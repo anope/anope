@@ -22,13 +22,13 @@ class CommandBSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(findbot(Config.s_BotServ), u, params[0].c_str());
+		mod_help_cmd(findbot(Config.s_BotServ), u, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		// Abuse syntax error to display general list help.
 		notice_help(Config.s_BotServ, u, BOT_HELP);
@@ -42,10 +42,11 @@ class CommandBSHelp : public Command
 class BSHelp : public Module
 {
  public:
-	BSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSHelp());
 	}
 };

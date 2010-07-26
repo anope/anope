@@ -47,7 +47,7 @@ void ThreadEngine::Start(Thread *thread)
 	if (pthread_create(&thread->Handle, &threadengine_attr, entry_point, thread))
 	{
 		delete thread;
-		throw CoreException("Unable to create thread: " + std::string(strerror(errno)));
+		throw CoreException(Anope::string("Unable to create thread: ") + strerror(errno));
 	}
 }
 

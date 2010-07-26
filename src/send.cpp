@@ -21,42 +21,7 @@
  * @param ... any number of parameters
  * @return void
  */
-void send_cmd(const char *source, const char *fmt, ...)
-{
-	va_list args;
-	static char buf[BUFSIZE];
-
-	va_start(args, fmt);
-
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-	if (!UplinkSock)
-	{
-		if (source)
-			Alog(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
-		else
-			Alog(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
-		return;
-	}
-
-	if (source)
-	{
-		UplinkSock->Write(":%s %s", source, buf);
-		Alog(LOG_DEBUG) << "Sent: :" << source << " " << buf;
-	}
-	else
-	{
-		UplinkSock->Write("%s", buf);
-		Alog(LOG_DEBUG) << "Sent: "<< buf;
-	}
-
-	va_end(args);
-}
-
-/*
- * Copypasta version that accepts std::string source.
- */
-void send_cmd(const std::string &source, const char *fmt, ...)
+void send_cmd(const Anope::string &source, const char *fmt, ...)
 {
 	va_list args;
 	static char buf[BUFSIZE];
@@ -70,7 +35,7 @@ void send_cmd(const std::string &source, const char *fmt, ...)
 		if (!source.empty())
 			Alog(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
 		else
-			Alog(LOG_DEBUG) << "Attemtped to send " << buf << "\" with UplinkSock NULL";
+			Alog(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
 		return;
 	}
 
@@ -82,7 +47,7 @@ void send_cmd(const std::string &source, const char *fmt, ...)
 	else
 	{
 		UplinkSock->Write("%s", buf);
-		Alog(LOG_DEBUG) << "Sent: " << buf;
+		Alog(LOG_DEBUG) << "Sent: "<< buf;
 	}
 
 	va_end(args);
@@ -98,7 +63,7 @@ void send_cmd(const std::string &source, const char *fmt, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_server(char *source, Server * s, const char *fmt, ...)
+void notice_server(const Anope::string &source, Server *s, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -119,32 +84,6 @@ void notice_server(char *source, Server * s, const char *fmt, ...)
 /*************************************************************************/
 
 /**
- * Send a NULL-terminated array of text as NOTICEs.
- * @param source Orgin of the Message
- * @param dest Destination of the Notice
- * @param text Array of text to send
- * @return void
- */
-void notice_list(char *source, char *dest, char **text)
-{
-	User *u = finduser(dest);
-	while (*text)
-	{
-		/* Have to kludge around an ircII bug here: if a notice includes
-		 * no text, it is ignored, so we replace blank lines by lines
-		 * with a single space.
-		 */
-		if (**text)
-			u->SendMessage(source, "%s", *text);
-		else
-			u->SendMessage(source, " ");
-		++text;
-	}
-}
-
-/*************************************************************************/
-
-/**
  * Send a message in the user's selected language to the user using NOTICE.
  * @param source Orgin of the Message
  * @param u User Struct
@@ -152,7 +91,7 @@ void notice_list(char *source, char *dest, char **text)
  * @param ... any number of parameters
  * @return void
  */
-void notice_lang(const std::string &source, User * dest, int message, ...)
+void notice_lang(const Anope::string &source, User *dest, int message, ...)
 {
 	va_list args;
 	char buf[4096]; /* because messages can be really big */
@@ -193,7 +132,7 @@ void notice_lang(const std::string &source, User * dest, int message, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_help(const char *source, User * dest, int message, ...)
+void notice_help(const Anope::string &source, User * dest, int message, ...)
 {
 	va_list args;
 	char buf[4096], buf2[4096], outbuf[BUFSIZE];
@@ -220,7 +159,7 @@ void notice_help(const char *source, User * dest, int message, ...)
 		if (*s)
 			*s++ = 0;
 		strscpy(outbuf, t, sizeof(outbuf));
-		strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
+		strnrepl(outbuf, sizeof(outbuf), "\1\1", source.c_str());
 
 		dest->SendMessage(source, "%s", *outbuf ? outbuf : " ");
 	}

@@ -20,7 +20,7 @@ class CommandHSOff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 
@@ -35,7 +35,7 @@ class CommandHSOff : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP_OFF);
 		return true;
@@ -50,7 +50,7 @@ class CommandHSOff : public Command
 class HSOff : public Module
 {
  public:
-	HSOff(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

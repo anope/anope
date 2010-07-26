@@ -20,32 +20,29 @@ class CommandNSLogout : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params.size() ? params[0].c_str() : NULL;
-		ci::string param = params.size() > 1 ? params[1] : "";
+		Anope::string nick = !params.empty() ? params[0] : "";
+		Anope::string param = params.size() > 1 ? params[1] : "";
 		User *u2;
-		NickAlias *na;
 
-		if (!u->Account()->IsServicesOper() && nick)
+		if (!u->Account()->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(u, "");
-		else if (!(u2 = (nick ? finduser(nick) : u)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-		else if (nick && u2->Account() && !u2->Account()->IsServicesOper())
-			notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
+		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
+			notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick.c_str());
 		else
 		{
-			na = findnick(u2->nick);
-
-			if (nick && !param.empty() && param == "REVALIDATE")
+			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
 				validate_user(u2);
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
 			Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
-			if (nick)
-				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
+			if (!nick.empty())
+				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
 			else
 				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
@@ -60,7 +57,7 @@ class CommandNSLogout : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
@@ -70,7 +67,7 @@ class CommandNSLogout : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}
@@ -84,7 +81,7 @@ class CommandNSLogout : public Command
 class NSLogout : public Module
 {
  public:
-	NSLogout(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

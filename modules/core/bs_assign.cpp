@@ -20,10 +20,10 @@ class CommandBSAssign : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
+		Anope::string chan = params[0];
+		Anope::string nick = params[1];
 		BotInfo *bi;
 		ChannelInfo *ci;
 
@@ -35,7 +35,7 @@ class CommandBSAssign : public Command
 
 		if (!(bi = findbot(nick)))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,9 +53,9 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->bi && ci::string(ci->bi->nick.c_str()) == nick)
+		if (ci->bi && nick.equals_ci(ci->bi->nick))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan);
+			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -64,13 +64,13 @@ class CommandBSAssign : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_ASSIGN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "ASSIGN", BOT_ASSIGN_SYNTAX);
 	}
@@ -84,10 +84,11 @@ class CommandBSAssign : public Command
 class BSAssign : public Module
 {
  public:
-	BSAssign(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSAssign);
 	}
 };

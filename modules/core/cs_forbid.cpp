@@ -21,21 +21,21 @@ class CommandCSForbid : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci;
-		const char *chan = params[0].c_str();
-		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string chan = params[0];
+		Anope::string reason = params.size() > 1 ? params[1] : "";
 
 		Channel *c;
 
-		if (Config.ForceForbidReason && !reason)
+		if (Config.ForceForbidReason && reason.empty())
 		{
 			syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
 			return MOD_CONT;
 		}
 
-		if (*chan != '#')
+		if (chan[0] != '#')
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 			return MOD_CONT;
@@ -54,14 +54,13 @@ class CommandCSForbid : public Command
 		if (!ci)
 		{
 			Alog() << Config.s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
-			notice_lang(Config.s_ChanServ, u, CHAN_FORBID_FAILED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_FORBID_FAILED, chan.c_str());
 			return MOD_CONT;
 		}
 
 		ci->SetFlag(CI_FORBIDDEN);
-		ci->forbidby = sstrdup(u->nick.c_str());
-		if (reason)
-			ci->forbidreason = sstrdup(reason);
+		ci->forbidby = u->nick;
+		ci->forbidreason = reason;
 
 		if ((c = findchan(ci->name)))
 		{
@@ -77,7 +76,7 @@ class CommandCSForbid : public Command
 				if (is_oper(uc->user))
 					continue;
 
-				c->Kick(ChanServ, uc->user, "%s", reason ? reason : getstring(uc->user->Account(), CHAN_FORBID_REASON));
+				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : getstring(uc->user->Account(), CHAN_FORBID_REASON));
 			}
 		}
 
@@ -91,20 +90,20 @@ class CommandCSForbid : public Command
 		}
 
 		Alog() << Config.s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;
-		notice_lang(Config.s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
+		notice_lang(Config.s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
 	}
@@ -118,10 +117,11 @@ class CommandCSForbid : public Command
 class CSForbid : public Module
 {
  public:
-	CSForbid(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSForbid());
 	}
 };

@@ -6,8 +6,8 @@ extern CoreExport Server *Me;
 
 extern CoreExport void CapabParse(int ac, const char **av);
 
-extern CoreExport void do_server(const std::string &source, const std::string &servername, unsigned int hops, const std::string &descript, const std::string &numeric);
-extern CoreExport void do_squit(const char *source, int ac, const char **av);
+extern CoreExport void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric);
+extern CoreExport void do_squit(const Anope::string &source, int ac, const char **av);
 
 extern CoreExport const char *ts6_uid_retrieve();
 extern CoreExport const char *ts6_sid_retrieve();
@@ -55,7 +55,7 @@ enum CapabType
 /* CAPAB stuffs */
 struct CapabInfo
 {
-	std::string Token;
+	Anope::string Token;
 	CapabType Flag;
 };
 
@@ -78,20 +78,20 @@ class CoreExport Server : public Flags<ServerFlag>
 {
  private:
 	/* Server name */
-	std::string Name;
+	Anope::string Name;
 	/* Hops between services and server */
 	unsigned int Hops;
 	/* Server description */
-	std::string Description;
+	Anope::string Description;
 	/* Server ID */
-	std::string SID;
+	Anope::string SID;
 	/* Links for this server */
-	std::list<Server *>* Links;
+	std::list<Server *> *Links;
 	/* Uplink for this server */
 	Server *UplinkServer;
 
 	/* Reason this server was quit */
-	std::string QReason;
+	Anope::string QReason;
 
  public:
 	/** Constructor
@@ -101,7 +101,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param description Server rdescription
 	 * @param sid Server sid/numeric
 	 */
-	Server(Server *uplink, const std::string &name, unsigned int hops, const std::string &description, const std::string &sid);
+	Server(Server *uplink, const Anope::string &name, unsigned int hops, const Anope::string &description, const Anope::string &sid);
 
 	/** Destructor
 	 */
@@ -110,12 +110,12 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Delete this server with a reason
 	 * @param reason The reason
 	 */
-	void Delete(const std::string &reason);
+	void Delete(const Anope::string &reason);
 
 	/** Get the name for this server
 	 * @return The name
 	 */
-	const std::string &GetName() const;
+	const Anope::string &GetName() const;
 
 	/** Get the number of hops this server is from services
 	 * @return Number of hops
@@ -125,17 +125,17 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Set the server description
 	 * @param desc The new description
 	 */
-	void SetDescription(const std::string &desc);
+	void SetDescription(const Anope::string &desc);
 
 	/** Get the server description
 	 * @return The server description
 	 */
-	const std::string &GetDescription() const;
+	const Anope::string &GetDescription() const;
 
 	/** Get the server numeric/SID
 	 * @return The numeric/SID
 	 */
-	const std::string &GetSID() const;
+	const Anope::string &GetSID() const;
 
 	/** Get the list of links this server has, or NULL if it has none
 	 * @return A list of servers
@@ -177,7 +177,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param s The server list to search for this server on, defaults to our Uplink
 	 * @return The server
 	 */
-	static Server *Find(const std::string &name, Server *s = NULL);
+	static Server *Find(const Anope::string &name, Server *s = NULL);
 };
 
 #endif // SERVERS_H

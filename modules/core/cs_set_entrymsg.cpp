@@ -16,38 +16,36 @@
 class CommandCSSetEntryMsg : public Command
 {
  public:
-	CommandCSSetEntryMsg(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetEntryMsg(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (ci->entry_message)
-			delete [] ci->entry_message;
 		if (params.size() > 1)
 		{
-			ci->entry_message = sstrdup(params[1].c_str());
-			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name.c_str(), ci->entry_message);
+			ci->entry_message = params[1];
+			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name.c_str(), ci->entry_message.c_str());
 		}
 		else
 		{
-			ci->entry_message = NULL;
+			ci->entry_message.clear();
 			notice_lang(Config.s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -62,17 +60,17 @@ class CommandCSSetEntryMsg : public Command
 class CommandCSSASetEntryMsg : public CommandCSSetEntryMsg
 {
  public:
-	CommandCSSASetEntryMsg(const ci::string &cname) : CommandCSSetEntryMsg(cname, "/chanserv/saset/entrymsg")
+	CommandCSSASetEntryMsg(const Anope::string &cname) : CommandCSSetEntryMsg(cname, "chanserv/saset/entrymsg")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
@@ -82,7 +80,7 @@ class CommandCSSASetEntryMsg : public CommandCSSetEntryMsg
 class CSSetEntryMsg : public Module
 {
  public:
-	CSSetEntryMsg(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetEntryMsg(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

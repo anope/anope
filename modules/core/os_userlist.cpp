@@ -20,19 +20,19 @@ class CommandOSUserList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
-		ci::string opt = params.size() > 1 ? params[1] : "";
+		Anope::string pattern = !params.empty() ? params[0] : "";
+		Anope::string opt = params.size() > 1 ? params[1] : "";
 		Channel *c;
 		std::list<UserModeName> Modes;
 
-		if (!opt.empty() && opt == "INVISIBLE")
+		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
 			Modes.push_back(UMODE_INVIS);
 
-		if (pattern && (c = findchan(pattern)))
+		if (!pattern.empty() && (c = findchan(pattern)))
 		{
-			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
+			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern.c_str());
 
 			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
@@ -54,11 +54,10 @@ class CommandOSUserList : public Command
 			{
 				User *u2 = uit->second;
 
-				if (pattern)
+				if (!pattern.empty())
 				{
-					char mask[BUFSIZE];
-					snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
-					if (!Anope::Match(mask, pattern, false))
+					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost();
+					if (!Anope::Match(mask, pattern))
 						continue;
 					if (!Modes.empty())
 						for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
@@ -73,7 +72,7 @@ class CommandOSUserList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_USERLIST);
 		return true;
@@ -88,7 +87,7 @@ class CommandOSUserList : public Command
 class OSUserList : public Module
 {
  public:
-	OSUserList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSUserList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -18,7 +18,7 @@ class SZLineDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	SZLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	SZLineDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -26,7 +26,7 @@ class SZLineDelCallback : public NumberList
 	{
 		if (!Deleted)
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
-		else if (Deleted == 0)
+		else if (Deleted == 1)
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_ONE);
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, Deleted);
@@ -55,7 +55,7 @@ class SZLineListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	SZLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	SZLineListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -90,7 +90,7 @@ class SZLineListCallback : public NumberList
 class SZLineViewCallback : public SZLineListCallback
 {
  public:
-	SZLineViewCallback(User *_u, const std::string &numlist) : SZLineListCallback(_u, numlist)
+	SZLineViewCallback(User *_u, const Anope::string &numlist) : SZLineListCallback(_u, numlist)
 	{
 	}
 
@@ -112,44 +112,41 @@ class SZLineViewCallback : public SZLineListCallback
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		char timebuf[32], expirebuf[256];
+		char timebuf[32];
 		struct tm tm;
 
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
+		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
+		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSSZLine : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
 	{
 		unsigned last_param = 2;
-		const char *expiry, *mask;
-		char reason[BUFSIZE];
+		Anope::string expiry, mask;
 		time_t expires;
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-		if (mask && *mask == '+')
+		mask = params.size() > 1 ? params[1] : "";
+		if (!mask.empty() && mask[0] == '+')
 		{
 			expiry = mask;
-			mask = params.size() > 2 ? params[2].c_str() : NULL;
+			mask = params.size() > 2 ? params[2] : "";
 			last_param = 3;
 		}
-		else
-			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : Config.SZLineExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config.SZLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
-		if (expiry && isdigit(expiry[strlen(expiry) - 1]))
+		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		/* Do not allow less than a minute expiry time */
-		if (expires != 0 && expires < 60)
+		if (expires && expires < 60)
 		{
 			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
@@ -162,26 +159,29 @@ class CommandOSSZLine : public Command
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
-		if (mask && *reason)
+
+		Anope::string reason = params[last_param];
+		if (last_param == 2 && params.size() > 3)
+			reason += " " + params[3];
+		if (!mask.empty() && !reason.empty())
 		{
 			XLine *x = SZLine->Add(OperServ, u, mask, expires, reason);
 
 			if (!x)
 				return MOD_CONT;
 
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_ADDED, mask);
+			notice_lang(Config.s_OperServ, u, OPER_SZLINE_ADDED, mask.c_str());
 
 			if (Config.WallOSSZLine)
 			{
-				char buf[128];
+				Anope::string buf;
 
 				if (!expires)
-					strcpy(buf, "does not expire");
+					buf = "does not expire";
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					const char *s = NULL;
+					Anope::string s;
 
 					if (wall_expiry >= 86400)
 					{
@@ -199,10 +199,10 @@ class CommandOSSZLine : public Command
 						s = "minute";
 					}
 
-					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
+					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(OperServ, "%s added an SZLINE for %s (%s)", u->nick.c_str(), mask, buf);
+				ircdproto->SendGlobops(OperServ, "%s added an SZLINE for %s (%s)", u->nick.c_str(), mask.c_str(), buf.c_str());
 			}
 
 			if (readonly)
@@ -215,7 +215,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SZLine->GetList().empty())
 		{
@@ -223,7 +223,7 @@ class CommandOSSZLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1].c_str() : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
@@ -231,9 +231,9 @@ class CommandOSSZLine : public Command
 			return MOD_CONT;
 		}
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineDelCallback list(u, mask.c_str());
+			SZLineDelCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -258,7 +258,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SZLine->GetList().empty())
 		{
@@ -266,11 +266,11 @@ class CommandOSSZLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineListCallback list(u, mask.c_str());
+			SZLineListCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -281,7 +281,7 @@ class CommandOSSZLine : public Command
 			{
 				XLine *x = SZLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -300,7 +300,7 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SZLine->GetList().empty())
 		{
@@ -308,11 +308,11 @@ class CommandOSSZLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineViewCallback list(u, mask.c_str());
+			SZLineViewCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -323,7 +323,7 @@ class CommandOSSZLine : public Command
 			{
 				XLine *x = SZLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -355,32 +355,32 @@ class CommandOSSZLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(u, params);
-		else if (cmd == "CLEAR")
+		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(u);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_SZLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
 	}
@@ -394,7 +394,7 @@ class CommandOSSZLine : public Command
 class OSSZLine : public Module
 {
  public:
-	OSSZLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSSZLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");

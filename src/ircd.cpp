@@ -18,25 +18,12 @@ IRCDProto *ircdproto;
  * Globals we want from the protocol file
  **/
 IRCDVar *ircd;
-char *version_protocol;
+Anope::string version_protocol;
 int UseTSMODE;
 
 void pmodule_ircd_proto(IRCDProto *proto)
 {
 	ircdproto = proto;
-}
-
-void anope_SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	if (fmt)
-	{
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	ircdproto->SendNumeric(source, numeric, dest, buf);
 }
 
 /**
@@ -47,9 +34,9 @@ void pmodule_ircd_var(IRCDVar *ircdvar)
 	ircd = ircdvar;
 }
 
-void pmodule_ircd_version(const char *version)
+void pmodule_ircd_version(const Anope::string &version)
 {
-	version_protocol = sstrdup(version);
+	version_protocol = version;
 }
 
 void pmodule_ircd_useTSMode(int use)

@@ -16,41 +16,39 @@
 class CommandNSSetMisc : public Command
 {
  private:
-	std::string Desc;
+	Anope::string Desc;
 
  protected:
-	CommandReturn RealExecute(User *u, const std::vector<ci::string> &params)
+	CommandReturn RealExecute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		nc->Shrink("nickserv:" + std::string(this->name.c_str()));
+		nc->Shrink("nickserv:" + this->name);
 		if (params.size() > 1)
 		{
-			nc->Extend("nickserv:" + std::string(this->name.c_str()), new ExtensibleItemRegular<ci::string>(params[1]));
-			notice_lang(Config.s_NickServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), nc->display, params[1].c_str());
+			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
+			notice_lang(Config.s_NickServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), params[1].c_str());
 		}
 		else
-		{
-			notice_lang(Config.s_NickServ, u, CHAN_SETTING_UNSET, this->name.c_str(), nc->display);
-		}
+			notice_lang(Config.s_NickServ, u, CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
 
 		return MOD_CONT;
 	}
 
  public:
-	CommandNSSetMisc(const ci::string &cname, const std::string &desc, const ci::string &cpermission = "") : Command(cname, 0, 1, cpermission), Desc(desc)
+	CommandNSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 0, 1, cpermission), Desc(desc)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		std::vector<ci::string> realparams = params;
+		std::vector<Anope::string> realparams = params;
 		realparams.insert(realparams.begin(), u->Account()->display);
 		return RealExecute(u, realparams);
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
@@ -64,18 +62,18 @@ class CommandNSSetMisc : public Command
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(const ci::string &cname, const std::string &desc) : CommandNSSetMisc(cname, desc, "nickserv/saset/" + cname)
+	CommandNSSASetMisc(const Anope::string &cname, const Anope::string &desc) : CommandNSSetMisc(cname, desc, "nickserv/saset/" + cname)
 	{
 		this->MinParams = 1;
 		this->MaxParams = 2;
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return RealExecute(u, params);
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
 	}
@@ -85,14 +83,14 @@ class NSSetMisc : public Module
 {
 	struct CommandInfo
 	{
-		std::string Name;
-		std::string Desc;
+		Anope::string Name;
+		Anope::string Desc;
 		bool ShowHidden;
 
-		CommandInfo(const std::string &name, const std::string &desc, bool showhidden) : Name(name), Desc(desc), ShowHidden(showhidden) { }
+		CommandInfo(const Anope::string &name, const Anope::string &desc, bool showhidden) : Name(name), Desc(desc), ShowHidden(showhidden) { }
 	};
 
-	std::map<std::string, CommandInfo *> Commands;
+	std::map<Anope::string, CommandInfo *> Commands;
 
 	void RemoveAll()
 	{
@@ -105,12 +103,12 @@ class NSSetMisc : public Module
 		if (!set && !saset)
 			return;
 
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
 			if (set)
-				set->DelSubcommand(it->first.c_str());
+				set->DelSubcommand(it->first);
 			if (saset)
-				saset->DelSubcommand(it->first.c_str());
+				saset->DelSubcommand(it->first);
 			delete it->second;
 		}
 
@@ -118,7 +116,7 @@ class NSSetMisc : public Module
 	}
 
  public:
-	NSSetMisc(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -145,12 +143,12 @@ class NSSetMisc : public Module
 
 		ConfigReader config;
 
-		for (int i = 0; true; ++i)
+		for (int i = 0, num = config.Enumerate("ns_set_misc"); i < num; ++i)
 		{
-			std::string cname = config.ReadValue("ns_set_misc", "name", "", i);
+			Anope::string cname = config.ReadValue("ns_set_misc", "name", "", i);
 			if (cname.empty())
-				break;
-			std::string desc = config.ReadValue("ns_set_misc", "desc", "", i);
+				continue;
+			Anope::string desc = config.ReadValue("ns_set_misc", "desc", "", i);
 			bool showhidden = config.ReadFlag("ns_set_misc", "operonly", "no", i);
 
 			CommandInfo *info = new CommandInfo(cname, desc, showhidden);
@@ -162,49 +160,40 @@ class NSSetMisc : public Module
 			}
 
 			if (set)
-				set->AddSubcommand(new CommandNSSetMisc(cname.c_str(), desc));
+				set->AddSubcommand(new CommandNSSetMisc(cname, desc));
 			if (saset)
-				saset->AddSubcommand(new CommandNSSASetMisc(cname.c_str(), desc));
+				saset->AddSubcommand(new CommandNSSASetMisc(cname, desc));
 		}
 	}
 
 	void OnNickInfo(User *u, NickAlias *na, bool ShowHidden)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
 			if (!ShowHidden && it->second->ShowHidden)
 				continue;
 
-			ci::string value;
+			Anope::string value;
 			if (na->nc->GetExtRegular("nickserv:" + it->first, value))
-			{
 				u->SendMessage(Config.s_NickServ, "      %s: %s", it->first.c_str(), value.c_str());
-			}
 		}
 	}
 
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickCore *nc)
+	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
-			ci::string value;
-
+			Anope::string value;
 			if (nc->GetExtRegular("nickserv:" + it->first, value))
-			{
-				WriteMetadata(it->first, ":" + std::string(value.c_str()));
-			}
+				WriteMetadata(it->first, ":" + value);
 		}
 	}
 
-	EventReturn OnDatabaseReadMetadata(NickCore *nc, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-		{
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 			if (key == it->first)
-			{
-				nc->Extend("nickserv:" + it->first, new ExtensibleItemRegular<ci::string>(params[0].c_str()));
-			}
-		}
+				nc->Extend("nickserv:" + it->first, new ExtensibleItemRegular<Anope::string>(params[0]));
 
 		return EVENT_CONTINUE;
 	}

@@ -26,15 +26,14 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const std::string &snick, const std::string &suid)
+User::User(const Anope::string &snick, const Anope::string &suid)
 {
 	if (snick.empty())
-		throw "what the craq, empty nick passed to constructor";
+		throw CoreException("what the craq, empty nick passed to constructor");
 
 	// XXX: we should also duplicate-check here.
 
 	/* we used to do this by calloc, no more. */
-	host = hostip = vhost = realname = NULL;
 	server = NULL;
 	nc = NULL;
 	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
@@ -43,7 +42,7 @@ User::User(const std::string &snick, const std::string &suid)
 	this->nick = snick;
 	this->uid = suid;
 
-	UserListByNick[snick.c_str()] = this;
+	UserListByNick[snick] = this;
 	if (!suid.empty())
 		UserListByUID[suid] = this;
 
@@ -62,19 +61,19 @@ User::User(const std::string &snick, const std::string &suid)
 	this->isSuperAdmin = 0;	 /* always set SuperAdmin to 0 for new users */
 }
 
-void User::SetNewNick(const std::string &newnick)
+void User::SetNewNick(const Anope::string &newnick)
 {
 	/* Sanity check to make sure we don't segfault */
 	if (newnick.empty())
-		throw "User::SetNewNick() got a bad argument";
+		throw CoreException("User::SetNewNick() got a bad argument");
 
 	Alog(LOG_DEBUG) << this->nick << " changed nick to " << newnick;
 
-	UserListByNick.erase(this->nick.c_str());
+	UserListByNick.erase(this->nick);
 
 	this->nick = newnick;
 
-	UserListByNick[this->nick.c_str()] = this;
+	UserListByNick[this->nick] = this;
 
 	OnAccess = false;
 	NickAlias *na = findnick(this->nick);
@@ -82,14 +81,12 @@ void User::SetNewNick(const std::string &newnick)
 		OnAccess = is_on_access(this, na->nc);
 }
 
-void User::SetDisplayedHost(const std::string &shost)
+void User::SetDisplayedHost(const Anope::string &shost)
 {
 	if (shost.empty())
-		throw "empty host? in MY services? it seems it's more likely than I thought.";
+		throw CoreException("empty host? in MY services? it seems it's more likely than I thought.");
 
-	if (this->vhost)
-		delete [] this->vhost;
-	this->vhost = sstrdup(shost.c_str());
+	this->vhost = shost;
 
 	Alog(LOG_DEBUG) << this->nick << " changed vhost to " << shost;
 
@@ -99,9 +96,9 @@ void User::SetDisplayedHost(const std::string &shost)
 /** Get the displayed vhost of a user record.
  * @return The displayed vhost of the user, where ircd-supported, or the user's real host.
  */
-const std::string User::GetDisplayedHost() const
+const Anope::string User::GetDisplayedHost() const
 {
-	if (ircd->vhost && this->vhost)
+	if (ircd->vhost && !this->vhost.empty())
 		return this->vhost;
 	else if (this->HasMode(UMODE_CLOAK) && !this->GetCloakedHost().empty())
 		return this->GetCloakedHost();
@@ -112,7 +109,7 @@ const std::string User::GetDisplayedHost() const
 /** Update the cloaked host of a user
  * @param host The cloaked host
  */
-void User::SetCloakedHost(const std::string &newhost)
+void User::SetCloakedHost(const Anope::string &newhost)
 {
 	if (newhost.empty())
 		throw "empty host in User::SetCloakedHost";
@@ -127,17 +124,17 @@ void User::SetCloakedHost(const std::string &newhost)
 /** Get the cloaked host of a user
  * @return The cloaked host
  */
-const std::string &User::GetCloakedHost() const
+const Anope::string &User::GetCloakedHost() const
 {
 	return chost;
 }
 
-const std::string &User::GetUID() const
+const Anope::string &User::GetUID() const
 {
 	return this->uid;
 }
 
-void User::SetVIdent(const std::string &sident)
+void User::SetVIdent(const Anope::string &sident)
 {
 	this->vident = sident;
 
@@ -146,7 +143,7 @@ void User::SetVIdent(const std::string &sident)
 	this->UpdateHost();
 }
 
-const std::string &User::GetVIdent() const
+const Anope::string &User::GetVIdent() const
 {
 	if (this->HasMode(UMODE_CLOAK))
 		return this->vident;
@@ -156,7 +153,7 @@ const std::string &User::GetVIdent() const
 		return this->ident;
 }
 
-void User::SetIdent(const std::string &sident)
+void User::SetIdent(const Anope::string &sident)
 {
 	this->ident = sident;
 
@@ -165,34 +162,28 @@ void User::SetIdent(const std::string &sident)
 	this->UpdateHost();
 }
 
-const std::string &User::GetIdent() const
+const Anope::string &User::GetIdent() const
 {
 	return this->ident;
 }
 
-const std::string User::GetMask()
+const Anope::string User::GetMask()
 {
 	std::stringstream buf;
 	buf << this->nick << "!" << this->ident << "@" << this->host;
 	return buf.str();
 }
 
-void User::SetRealname(const std::string &srealname)
+void User::SetRealname(const Anope::string &srealname)
 {
 	if (srealname.empty())
-		throw "realname empty in SetRealname";
+		throw CoreException("realname empty in SetRealname");
 
-	if (this->realname)
-		delete [] this->realname;
-	this->realname = sstrdup(srealname.c_str());
+	this->realname = srealname;
 	NickAlias *na = findnick(this->nick);
 
 	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
-	{
-		if (na->last_realname)
-			delete [] na->last_realname;
-		na->last_realname = sstrdup(srealname.c_str());
-	}
+		na->last_realname = srealname;
 
 	Alog(LOG_DEBUG) << this->nick << " changed realname to " << srealname;
 }
@@ -205,11 +196,9 @@ User::~User()
 
 	if (Config.LogUsers)
 	{
-		const char *srealname = normalizeBuffer(this->realname);
+		Anope::string srealname = normalizeBuffer(this->realname);
 
 		Alog() << "LOGUSERS: " << this->GetMask() << (ircd->vhost ? " => " : " ") << (ircd->vhost ? this->GetDisplayedHost() : "") << " (" << srealname << ") left the network (" << this->server->GetName() << ").";
-
-		delete [] srealname;
 	}
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
@@ -221,11 +210,11 @@ User::~User()
 
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
-	
+
 	if (Config.LimitSessions && !this->server->IsULined())
 		del_session(this->host);
 
-	UserListByNick.erase(this->nick.c_str());
+	UserListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
 
@@ -233,20 +222,10 @@ User::~User()
 	if (na)
 		na->OnCancel(this);
 
-	delete [] this->host;
-
-	if (this->vhost)
-		delete [] this->vhost;
-
-	if (this->realname)
-		delete [] this->realname;
-	if (this->hostip)
-		delete [] this->hostip;
-
 	Alog(LOG_DEBUG_2) << "User::~User() done";
 }
 
-void User::SendMessage(const std::string &source, const char *fmt, ...)
+void User::SendMessage(const Anope::string &source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -256,13 +235,13 @@ void User::SendMessage(const std::string &source, const char *fmt, ...)
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-		this->SendMessage(source, std::string(buf));
+		this->SendMessage(source, Anope::string(buf));
 
 		va_end(args);
 	}
 }
 
-void User::SendMessage(const std::string &source, const std::string &msg)
+void User::SendMessage(const Anope::string &source, const Anope::string &msg)
 {
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
@@ -270,9 +249,9 @@ void User::SendMessage(const std::string &source, const std::string &msg)
 	* - The user is registered and has set /ns set msg on
 	*/
 	if (Config.UsePrivmsg && ((!this->nc && Config.NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-		ircdproto->SendPrivmsg(findbot(source), this->nick.c_str(), "%s", msg.c_str());
+		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	else
-		ircdproto->SendNotice(findbot(source), this->nick.c_str(), "%s", msg.c_str());
+		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
 }
 
 /** Collides a nick.
@@ -338,17 +317,15 @@ void User::Collide(NickAlias *na)
 
 	if (ircd->svsnick)
 	{
-		std::string guestnick;
+		Anope::string guestnick;
 
 		do
 		{
-			char randbuf[17];
-			snprintf(randbuf, sizeof(randbuf), "%d", getrandom16());
-			guestnick = std::string(Config.NSGuestNickPrefix) + std::string(randbuf);
+			guestnick = Config.NSGuestNickPrefix + stringify(getrandom16());
 		} while (finduser(guestnick));
 
 		notice_lang(Config.s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
-		ircdproto->SendForceNickChange(this, guestnick.c_str(), time(NULL));
+		ircdproto->SendForceNickChange(this, guestnick, time(NULL));
 	}
 	else
 		kill_user(Config.s_NickServ, this->nick, "Services nickname-enforcer kill");
@@ -358,7 +335,7 @@ void User::Collide(NickAlias *na)
  * their svid matches the one stored in their nickcore
  * @param svid Services id
  */
-void User::CheckAuthenticationToken(const char *svid)
+void User::CheckAuthenticationToken(const Anope::string &svid)
 {
 	NickAlias *na;
 
@@ -367,12 +344,9 @@ void User::CheckAuthenticationToken(const char *svid)
 		char *c;
 		if (na->nc && na->nc->GetExtArray("authenticationtoken", c))
 		{
-			if (svid && c && !strcmp(svid, c))
-			{
+			if (!svid.empty() && c && svid.equals_cs(c))
 				/* Users authentication token matches so they should become identified */
 				this->Login(na->nc);
-				return;
-			}
 		}
 	}
 
@@ -382,9 +356,9 @@ void User::CheckAuthenticationToken(const char *svid)
 /** Auto identify the user to the given accountname.
  * @param account Display nick of account
  */
-void User::AutoID(const std::string &account)
+void User::AutoID(const Anope::string &account)
 {
-	NickCore *core = findcore(account.c_str());
+	NickCore *core = findcore(account);
 
 	if (core)
 	{
@@ -393,9 +367,7 @@ void User::AutoID(const std::string &account)
 		NickAlias *na = findnick(this->nick);
 		if (na && na->nc == core)
 		{
-			if (na->last_realname)
-				delete [] na->last_realname;
-			na->last_realname = sstrdup(this->realname);
+			na->last_realname = this->realname;
 			na->last_seen = time(NULL);
 			this->SetMode(NickServ, UMODE_REGISTERED);
 			this->UpdateHost();
@@ -433,7 +405,7 @@ void User::Logout()
 /** Get the account the user is logged in using
  * @reurn The account or NULL
  */
-NickCore *User::Account() const
+NickCore *User::Account()
 {
 	return nc;
 }
@@ -442,7 +414,7 @@ NickCore *User::Account() const
  * @param CheckNick True to check if the user is identified to the nickname they are on too
  * @return true or false
  */
-const bool User::IsIdentified(bool CheckNick) const
+bool User::IsIdentified(bool CheckNick) const
 {
 	if (CheckNick && this->nc)
 	{
@@ -461,7 +433,7 @@ const bool User::IsIdentified(bool CheckNick) const
  * @param CheckSecure Only returns true if the user has secure off
  * @return true or false
  */
-const bool User::IsRecognized(bool CheckSecure) const
+bool User::IsRecognized(bool CheckSecure) const
 {
 	if (CheckSecure && OnAccess)
 	{
@@ -478,7 +450,7 @@ const bool User::IsRecognized(bool CheckSecure) const
  */
 void User::UpdateHost()
 {
-	if (!this->host)
+	if (this->host.empty())
 		return;
 
 	NickAlias *na = findnick(this->nick);
@@ -488,11 +460,8 @@ void User::UpdateHost()
 
 	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
 	{
-		if (na->last_usermask)
-			delete [] na->last_usermask;
-
-		std::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
-		na->last_usermask = sstrdup(last_usermask.c_str());
+		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_usermask = last_usermask;
 	}
 }
 
@@ -500,7 +469,7 @@ void User::UpdateHost()
  * @param Name Mode name
  * @return true or false
  */
-const bool User::HasMode(UserModeName Name) const
+bool User::HasMode(UserModeName Name) const
 {
 	return modes.HasFlag(Name);
 }
@@ -509,7 +478,7 @@ const bool User::HasMode(UserModeName Name) const
  * @param um The user mode
  * @param Param The param, if there is one
  */
-void User::SetModeInternal(UserMode *um, const std::string &Param)
+void User::SetModeInternal(UserMode *um, const Anope::string &Param)
 {
 	if (!um)
 		return;
@@ -530,7 +499,7 @@ void User::RemoveModeInternal(UserMode *um)
 		return;
 
 	modes.UnsetFlag(um->Name);
-	std::map<UserModeName, std::string>::iterator it = Params.find(um->Name);
+	std::map<UserModeName, Anope::string>::iterator it = Params.find(um->Name);
 	if (it != Params.end())
 		Params.erase(it);
 
@@ -542,7 +511,7 @@ void User::RemoveModeInternal(UserMode *um)
  * @param um The user mode
  * @param Param Optional param for the mode
  */
-void User::SetMode(BotInfo *bi, UserMode *um, const std::string &Param)
+void User::SetMode(BotInfo *bi, UserMode *um, const Anope::string &Param)
 {
 	if (!um || HasMode(um->Name))
 		return;
@@ -556,7 +525,7 @@ void User::SetMode(BotInfo *bi, UserMode *um, const std::string &Param)
  * @param Name The mode name
  * @param param Optional param for the mode
  */
-void User::SetMode(BotInfo *bi, UserModeName Name, const std::string &Param)
+void User::SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param)
 {
 	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
 }
@@ -566,7 +535,7 @@ void User::SetMode(BotInfo *bi, UserModeName Name, const std::string &Param)
  * @param ModeChar The mode char
  * @param param Optional param for the mode
  */
-void User::SetMode(BotInfo *bi, char ModeChar, const std::string &Param)
+void User::SetMode(BotInfo *bi, char ModeChar, const Anope::string &Param)
 {
 	SetMode(bi, ModeManager::FindUserModeByChar(ModeChar), Param);
 }
@@ -610,7 +579,7 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 {
 	char buf[BUFSIZE] = "";
 	va_list args;
-	std::string modebuf, sbuf;
+	Anope::string modebuf, sbuf;
 	int add = -1;
 	va_start(args, umodes);
 	vsnprintf(buf, BUFSIZE - 1, umodes, args);
@@ -618,7 +587,7 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 
 	spacesepstream sep(buf);
 	sep.GetToken(modebuf);
-	for (unsigned i = 0, end = modebuf.size(); i < end; ++i)
+	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
 	{
 		UserMode *um;
 
@@ -687,15 +656,15 @@ void get_user_stats(long *nusers, long *memuse)
 
 		count++;
 		mem += sizeof(*user);
-		if (user->host)
-			mem += strlen(user->host) + 1;
+		if (!user->host.empty())
+			mem += user->host.length() + 1;
 		if (ircd->vhost)
 		{
-			if (user->vhost)
-				mem += strlen(user->vhost) + 1;
+			if (!user->vhost.empty())
+				mem += user->vhost.length() + 1;
 		}
-		if (user->realname)
-			mem += strlen(user->realname) + 1;
+		if (!user->realname.empty())
+			mem += user->realname.length() + 1;
 		mem += user->server->GetName().length() + 1;
 		mem += (sizeof(ChannelContainer) * user->chans.size());
 	}
@@ -703,21 +672,11 @@ void get_user_stats(long *nusers, long *memuse)
 	*memuse = mem;
 }
 
-User *finduser(const char *nick)
-{
-	return finduser(ci::string(nick));
-}
-
-User *finduser(const std::string &nick)
-{
-	return finduser(ci::string(nick.c_str()));
-}
-
-User *finduser(const ci::string &nick)
+User *finduser(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircd->ts6)
 	{
-		user_uid_map::const_iterator it = UserListByUID.find(nick.c_str());
+		user_uid_map::const_iterator it = UserListByUID.find(nick);
 
 		if (it != UserListByUID.end())
 			return it->second;
@@ -735,22 +694,23 @@ User *finduser(const ci::string &nick)
 
 /* Handle a server NICK command. */
 
-User *do_nick(const char *source, const char *nick, const char *username, const char *host, const char *server, const char *realname, time_t ts, uint32 ip, const char *vhost, const char *uid)
+User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, uint32 ip, const Anope::string &vhost, const Anope::string &uid)
 {
 	User *user = NULL;
+	Anope::string vhost2 = vhost;
 
-	if (!*source)
+	if (source.empty())
 	{
 		char ipbuf[16];
 		struct in_addr addr;
 
 		if (ircd->nickvhost)
 		{
-			if (vhost)
+			if (!vhost2.empty())
 			{
-				if (!strcmp(vhost, "*"))
+				if (vhost2.equals_cs("*"))
 				{
-					vhost = NULL;
+					vhost2.clear();
 					Alog(LOG_DEBUG) << "new user with no vhost in NICK command: " << nick;
 				}
 			}
@@ -772,42 +732,39 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			/**
 			 * Ugly swap routine for Flop's bug :)   XXX
 			 **/
-			if (realname)
+			Anope::string logrealname = realname;
+			if (!logrealname.empty())
 			{
-				char *tmp = const_cast<char *>(strchr(realname, '%'));
-				while (tmp)
-				{
-					*tmp = '-';
-					tmp = const_cast<char *>(strchr(realname, '%'));
-				}
+				size_t tmp;
+				while ((tmp = logrealname.find('%')) != Anope::string::npos)
+					logrealname[tmp] = '-';
 			}
-			const char *logrealname = normalizeBuffer(realname);
+			logrealname = normalizeBuffer(logrealname);
 
 			/**
 			 * End of ugly swap
 			 **/
-			Alog() << "LOGUSERS: " << nick << " (" << username << "@" << host << (ircd->nickvhost && vhost ? " => " : "") << (ircd->nickvhost && vhost ? vhost : "") << ") (" << logrealname << ") "
+			Alog() << "LOGUSERS: " << nick << " (" << username << "@" << host << (ircd->nickvhost && !vhost2.empty() ? " => " : "") << (ircd->nickvhost && !vhost2.empty() ? vhost2 : "") << ") (" << logrealname << ") "
 				<< (ircd->nickip ? "[" : "") << (ircd->nickip ? ipbuf : "") << (ircd->nickip ? "]" : "") << " connected to the network (" << serv->GetName() << ").";
-			delete [] logrealname;
 		}
 
 		/* Allocate User structure and fill it in. */
-		user = new User(nick, uid ? uid : "");
+		user = new User(nick, !uid.empty() ? uid : "");
 		user->SetIdent(username);
-		user->host = sstrdup(host);
+		user->host = host;
 		user->server = serv;
-		user->realname = sstrdup(realname);
+		user->realname = realname;
 		user->timestamp = ts;
 		user->my_signon = time(NULL);
-		if (vhost)
-			user->SetCloakedHost(vhost);
+		if (!vhost2.empty())
+			user->SetCloakedHost(vhost2);
 		user->SetVIdent(username);
 		/* We now store the user's ip in the user_ struct,
 		 * because we will use it in serveral places -- DrStein */
 		if (ircd->nickip)
-			user->hostip = sstrdup(ipbuf);
+			user->hostip = ipbuf;
 		else
-			user->hostip = NULL;
+			user->hostip = "";
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
@@ -840,16 +797,14 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
 		if (Config.LogUsers)
 		{
-			const char *logrealname = normalizeBuffer(user->realname);
-			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") ("
-				<< logrealname << ") " << "changed nick to " << nick << " (" << user->server->GetName() << ").";
-			if (logrealname)
-				delete [] logrealname;
+			Anope::string logrealname = normalizeBuffer(user->realname);
+			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" << logrealname << ") changed nick to "
+				<< nick << " (" << user->server->GetName() << ").";
 		}
 
 		user->timestamp = ts;
 
-		if (!stricmp(nick, user->nick.c_str()))
+		if (user->nick.equals_ci(nick))
 			/* No need to redo things */
 			user->SetNewNick(nick);
 		else
@@ -861,7 +816,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
 				old_na->last_seen = time(NULL);
 
-			std::string oldnick = user->nick;
+			Anope::string oldnick = user->nick;
 			user->SetNewNick(nick);
 			FOREACH_MOD(I_OnUserNickChange, OnUserNickChange(user, oldnick));
 
@@ -903,7 +858,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
  *	av[1] = modes
  */
 
-void do_umode(const char *source, int ac, const char **av)
+void do_umode(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
 
@@ -923,7 +878,7 @@ void do_umode(const char *source, int ac, const char **av)
  *	av[0] = reason
  */
 
-void do_quit(const char *source, int ac, const char **av)
+void do_quit(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
 	NickAlias *na;
@@ -938,9 +893,7 @@ void do_quit(const char *source, int ac, const char **av)
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = time(NULL);
-		if (na->last_quit)
-			delete [] na->last_quit;
-		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
+		na->last_quit = *av[0] ? av[0] : "";
 	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
 	delete user;
@@ -953,7 +906,7 @@ void do_quit(const char *source, int ac, const char **av)
  *	av[1] = reason
  */
 
-void do_kill(const std::string &nick, const std::string &msg)
+void do_kill(const Anope::string &nick, const Anope::string &msg)
 {
 	User *user;
 	NickAlias *na;
@@ -968,9 +921,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = time(NULL);
-		if (na->last_quit)
-			delete [] na->last_quit;
-		na->last_quit = !msg.empty() ? sstrdup(msg.c_str()) : NULL;
+		na->last_quit = msg;
 	}
 	delete user;
 }
@@ -980,7 +931,7 @@ void do_kill(const std::string &nick, const std::string &msg)
 
 /* Is the given nick an oper? */
 
-int is_oper(User * user)
+int is_oper(User *user)
 {
 	if (user && user->HasMode(UMODE_OPER))
 		return 1;
@@ -992,7 +943,7 @@ int is_oper(User * user)
 /*************************************************************************/
 
 /* Is the given user ban-excepted? */
-int is_excepted(ChannelInfo * ci, User * user)
+int is_excepted(ChannelInfo *ci, User *user)
 {
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return 0;
@@ -1006,7 +957,7 @@ int is_excepted(ChannelInfo * ci, User * user)
 /*************************************************************************/
 
 /* Is the given MASK ban-excepted? */
-int is_excepted_mask(ChannelInfo * ci, const char *mask)
+int is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
 {
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return 0;
@@ -1023,40 +974,34 @@ int is_excepted_mask(ChannelInfo * ci, const char *mask)
  * just user@host)?
  */
 
-int match_usermask(const char *mask, User * user)
+int match_usermask(const Anope::string &mask, User *user)
 {
-	char *mask2;
-	char *nick, *username, *host;
 	int result;
 
-	if (!mask || !*mask)
+	if (mask.empty())
 		return 0;
 
-	mask2 = sstrdup(mask);
-
-	if (strchr(mask2, '!'))
+	Anope::string mask2 = mask, nick, username, host;
+	size_t ex = mask2.find('!');
+	if (ex != Anope::string::npos)
 	{
-		nick = strtok(mask2, "!");
-		username = strtok(NULL, "@");
+		nick = mask2.substr(0, ex);
+		mask2 = mask2.substr(ex + 1);
 	}
-	else
+	size_t at = mask2.find('@');
+	if (at != Anope::string::npos)
 	{
-		nick = NULL;
-		username = strtok(mask2, "@");
+		username = mask2.substr(0, at);
+		host = mask2.substr(at + 1);
 	}
-	host = strtok(NULL, "");
-	if (!username || !host)
-	{
-		delete [] mask2;
+	if (username.empty() || host.empty())
 		return 0;
-	}
 
-	if (nick)
-		result = Anope::Match(user->nick, nick, false) && Anope::Match(user->GetIdent().c_str(), username, false) && (Anope::Match(user->host, host, false) || Anope::Match(user->GetDisplayedHost().c_str(), host, false));
+	if (!nick.empty())
+		result = Anope::Match(user->nick, nick) && Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
 	else
-		result = Anope::Match(user->GetIdent().c_str(), username, false) && (Anope::Match(user->host, host, false) || Anope::Match(user->GetDisplayedHost().c_str(), host, false));
+		result = Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
 
-	delete [] mask2;
 	return result;
 }
 
@@ -1067,49 +1012,37 @@ int match_usermask(const char *mask, User * user)
  * appropriate subnet mask (e.g. 35.1.1.1 -> 35.*; 128.2.1.1 -> 128.2.*);
  * for named addresses, wildcards the leftmost part of the name unless the
  * name only contains two parts.  If the username begins with a ~, delete
- * it.  The returned character string is malloc'd and should be free'd
- * when done with.
+ * it.
  */
 
-char *create_mask(User *u)
+Anope::string create_mask(User *u)
 {
-	char *mask, *s, *end;
-	std::string mident = u->GetIdent();
-	std::string mhost = u->GetDisplayedHost();
-	int ulen = mident.length();
+	Anope::string mask;
+	Anope::string mident = u->GetIdent();
+	Anope::string mhost = u->GetDisplayedHost();
 
 	/* Get us a buffer the size of the username plus hostname.  The result
 	 * will never be longer than this (and will often be shorter), thus we
 	 * can use strcpy() and sprintf() safely.
 	 */
-	end = mask = new char[ulen + mhost.length() + 3];
 	if (mident[0] == '~')
-		end += sprintf(end, "*%s@", mident.c_str());
+		mask = "*" + mident + "@";
 	else
-		end += sprintf(end, "%s@", mident.c_str());
+		mask = mident + "@";
 
-	// XXX: someone needs to rewrite this godawful kitten murdering pile of crap.
-	if (strspn(mhost.c_str(), "0123456789.") == mhost.length()
-		&& (s = strchr(const_cast<char *>(mhost.c_str()), '.')) // XXX - Potentially unsafe cast
-		&& (s = strchr(s + 1, '.')) && (s = strchr(s + 1, '.')) && (!strchr(s + 1, '.')))
+	size_t dot;
+	/* To make sure this is an IP, make sure the host contains only numbers and dots, and check to make sure it only contains 3 dots */
+	if (mhost.find_first_not_of("0123456789.") == Anope::string::npos && (dot = mhost.find('.')) != Anope::string::npos && (dot = mhost.find('.', dot + 1)) != Anope::string::npos && (dot = mhost.find('.', dot + 1)) != Anope::string::npos && mhost.find('.', dot + 1) == Anope::string::npos)
 	{ /* IP addr */
-		s = sstrdup(mhost.c_str());
-		*strrchr(s, '.') = 0;
-
-		sprintf(end, "%s.*", s);
-		delete [] s;
+		dot = mhost.find('.');
+		mask += mhost.substr(0, dot) + ".*";
 	}
 	else
 	{
-		if ((s = strchr(const_cast<char *>(mhost.c_str()), '.')) && strchr(s + 1, '.'))
-		{
-			s = sstrdup(strchr(mhost.c_str(), '.') - 1);
-			*s = '*';
-			strcpy(end, s);
-			delete [] s;
-		}
+		if ((dot = mhost.find('.')) != Anope::string::npos && mhost.find('.', dot + 1) != Anope::string::npos)
+			mask += "*" + mhost.substr(dot);
 		else
-			strcpy(end, mhost.c_str());
+			mask += mhost;
 	}
 	return mask;
 }
@@ -1183,11 +1116,8 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:
-				if (!add && user->vhost)
-				{
-					delete [] user->vhost;
-					user->vhost = NULL;
-				}
+				if (!add && !user->vhost.empty())
+					user->vhost.clear();
 				user->UpdateHost();
 			default:
 				break;

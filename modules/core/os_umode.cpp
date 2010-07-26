@@ -20,10 +20,10 @@ class CommandOSUMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *modes = params[1].c_str();
+		Anope::string nick = params[0];
+		Anope::string modes = params[1];
 
 		User *u2;
 
@@ -37,27 +37,27 @@ class CommandOSUMode : public Command
 			return MOD_CONT;
 		}
 		if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else
 		{
-			u2->SetModes(OperServ, modes);
+			u2->SetModes(OperServ, "%s", modes.c_str());
 
-			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick);
+			notice_lang(Config.s_OperServ, u, OPER_UMODE_SUCCESS, nick.c_str());
 			notice_lang(Config.s_OperServ, u2, OPER_UMODE_CHANGED, u->nick.c_str());
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 used UMODE on %s", u->nick.c_str(), nick);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used UMODE on %s", u->nick.c_str(), nick.c_str());
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_UMODE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
 	}
@@ -71,7 +71,7 @@ class CommandOSUMode : public Command
 class OSUMode : public Module
 {
  public:
-	OSUMode(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSUMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!ircd->umode)
 			throw ModuleException("Your IRCd does not support setting umodes");

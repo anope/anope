@@ -9,31 +9,9 @@
  * Based on the original code of Services by Andy Church.
  */
 
-/*
-   This is borrowed from Unreal
-*/
-
 #include "services.h"
 
-static char *int_to_base64(long);
-static long base64_to_int(const char *);
-
-const char *base64enc(long i)
-{
-	if (i < 0)
-		return "0";
-	return int_to_base64(i);
-}
-
-long base64dec(const char *b64)
-{
-	if (b64)
-		return base64_to_int(b64);
-	else
-		return 0;
-}
-
-static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const Anope::string Base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
 /* (From RFC1521 and draft-ietf-dnssec-secext-03.txt)
@@ -99,315 +77,101 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-int b64_encode(const char *src, size_t srclength, char *target, size_t targsize)
+void b64_encode(const Anope::string &src, Anope::string &target)
 {
-	size_t datalength = 0;
+	size_t src_pos = 0, src_len = src.length();
 	unsigned char input[3];
-	unsigned char output[4];
-	size_t i;
 
-	while (srclength > 2)
+	target.clear();
+
+	while (src_len - src_pos > 2)
 	{
-		input[0] = *src++;
-		input[1] = *src++;
-		input[2] = *src++;
-		srclength -= 3;
+		input[0] = src[src_pos++];
+		input[1] = src[src_pos++];
+		input[2] = src[src_pos++];
 
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-		output[3] = input[2] & 0x3f;
-
-		if (datalength + 4 > targsize)
-			return -1;
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		target[datalength++] = Base64[output[2]];
-		target[datalength++] = Base64[output[3]];
+		target += Base64[input[0] >> 2];
+		target += Base64[((input[0] & 0x03) << 4) + (input[1] >> 4)];
+		target += Base64[((input[1] & 0x0f) << 2) + (input[2] >> 6)];
+		target += Base64[input[2] & 0x3f];
 	}
 
-	/* Now we worry about padding. */
-	if (srclength)
+	/* Now we worry about padding */
+	if (src_pos != src_len)
 	{
-		/* Get what's left. */
-		input[0] = input[1] = input[2] = '\0';
-		for (i = 0; i < srclength; ++i)
-			input[i] = *src++;
+		input[0] = input[1] = input[2] = 0;
+		for (size_t i = 0; i < src_len - src_pos; ++i)
+			input[i] = src[src_pos + i];
 
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-
-		if (datalength + 4 > targsize)
-			return -1;
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		if (srclength == 1)
-			target[datalength++] = Pad64;
+		target += Base64[input[0] >> 2];
+		target += Base64[((input[0] & 0x03) << 4) + (input[1] >> 4)];
+		if (src_pos == src_len - 1)
+			target += Pad64;
 		else
-			target[datalength++] = Base64[output[2]];
-		target[datalength++] = Pad64;
+			target += Base64[((input[1] & 0x0f) << 2) + (input[2] >> 6)];
+		target += Pad64;
 	}
-	if (datalength >= targsize)
-		return -1;
-	target[datalength] = '\0'; /* Returned value doesn't count \0. */
-	return datalength;
 }
 
 /* skips all whitespace anywhere.
    converts characters, four at a time, starting at (or after)
    src from base - 64 numbers into three 8 bit bytes in the target area.
-   it returns the number of data bytes stored at the target, or -1 on error.
  */
 
-int b64_decode(const char *src, char *target, size_t targsize)
+void b64_decode(const Anope::string &src, Anope::string &target)
 {
-	int tarindex, state, ch;
-	char *pos;
+	target.clear();
 
-	state = 0;
-	tarindex = 0;
-
-	while ((ch = *src++) != '\0')
+	unsigned state = 0;
+	Anope::string::const_iterator ch = src.begin(), end = src.end();
+	for (; ch != end; ++ch)
 	{
-		if (isspace(ch)) /* Skip whitespace anywhere. */
+		if (isspace(*ch)) /* Skip whitespace anywhere */
 			continue;
 
-		if (ch == Pad64)
+		if (*ch == Pad64)
 			break;
 
-		pos = const_cast<char *>(strchr(Base64, ch));
-		if (!pos) /* A non-base64 character. */
-			return -1;
+		size_t pos = Base64.find(*ch);
+		if (pos == Anope::string::npos) /* A non-base64 character */
+			return;
 
 		switch (state)
 		{
 			case 0:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) >= targsize)
-						return -1;
-					target[tarindex] = (pos - Base64) << 2;
-				}
+				target += pos << 2;
 				state = 1;
 				break;
 			case 1:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) + 1 >= targsize)
-						return -1;
-					target[tarindex] |= (pos - Base64) >> 4;
-					target[tarindex + 1] = ((pos - Base64) & 0x0f) << 4;
-				}
-				++tarindex;
+				target[target.length() - 1] |= pos >> 4;
+				target += (pos & 0x0f) << 4;
 				state = 2;
 				break;
 			case 2:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) + 1 >= targsize)
-						return -1;
-					target[tarindex] |= (pos - Base64) >> 2;
-					target[tarindex + 1] = ((pos - Base64) & 0x03) << 6;
-				}
-				++tarindex;
+				target[target.length() - 1] |= pos >> 2;
+				target += (pos & 0x03) << 6;
 				state = 3;
 				break;
 			case 3:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) >= targsize)
-						return -1;
-					target[tarindex] |= (pos - Base64);
-				}
-				++tarindex;
+				target[target.length() - 1] |= pos;
 				state = 0;
-				break;
-			default:
-				abort();
 		}
 	}
-
-	/*
-	 * We are done decoding Base-64 chars.  Let's see if we ended
-	 * on a byte boundary, and/or with erroneous trailing characters.
-	 */
-
-	if (ch == Pad64) /* We got a pad char. */
-	{
-		ch = *src++; /* Skip it, get next. */
-		switch (state)
-		{
-			case 0: /* Invalid = in first position */
-			case 1: /* Invalid = in second position */
-				return -1;
-
-			case 2: /* Valid, means one byte of info */
-				/* Skip any number of spaces. */
-				for (; ch != '\0'; ch = *src++)
-					if (!isspace(ch))
-						break;
-				/* Make sure there is another trailing = sign. */
-				if (ch != Pad64)
-					return -1;
-				ch = *src++; /* Skip the = */
-				/* Fall through to "single trailing =" case. */
-				/* FALLTHROUGH */
-
-			case 3: /* Valid, means two bytes of info */
-				/*
-				 * We know this char is an =.  Is there anything but
-				 * whitespace after it?
-				 */
-				for (; ch != '\0'; ch = *src++)
-					if (!isspace(ch))
-						return -1;
-
-				/*
-				 * Now make sure for cases 2 and 3 that the "extra"
-				 * bits that slopped past the last full byte were
-				 * zeros.  If we don't check them, they become a
-				 * subliminal channel.
-				 */
-				if (target && target[tarindex])
-					return -1;
-		}
-	}
-	else
-	{
-		/*
-		 * We ended by seeing the end of the string.  Make sure we
-		 * have no partial bytes lying around.
-		 */
-		if (state)
-			return -1;
-	}
-
-	return tarindex;
+	if (!target[target.length() - 1])
+		target.erase(target.length() - 1);
 }
 
-const char *encode_ip(unsigned char *ip)
+int decode_ip(const Anope::string &buf)
 {
-	static char buf[25];
-	unsigned char *cp;
-	struct in_addr ia;	/* For IPv4 */
-	char *s_ip;			/* Signed ip string */
+	int len = buf.length();
+	Anope::string targ;
 
-	if (!ip)
-		return "*";
-
-	if (strchr(reinterpret_cast<char *>(ip), ':'))
-		return NULL;
-	else
-	{
-		s_ip = str_signed(ip);
-		ia.s_addr = inet_addr(s_ip);
-		cp = reinterpret_cast<unsigned char *>(ia.s_addr);
-		b64_encode(reinterpret_cast<const char *>(&cp), sizeof(struct in_addr), buf, 25);
-	}
-	return buf;
-}
-
-int decode_ip(const char *buf)
-{
-	int len = strlen(buf);
-	char targ[25];
-	struct in_addr ia;
-
-	b64_decode(buf, targ, 25);
-	ia = *reinterpret_cast<struct in_addr *>(targ);
+	b64_decode(buf, targ);
+	const struct in_addr ia = *reinterpret_cast<const struct in_addr *>(targ.c_str());
 	if (len == 24) /* IPv6 */
 		return 0;
 	else if (len == 8) /* IPv4 */
 		return ia.s_addr;
 	else /* Error?? */
 		return 0;
-}
-
-/* ':' and '#' and '&' and '+' and '@' must never be in this table. */
-/* these tables must NEVER CHANGE! >) */
-char int6_to_base64_map[] = {
-	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-	'E', 'F',
-	'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-	'U', 'V',
-	'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-	'k', 'l',
-	'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-	'{', '}'
-};
-
-char base64_to_int6_map[] = {
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
-	-1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-	25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1,
-	-1, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-	51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, -1, 63, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-};
-
-static char *int_to_base64(long val)
-{
-	/* 32/6 == max 6 bytes for representation,
-	 * +1 for the null, +1 for byte boundaries
-	 */
-	static char base64buf[8];
-	long i = 7;
-
-	base64buf[i] = '\0';
-
-	/* Temporary debugging code.. remove before 2038 ;p.
-	 * This might happen in case of 64bit longs (opteron/ia64),
-	 * if the value is then too large it can easily lead to
-	 * a buffer underflow and thus to a crash. -- Syzop
-	 */
-	if (val > 2147483647L)
-		abort();
-
-	do
-	{
-		base64buf[--i] = int6_to_base64_map[val & 63];
-	} while (val >>= 6);
-
-	return base64buf + i;
-}
-
-static long base64_to_int(const char *b64)
-{
-	int v = base64_to_int6_map[static_cast<const unsigned char>(*b64++)];
-
-	if (!b64)
-		return 0;
-
-	while (*b64)
-	{
-		v <<= 6;
-		v += base64_to_int6_map[static_cast<const unsigned char>(*b64++)];
-	}
-
-	return v;
-}
-
-long base64dects(const char *ts)
-{
-	if (!ts)
-		return 0;
-
-	char *token = myStrGetToken(ts, '!', 1);
-	if (!token)
-		return strtoul(ts, NULL, 10);
-
-	long value = base64dec(token);
-	delete [] token;
-	return value;
 }

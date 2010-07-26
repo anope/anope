@@ -22,31 +22,31 @@ class CommandCSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "LEVELS DESC")
+		if (cmd.equals_ci("LEVELS DESC"))
 		{
 			int i;
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
 			if (!levelinfo_maxwidth)
 				for (i = 0; levelinfo[i].what >= 0; ++i)
 				{
-					int len = strlen(levelinfo[i].name);
+					int len = levelinfo[i].name.length();
 					if (len > levelinfo_maxwidth)
 						levelinfo_maxwidth = len;
 				}
 			for (i = 0; levelinfo[i].what >= 0; ++i)
-				notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name, getstring(u, levelinfo[i].desc));
+				notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), getstring(u, levelinfo[i].desc));
 		}
 		else
-			mod_help_cmd(ChanServ, u, cmd.c_str());
+			mod_help_cmd(ChanServ, u, cmd);
 
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP);
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
@@ -62,10 +62,11 @@ class CommandCSHelp : public Command
 class CSHelp : public Module
 {
  public:
-	CSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSHelp());
 	}
 };

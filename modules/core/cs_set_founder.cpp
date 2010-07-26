@@ -16,11 +16,11 @@
 class CommandCSSetFounder : public Command
 {
  public:
-	CommandCSSetFounder(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetFounder(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
@@ -34,7 +34,6 @@ class CommandCSSetFounder : public Command
 		NickAlias *na = findnick(params[1]);
 		NickCore *nc, *nc0 = ci->founder;
 
-
 		if (!na)
 		{
 			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, params[1].c_str());
@@ -42,14 +41,14 @@ class CommandCSSetFounder : public Command
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		nc = na->nc;
 		if (Config.CSMaxReg && nc->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -63,18 +62,18 @@ class CommandCSSetFounder : public Command
 		ci->founder = nc;
 		++nc->channelcount;
 
-		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick);
+		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -89,17 +88,17 @@ class CommandCSSetFounder : public Command
 class CommandCSSASetFounder : public CommandCSSetFounder
 {
  public:
-	CommandCSSASetFounder(const ci::string &cname) : CommandCSSetFounder(cname, "chanserv/saset/founder")
+	CommandCSSASetFounder(const Anope::string &cname) : CommandCSSetFounder(cname, "chanserv/saset/founder")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
@@ -109,7 +108,7 @@ class CommandCSSASetFounder : public CommandCSSetFounder
 class CSSetFounder : public Module
 {
  public:
-	CSSetFounder(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

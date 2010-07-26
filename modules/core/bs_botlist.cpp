@@ -20,7 +20,7 @@ class CommandBSBotList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		unsigned count = 0;
 
@@ -39,7 +39,7 @@ class CommandBSBotList : public Command
 				if (!count)
 					notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
 				++count;
-				u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host);
+				u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 			}
 		}
 
@@ -53,7 +53,7 @@ class CommandBSBotList : public Command
 
 				if (bi->HasFlag(BI_PRIVATE))
 				{
-					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host);
+					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 					++count;
 				}
 			}
@@ -67,7 +67,7 @@ class CommandBSBotList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_BOTLIST);
 		return true;
@@ -82,10 +82,11 @@ class CommandBSBotList : public Command
 class BSBotList : public Module
 {
  public:
-	BSBotList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSBotList());
 	}
 };

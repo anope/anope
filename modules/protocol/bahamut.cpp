@@ -7,8 +7,6 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- *
- *
  */
 
 /*************************************************************************/
@@ -45,7 +43,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* Change RealName */
 	 1,					/* No Knock requires +i */
 	 0,					/* We support TOKENS */
-	 0,					/* TIME STAMPS are BASE64 */
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
 	 0,					/* ts6 */
@@ -60,7 +57,7 @@ IRCDVar myIrcd[] = {
 
 void bahamut_cmd_burst()
 {
-	send_cmd(NULL, "BURST");
+	send_cmd("", "BURST");
 }
 
 /*
@@ -73,138 +70,131 @@ void bahamut_cmd_burst()
  */
 void bahamut_cmd_svinfo()
 {
-	send_cmd(NULL, "SVINFO 3 1 0 :%ld", static_cast<long>(time(NULL)));
+	send_cmd("", "SVINFO 3 1 0 :%ld", static_cast<long>(time(NULL)));
 }
 
 /* PASS */
-void bahamut_cmd_pass(const char *pass)
+void bahamut_cmd_pass(const Anope::string &pass)
 {
-	send_cmd(NULL, "PASS %s :TS", pass);
+	send_cmd("", "PASS %s :TS", pass.c_str());
 }
 
 /* CAPAB */
 void bahamut_cmd_capab()
 {
-	send_cmd(NULL, "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
-}
-
-/* this avoids "undefined symbol" messages of those whom try to load mods that
-   call on this function */
-void bahamut_cmd_chghost(const char *nick, const char *vhost)
-{
-	Alog(LOG_DEBUG) << "This IRCD does not support vhosting";
+	send_cmd("", "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
 }
 
 class BahamutIRCdProto : public IRCDProto
 {
-	void SendModeInternal(BotInfo *source, Channel *dest, const char *buf)
+	void SendModeInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
 	{
-		if (!buf)
+		if (buf.empty())
 			return;
 		if (Capab.HasFlag(CAPAB_TSMODE))
-			send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf);
+			send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf.c_str());
 		else
-			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf);
+			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, User *u, const char *buf)
+	void SendModeInternal(BotInfo *bi, User *u, const Anope::string &buf)
 	{
-		if (!buf)
+		if (buf.empty())
 			return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf);
+		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
 	}
 
 	/* SVSHOLD - set */
-	void SendSVSHold(const char *nick)
+	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config.ServerName, "SVSHOLD %s %u :%s", nick, static_cast<unsigned>(Config.NSReleaseTimeout), "Being held for registered user");
+		send_cmd(Config.ServerName, "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config.NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
-	void SendSVSHoldDel(const char *nick)
+	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config.ServerName, "SVSHOLD %s 0", nick);
+		send_cmd(Config.ServerName, "SVSHOLD %s 0", nick.c_str());
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(Channel *c, const std::string &nick)
+	void SendBanDel(Channel *c, const Anope::string &nick)
 	{
-		SendSVSModeChan(c, "-b", nick.empty() ? NULL : nick.c_str());
+		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */
-	void SendSVSModeChan(Channel *c, const char *mode, const char *nick)
+	void SendSVSModeChan(Channel *c, const Anope::string &mode, const Anope::string &nick)
 	{
-		if (nick)
-			send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode, nick);
+		if (!nick.empty())
+			send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
 		else
-			send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode);
+			send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode.c_str());
 	}
 
 	/* SQLINE */
 	void SendSQLine(XLine *x)
 	{
-		send_cmd(NULL, "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		send_cmd("", "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* UNSLINE */
 	void SendSGLineDel(XLine *x)
 	{
-		send_cmd(NULL, "UNSGLINE 0 :%s", x->Mask.c_str());
+		send_cmd("", "UNSGLINE 0 :%s", x->Mask.c_str());
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "UNSZLINE 0 %s", x->Mask.c_str());
+		send_cmd("", "UNSZLINE 0 %s", x->Mask.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "RAKILL %s *", x->Mask.c_str());
+		send_cmd("", "RAKILL %s *", x->Mask.c_str());
 	}
 
 	/* SZLINE */
 	void SendSZLine(XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd(NULL, "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		send_cmd("", "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd("", "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SVSNOOP */
-	void SendSVSNOOP(const char *server, int set)
+	void SendSVSNOOP(const Anope::string &server, int set)
 	{
-		send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
+		send_cmd("", "SVSNOOP %s %s", server.c_str(), set ? "+" : "-");
 	}
 
 	/* SGLINE */
 	void SendSGLine(XLine *x)
 	{
-		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
+		send_cmd("", "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* RAKILL */
 	void SendAkillDel(XLine *x)
 	{
-		send_cmd(NULL, "RAKILL %s %s", x->GetHost().c_str(), x->GetUser().c_str());
+		send_cmd("", "RAKILL %s %s", x->GetHost().c_str(), x->GetUser().c_str());
 	}
 
 	/* TOPIC */
-	void SendTopic(BotInfo *whosets, Channel *c, const char *whosetit, const char *topic)
+	void SendTopic(BotInfo *whosets, Channel *c, const Anope::string &whosetit, const Anope::string &topic)
 	{
-		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), whosetit, static_cast<unsigned long>(c->topic_time), topic);
+		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), whosetit.c_str(), static_cast<unsigned long>(c->topic_time), topic.c_str());
 	}
 
 	/* UNSQLINE */
 	void SendSQLineDel(XLine *x)
 	{
-		send_cmd(NULL, "UNSQLINE %s", x->Mask.c_str());
+		send_cmd("", "UNSQLINE %s", x->Mask.c_str());
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
+	void SendJoin(BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
-		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
+		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel.c_str());
 	}
 
 	void SendAkill(XLine *x)
@@ -213,15 +203,15 @@ class BahamutIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd("", "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(BotInfo *source, User *user, const char *buf)
+	void SendSVSKillInternal(BotInfo *source, User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : NULL, "SVSKILL %s :%s", user->nick.c_str(), buf);
+		send_cmd(source ? source->nick : "", "SVSKILL %s :%s", user->nick.c_str(), buf.c_str());
 	}
 
 	/* SVSMODE */
@@ -238,28 +228,28 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendEOB()
 	{
-		send_cmd(NULL, "BURST 0");
+		send_cmd("", "BURST 0");
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const char *buf)
+	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
 	{
-		if (!buf)
+		if (buf.empty())
 			return;
-		send_cmd(NULL, "NOTICE @%s :%s", dest->name.c_str(), buf);
+		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const char *buf)
+	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const Anope::string &buf)
 	{
-		if (buf)
-			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf);
+		if (!buf.empty())
+			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
 		else
 			send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
-	void SendClientIntroduction(const std::string &nick, const std::string &user, const std::string &host, const std::string &real, const char *modes, const std::string &uid)
+	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
 	{
 		EnforceQlinedNick(nick, Config.s_BotServ);
-		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes, user.c_str(), host.c_str(), Config.ServerName, real.c_str());
+		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes.c_str(), user.c_str(), host.c_str(), Config.ServerName.c_str(), real.c_str());
 	}
 
 	/* SVSMODE +d */
@@ -274,7 +264,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* SERVER */
 	void SendServer(Server *server)
 	{
-		send_cmd(NULL, "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
 	void SendConnect()
@@ -288,28 +278,26 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-		char svidbuf[15];
-
 		if (!u->Account())
 			return;
 
 		srand(time(NULL));
-		snprintf(svidbuf, sizeof(svidbuf), "%d", rand());
+		Anope::string svidbuf = stringify(rand());
 
 		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemPointerArray<char>(sstrdup(svidbuf)));
+		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
 
 		BotInfo *bi = NickServ;
 		u->SetMode(bi, UMODE_REGISTERED);
-		ircdproto->SendMode(bi, u, "+d %s", svidbuf);
+		ircdproto->SendMode(bi, u, "+d %s", svidbuf.c_str());
 	}
 } ircd_proto;
 
 /* EVENT: SJOIN */
-int anope_event_sjoin(const char *source, int ac, const char **av)
+int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[1]);
-	time_t ts = atol(av[0]);
+	time_t ts = Anope::string(av[0]).is_number_only() ? convertTo<time_t>(av[0]) : 0;
 	bool was_created = false;
 	bool keep_their_modes = false;
 
@@ -399,11 +387,10 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 	else
 	{
 		spacesepstream sep(av[ac - 1]);
-		std::string buf;
+		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
 			std::list<ChannelMode *> Status;
-			Status.clear();
 			char ch;
 
 			/* Get prefixes from the nick */
@@ -488,13 +475,13 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 **	parv[0] = new nickname
 **	  parv[1] = hopcount
 */
-int anope_event_nick(const char *source, int ac, const char **av)
+int anope_event_nick(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
 
 	if (ac != 2)
 	{
-		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], strtoul(av[2], NULL, 10), strtoul(av[8], NULL, 0), NULL, NULL);
+		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, Anope::string(av[8]).is_number_only() ? convertTo<uint32>(av[8]) : 0, "", "");
 		if (user)
 		{
 			/* Check to see if the user should be identified because their
@@ -506,19 +493,19 @@ int anope_event_nick(const char *source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], NULL, NULL, NULL, NULL, strtoul(av[1], NULL, 10), 0, NULL, NULL);
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
 	return MOD_CONT;
 }
 
 /* EVENT : CAPAB */
-int anope_event_capab(const char *source, int ac, const char **av)
+int anope_event_capab(const Anope::string &source, int ac, const char **av)
 {
 	CapabParse(ac, av);
 	return MOD_CONT;
 }
 
 /* EVENT : OS */
-int anope_event_os(const char *source, int ac, const char **av)
+int anope_event_os(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -527,7 +514,7 @@ int anope_event_os(const char *source, int ac, const char **av)
 }
 
 /* EVENT : NS */
-int anope_event_ns(const char *source, int ac, const char **av)
+int anope_event_ns(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -536,7 +523,7 @@ int anope_event_ns(const char *source, int ac, const char **av)
 }
 
 /* EVENT : MS */
-int anope_event_ms(const char *source, int ac, const char **av)
+int anope_event_ms(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -545,7 +532,7 @@ int anope_event_ms(const char *source, int ac, const char **av)
 }
 
 /* EVENT : HS */
-int anope_event_hs(const char *source, int ac, const char **av)
+int anope_event_hs(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -554,7 +541,7 @@ int anope_event_hs(const char *source, int ac, const char **av)
 }
 
 /* EVENT : CS */
-int anope_event_cs(const char *source, int ac, const char **av)
+int anope_event_cs(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -562,7 +549,7 @@ int anope_event_cs(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_436(const char *source, int ac, const char **av)
+int anope_event_436(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -572,14 +559,14 @@ int anope_event_436(const char *source, int ac, const char **av)
 }
 
 /* EVENT : SERVER */
-int anope_event_server(const char *source, int ac, const char **av)
+int anope_event_server(const Anope::string &source, int ac, const char **av)
 {
-	do_server(source, av[0], atoi(av[1]), av[2], "");
+	do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
 	return MOD_CONT;
 }
 
 /* EVENT : PRIVMSG */
-int anope_event_privmsg(const char *source, int ac, const char **av)
+int anope_event_privmsg(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 2)
 		return MOD_CONT;
@@ -587,7 +574,7 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_part(const char *source, int ac, const char **av)
+int anope_event_part(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1 || ac > 2)
 		return MOD_CONT;
@@ -595,14 +582,14 @@ int anope_event_part(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_whois(const char *source, int ac, const char **av)
+int anope_event_whois(const Anope::string &source, int ac, const char **av)
 {
-	if (source && ac >= 1)
+	if (!source.empty() && ac >= 1)
 		m_whois(source, av[0]);
 	return MOD_CONT;
 }
 
-int anope_event_topic(const char *source, int ac, const char **av)
+int anope_event_topic(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 4)
 		return MOD_CONT;
@@ -610,7 +597,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_squit(const char *source, int ac, const char **av)
+int anope_event_squit(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 2)
 		return MOD_CONT;
@@ -618,7 +605,7 @@ int anope_event_squit(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_quit(const char *source, int ac, const char **av)
+int anope_event_quit(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 1)
 		return MOD_CONT;
@@ -627,7 +614,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 }
 
 /* EVENT: MODE */
-int anope_event_mode(const char *source, int ac, const char **av)
+int anope_event_mode(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 2)
 		return MOD_CONT;
@@ -640,7 +627,7 @@ int anope_event_mode(const char *source, int ac, const char **av)
 }
 
 /* EVENT: KILL */
-int anope_event_kill(const char *source, int ac, const char **av)
+int anope_event_kill(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 2)
 		return MOD_CONT;
@@ -650,7 +637,7 @@ int anope_event_kill(const char *source, int ac, const char **av)
 }
 
 /* EVENT: KICK */
-int anope_event_kick(const char *source, int ac, const char **av)
+int anope_event_kick(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 3)
 		return MOD_CONT;
@@ -659,7 +646,7 @@ int anope_event_kick(const char *source, int ac, const char **av)
 }
 
 /* EVENT: JOIN */
-int anope_event_join(const char *source, int ac, const char **av)
+int anope_event_join(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 1)
 		return MOD_CONT;
@@ -668,24 +655,24 @@ int anope_event_join(const char *source, int ac, const char **av)
 }
 
 /* EVENT: MOTD */
-int anope_event_motd(const char *source, int ac, const char **av)
+int anope_event_motd(const Anope::string &source, int ac, const char **av)
 {
-	if (!source)
+	if (source.empty())
 		return MOD_CONT;
 
 	m_motd(source);
 	return MOD_CONT;
 }
 
-int anope_event_away(const char *source, int ac, const char **av)
+int anope_event_away(const Anope::string &source, int ac, const char **av)
 {
-	if (!source)
+	if (source.empty())
 		return MOD_CONT;
-	m_away(source, (ac ? av[0] : NULL));
+	m_away(source, ac ? av[0] : "");
 	return MOD_CONT;
 }
 
-int anope_event_ping(const char *source, int ac, const char **av)
+int anope_event_ping(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
@@ -693,16 +680,16 @@ int anope_event_ping(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-int anope_event_error(const char *source, int ac, const char **av)
+int anope_event_error(const Anope::string &source, int ac, const char **av)
 {
 	if (ac >= 1)
 		Alog(LOG_DEBUG) << av[0];
 	return MOD_CONT;
 }
 
-int anope_event_burst(const char *source, int ac, const char **av)
+int anope_event_burst(const Anope::string &source, int ac, const char **av)
 {
-	Server *s = Server::Find(source ? source : "");
+	Server *s = Server::Find(source);
 
 	if (!ac)
 	{
@@ -722,11 +709,10 @@ int anope_event_burst(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-bool ChannelModeFlood::IsValid(const std::string &value)
+bool ChannelModeFlood::IsValid(const Anope::string &value)
 {
-	char *dp, *end;
-
-	if (!value.empty() && value[0] != ':' && strtoul((value[0] == '*' ? value.c_str() + 1 : value.c_str()), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end)
+	Anope::string rest;
+	if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
 		return true;
 
 	return false;
@@ -769,7 +755,7 @@ static void AddModes()
 	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
 	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
 	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER,"UMODE_OPER",  'o'));
+	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
 	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
 	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
 	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
@@ -802,7 +788,7 @@ static void AddModes()
 class ProtoBahamut : public Module
 {
  public:
-	ProtoBahamut(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
@@ -823,7 +809,7 @@ class ProtoBahamut : public Module
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 
-	void OnUserNickChange(User *u, const std::string &)
+	void OnUserNickChange(User *u, const Anope::string &)
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
 	}

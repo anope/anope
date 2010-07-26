@@ -16,26 +16,26 @@
 class CommandNSSASetNoexpire : public Command
 {
  public:
-	CommandNSSASetNoexpire(const ci::string &cname) : Command(cname, 1, 2, "nickserv/saset/noexpire")
+	CommandNSSASetNoexpire(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/noexpire")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
 		assert(na);
 
-		ci::string param = params.size() > 1 ? params[1] : "";
+		Anope::string param = params.size() > 1 ? params[1] : "";
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			na->SetFlag(NS_NO_EXPIRE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick.c_str());
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			na->UnsetFlag(NS_NO_EXPIRE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "NOEXPIRE");
@@ -43,13 +43,13 @@ class CommandNSSASetNoexpire : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
 	}
@@ -63,7 +63,7 @@ class CommandNSSASetNoexpire : public Command
 class NSSASetNoexpire : public Module
 {
  public:
-	NSSASetNoexpire(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSASetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

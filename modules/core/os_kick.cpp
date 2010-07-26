@@ -20,15 +20,15 @@ class CommandOSKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str(), *nick = params[1].c_str(), *s = params[2].c_str();
+		Anope::string chan = params[0], nick = params[1], s = params[2];
 		Channel *c;
 		User *u2;
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
@@ -38,23 +38,23 @@ class CommandOSKick : public Command
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 			return MOD_CONT;
 		}
 
-		c->Kick(OperServ, u2, "%s (%s)", u->nick.c_str(), s);
+		c->Kick(OperServ, u2, "%s (%s)", u->nick.c_str(), s.c_str());
 		if (Config.WallOSKick)
-			ircdproto->SendGlobops(OperServ, "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan);
+			ircdproto->SendGlobops(OperServ, "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_KICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
 	}
@@ -68,7 +68,7 @@ class CommandOSKick : public Command
 class OSKick : public Module
 {
  public:
-	OSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -16,21 +16,21 @@
 class CommandCSSetKeepTopic : public Command
 {
  public:
-	CommandCSSetKeepTopic(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetKeepTopic(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_KEEPTOPIC);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_KEEPTOPIC);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name.c_str());
@@ -41,13 +41,13 @@ class CommandCSSetKeepTopic : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_KEEPTOPIC, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET KEEPTOPIC", CHAN_SET_KEEPTOPIC_SYNTAX);
 	}
@@ -61,17 +61,17 @@ class CommandCSSetKeepTopic : public Command
 class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 {
  public:
-	CommandCSSASetKeepTopic(const ci::string &cname) : CommandCSSetKeepTopic(cname, "chanserv/saset/keeptopic")
+	CommandCSSASetKeepTopic(const Anope::string &cname) : CommandCSSetKeepTopic(cname, "chanserv/saset/keeptopic")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_KEEPTOPIC, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET KEEPTOPIC", CHAN_SASET_KEEPTOPIC_SYNTAX);
 	}
@@ -80,7 +80,7 @@ class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 class CSSetKeepTopic : public Module
 {
  public:
-	CSSetKeepTopic(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

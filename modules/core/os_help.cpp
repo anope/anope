@@ -20,13 +20,13 @@ class CommandOSHelp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(OperServ, u, params[0].c_str());
+		mod_help_cmd(OperServ, u, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP);
 		for (CommandMap::const_iterator it = OperServ->Commands.begin(), it_end = OperServ->Commands.end(); it != it_end; ++it)
@@ -39,7 +39,7 @@ class CommandOSHelp : public Command
 class OSHelp : public Module
 {
  public:
-	OSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

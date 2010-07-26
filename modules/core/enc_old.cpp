@@ -320,7 +320,7 @@ inline static char XTOI(char c) { return c > 9 ? c - 'A' + 10 : c - '0'; }
 class EOld : public Module
 {
  public:
-	EOld(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	EOld(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(ENCRYPTION);
@@ -330,47 +330,48 @@ class EOld : public Module
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	EventReturn OnEncrypt(const std::string &src, std::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		MD5_CTX context;
-		char digest[33] = "", digest2[33], cpass[1000];
+		char digest[33] = "", digest2[33];
+		Anope::string cpass;
 		int i;
-		std::string buf = "oldmd5:";
+		Anope::string buf = "oldmd5:";
 
 		memset(&context, 0, sizeof(context));
 
 		MD5Init(&context);
-		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.size());
+		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		MD5Final(reinterpret_cast<unsigned char *>(digest), &context);
 		for (i = 0; i < 32; i += 2)
 			digest2[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
 
-		b64_encode(digest2, 16, cpass, 1000);
+		b64_encode(digest2, cpass);
 		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest )
+	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
 	{
-		if (hashm != "oldmd5")
+		if (!hashm.equals_cs("oldmd5"))
 			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
+	EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password)
 	{
-		if (hashm != "oldmd5")
+		if (!hashm.equals_cs("oldmd5"))
 			return EVENT_CONTINUE;
-		std::string buf;
+		Anope::string buf;
 		this->OnEncrypt(plaintext, buf);
-		if (password == buf)
+		if (password.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() != this->name)
+			if (!this->name.equals_ci(Config.EncModuleList.front()))
 				enc_encrypt(plaintext, password);
 			return EVENT_ALLOW;
 		}

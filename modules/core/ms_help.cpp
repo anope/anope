@@ -21,26 +21,26 @@ class CommandMSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(MemoServ, u, params[0].c_str());
+		mod_help_cmd(MemoServ, u, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_HEADER);
 		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
 			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(u);
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_FOOTER, Config.s_ChanServ);
+		notice_help(Config.s_MemoServ, u, MEMO_HELP_FOOTER, Config.s_ChanServ.c_str());
 	}
 };
 
 class MSHelp : public Module
 {
  public:
-	MSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -21,20 +21,20 @@ class CommandBSKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		ci::string option = params[1];
-		ci::string value = params[2];
-		const char *ttb = params.size() > 3 ? params[3].c_str() : NULL;
+		Anope::string chan = params[0];
+		Anope::string option = params[1];
+		Anope::string value = params[2];
+		Anope::string ttb = params.size() > 3 ? params[3] : "";
 
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (readonly)
 			notice_lang(Config.s_BotServ, u, BOT_KICK_DISABLED);
-		else if (!chan || option.empty() || value.empty())
+		else if (chan.empty() || option.empty() || value.empty())
 			syntax_error(Config.s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
-		else if (value != "ON" && value != "OFF")
+		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
 			syntax_error(Config.s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
@@ -42,22 +42,22 @@ class CommandBSKick : public Command
 			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);
 		else
 		{
-			if (option == "BADWORDS")
+			if (option.equals_ci("BADWORDS"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_BADWORDS] = strtol(ttb, NULL, 10);
+						Anope::string error;
+						ci->ttb[TTB_BADWORDS] = convertTo<int16>(ttb, error, false);
 						/* Only error if errno returns ERANGE or EINVAL or we are less then 0 - TSL */
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_BADWORDS] < 0)
+						if (!error.empty() || ci->ttb[TTB_BADWORDS] < 0)
 						{
 							/* leaving the debug behind since we might want to know what these are */
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_BADWORDS];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BADWORDS];
 							/* reset the value back to 0 - TSL */
 							ci->ttb[TTB_BADWORDS] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -75,19 +75,19 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_BADWORDS_OFF);
 				}
 			}
-			else if (option == "BOLDS")
+			else if (option.equals_ci("BOLDS"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_BOLDS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_BOLDS] < 0)
+						Anope::string error;
+						ci->ttb[TTB_BOLDS] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_BOLDS] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_BOLDS];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BOLDS];
 							ci->ttb[TTB_BOLDS] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -105,39 +105,39 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_BOLDS_OFF);
 				}
 			}
-			else if (option == "CAPS")
+			else if (option.equals_ci("CAPS"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					const char *min = params.size() > 4 ? params[4].c_str() : NULL;
-					const char *percent = params.size() > 5 ? params[5].c_str() : NULL;
+					Anope::string min = params.size() > 4 ? params[4] : "";
+					Anope::string percent = params.size() > 5 ? params[5] : "";
 
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_CAPS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_CAPS] < 0)
+						Anope::string error;
+						ci->ttb[TTB_CAPS] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_CAPS] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_CAPS];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_CAPS];
 							ci->ttb[TTB_CAPS] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
 					else
 						ci->ttb[TTB_CAPS] = 0;
 
-					if (!min)
+					if (min.empty())
 						ci->capsmin = 10;
 					else
-						ci->capsmin = atol(min);
+						ci->capsmin = min.is_number_only() ? convertTo<int16>(min) : 10;
 					if (ci->capsmin < 1)
 						ci->capsmin = 10;
 
-					if (!percent)
+					if (percent.empty())
 						ci->capspercent = 25;
 					else
-						ci->capspercent = atol(percent);
+						ci->capspercent = percent.is_number_only() ? convertTo<int16>(percent) : 25;
 					if (ci->capspercent < 1 || ci->capspercent > 100)
 						ci->capspercent = 25;
 
@@ -153,19 +153,19 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_CAPS_OFF);
 				}
 			}
-			else if (option == "COLORS")
+			else if (option.equals_ci("COLORS"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_COLORS] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_COLORS] < 0)
+						Anope::string error;
+						ci->ttb[TTB_COLORS] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_COLORS] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_COLORS];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_COLORS];
 							ci->ttb[TTB_COLORS] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -183,39 +183,39 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_COLORS_OFF);
 				}
 			}
-			else if (option == "FLOOD")
+			else if (option.equals_ci("FLOOD"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					const char *lines = params.size() > 4 ? params[4].c_str() : NULL;
-					const char *secs = params.size() > 5 ? params[5].c_str() : NULL;
+					Anope::string lines = params.size() > 4 ? params[4] : "";
+					Anope::string secs = params.size() > 5 ? params[5] : "";
 
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_FLOOD] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_FLOOD] < 0)
+						Anope::string error;
+						ci->ttb[TTB_FLOOD] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_FLOOD] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_FLOOD];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_FLOOD];
 							ci->ttb[TTB_FLOOD] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
 					else
 						ci->ttb[TTB_FLOOD] = 0;
 
-					if (!lines)
+					if (lines.empty())
 						ci->floodlines = 6;
 					else
-						ci->floodlines = atol(lines);
+						ci->floodlines = lines.is_number_only() ? convertTo<int16>(lines) : 6;
 					if (ci->floodlines < 2)
 						ci->floodlines = 6;
 
-					if (!secs)
+					if (secs.empty())
 						ci->floodsecs = 10;
 					else
-						ci->floodsecs = atol(secs);
+						ci->floodsecs = secs.is_number_only() ? convertTo<int16>(secs) : 10;
 					if (ci->floodsecs < 1 || ci->floodsecs > Config.BSKeepData)
 						ci->floodsecs = 10;
 
@@ -231,31 +231,31 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_FLOOD_OFF);
 				}
 			}
-			else if (option == "REPEAT")
+			else if (option.equals_ci("REPEAT"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					const char *times = params.size() > 4 ? params[4].c_str() : NULL;
+					Anope::string times = params.size() > 4 ? params[4] : "";
 
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_REPEAT] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_REPEAT] < 0)
+						Anope::string error;
+						ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_REPEAT] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_REPEAT];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REPEAT];
 							ci->ttb[TTB_REPEAT] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
 					else
 						ci->ttb[TTB_REPEAT] = 0;
 
-					if (!times)
+					if (times.empty())
 						ci->repeattimes = 3;
 					else
-						ci->repeattimes = atol(times);
+						ci->repeattimes = times.is_number_only() ? convertTo<int16>(times) : 3;
 					if (ci->repeattimes < 2)
 						ci->repeattimes = 3;
 
@@ -271,19 +271,19 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_REPEAT_OFF);
 				}
 			}
-			else if (option == "REVERSES")
+			else if (option.equals_ci("REVERSES"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_REVERSES] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_REVERSES] < 0)
+						Anope::string error;
+						ci->ttb[TTB_REVERSES] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_REVERSES] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_REVERSES];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REVERSES];
 							ci->ttb[TTB_REVERSES] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -301,19 +301,19 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_REVERSES_OFF);
 				}
 			}
-			else if (option == "UNDERLINES")
+			else if (option.equals_ci("UNDERLINES"))
 			{
-				if (value == "ON")
+				if (value.equals_ci("ON"))
 				{
-					if (ttb)
+					if (!ttb.empty())
 					{
-						errno = 0;
-						ci->ttb[TTB_UNDERLINES] = strtol(ttb, NULL, 10);
-						if (errno == ERANGE || errno == EINVAL || ci->ttb[TTB_UNDERLINES] < 0)
+						Anope::string error;
+						ci->ttb[TTB_UNDERLINES] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_UNDERLINES] < 0)
 						{
-							Alog(LOG_DEBUG) << "errno is " << errno << " ERANGE " << ERANGE << " EINVAL " << EINVAL << " ttb " << ci->ttb[TTB_UNDERLINES];
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_UNDERLINES];
 							ci->ttb[TTB_UNDERLINES] = 0;
-							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -337,25 +337,25 @@ class CommandBSKick : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK);
-		else if (subcommand == "BADWORDS")
+		else if (subcommand.equals_ci("BADWORDS"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_BADWORDS);
-		else if (subcommand == "BOLDS")
+		else if (subcommand.equals_ci("BOLDS"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_BOLDS);
-		else if (subcommand == "CAPS")
+		else if (subcommand.equals_ci("CAPS"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_CAPS);
-		else if (subcommand == "COLORS")
+		else if (subcommand.equals_ci("COLORS"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_COLORS);
-		else if (subcommand == "FLOOD")
+		else if (subcommand.equals_ci("FLOOD"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_FLOOD);
-		else if (subcommand == "REPEAT")
+		else if (subcommand.equals_ci("REPEAT"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_REPEAT);
-		else if (subcommand == "REVERSES")
+		else if (subcommand.equals_ci("REVERSES"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_REVERSES);
-		else if (subcommand == "UNDERLINES")
+		else if (subcommand.equals_ci("UNDERLINES"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
 		else
 			return false;
@@ -363,7 +363,7 @@ class CommandBSKick : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
 	}
@@ -377,10 +377,11 @@ class CommandBSKick : public Command
 class BSKick : public Module
 {
  public:
-	BSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSKick());
 	}
 };

@@ -18,7 +18,7 @@ class MemoListCallback : public NumberList
 	User *u;
 	MemoInfo *mi;
  public:
-	MemoListCallback(User *_u, MemoInfo *_mi, const std::string &numlist) : NumberList(numlist, false), u(_u), mi(_mi)
+	MemoListCallback(User *_u, MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), u(_u), mi(_mi)
 	{
 	}
 
@@ -38,15 +38,15 @@ class MemoListCallback : public NumberList
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 		timebuf[sizeof(timebuf) - 1] = 0;
 		if (ci)
-			notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, ci->name.c_str(), m->number);
+			notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ.c_str(), ci->name.c_str(), m->number);
 		else
-			notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ, m->number);
-		notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text);
+			notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ.c_str(), m->number);
+		notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
 		/* Check if a receipt notification was requested */
 		if (m->HasFlag(MF_RECEIPT))
-			rsend_notify(u, m, ci ? ci->name.c_str() : NULL);
+			rsend_notify(u, m, ci ? ci->name : "");
 	}
 };
 
@@ -57,11 +57,11 @@ class CommandMSRead : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
-		ci::string numstr = params.size() ? params[0] : "", chan;
+		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 		int num;
 
 		if (!numstr.empty() && numstr[0] == '#')
@@ -83,8 +83,8 @@ class CommandMSRead : public Command
 		}
 		else
 			mi = &u->Account()->memos;
-		num = !numstr.empty() ? atoi(numstr.c_str()) : -1;
-		if (numstr.empty() || (numstr != "LAST" && numstr != "NEW" && num <= 0))
+		num = !numstr.empty() && numstr.is_number_only() ? convertTo<int>(numstr) : -1;
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && num <= 0))
 			this->OnSyntaxError(u, numstr);
 		else if (mi->memos.empty())
 		{
@@ -96,7 +96,7 @@ class CommandMSRead : public Command
 		else {
 			int i, end;
 
-			if (numstr == "NEW")
+			if (numstr.equals_ci("NEW"))
 			{
 				int readcount = 0;
 				for (i = 0, end = mi->memos.size(); i < end; ++i)
@@ -113,27 +113,27 @@ class CommandMSRead : public Command
 						notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
-			else if (numstr == "LAST")
+			else if (numstr.equals_ci("LAST"))
 			{
 				for (i = 0, end = mi->memos.size() - 1; i < end; ++i);
 				MemoListCallback::DoRead(u, mi, ci, i);
 			}
 			else /* number[s] */
 			{
-				MemoListCallback list(u, mi, numstr.c_str());
+				MemoListCallback list(u, mi, numstr);
 				list.Process();
 			}
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_READ);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 	}
@@ -147,7 +147,7 @@ class CommandMSRead : public Command
 class MSRead : public Module
 {
  public:
-	MSRead(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

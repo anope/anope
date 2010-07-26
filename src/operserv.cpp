@@ -22,7 +22,7 @@ Flags<ChannelModeName, CMODE_END> DefConModesOn;
 /* Defcon modes mlocked off */
 Flags<ChannelModeName, CMODE_END> DefConModesOff;
 /* Map of Modesa and Params for DefCon */
-std::map<ChannelModeName, std::string> DefConModesOnParams;
+std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 
 XLineManager *SGLine, *SZLine, *SQLine, *SNLine;
 
@@ -37,32 +37,32 @@ void os_init()
 	XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
 }
 
-void operserv(User *u, const std::string &buf)
+void operserv(User *u, const Anope::string &buf)
 {
 	if (!u || buf.empty())
 		return;
 
 	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
 
-	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	if (buf.substr(0, 6).equals_cs("\1PING ") && buf[buf.length() - 1] == '\1')
 	{
-		std::string command = buf;
+		Anope::string command = buf;
 		command.erase(command.begin());
 		command.erase(command.end());
-		ircdproto->SendCTCP(OperServ, u->nick.c_str(), "%s", command.c_str());
+		ircdproto->SendCTCP(OperServ, u->nick, "%s", command.c_str());
 	}
 	else
 		mod_run_cmd(OperServ, u, buf);
 }
 
-bool SetDefConParam(ChannelModeName Name, std::string &buf)
+bool SetDefConParam(ChannelModeName Name, const Anope::string &buf)
 {
 	return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;
 }
 
-bool GetDefConParam(ChannelModeName Name, std::string &buf)
+bool GetDefConParam(ChannelModeName Name, Anope::string &buf)
 {
-	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
+	std::map<ChannelModeName, Anope::string>::iterator it = DefConModesOnParams.find(Name);
 
 	buf.clear();
 
@@ -77,7 +77,7 @@ bool GetDefConParam(ChannelModeName Name, std::string &buf)
 
 void UnsetDefConParam(ChannelModeName Name)
 {
-	std::map<ChannelModeName, std::string>::iterator it = DefConModesOnParams.find(Name);
+	std::map<ChannelModeName, Anope::string>::iterator it = DefConModesOnParams.find(Name);
 
 	if (it != DefConModesOnParams.end())
 		DefConModesOnParams.erase(it);
@@ -122,7 +122,7 @@ void DelDefCon(int level, DefconLevel Level)
 	DefCon[level][Level] = false;
 }
 
-void server_global(Server *s, const std::string &message)
+void server_global(Server *s, const Anope::string &message)
 {
 	/* Do not send the notice to ourselves our juped servers */
 	if (s != Me && !s->HasFlag(SERVER_JUPED))
@@ -135,7 +135,7 @@ void server_global(Server *s, const std::string &message)
 	}
 }
 
-void oper_global(char *nick, const char *fmt, ...)
+void oper_global(const Anope::string &nick, const char *fmt, ...)
 {
 	va_list args;
 	char msg[2048]; /* largest valid message is 512, this should cover any global */
@@ -144,14 +144,13 @@ void oper_global(char *nick, const char *fmt, ...)
 	vsnprintf(msg, sizeof(msg), fmt, args);
 	va_end(args);
 
-	if (nick && !Config.AnonymousGlobal)
+	if (!nick.empty() && !Config.AnonymousGlobal)
 	{
-		std::string rmsg = std::string("[") + nick + std::string("] ") + msg;
-		server_global(Me->GetUplink(), rmsg.c_str());
+		Anope::string rmsg = "[" + nick + "] " + msg;
+		server_global(Me->GetUplink(), rmsg);
 	}
 	else
 		server_global(Me->GetUplink(), msg);
-
 }
 
 /**************************************************************************/
@@ -159,42 +158,45 @@ void oper_global(char *nick, const char *fmt, ...)
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
 
-XLine::XLine(const ci::string &mask, const std::string &reason) : Mask(mask), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask), Reason(reason)
 {
 	Expires = Created = 0;
 }
 
-XLine::XLine(const ci::string &mask, const ci::string &by, const time_t expires, const std::string &reason) : Mask(mask), By(by), Created(time(NULL)), Expires(expires), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason) : Mask(mask), By(by), Created(time(NULL)), Expires(expires), Reason(reason)
 {
 }
 
-ci::string XLine::GetNick() const
+Anope::string XLine::GetNick() const
 {
 	size_t nick_t = Mask.find('!');
 
-	if (nick_t == ci::string::npos)
+	if (nick_t == Anope::string::npos)
 		return "";
 
-	return Mask.substr(0, nick_t - 1);
+	return Mask.substr(0, nick_t);
 }
 
-ci::string XLine::GetUser() const
+Anope::string XLine::GetUser() const
 {
 	size_t user_t = Mask.find('!'), host_t = Mask.find('@');
 
-	if (user_t == ci::string::npos)
-		return Mask.substr(0, host_t);
-	else if (host_t != ci::string::npos)
-		return Mask.substr((user_t != ci::string::npos ? user_t + 1 : 0), host_t);
+	if (host_t != Anope::string::npos)
+	{
+		if (user_t != Anope::string::npos)
+			return Mask.substr(user_t + 1, host_t - user_t - 1);
+		else
+			return Mask.substr(0, host_t);
+	}
 	else
 		return "";
 }
 
-ci::string XLine::GetHost() const
+Anope::string XLine::GetHost() const
 {
 	size_t host_t = Mask.find('@');
 
-	if (host_t == ci::string::npos)
+	if (host_t == Anope::string::npos)
 		return Mask;
 	else
 		return Mask.substr(host_t + 1);
@@ -243,7 +245,7 @@ void XLineManager::UnregisterXLineManager(XLineManager *xlm)
 std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 {
 	std::pair<XLineManager *, XLine *> ret;
-	
+
 	ret.first = NULL;
 	ret.second = NULL;
 
@@ -275,7 +277,7 @@ const size_t XLineManager::GetCount() const
 /** Get the XLine vector
   * @return The vecotr
   */
-const std::vector<XLine *>& XLineManager::GetList() const
+const std::vector<XLine *> &XLineManager::GetList() const
 {
 	return XLines;
 }
@@ -336,7 +338,7 @@ void XLineManager::Clear()
  * @param reaosn The reason
  * @return A pointer to the XLine
  */
-XLine *XLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+XLine *XLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
 {
 	return NULL;
 }
@@ -357,10 +359,10 @@ void XLineManager::Del(XLine *x)
  * 3 - Mask is already covered by another mask
  * In each case the XLine it matches/is covered by is returned in XLine*
  */
-std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expires)
+std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t expires)
 {
 	std::pair<int, XLine *> ret;
-	
+
 	ret.first = 0;
 	ret.second = NULL;
 
@@ -369,7 +371,7 @@ std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expi
 		XLine *x = GetEntry(i);
 		ret.second = x;
 
-		if (x->Mask == mask)
+		if (x->Mask.equals_ci(mask))
 		{
 			if (!x->Expires || x->Expires >= expires)
 			{
@@ -403,13 +405,13 @@ std::pair<int, XLine *> XLineManager::CanAdd(const ci::string &mask, time_t expi
  * @param mask The mask
  * @return The XLine the user matches, or NULL
  */
-XLine *XLineManager::HasEntry(const ci::string &mask) const
+XLine *XLineManager::HasEntry(const Anope::string &mask) const
 {
 	for (unsigned i = 0, end = XLines.size(); i < end; ++i)
 	{
 		XLine *x = XLines[i];
 
-		if (x->Mask == mask)
+		if (x->Mask.equals_ci(mask))
 			return x;
 	}
 
@@ -437,13 +439,13 @@ XLine *XLineManager::Check(User *u)
 			continue;
 		}
 
-		if (!x->GetNick().empty() && !Anope::Match(u->nick.c_str(), x->GetNick()))
+		if (!x->GetNick().empty() && !Anope::Match(u->nick, x->GetNick()))
 			continue;
 
-		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent().c_str(), x->GetUser()))
+		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent(), x->GetUser()))
 			continue;
 
-		if (x->GetHost().empty() || (u->hostip && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost.c_str(), x->GetHost())) || (u->vhost && Anope::Match(u->vhost, x->GetHost())))
+		if (x->GetHost().empty() || (!u->hostip.empty() && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost, x->GetHost())) || (!u->vhost.empty() && Anope::Match(u->vhost, x->GetHost())))
 		{
 			OnMatch(u, x);
 			return x;
@@ -468,26 +470,26 @@ void XLineManager::OnExpire(XLine *x)
 {
 }
 
-XLine *SGLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
 {
-	if (mask.find('!') != ci::string::npos)
+	if (mask.find('!') != Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick.c_str(), u, OPER_AKILL_NO_NICK);
+			notice_lang(bi->nick, u, OPER_AKILL_NO_NICK);
 		return NULL;
 	}
 
-	if (mask.find('@') == ci::string::npos)
+	if (mask.find('@') == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick.c_str(), u, BAD_USERHOST_MASK);
+			notice_lang(bi->nick, u, BAD_USERHOST_MASK);
 		return NULL;
 	}
 
-	if (strspn(mask.c_str(), "~@.*?") == mask.length())
+	if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick.c_str(), u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			notice_lang(bi->nick, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -497,21 +499,21 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick.c_str(), u, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick.c_str(), u, OPER_AKILL_CHANGED, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_AKILL_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick.c_str(), u, OPER_AKILL_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_AKILL_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return canAdd.second;
 	}
 
-	std::string realreason = reason;
+	Anope::string realreason = reason;
 	if (u && Config.AddAkiller)
 		realreason = "[" + u->nick + "]" + reason;
 
-	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, realreason);
+	XLine *x = new XLine(mask, u ? u->nick : "", expires, realreason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, x));
@@ -545,12 +547,12 @@ void SGLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
 }
 
-XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
 {
-	if (!mask.empty() && strspn(mask.c_str(), "*?") == mask.length())
+	if (!mask.empty() && mask.find_first_not_of("*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick.c_str(), u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			notice_lang(bi->nick, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -560,17 +562,17 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_CHANGED, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SNLINE_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick.c_str(), u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return canAdd.second;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SNLINE));
@@ -584,7 +586,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 
 	if (Config.KillonSNline && !ircd->sglineenforce)
 	{
-		std::string rreason = "G-Lined: " + reason;
+		Anope::string rreason = "G-Lined: " + reason;
 
 		for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 		{
@@ -592,7 +594,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 			++it;
 
 			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
-				kill_user(Config.ServerName, user->nick, rreason.c_str());
+				kill_user(Config.ServerName, user->nick, rreason);
 		}
 	}
 
@@ -608,8 +610,8 @@ void SNLineManager::OnMatch(User *u, XLine *x)
 {
 	ircdproto->SendSGLine(x);
 
-	std::string reason = "G-Lined: " + x->Reason;
-	kill_user(Config.s_OperServ, u->nick, reason.c_str());
+	Anope::string reason = "G-Lined: " + x->Reason;
+	kill_user(Config.s_OperServ, u->nick, reason);
 }
 
 void SNLineManager::OnExpire(XLine *x)
@@ -618,9 +620,9 @@ void SNLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
-XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
 {
-	if (strspn(mask.c_str(), "*") == mask.length())
+	if (mask.find_first_not_of("*") == Anope::string::npos)
 	{
 		if (bi && u)
 			notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
@@ -640,17 +642,17 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_CHANGED, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SQLINE_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick.c_str(), u, OPER_SQLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SQLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return canAdd.second;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SQLINE));
@@ -664,7 +666,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 
 	if (Config.KillonSQline)
 	{
-		std::string rreason = "Q-Lined: " + reason;
+		Anope::string rreason = "Q-Lined: " + reason;
 
 		if (mask[0] == '#')
 		{
@@ -672,7 +674,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 			{
 				Channel *c = cit->second;
 
-				if (!Anope::Match(c->name.c_str(), mask))
+				if (!Anope::Match(c->name, mask))
 					continue;
 				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 				{
@@ -692,8 +694,8 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 				User *user = it->second;
 				++it;
 
-				if (!is_oper(user) && Anope::Match(user->nick.c_str(), x->Mask))
-					kill_user(Config.ServerName, user->nick, rreason.c_str());
+				if (!is_oper(user) && Anope::Match(user->nick, x->Mask))
+					kill_user(Config.ServerName, user->nick, rreason);
 			}
 		}
 	}
@@ -712,8 +714,7 @@ void SQLineManager::OnMatch(User *u, XLine *x)
 {
 	ircdproto->SendSQLine(x);
 
-	char reason[300];
-	snprintf(reason, sizeof(reason), "Q-Lined: %s", x->Reason.c_str());
+	Anope::string reason = "Q-Lined: " + x->Reason;
 	kill_user(Config.s_OperServ, u->nick, reason);
 }
 
@@ -731,7 +732,7 @@ bool SQLineManager::Check(Channel *c)
 		{
 			XLine *x = *it;
 
-			if (Anope::Match(c->name.c_str(), x->Mask))
+			if (Anope::Match(c->name, x->Mask))
 				return true;
 		}
 	}
@@ -739,15 +740,15 @@ bool SQLineManager::Check(Channel *c)
 	return false;
 }
 
-XLine *SZLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason)
+XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
 {
-	if (mask.find('!') != ci::string::npos || mask.find('@') != ci::string::npos)
+	if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_SZLINE_ONLY_IPS);
 		return NULL;
 	}
 
-	if (strspn(mask.c_str(), "*?") == mask.length())
+	if (mask.find_first_not_of("*?") == Anope::string::npos)
 	{
 		notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
@@ -759,17 +760,17 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const ci::string &mask, time_t e
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_CHANGED, canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SZLINE_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick.c_str(), u, OPER_SZLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				notice_lang(bi->nick, u, OPER_SZLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return canAdd.second;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick.c_str() : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SZLINE));

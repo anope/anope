@@ -24,12 +24,12 @@ class SSLSocket : public ClientSocket
 		return SSL_read(sslsock, buf, sz);
 	}
 
-	const int SendInternal(const std::string &buf) const
+	const int SendInternal(const Anope::string &buf) const
 	{
-		return SSL_write(sslsock, buf.c_str(), buf.size());
+		return SSL_write(sslsock, buf.c_str(), buf.length());
 	}
  public:
-	SSLSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
+	SSLSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
 		this->SetBlocking();
 
@@ -39,7 +39,7 @@ class SSLSocket : public ClientSocket
 			throw CoreException("Unable to initialize SSL socket");
 
 		SSL_set_connect_state(sslsock);
-		SSL_set_fd(sslsock, sock);
+		SSL_set_fd(sslsock, Sock);
 		SSL_connect(sslsock);
 
 		UplinkSock = this;
@@ -55,7 +55,7 @@ class SSLSocket : public ClientSocket
 		UplinkSock = NULL;
 	}
 
-	bool Read(const std::string &buf)
+	bool Read(const Anope::string &buf)
 	{
 		process(buf);
 		return true;
@@ -65,7 +65,7 @@ class SSLSocket : public ClientSocket
 class SSLModule : public Module
 {
  public:
-	SSLModule(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	SSLModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		SSL_load_error_strings();
 		SSLeay_add_ssl_algorithms();
@@ -128,10 +128,10 @@ class SSLModule : public Module
 		{
 			try
 			{
-				new SSLSocket(u->host, u->port, Config.LocalHost ? Config.LocalHost : "", u->ipv6);
+				new SSLSocket(u->host, u->port, Config.LocalHost, u->ipv6);
 				Alog() << "Connected to Server " << Number << " (" << u->host << ":" << u->port << ")";
 			}
-			catch (SocketException& ex)
+			catch (const SocketException &ex)
 			{
 				Alog() << "Unable to connect with SSL to server" << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
 			}

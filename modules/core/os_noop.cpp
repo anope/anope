@@ -20,22 +20,22 @@ class CommandOSNOOP : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
-		const char *server = params[1].c_str();
+		Anope::string cmd = params[0];
+		Anope::string server = params[1];
 
-		if (cmd == "SET")
+		if (cmd.equals_ci("SET"))
 		{
-			std::string reason;
+			Anope::string reason;
 
 			/* Remove the O:lines */
 			ircdproto->SendSVSNOOP(server, 1);
 
 			reason = "NOOP command used by " + u->nick;
 			if (Config.WallOSNoOp)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server);
-			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server.c_str());
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
 			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
@@ -44,26 +44,26 @@ class CommandOSNOOP : public Command
 				++it;
 
 				if (u2 && is_oper(u2) && Anope::Match(u2->server->GetName(), server, true))
-					kill_user(Config.s_OperServ, u2->nick.c_str(), reason.c_str());
+					kill_user(Config.s_OperServ, u2->nick, reason);
 			}
 		}
-		else if (cmd == "REVOKE")
+		else if (cmd.equals_ci("REVOKE"))
 		{
 			ircdproto->SendSVSNOOP(server, 0);
-			notice_lang(Config.s_OperServ, u, OPER_NOOP_REVOKE, server);
+			notice_lang(Config.s_OperServ, u, OPER_NOOP_REVOKE, server.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_NOOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
 	}
@@ -77,7 +77,7 @@ class CommandOSNOOP : public Command
 class OSNOOP : public Module
 {
  public:
-	OSNOOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

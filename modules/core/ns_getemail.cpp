@@ -24,9 +24,9 @@ class CommandNSGetEMail : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string email = params[0];
+		Anope::string email = params[0];
 		int j = 0;
 
 		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
@@ -35,10 +35,10 @@ class CommandNSGetEMail : public Command
 		{
 			NickCore *nc = it->second;
 
-			if (nc->email && nc->email == email)
+			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display, email.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
 			}
 		}
 
@@ -51,13 +51,13 @@ class CommandNSGetEMail : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
 	}
@@ -71,7 +71,7 @@ class CommandNSGetEMail : public Command
 class NSGetEMail : public Module
 {
  public:
-	NSGetEMail(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

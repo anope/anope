@@ -1,5 +1,5 @@
 /* ns_maxemail.c - Limit the amount of times an email address
- *				 can be used for a NickServ account.
+ *                 can be used for a NickServ account.
  *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
@@ -19,7 +19,7 @@
 
 void my_load_config();
 void my_add_languages();
-bool check_email_limit_reached(const char *email, User * u);
+bool check_email_limit_reached(const Anope::string &email, User *u);
 
 int NSEmailMax = 0;
 
@@ -35,7 +35,7 @@ static Module *me;
 class NSMaxEmail : public Module
 {
  public:
-	NSMaxEmail(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -102,21 +102,21 @@ class NSMaxEmail : public Module
 		my_load_config();
 	}
 
-	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
+	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == Config.s_NickServ)
+		if (service == findbot(Config.s_NickServ))
 		{
-			if (command == "REGISTER")
+			if (command.equals_ci("REGISTER"))
 			{
-				if (check_email_limit_reached(params.size() > 1 ? params[1].c_str() : NULL, u))
+				if (check_email_limit_reached(params.size() > 1 ? params[1] : "", u))
 					return EVENT_STOP;
 			}
-			else if (command == "SET")
+			else if (command.equals_ci("SET"))
 			{
-				ci::string set = params[0];
-				const char *email = params.size() > 1 ? params[1].c_str() : NULL;
+				Anope::string set = params[0];
+				Anope::string email = params.size() > 1 ? params[1] : "";
 
-				if (set == "email" && check_email_limit_reached(email, u))
+				if (set.equals_ci("email") && check_email_limit_reached(email, u))
 					return EVENT_STOP;
 			}
 		}
@@ -125,27 +125,27 @@ class NSMaxEmail : public Module
 	}
 };
 
-int count_email_in_use(const char *email, User * u)
+int count_email_in_use(const Anope::string &email, User *u)
 {
 	int count = 0;
 
-	if (!email)
+	if (email.empty())
 		return 0;
 
 	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 	{
 		NickCore *nc = it->second;
 
-		if (!(u->Account() && u->Account() == nc) && nc->email && !stricmp(nc->email, email))
+		if (!(u->Account() && u->Account() == nc) && !nc->email.empty() && nc->email.equals_ci(email))
 			++count;
 	}
 
 	return count;
 }
 
-bool check_email_limit_reached(const char *email, User * u)
+bool check_email_limit_reached(const Anope::string &email, User *u)
 {
-	if (NSEmailMax < 1 || !email)
+	if (NSEmailMax < 1 || email.empty())
 		return false;
 
 	if (count_email_in_use(email, u) < NSEmailMax)

@@ -16,34 +16,34 @@
 class CommandNSSetHide : public Command
 {
  public:
-	CommandNSSetHide(const ci::string &cname) : Command(cname, 2)
+	CommandNSSetHide(const Anope::string &cname) : Command(cname, 2)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		int onmsg, offmsg;
 		NickCoreFlag flag;
 
-		if (params[0] == "EMAIL")
+		if (params[0].equals_ci("EMAIL"))
 		{
 			flag = NI_HIDE_EMAIL;
 			onmsg = NICK_SET_HIDE_EMAIL_ON;
 			offmsg = NICK_SET_HIDE_EMAIL_OFF;
 		}
-		else if (params[0] == "USERMASK")
+		else if (params[0].equals_ci("USERMASK"))
 		{
 			flag = NI_HIDE_MASK;
 			onmsg = NICK_SET_HIDE_MASK_ON;
 			offmsg = NICK_SET_HIDE_MASK_OFF;
 		}
-		else if (params[0] == "STATUS")
+		else if (params[0].equals_ci("STATUS"))
 		{
 			flag = NI_HIDE_STATUS;
 			onmsg = NICK_SET_HIDE_STATUS_ON;
 			offmsg = NICK_SET_HIDE_STATUS_OFF;
 		}
-		else if (params[0] == "QUIT")
+		else if (params[0].equals_ci("QUIT"))
 		{
 			flag = NI_HIDE_QUIT;
 			onmsg = NICK_SET_HIDE_QUIT_ON;
@@ -55,15 +55,15 @@ class CommandNSSetHide : public Command
 			return MOD_CONT;
 		}
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			u->Account()->SetFlag(flag);
-			notice_lang(Config.s_NickServ, u, onmsg, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, onmsg, Config.s_NickServ.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(flag);
-			notice_lang(Config.s_NickServ, u, offmsg, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, offmsg, Config.s_NickServ.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "HIDE");
@@ -71,13 +71,13 @@ class CommandNSSetHide : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_HIDE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
 	}
@@ -91,39 +91,39 @@ class CommandNSSetHide : public Command
 class CommandNSSASetHide : public Command
 {
  public:
-	CommandNSSASetHide(const ci::string &cname) : Command(cname, 3, 3, "nickserv/saset/command")
+	CommandNSSASetHide(const Anope::string &cname) : Command(cname, 3, 3, "nickserv/saset/command")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
 		int onmsg, offmsg;
 		NickCoreFlag flag;
 
-		if (param == "EMAIL")
+		if (param.equals_ci("EMAIL"))
 		{
 			flag = NI_HIDE_EMAIL;
 			onmsg = NICK_SASET_HIDE_EMAIL_ON;
 			offmsg = NICK_SASET_HIDE_EMAIL_OFF;
 		}
-		else if (param == "USERMASK")
+		else if (param.equals_ci("USERMASK"))
 		{
 			flag = NI_HIDE_MASK;
 			onmsg = NICK_SASET_HIDE_MASK_ON;
 			offmsg = NICK_SASET_HIDE_MASK_OFF;
 		}
-		else if (param == "STATUS")
+		else if (param.equals_ci("STATUS"))
 		{
 			flag = NI_HIDE_STATUS;
 			onmsg = NICK_SASET_HIDE_STATUS_ON;
 			offmsg = NICK_SASET_HIDE_STATUS_OFF;
 		}
-		else if (param == "QUIT")
+		else if (param.equals_ci("QUIT"))
 		{
 			flag = NI_HIDE_QUIT;
 			onmsg = NICK_SASET_HIDE_QUIT_ON;
@@ -138,15 +138,15 @@ class CommandNSSASetHide : public Command
 		param = params[2];
 		if (param.empty())
 			this->OnSyntaxError(u, "HIDE");
-		else if (param == "ON")
+		else if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(flag);
-			notice_lang(Config.s_NickServ, u, onmsg, nc->display, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, onmsg, nc->display.c_str(), Config.s_NickServ.c_str());
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(flag);
-			notice_lang(Config.s_NickServ, u, offmsg, nc->display, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, offmsg, nc->display.c_str(), Config.s_NickServ.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "HIDE");
@@ -154,13 +154,13 @@ class CommandNSSASetHide : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_HIDE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 	}
@@ -174,23 +174,29 @@ class CommandNSSASetHide : public Command
 class NSSetHide : public Module
 {
  public:
-	NSSetHide(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetHide(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *set = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(NickServ, "SET");
+		if (c)
+			c->AddSubcommand(new CommandNSSetHide("HIDE"));
 
-		if (set)
-			set->AddSubcommand(new CommandNSSetHide("HIDE"));
+		c = FindCommand(NickServ, "SASET");
+		if (c)
+			c->AddSubcommand(new CommandNSSASetHide("HIDE"));
 	}
 
 	~NSSetHide()
 	{
-		Command *set = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(NickServ, "SET");
+		if (c)
+			c->DelSubcommand("HIDE");
 
-		if (set)
-			set->DelSubcommand("HIDE");
+		c = FindCommand(NickServ, "SASET");
+		if (c)
+			c->DelSubcommand("HIDE");
 	}
 };
 

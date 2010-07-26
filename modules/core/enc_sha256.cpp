@@ -132,26 +132,26 @@ class ESHA256 : public Module
 	}
 
 	/* returns the IV as base64-encrypted string */
-	std::string GetIVString()
+	Anope::string GetIVString()
 	{
-		unsigned char buf[33];
-		char buf2[512];
+		char buf[33];
+		Anope::string buf2;
 		for (int i = 0; i < 8; ++i)
-			UNPACK32(iv[i], &buf[i << 2]);
-		b64_encode(reinterpret_cast<char *>(buf), 32, buf2, 512);
+			UNPACK32(iv[i], reinterpret_cast<unsigned char *>(&buf[i << 2]));
+		b64_encode(buf, buf2);
 		return buf2;
 	}
 
 	/* splits the appended IV from the password string so it can be used for the next encryption */
 	/* password format:  <hashmethod>:<password_b64>:<iv_b64> */
-	void GetIVFromPass(std::string &password)
+	void GetIVFromPass(const Anope::string &password)
 	{
-		size_t pos = password.find(":");
-		std::string buf(password, password.find(":", pos + 1) + 1, password.size());
-		unsigned char buf2[33];
-		b64_decode(buf.c_str(), reinterpret_cast<char *>(buf2), 33);
+		size_t pos = password.find(':');
+		Anope::string buf = password.substr(password.find(':', pos + 1) + 1, password.length());
+		Anope::string buf2;
+		b64_decode(buf, buf2);
 		for (int i = 0 ; i < 8; ++i)
-			PACK32(&buf2[i<<2], iv[i]);
+			PACK32(reinterpret_cast<unsigned char *>(&buf2[i << 2]), iv[i]);
 	}
 
 	void SHA256Init(SHA256Context *ctx)
@@ -248,7 +248,7 @@ class ESHA256 : public Module
 
 /**********   ANOPE ******/
  public:
-	ESHA256(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	ESHA256(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(ENCRYPTION);
@@ -260,10 +260,10 @@ class ESHA256 : public Module
 		use_iv = false;
 	}
 
-	EventReturn OnEncrypt(const std::string &src, std::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		char digest[SHA256_DIGEST_SIZE];
-		char cpass[1000];
+		Anope::string cpass;
 		SHA256Context ctx;
 		std::stringstream buf;
 
@@ -273,40 +273,40 @@ class ESHA256 : public Module
 			use_iv = false;
 
 		SHA256Init(&ctx);
-		SHA256Update(&ctx, reinterpret_cast<const unsigned char *>(src.c_str()), src.size());
+		SHA256Update(&ctx, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		SHA256Final(&ctx, reinterpret_cast<unsigned char *>(digest));
 
-		b64_encode(digest, SHA256_DIGEST_SIZE, cpass, 1000);
+		b64_encode(digest, cpass);
 		buf << "sha256:" << cpass << ":" << GetIVString();
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest = buf.str();
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnDecrypt(const std::string &hashm, std::string &src, std::string &dest)
+	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
 	{
-		if (hashm != "sha256")
+		if (!hashm.equals_cs("sha256"))
 			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
+	EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password)
 	{
-		if (hashm != "sha256")
+		if (!hashm.equals_cs("sha256"))
 			return EVENT_CONTINUE;
-		std::string buf;
+		Anope::string buf;
 
 		GetIVFromPass(password);
 		use_iv = true;
 		this->OnEncrypt(plaintext, buf);
 
-		if (password == buf)
+		if (password.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() != this->name)
-				enc_encrypt(plaintext, password );
+			if (!this->name.equals_ci(Config.EncModuleList.front()))
+				enc_encrypt(plaintext, password);
 			return EVENT_ALLOW;
 		}
 		return EVENT_STOP;

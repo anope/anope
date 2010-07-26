@@ -20,10 +20,10 @@ class CommandOSJupe : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *jserver = params[0].c_str();
-		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string jserver = params[0];
+		Anope::string reason = params.size() > 1 ? params[1] : "";
 		Server *server = Server::Find(jserver);
 
 		if (!isValidHost(jserver, 3))
@@ -32,8 +32,7 @@ class CommandOSJupe : public Command
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else
 		{
-			char rbuf[256];
-			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick.c_str(), reason ? ": " : "", reason ? reason : "");
+			Anope::string rbuf = "Juped by " + u->nick + (!reason.empty() ? ": " + reason : "");
 			if (server)
 				ircdproto->SendSquit(jserver, rbuf);
 			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "");
@@ -41,18 +40,18 @@ class CommandOSJupe : public Command
 			ircdproto->SendServer(juped_server);
 
 			if (Config.WallOSJupe)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver);
+				ircdproto->SendGlobops(OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver.c_str());
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_JUPE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
 	}
@@ -66,7 +65,7 @@ class CommandOSJupe : public Command
 class OSJupe : public Module
 {
  public:
-	OSJupe(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

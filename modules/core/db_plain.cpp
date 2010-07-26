@@ -13,7 +13,7 @@
 #include "module.h"
 
 std::fstream db;
-std::string DatabaseFile;
+Anope::string DatabaseFile;
 
 /** Enum used for what METADATA type we are reading
  */
@@ -56,14 +56,14 @@ static void ReadDatabase(Module *m = NULL)
 	BotInfo *bi = NULL;
 	ChannelInfo *ci = NULL;
 
-	std::string buf;
-	while (std::getline(db, buf))
+	Anope::string buf;
+	while (std::getline(db, buf.str()))
 	{
 		if (buf.empty())
 			continue;
 
 		spacesepstream sep(buf);
-		std::vector<std::string> params;
+		std::vector<Anope::string> params;
 		while (sep.GetToken(buf))
 		{
 			if (buf[0] == ':')
@@ -90,36 +90,34 @@ static void ReadDatabase(Module *m = NULL)
 
 		if (!params.empty())
 		{
-			if (params[0] == "NC")
+			if (params[0].equals_ci("NC"))
 			{
 				nc = findcore(params[1]);
 				Type = MD_NC;
 			}
-			else if (params[0] == "NA")
+			else if (params[0].equals_ci("NA"))
 			{
 				na = findnick(params[2]);
 				Type = MD_NA;
 			}
-			else if (params[0] == "NR")
+			else if (params[0].equals_ci("NR"))
 			{
 				nr = findrequestnick(params[1]);
 				Type = MD_NR;
 			}
-			else if (params[0] == "BI")
+			else if (params[0].equals_ci("BI"))
 			{
 				bi = findbot(params[1]);
 				Type = MD_BI;
 			}
-			else if (params[0] == "CH")
+			else if (params[0].equals_ci("CH"))
 			{
 				ci = cs_findchan(params[1]);
 				Type = MD_CH;
 			}
-			else if (params[0] == "MD")
+			else if (params[0].equals_ci("MD"))
 			{
-				std::string key = params[1];
-				params.erase(params.begin());
-				params.erase(params.begin());
+				Anope::string key = params[1].substr(2);
 
 				if (Type == MD_NC && nc)
 				{
@@ -130,7 +128,7 @@ static void ReadDatabase(Module *m = NULL)
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nc, key, params));
 					}
-					catch (DatabaseException& ex)
+					catch (const DatabaseException &ex)
 					{
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
@@ -144,7 +142,7 @@ static void ReadDatabase(Module *m = NULL)
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
 					}
-					catch (DatabaseException& ex)
+					catch (const DatabaseException &ex)
 					{
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
@@ -158,7 +156,7 @@ static void ReadDatabase(Module *m = NULL)
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nr, key, params));
 					}
-					catch (DatabaseException& ex)
+					catch (const DatabaseException &ex)
 					{
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
@@ -172,7 +170,7 @@ static void ReadDatabase(Module *m = NULL)
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, key, params));
 					}
-					catch (DatabaseException& ex)
+					catch (const DatabaseException &ex)
 					{
 						Alog() << "[db_plain]: " << ex.GetReason();
 					}
@@ -186,7 +184,7 @@ static void ReadDatabase(Module *m = NULL)
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, key, params));
 					}
-					catch (DatabaseException& ex)
+					catch (const DatabaseException &ex)
 					{
 						Alog() << "[db_plain]: " << ex.GetReason();
 						if (!ci->founder)
@@ -205,31 +203,31 @@ static void ReadDatabase(Module *m = NULL)
 
 struct LangInfo
 {
-	std::string Name;
+	Anope::string Name;
 	int LanguageId;
 };
 
 struct ChannelFlagInfo
 {
-	std::string Name;
+	Anope::string Name;
 	ChannelInfoFlag Flag;
 };
 
 struct ChannelLevel
 {
-	std::string Name;
+	Anope::string Name;
 	int Level;
 };
 
 struct BotFlagInfo
 {
-	std::string Name;
+	Anope::string Name;
 	BotServFlag Flag;
 };
 
 struct NickCoreFlagInfo
 {
-	std::string Name;
+	Anope::string Name;
 	NickCoreFlag Flag;
 };
 
@@ -353,7 +351,7 @@ NickCoreFlagInfo NickCoreFlags[] = {
 	{"", static_cast<NickCoreFlag>(-1)}
 };
 
-static void LoadNickCore(const std::vector<std::string> &params)
+static void LoadNickCore(const std::vector<Anope::string> &params)
 {
 	NickCore *nc = new NickCore(params[0]);
 	/* Clear default flags */
@@ -363,19 +361,19 @@ static void LoadNickCore(const std::vector<std::string> &params)
 		/* This is a forbidden nick */
 		return;
 
-	nc->pass.assign(params[1]);
+	nc->pass = params[1];
 
 	for (int i = 0; LangInfos[i].LanguageId != -1; ++i)
-		if (params[2] == LangInfos[i].Name)
+		if (params[2].equals_ci(LangInfos[i].Name))
 			nc->language = LangInfos[i].LanguageId;
 
-	nc->memos.memomax = atoi(params[3].c_str());
-	nc->channelcount = atoi(params[4].c_str());
+	nc->memos.memomax = params[3].is_number_only() ? convertTo<int16>(params[3]) : 1;
+	nc->channelcount = params[4].is_number_only() ? convertTo<uint16>(params[4]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
 }
 
-static void LoadNickAlias(const std::vector<std::string> &params)
+static void LoadNickAlias(const std::vector<Anope::string> &params)
 {
 	NickCore *nc = findcore(params[0]);
 	if (!nc)
@@ -386,40 +384,40 @@ static void LoadNickAlias(const std::vector<std::string> &params)
 
 	NickAlias *na = new NickAlias(params[1], nc);
 
-	na->time_registered = strtol(params[2].c_str(), NULL, 10);
+	na->time_registered = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
 
-	na->last_seen = strtol(params[3].c_str(), NULL, 10);
+	na->last_seen = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
 }
 
-static void LoadNickRequest(const std::vector<std::string> &params)
+static void LoadNickRequest(const std::vector<Anope::string> &params)
 {
 	NickRequest *nr = new NickRequest(params[0]);
 	nr->passcode = params[1];
 	nr->password = params[2];
-	nr->email = sstrdup(params[3].c_str());
-	nr->requested = atol(params[4].c_str());
+	nr->email = params[3];
+	nr->requested = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
 }
 
-static void LoadBotInfo(const std::vector<std::string> &params)
+static void LoadBotInfo(const std::vector<Anope::string> &params)
 {
 	BotInfo *bi = findbot(params[0]);
 	if (!bi)
 		bi = new BotInfo(params[0]);
 	bi->SetIdent(params[1]);
-	bi->host = sstrdup(params[2].c_str());
-	bi->created = atol(params[3].c_str());
+	bi->host = params[2];
+	bi->created = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 	//bi no longer has a chancount, use bi->chans.size()
 	//bi->chancount = atol(params[4].c_str());
-	bi->realname = sstrdup(params[5].c_str());
+	bi->realname = params[5];
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }
 
-static void LoadChanInfo(const std::vector<std::string> &params)
+static void LoadChanInfo(const std::vector<Anope::string> &params)
 {
 	ChannelInfo *ci = new ChannelInfo(params[0]);
 	/* CLear default mlock */
@@ -428,38 +426,38 @@ static void LoadChanInfo(const std::vector<std::string> &params)
 	ci->ClearFlags();
 	ci->botflags.ClearFlags();
 
-	ci->time_registered = strtol(params[1].c_str(), NULL, 10);
+	ci->time_registered = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
 
-	ci->last_used = strtol(params[2].c_str(), NULL, 10);
+	ci->last_used = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
 
-	ci->bantype = atoi(params[3].c_str());
+	ci->bantype = params[3].is_number_only() ? convertTo<int16>(params[3]) : Config.CSDefBantype;
 
-	ci->memos.memomax = atoi(params[4].c_str());
+	ci->memos.memomax = params[4].is_number_only() ? convertTo<int16>(params[4]) : 1;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
 }
 
-static void LoadOperInfo(const std::vector<std::string> &params)
+static void LoadOperInfo(const std::vector<Anope::string> &params)
 {
-	if (params[0] == "STATS")
+	if (params[0].equals_ci("STATS"))
 	{
-		maxusercnt = atol(params[1].c_str());
-		maxusertime = strtol(params[2].c_str(), NULL, 10);
+		maxusercnt = params[1].is_number_only() ? convertTo<uint32>(params[1]) : 0;
+		maxusertime = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
 	}
-	else if (params[0] == "SNLINE" || params[0] == "SQLINE" || params[0] == "SZLINE")
+	else if (params[0].equals_ci("SNLINE") || params[0].equals_ci("SQLINE") || params[0].equals_ci("SZLINE"))
 	{
-		ci::string mask = params[1].c_str();
-		ci::string by = params[2].c_str();
-		time_t seton = atol(params[3].c_str());
-		time_t expires = atol(params[4].c_str());
-		std::string reason = params[5];
+		Anope::string mask = params[1];
+		Anope::string by = params[2];
+		time_t seton = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
+		time_t expires = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
+		Anope::string reason = params[5];
 
 		XLine *x = NULL;
-		if (params[0] == "SNLINE" && SNLine)
+		if (params[0].equals_ci("SNLINE") && SNLine)
 			x = SNLine->Add(NULL, NULL, mask, expires, reason);
-		else if (params[0] == "SQLINE" && SQLine)
+		else if (params[0].equals_ci("SQLINE") && SQLine)
 			x = SQLine->Add(NULL, NULL, mask, expires, reason);
-		else if (params[0] == "SZLINE" && SZLine)
+		else if (params[0].equals_ci("SZLINE") && SZLine)
 			x = SZLine->Add(NULL, NULL, mask, expires, reason);
 		if (x)
 		{
@@ -467,14 +465,14 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 			x->Created = seton;
 		}
 	}
-	else if (params[0] == "AKILL" && SGLine)
+	else if (params[0].equals_ci("AKILL") && SGLine)
 	{
-		ci::string user = params[1].c_str();
-		ci::string host = params[2].c_str();
-		ci::string by = params[3].c_str();
-		time_t seton = atol(params[4].c_str());
-		time_t expires = atol(params[5].c_str());
-		std::string reason = params[6];
+		Anope::string user = params[1];
+		Anope::string host = params[2];
+		Anope::string by = params[3];
+		time_t seton = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
+		time_t expires = params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0;
+		Anope::string reason = params[6];
 
 		XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
 		if (x)
@@ -483,26 +481,25 @@ static void LoadOperInfo(const std::vector<std::string> &params)
 			x->Created = seton;
 		}
 	}
-	else if (params[0] == "EXCEPTION")
+	else if (params[0].equals_ci("EXCEPTION"))
 	{
-		++nexceptions;
-		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
-		exceptions[nexceptions - 1].mask = sstrdup(params[1].c_str());
-		exceptions[nexceptions - 1].limit = atol(params[2].c_str());
-		exceptions[nexceptions - 1].who = sstrdup(params[3].c_str());
-		exceptions[nexceptions - 1].time = strtol(params[4].c_str(), NULL, 10);
-		exceptions[nexceptions - 1].expires = strtol(params[5].c_str(), NULL, 10);
-		exceptions[nexceptions - 1].reason = sstrdup(params[6].c_str());
-		exceptions[nexceptions - 1].num = nexceptions - 1;
+		Exception *exception = new Exception();
+		exception->mask = params[1];
+		exception->limit = params[2].is_number_only() ? convertTo<int>(params[2]) : 1;
+		exception->who = params[3];
+		exception->time = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
+		exception->expires = params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0;
+		exception->reason = params[6];
+		exceptions.push_back(exception);
 	}
 }
 
-void Write(const std::string &buf)
+void Write(const Anope::string &buf)
 {
 	db << buf << endl;
 }
 
-void WriteMetadata(const std::string &key, const std::string &data)
+void WriteMetadata(const Anope::string &key, const Anope::string &data)
 {
 	Write("MD " + key + " " + data);
 }
@@ -512,9 +509,9 @@ class DBPlain : public Module
 	/* Day the last backup was on */
 	int LastDay;
 	/* Backup file names */
-	std::list<std::string> Backups;
+	std::list<Anope::string> Backups;
  public:
-	DBPlain(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	DBPlain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(DATABASE);
@@ -543,18 +540,14 @@ class DBPlain : public Module
 		if (tm->tm_mday != LastDay)
 		{
 			LastDay = tm->tm_mday;
-			char *newname = new char[DatabaseFile.length() + 30];
-			snprintf(newname, DatabaseFile.length() + 30, "backups/%s.%d%d%d", DatabaseFile.c_str(), tm->tm_year, tm->tm_mon, tm->tm_mday);
+			Anope::string newname = "backups/" + DatabaseFile + "." + stringify(tm->tm_year) + stringify(tm->tm_mon) + stringify(tm->tm_mday);
 
 			/* Backup already exists */
 			if (IsFile(newname))
-			{
-				delete [] newname;
 				return;
-			}
 
 			Alog(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
-			if (rename(DatabaseFile.c_str(), newname) != 0)
+			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
 				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
 				Alog() << "Unable to back up database!";
@@ -562,14 +555,10 @@ class DBPlain : public Module
 				if (!Config.NoBackupOkay)
 					quitting = 1;
 
-				delete [] newname;
-
 				return;
 			}
 
 			Backups.push_back(newname);
-
-			delete [] newname;
 
 			unsigned KeepBackups = Config.KeepBackups;
 			if (KeepBackups && Backups.size() > KeepBackups)
@@ -586,23 +575,23 @@ class DBPlain : public Module
 		DatabaseFile = config.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
-	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
 	{
-		std::string key = params[0];
-		std::vector<std::string> otherparams = params;
+		Anope::string key = params[0];
+		std::vector<Anope::string> otherparams = params;
 		otherparams.erase(otherparams.begin());
 
-		if (key == "NC")
+		if (key.equals_ci("NC"))
 			LoadNickCore(otherparams);
-		else if (key == "NA")
+		else if (key.equals_ci("NA"))
 			LoadNickAlias(otherparams);
-		else if (key == "NR")
+		else if (key.equals_ci("NR"))
 			LoadNickRequest(otherparams);
-		else if (key == "BI")
+		else if (key.equals_ci("BI"))
 			LoadBotInfo(otherparams);
-		else if (key == "CH")
+		else if (key.equals_ci("CH"))
 			LoadChanInfo(otherparams);
-		else if (key == "OS")
+		else if (key.equals_ci("OS"))
 			LoadOperInfo(otherparams);
 
 		return EVENT_CONTINUE;
@@ -619,84 +608,80 @@ class DBPlain : public Module
 		return EVENT_STOP;
 	}
 
-	EventReturn OnDatabaseReadMetadata(NickCore *nc, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key == "EMAIL")
-			nc->email = sstrdup(params[0].c_str());
-		else if (key == "GREET")
-			nc->greet = sstrdup(params[0].c_str());
-		else if (key == "ACCESS")
+		if (key.equals_ci("EMAIL"))
+			nc->email = params[0];
+		else if (key.equals_ci("GREET"))
+			nc->greet = params[0];
+		else if (key.equals_ci("ACCESS"))
 			nc->AddAccess(params[0]);
-		else if (key == "FLAGS")
+		else if (key.equals_ci("FLAGS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; ++j)
 				for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
-					if (NickCoreFlags[i].Name == params[j])
+					if (params[j].equals_ci(NickCoreFlags[i].Name))
 						nc->SetFlag(NickCoreFlags[i].Flag);
 		}
-		else if (key == "MI")
+		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			m->number = atoi(params[0].c_str());
-			m->time = strtol(params[1].c_str(), NULL, 10);
+			m->number = params[0].is_number_only() ? convertTo<uint32>(params[0]) : 0;
+			m->time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
 			m->sender = params[2];
-			for (unsigned j = 3; params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"; ++j)
+			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
-				if (params[j] == "UNREAD")
+				if (params[j].equals_ci("UNREAD"))
 					m->SetFlag(MF_UNREAD);
-				else if (params[j] == "RECEIPT")
+				else if (params[j].equals_ci("RECEIPT"))
 					m->SetFlag(MF_RECEIPT);
-				else if (params[j] == "NOTIFYS")
+				else if (params[j].equals_ci("NOTIFYS"))
 					m->SetFlag(MF_NOTIFYS);
 			}
-			m->text = sstrdup(params[params.size() - 1].c_str());
+			m->text = params[params.size() - 1];
 			nc->memos.memos.push_back(m);
 		}
 
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnDatabaseReadMetadata(NickAlias *na, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key == "LAST_USERMASK")
-			na->last_usermask = sstrdup(params[0].c_str());
-		else if (key == "LAST_REALNAME")
-			na->last_realname = sstrdup(params[0].c_str());
-		else if (key == "LAST_QUIT")
-			na->last_quit = sstrdup(params[0].c_str());
-		else if (key == "FLAGS")
+		if (key.equals_ci("LAST_USERMASK"))
+			na->last_usermask = params[0];
+		else if (key.equals_ci("LAST_REALNAME"))
+			na->last_realname = params[0];
+		else if (key.equals_ci("LAST_QUIT"))
+			na->last_quit = params[0];
+		else if (key.equals_ci("FLAGS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; ++j)
 			{
-				if (params[j] == "FORBIDDEN")
+				if (params[j].equals_ci("FORBIDDEN"))
 					na->SetFlag(NS_FORBIDDEN);
-				else if (params[j] == "NOEXPIRE")
+				else if (params[j].equals_ci("NOEXPIRE"))
 					na->SetFlag(NS_NO_EXPIRE);
 			}
 		}
-		else if (key == "VHOST")
-			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], strtol(params[1].c_str(), NULL, 10));
+		else if (key.equals_ci("VHOST"))
+			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0);
 
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnDatabaseReadMetadata(BotInfo *bi, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key == "FLAGS")
-		{
+		if (key.equals_ci("FLAGS"))
 			for (unsigned j = 0, end = params.size(); j < end; ++j)
-			{
-				if (params[j] == "PRIVATE")
+				if (params[j].equals_ci("PRIVATE"))
 					bi->SetFlag(BI_PRIVATE);
-			}
-		}
 
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key == "FOUNDER")
+		if (key.equals_ci("FOUNDER"))
 		{
 			ci->founder = findcore(params[0]);
 			if (!ci->founder)
@@ -706,36 +691,36 @@ class DBPlain : public Module
 				throw DatabaseException(reason.str());
 			}
 		}
-		else if (key == "SUCCESSOR")
+		else if (key.equals_ci("SUCCESSOR"))
 			ci->successor = findcore(params[0]);
-		else if (key == "LEVELS")
+		else if (key.equals_ci("LEVELS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; j += 2)
 				for (int i = 0; ChannelLevels[i].Level != -1; ++i)
-					if (ChannelLevels[i].Name == params[j])
-						ci->levels[ChannelLevels[i].Level] = atoi(params[j + 1].c_str());
+					if (params[j].equals_ci(ChannelLevels[i].Name))
+						ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 		}
-		else if (key == "FLAGS")
+		else if (key.equals_ci("FLAGS"))
 		{
 			for (unsigned j = 0, end = params.size(); j < end; ++j)
 				for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
-					if (ChannelInfoFlags[i].Name == params[j])
+					if (params[j].equals_ci(ChannelInfoFlags[i].Name))
 						ci->SetFlag(ChannelInfoFlags[i].Flag);
 		}
-		else if (key == "DESC")
-			ci->desc = sstrdup(params[0].c_str());
-		else if (key == "TOPIC")
+		else if (key.equals_ci("DESC"))
+			ci->desc = params[0];
+		else if (key.equals_ci("TOPIC"))
 		{
 			ci->last_topic_setter = params[0];
-			ci->last_topic_time = strtol(params[1].c_str(), NULL, 10);
-			ci->last_topic = sstrdup(params[2].c_str());
+			ci->last_topic_time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
+			ci->last_topic = params[2];
 		}
-		else if (key == "FORBID")
+		else if (key.equals_ci("FORBID"))
 		{
-			ci->forbidby = sstrdup(params[0].c_str());
-			ci->forbidreason = sstrdup(params[1].c_str());
+			ci->forbidby = params[0];
+			ci->forbidreason = params[1];
 		}
-		else if (key == "ACCESS")
+		else if (key.equals_ci("ACCESS"))
 		{
 			NickCore *nc = findcore(params[0]);
 			if (!nc)
@@ -745,14 +730,14 @@ class DBPlain : public Module
 				throw DatabaseException(reason.str());
 			}
 
-			int level = atoi(params[1].c_str());
-			time_t last_seen = strtol(params[2].c_str(), NULL, 10);
+			int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
+			time_t last_seen = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
 			ci->AddAccess(nc, level, params[3], last_seen);
 		}
-		else if (key == "AKICK")
+		else if (key.equals_ci("AKICK"))
 		{
-			bool Stuck = params[0] == "STUCK" ? true : false;
-			bool Nick = params[1] == "NICK" ? true : false;
+			bool Stuck = params[0].equals_ci("STUCK");
+			bool Nick = params[1].equals_ci("NICK");
 			NickCore *nc = NULL;
 			if (Nick)
 			{
@@ -766,103 +751,103 @@ class DBPlain : public Module
 			}
 			AutoKick *ak;
 			if (Nick)
-				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", atol(params[4].c_str()), atol(params[5].c_str()));
+				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0);
 			else
-				ak = ci->AddAkick(params[3], params[2],  params.size() > 6 ? params[6] : "", atol(params[4].c_str()), atol(params[5].c_str()));
+				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0);
 			if (Stuck)
 				ak->SetFlag(AK_STUCK);
 			if (Nick)
 				ak->SetFlag(AK_ISNICK);
 
 		}
-		else if (key == "MLOCK_ON" || key == "MLOCK_OFF")
+		else if (key.equals_ci("MLOCK_ON") || key.equals_ci("MLOCK_OFF"))
 		{
-			bool Set = key == "MLOCK_ON" ? true : false;
+			bool Set = key.equals_ci("MLOCK_ON");
 
 			/* For now store mlock in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-			ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<std::string> >(params));
+			ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(params));
 		}
-		else if (key == "MLP")
+		else if (key.equals_ci("MLP"))
 		{
-			std::vector<std::pair<std::string, std::string> > mlp;
+			std::vector<std::pair<Anope::string, Anope::string> > mlp;
 
 			for (unsigned j = 0, end = params.size(); j < end; j += 2)
 				mlp.push_back(std::make_pair(params[j], params[j + 1]));
 
 			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
+			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
 		}
-		else if (key == "MI")
+		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			m->number = atoi(params[0].c_str());
-			m->time = strtol(params[1].c_str(), NULL, 10);
+			m->number = params[0].is_number_only() ? convertTo<uint32>(params[0]) : 0;
+			m->time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
 			m->sender = params[2];
-			for (unsigned j = 3; params[j] == "UNREAD" || params[j] == "RECEIPT" || params[j] == "NOTIFYS"; ++j)
+			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
-				if (params[j] == "UNREAD")
+				if (params[j].equals_ci("UNREAD"))
 					m->SetFlag(MF_UNREAD);
-				else if (params[j] == "RECEIPT")
+				else if (params[j].equals_ci("RECEIPT"))
 					m->SetFlag(MF_RECEIPT);
-				else if (params[j] == "NOTIFYS")
+				else if (params[j].equals_ci("NOTIFYS"))
 					m->SetFlag(MF_NOTIFYS);
 			}
-			m->text = sstrdup(params[params.size() - 1].c_str());
+			m->text = params[params.size() - 1];
 			ci->memos.memos.push_back(m);
 		}
-		else if (key == "ENTRYMSG")
-			ci->entry_message = sstrdup(params[0].c_str());
-		else if (key == "BI")
+		else if (key.equals_ci("ENTRYMSG"))
+			ci->entry_message = params[0];
+		else if (key.equals_ci("BI"))
 		{
-			if (params[0] == "NAME")
+			if (params[0].equals_ci("NAME"))
 				ci->bi = findbot(params[1]);
-			else if (params[0] == "FLAGS")
+			else if (params[0].equals_ci("FLAGS"))
 			{
 				for (unsigned j = 1, end = params.size(); j < end; ++j)
 					for (int i = 0; BotFlags[i].Flag != -1; ++i)
-						if (BotFlags[i].Name == params[j])
+						if (params[j].equals_ci(BotFlags[i].Name))
 							ci->botflags.SetFlag(BotFlags[i].Flag);
 			}
-			else if (params[0] == "TTB")
+			else if (params[0].equals_ci("TTB"))
 			{
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)
 				{
-					if (params[j] == "BOLDS")
-						ci->ttb[0] = atoi(params[j + 1].c_str());
-					else if (params[j] == "COLORS")
-						ci->ttb[1] = atoi(params[j + 1].c_str());
-					else if (params[j] == "REVERSES")
-						ci->ttb[2] = atoi(params[j + 1].c_str());
-					else if (params[j] == "UNDERLINES")
-						ci->ttb[3] = atoi(params[j + 1].c_str());
-					else if (params[j] == "BADWORDS")
-						ci->ttb[4] = atoi(params[j + 1].c_str());
-					else if (params[j] == "CAPS")
-						ci->ttb[5] = atoi(params[j + 1].c_str());
-					else if (params[j] == "FLOOD")
-						ci->ttb[6] = atoi(params[j + 1].c_str());
-					else if (params[j] == "REPEAT")
-						ci->ttb[7] = atoi(params[j + 1].c_str());
+					if (params[j].equals_ci("BOLDS"))
+						ci->ttb[0] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("COLORS"))
+						ci->ttb[1] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("REVERSES"))
+						ci->ttb[2] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("UNDERLINES"))
+						ci->ttb[3] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("BADWORDS"))
+						ci->ttb[4] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("CAPS"))
+						ci->ttb[5] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("FLOOD"))
+						ci->ttb[6] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("REPEAT"))
+						ci->ttb[7] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 				}
 			}
-			else if (params[0] == "CAPSMIN")
-				ci->capsmin = atoi(params[1].c_str());
-			else if (params[0] == "CAPSPERCENT")
-				ci->capspercent = atoi(params[1].c_str());
-			else if (params[0] == "FLOODLINES")
-				ci->floodlines = atoi(params[1].c_str());
-			else if (params[0] == "FLOODSECS")
-				ci->floodsecs = atoi(params[1].c_str());
-			else if (params[0] == "REPEATTIMES")
-				ci->repeattimes = atoi(params[1].c_str());
-			else if (params[0] == "BADWORD")
+			else if (params[0].equals_ci("CAPSMIN"))
+				ci->capsmin = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+			else if (params[0].equals_ci("CAPSPERCENT"))
+				ci->capspercent = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+			else if (params[0].equals_ci("FLOODLINES"))
+				ci->floodlines = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+			else if (params[0].equals_ci("FLOODSECS"))
+				ci->floodsecs = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+			else if (params[0].equals_ci("REPEATTIMES"))
+				ci->repeattimes = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+			else if (params[0].equals_ci("BADWORD"))
 			{
 				BadWordType Type;
-				if (params[1] == "SINGLE")
+				if (params[1].equals_ci("SINGLE"))
 					Type = BW_SINGLE;
-				else if (params[1] == "START")
+				else if (params[1].equals_ci("START"))
 					Type = BW_START;
-				else if (params[1] == "END")
+				else if (params[1].equals_ci("END"))
 					Type = BW_END;
 				else
 					Type = BW_ANY;
@@ -915,13 +900,14 @@ class DBPlain : public Module
 					db << LangInfos[j].Name;
 			db << " " << nc->memos.memomax << " " << nc->channelcount << endl;
 
-			if (nc->email)
+			if (!nc->email.empty())
 				db << "MD EMAIL " << nc->email << endl;
-			if (nc->greet)
+			if (!nc->greet.empty())
 				db << "MD GREET :" << nc->greet << endl;
+
 			if (!nc->access.empty())
 			{
-				for (std::vector<std::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
+				for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 					db << "MD ACCESS " << *it << endl;
 			}
 			if (nc->FlagCount())
@@ -955,11 +941,11 @@ class DBPlain : public Module
 			NickAlias *na = it->second;
 
 			db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
-			if (na->last_usermask)
+			if (!na->last_usermask.empty())
 				db << "MD LAST_USERMASK " << na->last_usermask << endl;
-			if (na->last_realname)
+			if (!na->last_realname.empty())
 				db << "MD LAST_REALNAME :" << na->last_realname << endl;
-			if (na->last_quit)
+			if (!na->last_quit.empty())
 				db << "MD LAST_QUIT :" << na->last_quit << endl;
 			if (na->HasFlag(NS_FORBIDDEN) || na->HasFlag(NS_NO_EXPIRE))
 				db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
@@ -993,9 +979,9 @@ class DBPlain : public Module
 				db << "MD FOUNDER " << ci->founder->display << endl;
 			if (ci->successor)
 				db << "MD SUCCESSOR " << ci->successor->display << endl;
-			if (ci->desc)
+			if (!ci->desc.empty())
 				db << "MD DESC :" << ci->desc << endl;
-			if (ci->last_topic)
+			if (!ci->last_topic.empty())
 				db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
 			db << "MD LEVELS";
 			for (int j = 0; ChannelLevels[j].Level != -1; ++j)
@@ -1015,7 +1001,8 @@ class DBPlain : public Module
 				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
-				db << "MD AKICK " << (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
+				db << "MD AKICK " << (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
+					(ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
 				if (!ci->GetAkick(k)->reason.empty())
 					db << ci->GetAkick(k)->reason;
 				db << endl;
@@ -1050,7 +1037,7 @@ class DBPlain : public Module
 				}
 				db << endl;
 			}
-			std::string Param;
+			Anope::string Param;
 			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 			{
 				if ((*it)->Class == MC_CHANNEL)
@@ -1077,7 +1064,7 @@ class DBPlain : public Module
 					db << " :" << memos->memos[k]->text << endl;
 				}
 			}
-			if (ci->entry_message)
+			if (!ci->entry_message.empty())
 				db << "MD ENTRYMSG :" << ci->entry_message << endl;
 			if (ci->bi)
 				db << "MD BI NAME " << ci->bi->nick << endl;
@@ -1101,7 +1088,8 @@ class DBPlain : public Module
 			if (ci->repeattimes)
 				db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
 			for (unsigned k = 0, end = ci->GetBadWordCount(); k < end; ++k)
-				db << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") << (ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
+				db << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") <<
+					(ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
@@ -1136,8 +1124,11 @@ class DBPlain : public Module
 				db << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
-		for (int i = 0; i < nexceptions; ++i)
-			db << "OS EXCEPTION " << exceptions[i].mask << " " << exceptions[i].limit << " " << exceptions[i].who << " " << exceptions[i].time << " " << exceptions[i].expires << " " << exceptions[i].reason << endl;
+		for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
+		{
+			Exception *e = *it;
+			db << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
+		}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 

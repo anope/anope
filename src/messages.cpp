@@ -15,7 +15,7 @@
 
 /*************************************************************************/
 
-int m_nickcoll(const char *user)
+int m_nickcoll(const Anope::string &user)
 {
 	introduce_user(user);
 	return MOD_CONT;
@@ -23,25 +23,25 @@ int m_nickcoll(const char *user)
 
 /*************************************************************************/
 
-int m_away(const char *source, const char *msg)
+int m_away(const Anope::string &source, const Anope::string &msg)
 {
 	User *u;
 
 	u = finduser(source);
 
-	if (u && !msg) /* un-away */
+	if (u && msg.empty()) /* un-away */
 		check_memos(u);
 	return MOD_CONT;
 }
 
 /*************************************************************************/
 
-int m_kill(const std::string &nick, const char *msg)
+int m_kill(const Anope::string &nick, const Anope::string &msg)
 {
 	BotInfo *bi;
 
 	/* Recover if someone kills us. */
-	if (Config.s_BotServ && (bi = findbot(nick)))
+	if (!Config.s_BotServ.empty() && (bi = findbot(nick)))
 	{
 		introduce_user(nick);
 		bi->RejoinAll();
@@ -54,36 +54,36 @@ int m_kill(const std::string &nick, const char *msg)
 
 /*************************************************************************/
 
-int m_time(const char *source, int ac, const char **av)
+int m_time(const Anope::string &source, int ac, const char **av)
 {
 	time_t t;
 	struct tm *tm;
 	char buf[64];
 
-	if (!source)
+	if (source.empty())
 		return MOD_CONT;
 
 	time(&t);
 	tm = localtime(&t);
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	ircdproto->SendNumeric(Config.ServerName, 391, source, "%s :%s", Config.ServerName, buf);
+	ircdproto->SendNumeric(Config.ServerName, 391, source, "%s :%s", Config.ServerName.c_str(), buf);
 	return MOD_CONT;
 }
 
 /*************************************************************************/
 
-int m_motd(const char *source)
+int m_motd(const Anope::string &source)
 {
 	FILE *f;
 	char buf[BUFSIZE];
 
-	if (!source)
+	if (source.empty())
 		return MOD_CONT;
 
-	f = fopen(Config.MOTDFilename, "r");
+	f = fopen(Config.MOTDFilename.c_str(), "r");
 	if (f)
 	{
-		ircdproto->SendNumeric(Config.ServerName, 375, source, ":- %s Message of the Day", Config.ServerName);
+		ircdproto->SendNumeric(Config.ServerName, 375, source, ":- %s Message of the Day", Config.ServerName.c_str());
 		while (fgets(buf, sizeof(buf), f))
 		{
 			buf[strlen(buf) - 1] = 0;
@@ -99,9 +99,8 @@ int m_motd(const char *source)
 
 /*************************************************************************/
 
-int m_privmsg(const std::string &source, const std::string &receiver, const std::string &message)
+int m_privmsg(const Anope::string &source, const Anope::string &receiver, const Anope::string &message)
 {
-	char *target;
 	time_t starttime, stoptime; /* When processing started and finished */
 
 	if (source.empty() || receiver.empty() || message.empty())
@@ -115,12 +114,12 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 
 		BotInfo *bi = findbot(receiver);
 		if (bi)
-			ircdproto->SendMessage(bi, source.c_str(), "%s", getstring(USER_RECORD_NOT_FOUND));
+			ircdproto->SendMessage(bi, source, "%s", getstring(USER_RECORD_NOT_FOUND));
 
 		return MOD_CONT;
 	}
 
-	if (receiver[0] == '#' && Config.s_BotServ)
+	if (receiver[0] == '#' && !Config.s_BotServ.empty())
 	{
 		ChannelInfo *ci = cs_findchan(receiver);
 		if (ci)
@@ -135,30 +134,29 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 		/* Check if we should ignore.  Operators always get through. */
 		if (allow_ignore && !is_oper(u))
 		{
-			if (get_ignore(source.c_str()))
+			if (get_ignore(source))
 			{
-				target = myStrGetToken(message.c_str(), ' ', 0);
+				Anope::string target = myStrGetToken(message, ' ', 0);
 				Alog() << "Ignored message from " << source << " to " << receiver << " using command " << target;
-				delete [] target;
 				return MOD_CONT;
 			}
 		}
 
 		/* If a server is specified (nick@server format), make sure it matches
 		 * us, and strip it off. */
-		std::string botname = receiver;
+		Anope::string botname = receiver;
 		size_t s = receiver.find('@');
-		if (s != std::string::npos)
+		if (s != Anope::string::npos)
 		{
-			ci::string servername(receiver.begin() + s + 1, receiver.end());
-			botname = botname.erase(s);
-			if (servername != Config.ServerName)
+			Anope::string servername(receiver.begin() + s + 1, receiver.end());
+			botname = botname.substr(0, s);
+			if (!servername.equals_ci(Config.ServerName))
 				return MOD_CONT;
 		}
 		else if (Config.UseStrictPrivMsg)
 		{
 			Alog(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
-			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config.ServerName, receiver.c_str());
+			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config.ServerName.c_str(), receiver.c_str());
 			return MOD_CONT;
 		}
 
@@ -169,32 +167,31 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 
 		if (bi)
 		{
-			ci::string ci_bi_nick(bi->nick.c_str());
-			if (ci_bi_nick == Config.s_OperServ)
+			if (bi->nick.equals_ci(Config.s_OperServ))
 			{
 				if (!is_oper(u) && Config.OSOpersOnly)
 				{
 					notice_lang(Config.s_OperServ, u, ACCESS_DENIED);
 					if (Config.WallBadOS)
-						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ, u->nick.c_str(), u->GetIdent().c_str(), u->host);
+						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 				}
 				else
 					operserv(u, message);
 			}
-			else if (ci_bi_nick == Config.s_NickServ)
+			else if (bi->nick.equals_ci(Config.s_NickServ))
 				nickserv(u, message);
-			else if (ci_bi_nick == Config.s_ChanServ)
+			else if (bi->nick.equals_ci(Config.s_ChanServ))
 			{
 				if (!is_oper(u) && Config.CSOpersOnly)
 					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 				else
 					chanserv(u, message);
 			}
-			else if (ci_bi_nick == Config.s_MemoServ)
+			else if (bi->nick.equals_ci(Config.s_MemoServ))
 				memoserv(u, message);
-			else if (Config.s_HostServ && ci_bi_nick == Config.s_HostServ)
+			else if (!Config.s_HostServ.empty() && bi->nick.equals_ci(Config.s_HostServ))
 				hostserv(u, message);
-			else if (Config.s_BotServ)
+			else if (!Config.s_BotServ.empty() && bi->nick.equals_ci(Config.s_BotServ))
 				botserv(u, bi, message);
 		}
 
@@ -202,8 +199,8 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 		if (allow_ignore)
 		{
 			stoptime = time(NULL);
-			if (stoptime > starttime && source.find('.') == std::string::npos)
-				add_ignore(source.c_str(), stoptime - starttime);
+			if (stoptime > starttime && source.find('.') == Anope::string::npos)
+				add_ignore(source, stoptime - starttime);
 		}
 	}
 
@@ -212,7 +209,7 @@ int m_privmsg(const std::string &source, const std::string &receiver, const std:
 
 /*************************************************************************/
 
-int m_stats(const char *source, int ac, const char **av)
+int m_stats(const Anope::string &source, int ac, const char **av)
 {
 	User *u;
 
@@ -227,7 +224,7 @@ int m_stats(const char *source, int ac, const char **av)
 			if (u && is_oper(u))
 			{
 				ircdproto->SendNumeric(Config.ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
+				ircdproto->SendNumeric(Config.ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
 			}
 
 			ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
@@ -240,11 +237,11 @@ int m_stats(const char *source, int ac, const char **av)
 				ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 			else
 			{
-				std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
+				std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
 				for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 				{
-					ci::string nick = it->first, type = it->second;
+					Anope::string nick = it->first, type = it->second;
 
 					NickCore *nc = findcore(nick);
 					if (nc)
@@ -273,28 +270,28 @@ int m_stats(const char *source, int ac, const char **av)
 
 /*************************************************************************/
 
-int m_version(const char *source, int ac, const char **av)
+int m_version(const Anope::string &source, int ac, const char **av)
 {
-	if (source)
-		ircdproto->SendNumeric(Config.ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config.ServerName, ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
+	if (!source.empty())
+		ircdproto->SendNumeric(Config.ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config.ServerName.c_str(), ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
 	return MOD_CONT;
 }
 
 /*************************************************************************/
 
-int m_whois(const char *source, const char *who)
+int m_whois(const Anope::string &source, const Anope::string &who)
 {
-	if (source && who)
+	if (!source.empty() && !who.empty())
 	{
 		NickAlias *na;
 		BotInfo *bi = findbot(who);
 		if (bi)
 		{
-			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, bi->realname);
+			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 			ircdproto->SendNumeric(Config.ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
-			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config.ServerName, Config.ServerDesc);
+			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config.ServerName.c_str(), Config.ServerDesc.c_str());
 			ircdproto->SendNumeric(Config.ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
-			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
+			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
 		else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_HELD))
 		{
@@ -302,12 +299,12 @@ int m_whois(const char *source, const char *who)
 			 * We can't just say it doesn't exist here, even tho it does for
 			 * other servers :) -GD
 			 */
-			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick, Config.NSEnforcerUser, Config.NSEnforcerHost);
-			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", na->nick, Config.ServerName, Config.ServerDesc);
-			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who);
+			ircdproto->SendNumeric(Config.ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick.c_str(), Config.NSEnforcerUser.c_str(), Config.NSEnforcerHost.c_str());
+			ircdproto->SendNumeric(Config.ServerName, 312, source, "%s %s :%s", na->nick.c_str(), Config.ServerName.c_str(), Config.ServerDesc.c_str());
+			ircdproto->SendNumeric(Config.ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
 		else
-			ircdproto->SendNumeric(Config.ServerName, 401, source, "%s :No such service.", who);
+			ircdproto->SendNumeric(Config.ServerName, 401, source, "%s :No such service.", who.c_str());
 	}
 	return MOD_CONT;
 }

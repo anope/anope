@@ -20,7 +20,7 @@ class CommandNSAList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		/*
 		 * List the channels that the given nickname has access on
@@ -31,7 +31,7 @@ class CommandNSAList : public Command
 		 * -jester
 		 */
 
-		const char *nick = NULL;
+		Anope::string nick;
 
 		NickAlias *na;
 
@@ -48,41 +48,38 @@ class CommandNSAList : public Command
 			 * The first argument for service admins must
 			 * always be a nickname.
 			 */
-			nick = params.size() ? params[0].c_str() : NULL;
+			nick = !params.empty() ? params[0] : "";
 			lev_param = 1;
 
 			/* If an argument was passed, use it as the nick to see levels
 			 * for, else check levels for the user calling the command */
-			if (nick)
-				na = findnick(nick);
-			else
-				na = findnick(u->nick);
+			na = findnick(!nick.empty() ? nick : u->nick);
 		}
 
 		/* If available, get level from arguments */
-		ci::string lev = params.size() > lev_param ? params[lev_param] : "";
+		Anope::string lev = params.size() > lev_param ? params[lev_param] : "";
 
 		/* if a level was given, make sure it's an int for later */
 		if (!lev.empty())
 		{
-			if (lev == "FOUNDER")
+			if (lev.equals_ci("FOUNDER"))
 				min_level = ACCESS_FOUNDER;
-			else if (lev == "SOP")
+			else if (lev.equals_ci("SOP"))
 				min_level = ACCESS_SOP;
-			else if (lev == "AOP")
+			else if (lev.equals_ci("AOP"))
 				min_level = ACCESS_AOP;
-			else if (lev == "HOP")
+			else if (lev.equals_ci("HOP"))
 				min_level = ACCESS_HOP;
-			else if (lev == "VOP")
+			else if (lev.equals_ci("VOP"))
 				min_level = ACCESS_VOP;
 			else
-				min_level = atoi(lev.c_str());
+				min_level = lev.is_number_only() ? convertTo<int>(lev) : ACCESS_INVALID;
 		}
 
 		if (!na)
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
 			notice_lang(Config.s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
@@ -91,7 +88,7 @@ class CommandNSAList : public Command
 			int chan_count = 0;
 			int match_count = 0;
 
-			notice_lang(Config.s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick);
+			notice_lang(Config.s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick.c_str());
 
 			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			{
@@ -108,14 +105,12 @@ class CommandNSAList : public Command
 
 					if (ci->HasFlag(CI_XOP) || level == ACCESS_FOUNDER)
 					{
-						const char *xop;
+						Anope::string xop = get_xop_level(level);
 
-						xop = get_xop_level(level);
-
-						notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop, ci->desc ? ci->desc : "");
+						notice_lang(Config.s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 					}
 					else
-						notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, ci->desc ? ci->desc : "");
+						notice_lang(Config.s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, !ci->desc.empty() ? ci->desc.c_str() : "");
 				}
 			}
 
@@ -124,7 +119,7 @@ class CommandNSAList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
@@ -143,7 +138,7 @@ class CommandNSAList : public Command
 class NSAList : public Module
 {
  public:
-	NSAList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

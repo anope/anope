@@ -32,7 +32,7 @@ Flags<ChannelModeName, CMODE_END> DefMLockOn;
 /* Default mlocked modes off */
 Flags<ChannelModeName, CMODE_END> DefMLockOff;
 /* Map for default mlocked mode parameters */
-std::map<ChannelModeName, std::string> DefMLockParams;
+std::map<ChannelModeName, Anope::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
 std::list<ChannelModeStatus *> BotModes;
 
@@ -45,11 +45,11 @@ void SetDefaultMLock()
 	DefMLockParams.clear();
 	Flags<ChannelModeName, CMODE_END> *ptr = NULL;
 
-	std::string modes, param;
+	Anope::string modes, param;
 	spacesepstream sep(Config.MLock);
 	sep.GetToken(modes);
 
-	for (unsigned i = 0, end_mode = modes.size(); i < end_mode; ++i)
+	for (unsigned i = 0, end_mode = modes.length(); i < end_mode; ++i)
 	{
 		if (modes[i] == '+')
 			ptr = &DefMLockOn;
@@ -82,7 +82,7 @@ void SetDefaultMLock()
 
 	/* Set Bot Modes */
 	BotModes.clear();
-	for (unsigned i = 0, end_mode = Config.BotModes.size(); i < end_mode; ++i)
+	for (unsigned i = 0, end_mode = Config.BotModes.length(); i < end_mode; ++i)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(Config.BotModes[i]);
 
@@ -97,7 +97,7 @@ void SetDefaultMLock()
  * @param modeChar The mode char
  * @param modeType The mode type
  */
-Mode::Mode(ModeClass mClass, const std::string &mNameAsString, char modeChar, ModeType modeType) : Class(mClass), NameAsString(mNameAsString), ModeChar(modeChar), Type(modeType)
+Mode::Mode(ModeClass mClass, const Anope::string &mNameAsString, char modeChar, ModeType modeType) : Class(mClass), NameAsString(mNameAsString), ModeChar(modeChar), Type(modeType)
 {
 }
 
@@ -112,7 +112,7 @@ Mode::~Mode()
  * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserMode::UserMode(UserModeName mName, const std::string &mNameAsString, char modeChar) : Mode(MC_USER, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
+UserMode::UserMode(UserModeName mName, const Anope::string &mNameAsString, char modeChar) : Mode(MC_USER, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -127,7 +127,7 @@ UserMode::~UserMode()
  * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserModeParam::UserModeParam(UserModeName mName, const std::string &mNameAsString, char modeChar) : UserMode(mName, mNameAsString, modeChar)
+UserModeParam::UserModeParam(UserModeName mName, const Anope::string &mNameAsString, char modeChar) : UserMode(mName, mNameAsString, modeChar)
 {
 	this->Type = MODE_PARAM;
 }
@@ -137,7 +137,7 @@ UserModeParam::UserModeParam(UserModeName mName, const std::string &mNameAsStrin
  * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelMode::ChannelMode(ChannelModeName mName, const std::string &mNameAsString, char modeChar) : Mode(MC_CHANNEL, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
+ChannelMode::ChannelMode(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar) : Mode(MC_CHANNEL, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -152,7 +152,7 @@ ChannelMode::~ChannelMode()
  * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelModeList::ChannelModeList(ChannelModeName mName, const std::string &mNameAsString, char modeChar) : ChannelMode(mName, mNameAsString, modeChar)
+ChannelModeList::ChannelModeList(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar) : ChannelMode(mName, mNameAsString, modeChar)
 {
 	this->Type = MODE_LIST;
 }
@@ -169,7 +169,7 @@ ChannelModeList::~ChannelModeList()
  * @param modeChar The mode char
  * @param MinusArg true if the mode sends no arg when unsetting
  */
-ChannelModeParam::ChannelModeParam(ChannelModeName mName, const std::string &mNameAsString, char modeChar, bool MinusArg) : ChannelMode(mName, mNameAsString, modeChar), MinusNoArg(MinusArg)
+ChannelModeParam::ChannelModeParam(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, bool MinusArg) : ChannelMode(mName, mNameAsString, modeChar), MinusNoArg(MinusArg)
 {
 	this->Type = MODE_PARAM;
 }
@@ -186,7 +186,7 @@ ChannelModeParam::~ChannelModeParam()
  * @param modeChar The mode char
  * @param mSymbol The symbol for the mode, eg @ % +
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, const std::string &mNameAsString, char modeChar, char mSymbol) : ChannelMode(mName, mNameAsString, modeChar), Symbol(mSymbol)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, char mSymbol) : ChannelMode(mName, mNameAsString, modeChar), Symbol(mSymbol)
 {
 	this->Type = MODE_STATUS;
 }
@@ -201,9 +201,9 @@ ChannelModeStatus::~ChannelModeStatus()
  * @param value The key
  * @return true or false
  */
-bool ChannelModeKey::IsValid(const std::string &value)
+bool ChannelModeKey::IsValid(const Anope::string &value)
 {
-	if (!value.empty() && value.find(':') != std::string::npos && value.find(',') != std::string::npos)
+	if (!value.empty() && value.find(':') != Anope::string::npos && value.find(',') != Anope::string::npos)
 		return true;
 
 	return false;
@@ -246,12 +246,12 @@ bool ChannelModeRegistered::CanSet(User *u)
  * @param chan The channel
  * @param mask The ban
  */
-void ChannelModeBan::AddMask(Channel *chan, const char *mask)
+void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 {
 	Entry *ban;
 
 	/* check for NULL values otherwise we will segfault */
-	if (!chan || !mask)
+	if (!chan || mask.empty())
 	{
 		Alog(LOG_DEBUG) << "add_ban called with NULL values";
 		return;
@@ -268,13 +268,13 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
 
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
-	if (Config.s_BotServ && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
+	if (!Config.s_BotServ.empty() && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
 	{
 		BotInfo *bi = chan->ci->bi;
 
-		if (entry_match(ban, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, 0))
+		if (entry_match(ban, bi->nick, bi->GetIdent(), bi->host, 0))
 		{
-			ircdproto->SendMode(bi, chan, "-b %s", mask);
+			ircdproto->SendMode(bi, chan, "-b %s", mask.c_str());
 			entry_delete(chan->bans, ban);
 			return;
 		}
@@ -287,13 +287,13 @@ void ChannelModeBan::AddMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The ban
  */
-void ChannelModeBan::DelMask(Channel *chan, const char *mask)
+void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
 {
 	AutoKick *akick;
 	Entry *ban;
 
 	/* Sanity check as it seems some IRCD will just send -b without a mask */
-	if (!mask || !chan->bans || !chan->bans->count)
+	if (mask.empty() || !chan->bans || !chan->bans->count)
 		return;
 
 	ban = elist_find_mask(chan->bans, mask);
@@ -313,11 +313,11 @@ void ChannelModeBan::DelMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The except
  */
-void ChannelModeExcept::AddMask(Channel *chan, const char *mask)
+void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
 {
 	Entry *exception;
 
-	if (!chan || !mask)
+	if (!chan || mask.empty())
 	{
 		Alog(LOG_DEBUG) << "add_exception called with NULL values";
 		return;
@@ -339,12 +339,12 @@ void ChannelModeExcept::AddMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The except
  */
-void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
+void ChannelModeExcept::DelMask(Channel *chan, const Anope::string &mask)
 {
 	Entry *exception;
 
 	/* Sanity check as it seems some IRCD will just send -e without a mask */
-	if (!mask || !chan->excepts || !chan->excepts->count)
+	if (mask.empty() || !chan->excepts || !chan->excepts->count)
 		return;
 
 	exception = elist_find_mask(chan->excepts, mask);
@@ -360,11 +360,11 @@ void ChannelModeExcept::DelMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The invex
  */
-void ChannelModeInvex::AddMask(Channel *chan, const char *mask)
+void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
 {
 	Entry *invite;
 
-	if (!chan || !mask)
+	if (!chan || mask.empty())
 	{
 		Alog(LOG_DEBUG) << "add_invite called with NULL values";
 		return;
@@ -387,12 +387,12 @@ void ChannelModeInvex::AddMask(Channel *chan, const char *mask)
  * @param chan The channel
  * @param mask The index
  */
-void ChannelModeInvex::DelMask(Channel *chan, const char *mask)
+void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
 {
 	Entry *invite;
 
 	/* Sanity check as it seems some IRCD will just send -I without a mask */
-	if (!mask || !chan->invites || !chan->invites->count)
+	if (mask.empty() || !chan->invites || !chan->invites->count)
 		return;
 
 	invite = elist_find_mask(chan->invites, mask);
@@ -404,12 +404,12 @@ void ChannelModeInvex::DelMask(Channel *chan, const char *mask)
 	}
 }
 
-void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
+void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 {
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
-	std::list<std::pair<void *, std::string> > *list, *otherlist;
-	std::list<std::pair<void *, std::string > >::iterator it, it_end;
+	std::list<std::pair<void *, Anope::string> > *list, *otherlist;
+	std::list<std::pair<void *, Anope::string > >::iterator it, it_end;
 	bool IsParam = false;
 
 	if (Type == ST_CHANNEL)
@@ -441,7 +441,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == Mode && (it->second == Param || IsParam))
+		if (it->first == Mode && (Param.equals_cs(it->second) || IsParam))
 		{
 			list->erase(it);
 			/* It can only be on this list once */
@@ -454,7 +454,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const std::string &Param)
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == Mode && (it->second == Param || IsParam))
+		if (it->first == Mode && (Param.equals_cs(it->second) || IsParam))
 		{
 			otherlist->erase(it);
 			return;
@@ -491,11 +491,11 @@ StackerInfo *ModeManager::GetInfo(void *Item)
  * @param info The stacker info for a channel or user
  * @return a list of strings
  */
-std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
+std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 {
-	std::list<std::string> ret;
-	std::list<std::pair<void *, std::string> >::iterator it, it_end;
-	std::string buf, parambuf;
+	std::list<Anope::string> ret;
+	std::list<std::pair<void *, Anope::string> >::iterator it, it_end;
+	Anope::string buf, parambuf;
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
 	unsigned NModes = 0;
@@ -571,7 +571,7 @@ std::list<std::string> ModeManager::BuildModeStrings(StackerInfo *info)
  * @param Set Adding or removing?
  * @param Param A param, if there is one
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const std::string &Param)
+void ModeManager::StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, u, um, Set, Param, ST_USER);
 }
@@ -583,7 +583,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Se
  * @param Set Adding or removing?
  * @param Param A param, if there is one
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param)
+void ModeManager::StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, c, cm, Set, Param, ST_CHANNEL);
 }
@@ -596,7 +596,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, b
  * @param Param A param, if there is one
  * @param Type The type this is, user or channel
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const std::string &Param, StackerType Type)
+void ModeManager::StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const Anope::string &Param, StackerType Type)
 {
 	StackerInfo *s = GetInfo(Object);
 	s->Type = Type;
@@ -747,7 +747,7 @@ char ModeManager::GetStatusChar(char Value)
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, c, cm, Set, Param);
 }
@@ -759,7 +759,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set,
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const Anope::string &Param)
 {
 	StackerAdd(bi, c, FindChannelModeByName(Name), Set, Param);
 }
@@ -771,7 +771,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const Anope::string &Param)
 {
 	StackerAdd(bi, c, FindChannelModeByChar(Mode), Set, Param);
 }
@@ -783,7 +783,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set,
  * @param Set true for setting, false for removing
  * @param param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
 	StackerAddInternal(bi, u, um, Set, Param);
 }
@@ -795,7 +795,7 @@ void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const Anope::string &Param)
 {
 	StackerAdd(bi, u, FindUserModeByName(Name), Set, Param);
 }
@@ -807,7 +807,7 @@ void ModeManager::StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, 
  * @param Set true for setting, false for removing
  * @param Param The param, if there is one
  */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const std::string &Param)
+void ModeManager::StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const Anope::string &Param)
 {
 	StackerAdd(bi, u, FindUserModeByChar(Mode), Set, Param);
 }
@@ -823,7 +823,7 @@ void ModeManager::ProcessModes()
 			StackerInfo *s = it->second;
 			User *u = NULL;
 			Channel *c = NULL;
-			std::list<std::string> ModeStrings = BuildModeStrings(s);
+			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
 
 			if (s->Type == ST_USER)
 				u = static_cast<User *>(it->first);
@@ -832,7 +832,7 @@ void ModeManager::ProcessModes()
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 
-			for (std::list<std::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
+			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
 			{
 				if (c)
 					ircdproto->SendMode(s->bi, c, lit->c_str());

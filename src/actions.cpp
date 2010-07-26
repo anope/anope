@@ -48,18 +48,16 @@ bool bad_password(User *u)
  * @param reason for the kill
  * @return void
  */
-void kill_user(const std::string &source, const std::string &user, const std::string &reason)
+void kill_user(const Anope::string &source, const Anope::string &user, const Anope::string &reason)
 {
-	char buf[BUFSIZE];
-
 	if (user.empty())
 		return;
 
-	std::string real_source = source.empty() ? Config.ServerName : source;
+	Anope::string real_source = source.empty() ? Config.ServerName : source;
 
-	snprintf(buf, sizeof(buf), "%s (%s)", source.c_str(), reason.c_str());
+	Anope::string buf = real_source + " (" + reason + ")";
 
-	ircdproto->SendSVSKill(findbot(source), finduser(user), buf);
+	ircdproto->SendSVSKill(findbot(source), finduser(user), "%s", buf.c_str());
 
 	if (!ircd->quitonkill && finduser(user))
 		do_kill(user, buf);
@@ -73,9 +71,9 @@ void kill_user(const std::string &source, const std::string &user, const std::st
  * @param nick to remove the ban for
  * @return void
  */
-void common_unban(ChannelInfo *ci, const std::string &nick)
+void common_unban(ChannelInfo *ci, const Anope::string &nick)
 {
-	char *host = NULL;
+	Anope::string host;
 	uint32 ip = 0;
 	User *u;
 	Entry *ban, *next;
@@ -89,18 +87,18 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 	if (!ci->c->bans || !ci->c->bans->count)
 		return;
 
-	if (!u->hostip)
+	if (u->hostip.empty())
 	{
 		host = host_resolve(u->host);
 		/* we store the just resolved hostname so we don't
 		 * need to do this again */
-		if (host)
-			u->hostip = sstrdup(host);
+		if (!host.empty())
+			u->hostip = host;
 	}
 	else
-		host = sstrdup(u->hostip);
+		host = u->hostip;
 	/* Convert the host to an IP.. */
-	if (host)
+	if (!host.empty())
 		ip = str_is_ip(host);
 
 	if (ircd->svsmode_unban)
@@ -109,12 +107,9 @@ void common_unban(ChannelInfo *ci, const std::string &nick)
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
-			if (entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->host, ip) || entry_match(ban, u->nick.c_str(), u->GetIdent().c_str(), u->GetDisplayedHost().c_str(), ip))
+			if (entry_match(ban, u->nick, u->GetIdent(), u->host, ip) || entry_match(ban, u->nick, u->GetIdent(), u->GetDisplayedHost(), ip))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
-	/* host_resolve() sstrdup us this info so we gotta free it */
-	if (host)
-		delete [] host;
 }
 
 /*************************************************************************/

@@ -20,13 +20,13 @@ class CommandCSStatus : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci;
 		User *u2;
-		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
-		const char *temp = NULL;
+		Anope::string chan = params[0];
+		Anope::string nick = params[1];
+		Anope::string temp;
 
 		if (!(ci = cs_findchan(chan)))
 		{
@@ -36,21 +36,21 @@ class CommandCSStatus : public Command
 			ci = cs_findchan(chan);
 		}
 		if (!ci)
-			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp.c_str());
 		else if ((u2 = finduser(nick)))
-			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_INFO, chan, nick, get_access(u2, ci));
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_INFO, chan.c_str(), nick.c_str(), get_access(u2, ci));
 		else /* !u2 */
-			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
+			notice_lang(Config.s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
 	}
@@ -64,10 +64,12 @@ class CommandCSStatus : public Command
 class CSStatus : public Module
 {
  public:
-	CSStatus(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
+		this->AddCommand(ChanServ, new CommandCSStatus());
 	}
 };
 

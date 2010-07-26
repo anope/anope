@@ -12,7 +12,7 @@
 class ENone : public Module
 {
  public:
-	ENone(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(ENCRYPTION);
@@ -22,41 +22,39 @@ class ENone : public Module
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	EventReturn OnEncrypt(const std::string &src, std::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
-		std::string buf = "plain:";
-		char cpass[1000];
-		b64_encode(src.c_str(), src.size(), cpass, 1000);
+		Anope::string buf = "plain:";
+		Anope::string cpass;
+		b64_encode(src, cpass);
 		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest)
+	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
 	{
-		if (hashm != "plain")
+		if (!hashm.equals_cs("plain"))
 			return EVENT_CONTINUE;
-		char cpass[1000] = "";
-		size_t pos = src.find(":");
-		std::string buf(src.begin() + pos + 1, src.end());
-		b64_decode(buf.c_str(), cpass, 1000);
-		dest = cpass;
+		size_t pos = src.find(':');
+		Anope::string buf = src.substr(pos + 1);
+		b64_decode(buf, dest);
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
+	EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password)
 	{
-		if (hashm != "plain")
+		if (!hashm.equals_cs("plain"))
 			return EVENT_CONTINUE;
-		std::string buf;
+		Anope::string buf;
 		this->OnEncrypt(plaintext, buf);
-		if (password == buf)
+		if (password.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() != this->name)
+			if (!this->name.equals_ci(Config.EncModuleList.front()))
 				enc_encrypt(plaintext, password);
 			return EVENT_ALLOW;
 		}

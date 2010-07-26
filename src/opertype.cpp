@@ -7,13 +7,13 @@
 
 #include "services.h"
 
-OperType::OperType(const ci::string &nname) : name(nname)
+OperType::OperType(const Anope::string &nname) : name(nname)
 {
 }
 
-bool OperType::HasCommand(const ci::string &cmdstr) const
+bool OperType::HasCommand(const Anope::string &cmdstr) const
 {
-	for (std::list<ci::string>::const_iterator it = this->commands.begin(), it_end = this->commands.end(); it != it_end; ++it)
+	for (std::list<Anope::string>::const_iterator it = this->commands.begin(), it_end = this->commands.end(); it != it_end; ++it)
 	{
 		if (Anope::Match(cmdstr, *it))
 			return true;
@@ -29,9 +29,9 @@ bool OperType::HasCommand(const ci::string &cmdstr) const
 	return false;
 }
 
-bool OperType::HasPriv(const ci::string &privstr) const
+bool OperType::HasPriv(const Anope::string &privstr) const
 {
-	for (std::list<ci::string>::const_iterator it = this->privs.begin(), it_end = this->privs.end(); it != it_end; ++it)
+	for (std::list<Anope::string>::const_iterator it = this->privs.begin(), it_end = this->privs.end(); it != it_end; ++it)
 	{
 		if (Anope::Match(privstr, *it))
 			return true;
@@ -47,17 +47,17 @@ bool OperType::HasPriv(const ci::string &privstr) const
 	return false;
 }
 
-void OperType::AddCommand(const ci::string &cmdstr)
+void OperType::AddCommand(const Anope::string &cmdstr)
 {
 	this->commands.push_back(cmdstr);
 }
 
-void OperType::AddPriv(const ci::string &privstr)
+void OperType::AddPriv(const Anope::string &privstr)
 {
 	this->privs.push_back(privstr);
 }
 
-const ci::string &OperType::GetName() const
+const Anope::string &OperType::GetName() const
 {
 	return this->name;
 }

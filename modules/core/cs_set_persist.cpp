@@ -16,18 +16,18 @@
 class CommandCSSetPersist : public Command
 {
  public:
-	CommandCSSetPersist(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPersist(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
-		if (params[0] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			if (!ci->HasFlag(CI_PERSIST))
 			{
@@ -55,7 +55,7 @@ class CommandCSSetPersist : public Command
 
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
 		}
-		else if (params[0] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			if (ci->HasFlag(CI_PERSIST))
 			{
@@ -64,13 +64,13 @@ class CommandCSSetPersist : public Command
 				/* Unset perm mode */
 				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
 					ci->c->RemoveMode(NULL, cm);
-				if (Config.s_BotServ && ci->bi && ci->c->FindUser(ci->bi))
+				if (!Config.s_BotServ.empty() && ci->bi && ci->c->FindUser(ci->bi))
 					ci->bi->Part(ci->c);
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				if (!cm && !Config.s_BotServ && ci->bi)
+				if (!cm && Config.s_BotServ.empty() && ci->bi)
 					/* Unassign bot */
 					ChanServ->UnAssign(NULL, ci);
 
@@ -86,13 +86,13 @@ class CommandCSSetPersist : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
 	}
@@ -106,17 +106,17 @@ class CommandCSSetPersist : public Command
 class CommandCSSASetPersist : public CommandCSSetPersist
 {
  public:
-	CommandCSSASetPersist(const ci::string &cname) : CommandCSSetPersist(cname, "chanserv/saset/persist")
+	CommandCSSASetPersist(const Anope::string &cname) : CommandCSSetPersist(cname, "chanserv/saset/persist")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
 	}
@@ -125,7 +125,7 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 class CSSetPersist : public Module
 {
  public:
-	CSSetPersist(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetPersist(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -99,7 +99,7 @@ void TimerManager::DelTimer(Timer *T)
  */
 void TimerManager::TickTimers(time_t ctime)
 {
-	while (Timers.size() && (ctime > Timers.front()->GetTimer()))
+	while (Timers.size() && ctime > Timers.front()->GetTimer())
 	{
 		Timer *t = Timers.front();
 
@@ -119,5 +119,5 @@ void TimerManager::TickTimers(time_t ctime)
  */
 bool TimerManager::TimerComparison(Timer *one, Timer *two)
 {
-	return (one->GetTimer() < two->GetTimer());
+	return one->GetTimer() < two->GetTimer();
 }

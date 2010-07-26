@@ -20,17 +20,17 @@ class CommandOSClearModes : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
+		Anope::string chan = params[0];
 		Channel *c;
 		int all = 0;
 		ChannelMode *cm;
-		std::string buf;
+		Anope::string buf;
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
@@ -40,10 +40,10 @@ class CommandOSClearModes : public Command
 		}
 		else
 		{
-			ci::string s = params.size() > 1 ? params[1] : "";
+			Anope::string s = params.size() > 1 ? params[1] : "";
 			if (!s.empty())
 			{
-				if (s == "ALL")
+				if (s.equals_ci("ALL"))
 					all = 1;
 				else
 				{
@@ -53,12 +53,12 @@ class CommandOSClearModes : public Command
 			}
 
 			if (Config.WallOSClearmodes)
-				ircdproto->SendGlobops(OperServ, "%s used CLEARMODES%s on %s", u->nick.c_str(), all ? " ALL" : "", chan);
+				ircdproto->SendGlobops(OperServ, "%s used CLEARMODES%s on %s", u->nick.c_str(), all ? " ALL" : "", chan.c_str());
 			if (all)
 			{
 				/* Clear mode +o */
 				if (ircd->svsmode_ucmode)
-					ircdproto->SendSVSModeChan(c, "-o", NULL);
+					ircdproto->SendSVSModeChan(c, "-o", "");
 				else
 				{
 					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
@@ -72,7 +72,7 @@ class CommandOSClearModes : public Command
 
 				/* Clear mode +v */
 				if (ircd->svsmode_ucmode)
-					ircdproto->SendSVSModeChan(c, "-v", NULL);
+					ircdproto->SendSVSModeChan(c, "-v", "");
 				else
 				{
 					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
@@ -88,7 +88,7 @@ class CommandOSClearModes : public Command
 				if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				{
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c, "-h", NULL);
+						ircdproto->SendSVSModeChan(c, "-h", "");
 					else
 					{
 						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
@@ -104,11 +104,10 @@ class CommandOSClearModes : public Command
 				/* Clear mode Owners */
 				if ((cm = ModeManager::FindChannelModeByName(CMODE_OWNER)))
 				{
-					buf = '-';
-					buf += cm->ModeChar;
+					buf = "-" + cm->ModeChar;
 
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
+						ircdproto->SendSVSModeChan(c, buf, "");
 					else
 					{
 						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
@@ -124,11 +123,10 @@ class CommandOSClearModes : public Command
 				/* Clear mode protected or admins */
 				if ((cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
 				{
-					buf = '-';
-					buf += cm->ModeChar;
+					buf = "-" + cm->ModeChar;
 
 					if (ircd->svsmode_ucmode)
-						ircdproto->SendSVSModeChan(c, buf.c_str(), NULL);
+						ircdproto->SendSVSModeChan(c, buf, "");
 					else
 					{
 						for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
@@ -150,20 +148,20 @@ class CommandOSClearModes : public Command
 		}
 
 		if (all)
-			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
+			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan.c_str());
 		else
-			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_DONE, chan);
+			notice_lang(Config.s_OperServ, u, OPER_CLEARMODES_DONE, chan.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_CLEARMODES);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
 	}
@@ -177,7 +175,7 @@ class CommandOSClearModes : public Command
 class OSClearModes : public Module
 {
  public:
-	OSClearModes(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSClearModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

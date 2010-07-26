@@ -20,7 +20,7 @@ class CommandNSUpdate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 
@@ -30,17 +30,15 @@ class CommandNSUpdate : public Command
 		do_setmodes(u);
 		check_memos(u);
 
-		if (na->last_realname)
-			delete [] na->last_realname;
-		na->last_realname = sstrdup(u->realname);
+		na->last_realname = u->realname;
 		na->last_seen = time(NULL);
 		if (ircd->vhost)
 			do_on_id(u);
-		notice_lang(Config.s_NickServ, u, NICK_UPDATE_SUCCESS, Config.s_NickServ);
+		notice_lang(Config.s_NickServ, u, NICK_UPDATE_SUCCESS, Config.s_NickServ.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_UPDATE);
 		return true;
@@ -55,7 +53,7 @@ class CommandNSUpdate : public Command
 class NSUpdate : public Module
 {
  public:
-	NSUpdate(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

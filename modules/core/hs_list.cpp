@@ -20,9 +20,9 @@ class CommandHSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string key = params.size() ? params[0] : "";
+		Anope::string key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
 		unsigned display_counter = 0;
 		tm *tm;
@@ -35,20 +35,20 @@ class CommandHSList : public Command
 		if (!key.empty() && key[0] == '#')
 		{
 			size_t tmp = key.find('-');
-			if (tmp == ci::string::npos || tmp == key.size() || tmp == 1)
+			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
 				notice_lang(Config.s_HostServ, u, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
-			for (unsigned i = 1, end = key.size(); i < end; ++i)
+			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
 					notice_lang(Config.s_HostServ, u, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-				from = atoi(key.substr(1, tmp - 1).c_str());
-				to = atoi(key.substr(tmp + 1, key.size()).c_str());
+				from = convertTo<int>(key.substr(1, tmp - 1));
+				to = convertTo<int>(key.substr(tmp + 1));
 			}
 		}
 
@@ -61,16 +61,16 @@ class CommandHSList : public Command
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key.c_str())) && display_counter < Config.NSListMax)
+				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key)) && display_counter < Config.NSListMax)
 				{
 					++display_counter;
 					time_t time = na->hostinfo.GetTime();
 					tm = localtime(&time);
 					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 					if (!na->hostinfo.GetIdent().empty())
-						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 					else
-						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 				}
 			}
 			else
@@ -86,9 +86,9 @@ class CommandHSList : public Command
 					tm = localtime(&time);
 					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 					if (!na->hostinfo.GetIdent().empty())
-						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						notice_lang(Config.s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 					else
-						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick, na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						notice_lang(Config.s_HostServ, u, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
 				}
 			}
 			++counter;
@@ -105,7 +105,7 @@ class CommandHSList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP_LIST);
 		return true;
@@ -120,7 +120,7 @@ class CommandHSList : public Command
 class HSList : public Module
 {
  public:
-	HSList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

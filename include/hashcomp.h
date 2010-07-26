@@ -28,6 +28,11 @@
 
 #include <string>
 
+namespace Anope
+{
+	class string;
+}
+
 #ifndef _WIN32
 //# ifdef HASHMAP_DEPRECATED /* If gcc ver > 4.3 */
 # if 1
@@ -218,10 +223,6 @@ namespace ci
 /* This was endless fun. No. Really. */
 /* It was also the first core change Ommeh made, if anyone cares */
 
-/** Operator << for irc::string
- */
-inline std::ostream &operator<<(std::ostream &os, const irc::string &str) { return os << std::string(str.c_str()); }
-
 /** Operator >> for irc::string
  */
 inline std::istream &operator>>(std::istream &is, irc::string &str)
@@ -231,10 +232,6 @@ inline std::istream &operator>>(std::istream &is, irc::string &str)
 	str = tmp.c_str();
 	return is;
 }
-
-/** Operator << for ci::string
- */
-inline std::ostream &operator<<(std::ostream &os, const ci::string &str) { return os << std::string(str.c_str()); }
 
 /** Operator >> for ci::string
  */
@@ -408,106 +405,11 @@ inline bool operator!=(const ci::string &leftval, const irc::string &rightval)
 	return !(leftval.c_str() == rightval);
 }
 
-/** Assign an irc::string to a std::string.
- */
-//inline std::string assign(const irc::string &other) { return other.c_str(); }
-
-/** Assign a std::string to an irc::string.
- */
-//inline irc::string assign(const std::string &other) { return other.c_str(); }
-
-/** Assign an ci::string to a std::string.
- */
-//inline std::string assign(const ci::string &other) { return other.c_str(); }
-
-/** Assign a std::string to an ci::string.
- */
-//inline ci::string assign(const std::string &other) { return other.c_str(); }
-
-/** Assign an irc::string to a ci::string.
- */
-//inline ci::string assign(const irc::string &other) { return other.c_str(); }
-
-/** Assign a ci::string to an irc::string.
- */
-//inline irc::string assign(const ci::string &other) { return other.c_str(); }
-
-/** sepstream allows for splitting token seperated lists.
- * Each successive call to sepstream::GetToken() returns
- * the next token, until none remain, at which point the method returns
- * an empty string.
- */
-class CoreExport sepstream
-{
- private:
-	/** Original string.
-	 */
-	std::string tokens;
-	/** Last position of a seperator token
-	 */
-	std::string::iterator last_starting_position;
-	/** Current string position
-	 */
-	std::string::iterator n;
-	/** Seperator value
-	 */
-	char sep;
- public:
-	/** Create a sepstream and fill it with the provided data
-	 */
-	sepstream(const std::string &source, char seperator);
-	sepstream(const ci::string &source, char seperator);
-	sepstream(const char *source, char seperator);
-	virtual ~sepstream() { }
-
-	/** Fetch the next token from the stream
-	 * @param token The next token from the stream is placed here
-	 * @return True if tokens still remain, false if there are none left
-	 */
-	virtual bool GetToken(std::string &token);
-	virtual bool GetToken(ci::string &token);
-
-	/** Fetch the entire remaining stream, without tokenizing
-	 * @return The remaining part of the stream
-	 */
-	virtual const std::string GetRemaining();
-
-	/** Returns true if the end of the stream has been reached
-	 * @return True if the end of the stream has been reached, otherwise false
-	 */
-	virtual bool StreamEnd();
-};
-
-/** A derived form of sepstream, which seperates on commas
- */
-class commasepstream : public sepstream
-{
- public:
-	/** Initialize with comma seperator
-	 */
-	commasepstream(const std::string &source) : sepstream(source, ',') { }
-	commasepstream(const ci::string &source) : sepstream(source, ',') { }
-	commasepstream(const char *source) : sepstream(source, ',') { }
-};
-
-/** A derived form of sepstream, which seperates on spaces
- */
-class spacesepstream : public sepstream
-{
- public:
-	/** Initialize with space seperator
-	 */
-	spacesepstream(const std::string &source) : sepstream(source, ' ') { }
-	spacesepstream(const ci::string &source) : sepstream(source, ' ') { }
-	spacesepstream(const char *source) : sepstream(source, ' ') { }
-};
-
 /** Class used to hash a std::string, given as the third argument to the unordered_map template
  */
 class CoreExport hash_compare_std_string
 {
  public:
-#if defined(_WIN32) && _MSV_VER < 1600
 	enum { bucket_size = 4, min_buckets = 8 };
 
 	/** Compare two std::string's values for hashing in hash_map
@@ -517,13 +419,14 @@ class CoreExport hash_compare_std_string
 	 * being less and greater than zero for str1 being greater than str2.
 	 */
 	bool operator()(const std::string &s1, const std::string &s2) const;
-#endif
+	bool operator()(const Anope::string &s1, const Anope::string &s2) const;
 
 	/** Return a hash value for a string
 	 * @param s The string
 	 * @return The hash value
 	 */
 	size_t operator()(const std::string &s) const;
+	size_t operator()(const Anope::string &s) const;
 };
 
 /** Class used to hash a ci::string, given as the third argument to the unordered_map template
@@ -531,7 +434,6 @@ class CoreExport hash_compare_std_string
 class CoreExport hash_compare_ci_string
 {
  public:
-#if defined(_WIN32) && _MSV_VER < 1600
 	enum { bucket_size = 4, min_buckets = 8 };
 
 	/** Compare two ci::string's values for hashing in hash_map
@@ -541,12 +443,14 @@ class CoreExport hash_compare_ci_string
 	 * being less and greater than zero for str1 being greater than str2.
 	 */
 	bool operator()(const ci::string &s1, const ci::string &s2) const;
-#endif
+	bool operator()(const Anope::string &s1, const Anope::string &s2) const;
+
 	/** Return a hash value for a string using case insensitivity
 	 * @param s The string
 	 * @return The hash value
 	 */
 	size_t operator()(const ci::string &s) const;
+	size_t operator()(const Anope::string &s) const;
 };
 
 /** Class used to hash a irc::string, given as the third argument to the unordered_map template
@@ -554,7 +458,6 @@ class CoreExport hash_compare_ci_string
 class CoreExport hash_compare_irc_string
 {
  public:
-#if defined(_WIN32) && _MSV_VER < 1600
 	enum { bucket_size = 4, min_buckets = 8 };
 
 	/** Compare two irc::string's values for hashing in hash_map
@@ -564,12 +467,14 @@ class CoreExport hash_compare_irc_string
 	 * being less and greater than zero for str1 being greater than str2.
 	 */
 	bool operator()(const irc::string &s1, const irc::string &s2) const;
-#endif
+	bool operator()(const Anope::string &s1, const Anope::string &s2) const;
+
 	/** Return a hash value for a string using RFC1459 case sensitivity rules
 	 * @param s The stirng
 	 * @return The hash value
 	 */
 	size_t operator()(const irc::string &s) const;
+	size_t operator()(const Anope::string &s) const;
 };
 
 #endif // HASHCOMP_H

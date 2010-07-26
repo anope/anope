@@ -20,9 +20,9 @@ class CommandOSModUnLoad : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const std::string mname = params[0].c_str();
+		Anope::string mname = params[0];
 		int status;
 
 		Module *m = FindModule(mname);
@@ -42,13 +42,13 @@ class CommandOSModUnLoad : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_MODUNLOAD);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
 	}
@@ -62,7 +62,7 @@ class CommandOSModUnLoad : public Command
 class OSModUnLoad : public Module
 {
  public:
-	OSModUnLoad(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSModUnLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

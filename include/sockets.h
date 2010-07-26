@@ -12,6 +12,8 @@
 #ifndef SOCKETS_H
 #define SOCKETS_H
 
+#include "anope.h"
+
 #define NET_BUFSIZE 65535
 
 #ifdef _WIN32
@@ -26,7 +28,7 @@ class SocketException : public CoreException
 	/** Default constructor for socket exceptions
 	 * @param message Error message
 	 */
-	SocketException(const std::string &message) : CoreException(message) { }
+	SocketException(const Anope::string &message) : CoreException(message) { }
 
 	/** Default destructor
 	 * @throws Nothing
@@ -59,12 +61,14 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 * @param buf What to write
 	 * @return Number of bytes written
 	 */
-	virtual const int SendInternal(const std::string &buf) const;
+	virtual const int SendInternal(const Anope::string &buf) const;
 
  protected:
- 	/* Socket FD */
-	int sock;
-	/* IPv6? */
+	/* Socket FD */
+	int Sock;
+	/* Port we're connected to */
+	int Port;
+	/* Is this an IPv6 socket? */
 	bool IPv6;
 	/* Things to be written to the socket */
 	std::string WriteBuffer;
@@ -136,24 +140,24 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 * @param buf The line
 	 * @return true to continue reading, false to drop the socket
 	 */
-	virtual bool Read(const std::string &buf);
+	virtual bool Read(const Anope::string &buf);
 
 	/** Write to the socket
 	 * @param message The message
 	 */
 	void Write(const char *message, ...);
-	void Write(const std::string &message);
+	void Write(const Anope::string &message);
 };
 
 class CoreExport ClientSocket : public Socket
 {
  protected:
 	/* Target host we're connected to */
-	std::string TargetHost;
+	Anope::string TargetHost;
 	/* Target port we're connected to */
 	int Port;
 	/* The host to bind to */
-	std::string BindHost;
+	Anope::string BindHost;
 
  public:
 
@@ -163,24 +167,24 @@ class CoreExport ClientSocket : public Socket
 	* @param nBindHost The host to bind to for connecting
 	* @param nIPv6 true to use IPv6
 	*/
-       ClientSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost, bool nIPv6);
+       ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6);
 
        /** Default destructor
 	*/
        virtual ~ClientSocket();
 
-      /** Called with a line recieved from the socket
+	/** Called with a line recieved from the socket
 	* @param buf The line
 	* @return true to continue reading, false to drop the socket
 	*/
-	virtual bool Read(const std::string &buf);
+	virtual bool Read(const Anope::string &buf);
 };
 
 class CoreExport ListenSocket : public Socket
 {
  protected:
 	/* Bind IP */
-	std::string BindIP;
+	Anope::string BindIP;
 	/* Port to bind to */
 	int Port;
 
@@ -189,7 +193,7 @@ class CoreExport ListenSocket : public Socket
 	 * @param bind The IP to bind to
 	 * @param port The port to listen on
 	 */
-	ListenSocket(const std::string &bind, int port);
+	ListenSocket(const Anope::string &bind, int port);
 
 	/** Destructor
 	 */
@@ -209,7 +213,7 @@ class CoreExport ListenSocket : public Socket
 	/** Get the bind IP for this socket
 	 * @return the bind ip
 	 */
-	const std::string &GetBindIP() const;
+	const Anope::string &GetBindIP() const;
 
 	/** Get the port this socket is bound to
 	 * @return The port

@@ -145,7 +145,7 @@ class DBMySQLExecute : public DBMySQL
 {
 	SQLTimer *_SQLTimer;
  public:
-	DBMySQLExecute(const std::string &modname, const std::string &creator) : DBMySQL(modname, creator)
+	DBMySQLExecute(const Anope::string &modname, const Anope::string &creator) : DBMySQL(modname, creator)
 	{
 		_SQLTimer = new SQLTimer();
 	}

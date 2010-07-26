@@ -24,9 +24,9 @@ Socket::Socket(int nsock, bool nIPv6)
 	Type = SOCKTYPE_CLIENT;
 	IPv6 = nIPv6;
 	if (nsock == 0)
-		sock = socket(IPv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
+		Sock = socket(IPv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
 	else
-		sock = nsock;
+		Sock = nsock;
 	SocketEngine->AddSocket(this);
 }
 
@@ -35,7 +35,7 @@ Socket::Socket(int nsock, bool nIPv6)
 Socket::~Socket()
 {
 	SocketEngine->DelSocket(this);
-	CloseSocket(sock);
+	CloseSocket(Sock);
 }
 
 /** Really recieve something from the buffer
@@ -52,7 +52,7 @@ const int Socket::RecvInternal(char *buf, size_t sz) const
  * @param buf What to write
  * @return Number of bytes written
  */
-const int Socket::SendInternal(const std::string &buf) const
+const int Socket::SendInternal(const Anope::string &buf) const
 {
 	return send(GetSock(), buf.c_str(), buf.length(), 0);
 }
@@ -62,7 +62,7 @@ const int Socket::SendInternal(const std::string &buf) const
  */
 int Socket::GetSock() const
 {
-	return sock;
+	return Sock;
 }
 
 /** Mark a socket as blockig
@@ -122,8 +122,7 @@ size_t Socket::WriteBufferLen() const
  */
 bool Socket::ProcessRead()
 {
-	char tbuffer[NET_BUFSIZE];
-	memset(&tbuffer, '\0', sizeof(tbuffer));
+	char tbuffer[NET_BUFSIZE] = "";
 
 	RecvLen = RecvInternal(tbuffer, sizeof(tbuffer) - 1);
 	if (RecvLen <= 0)
@@ -132,7 +131,7 @@ bool Socket::ProcessRead()
 	std::string sbuffer = extrabuf;
 	sbuffer.append(tbuffer);
 	extrabuf.clear();
-	size_t lastnewline = sbuffer.find_last_of('\n');
+	size_t lastnewline = sbuffer.rfind('\n');
 	if (lastnewline == std::string::npos)
 	{
 		extrabuf = sbuffer;
@@ -147,10 +146,12 @@ bool Socket::ProcessRead()
 
 	sepstream stream(sbuffer, '\n');
 
-	std::string tbuf;
+	Anope::string tbuf;
 	while (stream.GetToken(tbuf))
 	{
-		TrimBuf(tbuf);
+		std::string tmp_tbuf = tbuf.str();
+		TrimBuf(tmp_tbuf);
+		tbuf = tmp_tbuf;
 
 		if (!tbuf.empty())
 			if (!Read(tbuf))
@@ -190,7 +191,7 @@ void Socket::ProcessError()
  * @param buf The line
  * @return true to continue reading, false to drop the socket
  */
-bool Socket::Read(const std::string &buf)
+bool Socket::Read(const Anope::string &buf)
 {
 	return false;
 }
@@ -202,8 +203,7 @@ void Socket::Write(const char *message, ...)
 {
 	va_list vi;
 	char tbuffer[BUFSIZE];
-	std::string sbuf;
-	
+
 	if (!message)
 		return;
 
@@ -211,16 +211,16 @@ void Socket::Write(const char *message, ...)
 	vsnprintf(tbuffer, sizeof(tbuffer), message, vi);
 	va_end(vi);
 
-	sbuf = tbuffer;
+	Anope::string sbuf = tbuffer;
 	Write(sbuf);
 }
 
 /** Write to the socket
  * @param message The message
  */
-void Socket::Write(const std::string &message)
+void Socket::Write(const Anope::string &message)
 {
-	WriteBuffer.append(message + "\r\n");
+	WriteBuffer.append(message.str() + "\r\n");
 	SocketEngine->MarkWriteable(this);
 }
 
@@ -230,11 +230,11 @@ void Socket::Write(const std::string &message)
  * @param nsock The socket
  * @param nIPv6 IPv6
  */
-ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost, bool nIPv6) : Socket(0, nIPv6), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
+ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6) : Socket(0, nIPv6), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
 {
-	if (!IPv6 && (TargetHost.find(':') != std::string::npos || BindHost.find(':') != std::string::npos))
+	if (!IPv6 && (TargetHost.find(':') != Anope::string::npos || BindHost.find(':') != Anope::string::npos))
 		IPv6 = true;
-	
+
 	addrinfo hints;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = 0;
@@ -247,7 +247,7 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 		sockaddr_in bindaddr;
 		sockaddr_in6 bindaddr6;
 
-		if (getaddrinfo(BindHost.c_str(), NULL, &hints, &bindar) == 0)
+		if (!getaddrinfo(BindHost.c_str(), NULL, &hints, &bindar))
 		{
 			if (IPv6)
 				memcpy(&bindaddr6, bindar->ai_addr, bindar->ai_addrlen);
@@ -263,26 +263,26 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 				bindaddr6.sin6_family = AF_INET6;
 
 				if (inet_pton(AF_INET6, BindHost.c_str(), &bindaddr6.sin6_addr) < 1)
-					throw SocketException("Invalid bind host: " + std::string(strerror(errno)));
+					throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
 			}
 			else
 			{
 				bindaddr.sin_family = AF_INET;
 
 				if (inet_pton(AF_INET, BindHost.c_str(), &bindaddr.sin_addr) < 1)
-					throw SocketException("Invalid bind host: " + std::string(strerror(errno)));
+					throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
 			}
 		}
 
 		if (IPv6)
 		{
-			if (bind(sock, reinterpret_cast<sockaddr *>(&bindaddr6), sizeof(bindaddr6)) == -1)
-				throw SocketException("Unable to bind to address: " + std::string(strerror(errno)));
+			if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr6), sizeof(bindaddr6)) == -1)
+				throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 		}
 		else
 		{
-			if (bind(sock, reinterpret_cast<sockaddr *>(&bindaddr), sizeof(bindaddr)) == -1)
-				throw SocketException("Unable to bind to address: " + std::string(strerror(errno)));
+			if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr), sizeof(bindaddr)) == -1)
+				throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 		}
 	}
 
@@ -290,7 +290,7 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 	sockaddr_in6 addr6;
 	sockaddr_in addr;
 
-	if (getaddrinfo(TargetHost.c_str(), NULL, &hints, &conar) == 0)
+	if (!getaddrinfo(TargetHost.c_str(), NULL, &hints, &conar))
 	{
 		if (IPv6)
 			memcpy(&addr6, conar->ai_addr, conar->ai_addrlen);
@@ -304,12 +304,12 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 		if (IPv6)
 		{
 			if (inet_pton(AF_INET6, TargetHost.c_str(), &addr6.sin6_addr) < 1)
-				throw SocketException("Invalid server host: " + std::string(strerror(errno)));
+				throw SocketException(Anope::string("Invalid server host: ") + strerror(errno));
 		}
 		else
 		{
 			if (inet_pton(AF_INET, TargetHost.c_str(), &addr.sin_addr) < 1)
-				throw SocketException("Invalid server host: " + std::string(strerror(errno)));
+				throw SocketException(Anope::string("Invalid server host: ") + strerror(errno));
 		}
 	}
 
@@ -318,20 +318,16 @@ ClientSocket::ClientSocket(const std::string &nTargetHost, int nPort, const std:
 		addr6.sin6_family = AF_INET6;
 		addr6.sin6_port = htons(nPort);
 
-		if (connect(sock, reinterpret_cast<sockaddr *>(&addr6), sizeof(addr6)) == -1)
-		{
-			throw SocketException("Error connecting to server: " + std::string(strerror(errno)));
-		}
+		if (connect(Sock, reinterpret_cast<sockaddr *>(&addr6), sizeof(addr6)) == -1)
+			throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
 	}
 	else
 	{
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(nPort);
 
-		if (connect(sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1)
-		{
-			throw SocketException("Error connecting to server: " + std::string(strerror(errno)));
-		}
+		if (connect(Sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1)
+			throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
 	}
 
 	this->SetNonBlocking();
@@ -347,7 +343,7 @@ ClientSocket::~ClientSocket()
  * @param buf The line
  * @return true to continue reading, false to drop the socket
  */
-bool ClientSocket::Read(const std::string &buf)
+bool ClientSocket::Read(const Anope::string &buf)
 {
 	return true;
 }
@@ -356,7 +352,7 @@ bool ClientSocket::Read(const std::string &buf)
  * @param bind The IP to bind to
  * @param port The port to listen on
  */
-ListenSocket::ListenSocket(const std::string &bindip, int port) : Socket(0, (bindip.find(':') != std::string::npos ? true : false))
+ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (bindip.find(':') != Anope::string::npos ? true : false))
 {
 	Type = SOCKTYPE_LISTEN;
 	BindIP = bindip;
@@ -364,16 +360,14 @@ ListenSocket::ListenSocket(const std::string &bindip, int port) : Socket(0, (bin
 
 	sockaddr_in sock_addr;
 	sockaddr_in6 sock_addr6;
-	
+
 	if (IPv6)
 	{
 		sock_addr6.sin6_family = AF_INET6;
 		sock_addr6.sin6_port = htons(port);
-	
+
 		if (inet_pton(AF_INET6, bindip.c_str(), &sock_addr6.sin6_addr) < 1)
-		{
-			throw SocketException("Invalid bind host: " + std::string(strerror(errno)));
-		}
+			throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
 	}
 	else
 	{
@@ -381,30 +375,22 @@ ListenSocket::ListenSocket(const std::string &bindip, int port) : Socket(0, (bin
 		sock_addr.sin_port = htons(port);
 
 		if (inet_pton(AF_INET, bindip.c_str(), &sock_addr.sin_addr) < 1)
-		{
-			throw SocketException("Invalid bind host: " + std::string(strerror(errno)));
-		}
+			throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
 	}
 
 	if (IPv6)
 	{
-		if (bind(sock, reinterpret_cast<sockaddr *>(&sock_addr6), sizeof(sock_addr6)) == -1)
-		{
-			throw SocketException("Unable to bind to address: " + std::string(strerror(errno)));
-		}
+		if (bind(Sock, reinterpret_cast<sockaddr *>(&sock_addr6), sizeof(sock_addr6)) == -1)
+			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 	}
 	else
 	{
-		if (bind(sock, reinterpret_cast<sockaddr *>(&sock_addr), sizeof(sock_addr)) == -1)
-		{
-			throw SocketException("Unable to bind to address: " + std::string(strerror(errno)));
-		}
+		if (bind(Sock, reinterpret_cast<sockaddr *>(&sock_addr), sizeof(sock_addr)) == -1)
+			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 	}
 
-	if (listen(sock, 5) == -1)
-	{
-		throw SocketException("Unable to listen: " + std::string(strerror(errno)));
-	}
+	if (listen(Sock, 5) == -1)
+		throw SocketException(Anope::string("Unable to listen: ") + strerror(errno));
 
 	this->SetNonBlocking();
 }
@@ -419,16 +405,14 @@ ListenSocket::~ListenSocket()
  */
 bool ListenSocket::ProcessRead()
 {
-	int newsock = accept(sock, NULL, NULL);
+	int newsock = accept(Sock, NULL, NULL);
 
 #ifndef _WIN32
 # define INVALID_SOCKET 0
 #endif
 
 	if (newsock > 0 && newsock != INVALID_SOCKET)
-	{
 		return this->OnAccept(new Socket(newsock, IPv6));
-	}
 
 	return true;
 }
@@ -445,9 +429,9 @@ bool ListenSocket::OnAccept(Socket *s)
 /** Get the bind IP for this socket
  * @return the bind ip
  */
-const std::string &ListenSocket::GetBindIP() const
+const Anope::string &ListenSocket::GetBindIP() const
 {
-        return BindIP;
+	return BindIP;
 }
 
 /** Get the port this socket is bound to
@@ -457,4 +441,3 @@ const int ListenSocket::GetPort() const
 {
 	return Port;
 }
-

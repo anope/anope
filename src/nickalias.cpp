@@ -1,15 +1,14 @@
 #include "services.h"
 #include "modules.h"
 
-NickRequest::NickRequest(const std::string &nickname)
+NickRequest::NickRequest(const Anope::string &nickname)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickRequest constructor");
 
-	email = NULL;
 	requested = lastmail = 0;
 
-	this->nick = sstrdup(nickname.c_str());
+	this->nick = nickname;
 
 	NickRequestList[this->nick] = this;
 }
@@ -19,45 +18,39 @@ NickRequest::~NickRequest()
 	FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(this));
 
 	NickRequestList.erase(this->nick);
-
-	if (this->nick)
-		delete [] this->nick;
-	if (this->email)
-		delete [] this->email;
 }
 
 /** Default constructor
  * @param nick The nick
  * @param nickcore The nickcofe for this nick
  */
-NickAlias::NickAlias(const std::string &nickname, NickCore *nickcore)
+NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");
 	else if (!nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
-	nick = last_quit = last_realname = last_usermask = NULL;
 	time_registered = last_seen = 0;
 
-	this->nick = sstrdup(nickname.c_str());
+	this->nick = nickname;
 	this->nc = nickcore;
 	nc->aliases.push_back(this);
 
 	NickAliasList[this->nick] = this;
 
-	for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
+	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 	{
 		if (nc->ot)
 			break;
-		if (stricmp(it->first.c_str(), this->nick))
+		if (!this->nick.equals_ci(it->first))
 			continue;
 
 		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(), tit_end = Config.MyOperTypes.end(); tit != tit_end; ++tit)
 		{
 			OperType *ot = *tit;
 
-			if (ot->GetName() == it->second)
+			if (ot->GetName().equals_ci(it->second))
 			{
 				Alog() << "Tied oper " << nc->display << " to type " << ot->GetName();
 				nc->ot = ot;
@@ -99,21 +92,13 @@ NickAlias::~NickAlias()
 		else
 		{
 			/* Display updating stuff */
-			if (!stricmp(this->nick, this->nc->display))
+			if (this->nick.equals_ci(this->nc->display))
 				change_core_display(this->nc);
 		}
 	}
 
 	/* Remove us from the aliases list */
 	NickAliasList.erase(this->nick);
-
-	delete [] this->nick;
-	if (this->last_usermask)
-		delete [] this->last_usermask;
-	if (this->last_realname)
-		delete [] this->last_realname;
-	if (this->last_quit)
-		delete [] this->last_quit;
 }
 
 /** Release a nick from being held. This can be called from the core (ns_release)
@@ -127,7 +112,7 @@ void NickAlias::Release()
 		if (ircd->svshold)
 			ircdproto->SendSVSHoldDel(this->nick);
 		else
-			ircdproto->SendQuit(this->nick, NULL);
+			ircdproto->SendQuit(this->nick, "");
 
 		this->UnsetFlag(NS_HELD);
 	}
@@ -148,7 +133,7 @@ void NickAlias::OnCancel(User *)
 			ircdproto->SendSVSHold(this->nick);
 		else
 		{
-			std::string uid = (ircd->ts6 ? ts6_uid_retrieve() : "");
+			Anope::string uid = ircd->ts6 ? ts6_uid_retrieve() : "";
 
 			ircdproto->SendClientIntroduction(this->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid);
 			new NickServRelease(this->nick, uid, Config.NSReleaseTimeout);

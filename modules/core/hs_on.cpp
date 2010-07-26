@@ -20,7 +20,7 @@ class CommandHSOn : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
@@ -29,13 +29,9 @@ class CommandHSOn : public Command
 				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
 				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
-			ircdproto->SendVhost(u, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
-			{
-				if (u->vhost)
-					delete [] u->vhost;
-				u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
-			}
+				u->vhost = na->hostinfo.GetHost();
 			if (ircd->vident)
 			{
 				if (!na->hostinfo.GetIdent().empty())
@@ -49,7 +45,7 @@ class CommandHSOn : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP_ON);
 		return true;
@@ -64,7 +60,7 @@ class CommandHSOn : public Command
 class HSOn : public Module
 {
  public:
-	HSOn(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

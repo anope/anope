@@ -21,11 +21,11 @@ class CommandNSHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "SET LANGUAGE")
+		if (cmd.equals_ci("SET LANGUAGE"))
 		{
 			int i;
 			notice_help(Config.s_NickServ, u, NICK_HELP_SET_LANGUAGE);
@@ -33,12 +33,12 @@ class CommandNSHelp : public Command
 				u->SendMessage(Config.s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
-			mod_help_cmd(NickServ, u, cmd.c_str());
+			mod_help_cmd(NickServ, u, cmd);
 
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP);
 		for (CommandMap::const_iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; ++it)
@@ -55,7 +55,7 @@ class CommandNSHelp : public Command
 class NSHelp : public Module
 {
  public:
-	NSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

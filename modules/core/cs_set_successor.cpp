@@ -16,11 +16,11 @@
 class CommandCSSetSuccessor : public Command
 {
  public:
-	CommandCSSetSuccessor(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetSuccessor(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
@@ -44,16 +44,15 @@ class CommandCSSetSuccessor : public Command
 			}
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick);
+				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 				return MOD_CONT;
 			}
 			if (na->nc == ci->founder)
 			{
-				notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, na->nick, ci->name.c_str());
+				notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			nc = na->nc;
-
 		}
 		else
 			nc = NULL;
@@ -63,20 +62,20 @@ class CommandCSSetSuccessor : public Command
 		ci->successor = nc;
 
 		if (nc)
-			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display);
+			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
 		else
 			notice_lang(Config.s_ChanServ, u, CHAN_SUCCESSOR_UNSET, ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -91,27 +90,27 @@ class CommandCSSetSuccessor : public Command
 class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 {
  public:
-	CommandCSSASetSuccessor(const ci::string &cname) : CommandCSSetSuccessor(cname, "chanserv/saset/successor")
+	CommandCSSASetSuccessor(const Anope::string &cname) : CommandCSSetSuccessor(cname, "chanserv/saset/successor")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_ChanServ, u, "SASEt", CHAN_SASET_SYNTAX);
+		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 
 class CSSetSuccessor : public Module
 {
  public:
-	CSSetSuccessor(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

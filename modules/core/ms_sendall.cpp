@@ -20,10 +20,9 @@ class CommandMSSendAll : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		int z = 1;
-		const char *text = params[0].c_str();
+		Anope::string text = params[0];
 
 		if (readonly)
 		{
@@ -37,21 +36,21 @@ class CommandMSSendAll : public Command
 		{
 			NickCore *nc = it->second;
 
-			if ((na && na->nc == nc) || stricmp(u->nick.c_str(), nc->display))
-				memo_send(u, nc->display, text, z);
+			if ((na && na->nc == nc) || !nc->display.equals_ci(u->nick))
+				memo_send(u, nc->display, text, 1);
 		}
 
 		notice_lang(Config.s_MemoServ, u, MEMO_MASS_SENT);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_SENDALL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
 	}
@@ -65,7 +64,7 @@ class CommandMSSendAll : public Command
 class MSSendAll : public Module
 {
  public:
-	MSSendAll(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

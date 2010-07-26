@@ -88,7 +88,7 @@ class CommandCSEnforce : public Command
 	{
 		ChannelInfo *ci;
 		int16 old_nojoin_level;
-		char mask[BUFSIZE];
+		Anope::string mask;
 		const char *reason;
 
 		if (!(ci = c->ci))
@@ -106,7 +106,7 @@ class CommandCSEnforce : public Command
 
 			if (check_access(uc->user, ci, CA_NOJOIN))
 			{
-				get_idealban(ci, uc->user, mask, sizeof(mask));
+				get_idealban(ci, uc->user, mask);
 				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, uc->user, "%s", reason);
@@ -119,8 +119,7 @@ class CommandCSEnforce : public Command
 	void DoCModeR(Channel *c)
 	{
 		ChannelInfo *ci;
-		char mask[BUFSIZE];
-		const char *reason;
+		Anope::string mask;
 
 		if (!(ci = c->ci))
 			return;
@@ -133,11 +132,11 @@ class CommandCSEnforce : public Command
 
 			if (!uc->user->IsIdentified())
 			{
-				get_idealban(ci, uc->user, mask, sizeof(mask));
-				reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
+				get_idealban(ci, uc->user, mask);
+				Anope::string reason = getstring(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				if (!c->HasMode(CMODE_REGISTERED))
 					c->SetMode(NULL, CMODE_BAN, mask);
-				c->Kick(NULL, uc->user, "%s", reason);
+				c->Kick(NULL, uc->user, "%s", reason.c_str());
 			}
 		}
 	}
@@ -146,10 +145,10 @@ class CommandCSEnforce : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		ci::string what = params.size() > 1 ? params[1] : "";
+		Anope::string chan = params[0];
+		Anope::string what = params.size() > 1 ? params[1] : "";
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
@@ -157,32 +156,32 @@ class CommandCSEnforce : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_AKICK))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			if (what.empty() || what == "SET")
+			if (what.empty() || what.equals_ci("SET"))
 			{
 				this->DoSet(c);
 				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
 			}
-			else if (what == "MODES")
+			else if (what.equals_ci("MODES"))
 			{
 				this->DoModes(c);
 				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (what == "SECUREOPS")
+			else if (what.equals_ci("SECUREOPS"))
 			{
 				this->DoSecureOps(c);
 				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (what == "RESTRICTED")
+			else if (what.equals_ci("RESTRICTED"))
 			{
 				this->DoRestricted(c);
 				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
-			else if (what == "+R")
+			else if (what.equals_ci("+R"))
 			{
 				this->DoCModeR(c);
 				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
@@ -194,7 +193,7 @@ class CommandCSEnforce : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 		u->SendMessage(Config.s_ChanServ, " ");
@@ -208,7 +207,7 @@ class CommandCSEnforce : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	}
@@ -222,7 +221,7 @@ class CommandCSEnforce : public Command
 class CSEnforce : public Module
 {
  public:
-	CSEnforce(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -232,7 +231,7 @@ class CSEnforce : public Module
 		this->AddCommand(ChanServ, new CommandCSEnforce());
 
 		/* English (US) */
-		const char* langtable_en_us[] = {
+		const char *langtable_en_us[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Enforce various channel modes and set options",
 			/* LNG_ENFORCE_SYNTAX */
@@ -266,7 +265,7 @@ class CSEnforce : public Module
 		};
 
 		/* Dutch (NL) */
-		const char* langtable_nl[] = {
+		const char *langtable_nl[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Forceer enkele kanaalmodes en set-opties",
 			/* LNG_ENFORCE_SYNTAX */
@@ -302,7 +301,7 @@ class CSEnforce : public Module
 		};
 
 		/* German (DE) */
-		const char* langtable_de[] = {
+		const char *langtable_de[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Erzwingt verschieden Modes und SET Optionen",
 			/* LNG_ENFORCE_SYNTAX */
@@ -335,7 +334,7 @@ class CSEnforce : public Module
 		};
 
 		/* Portuguese (PT) */
-		const char* langtable_pt[] = {
+		const char *langtable_pt[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
 			/* LNG_ENFORCE_SYNTAX */
@@ -368,7 +367,7 @@ class CSEnforce : public Module
 		};
 
 		/* Russian (RU) */
-		const char* langtable_ru[] = {
+		const char *langtable_ru[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Перепроверка и установка различных режимов и опций канала",
 			/* LNG_ENFORCE_SYNTAX */
@@ -400,7 +399,7 @@ class CSEnforce : public Module
 		};
 
 		/* Italian (IT) */
-		const char* langtable_it[] = {
+		const char *langtable_it[] = {
 			/* LNG_CHAN_HELP */
 			"    ENFORCE    Forza diversi modi di canale ed opzioni SET",
 			/* LNG_ENFORCE_SYNTAX */

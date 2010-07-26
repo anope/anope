@@ -27,48 +27,40 @@ IgnoreData *ignore;
  * @param nick Nick or (nick!)user@host to add to the ignorelist.
  * @param delta Seconds untill new entry is set to expire. 0 for permanent.
  */
-void add_ignore(const char *nick, time_t delta)
+void add_ignore(const Anope::string &nick, time_t delta)
 {
 	IgnoreData *ign;
-	char tmp[BUFSIZE];
-	char *mask, *user, *host;
+	Anope::string tmp, mask;
+	size_t user, host;
 	User *u;
 	time_t now;
-	if (!nick)
+	if (nick.empty())
 		return;
 	now = time(NULL);
 	/* If it s an existing user, we ignore the hostmask. */
 	if ((u = finduser(nick)))
-	{
-		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
-		mask = sstrdup(tmp);
-	}
+		mask = "*!*@" + u->host;
 	/* Determine whether we get a nick or a mask. */
-	else if ((host = const_cast<char *>(strchr(nick, '@'))))
+	else if ((host = nick.find('@')) != Anope::string::npos)
 	{
 		/* Check whether we have a nick too.. */
-		if ((user = const_cast<char *>(strchr(nick, '!'))))
+		if ((user = nick.find('!')) != Anope::string::npos)
 		{
 			/* this should never happen */
 			if (user > host)
 				return;
-			mask = sstrdup(nick);
+			mask = nick;
 		}
 		else
-		{
 			/* We have user@host. Add nick wildcard. */
-			snprintf(tmp, sizeof(tmp), "*!%s", nick);
-			mask = sstrdup(tmp);
-		}
+			mask = "*!" + nick;
 	}
 	/* We only got a nick.. */
-	else {
-		snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
-		mask = sstrdup(tmp);
-	}
+	else
+		mask = nick + "!*@*";
 	/* Check if we already got an identical entry. */
 	for (ign = ignore; ign; ign = ign->next)
-		if (!stricmp(ign->mask, mask))
+		if (mask.equals_ci(ign->mask))
 			break;
 	/* Found one.. */
 	if (ign)
@@ -102,14 +94,14 @@ void add_ignore(const char *nick, time_t delta)
  * @param nick Nick or (nick!)user@host to look for on the ignorelist.
  * @return Pointer to the ignore record, NULL if none was found.
  */
-IgnoreData *get_ignore(const char *nick)
+IgnoreData *get_ignore(const Anope::string &nick)
 {
 	IgnoreData *ign;
-	char tmp[BUFSIZE];
-	char *user, *host;
+	Anope::string tmp;
+	size_t user, host;
 	time_t now;
 	User *u;
-	if (!nick)
+	if (nick.empty())
 		return NULL;
 	/* User has disabled the IGNORE system */
 	if (!allow_ignore)
@@ -129,24 +121,24 @@ IgnoreData *get_ignore(const char *nick)
 	else
 	{
 		/* We didn't get a user.. generate a valid mask. */
-		if ((host = const_cast<char *>(strchr(nick, '@'))))
+		if ((host = nick.find('@')) != Anope::string::npos)
 		{
-			if ((user = const_cast<char *>(strchr(nick, '!'))))
+			if ((user = nick.find('!')) != Anope::string::npos)
 			{
 				/* this should never happen */
 				if (user > host)
 					return NULL;
-				snprintf(tmp, sizeof(tmp), "%s", nick);
+				tmp = nick;
 			}
 			else
 				/* We have user@host. Add nick wildcard. */
-				snprintf(tmp, sizeof(tmp), "*!%s", nick);
+			tmp = "*!" + nick;
 		}
 		/* We only got a nick.. */
 		else
-			snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
+			tmp = nick + "!*@*";
 		for (ign = ignore; ign; ign = ign->next)
-			if (Anope::Match(tmp, ign->mask, false))
+			if (Anope::Match(tmp, ign->mask))
 				break;
 	}
 	/* Check whether the entry has timed out */
@@ -159,7 +151,6 @@ IgnoreData *get_ignore(const char *nick)
 			ignore = ign->next;
 		if (ign->next)
 			ign->next->prev = ign->prev;
-		delete [] ign->mask;
 		delete ign;
 		ign = NULL;
 	}
@@ -175,37 +166,37 @@ IgnoreData *get_ignore(const char *nick)
  * @param nick Nick or (nick!)user@host to delete from the ignorelist.
  * @return Returns 1 on success, 0 if no entry is found.
  */
-int delete_ignore(const char *nick)
+int delete_ignore(const Anope::string &nick)
 {
 	IgnoreData *ign;
-	char tmp[BUFSIZE];
-	char *user, *host;
+	Anope::string tmp;
+	size_t user, host;
 	User *u;
-	if (!nick)
+	if (nick.empty())
 		return 0;
 	/* If it s an existing user, we ignore the hostmask. */
 	if ((u = finduser(nick)))
-		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
+		tmp = "*!*@" + u->host;
 	/* Determine whether we get a nick or a mask. */
-	else if ((host = const_cast<char *>(strchr(nick, '@'))))
+	else if ((host = nick.find('@')) != Anope::string::npos)
 	{
 		/* Check whether we have a nick too.. */
-		if ((user = const_cast<char *>(strchr(nick, '!'))))
+		if ((user = nick.find('!')) != Anope::string::npos)
 		{
 			/* this should never happen */
 			if (user > host)
 				return 0;
-			snprintf(tmp, sizeof(tmp), "%s", nick);
+			tmp = nick;
 		}
 		else
 			/* We have user@host. Add nick wildcard. */
-			snprintf(tmp, sizeof(tmp), "*!%s", nick);
+			tmp = "*!" + nick;
 	}
 	/* We only got a nick.. */
 	else
-		snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
+		tmp = nick + "!*@*";
 	for (ign = ignore; ign; ign = ign->next)
-		if (!stricmp(ign->mask, tmp))
+		if (tmp.equals_ci(ign->mask))
 			break;
 	/* No matching ignore found. */
 	if (!ign)
@@ -218,7 +209,6 @@ int delete_ignore(const char *nick)
 		ignore = ign->next;
 	if (ign->next)
 		ign->next->prev = ign->prev;
-	delete [] ign->mask;
 	delete ign;
 	ign = NULL;
 	return 1;
@@ -240,7 +230,6 @@ int clear_ignores()
 	{
 		next = ign->next;
 		Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
-		delete [] ign->mask;
 		delete ign;
 		++i;
 	}
@@ -299,7 +288,7 @@ int split_buf(char *buf, const char ***argv, int colon_special)
 /* process:  Main processing routine.  Takes the string in inbuf (global
  *           variable) and does something appropriate with it. */
 
-void process(const std::string &buffer)
+void process(const Anope::string &buffer)
 {
 	int retVal = 0;
 	char source[64] = "";

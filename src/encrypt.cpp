@@ -18,7 +18,7 @@
  * Encrypt string `src' of length `len', placing the result in buffer
  * `dest' of size `size'.  Returns 0 on success, -1 on error.
  **/
-int enc_encrypt(const std::string &src, std::string &dest)
+int enc_encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
@@ -33,15 +33,15 @@ int enc_encrypt(const std::string &src, std::string &dest)
  * allow decryption, and -1 if another failure occurred (e.g. destination
  * buffer too small).
  **/
-int enc_decrypt(const std::string &src, std::string &dest)
+int enc_decrypt(const Anope::string &src, Anope::string &dest)
 {
-	size_t pos = src.find(":");
-	if (pos == std::string::npos)
+	size_t pos = src.find(':');
+	if (pos == Anope::string::npos)
 	{
 		Alog() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
 		return -1;
 	}
-	std::string hashm(src.begin(), src.begin() + pos);
+	Anope::string hashm(src.begin(), src.begin() + pos);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
@@ -57,16 +57,15 @@ int enc_decrypt(const std::string &src, std::string &dest)
  *   0 if the password does not match
  *   0 if an error occurred while checking
  **/
-int enc_check_password(std::string &plaintext, std::string &password)
+int enc_check_password(Anope::string &plaintext, Anope::string &password)
 {
-	std::string hashm;
-	size_t pos = password.find(":");
-	if (pos == std::string::npos)
+	size_t pos = password.find(':');
+	if (pos == Anope::string::npos)
 	{
 		Alog() << "Error: enc_check_password() called with invalid password string (" << password << ")";
 		return 0;
 	}
-	hashm.assign(password.begin(), password.begin() + pos);
+	Anope::string hashm(password.begin(), password.begin() + pos);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(hashm, plaintext, password));

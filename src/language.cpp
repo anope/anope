@@ -172,7 +172,7 @@ void lang_sanitize()
 					strnrepl(tmp, sizeof(tmp), "%R", "/");
 				else
 					strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
-				newstr = sstrdup(tmp);
+				newstr = strdup(tmp);
 				delete [] langtexts[i][j];
 				langtexts[i][j] = newstr;
 			}
@@ -303,7 +303,7 @@ int strftime_lang(char *buf, int size, User *u, int format, struct tm *tm)
 
 /* Send a syntax-error message to the user. */
 
-void syntax_error(char *service, User *u, const char *command, int msgnum)
+void syntax_error(const Anope::string &service, User *u, const Anope::string &command, int msgnum)
 {
 	const char *str;
 
@@ -312,7 +312,7 @@ void syntax_error(char *service, User *u, const char *command, int msgnum)
 
 	str = getstring(u, msgnum);
 	notice_lang(service, u, SYNTAX_ERROR, str);
-	notice_lang(service, u, MORE_INFO, service, command);
+	notice_lang(service, u, MORE_INFO, service.c_str(), command.c_str());
 }
 
 const char *getstring(NickAlias *na, int index)
@@ -327,7 +327,7 @@ const char *getstring(NickAlias *na, int index)
 	return langtexts[langidx][index];
 }
 
-const char *getstring(NickCore *nc, int index)
+const char *getstring(const NickCore *nc, int index)
 {
 	// Default to config
 	int langidx = Config.NSDefLanguage;

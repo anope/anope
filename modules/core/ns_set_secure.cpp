@@ -16,18 +16,18 @@
 class CommandNSSetSecure : public Command
 {
  public:
-	CommandNSSetSecure(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetSecure(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "ON")
+		if (params[0].equals_ci("ON"))
 		{
 			u->Account()->SetFlag(NI_SECURE);
 			notice_lang(Config.s_NickServ, u, NICK_SET_SECURE_ON);
 		}
-		else if (params[0] == "OFF")
+		else if (params[0].equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(NI_SECURE);
 			notice_lang(Config.s_NickServ, u, NICK_SET_SECURE_OFF);
@@ -38,13 +38,13 @@ class CommandNSSetSecure : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_SECURE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET SECURE", NICK_SET_SECURE_SYNTAX);
 	}
@@ -58,26 +58,26 @@ class CommandNSSetSecure : public Command
 class CommandNSSASetSecure : public Command
 {
  public:
-	CommandNSSASetSecure(const ci::string &cname) : Command(cname, 2, 2, "nickserv/saset/secure")
+	CommandNSSASetSecure(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/secure")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_ON, nc->display.c_str());
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");
@@ -85,13 +85,13 @@ class CommandNSSASetSecure : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_SECURE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
 	}
@@ -105,7 +105,7 @@ class CommandNSSASetSecure : public Command
 class NSSetSecure : public Module
 {
  public:
-	NSSetSecure(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetSecure(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

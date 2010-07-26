@@ -9,10 +9,10 @@
 
 class HelpChannel : public Module
 {
-	ci::string HelpChan;
+	Anope::string HelpChan;
 
  public:
-	HelpChannel(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
@@ -23,9 +23,9 @@ class HelpChannel : public Module
 		OnReload(true);
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const std::string &param)
+	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)
 	{
-		if (Name == CMODE_OP && c && c->ci && c->name == this->HelpChan)
+		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{
 			User *u = finduser(param);
 
@@ -40,7 +40,7 @@ class HelpChannel : public Module
 	{
 		ConfigReader config;
 
-		this->HelpChan = config.ReadValue("m_helpchan", "helpchannel", "", 0).c_str();
+		this->HelpChan = config.ReadValue("m_helpchan", "helpchannel", "", 0);
 	}
 };
 

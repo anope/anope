@@ -20,7 +20,7 @@ class CommandOSModList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		int count = 0;
 		int showCore = 0;
@@ -32,7 +32,7 @@ class CommandOSModList : public Command
 		int showDB = 1;
 		int showSocketEngine = 1;
 
-		ci::string param = params.size() ? params[0] : "";
+		Anope::string param = !params.empty() ? params[0] : "";
 
 		char core[] = "Core";
 		char third[] = "3rd";
@@ -45,7 +45,7 @@ class CommandOSModList : public Command
 
 		if (!param.empty())
 		{
-			if (param == core)
+			if (param.equals_ci(core))
 			{
 				showCore = 1;
 				showThird = 0;
@@ -56,7 +56,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == third)
+			else if (param.equals_ci(third))
 			{
 				showCore = 0;
 				showThird = 1;
@@ -67,7 +67,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == proto)
+			else if (param.equals_ci(proto))
 			{
 				showCore = 0;
 				showThird = 0;
@@ -78,7 +78,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == supported)
+			else if (param.equals_ci(supported))
 			{
 				showCore = 0;
 				showThird = 0;
@@ -89,7 +89,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == qa)
+			else if (param.equals_ci(qa))
 			{
 				showCore = 0;
 				showThird = 0;
@@ -100,7 +100,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == enc)
+			else if (param.equals_ci(enc))
 			{
 				showCore = 0;
 				showThird = 0;
@@ -111,7 +111,7 @@ class CommandOSModList : public Command
 				showDB = 0;
 				showSocketEngine = 0;
 			}
-			else if (param == db)
+			else if (param.equals_ci(db))
 			{
 				showCore = 0;
 				showThird = 0;
@@ -203,7 +203,7 @@ class CommandOSModList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_MODLIST);
 		return true;
@@ -218,7 +218,7 @@ class CommandOSModList : public Command
 class OSModList : public Module
 {
  public:
-	OSModList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSModList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

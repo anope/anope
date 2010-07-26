@@ -16,18 +16,18 @@
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp(const ci::string &cname) : Command(cname, 2)
+	CommandNSSetAutoOp(const Anope::string &cname) : Command(cname, 2)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "ON")
+		if (params[0].equals_ci("ON"))
 		{
 			u->Account()->SetFlag(NI_AUTOOP);
 			notice_lang(Config.s_NickServ, u, NICK_SET_AUTOOP_ON);
 		}
-		else if (params[0] == "OFF")
+		else if (params[0].equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(NI_AUTOOP);
 			notice_lang(Config.s_NickServ, u, NICK_SET_AUTOOP_OFF);
@@ -38,13 +38,13 @@ class CommandNSSetAutoOp : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_AUTOOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);
 	}
@@ -58,26 +58,26 @@ class CommandNSSetAutoOp : public Command
 class CommandNSSASetAutoOp : public Command
 {
  public:
-	CommandNSSASetAutoOp(const ci::string &cname) : Command(cname, 2, 2, "nickserv/saset/autoop")
+	CommandNSSASetAutoOp(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/autoop")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display.c_str());
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "AUTOOP");
@@ -85,13 +85,13 @@ class CommandNSSASetAutoOp : public Command
 		return MOD_CONT;
 	}
 
-	bool Help(User *u, const ci::string &)
+	bool Help(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_AUTOOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
 	}
@@ -105,23 +105,29 @@ class CommandNSSASetAutoOp : public Command
 class NSSetAutoOp : public Module
 {
  public:
-	NSSetAutoOp(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetAutoOp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *set = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(NickServ, "SET");
+		if (c)
+			c->AddSubcommand(new CommandNSSetAutoOp("AUTOOP"));
 
-		if (set)
-			set->AddSubcommand(new CommandNSSetAutoOp("AUTOOP"));
+		c = FindCommand(NickServ, "SASET");
+		if (c)
+			c->AddSubcommand(new CommandNSSASetAutoOp("AUTOOP"));
 	}
 
 	~NSSetAutoOp()
 	{
-		Command *set = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(NickServ, "SET");
+		if (c)
+			c->DelSubcommand("AUTOOP");
 
-		if (set)
-			set->DelSubcommand("AUTOOP");
+		c = FindCommand(NickServ, "SASET");
+		if (c)
+			c->DelSubcommand("AUTOOP");
 	}
 };
 

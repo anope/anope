@@ -22,32 +22,32 @@ class CommandMSCancel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		int ischan;
 		int isforbid;
-		const char *name = params[0].c_str();
+		Anope::string name = params[0];
 		MemoInfo *mi;
 
 		if (!u->IsRecognized())
-			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
+			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
 		else if (!(mi = getmemoinfo(name, &ischan, &isforbid)))
 		{
 			if (isforbid)
-				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name);
+				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
 			else
-				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
 		}
 		else
 		{
 			int i;
 
 			for (i = mi->memos.size() - 1; i >= 0; --i)
-				if ((mi->memos[i]->HasFlag(MF_UNREAD)) && !stricmp(mi->memos[i]->sender.c_str(), u->Account()->display) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
+				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number));
 					delmemo(mi, mi->memos[i]->number);
-					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_CANCELLED, name.c_str());
 					return MOD_CONT;
 				}
 
@@ -56,13 +56,13 @@ class CommandMSCancel : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_CANCEL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
 	}
@@ -76,10 +76,11 @@ class CommandMSCancel : public Command
 class MSCancel : public Module
 {
  public:
-	MSCancel(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(MemoServ, new CommandMSCancel());
 	}
 };

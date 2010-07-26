@@ -16,21 +16,21 @@
 class CommandCSSetSecureOps : public Command
 {
  public:
-	CommandCSSetSecureOps(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecureOps(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREOPS);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREOPS);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
@@ -41,13 +41,13 @@ class CommandCSSetSecureOps : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECUREOPS, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
 	}
@@ -61,17 +61,17 @@ class CommandCSSetSecureOps : public Command
 class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 {
  public:
-	CommandCSSASetSecureOps(const ci::string &cname) : CommandCSSetSecureOps(cname, "chanserv/saset/secureops")
+	CommandCSSASetSecureOps(const Anope::string &cname) : CommandCSSetSecureOps(cname, "chanserv/saset/secureops")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECUREOPS, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET SECUREOPS", CHAN_SASET_SECUREOPS_SYNTAX);
 	}
@@ -80,7 +80,7 @@ class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 class CSSetSecureOps : public Module
 {
  public:
-	CSSetSecureOps(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetSecureOps(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

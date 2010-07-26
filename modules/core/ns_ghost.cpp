@@ -21,30 +21,30 @@ class CommandNSGhost : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		std::string pass = params.size() > 1 ? params[1].c_str() : "";
+		Anope::string nick = params[0];
+		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na = findnick(nick);
 
 		if (!finduser(nick))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!na)
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!stricmp(nick, u->nick.c_str()))
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+		else if (nick.equals_ci(u->nick))
 			notice_lang(Config.s_NickServ, u, NICK_NO_GHOST_SELF);
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
-				std::string buf = "GHOST command used by " + u->nick;
-				kill_user(Config.s_NickServ, nick, buf.c_str());
-				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
+				Anope::string buf = "GHOST command used by " + u->nick;
+				kill_user(Config.s_NickServ, nick, buf);
+				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
 			}
 			else
 			{
@@ -59,11 +59,11 @@ class CommandNSGhost : public Command
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
-				std::string buf = "GHOST command used by " + u->nick;
-				kill_user(Config.s_NickServ, nick, buf.c_str());
-				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick);
+				Anope::string buf = "GHOST command used by " + u->nick;
+				kill_user(Config.s_NickServ, nick, buf);
+				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
@@ -71,13 +71,13 @@ class CommandNSGhost : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_GHOST);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
 	}
@@ -91,7 +91,7 @@ class CommandNSGhost : public Command
 class NSGhost : public Module
 {
  public:
-	NSGhost(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

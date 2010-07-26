@@ -130,7 +130,7 @@ static void DisplayNews(User *u, NewsType Type)
 	}
 }
 
-static int add_newsitem(User *u, const char *text, NewsType type)
+static int add_newsitem(User *u, const Anope::string &text, NewsType type)
 {
 	int num = 0;
 
@@ -141,7 +141,7 @@ static int add_newsitem(User *u, const char *text, NewsType type)
 			break;
 		}
 
-	NewsItem *news = new NewsItem;
+	NewsItem *news = new NewsItem();
 	news->type = type;
 	news->num = num + 1;
 	news->Text = text;
@@ -168,13 +168,12 @@ static int del_newsitem(unsigned num, NewsType type)
 	return count;
 }
 
-static int *findmsgs(NewsType type, const char **type_name)
+static int *findmsgs(NewsType type, Anope::string &type_name)
 {
 	for (unsigned i = 0; i < lenof(msgarray); ++i)
 		if (msgarray[i].type == type)
 		{
-			if (type_name)
-				*type_name = msgarray[i].name;
+			type_name = msgarray[i].name;
 			return msgarray[i].msgs;
 		}
 	return NULL;
@@ -207,12 +206,12 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params, NewsType type, int *msgs)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, NewsType type, int *msgs)
 	{
-		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string text = params.size() > 1 ? params[1] : "";
 		int n;
 
-		if (!text)
+		if (text.empty())
 			this->OnSyntaxError(u, "ADD");
 		else
 		{
@@ -231,12 +230,12 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params, NewsType type, int *msgs)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, NewsType type, int *msgs)
 	{
-		const char *text = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string text = params.size() > 1 ? params[1] : "";
 		unsigned num;
 
-		if (!text)
+		if (text.empty())
 			this->OnSyntaxError(u, "DEL");
 		else
 		{
@@ -245,9 +244,9 @@ class NewsBase : public Command
 				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
-			if (stricmp(text, "ALL"))
+			if (!text.equals_ci("ALL"))
 			{
-				num = atoi(text);
+				num = text.is_number_only() ? convertTo<unsigned>(text) : 0;
 				if (num > 0 && del_newsitem(num, type))
 				{
 					notice_lang(Config.s_OperServ, u, msgs[MSG_DELETED], num);
@@ -270,24 +269,24 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoNews(User *u, const std::vector<ci::string> &params, NewsType type)
+	CommandReturn DoNews(User *u, const std::vector<Anope::string> &params, NewsType type)
 	{
-		ci::string cmd = params[0];
-		const char *type_name;
+		Anope::string cmd = params[0];
+		Anope::string type_name;
 		int *msgs;
 
-		msgs = findmsgs(type, &type_name);
+		msgs = findmsgs(type, type_name);
 		if (!msgs)
 		{
 			Alog() << "news: Invalid type to do_news()";
 			return MOD_CONT;
 		}
 
-		if (cmd == "LIST")
+		if (cmd.equals_ci("LIST"))
 			return this->DoList(u, type, msgs);
-		else if (cmd == "ADD")
+		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params, type, msgs);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params, type, msgs);
 		else
 			this->OnSyntaxError(u, "");
@@ -295,7 +294,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
  public:
-	NewsBase(const ci::string &newstype) : Command(newstype, 1, 2, "operserv/news")
+	NewsBase(const Anope::string &newstype) : Command(newstype, 1, 2, "operserv/news")
 	{
 	}
 
@@ -303,11 +302,11 @@ class NewsBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &params) = 0;
+	virtual CommandReturn Execute(User *u, const std::vector<Anope::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
+	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u, const ci::string &subcommand) = 0;
+	virtual void OnSyntaxError(User *u, const Anope::string &subcommand) = 0;
 };
 
 class CommandOSLogonNews : public NewsBase
@@ -317,18 +316,18 @@ class CommandOSLogonNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, NEWS_HELP_LOGON, Config.NewsCount);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
@@ -346,18 +345,18 @@ class CommandOSOperNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_OPER);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, NEWS_HELP_OPER, Config.NewsCount);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
@@ -375,18 +374,18 @@ class CommandOSRandomNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoNews(u, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, NEWS_HELP_RANDOM);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}
@@ -400,7 +399,7 @@ class CommandOSRandomNews : public NewsBase
 class OSNews : public Module
 {
  public:
-	OSNews(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -432,19 +431,19 @@ class OSNews : public Module
 		DisplayNews(u, NEWS_RANDOM);
 	}
 
-	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "OS" && params.size() >= 7 && params[1] == "NEWS")
+		if (params[0].equals_ci("OS") && params.size() >= 7 && params[1].equals_ci("NEWS"))
 		{
-			NewsItem *n = new NewsItem;
-			n->num = atoi(params[2].c_str());
-			n->time = strtol(params[3].c_str(), NULL, 10);
+			NewsItem *n = new NewsItem();
+			n->num = params[2].is_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			n->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 			n->who = params[4];
-			if (params[5] == "LOGON")
+			if (params[5].equals_ci("LOGON"))
 				n->type = NEWS_LOGON;
-			else if (params[5] == "RANDOM")
+			else if (params[5].equals_ci("RANDOM"))
 				n->type = NEWS_RANDOM;
-			else if (params[5] == "OPER")
+			else if (params[5].equals_ci("OPER"))
 				n->type = NEWS_OPER;
 			n->Text = params[6];
 			News.push_back(n);
@@ -455,19 +454,19 @@ class OSNews : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDatabaseWrite(void (*Write)(const std::string &))
+	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
 		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
 		{
 			NewsItem *n = *it;
-			char buf[512]; const char* ntype;
+			Anope::string ntype;
 			if (n->type == NEWS_LOGON)
 				ntype = "LOGON";
 			else if (n->type == NEWS_RANDOM)
 				ntype = "RANDOM";
 			else if (n->type == NEWS_OPER)
 				ntype = "OPER";
-			snprintf(buf, sizeof(buf), "OS NEWS %d %ld %s %s :%s", n->num, n->time, n->who.c_str(), ntype, n->Text.c_str());
+			Anope::string buf = "OS NEWS " + stringify(n->num) + " " + stringify(n->time) + " " + n->who + " " + ntype + " :" + n->Text;
 			Write(buf);
 		}
 	}

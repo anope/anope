@@ -12,7 +12,7 @@
 #include "services.h"
 #include "modules.h"
 
-char *TS6SID = NULL;
+Anope::string TS6SID;
 
 /* Anope */
 Server *Me = NULL;
@@ -56,7 +56,7 @@ Flags<CapabType, CAPAB_END> Capab;
  * @param description Server rdescription
  * @param sid Server sid/numeric
  */
-Server::Server(Server *uplink, const std::string &name, unsigned int hops, const std::string &description, const std::string &sid) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
+Server::Server(Server *uplink, const Anope::string &name, unsigned int hops, const Anope::string &description, const Anope::string &sid) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
 {
 	Links = NULL;
 
@@ -103,9 +103,7 @@ Server::~Server()
 				if (na && !na->HasFlag(NS_FORBIDDEN) && (!na->nc->HasFlag(NI_SUSPENDED)) && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = t;
-					if (na->last_quit)
-						delete [] na->last_quit;
-					na->last_quit = (!QReason.empty() ? sstrdup(QReason.c_str()) : NULL);
+					na->last_quit = QReason;
 				}
 
 				delete u;
@@ -116,15 +114,11 @@ Server::~Server()
 	}
 
 	if (UplinkServer)
-	{
 		UplinkServer->DelLink(this);
-	}
 
 	if (Links)
-	{
 		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
 			delete *it;
-	}
 
 	delete Links;
 }
@@ -132,7 +126,7 @@ Server::~Server()
 /** Delete this server with a reason
  * @param reason The reason
  */
-void Server::Delete(const std::string &reason)
+void Server::Delete(const Anope::string &reason)
 {
 	QReason = reason;
 	delete this;
@@ -141,7 +135,7 @@ void Server::Delete(const std::string &reason)
 /** Get the name for this server
  * @return The name
  */
-const std::string &Server::GetName() const
+const Anope::string &Server::GetName() const
 {
 	return Name;
 }
@@ -157,7 +151,7 @@ unsigned int Server::GetHops() const
 /** Set the server description
  * @param desc The new description
  */
-void Server::SetDescription(const std::string &desc)
+void Server::SetDescription(const Anope::string &desc)
 {
 	Description = desc;
 }
@@ -165,7 +159,7 @@ void Server::SetDescription(const std::string &desc)
 /** Get the server description
  * @return The server description
  */
-const std::string &Server::GetDescription() const
+const Anope::string &Server::GetDescription() const
 {
 	return Description;
 }
@@ -173,7 +167,7 @@ const std::string &Server::GetDescription() const
 /** Get the server numeric/SID
  * @return The numeric/SID
  */
-const std::string &Server::GetSID() const
+const Anope::string &Server::GetSID() const
 {
 	return SID;
 }
@@ -204,7 +198,7 @@ void Server::AddLink(Server *s)
 	 */
 	if (this == Me && !UplinkServer)
 		UplinkServer = s;
-	
+
 	if (!Links)
 		Links = new std::list<Server *>();
 
@@ -286,8 +280,8 @@ bool Server::IsSynced() const
  */
 bool Server::IsULined() const
 {
-	for (int j = 0; j < Config.NumUlines; ++j)
-		if (!stricmp(Config.Ulines[j], GetName().c_str()))
+	for (std::list<Anope::string>::const_iterator it = Config.Ulines.begin(), it_end = Config.Ulines.end(); it != it_end; ++it)
+		if (it->equals_ci(GetName()))
 			return true;
 	return false;
 }
@@ -297,13 +291,13 @@ bool Server::IsULined() const
  * @param s The server list to search for this server on, defaults to our Uplink
  * @return The server
  */
-Server *Server::Find(const std::string &name, Server *s)
+Server *Server::Find(const Anope::string &name, Server *s)
 {
 	Alog(LOG_DEBUG) << "Server::Find called for " << name;
 
 	if (!s)
 		s = Me;
-	if (s->GetName() == name || s->GetSID() == name)
+	if (s->GetName().equals_cs(name) || s->GetSID().equals_cs(name))
 		return s;
 
 	if (s->GetLinks())
@@ -312,7 +306,7 @@ Server *Server::Find(const std::string &name, Server *s)
 		{
 			Server *serv = *it;
 
-			if (serv->GetName() == name || serv->GetSID() == name)
+			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
 				return serv;
 			Alog(LOG_DEBUG) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);
@@ -335,7 +329,7 @@ Server *Server::Find(const std::string &name, Server *s)
  * @param numeric Server Numberic/SUID
  * @return void
  */
-void do_server(const std::string &source, const std::string &servername, unsigned int hops, const std::string &descript, const std::string &numeric)
+void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric)
 {
 	if (source.empty())
 		Alog(LOG_DEBUG) << "Server " << servername << " introduced";
@@ -358,8 +352,8 @@ void do_server(const std::string &source, const std::string &servername, unsigne
 	Server *newserver = new Server(s, servername, hops, descript, numeric);
 
 	/* Announce services being online. */
-	if (Config.GlobalOnCycle && Config.GlobalOnCycleUP)
-		notice_server(Config.s_GlobalNoticer, newserver, "%s", Config.GlobalOnCycleUP);
+	if (Config.GlobalOnCycle && !Config.GlobalOnCycleUP.empty())
+		notice_server(Config.s_GlobalNoticer, newserver, "%s", Config.GlobalOnCycleUP.c_str());
 
 	/* Let modules know about the connection */
 	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
@@ -374,9 +368,8 @@ void do_server(const std::string &source, const std::string &servername, unsigne
  * @param av Agruments as part of the SQUIT
  * @return void
  */
-void do_squit(const char *source, int ac, const char **av)
+void do_squit(const Anope::string &source, int ac, const char **av)
 {
-	char buf[BUFSIZE];
 	Server *s = Server::Find(av[0]);
 
 	if (!s)
@@ -387,22 +380,23 @@ void do_squit(const char *source, int ac, const char **av)
 
 	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
 
+	Anope::string buf;
 	/* If this is a juped server, send a nice global to inform the online
 	 * opers that we received it.
 	 */
 	if (s->HasFlag(SERVER_JUPED))
 	{
-		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s", s->GetName().c_str());
-		ircdproto->SendGlobops(OperServ, buf);
+		buf = "Received SQUIT for juped server " + s->GetName();
+		ircdproto->SendGlobops(OperServ, "%s", buf.c_str());
 	}
 
-	snprintf(buf, sizeof(buf), "%s %s", s->GetName().c_str(), s->GetUplink()->GetName().c_str());
+	buf = s->GetName() + " " + s->GetUplink()->GetName();
 
 	if (s->GetUplink() == Me->GetUplink() && Capab.HasFlag(CAPAB_UNCONNECT))
 	{
 		Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
 		/* need to fix */
-		ircdproto->SendSquit(s->GetName().c_str(), buf);
+		ircdproto->SendSquit(s->GetName(), buf);
 	}
 
 	s->Delete(buf);
@@ -420,11 +414,11 @@ void CapabParse(int ac, const char **av)
 	{
 		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
 		{
-			if (av[i] == Capab_Info[j].Token)
+			if (Capab_Info[j].Token.equals_ci(av[i]))
 			{
 				Capab.SetFlag(Capab_Info[j].Flag);
 
-				if (Capab_Info[j].Token == "NICKIP" && !ircd->nickip)
+				if (Capab_Info[j].Token.equals_ci("NICKIP") && !ircd->nickip)
 					ircd->nickip = 1;
 				break;
 			}
@@ -452,7 +446,7 @@ static char ts6_new_uid[10];
 
 static void ts6_uid_increment(unsigned int slot)
 {
-	if (slot != strlen(TS6SID))
+	if (slot != TS6SID.length())
 	{
 		if (ts6_new_uid[slot] == 'Z')
 			ts6_new_uid[slot] = '0';
@@ -487,7 +481,7 @@ const char *ts6_uid_retrieve()
 
 	if (!ts6_uid_initted)
 	{
-		snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
+		snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID.c_str());
 		ts6_uid_initted = true;
 	}
 
@@ -554,7 +548,7 @@ const char *ts6_sid_retrieve()
 	if (!ts6_sid_initted)
 	{
 		// Initialize ts6_new_sid with the services server SID
-		snprintf(ts6_new_sid, 4, "%s", TS6SID);
+		snprintf(ts6_new_sid, 4, "%s", TS6SID.c_str());
 		ts6_sid_initted = true;
 	}
 

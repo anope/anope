@@ -20,29 +20,29 @@ class CommandMSCheck : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = NULL;
 		MemoInfo *mi = NULL;
 		int i, found = 0;
-		const char *recipient = params[0].c_str();
+		Anope::string recipient = params[0];
 		struct tm *tm;
 		char timebuf[64];
 
 		if (!u->IsRecognized())
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ);
+			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
 			return MOD_CONT;
 		}
 		else if (!(na = findnick(recipient)))
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
+			notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
+			notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, recipient.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,7 +53,7 @@ class CommandMSCheck : public Command
 
 		for (i = mi->memos.size() - 1; i >= 0; --i)
 		{
-			if (!stricmp(mi->memos[i]->sender.c_str(), u->Account()->display))
+			if (u->Account()->display.equals_ci(mi->memos[i]->sender))
 			{
 				found = 1; /* Yes, we've found the memo */
 
@@ -61,26 +61,26 @@ class CommandMSCheck : public Command
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 
 				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick, timebuf);
+					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick.c_str(), timebuf);
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_READ, na->nick, timebuf);
+					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_READ, na->nick.c_str(), timebuf);
 				break;
 			}
 		}
 
 		if (!found)
-			notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
+			notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_CHECK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
 	}
@@ -94,7 +94,7 @@ class CommandMSCheck : public Command
 class MSCheck : public Module
 {
  public:
-	MSCheck(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -17,31 +17,26 @@
 class CommandBSInfo : public Command
 {
  private:
-	void send_bot_channels(User * u, BotInfo * bi)
+	void send_bot_channels(User *u, BotInfo *bi)
 	{
-		char buf[307], *end;
-
-		*buf = 0;
-		end = buf;
-
+		Anope::string buf;
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
 			ChannelInfo *ci = it->second;
 
 			if (ci->bi == bi)
 			{
-				if (strlen(buf) + strlen(ci->name.c_str()) > 300)
+				if (buf.length() + ci->name.length() > 300)
 				{
-					u->SendMessage(Config.s_BotServ, "%s", buf);
-					*buf = 0;
-					end = buf;
+					u->SendMessage(Config.s_BotServ, "%s", buf.c_str());
+					buf.clear();
 				}
-				end += snprintf(end, sizeof(buf) - (end - buf), " %s ", ci->name.c_str());
+				buf += " " + ci->name + " ";
 			}
 		}
 
-		if (*buf)
-			u->SendMessage(Config.s_BotServ, "%s", buf);
+		if (!buf.empty())
+			u->SendMessage(Config.s_BotServ, "%s", buf.c_str());
 		return;
 	}
  public:
@@ -50,11 +45,11 @@ class CommandBSInfo : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		BotInfo *bi;
 		ChannelInfo *ci;
-		const char *query = params[0].c_str();
+		Anope::string query = params[0];
 
 		int need_comma = 0;
 		char buf[BUFSIZE], *end;
@@ -65,8 +60,8 @@ class CommandBSInfo : public Command
 			struct tm *tm;
 
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick.c_str());
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->GetIdent().c_str(), bi->host);
-			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->realname);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_MASK, bi->GetIdent().c_str(), bi->host.c_str());
+			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_REALNAME, bi->realname.c_str());
 			tm = localtime(&bi->created);
 			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 			notice_lang(Config.s_BotServ, u, BOT_INFO_BOT_CREATED, buf);
@@ -198,17 +193,17 @@ class CommandBSInfo : public Command
 			notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_OPTIONS, *buf ? buf : getstring(u, BOT_INFO_OPT_NONE));
 		}
 		else
-			notice_lang(Config.s_BotServ, u, BOT_INFO_NOT_FOUND, query);
+			notice_lang(Config.s_BotServ, u, BOT_INFO_NOT_FOUND, query.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_INFO);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "INFO", BOT_INFO_SYNTAX);
 	}
@@ -222,10 +217,11 @@ class CommandBSInfo : public Command
 class BSInfo : public Module
 {
  public:
-	BSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSInfo());
 	}
 };

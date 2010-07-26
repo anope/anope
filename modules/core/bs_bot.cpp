@@ -16,34 +16,33 @@
 class CommandBSBot : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[1].c_str();
-		const char *user = params[2].c_str();
-		const char *host = params[3].c_str();
-		const char *real = params[4].c_str();
-		const char *ch = NULL;
+		Anope::string nick = params[1];
+		Anope::string user = params[2];
+		Anope::string host = params[3];
+		Anope::string real = params[4];
 		BotInfo *bi;
 
 		if (findbot(nick))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick.c_str());
 			return MOD_CONT;
 		}
 
-		if (strlen(nick) > Config.NickLen)
+		if (nick.length() > Config.NickLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
-		if (strlen(user) > Config.UserLen)
+		if (user.length() > Config.UserLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, Config.UserLen);
 			return MOD_CONT;
 		}
 
-		if (strlen(user) > Config.HostLen)
+		if (host.length() > Config.HostLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, Config.HostLen);
 			return MOD_CONT;
@@ -56,8 +55,8 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && ch - nick < Config.NickLen; ++ch)
-			if (!isvalidnick(*ch))
+		for (unsigned i = 0, end = nick.length(); i < end && i < Config.NickLen; ++i)
+			if (!isvalidnick(nick[i]))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
@@ -77,8 +76,8 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = user; *ch && ch - user < Config.UserLen; ++ch)
-			if (!isalnum(*ch))
+		for (unsigned i = 0, end = user.length(); i < end && i < Config.UserLen; ++i)
+			if (!isalnum(user[i]))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 				return MOD_CONT;
@@ -90,7 +89,7 @@ class CommandBSBot : public Command
 		*/
 		if (findnick(nick))
 		{
-			notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
+			notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -100,23 +99,22 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		notice_lang(Config.s_BotServ, u, BOT_BOT_ADDED, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, bi->realname);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_ADDED, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
 		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
 		return MOD_CONT;
 	}
 
-	CommandReturn DoChange(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoChange(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *oldnick = params[1].c_str();
-		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
-		const char *user = params.size() > 3 ? params[3].c_str() : NULL;
-		const char *host = params.size() > 4 ? params[4].c_str() : NULL;
-		const char *real = params.size() > 5 ? params[5].c_str() : NULL;
-		const char *ch = NULL;
+		Anope::string oldnick = params[1];
+		Anope::string nick = params.size() > 2 ? params[2] : "";
+		Anope::string user = params.size() > 3 ? params[3] : "";
+		Anope::string host = params.size() > 4 ? params[4] : "";
+		Anope::string real = params.size() > 5 ? params[5] : "";
 		BotInfo *bi;
 
-		if (!oldnick || !nick)
+		if (oldnick.empty() || nick.empty())
 		{
 			this->OnSyntaxError(u, "CHANGE");
 			return MOD_CONT;
@@ -124,37 +122,37 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(oldnick)))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
-		if (stricmp(oldnick, nick) && nickIsServices(oldnick, 0))
+		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, 0))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
-		if (strlen(nick) > Config.NickLen)
+		if (nick.length() > Config.NickLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
 
-		if (user && strlen(user) > Config.UserLen)
+		if (!user.empty() && user.length() > Config.UserLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_LONG_IDENT, Config.UserLen);
 			return MOD_CONT;
 		}
 
-		if (host && strlen(host) > Config.HostLen)
+		if (!host.empty() && host.length() > Config.HostLen)
 		{
 			notice_lang(Config.s_BotServ, u, BOT_LONG_HOST, Config.HostLen);
 			return MOD_CONT;
 		}
 
-		if (stricmp(oldnick, nick) && nickIsServices(nick, 0))
+		if (!oldnick.equals_ci(nick) && nickIsServices(nick, 0))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
@@ -163,7 +161,7 @@ class CommandBSBot : public Command
 		* And we must finally check that the nick is not already
 		* taken by another bot.
 		*/
-		if (bi->nick == nick && (user ? bi->GetIdent() == user : 1) && (host ? !strcmp(bi->host, host) : 1) && (real ? !strcmp(bi->realname, real) : 1))
+		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BOT_ANY_CHANGES);
 			return MOD_CONT;
@@ -176,8 +174,8 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		for (ch = nick; *ch && ch - nick < Config.NickLen; ++ch)
-			if (!isvalidnick(*ch))
+		for (unsigned i = 0, end = nick.length(); i < end && i < Config.NickLen; ++i)
+			if (!isvalidnick(nick[i]))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BAD_NICK);
 				return MOD_CONT;
@@ -190,28 +188,27 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (host && !isValidHost(host, 3))
+		if (!host.empty() && !isValidHost(host, 3))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_BAD_HOST);
 			return MOD_CONT;
 		}
 
-		if (user)
-			for (ch = user; *ch && ch - user < Config.UserLen; ++ch)
-				if (!isalnum(*ch))
+		if (!user.empty())
+			for (unsigned i = 0, end = user.length(); i < end && i < Config.UserLen; ++i)
+				if (!isalnum(user[i]))
 				{
 					notice_lang(Config.s_BotServ, u, BOT_BAD_IDENT, Config.UserLen);
 					return MOD_CONT;
 				}
 
-		ci::string ci_bi_nick(bi->nick.c_str());
-		if (ci_bi_nick != nick && findbot(nick))
+		if (!nick.equals_ci(bi->nick) && findbot(nick))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
+			notice_lang(Config.s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick.c_str());
 			return MOD_CONT;
 		}
 
-		if (ci_bi_nick != nick)
+		if (!nick.equals_ci(bi->nick))
 		{
 			/* We check whether the nick is registered, and inform the user
 			* if so. You need to drop the nick manually before you can use
@@ -219,7 +216,7 @@ class CommandBSBot : public Command
 			*/
 			if (findnick(nick))
 			{
-				notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
+				notice_lang(Config.s_BotServ, u, NICK_ALREADY_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -227,7 +224,7 @@ class CommandBSBot : public Command
 			the old nick. */
 			if (ircd->sqline)
 			{
-				XLine x(bi->nick.c_str());
+				XLine x(bi->nick);
 				ircdproto->SendSQLineDel(&x);
 			}
 
@@ -235,45 +232,45 @@ class CommandBSBot : public Command
 			EnforceQlinedNick(nick, Config.s_BotServ);
 		}
 
-		if (user)
+		if (!user.empty())
 			ircdproto->SendQuit(bi, "Quit: Be right back");
 		else
 		{
 			ircdproto->SendChangeBotNick(bi, nick);
-			XLine x(bi->nick.c_str(), "Reserved for services");
+			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(&x);
 		}
 
-		if (bi->nick != nick)
+		if (!nick.equals_cs(bi->nick))
 			bi->SetNewNick(nick);
 
-		if (user && bi->GetIdent() != user)
+		if (!user.empty() && !user.equals_cs(bi->GetIdent()))
 			bi->SetIdent(user);
-		if (host && strcmp(bi->host, host))
-			bi->host = sstrdup(host);
-		if (real && strcmp(bi->realname, real))
-			bi->realname = sstrdup(real);
+		if (!host.empty() && !host.equals_cs(bi->host))
+			bi->host = host;
+		if (!real.empty() && !real.equals_cs(bi->realname))
+			bi->realname = real;
 
-		if (user)
+		if (!user.empty())
 		{
 			ircdproto->SendClientIntroduction(bi->nick, bi->GetIdent(), bi->host, bi->realname, ircd->pseudoclient_mode, bi->GetUID());
-			XLine x(bi->nick.c_str(), "Reserved for services");
+			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(&x);
 			bi->RejoinAll();
 		}
 
-		notice_lang(Config.s_BotServ, u, BOT_BOT_CHANGED, oldnick, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host, bi->realname);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_CHANGED, oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[1].c_str();
+		Anope::string nick = params[1];
 		BotInfo *bi;
 
-		if (!nick)
+		if (nick.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
@@ -281,24 +278,24 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(nick)))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (nickIsServices(nick, 0))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick.c_str());
-		XLine x(bi->nick.c_str());
+		XLine x(bi->nick);
 		ircdproto->SendSQLineDel(&x);
 
 		delete bi;
-		notice_lang(Config.s_BotServ, u, BOT_BOT_DELETED, nick);
+		notice_lang(Config.s_BotServ, u, BOT_BOT_DELETED, nick.c_str());
 		return MOD_CONT;
 	}
  public:
@@ -307,9 +304,9 @@ class CommandBSBot : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
 		if (readonly)
 		{
@@ -317,7 +314,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 		{
 			// ADD nick user host real - 5
 			if (!u->Account()->HasCommand("botserv/bot/add"))
@@ -332,14 +329,14 @@ class CommandBSBot : public Command
 				return MOD_CONT;
 			}
 
-			std::vector<ci::string> tempparams = params;
+			std::vector<Anope::string> tempparams = params;
 			// ADD takes less params than CHANGE, so we need to take 6 if given and append it with a space to 5.
 			if (tempparams.size() >= 6)
 				tempparams[4] = tempparams[4] + " " + tempparams[5];
 
 			return this->DoAdd(u, tempparams);
 		}
-		else if (cmd == "CHANGE")
+		else if (cmd.equals_ci("CHANGE"))
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
@@ -357,7 +354,7 @@ class CommandBSBot : public Command
 
 			return this->DoChange(u, params);
 		}
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 		{
 			// DEL nick
 			if (!u->Account()->HasCommand("botserv/bot/del"))
@@ -380,13 +377,13 @@ class CommandBSBot : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_lang(Config.s_BotServ, u, BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 	}
@@ -400,10 +397,11 @@ class CommandBSBot : public Command
 class BSBot : public Module
 {
  public:
-	BSBot(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSBot());
 	}
 };

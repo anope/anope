@@ -19,7 +19,7 @@ class MemoDelCallback : public NumberList
 	ChannelInfo *ci;
 	MemoInfo *mi;
  public:
-	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), mi(_mi)
+	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), mi(_mi)
 	{
 	}
 
@@ -44,11 +44,11 @@ class CommandMSDel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
-		ci::string numstr = params.size() ? params[0] : "", chan;
+		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 		unsigned i, end;
 		int last;
 
@@ -76,7 +76,7 @@ class CommandMSDel : public Command
 		}
 		else
 			mi = &u->Account()->memos;
-		if (numstr.empty() || (!isdigit(numstr[0]) && numstr != "ALL" && numstr != "LAST"))
+		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
 			this->OnSyntaxError(u, numstr);
 		else if (mi->memos.empty())
 		{
@@ -89,10 +89,10 @@ class CommandMSDel : public Command
 		{
 			if (isdigit(numstr[0]))
 			{
-				MemoDelCallback list(u, ci, mi, numstr.c_str());
+				MemoDelCallback list(u, ci, mi, numstr);
 				list.Process();
 			}
-			else if (numstr == "LAST")
+			else if (numstr.equals_ci("LAST"))
 			{
 				/* Delete last memo. */
 				for (i = 0, end = mi->memos.size(); i < end; ++i)
@@ -112,10 +112,7 @@ class CommandMSDel : public Command
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, 0));
 				/* Delete all memos. */
 				for (i = 0, end = mi->memos.size(); i < end; ++i)
-				{
-					delete [] mi->memos[i]->text;
 					delete mi->memos[i];
-				}
 				mi->memos.clear();
 				if (!chan.empty())
 					notice_lang(Config.s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan.c_str());
@@ -130,13 +127,13 @@ class CommandMSDel : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_DEL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
 	}
@@ -150,7 +147,7 @@ class CommandMSDel : public Command
 class MSDel : public Module
 {
  public:
-	MSDel(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

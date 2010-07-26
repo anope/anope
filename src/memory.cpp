@@ -21,25 +21,6 @@
 /*************************************************************************/
 
 /**
- * malloc, replacement so we can trap for "out of memory"
- * @param size to allocate
- * @return void
- */
-void *smalloc(long size)
-{
-	void *buf;
-
-	if (!size)
-		size = 1;
-	buf = malloc(size);
-	if (!buf)
-		abort();
-	return buf;
-}
-
-/*************************************************************************/
-
-/**
  * calloc, replacement so we can trap for "out of memory"
  * @param elsize to allocate
  * @param els size of members
@@ -75,33 +56,6 @@ void *srealloc(void *oldptr, long newsize)
 	if (!buf)
 		abort();
 	return buf;
-}
-
-/*************************************************************************/
-
-/**
- * strdup, replacement so we can trap for "out of memory"
- * @param oldptr Old Pointer
- * @param newsize Size of new pointer
- * @return void
- */
-char *sstrdup(const char *src)
-{
-	char *ret = NULL;
-	if (src)
-	{
-		ret = new char[strlen(src) + 1];
-		if (!ret)
-			abort();
-		strcpy(ret, src);
-	}
-	else
-	{
-		Alog() << "sstrdup() called with NULL-arg";
-		abort();
-	}
-
-	return ret;
 }
 
 /*************************************************************************/

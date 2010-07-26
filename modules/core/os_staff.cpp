@@ -20,14 +20,14 @@ class CommandOSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_STAFF_LIST_HEADER);
 
-		for (std::list<std::pair<ci::string, ci::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
+		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 		{
 			int found = 0;
-			ci::string nick = it->first, type = it->second;
+			Anope::string nick = it->first, type = it->second;
 
 			NickAlias *na = findnick(nick);
 			if (na)
@@ -40,14 +40,14 @@ class CommandOSStaff : public Command
 					if (u2->Account() && u2->Account() == na->nc)
 					{
 						found = 1;
-						if (na->nick == u2->nick)
+						if (na->nick.equals_ci(u2->nick))
 							notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
 						else
-							notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick, u2->nick.c_str());
+							notice_lang(Config.s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
 					}
 				}
 				if (!found)
-					notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick);
+					notice_lang(Config.s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
 			}
 		}
 
@@ -55,7 +55,7 @@ class CommandOSStaff : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_STAFF);
 		return true;
@@ -70,7 +70,7 @@ class CommandOSStaff : public Command
 class OSStaff : public Module
 {
  public:
-	OSStaff(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

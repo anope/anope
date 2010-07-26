@@ -19,7 +19,7 @@ class ExceptionDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	ExceptionDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	ExceptionDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -35,7 +35,7 @@ class ExceptionDelCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > nexceptions)
+		if (Number > exceptions.size())
 			return;
 
 		++Deleted;
@@ -45,29 +45,26 @@ class ExceptionDelCallback : public NumberList
 
 	static void DoDel(User *u, unsigned index)
 	{
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, &exceptions[index]));
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, exceptions[index]));
 
-		delete [] exceptions[index].mask;
-		delete [] exceptions[index].reason;
-		--nexceptions;
-		memmove(exceptions + index, exceptions + index + 1, sizeof(Exception) * (nexceptions - index));
-		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+		delete exceptions[index];
+		exceptions.erase(exceptions.begin() + index);
 	}
 };
 
 class ExceptionListCallback : public NumberList
 {
  protected:
- 	User *u;
+	User *u;
 	bool SentHeader;
  public:
-	ExceptionListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	ExceptionListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > nexceptions)
+		if (Number > exceptions.size())
 			return;
 
 		if (!SentHeader)
@@ -82,23 +79,23 @@ class ExceptionListCallback : public NumberList
 
 	static void DoList(User *u, unsigned index)
 	{
-		if (index >= nexceptions)
+		if (index >= exceptions.size())
 			return;
 
-		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index].limit, exceptions[index].mask);
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
 	}
 };
 
 class ExceptionViewCallback : public ExceptionListCallback
 {
  public:
-	ExceptionViewCallback(User *_u, const std::string &numlist) : ExceptionListCallback(_u, numlist)
+	ExceptionViewCallback(User *_u, const Anope::string &numlist) : ExceptionListCallback(_u, numlist)
 	{
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > nexceptions)
+		if (Number > exceptions.size())
 			return;
 
 		if (!SentHeader)
@@ -112,31 +109,31 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 	static void DoList(User *u, unsigned index)
 	{
-		if (index >= nexceptions)
+		if (index >= exceptions.size())
 			return;
 
-		char timebuf[32], expirebuf[256];
+		char timebuf[32];
 		struct tm tm;
 		time_t t = time(NULL);
 
-		tm = *localtime(exceptions[index].time ? &exceptions[index].time : &t);
+		tm = *localtime(exceptions[index]->time ? &exceptions[index]->time : &t);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 
-		expire_left(u->Account(), expirebuf, sizeof(expirebuf), exceptions[index].expires);
+		Anope::string expirebuf = expire_left(u->Account(), exceptions[index]->expires);
 
-		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index].mask, exceptions[index].who ? exceptions[index].who : "<unknown>", timebuf, expirebuf, exceptions[index].limit, exceptions[index].reason);
+		notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", timebuf, expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
 	}
 };
 
 class CommandOSSession : public Command
 {
  private:
-	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
 	{
 		int mincount;
-		const char *param = params[1].c_str();
+		Anope::string param = params[1];
 
-		if ((mincount = atoi(param)) <= 1)
+		if ((mincount = (param.is_number_only() ? convertTo<int>(param) : 0)) <= 1)
 			notice_lang(Config.s_OperServ, u, OPER_SESSION_INVALID_THRESHOLD);
 		else
 		{
@@ -148,23 +145,24 @@ class CommandOSSession : public Command
 				Session *session = it->second;
 
 				if (session->count >= mincount)
-					notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host);
+					notice_lang(Config.s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
 			}
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *param = params[1].c_str();
+		Anope::string param = params[1];
 		Session *session = findsession(param);
 
 		if (!session)
-			notice_lang(Config.s_OperServ, u, OPER_SESSION_NOT_FOUND, param);
-		else {
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_NOT_FOUND, param.c_str());
+		else
+		{
 			Exception *exception = find_host_exception(param);
-			notice_lang(Config.s_OperServ, u, OPER_SESSION_VIEW_FORMAT, param, session->count, exception ? exception-> limit : Config.DefSessionLimit);
+			notice_lang(Config.s_OperServ, u, OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config.DefSessionLimit);
 		}
 
 		return MOD_CONT;
@@ -174,9 +172,9 @@ class CommandOSSession : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
 		if (!Config.LimitSessions)
 		{
@@ -184,22 +182,22 @@ class CommandOSSession : public Command
 			return MOD_CONT;
 		}
 
-		if (cmd == "LIST")
+		if (cmd.equals_ci("LIST"))
 			return this->DoList(u, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(u, params);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_SESSION);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
@@ -213,39 +211,38 @@ class CommandOSSession : public Command
 class CommandOSException : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *mask, *expiry, *limitstr;
-		char reason[BUFSIZE];
+		Anope::string mask, expiry, limitstr;
 		unsigned last_param = 3;
 		int x;
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-		if (mask && *mask == '+')
+		mask = params.size() > 1 ? params[1] : "";
+		if (!mask.empty() && mask[0] == '+')
 		{
 			expiry = mask;
-			mask = params.size() > 2 ? params[2].c_str() : NULL;
+			mask = params.size() > 2 ? params[2] : "";
 			last_param = 4;
 		}
-		else
-			expiry = NULL;
 
-		limitstr = params.size() > last_param - 1 ? params[last_param - 1].c_str() : NULL;
+		limitstr = params.size() > last_param - 1 ? params[last_param - 1] : "";
 
 		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 3 && params.size() > 4 ? " " : "", last_param == 3 && params.size() > 4 ? params[4].c_str() : "");
 
-		if (!*reason)
+		Anope::string reason = params[last_param];
+		if (last_param == 3 && params.size() > 4)
+			reason += " " + params[4];
+		if (reason.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
-		time_t expires = expiry ? dotime(expiry) : Config.ExceptionExpiry;
+		time_t expires = !expiry.empty() ? dotime(expiry) : Config.ExceptionExpiry;
 		if (expires < 0)
 		{
 			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
@@ -254,7 +251,7 @@ class CommandOSException : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		int limit = limitstr && isdigit(*limitstr) ? atoi(limitstr) : -1;
+		int limit = !limitstr.empty() && limitstr.is_number_only() ? convertTo<int>(limitstr) : -1;
 
 		if (limit < 0 || limit > static_cast<int>(Config.MaxSessionLimit))
 		{
@@ -263,16 +260,16 @@ class CommandOSException : public Command
 		}
 		else
 		{
-			if (strchr(mask, '!') || strchr(mask, '@'))
+			if (mask.find('!') == Anope::string::npos || mask.find('@') == Anope::string::npos)
 			{
 				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_INVALID_HOSTMASK);
 				return MOD_CONT;
 			}
 
-			x = exception_add(u, mask, limit, reason, u->nick.c_str(), expires);
+			x = exception_add(u, mask, limit, reason, u->nick, expires);
 
 			if (x == 1)
-				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_ADDED, mask, limit);
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_ADDED, mask.c_str(), limit);
 
 			if (readonly)
 				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
@@ -281,45 +278,34 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
-		int i;
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask)
+		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
 		}
 
-		if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask))
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			ExceptionDelCallback list(u, mask);
 			list.Process();
 		}
 		else
 		{
-			int deleted = 0;
-
-			for (i = 0; i < nexceptions; ++i)
-				if (!stricmp(mask, exceptions[i].mask))
+			unsigned i = 0, end = exceptions.size();
+			for (; i < end; ++i)
+				if (mask.equals_ci(exceptions[i]->mask))
 				{
 					ExceptionDelCallback::DoDel(u, i);
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED, mask);
-					deleted = 1;
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_DELETED, mask.c_str());
 					break;
 				}
-			if (!deleted && i == nexceptions)
-				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask);
+			if (i == end)
+				notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask.c_str());
 		}
-
-		/* Renumber the exception list. I don't believe in having holes in
-		 * lists - it makes code more complex, harder to debug and we end up
-		 * with huge index numbers. Imho, fixed numbering is only beneficial
-		 * when one doesn't have range capable manipulation. -TheShadow */
-
-		for (i = 0; i < nexceptions; ++i)
-			exceptions[i].num = i;
 
 		if (readonly)
 			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
@@ -327,47 +313,28 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoMove(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoMove(User *u, const std::vector<Anope::string> &params)
 	{
-		Exception *exception;
-		const char *n1str = params.size() > 1 ? params[1].c_str() : NULL; /* From position */
-		const char *n2str = params.size() > 2 ? params[2].c_str() : NULL; /* To position */
-		int n1, n2, i;
+		Anope::string n1str = params.size() > 1 ? params[1] : ""; /* From position */
+		Anope::string n2str = params.size() > 2 ? params[2] : ""; /* To position */
+		int n1, n2;
 
-		if (!n2str)
+		if (n2str.empty())
 		{
 			this->OnSyntaxError(u, "MOVE");
 			return MOD_CONT;
 		}
 
-		n1 = atoi(n1str) - 1;
-		n2 = atoi(n2str) - 1;
+		n1 = n1str.is_number_only() ? convertTo<int>(n1str) - 1 : -1;
+		n2 = n2str.is_number_only() ? convertTo<int>(n2str) - 1 : -1;
 
-		if (n1 >= 0 && n1 < nexceptions && n2 >= 0 && n2 < nexceptions && n1 != n2)
+		if (n1 >= 0 && n1 < exceptions.size() && n2 >= 0 && n2 < exceptions.size() && n1 != n2)
 		{
-			exception = static_cast<Exception *>(smalloc(sizeof(Exception)));
-			memcpy(exception, &exceptions[n1], sizeof(Exception));
+			Exception *temp = exceptions[n1];
+			exceptions[n1] = exceptions[n2];
+			exceptions[n2] = temp;
 
-			if (n1 < n2)
-			{
-				/* Shift upwards */
-				memmove(&exceptions[n1], &exceptions[n1 + 1], sizeof(Exception) * (n2 - n1));
-				memmove(&exceptions[n2], exception, sizeof(Exception));
-			}
-			else
-			{
-				/* Shift downwards */
-				memmove(&exceptions[n2 + 1], &exceptions[n2], sizeof(Exception) * (n1 - n2));
-				memmove(&exceptions[n2], exception, sizeof(Exception));
-			}
-
-			free(exception);
-
-			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_MOVED, exceptions[n1].mask, n1 + 1, n2 + 1);
-
-			/* Renumber the exception list. See DoDel() above for why. */
-			for (i = 0; i < nexceptions; ++i)
-				exceptions[i].num = i;
+			notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
 				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
@@ -378,13 +345,12 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
 	{
-		int i;
 		expire_exceptions();
-		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
+		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			ExceptionListCallback list(u, mask);
 			list.Process();
@@ -393,8 +359,8 @@ class CommandOSException : public Command
 		{
 			bool SentHeader = false;
 
-			for (i = 0; i < nexceptions; ++i)
-				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
+			for (unsigned i = 0, end = exceptions.size(); i < end; ++i)
+				if (mask.empty() || Anope::Match(exceptions[i]->mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -413,13 +379,12 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
 	{
-		int i;
 		expire_exceptions();
-		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (mask && strspn(mask, "1234567890,-") == strlen(mask))
+		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			ExceptionViewCallback list(u, mask);
 			list.Process();
@@ -428,8 +393,8 @@ class CommandOSException : public Command
 		{
 			bool SentHeader = false;
 
-			for (i = 0; i < nexceptions; ++i)
-				if (!mask || Anope::Match(exceptions[i].mask, mask, false))
+			for (unsigned i = 0, end = exceptions.size(); i < end; ++i)
+				if (mask.empty() || Anope::Match(exceptions[i]->mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -451,9 +416,9 @@ class CommandOSException : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
 		if (!Config.LimitSessions)
 		{
@@ -461,28 +426,28 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params);
-		else if (cmd == "MOVE")
+		else if (cmd.equals_ci("MOVE"))
 			return this->DoMove(u, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(u, params);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_EXCEPTION);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}
@@ -496,7 +461,7 @@ class CommandOSException : public Command
 class OSSession : public Module
 {
  public:
-	OSSession(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

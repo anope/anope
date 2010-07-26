@@ -20,32 +20,32 @@ class CommandOSMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str(), *modes = params[1].c_str();
+		Anope::string chan = params[0], modes = params[1];
 		Channel *c;
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (c->bouncy_modes)
 			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
-			c->SetModes(OperServ, false, modes);
+			c->SetModes(OperServ, false, modes.c_str());
 
 			if (Config.WallOSMode)
-				ircdproto->SendGlobops(OperServ, "%s used MODE %s on %s", u->nick.c_str(), modes, chan);
+				ircdproto->SendGlobops(OperServ, "%s used MODE %s on %s", u->nick.c_str(), modes.c_str(), chan.c_str());
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_MODE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "MODE", OPER_MODE_SYNTAX);
 	}
@@ -59,7 +59,7 @@ class CommandOSMode : public Command
 class OSMode : public Module
 {
  public:
-	OSMode(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

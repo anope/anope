@@ -25,6 +25,12 @@ void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
 		ModuleManager::LoadModule(*it, NULL);
 }
 
+void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
+{
+	for (std::list<Anope::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
+		ModuleManager::LoadModule(*it, NULL);
+}
+
 /**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
@@ -34,39 +40,37 @@ void ModuleManager::LoadModuleList(std::list<ci::string> &ModuleList)
  * @param output the destination to copy the module to
  * @return MOD_ERR_OK on success
  */
-static int moduleCopyFile(const char *name, const char *output)
+static int moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
 	int ch;
 	FILE *source, *target;
 #ifndef _WIN32
 	int srcfp;
 #endif
-	char input[4096];
+	Anope::string input = services_dir + "/modules/" + name + MODULE_EXT;
 
-	strlcpy(input, services_dir.c_str(), sizeof(input));
-	strlcat(input, "/modules/", sizeof(input));  /* Get full path with module extension */
-	strlcat(input, name, sizeof(input));
-	strlcat(input, MODULE_EXT, sizeof(input));
-
-	if (!(source = fopen(input, "rb")))
+	if (!(source = fopen(input.c_str(), "rb")))
 		return MOD_ERR_NOEXIST;
 
+	char *tmp_output = strdup(output.c_str());
 #ifndef _WIN32
-	if ((srcfp = mkstemp(const_cast<char *>(output))) == -1)
+	if ((srcfp = mkstemp(const_cast<char *>(tmp_output))) == -1)
 #else
-	if (!mktemp(const_cast<char *>(output)))
+	if (!mktemp(const_cast<char *>(tmp_output)))
 #endif
 	{
 		fclose(source);
 		return MOD_ERR_FILE_IO;
 	}
+	output = tmp_output;
+	delete [] tmp_output;
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
 #ifndef _WIN32
 	if (!(target = fdopen(srcfp, "w")))
 #else
-	if (!(target = fopen(output, "wb")))
+	if (!(target = fopen(output.c_str(), "wb")))
 #endif
 	{
 		fclose(source);
@@ -116,35 +120,25 @@ template <class TYPE> TYPE function_cast(ano_module_t symbol)
 	return cast.function;
 }
 
-int ModuleManager::LoadModule(const std::string &modname, User *u)
+int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
 	const char *err;
-	Module *(*func)(const std::string &, const std::string &);
+	Module *(*func)(const Anope::string &, const Anope::string &);
 	int ret = 0;
 
 	if (modname.empty())
 		return MOD_ERR_PARAMS;
 
-	if (FindModule(modname) != NULL)
+	if (FindModule(modname))
 		return MOD_ERR_EXISTS;
 
 	Alog(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
-	std::string pbuf;
-	pbuf = services_dir + "/modules/";
-#ifndef _WIN32
-	pbuf += "runtime/";
-#else
-	pbuf += "runtime\\";
-#endif
-	pbuf += modname;
-	pbuf += MODULE_EXT;
-	pbuf += ".";
-	pbuf += "XXXXXX";
+	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + MODULE_EXT + ".XXXXXX";
 
 	/* Don't skip return value checking! -GD */
-	if ((ret = moduleCopyFile(modname.c_str(), pbuf.c_str())) != MOD_ERR_OK)
+	if ((ret = moduleCopyFile(modname, pbuf)) != MOD_ERR_OK)
 	{
 		/* XXX: This used to assign filename here, but I don't think that was correct..
 		 * even if it was, it makes life very fucking difficult, so.
@@ -162,7 +156,7 @@ int ModuleManager::LoadModule(const std::string &modname, User *u)
 	}
 
 	ano_modclearerr();
-	func = function_cast<Module *(*)(const std::string &, const std::string &)>(dlsym(handle, "AnopeInit"));
+	func = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	if (!func && (err = dlerror()))
 	{
 		Alog() << "No init function found, not an Anope module";
@@ -174,11 +168,9 @@ int ModuleManager::LoadModule(const std::string &modname, User *u)
 		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
 
 	/* Create module. */
-	std::string nick;
+	Anope::string nick;
 	if (u)
 		nick = u->nick;
-	else
-		nick = "";
 
 	Module *m;
 
@@ -238,16 +230,6 @@ int ModuleManager::LoadModule(const std::string &modname, User *u)
 	return MOD_ERR_OK;
 }
 
-int ModuleManager::LoadModule(const char *modname, User *u)
-{
-	return LoadModule(std::string(modname), u);
-}
-
-int ModuleManager::LoadModule(const ci::string &modname, User *u)
-{
-	return LoadModule(std::string(modname.c_str()), u);
-}
-
 int ModuleManager::UnloadModule(Module *m, User *u)
 {
 	if (!m || !m->handle)
@@ -286,7 +268,7 @@ void ModuleManager::DeleteModule(Module *m)
 
 	DetachAll(m);
 	ano_module_t handle = m->handle;
-	std::string filename = m->filename;
+	Anope::string filename = m->filename;
 
 	ano_modclearerr();
 	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
@@ -479,4 +461,3 @@ void ModuleManager::UnloadAll(bool unload_proto)
 			DeleteModule(m);
 	}
 }
-

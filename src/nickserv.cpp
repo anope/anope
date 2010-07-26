@@ -17,13 +17,16 @@ nickalias_map NickAliasList;
 nickcore_map NickCoreList;
 nickrequest_map NickRequestList;
 
-static std::map<std::string, NickServCollide *> NickServCollides;
-static std::map<std::string, NickServRelease *> NickServReleases;
+typedef std::map<Anope::string, NickServCollide *, hash_compare_std_string> nickservcollides_map;
+typedef std::map<Anope::string, NickServRelease *, hash_compare_std_string> nickservreleases_map;
 
-NickServCollide::NickServCollide(const std::string &_nick, time_t delay) : Timer(delay), nick(_nick)
+static nickservcollides_map NickServCollides;
+static nickservreleases_map NickServReleases;
+
+NickServCollide::NickServCollide(const Anope::string &_nick, time_t delay) : Timer(delay), nick(_nick)
 {
 	/* Erase the current collide and use the new one */
-	std::map<std::string, NickServCollide *>::iterator nit = NickServCollides.find(nick);
+	nickservcollides_map::iterator nit = NickServCollides.find(nick);
 	if (nit != NickServCollides.end())
 		delete nit->second;
 
@@ -46,10 +49,10 @@ void NickServCollide::Tick(time_t ctime)
 	u->Collide(na);
 }
 
-NickServRelease::NickServRelease(const std::string &_nick, const std::string &_uid, time_t delay) : Timer(delay), nick(_nick), uid(_uid)
+NickServRelease::NickServRelease(const Anope::string &_nick, const Anope::string &_uid, time_t delay) : Timer(delay), nick(_nick), uid(_uid)
 {
 	/* Erase the current release timer and use the new one */
-	std::map<std::string, NickServRelease *>::iterator nit = NickServReleases.find(nick);
+	nickservreleases_map::iterator nit = NickServReleases.find(nick);
 	if (nit != NickServReleases.end())
 		delete nit->second;
 
@@ -90,14 +93,14 @@ void get_aliases_stats(long *nrec, long *memuse)
 
 		++count;
 		mem += sizeof(*na);
-		if (na->nick)
-			mem += strlen(na->nick) + 1;
-		if (na->last_usermask)
-			mem += strlen(na->last_usermask) + 1;
-		if (na->last_realname)
-			mem += strlen(na->last_realname) + 1;
-		if (na->last_quit)
-			mem += strlen(na->last_quit) + 1;
+		if (!na->nick.empty())
+			mem += na->nick.length() + 1;
+		if (!na->last_usermask.empty())
+			mem += na->last_usermask.length() + 1;
+		if (!na->last_realname.empty())
+			mem += na->last_realname.length() + 1;
+		if (!na->last_quit.empty())
+			mem += na->last_quit.length() + 1;
 	}
 	*nrec = count;
 	*memuse = mem;
@@ -119,25 +122,22 @@ void get_core_stats(long *nrec, long *memuse)
 		++count;
 		mem += sizeof(*nc);
 
-		if (nc->display)
-			mem += strlen(nc->display) + 1;
+		if (!nc->display.empty())
+			mem += nc->display.length() + 1;
 		if (!nc->pass.empty())
-			mem += (nc->pass.capacity() + (2 * sizeof(size_t)) + (2 * sizeof(void *)));
-		if (nc->email)
-			mem += strlen(nc->email) + 1;
-		if (nc->greet)
-			mem += strlen(nc->greet) + 1;
+			mem += nc->pass.length() + 1;
+		if (!nc->greet.empty())
+			mem += nc->greet.length() + 1;
 
-		mem += sizeof(std::string) * nc->access.size();
+		mem += sizeof(Anope::string) * nc->access.size();
+
 		for (j = 0, end = nc->access.size(); j < end; ++j)
 			mem += nc->GetAccess(j).length() + 1;
 
 		mem += nc->memos.memos.size() * sizeof(Memo);
 		for (j = 0, end = nc->memos.memos.size(); j < end; ++j)
-		{
-			if (nc->memos.memos[j]->text)
-				mem += strlen(nc->memos.memos[j]->text) + 1;
-		}
+			if (!nc->memos.memos[j]->text.empty())
+				mem += nc->memos.memos[j]->text.length() + 1;
 
 		mem += sizeof(NickAlias *) * nc->aliases.size();
 	}
@@ -159,17 +159,17 @@ void ns_init()
 
 /* Main NickServ routine. */
 
-void nickserv(User *u, const std::string &buf)
+void nickserv(User *u, const Anope::string &buf)
 {
 	if (!u || buf.empty())
 		return;
 
-	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
 	{
-		std::string command = buf;
+		Anope::string command = buf;
 		command.erase(command.begin());
 		command.erase(command.end());
-		ircdproto->SendCTCP(NickServ, u->nick.c_str(), "%s", command.c_str());
+		ircdproto->SendCTCP(NickServ, u->nick, "%s", command.c_str());
 	}
 	else
 		mod_run_cmd(NickServ, u, buf);
@@ -216,13 +216,9 @@ int validate_user(User *u)
 	if (!na->nc->HasFlag(NI_SECURE) && u->IsRecognized())
 	{
 		na->last_seen = time(NULL);
-		if (na->last_usermask)
-			delete [] na->last_usermask;
-		std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-		na->last_usermask = sstrdup(last_usermask.c_str());
-		if (na->last_realname)
-			delete [] na->last_realname;
-		na->last_realname = sstrdup(u->realname);
+		Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+		na->last_usermask = last_usermask;
+		na->last_realname = u->realname;
 
 		check_memos(u);
 
@@ -232,9 +228,9 @@ int validate_user(User *u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			notice_lang(Config.s_NickServ, u, NICK_IS_SECURE, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_IS_SECURE, Config.s_NickServ.c_str());
 		else
-			notice_lang(Config.s_NickServ, u, NICK_IS_REGISTERED, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_IS_REGISTERED, Config.s_NickServ.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
@@ -288,7 +284,7 @@ void expire_nicks()
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
 			if (MOD_RESULT == EVENT_STOP)
 				continue;
-			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email ? na->nc->email : "none") << ")";
+			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
 			delete na;
 		}
@@ -313,17 +309,7 @@ void expire_requests()
 
 /*************************************************************************/
 
-NickRequest *findrequestnick(const char *nick)
-{
-	return findrequestnick(ci::string(nick));
-}
-
-NickRequest *findrequestnick(const std::string &nick)
-{
-	return findrequestnick(ci::string(nick.c_str()));
-}
-
-NickRequest *findrequestnick(const ci::string &nick)
+NickRequest *findrequestnick(const Anope::string &nick)
 {
 	nickrequest_map::const_iterator it = NickRequestList.find(nick);
 
@@ -332,17 +318,7 @@ NickRequest *findrequestnick(const ci::string &nick)
 	return NULL;
 }
 
-NickAlias *findnick(const char *nick)
-{
-	return findnick(ci::string(nick));
-}
-
-NickAlias *findnick(const std::string &nick)
-{
-	return findnick(ci::string(nick.c_str()));
-}
-
-NickAlias *findnick(const ci::string &nick)
+NickAlias *findnick(const Anope::string &nick)
 {
 	nickalias_map::const_iterator it = NickAliasList.find(nick);
 
@@ -353,17 +329,7 @@ NickAlias *findnick(const ci::string &nick)
 
 /*************************************************************************/
 
-NickCore *findcore(const char *nick)
-{
-	return findcore(ci::string(nick));
-}
-
-NickCore *findcore(const std::string &nick)
-{
-	return findcore(ci::string(nick.c_str()));
-}
-
-NickCore *findcore(const ci::string &nick)
+NickCore *findcore(const Anope::string &nick)
 {
 	nickcore_map::const_iterator it = NickCoreList.find(nick);
 
@@ -383,54 +349,23 @@ NickCore *findcore(const ci::string &nick)
  */
 bool is_on_access(User *u, NickCore *nc)
 {
-	unsigned i, end;
-	char *buf;
-	char *buf2 = NULL;
-	char *buf3 = NULL;
-	std::string tmp_buf;
-
 	if (!u || !nc || nc->access.empty())
 		return false;
 
-	tmp_buf = u->GetIdent() + "@" + u->host;
-	buf = sstrdup(tmp_buf.c_str());
+	Anope::string buf = u->GetIdent() + "@" + u->host, buf2, buf3;
 	if (ircd->vhost)
 	{
-		if (u->vhost)
-		{
-			tmp_buf = u->GetIdent() + "@" + u->vhost;
-			buf2 = sstrdup(tmp_buf.c_str());
-		}
+		if (!u->vhost.empty())
+			buf2 = u->GetIdent() + "@" + u->vhost;
 		if (!u->GetCloakedHost().empty())
-		{
-			tmp_buf = u->GetIdent() + "@" + u->GetCloakedHost();
-			buf3 = sstrdup(tmp_buf.c_str());
-		}
+			buf3 = u->GetIdent() + "@" + u->GetCloakedHost();
 	}
 
-	for (i = 0, end = nc->access.size(); i < end; ++i)
+	for (unsigned i = 0, end = nc->access.size(); i < end; ++i)
 	{
-		std::string access = nc->GetAccess(i);
-		if (Anope::Match(buf, access, false) || (buf2 && Anope::Match(buf2, access, false)) || (buf3 && Anope::Match(buf3, access, false)))
-		{
-			delete [] buf;
-			if (ircd->vhost)
-			{
-				if (u->vhost)
-					delete [] buf2;
-				if (!u->GetCloakedHost().empty())
-					delete [] buf3;
-			}
+		Anope::string access = nc->GetAccess(i);
+		if (Anope::Match(buf, access) || (!buf2.empty() && Anope::Match(buf2, access)) || (!buf3.empty() && Anope::Match(buf3, access)))
 			return true;
-		}
-	}
-	delete [] buf;
-	if (ircd->vhost)
-	{
-		if (buf2)
-			delete [] buf2;
-		if (buf3)
-			delete [] buf3;
 	}
 	return false;
 }
@@ -441,7 +376,7 @@ bool is_on_access(User *u, NickCore *nc)
  * it to the first alias in the list.
  */
 
-void change_core_display(NickCore *nc, const char *newdisplay)
+void change_core_display(NickCore *nc, const Anope::string &newdisplay)
 {
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
@@ -450,8 +385,7 @@ void change_core_display(NickCore *nc, const char *newdisplay)
 	/* Remove the core from the list */
 	NickCoreList.erase(nc->display);
 
-	delete [] nc->display;
-	nc->display = sstrdup(newdisplay);
+	nc->display = newdisplay;
 
 	NickCoreList[nc->display] = nc;
 }
@@ -462,7 +396,7 @@ void change_core_display(NickCore *nc)
 	if (nc->aliases.empty())
 		return;
 	na = nc->aliases.front();
-	change_core_display(nc,na->nick);
+	change_core_display(nc, na->nick);
 }
 
 /*************************************************************************/

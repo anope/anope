@@ -20,22 +20,21 @@ class CommandMSSend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *text = params[1].c_str();
-		int z = 0;
-		memo_send(u, nick, text, z);
+		Anope::string nick = params[0];
+		Anope::string text = params[1];
+		memo_send(u, nick, text, 0);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_SEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 	}
@@ -49,7 +48,7 @@ class CommandMSSend : public Command
 class MSSend : public Module
 {
  public:
-	MSSend(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

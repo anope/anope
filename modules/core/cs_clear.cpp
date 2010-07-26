@@ -20,13 +20,13 @@ class CommandCSClear : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		ci::string what = params[1];
+		Anope::string chan = params[0];
+		Anope::string what = params[1];
 		Channel *c = findchan(chan);
 		ChannelInfo *ci = c ? c->ci : NULL;
-		std::string modebuf;
+		Anope::string modebuf;
 
 		ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
 		ChannelMode *admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
@@ -35,58 +35,55 @@ class CommandCSClear : public Command
 		ChannelMode *voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!u || !check_access(u, ci, CA_CLEAR))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		else if (what == "bans")
+		else if (what.equals_ci("bans"))
 		{
 			c->ClearBans();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_BANS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_BANS, chan.c_str());
 		}
-		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what == "excepts")
+		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what.equals_ci("excepts"))
 		{
 			c->ClearExcepts();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan.c_str());
 		}
-		else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what == "invites")
+		else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what.equals_ci("invites"))
 		{
 			c->ClearInvites();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan.c_str());
 		}
-		else if (what == "modes")
+		else if (what.equals_ci("modes"))
 		{
 			c->ClearModes();
 			check_modes(c);
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan.c_str());
 		}
-		else if (what == "ops")
+		else if (what.equals_ci("ops"))
 		{
 			if (ircd->svsmode_ucmode)
 			{
 				if (owner)
 				{
-					modebuf = '-';
-					modebuf += owner->ModeChar;
+					modebuf = "-" + owner->ModeChar;
 
-					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
+					ircdproto->SendSVSModeChan(c, modebuf, "");
 				}
 				if (admin)
 				{
-					modebuf = '-';
-					modebuf += admin->ModeChar;
+					modebuf = "-" + admin->ModeChar;
 
-					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
+					ircdproto->SendSVSModeChan(c, modebuf, "");
 				}
 				if (op)
 				{
-					modebuf = "-";
-					modebuf += op->ModeChar;
+					modebuf = "-" + op->ModeChar;
 
-					ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
+					ircdproto->SendSVSModeChan(c, modebuf, "");
 				}
 			}
 			else
@@ -104,18 +101,17 @@ class CommandCSClear : public Command
 				}
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan.c_str());
 		}
-		else if ((halfop && what == "hops") || (voice && what == "voices"))
+		else if ((halfop && what.equals_ci("hops")) || (voice && what.equals_ci("voices")))
 		{
-			ChannelMode *cm = what == "hops" ? halfop : voice;
+			ChannelMode *cm = what.equals_ci("hops") ? halfop : voice;
 
 			if (ircd->svsmode_ucmode)
 			{
-				modebuf = "-";
-				modebuf += cm->ModeChar;
+				modebuf = "-" + cm->ModeChar;
 
-				ircdproto->SendSVSModeChan(c, modebuf.c_str(), NULL);
+				ircdproto->SendSVSModeChan(c, modebuf, "");
 			}
 			else
 			{
@@ -128,18 +124,18 @@ class CommandCSClear : public Command
 				}
 			}
 		}
-		else if (what == "users")
+		else if (what.equals_ci("users"))
 		{
-			std::string buf = "CLEAR USERS command from " + u->nick;
+			Anope::string buf = "CLEAR USERS command from " + u->nick;
 
 			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{
 				UserContainer *uc = *it++;
 
-				c->Kick(NULL, uc->user, buf.c_str());
+				c->Kick(NULL, uc->user, "%s", buf.c_str());
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan.c_str());
 		}
 		else
 			syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
@@ -147,13 +143,13 @@ class CommandCSClear : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_CLEAR);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 	}
@@ -167,10 +163,11 @@ class CommandCSClear : public Command
 class CSClear : public Module
 {
  public:
-	CSClear(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSClear(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSClear());
 	}
 };

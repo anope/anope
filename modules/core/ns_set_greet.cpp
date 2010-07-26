@@ -16,30 +16,27 @@
 class CommandNSSetGreet : public Command
 {
  public:
-	CommandNSSetGreet(const ci::string &cname) : Command(cname, 0)
+	CommandNSSetGreet(const Anope::string &cname) : Command(cname, 0)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (u->Account()->greet)
-			delete [] u->Account()->greet;
-
 		if (!params.empty())
 		{
-			u->Account()->greet = sstrdup(params[0].c_str());
-			notice_lang(Config.s_NickServ, u, NICK_SET_GREET_CHANGED, u->Account()->greet);
+			u->Account()->greet = params[0];
+			notice_lang(Config.s_NickServ, u, NICK_SET_GREET_CHANGED, u->Account()->greet.c_str());
 		}
 		else
 		{
-			u->Account()->greet = NULL;
+			u->Account()->greet.clear();
 			notice_lang(Config.s_NickServ, u, NICK_SET_GREET_UNSET);
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_GREET);
 		return true;
@@ -54,35 +51,32 @@ class CommandNSSetGreet : public Command
 class CommandNSSASetGreet : public Command
 {
  public:
-	CommandNSSASetGreet(const ci::string &cname) : Command(cname, 1, 2, "nickserv/saset/greet")
+	CommandNSSASetGreet(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/greet")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string param = params.size() > 1 ? params[1] : "";
 
-		if (nc->greet)
-			delete [] nc->greet;
-
-		if (param)
+		if (!param.empty())
 		{
-			nc->greet = sstrdup(param);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display, nc->greet);
+			nc->greet = param;
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
-			nc->greet = NULL;
-			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display);
+			nc->greet.clear();
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_GREET);
 		return true;
@@ -97,10 +91,9 @@ class CommandNSSASetGreet : public Command
 class NSSetGreet : public Module
 {
  public:
-	NSSetGreet(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetGreet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		Command *c = FindCommand(NickServ, "SET");

@@ -17,11 +17,11 @@
 class CommandCSSetXOP : public Command
 {
  public:
-	CommandCSSetXOP(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetXOP(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		if (!FindModule("cs_xop"))
 		{
@@ -32,7 +32,7 @@ class CommandCSSetXOP : public Command
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			if (!ci->HasFlag(CI_XOP))
 			{
@@ -66,7 +66,7 @@ class CommandCSSetXOP : public Command
 			Alog() << Config.s_ChanServ << ": " << u->GetMask() << " enabled XOP for " << ci->name;
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_XOP_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
@@ -79,13 +79,13 @@ class CommandCSSetXOP : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_XOP, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
 	}
@@ -99,17 +99,17 @@ class CommandCSSetXOP : public Command
 class CommandCSSASetXOP : public CommandCSSetXOP
 {
  public:
-	CommandCSSASetXOP(const ci::string &cname) : CommandCSSetXOP(cname, "chanserv/saset/xop")
+	CommandCSSASetXOP(const Anope::string &cname) : CommandCSSetXOP(cname, "chanserv/saset/xop")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_XOP, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
 	}
@@ -118,7 +118,7 @@ class CommandCSSASetXOP : public CommandCSSetXOP
 class CSSetXOP : public Module
 {
  public:
-	CSSetXOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -126,11 +126,19 @@ class CSSetXOP : public Module
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
 			c->AddSubcommand(new CommandCSSetXOP("XOP"));
+
+		c = FindCommand(ChanServ, "SASET");
+		if (c)
+			c->AddSubcommand(new CommandCSSASetXOP("XOP"));
 	}
 
 	~CSSetXOP()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
+		if (c)
+			c->DelSubcommand("XOP");
+
+		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->DelSubcommand("XOP");
 	}

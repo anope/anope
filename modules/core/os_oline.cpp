@@ -20,41 +20,41 @@ class CommandOSOLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *flag = params[1].c_str();
+		Anope::string nick = params[0];
+		Anope::string flag = params[1];
 		User *u2 = NULL;
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
 			u2->SetMode(OperServ, UMODE_OPER);
 			notice_lang(Config.s_OperServ, u2, OPER_OLINE_IRCOP);
-			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick);
+			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config.s_OperServ, nick, flag);
-			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag, nick);
-			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick);
+			notice_lang(Config.s_OperServ, u, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_OLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
 	}
@@ -68,7 +68,7 @@ class CommandOSOLine : public Command
 class OSOLine : public Module
 {
  public:
-	OSOLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");

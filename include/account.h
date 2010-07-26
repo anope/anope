@@ -1,13 +1,15 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
+#include "anope.h"
+
 class NickAlias;
 class NickCore;
 class NickRequest;
 
-typedef unordered_map_namespace::unordered_map<ci::string, NickAlias *, hash_compare_ci_string> nickalias_map;
-typedef unordered_map_namespace::unordered_map<ci::string, NickCore *, hash_compare_ci_string> nickcore_map;
-typedef unordered_map_namespace::unordered_map<ci::string, NickRequest *, hash_compare_ci_string> nickrequest_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, NickAlias *, hash_compare_ci_string> nickalias_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, NickCore *, hash_compare_ci_string> nickcore_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, NickRequest *, hash_compare_ci_string> nickrequest_map;
 
 extern CoreExport nickalias_map NickAliasList;
 extern CoreExport nickcore_map NickCoreList;
@@ -86,14 +88,14 @@ enum NickCoreFlag
 class CoreExport NickRequest : public Extensible
 {
  public:
-	NickRequest(const std::string &nickname);
+	NickRequest(const Anope::string &nickname);
 
 	~NickRequest();
 
-	char *nick;
-	std::string passcode;
-	std::string password;
-	char *email;
+	Anope::string nick;
+	Anope::string passcode;
+	Anope::string password;
+	Anope::string email;
 	time_t requested;
 	time_t lastmail; /* Unsaved */
 };
@@ -107,19 +109,19 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	 * @param nickname The nick
 	 * @param nickcore The nickcofe for this nick
 	 */
-	NickAlias(const std::string &nickname, NickCore *nickcore);
+	NickAlias(const Anope::string &nickname, NickCore *nickcore);
 
 	/** Default destructor
 	 */
 	~NickAlias();
 
-	char *nick;				/* Nickname */
-	char *last_quit;		/* Last quit message */
-	char *last_realname;	/* Last realname */
-	char *last_usermask;	/* Last usermask */
-	time_t time_registered;	/* When the nick was registered */
-	time_t last_seen;		/* When it was seen online for the last time */
-	NickCore *nc;			/* I'm an alias of this */
+	Anope::string nick;				/* Nickname */
+	Anope::string last_quit;		/* Last quit message */
+	Anope::string last_realname;	/* Last realname */
+	Anope::string last_usermask;	/* Last usermask */
+	time_t time_registered;			/* When the nick was registered */
+	time_t last_seen;				/* When it was seen online for the last time */
+	NickCore *nc;					/* I'm an alias of this */
 	HostInfo hostinfo;
 
 	/** Release a nick
@@ -138,10 +140,10 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>
 {
  public:
- 	/** Default constructor
+	/** Default constructor
 	 * @param display The display nick
 	 */
-	NickCore(const std::string &nickdisplay);
+	NickCore(const Anope::string &nickdisplay);
 
 	/** Default destructor
 	 */
@@ -149,12 +151,12 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 
 	std::list<User *> Users;
 
-	char *display;		/* How the nick is displayed */
-	std::string pass;	/* Password of the nicks */
-	char *email;		/* E-mail associated to the nick */
-	char *greet;		/* Greet associated to the nick */
-	uint16 language;	/* Language selected by nickname owner (LANG_*) */
-	std::vector<std::string> access; /* Access list, vector of strings */
+	Anope::string display;	/* How the nick is displayed */
+	Anope::string pass;		/* Password of the nicks */
+	Anope::string email;	/* E-mail associated to the nick */
+	Anope::string greet;	/* Greet associated to the nick */
+	uint16 language;		/* Language selected by nickname owner (LANG_*) */
+	std::vector<Anope::string> access; /* Access list, vector of strings */
 	MemoInfo memos;
 	uint16 channelcount; /* Number of channels currently registered */
 
@@ -168,7 +170,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	  * @param cmdstr The string to check, e.g. botserv/set/private.
 	  * @return True if this opertype may run the specified command, false otherwise.
 	  */
-	virtual bool HasCommand(const ci::string &cmdstr) const;
+	virtual bool HasCommand(const Anope::string &cmdstr) const;
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
@@ -179,7 +181,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	  * @param privstr The priv to check for, e.g. users/auspex.
 	  * @return True if this opertype has the specified priv, false otherwise.
 	  */
-	virtual bool HasPriv(const ci::string &privstr) const;
+	virtual bool HasPriv(const Anope::string &privstr) const;
 
 	/** Add an entry to the nick's access list
 	 *
@@ -187,7 +189,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 *
 	 * Adds a new entry into the access list.
 	 */
-	void AddAccess(const std::string &entry);
+	void AddAccess(const Anope::string &entry);
 
 	/** Get an entry from the nick's access list by index
 	 *
@@ -196,7 +198,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 *
 	 * Retrieves an entry from the access list corresponding to the given index.
 	 */
-	std::string GetAccess(unsigned entry);
+	Anope::string GetAccess(unsigned entry);
 
 	/** Find an entry in the nick's access list
 	 *
@@ -205,7 +207,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 *
 	 * Search for an entry within the access list.
 	 */
-	bool FindAccess(const std::string &entry);
+	bool FindAccess(const Anope::string &entry);
 
 	/** Erase an entry from the nick's access list
 	 *
@@ -213,7 +215,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 *
 	 * Removes the specified access list entry from the access list.
 	 */
-	void EraseAccess(const std::string &entry);
+	void EraseAccess(const Anope::string &entry);
 
 	/** Clears the entire nick's access list
 	 *

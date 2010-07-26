@@ -21,22 +21,22 @@ class CommandNSRecover : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		std::string pass = params.size() > 1 ? params[1].c_str() : "";
+		Anope::string nick = params[0];
+		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
 		User *u2;
 
 		if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!(na = findnick(u2->nick)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!stricmp(nick, u->nick.c_str()))
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+		else if (nick.equals_ci(u->nick))
 			notice_lang(Config.s_NickServ, u, NICK_NO_RECOVER_SELF);
 		else if (!pass.empty())
 		{
@@ -44,15 +44,13 @@ class CommandNSRecover : public Command
 
 			if (res == 1)
 			{
-				char relstr[192];
-
 				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config.NSReleaseTimeout seconds to string format */
-				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
+				Anope::string relstr = duration(na->nc, Config.NSReleaseTimeout);
 
-				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ, nick, relstr);
+				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
@@ -69,15 +67,13 @@ class CommandNSRecover : public Command
 		{
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
-				char relstr[192];
-
 				notice_lang(Config.s_NickServ, u2, FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config.NSReleaseTimeout seconds to string format */
-				duration(na->nc, relstr, sizeof(relstr), Config.NSReleaseTimeout);
+				Anope::string relstr = duration(na->nc, Config.NSReleaseTimeout);
 
-				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ, nick, relstr);
+				notice_lang(Config.s_NickServ, u, NICK_RECOVERED, Config.s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
@@ -85,20 +81,18 @@ class CommandNSRecover : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		char relstr[192];
-
 		/* Convert Config.NSReleaseTimeout seconds to string format */
-		duration(u->Account(), relstr, sizeof(relstr), Config.NSReleaseTimeout);
+		Anope::string relstr = duration(u->Account(), Config.NSReleaseTimeout);
 
-		notice_help(Config.s_NickServ, u, NICK_HELP_RECOVER, relstr);
+		notice_help(Config.s_NickServ, u, NICK_HELP_RECOVER, relstr.c_str());
 		//do_help_limited(Config.s_NickServ, u, this);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
 	}
@@ -112,7 +106,7 @@ class CommandNSRecover : public Command
 class NSRecover : public Module
 {
  public:
-	NSRecover(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

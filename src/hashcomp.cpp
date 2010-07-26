@@ -8,7 +8,7 @@
  * for use in Anope.
  */
 
-#include "hashcomp.h"
+#include "anope.h"
 
 /******************************************************
  *
@@ -103,33 +103,23 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 	return n >= 0 ? s1 : NULL;
 }
 
-sepstream::sepstream(const std::string &source, char seperator) : tokens(source), sep(seperator)
+sepstream::sepstream(const Anope::string &source, char seperator) : tokens(source), sep(seperator)
 {
 	last_starting_position = n = tokens.begin();
 }
 
-sepstream::sepstream(const ci::string &source, char seperator) : tokens(source.c_str()), sep(seperator)
+bool sepstream::GetToken(Anope::string &token)
 {
-	last_starting_position = n = tokens.begin();
-}
-
-sepstream::sepstream(const char *source, char seperator) : tokens(source), sep(seperator)
-{
-	last_starting_position = n = tokens.begin();
-}
-
-bool sepstream::GetToken(std::string &token)
-{
-	std::string::iterator lsp = last_starting_position;
+	Anope::string::iterator lsp = last_starting_position;
 
 	while (n != tokens.end())
 	{
 		if (*n == sep || n + 1 == tokens.end())
 		{
 			last_starting_position = n + 1;
-			token = std::string(lsp, n + 1 == tokens.end() ? n + 1 : n);
+			token = Anope::string(lsp, n + 1 == tokens.end() ? n + 1 : n);
 
-			while (token.length() && token.find_last_of(sep) == token.length() - 1)
+			while (token.length() && token.rfind(sep) == token.length() - 1)
 				token.erase(token.end() - 1);
 
 			++n;
@@ -140,21 +130,13 @@ bool sepstream::GetToken(std::string &token)
 		++n;
 	}
 
-	token = "";
+	token.clear();
 	return false;
 }
 
-bool sepstream::GetToken(ci::string &token)
+const Anope::string sepstream::GetRemaining()
 {
-	std::string tmp_token;
-	bool result = GetToken(tmp_token);
-	token = tmp_token.c_str();
-	return result;
-}
-
-const std::string sepstream::GetRemaining()
-{
-	return std::string(n, tokens.end());
+	return Anope::string(n, tokens.end());
 }
 
 bool sepstream::StreamEnd()
@@ -162,7 +144,6 @@ bool sepstream::StreamEnd()
 	return n == tokens.end();
 }
 
-#if defined(_WIN32) && _MSV_VER < 1600
 /** Compare two std::string's values for hashing in hash_map
  * @param s1 The first string
  * @param s2 The second string
@@ -171,11 +152,16 @@ bool sepstream::StreamEnd()
  */
 bool hash_compare_std_string::operator()(const std::string &s1, const std::string &s2) const
 {
-	if (s1.length() != s2.length())
-		return true;
-	return (std::char_traits<char>::compare(s1.c_str(), s2.c_str(), s1.length()) < 0);
+	register int i = std::char_traits<char>::compare(s1.c_str(), s2.c_str(), s1.length() < s2.length() ? s1.length() : s2.length());
+	if (!i)
+		return s1.length() < s2.length();
+	return i < 0;
 }
-#endif
+
+bool hash_compare_std_string::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return operator()(s1.str(), s2.str());
+}
 
 /** Return a hash value for a string
  * @param s The string
@@ -191,7 +177,11 @@ size_t hash_compare_std_string::operator()(const std::string &s) const
 	return t;
 }
 
-#if defined(_WIN32) && _MSV_VER < 1600
+size_t hash_compare_std_string::operator()(const Anope::string &s) const
+{
+	return operator()(s.str());
+}
+
 /** Compare two ci::string's values for hashing in hash_map
  * @param s1 The first string
  * @param s2 The second string
@@ -200,11 +190,16 @@ size_t hash_compare_std_string::operator()(const std::string &s) const
  */
 bool hash_compare_ci_string::operator()(const ci::string &s1, const ci::string &s2) const
 {
-	if (s1.length() != s2.length())
-		return true;
-	return (ci::ci_char_traits::compare(s1.c_str(), s2.c_str(), s1.length()) < 0);
+	register int i = ci::ci_char_traits::compare(s1.c_str(), s2.c_str(), s1.length() < s2.length() ? s1.length() : s2.length());
+	if (!i)
+		return s1.length() < s2.length();
+	return i < 0;
 }
-#endif
+
+bool hash_compare_ci_string::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return operator()(s1.ci_str(), s2.ci_str());
+}
 
 /** Return a hash value for a string using case insensitivity
  * @param s The string
@@ -220,7 +215,11 @@ size_t hash_compare_ci_string::operator()(const ci::string &s) const
 	return t;
 }
 
-#if defined(_WIN32) && _MSV_VER < 1600
+size_t hash_compare_ci_string::operator()(const Anope::string &s) const
+{
+	return operator()(s.ci_str());
+}
+
 /** Compare two irc::string's values for hashing in hash_map
  * @param s1 The first string
  * @param s2 The second string
@@ -229,11 +228,16 @@ size_t hash_compare_ci_string::operator()(const ci::string &s) const
  */
 bool hash_compare_irc_string::operator()(const irc::string &s1, const irc::string &s2) const
 {
-	if (s1.length() != s2.length())
-		return true;
-	return (irc::irc_char_traits::compare(s1.c_str(), s2.c_str(), s1.length()) < 0);
+	register int i = irc::irc_char_traits::compare(s1.c_str(), s2.c_str(), s1.length() < s2.length() ? s1.length() : s2.length());
+	if (!i)
+		return s1.length() < s2.length();
+	return i < 0;
 }
-#endif
+
+bool hash_compare_irc_string::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return operator()(s1.irc_str(), s2.irc_str());
+}
 
 /** Return a hash value for a string using RFC1459 case sensitivity rules
  * @param s The string
@@ -247,4 +251,9 @@ size_t hash_compare_irc_string::operator()(const irc::string &s) const
 		t = 5 * t + rfc_case_insensitive_map[static_cast<const unsigned char>(*it)];
 
 	return t;
+}
+
+size_t hash_compare_irc_string::operator()(const Anope::string &s) const
+{
+	return operator()(s.irc_str());
 }

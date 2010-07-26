@@ -16,18 +16,15 @@
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan(const ci::string &cname) : Command(cname, 2, 3)
+	CommandCSBan(const Anope::string &cname) : Command(cname, 2, 3)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *target = params[1].c_str();
-		const char *reason = NULL;
-
-		if (params.size() > 2)
-			reason = params[2].c_str();
+		Anope::string chan = params[0];
+		Anope::string target = params[1];
+		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
@@ -35,18 +32,15 @@ class CommandCSBan : public Command
 
 		int is_same;
 
-		if (!reason)
-			reason = "Requested";
-
-		is_same = !stricmp(target, u->nick.c_str());
+		is_same = target.equals_ci(u->nick);
 
 		if (c)
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
@@ -61,9 +55,9 @@ class CommandCSBan : public Command
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			char mask[BUFSIZE];
+			Anope::string mask;
 
-			get_idealban(ci, u2, mask, sizeof(mask));
+			get_idealban(ci, u2, mask);
 			c->SetMode(NULL, CMODE_BAN, mask);
 
 			/* We still allow host banning while not allowing to kick */
@@ -71,21 +65,21 @@ class CommandCSBan : public Command
 				return MOD_CONT;
 
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
-				c->Kick(whosends(ci), u2, "%s (%s)", reason, u->nick.c_str());
+				c->Kick(whosends(ci), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
-				c->Kick(whosends(ci), u2, "%s", reason);
+				c->Kick(whosends(ci), u2, "%s", reason.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_BAN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
@@ -99,10 +93,11 @@ class CommandCSBan : public Command
 class CSBan : public Module
 {
  public:
-	CSBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSBan("BAN"));
 		this->AddCommand(ChanServ, new CommandCSBan("KB"));
 	}

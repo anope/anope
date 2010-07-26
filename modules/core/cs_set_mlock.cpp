@@ -16,17 +16,16 @@
 class CommandCSSetMLock : public Command
 {
  public:
-	CommandCSSetMLock(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 1, 0, cpermission)
+	CommandCSSetMLock(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 0, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
 		int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
-		unsigned char mode;
 		ChannelMode *cm;
 		unsigned paramcount = 2;
 
@@ -36,10 +35,10 @@ class CommandCSSetMLock : public Command
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->SetMLock(CMODE_REGISTERED, true);
 
-		const char *modes = params[1].c_str();
-		while (modes && (mode = *modes++))
+		Anope::string modes = params[1];
+		for (Anope::string::const_iterator ch = modes.begin(), end = modes.end(); ch != end; ++ch)
 		{
-			switch (mode)
+			switch (*ch)
 			{
 				case '+':
 					add = 1;
@@ -52,10 +51,10 @@ class CommandCSSetMLock : public Command
 						continue;
 			}
 
-			if ((cm = ModeManager::FindChannelModeByChar(mode)))
+			if ((cm = ModeManager::FindChannelModeByChar(*ch)))
 			{
 				if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(u))
-					notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR, mode);
+					notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_IMPOSSIBLE_CHAR, *ch);
 				else if (add)
 				{
 					ci->RemoveMLock(cm->Name);
@@ -65,7 +64,7 @@ class CommandCSSetMLock : public Command
 						if (paramcount >= params.size())
 							continue;
 
-						std::string param = params[paramcount].c_str();
+						Anope::string param = params[paramcount];
 
 						ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
 
@@ -81,8 +80,8 @@ class CommandCSSetMLock : public Command
 					ci->SetMLock(cm->Name, false);
 			}
 			else
-				notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, mode);
-		} /* while (*modes) */
+				notice_lang(Config.s_ChanServ, u, CHAN_SET_MLOCK_UNKNOWN_CHAR, *ch);
+		}
 
 		/* We can't mlock +L if +l is not mlocked as well. */
 		if (ModeManager::FindChannelModeByName(CMODE_REDIRECT) && ci->HasMLock(CMODE_REDIRECT, true) && !ci->HasMLock(CMODE_LIMIT, true))
@@ -102,8 +101,8 @@ class CommandCSSetMLock : public Command
 		/* Since we always enforce mode r there is no way to have no
 		 * mode lock at all.
 		 */
-		if (get_mlock_modes(ci, 0))
-			notice_lang(Config.s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name.c_str(), get_mlock_modes(ci, 0));
+		if (!get_mlock_modes(ci, 0).empty())
+			notice_lang(Config.s_ChanServ, u, CHAN_MLOCK_CHANGED, ci->name.c_str(), get_mlock_modes(ci, 0).c_str());
 
 		/* Implement the new lock. */
 		if (ci->c)
@@ -112,13 +111,13 @@ class CommandCSSetMLock : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_MLOCK, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -133,17 +132,17 @@ class CommandCSSetMLock : public Command
 class CommandCSSASetMLock : public CommandCSSetMLock
 {
  public:
-	CommandCSSASetMLock(const ci::string &cname) : CommandCSSetMLock(cname, "chanserv/saset/mlock")
+	CommandCSSASetMLock(const Anope::string &cname) : CommandCSSetMLock(cname, "chanserv/saset/mlock")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_MLOCK, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
@@ -153,7 +152,7 @@ class CommandCSSASetMLock : public CommandCSSetMLock
 class CSSetMLock : public Module
 {
  public:
-	CSSetMLock(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetMLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

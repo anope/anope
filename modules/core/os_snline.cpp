@@ -19,7 +19,7 @@ class SNLineDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	SNLineDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	SNLineDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -27,7 +27,7 @@ class SNLineDelCallback : public NumberList
 	{
 		if (!Deleted)
 			notice_lang(Config.s_OperServ, u, OPER_SNLINE_NO_MATCH);
-		else if (Deleted == 0)
+		else if (Deleted == 1)
 			notice_lang(Config.s_OperServ, u, OPER_SNLINE_DELETED_ONE);
 		else
 			notice_lang(Config.s_OperServ, u, OPER_SNLINE_DELETED_SEVERAL, Deleted);
@@ -56,7 +56,7 @@ class SNLineListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	SNLineListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	SNLineListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -91,7 +91,7 @@ class SNLineListCallback : public NumberList
 class SNLineViewCallback : public SNLineListCallback
 {
  public:
-	SNLineViewCallback(User *_u, const std::string &numlist) : SNLineListCallback(_u, numlist)
+	SNLineViewCallback(User *_u, const Anope::string &numlist) : SNLineListCallback(_u, numlist)
 	{
 	}
 
@@ -113,41 +113,38 @@ class SNLineViewCallback : public SNLineListCallback
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		char timebuf[32], expirebuf[256];
+		char timebuf[32];
 		struct tm tm;
 
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
+		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
+		notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSSNLine : public Command
 {
  private:
-	CommandReturn OnAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn OnAdd(User *u, const std::vector<Anope::string> &params)
 	{
 		unsigned last_param = 2;
-		const char *param, *expiry;
-		char rest[BUFSIZE];
+		Anope::string param, expiry;
 		time_t expires;
 
-		param = params.size() > 1 ? params[1].c_str() : NULL;
-		if (param && *param == '+')
+		param = params.size() > 1 ? params[1] : "";
+		if (!param.empty() && param[0] == '+')
 		{
 			expiry = param;
-			param = params.size() > 2 ? params[2].c_str() : NULL;
+			param = params.size() > 2 ? params[2] : "";
 			last_param = 3;
 		}
-		else
-			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : Config.SNLineExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config.SNLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
-		if (expiry && isdigit(expiry[strlen(expiry) - 1]))
+		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
@@ -158,30 +155,33 @@ class CommandOSSNLine : public Command
 		else if (expires > 0)
 			expires += time(NULL);
 
-		if (!param)
+		if (param.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
-		snprintf(rest, sizeof(rest), "%s%s%s", param, params.size() > last_param ? " " : "", params.size() > last_param ? params[last_param].c_str() : "");
 
-		if (std::string(rest).find(':') == std::string::npos)
+		Anope::string rest = param;
+		if (params.size() > last_param)
+			rest += " " + params[last_param];
+
+		if (rest.find(':') == Anope::string::npos)
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
 
 		sepstream sep(rest, ':');
-		ci::string mask;
+		Anope::string mask;
 		sep.GetToken(mask);
-		std::string reason = sep.GetRemaining();
+		Anope::string reason = sep.GetRemaining();
 
 		if (!mask.empty() && !reason.empty())
 		{
 			/* Clean up the last character of the mask if it is a space
 			 * See bug #761
 			 */
-			unsigned masklen = mask.size();
+			unsigned masklen = mask.length();
 			if (mask[masklen - 1] == ' ')
 				mask.erase(masklen - 1);
 
@@ -194,14 +194,14 @@ class CommandOSSNLine : public Command
 
 			if (Config.WallOSSNLine)
 			{
-				char buf[128];
+				Anope::string buf;
 
 				if (!expires)
-					strcpy(buf, "does not expire");
+					buf = "does not expire";
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					const char *s = NULL;
+					Anope::string s;
 
 					if (wall_expiry >= 86400)
 					{
@@ -219,10 +219,10 @@ class CommandOSSNLine : public Command
 						s = "minute";
 					}
 
-					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
+					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SNLINE for %s (%s)", u->nick.c_str(), mask.c_str(), buf);
+				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SNLINE for %s (%s)", u->nick.c_str(), mask.c_str(), buf.c_str());
 			}
 
 			if (readonly)
@@ -235,7 +235,7 @@ class CommandOSSNLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn OnDel(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SNLine->GetList().empty())
 		{
@@ -243,7 +243,7 @@ class CommandOSSNLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
@@ -251,9 +251,9 @@ class CommandOSSNLine : public Command
 			return MOD_CONT;
 		}
 
-		if (isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineDelCallback list(u, mask.c_str());
+			SNLineDelCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -278,7 +278,7 @@ class CommandOSSNLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnList(User *u, const std::vector<ci::string> &params)
+	CommandReturn OnList(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SNLine->GetList().empty())
 		{
@@ -286,11 +286,11 @@ class CommandOSSNLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineListCallback list(u, mask.c_str());
+			SNLineListCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -301,7 +301,7 @@ class CommandOSSNLine : public Command
 			{
 				XLine *x = SNLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -322,7 +322,7 @@ class CommandOSSNLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnView(User *u, const std::vector<ci::string> &params)
+	CommandReturn OnView(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SNLine->GetList().empty())
 		{
@@ -330,11 +330,11 @@ class CommandOSSNLine : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineViewCallback list(u, mask.c_str());
+			SNLineViewCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -345,7 +345,7 @@ class CommandOSSNLine : public Command
 			{
 				XLine *x = SNLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -377,32 +377,32 @@ class CommandOSSNLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->OnAdd(u, params);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->OnDel(u, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->OnList(u, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			return this->OnView(u, params);
-		else if (cmd == "CLEAR")
+		else if (cmd.equals_ci("CLEAR"))
 			return this->OnClear(u);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_SNLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "SNLINE", OPER_SNLINE_SYNTAX);
 	}
@@ -416,7 +416,7 @@ class CommandOSSNLine : public Command
 class OSSNLine : public Module
 {
  public:
-	OSSNLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSSNLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!ircd->snline)
 			throw ModuleException("Your IRCd does not support SNLine");

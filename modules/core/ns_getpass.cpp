@@ -20,10 +20,10 @@ class CommandNSGetPass : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		std::string tmp_pass;
+		Anope::string nick = params[0];
+		Anope::string tmp_pass;
 		NickAlias *na;
 		NickRequest *nr = NULL;
 
@@ -33,14 +33,14 @@ class CommandNSGetPass : public Command
 			{
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
-				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick, nr->passcode.c_str());
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick.c_str(), nr->passcode.c_str());
 			}
 			else
-				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (Config.NSSecureAdmins && na->nc->IsServicesOper())
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else
@@ -49,8 +49,8 @@ class CommandNSGetPass : public Command
 			{
 				Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETPASS on " << nick;
 				if (Config.WallGetpass)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick);
-				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick, tmp_pass.c_str());
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick.c_str(), tmp_pass.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
@@ -58,13 +58,13 @@ class CommandNSGetPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GETPASS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
 	}
@@ -78,9 +78,9 @@ class CommandNSGetPass : public Command
 class NSGetPass : public Module
 {
  public:
-	NSGetPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		std::string tmp_pass = "plain:tmp";
+		Anope::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 

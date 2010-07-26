@@ -22,9 +22,9 @@ class CommandCSDrop : public Command
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
+		Anope::string chan = params[0];
 		ChannelInfo *ci;
 
 		if (readonly)
@@ -37,13 +37,13 @@ class CommandCSDrop : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -58,9 +58,9 @@ class CommandCSDrop : public Command
 		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 
-		if (ircd->chansqline && (ci->HasFlag(CI_FORBIDDEN)))
+		if (ircd->chansqline && ci->HasFlag(CI_FORBIDDEN))
 		{
-			XLine x(ci->name.c_str());
+			XLine x(ci->name);
 			ircdproto->SendSQLineDel(&x);
 		}
 
@@ -72,16 +72,16 @@ class CommandCSDrop : public Command
 		 * drop the channel before issuing the wallops.
 		 */
 		if (Config.WallDrop && (level < ACCESS_FOUNDER || (!IsFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER))))
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan);
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan.c_str());
 
-		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan);
+		notice_lang(Config.s_ChanServ, u, CHAN_DROPPED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_DROP);
@@ -91,7 +91,7 @@ class CommandCSDrop : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DROP", CHAN_DROP_SYNTAX);
 	}
@@ -105,10 +105,11 @@ class CommandCSDrop : public Command
 class CSDrop : public Module
 {
  public:
-	CSDrop(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSDrop());
 	}
 };

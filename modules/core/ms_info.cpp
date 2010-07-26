@@ -20,35 +20,35 @@ class CommandMSInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		MemoInfo *mi;
+		const MemoInfo *mi;
 		NickAlias *na = NULL;
 		ChannelInfo *ci = NULL;
-		const char *name = params.size() ? params[0].c_str() : NULL;
+		Anope::string name = !params.empty() ? params[0] : "";
 		int hardmax = 0;
 
-		if (name && *name != '#' && u->Account()->HasPriv("memoserv/info"))
+		if (!name.empty() && name[0] != '#' && u->Account()->HasPriv("memoserv/info"))
 		{
 			na = findnick(name);
 			if (!na)
 			{
-				notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, name.c_str());
 				return MOD_CONT;
 			}
 			else if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, name);
+				notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, name.c_str());
 				return MOD_CONT;
 			}
 			mi = &na->nc->memos;
 			hardmax = na->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
-		else if (name && *name == '#')
+		else if (!name.empty() && name[0] == '#')
 		{
 			if (!(ci = cs_findchan(name)))
 			{
-				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, name);
+				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, name.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
@@ -59,7 +59,7 @@ class CommandMSInfo : public Command
 			mi = &ci->memos;
 			hardmax = ci->HasFlag(CI_MEMO_HARDMAX) ? 1 : 0;
 		}
-		else if (name) /* It's not a chan and we aren't services admin */
+		else if (!name.empty()) /* It's not a chan and we aren't services admin */
 		{
 			notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -70,16 +70,16 @@ class CommandMSInfo : public Command
 			hardmax = u->Account()->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}
 
-		if (name && (ci || na->nc != u->Account()))
+		if (!name.empty() && (ci || na->nc != u->Account()))
 		{
 			if (mi->memos.empty())
-				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_MEMOS, name.c_str());
 			else if (mi->memos.size() == 1)
 			{
 				if (mi->memos[0]->HasFlag(MF_UNREAD))
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO_UNREAD, name.c_str());
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMO, name.c_str());
 			}
 			else
 			{
@@ -88,43 +88,43 @@ class CommandMSInfo : public Command
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
 				if (count == mi->memos.size())
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD, name, count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ALL_UNREAD, name.c_str(), count);
 				else if (!count)
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS, name, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS, name.c_str(), mi->memos.size());
 				else if (count == 1)
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD, name, mi->memos.size());
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD, name.c_str(), mi->memos.size());
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD, name, mi->memos.size(), count);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD, name.c_str(), mi->memos.size(), count);
 			}
 			if (!mi->memomax)
 			{
 				if (hardmax)
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name.c_str(), mi->memomax);
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name.c_str(), mi->memomax);
 			}
 			else if (mi->memomax > 0)
 			{
 				if (hardmax)
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name.c_str(), mi->memomax);
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name, mi->memomax);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_LIMIT, name.c_str(), mi->memomax);
 			}
 			else
-				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_LIMIT, name);
+				notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NO_LIMIT, name.c_str());
 
 			/* I ripped this code out of ircservices 4.4.5, since I didn't want
 			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
 				if (na->nc->HasFlag(NI_MEMO_RECEIVE) && na->nc->HasFlag(NI_MEMO_SIGNON))
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_ON, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_ON, name.c_str());
 				else if (na->nc->HasFlag(NI_MEMO_RECEIVE))
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_RECEIVE, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_RECEIVE, name.c_str());
 				else if (na->nc->HasFlag(NI_MEMO_SIGNON))
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_SIGNON, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_SIGNON, name.c_str());
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name);
+					notice_lang(Config.s_MemoServ, u, MEMO_INFO_X_NOTIFY_OFF, name.c_str());
 			}
 		}
 		else /* !name || (!ci || na->nc == u->Account()) */
@@ -184,7 +184,7 @@ class CommandMSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
 			notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_INFO);
@@ -203,7 +203,7 @@ class CommandMSInfo : public Command
 class MSInfo : public Module
 {
  public:
-	MSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

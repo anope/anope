@@ -20,28 +20,25 @@ class CommandOSChanKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *expiry, *channel;
-		char reason[BUFSIZE];
+		Anope::string expiry, channel;
 		time_t expires;
 		unsigned last_param = 1;
 		Channel *c;
 
-		channel = params[0].c_str();
-		if (channel && *channel == '+')
+		channel = params[0];
+		if (!channel.empty() && channel[0] == '+')
 		{
 			expiry = channel;
-			channel = params[1].c_str();
+			channel = params[1];
 			last_param = 2;
 		}
-		else
-			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : Config.ChankillExpiry;
-		if (expiry && isdigit(expiry[strlen(expiry) - 1]))
+		expires = !expiry.empty() ? dotime(expiry) : Config.ChankillExpiry;
+		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
-		if (expires != 0 && expires < 60)
+		if (expires && expires < 60)
 		{
 			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
@@ -54,13 +51,15 @@ class CommandOSChanKill : public Command
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s", params[last_param].c_str(), (params.size() > last_param + 1 ? params[last_param + 1].c_str() : ""));
-		if (*reason)
-		{
 
-			std::string realreason;
+		Anope::string reason = params[last_param];
+		if (params.size() > last_param + 1)
+			reason += params[last_param + 1];
+		if (!reason.empty())
+		{
+			Anope::string realreason;
 			if (Config.AddAkiller)
-				realreason = "[" + u->nick + "] " + std::string(reason);
+				realreason = "[" + u->nick + "] " + reason;
 			else
 				realreason = reason;
 
@@ -73,25 +72,25 @@ class CommandOSChanKill : public Command
 					if (is_oper(uc->user))
 						continue;
 
-					SGLine->Add(OperServ, u, ci::string("*@") + uc->user->host, expires, realreason);
+					SGLine->Add(OperServ, u, "*@" + uc->user->host, expires, realreason);
 					SGLine->Check(uc->user);
 				}
 				if (Config.WallOSAkill)
-					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel, realreason.c_str());
+					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel.c_str(), realreason.c_str());
 			}
 			else
-				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
+				notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, channel.c_str());
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_CHANKILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
 	}
@@ -105,7 +104,7 @@ class CommandOSChanKill : public Command
 class OSChanKill : public Module
 {
  public:
-	OSChanKill(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -16,27 +16,27 @@
 class CommandNSSetKill : public Command
 {
  public:
-	CommandNSSetKill(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetKill(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "ON")
+		if (params[0].equals_ci("ON"))
 		{
 			u->Account()->SetFlag(NI_KILLPROTECT);
 			u->Account()->UnsetFlag(NI_KILL_QUICK);
 			u->Account()->UnsetFlag(NI_KILL_IMMED);
 			notice_lang(Config.s_NickServ, u, NICK_SET_KILL_ON);
 		}
-		else if (params[0] == "QUICK")
+		else if (params[0].equals_ci("QUICK"))
 		{
 			u->Account()->SetFlag(NI_KILLPROTECT);
 			u->Account()->SetFlag(NI_KILL_QUICK);
 			u->Account()->UnsetFlag(NI_KILL_IMMED);
 			notice_lang(Config.s_NickServ, u, NICK_SET_KILL_QUICK);
 		}
-		else if (params[0] == "IMMED")
+		else if (params[0].equals_ci("IMMED"))
 		{
 			if (Config.NSAllowKillImmed)
 			{
@@ -48,7 +48,7 @@ class CommandNSSetKill : public Command
 			else
 				notice_lang(Config.s_NickServ, u, NICK_SET_KILL_IMMED_DISABLED);
 		}
-		else if (params[0] == "OFF")
+		else if (params[0].equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(NI_KILLPROTECT);
 			u->Account()->UnsetFlag(NI_KILL_QUICK);
@@ -61,13 +61,13 @@ class CommandNSSetKill : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_KILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET KILL", Config.NSAllowKillImmed ? NICK_SET_KILL_IMMED_SYNTAX : NICK_SET_KILL_SYNTAX);
 	}
@@ -81,49 +81,49 @@ class CommandNSSetKill : public Command
 class CommandNSSASetKill : public Command
 {
  public:
-	CommandNSSASetKill(const ci::string &cname) : Command(cname, 2, 2, "nickserv/saset/kill")
+	CommandNSSASetKill(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/kill")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_ON, nc->display.c_str());
 		}
-		else if (param == "QUICK")
+		else if (param.equals_ci("QUICK"))
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->SetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display.c_str());
 		}
-		else if (param == "IMMED")
+		else if (param.equals_ci("IMMED"))
 		{
 			if (Config.NSAllowKillImmed)
 			{
 				nc->SetFlag(NI_KILLPROTECT);
 				nc->SetFlag(NI_KILL_IMMED);
 				nc->UnsetFlag(NI_KILL_QUICK);
-				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display);
+				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "KILL");
@@ -131,13 +131,13 @@ class CommandNSSASetKill : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_KILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET KILL", Config.NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
 	}
@@ -151,7 +151,7 @@ class CommandNSSASetKill : public Command
 class NSSetKill : public Module
 {
  public:
-	NSSetKill(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

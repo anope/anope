@@ -19,9 +19,9 @@
 
 #define AUTHOR "Rob"
 
-void mySendResponse(User *u, const char *channel, char *mask, const char *time);
+void mySendResponse(User *u, const Anope::string &channel, const Anope::string &mask, const Anope::string &time);
 
-void addBan(Channel *c, time_t timeout, char *banmask);
+void addBan(Channel *c, time_t timeout, const Anope::string &banmask);
 int canBanUser(Channel *c, User *u, User *u2);
 
 void mAddLanguages();
@@ -44,24 +44,24 @@ class CommandCSTBan : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		char mask[BUFSIZE];
+		Anope::string mask;
 		Channel *c;
 		User *u2 = NULL;
 
-		const char *chan = params[0].c_str();
-		const char *nick = params[1].c_str();
-		const char *time = params[2].c_str();
+		Anope::string chan = params[0];
+		Anope::string nick = params[1];
+		Anope::string time = params[2];
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else
 			if (canBanUser(c, u, u2))
 			{
-				get_idealban(c->ci, u2, mask, sizeof(mask));
+				get_idealban(c->ci, u2, mask);
 				addBan(c, dotime(time), mask);
 				mySendResponse(u, chan, mask, time);
 			}
@@ -69,7 +69,7 @@ class CommandCSTBan : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		this->OnSyntaxError(u, "");
 		u->SendMessage(Config.s_ChanServ, " ");
@@ -78,7 +78,7 @@ class CommandCSTBan : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, TBAN_SYNTAX);
 	}
@@ -92,7 +92,7 @@ class CommandCSTBan : public Command
 class CSTBan : public Module
 {
  public:
-	CSTBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -101,7 +101,7 @@ class CSTBan : public Module
 		this->SetAuthor(AUTHOR);
 		this->SetType(SUPPORTED);
 
-		const char* langtable_en_us[] = {
+		const char *langtable_en_us[] = {
 			"    TBAN       Bans the user for a given length of time",
 			"Syntax: TBAN channel nick time",
 			"Bans the given user from a channel for a specified length of\n"
@@ -109,7 +109,7 @@ class CSTBan : public Module
 			"%s banned from %s, will auto-expire in %s"
 		};
 
-		const char* langtable_nl[] = {
+		const char *langtable_nl[] = {
 			"    TBAN       Verban een gebruiker voor een bepaalde tijd",
 			"Syntax: TBAN kanaal nick tijd",
 			"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
@@ -118,7 +118,7 @@ class CSTBan : public Module
 			"%s verbannen van %s, zal verlopen in %s"
 		};
 
-		const char* langtable_de[] = {
+		const char *langtable_de[] = {
 			"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
 			"Syntax: TBAN Channel Nickname Zeit",
 			"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
@@ -126,7 +126,7 @@ class CSTBan : public Module
 			"%s gebannt von %s, wird auto-auslaufen in %s"
 		};
 
-		const char* langtable_pt[] = {
+		const char *langtable_pt[] = {
 			"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
 			"Sintaxe: TBAN canal nick tempo",
 			"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
@@ -134,7 +134,7 @@ class CSTBan : public Module
 			"%s foi banido do %s, irб auto-expirar em %s"
 		};
 
-		const char* langtable_ru[] = {
+		const char *langtable_ru[] = {
 			"    TBAN       Банит пользователя на указанный промежуток времени",
 			"Синтаксис: TBAN #канал ник время",
 			"Банит пользователя на указанный промежуток времени в секундах\n"
@@ -143,7 +143,7 @@ class CSTBan : public Module
 			"Установленный бан %s на канале %s истечет через %s секунд"
 		};
 
-		const char* langtable_it[] = {
+		const char *langtable_it[] = {
 			"    TBAN       Banna l'utente per un periodo di tempo specificato",
 			"Sintassi: TBAN canale nick tempo",
 			"Banna l'utente specificato da un canale per un periodo di tempo\n"
@@ -160,37 +160,37 @@ class CSTBan : public Module
 	}
 };
 
-void mySendResponse(User *u, const char *channel, char *mask, const char *time)
+void mySendResponse(User *u, const Anope::string &channel, const Anope::string &mask, const Anope::string &time)
 {
-	me->NoticeLang(Config.s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
+	me->NoticeLang(Config.s_ChanServ, u, TBAN_RESPONSE, mask.c_str(), channel.c_str(), time.c_str());
 }
 
 class TempBan : public CallBack
 {
-	private:
-		std::string chan;
-		std::string mask;
+ private:
+	Anope::string chan;
+	Anope::string mask;
 
-	public:
-		TempBan(time_t seconds, const std::string &channel, const std::string &banmask) : CallBack(me, seconds), chan(channel), mask(banmask) { }
+ public:
+	TempBan(time_t seconds, const Anope::string &channel, const Anope::string &banmask) : CallBack(me, seconds), chan(channel), mask(banmask) { }
 
-		void Tick(time_t ctime)
-		{
-			Channel *c;
+	void Tick(time_t ctime)
+	{
+		Channel *c;
 
-			if ((c = findchan(chan)) && c->ci)
-				c->RemoveMode(NULL, CMODE_BAN, mask);
-		}
+		if ((c = findchan(chan)) && c->ci)
+			c->RemoveMode(NULL, CMODE_BAN, mask);
+	}
 };
 
-void addBan(Channel *c, time_t timeout, char *banmask)
+void addBan(Channel *c, time_t timeout, Anope::string &banmask)
 {
 	c->SetMode(NULL, CMODE_BAN, banmask);
 
 	new TempBan(timeout, c->name, banmask);
 }
 
-int canBanUser(Channel * c, User * u, User * u2)
+int canBanUser(Channel *c, User *u, User *u2)
 {
 	ChannelInfo *ci = c->ci;
 	int ok = 0;

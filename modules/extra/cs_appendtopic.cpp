@@ -38,7 +38,7 @@
  */
 
 /* ---------------------------------------------------------------------- */
-/* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING		  */
+/* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING         */
 /* ---------------------------------------------------------------------- */
 
 enum
@@ -58,11 +58,11 @@ class CommandCSAppendTopic : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *newtopic = params[1].c_str();
-		char topic[1024];
+		Anope::string chan = params[0];
+		Anope::string newtopic = params[1];
+		Anope::string topic;
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 
@@ -70,26 +70,24 @@ class CommandCSAppendTopic : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_TOPIC))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			if (ci->last_topic)
+			if (!ci->last_topic.empty())
 			{
-				snprintf(topic, sizeof(topic), "%s %s", ci->last_topic, newtopic);
-				delete [] ci->last_topic;
+				topic = ci->last_topic + " " + newtopic;
+				ci->last_topic.clear();
 			}
 			else
-				strscpy(topic, newtopic, sizeof(topic));
+				topic = newtopic;
 
-			ci->last_topic = *topic ? sstrdup(topic) : NULL;
+			ci->last_topic = topic;
 			ci->last_topic_setter = u->nick;
 			ci->last_topic_time = time(NULL);
 
-			if (c->topic)
-				delete [] c->topic;
-			c->topic = *topic ? sstrdup(topic) : NULL;
+			c->topic = topic;
 			c->topic_setter = u->nick;
 			if (ircd->topictsbackward)
 				c->topic_time = c->topic_time - 1;
@@ -101,16 +99,16 @@ class CommandCSAppendTopic : public Command
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
 				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
+				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ.c_str()); // XXX
 			}
-			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic);
+			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
 			if (ircd->join2set && whosends(ci) == ChanServ)
 				ChanServ->Part(c);
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 		u->SendMessage(Config.s_ChanServ, " ");
@@ -119,7 +117,7 @@ class CommandCSAppendTopic : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	}
@@ -133,7 +131,7 @@ class CommandCSAppendTopic : public Command
 class CSAppendTopic : public Module
 {
  public:
-	CSAppendTopic(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -143,7 +141,7 @@ class CSAppendTopic : public Module
 		this->AddCommand(ChanServ, new CommandCSAppendTopic());
 
 		/* English (US) */
-		const char* langtable_en_us[] = {
+		const char *langtable_en_us[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Add text to a channels topic",
 			/* LNG_CHAN_HELP_APPENDTOPIC */
@@ -155,7 +153,7 @@ class CSAppendTopic : public Module
 		};
 
 		/* Dutch (NL) */
-		const char* langtable_nl[] = {
+		const char *langtable_nl[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Voeg tekst aan een kanaal onderwerp toe",
 			/* LNG_CHAN_HELP_APPENDTOPIC */
@@ -168,7 +166,7 @@ class CSAppendTopic : public Module
 		};
 
 		/* German (DE) */
-		const char* langtable_de[] = {
+		const char *langtable_de[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Fьgt einen Text zu einem Channel-Topic hinzu.",
 			/* LNG_CHAN_HELP_APPENDTOPIC */
@@ -180,7 +178,7 @@ class CSAppendTopic : public Module
 		};
 
 		/* Portuguese (PT) */
-		const char* langtable_pt[] = {
+		const char *langtable_pt[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Adiciona texto ao tуpico de um canal",
 			/* LNG_CHAN_HELP_APPENDTOPIC */
@@ -192,7 +190,7 @@ class CSAppendTopic : public Module
 		};
 
 		/* Russian (RU) */
-		const char* langtable_ru[] = {
+		const char *langtable_ru[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Добавляет текст к топику канала",
 			/* LNG_CHAN_HELP_APPENDTOPIC */
@@ -204,7 +202,7 @@ class CSAppendTopic : public Module
 		};
 
 		/* Italian (IT) */
-		const char* langtable_it[] = {
+		const char *langtable_it[] = {
 			/* LNG_CHAN_HELP */
 			"   APPENDTOPIC Aggiunge del testo al topic di un canale",
 			/* LNG_CHAN_HELP_APPENDTOPIC */

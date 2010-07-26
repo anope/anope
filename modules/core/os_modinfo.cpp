@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-static int showModuleCmdLoaded(BotInfo *bi, const ci::string &mod_name, User *u);
+static int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, User *u);
 
 class CommandOSModInfo : public Command
 {
@@ -22,25 +22,25 @@ class CommandOSModInfo : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const std::string file = params[0].c_str();
+		Anope::string file = params[0];
 		struct tm tm;
 		char timebuf[64];
 
-		Module *m = FindModule(file.c_str());
+		Module *m = FindModule(file);
 		if (m)
 		{
 			tm = *localtime(&m->created);
 			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", timebuf);
 
-			showModuleCmdLoaded(HostServ, m->name.c_str(), u);
-			showModuleCmdLoaded(OperServ, m->name.c_str(), u);
-			showModuleCmdLoaded(NickServ, m->name.c_str(), u);
-			showModuleCmdLoaded(ChanServ, m->name.c_str(), u);
-			showModuleCmdLoaded(BotServ, m->name.c_str(), u);
-			showModuleCmdLoaded(MemoServ, m->name.c_str(), u);
+			showModuleCmdLoaded(HostServ, m->name, u);
+			showModuleCmdLoaded(OperServ, m->name, u);
+			showModuleCmdLoaded(NickServ, m->name, u);
+			showModuleCmdLoaded(ChanServ, m->name, u);
+			showModuleCmdLoaded(BotServ, m->name, u);
+			showModuleCmdLoaded(MemoServ, m->name, u);
 		}
 		else
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_NO_INFO, file.c_str());
@@ -48,13 +48,13 @@ class CommandOSModInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_MODINFO);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
 	}
@@ -68,7 +68,7 @@ class CommandOSModInfo : public Command
 class OSModInfo : public Module
 {
  public:
-	OSModInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -77,18 +77,18 @@ class OSModInfo : public Module
 	}
 };
 
-static int showModuleCmdLoaded(BotInfo *bi, const ci::string &mod_name, User *u)
+static int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, User *u)
 {
 	if (!bi)
 		return 0;
 
 	int display = 0;
 
-	for (std::map<ci::string, Command *>::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
+	for (CommandMap::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
 	{
 		Command *c = it->second;
 
-		if (c->module && c->module->name == mod_name)
+		if (c->module && c->module->name.equals_ci(mod_name))
 		{
 			notice_lang(Config.s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
 			++display;

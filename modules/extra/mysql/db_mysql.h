@@ -176,7 +176,7 @@ class DBMySQL : public Module
 	unsigned int Port;
 	unsigned int Delay;
 
-	DBMySQL(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -184,7 +184,7 @@ class DBMySQL : public Module
 		this->SetType(DATABASE);
 
 		if (!LoadConfig())
-			throw ModuleException("Couldn't load config");
+			throw ModuleException(Anope::string("Couldn't load config"));
 
 		Con = new mysqlpp::Connection(false);
 		Ne = new mysqlpp::NoExceptions(Con);
@@ -193,7 +193,7 @@ class DBMySQL : public Module
 			std::string Error = "MySQL: Error connecting to SQL server: ";
 			Error += Con->error();
 			delete Con;
-			throw ModuleException(Error.c_str());
+			throw ModuleException(Anope::string(Error));
 		}
 
 		mysqlpp::Query query(Con);

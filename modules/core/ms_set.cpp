@@ -16,31 +16,31 @@
 class CommandMSSet : public Command
 {
  private:
-	CommandReturn DoNotify(User *u, const std::vector<ci::string> &params, MemoInfo *mi)
+	CommandReturn DoNotify(User *u, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			u->Account()->SetFlag(NI_MEMO_SIGNON);
 			u->Account()->SetFlag(NI_MEMO_RECEIVE);
-			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_ON, Config.s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_ON, Config.s_MemoServ.c_str());
 		}
-		else if (param == "LOGON")
+		else if (param.equals_ci("LOGON"))
 		{
 			u->Account()->SetFlag(NI_MEMO_SIGNON);
 			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
-			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, Config.s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_LOGON, Config.s_MemoServ.c_str());
 		}
-		else if (param == "NEW")
+		else if (param.equals_ci("NEW"))
 		{
 			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
 			u->Account()->SetFlag(NI_MEMO_RECEIVE);
-			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NEW, Config.s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NEW, Config.s_MemoServ.c_str());
 		}
-		else if (param == "MAIL")
+		else if (param.equals_ci("MAIL"))
 		{
-			if (u->Account()->email)
+			if (!u->Account()->email.empty())
 			{
 				u->Account()->SetFlag(NI_MEMO_MAIL);
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
@@ -48,29 +48,29 @@ class CommandMSSet : public Command
 			else
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_INVALIDMAIL);
 		}
-		else if (param == "NOMAIL")
+		else if (param.equals_ci("NOMAIL"))
 		{
 			u->Account()->UnsetFlag(NI_MEMO_MAIL);
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
 			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
 			u->Account()->UnsetFlag(NI_MEMO_MAIL);
-			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_OFF, Config.s_MemoServ);
+			notice_lang(Config.s_MemoServ, u, MEMO_SET_NOTIFY_OFF, Config.s_MemoServ.c_str());
 		}
 		else
 			syntax_error(Config.s_MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
 		return MOD_CONT;
 	}
 
-	CommandReturn DoLimit(User *u, const std::vector<ci::string> &params, MemoInfo *mi)
+	CommandReturn DoLimit(User *u, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
-		ci::string p1 = params[1];
-		ci::string p2 = params.size() > 2 ? params[2] : "";
-		ci::string p3 = params.size() > 3 ? params[3] : "";
-		ci::string user, chan;
+		Anope::string p1 = params[1];
+		Anope::string p2 = params.size() > 2 ? params[2] : "";
+		Anope::string p3 = params.size() > 3 ? params[3] : "";
+		Anope::string user, chan;
 		int32 limit;
 		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
@@ -96,7 +96,7 @@ class CommandMSSet : public Command
 		}
 		if (is_servadmin)
 		{
-			if (!p2.empty() && p2 != "HARD" && chan.empty())
+			if (!p2.empty() && !p2.equals_ci("HARD") && chan.empty())
 			{
 				NickAlias *na;
 				if (!(na = findnick(p1)))
@@ -115,7 +115,7 @@ class CommandMSSet : public Command
 				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
-			if ((!isdigit(p1[0]) && p1 != "NONE") || (!p2.empty() && p2 != "HARD"))
+			if ((!isdigit(p1[0]) && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
 				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
@@ -134,32 +134,33 @@ class CommandMSSet : public Command
 				else
 					nc->UnsetFlag(NI_MEMO_HARDMAX);
 			}
-			limit = atoi(p1.c_str());
+			limit = p1.is_number_only() ? convertTo<int32>(p1) : -1;
 			if (limit < 0 || limit > 32767)
 			{
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_OVERFLOW, 32767);
 				limit = 32767;
 			}
-			if (p1 == "NONE")
+			if (p1.equals_ci("NONE"))
 				limit = -1;
 		}
 		else
 		{
-			if (p1.empty() || !p2.empty() || !isdigit(p1[0])) {
+			if (p1.empty() || !p2.empty() || !isdigit(p1[0]))
+			{
 				syntax_error(Config.s_MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
 				return MOD_CONT;
 			}
-			if (!chan.empty() && (ci->HasFlag(CI_MEMO_HARDMAX)))
+			if (!chan.empty() && ci->HasFlag(CI_MEMO_HARDMAX))
 			{
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_LIMIT_FORBIDDEN, chan.c_str());
 				return MOD_CONT;
 			}
-			else if (chan.empty() && (nc->HasFlag(NI_MEMO_HARDMAX)))
+			else if (chan.empty() && nc->HasFlag(NI_MEMO_HARDMAX))
 			{
 				notice_lang(Config.s_MemoServ, u, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;
 			}
-			limit = atoi(p1.c_str());
+			limit = p1.is_number_only() ? convertTo<int32>(p1) : -1;
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
 			if (limit < 0 || (Config.MSMaxMemos > 0 && limit > Config.MSMaxMemos))
@@ -205,9 +206,9 @@ class CommandMSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 		MemoInfo *mi = &u->Account()->memos;
 
 		if (readonly)
@@ -215,25 +216,25 @@ class CommandMSSet : public Command
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_DISABLED);
 			return MOD_CONT;
 		}
-		else if (cmd == "NOTIFY")
+		else if (cmd.equals_ci("NOTIFY"))
 			return this->DoNotify(u, params, mi);
-		else if (cmd == "LIMIT")
+		else if (cmd.equals_ci("LIMIT"))
 			return this->DoLimit(u, params, mi);
 		else
 		{
 			notice_lang(Config.s_MemoServ, u, MEMO_SET_UNKNOWN_OPTION, cmd.c_str());
-			notice_lang(Config.s_MemoServ, u, MORE_INFO, Config.s_MemoServ, "SET");
+			notice_lang(Config.s_MemoServ, u, MORE_INFO, Config.s_MemoServ.c_str(), "SET");
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 			notice_help(Config.s_MemoServ, u, MEMO_HELP_SET);
-		else if (subcommand == "NOTIFY")
+		else if (subcommand.equals_ci("NOTIFY"))
 			notice_help(Config.s_MemoServ, u, MEMO_HELP_SET_NOTIFY);
-		else if (subcommand == "LIMIT")
+		else if (subcommand.equals_ci("LIMIT"))
 		{
 			if (u->Account() && u->Account()->IsServicesOper())
 				notice_help(Config.s_MemoServ, u, MEMO_SERVADMIN_HELP_SET_LIMIT, Config.MSMaxMemos);
@@ -246,7 +247,7 @@ class CommandMSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "SET", MEMO_SET_SYNTAX);
 	}
@@ -260,7 +261,7 @@ class CommandMSSet : public Command
 class MSSet : public Module
 {
  public:
-	MSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

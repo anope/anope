@@ -30,7 +30,7 @@ struct arc4_stream
  * @param filename The file
  * @return true if the file exists, false if it doens't
  */
-bool IsFile(const std::string &filename)
+bool IsFile(const Anope::string &filename)
 {
 	struct stat fileinfo;
 	if (!stat(filename.c_str(), &fileinfo))
@@ -72,29 +72,8 @@ int tolower(char c)
 /*************************************************************************/
 
 /**
- * Simple function to convert binary data to hex.
- * Taken from hybrid-ircd ( http://ircd-hybrid.com/ )
- */
-void binary_to_hex(unsigned char *bin, char *hex, int length)
-{
-	static const char trans[] = "0123456789ABCDEF";
-	int i;
-
-	for (i = 0; i < length; ++i)
-	{
-		hex[i << 1] = trans[bin[i] >> 4];
-		hex[(i << 1) + 1] = trans[bin[i] & 0xf];
-	}
-
-	hex[i << 1] = '\0';
-}
-
-
-/*************************************************************************/
-
-/**
  * strscpy:  Copy at most len-1 characters from a string to a buffer, and
- *		   add a null terminator after the last character copied.
+ *           add a null terminator after the last character copied.
  * @param d Buffer to copy into
  * @param s Data to copy int
  * @param len Length of data
@@ -109,38 +88,6 @@ char *strscpy(char *d, const char *s, size_t len)
 	while (--len && (*d++ = *s++));
 	*d = '\0';
 	return d_orig;
-}
-
-/*************************************************************************/
-
-/**
- * stristr:  Search case-insensitively for string s2 within string s1,
- *		   returning the first occurrence of s2 or NULL if s2 was not
- *		   found.
- * @param s1 String 1
- * @param s2 String 2
- * @return first occurrence of s2
- */
-const char *stristr(const char *s1, const char *s2)
-{
-	register const char *s = s1, *d = s2;
-
-	while (*s1)
-	{
-		if (tolower(*s1) == tolower(*d))
-		{
-			++s1;
-			++d;
-			if (!*d)
-				return s;
-		}
-		else
-		{
-			s = ++s1;
-			d = s2;
-		}
-	}
-	return NULL;
 }
 
 /*************************************************************************/
@@ -223,11 +170,11 @@ const char *merge_args(int argc, char **argv)
 
 /*************************************************************************/
 
-NumberList::NumberList(const std::string &list, bool descending) : desc(descending), is_valid(true)
+NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {
-	char *error;
+	Anope::string error;
 	commasepstream sep(list);
-	std::string token;
+	Anope::string token;
 
 	sep.GetToken(token);
 	if (token.empty())
@@ -236,10 +183,10 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 	{
 		size_t t = token.find('-');
 
-		if (t == std::string::npos)
+		if (t == Anope::string::npos)
 		{
-			unsigned num = strtol(token.c_str(), &error, 10);
-			if (!*error)
+			unsigned num = convertTo<unsigned>(token, error, false);
+			if (error.empty())
 				numbers.insert(num);
 			else
 			{
@@ -252,10 +199,10 @@ NumberList::NumberList(const std::string &list, bool descending) : desc(descendi
 		}
 		else
 		{
-			char *error2;
-			unsigned num1 = strtol(token.substr(0, t).c_str(), &error, 10);
-			unsigned num2 = strtol(token.substr(t + 1).c_str(), &error2, 10);
-			if (!*error && !*error2)
+			Anope::string error2;
+			unsigned num1 = convertTo<unsigned>(token.substr(0, t), error, false);
+			unsigned num2 = convertTo<unsigned>(token.substr(t + 1), error2, false);
+			if (error.empty() && error2.empty())
 			{
 				for (unsigned i = num1; i <= num2; ++i)
 					numbers.insert(i);
@@ -299,7 +246,7 @@ void NumberList::HandleNumber(unsigned)
 {
 }
 
-bool NumberList::InvalidRange(const std::string &)
+bool NumberList::InvalidRange(const Anope::string &)
 {
 	return true;
 }
@@ -315,17 +262,18 @@ bool NumberList::InvalidRange(const std::string &)
  * @param s String to convert
  * @return time_t
  */
-time_t dotime(const char *s)
+time_t dotime(const Anope::string &s)
 {
 	int amount;
 
-	if (!s || !*s)
+	if (s.empty())
 		return -1;
 
-	amount = strtol(s, const_cast<char **>(&s), 10);
-	if (*s)
+	Anope::string end;
+	amount = convertTo<int>(s, end, false);
+	if (!end.empty())
 	{
-		switch (*s)
+		switch (end[0])
 		{
 			case 's':
 				return amount;
@@ -353,17 +301,16 @@ time_t dotime(const char *s)
  * Expresses in a string the period of time represented by a given amount
  * of seconds (with days/hours/minutes).
  * @param na Nick Alias
- * @param buf buffer to store result into
- * @param bufsize Size of the buffer
  * @param seconds time in seconds
  * @return buffer
  */
-const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds)
+Anope::string duration(const NickCore *nc, time_t seconds)
 {
 	int days = 0, hours = 0, minutes = 0;
 	int need_comma = 0;
 
-	char buf2[64], *end;
+	char buf[64];
+	Anope::string buffer;
 	const char *comma = getstring(nc, COMMA_SPACE);
 
 	/* We first calculate everything */
@@ -374,31 +321,32 @@ const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds)
 	minutes = seconds / 60;
 
 	if (!days && !hours && !minutes)
-		snprintf(buf, bufsize, getstring(nc, seconds <= 1 ? DURATION_SECOND : DURATION_SECONDS), seconds);
+	{
+		snprintf(buf, sizeof(buf), getstring(nc, seconds <= 1 ? DURATION_SECOND : DURATION_SECONDS), seconds);
+		buffer = buf;
+	}
 	else
 	{
-		end = buf;
 		if (days)
 		{
-			snprintf(buf2, sizeof(buf2), getstring(nc, days == 1 ? DURATION_DAY : DURATION_DAYS), days);
-			end += snprintf(end, bufsize - (end - buf), "%s", buf2);
+			snprintf(buf, sizeof(buf), getstring(nc, days == 1 ? DURATION_DAY : DURATION_DAYS), days);
+			buffer = buf;
 			need_comma = 1;
 		}
 		if (hours)
 		{
-			snprintf(buf2, sizeof(buf2), getstring(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS), hours);
-			end += snprintf(end, bufsize - (end - buf), "%s%s", need_comma ? comma : "", buf2);
+			snprintf(buf, sizeof(buf), getstring(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS), hours);
+			buffer += Anope::string(need_comma ? comma : "") + buf;
 			need_comma = 1;
 		}
 		if (minutes)
 		{
-			snprintf(buf2, sizeof(buf2), getstring(nc, minutes == 1 ? DURATION_MINUTE : DURATION_MINUTES), minutes);
-			end += snprintf(end, bufsize - (end - buf), "%s%s", need_comma ? comma : "", buf2);
-			need_comma = 1;
+			snprintf(buf, sizeof(buf), getstring(nc, minutes == 1 ? DURATION_MINUTE : DURATION_MINUTES), minutes);
+			buffer += Anope::string(need_comma ? comma : "") + buf;
 		}
 	}
 
-	return buf;
+	return buffer;
 }
 
 /*************************************************************************/
@@ -406,19 +354,19 @@ const char *duration(NickCore *nc, char *buf, int bufsize, time_t seconds)
 /**
  * Generates a human readable string of type "expires in ..."
  * @param na Nick Alias
- * @param buf buffer to store result into
- * @param bufsize Size of the buffer
  * @param seconds time in seconds
  * @return buffer
  */
-const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
+Anope::string expire_left(const NickCore *nc, time_t expires)
 {
 	time_t now = time(NULL);
 
+	char buf[256];
+
 	if (!expires)
-		strlcpy(buf, getstring(nc, NO_EXPIRE), len);
+		strlcpy(buf, getstring(nc, NO_EXPIRE), sizeof(buf));
 	else if (expires <= now)
-		strlcpy(buf, getstring(nc, EXPIRES_SOON), len);
+		strlcpy(buf, getstring(nc, EXPIRES_SOON), sizeof(buf));
 	else
 	{
 		time_t diff = expires - now + 59;
@@ -426,21 +374,21 @@ const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, len, getstring(nc, days == 1 ? EXPIRES_1D : EXPIRES_D), days);
+			snprintf(buf, sizeof(buf), getstring(nc, days == 1 ? EXPIRES_1D : EXPIRES_D), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, len, getstring(nc, minutes == 1 ? EXPIRES_1M : EXPIRES_M), minutes);
+				snprintf(buf, sizeof(buf), getstring(nc, minutes == 1 ? EXPIRES_1M : EXPIRES_M), minutes);
 			}
 			else
 			{
 				int hours = diff / 3600, minutes;
 				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, len, getstring(nc, hours == 1 && minutes == 1 ? EXPIRES_1H1M : (hours == 1 && minutes != 1 ? EXPIRES_1HM : (hours != 1 && minutes == 1 ? EXPIRES_H1M : EXPIRES_HM))), hours, minutes);
+				snprintf(buf, sizeof(buf), getstring(nc, hours == 1 && minutes == 1 ? EXPIRES_1H1M : (hours == 1 && minutes != 1 ? EXPIRES_1HM : (hours != 1 && minutes == 1 ? EXPIRES_H1M : EXPIRES_HM))), hours, minutes);
 			}
 		}
 	}
@@ -448,19 +396,18 @@ const char *expire_left(NickCore *nc, char *buf, int len, time_t expires)
 	return buf;
 }
 
-
 /*************************************************************************/
 
 /**
  * Validate the host
  * shortname  =  ( letter / digit ) *( letter / digit / "-" ) *( letter / digit )
  * hostname   =  shortname *( "." shortname )
- * ip4addr	=  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
+ * ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
  * @param host = string to check
  * @param type = format, 1 = ip4addr, 2 = hostname
  * @return 1 if a host is valid, 0 if it isnt.
  */
-int doValidHost(const char *host, int type)
+int doValidHost(const Anope::string &host, int type)
 {
 	int idx = 0;
 	int len = 0;
@@ -468,10 +415,10 @@ int doValidHost(const char *host, int type)
 	int dots = 1;
 	if (type != 1 && type != 2)
 		return 0;
-	if (!host)
+	if (host.empty())
 		return 0;
 
-	len = strlen(host);
+	len = host.length();
 
 	if (len > Config.HostLen)
 		return 0;
@@ -539,7 +486,7 @@ int doValidHost(const char *host, int type)
  * @param type = format, 1 = ip4addr, 2 = hostname
  * @return 1 if a host is valid, 0 if it isnt.
  */
-int isValidHost(const char *host, int type)
+int isValidHost(const Anope::string &host, int type)
 {
 	int status = 0;
 	if (type == 3)
@@ -576,54 +523,18 @@ int isvalidchar(const char c)
  * @param token_number the token number
  * @return token
  */
-char *myStrGetToken(const char *str, const char dilim, int token_number)
+Anope::string myStrGetToken(const Anope::string &str, char delim, int token_number)
 {
-	int len, idx, counter = 0, start_pos = 0;
-	char *substring = NULL;
-	if (!str)
-		return NULL;
-	len = strlen(str);
-	for (idx = 0; idx <= len; ++idx)
+	if (str.empty())
+		return "";
+
+	Anope::string substring;
+	for (size_t idx = 0, len = str.length(), start_pos = 0, counter = 0; idx <= len; ++idx)
 	{
-		if (str[idx] == dilim || idx == len)
+		if (str[idx] == delim || idx == len)
 		{
 			if (counter == token_number)
-				substring = myStrSubString(str, start_pos, idx);
-			else
-				start_pos = idx + 1;
-			++counter;
-		}
-	}
-	return substring;
-}
-
-/*************************************************************************/
-
-/**
- * Get the token only
- * @param str String to search in
- * @param dilim Character to search for
- * @param token_number the token number
- * @return token
- */
-char *myStrGetOnlyToken(const char *str, const char dilim, int token_number)
-{
-	int len, idx, counter = 0, start_pos = 0;
-	char *substring = NULL;
-	if (!str)
-		return NULL;
-	len = strlen(str);
-	for (idx = 0; idx <= len; ++idx)
-	{
-		if (str[idx] == dilim)
-		{
-			if (counter == token_number)
-			{
-				if (str[idx] == '\r')
-					substring = myStrSubString(str, start_pos, idx - 1);
-				else
-					substring = myStrSubString(str, start_pos, idx);
-			}
+				substring = str.substr(start_pos, idx - start_pos - 1);
 			else
 				start_pos = idx + 1;
 			++counter;
@@ -641,50 +552,22 @@ char *myStrGetOnlyToken(const char *str, const char dilim, int token_number)
  * @param token_number the token number
  * @return token
  */
-char *myStrGetTokenRemainder(const char *str, const char dilim, int token_number)
+Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim, int token_number)
 {
-	int len, idx, counter = 0, start_pos = 0;
-	char *substring = NULL;
-	if (!str)
-		return NULL;
-	len = strlen(str);
+	if (str.empty())
+		return "";
 
-	for (idx = 0; idx <= len; ++idx)
+	Anope::string substring;
+	for (size_t idx = 0, len = str.length(), start_pos = 0, counter = 0; idx <= len; ++idx)
 	{
 		if (str[idx] == dilim || idx == len)
 		{
 			if (counter == token_number)
-				substring = myStrSubString(str, start_pos, len);
+				substring = str.substr(start_pos);
 			else
 				start_pos = idx + 1;
 			++counter;
 		}
-	}
-	return substring;
-}
-
-/*************************************************************************/
-
-/**
- * Get the string between point A and point B
- * @param str String to search in
- * @param start Point A
- * @param end Point B
- * @return the string in between
- */
-char *myStrSubString(const char *src, int start, int end)
-{
-	char *substring = NULL;
-	int len, idx;
-	if (!src)
-		return NULL;
-	len = strlen(src);
-	if (start >= 0 && end <= len && end > start)
-	{
-		substring = new char[(end - start) + 1];
-		for (idx = 0; idx <= end - start; ++idx)
-			substring[idx] = src[start + idx];
-		substring[end - start] = '\0';
 	}
 	return substring;
 }
@@ -733,17 +616,17 @@ void doCleanBuffer(char *str)
  * @param killer whom is doing the killing
  * @return void
  */
-void EnforceQlinedNick(const std::string &nick, const char *killer)
+void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
 {
 	if (findbot(nick))
 		return;
-	
+
 	User *u2 = finduser(nick);
 
 	if (u2)
 	{
 		Alog() << "Killed Q-lined nick: " << u2->GetMask();
-		kill_user(killer, u2->nick.c_str(), "This nick is reserved for Services. Please use a non Q-Lined nick.");
+		kill_user(killer, u2->nick, "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
 }
 
@@ -755,58 +638,51 @@ void EnforceQlinedNick(const std::string &nick, const char *killer)
  * @param int Check if botserv bots
  * @return int
  */
-int nickIsServices(const char *tempnick, int bot)
+int nickIsServices(const Anope::string &tempnick, int bot)
 {
 	int found = 0;
-	char *s, *nick;
 
-	if (!tempnick)
+	if (tempnick.empty())
 		return found;
 
-	nick = sstrdup(tempnick);
+	Anope::string nick = tempnick;
 
-	s = strchr(nick, '@');
-	if (s)
+	size_t at = nick.find('@');
+	if (at != Anope::string::npos)
 	{
-		*s++ = 0;
-		if (stricmp(s, Config.ServerName))
-		{
-			delete [] nick;
+		Anope::string servername = nick.substr(at + 1);
+		if (!servername.equals_ci(Config.ServerName))
 			return found;
-		}
+		nick = nick.substr(0, at);
 	}
 
-	if (Config.s_NickServ && !stricmp(nick, Config.s_NickServ))
+	if (!Config.s_NickServ.empty() && nick.equals_ci(Config.s_NickServ))
 		++found;
-	else if (Config.s_ChanServ && !stricmp(nick, Config.s_ChanServ))
+	else if (!Config.s_ChanServ.empty() && nick.equals_ci(Config.s_ChanServ))
 		++found;
-	else if (Config.s_HostServ && !stricmp(nick, Config.s_HostServ))
+	else if (!Config.s_HostServ.empty() && nick.equals_ci(Config.s_HostServ))
 		++found;
-	else if (Config.s_MemoServ && !stricmp(nick, Config.s_MemoServ))
+	else if (!Config.s_MemoServ.empty() && nick.equals_ci(Config.s_MemoServ))
 		++found;
-	else if (Config.s_BotServ && !stricmp(nick, Config.s_BotServ))
+	else if (!Config.s_BotServ.empty() && nick.equals_ci(Config.s_BotServ))
 		++found;
-	else if (Config.s_OperServ && !stricmp(nick, Config.s_OperServ))
+	else if (!Config.s_OperServ.empty() && nick.equals_ci(Config.s_OperServ))
 		++found;
-	else if (Config.s_GlobalNoticer && !stricmp(nick, Config.s_GlobalNoticer))
+	else if (!Config.s_GlobalNoticer.empty() && nick.equals_ci(Config.s_GlobalNoticer))
 		++found;
-	else if (Config.s_BotServ && bot)
+	else if (!Config.s_BotServ.empty() && bot)
 	{
 		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
 
-			ci::string ci_bi_nick(bi->nick.c_str());
-			if (ci_bi_nick == nick)
+			if (nick.equals_ci(bi->nick))
 			{
 				++found;
 				break;
 			}
 		}
 	}
-
-	/* Somehow, something tells me we should free this :) -GD */
-	delete [] nick;
 
 	return found;
 }
@@ -967,20 +843,14 @@ uint32 getrandom32()
  * @param dilim Dilimiter
  * @return number of tokens
  */
-int myNumToken(const char *str, const char dilim)
+int myNumToken(const Anope::string &str, char dilim)
 {
-	int len, idx, counter = 0, start_pos = 0;
-	if (!str)
+	if (str.empty())
 		return 0;
-	len = strlen(str);
-	for (idx = 0; idx <= len; ++idx)
-	{
+	int counter = 0;
+	for (size_t idx = 0, len = str.length(); idx <= len; ++idx)
 		if (str[idx] == dilim || idx == len)
-		{
-			start_pos = idx + 1;
 			++counter;
-		}
-	}
 	return counter;
 }
 
@@ -991,24 +861,22 @@ int myNumToken(const char *str, const char dilim)
  * @param host to convert
  * @return ip address
  */
-char *host_resolve(char *host)
+Anope::string host_resolve(const Anope::string &host)
 {
 	struct hostent *hentp = NULL;
 	uint32 ip = INADDR_NONE;
 	char ipbuf[16];
-	char *ipreturn;
+	Anope::string ipreturn;
 	struct in_addr addr;
 
-	ipreturn = NULL;
-
-	hentp = gethostbyname(host);
+	hentp = gethostbyname(host.c_str());
 
 	if (hentp)
 	{
 		memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
 		addr.s_addr = ip;
 		ntoa(addr, ipbuf, sizeof(ipbuf));
-		ipreturn = sstrdup(ipbuf);
+		ipreturn = ipbuf;
 		Alog(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
 	}
 	return ipreturn;
@@ -1020,11 +888,11 @@ char *host_resolve(char *host)
  * @param src The source string
  * @return a list of strings
  */
-std::list<std::string> BuildStringList(const std::string &src)
+std::list<Anope::string> BuildStringList(const Anope::string &src)
 {
 	spacesepstream tokens(src);
-	std::string token;
-	std::list<std::string> Ret;
+	Anope::string token;
+	std::list<Anope::string> Ret;
 
 	while (tokens.GetToken(token))
 		Ret.push_back(token);
@@ -1032,23 +900,11 @@ std::list<std::string> BuildStringList(const std::string &src)
 	return Ret;
 }
 
-std::list<ci::string> BuildStringList(const ci::string &src)
+std::vector<Anope::string> BuildStringVector(const Anope::string &src)
 {
 	spacesepstream tokens(src);
-	ci::string token;
-	std::list<ci::string> Ret;
-
-	while (tokens.GetToken(token))
-		Ret.push_back(token);
-
-	return Ret;
-}
-
-std::vector<std::string> BuildStringVector(const std::string &src)
-{
-	spacesepstream tokens(src);
-	std::string token;
-	std::vector<std::string> Ret;
+	Anope::string token;
+	std::vector<Anope::string> Ret;
 
 	while (tokens.GetToken(token))
 		Ret.push_back(token);
@@ -1073,23 +929,11 @@ char *str_signed(unsigned char *str)
 	while (*str)
 	{
 		*nstr = static_cast<char>(*str);
-		str++;
-		nstr++;
+		++str;
+		++nstr;
 	}
 
 	return nstr;
-}
-
-/**
- *  Strip the mode prefix from the given string.
- *  Useful for using the modes stored in things like ircd->ownerset etc..
- **/
-
-char *stripModePrefix(const char *str)
-{
-	if (str && (*str == '+' || *str == '-'))
-		return sstrdup(str + 1);
-	return NULL;
 }
 
 /* Equivalent to inet_ntoa */
@@ -1194,36 +1038,32 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 #endif
 
 #ifdef _WIN32
-char *GetWindowsVersion()
+Anope::string GetWindowsVersion()
 {
 	OSVERSIONINFOEX osvi;
 	BOOL bOsVersionInfoEx;
-	char buf[BUFSIZE];
-	char *extra;
-	char *cputype;
+	Anope::string buf, extra, cputype;
 	SYSTEM_INFO si;
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
+	if (!(bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))))
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
-			return sstrdup("");
+		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
+			return "";
 	}
 	GetSystemInfo(&si);
 
 	/* Determine CPU type 32 or 64 */
 	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-		cputype = sstrdup(" 64-bit");
+		cputype = " 64-bit";
 	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-		cputype = sstrdup(" 32-bit");
+		cputype = " 32-bit";
 	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
-		cputype = sstrdup(" Itanium 64-bit");
-	else
-		cputype = sstrdup(" ");
+		cputype = " Itanium 64-bit";
 
 	switch (osvi.dwPlatformId)
 	{
@@ -1233,96 +1073,78 @@ char *GetWindowsVersion()
 			if (osvi.dwMajorVersion == 6 && !osvi.dwMinorVersion)
 			{
 				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = sstrdup("Enterprise Edition");
+					extra = " Enterprise Edition";
 				else if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = sstrdup("Datacenter Edition");
+					extra = " Datacenter Edition";
 				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-					extra = sstrdup("Home Premium/Basic");
-				else
-					extra = sstrdup(" ");
+					extra = " Home Premium/Basic";
 				if (osvi.wProductType & VER_NT_WORKSTATION)
-					snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s", cputype, extra);
+					buf = "Microsoft Windows Vista" + cputype + extra;
 				else
-					snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s", cputype, extra);
-				delete [] extra;
+					buf = "Microsoft Windows Server 2008" + cputype + extra;
 			}
 			/* Windows 2003 or Windows XP Pro 64 */
 			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
 			{
 				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = sstrdup("Datacenter Edition");
+					extra = " Datacenter Edition";
 				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = sstrdup("Enterprise Edition");
+					extra = " Enterprise Edition";
 #ifdef VER_SUITE_COMPUTE_SERVER
 				else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
-					extra = sstrdup("Compute Cluster Edition");
+					extra = " Compute Cluster Edition";
 #endif
 				else if (osvi.wSuiteMask == VER_SUITE_BLADE)
-					extra = sstrdup("Web Edition");
+					extra = " Web Edition";
 				else
-					extra = sstrdup("Standard Edition");
+					extra = " Standard Edition";
 				if (osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-					snprintf(buf, sizeof(buf), "Windows XP Professional x64 Edition %s", extra);
+					buf = "Microsoft Windows XP Professional x64 Edition" + extra;
 				else
-					snprintf(buf, sizeof(buf), "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
-				delete [] extra;
+					buf = "Microsoft Windows Server 2003 Family" + cputype + extra;
 			}
 			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
 			{
 				if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT)
-					extra = sstrdup("Embedded");
+					extra = " Embedded";
 				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-					extra = sstrdup("Home Edition");
-				else
-					extra = sstrdup(" ");
-				snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
-				delete [] extra;
+					extra = " Home Edition";
+				buf = "Microsoft Windows XP" + extra;
 			}
 			if (osvi.dwMajorVersion == 5 && !osvi.dwMinorVersion)
 			{
 				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = sstrdup("Datacenter Server");
+					extra = " Datacenter Server";
 				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = sstrdup("Advanced Server");
+					extra = " Advanced Server";
 				else
-					extra = sstrdup("Server");
-				snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
-				delete [] extra;
+					extra = " Server";
+				buf = "Microsoft Windows 2000" + extra;
 			}
 			if (osvi.dwMajorVersion <= 4)
 			{
 				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = sstrdup("Server 4.0, Enterprise Edition");
-				else
-					extra = sstrdup("Server 4.0");
-				snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
-				delete [] extra;
+					extra = " Enterprise Edition";
+				buf = "Microsoft Windows NT Server 4.0" + extra;
 			}
 			break;
 		case VER_PLATFORM_WIN32_WINDOWS:
 			if (osvi.dwMajorVersion == 4 && !osvi.dwMinorVersion)
 			{
 				if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B')
-					extra = sstrdup("OSR2");
-				else
-					extra = sstrdup(" ");
-				snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
-				delete [] extra;
+					extra = " OSR2";
+				buf = "Microsoft Windows 95" + extra;
 			}
 			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
 			{
 				if (osvi.szCSDVersion[1] == 'A')
-					extra = sstrdup("SE");
-				else
-					extra = sstrdup(" ");
-				snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
-				delete [] extra;
+					extra = "SE";
+				buf = "Microsoft Windows 98" + extra;
 			}
 			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-				snprintf(buf, sizeof(buf), "Microsoft Windows Millennium Edition");
+				buf = "Microsoft Windows Millenium Edition";
 	}
-	delete [] cputype;
-	return sstrdup(buf);
+	return buf;
 }
 
 int SupportedWindowsVersion()
@@ -1333,10 +1155,10 @@ int SupportedWindowsVersion()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
+	if (!(bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))))
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx((OSVERSIONINFO *)&osvi))
+		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
 			return 0;
 	}
 
@@ -1396,14 +1218,11 @@ uint16 netmask_to_cidr(uint32 mask)
  * @param str String to check
  * @return 1 for wildcard, 0 for anything else
  */
-int str_is_wildcard(const char *str)
+int str_is_wildcard(const Anope::string &str)
 {
-	while (*str)
-	{
-		if (*str == '*' || *str == '?')
+	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
+		if (*c == '*' || *c == '?')
 			return 1;
-		++str;
-	}
 
 	return 0;
 }
@@ -1413,14 +1232,11 @@ int str_is_wildcard(const char *str)
  * @param str String to check
  * @return 1 for pure wildcard, 0 for anything else
  */
-int str_is_pure_wildcard(const char *str)
+int str_is_pure_wildcard(const Anope::string &str)
 {
-	while (*str)
-	{
-		if (*str != '*')
+	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
+		if (*c != '*')
 			return 0;
-		++str;
-	}
 
 	return 1;
 }
@@ -1432,21 +1248,19 @@ int str_is_pure_wildcard(const char *str)
  * @param str String to check
  * @return The IP, if one found. 0 if none.
  */
-uint32 str_is_ip(char *str)
+uint32 str_is_ip(const Anope::string &str)
 {
 	int i;
 	int octets[4] = { -1, -1, -1, -1 };
-	char *s = str;
+	Anope::string s = str;
 	uint32 ip;
 
 	for (i = 0; i < 4; ++i)
 	{
-		octets[i] = strtol(s, &s, 10);
+		octets[i] = convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && *s != '.'))
+		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
 			return 0;
-		if (i < 3)
-			++s;
 	}
 
 	/* Fill the IP - the dirty way */
@@ -1469,22 +1283,19 @@ uint32 str_is_ip(char *str)
  * @param host Displayed host
  * @return 1 for IP/CIDR, 0 for anything else
  */
-int str_is_cidr(char *str, uint32 *ip, uint32 *mask, char **host)
+int str_is_cidr(const Anope::string &str, uint32 *ip, uint32 *mask, Anope::string &host)
 {
 	int i;
 	int octets[4] = { -1, -1, -1, -1 };
-	char *s = str;
-	char buf[512];
+	Anope::string s = str;
 	uint16 cidr;
 
 	for (i = 0; i < 4; ++i)
 	{
-		octets[i] = strtol(s, &s, 10);
+		octets[i] = convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && *s != '.'))
+		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
 			return 0;
-		if (i < 3)
-			++s;
 	}
 
 	/* Fill the IP - the dirty way */
@@ -1493,13 +1304,12 @@ int str_is_cidr(char *str, uint32 *ip, uint32 *mask, char **host)
 	*ip += octets[1] * 65536;
 	*ip += octets[0] * 16777216;
 
-	if (*s == '/')
+	if (s[0] == '/')
 	{
-		++s;
 		/* There's a CIDR mask here! */
-		cidr = strtol(s, &s, 10);
+		cidr = convertTo<uint16>(s.substr(1), s, false);
 		/* Bail out if the CIDR is invalid or the string isn't done yet */
-		if (cidr > 32 || *s)
+		if (cidr > 32 || s[0])
 			return 0;
 	}
 	else
@@ -1516,12 +1326,9 @@ int str_is_cidr(char *str, uint32 *ip, uint32 *mask, char **host)
 	octets[2] = (*ip & 0x0000FF00) / 256;
 	octets[3] = (*ip & 0x000000FF);
 
-	if (cidr == 32)
-		snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2], octets[3]);
-	else
-		snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1], octets[2], octets[3], cidr);
-
-	*host = sstrdup(buf);
+	host = stringify(octets[0]) + "." + stringify(octets[1]) + "." + stringify(octets[2]) + "." + stringify(octets[3]);
+	if (cidr != 32)
+		host += "/" + stringify(cidr);
 
 	return 1;
 }

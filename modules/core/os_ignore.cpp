@@ -16,13 +16,13 @@
 class CommandOSIgnore : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *time = params.size() > 1 ? params[1].c_str() : NULL;
-		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		Anope::string time = params.size() > 1 ? params[1] : "";
+		Anope::string nick = params.size() > 2 ? params[2] : "";
 		time_t t;
 
-		if (!time || !nick)
+		if (time.empty() || nick.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
@@ -39,12 +39,12 @@ class CommandOSIgnore : public Command
 			else if (!t)
 			{
 				add_ignore(nick, t);
-				notice_lang(Config.s_OperServ, u, OPER_IGNORE_PERM_DONE, nick);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_PERM_DONE, nick.c_str());
 			}
 			else
 			{
 				add_ignore(nick, t);
-				notice_lang(Config.s_OperServ, u, OPER_IGNORE_TIME_DONE, nick, time);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
 			}
 		}
 
@@ -63,24 +63,24 @@ class CommandOSIgnore : public Command
 
 		notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST);
 		for (id = ignore; id; id = id->next)
-			u->SendMessage(Config.s_OperServ, "%s", id->mask);
+			u->SendMessage(Config.s_OperServ, "%s", id->mask.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params.size() > 1 ? params[1].c_str() : NULL;
-		if (!nick)
+		Anope::string nick = params.size() > 1 ? params[1] : "";
+		if (nick.empty())
 			this->OnSyntaxError(u, "DEL");
 		else
 		{
 			if (delete_ignore(nick))
 			{
-				notice_lang(Config.s_OperServ, u, OPER_IGNORE_DEL_DONE, nick);
+				notice_lang(Config.s_OperServ, u, OPER_IGNORE_DEL_DONE, nick.c_str());
 				return MOD_CONT;
 			}
-			notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_NOMATCH, nick);
+			notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_NOMATCH, nick.c_str());
 		}
 
 		return MOD_CONT;
@@ -98,17 +98,17 @@ class CommandOSIgnore : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params);
-		else if (cmd == "CLEAR")
+		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(u);
 		else
 			this->OnSyntaxError(u, "");
@@ -116,13 +116,13 @@ class CommandOSIgnore : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_IGNORE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 	}
@@ -136,7 +136,7 @@ class CommandOSIgnore : public Command
 class OSIgnore : public Module
 {
  public:
-	OSIgnore(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -147,19 +147,17 @@ class OSIgnore : public Module
 		ModuleManager::Attach(i, this, 2);
 	}
 
-	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
 	{
-		std::string buf;
-
-		if (params[0] == "OS" && params.size() >= 4 && params[1] == "IGNORE")
+		if (params[0].equals_ci("OS") && params.size() >= 4 && params[1].equals_ci("IGNORE"))
 		{
-			IgnoreData *ign = new IgnoreData;
-			ign->mask = sstrdup(params[2].c_str());
-			ign->time = strtol(params[3].c_str(), NULL, 10);
+			IgnoreData *ign = new IgnoreData();
+			ign->mask = params[2];
+			ign->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 			ign->prev = NULL;
 			ign->next = ignore;
 			if (ignore)
-			ignore->prev = ign;
+				ignore->prev = ign;
 			ignore = ign;
 
 			return EVENT_STOP;
@@ -168,7 +166,7 @@ class OSIgnore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDatabaseWrite(void (*Write)(const std::string &))
+	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
 		IgnoreData *ign, *next;
 		time_t now = time(NULL);
@@ -186,7 +184,6 @@ class OSIgnore : public Module
 					ignore = ign->next;
 				if (ign->next)
 					ign->next->prev = ign->prev;
-				delete [] ign->mask;
 				delete ign;
 				ign = NULL;
 			}

@@ -18,7 +18,7 @@ class AkillDelCallback : public NumberList
 	User *u;
 	unsigned Deleted;
  public:
-	AkillDelCallback(User *_u, const std::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	AkillDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
 	{
 	}
 
@@ -55,7 +55,7 @@ class AkillListCallback : public NumberList
 	User *u;
 	bool SentHeader;
  public:
-	AkillListCallback(User *_u, const std::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	AkillListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
 	{
 	}
 
@@ -92,7 +92,7 @@ class AkillListCallback : public NumberList
 class AkillViewCallback : public AkillListCallback
 {
  public:
-	AkillViewCallback(User *_u, const std::string &numlist) : AkillListCallback(_u, numlist)
+	AkillViewCallback(User *_u, const Anope::string &numlist) : AkillListCallback(_u, numlist)
 	{
 	}
 
@@ -114,45 +114,42 @@ class AkillViewCallback : public AkillListCallback
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		char timebuf[32], expirebuf[256];
+		char timebuf[32];
 		struct tm tm;
 
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-		expire_left(u->Account(), expirebuf, sizeof(expirebuf), x->Expires);
+		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
 
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf, x->Reason.c_str());
+		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSAKill : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
 	{
 		unsigned last_param = 2;
-		const char *expiry, *mask;
-		char reason[BUFSIZE];
+		Anope::string expiry, mask;
 		time_t expires;
 
-		mask = params.size() > 1 ? params[1].c_str() : NULL;
-		if (mask && *mask == '+')
+		mask = params.size() > 1 ? params[1] : "";
+		if (!mask.empty() && mask[0] == '+')
 		{
 			expiry = mask;
-			mask = params.size() > 2 ? params[2].c_str() : NULL;
+			mask = params.size() > 2 ? params[2] : "";
 			last_param = 3;
 		}
-		else
-			expiry = NULL;
 
-		expires = expiry ? dotime(expiry) : Config.AutokillExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config.AutokillExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
-		if (expiry && isdigit(expiry[strlen(expiry) - 1]))
+		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
 			expires *= 86400;
 		/* Do not allow less than a minute expiry time */
-		if (expires != 0 && expires < 60)
+		if (expires && expires < 60)
 		{
 			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
@@ -165,26 +162,29 @@ class CommandOSAKill : public Command
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
 		}
-		snprintf(reason, sizeof(reason), "%s%s%s", params[last_param].c_str(), last_param == 2 && params.size() > 3 ? " " : "", last_param == 2 && params.size() > 3 ? params[3].c_str() : "");
-		if (mask && *reason)
+
+		Anope::string reason = params[last_param];
+		if (last_param == 2 && params.size() > 3)
+			reason += " " + params[3];
+		if (!mask.empty() && !reason.empty())
 		{
 			XLine *x = SGLine->Add(OperServ, u, mask, expires, reason);
 
 			if (!x)
 				return MOD_CONT;
 
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_ADDED, mask);
+			notice_lang(Config.s_OperServ, u, OPER_AKILL_ADDED, mask.c_str());
 
 			if (Config.WallOSAkill)
 			{
-				char buf[128];
+				Anope::string buf;
 
 				if (!expires)
-					strcpy(buf, "does not expire");
+					buf = "does not expire";
 				else
 				{
 					int wall_expiry = expires - time(NULL);
-					const char *s = NULL;
+					Anope::string s;
 
 					if (wall_expiry >= 86400)
 					{
@@ -202,10 +202,10 @@ class CommandOSAKill : public Command
 						s = "minute";
 					}
 
-					snprintf(buf, sizeof(buf), "expires in %d %s%s", wall_expiry, s, wall_expiry == 1 ? "" : "s");
+					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask, reason, buf);
+				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask.c_str(), reason.c_str(), buf.c_str());
 			}
 
 			if (readonly)
@@ -217,9 +217,9 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
-		const ci::string mask = params.size() > 1 ? params[0] : "";
+		Anope::string mask = params.size() > 1 ? params[0] : "";
 
 		if (mask.empty())
 		{
@@ -233,9 +233,9 @@ class CommandOSAKill : public Command
 			return MOD_CONT;
 		}
 
-		if (isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillDelCallback list(u, mask.c_str());
+			AkillDelCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -260,7 +260,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SGLine->GetList().empty())
 		{
@@ -268,11 +268,11 @@ class CommandOSAKill : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillListCallback list(u, mask.c_str());
+			AkillListCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -283,7 +283,7 @@ class CommandOSAKill : public Command
 			{
 				XLine *x = SGLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -304,7 +304,7 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
 	{
 		if (SGLine->GetList().empty())
 		{
@@ -312,11 +312,11 @@ class CommandOSAKill : public Command
 			return MOD_CONT;
 		}
 
-		const ci::string mask = params.size() > 1 ? params[1] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
-		if (!mask.empty() && isdigit(mask[0]) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillViewCallback list(u, mask.c_str());
+			AkillViewCallback list(u, mask);
 			list.Process();
 		}
 		else
@@ -327,7 +327,7 @@ class CommandOSAKill : public Command
 			{
 				XLine *x = SGLine->GetEntry(i);
 
-				if (mask.empty() || mask == x->Mask || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -359,32 +359,32 @@ class CommandOSAKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
+		Anope::string cmd = params[0];
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(u, params);
-		else if (cmd == "CLEAR")
+		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(u);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_AKILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
 	}
@@ -398,7 +398,7 @@ class CommandOSAKill : public Command
 class OSAKill : public Module
 {
  public:
-	OSAKill(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

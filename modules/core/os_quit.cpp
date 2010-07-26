@@ -21,21 +21,17 @@ class CommandOSQuit : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		quitmsg = new char[28 + u->nick.length()];
-		if (!quitmsg)
-			quitmsg = "QUIT command received, but out of memory!";
-		else
-			sprintf(const_cast<char *>(quitmsg), "QUIT command received from %s", u->nick.c_str()); // XXX we know this is safe, but..
+		quitmsg = "QUIT command received from " + u->nick;
 
 		if (Config.GlobalOnCycle)
-			oper_global(NULL, "%s", Config.GlobalOnCycleMessage);
+			oper_global("", "%s", Config.GlobalOnCycleMessage.c_str());
 		quitting = 1;
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_QUIT);
 		return true;
@@ -50,7 +46,7 @@ class CommandOSQuit : public Command
 class OSQuit : public Module
 {
  public:
-	OSQuit(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSQuit(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

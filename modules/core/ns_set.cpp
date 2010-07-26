@@ -15,20 +15,22 @@
 
 class CommandNSSet : public Command
 {
-	std::map<ci::string, Command *> subcommands;
+	typedef std::map<Anope::string, Command *, hash_compare_ci_string> subcommand_map;
+	subcommand_map subcommands;
+
  public:
-	CommandNSSet(const ci::string &cname) : Command(cname, 1, 3)
+	CommandNSSet(const Anope::string &cname) : Command(cname, 1, 3)
 	{
 	}
 
 	~CommandNSSet()
 	{
-		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
+		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 			delete it->second;
 		this->subcommands.clear();
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		if (readonly)
 		{
@@ -38,7 +40,7 @@ class CommandNSSet : public Command
 
 		if (u->Account()->HasFlag(NI_SUSPENDED))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -46,8 +48,8 @@ class CommandNSSet : public Command
 
 		if (c)
 		{
-			ci::string cmdparams;
-			for (std::vector<ci::string>::const_iterator it = params.begin() + 1, it_end = params.end(); it != it_end; ++it)
+			Anope::string cmdparams;
+			for (std::vector<Anope::string>::const_iterator it = params.begin() + 1, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
 			if (!cmdparams.empty())
 				cmdparams.erase(cmdparams.begin());
@@ -59,12 +61,12 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_NickServ, u, NICK_HELP_SET_HEAD);
-			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
+			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_NickServ, u, NICK_HELP_SET_TAIL);
 			return true;
@@ -80,7 +82,7 @@ class CommandNSSet : public Command
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
@@ -95,14 +97,14 @@ class CommandNSSet : public Command
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
-	bool DelSubcommand(const ci::string &command)
+	bool DelSubcommand(const Anope::string &command)
 	{
 		return this->subcommands.erase(command);
 	}
 
-	Command *FindCommand(const ci::string &subcommand)
+	Command *FindCommand(const Anope::string &subcommand)
 	{
-		std::map<ci::string, Command *>::const_iterator it = this->subcommands.find(subcommand);
+		subcommand_map::const_iterator it = this->subcommands.find(subcommand);
 
 		if (it != this->subcommands.end())
 			return it->second;
@@ -114,11 +116,11 @@ class CommandNSSet : public Command
 class CommandNSSetDisplay : public Command
 {
  public:
-	CommandNSSetDisplay(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetDisplay(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
 
@@ -128,18 +130,18 @@ class CommandNSSetDisplay : public Command
 			return MOD_CONT;
 		}
 
-		change_core_display(u->Account(), params[0].c_str());
-		notice_lang(Config.s_NickServ, u, NICK_SET_DISPLAY_CHANGED, u->Account()->display);
+		change_core_display(u->Account(), params[0]);
+		notice_lang(Config.s_NickServ, u, NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_DISPLAY);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
@@ -154,17 +156,17 @@ class CommandNSSetDisplay : public Command
 class CommandNSSetPassword : public Command
 {
  public:
-	CommandNSSetPassword(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetPassword(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string param = params[0];
+		Anope::string param = params[0];
 
-		int len = param.size();
+		int len = param.length();
 
-		if (u->Account()->display == param || (Config.StrictPasswords && len < 5))
+		if (u->Account()->display.equals_ci(param) || (Config.StrictPasswords && len < 5))
 		{
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
@@ -175,31 +177,30 @@ class CommandNSSetPassword : public Command
 			return MOD_CONT;
 		}
 
-		std::string buf = param.c_str(); /* conversion from ci::string to std::string */
-		if (enc_encrypt(buf, u->Account()->pass) < 0)
+		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
 			Alog() << Config.s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
 
-		std::string tmp_pass;
+		Anope::string tmp_pass;
 		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass.c_str());
 		else
 			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (u->Account()->email ? u->Account()->email : "none") << ") changed its password.";
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none") << ") changed its password.";
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_PASSWORD);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
@@ -214,7 +215,7 @@ class CommandNSSetPassword : public Command
 class NSSet : public Module
 {
  public:
-	NSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

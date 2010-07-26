@@ -20,10 +20,9 @@ class CommandMSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		int z = 0;
-		const char *text = params[0].c_str();
+		Anope::string text = params[0];
 
 		if (readonly)
 		{
@@ -36,19 +35,19 @@ class CommandMSStaff : public Command
 			NickCore *nc = it->second;
 
 			if (nc->IsServicesOper())
-				memo_send(u, nc->display, text, z);
+				memo_send(u, nc->display, text, 0);
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_STAFF);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
 	}
@@ -62,7 +61,7 @@ class CommandMSStaff : public Command
 class MSStaff : public Module
 {
  public:
-	MSStaff(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

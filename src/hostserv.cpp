@@ -13,8 +13,6 @@
 #include "modules.h"
 #include "language.h"
 
-E int do_hs_sync(NickCore *nc, char *vIdent, char *hostmask, char *creator, time_t time);
-
 E void moduleAddHostServCmds();
 
 /*************************************************************************/
@@ -43,11 +41,11 @@ void get_hostserv_stats(long *nrec, long *memuse)
 			continue;
 
 		if (!na->hostinfo.GetIdent().empty())
-			mem += na->hostinfo.GetIdent().size();
+			mem += na->hostinfo.GetIdent().length();
 		if (!na->hostinfo.GetHost().empty())
-			mem += na->hostinfo.GetHost().size();
+			mem += na->hostinfo.GetHost().length();
 		if (!na->hostinfo.GetCreator().empty())
-			mem += na->hostinfo.GetCreator().size();
+			mem += na->hostinfo.GetCreator().length();
 		++count;
 	}
 
@@ -63,7 +61,7 @@ void get_hostserv_stats(long *nrec, long *memuse)
  */
 void hostserv_init()
 {
-	if (Config.s_HostServ)
+	if (!Config.s_HostServ.empty())
 		moduleAddHostServCmds();
 }
 
@@ -75,20 +73,20 @@ void hostserv_init()
  * @param buf Buffer holding the message
  * @return void
  */
-void hostserv(User *u, const std::string &buf)
+void hostserv(User *u, const Anope::string &buf)
 {
 	if (!u || buf.empty())
 		return;
 
-	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
 	{
-		std::string command = buf;
+		Anope::string command = buf;
 		command.erase(command.begin());
 		command.erase(command.end());
-		ircdproto->SendCTCP(HostServ, u->nick.c_str(), "%s", command.c_str());
+		ircdproto->SendCTCP(HostServ, u->nick, "%s", command.c_str());
 	}
 	else if (!ircd->vhost)
-		notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ);
+		notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ.c_str());
 	else
 		mod_run_cmd(HostServ, u, buf);
 }
@@ -99,7 +97,7 @@ void hostserv(User *u, const std::string &buf)
  * @param creator Who created the vhost
  * @param time When the vhost was craated
  */
-void HostInfo::SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t created)
+void HostInfo::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
 {
 	Ident = ident;
 	Host = host;
@@ -128,7 +126,7 @@ bool HostInfo::HasVhost() const
 /** Retrieve the vhost ident
  * @return the ident
  */
-const std::string &HostInfo::GetIdent() const
+const Anope::string &HostInfo::GetIdent() const
 {
 	return Ident;
 }
@@ -136,7 +134,7 @@ const std::string &HostInfo::GetIdent() const
 /** Retrieve the vhost host
  * @return the host
  */
-const std::string &HostInfo::GetHost() const
+const Anope::string &HostInfo::GetHost() const
 {
 	return Host;
 }
@@ -144,7 +142,7 @@ const std::string &HostInfo::GetHost() const
 /** Retrieve the vhost creator
  * @return the creator
  */
-const std::string &HostInfo::GetCreator() const
+const Anope::string &HostInfo::GetCreator() const
 {
 	return Creator;
 }
@@ -186,15 +184,11 @@ void do_on_id(User *u)
 	if (!na || !na->hostinfo.HasVhost())
 		return;
 
-	if (!u->vhost || u->vhost != na->hostinfo.GetHost() || (!na->hostinfo.GetIdent().empty() && u->GetVIdent() != na->hostinfo.GetIdent()))
+	if (u->vhost.empty() || !u->vhost.equals_cs(na->hostinfo.GetHost()) || (!na->hostinfo.GetIdent().empty() && !u->GetVIdent().equals_cs(na->hostinfo.GetIdent())))
 	{
 		ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 		if (ircd->vhost)
-		{
-			if (u->vhost)
-				delete [] u->vhost;
-			u->vhost = sstrdup(na->hostinfo.GetHost().c_str());
-		}
+			u->vhost = na->hostinfo.GetHost();
 		if (ircd->vident && !na->hostinfo.GetIdent().empty())
 			u->SetVIdent(na->hostinfo.GetIdent());
 		u->UpdateHost();

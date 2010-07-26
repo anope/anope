@@ -51,8 +51,7 @@
 
 session_map SessionList;
 
-Exception *exceptions = NULL;
-int16 nexceptions = 0;
+std::vector<Exception *> exceptions;
 
 /*************************************************************************/
 /****************************** Statistics *******************************/
@@ -66,7 +65,7 @@ void get_session_stats(long *nrec, long *memuse)
 	{
 		Session *session = it->second;
 
-		mem += strlen(session->host) + 1;
+		mem += session->host.length() + 1;
 	}
 
 	*memuse = mem;
@@ -76,15 +75,19 @@ void get_session_stats(long *nrec, long *memuse)
 void get_exception_stats(long *nrec, long *memuse)
 {
 	long mem;
-	int i;
 
-	mem = sizeof(Exception) * nexceptions;
-	for (i = 0; i < nexceptions; ++i)
+	mem = sizeof(Exception) * exceptions.size();
+	for (std::vector<Exception *>::const_iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
 	{
-		mem += strlen(exceptions[i].mask) + 1;
-		mem += strlen(exceptions[i].reason) + 1;
+		Exception *e = *it;
+		if (!e->mask.empty())
+			mem += e->mask.length() + 1;
+		if (!e->reason.empty())
+			mem += e->reason.length() + 1;
+		if (!e->who.empty())
+			mem += e->who.length() + 1;
 	}
-	*nrec = nexceptions;
+	*nrec = exceptions.size();
 	*memuse = mem;
 }
 
@@ -92,7 +95,7 @@ void get_exception_stats(long *nrec, long *memuse)
 /********************* Internal Session Functions ************************/
 /*************************************************************************/
 
-Session *findsession(const std::string &host)
+Session *findsession(const Anope::string &host)
 {
 	session_map::const_iterator it = SessionList.find(host);
 
@@ -106,7 +109,7 @@ Session *findsession(const std::string &host)
  * Returns 1 if the host was added or 0 if the user was killed.
  */
 
-int add_session(const char *nick, const char *host, char *hostip)
+int add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip)
 {
 	Session *session;
 	Exception *exception;
@@ -120,12 +123,12 @@ int add_session(const char *nick, const char *host, char *hostip)
 
 		sessionlimit = exception ? exception->limit : Config.DefSessionLimit;
 
-		if (sessionlimit != 0 && session->count >= sessionlimit)
+		if (sessionlimit && session->count >= sessionlimit)
 		{
-			if (Config.SessionLimitExceeded)
-				ircdproto->SendMessage(OperServ, nick, Config.SessionLimitExceeded, host);
-			if (Config.SessionLimitDetailsLoc)
-				ircdproto->SendMessage(OperServ, nick, "%s", Config.SessionLimitDetailsLoc);
+			if (!Config.SessionLimitExceeded.empty())
+				ircdproto->SendMessage(OperServ, nick, Config.SessionLimitExceeded.c_str(), host.c_str());
+			if (!Config.SessionLimitDetailsLoc.empty())
+				ircdproto->SendMessage(OperServ, nick, "%s", Config.SessionLimitDetailsLoc.c_str());
 
 			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
 			 * decremented in do_quit, which caused problems and fixed here
@@ -140,12 +143,11 @@ int add_session(const char *nick, const char *host, char *hostip)
 			++session->hits;
 			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
 			{
-				char akillmask[BUFSIZE];
-				snprintf(akillmask, sizeof(akillmask), "*@%s", host);
-				XLine *x = new XLine(ci::string("*@") + host, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
+				Anope::string akillmask = "*@" + host;
+				XLine *x = new XLine(akillmask, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
 				if (x)
 					x->By = Config.s_OperServ;
-				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask);
+				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 			}
 			return 0;
 		}
@@ -157,7 +159,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 	}
 
 	session = new Session;
-	session->host = sstrdup(host);
+	session->host = host;
 	session->count = 1;
 	session->hits = 0;
 
@@ -166,7 +168,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 	return 1;
 }
 
-void del_session(const char *host)
+void del_session(const Anope::string &host)
 {
 	if (!Config.LimitSessions)
 	{
@@ -174,7 +176,7 @@ void del_session(const char *host)
 		return;
 	}
 
-	if (!host || !*host)
+	if (host.empty())
 	{
 		Alog(LOG_DEBUG) << "del_session called with NULL values";
 		return;
@@ -188,7 +190,7 @@ void del_session(const char *host)
 	{
 		if (debug)
 		{
-			ircdproto->SendGlobops(OperServ, "WARNING: Tried to delete non-existant session: \2%s", host);
+			ircdproto->SendGlobops(OperServ, "WARNING: Tried to delete non-existant session: \2%s", host.c_str());
 			Alog(LOG_DEBUG) << "session: Tried to delete non-existant session: " << host;
 		}
 		return;
@@ -204,7 +206,6 @@ void del_session(const char *host)
 
 	Alog(LOG_DEBUG_2) << "del_session(): free session structure";
 
-	delete [] session->host;
 	delete session;
 
 	Alog(LOG_DEBUG_2) << "del_session() done";
@@ -216,46 +217,45 @@ void del_session(const char *host)
 
 void expire_exceptions()
 {
-	int i;
 	time_t now = time(NULL);
 
-	for (i = 0; i < nexceptions; ++i)
+	for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; )
 	{
-		if (!exceptions[i].expires || exceptions[i].expires > now)
+		Exception *e = *it;
+		std::vector<Exception *>::iterator curr_it = it++;
+
+		if (!e->expires || e->expires > now)
 			continue;
 		if (Config.WallExceptionExpire)
-			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", exceptions[i].mask);
-		delete [] exceptions[i].mask;
-		delete [] exceptions[i].reason;
-		delete [] exceptions[i].who;
-		--nexceptions;
-		memmove(exceptions + i, exceptions + i + 1, sizeof(Exception) * (nexceptions - i));
-		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
-		--i;
+			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", e->mask.c_str());
+		delete e;
+		exceptions.erase(curr_it);
 	}
 }
 
 /* Find the first exception this host matches and return it. */
-Exception *find_host_exception(const char *host)
+Exception *find_host_exception(const Anope::string &host)
 {
-	int i;
-
-	for (i = 0; i < nexceptions; ++i)
-		if ((Anope::Match(host, exceptions[i].mask, false)))
-			return &exceptions[i];
+	for (std::vector<Exception *>::const_iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
+	{
+		Exception *e = *it;
+		if (Anope::Match(host, e->mask))
+			return e;
+	}
 
 	return NULL;
 }
 
 /* Same as find_host_exception() except
  * this tries to find the exception by IP also. */
-Exception *find_hostip_exception(const char *host, const char *hostip)
+Exception *find_hostip_exception(const Anope::string &host, const Anope::string &hostip)
 {
-	int i;
-
-	for (i = 0; i < nexceptions; ++i)
-		if (Anope::Match(host, exceptions[i].mask, false) || ((ircd->nickip && hostip) && Anope::Match(hostip, exceptions[i].mask, false)))
-			return &exceptions[i];
+	for (std::vector<Exception *>::const_iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
+	{
+		Exception *e = *it;
+		if (Anope::Match(host, e->mask) || (ircd->nickip && !hostip.empty() && Anope::Match(hostip, e->mask)))
+			return e;
+	}
 
 	return NULL;
 }
@@ -264,52 +264,47 @@ Exception *find_hostip_exception(const char *host, const char *hostip)
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 
-int exception_add(User *u, const char *mask, const int limit, const char *reason, const char *who, const time_t expires)
+int exception_add(User *u, const Anope::string &mask, int limit, const Anope::string &reason, const Anope::string &who, time_t expires)
 {
-	int i;
-
 	/* Check if an exception already exists for this mask */
-	for (i = 0; i < nexceptions; ++i)
+	for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
 	{
-		if (!stricmp(mask, exceptions[i].mask))
+		Exception *e = *it;
+		if (e->mask.equals_ci(mask))
 		{
-			if (exceptions[i].limit != limit)
+			if (e->limit != limit)
 			{
-				exceptions[i].limit = limit;
+				e->limit = limit;
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED, mask, exceptions[i].limit);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
 				return -2;
 			}
 			else
 			{
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS, mask);
+					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS, mask.c_str());
 				return -1;
 			}
 		}
 	}
 
-	nexceptions++;
-	exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
-
-	exceptions[nexceptions - 1].mask = sstrdup(mask);
-	exceptions[nexceptions - 1].limit = limit;
-	exceptions[nexceptions - 1].reason = sstrdup(reason);
-	exceptions[nexceptions - 1].time = time(NULL);
-	exceptions[nexceptions - 1].who = sstrdup(who);
-	exceptions[nexceptions - 1].expires = expires;
-	exceptions[nexceptions - 1].num = nexceptions - 1;
+	Exception *exception = new Exception();
+	exception->mask = mask;
+	exception->limit = limit;
+	exception->reason = reason;
+	exception->time = time(NULL);
+	exception->who = who;
+	exception->expires = expires;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(u, &exceptions[nexceptions - 1]));
+	FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(u, exception));
 	if (MOD_RESULT == EVENT_STOP)
 	{
-		delete [] exceptions[nexceptions - 1].mask;
-		delete [] exceptions[nexceptions - 1].reason;
-		--nexceptions;
-		exceptions = static_cast<Exception *>(srealloc(exceptions, sizeof(Exception) * nexceptions));
+		delete exception;
 		return -3;
 	}
+
+	exceptions.push_back(exception);
 
 	return 1;
 }

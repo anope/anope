@@ -20,15 +20,15 @@ class CommandBSUnassign : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
+		Anope::string chan = params[0];
 		ChannelInfo *ci = cs_findchan(chan);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
 		if (readonly)
 			notice_lang(Config.s_BotServ, u, BOT_ASSIGN_READONLY);
-		else if (!u->Account()->HasPriv("botserv/administration")  && !check_access(u, ci, CA_ASSIGN))
+		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
 			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
 		else if (!ci->bi)
 			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);
@@ -42,13 +42,13 @@ class CommandBSUnassign : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_UNASSIGN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
 	}
@@ -62,10 +62,11 @@ class CommandBSUnassign : public Command
 class BSUnassign : public Module
 {
  public:
-	BSUnassign(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSUnassign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSUnassign);
 	}
 };

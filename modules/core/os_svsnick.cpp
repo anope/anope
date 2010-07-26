@@ -20,10 +20,10 @@ class CommandOSSVSNick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		ci::string newnick = params[1];
+		Anope::string nick = params[0];
+		Anope::string newnick = params[1];
 		User *u2;
 
 		NickAlias *na;
@@ -41,7 +41,7 @@ class CommandOSSVSNick : public Command
 			notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
 			return MOD_CONT;
 		}
-		for (unsigned i = 0, end = newnick.size(); i < end; ++i)
+		for (unsigned i = 0, end = newnick.length(); i < end; ++i)
 			if (!isvalidnick(newnick[i]))
 			{
 				notice_lang(Config.s_OperServ, u, NICK_X_ILLEGAL, newnick.c_str());
@@ -50,27 +50,27 @@ class CommandOSSVSNick : public Command
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+			notice_lang(Config.s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (finduser(newnick))
 			notice_lang(Config.s_OperServ, u, NICK_X_IN_USE, newnick.c_str());
-		else if ((na = findnick(newnick)) && (na->HasFlag(NS_FORBIDDEN)))
+		else if ((na = findnick(newnick)) && na->HasFlag(NS_FORBIDDEN))
 			notice_lang(Config.s_OperServ, u, NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick.c_str());
-			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick, newnick.c_str());
-			ircdproto->SendForceNickChange(u2, newnick.c_str(), time(NULL));
+			notice_lang(Config.s_OperServ, u, OPER_SVSNICK_NEWNICK, nick.c_str(), newnick.c_str());
+			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
+			ircdproto->SendForceNickChange(u2, newnick, time(NULL));
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_SVSNICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "SVSNICK", OPER_SVSNICK_SYNTAX);
 	}
@@ -84,7 +84,7 @@ class CommandOSSVSNick : public Command
 class OSSVSNick : public Module
 {
  public:
-	OSSVSNick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");

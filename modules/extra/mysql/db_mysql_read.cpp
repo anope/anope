@@ -237,37 +237,37 @@ static void LoadDatabase()
 			ci->bantype = atoi(qres[i]["bantype"].c_str());
 			if (qres[i]["mlock_on"].size())
 			{
-				std::vector<std::string> modes;
+				std::vector<Anope::string> modes;
 				std::string buf;
 
 				spacesepstream sep(SQLAssign(qres[i]["mlock_on"]));
 				while (sep.GetToken(buf))
-					modes.push_back(buf);
+					modes.push_back(Anope::string(buf));
 
-				ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<std::string> >(modes));
+				ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
 			}
 			if (qres[i]["mlock_off"].size())
 			{
-				std::vector<std::string> modes;
+				std::vector<Anope::string> modes;
 				std::string buf;
 
 				spacesepstream sep(SQLAssign(qres[i]["mlock_off"]));
 				while (sep.GetToken(buf))
-					modes.push_back(buf);
+					modes.push_back(Anope::string(buf));
 
-				ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<std::string> >(modes));
+				ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
 			}
 			if (qres[i]["mlock_params"].size())
 			{
-				std::vector<std::pair<std::string, std::string> > mlp;
+				std::vector<std::pair<Anope::string, Anope::string> > mlp;
 				std::string buf, buf2;
 
 				spacesepstream sep(SQLAssign(qres[i]["mlock_params"]));
 
 				while (sep.GetToken(buf) && sep.GetToken(buf2))
-					mlp.push_back(std::make_pair(buf, buf2));
+					mlp.push_back(std::make_pair(Anope::string(buf), Anope::string(buf2)));
 
-				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<std::string, std::string> > >(mlp));
+				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
 			}
 			if (qres[i]["entry_message"].size())
 				ci->entry_message = sstrdup(qres[i]["entry_message"].c_str());
@@ -594,7 +594,7 @@ static void LoadDatabase()
 class DBMySQLRead : public DBMySQL
 {
  public:
-	DBMySQLRead(const std::string &modname, const std::string &creator) : DBMySQL(modname, creator)
+	DBMySQLRead(const Anope::string &modname, const Anope::string &creator) : DBMySQL(modname, creator)
 	{
 		Implementation i[] = { I_OnLoadDatabase };
 		ModuleManager::Attach(i, this, 1);

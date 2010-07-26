@@ -17,7 +17,7 @@ class CommandNSInfo : public Command
 {
  private:
 	// cannot be const, as it is modified
-	void CheckOptStr(std::string &buf, NickCoreFlag opt, const std::string &str, NickCore *nc, bool reverse_logic = false)
+	void CheckOptStr(Anope::string &buf, NickCoreFlag opt, const Anope::string &str, NickCore *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
@@ -34,9 +34,9 @@ class CommandNSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
+		Anope::string nick = params[0];
 
 		NickAlias *na = findnick(nick);
 		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex");
@@ -48,19 +48,19 @@ class CommandNSInfo : public Command
 			{
 				notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 				if (has_auspex)
-					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email.c_str());
 			}
 			else if (nickIsServices(nick, 1))
-				notice_lang(Config.s_NickServ, u, NICK_X_IS_SERVICES, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_IS_SERVICES, nick.c_str());
 			else
-				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			if (is_oper(u) && na->last_usermask)
-				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick, na->last_usermask, na->last_realname ? na->last_realname : getstring(u, NO_REASON));
+			if (is_oper(u) && !na->last_usermask.empty())
+				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : getstring(u, NO_REASON));
 			else
-				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick.c_str());
 		}
 		else
 		{
@@ -77,22 +77,22 @@ class CommandNSInfo : public Command
 			if (has_auspex || (u->Account() && na->nc == u->Account()))
 				show_hidden = true;
 
-			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick, na->last_realname);
+			notice_lang(Config.s_NickServ, u, NICK_INFO_REALNAME, na->nick.c_str(), na->last_realname.c_str());
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
-				notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick, na->nc->ot->GetName().c_str());
+				notice_lang(Config.s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick.c_str(), na->nc->ot->GetName().c_str());
 
 			if (nick_online)
 			{
-				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
-					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask);
+				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask.c_str());
 				else
-					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick);
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick.c_str());
 			}
 			else
 			{
-				if (show_hidden || !(na->nc->HasFlag(NI_HIDE_MASK)))
-					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask);
+				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
+					notice_lang(Config.s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask.c_str());
 			}
 
 			tm = localtime(&na->time_registered);
@@ -106,25 +106,25 @@ class CommandNSInfo : public Command
 				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_SEEN, buf);
 			}
 
-			if (na->last_quit && (show_hidden || !(na->nc->HasFlag(NI_HIDE_QUIT))))
-				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit);
+			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
+				notice_lang(Config.s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit.c_str());
 
-			if (na->nc->email && (show_hidden || !(na->nc->HasFlag(NI_HIDE_EMAIL))))
-				notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, na->nc->email);
+			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_EMAIL)))
+				notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, na->nc->email.c_str());
 
 			if (show_hidden)
 			{
-				if (Config.s_HostServ && ircd->vhost && na->hostinfo.HasVhost())
+				if (!Config.s_HostServ.empty() && ircd->vhost && na->hostinfo.HasVhost())
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
 						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 					else
 						notice_lang(Config.s_NickServ, u, NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
 				}
-				if (na->nc->greet)
-					notice_lang(Config.s_NickServ, u, NICK_INFO_GREET, na->nc->greet);
+				if (!na->nc->greet.empty())
+					notice_lang(Config.s_NickServ, u, NICK_INFO_GREET, na->nc->greet.c_str());
 
-				std::string optbuf;
+				Anope::string optbuf;
 
 				CheckOptStr(optbuf, NI_KILLPROTECT, getstring(u, NICK_INFO_OPT_KILL), na->nc);
 				CheckOptStr(optbuf, NI_SECURE, getstring(u, NICK_INFO_OPT_SECURE), na->nc);
@@ -136,8 +136,8 @@ class CommandNSInfo : public Command
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
-					if (na->last_quit)
-						notice_lang(Config.s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit);
+					if (!na->last_quit.empty())
+						notice_lang(Config.s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit.c_str());
 					else
 						notice_lang(Config.s_NickServ, u, NICK_INFO_SUSPENDED_NO_REASON);
 				}
@@ -158,14 +158,14 @@ class CommandNSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_INFO);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
 	}
@@ -179,7 +179,7 @@ class CommandNSInfo : public Command
 class NSInfo : public Module
 {
  public:
-	NSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

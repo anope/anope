@@ -1,5 +1,4 @@
 /*
- *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
  *
@@ -15,32 +14,30 @@
 
 class CommandCSSetMisc : public Command
 {
-	std::string Desc;
+	Anope::string Desc;
  public:
-	CommandCSSetMisc(const ci::string &cname, const std::string &desc, const ci::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(desc)
+	CommandCSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(desc)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		ci->Shrink("chanserv:" + std::string(this->name.c_str()));
+		ci->Shrink("chanserv:" + this->name);
 		if (params.size() > 1)
 		{
-			ci->Extend("chanserv:" + std::string(this->name.c_str()), new ExtensibleItemRegular<ci::string>(params[1]));
+			ci->Extend("chanserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
 			notice_lang(Config.s_ChanServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
-		{
 			notice_lang(Config.s_ChanServ, u, CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
-		}
 
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
@@ -54,11 +51,11 @@ class CommandCSSetMisc : public Command
 class CommandCSSASetMisc : public CommandCSSetMisc
 {
  public:
-	CommandCSSASetMisc(const ci::string &cname, const std::string &desc) : CommandCSSetMisc(cname, desc, "chanserv/saset/" + cname)
+	CommandCSSASetMisc(const Anope::string &cname, const Anope::string &desc) : CommandCSSetMisc(cname, desc, "chanserv/saset/" + cname)
 	{
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
@@ -68,14 +65,14 @@ class CSSetMisc : public Module
 {
 	struct CommandInfo
 	{
-		std::string Name;
-		std::string Desc;
+		Anope::string Name;
+		Anope::string Desc;
 		bool ShowHidden;
 
-		CommandInfo(const std::string &name, const std::string &desc, bool showhidden) : Name(name), Desc(desc), ShowHidden(showhidden) { }
+		CommandInfo(const Anope::string &name, const Anope::string &desc, bool showhidden) : Name(name), Desc(desc), ShowHidden(showhidden) { }
 	};
 
-	std::map<std::string, CommandInfo *> Commands;
+	std::map<Anope::string, CommandInfo *> Commands;
 
 	void RemoveAll()
 	{
@@ -88,12 +85,12 @@ class CSSetMisc : public Module
 		if (!set && !saset)
 			return;
 
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
 			if (set)
-				set->DelSubcommand(it->first.c_str());
+				set->DelSubcommand(it->first);
 			if (saset)
-				saset->DelSubcommand(it->first.c_str());
+				saset->DelSubcommand(it->first);
 			delete it->second;
 		}
 
@@ -101,7 +98,7 @@ class CSSetMisc : public Module
 	}
 
  public:
-	CSSetMisc(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -128,12 +125,12 @@ class CSSetMisc : public Module
 
 		ConfigReader config;
 
-		for (int i = 0; true; ++i)
+		for (int i = 0, num = config.Enumerate("cs_set_misc"); i < num; ++i)
 		{
-			std::string cname = config.ReadValue("cs_set_misc", "name", "", i);
+			Anope::string cname = config.ReadValue("cs_set_misc", "name", "", i);
 			if (cname.empty())
-				break;
-			std::string desc = config.ReadValue("cs_set_misc", "desc", "", i);
+				continue;
+			Anope::string desc = config.ReadValue("cs_set_misc", "desc", "", i);
 			bool showhidden = config.ReadFlag("cs_set_misc", "operonly", "no", i);
 
 			CommandInfo *info = new CommandInfo(cname, desc, showhidden);
@@ -145,49 +142,40 @@ class CSSetMisc : public Module
 			}
 
 			if (set)
-				set->AddSubcommand(new CommandCSSetMisc(cname.c_str(), desc));
+				set->AddSubcommand(new CommandCSSetMisc(cname, desc));
 			if (saset)
-				saset->AddSubcommand(new CommandCSSASetMisc(cname.c_str(), desc));
+				saset->AddSubcommand(new CommandCSSASetMisc(cname, desc));
 		}
 	}
 
 	void OnChanInfo(User *u, ChannelInfo *ci, bool ShowHidden)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
 			if (!ShowHidden && it->second->ShowHidden)
 				continue;
 
-			ci::string value;
+			Anope::string value;
 			if (ci->GetExtRegular("chanserv:" + it->first, value))
-			{
 				u->SendMessage(Config.s_ChanServ, "      %s: %s", it->first.c_str(), value.c_str());
-			}
 		}
 	}
 
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), ChannelInfo *ci)
+	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
-			ci::string value;
-
+			Anope::string value;
 			if (ci->GetExtRegular("chanserv:" + it->first, value))
-			{
-				WriteMetadata(it->first, ":" + std::string(value.c_str()));
-			}
+				WriteMetadata(it->first, ":" + value);
 		}
 	}
 
-	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params)
+	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		for (std::map<std::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-		{
+		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 			if (key == it->first)
-			{
-				ci->Extend("chanserv:" + it->first, new ExtensibleItemRegular<ci::string>(params[0].c_str()));
-			}
-		}
+				ci->Extend("chanserv:" + it->first, new ExtensibleItemRegular<Anope::string>(params[0]));
 
 		return EVENT_CONTINUE;
 	}

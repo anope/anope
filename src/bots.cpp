@@ -20,32 +20,31 @@ BotInfo *MemoServ = NULL;
 BotInfo *NickServ = NULL;
 BotInfo *OperServ = NULL;
 
-BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::string &nhost, const std::string &nreal) : User(nnick, ts6_uid_retrieve())
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, ts6_uid_retrieve())
 {
 	this->ident = nuser;
-	this->host = sstrdup(nhost.c_str());
-	this->realname = sstrdup(nreal.c_str());
+	this->host = nhost;
+	this->realname = nreal;
 	this->server = Me;
 
 	this->lastmsg = this->created = time(NULL);
 
-	ci::string ci_nick(nnick.c_str());
-	if (Config.s_ChanServ && ci_nick == Config.s_ChanServ)
+	if (!Config.s_ChanServ.empty() && nnick.equals_ci(Config.s_ChanServ))
 		ChanServ = this;
-	else if (Config.s_BotServ && ci_nick == Config.s_BotServ)
+	else if (!Config.s_BotServ.empty() && nnick.equals_ci(Config.s_BotServ))
 		BotServ = this;
-	else if (Config.s_HostServ && ci_nick == Config.s_HostServ)
+	else if (!Config.s_HostServ.empty() && nnick.equals_ci(Config.s_HostServ))
 		HostServ = this;
-	else if (Config.s_OperServ && ci_nick == Config.s_OperServ)
+	else if (!Config.s_OperServ.empty() && nnick.equals_ci(Config.s_OperServ))
 		OperServ = this;
-	else if (Config.s_MemoServ && ci_nick == Config.s_MemoServ)
+	else if (!Config.s_MemoServ.empty() && nnick.equals_ci(Config.s_MemoServ))
 		MemoServ = this;
-	else if (Config.s_NickServ && ci_nick == Config.s_NickServ)
+	else if (!Config.s_NickServ.empty() && nnick.equals_ci(Config.s_NickServ))
 		NickServ = this;
-	else if (Config.s_GlobalNoticer && ci_nick == Config.s_GlobalNoticer)
+	else if (!Config.s_GlobalNoticer.empty() && nnick.equals_ci(Config.s_GlobalNoticer))
 		Global = this;
 
-	BotListByNick[this->nick.c_str()] = this;
+	BotListByNick[this->nick] = this;
 	if (!this->uid.empty())
 		BotListByUID[this->uid] = this;
 
@@ -53,7 +52,7 @@ BotInfo::BotInfo(const std::string &nnick, const std::string &nuser, const std::
 	if (Me && Me->GetUplink() && Me->GetUplink()->IsSynced())
 	{
 		ircdproto->SendClientIntroduction(this->nick, this->GetIdent(), this->host, this->realname, ircd->pseudoclient_mode, this->uid);
-		XLine x(this->nick.c_str(), "Reserved for services");
+		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(&x);
 	}
 }
@@ -68,21 +67,21 @@ BotInfo::~BotInfo()
 			ci->bi = NULL;
 	}
 
-	BotListByNick.erase(this->nick.c_str());
+	BotListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID.erase(this->uid);
 }
 
 
-void BotInfo::SetNewNick(const std::string &newnick)
+void BotInfo::SetNewNick(const Anope::string &newnick)
 {
-	UserListByNick.erase(this->nick.c_str());
-	BotListByNick.erase(this->nick.c_str());
+	UserListByNick.erase(this->nick);
+	BotListByNick.erase(this->nick);
 
 	this->nick = newnick;
 
-	UserListByNick[this->nick.c_str()] = this;
-	BotListByNick[this->nick.c_str()] = this;
+	UserListByNick[this->nick] = this;
+	BotListByNick[this->nick] = this;
 }
 
 void BotInfo::RejoinAll()
@@ -142,14 +141,14 @@ void BotInfo::Join(Channel *c)
 			{
 				next = ban->next;
 
-				if (entry_match(ban, this->nick.c_str(), this->GetIdent().c_str(), this->host, 0))
+				if (entry_match(ban, this->nick, this->GetIdent(), this->host, 0))
 					c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 			}
 
-			std::string Limit;
+			Anope::string Limit;
 			int limit = 0;
-			if (c->GetParam(CMODE_LIMIT, Limit))
-				limit = atoi(Limit.c_str());
+			if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_number_only())
+				limit = convertTo<int>(Limit);
 
 			/* Should we be invited? */
 			if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
@@ -157,21 +156,21 @@ void BotInfo::Join(Channel *c)
 		}
 	}
 
-	ircdproto->SendJoin(this, c->name.c_str(), c->creation_time);
+	ircdproto->SendJoin(this, c->name, c->creation_time);
 	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(), it_end = BotModes.end(); it != it_end; ++it)
 		c->SetMode(this, *it, this->nick, false);
 	c->JoinUser(this);
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c->ci, this));
 }
 
-void BotInfo::Join(const std::string &chname)
+void BotInfo::Join(const Anope::string &chname)
 {
 	Channel *c = findchan(chname);
 	return this->Join(c ? c : new Channel(chname));
 }
 
-void BotInfo::Part(Channel *c, const std::string &reason)
+void BotInfo::Part(Channel *c, const Anope::string &reason)
 {
-	ircdproto->SendPart(this, c, !reason.empty() ? reason.c_str() : "");
+	ircdproto->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 	c->DeleteUser(this);
 }

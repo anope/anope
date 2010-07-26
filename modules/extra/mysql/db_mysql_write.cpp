@@ -161,7 +161,7 @@ void WriteMetadata(const std::string &key, const std::string &data)
 void WriteNickMetadata(const std::string &key, const std::string &data)
 {
 	if (!CurNick)
-		throw CoreException("WriteNickMetadata without a nick to write");
+		throw CoreException(Anope::string("WriteNickMetadata without a nick to write"));
 
 	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_ns_alias_metadata` (nick, name, value) VALUES(" << mysqlpp::quote << CurNick->nick << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
@@ -171,7 +171,7 @@ void WriteNickMetadata(const std::string &key, const std::string &data)
 void WriteCoreMetadata(const std::string &key, const std::string &data)
 {
 	if (!CurCore)
-		throw CoreException("WritCoreMetadata without a core to write");
+		throw CoreException(Anope::string("WritCoreMetadata without a core to write"));
 
 	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_ns_core_metadata` (nick, name, value) VALUES(" << mysqlpp::quote << CurCore->display << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
@@ -181,7 +181,7 @@ void WriteCoreMetadata(const std::string &key, const std::string &data)
 void WriteChannelMetadata(const std::string &key, const std::string &data)
 {
 	if (!CurChannel)
-		throw CoreException("WriteChannelMetadata without a channel to write");
+		throw CoreException(Anope::string("WriteChannelMetadata without a channel to write"));
 
 	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_cs_info_metadata` (channel, name, value) VALUES(" << mysqlpp::quote << CurChannel->name << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
@@ -191,7 +191,7 @@ void WriteChannelMetadata(const std::string &key, const std::string &data)
 void WriteBotMetadata(const std::string &key, const std::string &data)
 {
 	if (!CurBot)
-		throw CoreException("WriteBotMetadata without a bot to write");
+		throw CoreException(Anope::string("WriteBotMetadata without a bot to write"));
 
 	mysqlpp::Query query(me->Con);
 	query << "INSERT DELAYED INTO `anope_bs_info_metadata` (botname, name, value) VALUES(" << mysqlpp::quote << CurBot->nick << ", " << mysqlpp::quote << key << ", " << mysqlpp::quote << data << ")";
@@ -336,7 +336,7 @@ class CommandSyncSQL : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_SYNC);
 		return true;
@@ -351,7 +351,7 @@ class CommandSyncSQL : public Command
 class DBMySQLWrite : public DBMySQL
 {
  public:
-	DBMySQLWrite(const std::string &modname, const std::string &creator) : DBMySQL(modname, creator)
+	DBMySQLWrite(const Anope::string &modname, const Anope::string &creator) : DBMySQL(modname, creator)
 	{
 		me = this;
 
@@ -612,14 +612,14 @@ class DBMySQLWrite : public DBMySQL
 		}
 	}
 
-	void OnNickAddAccess(NickCore *nc, const std::string &entry)
+	void OnNickAddAccess(NickCore *nc, const Anope::string &entry)
 	{
 		mysqlpp::Query query(me->Con);
 		query << "INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES(" << mysqlpp::quote << nc->display << ", " << mysqlpp::quote << entry << ")";
 		ExecuteQuery(query);
 	}
 
-	void OnNickEraseAccess(NickCore *nc, const std::string &entry)
+	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry)
 	{
 		mysqlpp::Query query(me->Con);
 		query << "DELETE FROM `anope_ns_access` WHERE `display` = " << mysqlpp::quote << nc->display << " AND `access` = " << mysqlpp::quote << entry;
@@ -703,7 +703,7 @@ class DBMySQLWrite : public DBMySQL
 		ExecuteQuery(query);
 	}
 
-	void OnChangeCoreDisplay(NickCore *nc, const std::string &newdisplay)
+	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
 	{
 		mysqlpp::Query query(me->Con);
 		query << "UPDATE `anope_ns_core` SET `display` = " << mysqlpp::quote << newdisplay << " WHERE `display` = " << mysqlpp::quote << nc->display;

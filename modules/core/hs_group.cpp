@@ -13,8 +13,6 @@
 
 #include "module.h"
 
-extern int do_hs_sync(NickCore *nc, char *vIdent, char *hostmask, char *creator, time_t time);
-
 class CommandHSGroup : public Command
 {
  public:
@@ -22,16 +20,16 @@ class CommandHSGroup : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			HostServSyncVhosts(na);
 			if (!na->hostinfo.GetIdent().empty())
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->Account()->display, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->Account()->display, na->hostinfo.GetHost().c_str());
+				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
 			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
@@ -39,7 +37,7 @@ class CommandHSGroup : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP_GROUP);
 		return true;
@@ -54,7 +52,7 @@ class CommandHSGroup : public Command
 class HSGroup : public Module
 {
  public:
-	HSGroup(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

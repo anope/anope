@@ -16,43 +16,40 @@
 class CommandNSSetEmail : public Command
 {
  public:
-	CommandNSSetEmail(const ci::string &cname) : Command(cname, 0)
+	CommandNSSetEmail(const Anope::string &cname) : Command(cname, 0)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		if (params.empty() && Config.NSForceEmail)
 		{
 			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
-		else if (!params.empty() && !MailValidate(params[0].c_str()))
+		else if (!params.empty() && !MailValidate(params[0]))
 		{
 			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, params[0].c_str());
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (u->Account()->email ? u->Account()->email : "none")  << ") changed its e-mail to " << (!params.empty() ? params[0] : "none");
-
-		if (u->Account()->email)
-			delete [] u->Account()->email;
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed its e-mail to " << (!params.empty() ? params[0] : "none");
 
 		if (!params.empty())
 		{
-			u->Account()->email = sstrdup(params[0].c_str());
+			u->Account()->email = params[0];
 			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_CHANGED, params[0].c_str());
 		}
 		else
 		{
-			u->Account()->email = NULL;
+			u->Account()->email.clear();
 			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_UNSET);
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_EMAIL);
 		return true;
@@ -67,18 +64,18 @@ class CommandNSSetEmail : public Command
 class CommandNSSASetEmail : public Command
 {
  public:
-	CommandNSSASetEmail(const ci::string &cname) : Command(cname, 1, 2, "nickserv/saset/email")
+	CommandNSSASetEmail(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/email")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		const char *param = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string param = params.size() > 1 ? params[1] : "";
 
-		if (!param && Config.NSForceEmail)
+		if (param.empty() && Config.NSForceEmail)
 		{
 			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
@@ -88,32 +85,29 @@ class CommandNSSASetEmail : public Command
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
-		else if (param && !MailValidate(param))
+		else if (!param.empty() && !MailValidate(param))
 		{
-			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, param);
+			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, param.c_str());
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET EMAIL on " << nc->display << " (e-mail: " << (nc->email ? nc->email : "none") << ")";
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET EMAIL on " << nc->display << " (e-mail: " << (!nc->email.empty() ? nc->email : "none") << ")";
 
-		if (nc->email)
-			delete [] nc->email;
-
-		if (param)
+		if (!param.empty())
 		{
-			nc->email = sstrdup(param);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display, param);
+			nc->email = param;
+			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
 		}
 		else
 		{
-			nc->email = NULL;
-			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display);
+			nc->email.clear();
+			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_EMAIL);
 		return true;
@@ -128,7 +122,7 @@ class CommandNSSASetEmail : public Command
 class NSSetEmail : public Module
 {
  public:
-	NSSetEmail(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

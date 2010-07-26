@@ -16,28 +16,28 @@
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, const std::vector<ci::string> &params, NickCore *nc)
+	CommandReturn DoServAdminList(User *u, const std::vector<Anope::string> &params, NickCore *nc)
 	{
-		const char *mask = params.size() > 2 ? params[2].c_str() : NULL;
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 		unsigned i, end;
 
 		if (nc->access.empty())
 		{
-			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
-			std::string access = nc->GetAccess(i);
-			if (mask && !Anope::Match(access, mask, true))
+			Anope::string access = nc->GetAccess(i);
+			if (!mask.empty() && !Anope::Match(access, mask))
 				continue;
 			u->SendMessage(Config.s_NickServ, "    %s", access.c_str());
 		}
@@ -45,9 +45,9 @@ class CommandNSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, NickCore *nc, const char *mask)
+	CommandReturn DoAdd(User *u, NickCore *nc, const Anope::string &mask)
 	{
-		if (!mask)
+		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
@@ -61,19 +61,19 @@ class CommandNSAccess : public Command
 
 		if (nc->FindAccess(mask))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, *access);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
 			return MOD_CONT;
 		}
 
 		nc->AddAccess(mask);
-		notice_lang(Config.s_NickServ, u, NICK_ACCESS_ADDED, mask);
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_ADDED, mask.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, NickCore *nc, const char *mask)
+	CommandReturn DoDel(User *u, NickCore *nc, const Anope::string &mask)
 	{
-		if (!mask)
+		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
@@ -81,17 +81,17 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask);
+			notice_lang(Config.s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config.s_NickServ, u, NICK_ACCESS_DELETED, mask);
+		notice_lang(Config.s_NickServ, u, NICK_ACCESS_DELETED, mask.c_str());
 		nc->EraseAccess(mask);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, NickCore *nc, const char *mask)
+	CommandReturn DoList(User *u, NickCore *nc, const Anope::string &mask)
 	{
 		unsigned i, end;
 
@@ -104,8 +104,8 @@ class CommandNSAccess : public Command
 		notice_lang(Config.s_NickServ, u, NICK_ACCESS_LIST);
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
-			std::string access = nc->GetAccess(i);
-			if (mask && !Anope::Match(access, mask, true))
+			Anope::string access = nc->GetAccess(i);
+			if (!mask.empty() && !Anope::Match(access, mask))
 				continue;
 			u->SendMessage(Config.s_NickServ, "    %s", access.c_str());
 		}
@@ -117,45 +117,44 @@ class CommandNSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string cmd = params[0];
-		const char *mask = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string cmd = params[0];
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
 
-		if (cmd == "LIST" && u->Account()->IsServicesOper() && mask && (na = findnick(params[1])))
+		if (cmd.equals_ci("LIST") && u->Account()->IsServicesOper() && !mask.empty() && (na = findnick(params[1])))
 			return this->DoServAdminList(u, params, na->nc);
 
-		if (mask && !strchr(mask, '@'))
+		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
 			notice_lang(Config.s_NickServ, u, BAD_USERHOST_MASK);
-			notice_lang(Config.s_NickServ, u, MORE_INFO, Config.s_NickServ, "ACCESS");
-
+			notice_lang(Config.s_NickServ, u, MORE_INFO, Config.s_NickServ.c_str(), "ACCESS");
 		}
 		/*
 		else if (na->HasFlag(NS_FORBIDDEN))
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
 			*/
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display);
-		else if (cmd == "ADD")
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display.c_str());
+		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, u->Account(), mask);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, u->Account(), mask);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, u->Account(), mask);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_ACCESS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
 	}
@@ -169,7 +168,7 @@ class CommandNSAccess : public Command
 class NSAccess : public Module
 {
  public:
-	NSAccess(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

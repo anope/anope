@@ -24,26 +24,27 @@
  * @param name The name, eg "OP" or "HALFOP"
  * @param notice Flag required on a channel to send a notice
  */
-static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const char *nick, bool set, int level, int levelself, const std::string &name, ChannelInfoFlag notice)
+static CommandReturn do_util(User *u, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, const Anope::string &name, ChannelInfoFlag notice)
 {
 	Channel *c = findchan(chan);
 	ChannelInfo *ci;
 	User *u2;
+	Anope::string realnick = nick;
 
 	int is_same;
 
-	if (!nick)
-		nick = u->nick.c_str();
+	if (realnick.empty())
+		realnick = u->nick;
 
-	is_same = nick == u->nick ? 1 : !stricmp(nick, u->nick.c_str());
+	is_same = u->nick.equals_cs(realnick) ? 1 : u->nick.equals_ci(realnick);
 
 	if (c)
 		ci = c->ci;
 
 	if (!c)
-		notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-	else if (is_same ? !(u2 = u) : !(u2 = finduser(nick)))
-		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+		notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+	else if (is_same ? !(u2 = u) : !(u2 = finduser(realnick)))
+		notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, realnick.c_str());
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
 		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
@@ -60,7 +61,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const char *chan, const c
 			c->RemoveMode(NULL, cm, u2->nick);
 
 		if (notice && ci->HasFlag(notice))
-			ircdproto->SendMessage(whosends(ci), c->name.c_str(), "%s command used for %s by %s", name.c_str(), u2->nick.c_str(), u->nick.c_str());
+			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s", name.c_str(), u2->nick.c_str(), u->nick.c_str());
 	}
 
 	return MOD_CONT;
@@ -73,20 +74,20 @@ class CommandCSOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_OP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
 	}
@@ -104,20 +105,20 @@ class CommandCSDeOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
 	}
@@ -135,20 +136,20 @@ class CommandCSVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_VOICE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
 	}
@@ -166,20 +167,20 @@ class CommandCSDeVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEVOICE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
 	}
@@ -197,7 +198,7 @@ class CommandCSHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
@@ -206,16 +207,16 @@ class CommandCSHalfOp : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_HALFOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
 	}
@@ -233,23 +234,23 @@ class CommandCSDeHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEHALFOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
 	}
@@ -267,23 +268,23 @@ class CommandCSProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_PROTECT);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
@@ -301,23 +302,23 @@ class CommandCSDeProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEPROTECT);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
 	}
@@ -335,23 +336,23 @@ class CommandCSOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_OWNER);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
 	}
@@ -369,23 +370,23 @@ class CommandCSDeOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, params.size() > 0 ? params[0].c_str() : NULL, params.size() > 1 ? params[1].c_str() : NULL, false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
+		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_DEOWNER);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}
@@ -399,7 +400,7 @@ class CommandCSDeOwner : public Command
 class CSModes : public Module
 {
  public:
-	CSModes(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

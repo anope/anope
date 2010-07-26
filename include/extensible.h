@@ -7,6 +7,8 @@
 #ifndef EXTENSIBLE_H
 #define EXTENSIBLE_H
 
+#include "hashcomp.h"
+
 /** Dummy base class we use to cast everything to/from
  */
 class ExtensibleItemBase
@@ -58,7 +60,8 @@ template<typename T> class ExtensibleItemPointerArray : public ExtensibleItemBas
 class CoreExport Extensible
 {
  private:
-	std::map<std::string, ExtensibleItemBase *> Extension_Items;
+	typedef std::map<Anope::string, ExtensibleItemBase *, hash_compare_std_string> extensible_map;
+	extensible_map Extension_Items;
 
  public:
 	/** Default constructor, does nothing
@@ -70,7 +73,7 @@ class CoreExport Extensible
 	 */
 	virtual ~Extensible()
 	{
-		for (std::map<std::string, ExtensibleItemBase *>::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
+		for (extensible_map::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
 			delete it->second;
 		Extension_Items.clear();
 	}
@@ -86,7 +89,7 @@ class CoreExport Extensible
 	 *
 	 * @return Returns true on success, false if otherwise
 	 */
-	bool Extend(const std::string &key, ExtensibleItemBase *p)
+	bool Extend(const Anope::string &key, ExtensibleItemBase *p)
 	{
 		bool Ret = this->Extension_Items.insert(std::make_pair(key, p)).second;
 		if (!Ret)
@@ -105,7 +108,7 @@ class CoreExport Extensible
 	 *
 	 * @return Returns true on success, false if otherwise
 	 */
-	bool Extend(const std::string &key)
+	bool Extend(const Anope::string &key)
 	{
 		/* This will only add an item if it doesnt already exist,
 		 * the return value is a std::pair of an iterator to the
@@ -122,9 +125,9 @@ class CoreExport Extensible
 	 * you provide a nonexistent key (case is important) then the function will return false.
 	 * @return Returns true on success.
 	 */
-	bool Shrink(const std::string &key)
+	bool Shrink(const Anope::string &key)
 	{
-		std::map<std::string, ExtensibleItemBase *>::iterator it = this->Extension_Items.find(key);
+		extensible_map::iterator it = this->Extension_Items.find(key);
 		if (it != this->Extension_Items.end())
 		{
 			delete it->second;
@@ -144,9 +147,9 @@ class CoreExport Extensible
 	 * @param p If you provide a non-existent key, this value will be 0. Otherwise a copy to the item you requested will be placed in this templated parameter.
 	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
 	 */
-	template<typename T> bool GetExtRegular(const std::string &key, T &p)
+	template<typename T> bool GetExtRegular(const Anope::string &key, T &p)
 	{
-		std::map<std::string, ExtensibleItemBase *>::iterator it = this->Extension_Items.find(key);
+		extensible_map::iterator it = this->Extension_Items.find(key);
 
 		if (it != this->Extension_Items.end())
 		{
@@ -163,9 +166,9 @@ class CoreExport Extensible
 	 * * @param p If you provide a non-existent key, this value will be NULL. Otherwise a pointer to the item you requested will be placed in this templated parameter.
 	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
 	 */
-	template<typename T> bool GetExtPointer(const std::string &key, T *&p)
+	template<typename T> bool GetExtPointer(const Anope::string &key, T *&p)
 	{
-		std::map<std::string, ExtensibleItemBase *>::iterator it = this->Extension_Items.find(key);
+		extensible_map::iterator it = this->Extension_Items.find(key);
 
 		if (it != this->Extension_Items.end())
 		{
@@ -183,9 +186,9 @@ class CoreExport Extensible
 	 * @param p If you provide a non-existent key, this value will be NULL. Otherwise a pointer to the item you requested will be placed in this templated parameter.
 	 * @return Returns true if the item was found and false if it was nor, regardless of wether 'p' is NULL. This allows you to store NULL values in Extensible.
 	 */
-	template<typename T> bool GetExtArray(const std::string &key, T *&p)
+	template<typename T> bool GetExtArray(const Anope::string &key, T *&p)
 	{
-		std::map<std::string, ExtensibleItemBase *>::iterator it = this->Extension_Items.find(key);
+		extensible_map::iterator it = this->Extension_Items.find(key);
 
 		if (it != this->Extension_Items.end())
 		{
@@ -206,7 +209,7 @@ class CoreExport Extensible
 	 * the 'data' field and is probably only useful in conjunction with the single-parameter
 	 * version of Extend().
 	 */
-	bool GetExt(const std::string &key)
+	bool GetExt(const Anope::string &key)
 	{
 		return this->Extension_Items.find(key) != this->Extension_Items.end();
 	}
@@ -216,9 +219,9 @@ class CoreExport Extensible
 	 * @return This function writes a list of all extension items stored
 	 *	 in this object by name into the given deque and returns void.
 	 */
-	void GetExtList(std::deque<std::string> &list)
+	void GetExtList(std::deque<Anope::string> &list)
 	{
-		for (std::map<std::string, ExtensibleItemBase *>::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
+		for (extensible_map::iterator it = Extension_Items.begin(), it_end = Extension_Items.end(); it != it_end; ++it)
 			list.push_back(it->first);
 	}
 };

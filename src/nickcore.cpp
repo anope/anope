@@ -4,17 +4,16 @@
 /** Default constructor
  * @param display The display nick
  */
-NickCore::NickCore(const std::string &coredisplay)
+NickCore::NickCore(const Anope::string &coredisplay)
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	display = email = greet = NULL;
 	ot = NULL;
 	language = channelcount = 0;
 	lastmail = 0;
 
-	this->display = sstrdup(coredisplay.c_str());
+	this->display = coredisplay;
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
@@ -55,32 +54,19 @@ NickCore::~NickCore()
 	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();
 
-	/* Now we can safely free it. */
-	delete [] this->display;
-
-	if (this->email)
-		delete [] this->email;
-	if (this->greet)
-		delete [] this->greet;
 	if (!this->memos.memos.empty())
 	{
 		for (unsigned i = 0, end = this->memos.memos.size(); i < end; ++i)
-		{
-			if (this->memos.memos[i]->text)
-				delete [] this->memos.memos[i]->text;
 			delete this->memos.memos[i];
-		}
 		this->memos.memos.clear();
 	}
 }
 
-bool NickCore::HasCommand(const ci::string &cmdstr) const
+bool NickCore::HasCommand(const Anope::string &cmdstr) const
 {
 	if (!this->ot)
-	{
 		// No opertype.
 		return false;
-	}
 
 	return this->ot->HasCommand(cmdstr);
 }
@@ -93,7 +79,7 @@ bool NickCore::IsServicesOper() const
 	return false;
 }
 
-bool NickCore::HasPriv(const ci::string &privstr) const
+bool NickCore::HasPriv(const Anope::string &privstr) const
 {
 	if (!this->ot)
 		// No opertype.
@@ -102,20 +88,20 @@ bool NickCore::HasPriv(const ci::string &privstr) const
 	return this->ot->HasPriv(privstr);
 }
 
-void NickCore::AddAccess(const std::string &entry)
+void NickCore::AddAccess(const Anope::string &entry)
 {
 	access.push_back(entry);
 	FOREACH_MOD(I_OnNickAddAccess, OnNickAddAccess(this, entry));
 }
 
-std::string NickCore::GetAccess(unsigned entry)
+Anope::string NickCore::GetAccess(unsigned entry)
 {
 	if (access.empty() || entry >= access.size())
 		return "";
 	return access[entry];
 }
 
-bool NickCore::FindAccess(const std::string &entry)
+bool NickCore::FindAccess(const Anope::string &entry)
 {
 	for (unsigned i = 0, end = access.size(); i < end; ++i)
 		if (access[i] == entry)
@@ -124,7 +110,7 @@ bool NickCore::FindAccess(const std::string &entry)
 	return false;
 }
 
-void NickCore::EraseAccess(const std::string &entry)
+void NickCore::EraseAccess(const Anope::string &entry)
 {
 	for (unsigned i = 0, end = access.size(); i < end; ++i)
 		if (access[i] == entry)

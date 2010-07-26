@@ -22,18 +22,6 @@
 
 /* Some SUN fixs */
 #ifdef __sun
-/* Solaris specific code, types that do not exist in Solaris'
- * sys/types.h
- */
-# undef u_int8_t
-# undef u_int16_t
-# undef u_int32_t
-# undef u_int_64_t
-# define u_int8_t uint8_t
-# define u_int16_t uint16_t
-# define u_int32_t uint32_t
-# define u_int64_t uint64_t
-
 # ifndef INADDR_NONE
 #  define INADDR_NONE (-1)
 # endif
@@ -114,16 +102,6 @@ extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size
 # include <sys/select.h>
 #endif
 
-#ifndef va_copy
-# ifdef __va_copy
-#  define VA_COPY(DEST,SRC) __va_copy((DEST), (SRC))
-# else
-#  define VA_COPY(DEST, SRC) memcpy ((&DEST), (&SRC), sizeof(va_list))
-# endif
-#else
-# define VA_COPY(DEST, SRC) va_copy((DEST), (SRC))
-#endif
-
 #ifdef _AIX
 /* Some AIX boxes seem to have bogus includes that don't have these
  * prototypes. */
@@ -166,7 +144,7 @@ extern "C" void __pfnBkCheck() {}
 #ifdef _WIN32
 # define MODULE_INIT(x) \
 	extern "C" DllExport Module *AnopeInit(const std::string &, const std::string &); \
-	extern "C" Module *AnopeInit(const std::string &modname, const std::string &creator) \
+	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
 		return new x(modname, creator); \
 	} \
@@ -187,7 +165,7 @@ extern "C" void __pfnBkCheck() {}
 	}
 #else
 # define MODULE_INIT(x) \
-	extern "C" DllExport Module *AnopeInit(const std::string &modname, const std::string &creator) \
+	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
 		return new x(modname, creator); \
 	} \
@@ -212,6 +190,8 @@ extern "C" void __pfnBkCheck() {}
 #include <bitset>
 #include <set>
 
+#include "anope.h"
+
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
  * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not
@@ -223,45 +203,37 @@ class CoreException : public std::exception
  protected:
 	/** Holds the error message to be displayed
 	 */
-	std::string err;
+	Anope::string err;
 	/** Source of the exception
 	 */
-	std::string source;
+	Anope::string source;
  public:
 	/** Default constructor, just uses the error mesage 'Core threw an exception'.
 	 */
-	CoreException() : err("Core threw an exception"), source("The core") {}
+	CoreException() : err("Core threw an exception"), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing.
 	 */
-	CoreException(const char *message) : err(message), source("The core") {}
-	CoreException(const std::string &message) : err(message), source("The core") {}
-	CoreException(const ci::string &message) : err(message.c_str()), source("The core") {}
+	CoreException(const Anope::string &message) : err(message), source("The core") { }
 	/** This constructor can be used to specify an error message before throwing,
 	 * and to specify the source of the exception.
 	 */
-	CoreException(const char *message, const char *src) : err(message), source(src) {}
-	CoreException(const std::string &message, const char *src) : err(message), source(src) {}
-	CoreException(const ci::string &message, const char *src) : err(message.c_str()), source(src) {}
-	CoreException(const std::string &message, const std::string &src) : err(message), source(src) {}
-	CoreException(const ci::string &message, const std::string &src) : err(message.c_str()), source(src) {}
-	CoreException(const std::string &message, const ci::string &src) : err(message), source(src.c_str()) {}
-	CoreException(const ci::string &message, const ci::string &src) : err(message.c_str()), source(src.c_str()) {}
+	CoreException(const Anope::string &message, const Anope::string &src) : err(message), source(src) { }
 	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~CoreException() throw() {}
+	virtual ~CoreException() throw() { }
 	/** Returns the reason for the exception.
 	 * The module should probably put something informative here as the user will see this upon failure.
 	 */
-	virtual const char *GetReason() const
+	virtual const Anope::string &GetReason() const
 	{
-		return err.c_str();
+		return err;
 	}
 
-	virtual const char *GetSource() const
+	virtual const Anope::string &GetSource() const
 	{
-		return source.c_str();
+		return source;
 	}
 };
 
@@ -270,18 +242,16 @@ class ModuleException : public CoreException
  public:
 	/** Default constructor, just uses the error mesage 'Module threw an exception'.
 	 */
-	ModuleException() : CoreException("Module threw an exception", "A Module") {}
+	ModuleException() : CoreException("Module threw an exception", "A Module") { }
 
 	/** This constructor can be used to specify an error message before throwing.
 	 */
-	ModuleException(const char *message) : CoreException(message, "A Module") {}
-	ModuleException(const std::string &message) : CoreException(message, "A Module") {}
-	ModuleException(const ci::string &message) : CoreException(message, "A Module") {}
+	ModuleException(const Anope::string &message) : CoreException(message, "A Module") { }
 	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
 	 */
-	virtual ~ModuleException() throw() {}
+	virtual ~ModuleException() throw() { }
 };
 
 class DatabaseException : public CoreException
@@ -290,7 +260,7 @@ class DatabaseException : public CoreException
 	/** This constructor can be used to specify an error message before throwing.
 	 * @param mmessage The exception
 	 */
-	DatabaseException(const std::string &message) : CoreException(message, "A database module") { }
+	DatabaseException(const Anope::string &message) : CoreException(message, "A database module") { }
 
 	/** Destructor
 	 * @throws Nothing
@@ -355,15 +325,55 @@ template<typename T, size_t Size = 32> class Flags
 
 /*************************************************************************/
 
-template<typename T>
-inline const std::string stringify(const T &x)
+template<typename T> inline Anope::string stringify(const T &x)
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 
 	if (!(stream << x))
 		throw CoreException("Stringify fail");
 
 	return stream.str();
+}
+
+template<typename T> inline void convert(const Anope::string &s, T &x, Anope::string &leftover, bool failIfLeftoverChars = true)
+{
+	leftover.clear();
+	std::istringstream i(s.str());
+	char c;
+	bool res = i >> x;
+	if (!res)
+		throw CoreException("Convert fail");
+	if (failIfLeftoverChars)
+	{
+		if (i.get(c))
+			throw CoreException("Convert fail");
+	}
+	else
+	{
+		std::string left;
+		getline(i, left);
+		leftover = left;
+	}
+}
+
+template<typename T> inline void convert(const Anope::string &s, T &x, bool failIfLeftoverChars = true)
+{
+	Anope::string Unused;
+	convert(s, x, Unused, failIfLeftoverChars);
+}
+
+template<typename T> inline T convertTo(const Anope::string &s, Anope::string &leftover, bool failIfLeftoverChars = true)
+{
+	T x;
+	convert(s, x, leftover, failIfLeftoverChars);
+	return x;
+}
+
+template<typename T> inline T convertTo(const Anope::string &s, bool failIfLeftoverChars = true)
+{
+	T x;
+	convert(s, x, failIfLeftoverChars);
+	return x;
 }
 
 /*************************************************************************/
@@ -415,7 +425,6 @@ struct IRCDVar
 	int chgreal;					/* Change RealName */
 	int knock_needs_i;				/* Check if we needed +i when setting NOKNOCK */
 	int token;						/* Does Anope support the tokens for the ircd */
-	int sjb64;
 	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	int ts6;						/* ircd is TS6 */
@@ -448,8 +457,8 @@ class Memo : public Flags<MemoFlag>
  public:
 	uint32 number;	/* Index number -- not necessarily array position! */
 	time_t time;	/* When it was sent */
-	std::string sender;
-	char *text;
+	Anope::string sender;
+	Anope::string text;
 };
 
 struct MemoInfo
@@ -463,9 +472,9 @@ struct MemoInfo
 class CoreExport HostInfo
 {
  private:
-	std::string Ident;
-	std::string Host;
-	std::string Creator;
+	Anope::string Ident;
+	Anope::string Host;
+	Anope::string Creator;
 	time_t Time;
 
  public:
@@ -475,7 +484,7 @@ class CoreExport HostInfo
 	 * @param creator Who created the vhost
 	 * @param time When the vhost was craated
 	 */
-	void SetVhost(const std::string &ident, const std::string &host, const std::string &creator, time_t created = time(NULL));
+	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = time(NULL));
 
 	/** Remove a users vhost
 	 **/
@@ -489,17 +498,17 @@ class CoreExport HostInfo
 	/** Retrieve the vhost ident
 	 * @return the ident
 	 */
-	const std::string &GetIdent() const;
+	const Anope::string &GetIdent() const;
 
 	/** Retrieve the vhost host
 	 * @return the host
 	 */
-	const std::string &GetHost() const;
+	const Anope::string &GetHost() const;
 
 	/** Retrieve the vhost creator
 	 * @return the creator
 	 */
-	const std::string &GetCreator() const;
+	const Anope::string &GetCreator() const;
 
 	/** Retrieve when the vhost was crated
 	 * @return the time it was created
@@ -545,7 +554,7 @@ struct ChanAccess
 	int16 level;
 	NickCore *nc; /* Guaranteed to be non-NULL if in use, NULL if not */
 	time_t last_seen;
-	std::string creator;
+	Anope::string creator;
 };
 
 /** Flags for auto kick
@@ -563,11 +572,11 @@ class AutoKick : public Flags<AutoKickFlag>
 {
  public:
 	/* Only one of these can be in use */
-	std::string mask;
+	Anope::string mask;
 	NickCore *nc;
 
-	std::string reason;
-	std::string creator;
+	Anope::string reason;
+	Anope::string creator;
 	time_t addtime;
 	time_t last_used;
 };
@@ -589,7 +598,7 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord
 {
-	std::string word;
+	Anope::string word;
 	BadWordType type;
 };
 
@@ -673,15 +682,18 @@ enum BotServFlag
 };
 
 /* Indices for TTB (Times To Ban) */
-#define TTB_BOLDS 		0
-#define TTB_COLORS 		1
-#define TTB_REVERSES		2
-#define TTB_UNDERLINES  	3
-#define TTB_BADWORDS		4
-#define TTB_CAPS		5
-#define TTB_FLOOD		6
-#define TTB_REPEAT		7
-#define TTB_SIZE 		8
+enum
+{
+	TTB_BOLDS,
+	TTB_COLORS,
+	TTB_REVERSES,
+	TTB_UNDERLINES,
+	TTB_BADWORDS,
+	TTB_CAPS,
+	TTB_FLOOD,
+	TTB_REPEAT,
+	TTB_SIZE
+};
 
 #include "regchannel.h"
 
@@ -690,10 +702,9 @@ enum BotServFlag
 struct LevelInfo
 {
 	int what;
-	const char *name;
+	Anope::string name;
 	int desc;
 };
-
 
 /*************************************************************************/
 
@@ -708,7 +719,7 @@ struct BanData
 {
 	BanData *next, *prev;
 
-	char *mask;			/* Since a nick is unsure and a User structure is unsafe */
+	Anope::string mask;	/* Since a nick is unsure and a User structure is unsafe */
 	time_t last_use;	/* Since time is the only way to check whether it's still useful */
 	int16 ttb[TTB_SIZE];
 };
@@ -735,7 +746,7 @@ class Entry : public Flags<EntryType>
 	Entry *next, *prev;
 	uint32 cidr_ip;		/* IP mask for CIDR matching */
 	uint32 cidr_mask;	/* Netmask for CIDR matching */
-	char *nick, *user, *host, *mask;
+	Anope::string nick, user, host, mask;
 };
 
 struct EList
@@ -751,7 +762,7 @@ struct EList
 struct IgnoreData
 {
 	IgnoreData *prev, *next;
-	char *mask;
+	Anope::string mask;
 	time_t time; /* When do we stop ignoring them? */
 };
 
@@ -771,7 +782,7 @@ enum NewsType
 struct newsmsgs
 {
 	NewsType type;
-	const char *name;
+	Anope::string name;
 	int msgs[MSG_MAX + 1];
 };
 
@@ -779,8 +790,8 @@ struct NewsItem
 {
 	NewsType type;
 	uint32 num;
-	std::string Text;
-	std::string who;
+	Anope::string Text;
+	Anope::string who;
 	time_t time;
 };
 
@@ -800,26 +811,22 @@ struct MailInfo
 
 struct Exception
 {
-	char *mask;		/* Hosts to which this exception applies */
-	int limit;		/* Session limit for exception */
-	char *who;		/* Nick of person who added the exception */
-	char *reason;	/* Reason for exception's addition */
-	time_t time;	/* When this exception was added */
-	time_t expires;	/* Time when it expires. 0 == no expiry */
-	int num;		/* Position in exception list; used to track
-					 * positions when deleting entries. It is
-					 * symbolic and used internally. It is
-					 * calculated at load time and never saved. */
+	Anope::string mask;		/* Hosts to which this exception applies */
+	int limit;				/* Session limit for exception */
+	Anope::string who;		/* Nick of person who added the exception */
+	Anope::string reason;	/* Reason for exception's addition */
+	time_t time;			/* When this exception was added */
+	time_t expires;			/* Time when it expires. 0 == no expiry */
 };
 
 /*************************************************************************/
 
-typedef unordered_map_namespace::unordered_map<std::string, Session *, hash_compare_std_string> session_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, Session *, hash_compare_std_string> session_map;
 extern CoreExport session_map SessionList;
 
 struct Session
 {
-	char *host;
+	Anope::string host;
 	int count;	/* Number of clients with this host */
 	int hits;	/* Number of subsequent kills for a host */
 };
@@ -901,24 +908,24 @@ class ServerConfig;
 class CoreExport IRCDProto
 {
  private:
-	virtual void SendSVSKillInternal(BotInfo *, User *, const char *) = 0;
-	virtual void SendModeInternal(BotInfo *, Channel *, const char *) = 0;
-	virtual void SendModeInternal(BotInfo *, User *, const char *) = 0;
-	virtual void SendKickInternal(BotInfo *, Channel *, User *, const char *) = 0;
-	virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const char *) = 0;
-	virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf);
-	virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg);
-	virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf);
-	virtual void SendQuitInternal(BotInfo *bi, const char *buf);
-	virtual void SendPartInternal(BotInfo *bi, Channel *chan, const char *buf);
-	virtual void SendGlobopsInternal(BotInfo *source, const char *buf);
-	virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf);
-	virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf);
+	virtual void SendSVSKillInternal(BotInfo *, User *, const Anope::string &) = 0;
+	virtual void SendModeInternal(BotInfo *, Channel *, const Anope::string &) = 0;
+	virtual void SendModeInternal(BotInfo *, User *, const Anope::string &) = 0;
+	virtual void SendKickInternal(BotInfo *, Channel *, User *, const Anope::string &) = 0;
+	virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const Anope::string &) = 0;
+	virtual void SendMessageInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNoticeInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
+	virtual void SendPrivmsgInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendQuitInternal(BotInfo *bi, const Anope::string &buf);
+	virtual void SendPartInternal(BotInfo *bi, Channel *chan, const Anope::string &buf);
+	virtual void SendGlobopsInternal(BotInfo *source, const Anope::string &buf);
+	virtual void SendCTCPInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf);
  public:
 	virtual ~IRCDProto() { }
 
-	virtual void SendSVSNOOP(const char *, int) { }
-	virtual void SendTopic(BotInfo *, Channel *, const char *, const char *) = 0;
+	virtual void SendSVSNOOP(const Anope::string &, int) { }
+	virtual void SendTopic(BotInfo *, Channel *, const Anope::string &, const Anope::string &) = 0;
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(XLine *) = 0;
 	virtual void SendAkillDel(XLine *) = 0;
@@ -926,67 +933,67 @@ class CoreExport IRCDProto
 	virtual void SendSVSMode(User *, int, const char **) = 0;
 	virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
 	virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
-	virtual void SendClientIntroduction(const std::string &, const std::string &, const std::string &, const std::string &, const char *, const std::string &uid) = 0;
+	virtual void SendClientIntroduction(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &uid) = 0;
 	virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
 	virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
-	virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...);
-	virtual void SendNotice(BotInfo *bi, const char *dest, const char *fmt, ...);
-	virtual void SendAction(BotInfo *bi, const char *dest, const char *fmt, ...);
-	virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...);
-	virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const char *msg);
-	virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const char *msg);
+	virtual void SendMessage(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendNotice(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendAction(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const Anope::string &msg);
+	virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const Anope::string &msg);
 
 	/** XXX: This is a hack for NickServ enforcers. It is deprecated.
 	 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
 	 * Thanks.
 	 * -- w00t
 	 */
-	virtual void SendQuit(const char *nick, const char *) MARK_DEPRECATED;
+	virtual void SendQuit(const Anope::string &nick, const Anope::string &) MARK_DEPRECATED;
 	virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
-	virtual void SendPing(const char *servname, const char *who);
-	virtual void SendPong(const char *servname, const char *who);
-	virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
+	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
+	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
+	virtual void SendJoin(BotInfo *bi, const Anope::string &, time_t) = 0;
 	virtual void SendSQLineDel(XLine *x) = 0;
-	virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick);
+	virtual void SendInvite(BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
 	virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
 	virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
 	virtual void SendSQLine(XLine *x) = 0;
-	virtual void SendSquit(const char *servname, const char *message);
-	virtual void SendSVSO(const char *, const char *, const char *) { }
-	virtual void SendChangeBotNick(BotInfo *bi, const char *newnick);
-	virtual void SendForceNickChange(User *u, const char *newnick, time_t when);
-	virtual void SendVhost(User *, const std::string &, const std::string &) { }
+	virtual void SendSquit(const Anope::string &servname, const Anope::string &message);
+	virtual void SendSVSO(const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendChangeBotNick(BotInfo *bi, const Anope::string &newnick);
+	virtual void SendForceNickChange(User *u, const Anope::string &newnick, time_t when);
+	virtual void SendVhost(User *, const Anope::string &, const Anope::string &) { }
 	virtual void SendConnect() = 0;
-	virtual void SendSVSHold(const char *) { }
-	virtual void SendSVSHoldDel(const char *) { }
+	virtual void SendSVSHold(const Anope::string &) { }
+	virtual void SendSVSHoldDel(const Anope::string &) { }
 	virtual void SendSGLineDel(XLine *) { }
 	virtual void SendSZLineDel(XLine *) { }
 	virtual void SendSZLine(XLine *) { }
 	virtual void SendSGLine(XLine *) { }
-	virtual void SendBanDel(Channel *, const std::string &) { }
-	virtual void SendSVSModeChan(Channel *, const char *, const char *) { }
+	virtual void SendBanDel(Channel *, const Anope::string &) { }
+	virtual void SendSVSModeChan(Channel *, const Anope::string &, const Anope::string &) { }
 	virtual void SendUnregisteredNick(User *) { }
-	virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...);
-	virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
-	virtual void SendSVSPart(const char *, const char *, const char *) { }
-	virtual void SendSWhois(const char *, const char *, const char *) { }
+	virtual void SendCTCP(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSVSPart(const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendEOB() { }
 	virtual void SendServer(Server *) = 0;
-	virtual int IsNickValid(const char *) { return 1; }
-	virtual int IsChannelValid(const char *);
-	virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...);
+	virtual bool IsNickValid(const Anope::string &) { return true; }
+	virtual bool IsChannelValid(const Anope::string &);
+	virtual void SendNumeric(const Anope::string &source, int numeric, const Anope::string &dest, const char *fmt, ...);
 
 	/** Sends a message logging a user into an account, where ircds support such a feature.
 	 * @param u The user logging in
 	 * @param account The account the user is logging into
 	 */
-	virtual void SendAccountLogin(User *u, NickCore *account) { }
+	virtual void SendAccountLogin(User *u, const NickCore *account) { }
 
 	/** Sends a message logging a user out of an account, where ircds support such a feature.
 	 * @param u The user logging out
 	 * @param account The account the user is logging out of
 	 */
-	virtual void SendAccountLogout(User *u, NickCore *account) { }
+	virtual void SendAccountLogout(User *u, const NickCore *account) { }
 
 	/** Set a users auto identification token
 	 * @param u The user
@@ -1002,23 +1009,12 @@ class IRCDTS6Proto : public IRCDProto
 
 struct Uplink
 {
-	char *host;
+	Anope::string host;
 	unsigned port;
-	char *password;
+	Anope::string password;
 	bool ipv6;
 
-	Uplink(const char *_host, int _port, const char *_password, bool _ipv6)
-	{
-		host = sstrdup(_host);
-		port = _port;
-		password = sstrdup(_password);
-		ipv6 = _ipv6;
-	}
-	~Uplink()
-	{
-		delete [] host;
-		delete [] password;
-	}
+	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
 };
 
 enum LogLevel
@@ -1046,46 +1042,6 @@ class CoreExport Alog
 	}
 };
 
-struct Message; // XXX
-
-class CoreExport Anope
-{
- private:
-	static const char * const compiled;
- public:
-	static std::string Version();
-
-	static std::string Build();
-
-	/** Check whether two strings match.
-	 * @param str The string to check against the pattern (e.g. foobar)
-	 * @param mask The pattern to check (e.g. foo*bar)
-	 * @param case_sensitive Whether or not the match is case sensitive, default false.
-	 */
-	static bool Match(const std::string &str, const std::string &mask, bool case_sensitive = false);
-	inline static bool Match(const ci::string &str, const ci::string &mask) { return Match(str.c_str(), mask.c_str(), false); }
-
-	/** Add a message to Anope
-	 * @param name The message name as sent by the IRCd
-	 * @param func A callback function that will be called when this message is received
-	 * @return The new message object
-	 */
-	static Message *AddMessage(const std::string &name, int (*func)(const char *source, int ac, const char **av));
-
-	/** Deletes a message from Anope
-	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check
-	 * @param m The message
-	 * @return true if the message was found and deleted, else false
-	 */
-	static bool DelMessage(Message *m);
-
-	/** Returns a list of pointers to message handlers
-	 * @param The message name as sent by the IRCd
-	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
-	 */
-	static std::vector<Message *> FindMessage(const std::string &name);
-};
-
 /*************************************************************************/
 
 #include "timers.h"
@@ -1095,14 +1051,14 @@ class CoreExport Anope
 class NickServCollide : public Timer
 {
 	/* The nick */
-	std::string nick;
+	Anope::string nick;
 
  public:
 	/** Default constructor
 	 * @param _nick The nick were colliding
 	 * @param delay How long to delay before kicking the user off the nick
 	 */
-	NickServCollide(const std::string &_nick, time_t delay);
+	NickServCollide(const Anope::string &_nick, time_t delay);
 
 	/** Default destructor
 	 */
@@ -1119,18 +1075,18 @@ class NickServCollide : public Timer
 class NickServRelease : public Timer
 {
 	/* The nick */
-	std::string nick;
+	Anope::string nick;
 
  public:
 	/* The uid of the services enforcer client (used for TS6 ircds) */
-	std::string uid;
+	Anope::string uid;
 
 	/** Default constructor
 	 * @param _nick The nick
 	 * @param _uid the uid of the enforcer, if any
 	 * @param delay The delay before the nick is released
 	 */
-	NickServRelease(const std::string &_nick, const std::string &_uid, time_t delay);
+	NickServRelease(const Anope::string &_nick, const Anope::string &_uid, time_t delay);
 
 	/** Default destructor
 	 */
@@ -1172,7 +1128,7 @@ class ChanServTimer : public Timer
 class CoreExport NumberList
 {
  private:
- 	bool is_valid;
+	bool is_valid;
 
 	std::set<unsigned> numbers;
 
@@ -1182,7 +1138,7 @@ class CoreExport NumberList
 	 * @param list The list
 	 * @param descending True to make HandleNumber get called with numbers in descending order
 	 */
-	NumberList(const std::string &list, bool descending);
+	NumberList(const Anope::string &list, bool descending);
 
 	/** Destructor, does nothing
 	 */
@@ -1203,7 +1159,7 @@ class CoreExport NumberList
 	 * @param list The list
 	 * @return false to stop processing
 	 */
-	virtual bool InvalidRange(const std::string &list);
+	virtual bool InvalidRange(const Anope::string &list);
 };
 
 #endif /* SERVICES_H */

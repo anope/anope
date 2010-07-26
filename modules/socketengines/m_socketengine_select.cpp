@@ -79,31 +79,19 @@ class SocketEngineSelect : public SocketEngineBase
 					s->SetFlag(SF_DEAD);
 					continue;
 				}
-				if (FD_ISSET(s->GetSock(), &rfdset))
-				{
-					if (!s->ProcessRead())
-					{
-						s->SetFlag(SF_DEAD);
-					}
-				}
-				if (FD_ISSET(s->GetSock(), &wfdset))
-				{
-					if (!s->ProcessWrite())
-					{
-						s->SetFlag(SF_DEAD);
-					}
-				}
+				if (FD_ISSET(s->GetSock(), &rfdset) && !s->ProcessRead())
+					s->SetFlag(SF_DEAD);
+				if (FD_ISSET(s->GetSock(), &wfdset) && !s->ProcessWrite())
+					s->SetFlag(SF_DEAD);
 			}
 
-			for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end;)
+			for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; )
 			{
 				Socket *s = it->second;
 				++it;
 
 				if (s->HasFlag(SF_DEAD))
-				{
 					delete s;
-				}
 			}
 		}
 	}
@@ -114,8 +102,9 @@ class ModuleSocketEngineSelect : public Module
 	SocketEngineSelect *engine;
 
  public:
-	ModuleSocketEngineSelect(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	ModuleSocketEngineSelect(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
+		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 		this->SetType(SOCKETENGINE);
 
@@ -131,4 +120,3 @@ class ModuleSocketEngineSelect : public Module
 };
 
 MODULE_INIT(ModuleSocketEngineSelect)
-

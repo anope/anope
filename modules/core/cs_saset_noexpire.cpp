@@ -16,21 +16,21 @@
 class CommandCSSASetNoexpire : public Command
 {
  public:
-	CommandCSSASetNoexpire(const ci::string &cname) : Command(cname, 2, 2, "chanserv/saset/noexpire")
+	CommandCSSASetNoexpire(const Anope::string &cname) : Command(cname, 2, 2, "chanserv/saset/noexpire")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[0] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_NO_EXPIRE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name.c_str());
 		}
-		else if (params[0] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_NO_EXPIRE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
@@ -41,13 +41,13 @@ class CommandCSSASetNoexpire : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
 	}
@@ -61,7 +61,7 @@ class CommandCSSASetNoexpire : public Command
 class CSSetNoexpire : public Module
 {
  public:
-	CSSetNoexpire(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

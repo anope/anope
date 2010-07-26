@@ -18,30 +18,37 @@
  * missing parts.
  */
 
-static void split_usermask(const char *mask, const char **nick, const char **user, const char **host)
+static void split_usermask(const Anope::string &mask, Anope::string &nick, Anope::string &user, Anope::string &host)
 {
-	char *mask2 = sstrdup(mask);
-
-	*nick = strtok(mask2, "!");
-	*user = strtok(NULL, "@");
-	*host = strtok(NULL, "");
-	/* Handle special case: mask == user@host */
-	if (*nick && !*user && strchr(*nick, '@'))
+	size_t ex = mask.find('!'), at = mask.find('@', ex == Anope::string::npos ? 0 : ex + 1);
+	if (ex == Anope::string::npos)
 	{
-		*nick = NULL;
-		*user = strtok(mask2, "@");
-		*host = strtok(NULL, "");
+		if (at == Anope::string::npos)
+		{
+			nick = mask;
+			user = host = "*";
+		}
+		else
+		{
+			nick = "*";
+			user = mask.substr(0, at);
+			host = mask.substr(at + 1);
+		}
 	}
-	if (!*nick)
-		*nick = "*";
-	if (!*user)
-		*user = "*";
-	if (!*host)
-		*host = "*";
-	*nick = sstrdup(*nick);
-	*user = sstrdup(*user);
-	*host = sstrdup(*host);
-	delete [] mask2;
+	else
+	{
+		nick = mask.substr(0, ex);
+		if (at == Anope::string::npos)
+		{
+			user = mask.substr(ex + 1);
+			host = "*";
+		}
+		else
+		{
+			user = mask.substr(ex + 1, at - ex - 1);
+			host = mask.substr(at + 1);
+		}
+	}
 }
 
 class AkickListCallback : public NumberList
@@ -51,7 +58,7 @@ class AkickListCallback : public NumberList
 	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	AkickListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : NumberList(numlist, false), u(_u), ci(_ci), SentHeader(false)
+	AkickListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), u(_u), ci(_ci), SentHeader(false)
 	{
 	}
 
@@ -77,14 +84,14 @@ class AkickListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
+		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() :akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
 	}
 };
 
 class AkickViewCallback : public AkickListCallback
 {
  public:
-	AkickViewCallback(User *_u, ChannelInfo *_ci, const std::string &numlist) : AkickListCallback(u, ci, numlist)
+	AkickViewCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : AkickListCallback(u, ci, numlist)
 	{
 	}
 
@@ -104,10 +111,8 @@ class AkickViewCallback : public AkickListCallback
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		char timebuf[64];
+		char timebuf[64] = "";
 		struct tm tm;
-
-		memset(&timebuf, 0, sizeof(timebuf));
 
 		if (akick->addtime)
 		{
@@ -117,7 +122,7 @@ class AkickViewCallback : public AkickListCallback
 		else
 			snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
 
-		notice_lang(Config.s_ChanServ, u, (akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT), index + 1, (akick->HasFlag(AK_ISNICK)) ? akick->nc->display : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf, !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
+		notice_lang(Config.s_ChanServ, u, akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf, !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
 
 		if (akick->last_used)
 		{
@@ -135,7 +140,7 @@ class AkickDelCallback : public NumberList
 	ChannelInfo *ci;
 	unsigned Deleted;
  public:
-	AkickDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
+	AkickDelCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
 	{
 	}
 
@@ -161,37 +166,34 @@ class AkickDelCallback : public NumberList
 
 class CommandCSAKick : public Command
 {
-	void DoAdd(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoAdd(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci::string mask = params[2];
-		ci::string reason = params.size() > 3 ? params[3] : "";
+		Anope::string mask = params[2];
+		Anope::string reason = params.size() > 3 ? params[3] : "";
 		NickAlias *na = findnick(mask);
 		NickCore *nc = NULL;
 		AutoKick *akick;
 
 		if (!na)
 		{
-			const char *nick, *user, *host;
+			Anope::string nick, user, host;
 
-			split_usermask(mask.c_str(), &nick, &user, &host);
-			mask = ci::string(nick) + "!" + user + "@" + host;
-			delete [] nick;
-			delete [] user;
-			delete [] host;
+			split_usermask(mask, nick, user, host);
+			mask = nick + "!" + user + "@" + host;
 		}
 		else
 		{
-			 if (na->HasFlag(NS_FORBIDDEN))
-			 {
+			if (na->HasFlag(NS_FORBIDDEN))
+			{
 				notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, mask.c_str());
 				return;
-			 }
+			}
 
-			 nc = na->nc;
+			nc = na->nc;
 		}
 
 		/* Check excepts BEFORE we get this far */
-		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask.c_str()))
+		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask))
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 			return;
@@ -215,7 +217,7 @@ class CommandCSAKick : public Command
 			{
 				User *u2 = it->second;
 
-				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask.c_str(), u2))
+				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask, u2))
 				{
 					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 					return;
@@ -233,10 +235,8 @@ class CommandCSAKick : public Command
 
 				if (na2->nc && (na2->nc == ci->founder || get_access_level(ci, na2->nc) >= get_access(u, ci)))
 				{
-					char buf[BUFSIZE];
-
-					snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
-					if (Anope::Match(buf, mask.c_str(), false))
+					Anope::string buf = na2->nick + "!" + na2->last_usermask;
+					if (Anope::Match(buf, mask))
 					{
 						notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 						return;
@@ -248,37 +248,36 @@ class CommandCSAKick : public Command
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
 		{
 			akick = ci->GetAkick(j);
-			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : akick->mask == mask)
+			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : mask.equals_ci(akick->mask))
 			{
-				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display : akick->mask.c_str(), ci->name.c_str());
+				notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
 				return;
 			}
 		}
 
-
 		if (ci->GetAkickCount() >= Config.CSAutokickMax)
 		{
-			 notice_lang(Config.s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, Config.CSAutokickMax);
-			 return;
+			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, Config.CSAutokickMax);
+			return;
 		}
 
 		if (nc)
-			akick = ci->AddAkick(u->nick, nc, !reason.empty() ? reason.c_str() : "");
+			akick = ci->AddAkick(u->nick, nc, reason);
 		else
-			akick = ci->AddAkick(u->nick, mask.c_str(), !reason.empty() ? reason.c_str() : "");
+			akick = ci->AddAkick(u->nick, mask, reason);
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
 
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
 
-		this->DoEnforce(u, ci, params);
+		this->DoEnforce(u, ci);
 	}
 
-	void DoStick(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoStick(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na;
 		NickCore *nc;
-		ci::string mask = params[2];
+		Anope::string mask = params[2];
 		unsigned i, end;
 		AutoKick *akick;
 
@@ -297,7 +296,7 @@ class CommandCSAKick : public Command
 
 			if (akick->HasFlag(AK_ISNICK))
 				continue;
-			if (akick->mask == mask)
+			if (mask.equals_ci(akick->mask))
 				break;
 		}
 
@@ -314,13 +313,13 @@ class CommandCSAKick : public Command
 			stick_mask(ci, akick);
 	}
 
-	void DoUnStick(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoUnStick(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na;
 		NickCore *nc;
 		AutoKick *akick;
 		unsigned i, end;
-		ci::string mask = params[2];
+		Anope::string mask = params[2];
 
 		if (!ci->GetAkickCount())
 		{
@@ -337,7 +336,7 @@ class CommandCSAKick : public Command
 
 			if (akick->HasFlag(AK_ISNICK))
 				continue;
-			if (akick->mask == mask)
+			if (mask.equals_ci(akick->mask))
 				break;
 		}
 
@@ -351,9 +350,9 @@ class CommandCSAKick : public Command
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name.c_str());
 	}
 
-	void DoDel(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoDel(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci::string mask = params[2];
+		Anope::string mask = params[2];
 		AutoKick *akick;
 		unsigned i, end;
 
@@ -364,21 +363,21 @@ class CommandCSAKick : public Command
 		}
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickDelCallback list(u, ci, mask.c_str());
+			AkickDelCallback list(u, ci, mask);
 			list.Process();
 		}
 		else
 		{
 			NickAlias *na = findnick(mask);
-			NickCore *nc = (na ? na->nc : NULL);
+			NickCore *nc = na ? na->nc : NULL;
 
 			for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				akick = ci->GetAkick(i);
 
-				if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) || (!akick->HasFlag(AK_ISNICK) && akick->mask == mask))
+				if ((akick->HasFlag(AK_ISNICK) && akick->nc == nc) || (!akick->HasFlag(AK_ISNICK) && mask.equals_ci(akick->mask)))
 					break;
 			}
 
@@ -394,9 +393,9 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoList(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoList(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci::string mask = params.size() > 2 ? params[2] : "";
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAkickCount())
 		{
@@ -404,9 +403,9 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickListCallback list(u, ci, mask.c_str());
+			AkickListCallback list(u, ci, mask);
 			list.Process();
 		}
 		else
@@ -419,9 +418,9 @@ class CommandCSAKick : public Command
 
 				if (!mask.empty())
 				{
-					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask, mask))
 						continue;
-					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask))
 						continue;
 				}
 
@@ -439,9 +438,9 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoView(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoView(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		ci::string mask = params.size() > 2 ? params[2] : "";
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAkickCount())
 		{
@@ -449,9 +448,9 @@ class CommandCSAKick : public Command
 			return;
 		}
 
-		if (!mask.empty() && isdigit(*mask.c_str()) && strspn(mask.c_str(), "1234567890,-") == mask.length())
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickViewCallback list(u, ci, mask.c_str());
+			AkickViewCallback list(u, ci, mask);
 			list.Process();
 		}
 		else
@@ -464,9 +463,9 @@ class CommandCSAKick : public Command
 
 				if (!mask.empty())
 				{
-					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask.c_str(), mask.c_str(), false))
+					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask, mask))
 						continue;
-					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask.c_str(), false))
+					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask))
 						continue;
 				}
 
@@ -484,7 +483,7 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoEnforce(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoEnforce(User *u, ChannelInfo *ci)
 	{
 		Channel *c = ci->c;
 		int count = 0;
@@ -506,7 +505,7 @@ class CommandCSAKick : public Command
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
 	}
 
-	void DoClear(User *u, ChannelInfo *ci, const std::vector<ci::string> &params)
+	void DoClear(User *u, ChannelInfo *ci)
 	{
 		ci->ClearAkick();
 		notice_lang(Config.s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name.c_str());
@@ -517,49 +516,49 @@ class CommandCSAKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string chan = params[0];
-		ci::string cmd = params[1];
-		ci::string mask = params.size() > 2 ? params[2] : "";
+		Anope::string chan = params[0];
+		Anope::string cmd = params[1];
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		ChannelInfo *ci = cs_findchan(chan);
 
-		if (mask.empty() && (cmd == "ADD" || cmd == "STICK" || cmd == "UNSTICK" || cmd == "DEL"))
+		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("STICK") || cmd.equals_ci("UNSTICK") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(u, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-		else if (cmd != "LIST" && cmd != "VIEW" && cmd != "ENFORCE" && readonly)
+		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			notice_lang(Config.s_ChanServ, u, CHAN_AKICK_DISABLED);
-		else if (cmd == "ADD")
+		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(u, ci, params);
-		else if (cmd == "STICK")
+		else if (cmd.equals_ci("STICK"))
 			this->DoStick(u, ci, params);
-		else if (cmd == "UNSTICK")
+		else if (cmd.equals_ci("UNSTICK"))
 			this->DoUnStick(u, ci, params);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			this->DoDel(u, ci, params);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			this->DoList(u, ci, params);
-		else if (cmd == "VIEW")
+		else if (cmd.equals_ci("VIEW"))
 			this->DoView(u, ci, params);
-		else if (cmd == "ENFORCE")
-			this->DoEnforce(u, ci, params);
-		else if (cmd == "CLEAR")
-			this->DoClear(u, ci, params);
+		else if (cmd.equals_ci("ENFORCE"))
+			this->DoEnforce(u, ci);
+		else if (cmd.equals_ci("CLEAR"))
+			this->DoClear(u, ci);
 		else
 			this->OnSyntaxError(u, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_AKICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
 	}
@@ -573,10 +572,11 @@ class CommandCSAKick : public Command
 class CSAKick : public Module
 {
  public:
-	CSAKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSAKick());
 	}
 };

@@ -16,18 +16,15 @@
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick(const ci::string &cname) : Command(cname, 2, 3)
+	CommandCSKick(const Anope::string &cname) : Command(cname, 2, 3)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *target = params[1].c_str();
-		const char *reason = NULL;
-
-		if (params.size() > 2)
-			reason = params[2].c_str();
+		Anope::string chan = params[0];
+		Anope::string target = params[1];
+		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
 
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
@@ -35,18 +32,15 @@ class CommandCSKick : public Command
 
 		int is_same;
 
-		if (!reason)
-			reason = "Requested";
-
-		is_same = target == u->nick.c_str() ? 1 : !stricmp(target, u->nick.c_str());
+		is_same = target.equals_cs(u->nick) ? 1 : target.equals_ci(u->nick);
 
 		if (c)
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target);
+			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && get_access(u2, ci) >= get_access(u, ci))
@@ -58,20 +52,20 @@ class CommandCSKick : public Command
 		else
 		{
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
-				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason, u->nick.c_str());
+				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
-				ci->c->Kick(whosends(ci), u2, "%s", reason);
+				ci->c->Kick(whosends(ci), u2, "%s", reason.c_str());
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_KICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
 	}
@@ -85,10 +79,11 @@ class CommandCSKick : public Command
 class CSKick : public Module
 {
  public:
-	CSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSKick("KICK"));
 		this->AddCommand(ChanServ, new CommandCSKick("K"));
 	}

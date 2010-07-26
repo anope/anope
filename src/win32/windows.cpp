@@ -47,7 +47,7 @@ int inet_pton(int af, const char *src, void *dst)
 			return -1;
 	}
 
-	if (!WSAStringToAddress((LPSTR) src, af, NULL, reinterpret_cast<LPSOCKADDR>(&sa), &address_length))
+	if (!WSAStringToAddress(static_cast<LPSTR>(const_cast<char *>(src)), af, NULL, reinterpret_cast<LPSOCKADDR>(&sa), &address_length))
 	{
 		switch (af)
 		{

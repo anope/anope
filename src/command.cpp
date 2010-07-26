@@ -8,7 +8,7 @@
 #include "services.h"
 #include "modules.h"
 
-Command::Command(const ci::string &sname, size_t min_params, size_t max_params, const ci::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
 	this->module = NULL;
 	this->service = NULL;
@@ -18,20 +18,18 @@ Command::~Command()
 {
 }
 
-CommandReturn Command::Execute(User *u, const std::vector<ci::string> &)
+CommandReturn Command::Execute(User *u, const std::vector<Anope::string> &)
 {
 	return MOD_CONT;
 }
 
 void Command::OnServHelp(User *u) { }
 
-bool Command::OnHelp(User *u, const ci::string &subcommand) { return false; }
+bool Command::OnHelp(User *u, const Anope::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(User *u, const ci::string &subcommand)
-{
-}
+void Command::OnSyntaxError(User *u, const Anope::string &subcommand) { }
 
-void Command::SetPermission(const ci::string &reststr)
+void Command::SetPermission(const Anope::string &reststr)
 {
 	this->permission = reststr;
 }
@@ -41,7 +39,7 @@ bool Command::AddSubcommand(Command *c)
 	return false;
 }
 
-bool Command::DelSubcommand(const ci::string &cname)
+bool Command::DelSubcommand(const Anope::string &cname)
 {
 	return false;
 }

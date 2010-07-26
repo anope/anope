@@ -43,7 +43,7 @@ void ThreadEngine::Start(Thread *thread)
 	if (!thread->Handle)
 	{
 		delete thread;
-		throw CoreException("Unable to create thread: " + std::string(dlerror()));
+		throw CoreException(Anope::string("Unable to create thread: ") + dlerror());
 	}
 }
 

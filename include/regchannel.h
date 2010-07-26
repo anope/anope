@@ -9,7 +9,7 @@
 #ifndef REGCHANNEL_H
 #define REGCHANNEL_H
 
-typedef unordered_map_namespace::unordered_map<ci::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
 extern CoreExport registered_channel_map RegisteredChannelList;
 
 /** Flags used for the ChannelInfo class
@@ -65,41 +65,41 @@ enum ChannelInfoFlag
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
-	std::map<ChannelModeName, std::string> Params;	/* Map of parameters by mode name for mlock */
-	std::vector<ChanAccess *> access;				/* List of authorized users */
-	std::vector<AutoKick *> akick;					/* List of users to kickban */
-	std::vector<BadWord *> badwords;				/* List of badwords */
-	Flags<ChannelModeName, CMODE_END> mlock_on;				/* Modes mlocked on */
-	Flags<ChannelModeName, CMODE_END> mlock_off;				/* Modes mlocked off */
+	std::map<ChannelModeName, Anope::string> Params;	/* Map of parameters by mode name for mlock */
+	std::vector<ChanAccess *> access;					/* List of authorized users */
+	std::vector<AutoKick *> akick;						/* List of users to kickban */
+	std::vector<BadWord *> badwords;					/* List of badwords */
+	Flags<ChannelModeName, CMODE_END> mlock_on;			/* Modes mlocked on */
+	Flags<ChannelModeName, CMODE_END> mlock_off;		/* Modes mlocked off */
 
  public:
  	/** Default constructor
 	 * @param chname The channel name
 	 */
-	ChannelInfo(const std::string &chname);
+	ChannelInfo(const Anope::string &chname);
 
 	/** Default destructor
 	 */
 	~ChannelInfo();
 
-	std::string name; /* Channel name */
+	Anope::string name; /* Channel name */
 	NickCore *founder;
 	NickCore *successor; /* Who gets the channel if the founder nick is dropped or expires */
-	char *desc;
+	Anope::string desc;
 
 	time_t time_registered;
 	time_t last_used;
-	char *last_topic;				/* Last topic on the channel */
-	std::string last_topic_setter;	/* Who set the last topic */
-	time_t last_topic_time;			/* When the last topic was set */
+	Anope::string last_topic;			/* Last topic on the channel */
+	Anope::string last_topic_setter;	/* Who set the last topic */
+	time_t last_topic_time;				/* When the last topic was set */
 
-	char *forbidby;
-	char *forbidreason;
+	Anope::string forbidby;
+	Anope::string forbidreason;
 
 	int16 bantype;
 	int16 *levels; /* Access levels for commands */
 
-	char *entry_message; /* Notice sent on entering channel */
+	Anope::string entry_message; /* Notice sent on entering channel */
 
 	MemoInfo memos;
 
@@ -124,7 +124,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 *
 	 * Creates a new access list entry and inserts it into the access list.
 	 */
-	void AddAccess(NickCore *nc, int16 level, const std::string &creator, int32 last_seen = 0);
+	void AddAccess(NickCore *nc, int16 level, const Anope::string &creator, int32 last_seen = 0);
 
 	/** Get an entry from the channel access list by index
 	 *
@@ -143,7 +143,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 *
 	 * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
 	 */
-	ChanAccess *GetAccess(NickCore *nc, int16 level = 0);
+	ChanAccess *GetAccess(const NickCore *nc, int16 level = 0);
 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size
@@ -171,7 +171,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const std::string &user, NickCore *akicknc, const std::string &reason, time_t t = time(NULL), time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = time(NULL), time_t lu = 0);
 
 	/** Add an akick entry to the channel by reason
 	 * @param user The user who added the akick
@@ -180,7 +180,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const std::string &user, const std::string &mask, const std::string &reason, time_t t = time(NULL), time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = time(NULL), time_t lu = 0);
 
 	/** Get an entry from the channel akick list
 	 * @param index The index in the akick vector
@@ -207,7 +207,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param type The type (SINGLE START END)
 	 * @return The badword
 	 */
-	BadWord *AddBadWord(const std::string &word, BadWordType type);
+	BadWord *AddBadWord(const Anope::string &word, BadWordType type);
 
 	/** Get a badword structure by index
 	 * @param index The index
@@ -247,7 +247,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param param An optional param arg for + mlocked modes
 	 * @return true on success, false on failure (module blocking)
 	 */
-	bool SetMLock(ChannelModeName Name, bool status, const std::string param = "");
+	bool SetMLock(ChannelModeName Name, bool status, const Anope::string &param = "");
 
 	/** Remove a mlock
 	 * @param Name The mode
@@ -270,7 +270,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
-	const bool GetParam(ChannelModeName Name, std::string &Target);
+	const bool GetParam(ChannelModeName Name, Anope::string &Target);
 
 	/** Check if a mode is set and has a param
 	 * @param Name The mode

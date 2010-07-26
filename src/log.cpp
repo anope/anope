@@ -17,7 +17,7 @@ static int curday = 0;
 
 /*************************************************************************/
 
-static int get_logname(char *name, int count, struct tm *tm)
+static int get_logname(Anope::string &name, struct tm *tm)
 {
 	char timestamp[32];
 	time_t t;
@@ -30,7 +30,7 @@ static int get_logname(char *name, int count, struct tm *tm)
 
 	/* fix bug 577 */
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-	snprintf(name, count, "logs/%s.%s", timestamp, log_filename.c_str());
+	name = Anope::string("logs/") + timestamp + "." + log_filename;
 	curday = tm->tm_yday;
 
 	return 1;
@@ -43,7 +43,7 @@ static void remove_log()
 	time_t t;
 	struct tm tm;
 
-	char name[PATH_MAX];
+	Anope::string name;
 
 	if (!Config.KeepLogs)
 		return;
@@ -53,8 +53,8 @@ static void remove_log()
 	tm = *localtime(&t);
 
 	/* removed if from here cause get_logchan is always 1 */
-	get_logname(name, sizeof(name), &tm);
-	DeleteFile(name);
+	get_logname(name, &tm);
+	DeleteFile(name.c_str());
 }
 
 /*************************************************************************/
@@ -82,18 +82,18 @@ static void checkday()
 
 int open_log()
 {
-	char name[PATH_MAX];
+	Anope::string name;
 
 	if (logfile)
 		return 0;
 
 	/* if removed again.. get_logname is always 1 */
-	get_logname(name, sizeof(name), NULL);
-	logfile = fopen(name, "a");
+	get_logname(name, NULL);
+	logfile = fopen(name.c_str(), "a");
 
 	if (logfile)
 		setbuf(logfile, NULL);
-	return logfile != NULL ? 0 : -1;
+	return logfile ? 0 : -1;
 }
 
 /*************************************************************************/
@@ -111,11 +111,11 @@ void close_log()
 /*************************************************************************/
 
 /* added cause this is used over and over in the code */
-char *log_gettimestamp()
+Anope::string log_gettimestamp()
 {
 	time_t t;
 	struct tm tm;
-	static char tbuf[256];
+	char tbuf[256];
 
 	time(&t);
 	tm = *localtime(&t);
@@ -145,7 +145,6 @@ char *log_gettimestamp()
 void log_perror(const char *fmt, ...)
 {
 	va_list args;
-	char *buf;
 	int errno_save = errno;
 	char str[BUFSIZE];
 
@@ -158,12 +157,12 @@ void log_perror(const char *fmt, ...)
 	vsnprintf(str, sizeof(str), fmt, args);
 	va_end(args);
 
-	buf = log_gettimestamp();
+	Anope::string buf = log_gettimestamp();
 
 	if (logfile)
-		fprintf(logfile, "%s %s : %s\n", buf, str, strerror(errno_save));
+		fprintf(logfile, "%s %s : %s\n", buf.c_str(), str, strerror(errno_save));
 	if (nofork)
-		fprintf(stderr, "%s %s : %s\n", buf, str, strerror(errno_save));
+		fprintf(stderr, "%s %s : %s\n", buf.c_str(), str, strerror(errno_save));
 	errno = errno_save;
 }
 
@@ -176,7 +175,6 @@ void log_perror(const char *fmt, ...)
 void fatal(const char *fmt, ...)
 {
 	va_list args;
-	char *buf;
 	char buf2[4096];
 
 	checkday();
@@ -188,12 +186,12 @@ void fatal(const char *fmt, ...)
 	vsnprintf(buf2, sizeof(buf2), fmt, args);
 	va_end(args);
 
-	buf = log_gettimestamp();
+	Anope::string buf = log_gettimestamp();
 
 	if (logfile)
-		fprintf(logfile, "%s FATAL: %s\n", buf, buf2);
+		fprintf(logfile, "%s FATAL: %s\n", buf.c_str(), buf2);
 	if (nofork)
-		fprintf(stderr, "%s FATAL: %s\n", buf, buf2);
+		fprintf(stderr, "%s FATAL: %s\n", buf.c_str(), buf2);
 	if (UplinkSock)
 		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s", buf2);
 
@@ -210,7 +208,6 @@ void fatal(const char *fmt, ...)
 void fatal_perror(const char *fmt, ...)
 {
 	va_list args;
-	char *buf;
 	char buf2[4096];
 	int errno_save = errno;
 
@@ -223,12 +220,12 @@ void fatal_perror(const char *fmt, ...)
 	vsnprintf(buf2, sizeof(buf2), fmt, args);
 	va_end(args);
 
-	buf = log_gettimestamp();
+	Anope::string buf = log_gettimestamp();
 
 	if (logfile)
-		fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2, strerror(errno_save));
+		fprintf(logfile, "%s FATAL: %s: %s\n", buf.c_str(), buf2, strerror(errno_save));
 	if (nofork)
-		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2, strerror(errno_save));
+		fprintf(stderr, "%s FATAL: %s: %s\n", buf.c_str(), buf2, strerror(errno_save));
 	if (UplinkSock)
 		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
 
@@ -249,20 +246,19 @@ Alog::~Alog()
 	if (Level >= LOG_DEBUG && (Level - LOG_DEBUG + 1) > debug)
 		return;
 
-	char *tbuf;
 	int errno_save = errno;
 
 	checkday();
 
-	tbuf = log_gettimestamp();
+	Anope::string tbuf = log_gettimestamp();
 
 	if (logfile)
-		fprintf(logfile, "%s %s\n", tbuf, buf.str().c_str());
+		fprintf(logfile, "%s %s\n", tbuf.c_str(), buf.str().c_str());
 	if (nofork)
 		std::cout << tbuf << " " << buf.str() << std::endl;
 	else if (Level == LOG_TERMINAL) // XXX dont use this yet unless you know we're at terminal and not daemonized
 		std::cout << buf.str() << std::endl;
-	if (Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
+	if (!Config.LogChannel.empty() && LogChan && !debug && findchan(Config.LogChannel))
 		ircdproto->SendPrivmsg(Global, Config.LogChannel, "%s", buf.str().c_str());
 	errno = errno_save;
 }

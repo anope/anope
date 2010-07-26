@@ -16,18 +16,18 @@
 class CommandNSSetPrivate : public Command
 {
  public:
-	CommandNSSetPrivate(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetPrivate(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "ON")
+		if (params[0].equals_ci("ON"))
 		{
 			u->Account()->SetFlag(NI_PRIVATE);
 			notice_lang(Config.s_NickServ, u, NICK_SET_PRIVATE_ON);
 		}
-		else if (params[0] == "OFF")
+		else if (params[0].equals_ci("OFF"))
 		{
 			u->Account()->UnsetFlag(NI_PRIVATE);
 			notice_lang(Config.s_NickServ, u, NICK_SET_PRIVATE_OFF);
@@ -38,13 +38,13 @@ class CommandNSSetPrivate : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_PRIVATE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
 	}
@@ -58,26 +58,26 @@ class CommandNSSetPrivate : public Command
 class CommandNSSASetPrivate : public Command
 {
  public:
-	CommandNSSASetPrivate(const ci::string &cname) : Command(cname, 2, 2, "nickserv/saset/private")
+	CommandNSSASetPrivate(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/private")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		ci::string param = params[1];
+		Anope::string param = params[1];
 
-		if (param == "ON")
+		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display.c_str());
 		}
-		else if (param == "OFF")
+		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PRIVATE");
@@ -85,13 +85,13 @@ class CommandNSSASetPrivate : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_PRIVATE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
 	}
@@ -105,7 +105,7 @@ class CommandNSSASetPrivate : public Command
 class NSSetPrivate : public Module
 {
  public:
-	NSSetPrivate(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

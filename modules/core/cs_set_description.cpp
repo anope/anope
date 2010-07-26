@@ -16,31 +16,29 @@
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetDescription(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (ci->desc)
-			delete [] ci->desc;
-		ci->desc = sstrdup(params[1].c_str());
+		ci->desc = params[1];
 
-		notice_lang(Config.s_ChanServ, u, CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc);
+		notice_lang(Config.s_ChanServ, u, CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_DESC, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -55,17 +53,17 @@ class CommandCSSetDescription : public Command
 class CommandCSSASetDescription : public CommandCSSetDescription
 {
  public:
-	CommandCSSASetDescription(const ci::string &cname) : CommandCSSetDescription(cname, "chanserv/saset/description")
+	CommandCSSASetDescription(const Anope::string &cname) : CommandCSSetDescription(cname, "chanserv/saset/description")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_DESC, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
@@ -75,7 +73,7 @@ class CommandCSSASetDescription : public CommandCSSetDescription
 class CSSetDescription : public Module
 {
  public:
-	CSSetDescription(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -84,7 +82,7 @@ class CSSetDescription : public Module
 		if (c)
 			c->AddSubcommand(new CommandCSSetDescription("DESC"));
 
-		c = FindCommand(ChanServ, "SASEt");
+		c = FindCommand(ChanServ, "SASET");
 		if (c)
 			c->AddSubcommand(new CommandCSSASetDescription("DESC"));
 	}

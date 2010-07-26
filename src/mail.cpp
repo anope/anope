@@ -11,12 +11,12 @@ MailThread::~MailThread()
 
 void MailThread::Run()
 {
-	FILE *pipe = popen(Config.SendMailPath, "w");
+	FILE *pipe = popen(Config.SendMailPath.c_str(), "w");
 
 	if (!pipe)
 		return;
 
-	fprintf(pipe, "From: %s\n", Config.SendFrom);
+	fprintf(pipe, "From: %s\n", Config.SendFrom.c_str());
 	if (Config.DontQuoteAddresses)
 		fprintf(pipe, "To: %s <%s>\n", MailTo.c_str(), Addr.c_str());
 	else
@@ -30,7 +30,7 @@ void MailThread::Run()
 	Success = true;
 }
 
-bool Mail(User *u, NickRequest *nr, const std::string &service, const std::string &subject, const std::string &message)
+bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!u || !nr || subject.empty() || service.empty() || message.empty())
 		return false;
@@ -38,11 +38,11 @@ bool Mail(User *u, NickRequest *nr, const std::string &service, const std::strin
 	time_t t = time(NULL);
 
 	if (!Config.UseMail)
-		notice_lang(service.c_str(), u, MAIL_DISABLED);
+		notice_lang(service, u, MAIL_DISABLED);
 	else if (t - u->lastmail < Config.MailDelay)
-		notice_lang(service.c_str(), u, MAIL_DELAYED, t - u->lastmail);
-	else if (!nr->email)
-		notice_lang(service.c_str(), u, MAIL_INVALID, nr->nick);
+		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
+	else if (nr->email.empty())
+		notice_lang(service, u, MAIL_INVALID, nr->nick.c_str());
 	else
 	{
 		u->lastmail = nr->lastmail = t;
@@ -53,7 +53,7 @@ bool Mail(User *u, NickRequest *nr, const std::string &service, const std::strin
 	return false;
 }
 
-bool Mail(User *u, NickCore *nc, const std::string &service, const std::string &subject, const std::string &message)
+bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!u || !nc || subject.empty() || service.empty() || message.empty())
 		return false;
@@ -61,11 +61,11 @@ bool Mail(User *u, NickCore *nc, const std::string &service, const std::string &
 	time_t t = time(NULL);
 
 	if (!Config.UseMail)
-		notice_lang(service.c_str(), u, MAIL_DISABLED);
+		notice_lang(service, u, MAIL_DISABLED);
 	else if (t - u->lastmail < Config.MailDelay)
-		notice_lang(service.c_str(), u, MAIL_DELAYED, t - u->lastmail);
-	else if (!nc->email)
-		notice_lang(service.c_str(), u, MAIL_INVALID, nc->display);
+		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
+	else if (nc->email.empty())
+		notice_lang(service, u, MAIL_INVALID, nc->display.c_str());
 	else
 	{
 		u->lastmail = nc->lastmail = t;
@@ -76,9 +76,9 @@ bool Mail(User *u, NickCore *nc, const std::string &service, const std::string &
 	return false;
 }
 
-bool Mail(NickCore *nc, const std::string &subject, const std::string &message)
+bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message)
 {
-	if (!Config.UseMail || !nc || !nc->email || subject.empty() || message.empty())
+	if (!Config.UseMail || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = time(NULL);
@@ -96,28 +96,28 @@ bool Mail(NickCore *nc, const std::string &subject, const std::string &message)
  * @param email Email to Validate
  * @return bool
  */
-bool MailValidate(const std::string &email)
+bool MailValidate(const Anope::string &email)
 {
 	bool has_period = false;
-	char copy[BUFSIZE];
 
 	static char specials[] = {'(', ')', '<', '>', '@', ',', ';', ':', '\\', '\"', '[', ']', ' '};
 
 	if (email.empty())
 		return false;
-	strlcpy(copy, email.c_str(), sizeof(copy));
+	Anope::string copy = email;
 
-	char *domain = strchr(copy, '@');
-	if (!domain)
+	size_t at = copy.find('@');
+	if (at == Anope::string::npos)
 		return false;
-	*domain++ = '\0';
+	Anope::string domain = copy.substr(at + 1);
+	copy = copy.substr(0, at);
 
-	/* Don't accept NULL copy or domain. */
-	if (!*copy || !*domain)
+	/* Don't accept empty copy or domain. */
+	if (copy.empty() || domain.empty())
 		return false;
 
 	/* Check for forbidden characters in the name */
-	for (unsigned int i = 0; i < strlen(copy); ++i)
+	for (unsigned i = 0, end = copy.length(); i < end; ++i)
 	{
 		if (copy[i] <= 31 || copy[i] >= 127)
 			return false;
@@ -127,7 +127,7 @@ bool MailValidate(const std::string &email)
 	}
 
 	/* Check for forbidden characters in the domain */
-	for (unsigned int i = 0; i < strlen(domain); ++i)
+	for (unsigned i = 0, end = domain.length(); i < end; ++i)
 	{
 		if (domain[i] <= 31 || domain[i] >= 127)
 			return false;
@@ -136,7 +136,7 @@ bool MailValidate(const std::string &email)
 				return false;
 		if (domain[i] == '.')
 		{
-			if (!i || i == strlen(domain) - 1)
+			if (!i || i == end - 1)
 				return false;
 			has_period = true;
 		}

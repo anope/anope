@@ -20,9 +20,9 @@ class CommandSSHelp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ircdproto->SendMessage(statserv, u->nick.c_str(), "This is a test of the emergency StatServ system.");
+		ircdproto->SendMessage(statserv, u->nick, "This is a test of the emergency StatServ system.");
 		return MOD_CONT;
 	}
 };
@@ -30,7 +30,7 @@ class CommandSSHelp : public Command
 class SSMain : public Module
 {
  public:
-	SSMain(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	SSMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -51,7 +51,7 @@ class SSMain : public Module
 	{
 		if (statserv)
 		{
-			for (std::map<ci::string, Command *>::iterator it = statserv->Commands.begin(), it_end = statserv->Commands.end(); it != it_end; ++it)
+			for (CommandMap::iterator it = statserv->Commands.begin(), it_end = statserv->Commands.end(); it != it_end; ++it)
 				this->DelCommand(statserv, it->second);
 
 			ircdproto->SendQuit(statserv, "Quit due to module unload.");

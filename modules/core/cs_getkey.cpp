@@ -20,11 +20,11 @@ class CommandCSGetKey : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
+		Anope::string chan = params[0];
 		ChannelInfo *ci;
-		std::string key;
+		Anope::string key;
 
 		ci = cs_findchan(chan);
 
@@ -36,21 +36,21 @@ class CommandCSGetKey : public Command
 
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_NOKEY, chan.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_KEY, chan, key.c_str());
+		notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_KEY, chan.c_str(), key.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_GETKEY);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
 	}
@@ -64,10 +64,11 @@ class CommandCSGetKey : public Command
 class CSGetKey : public Module
 {
  public:
-	CSGetKey(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(ChanServ, new CommandCSGetKey());
 	}
 };

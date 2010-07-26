@@ -29,7 +29,7 @@ class CommandNSConfirm : public Command
 			return MOD_CONT;
 		}
 
-		std::string tmp_pass;
+		Anope::string tmp_pass;
 
 		na->nc->pass = nr->password;
 
@@ -37,27 +37,27 @@ class CommandNSConfirm : public Command
 
 		if (force)
 		{
-			na->last_usermask = sstrdup("*@*");
-			na->last_realname = sstrdup("unknown");
+			na->last_usermask = "*@*";
+			na->last_realname = "unknown";
 		}
 		else
 		{
-			std::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-			na->last_usermask = sstrdup(last_usermask.c_str());
-			na->last_realname = sstrdup(u->realname);
+			Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_usermask = last_usermask;
+			na->last_realname = u->realname;
 			if (Config.NSAddAccessOnReg)
 				na->nc->AddAccess(create_mask(u));
 		}
 
 		na->time_registered = na->last_seen = time(NULL);
 		na->nc->language = Config.NSDefLanguage;
-		if (nr->email)
-			na->nc->email = sstrdup(nr->email);
+		if (!nr->email.empty())
+			na->nc->email = nr->email;
 
 		if (!force)
 		{
 			u->Login(na->nc);
-			Alog() << Config.s_NickServ << ": '" << u->nick << "' registered by " << u->GetIdent() << "@" << u->host << " (e-mail: " << (nr->email ? nr->email : "none") << ")";
+			Alog() << Config.s_NickServ << ": '" << u->nick << "' registered by " << u->GetIdent() << "@" << u->host << " (e-mail: " << (!nr->email.empty() ? nr->email : "none") << ")";
 			if (Config.NSAddAccessOnReg)
 				notice_lang(Config.s_NickServ, u, NICK_REGISTERED, u->nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
@@ -74,8 +74,8 @@ class CommandNSConfirm : public Command
 		}
 		else
 		{
-			Alog() << Config.s_NickServ << ": '" << nr->nick << "' confirmed by " << u->GetMask() << " (email: " << (nr->email ? nr->email : "none") << " )";
-			notice_lang(Config.s_NickServ, u, NICK_FORCE_REG, nr->nick);
+			Alog() << Config.s_NickServ << ": '" << nr->nick << "' confirmed by " << u->GetMask() << " (email: " << (!nr->email.empty() ? nr->email : "none") << " )";
+			notice_lang(Config.s_NickServ, u, NICK_FORCE_REG, nr->nick.c_str());
 			User *user = finduser(nr->nick);
 			/* Delrequest must be called before validate_user */
 			delete nr;
@@ -86,12 +86,11 @@ class CommandNSConfirm : public Command
 		FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
 
 		return MOD_CONT;
-
 	}
 
-	CommandReturn DoConfirm(User *u, const std::vector<ci::string> &params)
+	CommandReturn DoConfirm(User *u, const std::vector<Anope::string> &params)
 	{
-		std::string passcode = !params.empty() ? params[0].c_str() : "";
+		Anope::string passcode = !params.empty() ? params[0] : "";
 
 		NickRequest *nr = findrequestnick(u->nick);
 
@@ -116,12 +115,12 @@ class CommandNSConfirm : public Command
 						return MOD_CONT;
 					}
 				}
-				notice_lang(Config.s_NickServ, u, NICK_CONFIRM_NOT_FOUND, Config.s_NickServ);
+				notice_lang(Config.s_NickServ, u, NICK_CONFIRM_NOT_FOUND, Config.s_NickServ.c_str());
 
 				return MOD_CONT;
 			}
 
-			if (nr->passcode.compare(passcode))
+			if (!nr->passcode.equals_cs(passcode))
 			{
 				notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 				return MOD_CONT;
@@ -139,17 +138,17 @@ class CommandNSConfirm : public Command
 	}
 
  public:
-	CommandNSConfirm(const ci::string &cmdn, int min, int max) : Command(cmdn, min, max)
+	CommandNSConfirm(const Anope::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoConfirm(u, params);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_CONFIRM);
 		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
@@ -157,7 +156,7 @@ class CommandNSConfirm : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_CONFIRM_INVALID);
 	}
@@ -176,15 +175,15 @@ class CommandNSRegister : public CommandNSConfirm
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickRequest *nr = NULL, *anr = NULL;
 		NickAlias *na;
-		int prefixlen = strlen(Config.NSGuestNickPrefix);
-		int nicklen = u->nick.length();
-		const char *pass = params[0].c_str();
-		const char *email = params.size() > 1 ? params[1].c_str() : NULL;
-		char passcode[11];
+		size_t prefixlen = Config.NSGuestNickPrefix.length();
+		size_t nicklen = u->nick.length();
+		Anope::string pass = params[0];
+		Anope::string email = params.size() > 1 ? params[1] : "";
+		Anope::string passcode;
 		int idx, min = 1, max = 62;
 		int chars[] = {
 			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -193,7 +192,7 @@ class CommandNSRegister : public CommandNSConfirm
 			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
 			'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 		};
-		std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
+		std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
 		if (readonly)
 		{
@@ -218,13 +217,13 @@ class CommandNSRegister : public CommandNSConfirm
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && stristr(u->nick.c_str(), Config.NSGuestNickPrefix) == u->nick.c_str() && strspn(u->nick.c_str() + prefixlen, "1234567890") == nicklen - prefixlen)
+		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config.NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			return MOD_CONT;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick.c_str()))
+		if (!ircdproto->IsNickValid(u->nick))
 		{
 			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, u->nick.c_str());
 			return MOD_CONT;
@@ -233,16 +232,16 @@ class CommandNSRegister : public CommandNSConfirm
 		if (Config.RestrictOperNicks)
 			for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 			{
-				ci::string nick = it->first;
+				Anope::string nick = it->first;
 
-				if (stristr(u->nick.c_str(), nick.c_str()) && !is_oper(u))
+				if (u->nick.find_ci(nick) != Anope::string::npos && !is_oper(u))
 				{
 					notice_lang(Config.s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
 		}
 
-		if (Config.NSForceEmail && !email)
+		if (Config.NSForceEmail && email.empty())
 			this->OnSyntaxError(u, "");
 		else if (time(NULL) < u->lastnickreg + Config.NSRegDelay)
 			notice_lang(Config.s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config.NSRegDelay) - time(NULL));
@@ -257,29 +256,28 @@ class CommandNSRegister : public CommandNSConfirm
 			else
 				notice_lang(Config.s_NickServ, u, NICK_ALREADY_REGISTERED, u->nick.c_str());
 		}
-		else if (!stricmp(u->nick.c_str(), pass) || (Config.StrictPasswords && strlen(pass) < 5))
+		else if (pass.equals_ci(u->nick) || (Config.StrictPasswords && pass.length() < 5))
 			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
-		else if (strlen(pass) > Config.PassLen)
+		else if (pass.length() > Config.PassLen)
 			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
-		else if (email && !MailValidate(email))
-			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, email);
+		else if (!email.empty() && !MailValidate(email))
+			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, email.c_str());
 		else
 		{
 			for (idx = 0; idx < 9; ++idx)
-				passcode[idx] = chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
-			passcode[idx] = '\0';
+				passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 			nr = new NickRequest(u->nick);
 			nr->passcode = passcode;
 			enc_encrypt(pass, nr->password);
-			if (email)
-				nr->email = sstrdup(email);
+			if (!email.empty())
+				nr->email = email;
 			nr->requested = time(NULL);
 			FOREACH_MOD(I_OnMakeNickRequest, OnMakeNickRequest(nr));
 			if (Config.NSEmailReg)
 			{
 				if (SendRegmail(u, nr))
 				{
-					notice_lang(Config.s_NickServ, u, NICK_ENTER_REG_CODE, email, Config.s_NickServ);
+					notice_lang(Config.s_NickServ, u, NICK_ENTER_REG_CODE, email.c_str(), Config.s_NickServ.c_str());
 					Alog() << Config.s_NickServ << ": sent registration verification code to " << nr->email;
 				}
 				else
@@ -292,7 +290,7 @@ class CommandNSRegister : public CommandNSConfirm
 			}
 			else
 			{
-				std::vector<ci::string> empty_params;
+				std::vector<Anope::string> empty_params;
 				return this->DoConfirm(u, empty_params);
 			}
 		}
@@ -300,13 +298,13 @@ class CommandNSRegister : public CommandNSConfirm
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_REGISTER);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		if (Config.NSForceEmail)
 			syntax_error(Config.s_NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX_EMAIL);
@@ -328,7 +326,7 @@ class CommandNSResend : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickRequest *nr = NULL;
 		if (Config.NSEmailReg)
@@ -343,7 +341,7 @@ class CommandNSResend : public Command
 				if (!SendRegmail(u, nr))
 				{
 					nr->lastmail = time(NULL);
-					notice_lang(Config.s_NickServ, u, NICK_REG_RESENT, nr->email);
+					notice_lang(Config.s_NickServ, u, NICK_REG_RESENT, nr->email.c_str());
 					Alog() << Config.s_NickServ << ": re-sent registration verification code for " << nr->nick << " to " << nr->email;
 				}
 				else
@@ -356,7 +354,7 @@ class CommandNSResend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_RESEND);
 		return true;
@@ -371,7 +369,7 @@ class CommandNSResend : public Command
 class NSRegister : public Module
 {
  public:
-	NSRegister(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -386,8 +384,8 @@ static bool SendRegmail(User *u, NickRequest *nr)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), getstring(NICK_REG_MAIL_SUBJECT), nr->nick);
-	snprintf(message, sizeof(message), getstring(NICK_REG_MAIL), nr->nick, Config.NetworkName, Config.s_NickServ, nr->passcode.c_str(), Config.NetworkName);
+	snprintf(subject, sizeof(subject), getstring(NICK_REG_MAIL_SUBJECT), nr->nick.c_str());
+	snprintf(message, sizeof(message), getstring(NICK_REG_MAIL), nr->nick.c_str(), Config.NetworkName.c_str(), Config.s_NickServ.c_str(), nr->passcode.c_str(), Config.NetworkName.c_str());
 
 	return Mail(u, nr, Config.s_NickServ, subject, message);
 }

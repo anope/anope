@@ -19,7 +19,7 @@ class BadwordsListCallback : public NumberList
 	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	BadwordsListCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, false), u(_u), ci(_ci), SentHeader(false)
+	BadwordsListCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, false), u(_u), ci(_ci), SentHeader(false)
 	{
 	}
 
@@ -45,7 +45,7 @@ class BadwordsListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned Number, BadWord *bw)
 	{
-		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), ((bw->type == BW_SINGLE) ? "(SINGLE)" : ((bw->type == BW_START) ? "(START)" : ((bw->type == BW_END) ? "(END)" : ""))));
+		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
 	}
 };
 
@@ -55,7 +55,7 @@ class BadwordsDelCallback : public NumberList
 	ChannelInfo *ci;
 	unsigned Deleted;
  public:
-	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const std::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
+	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
 	{
 	}
 
@@ -82,13 +82,13 @@ class BadwordsDelCallback : public NumberList
 class CommandBSBadwords : public Command
 {
  private:
-	CommandReturn DoList(User *u, ChannelInfo *ci, const ci::string &word)
+	CommandReturn DoList(User *u, ChannelInfo *ci, const Anope::string &word)
 	{
 		if (!ci->GetBadWordCount())
 			notice_lang(Config.s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
-		else if (!word.empty() && strspn(word.c_str(), "1234567890,-") == word.length())
+		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsListCallback list(u, ci, word.c_str());
+			BadwordsListCallback list(u, ci, word);
 			list.Process();
 		}
 		else
@@ -99,7 +99,7 @@ class CommandBSBadwords : public Command
 			{
 				BadWord *bw = ci->GetBadWord(i);
 
-				if (!word.empty() && !Anope::Match(bw->word, word.c_str(), false))
+				if (!word.empty() && !Anope::Match(bw->word, word))
 					continue;
 
 				if (!SentHeader)
@@ -118,25 +118,25 @@ class CommandBSBadwords : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, ChannelInfo *ci, const ci::string &word)
+	CommandReturn DoAdd(User *u, ChannelInfo *ci, const Anope::string &word)
 	{
-		size_t pos = word.find_last_of(" ");
+		size_t pos = word.rfind(' ');
 		BadWordType type = BW_ANY;
-		ci::string realword = word;
+		Anope::string realword = word;
 
-		if (pos != ci::string::npos)
+		if (pos != Anope::string::npos)
 		{
-			ci::string opt = ci::string(word, pos + 1);
+			Anope::string opt = word.substr(pos + 1);
 			if (!opt.empty())
 			{
-				if (opt == "SINGLE")
+				if (opt.equals_ci("SINGLE"))
 					type = BW_SINGLE;
-				else if (opt == "START")
+				else if (opt.equals_ci("START"))
 					type = BW_START;
-				else if (opt == "END")
+				else if (opt.equals_ci("END"))
 					type = BW_END;
 			}
-			realword = ci::string(word, 0, pos);
+			realword = word.substr(0, pos);
 		}
 
 		if (ci->GetBadWordCount() >= Config.BSBadWordsMax)
@@ -149,26 +149,26 @@ class CommandBSBadwords : public Command
 		{
 			BadWord *bw = ci->GetBadWord(i);
 
-			if (!bw->word.empty() && ((Config.BSCaseSensitive && !stricmp(bw->word.c_str(), realword.c_str())) || (!Config.BSCaseSensitive && bw->word == realword.c_str())))
+			if (!bw->word.empty() && ((Config.BSCaseSensitive && realword.equals_cs(bw->word)) || (!Config.BSCaseSensitive && realword.equals_ci(bw->word))))
 			{
 				notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 		}
 
-		ci->AddBadWord(realword.c_str(), type);
+		ci->AddBadWord(realword, type);
 
 		notice_lang(Config.s_BotServ, u, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDelete(User *u, ChannelInfo *ci, const ci::string &word)
+	CommandReturn DoDelete(User *u, ChannelInfo *ci, const Anope::string &word)
 	{
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (!word.empty() && isdigit(word[0]) && strspn(word.c_str(), "1234567890,-") == word.length())
+		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsDelCallback list(u, ci, word.c_str());
+			BadwordsDelCallback list(u, ci, word);
 			list.Process();
 		}
 		else
@@ -180,7 +180,7 @@ class CommandBSBadwords : public Command
 			{
 				badword = ci->GetBadWord(i);
 
-				if (badword->word == word)
+				if (word.equals_ci(badword->word))
 					break;
 			}
 
@@ -209,13 +209,13 @@ class CommandBSBadwords : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		ci::string cmd = params[1];
-		ci::string word = params.size() > 2 ? params[2].c_str() : "";
+		Anope::string chan = params[0];
+		Anope::string cmd = params[1];
+		Anope::string word = params.size() > 2 ? params[2] : "";
 		ChannelInfo *ci;
-		bool need_args = cmd == "LIST" || cmd == "CLEAR";
+		bool need_args = cmd.equals_ci("LIST") || cmd.equals_ci("CLEAR");
 
 		if (!need_args && word.empty())
 		{
@@ -237,13 +237,13 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		if (cmd == "ADD")
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, ci, word);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDelete(u, ci, word);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, ci, word);
-		else if (cmd == "CLEAR")
+		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(u, ci);
 		else
 			this->OnSyntaxError(u, "");
@@ -251,13 +251,13 @@ class CommandBSBadwords : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_BADWORDS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
 	}
@@ -271,10 +271,11 @@ class CommandBSBadwords : public Command
 class BSBadwords : public Module
 {
  public:
-	BSBadwords(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSBadwords);
 	}
 };

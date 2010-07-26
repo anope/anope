@@ -20,15 +20,15 @@ class CommandHSDelAll : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
+		Anope::string nick = params[0];
 		NickAlias *na;
 		if ((na = findnick(nick)))
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
@@ -38,21 +38,21 @@ class CommandHSDelAll : public Command
 				na = *it;
 				na->hostinfo.RemoveVhost();
 			}
-			Alog() << "vHosts for all nicks in group \002" << nc->display << "\002 deleted by oper \002" << u->nick << "\002";
-			notice_lang(Config.s_HostServ, u, HOST_DELALL, nc->display);
+			Alog() << "vHosts for all nicks in group \2" << nc->display << "\2 deleted by oper \2" << u->nick << "\2";
+			notice_lang(Config.s_HostServ, u, HOST_DELALL, nc->display.c_str());
 		}
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_HostServ, u, HOST_HELP_DELALL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
 	}
@@ -66,7 +66,7 @@ class CommandHSDelAll : public Command
 class HSDelAll : public Module
 {
  public:
-	HSDelAll(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSDelAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

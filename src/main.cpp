@@ -34,15 +34,13 @@
 # include <sys/resource.h>
 #endif
 
-const char * const Anope::compiled = __TIME__ " " __DATE__;
-
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
-std::string services_dir;	/* -dir dirname */
-std::string services_bin;	/* Binary as specified by the user */
-std::string orig_cwd;		/* Original current working directory */
-std::string log_filename = "services.log"; /* -log filename */
+Anope::string services_dir;	/* -dir dirname */
+Anope::string services_bin;	/* Binary as specified by the user */
+Anope::string orig_cwd;		/* Original current working directory */
+Anope::string log_filename = "services.log"; /* -log filename */
 int debug = 0;				/* -debug */
 int readonly = 0;			/* -readonly */
 bool LogChan = false;		/* -logchan */
@@ -52,7 +50,7 @@ int nothird = 0;			/* -nothrid */
 int noexpire = 0;			/* -noexpire */
 int protocoldebug = 0;		/* -protocoldebug */
 
-std::string binary_dir; /* Used to store base path for Anope */
+Anope::string binary_dir; /* Used to store base path for Anope */
 #ifdef _WIN32
 # include <process.h>
 # define execve _execve
@@ -65,7 +63,7 @@ int quitting = 0;
 int shutting_down = 0;
 
 /* Contains a message as to why services is terminating */
-const char *quitmsg = NULL;
+Anope::string quitmsg;
 
 /* Should we update the databases now? */
 int save_data = 0;
@@ -112,7 +110,7 @@ Socket *UplinkSock = NULL;
 class UplinkSocket : public ClientSocket
 {
  public:
-	UplinkSocket(const std::string &nTargetHost, int nPort, const std::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
+	UplinkSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
 	{
 		UplinkSock = this;
 	}
@@ -124,7 +122,7 @@ class UplinkSocket : public ClientSocket
 		UplinkSock = NULL;
 	}
 
-	bool Read(const std::string &buf)
+	bool Read(const Anope::string &buf)
 	{
 		process(buf);
 		return true;
@@ -178,7 +176,7 @@ void do_restart_services()
 
 	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
 
-	if (!quitmsg)
+	if (quitmsg.empty())
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
 	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
@@ -186,9 +184,9 @@ void do_restart_services()
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(it->second, "Restarting");
 		/* Erase bots from the user list so they don't get nuked later on */
-		UserListByNick.erase(it->second->nick.c_str());
+		UserListByNick.erase(it->second->nick);
 		if (!it->second->GetUID().empty())
-			UserListByUID.erase(it->second->GetUID().c_str());
+			UserListByUID.erase(it->second->GetUID());
 	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
 	delete UplinkSock;
@@ -218,7 +216,7 @@ static void services_shutdown()
 {
 	FOREACH_MOD(I_OnPreShutdown, OnPreShutdown());
 
-	if (!quitmsg)
+	if (quitmsg.empty())
 		quitmsg = "Terminating, reason unknown";
 	Alog() << quitmsg;
 	if (started && UplinkSock)
@@ -229,7 +227,7 @@ static void services_shutdown()
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(it->second, "Shutting down");
 			/* Erase bots from the user list so they don't get nuked later on */
-			UserListByNick.erase(it->second->nick.c_str());
+			UserListByNick.erase(it->second->nick);
 			if (!it->second->GetUID().empty())
 				UserListByUID.erase(it->second->GetUID());
 		}
@@ -258,7 +256,7 @@ void sighandler(int signum)
 	 * always set when we need it. It seems some signals slip through to the
 	 * QUIT code without having a valid quitmsg. -GD
 	 */
-	if (!quitmsg)
+	if (quitmsg.empty())
 		quitmsg = "Services terminating via a signal.";
 
 	if (started)
@@ -324,7 +322,7 @@ void sighandler(int signum)
 	else
 	{
 		if (isatty(2))
-			fprintf(stderr, "%s\n", quitmsg);
+			fprintf(stderr, "%s\n", quitmsg.c_str());
 		else
 			Alog() << quitmsg;
 
@@ -336,7 +334,7 @@ void sighandler(int signum)
 
 /** The following comes from InspIRCd to get the full path of the Anope executable
  */
-std::string GetFullProgDir(char *argv0)
+Anope::string GetFullProgDir(const Anope::string &argv0)
 {
 	char buffer[PATH_MAX];
 #ifdef _WIN32
@@ -346,31 +344,31 @@ std::string GetFullProgDir(char *argv0)
 	 */
 	if (GetModuleFileName(NULL, buffer, PATH_MAX))
 	{
-		std::string fullpath = buffer;
-		std::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
-		services_bin = fullpath.substr(n + 1, fullpath.size());
-		return std::string(fullpath, 0, n);
+		Anope::string fullpath = buffer;
+		Anope::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
+		services_bin = fullpath.substr(n + 1, fullpath.length());
+		return fullpath.substr(0, n);
 	}
 #else
 	// Get the current working directory
 	if (getcwd(buffer, PATH_MAX))
 	{
-		std::string remainder = argv0;
+		Anope::string remainder = argv0;
 
 		/* Does argv[0] start with /? If so, it's a full path, use it */
 		if (remainder[0] == '/')
 		{
-			std::string::size_type n = remainder.rfind("/" SERVICES_BIN);
-			services_bin = remainder.substr(n + 1, remainder.size());
-			return std::string(remainder, 0, n);
+			Anope::string::size_type n = remainder.rfind("/" SERVICES_BIN);
+			services_bin = remainder.substr(n + 1, remainder.length());
+			return remainder.substr(0, n);
 		}
 
 		services_bin = remainder;
-		if (services_bin.substr(0, 2) == "./")
+		if (services_bin.substr(0, 2).equals_cs("./"))
 			services_bin = services_bin.substr(2);
-		std::string fullpath = std::string(buffer) + "/" + remainder;
-		std::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
-		return std::string(fullpath, 0, n);
+		Anope::string fullpath = Anope::string(buffer) + "/" + remainder;
+		Anope::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
+		return fullpath.substr(0, n);
 	}
 #endif
 	return "/";
@@ -397,7 +395,7 @@ static bool Connect()
 
 		try
 		{
-			new UplinkSocket(uplink_server->host, uplink_server->port, Config.LocalHost ? Config.LocalHost : "", uplink_server->ipv6);
+			new UplinkSocket(uplink_server->host, uplink_server->port, Config.LocalHost, uplink_server->ipv6);
 		}
 		catch (const SocketException &ex)
 		{
@@ -444,13 +442,13 @@ int main(int ac, char **av, char **envp)
 #endif
 
 	binary_dir = GetFullProgDir(av[0]);
-	if (binary_dir[binary_dir.size() - 1] == '.')
-		binary_dir = binary_dir.substr(0, binary_dir.size() - 2);
+	if (binary_dir[binary_dir.length() - 1] == '.')
+		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
 #ifdef _WIN32
-	std::string::size_type n = binary_dir.rfind("\\");
+	Anope::string::size_type n = binary_dir.rfind('\\');
 	services_dir = binary_dir.substr(0, n) + "\\data";
 #else
-	std::string::size_type n = binary_dir.rfind("/");
+	Anope::string::size_type n = binary_dir.rfind('/');
 	services_dir = binary_dir.substr(0, n) + "/data";
 #endif
 
@@ -580,12 +578,12 @@ int main(int ac, char **av, char **envp)
 	return 0;
 }
 
-inline std::string Anope::Version()
+inline Anope::string Anope::Version()
 {
 	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + stringify(VERSION_BUILD) + ")";
 }
 
-inline std::string Anope::Build()
+inline Anope::string Anope::Build()
 {
-	return std::string("build #") + stringify(BUILD) + ", compiled " + compiled;
+	return "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
 }

@@ -20,12 +20,12 @@ class CommandBSSay : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci;
 
-		const char *chan = params[0].c_str();
-		const char *text = params[1].c_str();
+		Anope::string chan = params[0];
+		Anope::string text = params[1];
 
 		ci = cs_findchan(chan);
 
@@ -53,20 +53,20 @@ class CommandBSSay : public Command
 			return MOD_CONT;
 		}
 
-		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", text);
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
 		ci->bi->lastmsg = time(NULL);
-		if (Config.LogBot && Config.LogChannel && LogChan && !debug && findchan(Config.LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text);
+		if (Config.LogBot && !Config.LogChannel.empty() && LogChan && !debug && findchan(Config.LogChannel))
+			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_BotServ, u, BOT_HELP_SAY);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}
@@ -80,10 +80,11 @@ class CommandBSSay : public Command
 class BSSay : public Module
 {
  public:
-	BSSay(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	BSSay(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
 		this->AddCommand(BotServ, new CommandBSSay());
 	}
 };

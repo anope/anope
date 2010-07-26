@@ -16,21 +16,21 @@
 class CommandCSSetPrivate : public Command
 {
  public:
-	CommandCSSetPrivate(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPrivate(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PRIVATE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PRIVATE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name.c_str());
@@ -41,13 +41,13 @@ class CommandCSSetPrivate : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
 	}
@@ -61,17 +61,17 @@ class CommandCSSetPrivate : public Command
 class CommandCSSASetPrivate : public CommandCSSetPrivate
 {
  public:
-	CommandCSSASetPrivate(const ci::string &cname) : CommandCSSetPrivate(cname, "chanserv/saset/private")
+	CommandCSSASetPrivate(const Anope::string &cname) : CommandCSSetPrivate(cname, "chanserv/saset/private")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
 	}
@@ -80,7 +80,7 @@ class CommandCSSASetPrivate : public CommandCSSetPrivate
 class CSSetPrivate : public Module
 {
  public:
-	CSSetPrivate(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

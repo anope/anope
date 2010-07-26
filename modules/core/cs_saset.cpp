@@ -15,21 +15,22 @@
 
 class CommandCSSASet : public Command
 {
-	std::map<ci::string, Command *> subcommands;
+	typedef std::map<Anope::string, Command *, hash_compare_ci_string> subcommand_map;
+	subcommand_map subcommands;
 
  public:
-	CommandCSSASet(const ci::string &cname) : Command(cname, 2, 3)
+	CommandCSSASet(const Anope::string &cname) : Command(cname, 2, 3)
 	{
 	}
 
 	~CommandCSSASet()
 	{
-		for (std::map<ci::string, Command *>::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
+		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 			delete it->second;
 		this->subcommands.clear();
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		if (readonly)
 		{
@@ -41,26 +42,26 @@ class CommandCSSASet : public Command
 
 		if (c)
 		{
-			ci::string cmdparams = cs_findchan(params[0])->name.c_str();
-			for (std::vector<ci::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
+			Anope::string cmdparams = cs_findchan(params[0])->name;
+			for (std::vector<Anope::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
 			mod_run_cmd(ChanServ, u, c, params[1], cmdparams);
 		}
 		else
 		{
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, params[1].c_str());
-			notice_lang(Config.s_ChanServ, u, MORE_INFO, Config.s_ChanServ, "SET");
+			notice_lang(Config.s_ChanServ, u, MORE_INFO, Config.s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_HEAD);
-			for (std::map<ci::string, Command *>::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
+			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_TAIL);
 			return true;
@@ -76,7 +77,7 @@ class CommandCSSASet : public Command
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
@@ -91,14 +92,14 @@ class CommandCSSASet : public Command
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
-	bool DelSubcommand(const ci::string &command)
+	bool DelSubcommand(const Anope::string &command)
 	{
 		return this->subcommands.erase(command);
 	}
 
-	Command *FindCommand(const ci::string &subcommand)
+	Command *FindCommand(const Anope::string &subcommand)
 	{
-		std::map<ci::string, Command *>::const_iterator it = this->subcommands.find(subcommand);
+		subcommand_map::const_iterator it = this->subcommands.find(subcommand);
 
 		if (it != this->subcommands.end())
 			return it->second;
@@ -110,7 +111,7 @@ class CommandCSSASet : public Command
 class CSSASet : public Module
 {
  public:
-	CSSASet(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

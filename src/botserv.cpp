@@ -42,12 +42,12 @@ void get_botserv_stats(long *nrec, long *memuse)
 	{
 		BotInfo *bi = it->second;
 
-		count++;
+		++count;
 		mem += sizeof(*bi);
-		mem += bi->nick.size() + 1;
-		mem += bi->GetIdent().size() + 1;
-		mem += strlen(bi->host) + 1;
-		mem += strlen(bi->realname) + 1;
+		mem += bi->nick.length() + 1;
+		mem += bi->GetIdent().length() + 1;
+		mem += bi->host.length() + 1;
+		mem += bi->realname.length() + 1;
 	}
 
 	*nrec = count;
@@ -61,7 +61,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 
 void bs_init()
 {
-	if (Config.s_BotServ)
+	if (!Config.s_BotServ.empty())
 		moduleAddBotServCmds();
 }
 
@@ -69,17 +69,17 @@ void bs_init()
 
 /* Main BotServ routine. */
 
-void botserv(User *u, BotInfo *bi, const std::string &buf)
+void botserv(User *u, BotInfo *bi, const Anope::string &buf)
 {
 	if (!u || !bi || buf.empty())
 		return;
 
-	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
 	{
-		std::string command = buf;
+		Anope::string command = buf;
 		command.erase(command.begin());
 		command.erase(command.end());
-		ircdproto->SendCTCP(bi, u->nick.c_str(), "%s", command.c_str());
+		ircdproto->SendCTCP(bi, u->nick, "%s", command.c_str());
 	}
 	else
 		mod_run_cmd(bi, u, buf);
@@ -91,27 +91,27 @@ void botserv(User *u, BotInfo *bi, const std::string &buf)
  * bot is on.
  */
 
-void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
+void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 {
 	if (!u || !ci || !ci->c || buf.empty())
 		return;
 
 	/* Answer to ping if needed */
-	if (buf.find("\1PING ", 0, 6) != std::string::npos && buf[buf.length() - 1] == '\1')
+	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
 	{
-		std::string ctcp = buf;
+		Anope::string ctcp = buf;
 		ctcp.erase(ctcp.begin());
 		ctcp.erase(ctcp.end());
-		ircdproto->SendCTCP(ci->bi, u->nick.c_str(), "%s", ctcp.c_str());
+		ircdproto->SendCTCP(ci->bi, u->nick, "%s", ctcp.c_str());
 	}
 
 	bool was_action = false;
-	std::string realbuf = buf;
+	Anope::string realbuf = buf;
 
 	/* If it's a /me, cut the CTCP part because the ACTION will cause
 	 * problems with the caps or badwords kicker
 	 */
-	if (realbuf.find("\1ACTION ", 0, 8) && realbuf[buf.length() - 1] == '\1')
+	if (!realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[buf.length() - 1] == '\1')
 	{
 		realbuf.erase(0, 8);
 		realbuf.erase(realbuf.end());
@@ -141,7 +141,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 	if (!check_access(u, ci, CA_NOKICK) && Allow)
 	{
 		/* Bolds kicker */
-		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find_first_of(2) != std::string::npos)
+		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_BOLDS);
 			bot_kick(ci, u, BOT_REASON_BOLD);
@@ -149,7 +149,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 		}
 
 		/* Color kicker */
-		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find_first_of(3) != std::string::npos)
+		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find(3) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_COLORS);
 			bot_kick(ci, u, BOT_REASON_COLOR);
@@ -157,7 +157,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 		}
 
 		/* Reverses kicker */
-		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find_first_of(22) != std::string::npos)
+		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find(22) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_REVERSES);
 			bot_kick(ci, u, BOT_REASON_REVERSE);
@@ -165,7 +165,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 		}
 
 		/* Underlines kicker */
-		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find_first_of(31) != std::string::npos)
+		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_UNDERLINES);
 			bot_kick(ci, u, BOT_REASON_UNDERLINE);
@@ -204,39 +204,32 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 			bool mustkick = false;
 
 			/* Normalize the buffer */
-			const char *nbuf = normalizeBuffer(realbuf.c_str());
+			Anope::string nbuf = normalizeBuffer(realbuf);
 
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
 				BadWord *bw = ci->GetBadWord(i);
 
-				if (bw->type == BW_ANY && ((Config.BSCaseSensitive && strstr(nbuf, bw->word.c_str())) || (!Config.BSCaseSensitive && stristr(nbuf, bw->word.c_str()))))
+				if (bw->type == BW_ANY && ((Config.BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 					mustkick = true;
 				else if (bw->type == BW_SINGLE)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && nbuf == bw->word) || (!Config.BSCaseSensitive && (!stricmp(nbuf, bw->word.c_str()))))
+					if ((Config.BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config.BSCaseSensitive && bw->word.equals_ci(nbuf)))
 						mustkick = true;
-					else if ((strchr(nbuf, ' ') == nbuf + len) && ((Config.BSCaseSensitive && nbuf == bw->word) || (!Config.BSCaseSensitive && (stristr(nbuf, bw->word.c_str()) == nbuf))))
+					else if (nbuf.find(' ') == len && ((Config.BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config.BSCaseSensitive && bw->word.equals_ci(nbuf))))
 						mustkick = true;
 					else
 					{
-						if ((strrchr(nbuf, ' ') == nbuf + strlen(nbuf) - len - 1) && ((Config.BSCaseSensitive && (strstr(nbuf, bw->word.c_str()) == nbuf + strlen(nbuf) - len)) || (!Config.BSCaseSensitive && (stristr(nbuf, bw->word.c_str()) == nbuf + strlen(nbuf) - len))))
+						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config.BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config.BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
 							mustkick = true;
 						else
 						{
-							char *wordbuf = new char[len + 3];
+							Anope::string wordbuf = " " + bw->word + " ";
 
-							wordbuf[0] = ' ';
-							wordbuf[len + 1] = ' ';
-							wordbuf[len + 2] = '\0';
-							memcpy(wordbuf + 1, bw->word.c_str(), len);
-
-							if ((Config.BSCaseSensitive && strstr(nbuf, wordbuf)) || (!Config.BSCaseSensitive && stristr(nbuf, wordbuf)))
+							if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;
-
-							delete [] wordbuf;
 						}
 					}
 				}
@@ -244,40 +237,28 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && !strncmp(nbuf, bw->word.c_str(), len)) || (!Config.BSCaseSensitive && !strnicmp(nbuf, bw->word.c_str(), len)))
+					if ((Config.BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config.BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
-						char *wordbuf = new char[len + 2];
+						Anope::string wordbuf = " " + bw->word;
 
-						memcpy(wordbuf + 1, bw->word.c_str(), len);
-						wordbuf[0] = ' ';
-						wordbuf[len + 1] = '\0';
-
-						if ((Config.BSCaseSensitive && strstr(nbuf, wordbuf)) || (!Config.BSCaseSensitive && stristr(nbuf, wordbuf)))
+						if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
-
-						delete [] wordbuf;
 					}
 				}
 				else if (bw->type == BW_END)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && !strncmp(nbuf + strlen(nbuf) - len, bw->word.c_str(), len)) || (!Config.BSCaseSensitive && !strnicmp(nbuf + strlen(nbuf) - len, bw->word.c_str(), len)))
+					if ((Config.BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config.BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
-						char *wordbuf = new char[len + 2];
+						Anope::string wordbuf = bw->word + " ";
 
-						memcpy(wordbuf, bw->word.c_str(), len);
-						wordbuf[len] = ' ';
-						wordbuf[len + 1] = '\0';
-
-						if ((Config.BSCaseSensitive && strstr(nbuf, wordbuf)) || (!Config.BSCaseSensitive && stristr(nbuf, wordbuf)))
+						if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
-
-						delete [] wordbuf;
 					}
 				}
 
@@ -289,15 +270,9 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 					else
 						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word.c_str());
 
-					/* free the normalized buffer before return (#850) */
-					delete [] nbuf;
-
 					return;
 				}
 			}
-
-			/* Free the normalized buffer */
-			delete [] nbuf;
 		}
 
 		/* Flood kicker */
@@ -331,16 +306,15 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 			if (!ud)
 				return;
 
-			if (ud->lastline && stricmp(ud->lastline, buf.c_str()))
+			if (!ud->lastline.empty() && !ud->lastline.equals_ci(buf))
 			{
-				delete [] ud->lastline;
-				ud->lastline = sstrdup(buf.c_str());
+				ud->lastline = buf;
 				ud->times = 0;
 			}
 			else
 			{
-				if (!ud->lastline)
-					ud->lastline = sstrdup(buf.c_str());
+				if (ud->lastline.empty())
+					ud->lastline = buf;
 				++ud->times;
 			}
 
@@ -354,41 +328,35 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 	}
 
 	/* return if the user is on the ignore list  */
-	if (get_ignore(u->nick.c_str()) != NULL)
+	if (get_ignore(u->nick))
 		return;
 
 	/* Fantaisist commands */
-	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == *Config.BSFantasyCharacter && !was_action)
+	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config.BSFantasyCharacter[0] && !was_action)
 	{
 		spacesepstream sep(buf);
-		std::string token;
+		Anope::string token;
 
-		if (sep.GetToken(token) && token[0] == *Config.BSFantasyCharacter)
+		if (sep.GetToken(token) && token[0] == Config.BSFantasyCharacter[0])
 		{
 			/* Strip off the fantasy character */
 			token.erase(token.begin());
 
 			if (check_access(u, ci, CA_FANTASIA))
 			{
-				Command *command = FindCommand(ChanServ, token.c_str());
+				Command *command = FindCommand(ChanServ, token);
 
 				/* Command exists and can not be called by fantasy */
 				if (command && !command->HasFlag(CFLAG_DISABLE_FANTASY))
 				{
-					std::string bbuf = std::string(token);
+					Anope::string bbuf = token;
 
 					/* Some commands don't need the channel name added.. eg !help */
 					if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
-					{
-						bbuf += " ";
-						bbuf += ci->name;
-					}
+						bbuf += " " + ci->name;
 
 					if (!sep.StreamEnd())
-					{
-						bbuf += " ";
-						bbuf += sep.GetRemaining();
-					}
+						bbuf += " " + sep.GetRemaining();
 
 					chanserv(u, bbuf);
 				}
@@ -405,21 +373,11 @@ void botchanmsgs(User *u, ChannelInfo *ci, const std::string &buf)
 
 /*************************************************************************/
 
-BotInfo *findbot(const char *nick)
-{
-	return findbot(ci::string(nick));
-}
-
-BotInfo *findbot(const std::string &nick)
-{
-	return findbot(ci::string(nick.c_str()));
-}
-
-BotInfo *findbot(const ci::string &nick)
+BotInfo *findbot(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircd->ts6)
 	{
-		botinfo_uid_map::const_iterator it = BotListByUID.find(nick.c_str());
+		botinfo_uid_map::const_iterator it = BotListByUID.find(nick);
 
 		if (it != BotListByUID.end())
 			return it->second;
@@ -440,14 +398,13 @@ BotInfo *findbot(const ci::string &nick)
 
 static BanData *get_ban_data(Channel *c, User *u)
 {
-	char mask[BUFSIZE];
 	BanData *bd, *next;
 	time_t now = time(NULL);
 
 	if (!c || !u)
 		return NULL;
 
-	snprintf(mask, sizeof(mask), "%s@%s", u->GetIdent().c_str(), u->GetDisplayedHost().c_str());
+	Anope::string mask = u->GetIdent() + "@" + u->GetDisplayedHost();
 
 	for (bd = c->bd; bd; bd = next)
 	{
@@ -459,13 +416,11 @@ static BanData *get_ban_data(Channel *c, User *u)
 				bd->prev->next = bd->next;
 			else
 				c->bd = bd->next;
-			if (bd->mask)
-				delete [] bd->mask;
 			next = bd->next;
 			delete bd;
 			continue;
 		}
-		if (!stricmp(bd->mask, mask))
+		if (bd->mask.equals_ci(mask))
 		{
 			bd->last_use = now;
 			return bd;
@@ -475,7 +430,7 @@ static BanData *get_ban_data(Channel *c, User *u)
 
 	/* If we fall here it is that we haven't found the record */
 	bd = new BanData;
-	bd->mask = sstrdup(mask);
+	bd->mask = mask;
 	bd->last_use = now;
 	for (int x = 0; x < TTB_SIZE; ++x)
 		bd->ttb[x] = 0;
@@ -511,11 +466,9 @@ static UserData *get_user_data(Channel *c, User *u)
 			/* Checks whether data is obsolete */
 			if (now - uc->ud.last_use > Config.BSKeepData)
 			{
-				if (uc->ud.lastline)
-					delete [] uc->ud.lastline;
 				/* We should not free and realloc, but reset to 0
 				   instead. */
-				memset(&uc->ud, 0, sizeof(UserData));
+				uc->ud.Clear();
 				uc->ud.last_use = now;
 			}
 
@@ -550,11 +503,11 @@ static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 		/* Should not use == here because bd->ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
 		 * if the TTB was changed after it was not set (0) before and the user had already been
 		 * kicked a few times. Bug #1056 - Adam */
-		char mask[BUFSIZE];
+		Anope::string mask;
 
 		bd->ttb[ttbtype] = 0;
 
-		get_idealban(ci, u, mask, sizeof(mask));
+		get_idealban(ci, u, mask);
 
 		if (ci->c)
 			ci->c->SetMode(NULL, CMODE_BAN, mask);
@@ -589,9 +542,9 @@ static void bot_kick(ChannelInfo *ci, User *u, int message, ...)
 
 /* Makes a simple ban and kicks the target */
 
-void bot_raw_ban(User *requester, ChannelInfo *ci, char *nick, const char *reason)
+void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason)
 {
-	char mask[BUFSIZE];
+	Anope::string mask;
 	User *u = finduser(nick);
 
 	if (!u)
@@ -599,35 +552,35 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, char *nick, const char *reaso
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
 		return;
 	}
 
-	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && get_access(u, ci) >= get_access(requester, ci))
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
 		return;
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u) == 1)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(BOT_EXCEPT));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(BOT_EXCEPT));
 		return;
 	}
 
-	get_idealban(ci, u, mask, sizeof(mask));
+	get_idealban(ci, u, mask);
 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
 	/* Check if we need to do a signkick or not -GD */
 	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
-		ci->c->Kick(ci->bi, u, "%s (%s)", reason ? reason : ci->bi->nick.c_str(), requester->nick.c_str());
+		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
-		ci->c->Kick(ci->bi, u, "%s", reason ? reason : ci->bi->nick.c_str());
+		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());
 }
 
 /*************************************************************************/
 
 /* Makes a kick with a "dynamic" reason ;) */
 
-void bot_raw_kick(User *requester, ChannelInfo *ci, char *nick, const char *reason)
+void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason)
 {
 	User *u = finduser(nick);
 
@@ -636,24 +589,24 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, char *nick, const char *reas
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
 		return;
 	}
 
-	if (ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && get_access(u, ci) >= get_access(requester, ci))
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
 		return;
 
 	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
-		ci->c->Kick(ci->bi, u, "%s (%s)", reason ? reason : ci->bi->nick.c_str(), requester->nick.c_str());
+		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
-		ci->c->Kick(ci->bi, u, "%s", reason ? reason : ci->bi->nick.c_str());
+		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());
 }
 
 /*************************************************************************/
 
 /* Makes a mode operation on a channel for a nick */
 
-void bot_raw_mode(User *requester, ChannelInfo *ci, const char *mode, char *nick)
+void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, const Anope::string &nick)
 {
 	char buf[BUFSIZE] = "";
 	User *u;
@@ -665,16 +618,16 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const char *mode, char *nick
 
 	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
 
-	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && *mode == '-' && requester != u)
+	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && mode[0] == '-' && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name.c_str(), "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
 		return;
 	}
 
-	if (*mode == '-' && ci->HasFlag(CI_PEACE) && stricmp(requester->nick.c_str(), nick) && get_access(u, ci) >= get_access(requester, ci))
+	if (mode[0] == '-' && ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
 		return;
 
-	ci->c->SetModes(NULL, "%s %s", mode, nick);
+	ci->c->SetModes(NULL, "%s %s", mode.c_str(), nick.c_str());
 }
 
 /*************************************************************************/
@@ -683,15 +636,11 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const char *mode, char *nick
  * @param A string to be parsed for control and color codes
  * @return A string stripped of control and color codes
  */
-char *normalizeBuffer(const char *buf)
+Anope::string normalizeBuffer(const Anope::string &buf)
 {
-	char *newbuf;
-	int i, len, j = 0;
+	Anope::string newbuf;
 
-	len = strlen(buf);
-	newbuf = new char[len + 1];
-
-	for (i = 0; i < len; ++i)
+	for (unsigned i = 0, end = buf.length(); i < end; ++i)
 	{
 		switch (buf[i])
 		{
@@ -748,13 +697,9 @@ char *normalizeBuffer(const char *buf)
 				break;
 			/* A valid char gets copied into the new buffer */
 			default:
-				newbuf[j] = buf[i];
-				++j;
+				newbuf += buf[i];
 		}
 	}
-
-	/* Terminate the string */
-	newbuf[j] = 0;
 
 	return newbuf;
 }

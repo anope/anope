@@ -51,22 +51,23 @@ enum
 	LNG_NUM_STRINGS
 };
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, time_t tmp_time);
-int my_isvalidchar(const char c);
-void my_memo_lang(User *u, const char *name, int z, int number, ...);
-void req_send_memos(User *u, char *vIdent, char *vHost);
+void my_add_host_request(const Anope::string &nick, const Anope::string &vIdent, const Anope::string &vhost, const Anope::string &creator, time_t tmp_time);
+int my_isvalidchar(char c);
+void my_memo_lang(User *u, const Anope::string &name, int z, int number, ...);
+void req_send_memos(User *u, const Anope::string &vIdent, const Anope::string &vHost);
 
 void my_load_config();
 void my_add_languages();
 
 struct HostRequest
 {
-	std::string ident;
-	std::string host;
+	Anope::string ident;
+	Anope::string host;
 	time_t time;
 };
 
-std::map<ci::string, HostRequest *> Requests;
+typedef std::map<Anope::string, HostRequest *, hash_compare_ci_string> RequestMap;
+RequestMap Requests;
 
 static Module *me;
 
@@ -77,79 +78,52 @@ class CommandHSRequest : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick;
-		const char *rawhostmask = params[0].c_str();
-		char *hostmask = new char[Config.HostLen];
+		Anope::string nick = u->nick;
+		Anope::string rawhostmask = params[0];
+		Anope::string hostmask;
 		NickAlias *na;
-		char *s;
-		char *vIdent = NULL;
 		time_t now = time(NULL);
 
-		nick = u->nick.c_str();
-
-		vIdent = myStrGetOnlyToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
-		if (vIdent)
+		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
+		if (!vIdent.empty())
 		{
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
-			if (!rawhostmask)
+			if (rawhostmask.empty())
 			{
 				me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
-				delete [] vIdent;
-				delete [] hostmask;
 				return MOD_CONT;
 			}
-			if (strlen(vIdent) > Config.UserLen)
+			if (vIdent.length() > Config.UserLen)
 			{
 				notice_lang(Config.s_HostServ, u, HOST_SET_IDENTTOOLONG, Config.UserLen);
-				delete [] vIdent;
-				delete [] rawhostmask;
-				delete [] hostmask;
 				return MOD_CONT;
 			}
 			else
-				for (s = vIdent; *s; ++s)
+				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!my_isvalidchar(*s))
 					{
 						notice_lang(Config.s_HostServ, u, HOST_SET_IDENT_ERROR);
-						delete [] vIdent;
-						delete [] rawhostmask;
-						delete [] hostmask;
 						return MOD_CONT;
 					}
 			if (!ircd->vident)
 			{
 				notice_lang(Config.s_HostServ, u, HOST_NO_VIDENT);
-				delete [] vIdent;
-				delete [] rawhostmask;
-				delete [] hostmask;
 				return MOD_CONT;
 			}
 		}
-		if (strlen(rawhostmask) < Config.HostLen)
-			snprintf(hostmask, Config.HostLen, "%s", rawhostmask);
+		if (rawhostmask.length() < Config.HostLen)
+			hostmask = rawhostmask;
 		else
 		{
 			notice_lang(Config.s_HostServ, u, HOST_SET_TOOLONG, Config.HostLen);
-			if (vIdent)
-			{
-				delete [] vIdent;
-				delete [] rawhostmask;
-			}
-			delete [] hostmask;
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
 			notice_lang(Config.s_HostServ, u, HOST_SET_ERROR);
-			if (vIdent)
-			{
-				delete [] vIdent;
-				delete [] rawhostmask;
-			}
-			delete [] hostmask;
 			return MOD_CONT;
 		}
 
@@ -159,34 +133,21 @@ class CommandHSRequest : public Command
 			{
 				me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_WAIT, Config.MSSendDelay);
 				u->lastmemosend = now;
-				if (vIdent)
-				{
-					delete [] vIdent;
-					delete [] rawhostmask;
-				}
-				delete [] hostmask;
 				return MOD_CONT;
 			}
-			my_add_host_request(const_cast<char *>(nick), vIdent, hostmask, const_cast<char *>(u->nick.c_str()), now);
+			my_add_host_request(nick, vIdent, hostmask, u->nick, now);
 
 			me->NoticeLang(Config.s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
 			Alog() << "New vHost Requested by " << nick;
 		}
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick);
-
-		if (vIdent)
-		{
-			delete [] vIdent;
-			delete [] rawhostmask;
-		}
-		delete [] hostmask;
+			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 		u->SendMessage(Config.s_HostServ, " ");
@@ -195,7 +156,7 @@ class CommandHSRequest : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REQUEST_SYNTAX);
 	}
@@ -213,14 +174,14 @@ class CommandHSActivate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
+		Anope::string nick = params[0];
 		NickAlias *na;
 
 		if ((na = findnick(nick)))
 		{
-			std::map<ci::string, HostRequest *>::iterator it = Requests.find(na->nick);
+			RequestMap::iterator it = Requests.find(na->nick);
 			if (it != Requests.end())
 			{
 				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
@@ -230,19 +191,19 @@ class CommandHSActivate : public Command
 				if (HSRequestMemoUser)
 					my_memo_lang(u, na->nick, 2, LNG_ACTIVATE_MEMO);
 
-				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick);
+				me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATED, nick.c_str());
 				Alog() << "Host Request for " << nick << " activated by " << u->nick;
 			}
 			else
-				me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
+				me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick.c_str());
 		}
 		else
-			notice_lang(Config.s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_HostServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 		u->SendMessage(Config.s_HostServ, " ");
@@ -253,7 +214,7 @@ class CommandHSActivate : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 	}
@@ -271,12 +232,12 @@ class CommandHSReject : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *reason = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string nick = params[0];
+		Anope::string reason = params.size() > 1 ? params[1] : "";
 
-		std::map<ci::string, HostRequest *>::iterator it = Requests.find(nick);
+		RequestMap::iterator it = Requests.find(nick);
 		if (it != Requests.end())
 		{
 			delete it->second;
@@ -284,22 +245,22 @@ class CommandHSReject : public Command
 
 			if (HSRequestMemoUser)
 			{
-				if (reason)
-					my_memo_lang(u, nick, 2, LNG_REJECT_MEMO_REASON, reason);
+				if (!reason.empty())
+					my_memo_lang(u, nick, 2, LNG_REJECT_MEMO_REASON, reason.c_str());
 				else
 					my_memo_lang(u, nick, 2, LNG_REJECT_MEMO);
 			}
 
-			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick);
-			Alog() << "Host Request for " << nick << " rejected by " << u->nick << " (" << (reason ? reason : "") << ")";
+			me->NoticeLang(Config.s_HostServ, u, LNG_REJECTED, nick.c_str());
+			Alog() << "Host Request for " << nick << " rejected by " << u->nick << " (" << (!reason.empty() ? reason : "") << ")";
 		}
 		else
-			me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick);
+			me->NoticeLang(Config.s_HostServ, u, LNG_NO_REQUEST, nick.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REJECT_SYNTAX);
 		u->SendMessage(Config.s_HostServ, " ");
@@ -310,7 +271,7 @@ class CommandHSReject : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_REJECT_SYNTAX);
 	}
@@ -327,7 +288,7 @@ class HSListBase : public Command
 		unsigned display_counter = 0;
 		tm *tm;
 
-		for (std::map<ci::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
+		for (RequestMap::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config.NSListMax)
@@ -347,11 +308,11 @@ class HSListBase : public Command
 		return MOD_CONT;
 	}
  public:
-	HSListBase(const ci::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
+	HSListBase(const Anope::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
 	{
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		// no-op
 	}
@@ -364,12 +325,12 @@ class CommandHSWaiting : public HSListBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoList(u);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		me->NoticeLang(Config.s_HostServ, u, LNG_WAITING_SYNTAX);
 		u->SendMessage(Config.s_HostServ, " ");
@@ -382,7 +343,7 @@ class CommandHSWaiting : public HSListBase
 class HSRequest : public Module
 {
  public:
-	HSRequest(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
@@ -396,7 +357,7 @@ class HSRequest : public Module
 
 		my_load_config();
 
-		const char* langtable_en_us[] = {
+		const char *langtable_en_us[] = {
 			/* LNG_REQUEST_SYNTAX */
 			"Syntax: \002REQUEST \037vhost\037\002",
 			/* LNG_REQUESTED */
@@ -446,7 +407,7 @@ class HSRequest : public Module
 			"the same as performing a LIST +req ."
 		};
 
-		const char* langtable_nl[] = {
+		const char *langtable_nl[] = {
 			/* LNG_REQUEST_SYNTAX */
 			"Gebruik: \002REQUEST \037vhost\037\002",
 			/* LNG_REQUESTED */
@@ -496,7 +457,7 @@ class HSRequest : public Module
 			"hetzelfde als LIST +req ."
 		};
 
-		const char* langtable_pt[] = {
+		const char *langtable_pt[] = {
 			/* LNG_REQUEST_SYNTAX */
 			"Sintaxe: \002REQUEST \037vhost\037\002",
 			/* LNG_REQUESTED */
@@ -546,7 +507,7 @@ class HSRequest : public Module
 			"o mesmo que fazer um LIST +req"
 		};
 
-		const char* langtable_ru[] = {
+		const char *langtable_ru[] = {
 			/* LNG_REQUEST_SYNTAX */
 			"Синтаксис: \002REQUEST \037vHost\037\002",
 			/* LNG_REQUESTED */
@@ -596,7 +557,7 @@ class HSRequest : public Module
 			"ожидающих обработки. Аналогичная команда: LIST +req ."
 		};
 
-		const char* langtable_it[] = {
+		const char *langtable_it[] = {
 			/* LNG_REQUEST_SYNTAX */
 			"Sintassi: \002REQUEST \037vhost\037\002",
 			/* LNG_REQUESTED */
@@ -666,32 +627,32 @@ class HSRequest : public Module
 		}
 	}
 
-	EventReturn OnPreCommand(User *u, const std::string &service, const ci::string &command, const std::vector<ci::string> &params)
+	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (Config.s_HostServ && service == Config.s_HostServ)
+		if (!Config.s_HostServ.empty() && service == findbot(Config.s_HostServ))
 		{
-			if (command == "LIST")
+			if (command.equals_ci("LIST"))
 			{
-				ci::string key = params.size() ? params[0] : "";
+				Anope::string key = params.size() ? params[0] : "";
 
-				if (!key.empty() && key == "+req")
+				if (!key.empty() && key.equals_ci("+req"))
 				{
-					std::vector<ci::string> emptyParams;
+					std::vector<Anope::string> emptyParams;
 					Command *c = FindCommand(HostServ, "WAITING");
 					c->Execute(u, emptyParams);
 					return EVENT_STOP;
 				}
 			}
 		}
-		else if (service == Config.s_NickServ)
+		else if (service == findbot(Config.s_NickServ))
 		{
-			if (command == "DROP")
+			if (command.equals_ci("DROP"))
 			{
 				NickAlias *na = findnick(u->nick);
 
 				if (na)
 				{
-					std::map<ci::string, HostRequest *>::iterator it = Requests.find(na->nick);
+					RequestMap::iterator it = Requests.find(na->nick);
 
 					if (it != Requests.end())
 					{
@@ -705,12 +666,12 @@ class HSRequest : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnDatabaseRead(const std::vector<std::string> &params)
+	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
 	{
-		if (params[0] == "HS_REQUEST" && params.size() >= 5)
+		if (params[0].equals_ci("HS_REQUEST") && params.size() >= 5)
 		{
-			char *vident = params[2] == "(null)" ? NULL : const_cast<char *>(params[2].c_str());
-			my_add_host_request(const_cast<char *>(params[1].c_str()), vident, const_cast<char *>(params[3].c_str()), const_cast<char *>(params[1].c_str()), strtol(params[4].c_str(), NULL, 10));
+			Anope::string vident = params[2].equals_ci("(null)") ? "" : params[2];
+			my_add_host_request(params[1], vident, params[3], params[1], params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0);
 
 			return EVENT_STOP;
 		}
@@ -718,9 +679,9 @@ class HSRequest : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDatabaseWrite(void (*Write)(const std::string &))
+	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		for (std::map<ci::string, HostRequest *>::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
+		for (RequestMap::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
 		{
 			HostRequest *hr = it->second;
 			std::stringstream buf;
@@ -730,7 +691,7 @@ class HSRequest : public Module
 	}
 };
 
-void my_memo_lang(User *u, const char *name, int z, int number, ...)
+void my_memo_lang(User *u, const Anope::string &name, int z, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -753,7 +714,7 @@ void my_memo_lang(User *u, const char *name, int z, int number, ...)
 	{
 		fmt = me->lang[lang].argv[number];
 
-		buf = sstrdup(fmt);
+		buf = strdup(fmt);
 		s = buf;
 		while (*s)
 		{
@@ -774,22 +735,21 @@ void my_memo_lang(User *u, const char *name, int z, int number, ...)
 		Alog() << me->name << ": INVALID language string call, language: [" << lang << "], String [" << number << "]";
 }
 
-void req_send_memos(User *u, char *vIdent, char *vHost)
+void req_send_memos(User *u, const Anope::string &vIdent, const Anope::string &vHost)
 {
-	int z = 2;
-	char host[BUFSIZE];
-	std::list<std::pair<ci::string, ci::string> >::iterator it, it_end;
+	Anope::string host;
+	std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
-	if (vIdent)
-		snprintf(host, sizeof(host), "%s@%s", vIdent, vHost);
+	if (!vIdent.empty())
+		host = vIdent + "@" + vHost;
 	else
-		snprintf(host, sizeof(host), "%s", vHost);
+		host = vHost;
 
 	if (HSRequestMemoOper == 1)
 		for (it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 		{
-			ci::string nick = it->first;
-			my_memo_lang(u, nick.c_str(), z, LNG_REQUEST_MEMO, host);
+			Anope::string nick = it->first;
+			my_memo_lang(u, nick, 2, LNG_REQUEST_MEMO, host.c_str());
 		}
 	if (HSRequestMemoSetters == 1)
 	{
@@ -799,13 +759,13 @@ void req_send_memos(User *u, char *vIdent, char *vHost)
 	}
 }
 
-void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, time_t tmp_time)
+void my_add_host_request(const Anope::string &nick, const Anope::string &vIdent, const Anope::string &vhost, const Anope::string &creator, time_t tmp_time)
 {
 	HostRequest *hr = new HostRequest;
-	hr->ident = vIdent ? vIdent : "";
+	hr->ident = vIdent;
 	hr->host = vhost;
 	hr->time = tmp_time;
-	std::map<ci::string, HostRequest *>::iterator it = Requests.find(nick);
+	RequestMap::iterator it = Requests.find(nick);
 	if (it != Requests.end())
 	{
 		delete it->second;
@@ -814,7 +774,7 @@ void my_add_host_request(char *nick, char *vIdent, char *vhost, char *creator, t
 	Requests.insert(std::make_pair(nick, hr));
 }
 
-int my_isvalidchar(const char c)
+int my_isvalidchar(char c)
 {
 	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
 		return 1;

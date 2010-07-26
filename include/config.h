@@ -8,9 +8,11 @@
 #include <map>
 #include <deque>
 
+#include "anope.h"
+
 /** A configuration key and value pair
  */
-typedef std::pair<ci::string, ci::string> KeyVal;
+typedef std::pair<Anope::string, Anope::string> KeyVal;
 
 /** A list of related configuration keys and values
  */
@@ -18,7 +20,7 @@ typedef std::vector<KeyVal> KeyValList;
 
 /** An entire config file, built up of KeyValLists
  */
-typedef std::multimap<ci::string, KeyValList> ConfigDataHash;
+typedef std::multimap<Anope::string, KeyValList> ConfigDataHash;
 
 // Required forward definitions
 class ServerConfig;
@@ -32,8 +34,9 @@ enum ConfigDataType
 	DT_UINTEGER, // Unsigned Integer
 	DT_LUINTEGER, // Long Unsigned Integer
 	DT_CHARPTR, // Char pointer
-	DT_STRING, // std::string
+	DT_CSSTRING, // std::string
 	DT_CISTRING, // ci::string
+	DT_STRING, // Anope::string
 	DT_BOOLEAN, // Boolean
 	DT_HOSTNAME, // Hostname syntax
 	DT_NOSPACES, // No spaces
@@ -54,7 +57,7 @@ class ValueItem
 {
  private:
 	/** Actual data */
-	std::string v;
+	Anope::string v;
  public:
 	/** Initialize with an int */
 	ValueItem(int);
@@ -64,8 +67,10 @@ class ValueItem
 	ValueItem(const char *);
 	/** Initialize with an std::string */
 	ValueItem(const std::string &);
-	/** Initialize with an std::string */
+	/** Initialize with a ci::string */
 	ValueItem(const ci::string &);
+	/** Initialize with an Anope::string */
+	ValueItem(const Anope::string &);
 	/** Initialize with a long */
 	ValueItem(long);
 	/** Change value to a char pointer */
@@ -76,16 +81,20 @@ class ValueItem
 	void Set(const std::string &);
 	/** Change value to a ci::string */
 	void Set(const ci::string &);
+	/** Change value to an Anope::string */
+	void Set(const Anope::string &);
 	/** Change value to an int */
 	void Set(int);
 	/** Get value as an int */
 	int GetInteger();
 	/** Get value as a string */
 	const char *GetString() const;
-	/** Get value as a string */
-	inline const std::string &GetValue() const { return v; }
+	/** Get value as an std::string */
+	inline const std::string GetCSValue() const { return v.str(); }
 	/** Get value as a ci::string */
-	inline const ci::string GetCIValue() const { return v.c_str(); }
+	inline const ci::string GetCIValue() const { return v.ci_str(); }
+	/** Get value as a ci::string */
+	inline const Anope::string &GetValue() const { return v; }
 	/** Get value as a bool */
 	bool GetBool();
 };
@@ -240,6 +249,47 @@ template<> class ValueContainer<ci::string *> : public ValueContainerBase
 	}
 };
 
+/** This a specific version of ValueContainer to handle Anope::string specially
+ */
+template<> class ValueContainer<Anope::string *> : public ValueContainerBase
+{
+ private:
+	/** Contained item */
+	Anope::string *val;
+ public:
+	/** Initialize with nothing */
+	ValueContainer() : ValueContainerBase(), val(NULL) { }
+	/** Initialize with an std::string */
+	ValueContainer(Anope::string *Val) : ValueContainerBase(), val(Val) { }
+	/** Initialize with a copy */
+	ValueContainer(const ValueContainer &Val) : ValueContainerBase(), val(Val.val) { }
+	ValueContainer &operator=(const ValueContainer &Val)
+	{
+		val = Val.val;
+		return *this;
+	}
+	/** Change value to given std::string */
+	void Set(const std::string &newval)
+	{
+		*val = newval;
+	}
+	/** Change value to given ci::string */
+	void Set(const ci::string &newval)
+	{
+		*val = newval;
+	}
+	/** Change value to given Anope::string */
+	void Set(const Anope::string &newval)
+	{
+		*val = newval;
+	}
+	/** Change value to given char pointer */
+	void Set(const char *newval)
+	{
+		*val = newval;
+	}
+};
+
 /** A specialization of ValueContainer to hold a pointer to a bool
  */
 typedef ValueContainer<bool *> ValueContainerBool;
@@ -272,12 +322,17 @@ typedef ValueContainer<time_t *> ValueContainerTime;
 /** A specialization of ValueContainer to hold a pointer to
  * an std::string
  */
-typedef ValueContainer<std::string *> ValueContainerString;
+typedef ValueContainer<std::string *> ValueContainerCSString;
 
 /** A specialization of ValueContainer to hold a pointer to
  * an ci::string
  */
 typedef ValueContainer<ci::string *> ValueContainerCIString;
+
+/** A specialization of ValueContainer to hold a pointer to
+ * an Anope::string
+ */
+typedef ValueContainer<Anope::string *> ValueContainerString;
 
 /** A set of ValueItems used by multi-value validator functions
  */
@@ -285,24 +340,24 @@ typedef std::deque<ValueItem> ValueList;
 
 /** A callback for validating a single value
  */
-typedef bool (*Validator)(ServerConfig *, const char *, const char *, ValueItem &);
+typedef bool (*Validator)(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &);
 /** A callback for validating multiple value entries
  */
-typedef bool (*MultiValidator)(ServerConfig *, const char *, const char **, ValueList &, int *, bool);
+typedef bool (*MultiValidator)(ServerConfig *, const Anope::string &, const Anope::string *, ValueList &, int *, bool);
 /** A callback indicating the end of a group of entries
  */
-typedef bool (*MultiNotify)(ServerConfig *, const char *, bool);
+typedef bool (*MultiNotify)(ServerConfig *, const Anope::string &, bool);
 
 /** Holds a core configuration item and its callbacks
  */
 struct InitialConfig
 {
 	/** Tag name */
-	const char *tag;
+	const Anope::string tag;
 	/** Value name */
-	const char *value;
+	const Anope::string value;
 	/** Default, if not defined */
-	const char *default_value;
+	const Anope::string default_value;
 	/** Value containers */
 	ValueContainerBase *val;
 	/** Data types */
@@ -317,11 +372,11 @@ struct InitialConfig
 struct MultiConfig
 {
 	/** Tag name */
-	const char *tag;
+	const Anope::string tag;
 	/** One or more items within tag */
-	const char *items[17];
+	const Anope::string items[17];
 	/** One or more defaults for items within tags */
-	const char *items_default[17];
+	const Anope::string items_default[17];
 	/** One or more data types */
 	int datatype[17];
 	/** Initialization function */
@@ -348,7 +403,7 @@ class ServerConfig
 	std::vector<std::string> include_stack;
 	/** Check that there is only one of each configuration item
 	 */
-	bool CheckOnce(const char *);
+	bool CheckOnce(const Anope::string &);
  public:
 	std::ostringstream errstr;
 	ConfigDataHash newconfig;
@@ -373,98 +428,63 @@ class ServerConfig
 	 * this connection as SNOTICEs.
 	 * If the parameter is NULL, the messages are spooled to all connections via WriteOpers as SNOTICEs.
 	 */
-	void ReportConfigError(const std::string &, bool);
+	void ReportConfigError(const Anope::string &, bool);
 	/** Load 'filename' into 'target', with the new config parser everything is parsed into
 	 * tag/key/value at load-time rather than at read-value time.
 	 */
-	bool LoadConf(ConfigDataHash &, const char *, std::ostringstream &);
-	/** Load 'filename' into 'target', with the new config parser everything is parsed into
-	 * tag/key/value at load-time rather than at read-value time.
-	 */
-	bool LoadConf(ConfigDataHash &, const std::string &, std::ostringstream &);
-	/** Load 'filename' into 'target', with the new config parser everything is parsed into
-	 * tag/key/value at load-time rather than at read-value time.
-	 */
-	bool LoadConf(ConfigDataHash &, const ci::string &, std::ostringstream &);
+	bool LoadConf(ConfigDataHash &, const Anope::string &, std::ostringstream &);
 	// Both these return true if the value existed or false otherwise
 	/** Writes 'length' chars into 'result' as a string
 	 */
-	bool ConfValue(ConfigDataHash &, const char *, const char *, int, char *, int, bool = false);
+	bool ConfValue(ConfigDataHash &, const Anope::string &, const Anope::string &, int, Anope::string &, bool = false);
 	/** Writes 'length' chars into 'result' as a string
 	 */
-	bool ConfValue(ConfigDataHash &, const char *, const char *, const char *, int, char *, int, bool = false);
-	/** Writes 'length' chars into 'result' as a string
-	 */
-	bool ConfValue(ConfigDataHash &, const ci::string &, const ci::string &, int, ci::string &, bool = false);
-	/** Writes 'length' chars into 'result' as a string
-	 */
-	bool ConfValue(ConfigDataHash &, const ci::string &, const ci::string &, const ci::string &, int, ci::string &, bool = false);
+	bool ConfValue(ConfigDataHash &, const Anope::string &, const Anope::string &, const Anope::string &, int, Anope::string &, bool = false);
 	/** Tries to convert the value to an integer and write it to 'result'
 	 */
-	bool ConfValueInteger(ConfigDataHash &, const char *, const char *, int, int &);
+	bool ConfValueInteger(ConfigDataHash &, const Anope::string &, const Anope::string &, int, int &);
 	/** Tries to convert the value to an integer and write it to 'result'
 	 */
-	bool ConfValueInteger(ConfigDataHash &, const char *, const char *, const char *, int, int &);
-	/** Tries to convert the value to an integer and write it to 'result'
-	 */
-	bool ConfValueInteger(ConfigDataHash &, const ci::string &, const ci::string &, int, int &);
-	/** Tries to convert the value to an integer and write it to 'result'
-	 */
-	bool ConfValueInteger(ConfigDataHash &, const ci::string &, const ci::string &, const ci::string &, int, int &);
+	bool ConfValueInteger(ConfigDataHash &, const Anope::string &, const Anope::string &, const Anope::string &, int, int &);
 	/** Returns true if the value exists and has a true value, false otherwise
 	 */
-	bool ConfValueBool(ConfigDataHash &, const char *, const char *, int);
+	bool ConfValueBool(ConfigDataHash &, const Anope::string &, const Anope::string &, int);
 	/** Returns true if the value exists and has a true value, false otherwise
 	 */
-	bool ConfValueBool(ConfigDataHash &, const char *, const char *, const char *, int);
-	/** Returns true if the value exists and has a true value, false otherwise
-	 */
-	bool ConfValueBool(ConfigDataHash &, const ci::string &, const ci::string &, int);
-	/** Returns true if the value exists and has a true value, false otherwise
-	 */
-	bool ConfValueBool(ConfigDataHash &, const ci::string &, const ci::string &, const ci::string &, int);
+	bool ConfValueBool(ConfigDataHash &, const Anope::string &, const Anope::string &, const Anope::string &, int);
 	/** Returns the number of occurences of tag in the config file
 	 */
-	int ConfValueEnum(ConfigDataHash &, const char *);
-	/** Returns the number of occurences of tag in the config file
-	 */
-	int ConfValueEnum(ConfigDataHash &, const std::string &);
-	/** Returns the number of occurences of tag in the config file
-	 */
-	int ConfValueEnum(ConfigDataHash &, const ci::string &);
+	int ConfValueEnum(ConfigDataHash &, const Anope::string &);
 	/** Returns the numbers of vars inside the index'th 'tag in the config file
 	 */
-	int ConfVarEnum(ConfigDataHash &, const char *, int);
-	/** Returns the numbers of vars inside the index'th 'tag in the config file
-	 */
-	int ConfVarEnum(ConfigDataHash &, const ci::string &, int);
-	void ValidateHostname(const char *, const ci::string &, const ci::string &);
-	void ValidateIP(const char *p, const ci::string &, const ci::string &, bool);
-	void ValidateNoSpaces(const char *, const ci::string &, const ci::string &);
+	int ConfVarEnum(ConfigDataHash &, const Anope::string &, int);
+	void ValidateHostname(const Anope::string &, const Anope::string &, const Anope::string &);
+	void ValidateIP(const Anope::string &p, const Anope::string &, const Anope::string &, bool);
+	void ValidateNoSpaces(const Anope::string &, const Anope::string &, const Anope::string &);
 
 	/** Below here is a list of variables which contain the config files values
 	 */
 	/* IRCd module in use */
-	char *IRCDModule;
+	Anope::string IRCDModule;
 
 	/* Host to connect to **/
-	char *LocalHost;
+	Anope::string LocalHost;
 	/* List of uplink servers to try and connect to */
 	std::list<Uplink *> Uplinks;
 
 	/* Our server name */
-	char *ServerName;
+	Anope::string ServerName;
 	/* Our servers description */
-	char *ServerDesc;
+	Anope::string ServerDesc;
 	/* The username/ident of services clients */
-	char *ServiceUser;
+	Anope::string ServiceUser;
 	/* The hostname if services clients */
-	char *ServiceHost;
+	Anope::string ServiceHost;
 
 	/* Log channel */
-	char *LogChannel;
+	Anope::string LogChannel;
 	/* Name of the network were on */
-	char *NetworkName;
+	Anope::string NetworkName;
 	/* The max legnth of nicks */
 	unsigned NickLen;
 	/* Max length of idents */
@@ -476,39 +496,39 @@ class ServerConfig
 	unsigned PassLen;
 
 	/* NickServ Name */
-	char *s_NickServ;
+	Anope::string s_NickServ;
 	/* ChanServ Name */
-	char *s_ChanServ;
+	Anope::string s_ChanServ;
 	/* MemoServ Name */
-	char *s_MemoServ;
+	Anope::string s_MemoServ;
 	/* BotServ Name */
-	char *s_BotServ;
+	Anope::string s_BotServ;
 	/* OperServ name */
-	char *s_OperServ;
+	Anope::string s_OperServ;
 	/* Global name */
-	char *s_GlobalNoticer;
+	Anope::string s_GlobalNoticer;
 	/* NickServs realname */
-	char *desc_NickServ;
+	Anope::string desc_NickServ;
 	/* ChanServ realname */
-	char *desc_ChanServ;
-	/* MemoServ relname */
-	char *desc_MemoServ;
+	Anope::string desc_ChanServ;
+	/* MemoServ realname */
+	Anope::string desc_MemoServ;
 	/* BotServ realname */
-	char *desc_BotServ;
+	Anope::string desc_BotServ;
 	/* OperServ realname */
-	char *desc_OperServ;
+	Anope::string desc_OperServ;
 	/* Global realname */
-	char *desc_GlobalNoticer;
+	Anope::string desc_GlobalNoticer;
 
 	/* HostServ Name */
-	char *s_HostServ;
+	Anope::string s_HostServ;
 	/* HostServ realname */
-	char *desc_HostServ;
+	Anope::string desc_HostServ;
 
 	/* Filename for the PID file */
-	char *PIDFilename;
+	Anope::string PIDFilename;
 	/* MOTD filename */
-	char *MOTDFilename;
+	Anope::string MOTDFilename;
 
 	/* True if its ok to not be able to save backs */
 	bool NoBackupOkay;
@@ -548,9 +568,9 @@ class ServerConfig
 	/* Max number if news items allowed in the list */
 	unsigned NewsCount;
 	/* Default mlock modes */
-	ci::string MLock;
+	Anope::string MLock;
 	/* Default botmodes on channels, defaults to ao */
-	ci::string BotModes;
+	Anope::string BotModes;
 	/* How many times to try and reconnect to the uplink before giving up */
 	unsigned MaxRetries;
 	/* How long to wait between connection attempts */
@@ -561,9 +581,9 @@ class ServerConfig
 	/* Services can use email */
 	bool UseMail;
 	/* Path to the sendmail executable */
-	char *SendMailPath;
+	Anope::string SendMailPath;
 	/* Address to send from */
-	char *SendFrom;
+	Anope::string SendFrom;
 	/* Only opers can have services send mail */
 	bool RestrictMail;
 	/* Delay between sending mail */
@@ -572,7 +592,7 @@ class ServerConfig
 	bool DontQuoteAddresses;
 
 	/* Prefix of guest nicks when a user gets forced off of a nick */
-	char *NSGuestNickPrefix;
+	Anope::string NSGuestNickPrefix;
 	/* Allow users to set kill immed on */
 	bool NSAllowKillImmed;
 	/* Don't allow nicks to use /ns group to regroup nicks */
@@ -597,9 +617,9 @@ class ServerConfig
 	/* Max number of allowed strings on the access list */
 	unsigned NSAccessMax;
 	/* Enforcer client user name */
-	char *NSEnforcerUser;
+	Anope::string NSEnforcerUser;
 	/* Enforcer client hostname */
-	char *NSEnforcerHost;
+	Anope::string NSEnforcerHost;
 	/* How long before recovered nicks are released */
 	time_t NSReleaseTimeout;
 	/* /nickserv list is oper only */
@@ -630,7 +650,7 @@ class ServerConfig
 	/* Max number of entries allowed on autokick lists */
 	unsigned CSAutokickMax;
 	/* Default autokick reason */
-	char *CSAutokickReason;
+	Anope::string CSAutokickReason;
 	/* Time ChanServ should stay in the channel to hold it to keep users from getting in */
 	time_t CSInhabit;
 	/* ChanServ's LIST command is oper only */
@@ -664,7 +684,7 @@ class ServerConfig
 	/* Case sensitive badwords matching */
 	bool BSCaseSensitive;
 	/* Char to use for the fantasy char, eg ! */
-	char *BSFantasyCharacter;
+	Anope::string BSFantasyCharacter;
 
 	/* Only show /stats o to opers */
 	bool HideStatsO;
@@ -675,9 +695,9 @@ class ServerConfig
 	/* Dont allow users to register nicks with oper names in them */
 	bool RestrictOperNicks;
 	/* Message to send when shutting down */
-	char *GlobalOnCycleMessage;
+	Anope::string GlobalOnCycleMessage;
 	/* Message to send when starting up */
-	char *GlobalOnCycleUP;
+	Anope::string GlobalOnCycleUP;
 	/* Super admin is allowed */
 	bool SuperAdmin;
 	/* Log things said through ACT/SAY */
@@ -758,30 +778,30 @@ class ServerConfig
 	/* How long session akills should last */
 	time_t SessionAutoKillExpiry;
 	/* Reason to use for session kills */
-	char *SessionLimitExceeded;
+	Anope::string SessionLimitExceeded;
 	/* Optional second reason */
-	char *SessionLimitDetailsLoc;
+	Anope::string SessionLimitDetailsLoc;
 	/* OperServ requires you to be an operator */
 	bool OSOpersOnly;
 
 	/* List of modules to autoload */
-	std::list<ci::string> ModulesAutoLoad;
+	std::list<Anope::string> ModulesAutoLoad;
 	/* Encryption modules */
-	std::list<ci::string> EncModuleList;
+	std::list<Anope::string> EncModuleList;
 	/* Database modules */
-	std::list<ci::string> DBModuleList;
+	std::list<Anope::string> DBModuleList;
 	/* HostServ Core Modules */
-	std::list<ci::string> HostServCoreModules;
+	std::list<Anope::string> HostServCoreModules;
 	/* MemoServ Core Modules */
-	std::list<ci::string> MemoServCoreModules;
+	std::list<Anope::string> MemoServCoreModules;
 	/* BotServ Core Modules */
-	std::list<ci::string> BotServCoreModules;
+	std::list<Anope::string> BotServCoreModules;
 	/* OperServ Core Modules */
-	std::list<ci::string> OperServCoreModules;
+	std::list<Anope::string> OperServCoreModules;
 	/* NickServ Core Modules */
-	std::list<ci::string> NickServCoreModules;
+	std::list<Anope::string> NickServCoreModules;
 	/* ChanServ Core Modules */
-	std::list<ci::string> ChanServCoreModules;
+	std::list<Anope::string> ChanServCoreModules;
 
 	/* Default defcon level */
 	int DefConLevel;
@@ -792,37 +812,35 @@ class ServerConfig
 	/* How long to add akills for defcon */
 	time_t DefConAKILL;
 	/* Chan modes for defcon */
-	char *DefConChanModes;
+	Anope::string DefConChanModes;
 	/* Should we global on defcon */
 	bool GlobalOnDefcon;
 	/* Should we send DefconMessage aswell? */
 	bool GlobalOnDefconMore;
 	/* Message to send when defcon is off */
-	char *DefConOffMessage;
+	Anope::string DefConOffMessage;
 	/* Message to send when defcon is on*/
-	char *DefconMessage;
+	Anope::string DefconMessage;
 	/* Reason to akill clients for defcon */
-	char *DefConAkillReason;
+	Anope::string DefConAkillReason;
 
 	/* The socket engine in use */
-	ci::string SocketEngine;
+	Anope::string SocketEngine;
 
 	/* User keys to use for generating random hashes for pass codes etc */
-	long unsigned int UserKey1;
-	long unsigned int UserKey2;
-	long unsigned int UserKey3;
+	unsigned long UserKey1;
+	unsigned long UserKey2;
+	unsigned long UserKey3;
 
 	/* Numeric */
-	char *Numeric;
+	Anope::string Numeric;
 	/* Array of ulined servers */
-	char **Ulines;
-	/* Number of ulines */
-	int NumUlines;
+	std::list<Anope::string> Ulines;
 
 	/* List of available opertypes */
 	std::list<OperType *> MyOperTypes;
 	/* List of pairs of opers and their opertype from the config */
-	std::list<std::pair<ci::string, ci::string> > Opers;
+	std::list<std::pair<Anope::string, Anope::string> > Opers;
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
@@ -836,12 +854,10 @@ class ConfigException : public CoreException
  public:
 	/** Default constructor, just uses the error mesage 'Config threw an exception'.
 	 */
-	ConfigException() : CoreException("Config threw an exception", "Config Parser") {}
+	ConfigException() : CoreException("Config threw an exception", "Config Parser") { }
 	/** This constructor can be used to specify an error message before throwing.
 	 */
-	ConfigException(const char *message) : CoreException(message, "Config Parser") {}
-	ConfigException(const std::string &message) : CoreException(message, "Config Parser") {}
-	ConfigException(const ci::string &message) : CoreException(message, "Config Parser") {}
+	ConfigException(const Anope::string &message) : CoreException(message, "Config Parser") { }
 	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
 	 * Actually no, it does nothing. Never mind.
 	 * @throws Nothing!
@@ -890,7 +906,7 @@ class CoreExport ConfigReader
 	/** Overloaded constructor.
 	 * This constructor initialises the ConfigReader class to read a user-specified config file
 	 */
-	ConfigReader(const std::string &);
+	ConfigReader(const Anope::string &);
 	/** Default destructor.
 	 * This method destroys the ConfigReader class.
 	 */
@@ -899,26 +915,26 @@ class CoreExport ConfigReader
 	 * This method retrieves a value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve.
 	 */
-	std::string ReadValue(const std::string &, const std::string &, int, bool = false);
+	Anope::string ReadValue(const Anope::string &, const Anope::string &, int, bool = false);
 	/** Retrieves a value from the config file.
 	 * This method retrieves a value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve. If the
 	 * tag is not found the default value is returned instead.
 	 */
-	std::string ReadValue(const std::string &, const std::string &, const std::string &, int, bool = false);
+	Anope::string ReadValue(const Anope::string &, const Anope::string &, const Anope::string &, int, bool = false);
 	/** Retrieves a boolean value from the config file.
 	 * This method retrieves a boolean value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve. The values "1", "yes"
 	 * and "true" in the config file count as true to ReadFlag, and any other value counts as false.
 	 */
-	bool ReadFlag(const std::string &, const std::string &, int);
+	bool ReadFlag(const Anope::string &, const Anope::string &, int);
 	/** Retrieves a boolean value from the config file.
 	 * This method retrieves a boolean value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve. The values "1", "yes"
 	 * and "true" in the config file count as true to ReadFlag, and any other value counts as false.
 	 * If the tag is not found, the default value is used instead.
 	 */
-	bool ReadFlag(const std::string &, const std::string &, const std::string &, int);
+	bool ReadFlag(const Anope::string &, const Anope::string &, const Anope::string &, int);
 	/** Retrieves an integer value from the config file.
 	 * This method retrieves an integer value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve. Any invalid integer
@@ -928,7 +944,7 @@ class CoreExport ConfigReader
 	 * will return CONF_INT_NEGATIVE. Note that need_positive is not suitable to get an unsigned int - you
 	 * should cast the result to achieve that effect.
 	 */
-	int ReadInteger(const std::string &, const std::string &, int, bool);
+	int ReadInteger(const Anope::string &, const Anope::string &, int, bool);
 	/** Retrieves an integer value from the config file.
 	 * This method retrieves an integer value from the config file. Where multiple copies of the tag
 	 * exist in the config file, index indicates which of the values to retrieve. Any invalid integer
@@ -937,7 +953,7 @@ class CoreExport ConfigReader
 	 * If a signed number is placed into a tag which is specified unsigned, 0 will be returned and GetError()
 	 * will return CONF_NOT_UNSIGNED. If the tag is not found, the default value is used instead.
 	 */
-	int ReadInteger(const std::string &, const std::string &, const std::string &, int, bool);
+	int ReadInteger(const Anope::string &, const Anope::string &, const Anope::string &, int, bool);
 	/** Returns the last error to occur.
 	 * Valid errors can be found by looking in modules.h. Any nonzero value indicates an error condition.
 	 * A call to GetError() resets the error flag back to 0.
@@ -949,7 +965,7 @@ class CoreExport ConfigReader
 	 * used with the index value of ConfigReader::ReadValue to loop through all copies of a
 	 * multiple instance tag.
 	 */
-	int Enumerate(const std::string &);
+	int Enumerate(const Anope::string &);
 	/** Returns true if a config file is valid.
 	 * This method is partially implemented and will only return false if the config
 	 * file does not exist or could not be opened.
@@ -967,7 +983,7 @@ class CoreExport ConfigReader
 	 * function would return 2. Spaces and newlines both qualify as valid seperators
 	 * between values.
 	 */
-	int EnumerateValues(const std::string &, int);
+	int EnumerateValues(const Anope::string &, int);
 };
 
 #endif // CONFIG_H

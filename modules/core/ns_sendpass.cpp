@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-static bool SendPassMail(User *u, NickAlias *na, const std::string &pass);
+static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass);
 
 class CommandNSSendPass : public Command
 {
@@ -22,26 +22,26 @@ class CommandNSSendPass : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
+		Anope::string nick = params[0];
 		NickAlias *na;
 
 		if (Config.RestrictMail && !u->Account()->HasCommand("nickserv/sendpass"))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
-			std::string tmp_pass;
-			if (enc_decrypt(na->nc->pass,tmp_pass) == 1)
+			Anope::string tmp_pass;
+			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				if (SendPassMail(u, na, tmp_pass))
 				{
 					Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SENDPASS on " << nick;
-					notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick);
+					notice_lang(Config.s_NickServ, u, NICK_SENDPASS_OK, nick.c_str());
 				}
 			}
 			else
@@ -51,13 +51,13 @@ class CommandNSSendPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SENDPASS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
 	}
@@ -71,12 +71,12 @@ class CommandNSSendPass : public Command
 class NSSendPass : public Module
 {
  public:
-	NSSendPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!Config.UseMail)
 			throw ModuleException("Not using mail, whut.");
 
-		std::string tmp_pass = "plain:tmp";
+		Anope::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
@@ -87,12 +87,12 @@ class NSSendPass : public Module
 	}
 };
 
-static bool SendPassMail(User *u, NickAlias *na, const std::string &pass)
+static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), getstring(na, NICK_SENDPASS_SUBJECT), na->nick);
-	snprintf(message, sizeof(message), getstring(na, NICK_SENDPASS), na->nick, pass.c_str(), Config.NetworkName);
+	snprintf(subject, sizeof(subject), getstring(na, NICK_SENDPASS_SUBJECT), na->nick.c_str());
+	snprintf(message, sizeof(message), getstring(na, NICK_SENDPASS), na->nick.c_str(), pass.c_str(), Config.NetworkName.c_str());
 
 	return Mail(u, na->nc, Config.s_NickServ, subject, message);
 }

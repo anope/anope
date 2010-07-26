@@ -16,20 +16,20 @@
 class CommandCSSetBanType : public Command
 {
  public:
-	CommandCSSetBanType(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetBanType(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		char *endptr;
+		Anope::string end;
 
-		int16 bantype = strtol(params[1].c_str(), &endptr, 10);
+		int16 bantype = convertTo<int16>(params[1], end, false);
 
-		if (*endptr || bantype < 0 || bantype > 3)
+		if (!end.empty() || bantype < 0 || bantype > 3)
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, params[1].c_str());
 		else
 		{
@@ -40,13 +40,13 @@ class CommandCSSetBanType : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
@@ -61,17 +61,17 @@ class CommandCSSetBanType : public Command
 class CommandCSSASetBanType : public CommandCSSetBanType
 {
  public:
-	CommandCSSASetBanType(const ci::string &cname) : CommandCSSetBanType(cname, "chanserv/saset/bantype")
+	CommandCSSASetBanType(const Anope::string &cname) : CommandCSSetBanType(cname, "chanserv/saset/bantype")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
 		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
@@ -81,7 +81,7 @@ class CommandCSSASetBanType : public CommandCSSetBanType
 class CSSetBanType : public Module
 {
  public:
-	CSSetBanType(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -20,20 +20,20 @@ class CommandOSChanList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *pattern = params.size() > 0 ? params[0].c_str() : NULL;
-		ci::string opt = params.size() > 1 ? params[1] : "";
+		Anope::string pattern = !params.empty() ? params[0] : "";
+		Anope::string opt = params.size() > 1 ? params[1] : "";
 		std::list<ChannelModeName> Modes;
 		User *u2;
 
-		if (!opt.empty() && opt == "SECRET")
+		if (!opt.empty() && opt.equals_ci("SECRET"))
 		{
 			Modes.push_back(CMODE_SECRET);
 			Modes.push_back(CMODE_PRIVATE);
 		}
 
-		if (pattern && (u2 = finduser(pattern)))
+		if (!pattern.empty() && (u2 = finduser(pattern)))
 		{
 			notice_lang(Config.s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
@@ -46,7 +46,7 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), chan_get_modes(cc->chan, 1, 1), cc->chan->topic ? cc->chan->topic : "");
+				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), chan_get_modes(cc->chan, 1, 1).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
 			}
 		}
 		else
@@ -57,14 +57,14 @@ class CommandOSChanList : public Command
 			{
 				Channel *c = cit->second;
 
-				if (pattern && !Anope::Match(c->name, pattern, false))
+				if (!pattern.empty() && !Anope::Match(c->name, pattern))
 					continue;
 				if (!Modes.empty())
 					for (std::list<ChannelModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
 						if (!c->HasMode(*it))
 							continue;
 
-				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1), c->topic ? c->topic : "");
+				notice_lang(Config.s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
 			}
 		}
 
@@ -72,7 +72,7 @@ class CommandOSChanList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_CHANLIST);
 		return true;
@@ -87,7 +87,7 @@ class CommandOSChanList : public Command
 class OSChanList : public Module
 {
  public:
-	OSChanList(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSChanList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

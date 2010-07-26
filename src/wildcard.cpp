@@ -2,9 +2,9 @@
 
 static bool match_internal(const unsigned char *str, const unsigned char *mask, bool case_sensitive)
 {
-	unsigned char *cp = NULL, *mp = NULL;
-	unsigned char *string = const_cast<unsigned char *>(str); // XXX: unsafe cast
-	unsigned char *wild = const_cast<unsigned char *>(mask); // XXX: unsafe cast
+	const unsigned char *cp = NULL, *mp = NULL;
+	const unsigned char *string = str;
+	const unsigned char *wild = mask;
 
 	while (*string && *wild != '*')
 	{
@@ -19,8 +19,8 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 				return false;
 		}
 
-		wild++;
-		string++;
+		++wild;
+		++string;
 	}
 
 	while (*string)
@@ -71,7 +71,7 @@ static bool match_internal(const unsigned char *str, const unsigned char *mask, 
 	return !*wild;
 }
 
-bool Anope::Match(const std::string &str, const std::string &mask, bool case_sensitive)
+bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
 {
 	return match_internal(reinterpret_cast<const unsigned char *>(str.c_str()), reinterpret_cast<const unsigned char *>(mask.c_str()), case_sensitive);
 }

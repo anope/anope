@@ -20,10 +20,10 @@ class CommandCSTopic : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *topic = params.size() > 1 ? params[1].c_str() : NULL;
+		Anope::string chan = params[0];
+		Anope::string topic = params.size() > 1 ? params[1] : "";
 
 		Channel *c;
 		ChannelInfo *ci;
@@ -32,20 +32,16 @@ class CommandCSTopic : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
 			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			if (ci->last_topic)
-				delete [] ci->last_topic;
-			ci->last_topic = topic ? sstrdup(topic) : NULL;
+			ci->last_topic = topic;
 			ci->last_topic_setter = u->nick;
 			ci->last_topic_time = time(NULL);
 
-			if (c->topic)
-				delete [] c->topic;
-			c->topic = topic ? sstrdup(topic) : NULL;
+			c->topic = topic;
 			c->topic_setter = u->nick;
 			if (ircd->topictsbackward)
 				c->topic_time = c->topic_time - 1;
@@ -57,22 +53,22 @@ class CommandCSTopic : public Command
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
 				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ); // XXX
+				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ.c_str()); // XXX
 			}
-			ircdproto->SendTopic(whosends(ci), c, u->nick.c_str(), topic ? topic : "");
+			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
 			if (ircd->join2set && whosends(ci) == ChanServ)
 				ChanServ->Part(c);
 		}
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_TOPIC);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
 	}
@@ -86,7 +82,7 @@ class CommandCSTopic : public Command
 class CSTopic : public Module
 {
  public:
-	CSTopic(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

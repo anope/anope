@@ -14,7 +14,7 @@ extern CoreExport std::vector<std::bitset<32> > DefCon;
 extern CoreExport bool DefConModesSet;
 extern CoreExport Flags<ChannelModeName, CMODE_END> DefConModesOn;
 extern CoreExport Flags<ChannelModeName, CMODE_END> DefConModesOff;
-extern CoreExport std::map<ChannelModeName, std::string> DefConModesOnParams;
+extern CoreExport std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 
 class XLineManager;
 extern CoreExport XLineManager *SGLine;
@@ -22,19 +22,19 @@ extern CoreExport XLineManager *SZLine;
 extern CoreExport XLineManager *SQLine;
 extern CoreExport XLineManager *SNLine;
 
-extern CoreExport bool SetDefConParam(ChannelModeName, std::string &);
-extern CoreExport bool GetDefConParam(ChannelModeName, std::string &);
+extern CoreExport bool SetDefConParam(ChannelModeName, const Anope::string &);
+extern CoreExport bool GetDefConParam(ChannelModeName, Anope::string &);
 extern CoreExport void UnsetDefConParam(ChannelModeName);
 extern CoreExport bool CheckDefCon(DefconLevel Level);
 extern CoreExport bool CheckDefCon(int level, DefconLevel Level);
 extern CoreExport void AddDefCon(int level, DefconLevel Level);
 extern CoreExport void DelDefCon(int level, DefconLevel Level);
 
-extern CoreExport void operserv(User *u, const std::string &message);
+extern CoreExport void operserv(User *u, const Anope::string &message);
 extern CoreExport void os_init();
 
-extern CoreExport void oper_global(char *nick, const char *fmt, ...);
-extern CoreExport void server_global(Server *s, const std::string &message);
+extern CoreExport void oper_global(const Anope::string &nick, const char *fmt, ...);
+extern CoreExport void server_global(Server *s, const Anope::string &message);
 
 enum XLineType
 {
@@ -46,19 +46,19 @@ enum XLineType
 class CoreExport XLine
 {
  public:
-	ci::string Mask;
-	ci::string By;
+	Anope::string Mask;
+	Anope::string By;
 	time_t Created;
 	time_t Expires;
-	std::string Reason;
+	Anope::string Reason;
 
-	XLine(const ci::string &mask, const std::string &reason = "");
+	XLine(const Anope::string &mask, const Anope::string &reason = "");
 
-	XLine(const ci::string &mask, const ci::string &by, const time_t expires, const std::string &reason);
+	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason);
 
-	ci::string GetNick() const;
-	ci::string GetUser() const;
-	ci::string GetHost() const;
+	Anope::string GetNick() const;
+	Anope::string GetUser() const;
+	Anope::string GetHost() const;
 };
 
 class CoreExport XLineManager
@@ -106,7 +106,7 @@ class CoreExport XLineManager
 	/** Get the XLine vector
 	 * @return The vector
 	 */
-	const std::vector<XLine *>& GetList() const;
+	const std::vector<XLine *> &GetList() const;
 
 	/** Add an entry to this XLineManager
 	 * @param x The entry
@@ -137,7 +137,7 @@ class CoreExport XLineManager
 	 * @param reaosn The reason
 	 * @return A pointer to the XLine
 	 */
-	virtual XLine *Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason);
+	virtual XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	/** Delete an XLine, eg, remove it from the IRCd.
 	 * @param x The xline
@@ -153,13 +153,13 @@ class CoreExport XLineManager
 	 * 3 - Mask is already covered by another mask
 	 * In each case the XLine it matches/is covered by is returned in XLine*
 	 */
-	std::pair<int, XLine *> CanAdd(const ci::string &mask, time_t expires);
+	std::pair<int, XLine *> CanAdd(const Anope::string &mask, time_t expires);
 
 	/** Checks if this list has an entry
 	 * @param mask The mask
 	 * @return The XLine the user matches, or NULL
 	 */
-	XLine *HasEntry(const ci::string &mask) const;
+	XLine *HasEntry(const Anope::string &mask) const;
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user
@@ -183,7 +183,7 @@ class CoreExport XLineManager
 class SGLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason);
+	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -195,7 +195,7 @@ class SGLineManager : public XLineManager
 class SNLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason);
+	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -207,7 +207,7 @@ class SNLineManager : public XLineManager
 class SQLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason);
+	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -221,7 +221,7 @@ class SQLineManager : public XLineManager
 class SZLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const ci::string &mask, time_t expires, const std::string &reason);
+	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 

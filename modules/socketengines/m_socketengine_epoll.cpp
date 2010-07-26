@@ -17,7 +17,7 @@ class SocketEngineEPoll : public SocketEngineBase
 	{
 		SocketCount = 0;
 		max = ulimit(4, 0);
-		
+
 		if (max <= 0)
 		{
 			Alog() << "Can't determine maximum number of open sockets";
@@ -29,7 +29,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		if (EngineHandle == -1)
 		{
 			Alog() << "Could not initialize epoll socket engine: " << strerror(errno);
-			throw ModuleException("Could not initialize epoll socket engine: " + std::string(strerror(errno)));
+			throw ModuleException(Anope::string("Could not initialize epoll socket engine: ") + strerror(errno));
 		}
 
 		events = new epoll_event[max];
@@ -44,7 +44,7 @@ class SocketEngineEPoll : public SocketEngineBase
 	void AddSocket(Socket *s)
 	{
 		epoll_event ev;
-		
+
 		memset(&ev, 0, sizeof(ev));
 
 		ev.events = EPOLLIN | EPOLLOUT;
@@ -82,7 +82,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 	void Process()
 	{
-		int total = epoll_wait(EngineHandle, events, max - 1, (Config.ReadTimeout * 1000));
+		int total = epoll_wait(EngineHandle, events, max - 1, Config.ReadTimeout * 1000);
 
 		if (total == -1)
 		{
@@ -102,32 +102,20 @@ class SocketEngineEPoll : public SocketEngineBase
 				continue;
 			}
 
-			if (ev->events & EPOLLIN)
-			{
-				if (!s->ProcessRead())
-				{
-					s->SetFlag(SF_DEAD);
-				}
-			}
+			if ((ev->events & EPOLLIN) && !s->ProcessRead())
+				s->SetFlag(SF_DEAD);
 
-			if (ev->events & EPOLLOUT)
-			{
-				if (!s->ProcessWrite())
-				{
-					s->SetFlag(SF_DEAD);
-				}
-			}
+			if ((ev->events & EPOLLOUT) && !s->ProcessWrite())
+				s->SetFlag(SF_DEAD);
 		}
 
-		for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end;)
+		for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; )
 		{
 			Socket *s = it->second;
 			++it;
 
 			if (s->HasFlag(SF_DEAD))
-			{
 				delete s;
-			}
 		}
 	}
 };
@@ -137,8 +125,9 @@ class ModuleSocketEngineEPoll : public Module
 	SocketEngineEPoll *engine;
 
  public:
-	ModuleSocketEngineEPoll(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	ModuleSocketEngineEPoll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
+		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 		this->SetType(SOCKETENGINE);
 
@@ -154,4 +143,3 @@ class ModuleSocketEngineEPoll : public Module
 };
 
 MODULE_INIT(ModuleSocketEngineEPoll)
-

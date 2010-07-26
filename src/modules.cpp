@@ -13,14 +13,12 @@
 #include "language.h"
 #include "version.h"
 
-std::multimap<std::string, Message *> MessageMap;
+message_map MessageMap;
 std::list<Module *> Modules;
 
-char *mod_current_buffer = NULL;
-
-char *ModuleGetErrStr(int status)
+Anope::string ModuleGetErrStr(int status)
 {
-	const char *module_err_str[] = {
+	Anope::string module_err_str[] = {
 		"Module, Okay - No Error",						/* MOD_ERR_OK */
 		"Module Error, Allocating memory",				/* MOD_ERR_MEMORY */
 		"Module Error, Not enough parameters",			/* MOD_ERR_PARAMS */
@@ -36,7 +34,7 @@ char *ModuleGetErrStr(int status)
 		"Module Error, No Service found for request",	/* MOD_ERR_NOSERVICE */
 		"Module Error, No module name for request"		/* MOD_ERR_NO_MOD_NAME */
 	};
-	return const_cast<char *>(module_err_str[status]);
+	return module_err_str[status];
 }
 
 /************************************************/
@@ -60,7 +58,7 @@ int protocol_module_init()
 		 */
 		if (ircd->ts6)
 		{
-			if (!Config.Numeric)
+			if (Config.Numeric.empty())
 			{
 				Alog() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
 				ret = -1;
@@ -83,7 +81,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 	this->lang[langNumber].argc = ac;
 	this->lang[langNumber].argv = new char *[ac];
 	for (i = 0; i < ac; ++i)
-		this->lang[langNumber].argv[i] = sstrdup(av[i]);
+		this->lang[langNumber].argv[i] = strdup(av[i]);
 }
 
 /**
@@ -91,27 +89,17 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
  * @param name the name of the module to find
  * @return a pointer to the module found, or NULL
  */
-Module *FindModule(const std::string &name)
+Module *FindModule(const Anope::string &name)
 {
 	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 	{
 		Module *m = *it;
 
-		if (m->name == name)
+		if (m->name.equals_ci(name))
 			return m;
 	}
 
 	return NULL;
-}
-
-Module *FindModule(const char *name)
-{
-	return FindModule(std::string(name));
-}
-
-Module *FindModule(const ci::string &name)
-{
-	return FindModule(std::string(name.c_str()));
 }
 
 /** Add a message to Anope
@@ -119,7 +107,7 @@ Module *FindModule(const ci::string &name)
  * @param func A callback function that will be called when this message is received
  * @return The new message object
  */
-Message *Anope::AddMessage(const std::string &name, int (*func)(const char *source, int ac, const char **av))
+Message *Anope::AddMessage(const Anope::string &name, int (*func)(const Anope::string &source, int ac, const char **av))
 {
 	Message *m = new Message;
 
@@ -139,12 +127,12 @@ Message *Anope::AddMessage(const std::string &name, int (*func)(const char *sour
  */
 bool Anope::DelMessage(Message *m)
 {
-	std::multimap<std::string, Message *>::iterator it = MessageMap.find(m->name);
+	message_map::iterator it = MessageMap.find(m->name);
 
 	if (it == MessageMap.end())
 		return false;
 
-	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(m->name);
+	message_map::iterator upper = MessageMap.upper_bound(m->name);
 
 	for (; it != upper; ++it)
 	{
@@ -158,27 +146,27 @@ bool Anope::DelMessage(Message *m)
 
 	return false;
 }
+
 /** Find  message in the message table
  * @param name The name of the message were looking for
  * @return NULL if we cant find it, or a pointer to the Message if we can
  **/
-std::vector<Message *> Anope::FindMessage(const std::string &name)
+std::vector<Message *> Anope::FindMessage(const Anope::string &name)
 {
 	std::vector<Message *> messages;
 
-	std::multimap<std::string, Message *>::iterator it = MessageMap.find(name);
+	message_map::iterator it = MessageMap.find(name);
 
 	if (it == MessageMap.end())
 		return messages;
 
-	std::multimap<std::string, Message *>::iterator upper = MessageMap.upper_bound(name);
+	message_map::iterator upper = MessageMap.upper_bound(name);
 
 	for (; it != upper; ++it)
 		messages.push_back(it->second);
 
 	return messages;
 }
-
 
 /*******************************************************************************
  * Command Functions
@@ -192,7 +180,7 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 	c->module = this;
 	c->service = bi;
 
-	std::pair<std::map<ci::string, Command *>::iterator, bool> it = bi->Commands.insert(std::make_pair(c->name, c));
+	std::pair<CommandMap::iterator, bool> it = bi->Commands.insert(std::make_pair(c->name, c));
 
 	if (it.second != true)
 	{
@@ -266,7 +254,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-void Module::NoticeLang(const char *source, User *u, int number, ...)
+void Module::NoticeLang(const Anope::string &source, User *u, int number, ...)
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -287,7 +275,7 @@ void Module::NoticeLang(const char *source, User *u, int number, ...)
 	{
 		fmt = this->lang[mlang].argv[number];
 
-		buf = sstrdup(fmt);
+		buf = strdup(fmt);
 		va_start(va, number);
 		vsnprintf(buffer, 4095, buf, va);
 		va_end(va);
@@ -366,7 +354,7 @@ void ModuleRunTimeDirCleanUp()
 	{
 		if (!dp->d_ino)
 			continue;
-		if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, ".."))
+		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
 			continue;
 		snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
 		DeleteFile(filebuf);

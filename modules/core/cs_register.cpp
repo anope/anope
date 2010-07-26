@@ -21,10 +21,10 @@ class CommandCSRegister : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
-		const char *desc = params[1].c_str();
+		Anope::string chan = params[0];
+		Anope::string desc = params[1];
 		Channel *c = findchan(chan);
 		ChannelInfo *ci;
 		ChannelMode *cm;
@@ -35,14 +35,14 @@ class CommandCSRegister : public Command
 			return MOD_CONT;
 		}
 
-		if (*chan == '&')
+		if (chan[0] == '&')
 			notice_lang(Config.s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
-		else if (*chan != '#')
+		else if (chan[0] != '#')
 			notice_lang(Config.s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			notice_lang(Config.s_ChanServ, u, CHAN_X_INVALID, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_INVALID, chan.c_str());
 		else if ((ci = cs_findchan(chan)))
-			notice_lang(Config.s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			notice_lang(Config.s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 		else if (Config.CSMaxReg && u->Account()->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
@@ -60,11 +60,11 @@ class CommandCSRegister : public Command
 				ci->c = c;
 			}
 			ci->founder = u->Account();
-			ci->desc = sstrdup(desc);
+			ci->desc = desc;
 
-			if (c && c->topic)
+			if (c && !c->topic.empty())
 			{
-				ci->last_topic = sstrdup(c->topic);
+				ci->last_topic = c->topic;
 				ci->last_topic_setter = c->topic_setter;
 				ci->last_topic_time = c->topic_time;
 			}
@@ -74,7 +74,7 @@ class CommandCSRegister : public Command
 			ci->bi = NULL;
 			++ci->founder->channelcount;
 			Alog() << Config.s_ChanServ << ": Channel '" << chan << "' registered by " << u->GetMask();
-			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan, u->nick.c_str());
+			notice_lang(Config.s_ChanServ, u, CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
 
 			/* Implement new mode lock */
 			if (c)
@@ -99,9 +99,9 @@ class CommandCSRegister : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_REGISTER, Config.s_ChanServ);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_REGISTER, Config.s_ChanServ.c_str());
 		return true;
 	}
 
@@ -109,17 +109,12 @@ class CommandCSRegister : public Command
 	{
 		syntax_error(Config.s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
-
-	void OnSyntaxError(User *u)
-	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_REGISTER);
-	}
 };
 
 class CSRegister : public Module
 {
  public:
-	CSRegister(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

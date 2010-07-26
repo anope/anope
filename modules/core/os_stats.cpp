@@ -200,7 +200,7 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsUplink(User *u)
 	{
-		std::string buf;
+		Anope::string buf;
 
 		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
 			if (Capab.HasFlag(Capab_Info[j].Flag))
@@ -232,12 +232,12 @@ class CommandOSStats : public Command
 		notice_lang(Config.s_OperServ, u, OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
 		get_chanserv_stats(&count, &mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
-		if (Config.s_BotServ)
+		if (!Config.s_BotServ.empty())
 		{
 			get_botserv_stats(&count, &mem);
 			notice_lang(Config.s_OperServ, u, OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
 		}
-		if (Config.s_HostServ)
+		if (!Config.s_HostServ.empty())
 		{
 			get_hostserv_stats(&count, &mem);
 			notice_lang(Config.s_OperServ, u, OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
@@ -254,33 +254,33 @@ class CommandOSStats : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		ci::string extra = params.size() ? params[0] : "";
+		Anope::string extra = !params.empty() ? params[0] : "";
 
-		if (!extra.empty() && extra != "ALL")
+		if (!extra.empty() && !extra.equals_ci("ALL"))
 		{
-			if (extra == "AKILL")
+			if (extra.equals_ci("AKILL"))
 				return this->DoStatsAkill(u);
-			else if (extra == "RESET")
+			else if (extra.equals_ci("RESET"))
 				return this->DoStatsReset(u);
-			else if (extra != "MEMORY" && extra != "UPLINK")
+			else if (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK"))
 				notice_lang(Config.s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra.c_str());
 		}
 
-		if (extra.empty() || (extra != "MEMORY" && extra != "UPLINK"))
+		if (extra.empty() || (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK")))
 			this->DoStatsUptime(u);
 
-		if (!extra.empty() && (extra == "ALL" || extra == "UPLINK"))
+		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("UPLINK")))
 			this->DoStatsUplink(u);
 
-		if (!extra.empty() && (extra == "ALL" || extra == "MEMORY"))
+		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("MEMORY")))
 			this->DoStatsMemory(u);
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_OperServ, u, OPER_HELP_STATS);
 		return true;
@@ -295,7 +295,7 @@ class CommandOSStats : public Command
 class OSStats : public Module
 {
  public:
-	OSStats(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

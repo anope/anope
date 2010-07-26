@@ -20,15 +20,15 @@ class CommandCSUnban : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *chan = params[0].c_str();
+		Anope::string chan = params[0];
 		Channel *c;
 		User *u2;
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -56,13 +56,13 @@ class CommandCSUnban : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_UNBAN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
 	}
@@ -76,7 +76,7 @@ class CommandCSUnban : public Command
 class CSUnban : public Module
 {
  public:
-	CSUnban(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

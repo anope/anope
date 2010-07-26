@@ -127,12 +127,12 @@ else \
 	const char *ano_moderr();
 #endif
 
-extern CoreExport Module *FindModule(const char *name);
-extern CoreExport Module *FindModule(const std::string &name);
-extern CoreExport Module *FindModule(const ci::string &name);
+struct Message;
+
+extern CoreExport Module *FindModule(const Anope::string &name);
 int protocol_module_init();
 extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
-extern CoreExport bool moduleMinVersion(int major,int minor,int patch,int build);
+extern CoreExport bool moduleMinVersion(int major, int minor, int patch, int build);
 
 enum ModuleReturn
 {
@@ -158,7 +158,8 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE, SOCKETENGINE };
 
 struct Message;
-extern CoreExport std::multimap<std::string, Message *> MessageMap;
+typedef std::multimap<Anope::string, Message *, hash_compare_std_string> message_map;
+extern CoreExport message_map MessageMap;
 class Module;
 extern CoreExport std::list<Module *> Modules;
 
@@ -212,11 +213,11 @@ class CoreExport Module
  public:
 	/** The module name (e.g. os_modload)
 	 */
-	std::string name;
+	Anope::string name;
 
 	/** The temporary path/filename
 	 */
-	std::string filename;
+	Anope::string filename;
 
 	/** Callbacks used in this module
 	 */
@@ -232,11 +233,11 @@ class CoreExport Module
 
 	/** Version of this module
 	 */
-	std::string version;
+	Anope::string version;
 
 	/** Author of the module
 	 */
-	std::string author;
+	Anope::string author;
 
 	/** What type this module is
 	 */
@@ -251,7 +252,7 @@ class CoreExport Module
 	/** Creates and initialises a new module.
 	 * @param loadernick The nickname of the user loading the module.
 	 */
-	Module(const std::string &modname, const std::string &loadernick);
+	Module(const Anope::string &modname, const Anope::string &loadernick);
 
 	/** Destroys a module, freeing resources it has allocated.
 	 */
@@ -279,12 +280,12 @@ class CoreExport Module
 	/** Set the modules version info.
 	 * @param version the version of the module
 	 */
-	void SetVersion(const std::string &version);
+	void SetVersion(const Anope::string &version);
 
 	/** Set the modules author info
 	 * @param author the author of the module
 	 */
-	void SetAuthor(const std::string &author);
+	void SetAuthor(const Anope::string &author);
 
 	/** Get the version of Anope this module was
 	 * compiled against
@@ -321,7 +322,7 @@ class CoreExport Module
 	 * @param number The message number
 	 * @param ... The argument list
 	 **/
-	void NoticeLang(const char *source, User * u, int number, ...);
+	void NoticeLang(const Anope::string &source, User *u, int number, ...);
 
 	/**
 	 * Add a module provided command to the given service.
@@ -345,7 +346,7 @@ class CoreExport Module
 	 * @param source The nick of the sender.
 	 * @param kickmsg The reason for the kick.
 	 */
-	virtual void OnUserKicked(Channel *c, User *target, const std::string &source, const std::string &kickmsg) { }
+	virtual void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &kickmsg) { }
 
 	/** Called when Services' configuration has been loaded.
 	 * @param startup True if Services is starting for the first time, false otherwise.
@@ -391,7 +392,7 @@ class CoreExport Module
 	 * @param u The user.
 	 * @param oldnick The old nick of the user
 	 */
-	virtual void OnUserNickChange(User *u, const std::string &oldnick) { }
+	virtual void OnUserNickChange(User *u, const Anope::string &oldnick) { }
 
 	/** Called immediatly when a user tries to run a command
 	 * @param u The user
@@ -401,7 +402,7 @@ class CoreExport Module
 	 * @param c The command class (if it exists)
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, const ci::string &command, const ci::string &message, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, const Anope::string &command, const Anope::string &message, Command *c) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command
@@ -410,7 +411,7 @@ class CoreExport Module
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param u The user executing the command
@@ -418,7 +419,7 @@ class CoreExport Module
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(User *u, BotInfo *service, const ci::string &command, const std::vector<ci::string> &params) { }
+	virtual void OnPostCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params) { }
 
 	/** Called after the core has finished loading the databases, but before
 	 * we connect to the server
@@ -438,9 +439,9 @@ class CoreExport Module
 	/** Called when anope needs to check passwords against encryption
 	 *  see src/encrypt.c for detailed informations
 	 */
-	virtual EventReturn OnEncrypt(const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
-	virtual EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest) { return EVENT_CONTINUE; }
-	virtual EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password) { return EVENT_CONTINUE; }
+	virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command
 	 * @param command The command
@@ -448,7 +449,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotFantasy(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
+	virtual void OnBotFantasy(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params) { }
 
 	/** Called on fantasy command without access
 	 * @param command The command
@@ -456,7 +457,7 @@ class CoreExport Module
 	 * @param ci The channel it's being used in
 	 * @param params The params
 	 */
-	virtual void OnBotNoFantasyAccess(const std::string &command, User *u, ChannelInfo *ci, const std::string &params) { }
+	virtual void OnBotNoFantasyAccess(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params) { }
 
 	/** Called after a bot joins a channel
 	 * @param ci The channael
@@ -469,7 +470,7 @@ class CoreExport Module
 	 * @param ci Channel the ban is placed on
 	 * @param mask The mask being banned
 	 */
-	virtual void OnBotBan(User *u, ChannelInfo *ci, const char *mask) { }
+	virtual void OnBotBan(User *u, ChannelInfo *ci, const Anope::string &mask) { }
 
 	/** Called before a badword is added to the badword list
 	 * @param ci The channel
@@ -490,7 +491,7 @@ class CoreExport Module
 	 * @param reason The reason
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const std::string &reason) { return EVENT_CONTINUE; }
+	virtual EventReturn OnBotKick(BotInfo *bi, Channel *c, User *u, const Anope::string &reason) { return EVENT_CONTINUE; }
 
 	/** Called before a user parts a channel
 	 * @param u The user
@@ -504,7 +505,7 @@ class CoreExport Module
 	 * @param channel The channel name
 	 * @param msg The part reason
 	 */
-	virtual void OnPartChannel(User *u, Channel *c, const std::string &channel, const std::string &msg) { }
+	virtual void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) { }
 
 	/** Called before a user joins a channel
 	 * @param u The user
@@ -523,7 +524,7 @@ class CoreExport Module
 	 * @param c The channel
 	 * @param topic The new topic
 	 */
-	virtual void OnTopicUpdated(Channel *c, const char *topic) { }
+	virtual void OnTopicUpdated(Channel *c, const Anope::string &topic) { }
 
 	/** Called before a channel expires
 	 * @param ci The channel
@@ -534,7 +535,7 @@ class CoreExport Module
 	/** Called when a channel expires
 	 * @param chname The channel name
 	 */
-	virtual void OnChanExpire(const char *chname) { }
+	virtual void OnChanExpire(const Anope::string &chname) { }
 
 	/** Called before Anope connects to its uplink
 	 * @param u The uplink we're going to connect to
@@ -568,13 +569,13 @@ class CoreExport Module
 	/** Called when the flatfile dbs are being written
 	 * @param Write A callback to the function used to insert a line into the database
 	 */
-	virtual void OnDatabaseWrite(void (*Write)(const std::string &)) { }
+	virtual void OnDatabaseWrite(void (*Write)(const Anope::string &)) { }
 
 	/** Called when a line is read from the database
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseRead(const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseRead(const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when nickcore metadata is read from the database
 	 * @param nc The nickcore
@@ -582,7 +583,7 @@ class CoreExport Module
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickCore *nc, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when nickcore metadata is read from the database
 	 * @param na The nickalias
@@ -590,7 +591,7 @@ class CoreExport Module
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when nickrequest metadata is read from the database
 	 * @param nr The nickrequest
@@ -598,7 +599,7 @@ class CoreExport Module
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickRequest *nr, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseReadMetadata(NickRequest *nr, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when botinfo metadata is read from the database
 	 * @param bi The botinfo
@@ -606,7 +607,7 @@ class CoreExport Module
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseReadMetadata(BotInfo *bi, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when chaninfo metadata is read from the database
 	 * @param ci The chaninfo
@@ -614,37 +615,37 @@ class CoreExport Module
 	 * @param params The params from the database
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
 	 */
-	virtual EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const std::string &key, const std::vector<std::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when we are writing metadata for a nickcore
 	 * @param WriteMetata A callback function used to insert the metadata
 	 * @param nc The nickcore
 	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickCore *nc) { }
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc) { }
 
 	/** Called when we are wrting metadata for a nickalias
 	 * @param WriteMetata A callback function used to insert the metadata
 	 * @param na The nick alias
 	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickAlias *na) { }
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickAlias *na) { }
 
 	/** Called when we are wrting metadata for a nickrequest
 	 * @param WriteMetata A callback function used to insert the metadata
 	 * @param nr The nick request
 	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), NickRequest *nr) { }
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickRequest *nr) { }
 
 	/** Called when we are writing metadata for a botinfo
 	 * @param WriteMetata A callback function used to insert the metadata
 	 * @param bi The botinfo
 	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), BotInfo *bi) { }
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), BotInfo *bi) { }
 
 	/** Called when are are writing metadata for a channelinfo
 	 * @param WriteMetata A callback function used to insert the metadata
 	 * @param bi The channelinfo
 	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const std::string &, const std::string &), ChannelInfo *ci) { }
+	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci) { }
 
 	/** Called before services restart
 	*/
@@ -665,7 +666,7 @@ class CoreExport Module
 	/** Called on signal
 	 * @param msg The quitmsg
 	 */
-	virtual void OnSignal(const char *msg) { }
+	virtual void OnSignal(const Anope::string &msg) { }
 
 	/** Called before a nick expires
 	 * @param na The nick
@@ -733,7 +734,7 @@ class CoreExport Module
 	 * @param u The user
 	 * @param msg The quit message
 	 */
-	virtual void OnUserQuit(User *u, const std::string &msg) { }
+	virtual void OnUserQuit(User *u, const Anope::string &msg) { }
 
 	/** Called when a user disconnects
 	 * @param u The user
@@ -795,7 +796,7 @@ class CoreExport Module
 	/** Called when a channel is dropped
 	 * @param chname The channel name
 	 */
-	virtual void OnChanDrop(const std::string &chname) { }
+	virtual void OnChanDrop(const Anope::string &chname) { }
 
 	/** Called when a channel is forbidden
 	 * @param ci The channel
@@ -856,7 +857,7 @@ class CoreExport Module
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
-	virtual void OnNickDrop(const char *nick) { }
+	virtual void OnNickDrop(const Anope::string &nick) { }
 
 	/** Called when a nick is forbidden
 	 * @param na The nick alias of the forbidden nick
@@ -908,7 +909,7 @@ class CoreExport Module
 	 * @param nc pointer to the NickCore
 	 * @param newdisplay the new display
 	 */
-	virtual void OnChangeCoreDisplay(NickCore *nc, const std::string &newdisplay) { }
+	virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) { }
 
 	/** called from ns_register.c, after the NickRequest have been created
 	 * @param nr pointer to the NickRequest
@@ -929,13 +930,13 @@ class CoreExport Module
 	 * @param nc The nick
 	 * @param entry The entry
 	 */
-	virtual void OnNickAddAccess(NickCore *nc, const std::string &entry) { }
+	virtual void OnNickAddAccess(NickCore *nc, const Anope::string &entry) { }
 
 	/** Called from NickCore::EraseAccess()
 	 * @param nc pointer to the NickCore
 	 * @param entry The access mask
 	 */
-	virtual void OnNickEraseAccess(NickCore *nc, const std::string &entry) { }
+	virtual void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) { }
 
 	/** Called when a user requests info for a nick
 	 * @param u The user requesting info
@@ -973,7 +974,7 @@ class CoreExport Module
 	 * @param mi The memo info
 	 * @param number What memo number is being deleted, can be 0 for all memos
 	 */
-	virtual void OnMemoDel(NickCore *nc, MemoInfo *mi, int number) { }
+	virtual void OnMemoDel(const NickCore *nc, MemoInfo *mi, int number) { }
 
 	/** Called when a memo is deleted
 	 * @param ci The channel of the memo being deleted
@@ -988,7 +989,7 @@ class CoreExport Module
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const std::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
@@ -996,7 +997,7 @@ class CoreExport Module
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name, const std::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user
@@ -1026,7 +1027,7 @@ class CoreExport Module
 	 * @param param The param, if there is one and if status is true
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnMLock(ChannelModeName Name, bool status, const std::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnMLock(ChannelModeName Name, bool status, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is about to be unlocked
 	 * @param Name The mode being mlocked
@@ -1132,26 +1133,17 @@ class CoreExport ModuleManager
 	 **/
 	static void LoadModuleList(std::list<ci::string> &ModList);
 
-	/** Loads a given module.
-	 * @param m the module to load
-	 * @param u the user who loaded it, NULL for auto-load
-	 * @return MOD_ERR_OK on success, anything else on fail
-	 */
-	static int LoadModule(const char *modname, User *u);
+	/** Load up a list of modules.
+	 * @param module_list The list of modules to load
+	 **/
+	static void LoadModuleList(std::list<Anope::string> &ModList);
 
 	/** Loads a given module.
 	 * @param m the module to load
 	 * @param u the user who loaded it, NULL for auto-load
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
-	static int LoadModule(const std::string &modname, User *u);
-
-	/** Loads a given module.
-	 * @param m the module to load
-	 * @param u the user who loaded it, NULL for auto-load
-	 * @return MOD_ERR_OK on success, anything else on fail
-	 */
-	static int LoadModule(const ci::string &modname, User *u);
+	static int LoadModule(const Anope::string &modname, User *u);
 
 	/** Unload the given module.
 	 * @param m the module to unload
@@ -1252,8 +1244,8 @@ class CallBack : public Timer
 
 struct Message
 {
-	std::string name;
-	int (*func)(const char *source, int ac, const char **av);
+	Anope::string name;
+	int (*func)(const Anope::string &source, int ac, const char **av);
 };
 
 #endif // MODULES_H

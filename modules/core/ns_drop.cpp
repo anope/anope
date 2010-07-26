@@ -20,13 +20,13 @@ class CommandNSDrop : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params.size() ? params[0].c_str() : NULL;
+		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na;
 		NickRequest *nr = NULL;
 		int is_mine; /* Does the nick being dropped belong to the user that is dropping? */
-		char *my_nick = NULL;
+		Anope::string my_nick;
 
 		if (readonly)
 		{
@@ -34,20 +34,20 @@ class CommandNSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if (!(na = (nick ? findnick(nick) : findnick(u->nick))))
+		if (!(na = findnick(!nick.empty() ? nick : u->nick)))
 		{
-			if (nick)
+			if (!nick.empty())
 			{
 				if ((nr = findrequestnick(nick)) && u->Account()->IsServicesOper())
 				{
 					if (Config.WallDrop)
-						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
+						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
 					Alog() << Config.s_NickServ << ": " << u->GetMask() << " dropped nickname " << nr->nick << " (e-mail: " << nr->email << ")";
 					delete nr;
-					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
+					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick.c_str());
 				}
 				else
-					notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+					notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 			}
 			else
 				notice_lang(Config.s_NickServ, u, NICK_NOT_REGISTERED);
@@ -55,8 +55,8 @@ class CommandNSDrop : public Command
 		}
 
 		is_mine = u->Account() && u->Account() == na->nc;
-		if (is_mine && !nick)
-			my_nick = sstrdup(na->nick);
+		if (is_mine && nick.empty())
+			my_nick = na->nick;
 
 		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
 			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
@@ -67,39 +67,36 @@ class CommandNSDrop : public Command
 			if (readonly)
 				notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
 
-			if (ircd->sqline && (na->HasFlag(NS_FORBIDDEN)))
+			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
 			{
 				XLine x(na->nick);
 				ircdproto->SendSQLineDel(&x);
 			}
 
-			Alog() << Config.s_NickServ << ": " << u->GetMask() << " dropped nickname " << na->nick << " (group " << na->nc->display << ") (e-mail: " << (na->nc->email ? na->nc->email : "none") << ")";
+			Alog() << Config.s_NickServ << ": " << u->GetMask() << " dropped nickname " << na->nick << " (group " << na->nc->display << ") (e-mail: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
 
-			FOREACH_MOD(I_OnNickDrop, OnNickDrop(my_nick ? my_nick : nick));
+			FOREACH_MOD(I_OnNickDrop, OnNickDrop(!my_nick.empty() ? my_nick : nick));
 
 			if (!is_mine)
 			{
 				if (Config.WallDrop)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick);
-				notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
+				notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick.c_str());
 			}
 			else
 			{
-				if (nick)
-					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick);
+				if (!nick.empty())
+					notice_lang(Config.s_NickServ, u, NICK_X_DROPPED, nick.c_str());
 				else
 					notice_lang(Config.s_NickServ, u, NICK_DROPPED);
 			}
 		}
 
-		if (my_nick)
-			delete [] my_nick;
-
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->HasPriv("nickserv/drop"))
 			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
@@ -118,7 +115,7 @@ class CommandNSDrop : public Command
 class NSDrop : public Module
 {
  public:
-	NSDrop(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

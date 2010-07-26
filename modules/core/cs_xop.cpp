@@ -117,7 +117,7 @@ class XOPListCallback : public NumberList
 	int *messages;
 	bool SentHeader;
  public:
-	XOPListCallback(User *_u, ChannelInfo *_ci, const std::string &numlist, int _level, int *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
+	XOPListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist, int _level, int *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
 	{
 	}
 
@@ -142,7 +142,7 @@ class XOPListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, ChanAccess *access, unsigned index, int level, int *messages)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index, access->nc->display);
+		notice_lang(Config.s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
 	}
 };
 
@@ -152,9 +152,9 @@ class XOPDelCallback : public NumberList
 	ChannelInfo *ci;
 	int *messages;
 	unsigned Deleted;
-	std::string Nicks;
+	Anope::string Nicks;
  public:
-	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const std::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), messages(_messages), Deleted(0)
+	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), messages(_messages), Deleted(0)
 	{
 	}
 
@@ -182,7 +182,7 @@ class XOPDelCallback : public NumberList
 
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + std::string(access->nc->display);
+			Nicks += ", " + access->nc->display;
 		else
 			Nicks = access->nc->display;
 
@@ -195,13 +195,13 @@ class XOPDelCallback : public NumberList
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
-		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		Anope::string nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
 		int change = 0;
 
-		if (!nick)
+		if (nick.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
 			return MOD_CONT;
@@ -229,7 +229,7 @@ class XOPBase : public Command
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -268,23 +268,23 @@ class XOPBase : public Command
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
-			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display, ci->name.c_str());
+			notice_lang(Config.s_ChanServ, u, messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
-			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display, ci->name.c_str());
+			notice_lang(Config.s_ChanServ, u, messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
-		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		Anope::string nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
 
-		if (!nick)
+		if (nick.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
 			return MOD_CONT;
@@ -311,7 +311,7 @@ class XOPBase : public Command
 		}
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick))
+		if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			XOPDelCallback list(u, ci, messages, nick);
 			list.Process();
@@ -321,7 +321,7 @@ class XOPBase : public Command
 			NickAlias *na = findnick(nick);
 			if (!na)
 			{
-				notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick);
+				notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
@@ -337,7 +337,7 @@ class XOPBase : public Command
 
 			if (i == end)
 			{
-				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick, ci->name.c_str());
+				notice_lang(Config.s_ChanServ, u, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 
@@ -347,7 +347,7 @@ class XOPBase : public Command
 			{
 				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user " << access->nc->display << " on " << ci->name;
 
-				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED], access->nc->display, ci->name.c_str());
+				notice_lang(Config.s_ChanServ, u, messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
@@ -358,9 +358,9 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
 	{
-		const char *nick = params.size() > 2 ? params[2].c_str() : NULL;
+		Anope::string nick = params.size() > 2 ? params[2] : "";
 
 		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
 		{
@@ -374,7 +374,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (nick && strspn(nick, "1234567890,-") == strlen(nick))
+		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			XOPListCallback list(u, ci, nick, level, messages);
 			list.Process();
@@ -387,7 +387,7 @@ class XOPBase : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (nick && access->nc && !Anope::Match(access->nc->display, nick, false))
+				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
 					continue;
 
 				if (!SentHeader)
@@ -406,7 +406,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, const std::vector<ci::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoClear(User *u, ChannelInfo *ci, int level, int *messages)
 	{
 		if (readonly)
 		{
@@ -440,29 +440,29 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
  protected:
-	CommandReturn DoXop(User *u, const std::vector<ci::string> &params, int level, int *messages)
+	CommandReturn DoXop(User *u, const std::vector<Anope::string> &params, int level, int *messages)
 	{
-		const char *chan = params[0].c_str();
-		ci::string cmd = params[1];
+		Anope::string chan = params[0];
+		Anope::string cmd = params[1];
 
 		ChannelInfo *ci = cs_findchan(chan);
 
-		if (!(ci->HasFlag(CI_XOP)))
-			notice_lang(Config.s_ChanServ, u, CHAN_XOP_ACCESS, Config.s_ChanServ);
-		else if (cmd == "ADD")
+		if (!ci->HasFlag(CI_XOP))
+			notice_lang(Config.s_ChanServ, u, CHAN_XOP_ACCESS, Config.s_ChanServ.c_str());
+		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params, ci, level, messages);
-		else if (cmd == "DEL")
+		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(u, params, ci, level, messages);
-		else if (cmd == "LIST")
+		else if (cmd.equals_ci("LIST"))
 			return this->DoList(u, params, ci, level, messages);
-		else if (cmd == "CLEAR")
-			return this->DoClear(u, params, ci, level, messages);
+		else if (cmd.equals_ci("CLEAR"))
+			return this->DoClear(u, ci, level, messages);
 		else
 			this->OnSyntaxError(u, "");
 		return MOD_CONT;
 	}
  public:
-	XOPBase(const ci::string &command) : Command(command, 2, 3)
+	XOPBase(const Anope::string &command) : Command(command, 2, 3)
 	{
 	}
 
@@ -470,11 +470,11 @@ class XOPBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, const std::vector<ci::string> &params) = 0;
+	virtual CommandReturn Execute(User *u, const std::vector<Anope::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const ci::string &subcommand) = 0;
+	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u, const ci::string &subcommand) = 0;
+	virtual void OnSyntaxError(User *u, const Anope::string &subcommand) = 0;
 
 	virtual void OnServHelp(User *u) = 0;
 };
@@ -486,18 +486,18 @@ class CommandCSQOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_QOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
 	}
@@ -515,18 +515,18 @@ class CommandCSAOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_AOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
 	}
@@ -544,18 +544,18 @@ class CommandCSHOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_HOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
 	}
@@ -573,18 +573,18 @@ class CommandCSSOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
 	}
@@ -602,18 +602,18 @@ class CommandCSVOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(u, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_VOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
 	}
@@ -627,7 +627,7 @@ class CommandCSVOP : public XOPBase
 class CSXOP : public Module
 {
  public:
-	CSXOP(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

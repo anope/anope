@@ -20,23 +20,23 @@ class CommandOSGlobal : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *msg = params[0].c_str();
+		Anope::string msg = params[0];
 
 		if (Config.WallOSGlobal)
 			ircdproto->SendGlobops(OperServ, "\2%s\2 just used GLOBAL command.", u->nick.c_str());
-		oper_global(const_cast<char *>(u->nick.c_str()), "%s", msg);
+		oper_global(u->nick, "%s", msg.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_GLOBAL, Config.s_GlobalNoticer);
+		notice_help(Config.s_OperServ, u, OPER_HELP_GLOBAL, Config.s_GlobalNoticer.c_str());
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
 	}
@@ -50,7 +50,7 @@ class CommandOSGlobal : public Command
 class OSGlobal : public Module
 {
  public:
-	OSGlobal(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	OSGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

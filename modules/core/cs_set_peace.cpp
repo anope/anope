@@ -16,21 +16,21 @@
 class CommandCSSetPeace : public Command
 {
  public:
-	CommandCSSetPeace(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPeace(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PEACE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PEACE);
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name.c_str());
@@ -41,13 +41,13 @@ class CommandCSSetPeace : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PEACE, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
 	}
@@ -61,17 +61,17 @@ class CommandCSSetPeace : public Command
 class CommandCSSASetPeace : public CommandCSSetPeace
 {
  public:
-	CommandCSSASetPeace(const ci::string &cname) : CommandCSSetPeace(cname, "chanserv/saset/peace")
+	CommandCSSASetPeace(const Anope::string &cname) : CommandCSSetPeace(cname, "chanserv/saset/peace")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PEACE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
 	}
@@ -80,7 +80,7 @@ class CommandCSSASetPeace : public CommandCSSetPeace
 class CSSetPeace : public Module
 {
  public:
-	CSSetPeace(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

@@ -15,23 +15,23 @@
 class CommandCSSetRestricted : public Command
 {
  public:
-	CommandCSSetRestricted(const ci::string &cname, const ci::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetRestricted(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		assert(ci);
 
-		if (params[1] == "ON")
+		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name.c_str());
 		}
-		else if (params[1] == "OFF")
+		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
@@ -44,13 +44,13 @@ class CommandCSSetRestricted : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_RESTRICTED, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
 	}
@@ -64,17 +64,17 @@ class CommandCSSetRestricted : public Command
 class CommandCSSASetRestricted : public CommandCSSetRestricted
 {
  public:
-	CommandCSSASetRestricted(const ci::string &cname) : CommandCSSetRestricted(cname, "chanserv/saset/restricted")
+	CommandCSSASetRestricted(const Anope::string &cname) : CommandCSSetRestricted(cname, "chanserv/saset/restricted")
 	{
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_RESTRICTED, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_ChanServ, u, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
 	}
@@ -83,7 +83,7 @@ class CommandCSSASetRestricted : public CommandCSSetRestricted
 class CSSetRestricted : public Module
 {
  public:
-	CSSetRestricted(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

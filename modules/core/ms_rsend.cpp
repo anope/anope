@@ -20,12 +20,11 @@ class CommandMSRSend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		const char *text = params[1].c_str();
+		Anope::string nick = params[0];
+		Anope::string text = params[1];
 		NickAlias *na = NULL;
-		int z = 3;
 
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(nick)) && na->nc == u->Account())
@@ -38,13 +37,13 @@ class CommandMSRSend : public Command
 		{
 			/* Services opers and above can use rsend */
 			if (u->Account()->IsServicesOper())
-				memo_send(u, nick, text, z);
+				memo_send(u, nick, text, 3);
 			else
 				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
 		}
 		else if (Config.MSMemoReceipt == 2)
 			/* Everybody can use rsend */
-			memo_send(u, nick, text, z);
+			memo_send(u, nick, text, 3);
 		else
 		{
 			/* rsend has been disabled */
@@ -55,13 +54,13 @@ class CommandMSRSend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		notice_help(Config.s_MemoServ, u, MEMO_HELP_RSEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 	}
@@ -75,7 +74,7 @@ class CommandMSRSend : public Command
 class MSRSend : public Module
 {
  public:
-	MSRSend(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!Config.MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");

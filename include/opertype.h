@@ -15,12 +15,12 @@ class CoreExport OperType
  private:
 	/** The name of this opertype, e.g. "sra".
 	 */
-	ci::string name;
+	Anope::string name;
 
 	/** Privs that this opertype may use, e.g. 'users/auspex'.
 	 * This *must* be std::list, see commands comment for details.
 	 */
-	std::list<ci::string> privs;
+	std::list<Anope::string> privs;
 
 	/** Commands this user may execute, e.g:
 	 * botserv/set/ *, botserv/set/private, botserv/ *
@@ -30,7 +30,7 @@ class CoreExport OperType
 	 * we support full globbing here. This shouldn't be a problem
 	 * as we don't invoke it often.
 	 */
-	std::list<ci::string> commands;
+	std::list<Anope::string> commands;
 
 	/** Set of opertypes we inherit from
 	 */
@@ -39,33 +39,33 @@ class CoreExport OperType
 	/** Create a new opertype of the given name.
 	 * @param nname The opertype name, e.g. "sra".
 	 */
-	OperType(const ci::string &nname);
+	OperType(const Anope::string &nname);
 
 	/** Check whether this opertype has access to run the given command string.
 	 * @param cmdstr The string to check, e.g. botserv/set/private.
 	 * @return True if this opertype may run the specified command, false otherwise.
 	 */
-	bool HasCommand(const ci::string &cmdstr) const;
+	bool HasCommand(const Anope::string &cmdstr) const;
 
 	/** Check whether this opertype has access to the given special permission.
 	 * @param privstr The priv to check for, e.g. users/auspex.
 	 * @return True if this opertype has the specified priv, false otherwise.
 	 */
-	bool HasPriv(const ci::string &privstr) const;
+	bool HasPriv(const Anope::string &privstr) const;
 
 	/** Add the specified command to this opertype.
 	 * @param cmdstr The command mask to grant this opertype access to, e.g: nickserv/ *, chanserv/set/ *, botserv/set/private.
 	 */
-	void AddCommand(const ci::string &cmdstr);
+	void AddCommand(const Anope::string &cmdstr);
 
 	/** Add the specified priv mask to this opertype.
 	 * @param privstr The specified mask of privs to grant this opertype access to,  e.g. users/auspex, users/ *, etc.
 	 */
-	void AddPriv(const ci::string &privstr);
+	void AddPriv(const Anope::string &privstr);
 
 	/** Returns the name of this opertype.
 	 */
-	const ci::string &GetName() const;
+	const Anope::string &GetName() const;
 
 	/** Make this opertype inherit commands and privs from another opertype
 	 * @param ot The opertype to inherit from

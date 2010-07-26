@@ -12,8 +12,8 @@
 
 class BotInfo;
 
-typedef unordered_map_namespace::unordered_map<ci::string, BotInfo *, hash_compare_ci_string> botinfo_map;
-typedef unordered_map_namespace::unordered_map<std::string, BotInfo *, hash_compare_std_string> botinfo_uid_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, hash_compare_ci_string> botinfo_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, hash_compare_std_string> botinfo_uid_map;
 extern CoreExport botinfo_map BotListByNick;
 extern CoreExport botinfo_uid_map BotListByUID;
 
@@ -32,8 +32,8 @@ enum BotFlag
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 {
  public:
-	time_t created; 	/* Birth date ;) */
-	time_t lastmsg;		/* Last time we said something */
+	time_t created;			/* Birth date ;) */
+	time_t lastmsg;			/* Last time we said something */
 	CommandMap Commands;	/* Commands on this bot */
 
 	/** Create a new bot.
@@ -42,7 +42,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 * @param host The hostname to give the bot.
 	 * @param real The realname to give the bot.
 	 */
-	BotInfo(const std::string &nick, const std::string &user = "", const std::string &host = "", const std::string &real = "");
+	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "");
 
 	/** Destroy a bot, clearing up appropriately.
 	 */
@@ -51,7 +51,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to
 	 */
-	void SetNewNick(const std::string &newnick);
+	void SetNewNick(const Anope::string &newnick);
 
 	/** Rejoins all channels that this bot is assigned to.
 	 * Used on /kill, rename, etc.
@@ -71,8 +71,8 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	void UnAssign(User *u, ChannelInfo *ci);
 
 	void Join(Channel *c);
-	void Join(const std::string &chname);
-	void Part(Channel *c, const std::string &reason = "");
+	void Join(const Anope::string &chname);
+	void Part(Channel *c, const Anope::string &reason = "");
 };
 
 #endif // BOTS_H

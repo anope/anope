@@ -16,24 +16,24 @@
 class CommandNSSetLanguage : public Command
 {
  public:
-	CommandNSSetLanguage(const ci::string &cname) : Command(cname, 1)
+	CommandNSSetLanguage(const Anope::string &cname) : Command(cname, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *param = params[0].c_str();
+		Anope::string param = params[0];
 
-		if (param[strspn(param, "0123456789")]) /* i.e. not a number */
+		if (param.find_first_not_of("0123456789") != Anope::string::npos) /* i.e. not a number */
 		{
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
-		int langnum = atoi(param) - 1;
+		int langnum = convertTo<int>(param) - 1;
 		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_SET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -43,13 +43,13 @@ class CommandNSSetLanguage : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SET_LANGUAGE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
 	}
@@ -63,26 +63,26 @@ class CommandNSSetLanguage : public Command
 class CommandNSSASetLanguage : public Command
 {
  public:
-	CommandNSSASetLanguage(const ci::string &cname) : Command(cname, 2, 2, "nickserv/saset/language")
+	CommandNSSASetLanguage(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/language")
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
 		assert(nc);
 
-		const char *param = params[1].c_str();
+		Anope::string param = params[1];
 
-		if (param[strspn(param, "0123456789")]) /* i.e. not a number */
+		if (param.find_first_not_of("0123456789") != Anope::string::npos) /* i.e. not a number */
 		{
 			this->OnSyntaxError(u, "LANGUAGE");
 			return MOD_CONT;
 		}
-		int langnum = atoi(param) - 1;
+		int langnum = convertTo<int>(param) - 1;
 		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ.c_str());
 			return MOD_CONT;
 		}
 		nc->language = langlist[langnum];
@@ -91,13 +91,13 @@ class CommandNSSASetLanguage : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &)
+	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		syntax_error(Config.s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
 	}
@@ -111,7 +111,7 @@ class CommandNSSASetLanguage : public Command
 class NSSetLanguage : public Module
 {
  public:
-	NSSetLanguage(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSSetLanguage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

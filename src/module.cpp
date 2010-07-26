@@ -9,7 +9,7 @@
 #include "modules.h"
 #include "language.h"
 
-Module::Module(const std::string &mname, const std::string &creator)
+Module::Module(const Anope::string &mname, const Anope::string &creator)
 {
 	this->name = mname; /* Our name */
 	this->type = THIRD;
@@ -45,7 +45,7 @@ Module::~Module()
 	 **/
 	if (HostServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -57,7 +57,7 @@ Module::~Module()
 
 	if (BotServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -69,7 +69,7 @@ Module::~Module()
 
 	if (MemoServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -81,7 +81,7 @@ Module::~Module()
 
 	if (NickServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -93,7 +93,7 @@ Module::~Module()
 
 	if (ChanServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = ChanServ->Commands.begin(), it_end = ChanServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = ChanServ->Commands.begin(), it_end = ChanServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -105,7 +105,7 @@ Module::~Module()
 
 	if (OperServ)
 	{
-		for (std::map<ci::string, Command *>::iterator it = OperServ->Commands.begin(), it_end = OperServ->Commands.end(); it != it_end; )
+		for (CommandMap::iterator it = OperServ->Commands.begin(), it_end = OperServ->Commands.end(); it != it_end; )
 		{
 			Command *c = it->second;
 			++it;
@@ -117,9 +117,7 @@ Module::~Module()
 
 	std::list<Module *>::iterator it = std::find(Modules.begin(), Modules.end(), this);
 	if (it != Modules.end())
-	{
 		Modules.erase(it);
-	}
 }
 
 void Module::SetType(MODType ntype)
@@ -137,12 +135,12 @@ bool Module::GetPermanent()
 	return this->permanent;
 }
 
-void Module::SetVersion(const std::string &nversion)
+void Module::SetVersion(const Anope::string &nversion)
 {
 	this->version = nversion;
 }
 
-void Module::SetAuthor(const std::string &nauthor)
+void Module::SetAuthor(const Anope::string &nauthor)
 {
 	this->author = nauthor;
 }

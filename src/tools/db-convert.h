@@ -704,8 +704,6 @@ int delcore(NickCore *nc)
 		nclists[HASH(nc->display)] = nc->next;
 
 	delete [] nc->display;
-	if (nc->pass)
-		delete [] nc->pass;
 	if (nc->email)
 		delete [] nc->email;
 	if (nc->greet)

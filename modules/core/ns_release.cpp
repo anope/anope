@@ -21,20 +21,20 @@ class CommandNSRelease : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<ci::string> &params)
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		const char *nick = params[0].c_str();
-		std::string pass = params.size() > 1 ? params[1].c_str() : "";
+		Anope::string nick = params[0];
+		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-		else if (!(na->HasFlag(NS_HELD)))
-			notice_lang(Config.s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
+			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+		else if (!na->HasFlag(NS_HELD))
+			notice_lang(Config.s_NickServ, u, NICK_RELEASE_NOT_HELD, nick.c_str());
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
@@ -56,7 +56,7 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!(na->nc->HasFlag(NI_SECURE)) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				na->Release();
 				notice_lang(Config.s_NickServ, u, NICK_RELEASED);
@@ -67,20 +67,18 @@ class CommandNSRelease : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const ci::string &subcommand)
+	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		char relstr[192];
-
 		/* Convert Config.NSReleaseTimeout seconds to string format */
-		duration(u->Account(), relstr, sizeof(relstr), Config.NSReleaseTimeout);
+		Anope::string relstr = duration(u->Account(), Config.NSReleaseTimeout);
 
-		notice_help(Config.s_NickServ, u, NICK_HELP_RELEASE, relstr);
+		notice_help(Config.s_NickServ, u, NICK_HELP_RELEASE, relstr.c_str());
 		//do_help_limited(Config.s_NickServ, u, this);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const ci::string &subcommand)
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		syntax_error(Config.s_NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
 	}
@@ -94,7 +92,7 @@ class CommandNSRelease : public Command
 class NSRelease : public Module
 {
  public:
-	NSRelease(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	NSRelease(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);

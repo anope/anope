@@ -315,7 +315,7 @@ void Decode(unsigned *output, const unsigned char *input, unsigned len)
 class EMD5 : public Module
 {
  public:
-	EMD5(const std::string &modname, const std::string &creator) : Module(modname, creator)
+	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(ENCRYPTION);
@@ -325,18 +325,18 @@ class EMD5 : public Module
 		ModuleManager::Attach(I_OnCheckPassword, this);
 	}
 
-	EventReturn OnEncrypt(const std::string &src, std::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		MD5_CTX context;
 		char *digest = new char[Config.PassLen];
-		std::string buf = "md5:";
-		char cpass[1000];
+		Anope::string buf = "md5:";
+		Anope::string cpass;
 
 		MD5Init(&context);
-		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.size());
+		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		MD5Final(reinterpret_cast<unsigned char *>(digest), &context);
 
-		b64_encode(digest, 16, cpass, 1000);
+		b64_encode(digest, cpass);
 		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
@@ -344,25 +344,25 @@ class EMD5 : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnDecrypt(const std::string &hashm, const std::string &src, std::string &dest)
+	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
 	{
-		if (hashm != "md5")
+		if (!hashm.equals_cs("md5"))
 			return EVENT_CONTINUE;
 		return EVENT_STOP;
 	}
 
-	EventReturn OnCheckPassword(const std::string &hashm, std::string &plaintext, std::string &password)
+	EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password)
 	{
-		if (hashm != "md5")
+		if (!hashm.equals_cs("md5"))
 			return EVENT_CONTINUE;
-		std::string buf;
+		Anope::string buf;
 		this->OnEncrypt(plaintext, buf);
-		if (password == buf)
+		if (password.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (Config.EncModuleList.front() != this->name)
+			if (!this->name.equals_ci(Config.EncModuleList.front()))
 				enc_encrypt(plaintext, password);
 			return EVENT_ALLOW;
 		}

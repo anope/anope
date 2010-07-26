@@ -19,7 +19,7 @@ extern void moduleAddIRCDMsgs();
 
 /*************************************************************************/
 
-void introduce_user(const std::string &user)
+void introduce_user(const Anope::string &user)
 {
 	/* Watch out for infinite loops... */
 #define LTSIZE 20
@@ -36,11 +36,10 @@ void introduce_user(const std::string &user)
 	{
 		BotInfo *bi = it->second;
 
-		ci::string ci_bi_nick(bi->nick.c_str());
-		if (user.empty() || ci_bi_nick == user)
+		if (user.empty() || bi->nick.equals_ci(user))
 		{
 			ircdproto->SendClientIntroduction(bi->nick, bi->GetIdent(), bi->host, bi->realname, ircd->pseudoclient_mode, bi->GetUID());
-			XLine x(bi->nick.c_str(), "Reserved for services");
+			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(&x);
 		}
 	}
@@ -58,7 +57,7 @@ static int set_group()
 	struct group *gr;
 
 	setgrent();
-	while ((gr = getgrent()) != NULL)
+	while ((gr = getgrent()))
 	{
 		if (!strcmp(gr->gr_name, RUNGROUP))
 			break;
@@ -82,7 +81,7 @@ static int set_group()
 /*************************************************************************/
 
 /* Vector of pairs of command line arguments and their params */
-static std::vector<std::pair<std::string, std::string> > CommandLineArguments;
+static std::vector<std::pair<Anope::string, Anope::string> > CommandLineArguments;
 
 /** Called on startup to organize our starting arguments in a better way
  * and check for errors
@@ -93,12 +92,12 @@ static void ParseCommandLineArguments(int ac, char **av)
 {
 	for (int i = 1; i < ac; ++i)
 	{
-		std::string option = av[i];
-		std::string param = "";
+		Anope::string option = av[i];
+		Anope::string param;
 		while (!option.empty() && option[0] == '-')
 			option.erase(option.begin());
 		size_t t = option.find('=');
-		if (t != std::string::npos)
+		if (t != Anope::string::npos)
 		{
 			param = option.substr(t + 1);
 			option.erase(t);
@@ -116,9 +115,9 @@ static void ParseCommandLineArguments(int ac, char **av)
  * @param shortname A shorter name, eg --debug and -d
  * @return true if name/shortname was found, false if not
  */
-bool GetCommandLineArgument(const std::string &name, char shortname)
+bool GetCommandLineArgument(const Anope::string &name, char shortname)
 {
-	std::string Unused;
+	Anope::string Unused;
 	return GetCommandLineArgument(name, shortname, Unused);
 }
 
@@ -128,13 +127,13 @@ bool GetCommandLineArgument(const std::string &name, char shortname)
  * @param param A string to put the param, if any, of the argument
  * @return true if name/shortname was found, false if not
  */
-bool GetCommandLineArgument(const std::string &name, char shortname, std::string &param)
+bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param)
 {
 	param.clear();
 
-	for (std::vector<std::pair<std::string, std::string> >::iterator it = CommandLineArguments.begin(), it_end = CommandLineArguments.end(); it != it_end; ++it)
+	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = CommandLineArguments.begin(), it_end = CommandLineArguments.end(); it != it_end; ++it)
 	{
-		if (it->first == name || it->first[0] == shortname)
+		if (it->first.equals_ci(name) || it->first[0] == shortname)
 		{
 			param = it->second;
 			return true;
@@ -150,7 +149,7 @@ bool GetCommandLineArgument(const std::string &name, char shortname, std::string
 
 static void remove_pidfile()
 {
-	remove(Config.PIDFilename);
+	remove(Config.PIDFilename.c_str());
 }
 
 /*************************************************************************/
@@ -161,7 +160,7 @@ static void write_pidfile()
 {
 	FILE *pidfile;
 
-	pidfile = fopen(Config.PIDFilename, "w");
+	pidfile = fopen(Config.PIDFilename.c_str(), "w");
 	if (pidfile)
 	{
 #ifdef _WIN32
@@ -173,7 +172,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename);
+		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename.c_str());
 }
 
 /*************************************************************************/
@@ -246,12 +245,12 @@ int init_primary(int ac, char **av)
 	if (GetCommandLineArgument("protocoldebug"))
 		protocoldebug = 1;
 
-	std::string Arg;
+	Anope::string Arg;
 	if (GetCommandLineArgument("debug", 'd', Arg))
 	{
-		 if (!Arg.empty())
-		 {
-		 	int level = atoi(Arg.c_str());
+		if (!Arg.empty())
+		{
+			int level = Arg.is_number_only() ? convertTo<int>(Arg) : -1;
 			if (level > 0)
 				debug = level;
 			else
@@ -259,9 +258,9 @@ int init_primary(int ac, char **av)
 				Alog(LOG_TERMINAL) << "Invalid option given to --debug";
 				return -1;
 			}
-		 }
-		 else
-		 	++debug;
+		}
+		else
+			++debug;
 	}
 
 	if (GetCommandLineArgument("config", 'c', Arg))
@@ -271,7 +270,7 @@ int init_primary(int ac, char **av)
 			Alog(LOG_TERMINAL) << "The --config option requires a file name";
 			return -1;
 		}
-		services_conf = Arg.c_str();
+		services_conf = Arg;
 	}
 
 	if (GetCommandLineArgument("dir", 0, Arg))
@@ -318,9 +317,9 @@ int init_primary(int ac, char **av)
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
 		return -1;
-	
+
 	/* Create me */
-	Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, (Config.Numeric ? Config.Numeric : ""));
+	Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, Config.Numeric);
 
 	/* First thing, add our core bots internally. Before modules are loaded and before the database is read
 	 * This is used for modules adding commands and for the BotInfo* poiners in the command classes.
@@ -334,19 +333,19 @@ int init_primary(int ac, char **av)
 	 * Note that it is important this is after loading the protocol module. The ircd struct must exist for
 	 * the ts6_ functions
 	 */
-	if (Config.s_OperServ)
+	if (!Config.s_OperServ.empty())
 		new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
-	if (Config.s_NickServ)
+	if (!Config.s_NickServ.empty())
 		new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
-	if (Config.s_ChanServ)
+	if (!Config.s_ChanServ.empty())
 		new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
-	if (Config.s_HostServ)
+	if (!Config.s_HostServ.empty())
 		new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
-	if (Config.s_MemoServ)
+	if (!Config.s_MemoServ.empty())
 		new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
-	if (Config.s_BotServ)
+	if (!Config.s_BotServ.empty())
 		new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
-	if (Config.s_GlobalNoticer)
+	if (!Config.s_GlobalNoticer.empty())
 		new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
 
 	/* Add Encryption Modules */
@@ -399,11 +398,7 @@ int init_secondary(int ac, char **av)
 #else
 	if (!SupportedWindowsVersion())
 	{
-		char *winver = GetWindowsVersion();
-
-		Alog() << winver << " is not a supported version of Windows";
-
-		delete [] winver;
+		Alog() << GetWindowsVersion() << " is not a supported version of Windows";
 
 		return -1;
 	}

@@ -80,7 +80,7 @@ class CoreExport Mode
 	/* Class of mode this is */
 	ModeClass Class;
 	/* The mode name, as a string */
-	std::string NameAsString;
+	Anope::string NameAsString;
 	/* Mode char for this */
 	char ModeChar;
 	/* Type of mode this is */
@@ -92,7 +92,7 @@ class CoreExport Mode
 	 * @param modeChar The mode char
 	 * @param type The mode type
 	 */
-	Mode(ModeClass mClass, const std::string &mNameAsString, char modeChar, ModeType type);
+	Mode(ModeClass mClass, const Anope::string &mNameAsString, char modeChar, ModeType type);
 
 	/** Default destructor
 	 */
@@ -112,7 +112,7 @@ class CoreExport UserMode : public Mode
 	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserMode(UserModeName mName, const std::string &mNameAsString, char modeChar);
+	UserMode(UserModeName mName, const Anope::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -127,13 +127,13 @@ class CoreExport UserModeParam : public UserMode
 	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserModeParam(UserModeName mName, const std::string &mNameAsString, char modeChar);
+	UserModeParam(UserModeName mName, const Anope::string &mNameAsString, char modeChar);
 
 	/** Check if the param is valid
 	 * @param value The param
 	 * @return true or false
 	 */
-	virtual bool IsValid(const std::string &value) { return true; }
+	virtual bool IsValid(const Anope::string &value) { return true; }
 };
 
 /** This class is a channel mode, all channel modes use this/inherit from this
@@ -149,7 +149,7 @@ class CoreExport ChannelMode : public Mode
 	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelMode(ChannelModeName mName, const std::string &mNameAsString, char modeChar);
+	ChannelMode(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -173,7 +173,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelModeList(ChannelModeName mName, const std::string &mNameAsString, char modeChar);
+	ChannelModeList(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar);
 
 	/** Default destructor
 	 */
@@ -183,19 +183,19 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const std::string &mask) { return true; }
+	virtual bool IsValid(const Anope::string &mask) { return true; }
 
 	/** Add the mask to the channel, this should be overridden
 	 * @param chan The channel
 	 * @param mask The mask
 	 */
-	virtual void AddMask(Channel *chan, const char *mask) { }
+	virtual void AddMask(Channel *chan, const Anope::string &mask) { }
 
 	/** Delete the mask from the channel, this should be overridden
 	 * @param chan The channel
 	 * @param mask The mask
 	 */
-	virtual void DelMask(Channel *chan, const char *mask) { }
+	virtual void DelMask(Channel *chan, const Anope::string &mask) { }
 
 };
 
@@ -210,7 +210,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param modeChar The mode char
 	 * @param MinusArg true if this mode sends no arg when unsetting
 	 */
-	ChannelModeParam(ChannelModeName mName, const std::string &mNameAsString, char modeChar, bool MinusArg = false);
+	ChannelModeParam(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, bool MinusArg = false);
 
 	/** Default destructor
 	 */
@@ -223,7 +223,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const std::string &value) { return true; }
+	virtual bool IsValid(const Anope::string &value) { return true; }
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -240,7 +240,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	 * @param modeChar The mode char
 	 * @param mSymbol The symbol for the mode, eg @ % +
 	 */
-	ChannelModeStatus(ChannelModeName mName, const std::string &mNameAsString, char modeChar, char mSymbol);
+	ChannelModeStatus(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, char mSymbol);
 
 	/** Default destructor
 	 */
@@ -254,9 +254,9 @@ class CoreExport ChannelModeBan : public ChannelModeList
  public:
 	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, "CMODE_BAN", modeChar) { }
 
-	void AddMask(Channel *chan, const char *mask);
+	void AddMask(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const char *mask);
+	void DelMask(Channel *chan, const Anope::string &mask);
 };
 
 /** Channel mode +e
@@ -266,9 +266,9 @@ class CoreExport ChannelModeExcept : public ChannelModeList
  public:
 	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, "CMODE_EXCEPT", modeChar) { }
 
-	void AddMask(Channel *chan, const char *mask);
+	void AddMask(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const char *mask);
+	void DelMask(Channel *chan, const Anope::string &mask);
 };
 
 /** Channel mode +I
@@ -278,9 +278,9 @@ class CoreExport ChannelModeInvex : public ChannelModeList
  public:
 	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
 
-	void AddMask(Channel *chan, const char *mask);
+	void AddMask(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const char *mask);
+	void DelMask(Channel *chan, const Anope::string &mask);
 };
 
 
@@ -291,7 +291,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, "CMODE_KEY", modeChar) { }
 
-	bool IsValid(const std::string &value);
+	bool IsValid(const Anope::string &value);
 };
 
 /** Channel mode +f (flood)
@@ -301,7 +301,7 @@ class ChannelModeFlood : public ChannelModeParam
  public:
 	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, "CMODE_FLOOD", modeChar, minusNoArg) { }
 
-	bool IsValid(const std::string &value);
+	bool IsValid(const Anope::string &value);
 };
 
 /** This class is used for channel mode +A (Admin only)
@@ -350,9 +350,9 @@ class StackerInfo
 {
  public:
 	/* Modes to be added */
-	std::list<std::pair<void *, std::string> > AddModes;
+	std::list<std::pair<void *, Anope::string> > AddModes;
 	/* Modes to be deleted */
-	std::list<std::pair<void *, std::string> > DelModes;
+	std::list<std::pair<void *, Anope::string> > DelModes;
 	/* The type of object this stacker info is for */
 	StackerType Type;
 	/* Bot this is sent from */
@@ -363,7 +363,7 @@ class StackerInfo
 	 * @param Set true if setting, false if unsetting
 	 * @param Param The param for the mode
 	 */
-	void AddMode(void *Mode, bool Set, const std::string &Param);
+	void AddMode(void *Mode, bool Set, const Anope::string &Param);
 };
 
 /** This is mode manager
@@ -388,7 +388,7 @@ class CoreExport ModeManager
 	 * @param info The stacker info for a channel or user
 	 * @return a list of strings
 	 */
-	static std::list<std::string> BuildModeStrings(StackerInfo *info);
+	static std::list<Anope::string> BuildModeStrings(StackerInfo *info);
 
 	/** Add a mode to the stacker, internal use only
 	 * @param bi The client to set the modes from
@@ -397,7 +397,7 @@ class CoreExport ModeManager
 	 * @param Set Adding or removing?
 	 * @param Param A param, if there is one
 	 */
-	static void StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const std::string &Param);
+	static void StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param);
 
 	/** Add a mode to the stacker, internal use only
 	 * @param bi The client to set the modes from
@@ -406,7 +406,7 @@ class CoreExport ModeManager
 	 * @param Set Adding or removing?
 	 * @param Param A param, if there is one
 	 */
-	static void StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param);
+	static void StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param);
 
 	/** Really add a mode to the stacker, internal use only
 	 * @param bi The client to set the modes from
@@ -416,7 +416,7 @@ class CoreExport ModeManager
 	 * @param Param A param, if there is one
 	 * @param Type The type this is, user or channel
 	 */
-	static void StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const std::string &Param, StackerType Type);
+	static void StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
 	/* List of all modes Anope knows about */
@@ -481,7 +481,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
@@ -490,7 +490,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a channel
 	 * @param bi The client to set the modes from
@@ -499,7 +499,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -508,7 +508,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -517,7 +517,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const Anope::string &Param = "");
 
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
@@ -526,7 +526,7 @@ class CoreExport ModeManager
 	 * @param Set true for setting, false for removing
 	 * @param Param The param, if there is one
 	 */
-	static void StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const std::string &Param = "");
+	static void StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const Anope::string &Param = "");
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */

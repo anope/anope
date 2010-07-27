@@ -56,22 +56,22 @@ class CoreExport Timer : public Extensible
 	/** Retrieve the triggering time
 	 * @return The trigger time
 	 */
-	const time_t GetTimer();
+	time_t GetTimer() const;
 
 	/** Returns true if the timer is set to repeat
 	 * @return Returns true if the timer is set to repeat
 	 */
-	const bool GetRepeat();
+	bool GetRepeat() const;
 
 	/** Returns the interval between ticks
 	 * @return The interval
 	 */
-	const long GetSecs();
+	long GetSecs() const;
 
 	/** Returns the time this timer was created
 	 * @return The time this timer was created
 	 */
-	const time_t GetSetTime();
+	time_t GetSetTime() const;
 
 	/** Called when the timer ticks
 	 * This should be overridden with something useful

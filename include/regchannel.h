@@ -148,7 +148,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size
 	 */
-	const unsigned GetAccessCount() const;
+	unsigned GetAccessCount() const;
 
 	/** Erase an entry from the channel access list
 	 *
@@ -191,7 +191,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Get the size of the akick vector for this channel
 	 * @return The akick vector size
 	 */
-	const unsigned GetAkickCount() const;
+	unsigned GetAkickCount() const;
 
 	/** Erase an entry from the channel akick list
 	 * @param index The index of the akick
@@ -218,7 +218,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Get how many badwords are on this channel
 	 * @return The number of badwords in the vector
 	 */
-	const unsigned GetBadWordCount() const;
+	unsigned GetBadWordCount() const;
 
 	/** Remove a badword
 	 * @param index The index of the badword
@@ -239,7 +239,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param status True to check mlock on, false for mlock off
 	 * @return true on success, false on fail
 	 */
-	const bool HasMLock(ChannelModeName Name, bool status);
+	bool HasMLock(ChannelModeName Name, bool status) const;
 
 	/** Set a mlock
 	 * @param Name The mode
@@ -263,19 +263,19 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param status true for mlock on, false for mlock off
 	 * @return The number of mlocked modes
 	 */
-	const size_t GetMLockCount(bool status) const;
+	size_t GetMLockCount(bool status) const;
 
 	/** Get a param from the channel
 	 * @param Name The mode
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
-	const bool GetParam(ChannelModeName Name, Anope::string &Target);
+	bool GetParam(ChannelModeName Name, Anope::string &Target) const;
 
 	/** Check if a mode is set and has a param
 	 * @param Name The mode
 	 */
-	const bool HasParam(ChannelModeName Name);
+	bool HasParam(ChannelModeName Name) const;
 
 	/** Clear all the params from the channel
 	 */

@@ -43,7 +43,7 @@ Socket::~Socket()
  * @param sz How much to read
  * @return Number of bytes recieved
  */
-const int Socket::RecvInternal(char *buf, size_t sz) const
+int Socket::RecvInternal(char *buf, size_t sz) const
 {
 	return recv(GetSock(), buf, sz, 0);
 }
@@ -52,7 +52,7 @@ const int Socket::RecvInternal(char *buf, size_t sz) const
  * @param buf What to write
  * @return Number of bytes written
  */
-const int Socket::SendInternal(const Anope::string &buf) const
+int Socket::SendInternal(const Anope::string &buf) const
 {
 	return send(GetSock(), buf.c_str(), buf.length(), 0);
 }
@@ -437,7 +437,7 @@ const Anope::string &ListenSocket::GetBindIP() const
 /** Get the port this socket is bound to
  * @return The port
  */
-const int ListenSocket::GetPort() const
+int ListenSocket::GetPort() const
 {
 	return Port;
 }

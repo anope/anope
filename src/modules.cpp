@@ -254,7 +254,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-void Module::NoticeLang(const Anope::string &source, User *u, int number, ...)
+void Module::NoticeLang(const Anope::string &source, const User *u, int number, ...) const
 {
 	va_list va;
 	char buffer[4096], outbuf[4096];
@@ -396,7 +396,7 @@ void ModuleRunTimeDirCleanUp()
 	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }
 
-Version Module::GetVersion()
+Version Module::GetVersion() const
 {
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }

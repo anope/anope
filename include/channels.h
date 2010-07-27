@@ -129,7 +129,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags, CMODE_E
 	 * @param cms The status mode, or NULL to represent no status
 	 * @return true or false
 	 */
-	bool HasUserStatus(User *u, ChannelModeStatus *cms);
+	bool HasUserStatus(User *u, ChannelModeStatus *cms) const;
 
 	/** Check if a user has a status on a channel
 	 * Use the overloaded function for ChannelModeStatus* to check for no status
@@ -137,7 +137,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags, CMODE_E
 	 * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
 	 * @return true or false
 	 */
-	bool HasUserStatus(User *u, ChannelModeName Name);
+	bool HasUserStatus(User *u, ChannelModeName Name) const;
 
 	/** See if the channel has any modes at all
 	 * @return true or false
@@ -148,7 +148,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags, CMODE_E
 	 * @param Name The mode name
 	 * @return true or false
 	 */
-	bool HasMode(ChannelModeName Name);
+	bool HasMode(ChannelModeName Name) const;
 
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param cm The mode
@@ -240,12 +240,13 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags, CMODE_E
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
-	const bool GetParam(ChannelModeName Name, Anope::string &Target);
+	bool GetParam(ChannelModeName Name, Anope::string &Target) const;
 
 	/** Check if a mode is set and has a param
 	 * @param Name The mode
 	 */
-	const bool HasParam(ChannelModeName Name);
+	bool HasParam(ChannelModeName Name) const;
+
 	/** Set a string of modes on the channel
 	 * @param bi The client setting the modes
 	 * @param EnforceMLock Should mlock be enforced on this mode change

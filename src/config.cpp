@@ -65,7 +65,7 @@ bool NoValidation(ServerConfig *, const Anope::string &, const Anope::string &, 
 	return true;
 }
 
-void ServerConfig::ValidateNoSpaces(const Anope::string &p, const Anope::string &tag, const Anope::string &val)
+void ServerConfig::ValidateNoSpaces(const Anope::string &p, const Anope::string &tag, const Anope::string &val) const
 {
 	for (Anope::string::const_iterator ptr = p.begin(), end = p.end(); ptr != end; ++ptr)
 		if (*ptr == ' ')
@@ -76,7 +76,7 @@ void ServerConfig::ValidateNoSpaces(const Anope::string &p, const Anope::string 
  * even in strerror(errno). They just return 'yes' or 'no' to an address without such detail as to whats WRONG with the address.
  * Because ircd users arent as technical as they used to be (;)) we are going to give more of a useful error message.
  */
-void ServerConfig::ValidateIP(const Anope::string &p, const Anope::string &tag, const Anope::string &val, bool wild)
+void ServerConfig::ValidateIP(const Anope::string &p, const Anope::string &tag, const Anope::string &val, bool wild) const
 {
 	int num_dots = 0, num_seps = 0;
 	bool not_numbers = false, not_hex = false;
@@ -128,7 +128,7 @@ void ServerConfig::ValidateIP(const Anope::string &p, const Anope::string &tag, 
 	}
 }
 
-void ServerConfig::ValidateHostname(const Anope::string &p, const Anope::string &tag, const Anope::string &val)
+void ServerConfig::ValidateHostname(const Anope::string &p, const Anope::string &tag, const Anope::string &val) const
 {
 	if (p.equals_ci("localhost"))
 		return;
@@ -1454,7 +1454,7 @@ void ValueItem::Set(int value)
 	v = n.str();
 }
 
-int ValueItem::GetInteger()
+int ValueItem::GetInteger() const
 {
 	if (v.empty() || !v.is_number_only())
 		return 0;
@@ -1466,7 +1466,7 @@ const char *ValueItem::GetString() const
 	return v.c_str();
 }
 
-bool ValueItem::GetBool()
+bool ValueItem::GetBool() const
 {
 	return GetInteger() || v == "yes" || v == "true";
 }

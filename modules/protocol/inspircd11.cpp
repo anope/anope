@@ -1081,7 +1081,7 @@ void moduleAddIRCDMsgs()
 	Anope::AddMessage("IDLE", anope_event_idle);
 }
 
-bool ChannelModeFlood::IsValid(const Anope::string &value)
+bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
 	Anope::string rest;
 	if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())

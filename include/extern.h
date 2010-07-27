@@ -341,7 +341,7 @@ E void process(const Anope::string &buf);
 
 E void send_cmd(const Anope::string &source, const char *fmt, ...) FORMAT(printf, 2, 3);
 
-E void notice_server(const Anope::string &source, Server * s, const char *fmt, ...) FORMAT(printf, 3, 4);
+E void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...) FORMAT(printf, 3, 4);
 
 E void notice_lang(const Anope::string &source, User *dest, int message, ...); // MARK_DEPRECATED;
 E void notice_help(const Anope::string &source, User *dest, int message, ...); // MARK_DEPRECATED;

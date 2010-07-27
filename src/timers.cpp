@@ -45,7 +45,7 @@ void Timer::SetTimer(time_t t)
 /** Retrieve the triggering time
  * @return The trigger time
  */
-const time_t Timer::GetTimer()
+time_t Timer::GetTimer() const
 {
 	return trigger;
 }
@@ -53,7 +53,7 @@ const time_t Timer::GetTimer()
 /** Returns true if the timer is set to repeat
  * @return Returns true if the timer is set to repeat
  */
-const bool Timer::GetRepeat()
+bool Timer::GetRepeat() const
 {
 	return repeat;
 }
@@ -61,7 +61,7 @@ const bool Timer::GetRepeat()
 /** Returns the time this timer was created
 * @return The time this timer was created
 */
-const time_t Timer::GetSetTime()
+time_t Timer::GetSetTime() const
 {
 	return settime;
 }
@@ -69,7 +69,7 @@ const time_t Timer::GetSetTime()
 /** Returns the interval between ticks
 * @return The interval
 */
-const long Timer::GetSecs()
+long Timer::GetSecs() const
 {
 	return secs;
 }

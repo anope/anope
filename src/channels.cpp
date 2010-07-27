@@ -206,7 +206,7 @@ UserContainer *Channel::FindUser(User *u)
  * @param cms The status mode, or NULL to represent no status
  * @return true or false
  */
-bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms)
+bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms) const
 {
 	if (!u || (cms && cms->Type != MODE_STATUS))
 		throw CoreException("Channel::HasUserStatus got bad mode");
@@ -230,7 +230,7 @@ bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms)
  * @param Name The Mode name, eg CMODE_OP, CMODE_VOICE
  * @return true or false
  */
-bool Channel::HasUserStatus(User *u, ChannelModeName Name)
+bool Channel::HasUserStatus(User *u, ChannelModeName Name) const
 {
 	return HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(Name)));
 }
@@ -240,7 +240,7 @@ bool Channel::HasUserStatus(User *u, ChannelModeName Name)
  * @param Name The mode name
  * @return true or false
  */
-bool Channel::HasMode(ChannelModeName Name)
+bool Channel::HasMode(ChannelModeName Name) const
 {
 	return modes.HasFlag(Name);
 }
@@ -612,9 +612,9 @@ void Channel::RemoveMode(BotInfo *bi, char Mode, const Anope::string &param, boo
  * @param Target a string to put the param into
  * @return true on success
  */
-const bool Channel::GetParam(ChannelModeName Name, Anope::string &Target)
+bool Channel::GetParam(ChannelModeName Name, Anope::string &Target) const
 {
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
 
 	Target.clear();
 
@@ -630,9 +630,9 @@ const bool Channel::GetParam(ChannelModeName Name, Anope::string &Target)
 /** Check if a mode is set and has a param
  * @param Name The mode
  */
-const bool Channel::HasParam(ChannelModeName Name)
+bool Channel::HasParam(ChannelModeName Name) const
 {
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
 
 	if (it != Params.end())
 		return true;

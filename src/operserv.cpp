@@ -122,7 +122,7 @@ void DelDefCon(int level, DefconLevel Level)
 	DefCon[level][Level] = false;
 }
 
-void server_global(Server *s, const Anope::string &message)
+void server_global(const Server *s, const Anope::string &message)
 {
 	/* Do not send the notice to ourselves our juped servers */
 	if (s != Me && !s->HasFlag(SERVER_JUPED))
@@ -269,7 +269,7 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 /** Get the number of XLines in this XLineManager
  * @return The number of XLines
  */
-const size_t XLineManager::GetCount() const
+size_t XLineManager::GetCount() const
 {
 	return XLines.size();
 }
@@ -313,7 +313,7 @@ bool XLineManager::DelXLine(XLine *x)
   * @param index The index
   * @return The XLine, or NULL if the index is out of bounds
   */
-XLine *XLineManager::GetEntry(unsigned index) const
+XLine *XLineManager::GetEntry(unsigned index)
 {
 	if (index >= XLines.size())
 		return NULL;
@@ -405,7 +405,7 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
  * @param mask The mask
  * @return The XLine the user matches, or NULL
  */
-XLine *XLineManager::HasEntry(const Anope::string &mask) const
+XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
 	for (unsigned i = 0, end = XLines.size(); i < end; ++i)
 	{

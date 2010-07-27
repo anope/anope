@@ -86,7 +86,7 @@ class ValueItem
 	/** Change value to an int */
 	void Set(int);
 	/** Get value as an int */
-	int GetInteger();
+	int GetInteger() const;
 	/** Get value as a string */
 	const char *GetString() const;
 	/** Get value as an std::string */
@@ -96,7 +96,7 @@ class ValueItem
 	/** Get value as a ci::string */
 	inline const Anope::string &GetValue() const { return v; }
 	/** Get value as a bool */
-	bool GetBool();
+	bool GetBool() const;
 };
 
 /** The base class of the container 'ValueContainer'
@@ -458,9 +458,9 @@ class ServerConfig
 	/** Returns the numbers of vars inside the index'th 'tag in the config file
 	 */
 	int ConfVarEnum(ConfigDataHash &, const Anope::string &, int);
-	void ValidateHostname(const Anope::string &, const Anope::string &, const Anope::string &);
-	void ValidateIP(const Anope::string &p, const Anope::string &, const Anope::string &, bool);
-	void ValidateNoSpaces(const Anope::string &, const Anope::string &, const Anope::string &);
+	void ValidateHostname(const Anope::string &, const Anope::string &, const Anope::string &) const;
+	void ValidateIP(const Anope::string &p, const Anope::string &, const Anope::string &, bool) const;
+	void ValidateNoSpaces(const Anope::string &, const Anope::string &, const Anope::string &) const;
 
 	/** Below here is a list of variables which contain the config files values
 	 */
@@ -965,7 +965,7 @@ class CoreExport ConfigReader
 	 * used with the index value of ConfigReader::ReadValue to loop through all copies of a
 	 * multiple instance tag.
 	 */
-	int Enumerate(const Anope::string &);
+	int Enumerate(const Anope::string &) const;
 	/** Returns true if a config file is valid.
 	 * This method is partially implemented and will only return false if the config
 	 * file does not exist or could not be opened.

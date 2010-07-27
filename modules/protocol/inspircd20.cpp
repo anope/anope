@@ -1251,7 +1251,7 @@ void moduleAddIRCDMsgs()
 	Anope::AddMessage("METADATA", anope_event_metadata);
 }
 
-bool ChannelModeFlood::IsValid(const Anope::string &value)
+bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
 	//char *dp, *end;
 	Anope::string rest;

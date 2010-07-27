@@ -133,7 +133,7 @@ class CoreExport UserModeParam : public UserMode
 	 * @param value The param
 	 * @return true or false
 	 */
-	virtual bool IsValid(const Anope::string &value) { return true; }
+	virtual bool IsValid(const Anope::string &value) const { return true; }
 };
 
 /** This class is a channel mode, all channel modes use this/inherit from this
@@ -159,7 +159,7 @@ class CoreExport ChannelMode : public Mode
 	 * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
 	 * @param u The user, or NULL
 	 */
-	virtual bool CanSet(User *u) { return true; }
+	virtual bool CanSet(User *u) const { return true; }
 };
 
 
@@ -183,7 +183,7 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &mask) { return true; }
+	virtual bool IsValid(const Anope::string &mask) const { return true; }
 
 	/** Add the mask to the channel, this should be overridden
 	 * @param chan The channel
@@ -223,7 +223,7 @@ class CoreExport ChannelModeParam : public ChannelMode
 	 * @param value The param
 	 * @return true for yes, false for no
 	 */
-	virtual bool IsValid(const Anope::string &value) { return true; }
+	virtual bool IsValid(const Anope::string &value) const { return true; }
 };
 
 /** This is a mode that is a channel status, eg +v/h/o/a/q.
@@ -291,7 +291,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, "CMODE_KEY", modeChar) { }
 
-	bool IsValid(const Anope::string &value);
+	bool IsValid(const Anope::string &value) const;
 };
 
 /** Channel mode +f (flood)
@@ -301,7 +301,7 @@ class ChannelModeFlood : public ChannelModeParam
  public:
 	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, "CMODE_FLOOD", modeChar, minusNoArg) { }
 
-	bool IsValid(const Anope::string &value);
+	bool IsValid(const Anope::string &value) const;
 };
 
 /** This class is used for channel mode +A (Admin only)
@@ -313,7 +313,7 @@ class CoreExport ChannelModeAdmin : public ChannelMode
 	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, "CMODE_ADMINONLY", modeChar) { }
 
 	/* Opers only */
-	bool CanSet(User *u);
+	bool CanSet(User *u) const;
 };
 
 /** This class is used for channel mode +O (Opers only)
@@ -325,7 +325,7 @@ class CoreExport ChannelModeOper : public ChannelMode
 	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, "CMODE_OPERONLY", modeChar) { }
 
 	/* Opers only */
-	bool CanSet(User *u);
+	bool CanSet(User *u) const;
 };
 
 /** This class is used for channel mode +r (registered channel)
@@ -337,7 +337,7 @@ class CoreExport ChannelModeRegistered : public ChannelMode
 	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, "CMODE_REGISTERED", modeChar) { }
 
 	/* No one mlocks +r */
-	bool CanSet(User *u);
+	bool CanSet(User *u) const;
 };
 
 enum StackerType

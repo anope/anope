@@ -143,7 +143,7 @@ const Anope::string &Server::GetName() const
 /** Get the number of hops this server is from services
  * @return Number of hops
  */
-unsigned int Server::GetHops() const
+unsigned Server::GetHops() const
 {
 	return Hops;
 }
@@ -183,7 +183,7 @@ const std::list<Server*> *Server::GetLinks() const
 /** Get the uplink server for this server, if this is our uplink will be Me
  * @return The servers uplink
  */
-Server *Server::GetUplink() const
+Server *Server::GetUplink()
 {
 	return UplinkServer;
 }

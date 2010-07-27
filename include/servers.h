@@ -120,7 +120,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Get the number of hops this server is from services
 	 * @return Number of hops
 	 */
-	unsigned int GetHops() const;
+	unsigned GetHops() const;
 
 	/** Set the server description
 	 * @param desc The new description
@@ -145,7 +145,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Get the uplink server for this server, if this is our uplink will be Me
 	 * @return The servers uplink
 	 */
-	Server *GetUplink() const;
+	Server *GetUplink();
 
 	/** Adds a link to this server
 	 * @param s The linking server

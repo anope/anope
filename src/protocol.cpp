@@ -150,12 +150,12 @@ void IRCDProto::SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *
 	SendPrivmsgInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendGlobalNotice(BotInfo *bi, Server *dest, const Anope::string &msg)
+void IRCDProto::SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
 }
 
-void IRCDProto::SendGlobalPrivmsg(BotInfo *bi, Server *dest, const Anope::string &msg)
+void IRCDProto::SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
 }

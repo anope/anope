@@ -19,12 +19,12 @@ class SSLSocket : public ClientSocket
  private:
 	SSL *sslsock;
 
-	const int RecvInternal(char *buf, size_t sz) const
+	int RecvInternal(char *buf, size_t sz) const
 	{
 		return SSL_read(sslsock, buf, sz);
 	}
 
-	const int SendInternal(const Anope::string &buf) const
+	int SendInternal(const Anope::string &buf) const
 	{
 		return SSL_write(sslsock, buf.c_str(), buf.length());
 	}

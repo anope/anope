@@ -1215,7 +1215,7 @@ void moduleAddIRCDMsgs()
 }
 
 /* Borrowed part of this check from UnrealIRCd */
-bool ChannelModeFlood::IsValid(const Anope::string &value)
+bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
 	if (value.empty())
 		return false;

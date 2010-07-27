@@ -940,8 +940,8 @@ class CoreExport IRCDProto
 	virtual void SendNotice(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendAction(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendGlobalNotice(BotInfo *bi, Server *dest, const Anope::string &msg);
-	virtual void SendGlobalPrivmsg(BotInfo *bi, Server *desc, const Anope::string &msg);
+	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg);
+	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg);
 
 	/** XXX: This is a hack for NickServ enforcers. It is deprecated.
 	 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.

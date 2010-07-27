@@ -34,7 +34,7 @@ extern CoreExport void operserv(User *u, const Anope::string &message);
 extern CoreExport void os_init();
 
 extern CoreExport void oper_global(const Anope::string &nick, const char *fmt, ...);
-extern CoreExport void server_global(Server *s, const Anope::string &message);
+extern CoreExport void server_global(const Server *s, const Anope::string &message);
 
 enum XLineType
 {
@@ -101,7 +101,7 @@ class CoreExport XLineManager
 	/** Get the number of XLines in this XLineManager
 	 * @return The number of XLines
 	 */
-	const size_t GetCount() const;
+	size_t GetCount() const;
 
 	/** Get the XLine vector
 	 * @return The vector
@@ -123,7 +123,7 @@ class CoreExport XLineManager
 	 * @param index The index
 	 * @return The XLine, or NULL if the index is out of bounds
 	 */
-	XLine *GetEntry(unsigned index) const;
+	XLine *GetEntry(unsigned index);
 
 	/** Clear the XLine vector
 	 */
@@ -159,7 +159,7 @@ class CoreExport XLineManager
 	 * @param mask The mask
 	 * @return The XLine the user matches, or NULL
 	 */
-	XLine *HasEntry(const Anope::string &mask) const;
+	XLine *HasEntry(const Anope::string &mask);
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user

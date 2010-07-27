@@ -92,7 +92,7 @@ class CoreExport User : public Extensible
 	/** Get the displayed vhost of a user record.
 	 * @return The displayed vhost of the user, where ircd-supported, or the user's real host.
 	 */
-	const Anope::string GetDisplayedHost() const;
+	const Anope::string &GetDisplayedHost() const;
 
 	/** Update the cloaked host of a user
 	 * @param host The cloaked host
@@ -134,7 +134,7 @@ class CoreExport User : public Extensible
 
 	/** Get the full mask ( nick!ident@realhost ) of a user
 	 */
-	const Anope::string GetMask();
+	Anope::string GetMask() const;
 
 	/** Updates the realname of the user record.
 	 */
@@ -146,8 +146,8 @@ class CoreExport User : public Extensible
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	virtual void SendMessage(const Anope::string &source, const char *fmt, ...);
-	virtual void SendMessage(const Anope::string &source, const Anope::string &msg);
+	virtual void SendMessage(const Anope::string &source, const char *fmt, ...) const;
+	virtual void SendMessage(const Anope::string &source, const Anope::string &msg) const;
 
 	/** Collide a nick
 	 * See the comment in users.cpp
@@ -179,6 +179,7 @@ class CoreExport User : public Extensible
 	 * @reurn The account or NULL
 	 */
 	virtual NickCore *Account();
+	virtual const NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @param CheckNick True to check if the user is identified to the nickname they are on too
@@ -264,7 +265,7 @@ class CoreExport User : public Extensible
 	 * @param c The channel
 	 * @return The channel container, or NULL
 	 */
-	ChannelContainer *FindChannel(Channel *c);
+	ChannelContainer *FindChannel(const Channel *c);
 
 	/** Check if the user is protected from kicks and negative mode changes
 	 * @return true or false

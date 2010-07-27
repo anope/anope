@@ -201,7 +201,7 @@ ChannelModeStatus::~ChannelModeStatus()
  * @param value The key
  * @return true or false
  */
-bool ChannelModeKey::IsValid(const Anope::string &value)
+bool ChannelModeKey::IsValid(const Anope::string &value) const
 {
 	if (!value.empty() && value.find(':') != Anope::string::npos && value.find(',') != Anope::string::npos)
 		return true;
@@ -213,7 +213,7 @@ bool ChannelModeKey::IsValid(const Anope::string &value)
  * @param u The user - can be NULL if defcon is checking
  * @return true or false
  */
-bool ChannelModeAdmin::CanSet(User *u)
+bool ChannelModeAdmin::CanSet(User *u) const
 {
 	if (u && is_oper(u))
 		return true;
@@ -225,7 +225,7 @@ bool ChannelModeAdmin::CanSet(User *u)
  * @param u The user - can be NULL if defcon is checking
  * @return true or false
  */
-bool ChannelModeOper::CanSet(User *u)
+bool ChannelModeOper::CanSet(User *u) const
 {
 	if (u && is_oper(u))
 		return true;
@@ -233,11 +233,11 @@ bool ChannelModeOper::CanSet(User *u)
 	return false;
 }
 
-/** Can the user set the registerd mode?
+/** Can the user set the registered mode?
  * No.
  * @return false
  */
-bool ChannelModeRegistered::CanSet(User *u)
+bool ChannelModeRegistered::CanSet(User *u) const
 {
 	return false;
 }

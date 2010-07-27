@@ -27,7 +27,6 @@
 # define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
 # define dlclose(file) FreeLibrary(file) ? 0 : 1
 # define ano_modclearerr() SetLastError(0)
-# define MODULE_EXT ".so"
 #else
 	typedef void * ano_module_t;
 
@@ -37,7 +36,6 @@
  * to be cleared, POSIX-wise. -GD
  */
 # define ano_modclearerr() dlerror()
-# define MODULE_EXT ".so"
 #endif
 
 /** Possible return types from events.
@@ -131,7 +129,6 @@ struct Message;
 
 extern CoreExport Module *FindModule(const Anope::string &name);
 int protocol_module_init();
-extern CoreExport Message *createMessage(const char *name, int (*func)(const char *source, int ac, const char **av));
 extern CoreExport bool moduleMinVersion(int major, int minor, int patch, int build);
 
 enum ModuleReturn
@@ -188,17 +185,17 @@ class Version
 	/** Get the major version of Anope this was built against
 	 * @return The major version
 	 */
-	const unsigned GetMajor();
+	unsigned GetMajor() const;
 
 	/** Get the minor version of Anope this was built against
 	 * @return The minor version
 	 */
-	const unsigned GetMinor();
+	unsigned GetMinor() const;
 
 	/** Get the build version this was built against
 	 * @return The build version
 	 */
-	const unsigned GetBuild();
+	unsigned GetBuild() const;
 };
 
 /* Forward declaration of CallBack class for the Module class */
@@ -275,7 +272,7 @@ class CoreExport Module
 	/** Retrieves whether or not a given module is permanent.
 	 * @return true if the module is permanent, false else.
 	 */
-	bool GetPermanent();
+	bool GetPermanent() const;
 
 	/** Set the modules version info.
 	 * @param version the version of the module
@@ -291,7 +288,7 @@ class CoreExport Module
 	 * compiled against
 	 * @return The version
 	 */
-	Version GetVersion();
+	Version GetVersion() const;
 
 	/**
 	 * Allow a module to add a set of language strings to anope
@@ -322,7 +319,7 @@ class CoreExport Module
 	 * @param number The message number
 	 * @param ... The argument list
 	 **/
-	void NoticeLang(const Anope::string &source, User *u, int number, ...);
+	void NoticeLang(const Anope::string &source, const User *u, int number, ...) const;
 
 	/**
 	 * Add a module provided command to the given service.

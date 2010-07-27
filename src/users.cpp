@@ -96,7 +96,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
 /** Get the displayed vhost of a user record.
  * @return The displayed vhost of the user, where ircd-supported, or the user's real host.
  */
-const Anope::string User::GetDisplayedHost() const
+const Anope::string &User::GetDisplayedHost() const
 {
 	if (ircd->vhost && !this->vhost.empty())
 		return this->vhost;
@@ -167,11 +167,9 @@ const Anope::string &User::GetIdent() const
 	return this->ident;
 }
 
-const Anope::string User::GetMask()
+Anope::string User::GetMask() const
 {
-	std::stringstream buf;
-	buf << this->nick << "!" << this->ident << "@" << this->host;
-	return buf.str();
+	return this->nick + "!" + this->ident + "@" + this->host;
 }
 
 void User::SetRealname(const Anope::string &srealname)
@@ -225,7 +223,7 @@ User::~User()
 	Alog(LOG_DEBUG_2) << "User::~User() done";
 }
 
-void User::SendMessage(const Anope::string &source, const char *fmt, ...)
+void User::SendMessage(const Anope::string &source, const char *fmt, ...) const
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -241,7 +239,7 @@ void User::SendMessage(const Anope::string &source, const char *fmt, ...)
 	}
 }
 
-void User::SendMessage(const Anope::string &source, const Anope::string &msg)
+void User::SendMessage(const Anope::string &source, const Anope::string &msg) const
 {
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
@@ -406,6 +404,11 @@ void User::Logout()
  * @reurn The account or NULL
  */
 NickCore *User::Account()
+{
+	return nc;
+}
+
+const NickCore *User::Account() const
 {
 	return nc;
 }
@@ -625,9 +628,9 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
  * @param c The channel
  * @return The channel container, or NULL
  */
-ChannelContainer *User::FindChannel(Channel *c)
+ChannelContainer *User::FindChannel(const Channel *c)
 {
-	for (UChannelList::iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
+	for (UChannelList::const_iterator it = this->chans.begin(), it_end = this->chans.end(); it != it_end; ++it)
 		if ((*it)->chan == c)
 			return *it;
 	return NULL;

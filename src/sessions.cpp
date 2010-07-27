@@ -253,7 +253,7 @@ Exception *find_hostip_exception(const Anope::string &host, const Anope::string 
 	for (std::vector<Exception *>::const_iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
 	{
 		Exception *e = *it;
-		if (Anope::Match(host, e->mask) || (ircd->nickip && !hostip.empty() && Anope::Match(hostip, e->mask)))
+		if (Anope::Match(host, e->mask) || (!hostip.empty() && Anope::Match(hostip, e->mask)))
 			return e;
 	}
 

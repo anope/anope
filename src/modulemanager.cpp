@@ -35,7 +35,7 @@ static int moduleCopyFile(const Anope::string &name, Anope::string &output)
 #ifndef _WIN32
 	int srcfp;
 #endif
-	Anope::string input = services_dir + "/modules/" + name + MODULE_EXT;
+	Anope::string input = services_dir + "/modules/" + name + ".so";
 
 	if (!(source = fopen(input.c_str(), "rb")))
 		return MOD_ERR_NOEXIST;
@@ -123,7 +123,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Alog(LOG_DEBUG) << "trying to load [" << modname <<  "]";
 
 	/* Generate the filename for the temporary copy of the module */
-	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + MODULE_EXT + ".XXXXXX";
+	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
 	if ((ret = moduleCopyFile(modname, pbuf)) != MOD_ERR_OK)

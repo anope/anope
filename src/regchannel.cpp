@@ -162,7 +162,7 @@ ChanAccess *ChannelInfo::GetAccess(const NickCore *nc, int16 level)
 /** Get the size of the accss vector for this channel
  * @return The access vector size
  */
-const unsigned ChannelInfo::GetAccessCount() const
+unsigned ChannelInfo::GetAccessCount() const
 {
 	return access.empty() ? 0 : access.size();
 }
@@ -254,7 +254,7 @@ AutoKick *ChannelInfo::GetAkick(unsigned index)
 /** Get the size of the akick vector for this channel
  * @return The akick vector size
  */
-const unsigned ChannelInfo::GetAkickCount() const
+unsigned ChannelInfo::GetAkickCount() const
 {
 	return akick.empty() ? 0 : akick.size();
 }
@@ -312,7 +312,7 @@ BadWord *ChannelInfo::GetBadWord(unsigned index)
 /** Get how many badwords are on this channel
  * @return The number of badwords in the vector
  */
-const unsigned ChannelInfo::GetBadWordCount() const
+unsigned ChannelInfo::GetBadWordCount() const
 {
 	return badwords.empty() ? 0 : badwords.size();
 }
@@ -409,7 +409,7 @@ void ChannelInfo::LoadMLock()
  * @param status True to check mlock on, false for mlock off
  * @return true on success, false on fail
  */
-const bool ChannelInfo::HasMLock(ChannelModeName Name, bool status)
+bool ChannelInfo::HasMLock(ChannelModeName Name, bool status) const
 {
 	if (status)
 		return mlock_on.HasFlag(Name);
@@ -485,7 +485,7 @@ void ChannelInfo::ClearMLock()
  * @param status true for mlock on, false for mlock off
  * @return The number of mlocked modes
  */
-const size_t ChannelInfo::GetMLockCount(bool status) const
+size_t ChannelInfo::GetMLockCount(bool status) const
 {
 	if (status)
 		return mlock_on.FlagCount();
@@ -498,9 +498,9 @@ const size_t ChannelInfo::GetMLockCount(bool status) const
  * @param Target a string to put the param into
  * @return true on success
  */
-const bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target)
+bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target) const
 {
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
 
 	Target.clear();
 
@@ -516,9 +516,9 @@ const bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target)
 /** Check if a mode is set and has a param
  * @param Name The mode
  */
-const bool ChannelInfo::HasParam(ChannelModeName Name)
+bool ChannelInfo::HasParam(ChannelModeName Name) const
 {
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
 
 	if (it != Params.end())
 		return true;

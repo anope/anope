@@ -92,7 +92,7 @@ void ConfigReader::DumpErrors(bool bail)
 	Config.ReportConfigError(this->errorlog->str(), bail);
 }
 
-int ConfigReader::Enumerate(const Anope::string &tag)
+int ConfigReader::Enumerate(const Anope::string &tag) const
 {
 	return Config.ConfValueEnum(*this->data, tag);
 }

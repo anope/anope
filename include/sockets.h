@@ -1,4 +1,4 @@
-/*                                               
+/*
  *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
@@ -55,13 +55,13 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 * @param sz How much to read
 	 * @return Number of bytes recieved
 	 */
-	virtual const int RecvInternal(char *buf, size_t sz) const;
+	virtual int RecvInternal(char *buf, size_t sz) const;
 
 	/** Really write something to the socket
 	 * @param buf What to write
 	 * @return Number of bytes written
 	 */
-	virtual const int SendInternal(const Anope::string &buf) const;
+	virtual int SendInternal(const Anope::string &buf) const;
 
  protected:
 	/* Socket FD */
@@ -86,7 +86,7 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 * @param nIPv6 true if using ipv6
 	 */
  	Socket(int nsock, bool nIPv6);
-	
+
 	/** Default destructor
 	 */
 	virtual ~Socket();
@@ -161,22 +161,22 @@ class CoreExport ClientSocket : public Socket
 
  public:
 
-       /** Constructor
-	* @param nTargetHost The target host to connect to
-	* @param nPort The target port to connect to
-	* @param nBindHost The host to bind to for connecting
-	* @param nIPv6 true to use IPv6
-	*/
-       ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6);
+	/** Constructor
+	 * @param nTargetHost The target host to connect to
+	 * @param nPort The target port to connect to
+	 * @param nBindHost The host to bind to for connecting
+	 * @param nIPv6 true to use IPv6
+	 */
+	ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6);
 
-       /** Default destructor
-	*/
-       virtual ~ClientSocket();
+	/** Default destructor
+	 */
+	virtual ~ClientSocket();
 
 	/** Called with a line recieved from the socket
-	* @param buf The line
-	* @return true to continue reading, false to drop the socket
-	*/
+	 * @param buf The line
+	 * @return true to continue reading, false to drop the socket
+	 */
 	virtual bool Read(const Anope::string &buf);
 };
 
@@ -217,8 +217,8 @@ class CoreExport ListenSocket : public Socket
 
 	/** Get the port this socket is bound to
 	 * @return The port
-	*/
-	const int GetPort() const;
+	 */
+	int GetPort() const;
 };
 
 #endif // SOCKET_H

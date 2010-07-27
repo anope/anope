@@ -63,7 +63,7 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_server(const Anope::string &source, Server *s, const char *fmt, ...)
+void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";

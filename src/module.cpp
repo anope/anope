@@ -130,7 +130,7 @@ void Module::SetPermanent(bool state)
 	this->permanent = state;
 }
 
-bool Module::GetPermanent()
+bool Module::GetPermanent() const
 {
 	return this->permanent;
 }
@@ -153,17 +153,17 @@ Version::~Version()
 {
 }
 
-const unsigned Version::GetMajor()
+unsigned Version::GetMajor() const
 {
 	return Major;
 }
 
-const unsigned Version::GetMinor()
+unsigned Version::GetMinor() const
 {
 	return Minor;
 }
 
-const unsigned Version::GetBuild()
+unsigned Version::GetBuild() const
 {
 	return Build;
 }

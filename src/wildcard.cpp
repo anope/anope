@@ -1,77 +1,72 @@
 #include "services.h"
 
-static bool match_internal(const unsigned char *str, const unsigned char *mask, bool case_sensitive)
+bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
 {
-	const unsigned char *cp = NULL, *mp = NULL;
-	const unsigned char *string = str;
-	const unsigned char *wild = mask;
+	size_t s = 0, m = 0, str_len = str.length(), mask_len = mask.length();
 
-	while (*string && *wild != '*')
+	while (s < str_len && m < mask_len && mask[m] != '*')
 	{
+		char string = str[s], wild = mask[m];
 		if (case_sensitive)
 		{
-			if (*wild != *string && *wild != '?')
+			if (wild != string && wild != '?')
 				return false;
 		}
 		else
 		{
-			if (tolower(*wild) != tolower(*string) && *wild != '?')
+			if (tolower(wild) != tolower(string) && wild != '?')
 				return false;
 		}
 
-		++wild;
-		++string;
+		++m;
+		++s;
 	}
 
-	while (*string)
+	size_t sp = 0, mp = 0;
+	while (s < str_len)
 	{
-		if (*wild == '*')
+		char string = str[s], wild = mask[m];
+		if (wild == '*')
 		{
-			if (!*++wild)
+			if (++m == mask_len)
 				return 1;
 
-			mp = wild;
-			cp = string + 1;
+			mp = m;
+			sp = s + 1;
 		}
 		else
 		{
 			if (case_sensitive)
 			{
-				if (*wild == *string || *wild == '?')
+				if (wild == string || wild == '?')
 				{
-					++wild;
-					++string;
+					++m;
+					++s;
 				}
 				else
 				{
-					wild = mp;
-					string = cp++;
+					m = mp;
+					s = sp++;
 				}
 			}
 			else
 			{
-				if (tolower(*wild) == tolower(*string) || *wild == '?')
+				if (tolower(wild) == tolower(string) || wild == '?')
 				{
-					++wild;
-					++string;
+					++m;
+					++s;
 				}
 				else
 				{
-					wild = mp;
-					string = cp++;
+					m = mp;
+					s = sp++;
 				}
 			}
 		}
-
 	}
 
-	while (*wild == '*')
-		++wild;
+	if (mask[m] == '*')
+		++m;
 
-	return !*wild;
-}
-
-bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
-{
-	return match_internal(reinterpret_cast<const unsigned char *>(str.c_str()), reinterpret_cast<const unsigned char *>(mask.c_str()), case_sensitive);
+	return m == mask_len;
 }

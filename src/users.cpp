@@ -145,9 +145,7 @@ void User::SetVIdent(const Anope::string &sident)
 
 const Anope::string &User::GetVIdent() const
 {
-	if (this->HasMode(UMODE_CLOAK))
-		return this->vident;
-	else if (ircd->vident && !this->vident.empty())
+	if (this->HasMode(UMODE_CLOAK) || (ircd->vident && !this->vident.empty()))
 		return this->vident;
 	else
 		return this->ident;
@@ -339,10 +337,10 @@ void User::CheckAuthenticationToken(const Anope::string &svid)
 
 	if ((na = findnick(this->nick)))
 	{
-		char *c;
-		if (na->nc && na->nc->GetExtArray("authenticationtoken", c))
+		Anope::string c;
+		if (na->nc && na->nc->GetExtRegular("authenticationtoken", c))
 		{
-			if (!svid.empty() && c && svid.equals_cs(c))
+			if (!svid.empty() && !c.empty() && svid.equals_cs(c))
 				/* Users authentication token matches so they should become identified */
 				this->Login(na->nc);
 		}

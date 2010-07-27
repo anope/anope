@@ -18,7 +18,7 @@
 class CommandHSDelAll : public Command
 {
  public:
-	CommandHSDelAll() : Command("DELALL", 1, 1, "hostserv/set")
+	CommandHSDelAll() : Command("DELALL", 1, 1, "hostserv/del")
 	{
 	}
 

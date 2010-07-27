@@ -222,7 +222,7 @@ class CommandOSStats : public Command
 		notice_lang(Config.s_OperServ, u, OPER_STATS_BYTES_READ, TotalRead / 1024);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
 
-		get_user_stats(&count, &mem);
+		get_user_stats(count, mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
 		get_channel_stats(&count, &mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);

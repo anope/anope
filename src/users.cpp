@@ -380,7 +380,7 @@ void User::AutoID(const Anope::string &account)
 void User::Login(NickCore *core)
 {
 	this->Logout();
-	nc = core;
+	this->nc = core;
 	core->Users.push_back(this);
 }
 
@@ -395,7 +395,7 @@ void User::Logout()
 	if (it != this->nc->Users.end())
 		this->nc->Users.erase(it);
 
-	nc = NULL;
+	this->nc = NULL;
 }
 
 /** Get the account the user is logged in using
@@ -403,12 +403,12 @@ void User::Logout()
  */
 NickCore *User::Account()
 {
-	return nc;
+	return this->nc;
 }
 
 const NickCore *User::Account() const
 {
-	return nc;
+	return this->nc;
 }
 
 /** Check if the user is identified for their nick
@@ -472,7 +472,7 @@ void User::UpdateHost()
  */
 bool User::HasMode(UserModeName Name) const
 {
-	return modes.HasFlag(Name);
+	return this->modes.HasFlag(Name);
 }
 
 /** Set a mode internally on the user, the IRCd is not informed
@@ -484,7 +484,7 @@ void User::SetModeInternal(UserMode *um, const Anope::string &Param)
 	if (!um)
 		return;
 
-	modes.SetFlag(um->Name);
+	this->modes.SetFlag(um->Name);
 	if (!Param.empty())
 		Params.insert(std::make_pair(um->Name, Param));
 
@@ -499,7 +499,7 @@ void User::RemoveModeInternal(UserMode *um)
 	if (!um)
 		return;
 
-	modes.UnsetFlag(um->Name);
+	this->modes.UnsetFlag(um->Name);
 	std::map<UserModeName, Anope::string>::iterator it = Params.find(um->Name);
 	if (it != Params.end())
 		Params.erase(it);
@@ -647,15 +647,15 @@ bool User::IsProtected() const
 
 /*************************************************************************/
 
-void get_user_stats(long *nusers, long *memuse)
+void get_user_stats(long &count, long &mem)
 {
-	long count = 0, mem = 0;
+	count = mem = 0;
 
 	for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
 		User *user = it->second;
 
-		count++;
+		++count;
 		mem += sizeof(*user);
 		if (!user->host.empty())
 			mem += user->host.length() + 1;
@@ -669,8 +669,6 @@ void get_user_stats(long *nusers, long *memuse)
 		mem += user->server->GetName().length() + 1;
 		mem += (sizeof(ChannelContainer) * user->chans.size());
 	}
-	*nusers = count;
-	*memuse = mem;
 }
 
 User *finduser(const Anope::string &nick)
@@ -855,15 +853,13 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 /*************************************************************************/
 
 /* Handle a MODE command for a user.
- *	av[0] = nick to change mode for
- *	av[1] = modes
+ *  av[0] = nick to change mode for
+ *  av[1] = modes
  */
 
 void do_umode(const Anope::string &source, int ac, const char **av)
 {
-	User *user;
-
-	user = finduser(av[0]);
+	User *user = finduser(av[0]);
 	if (!user)
 	{
 		Alog() << "user: MODE "<< av[1] << " for nonexistent nick "<< av[0] << ":" << merge_args(ac, av);
@@ -876,22 +872,21 @@ void do_umode(const Anope::string &source, int ac, const char **av)
 /*************************************************************************/
 
 /* Handle a QUIT command.
- *	av[0] = reason
+ *  av[0] = reason
  */
 
 void do_quit(const Anope::string &source, int ac, const char **av)
 {
-	User *user;
-	NickAlias *na;
-
-	user = finduser(source);
+	User *user = finduser(source);
 	if (!user)
 	{
 		Alog() << "user: QUIT from nonexistent user " << source << ":" << merge_args(ac, av);
 		return;
 	}
 	Alog(LOG_DEBUG) << source << " quits";
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+
+	NickAlias *na = findnick(user->nick);
+	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = time(NULL);
 		na->last_quit = *av[0] ? av[0] : "";
@@ -903,23 +898,22 @@ void do_quit(const Anope::string &source, int ac, const char **av)
 /*************************************************************************/
 
 /* Handle a KILL command.
- *	av[0] = nick being killed
- *	av[1] = reason
+ *  av[0] = nick being killed
+ *  av[1] = reason
  */
 
 void do_kill(const Anope::string &nick, const Anope::string &msg)
 {
-	User *user;
-	NickAlias *na;
-
-	user = finduser(nick);
+	User *user = finduser(nick);
 	if (!user)
 	{
 		Alog(LOG_DEBUG) << "KILL of nonexistent nick: " <<  nick;
 		return;
 	}
 	Alog(LOG_DEBUG) << nick << " killed";
-	if ((na = findnick(user->nick)) && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+
+	NickAlias *na = findnick(user->nick);
+	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = time(NULL);
 		na->last_quit = msg;
@@ -932,41 +926,32 @@ void do_kill(const Anope::string &nick, const Anope::string &msg)
 
 /* Is the given nick an oper? */
 
-int is_oper(User *user)
+bool is_oper(User *user)
 {
-	if (user && user->HasMode(UMODE_OPER))
-		return 1;
-
-	return 0;
+	return user && user->HasMode(UMODE_OPER);
 }
 
 /*************************************************************************/
 /*************************************************************************/
 
 /* Is the given user ban-excepted? */
-int is_excepted(ChannelInfo *ci, User *user)
+bool is_excepted(ChannelInfo *ci, User *user)
 {
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-		return 0;
+		return false;
 
-	if (elist_match_user(ci->c->excepts, user))
-		return 1;
-
-	return 0;
+	return elist_match_user(ci->c->excepts, user);
 }
 
 /*************************************************************************/
 
 /* Is the given MASK ban-excepted? */
-int is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
+bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
 {
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-		return 0;
+		return false;
 
-	if (elist_match_mask(ci->c->excepts, mask, 0))
-		return 1;
-
-	return 0;
+	return elist_match_mask(ci->c->excepts, mask, 0);
 }
 
 /*************************************************************************/
@@ -975,12 +960,10 @@ int is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
  * just user@host)?
  */
 
-int match_usermask(const Anope::string &mask, User *user)
+bool match_usermask(const Anope::string &mask, User *user)
 {
-	int result;
-
 	if (mask.empty())
-		return 0;
+		return false;
 
 	Anope::string mask2 = mask, nick, username, host;
 	size_t ex = mask2.find('!');
@@ -998,12 +981,7 @@ int match_usermask(const Anope::string &mask, User *user)
 	if (username.empty() || host.empty())
 		return 0;
 
-	if (!nick.empty())
-		result = Anope::Match(user->nick, nick) && Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
-	else
-		result = Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
-
-	return result;
+	return (nick.empty() ? true : Anope::Match(user->nick, nick)) && Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
 }
 
 /*************************************************************************/

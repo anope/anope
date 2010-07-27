@@ -376,7 +376,7 @@ E int32 opcnt;
 E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
 
-E void get_user_stats(long *nusers, long *memuse);
+E void get_user_stats(long &count, long &mem);
 
 E User *finduser(const Anope::string &nick);
 
@@ -388,12 +388,12 @@ E void do_umode(const Anope::string &source, int ac, const char **av);
 E void do_quit(const Anope::string &source, int ac, const char **av);
 E void do_kill(const Anope::string &source, const Anope::string &reason);
 
-E int is_oper(User *user);
+E bool is_oper(User *user);
 
-E int is_excepted(ChannelInfo *ci, User * user);
-E int is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
+E bool is_excepted(ChannelInfo *ci, User *user);
+E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
 
-E int match_usermask(const Anope::string &mask, User *user);
+E bool match_usermask(const Anope::string &mask, User *user);
 E Anope::string create_mask(User *u);
 
 E void UserSetInternalModes(User *user, int ac, const char **av);

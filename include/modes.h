@@ -117,7 +117,7 @@ class CoreExport UserMode : public Mode
 	virtual ~UserMode();
 };
 
-class UserModeParam : public UserMode
+class CoreExport UserModeParam : public UserMode
 {
  public:
  	/** Default constructor

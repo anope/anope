@@ -16,6 +16,7 @@ A Added a sha_256 encryption module
 A Added the ability to load multiple encryption modules, and the ability to seamlessly convert your database between diferent encryptions
 A Added configuration options to allow Anope to reconnect if it disconnects from the uplink instead of dieing
 A Added support for linking with IPv6
+A Added support for InspIRCd2.0's customprefix module 
 F Unban command to accept an optional nick arg
 F Some typos in services.conf
 F Crash when users change their host that are identified to a group, but not a nick

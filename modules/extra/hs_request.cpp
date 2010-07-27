@@ -714,7 +714,7 @@ void my_memo_lang(User *u, const Anope::string &name, int z, int number, ...)
 	{
 		fmt = me->lang[lang].argv[number];
 
-		buf = strdup(fmt);
+		buf = strdup(fmt); // XXX
 		s = buf;
 		while (*s)
 		{
@@ -729,7 +729,7 @@ void my_memo_lang(User *u, const Anope::string &name, int z, int number, ...)
 			va_end(va);
 			memo_send(u, name, buffer, z);
 		}
-		delete [] buf;
+		free(buf); // XXX
 	}
 	else
 		Alog() << me->name << ": INVALID language string call, language: [" << lang << "], String [" << number << "]";

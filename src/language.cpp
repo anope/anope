@@ -97,7 +97,7 @@ static void load_lang(int index, const char *filename)
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
-					delete [] langtexts[index][i];
+					free(langtexts[index][i]); // XXX
 			}
 			delete [] langtexts[index];
 			langtexts[index] = NULL;
@@ -111,7 +111,7 @@ static void load_lang(int index, const char *filename)
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
-					delete [] langtexts[index][i];
+					free(langtexts[index][i]); // XXX
 			}
 			delete [] langtexts[index];
 			langtexts[index] = NULL;
@@ -123,7 +123,7 @@ static void load_lang(int index, const char *filename)
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
-					delete [] langtexts[index][i];
+					free(langtexts[index][i]); // XXX
 			}
 			delete [] langtexts[index];
 			langtexts[index] = NULL;
@@ -139,7 +139,7 @@ static void load_lang(int index, const char *filename)
 				while (--i >= 0)
 				{
 					if (langtexts[index][i])
-						delete [] langtexts[index][i];
+						free(langtexts[index][i]);
 				}
 				delete [] langtexts[index];
 				langtexts[index] = NULL;
@@ -173,7 +173,7 @@ void lang_sanitize()
 				else
 					strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
 				newstr = strdup(tmp);
-				delete [] langtexts[i][j];
+				free(langtexts[i][j]); // XXX
 				langtexts[i][j] = newstr;
 			}
 		}

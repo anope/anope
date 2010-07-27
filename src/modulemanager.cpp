@@ -51,7 +51,7 @@ static int moduleCopyFile(const Anope::string &name, Anope::string &output)
 		return MOD_ERR_FILE_IO;
 	}
 	output = tmp_output;
-	delete [] tmp_output;
+	free(tmp_output); // XXX
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 

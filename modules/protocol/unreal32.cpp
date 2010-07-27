@@ -1299,7 +1299,7 @@ class ProtoUnreal : public Module
 		pmodule_ircd_useTSMode(0);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_NICKCHARS };
-		for (unsigned i = 0; i < 11; ++i)
+		for (unsigned i = 0; i < 10; ++i)
 			Capab.SetFlag(c[i]);
 
 		AddModes();

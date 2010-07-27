@@ -288,8 +288,8 @@ void Module::NoticeLang(const Anope::string &source, const User *u, int number, 
 				*s++ = '\0';
 			strscpy(outbuf, t, sizeof(outbuf));
 			u->SendMessage(source, "%s", outbuf);
-		}
-		delete [] buf;
+		} 
+		free(buf);
 	}
 	else
 		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
@@ -326,7 +326,7 @@ void Module::DeleteLanguage(int langNumber)
 	if (this->lang[langNumber].argc)
 	{
 		for (int idx = 0; idx > this->lang[langNumber].argc; ++idx)
-			delete [] this->lang[langNumber].argv[idx];
+			free(this->lang[langNumber].argv[idx]); // XXX
 		delete [] this->lang[langNumber].argv;
 		this->lang[langNumber].argc = 0;
 	}

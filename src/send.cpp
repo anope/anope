@@ -24,7 +24,7 @@
 void send_cmd(const Anope::string &source, const char *fmt, ...)
 {
 	va_list args;
-	static char buf[BUFSIZE];
+	char buf[BUFSIZE] = "";
 
 	va_start(args, fmt);
 
@@ -65,11 +65,11 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
  */
 void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...)
 {
-	va_list args;
-	char buf[BUFSIZE] = "";
-
 	if (fmt)
 	{
+		va_list args;
+		char buf[BUFSIZE] = "";
+
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
@@ -91,32 +91,25 @@ void notice_server(const Anope::string &source, const Server *s, const char *fmt
  * @param ... any number of parameters
  * @return void
  */
-void notice_lang(const Anope::string &source, User *dest, int message, ...)
+void notice_lang(const Anope::string &source, const User *dest, int message, ...)
 {
-	va_list args;
-	char buf[4096]; /* because messages can be really big */
-	char *s, *t;
-	const char *fmt;
-
 	if (!dest || !message)
 		return;
+
+	va_list args;
 	va_start(args, message);
-	fmt = getstring(dest, message);
+	const char *fmt = getstring(dest, message);
 
 	if (!fmt)
 		return;
-	memset(buf, 0, 4096);
-	vsnprintf(buf, sizeof(buf), fmt, args);
-	s = buf;
-	while (*s)
-	{
-		t = s;
-		s += strcspn(s, "\n");
-		if (*s)
-			*s++ = 0;
 
-		dest->SendMessage(source, "%s", *t ? t : " ");
-	}
+	char buf[4096] = ""; /* because messages can be really big */
+	vsnprintf(buf, sizeof(buf), fmt, args);
+
+	sepstream lines(buf, '\n');
+	Anope::string line;
+	while (lines.GetToken(line))
+		dest->SendMessage(source, "%s", line.empty() ? " " : line.c_str());
 	va_end(args);
 }
 
@@ -132,36 +125,31 @@ void notice_lang(const Anope::string &source, User *dest, int message, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_help(const Anope::string &source, User * dest, int message, ...)
+void notice_help(const Anope::string &source, const User *dest, int message, ...)
 {
-	va_list args;
-	char buf[4096], buf2[4096], outbuf[BUFSIZE];
-	char *s, *t;
-	const char *fmt;
-
 	if (!dest || !message)
 		return;
+
+	va_list args;
 	va_start(args, message);
-	fmt = getstring(dest, message);
+	const char *fmt = getstring(dest, message);
 	if (!fmt)
 		return;
+
 	/* Some sprintf()'s eat %S or turn it into just S, so change all %S's
 	 * into \1\1... we assume this doesn't occur anywhere else in the
 	 * string. */
-	strscpy(buf2, fmt, sizeof(buf2));
-	strnrepl(buf2, sizeof(buf2), "%S", "\1\1");
-	vsnprintf(buf, sizeof(buf), buf2, args);
-	s = buf;
-	while (*s)
-	{
-		t = s;
-		s += strcspn(s, "\n");
-		if (*s)
-			*s++ = 0;
-		strscpy(outbuf, t, sizeof(outbuf));
-		strnrepl(outbuf, sizeof(outbuf), "\1\1", source.c_str());
+	char buf[4096];
+	Anope::string buf2 = fmt;
+	buf2 = buf2.replace_all_cs("%S", "\1\1");
+	vsnprintf(buf, sizeof(buf), buf2.c_str(), args);
 
-		dest->SendMessage(source, "%s", *outbuf ? outbuf : " ");
+	sepstream lines(buf, '\n');
+	Anope::string line;
+	while (lines.GetToken(line))
+	{
+		line = line.replace_all_cs("\1\1", source);
+		dest->SendMessage(source, "%s", line.empty() ? " " : line.c_str());
 	}
 	va_end(args);
 }

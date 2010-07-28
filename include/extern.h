@@ -175,7 +175,7 @@ E int strftime_lang(char *buf, int size, User *u, int format, struct tm *tm);
 E void syntax_error(const Anope::string &service, User *u, const Anope::string &command, int msgnum);
 E const char *getstring(NickAlias *na, int index);
 E const char *getstring(const NickCore *nc, int index);
-E const char *getstring(User *nc, int index);
+E const char *getstring(const User *nc, int index);
 E const char *getstring(int index);
 
 /**** log.c ****/
@@ -343,8 +343,8 @@ E void send_cmd(const Anope::string &source, const char *fmt, ...) FORMAT(printf
 
 E void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...) FORMAT(printf, 3, 4);
 
-E void notice_lang(const Anope::string &source, User *dest, int message, ...); // MARK_DEPRECATED;
-E void notice_help(const Anope::string &source, User *dest, int message, ...); // MARK_DEPRECATED;
+E void notice_lang(const Anope::string &source, const User *dest, int message, ...); // MARK_DEPRECATED;
+E void notice_help(const Anope::string &source, const User *dest, int message, ...); // MARK_DEPRECATED;
 
 /**** sessions.c ****/
 

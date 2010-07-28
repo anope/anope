@@ -338,7 +338,7 @@ const char *getstring(const NickCore *nc, int index)
 	return langtexts[langidx][index];
 }
 
-const char *getstring(User *u, int index)
+const char *getstring(const User *u, int index)
 {
 	return getstring(u->Account(), index);
 }

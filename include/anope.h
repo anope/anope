@@ -206,22 +206,22 @@ namespace Anope
 		inline string replace_all_cs(const string &_orig, const string &_repl)
 		{
 			Anope::string new_string = *this;
-			size_type pos = new_string.find(_orig), orig_length = _orig.length();
+			size_type pos = new_string.find(_orig), orig_length = _orig.length(), repl_length = _repl.length();
 			while (pos != npos)
 			{
-				new_string.replace(pos, pos + orig_length, _repl);
-				pos = new_string.find(_orig, pos + orig_length);
+				new_string = new_string.substr(0, pos) + _repl + new_string.substr(pos + orig_length);
+				pos = new_string.find(_orig, pos + repl_length);
 			}
 			return new_string;
 		}
 		inline string replace_all_ci(const string &_orig, const string &_repl)
 		{
 			Anope::string new_string = *this;
-			size_type pos = new_string.find_ci(_orig), orig_length = _orig.length();
+			size_type pos = new_string.find_ci(_orig), orig_length = _orig.length(), repl_length = _repl.length();
 			while (pos != npos)
 			{
-				new_string.replace(pos, pos + orig_length, _repl);
-				pos = new_string.find_ci(_orig, pos + orig_length);
+				new_string = new_string.substr(0, pos) + _repl + new_string.substr(pos + orig_length);
+				pos = new_string.find_ci(_orig, pos + repl_length);
 			}
 			return new_string;
 		}

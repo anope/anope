@@ -39,7 +39,6 @@
 
 #include <sys/stat.h> /* for umask() on some systems */
 #include <sys/types.h>
-#include <assert.h>
 #include <fcntl.h>
 #include <typeinfo>
 

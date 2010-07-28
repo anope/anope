@@ -128,7 +128,8 @@ class CommandNSSASetDisplay : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
-		assert(nc);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSASetDisplay");
 
 		NickAlias *na = findnick(params[1]);
 		if (!na || na->nc != nc)
@@ -170,7 +171,8 @@ class CommandNSSASetPassword : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
-		assert(nc);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSASetPassword");
 
 		size_t len = params[1].length();
 

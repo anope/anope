@@ -23,7 +23,8 @@ class CommandCSSetMLock : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
-		assert(ci);
+		if (!ci)
+			throw CoreException("NULL ci in CommandCSSetMLock");
 
 		int add = -1; /* 1 if adding, 0 if deleting, -1 if neither */
 		ChannelMode *cm;

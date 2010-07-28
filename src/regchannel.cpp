@@ -21,20 +21,20 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
 
-	founder = successor = NULL;
-	last_topic_time = 0;
-	levels = NULL;
-	c = NULL;
-	capsmin = capspercent = 0;
-	floodlines = floodsecs = 0;
-	repeattimes = 0;
-	bi = NULL;
+	this->founder = this->successor = NULL;
+	this->last_topic_time = 0;
+	this->levels = NULL;
+	this->c = NULL;
+	this->capsmin = this->capspercent = 0;
+	this->floodlines = this->floodsecs = 0;
+	this->repeattimes = 0;
+	this->bi = NULL;
 
 	this->name = chname;
 
-	mlock_on = DefMLockOn;
-	mlock_off = DefMLockOff;
-	Params = DefMLockParams;
+	this->mlock_on = DefMLockOn;
+	this->mlock_off = DefMLockOff;
+	this->Params = DefMLockParams;
 
 	size_t t;
 	/* Set default channel flags */
@@ -47,9 +47,9 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 		if (Config.BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
 			this->botflags.SetFlag(static_cast<BotServFlag>(t));
 
-	bantype = Config.CSDefBantype;
-	memos.memomax = Config.MSMaxMemos;
-	last_used = time_registered = time(NULL);
+	this->bantype = Config.CSDefBantype;
+	this->memos.memomax = Config.MSMaxMemos;
+	this->last_used = this->time_registered = time(NULL);
 
 	this->ttb = new int16[2 * TTB_SIZE];
 	for (int i = 0; i < TTB_SIZE; ++i)
@@ -120,7 +120,7 @@ void ChannelInfo::AddAccess(NickCore *nc, int16 level, const Anope::string &crea
 	else
 		new_access->creator = "Unknown";
 
-	access.push_back(new_access);
+	this->access.push_back(new_access);
 }
 
 /** Get an entry from the channel access list by index
@@ -132,10 +132,10 @@ void ChannelInfo::AddAccess(NickCore *nc, int16 level, const Anope::string &crea
  */
 ChanAccess *ChannelInfo::GetAccess(unsigned index)
 {
-	if (access.empty() || index >= access.size())
+	if (this->access.empty() || index >= this->access.size())
 		return NULL;
 
-	return access[index];
+	return this->access[index];
 }
 
 /** Get an entry from the channel access list by NickCore
@@ -149,12 +149,12 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
 
 ChanAccess *ChannelInfo::GetAccess(const NickCore *nc, int16 level)
 {
-	if (access.empty())
+	if (this->access.empty())
 		return NULL;
 
-	for (unsigned i = 0, end = access.size(); i < end; ++i)
-		if (access[i]->nc == nc && (level ? access[i]->level == level : true))
-			return access[i];
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (this->access[i]->nc == nc && (level ? this->access[i]->level == level : true))
+			return this->access[i];
 
 	return NULL;
 }
@@ -164,7 +164,7 @@ ChanAccess *ChannelInfo::GetAccess(const NickCore *nc, int16 level)
  */
 unsigned ChannelInfo::GetAccessCount() const
 {
-	return access.empty() ? 0 : access.size();
+	return this->access.empty() ? 0 : this->access.size();
 }
 
 /** Erase an entry from the channel access list
@@ -175,10 +175,11 @@ unsigned ChannelInfo::GetAccessCount() const
  */
 void ChannelInfo::EraseAccess(unsigned index)
 {
-	if (access.empty() || index >= access.size())
+	if (this->access.empty() || index >= this->access.size())
 		return;
-	delete access[index];
-	access.erase(access.begin() + index);
+
+	delete this->access[index];
+	this->access.erase(this->access.begin() + index);
 }
 
 /** Clear the entire channel access list
@@ -187,7 +188,7 @@ void ChannelInfo::EraseAccess(unsigned index)
  */
 void ChannelInfo::ClearAccess()
 {
-	while (!access.empty())
+	while (!this->access.empty())
 		EraseAccess(0);
 }
 
@@ -212,7 +213,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
-	akick.push_back(autokick);
+	this->akick.push_back(autokick);
 
 	return autokick;
 }
@@ -234,7 +235,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
 	autokick->addtime = t;
 	autokick->last_used = lu;
 
-	akick.push_back(autokick);
+	this->akick.push_back(autokick);
 
 	return autokick;
 }
@@ -245,10 +246,10 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
  */
 AutoKick *ChannelInfo::GetAkick(unsigned index)
 {
-	if (akick.empty() || index >= akick.size())
+	if (this->akick.empty() || index >= this->akick.size())
 		return NULL;
 
-	return akick[index];
+	return this->akick[index];
 }
 
 /** Get the size of the akick vector for this channel
@@ -256,7 +257,7 @@ AutoKick *ChannelInfo::GetAkick(unsigned index)
  */
 unsigned ChannelInfo::GetAkickCount() const
 {
-	return akick.empty() ? 0 : akick.size();
+	return this->akick.empty() ? 0 : this->akick.size();
 }
 
 /** Erase an entry from the channel akick list
@@ -264,18 +265,18 @@ unsigned ChannelInfo::GetAkickCount() const
  */
 void ChannelInfo::EraseAkick(unsigned index)
 {
-	if (akick.empty() || index > akick.size())
+	if (this->akick.empty() || index >= this->akick.size())
 		return;
 
-	delete akick[index];
-	akick.erase(akick.begin() + index);
+	delete this->akick[index];
+	this->akick.erase(this->akick.begin() + index);
 }
 
 /** Clear the whole akick list
  */
 void ChannelInfo::ClearAkick()
 {
-	while (!akick.empty())
+	while (!this->akick.empty())
 		EraseAkick(0);
 }
 
@@ -290,7 +291,7 @@ BadWord *ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
 	bw->word = word;
 	bw->type = type;
 
-	badwords.push_back(bw);
+	this->badwords.push_back(bw);
 
 	FOREACH_MOD(I_OnBadWordAdd, OnBadWordAdd(this, bw));
 
@@ -303,10 +304,10 @@ BadWord *ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
  */
 BadWord *ChannelInfo::GetBadWord(unsigned index)
 {
-	if (badwords.empty() || index >= badwords.size())
+	if (this->badwords.empty() || index >= this->badwords.size())
 		return NULL;
 
-	return badwords[index];
+	return this->badwords[index];
 }
 
 /** Get how many badwords are on this channel
@@ -314,7 +315,7 @@ BadWord *ChannelInfo::GetBadWord(unsigned index)
  */
 unsigned ChannelInfo::GetBadWordCount() const
 {
-	return badwords.empty() ? 0 : badwords.size();
+	return this->badwords.empty() ? 0 : this->badwords.size();
 }
 
 /** Remove a badword
@@ -322,18 +323,18 @@ unsigned ChannelInfo::GetBadWordCount() const
  */
 void ChannelInfo::EraseBadWord(unsigned index)
 {
-	if (badwords.empty() || index >= badwords.size())
+	if (this->badwords.empty() || index >= this->badwords.size())
 		return;
 
-	delete badwords[index];
-	badwords.erase(badwords.begin() + index);
+	delete this->badwords[index];
+	this->badwords.erase(this->badwords.begin() + index);
 }
 
 /** Clear all badwords from the channel
  */
 void ChannelInfo::ClearBadWords()
 {
-	while (!badwords.empty())
+	while (!this->badwords.empty())
 		EraseBadWord(0);
 }
 
@@ -412,9 +413,9 @@ void ChannelInfo::LoadMLock()
 bool ChannelInfo::HasMLock(ChannelModeName Name, bool status) const
 {
 	if (status)
-		return mlock_on.HasFlag(Name);
+		return this->mlock_on.HasFlag(Name);
 	else
-		return mlock_off.HasFlag(Name);
+		return this->mlock_off.HasFlag(Name);
 }
 
 /** Set a mlock
@@ -434,20 +435,20 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const Anope::strin
 		return false;
 
 	/* First, remove this everywhere */
-	mlock_on.UnsetFlag(Name);
-	mlock_off.UnsetFlag(Name);
+	this->mlock_on.UnsetFlag(Name);
+	this->mlock_off.UnsetFlag(Name);
 
 	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
 		Params.erase(it);
 
 	if (status)
-		mlock_on.SetFlag(Name);
+		this->mlock_on.SetFlag(Name);
 	else
-		mlock_off.SetFlag(Name);
+		this->mlock_off.SetFlag(Name);
 
 	if (status && !param.empty())
-		Params.insert(std::make_pair(Name, param));
+		this->Params.insert(std::make_pair(Name, param));
 
 	return true;
 }
@@ -463,12 +464,12 @@ bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
-	mlock_on.UnsetFlag(Name);
-	mlock_off.UnsetFlag(Name);
+	this->mlock_on.UnsetFlag(Name);
+	this->mlock_off.UnsetFlag(Name);
 
 	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
 	if (it != Params.end())
-		Params.erase(it);
+		this->Params.erase(it);
 
 	return true;
 }
@@ -477,8 +478,8 @@ bool ChannelInfo::RemoveMLock(ChannelModeName Name)
  */
 void ChannelInfo::ClearMLock()
 {
-	mlock_on.ClearFlags();
-	mlock_off.ClearFlags();
+	this->mlock_on.ClearFlags();
+	this->mlock_off.ClearFlags();
 }
 
 /** Get the number of mlocked modes for this channel
@@ -488,9 +489,9 @@ void ChannelInfo::ClearMLock()
 size_t ChannelInfo::GetMLockCount(bool status) const
 {
 	if (status)
-		return mlock_on.FlagCount();
+		return this->mlock_on.FlagCount();
 	else
-		return mlock_off.FlagCount();
+		return this->mlock_off.FlagCount();
 }
 
 /** Get a param from the channel
@@ -500,11 +501,11 @@ size_t ChannelInfo::GetMLockCount(bool status) const
  */
 bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target) const
 {
-	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = this->Params.find(Name);
 
 	Target.clear();
 
-	if (it != Params.end())
+	if (it != this->Params.end())
 	{
 		Target = it->second;
 		return true;
@@ -518,9 +519,9 @@ bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target) const
  */
 bool ChannelInfo::HasParam(ChannelModeName Name) const
 {
-	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
+	std::map<ChannelModeName, Anope::string>::const_iterator it = this->Params.find(Name);
 
-	if (it != Params.end())
+	if (it != this->Params.end())
 		return true;
 
 	return false;
@@ -539,12 +540,6 @@ void ChannelInfo::ClearParams()
  */
 bool ChannelInfo::CheckKick(User *user)
 {
-	AutoKick *autokick;
-	bool set_modes = false, do_kick = false;
-	const NickCore *nc;
-	Anope::string mask;
-	Anope::string reason;
-
 	if (!user || !this->c)
 		return false;
 
@@ -556,16 +551,18 @@ bool ChannelInfo::CheckKick(User *user)
 	if (user->server->IsULined())
 		return false;
 
-	if (!do_kick && user->IsProtected())
+	if (user->IsProtected())
 		return false;
 
+	bool set_modes = false, do_kick = false;
 	if (ircd->chansqline && SQLineManager::Check(this->c))
 		do_kick = true;
 
+	Anope::string mask, reason;
 	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
 		get_idealban(this, user, mask);
-		reason = !this->forbidreason.empty() ? this->forbidreason : getstring(user, CHAN_MAY_NOT_BE_USED);
+		reason = this->forbidreason.empty() ? getstring(user, CHAN_MAY_NOT_BE_USED) : this->forbidreason;
 		set_modes = true;
 		do_kick = true;
 	}
@@ -573,16 +570,13 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
 		return false;
 
-	if (user->Account() || user->IsRecognized())
-		nc = user->Account();
-	else
-		nc = NULL;
+	const NickCore *nc = user->Account() || user->IsRecognized() ? user->Account() : NULL;
 
 	if (!do_kick)
 	{
 		for (unsigned j = 0, end = this->GetAkickCount(); j < end; ++j)
 		{
-			autokick = this->GetAkick(j);
+			AutoKick *autokick = this->GetAkick(j);
 
 			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc) || (!autokick->HasFlag(AK_ISNICK) && match_usermask(autokick->mask, user)))
 			{
@@ -592,7 +586,7 @@ bool ChannelInfo::CheckKick(User *user)
 					get_idealban(this, user, mask);
 				else
 					mask = autokick->mask;
-				reason = !autokick->reason.empty() ? autokick->reason : Config.CSAutokickReason;
+				reason = autokick->reason.empty() ? Config.CSAutokickReason : autokick->reason;
 				do_kick = true;
 				break;
 			}

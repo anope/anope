@@ -39,8 +39,8 @@
 
 #include <sys/stat.h> /* for umask() on some systems */
 #include <sys/types.h>
-#include <assert.h>
 #include <fcntl.h>
+#include <typeinfo>
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -267,6 +267,22 @@ class DatabaseException : public CoreException
 	 */
 	virtual ~DatabaseException() throw() { }
 };
+
+/** Debug cast to be used instead of dynamic_cast, this uses dynamic_cast
+ * for debug builds and static_cast on releass builds to speed up the program
+ * because dynamic_cast relies on RTTI.
+ */
+template<typename T, typename O> inline T debug_cast(O ptr)
+{
+#ifdef DEBUG_BUILD
+	T ret = dynamic_cast<T>(ptr);
+	if (ret == NULL)
+		throw CoreException(Anope::string("debug_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+	return ret;
+#else
+	return static_cast<T>(ptr);
+#endif
+}
 
 /*************************************************************************/
 

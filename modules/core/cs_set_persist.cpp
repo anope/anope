@@ -23,7 +23,8 @@ class CommandCSSetPersist : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
-		assert(ci);
+		if (!ci)
+			throw CoreException("NULL ci in CommandCSSetPersist");
 
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 

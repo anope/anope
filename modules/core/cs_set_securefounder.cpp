@@ -23,7 +23,8 @@ class CommandCSSetSecureFounder : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
-		assert(ci);
+		if (!ci)
+			throw CoreException("NULL ci in CommandCSSetSecureFounder");
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{

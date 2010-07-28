@@ -66,7 +66,7 @@ static std::string MakeMLock(ChannelInfo *ci, bool status)
 	{
 		if ((*it)->Class == MC_CHANNEL)
 		{
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 			if (ci->HasMLock(cm->Name, status))
 				ret += " " + cm->NameAsString;
@@ -97,7 +97,7 @@ static std::string GetMLockParams(ChannelInfo *ci)
 	{
 		if ((*it)->Class == MC_CHANNEL)
 		{
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 			std::string param;
 			if (ci->GetParam(cm->Name, param))

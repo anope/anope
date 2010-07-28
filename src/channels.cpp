@@ -232,7 +232,7 @@ bool Channel::HasUserStatus(User *u, ChannelModeStatus *cms) const
  */
 bool Channel::HasUserStatus(User *u, ChannelModeName Name) const
 {
-	return HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(Name)));
+	return HasUserStatus(u, debug_cast<ChannelModeStatus *>(ModeManager::FindChannelModeByName(Name)));
 }
 
 /**
@@ -298,7 +298,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 			return;
 		}
 
-		ChannelModeList *cml = dynamic_cast<ChannelModeList *>(cm);
+		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
 		cml->AddMask(this, param);
 		return;
 	}
@@ -357,7 +357,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	/* If this is a param mode and its mlocked +, check to ensure someone didn't reset it with the wrong param */
 	else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
 	{
-		ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+		ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 		Anope::string cparam, ciparam;
 		/* Get the param currently set on this channel */
 		GetParam(cmp->Name, cparam);
@@ -429,7 +429,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 			return;
 		}
 
-		ChannelModeList *cml = dynamic_cast<ChannelModeList *>(cm);
+		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
 		cml->DelMask(this, param);
 		return;
 	}
@@ -509,7 +509,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u && HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
+		if (u && HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
 	else if (cm->Type == MODE_LIST)
@@ -562,7 +562,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u && !HasUserStatus(u, dynamic_cast<ChannelModeStatus *>(cm)))
+		if (u && !HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
 	else if (cm->Type == MODE_LIST)
@@ -574,7 +574,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	bool SendParam = true;
 	if (cm->Type == MODE_PARAM)
 	{
-		ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+		ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 		if (cmp->MinusNoArg)
 			SendParam = false;
 	}
@@ -677,7 +677,7 @@ void Channel::ClearBans(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
+	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 	if (cml && this->bans && this->bans->count)
 		for (entry = this->bans->entries; entry; entry = nexte)
@@ -696,7 +696,7 @@ void Channel::ClearExcepts(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
+	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 	if (cml && this->excepts && this->excepts->count)
 		for (entry = this->excepts->entries; entry; entry = nexte)
@@ -715,7 +715,7 @@ void Channel::ClearInvites(BotInfo *bi)
 	Entry *entry, *nexte;
 	ChannelModeList *cml;
 
-	cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
+	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 	if (cml && this->invites && this->invites->count)
 		for (entry = this->invites->entries; entry; entry = nexte)
@@ -823,7 +823,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		}
 		else if (cm->Type == MODE_PARAM)
 		{
-			ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+			ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 
 			if (!add && cmp->MinusNoArg)
 			{
@@ -927,7 +927,7 @@ Anope::string chan_get_modes(Channel *chan, int complete, int plus)
 			if ((*it)->Class != MC_CHANNEL)
 				continue;
 
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 			if (chan->HasMode(cm->Name))
 			{
@@ -937,7 +937,7 @@ Anope::string chan_get_modes(Channel *chan, int complete, int plus)
 				{
 					if (cm->Type == MODE_PARAM)
 					{
-						ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+						ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 
 						if (plus || !cmp->MinusNoArg)
 						{

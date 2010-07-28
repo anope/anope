@@ -413,7 +413,7 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 			if (m->Type != MODE_STATUS)
 				continue;
 
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(m);
+			ChannelMode *cm = debug_cast<ChannelMode *>(m);
 
 			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
 			{

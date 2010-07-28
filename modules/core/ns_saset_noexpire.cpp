@@ -23,7 +23,8 @@ class CommandNSSASetNoexpire : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
-		assert(na);
+		if (!na)
+			throw CoreException("NULL na in CommandNSSASsetNoexpire");
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 

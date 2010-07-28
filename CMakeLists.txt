@@ -309,6 +309,11 @@ if(NOT DEFUMASK)
   endif(RUNGROUP)
 endif(NOT DEFUMASK)
 
+# Set the DEBUG_BUILD for sysconf.h
+if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+  set(DEBUG_BUILD TRUE)
+endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
+
 # Check for the existance of the following include files
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(strings.h HAVE_STRINGS_H)

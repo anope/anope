@@ -88,7 +88,8 @@ class CommandNSSASetKill : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
-		assert(nc);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSASetKill");
 
 		Anope::string param = params[1];
 

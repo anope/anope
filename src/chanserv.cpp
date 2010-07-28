@@ -160,7 +160,7 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 
 				if (cm->Type == MODE_PARAM)
 				{
-					cmp = dynamic_cast<ChannelModeParam *>(cm);
+					cmp = debug_cast<ChannelModeParam *>(cm);
 
 					ci->GetParam(cmp->Name, param);
 
@@ -343,7 +343,7 @@ void check_modes(Channel *c)
 			/* Add the eventual parameter */
 			if (cm->Type == MODE_PARAM)
 			{
-				ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+				ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 
 				if (!cmp->MinusNoArg)
 				{

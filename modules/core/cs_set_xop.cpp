@@ -30,7 +30,8 @@ class CommandCSSetXOP : public Command
 		}
 
 		ChannelInfo *ci = cs_findchan(params[0]);
-		assert(ci);
+		if (!ci)
+			throw CoreException("NULL ci in CommandCSSetXOP");
 
 		if (params[1].equals_ci("ON"))
 		{

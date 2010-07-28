@@ -71,7 +71,8 @@ class CommandNSSASetEmail : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickCore *nc = findcore(params[0]);
-		assert(nc);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSASetEmail");
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 

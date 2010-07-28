@@ -78,6 +78,11 @@ This is safer than C-style casting in that an invalid pointer conversion will
 return a NULL pointer, and an invalid reference conversion will throw a
 Bad_cast exception.
 
+Note that in Anope we prefer if Anope::debug_cast is used.
+This uses dynamic_cast (and checks for a NULL pointer return) on debug builds
+and static_cast on release builds, to speed up the program beacuse of dynamic_cast's
+reliance on RTTI.
+
 reinterpret_cast
 ----------------
 

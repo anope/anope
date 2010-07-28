@@ -302,7 +302,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 			if (m->Type != MODE_STATUS)
 				continue;
 
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(m);
+			ChannelMode *cm = debug_cast<ChannelMode *>(m);
 
 			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
 			{
@@ -726,17 +726,17 @@ int anope_event_bmask(const Anope::string &source, int ac, const char **av)
 			Anope::string b = myStrGetToken(bans, ' ', i);
 			if (!stricmp(av[2], "b"))
 			{
-				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('b'));
+				cms = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('b'));
 				cms->AddMask(c, b);
 			}
 			if (!stricmp(av[2], "e"))
 			{
-				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('e'));
+				cms = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('e'));
 				cms->AddMask(c, b);
 			}
 			if (!stricmp(av[2], "I"))
 			{
-				cms = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('I'));
+				cms = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByChar('I'));
 				cms->AddMask(c, b);
 			}
 		}

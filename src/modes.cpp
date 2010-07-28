@@ -87,7 +87,7 @@ void SetDefaultMLock()
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(Config.BotModes[i]);
 
 		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
-			BotModes.push_back(dynamic_cast<ChannelModeStatus *>(cm));
+			BotModes.push_back(debug_cast<ChannelModeStatus *>(cm));
 	}
 }
 
@@ -730,7 +730,7 @@ char ModeManager::GetStatusChar(char Value)
 		cm = it->second;
 		if (cm->Type == MODE_STATUS)
 		{
-			cms = dynamic_cast<ChannelModeStatus *>(cm);
+			cms = debug_cast<ChannelModeStatus *>(cm);
 
 			if (Value == cms->Symbol)
 				return it->first;

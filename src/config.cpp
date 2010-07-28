@@ -838,82 +838,82 @@ int ServerConfig::Read(bool bail)
 			{
 				case DT_NOSPACES:
 					{
-						ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+						ValueContainerString *vcs = debug_cast<ValueContainerString *>(Values[Index].val);
 						ValidateNoSpaces(vi.GetValue(), Values[Index].tag, Values[Index].value);
 						vcs->Set(vi.GetValue());
 					}
 					break;
 				case DT_HOSTNAME:
 					{
-						ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+						ValueContainerString *vcs = debug_cast<ValueContainerString *>(Values[Index].val);
 						ValidateHostname(vi.GetValue(), Values[Index].tag, Values[Index].value);
 						vcs->Set(vi.GetValue());
 					}
 					break;
 				case DT_IPADDRESS:
 					{
-						ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+						ValueContainerString *vcs = debug_cast<ValueContainerString *>(Values[Index].val);
 						ValidateIP(vi.GetValue(), Values[Index].tag, Values[Index].value, allow_wild);
 						vcs->Set(vi.GetValue());
 					}
 					break;
 				case DT_CHARPTR:
 					{
-						ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+						ValueContainerChar *vcc = debug_cast<ValueContainerChar *>(Values[Index].val);
 						// Make sure we also copy the null terminator
 						vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 					}
 					break;
 				case DT_CSSTRING:
 					{
-						ValueContainerCSString *vcs = dynamic_cast<ValueContainerCSString *>(Values[Index].val);
+						ValueContainerCSString *vcs = debug_cast<ValueContainerCSString *>(Values[Index].val);
 						vcs->Set(vi.GetCSValue());
 					}
 					break;
 				case DT_CISTRING:
 					{
-						ValueContainerCIString *vcs = dynamic_cast<ValueContainerCIString *>(Values[Index].val);
+						ValueContainerCIString *vcs = debug_cast<ValueContainerCIString *>(Values[Index].val);
 						vcs->Set(vi.GetCIValue());
 					}
 					break;
 				case DT_STRING:
 					{
-						ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+						ValueContainerString *vcs = debug_cast<ValueContainerString *>(Values[Index].val);
 						vcs->Set(vi.GetValue());
 					}
 					break;
 				case DT_INTEGER:
 					{
 						int val = vi.GetInteger();
-						ValueContainerInt *vci = dynamic_cast<ValueContainerInt *>(Values[Index].val);
+						ValueContainerInt *vci = debug_cast<ValueContainerInt *>(Values[Index].val);
 						vci->Set(&val, sizeof(int));
 					}
 					break;
 				case DT_UINTEGER:
 					{
 						unsigned val = vi.GetInteger();
-						ValueContainerUInt *vci = dynamic_cast<ValueContainerUInt *>(Values[Index].val);
+						ValueContainerUInt *vci = debug_cast<ValueContainerUInt *>(Values[Index].val);
 						vci->Set(&val, sizeof(unsigned));
 					}
 					break;
 				case DT_LUINTEGER:
 					{
 						unsigned long val = vi.GetInteger();
-						ValueContainerLUInt *vci = dynamic_cast<ValueContainerLUInt *>(Values[Index].val);
+						ValueContainerLUInt *vci = debug_cast<ValueContainerLUInt *>(Values[Index].val);
 						vci->Set(&val, sizeof(unsigned long));
 					}
 					break;
 				case DT_TIME:
 					{
 						time_t time = dotime(vi.GetValue());
-						ValueContainerTime *vci = dynamic_cast<ValueContainerTime *>(Values[Index].val);
+						ValueContainerTime *vci = debug_cast<ValueContainerTime *>(Values[Index].val);
 						vci->Set(&time, sizeof(time_t));
 					}
 					break;
 				case DT_BOOLEAN:
 					{
 						bool val = vi.GetBool();
-						ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
+						ValueContainerBool *vcb = debug_cast<ValueContainerBool *>(Values[Index].val);
 						vcb->Set(&val, sizeof(bool));
 					}
 					break;

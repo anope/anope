@@ -350,8 +350,8 @@ E void notice_help(const Anope::string &source, User *dest, int message, ...); /
 
 E std::vector<Exception *> exceptions;
 
-E void get_session_stats(long *nrec, long *memuse);
-E void get_exception_stats(long *nrec, long *memuse);
+E void get_session_stats(long &count, long &mem);
+E void get_exception_stats(long &count, long &mem);
 
 E int add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip);
 E void del_session(const Anope::string &host);

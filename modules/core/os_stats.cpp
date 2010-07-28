@@ -244,7 +244,7 @@ class CommandOSStats : public Command
 		}
 		get_operserv_stats(&count, &mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
-		get_session_stats(&count, &mem);
+		get_session_stats(count, mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
 
 		return MOD_CONT;
@@ -381,7 +381,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 		}
 	}
 
-	get_exception_stats(&count2, &mem2);
+	get_exception_stats(count2, mem2);
 	count += count2;
 	mem += mem2;
 

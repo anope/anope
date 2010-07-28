@@ -57,9 +57,10 @@ std::vector<Exception *> exceptions;
 /****************************** Statistics *******************************/
 /*************************************************************************/
 
-void get_session_stats(long *nrec, long *memuse)
+void get_session_stats(long &count, long &mem)
 {
-	long mem = sizeof(Session) * SessionList.size();
+	count = SessionList.size();
+	mem = sizeof(Session) * SessionList.size();
 
 	for (session_map::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 	{
@@ -67,16 +68,13 @@ void get_session_stats(long *nrec, long *memuse)
 
 		mem += session->host.length() + 1;
 	}
-
-	*memuse = mem;
-	*nrec = SessionList.size();
 }
 
-void get_exception_stats(long *nrec, long *memuse)
+void get_exception_stats(long &count, long &mem)
 {
-	long mem;
-
+	count = exceptions.size();
 	mem = sizeof(Exception) * exceptions.size();
+
 	for (std::vector<Exception *>::const_iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
 	{
 		Exception *e = *it;
@@ -87,8 +85,6 @@ void get_exception_stats(long *nrec, long *memuse)
 		if (!e->who.empty())
 			mem += e->who.length() + 1;
 	}
-	*nrec = exceptions.size();
-	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -158,7 +154,7 @@ int add_session(const Anope::string &nick, const Anope::string &host, const Anop
 		}
 	}
 
-	session = new Session;
+	session = new Session();
 	session->host = host;
 	session->count = 1;
 	session->hits = 0;

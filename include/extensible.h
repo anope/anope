@@ -153,7 +153,7 @@ class CoreExport Extensible
 
 		if (it != this->Extension_Items.end())
 		{
-			p = dynamic_cast<ExtensibleItemRegular<T> *>(it->second)->GetItem();
+			p = debug_cast<ExtensibleItemRegular<T> *>(it->second)->GetItem();
 			return true;
 		}
 
@@ -172,7 +172,7 @@ class CoreExport Extensible
 
 		if (it != this->Extension_Items.end())
 		{
-			p = dynamic_cast<ExtensibleItemPointer<T> *>(it->second)->GetItem();
+			p = debug_cast<ExtensibleItemPointer<T> *>(it->second)->GetItem();
 			return true;
 		}
 
@@ -192,7 +192,7 @@ class CoreExport Extensible
 
 		if (it != this->Extension_Items.end())
 		{
-			p = dynamic_cast<ExtensibleItemPointerArray<T> *>(it->second)->GetItem();
+			p = debug_cast<ExtensibleItemPointerArray<T> *>(it->second)->GetItem();
 			return true;
 		}
 

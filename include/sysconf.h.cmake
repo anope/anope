@@ -1,6 +1,8 @@
 #ifndef _SYSCONF_H_
 #define _SYSCONF_H_
 
+#cmakedefine DEBUG_BUILD
+
 #cmakedefine DEFUMASK @DEFUMASK@
 #cmakedefine HAVE_SYS_TYPES_H 1
 #cmakedefine HAVE_STDINT_H 1

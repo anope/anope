@@ -1014,7 +1014,7 @@ class DBPlain : public Module
 				{
 					if ((*it)->Class == MC_CHANNEL)
 					{
-						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+						ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 						if (ci->HasMLock(cm->Name, true))
 							db << " " << cm->NameAsString;
@@ -1029,7 +1029,7 @@ class DBPlain : public Module
 				{
 					if ((*it)->Class == MC_CHANNEL)
 					{
-						ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+						ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 						if (ci->HasMLock(cm->Name, false))
 							db << " " << cm->NameAsString;
@@ -1042,7 +1042,7 @@ class DBPlain : public Module
 			{
 				if ((*it)->Class == MC_CHANNEL)
 				{
-					ChannelMode *cm = dynamic_cast<ChannelMode *>(*it);
+					ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
 					if (ci->GetParam(cm->Name, Param))
 						db << "MD MLP " << cm->NameAsString << " " << Param << endl;

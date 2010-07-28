@@ -352,7 +352,7 @@ void ChannelInfo::LoadMLock()
 			{
 				if ((*mit)->Class == MC_CHANNEL)
 				{
-					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
 
 					if (cm->NameAsString.equals_ci(*it))
 						this->SetMLock(cm->Name, true);
@@ -371,7 +371,7 @@ void ChannelInfo::LoadMLock()
 			{
 				if ((*mit)->Class == MC_CHANNEL)
 				{
-					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
 
 					if (cm->NameAsString.equals_ci(*it))
 						this->SetMLock(cm->Name, false);
@@ -392,7 +392,7 @@ void ChannelInfo::LoadMLock()
 			{
 				if ((*mit)->Class == MC_CHANNEL)
 				{
-					ChannelMode *cm = dynamic_cast<ChannelMode *>(*mit);
+					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
 
 					if (cm->NameAsString.equals_ci(it->first))
 						this->SetMLock(cm->Name, true, it->second);

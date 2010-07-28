@@ -428,7 +428,7 @@ void defconParseModeString(const Anope::string &str)
 
 				if (cm->Type == MODE_PARAM)
 				{
-					cmp = dynamic_cast<ChannelModeParam *>(cm);
+					cmp = debug_cast<ChannelModeParam *>(cm);
 
 					if (!ss.GetToken(param))
 					{

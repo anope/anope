@@ -66,7 +66,7 @@ class CommandCSSetMLock : public Command
 
 						Anope::string param = params[paramcount];
 
-						ChannelModeParam *cmp = dynamic_cast<ChannelModeParam *>(cm);
+						ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 
 						if (!cmp || !cmp->IsValid(param))
 							continue;

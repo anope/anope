@@ -1008,7 +1008,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 			if (m->Type != MODE_STATUS)
 				continue;
 
-			ChannelMode *cm = dynamic_cast<ChannelMode *>(m);
+			ChannelMode *cm = debug_cast<ChannelMode *>(m);
 
 			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
 			{
@@ -1052,7 +1052,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		if (keep_their_modes && buf[0] == '&')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
+			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 			if (cml->IsValid(buf))
 				cml->AddMask(c, buf);
@@ -1061,7 +1061,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		else if (keep_their_modes && buf[0] == '"')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
+			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 			if (cml->IsValid(buf))
 				cml->AddMask(c, buf);
@@ -1070,7 +1070,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		else if (keep_their_modes && buf[0] == '\'')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = dynamic_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
+			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 			if (cml->IsValid(buf))
 				cml->AddMask(c, buf);

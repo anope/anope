@@ -86,7 +86,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/* Server ID */
 	Anope::string SID;
 	/* Links for this server */
-	std::list<Server *> *Links;
+	std::list<Server *> Links;
 	/* Uplink for this server */
 	Server *UplinkServer;
 
@@ -101,7 +101,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param description Server rdescription
 	 * @param sid Server sid/numeric
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned int hops, const Anope::string &description, const Anope::string &sid);
+	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid);
 
 	/** Destructor
 	 */
@@ -140,7 +140,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Get the list of links this server has, or NULL if it has none
 	 * @return A list of servers
 	 */
-	const std::list<Server *> *GetLinks() const;
+	const std::list<Server *> &GetLinks() const;
 
 	/** Get the uplink server for this server, if this is our uplink will be Me
 	 * @return The servers uplink

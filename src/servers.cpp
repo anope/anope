@@ -56,21 +56,19 @@ Flags<CapabType, CAPAB_END> Capab;
  * @param description Server rdescription
  * @param sid Server sid/numeric
  */
-Server::Server(Server *uplink, const Anope::string &name, unsigned int hops, const Anope::string &description, const Anope::string &sid) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
+Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
 {
-	Links = NULL;
-
 	SetFlag(SERVER_SYNCING);
 
-	Alog(LOG_DEBUG) << "Creating " << GetName() << " (" << GetSID() << ") uplinked to " << (UplinkServer ? UplinkServer->GetName() : "no uplink");
+	Alog(LOG_DEBUG) << "Creating " << this->GetName() << " (" << this->GetSID() << ") uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink");
 
 	/* Add this server to our uplinks leaf list */
-	if (UplinkServer)
+	if (this->UplinkServer)
 	{
-		UplinkServer->AddLink(this);
+		this->UplinkServer->AddLink(this);
 
 		/* Check to be sure the uplink server only has one uplink, otherwise we introduce our clients if we jupe servers */
-		if (Me == UplinkServer && UplinkServer->GetLinks()->size() == 1)
+		if (Me == this->UplinkServer && this->UplinkServer->GetLinks().size() == 1)
 		{
 			/* Bring in our pseudo-clients */
 			introduce_user("");
@@ -86,7 +84,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned int hops, con
  */
 Server::~Server()
 {
-	Alog(LOG_DEBUG) << "Deleting server " << GetName() << " (" << GetSID() << ") uplinked to " << GetName();
+	Alog(LOG_DEBUG) << "Deleting server " << this->GetName() << " (" << this->GetSID() << ") uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink");
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{
@@ -103,24 +101,21 @@ Server::~Server()
 				if (na && !na->HasFlag(NS_FORBIDDEN) && (!na->nc->HasFlag(NI_SUSPENDED)) && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = t;
-					na->last_quit = QReason;
+					na->last_quit = this->QReason;
 				}
 
 				delete u;
 			}
 		}
 
-		Alog(LOG_DEBUG) << "Finished removing all users for " << GetName();
+		Alog(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
 	}
 
-	if (UplinkServer)
-		UplinkServer->DelLink(this);
+	if (this->UplinkServer)
+		this->UplinkServer->DelLink(this);
 
-	if (Links)
-		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
-			delete *it;
-
-	delete Links;
+	for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
+		delete *it;
 }
 
 /** Delete this server with a reason
@@ -128,7 +123,7 @@ Server::~Server()
  */
 void Server::Delete(const Anope::string &reason)
 {
-	QReason = reason;
+	this->QReason = reason;
 	delete this;
 }
 
@@ -137,7 +132,7 @@ void Server::Delete(const Anope::string &reason)
  */
 const Anope::string &Server::GetName() const
 {
-	return Name;
+	return this->Name;
 }
 
 /** Get the number of hops this server is from services
@@ -145,7 +140,7 @@ const Anope::string &Server::GetName() const
  */
 unsigned Server::GetHops() const
 {
-	return Hops;
+	return this->Hops;
 }
 
 /** Set the server description
@@ -153,7 +148,7 @@ unsigned Server::GetHops() const
  */
 void Server::SetDescription(const Anope::string &desc)
 {
-	Description = desc;
+	this->Description = desc;
 }
 
 /** Get the server description
@@ -161,7 +156,7 @@ void Server::SetDescription(const Anope::string &desc)
  */
 const Anope::string &Server::GetDescription() const
 {
-	return Description;
+	return this->Description;
 }
 
 /** Get the server numeric/SID
@@ -169,15 +164,15 @@ const Anope::string &Server::GetDescription() const
  */
 const Anope::string &Server::GetSID() const
 {
-	return SID;
+	return this->SID;
 }
 
 /** Get the list of links this server has, or NULL if it has none
  * @return A list of servers
  */
-const std::list<Server*> *Server::GetLinks() const
+const std::list<Server*> &Server::GetLinks() const
 {
-	return Links;
+	return this->Links;
 }
 
 /** Get the uplink server for this server, if this is our uplink will be Me
@@ -185,7 +180,7 @@ const std::list<Server*> *Server::GetLinks() const
  */
 Server *Server::GetUplink()
 {
-	return UplinkServer;
+	return this->UplinkServer;
 }
 
 /** Adds a link to this server
@@ -196,15 +191,12 @@ void Server::AddLink(Server *s)
 	/* This is only used for Me, initially we start services with an uplink of NULL, then
 	 * connect to the server which introduces itself and has us as the uplink, which calls this
 	 */
-	if (this == Me && !UplinkServer)
-		UplinkServer = s;
+	if (this == Me && !this->UplinkServer)
+		this->UplinkServer = s;
 
-	if (!Links)
-		Links = new std::list<Server *>();
+	this->Links.push_back(s);
 
-	Links->push_back(s);
-
-	Alog() << "Server " << s->GetName() << " introduced from " << GetName();
+	Alog() << "Server " << s->GetName() << " introduced from " << this->GetName();
 }
 
 /** Delinks a server from this server
@@ -212,25 +204,19 @@ void Server::AddLink(Server *s)
  */
 void Server::DelLink(Server *s)
 {
-	if (!Links)
-		throw CoreException("Server::DelLink called on " + GetName() + " for " + s->GetName() + " but we have no links?");
+	if (this->Links.empty())
+		throw CoreException("Server::DelLink called on " + this->GetName() + " for " + s->GetName() + " but we have no links?");
 
-	for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
+	for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
 	{
 		if (*it == s)
 		{
-			Links->erase(it);
+			this->Links.erase(it);
 			break;
 		}
 	}
 
-	if (Links->empty())
-	{
-		delete Links;
-		Links = NULL;
-	}
-
-	Alog() << "Server " << s->GetName() << " quit from " << GetName();
+	Alog() << "Server " << s->GetName() << " quit from " << this->GetName();
 }
 
 /** Finish syncing this server and optionally all links to it
@@ -238,14 +224,14 @@ void Server::DelLink(Server *s)
  */
 void Server::Sync(bool SyncLinks)
 {
-	if (IsSynced())
+	if (this->IsSynced())
 		return;
 
-	UnsetFlag(SERVER_SYNCING);
+	this->UnsetFlag(SERVER_SYNCING);
 
-	if (SyncLinks && Links)
+	if (SyncLinks && !this->Links.empty())
 	{
-		for (std::list<Server *>::iterator it = Links->begin(), it_end = Links->end(); it != it_end; ++it)
+		for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
 			(*it)->Sync(true);
 	}
 
@@ -256,7 +242,7 @@ void Server::Sync(bool SyncLinks)
 		Me->UnsetFlag(SERVER_SYNCING);
 	}
 
-	Alog() << "Server " << GetName() << " is done syncing";
+	Alog() << "Server " << this->GetName() << " is done syncing";
 
 	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
@@ -272,7 +258,7 @@ void Server::Sync(bool SyncLinks)
  */
 bool Server::IsSynced() const
 {
-	return !HasFlag(SERVER_SYNCING);
+	return !this->HasFlag(SERVER_SYNCING);
 }
 
 /** Check if this server is ULined
@@ -281,7 +267,7 @@ bool Server::IsSynced() const
 bool Server::IsULined() const
 {
 	for (std::list<Anope::string>::const_iterator it = Config.Ulines.begin(), it_end = Config.Ulines.end(); it != it_end; ++it)
-		if (it->equals_ci(GetName()))
+		if (it->equals_ci(this->GetName()))
 			return true;
 	return false;
 }
@@ -300,9 +286,9 @@ Server *Server::Find(const Anope::string &name, Server *s)
 	if (s->GetName().equals_cs(name) || s->GetSID().equals_cs(name))
 		return s;
 
-	if (s->GetLinks())
+	if (!s->GetLinks().empty())
 	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(), it_end = s->GetLinks()->end(); it != it_end; ++it)
+		for (std::list<Server *>::const_iterator it = s->GetLinks().begin(), it_end = s->GetLinks().end(); it != it_end; ++it)
 		{
 			Server *serv = *it;
 
@@ -444,7 +430,7 @@ void CapabParse(int ac, const char **av)
 static bool ts6_uid_initted = false;
 static char ts6_new_uid[10];
 
-static void ts6_uid_increment(unsigned int slot)
+static void ts6_uid_increment(unsigned slot)
 {
 	if (slot != TS6SID.length())
 	{

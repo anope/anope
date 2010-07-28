@@ -27,8 +27,8 @@ static int stats_count_servers(Server *s)
 
 	int count = 1;
 
-	if (s->GetLinks())
-		for (std::list<Server *>::const_iterator it = s->GetLinks()->begin(), it_end = s->GetLinks()->end(); it != it_end; ++it)
+	if (!s->GetLinks().empty())
+		for (std::list<Server *>::const_iterator it = s->GetLinks().begin(), it_end = s->GetLinks().end(); it != it_end; ++it)
 			count += stats_count_servers(*it);
 
 	return count;

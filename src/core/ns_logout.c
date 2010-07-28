@@ -102,7 +102,7 @@ int do_logout(User * u)
             common_svsmode(u2, ircd->modeonunreg, "1");
         }
 
-        u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
+        u2->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
         alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
              u->username, u->host, u2->nick);
 

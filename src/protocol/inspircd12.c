@@ -614,7 +614,7 @@ void inspircd_cmd_svsmode(User * u, int ac, char **av)
     Uid *ud = find_uid(s_NickServ);
     send_cmd(ud->uid, "MODE %s %s", u->nick, merge_args(ac, av));
 
-    if (strstr(av[0], "+r")) {
+    if (strstr(av[0], "+r") && u->na) {
         send_cmd(TS6SID, "METADATA %s accountname :%s", u->uid, u->na->nc->display);
     } else if (strstr(av[0], "-r")) {
         send_cmd(TS6SID, "METADATA %s accountname :", u->uid);

@@ -155,7 +155,7 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE, SOCKETENGINE };
 
 struct Message;
-typedef std::multimap<Anope::string, Message *, hash_compare_std_string> message_map;
+typedef std::multimap<Anope::string, Message *> message_map;
 extern CoreExport message_map MessageMap;
 class Module;
 extern CoreExport std::list<Module *> Modules;

@@ -18,7 +18,7 @@ class Module;
 class BotInfo;
 class Command;
 
-typedef std::map<Anope::string, Command *, hash_compare_ci_string> CommandMap;
+typedef std::map<Anope::string, Command *, std::less<ci::string> > CommandMap;
 
 /** The return value from commands.
  */

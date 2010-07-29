@@ -66,7 +66,7 @@ struct HostRequest
 	time_t time;
 };
 
-typedef std::map<Anope::string, HostRequest *, hash_compare_ci_string> RequestMap;
+typedef std::map<Anope::string, HostRequest *, std::less<ci::string> > RequestMap;
 RequestMap Requests;
 
 static Module *me;

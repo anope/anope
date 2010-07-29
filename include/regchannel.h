@@ -9,7 +9,7 @@
 #ifndef REGCHANNEL_H
 #define REGCHANNEL_H
 
-typedef unordered_map_namespace::unordered_map<Anope::string, ChannelInfo *, hash_compare_ci_string> registered_channel_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, ChannelInfo *, ci::hash, std::equal_to<ci::string> > registered_channel_map;
 extern CoreExport registered_channel_map RegisteredChannelList;
 
 /** Flags used for the ChannelInfo class

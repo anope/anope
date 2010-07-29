@@ -60,7 +60,7 @@ template<typename T> class ExtensibleItemPointerArray : public ExtensibleItemBas
 class CoreExport Extensible
 {
  private:
-	typedef std::map<Anope::string, ExtensibleItemBase *, hash_compare_std_string> extensible_map;
+	typedef std::map<Anope::string, ExtensibleItemBase *> extensible_map;
 	extensible_map Extension_Items;
 
  public:

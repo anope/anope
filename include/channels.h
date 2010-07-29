@@ -9,7 +9,7 @@
 #ifndef CHANNELS_H
 #define CHANNELS_H
 
-typedef unordered_map_namespace::unordered_map<Anope::string, Channel *, hash_compare_ci_string> channel_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, Channel *, ci::hash, std::equal_to<ci::string> > channel_map;
 extern CoreExport channel_map ChannelList;
 
 struct UserData

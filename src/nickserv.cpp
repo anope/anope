@@ -17,8 +17,8 @@ nickalias_map NickAliasList;
 nickcore_map NickCoreList;
 nickrequest_map NickRequestList;
 
-typedef std::map<Anope::string, NickServCollide *, hash_compare_std_string> nickservcollides_map;
-typedef std::map<Anope::string, NickServRelease *, hash_compare_std_string> nickservreleases_map;
+typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
+typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
 
 static nickservcollides_map NickServCollides;
 static nickservreleases_map NickServReleases;

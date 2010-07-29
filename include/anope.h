@@ -255,6 +255,17 @@ namespace Anope
 		friend std::ostream &operator<<(std::ostream &os, const string &_str);
 	};
 
+	/** Hash an Anope::string for unorderd_map, passed as the third template arg to unordered_map
+	 */
+	struct hash
+	{
+		/** Hash an Anope::string for unordered_map
+		 * @param s The string
+		 * @return A hash value for the string
+		 */
+		bool operator()(const string &s) const;
+	};
+
 	inline std::ostream &operator<<(std::ostream &os, const string &_str) { return os << _str._string; }
 
 	inline const string operator+(char chr, const string &str) { string tmp(chr); tmp += str; return tmp; }

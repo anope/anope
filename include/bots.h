@@ -12,8 +12,8 @@
 
 class BotInfo;
 
-typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, hash_compare_ci_string> botinfo_map;
-typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, hash_compare_std_string> botinfo_uid_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, ci::hash, std::equal_to<ci::string> > botinfo_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, Anope::hash> botinfo_uid_map;
 extern CoreExport botinfo_map BotListByNick;
 extern CoreExport botinfo_uid_map BotListByUID;
 

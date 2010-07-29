@@ -837,7 +837,7 @@ struct Exception
 
 /*************************************************************************/
 
-typedef unordered_map_namespace::unordered_map<Anope::string, Session *, hash_compare_std_string> session_map;
+typedef unordered_map_namespace::unordered_map<Anope::string, Session *, Anope::hash> session_map;
 extern CoreExport session_map SessionList;
 
 struct Session

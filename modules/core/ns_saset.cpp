@@ -15,7 +15,7 @@
 
 class CommandNSSASet : public Command
 {
-	typedef std::map<Anope::string, Command *, hash_compare_ci_string> subcommand_map;
+	typedef std::map<Anope::string, Command *, std::less<ci::string> > subcommand_map;
 	subcommand_map subcommands;
 
  public:

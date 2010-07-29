@@ -113,27 +113,26 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd("", "f %s %s", server.c_str(), set ? "+" : "-");
 	}
 
-	void SendAkillDel(XLine *x)
+	void SendAkillDel(const XLine *x)
 	{
 		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config.s_OperServ.c_str());
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c, const Anope::string &whosetit, const Anope::string &topic)
+	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
 	{
 		send_cmd(whosets->nick, ") %s %s %lu :%s", c->name.c_str(), whosetit.c_str(), static_cast<unsigned long>(c->topic_time), topic.c_str());
 	}
 
 	void SendVhostDel(User *u)
 	{
-		BotInfo *bi = HostServ;
-		u->RemoveMode(bi, UMODE_CLOAK);
-		u->RemoveMode(bi, UMODE_VHOST);
+		u->RemoveMode(HostServ, UMODE_CLOAK);
+		u->RemoveMode(HostServ, UMODE_VHOST);
 		ModeManager::ProcessModes();
-		u->SetMode(bi, UMODE_CLOAK);
+		u->SetMode(HostServ, UMODE_CLOAK);
 		ModeManager::ProcessModes();
 	}
 
-	void SendAkill(XLine *x)
+	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - time(NULL);
@@ -142,7 +141,7 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Expires), x->Reason.c_str());
 	}
 
-	void SendSVSKillInternal(BotInfo *source, User *user, const Anope::string &buf)
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
 		send_cmd(source ? source->nick : Config.ServerName, "h %s :%s", user->nick.c_str(), buf.c_str());
 	}
@@ -154,7 +153,7 @@ class UnrealIRCdProto : public IRCDProto
 	 * parv[2] - modes to change
 	 * parv[3] - Service Stamp (if mode == d)
 	 */
-	void SendSVSMode(User *u, int ac, const char **av)
+	void SendSVSMode(const User *u, int ac, const char **av)
 	{
 		if (ac >= 1)
 		{
@@ -164,14 +163,14 @@ class UnrealIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendModeInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
 		send_cmd(source->nick, "G %s %s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, User *u, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
@@ -184,7 +183,7 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config.ServerName.c_str(), modes.c_str(), host.c_str(), myIrcd->nickip ? " *" : "", real.c_str());
 	}
 
-	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const Anope::string &buf)
+	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
 			send_cmd(source->nick, "H %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
@@ -192,7 +191,7 @@ class UnrealIRCdProto : public IRCDProto
 			send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
@@ -201,7 +200,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	/* SERVER name hop descript */
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
-	void SendServer(Server *server)
+	void SendServer(const Server *server)
 	{
 		if (!Config.Numeric.empty())
 			send_cmd("", "SERVER %s %d :U0-*-%s %s", server->GetName().c_str(), server->GetHops(), Config.Numeric.c_str(), server->GetDescription().c_str());
@@ -210,14 +209,14 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
 		send_cmd(Config.ServerName, "~ %ld %s :%s", static_cast<long>(chantime), channel.c_str(), user->nick.c_str());
 	}
 
 	/* unsqline
 	*/
-	void SendSQLineDel(XLine *x)
+	void SendSQLineDel(const XLine *x)
 	{
 		send_cmd("", "d %s", x->Mask.c_str());
 	}
@@ -227,7 +226,7 @@ class UnrealIRCdProto : public IRCDProto
 	** - Unreal will translate this to TKL for us
 	**
 	*/
-	void SendSQLine(XLine *x)
+	void SendSQLine(const XLine *x)
 	{
 		send_cmd("", "c %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
@@ -246,7 +245,7 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* NICK <newnick>  */
-	void SendChangeBotNick(BotInfo *oldnick, const Anope::string &newnick)
+	void SendChangeBotNick(const BotInfo *oldnick, const Anope::string &newnick)
 	{
 		if (!oldnick || newnick.empty())
 			return;
@@ -286,19 +285,19 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE - :realname mask
 	*/
-	void SendSGLineDel(XLine *x)
+	void SendSGLineDel(const XLine *x)
 	{
 		send_cmd("", "BR - :%s", x->Mask.c_str());
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(XLine *x)
+	void SendSZLineDel(const XLine *x)
 	{
 		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config.s_OperServ.c_str());
 	}
 
 	/* SZLINE */
-	void SendSZLine(XLine *x)
+	void SendSZLine(const XLine *x)
 	{
 		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
@@ -307,7 +306,7 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE + reason_where_is_space :realname mask with spaces
 	*/
-	void SendSGLine(XLine *x)
+	void SendSGLine(const XLine *x)
 	{
 		Anope::string edited_reason = x->Reason;
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
@@ -315,14 +314,14 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(Channel *c, const Anope::string &nick)
+	void SendBanDel(const Channel *c, const Anope::string &nick)
 	{
 		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */
 
-	void SendSVSModeChan(Channel *c, const Anope::string &mode, const Anope::string &nick)
+	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
 	{
 		if (!nick.empty())
 			send_cmd(Config.ServerName, "n %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
@@ -400,11 +399,9 @@ class UnrealIRCdProto : public IRCDProto
 		ircdproto->SendMode(bi, u, "+d %s", svidbuf.c_str());
 	}
 
-	void SendUnregisteredNick(User *u)
+	void SendUnregisteredNick(const User *u)
 	{
-		BotInfo *bi = NickServ;
-		u->RemoveMode(bi, UMODE_REGISTERED);
-		ircdproto->SendMode(bi, u, "+d 1");
+		ircdproto->SendMode(NickServ, u, "+d 1");
 	}
 } ircd_proto;
 

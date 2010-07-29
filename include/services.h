@@ -924,40 +924,40 @@ class ServerConfig;
 class CoreExport IRCDProto
 {
  private:
-	virtual void SendSVSKillInternal(BotInfo *, User *, const Anope::string &) = 0;
-	virtual void SendModeInternal(BotInfo *, Channel *, const Anope::string &) = 0;
-	virtual void SendModeInternal(BotInfo *, User *, const Anope::string &) = 0;
-	virtual void SendKickInternal(BotInfo *, Channel *, User *, const Anope::string &) = 0;
-	virtual void SendNoticeChanopsInternal(BotInfo *bi, Channel *, const Anope::string &) = 0;
-	virtual void SendMessageInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendNoticeInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
-	virtual void SendPrivmsgInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendQuitInternal(BotInfo *bi, const Anope::string &buf);
-	virtual void SendPartInternal(BotInfo *bi, Channel *chan, const Anope::string &buf);
-	virtual void SendGlobopsInternal(BotInfo *source, const Anope::string &buf);
-	virtual void SendCTCPInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendSVSKillInternal(const BotInfo *, const User *, const Anope::string &) = 0;
+	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &) = 0;
+	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &) = 0;
+	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &) = 0;
+	virtual void SendNoticeChanopsInternal(const BotInfo *bi, const Channel *, const Anope::string &) = 0;
+	virtual void SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
+	virtual void SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendQuitInternal(const BotInfo *bi, const Anope::string &buf);
+	virtual void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf);
+	virtual void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf);
+	virtual void SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf);
  public:
 	virtual ~IRCDProto() { }
 
 	virtual void SendSVSNOOP(const Anope::string &, int) { }
-	virtual void SendTopic(BotInfo *, Channel *, const Anope::string &, const Anope::string &) = 0;
+	virtual void SendTopic(const BotInfo *, const Channel *, const Anope::string &, const Anope::string &) = 0;
 	virtual void SendVhostDel(User *) { }
-	virtual void SendAkill(XLine *) = 0;
-	virtual void SendAkillDel(XLine *) = 0;
-	virtual void SendSVSKill(BotInfo *source, User *user, const char *fmt, ...);
-	virtual void SendSVSMode(User *, int, const char **) = 0;
-	virtual void SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...);
-	virtual void SendMode(BotInfo *bi, User *u, const char *fmt, ...);
+	virtual void SendAkill(const XLine *) = 0;
+	virtual void SendAkillDel(const XLine *) = 0;
+	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
+	virtual void SendSVSMode(const User *, int, const char **) = 0;
+	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
+	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
 	virtual void SendClientIntroduction(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &uid) = 0;
-	virtual void SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...);
-	virtual void SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...);
-	virtual void SendMessage(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendNotice(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendAction(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg);
-	virtual void SendGlobalPrivmsg(BotInfo *bi, const Server *desc, const Anope::string &msg);
+	virtual void SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...);
+	virtual void SendNoticeChanops(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
+	virtual void SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg);
+	virtual void SendGlobalPrivmsg(const BotInfo *bi, const Server *desc, const Anope::string &msg);
 
 	/** XXX: This is a hack for NickServ enforcers. It is deprecated.
 	 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
@@ -965,36 +965,36 @@ class CoreExport IRCDProto
 	 * -- w00t
 	 */
 	virtual void SendQuit(const Anope::string &nick, const Anope::string &) MARK_DEPRECATED;
-	virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
+	virtual void SendQuit(const BotInfo *bi, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
-	virtual void SendJoin(BotInfo *bi, const Anope::string &, time_t) = 0;
-	virtual void SendSQLineDel(XLine *x) = 0;
-	virtual void SendInvite(BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
-	virtual void SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...);
-	virtual void SendGlobops(BotInfo *source, const char *fmt, ...);
-	virtual void SendSQLine(XLine *x) = 0;
+	virtual void SendJoin(const BotInfo *bi, const Anope::string &, time_t) = 0;
+	virtual void SendSQLineDel(const XLine *x) = 0;
+	virtual void SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
+	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
+	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);
+	virtual void SendSQLine(const XLine *x) = 0;
 	virtual void SendSquit(const Anope::string &servname, const Anope::string &message);
 	virtual void SendSVSO(const Anope::string &, const Anope::string &, const Anope::string &) { }
-	virtual void SendChangeBotNick(BotInfo *bi, const Anope::string &newnick);
-	virtual void SendForceNickChange(User *u, const Anope::string &newnick, time_t when);
+	virtual void SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick);
+	virtual void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when);
 	virtual void SendVhost(User *, const Anope::string &, const Anope::string &) { }
 	virtual void SendConnect() = 0;
 	virtual void SendSVSHold(const Anope::string &) { }
 	virtual void SendSVSHoldDel(const Anope::string &) { }
-	virtual void SendSGLineDel(XLine *) { }
-	virtual void SendSZLineDel(XLine *) { }
-	virtual void SendSZLine(XLine *) { }
-	virtual void SendSGLine(XLine *) { }
-	virtual void SendBanDel(Channel *, const Anope::string &) { }
-	virtual void SendSVSModeChan(Channel *, const Anope::string &, const Anope::string &) { }
-	virtual void SendUnregisteredNick(User *) { }
-	virtual void SendCTCP(BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendSGLineDel(const XLine *) { }
+	virtual void SendSZLineDel(const XLine *) { }
+	virtual void SendSZLine(const XLine *) { }
+	virtual void SendSGLine(const XLine *) { }
+	virtual void SendBanDel(const Channel *, const Anope::string &) { }
+	virtual void SendSVSModeChan(const Channel *, const Anope::string &, const Anope::string &) { }
+	virtual void SendUnregisteredNick(const User *) { }
+	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSVSPart(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendEOB() { }
-	virtual void SendServer(Server *) = 0;
+	virtual void SendServer(const Server *) = 0;
 	virtual bool IsNickValid(const Anope::string &) { return true; }
 	virtual bool IsChannelValid(const Anope::string &);
 	virtual void SendNumeric(const Anope::string &source, int numeric, const Anope::string &dest, const char *fmt, ...);
@@ -1003,13 +1003,13 @@ class CoreExport IRCDProto
 	 * @param u The user logging in
 	 * @param account The account the user is logging into
 	 */
-	virtual void SendAccountLogin(User *u, const NickCore *account) { }
+	virtual void SendAccountLogin(const User *u, const NickCore *account) { }
 
 	/** Sends a message logging a user out of an account, where ircds support such a feature.
 	 * @param u The user logging out
 	 * @param account The account the user is logging out of
 	 */
-	virtual void SendAccountLogout(User *u, const NickCore *account) { }
+	virtual void SendAccountLogout(const User *u, const NickCore *account) { }
 
 	/** Set a users auto identification token
 	 * @param u The user

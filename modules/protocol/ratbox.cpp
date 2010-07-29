@@ -112,57 +112,57 @@ class RatboxProto : public IRCDTS6Proto
 			send_cmd(TS6SID, "OPERWALL :%s", buf.c_str());
 	}
 
-	void SendSQLine(XLine *x)
+	void SendSQLine(const XLine *x)
 	{
 		send_cmd(TS6SID, "RESV * %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
-	void SendSGLineDel(XLine *x)
+	void SendSGLineDel(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
-	void SendSGLine(XLine *x)
+	void SendSGLine(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
-	void SendAkillDel(XLine *x)
+	void SendAkillDel(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
-	void SendSQLineDel(XLine *x)
+	void SendSQLineDel(const XLine *x)
 	{
 		send_cmd(TS6SID, "UNRESV * %s", x->Mask.c_str());
 	}
 
-	void SendJoin(BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
 		send_cmd("", "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel.c_str(), user->GetUID().c_str());
 	}
 
-	void SendAkill(XLine *x)
+	void SendAkill(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
-	void SendSVSKillInternal(BotInfo *source, User *user, const Anope::string &buf)
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
 		send_cmd(source ? source->GetUID() : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendSVSMode(User *u, int ac, const char **av)
+	void SendSVSMode(const User *u, int ac, const char **av)
 	{
 		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	/* SERVER name hop descript */
-	void SendServer(Server *server)
+	void SendServer(const Server *server)
 	{
 		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
@@ -182,7 +182,7 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick.c_str(), static_cast<long>(time(NULL)), modes.c_str(), user.c_str(), host.c_str(), uid.c_str(), real.c_str());
 	}
 
-	void SendPartInternal(BotInfo *bi, Channel *chan, const Anope::string &buf)
+	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
 	{
 		if (!buf.empty())
 			send_cmd(bi->GetUID(), "PART %s :%s", chan->name.c_str(), buf.c_str());
@@ -196,7 +196,7 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(TS6SID, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, Channel *dest, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
 		if (bi)
 			send_cmd(bi->GetUID(), "MODE %s %s", dest->name.c_str(), buf.c_str());
@@ -204,14 +204,14 @@ class RatboxProto : public IRCDTS6Proto
 			send_cmd(TS6SID, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, User *u, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
 		send_cmd(bi ? bi->GetUID() : TS6SID, "SVSMODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
-	void SendKickInternal(BotInfo *bi, Channel *chan, User *user, const Anope::string &buf)
+	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
 			send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf.c_str());
@@ -219,7 +219,7 @@ class RatboxProto : public IRCDTS6Proto
 			send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
@@ -240,12 +240,12 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(source->GetUID(), "INVITE %s %s", u ? u->GetUID().c_str() : nick.c_str(), chan.c_str());
 	}
 
-	void SendAccountLogin(User *u, const NickCore *account)
+	void SendAccountLogin(const User *u, const NickCore *account)
 	{
 		send_cmd(TS6SID, "ENCAP * SU %s %s", u->GetUID().c_str(), account->display.c_str());
 	}
 
-	void SendAccountLogout(User *u, const NickCore *account)
+	void SendAccountLogout(const User *u, const NickCore *account)
 	{
 		send_cmd(TS6SID, "ENCAP * SU %s", u->GetUID().c_str());
 	}
@@ -259,7 +259,7 @@ class RatboxProto : public IRCDTS6Proto
 		return true;
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c, const Anope::string &, const Anope::string &topic)
+	void SendTopic(const BotInfo *bi, const Channel *c, const Anope::string &, const Anope::string &topic)
 	{
 		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), topic.c_str());
 	}

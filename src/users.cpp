@@ -826,6 +826,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			/* If the new nick isnt registerd or its registerd and not yours */
 			if (!na || na->nc != user->Account())
 			{
+				user->RemoveMode(NickServ, UMODE_REGISTERED);
 				ircdproto->SendUnregisteredNick(user);
 
 				validate_user(user);

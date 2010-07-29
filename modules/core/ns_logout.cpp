@@ -47,6 +47,7 @@ class CommandNSLogout : public Command
 				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
+			u2->RemoveMode(NickServ, UMODE_REGISTERED);
 			ircdproto->SendUnregisteredNick(u2);
 
 			u2->Logout();

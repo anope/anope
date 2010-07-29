@@ -36,6 +36,7 @@ NickCore::~NickCore()
 	{
 		User *user = *it;
 		ircdproto->SendAccountLogout(user, user->Account());
+		user->RemoveMode(NickServ, UMODE_REGISTERED);
 		ircdproto->SendUnregisteredNick(user);
 		user->Logout();
 		FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));

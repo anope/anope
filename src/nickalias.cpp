@@ -73,6 +73,7 @@ NickAlias::~NickAlias()
 	if ((u = finduser(this->nick)) && u->Account())
 	{
 		ircdproto->SendAccountLogout(u, u->Account());
+		u->RemoveMode(NickServ, UMODE_REGISTERED);
 		ircdproto->SendUnregisteredNick(u);
 		u->Logout();
 	}

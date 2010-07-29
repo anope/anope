@@ -96,12 +96,12 @@ void inspircd_cmd_pass(const Anope::string &pass)
 
 class InspIRCdProto : public IRCDProto
 {
-	void SendAkillDel(XLine *x)
+	void SendAkillDel(const XLine *x)
 	{
 		send_cmd(OperServ->GetUID(), "GLINE %s", x->Mask.c_str());
 	}
 
-	void SendTopic(BotInfo *whosets, Channel *c, const Anope::string &whosetit, const Anope::string &topic)
+	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
 	{
 		send_cmd(whosets->GetUID(), "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit.c_str(), topic.c_str());
 	}
@@ -117,7 +117,7 @@ class InspIRCdProto : public IRCDProto
 			inspircd_cmd_chgident(u->nick, u->GetIdent());
 	}
 
-	void SendAkill(XLine *x)
+	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - time(NULL);
@@ -126,12 +126,12 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(OperServ->GetUID(), "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
-	void SendSVSKillInternal(BotInfo *source, User *user, const Anope::string &buf)
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
 		send_cmd(source ? source->GetUID() : TS6SID, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendSVSMode(User *u, int ac, const char **av)
+	void SendSVSMode(const User *u, int ac, const char **av)
 	{
 		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
@@ -141,12 +141,12 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "PUSH %s ::%s %03d %s %s", dest.c_str(), source.c_str(), numeric, dest.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		send_cmd(source ? source->GetUID() : TS6SID, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, User *u, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
@@ -158,7 +158,7 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", uid.c_str(), static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), static_cast<long>(time(NULL)), modes.c_str(), real.c_str());
 	}
 
-	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const Anope::string &buf)
+	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
 			send_cmd(source->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf.c_str());
@@ -166,31 +166,31 @@ class InspIRCdProto : public IRCDProto
 			send_cmd(source->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), user->nick.c_str());
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		send_cmd(TS6SID, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
-	void SendServer(Server *server)
+	void SendServer(const Server *server)
 	{
 		send_cmd("", "SERVER %s %s %d %s :%s", server->GetName().c_str(), currentpass.c_str(), server->GetHops(), server->GetSID().c_str(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
-	void SendJoin(BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
 		send_cmd(TS6SID, "FJOIN %s %ld + :,%s", channel.c_str(), static_cast<long>(chantime), user->GetUID().c_str());
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(XLine *x)
+	void SendSQLineDel(const XLine *x)
 	{
 		send_cmd(TS6SID, "DELLINE Q %s", x->Mask.c_str());
 	}
 
 	/* SQLINE */
-	void SendSQLine(XLine *x)
+	void SendSQLine(const XLine *x)
 	{
 		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config.s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
@@ -244,21 +244,15 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(XLine *x)
+	void SendSZLineDel(const XLine *x)
 	{
 		send_cmd(TS6SID, "DELLINE Z %s", x->Mask.c_str());
 	}
 
 	/* SZLINE */
-	void SendSZLine(XLine *x)
+	void SendSZLine(const XLine *x)
 	{
 		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
-	}
-
-	/* SVSMODE -r */
-	void SendUnregisteredNick(User *u)
-	{
-		u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)
@@ -292,12 +286,12 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(source ? source->GetUID() : TS6SID, "SNONOTICE g :%s", buf.c_str());
 	}
 
-	void SendAccountLogin(User *u, const NickCore *account)
+	void SendAccountLogin(const User *u, const NickCore *account)
 	{
 		send_cmd(TS6SID, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display.c_str());
 	}
 
-	void SendAccountLogout(User *u, const NickCore *account)
+	void SendAccountLogout(const User *u, const NickCore *account)
 	{
 		send_cmd(TS6SID, "METADATA %s accountname :", u->GetUID().c_str());
 	}

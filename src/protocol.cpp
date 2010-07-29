@@ -1,6 +1,6 @@
 #include "services.h"
 
-void IRCDProto::SendMessageInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
 	if (Config.NSDefFlags.HasFlag(NI_MSG))
 		SendPrivmsgInternal(bi, dest, buf);
@@ -8,17 +8,17 @@ void IRCDProto::SendMessageInternal(BotInfo *bi, const Anope::string &dest, cons
 		SendNoticeInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendNoticeInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &msg)
+void IRCDProto::SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :%s", dest.c_str(), msg.c_str());
 }
 
-void IRCDProto::SendPrivmsgInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s :%s", dest.c_str(), buf.c_str());
 }
 
-void IRCDProto::SendQuitInternal(BotInfo *bi, const Anope::string &buf)
+void IRCDProto::SendQuitInternal(const BotInfo *bi, const Anope::string &buf)
 {
 	if (!buf.empty())
 		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT :%s", buf.c_str());
@@ -26,7 +26,7 @@ void IRCDProto::SendQuitInternal(BotInfo *bi, const Anope::string &buf)
 		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT");
 }
 
-void IRCDProto::SendPartInternal(BotInfo *bi, Channel *chan, const Anope::string &buf)
+void IRCDProto::SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
 {
 	if (!buf.empty())
 		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s :%s", chan->name.c_str(), buf.c_str());
@@ -34,7 +34,7 @@ void IRCDProto::SendPartInternal(BotInfo *bi, Channel *chan, const Anope::string
 		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s", chan->name.c_str());
 }
 
-void IRCDProto::SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
+void IRCDProto::SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 {
 	if (source)
 		send_cmd(ircd->ts6 ? source->GetUID() : source->nick, "GLOBOPS :%s", buf.c_str());
@@ -42,7 +42,7 @@ void IRCDProto::SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
 		send_cmd(Config.ServerName, "GLOBOPS :%s", buf.c_str());
 }
 
-void IRCDProto::SendCTCPInternal(BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
+void IRCDProto::SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
 	Anope::string s = normalizeBuffer(buf);
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :\1%s\1", dest.c_str(), s.c_str());
@@ -53,7 +53,7 @@ void IRCDProto::SendNumericInternal(const Anope::string &source, int numeric, co
 	send_cmd(source, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
 }
 
-void IRCDProto::SendSVSKill(BotInfo *source, User *user, const char *fmt, ...)
+void IRCDProto::SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...)
 {
 	if (!user || !fmt)
 		return;
@@ -66,7 +66,7 @@ void IRCDProto::SendSVSKill(BotInfo *source, User *user, const char *fmt, ...)
 	SendSVSKillInternal(source, user, buf);
 }
 
-void IRCDProto::SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...)
+void IRCDProto::SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -76,7 +76,7 @@ void IRCDProto::SendMode(BotInfo *bi, Channel *dest, const char *fmt, ...)
 	SendModeInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendMode(BotInfo *bi, User *u, const char *fmt, ...)
+void IRCDProto::SendMode(const BotInfo *bi, const User *u, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -86,7 +86,7 @@ void IRCDProto::SendMode(BotInfo *bi, User *u, const char *fmt, ...)
 	SendModeInternal(bi, u, buf);
 }
 
-void IRCDProto::SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt, ...)
+void IRCDProto::SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...)
 {
 	if (!bi || !chan || !user)
 		return;
@@ -99,7 +99,7 @@ void IRCDProto::SendKick(BotInfo *bi, Channel *chan, User *user, const char *fmt
 	SendKickInternal(bi, chan, user, buf);
 }
 
-void IRCDProto::SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, ...)
+void IRCDProto::SendNoticeChanops(const BotInfo *bi, const Channel *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -109,7 +109,7 @@ void IRCDProto::SendNoticeChanops(BotInfo *bi, Channel *dest, const char *fmt, .
 	SendNoticeChanopsInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendMessage(BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -119,7 +119,7 @@ void IRCDProto::SendMessage(BotInfo *bi, const Anope::string &dest, const char *
 	SendMessageInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendNotice(BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendNotice(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -129,7 +129,7 @@ void IRCDProto::SendNotice(BotInfo *bi, const Anope::string &dest, const char *f
 	SendNoticeInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendAction(BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendAction(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -140,7 +140,7 @@ void IRCDProto::SendAction(BotInfo *bi, const Anope::string &dest, const char *f
 	SendPrivmsgInternal(bi, dest, actionbuf);
 }
 
-void IRCDProto::SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -150,12 +150,12 @@ void IRCDProto::SendPrivmsg(BotInfo *bi, const Anope::string &dest, const char *
 	SendPrivmsgInternal(bi, dest, buf);
 }
 
-void IRCDProto::SendGlobalNotice(BotInfo *bi, const Server *dest, const Anope::string &msg)
+void IRCDProto::SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
 }
 
-void IRCDProto::SendGlobalPrivmsg(BotInfo *bi, const Server *dest, const Anope::string &msg)
+void IRCDProto::SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
 }
@@ -165,7 +165,7 @@ void IRCDProto::SendQuit(const Anope::string &nick, const Anope::string &)
 	send_cmd(nick, "QUIT");
 }
 
-void IRCDProto::SendQuit(BotInfo *bi, const char *fmt, ...)
+void IRCDProto::SendQuit(const BotInfo *bi, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -197,12 +197,12 @@ void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who
 		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PONG %s %s", servname.c_str(), who.c_str());
 }
 
-void IRCDProto::SendInvite(BotInfo *bi, const Anope::string &chan, const Anope::string &nick)
+void IRCDProto::SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "INVITE %s %s", nick.c_str(), chan.c_str());
 }
 
-void IRCDProto::SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...)
+void IRCDProto::SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...)
 {
 	if (fmt)
 	{
@@ -217,7 +217,7 @@ void IRCDProto::SendPart(BotInfo *bi, Channel *chan, const char *fmt, ...)
 		SendPartInternal(bi, chan, "");
 }
 
-void IRCDProto::SendGlobops(BotInfo *source, const char *fmt, ...)
+void IRCDProto::SendGlobops(const BotInfo *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -232,17 +232,17 @@ void IRCDProto::SendSquit(const Anope::string &servname, const Anope::string &me
 	send_cmd("", "SQUIT %s :%s", servname.c_str(), message.c_str());
 }
 
-void IRCDProto::SendChangeBotNick(BotInfo *bi, const Anope::string &newnick)
+void IRCDProto::SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NICK %s %ld", newnick.c_str(), static_cast<long>(time(NULL)));
 }
 
-void IRCDProto::SendForceNickChange(User *u, const Anope::string &newnick, time_t when)
+void IRCDProto::SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 {
 	send_cmd("", "SVSNICK %s %s :%ld", u->nick.c_str(), newnick.c_str(), static_cast<long>(when));
 }
 
-void IRCDProto::SendCTCP(BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
+void IRCDProto::SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";

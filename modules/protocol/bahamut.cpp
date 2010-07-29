@@ -87,7 +87,7 @@ void bahamut_cmd_capab()
 
 class BahamutIRCdProto : public IRCDProto
 {
-	void SendModeInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
@@ -97,7 +97,7 @@ class BahamutIRCdProto : public IRCDProto
 			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendModeInternal(BotInfo *bi, User *u, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
@@ -117,13 +117,13 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSMODE -b */
-	void SendBanDel(Channel *c, const Anope::string &nick)
+	void SendBanDel(const Channel *c, const Anope::string &nick)
 	{
 		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */
-	void SendSVSModeChan(Channel *c, const Anope::string &mode, const Anope::string &nick)
+	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
 	{
 		if (!nick.empty())
 			send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
@@ -132,19 +132,19 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(XLine *x)
+	void SendSQLine(const XLine *x)
 	{
 		send_cmd("", "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* UNSLINE */
-	void SendSGLineDel(XLine *x)
+	void SendSGLineDel(const XLine *x)
 	{
 		send_cmd("", "UNSGLINE 0 :%s", x->Mask.c_str());
 	}
 
 	/* UNSZLINE */
-	void SendSZLineDel(XLine *x)
+	void SendSZLineDel(const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
 		send_cmd("", "UNSZLINE 0 %s", x->Mask.c_str());
@@ -153,7 +153,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(XLine *x)
+	void SendSZLine(const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
 		send_cmd("", "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
@@ -168,36 +168,36 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SGLINE */
-	void SendSGLine(XLine *x)
+	void SendSGLine(const XLine *x)
 	{
 		send_cmd("", "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	/* RAKILL */
-	void SendAkillDel(XLine *x)
+	void SendAkillDel(const XLine *x)
 	{
 		send_cmd("", "RAKILL %s %s", x->GetHost().c_str(), x->GetUser().c_str());
 	}
 
 	/* TOPIC */
-	void SendTopic(BotInfo *whosets, Channel *c, const Anope::string &whosetit, const Anope::string &topic)
+	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
 	{
 		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), whosetit.c_str(), static_cast<unsigned long>(c->topic_time), topic.c_str());
 	}
 
 	/* UNSQLINE */
-	void SendSQLineDel(XLine *x)
+	void SendSQLineDel(const XLine *x)
 	{
 		send_cmd("", "UNSQLINE %s", x->Mask.c_str());
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
 		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel.c_str());
 	}
 
-	void SendAkill(XLine *x)
+	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - time(NULL);
@@ -209,7 +209,7 @@ class BahamutIRCdProto : public IRCDProto
 	/*
 	  Note: if the stamp is null 0, the below usage is correct of Bahamut
 	*/
-	void SendSVSKillInternal(BotInfo *source, User *user, const Anope::string &buf)
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
 		send_cmd(source ? source->nick : "", "SVSKILL %s :%s", user->nick.c_str(), buf.c_str());
 	}
@@ -221,7 +221,7 @@ class BahamutIRCdProto : public IRCDProto
 	 * parv[3] - mode (or services id if old svs version)
 	 * parv[4] - optional arguement (services id)
 	 */
-	void SendSVSMode(User *u, int ac, const char **av)
+	void SendSVSMode(const User *u, int ac, const char **av)
 	{
 		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
@@ -231,14 +231,14 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd("", "BURST 0");
 	}
 
-	void SendNoticeChanopsInternal(BotInfo *source, Channel *dest, const Anope::string &buf)
+	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
 		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
-	void SendKickInternal(BotInfo *source, Channel *chan, User *user, const Anope::string &buf)
+	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
 			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
@@ -254,15 +254,13 @@ class BahamutIRCdProto : public IRCDProto
 
 	/* SVSMODE +d */
 	/* nc_change was = 1, and there is no na->status */
-	void SendUnregisteredNick(User *u)
+	void SendUnregisteredNick(const User *u)
 	{
-		BotInfo *bi = NickServ;
-		u->RemoveMode(bi, UMODE_REGISTERED);
-		ircdproto->SendMode(bi, u, "+d 1");
+		ircdproto->SendMode(NickServ, u, "+d 1");
 	}
 
 	/* SERVER */
-	void SendServer(Server *server)
+	void SendServer(const Server *server)
 	{
 		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}

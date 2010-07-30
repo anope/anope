@@ -226,9 +226,9 @@ class CommandOSStats : public Command
 		notice_lang(Config.s_OperServ, u, OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
 		get_channel_stats(&count, &mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
-		get_core_stats(&count, &mem);
+		get_core_stats(count, mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
-		get_aliases_stats(&count, &mem);
+		get_aliases_stats(count, mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
 		get_chanserv_stats(&count, &mem);
 		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);

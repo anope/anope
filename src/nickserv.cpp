@@ -26,7 +26,7 @@ static nickservreleases_map NickServReleases;
 NickServCollide::NickServCollide(const Anope::string &_nick, time_t delay) : Timer(delay), nick(_nick)
 {
 	/* Erase the current collide and use the new one */
-	nickservcollides_map::iterator nit = NickServCollides.find(nick);
+	nickservcollides_map::iterator nit = NickServCollides.find(this->nick);
 	if (nit != NickServCollides.end())
 		delete nit->second;
 
@@ -35,14 +35,14 @@ NickServCollide::NickServCollide(const Anope::string &_nick, time_t delay) : Tim
 
 NickServCollide::~NickServCollide()
 {
-	NickServCollides.erase(nick);
+	NickServCollides.erase(this->nick);
 }
 
 void NickServCollide::Tick(time_t ctime)
 {
 	/* If they identified or don't exist anymore, don't kill them. */
-	User *u = finduser(nick);
-	NickAlias *na = findnick(nick);
+	User *u = finduser(this->nick);
+	NickAlias *na = findnick(this->nick);
 	if (!u || !na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
 		return;
 
@@ -52,7 +52,7 @@ void NickServCollide::Tick(time_t ctime)
 NickServRelease::NickServRelease(const Anope::string &_nick, const Anope::string &_uid, time_t delay) : Timer(delay), nick(_nick), uid(_uid)
 {
 	/* Erase the current release timer and use the new one */
-	nickservreleases_map::iterator nit = NickServReleases.find(nick);
+	nickservreleases_map::iterator nit = NickServReleases.find(this->nick);
 	if (nit != NickServReleases.end())
 		delete nit->second;
 
@@ -61,12 +61,12 @@ NickServRelease::NickServRelease(const Anope::string &_nick, const Anope::string
 
 NickServRelease::~NickServRelease()
 {
-	NickServReleases.erase(nick);
+	NickServReleases.erase(this->nick);
 }
 
 void NickServRelease::Tick(time_t ctime)
 {
-	NickAlias *na = findnick(nick);
+	NickAlias *na = findnick(this->nick);
 
 	if (na)
 		na->Release();
@@ -83,9 +83,9 @@ void moduleAddNickServCmds()
 
 /* Return information on memory use.  Assumes pointers are valid. */
 
-void get_aliases_stats(long *nrec, long *memuse)
+void get_aliases_stats(long &count, long &mem)
 {
-	long count = 0, mem = 0;
+	count = mem = 0;
 
 	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 	{
@@ -102,17 +102,15 @@ void get_aliases_stats(long *nrec, long *memuse)
 		if (!na->last_quit.empty())
 			mem += na->last_quit.length() + 1;
 	}
-	*nrec = count;
-	*memuse = mem;
 }
 
 /*************************************************************************/
 
 /* Return information on memory use.  Assumes pointers are valid. */
 
-void get_core_stats(long *nrec, long *memuse)
+void get_core_stats(long &count, long &mem)
 {
-	long count = 0, mem = 0;
+	count = mem = 0;
 	unsigned j, end;
 
 	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
@@ -141,8 +139,6 @@ void get_core_stats(long *nrec, long *memuse)
 
 		mem += sizeof(NickAlias *) * nc->aliases.size();
 	}
-	*nrec = count;
-	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -187,16 +183,15 @@ void nickserv(User *u, const Anope::string &buf)
 
 int validate_user(User *u)
 {
-	NickAlias *na;
-	NickRequest *nr;
-
-	if ((nr = findrequestnick(u->nick)))
+	NickRequest *nr = findrequestnick(u->nick);
+	if (nr)
 	{
 		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
 		return 0;
 	}
 
-	if (!(na = findnick(u->nick)))
+	NickAlias *na = findnick(u->nick);
+	if (!na)
 		return 0;
 
 	if (na->HasFlag(NS_FORBIDDEN))
@@ -284,7 +279,7 @@ void expire_nicks()
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
 			if (MOD_RESULT == EVENT_STOP)
 				continue;
-			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 			FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
 			delete na;
 		}
@@ -295,9 +290,10 @@ void expire_requests()
 {
 	time_t now = time(NULL);
 
-	for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
+	for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; )
 	{
 		NickRequest *nr = it->second;
+		++it;
 
 		if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
 		{
@@ -347,7 +343,7 @@ NickCore *findcore(const Anope::string &nick)
  * @param nc The nickcore
  * @return true or false
  */
-bool is_on_access(User *u, NickCore *nc)
+bool is_on_access(const User *u, const NickCore *nc)
 {
 	if (!u || !nc || nc->access.empty())
 		return false;
@@ -405,14 +401,13 @@ void change_core_display(NickCore *nc)
 
 int do_setmodes(User *u)
 {
-	Channel *c;
-
 	/* Walk users current channels */
 	for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 	{
 		ChannelContainer *cc = *it;
 
-		if ((c = cc->chan))
+		Channel *c = cc->chan;
+		if (c)
 			chan_set_correct_modes(u, c, 1);
 	}
 	return MOD_CONT;

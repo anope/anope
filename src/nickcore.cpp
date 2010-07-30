@@ -95,7 +95,7 @@ void NickCore::AddAccess(const Anope::string &entry)
 	FOREACH_MOD(I_OnNickAddAccess, OnNickAddAccess(this, entry));
 }
 
-Anope::string NickCore::GetAccess(unsigned entry)
+Anope::string NickCore::GetAccess(unsigned entry) const
 {
 	if (access.empty() || entry >= access.size())
 		return "";

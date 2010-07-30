@@ -309,8 +309,8 @@ E void SetDefaultMLock();
 /**** nickserv.c ****/
 
 E NickRequest *findrequestnick(const Anope::string &nick);
-E void get_aliases_stats(long *nrec, long *memuse);
-E void get_core_stats(long *nrec, long *memuse);
+E void get_aliases_stats(long &count, long &mem);
+E void get_core_stats(long &count, long &mem);
 E void change_core_display(NickCore *nc);
 E void change_core_display(NickCore *nc, const Anope::string &newdisplay);
 E int do_setmodes(User *u);
@@ -322,7 +322,7 @@ E void expire_nicks();
 E void expire_requests();
 E NickAlias *findnick(const Anope::string &nick);
 E NickCore *findcore(const Anope::string &nick);
-E bool is_on_access(User *u, NickCore *nc);
+E bool is_on_access(const User *u, const NickCore *nc);
 
 /**** process.c ****/
 

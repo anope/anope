@@ -198,7 +198,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 *
 	 * Retrieves an entry from the access list corresponding to the given index.
 	 */
-	Anope::string GetAccess(unsigned entry);
+	Anope::string GetAccess(unsigned entry) const;
 
 	/** Find an entry in the nick's access list
 	 *

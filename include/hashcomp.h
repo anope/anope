@@ -45,9 +45,20 @@ namespace Anope
 #  define unordered_map hash_map
 # endif
 #else
+# if _MSV_VER >= 1600
 /* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
-# include <unordered_map>
-# define unordered_map_namespace std::tr1
+#  include <unordered_map>
+#  define unordered_map_namespace std::tr1
+# else
+#  include <hash_map>
+#  define unordered_map_namespace
+template<typename Key, typename Type, typename Compare, typename Unused = void>
+class unordered_map : public stdext::hash_map<Key, Type, Compare>
+{
+ public:
+	unordered_map() : hash_map() { }
+};
+# endif
 #endif
 
 /*******************************************************
@@ -161,6 +172,11 @@ namespace irc
 	 */
 	struct hash
 	{
+		/* VS 2008 specific code */
+		enum { bucket_size = 4, min_buckets = 8 };
+		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
+		/* End VS 2008 specific code */
+
 		/** Hash an irc::string for unordered_map
 		 * @param s The string
 		 * @return A hash value for the string
@@ -227,6 +243,11 @@ namespace ci
 	 */
 	struct hash
 	{
+		/* VS 2008 specific code */
+		enum { bucket_size = 4, min_buckets = 8 };
+		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
+		/* End VS 2008 specific code */
+
 		/** Hash a ci::string for unordered_map
 		 * @param s The string
 		 * @return A hash value for the string
@@ -271,7 +292,7 @@ namespace std
 	 */
 	template<> class CoreExport less<ci::string>
 	{
-	 public:
+	 public:	
 		/** Compare two Anope::strings as ci::strings and find which one is less
 		 * @param s1 The first string
 		 * @param s2 The second string

@@ -259,6 +259,11 @@ namespace Anope
 	 */
 	struct hash
 	{
+		/* VS 2008 specific code */
+		enum { bucket_size = 4, min_buckets = 8 };
+		bool operator()(const string &s1, const string &s2) const;
+		/* End of 2008 specific code */
+
 		/** Hash an Anope::string for unordered_map
 		 * @param s The string
 		 * @return A hash value for the string

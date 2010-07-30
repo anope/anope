@@ -25,6 +25,12 @@
  * ascii_case_insensitive_map
  *
  */
+ 
+/* VS 2008 specific function */
+bool Anope::hash::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return s1.str().compare(s2.str()) < 0;
+}
 
 /** Hash an Anope::string for unordered_map
  * @param s The string
@@ -79,6 +85,12 @@ const char *irc::irc_char_traits::find(const char *s1, int n, char c)
 	while (n-- > 0 && rfc_case_insensitive_map[static_cast<unsigned char>(*s1)] != rfc_case_insensitive_map[static_cast<unsigned char>(c)])
 		++s1;
 	return n >= 0 ? s1 : NULL;
+}
+
+/* VS 2008 specific function */
+bool irc::hash::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return s1.irc_str().compare(s2.irc_str()) < 0;
 }
 
 /** Hash an irc::string for unordered_map
@@ -139,6 +151,12 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 	while (n-- > 0 && ascii_case_insensitive_map[static_cast<unsigned char>(*s1)] != ascii_case_insensitive_map[static_cast<unsigned char>(c)])
 		++s1;
 	return n >= 0 ? s1 : NULL;
+}
+
+/* VS 2008 specific function */
+bool ci::hash::operator()(const Anope::string &s1, const Anope::string &s2) const
+{
+	return s1.ci_str().compare(s2.ci_str()) < 0;
 }
 
 /** Hash a ci::string for unordered_map

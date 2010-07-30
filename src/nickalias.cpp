@@ -6,7 +6,7 @@ NickRequest::NickRequest(const Anope::string &nickname)
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickRequest constructor");
 
-	requested = lastmail = 0;
+	this->requested = this->lastmail = 0;
 
 	this->nick = nickname;
 
@@ -31,17 +31,17 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 	else if (!nickcore)
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
-	time_registered = last_seen = 0;
+	this->time_registered = this->last_seen = 0;
 
 	this->nick = nickname;
 	this->nc = nickcore;
-	nc->aliases.push_back(this);
+	this->nc->aliases.push_back(this);
 
 	NickAliasList[this->nick] = this;
 
 	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
 	{
-		if (nc->ot)
+		if (this->nc->ot)
 			break;
 		if (!this->nick.equals_ci(it->first))
 			continue;
@@ -52,8 +52,8 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 
 			if (ot->GetName().equals_ci(it->second))
 			{
-				Alog() << "Tied oper " << nc->display << " to type " << ot->GetName();
-				nc->ot = ot;
+				Alog() << "Tied oper " << this->nc->display << " to type " << ot->GetName();
+				this->nc->ot = ot;
 				break;
 			}
 		}
@@ -64,13 +64,12 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
  */
 NickAlias::~NickAlias()
 {
-	User *u = NULL;
-
 	FOREACH_MOD(I_OnDelNick, OnDelNick(this));
 
 	/* Second thing to do: look for an user using the alias
 	 * being deleted, and make appropriate changes */
-	if ((u = finduser(this->nick)) && u->Account())
+	User *u = finduser(this->nick);
+	if (u && u->Account())
 	{
 		ircdproto->SendAccountLogout(u, u->Account());
 		u->RemoveMode(NickServ, UMODE_REGISTERED);
@@ -84,7 +83,7 @@ NickAlias::~NickAlias()
 		/* Next: see if our core is still useful. */
 		std::list<NickAlias *>::iterator it = std::find(this->nc->aliases.begin(), this->nc->aliases.end(), this);
 		if (it != this->nc->aliases.end())
-			nc->aliases.erase(it);
+			this->nc->aliases.erase(it);
 		if (this->nc->aliases.empty())
 		{
 			delete this->nc;

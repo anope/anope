@@ -9,16 +9,16 @@ NickCore::NickCore(const Anope::string &coredisplay)
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	ot = NULL;
-	language = channelcount = 0;
-	lastmail = 0;
+	this->ot = NULL;
+	this->language = this->channelcount = 0;
+	this->lastmail = 0;
 
 	this->display = coredisplay;
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
 		if (Config.NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
-			SetFlag(static_cast<NickCoreFlag>(t));
+			this->SetFlag(static_cast<NickCoreFlag>(t));
 
 	NickCoreList[this->display] = this;
 }
@@ -91,21 +91,21 @@ bool NickCore::HasPriv(const Anope::string &privstr) const
 
 void NickCore::AddAccess(const Anope::string &entry)
 {
-	access.push_back(entry);
+	this->access.push_back(entry);
 	FOREACH_MOD(I_OnNickAddAccess, OnNickAddAccess(this, entry));
 }
 
 Anope::string NickCore::GetAccess(unsigned entry) const
 {
-	if (access.empty() || entry >= access.size())
+	if (this->access.empty() || entry >= this->access.size())
 		return "";
-	return access[entry];
+	return this->access[entry];
 }
 
 bool NickCore::FindAccess(const Anope::string &entry)
 {
-	for (unsigned i = 0, end = access.size(); i < end; ++i)
-		if (access[i] == entry)
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (this->access[i] == entry)
 			return true;
 
 	return false;
@@ -113,11 +113,11 @@ bool NickCore::FindAccess(const Anope::string &entry)
 
 void NickCore::EraseAccess(const Anope::string &entry)
 {
-	for (unsigned i = 0, end = access.size(); i < end; ++i)
-		if (access[i] == entry)
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (this->access[i] == entry)
 		{
 			FOREACH_MOD(I_OnNickEraseAccess, OnNickEraseAccess(this, entry));
-			access.erase(access.begin() + i);
+			this->access.erase(this->access.begin() + i);
 			break;
 		}
 }
@@ -125,5 +125,5 @@ void NickCore::EraseAccess(const Anope::string &entry)
 void NickCore::ClearAccess()
 {
 	FOREACH_MOD(I_OnNickClearAccess, OnNickClearAccess(this));
-	access.clear();
+	this->access.clear();
 }

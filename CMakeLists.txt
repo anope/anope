@@ -231,11 +231,12 @@ if(MSVC)
 else(MSVC)
   # Set the compile flags to have all warnings on (including shadowed variables)
   set(CXXFLAGS "${CXXFLAGS} -Wall -Wshadow")
-  # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols
+  # If on a *nix system, also set the compile flags to remove GNU extensions (favor ISO C++) as well as reject non-ISO C++ code, also remove all leading underscores in exported symbols (only on GNU compiler)
   if(UNIX)
-    set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic -fno-leading-underscore")
-    # Set the module-specific compile flags to the same setting as the compile flags
-    set(MODULE_CXXFLAGS "${CXXFLAGS}")
+    set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      set(CXXFLAGS "${CXXFLAGS} -fno-leading-underscore")
+    endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # If we aren't on a *nix system, we are using MinGW
   else(UNIX)
     # Also, if we are building under MinGW, add another define for MinGW

@@ -30,23 +30,20 @@ void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
  */
 static int moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
-	int ch;
-	FILE *source, *target;
-#ifndef _WIN32
-	int srcfp;
-#endif
 	Anope::string input = services_dir + "/modules/" + name + ".so";
-
-	if (!(source = fopen(input.c_str(), "rb")))
+	FILE *source = fopen(input.c_str(), "rb");
+	if (!source)
 		return MOD_ERR_NOEXIST;
 
 	char *tmp_output = strdup(output.c_str());
 #ifndef _WIN32
-	if ((srcfp = mkstemp(const_cast<char *>(tmp_output))) == -1)
+	int srcfp = mkstemp(tmp_output);
+	if (srcfp == -1)
 #else
-	if (!mktemp(const_cast<char *>(tmp_output)))
+	if (!mktemp(tmp_output))
 #endif
 	{
+		free(tmp_output);
 		fclose(source);
 		return MOD_ERR_FILE_IO;
 	}
@@ -55,15 +52,19 @@ static int moduleCopyFile(const Anope::string &name, Anope::string &output)
 
 	Alog(LOG_DEBUG) << "Runtime module location: " << output;
 
+	FILE *target;
 #ifndef _WIN32
-	if (!(target = fdopen(srcfp, "w")))
+	target = fdopen(srcfp, "w");
 #else
-	if (!(target = fopen(output.c_str(), "wb")))
+	target = fopen(output.c_str(), "wb");
 #endif
+	if (!target)
 	{
 		fclose(source);
 		return MOD_ERR_FILE_IO;
 	}
+
+	int ch;
 	while ((ch = fgetc(source)) != EOF)
 		fputc(ch, target);
 	fclose(source);
@@ -77,10 +78,8 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
 	int pmods = 0;
 
 	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-	{
 		if ((*it)->type == mt)
 			++pmods;
-	}
 
 	/*
 	 * 2, because module constructors now add modules to the hash.. so 1 (original module)
@@ -110,10 +109,6 @@ template <class TYPE> TYPE function_cast(ano_module_t symbol)
 
 int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
-	const char *err;
-	Module *(*func)(const Anope::string &, const Anope::string &);
-	int ret = 0;
-
 	if (modname.empty())
 		return MOD_ERR_PARAMS;
 
@@ -126,7 +121,8 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
-	if ((ret = moduleCopyFile(modname, pbuf)) != MOD_ERR_OK)
+	int ret = moduleCopyFile(modname, pbuf);
+	if (ret != MOD_ERR_OK)
 	{
 		/* XXX: This used to assign filename here, but I don't think that was correct..
 		 * even if it was, it makes life very fucking difficult, so.
@@ -137,6 +133,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	ano_modclearerr();
 
 	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
+	const char *err;
 	if (!handle && (err = dlerror()))
 	{
 		Alog() << err;
@@ -144,7 +141,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	}
 
 	ano_modclearerr();
-	func = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
+	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
 	if (!func && (err = dlerror()))
 	{
 		Alog() << "No init function found, not an Anope module";
@@ -251,15 +248,13 @@ void ModuleManager::DeleteModule(Module *m)
 	if (!m || !m->handle)
 		return;
 
-	const char *err;
-	void (*destroy_func)(Module *m);
-
 	DetachAll(m);
 	ano_module_t handle = m->handle;
 	Anope::string filename = m->filename;
 
 	ano_modclearerr();
-	destroy_func = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
+	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
+	const char *err;
 	if (!destroy_func && (err = dlerror()))
 	{
 		Alog() << "No destroy function found, chancing delete...";
@@ -326,23 +321,19 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	 * on which they want, and we make sure our module is *at least* before or after
 	 * the first or last of this subset, depending again on the type of priority.
 	 */
-	size_t swap_pos = 0;
-	size_t source = 0;
-	bool swap = true;
-	bool found = false;
 
 	/* Locate our module. This is O(n) but it only occurs on module load so we're
 	 * not too bothered about it
 	 */
+	size_t source = 0;
+	bool found = false;
 	for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-	{
 		if (EventHandlers[i][x] == mod)
 		{
 			source = x;
 			found = true;
 			break;
 		}
-	}
 
 	/* Eh? this module doesnt exist, probably trying to set priority on an event
 	 * theyre not attached to.
@@ -350,6 +341,8 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 	if (!found)
 		return false;
 
+	size_t swap_pos = 0;
+	bool swap = true;
 	switch (s)
 	{
 		/* Dummy value */
@@ -369,40 +362,28 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 			break;
 		/* Place this module after a set of other modules */
 		case PRIORITY_AFTER:
-			{
-				/* Find the latest possible position */
-				swap_pos = 0;
-				swap = false;
-				for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-				{
-					for (size_t n = 0; n < sz; ++n)
+			/* Find the latest possible position */
+			swap_pos = 0;
+			swap = false;
+			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+				for (size_t n = 0; n < sz; ++n)
+					if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
 					{
-						if (modules[n] && EventHandlers[i][x] == modules[n] && x >= swap_pos && source <= swap_pos)
-						{
-							swap_pos = x;
-							swap = true;
-						}
+						swap_pos = x;
+						swap = true;
 					}
-				}
-			}
 			break;
 		/* Place this module before a set of other modules */
 		case PRIORITY_BEFORE:
-			{
-				swap_pos = EventHandlers[i].size() - 1;
-				swap = false;
-				for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
-				{
-					for (size_t n = 0; n < sz; ++n)
+			swap_pos = EventHandlers[i].size() - 1;
+			swap = false;
+			for (size_t x = 0, end = EventHandlers[i].size(); x != end; ++x)
+				for (size_t n = 0; n < sz; ++n)
+					if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
 					{
-						if (modules[n] && EventHandlers[i][x] == modules[n] && x <= swap_pos && source >= swap_pos)
-						{
-							swap = true;
-							swap_pos = x;
-						}
+						swap = true;
+						swap_pos = x;
 					}
-				}
-			}
 	}
 
 	/* Do we need to swap? */
@@ -414,7 +395,7 @@ bool ModuleManager::SetPriority(Module *mod, Implementation i, Priority s, Modul
 		if (source > swap_pos)
 			incrmnt = -1;
 
-		for (unsigned int j = source; j != swap_pos; j += incrmnt)
+		for (unsigned j = source; j != swap_pos; j += incrmnt)
 		{
 			if (j + incrmnt > EventHandlers[i].size() - 1 || j + incrmnt < 0)
 				continue;

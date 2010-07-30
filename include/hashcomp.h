@@ -35,17 +35,17 @@ namespace Anope
 
 #ifndef _WIN32
 # if defined(__GNUC__) && __GNUC__ >= 4
-/* GCC4.3+ has deprecated hash_map and uses tr1. But of course, uses a different include to MSVC. */
+/* GCC4+ has deprecated hash_map and uses tr1. But of course, uses a different include to MSVC. */
 #  include <tr1/unordered_map>
 #  define unordered_map_namespace std::tr1
-# else /* gcc ver < 4.3 */
+# else /* GCC ver < 4 */
 #  include <ext/hash_map>
 /* Oddball linux namespace for hash_map */
 #  define unordered_map_namespace __gnu_cxx
 #  define unordered_map hash_map
 # endif
 #else
-# if _MSV_VER >= 1600
+# if _MSC_VER >= 1600
 /* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
 #  include <unordered_map>
 #  define unordered_map_namespace std::tr1

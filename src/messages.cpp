@@ -194,14 +194,6 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 			else if (!Config.s_BotServ.empty() && bi->nick.equals_ci(Config.s_BotServ))
 				botserv(u, bi, message);
 		}
-
-		/* Add to ignore list if the command took a significant amount of time. */
-		if (allow_ignore)
-		{
-			stoptime = time(NULL);
-			if (stoptime > starttime && source.find('.') == Anope::string::npos)
-				add_ignore(source, stoptime - starttime);
-		}
 	}
 
 	return MOD_CONT;

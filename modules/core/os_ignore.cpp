@@ -53,17 +53,15 @@ class CommandOSIgnore : public Command
 
 	CommandReturn DoList(User *u)
 	{
-		IgnoreData *id;
-
-		if (!ignore)
+		if (ignore.empty())
 		{
 			notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
 		notice_lang(Config.s_OperServ, u, OPER_IGNORE_LIST);
-		for (id = ignore; id; id = id->next)
-			u->SendMessage(Config.s_OperServ, "%s", id->mask.c_str());
+		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
+			u->SendMessage(Config.s_OperServ, "%s", (*ign)->mask.c_str());
 
 		return MOD_CONT;
 	}
@@ -154,11 +152,7 @@ class OSIgnore : public Module
 			IgnoreData *ign = new IgnoreData();
 			ign->mask = params[2];
 			ign->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
-			ign->prev = NULL;
-			ign->next = ignore;
-			if (ignore)
-				ignore->prev = ign;
-			ignore = ign;
+			ignore.push_front(ign);
 
 			return EVENT_STOP;
 		}
@@ -168,30 +162,22 @@ class OSIgnore : public Module
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		IgnoreData *ign, *next;
 		time_t now = time(NULL);
 
-		for (ign = ignore; ign; ign = next)
+		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; )
 		{
-			next = ign->next;
-
-			if (ign->time && ign->time <= now)
+			if ((*ign)->time && (*ign)->time <= now)
 			{
-				Alog(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
-				if (ign->prev)
-					ign->prev->next = ign->next;
-				else if (ignore == ign)
-					ignore = ign->next;
-				if (ign->next)
-					ign->next->prev = ign->prev;
-				delete ign;
-				ign = NULL;
+				Alog(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << (*ign)->mask;
+				delete *ign;
+				ign = ignore.erase(ign);
 			}
 			else
 			{
 				std::stringstream buf;
-				buf <<  "OS IGNORE " << ign->mask << " " << ign->time;
+				buf << "OS IGNORE " << (*ign)->mask << " " << (*ign)->time;
 				Write(buf.str());
+				++ign;
 			}
 		}
 	}

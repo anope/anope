@@ -18,27 +18,24 @@
 int allow_ignore = 1;
 
 /* Masks to ignore. */
-IgnoreData *ignore;
+std::list<IgnoreData *> ignore;
 
 /*************************************************************************/
 
 /**
- * Add a mask/nick to the ignorelits for delta seconds.
+ * Add a mask/nick to the ignorelist for delta seconds.
  * @param nick Nick or (nick!)user@host to add to the ignorelist.
  * @param delta Seconds untill new entry is set to expire. 0 for permanent.
  */
 void add_ignore(const Anope::string &nick, time_t delta)
 {
-	IgnoreData *ign;
-	Anope::string tmp, mask;
-	size_t user, host;
-	User *u;
-	time_t now;
 	if (nick.empty())
 		return;
-	now = time(NULL);
 	/* If it s an existing user, we ignore the hostmask. */
-	if ((u = finduser(nick)))
+	Anope::string mask;
+	User *u = finduser(nick);
+	size_t user, host;
+	if (u)
 		mask = "*!*@" + u->host;
 	/* Determine whether we get a nick or a mask. */
 	else if ((host = nick.find('@')) != Anope::string::npos)
@@ -59,28 +56,26 @@ void add_ignore(const Anope::string &nick, time_t delta)
 	else
 		mask = nick + "!*@*";
 	/* Check if we already got an identical entry. */
-	for (ign = ignore; ign; ign = ign->next)
-		if (mask.equals_ci(ign->mask))
+	std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end();
+	for (; ign != ign_end; ++ign)
+		if (mask.equals_ci((*ign)->mask))
 			break;
+	time_t now = time(NULL);
 	/* Found one.. */
-	if (ign)
+	if (ign != ign_end)
 	{
 		if (!delta)
-			ign->time = 0;
-		else if (ign->time < now + delta)
-			ign->time = now + delta;
+			(*ign)->time = 0;
+		else if ((*ign)->time < now + delta)
+			(*ign)->time = now + delta;
 	}
 	/* Create new entry.. */
 	else
 	{
-		ign = new IgnoreData;
-		ign->mask = mask;
-		ign->time = !delta ? 0 : now + delta;
-		ign->prev = NULL;
-		ign->next = ignore;
-		if (ignore)
-			ignore->prev = ign;
-		ignore = ign;
+		IgnoreData *newign = new IgnoreData();
+		newign->mask = mask;
+		newign->time = delta ? now + delta : 0;
+		ignore.push_front(newign);
 		Alog(LOG_DEBUG) << "Added new ignore entry for " << mask;
 	}
 }
@@ -96,30 +91,27 @@ void add_ignore(const Anope::string &nick, time_t delta)
  */
 IgnoreData *get_ignore(const Anope::string &nick)
 {
-	IgnoreData *ign;
-	Anope::string tmp;
-	size_t user, host;
-	time_t now;
-	User *u;
 	if (nick.empty())
 		return NULL;
 	/* User has disabled the IGNORE system */
 	if (!allow_ignore)
 		return NULL;
-	now = time(NULL);
-	u = finduser(nick);
+	User *u = finduser(nick);
+	std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end();
 	/* If we find a real user, match his mask against the ignorelist. */
 	if (u)
 	{
 		/* Opers are not ignored, even if a matching entry may be present. */
 		if (is_oper(u))
 			return NULL;
-		for (ign = ignore; ign; ign = ign->next)
-			if (match_usermask(ign->mask, u))
+		for (; ign != ign_end; ++ign)
+			if (match_usermask((*ign)->mask, u))
 				break;
 	}
 	else
 	{
+		Anope::string tmp;
+		size_t user, host;
 		/* We didn't get a user.. generate a valid mask. */
 		if ((host = nick.find('@')) != Anope::string::npos)
 		{
@@ -137,26 +129,22 @@ IgnoreData *get_ignore(const Anope::string &nick)
 		/* We only got a nick.. */
 		else
 			tmp = nick + "!*@*";
-		for (ign = ignore; ign; ign = ign->next)
-			if (Anope::Match(tmp, ign->mask))
+		for (; ign != ign_end; ++ign)
+			if (Anope::Match(tmp, (*ign)->mask))
 				break;
 	}
+	time_t now = time(NULL);
 	/* Check whether the entry has timed out */
-	if (ign && ign->time != 0 && ign->time <= now)
+	if (ign != ign_end && (*ign)->time && (*ign)->time <= now)
 	{
-		Alog(LOG_DEBUG) << "Expiring ignore entry " << ign->mask;
-		if (ign->prev)
-			ign->prev->next = ign->next;
-		else if (ignore == ign)
-			ignore = ign->next;
-		if (ign->next)
-			ign->next->prev = ign->prev;
-		delete ign;
-		ign = NULL;
+		Alog(LOG_DEBUG) << "Expiring ignore entry " << (*ign)->mask;
+		delete *ign;
+		ignore.erase(ign);
+		ign = ign_end = ignore.end();
 	}
-	if (ign && debug)
-		Alog(LOG_DEBUG) << "Found ignore entry (" << ign->mask << ") for " << nick;
-	return ign;
+	if (ign != ign_end && debug)
+		Alog(LOG_DEBUG) << "Found ignore entry (" << (*ign)->mask << ") for " << nick;
+	return ign == ign_end ? NULL : *ign;
 }
 
 /*************************************************************************/
@@ -168,14 +156,13 @@ IgnoreData *get_ignore(const Anope::string &nick)
  */
 int delete_ignore(const Anope::string &nick)
 {
-	IgnoreData *ign;
-	Anope::string tmp;
-	size_t user, host;
-	User *u;
 	if (nick.empty())
 		return 0;
 	/* If it s an existing user, we ignore the hostmask. */
-	if ((u = finduser(nick)))
+	Anope::string tmp;
+	size_t user, host;
+	User *u = finduser(nick);
+	if (u)
 		tmp = "*!*@" + u->host;
 	/* Determine whether we get a nick or a mask. */
 	else if ((host = nick.find('@')) != Anope::string::npos)
@@ -195,22 +182,17 @@ int delete_ignore(const Anope::string &nick)
 	/* We only got a nick.. */
 	else
 		tmp = nick + "!*@*";
-	for (ign = ignore; ign; ign = ign->next)
-		if (tmp.equals_ci(ign->mask))
+	std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end();
+	for (; ign != ign_end; ++ign)
+		if (tmp.equals_ci((*ign)->mask))
 			break;
 	/* No matching ignore found. */
-	if (!ign)
+	if (ign == ign_end)
 		return 0;
-	Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
+	Alog(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
 	/* Delete the entry and all references to it. */
-	if (ign->prev)
-		ign->prev->next = ign->next;
-	else if (ignore == ign)
-		ignore = ign->next;
-	if (ign->next)
-		ign->next->prev = ign->prev;
-	delete ign;
-	ign = NULL;
+	delete *ign;
+	ignore.erase(ign);
 	return 1;
 }
 
@@ -222,19 +204,16 @@ int delete_ignore(const Anope::string &nick)
  */
 int clear_ignores()
 {
-	IgnoreData *ign, *next;
-	int i = 0;
-	if (!ignore)
+	if (ignore.empty())
 		return 0;
-	for (ign = ignore; ign; ign = next)
+	for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
 	{
-		next = ign->next;
-		Alog(LOG_DEBUG) << "Deleting ignore entry " << ign->mask;
-		delete ign;
-		++i;
+		Alog(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
+		delete *ign;
 	}
-	ignore = NULL;
-	return i;
+	int deleted = ignore.size();
+	ignore.clear();
+	return deleted;
 }
 
 /*************************************************************************/

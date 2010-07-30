@@ -777,7 +777,6 @@ struct EList
 
 struct IgnoreData
 {
-	IgnoreData *prev, *next;
 	Anope::string mask;
 	time_t time; /* When do we stop ignoring them? */
 };

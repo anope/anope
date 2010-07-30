@@ -73,7 +73,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 {
 	int i;
 
-	Alog(LOG_DEBUG) << this->name << "Adding " << ac << " texts for language " << langNumber;
+	Alog(LOG_DEBUG) << this->name << " Adding " << ac << " texts for language " << langNumber;
 
 	if (this->lang[langNumber].argc > 0)
 		this->DeleteLanguage(langNumber);
@@ -109,7 +109,7 @@ Module *FindModule(const Anope::string &name)
  */
 Message *Anope::AddMessage(const Anope::string &name, int (*func)(const Anope::string &source, int ac, const char **av))
 {
-	Message *m = new Message;
+	Message *m = new Message();
 
 	m->name = name;
 	m->func = func;
@@ -256,13 +256,8 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 
 void Module::NoticeLang(const Anope::string &source, const User *u, int number, ...) const
 {
-	va_list va;
-	char buffer[4096], outbuf[4096];
-	char *fmt = NULL;
-	int mlang = Config.NSDefLanguage;
-	char *s, *t, *buf;
-
 	/* Find the users lang, and use it if we can */
+	int mlang = Config.NSDefLanguage;
 	if (u && u->Account())
 		mlang = u->Account()->language;
 
@@ -273,23 +268,19 @@ void Module::NoticeLang(const Anope::string &source, const User *u, int number, 
 	/* If the requested lang string exists for the language */
 	if (this->lang[mlang].argc > number)
 	{
-		fmt = this->lang[mlang].argv[number];
+		const char *fmt = this->lang[mlang].argv[number];
 
-		buf = strdup(fmt);
+		va_list va;
 		va_start(va, number);
-		vsnprintf(buffer, 4095, buf, va);
+
+		char buf[4096] = "";
+		vsnprintf(buf, sizeof(buf), fmt, va);
+
+		sepstream lines(buf, '\n');
+		Anope::string line;
+		while (lines.GetToken(line))
+			u->SendMessage(source, "%s", line.empty() ? " " : line.c_str());
 		va_end(va);
-		s = buffer;
-		while (*s)
-		{
-			t = s;
-			s += strcspn(s, "\n");
-			if (*s)
-				*s++ = '\0';
-			strscpy(outbuf, t, sizeof(outbuf));
-			u->SendMessage(source, "%s", outbuf);
-		} 
-		free(buf);
 	}
 	else
 		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
@@ -297,9 +288,9 @@ void Module::NoticeLang(const Anope::string &source, const User *u, int number, 
 
 const char *Module::GetLangString(User *u, int number)
 {
-	int mlang = Config.NSDefLanguage;
 
 	/* Find the users lang, and use it if we can */
+	int mlang = Config.NSDefLanguage;
 	if (u && u->Account())
 		mlang = u->Account()->language;
 
@@ -334,56 +325,48 @@ void Module::DeleteLanguage(int langNumber)
 
 void ModuleRunTimeDirCleanUp()
 {
-	char dirbuf[BUFSIZE];
-	char filebuf[BUFSIZE];
-
-	snprintf(dirbuf, BUFSIZE, "%s/modules/runtime", services_dir.c_str());
+	Anope::string dirbuf = services_dir + "/modules/runtime";
 
 	Alog(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
 #ifndef _WIN32
-	DIR *dirp;
-	struct dirent *dp;
-
-	if (!(dirp = opendir(dirbuf)))
+	DIR *dirp = opendir(dirbuf.c_str());
+	if (!dirp)
 	{
 		Alog(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
 		return;
 	}
+	struct dirent *dp;
 	while ((dp = readdir(dirp)))
 	{
 		if (!dp->d_ino)
 			continue;
 		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
 			continue;
-		snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
-		DeleteFile(filebuf);
+		Anope::string filebuf = dirbuf + "/" + dp->d_name;
+		DeleteFile(filebuf.c_str());
 	}
 	closedir(dirp);
 #else
-	BOOL fFinished;
-	HANDLE hList;
-	TCHAR szDir[MAX_PATH + 1];
+	Anope::string szDir = dirbuf + "/*";
+
 	WIN32_FIND_DATA FileData;
-
-	snprintf(szDir, sizeof(szDir), "%s/*", dirbuf);
-
-	hList = FindFirstFile(szDir, &FileData);
+	HANDLE hList = FindFirstFile(szDir.c_str(), &FileData);
 	if (hList != INVALID_HANDLE_VALUE)
 	{
-		fFinished = FALSE;
+		bool fFinished = false;
 		while (!fFinished)
 		{
 			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 			{
-				snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
-				if (!DeleteFile(filebuf))
+				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
+				if (!DeleteFile(filebuf.c_str()))
 					Alog(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << dlerror();
 			}
 			if (!FindNextFile(hList, &FileData))
 			{
 				if (GetLastError() == ERROR_NO_MORE_FILES)
-					fFinished = TRUE;
+					fFinished = true;
 			}
 		}
 	}
@@ -391,7 +374,6 @@ void ModuleRunTimeDirCleanUp()
 		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
 
 	FindClose(hList);
-
 #endif
 	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }

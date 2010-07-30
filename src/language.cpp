@@ -84,7 +84,7 @@ static void load_lang(int index, const char *filename)
 	}
 	else if (num != NUM_STRINGS)
 		Alog() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") for language " << index << " (" << filename << ")";
-	langtexts[index] = new char *[NUM_STRINGS];
+	langtexts[index] = static_cast<char **>(scalloc(sizeof(char *), NUM_STRINGS));
 	if (num > NUM_STRINGS)
 		num = NUM_STRINGS;
 	for (i = 0; i < num; ++i)
@@ -99,7 +99,7 @@ static void load_lang(int index, const char *filename)
 				if (langtexts[index][i])
 					free(langtexts[index][i]); // XXX
 			}
-			delete [] langtexts[index];
+			free(langtexts[index]);
 			langtexts[index] = NULL;
 			return;
 		}
@@ -113,7 +113,7 @@ static void load_lang(int index, const char *filename)
 				if (langtexts[index][i])
 					free(langtexts[index][i]); // XXX
 			}
-			delete [] langtexts[index];
+			free(langtexts[index]);
 			langtexts[index] = NULL;
 			return;
 		}
@@ -125,13 +125,13 @@ static void load_lang(int index, const char *filename)
 				if (langtexts[index][i])
 					free(langtexts[index][i]); // XXX
 			}
-			delete [] langtexts[index];
+			free(langtexts[index]);
 			langtexts[index] = NULL;
 			return;
 		}
 		else
 		{
-			langtexts[index][i] = new char[len + 1];
+			langtexts[index][i] = static_cast<char *>(malloc(len + 1));
 			fseek(f, pos, SEEK_SET);
 			if (fread(langtexts[index][i], 1, len, f) != len)
 			{
@@ -141,7 +141,7 @@ static void load_lang(int index, const char *filename)
 					if (langtexts[index][i])
 						free(langtexts[index][i]);
 				}
-				delete [] langtexts[index];
+				free(langtexts[index]);
 				langtexts[index] = NULL;
 				return;
 			}

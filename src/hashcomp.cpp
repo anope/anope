@@ -197,7 +197,7 @@ bool std::less<ci::string>::operator()(const Anope::string &s1, const Anope::str
  */
 bool std::less<irc::string>::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
-	return s2.irc_str().compare(s2.irc_str()) < 0;
+	return s1.irc_str().compare(s2.irc_str()) < 0;
 }
 
 sepstream::sepstream(const Anope::string &source, char seperator) : tokens(source), sep(seperator)

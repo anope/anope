@@ -12,7 +12,6 @@
 
 #include "services.h"
 #include "language.h"
-#include "hashcomp.h" // If this gets added to services.h or someplace else later, remove it from here -- CyberBotX
 
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)

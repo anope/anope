@@ -15,6 +15,21 @@ static void TrimBuf(std::string &buffer)
 		buffer.erase(buffer.length() - 1);
 }
 
+SocketEngineBase::SocketEngineBase()
+{
+#ifdef _WIN32
+	if (WSAStartup(MAKEWORD(2, 0), &wsa))
+		Alog() << "Failed to initialize WinSock library";
+#endif
+}
+
+SocketEngineBase::~SocketEngineBase()
+{
+#ifdef _WIN32
+	WSACleanup();
+#endif
+}
+
 /** Constructor
  * @param nsock The socket
  * @param nIPv6 IPv6?
@@ -232,9 +247,6 @@ void Socket::Write(const Anope::string &message)
  */
 ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6) : Socket(0, nIPv6), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
 {
-	if (!IPv6 && (TargetHost.find(':') != Anope::string::npos || BindHost.find(':') != Anope::string::npos))
-		IPv6 = true;
-
 	addrinfo hints;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = 0;

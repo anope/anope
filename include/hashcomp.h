@@ -45,15 +45,9 @@ namespace Anope
 #  define unordered_map hash_map
 # endif
 #else
-# if _MSV_VER >= 1600
 /* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
-#  include <unordered_map>
-#  define unordered_map_namespace std::tr1
-# else
-#  include <hash_map>
-#  define unordered_map_namespace stdext
-#  define unordered_map hash_map
-# endif
+# include <unordered_map>
+# define unordered_map_namespace std::tr1
 #endif
 
 /*******************************************************
@@ -247,8 +241,9 @@ namespace std
 	/** An overload for std::equal_to<ci::string> that uses Anope::string, passed for the fourth temmplate
 	 * argument for unordered_map
 	 */
-	template<> struct equal_to<ci::string>
+	template<> class CoreExport equal_to<ci::string>
 	{
+	 public:
 		/** Compare two Anope::strings as ci::strings
 		 * @paarm s1 The first string
 		 * @param s2 The second string
@@ -260,8 +255,9 @@ namespace std
 	/** An overload for std::equal_to<irc::string> that uses Anope::string, passed for the fourth template
 	 * argument for unorderd_map
 	 */
-	template<> struct equal_to<irc::string>
+	template<> class CoreExport equal_to<irc::string>
 	{
+	 public:
 		/** Compare two Anope::strings as irc::strings
 		 * @param s1 The first string
 		 * @param s2 The second string
@@ -273,8 +269,9 @@ namespace std
 	/** An overload for std::less<ci::string> that uses Anope::string, passed for the third template argument
 	 * to std::map and std::multimap
 	 */
-	template<> struct less<ci::string>
+	template<> class CoreExport less<ci::string>
 	{
+	 public:
 		/** Compare two Anope::strings as ci::strings and find which one is less
 		 * @param s1 The first string
 		 * @param s2 The second string
@@ -286,8 +283,9 @@ namespace std
 	/** An overload for std;:less<irc::string> that uses Anope::string, passed for the third tempalte argument
 	 * to std::map and std::multimap
 	 */
-	template<> struct less<irc::string>
+	template<> class CoreExport less<irc::string>
 	{
+	 public:
 		/** Compare two Anope::strings as irc::strings and find which one is less
 		 * @param s1 The first string
 		 * @param s2 The second string

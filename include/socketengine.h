@@ -15,16 +15,20 @@
 class CoreExport SocketEngineBase
 {
  public:
+#ifdef _WIN32
+	/* Windows crap */
+	WSADATA wsa;
+#endif
 	/* Map of sockets */
 	std::map<int, Socket *> Sockets;
 
 	/** Default constructor
 	 */
-	SocketEngineBase() { }
+	SocketEngineBase();
 
 	/** Default destructor
 	 */
-	virtual ~SocketEngineBase() { }
+	virtual ~SocketEngineBase();
 
 	/** Add a socket to the internal list
 	 * @param s The socket

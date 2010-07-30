@@ -158,9 +158,8 @@ void oper_global(const Anope::string &nick, const char *fmt, ...)
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
 
-XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask), Created(0), Expires(0), Reason(reason)
 {
-	Expires = Created = 0;
 }
 
 XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason) : Mask(mask), By(by), Created(time(NULL)), Expires(expires), Reason(reason)
@@ -169,24 +168,24 @@ XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t ex
 
 Anope::string XLine::GetNick() const
 {
-	size_t nick_t = Mask.find('!');
+	size_t nick_t = this->Mask.find('!');
 
 	if (nick_t == Anope::string::npos)
 		return "";
 
-	return Mask.substr(0, nick_t);
+	return this->Mask.substr(0, nick_t);
 }
 
 Anope::string XLine::GetUser() const
 {
-	size_t user_t = Mask.find('!'), host_t = Mask.find('@');
+	size_t user_t = this->Mask.find('!'), host_t = this->Mask.find('@');
 
 	if (host_t != Anope::string::npos)
 	{
 		if (user_t != Anope::string::npos)
-			return Mask.substr(user_t + 1, host_t - user_t - 1);
+			return this->Mask.substr(user_t + 1, host_t - user_t - 1);
 		else
-			return Mask.substr(0, host_t);
+			return this->Mask.substr(0, host_t);
 	}
 	else
 		return "";
@@ -194,12 +193,12 @@ Anope::string XLine::GetUser() const
 
 Anope::string XLine::GetHost() const
 {
-	size_t host_t = Mask.find('@');
+	size_t host_t = this->Mask.find('@');
 
 	if (host_t == Anope::string::npos)
-		return Mask;
+		return this->Mask;
 	else
-		return Mask.substr(host_t + 1);
+		return this->Mask.substr(host_t + 1);
 }
 
 /** Constructor
@@ -213,7 +212,7 @@ XLineManager::XLineManager()
  */
 XLineManager::~XLineManager()
 {
-	Clear();
+	this->Clear();
 }
 
  /** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
@@ -271,7 +270,7 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
  */
 size_t XLineManager::GetCount() const
 {
-	return XLines.size();
+	return this->XLines.size();
 }
 
 /** Get the XLine vector
@@ -279,7 +278,7 @@ size_t XLineManager::GetCount() const
   */
 const std::vector<XLine *> &XLineManager::GetList() const
 {
-	return XLines;
+	return this->XLines;
 }
 
 /** Add an entry to this XLineManager
@@ -287,7 +286,7 @@ const std::vector<XLine *> &XLineManager::GetList() const
  */
 void XLineManager::AddXLine(XLine *x)
 {
-	XLines.push_back(x);
+	this->XLines.push_back(x);
 }
 
 /** Delete an entry from this XLineManager
@@ -296,12 +295,12 @@ void XLineManager::AddXLine(XLine *x)
  */
 bool XLineManager::DelXLine(XLine *x)
 {
-	std::vector<XLine *>::iterator it = std::find(XLines.begin(), XLines.end(), x);
+	std::vector<XLine *>::iterator it = std::find(this->XLines.begin(), this->XLines.end(), x);
 
-	if (it != XLines.end())
+	if (it != this->XLines.end())
 	{
 		delete x;
-		XLines.erase(it);
+		this->XLines.erase(it);
 
 		return true;
 	}
@@ -315,19 +314,19 @@ bool XLineManager::DelXLine(XLine *x)
   */
 XLine *XLineManager::GetEntry(unsigned index)
 {
-	if (index >= XLines.size())
+	if (index >= this->XLines.size())
 		return NULL;
 
-	return XLines[index];
+	return this->XLines[index];
 }
 
 /** Clear the XLine vector
  */
 void XLineManager::Clear()
 {
-	for (std::vector<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
+	for (std::vector<XLine *>::iterator it = this->XLines.begin(), it_end = this->XLines.end(); it != it_end; ++it)
 		delete *it;
-	XLines.clear();
+	this->XLines.clear();
 }
 
 /** Add an entry to this XLine Manager
@@ -366,9 +365,9 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
 	ret.first = 0;
 	ret.second = NULL;
 
-	for (unsigned i = 0, end = GetCount(); i < end; ++i)
+	for (unsigned i = 0, end = this->GetCount(); i < end; ++i)
 	{
-		XLine *x = GetEntry(i);
+		XLine *x = this->GetEntry(i);
 		ret.second = x;
 
 		if (x->Mask.equals_ci(mask))
@@ -407,9 +406,9 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
  */
 XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
-	for (unsigned i = 0, end = XLines.size(); i < end; ++i)
+	for (unsigned i = 0, end = this->XLines.size(); i < end; ++i)
 	{
-		XLine *x = XLines[i];
+		XLine *x = this->XLines[i];
 
 		if (x->Mask.equals_ci(mask))
 			return x;
@@ -426,7 +425,7 @@ XLine *XLineManager::Check(User *u)
 {
 	const time_t now = time(NULL);
 
-	for (std::vector<XLine *>::iterator it = XLines.begin(), it_end = XLines.end(); it != it_end; ++it)
+	for (std::vector<XLine *>::iterator it = this->XLines.begin(), it_end = this->XLines.end(); it != it_end; ++it)
 	{
 		XLine *x = *it;
 

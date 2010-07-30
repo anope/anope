@@ -91,7 +91,7 @@ void Channel::JoinUser(User *user)
 {
 	Alog(LOG_DEBUG) << user->nick << " joins " << this->name;
 
-	Flags<ChannelModeName, CMODE_END> *Status = new Flags<ChannelModeName, CMODE_END>;
+	Flags<ChannelModeName> *Status = new Flags<ChannelModeName>;
 	ChannelContainer *cc = new ChannelContainer(this);
 	cc->Status = Status;
 	user->chans.push_back(cc);

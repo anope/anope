@@ -12,8 +12,8 @@
 extern CoreExport std::vector<NewsItem *> News;
 extern CoreExport std::vector<std::bitset<32> > DefCon;
 extern CoreExport bool DefConModesSet;
-extern CoreExport Flags<ChannelModeName, CMODE_END> DefConModesOn;
-extern CoreExport Flags<ChannelModeName, CMODE_END> DefConModesOff;
+extern CoreExport Flags<ChannelModeName> DefConModesOn;
+extern CoreExport Flags<ChannelModeName> DefConModesOff;
 extern CoreExport std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 
 class XLineManager;

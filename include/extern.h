@@ -299,8 +299,8 @@ E int str_is_cidr(const Anope::string &str, uint32 *ip, uint32 *mask, Anope::str
 /**** modes.cpp ****/
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E Flags<ChannelModeName, CMODE_END> DefMLockOn;
-E Flags<ChannelModeName, CMODE_END> DefMLockOff;
+E Flags<ChannelModeName> DefMLockOn;
+E Flags<ChannelModeName> DefMLockOff;
 E std::map<ChannelModeName, Anope::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
 E std::list<ChannelModeStatus *> BotModes;

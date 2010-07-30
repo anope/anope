@@ -1030,6 +1030,8 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 				um = new UserMode(UMODE_HIDEOPER, "UMODE_HIDEOPER", modechar[0]);
 			else if (modename.equals_cs("invisible"))
 				um = new UserMode(UMODE_INVIS, "UMODE_INVIS", modechar[0]);
+			else if (modename.equals_cs("invis-oper"))
+				um = new UserMode(UMODE_INVISIBLE_OPER, "UMODE_INVISIBLE_OPER", modechar[0]);
 			else if (modename.equals_cs("oper"))
 				um = new UserMode(UMODE_OPER, "UMODE_OPER", modechar[0]);
 			else if (modename.equals_cs("regdeaf"))

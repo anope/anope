@@ -69,8 +69,8 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	std::vector<ChanAccess *> access;					/* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
-	Flags<ChannelModeName, CMODE_END> mlock_on;			/* Modes mlocked on */
-	Flags<ChannelModeName, CMODE_END> mlock_off;		/* Modes mlocked off */
+	Flags<ChannelModeName> mlock_on;			/* Modes mlocked on */
+	Flags<ChannelModeName> mlock_off;		/* Modes mlocked off */
 
  public:
  	/** Default constructor

@@ -117,7 +117,9 @@ static void ReadDatabase(Module *m = NULL)
 			}
 			else if (params[0].equals_ci("MD"))
 			{
-				Anope::string key = params[1].substr(2);
+				Anope::string key = params[1];
+				params.erase(params.begin());
+				params.erase(params.begin());
 
 				if (Type == MD_NC && nc)
 				{

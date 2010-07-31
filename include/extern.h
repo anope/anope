@@ -262,17 +262,17 @@ E const char *merge_args(int argc, const char **argv);
 E time_t dotime(const Anope::string &s);
 E Anope::string duration(const NickCore *nc, time_t seconds);
 E Anope::string expire_left(const NickCore *nc, time_t expires);
-E int doValidHost(const Anope::string &host, int type);
+E bool doValidHost(const Anope::string &host, int type);
 
-E int isValidHost(const Anope::string &host, int type);
-E int isvalidchar(const char c);
+E bool isValidHost(const Anope::string &host, int type);
+E bool isvalidchar(char c);
 
 E Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number);
 E Anope::string myStrGetTokenRemainder(const Anope::string &str, char dilim, int token_number);
 E int myNumToken(const Anope::string &str, char dilim);
 E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer);
-E int nickIsServices(const Anope::string &nick, int bot);
+E bool nickIsServices(const Anope::string &nick, bool bot);
 
 E void add_entropy_userkeys();
 E void rand_init();
@@ -290,11 +290,11 @@ E std::vector<Anope::string> BuildStringVector(const Anope::string &);
 E uint32 cidr_to_netmask(uint16 cidr);
 E uint16 netmask_to_cidr(uint32 mask);
 
-E int str_is_wildcard(const Anope::string &str);
-E int str_is_pure_wildcard(const Anope::string &str);
+E bool str_is_wildcard(const Anope::string &str);
+E bool str_is_pure_wildcard(const Anope::string &str);
 
 E uint32 str_is_ip(const Anope::string &str);
-E int str_is_cidr(const Anope::string &str, uint32 *ip, uint32 *mask, Anope::string &host);
+E bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host);
 
 /**** modes.cpp ****/
 /* Number of generic modes we support */
@@ -408,7 +408,7 @@ E Anope::string host_resolve(const Anope::string &host);
 
 #ifdef _WIN32
 E Anope::string GetWindowsVersion();
-E int SupportedWindowsVersion();
+E bool SupportedWindowsVersion();
 #endif
 
 #endif /* EXTERN_H */

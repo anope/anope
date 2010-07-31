@@ -1467,7 +1467,7 @@ Entry *entry_create(const Anope::string &mask)
 	/* Only check the host if it's not a pure wildcard */
 	if (!host.empty() && !str_is_pure_wildcard(host))
 	{
-		if (ircd->cidrchanbei && str_is_cidr(host, &ip, &cidr, cidrhost))
+		if (ircd->cidrchanbei && str_is_cidr(host, ip, cidr, cidrhost))
 		{
 			entry->cidr_ip = ip;
 			entry->cidr_mask = cidr;

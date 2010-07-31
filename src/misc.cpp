@@ -237,8 +237,6 @@ void NumberList::Process()
 		for (std::set<unsigned>::iterator it = numbers.begin(), it_end = numbers.end(); it != it_end; ++it)
 			this->HandleNumber(*it);
 	}
-
-	delete this;
 }
 
 void NumberList::HandleNumber(unsigned)
@@ -305,19 +303,16 @@ time_t dotime(const Anope::string &s)
  */
 Anope::string duration(const NickCore *nc, time_t seconds)
 {
-	int days = 0, hours = 0, minutes = 0;
-	int need_comma = 0;
+	/* We first calculate everything */
+	int days = seconds / 86400;
+	seconds -= (days * 86400);
+	int hours = seconds / 3600;
+	seconds -= (hours * 3600);
+	int minutes = seconds / 60;
 
 	char buf[64];
 	Anope::string buffer;
 	const char *comma = getstring(nc, COMMA_SPACE);
-
-	/* We first calculate everything */
-	days = seconds / 86400;
-	seconds -= (days * 86400);
-	hours = seconds / 3600;
-	seconds -= (hours * 3600);
-	minutes = seconds / 60;
 
 	if (!days && !hours && !minutes)
 	{
@@ -326,17 +321,18 @@ Anope::string duration(const NickCore *nc, time_t seconds)
 	}
 	else
 	{
+		bool need_comma = false;
 		if (days)
 		{
 			snprintf(buf, sizeof(buf), getstring(nc, days == 1 ? DURATION_DAY : DURATION_DAYS), days);
 			buffer = buf;
-			need_comma = 1;
+			need_comma = true;
 		}
 		if (hours)
 		{
 			snprintf(buf, sizeof(buf), getstring(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS), hours);
 			buffer += Anope::string(need_comma ? comma : "") + buf;
-			need_comma = 1;
+			need_comma = true;
 		}
 		if (minutes)
 		{
@@ -406,22 +402,19 @@ Anope::string expire_left(const NickCore *nc, time_t expires)
  * @param type = format, 1 = ip4addr, 2 = hostname
  * @return 1 if a host is valid, 0 if it isnt.
  */
-int doValidHost(const Anope::string &host, int type)
+bool doValidHost(const Anope::string &host, int type)
 {
-	int idx = 0;
-	int len = 0;
-	int sec_len = 0;
-	int dots = 1;
 	if (type != 1 && type != 2)
-		return 0;
+		return false;
 	if (host.empty())
-		return 0;
+		return false;
 
-	len = host.length();
+	size_t len = host.length();
 
 	if (len > Config.HostLen)
-		return 0;
+		return false;
 
+	size_t idx, sec_len = 0, dots = 1;
 	switch (type)
 	{
 		case 1:
@@ -432,22 +425,22 @@ int doValidHost(const Anope::string &host, int type)
 					if (sec_len < 3)
 						++sec_len;
 					else
-						return 0;
+						return false;
 				}
 				else
 				{
 					if (!idx)
-						return 0; /* cant start with a non-digit */
+						return false; /* cant start with a non-digit */
 					if (host[idx] != '.')
-						return 0; /* only . is a valid non-digit */
+						return false; /* only . is a valid non-digit */
 					if (sec_len > 3)
-						return 0; /* sections cant be more than 3 digits */
+						return false; /* sections cant be more than 3 digits */
 					sec_len = 0;
 					++dots;
 				}
 			}
 			if (dots != 4)
-				return 0;
+				return false;
 			break;
 		case 2:
 			dots = 0;
@@ -456,25 +449,23 @@ int doValidHost(const Anope::string &host, int type)
 				if (!isalnum(host[idx]))
 				{
 					if (!idx)
-						return 0;
+						return false;
 					if (host[idx] != '.' && host[idx] != '-')
-						return 0;
+						return false;
 					if (host[idx] == '.')
 						++dots;
 				}
 			}
 			if (host[len - 1] == '.')
-				return 0;
+				return false;
 			/**
 			 * Ultimate3 dosnt like a non-dotted hosts at all, nor does unreal,
 			 * so just dont allow them.
 			 */
 			if (!dots)
-				return 0;
-
-			break;
+				return false;
 	}
-	return 1;
+	return true;
 }
 
 /*************************************************************************/
@@ -485,12 +476,13 @@ int doValidHost(const Anope::string &host, int type)
  * @param type = format, 1 = ip4addr, 2 = hostname
  * @return 1 if a host is valid, 0 if it isnt.
  */
-int isValidHost(const Anope::string &host, int type)
+bool isValidHost(const Anope::string &host, int type)
 {
-	int status = 0;
+	bool status = false;
 	if (type == 3)
 	{
-		if (!(status = doValidHost(host, 1)))
+		status = doValidHost(host, 1);
+		if (!status)
 			status = doValidHost(host, 2);
 	}
 	else
@@ -505,12 +497,9 @@ int isValidHost(const Anope::string &host, int type)
  * @param c Character to check
  * @return 1 if a host is valid, 0 if it isnt.
  */
-int isvalidchar(const char c)
+bool isvalidchar(char c)
 {
-	if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
-		return 1;
-	else
-		return 0;
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
 }
 
 /*************************************************************************/
@@ -637,12 +626,10 @@ void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
  * @param int Check if botserv bots
  * @return int
  */
-int nickIsServices(const Anope::string &tempnick, int bot)
+bool nickIsServices(const Anope::string &tempnick, bool bot)
 {
-	int found = 0;
-
 	if (tempnick.empty())
-		return found;
+		return false;
 
 	Anope::string nick = tempnick;
 
@@ -651,24 +638,24 @@ int nickIsServices(const Anope::string &tempnick, int bot)
 	{
 		Anope::string servername = nick.substr(at + 1);
 		if (!servername.equals_ci(Config.ServerName))
-			return found;
+			return false;
 		nick = nick.substr(0, at);
 	}
 
 	if (!Config.s_NickServ.empty() && nick.equals_ci(Config.s_NickServ))
-		++found;
+		return true;
 	else if (!Config.s_ChanServ.empty() && nick.equals_ci(Config.s_ChanServ))
-		++found;
+		return true;
 	else if (!Config.s_HostServ.empty() && nick.equals_ci(Config.s_HostServ))
-		++found;
+		return true;
 	else if (!Config.s_MemoServ.empty() && nick.equals_ci(Config.s_MemoServ))
-		++found;
+		return true;
 	else if (!Config.s_BotServ.empty() && nick.equals_ci(Config.s_BotServ))
-		++found;
+		return true;
 	else if (!Config.s_OperServ.empty() && nick.equals_ci(Config.s_OperServ))
-		++found;
+		return true;
 	else if (!Config.s_GlobalNoticer.empty() && nick.equals_ci(Config.s_GlobalNoticer))
-		++found;
+		return true;
 	else if (!Config.s_BotServ.empty() && bot)
 	{
 		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
@@ -676,14 +663,11 @@ int nickIsServices(const Anope::string &tempnick, int bot)
 			BotInfo *bi = it->second;
 
 			if (nick.equals_ci(bi->nick))
-			{
-				++found;
-				break;
-			}
+				return true;
 		}
 	}
 
-	return found;
+	return false;
 }
 
 /*************************************************************************/
@@ -694,8 +678,7 @@ int nickIsServices(const Anope::string &tempnick, int bot)
  */
 static void arc4_init()
 {
-	int n;
-	for (n = 0; n < 256; ++n)
+	for (int n = 0; n < 256; ++n)
 		rs.s[n] = n;
 	rs.i = 0;
 	rs.j = 0;
@@ -711,14 +694,11 @@ static void arc4_init()
  */
 static void arc4_addrandom(void *dat, int datlen)
 {
-	int n;
-	uint8 si;
-
 	--rs.i;
-	for (n = 0; n < 256; ++n)
+	for (int n = 0; n < 256; ++n)
 	{
-		rs.i = rs.i + 1;
-		si = rs.s[rs.i];
+		++rs.i;
+		uint8 si = rs.s[rs.i];
 		rs.j = rs.j + si + (static_cast<unsigned char *>(dat))[n % datlen];
 		rs.s[rs.i] = rs.s[rs.j];
 		rs.s[rs.j] = si;
@@ -733,10 +713,8 @@ static void arc4_addrandom(void *dat, int datlen)
  */
 void rand_init()
 {
-#ifndef _WIN32
-	int n, fd;
-#endif
-	struct {
+	struct
+	{
 #ifndef _WIN32
 		struct timeval nowt; /* time */
 		char rnd[32]; /* /dev/urandom */
@@ -753,10 +731,10 @@ void rand_init()
 	/* unix/bsd: time */
 	gettimeofday(&rdat.nowt, NULL);
 	/* unix/bsd: /dev/urandom */
-	fd = open("/dev/urandom", O_RDONLY);
+	int fd = open("/dev/urandom", O_RDONLY);
 	if (fd)
 	{
-		n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
+		read(fd, &rdat.rnd, sizeof(rdat.rnd));
 		close(fd);
 	}
 #else
@@ -791,12 +769,10 @@ void add_entropy_userkeys()
  */
 unsigned char getrandom8()
 {
-	unsigned char si, sj;
-
-	rs.i = rs.i + 1;
-	si = rs.s[rs.i];
-	rs.j = rs.j + si;
-	sj = rs.s[rs.j];
+	++rs.i;
+	unsigned char si = rs.s[rs.i];
+	rs.j += si;
+	unsigned char sj = rs.s[rs.j];
 	rs.s[rs.i] = sj;
 	rs.s[rs.j] = si;
 	return rs.s[(si + sj) & 0xff];
@@ -810,9 +786,7 @@ unsigned char getrandom8()
  */
 uint16 getrandom16()
 {
-	uint16 val;
-
-	val = getrandom8() << 8;
+	uint16 val = getrandom8() << 8;
 	val |= getrandom8();
 	return val;
 }
@@ -825,9 +799,7 @@ uint16 getrandom16()
  */
 uint32 getrandom32()
 {
-	uint32 val;
-
-	val = getrandom8() << 24;
+	uint32 val = getrandom8() << 24;
 	val |= getrandom8() << 16;
 	val |= getrandom8() << 8;
 	val |= getrandom8();
@@ -862,18 +834,16 @@ int myNumToken(const Anope::string &str, char dilim)
  */
 Anope::string host_resolve(const Anope::string &host)
 {
-	struct hostent *hentp = NULL;
-	uint32 ip = INADDR_NONE;
-	char ipbuf[16];
+	struct hostent *hentp = gethostbyname(host.c_str());
 	Anope::string ipreturn;
-	struct in_addr addr;
-
-	hentp = gethostbyname(host.c_str());
 
 	if (hentp)
 	{
+		uint32 ip;
 		memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
+		struct in_addr addr;
 		addr.s_addr = ip;
+		char ipbuf[16];
 		ntoa(addr, ipbuf, sizeof(ipbuf));
 		ipreturn = ipbuf;
 		Alog(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
@@ -922,9 +892,7 @@ std::vector<Anope::string> BuildStringVector(const Anope::string &src)
 
 char *str_signed(unsigned char *str)
 {
-	char *nstr;
-
-	nstr = reinterpret_cast<char *>(str);
+	char *nstr = reinterpret_cast<char *>(str);
 	while (*str)
 	{
 		*nstr = static_cast<char>(*str);
@@ -1040,15 +1008,14 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 Anope::string GetWindowsVersion()
 {
 	OSVERSIONINFOEX osvi;
-	BOOL bOsVersionInfoEx;
-	Anope::string buf, extra, cputype;
 	SYSTEM_INFO si;
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))))
+	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))
+	if (!bOsVersionInfoEx)
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
@@ -1056,6 +1023,7 @@ Anope::string GetWindowsVersion()
 	}
 	GetSystemInfo(&si);
 
+	Anope::string buf, extra, cputype;
 	/* Determine CPU type 32 or 64 */
 	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
 		cputype = " 64-bit";
@@ -1146,19 +1114,19 @@ Anope::string GetWindowsVersion()
 	return buf;
 }
 
-int SupportedWindowsVersion()
+bool SupportedWindowsVersion()
 {
 	OSVERSIONINFOEX osvi;
-	BOOL bOsVersionInfoEx;
 
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	if (!(bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))))
+	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))
+	if (!bOsVersionInfoEx)
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
-			return 0;
+			return false;
 	}
 
 	switch (osvi.dwPlatformId)
@@ -1167,14 +1135,14 @@ int SupportedWindowsVersion()
 		case VER_PLATFORM_WIN32_NT:
 			/* win nt4 */
 			if (osvi.dwMajorVersion <= 4)
-				return 0;
+				return false;
 			/* the rest */
-			return 1;
+			return true;
 		/* win95 win98 winME */
 		case VER_PLATFORM_WIN32_WINDOWS:
-			return 0;
+			return false;
 	}
-	return 0;
+	return false;
 }
 
 #endif
@@ -1217,13 +1185,13 @@ uint16 netmask_to_cidr(uint32 mask)
  * @param str String to check
  * @return 1 for wildcard, 0 for anything else
  */
-int str_is_wildcard(const Anope::string &str)
+bool str_is_wildcard(const Anope::string &str)
 {
 	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
 		if (*c == '*' || *c == '?')
-			return 1;
+			return true;
 
-	return 0;
+	return false;
 }
 
 /**
@@ -1231,13 +1199,13 @@ int str_is_wildcard(const Anope::string &str)
  * @param str String to check
  * @return 1 for pure wildcard, 0 for anything else
  */
-int str_is_pure_wildcard(const Anope::string &str)
+bool str_is_pure_wildcard(const Anope::string &str)
 {
 	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
 		if (*c != '*')
-			return 0;
+			return false;
 
-	return 1;
+	return true;
 }
 
 /*************************************************************************/
@@ -1249,12 +1217,10 @@ int str_is_pure_wildcard(const Anope::string &str)
  */
 uint32 str_is_ip(const Anope::string &str)
 {
-	int i;
 	int octets[4] = { -1, -1, -1, -1 };
 	Anope::string s = str;
-	uint32 ip;
 
-	for (i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		octets[i] = convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
@@ -1263,7 +1229,7 @@ uint32 str_is_ip(const Anope::string &str)
 	}
 
 	/* Fill the IP - the dirty way */
-	ip = octets[3];
+	uint32 ip = octets[3];
 	ip += octets[2] * 256;
 	ip += octets[1] * 65536;
 	ip += octets[0] * 16777216;
@@ -1282,52 +1248,51 @@ uint32 str_is_ip(const Anope::string &str)
  * @param host Displayed host
  * @return 1 for IP/CIDR, 0 for anything else
  */
-int str_is_cidr(const Anope::string &str, uint32 *ip, uint32 *mask, Anope::string &host)
+bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host)
 {
-	int i;
 	int octets[4] = { -1, -1, -1, -1 };
 	Anope::string s = str;
-	uint16 cidr;
 
-	for (i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		octets[i] = convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
 		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
-			return 0;
+			return false;
 	}
 
 	/* Fill the IP - the dirty way */
-	*ip = octets[3];
-	*ip += octets[2] * 256;
-	*ip += octets[1] * 65536;
-	*ip += octets[0] * 16777216;
+	ip = octets[3];
+	ip += octets[2] * 256;
+	ip += octets[1] * 65536;
+	ip += octets[0] * 16777216;
 
+	uint16 cidr;
 	if (s[0] == '/')
 	{
 		/* There's a CIDR mask here! */
 		cidr = convertTo<uint16>(s.substr(1), s, false);
 		/* Bail out if the CIDR is invalid or the string isn't done yet */
 		if (cidr > 32 || s[0])
-			return 0;
+			return false;
 	}
 	else
 		/* No CIDR mask here - use 32 so the whole ip will be matched */
 		cidr = 32;
 
-	*mask = cidr_to_netmask(cidr);
+	mask = cidr_to_netmask(cidr);
 	/* Apply the mask to avoid 255.255.255.255/8 bans */
-	*ip &= *mask;
+	ip &= mask;
 
 	/* Refill the octets to fill the host */
-	octets[0] = (*ip & 0xFF000000) / 16777216;
-	octets[1] = (*ip & 0x00FF0000) / 65536;
-	octets[2] = (*ip & 0x0000FF00) / 256;
-	octets[3] = (*ip & 0x000000FF);
+	octets[0] = (ip & 0xFF000000) / 16777216;
+	octets[1] = (ip & 0x00FF0000) / 65536;
+	octets[2] = (ip & 0x0000FF00) / 256;
+	octets[3] = (ip & 0x000000FF);
 
 	host = stringify(octets[0]) + "." + stringify(octets[1]) + "." + stringify(octets[2]) + "." + stringify(octets[3]);
 	if (cidr != 32)
 		host += "/" + stringify(cidr);
 
-	return 1;
+	return true;
 }

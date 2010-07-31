@@ -50,7 +50,7 @@ class CommandNSInfo : public Command
 				if (has_auspex)
 					notice_lang(Config.s_NickServ, u, NICK_INFO_EMAIL, nr->email.c_str());
 			}
-			else if (nickIsServices(nick, 1))
+			else if (nickIsServices(nick, true))
 				notice_lang(Config.s_NickServ, u, NICK_X_IS_SERVICES, nick.c_str());
 			else
 				notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());

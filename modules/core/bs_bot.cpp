@@ -126,7 +126,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, 0))
+		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, false))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
@@ -150,7 +150,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (!oldnick.equals_ci(nick) && nickIsServices(nick, 0))
+		if (!oldnick.equals_ci(nick) && nickIsServices(nick, false))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
@@ -282,7 +282,7 @@ class CommandBSBot : public Command
 			return MOD_CONT;
 		}
 
-		if (nickIsServices(nick, 0))
+		if (nickIsServices(nick, false))
 		{
 			notice_lang(Config.s_BotServ, u, BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;

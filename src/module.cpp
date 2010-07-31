@@ -155,15 +155,15 @@ Version::~Version()
 
 unsigned Version::GetMajor() const
 {
-	return Major;
+	return this->Major;
 }
 
 unsigned Version::GetMinor() const
 {
-	return Minor;
+	return this->Minor;
 }
 
 unsigned Version::GetBuild() const
 {
-	return Build;
+	return this->Build;
 }

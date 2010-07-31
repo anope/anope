@@ -248,8 +248,6 @@ bool ChannelModeRegistered::CanSet(User *u) const
  */
 void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 {
-	Entry *ban;
-
 	/* check for NULL values otherwise we will segfault */
 	if (!chan || mask.empty())
 	{
@@ -261,8 +259,8 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 	 * Create a new ban and add it to the list.. ~ Viper */
 	if (!chan->bans)
 		chan->bans = list_create();
-	ban = entry_add(chan->bans, mask);
 
+	Entry *ban = entry_add(chan->bans, mask);
 	if (!ban)
 		fatal("Creating new ban entry failed");
 
@@ -289,15 +287,11 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
  */
 void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
 {
-	AutoKick *akick;
-	Entry *ban;
-
 	/* Sanity check as it seems some IRCD will just send -b without a mask */
 	if (mask.empty() || !chan->bans || !chan->bans->count)
 		return;
 
-	ban = elist_find_mask(chan->bans, mask);
-
+	Entry *ban = elist_find_mask(chan->bans, mask);
 	if (ban)
 	{
 		entry_delete(chan->bans, ban);
@@ -305,6 +299,7 @@ void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
 		Alog(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
 	}
 
+	AutoKick *akick;
 	if (chan->ci && (akick = is_stuck(chan->ci, mask)))
 		stick_mask(chan->ci, akick);
 }
@@ -315,8 +310,6 @@ void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
  */
 void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
 {
-	Entry *exception;
-
 	if (!chan || mask.empty())
 	{
 		Alog(LOG_DEBUG) << "add_exception called with NULL values";
@@ -327,8 +320,8 @@ void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
 	 * Create a new exception and add it to the list.. ~ Viper */
 	if (!chan->excepts)
 		chan->excepts = list_create();
-	exception = entry_add(chan->excepts, mask);
 
+	Entry *exception = entry_add(chan->excepts, mask);
 	if (!exception)
 		fatal("Creating new exception entry failed");
 
@@ -341,14 +334,11 @@ void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
  */
 void ChannelModeExcept::DelMask(Channel *chan, const Anope::string &mask)
 {
-	Entry *exception;
-
 	/* Sanity check as it seems some IRCD will just send -e without a mask */
 	if (mask.empty() || !chan->excepts || !chan->excepts->count)
 		return;
 
-	exception = elist_find_mask(chan->excepts, mask);
-
+	Entry *exception = elist_find_mask(chan->excepts, mask);
 	if (exception)
 	{
 		entry_delete(chan->excepts, exception);
@@ -362,8 +352,6 @@ void ChannelModeExcept::DelMask(Channel *chan, const Anope::string &mask)
  */
 void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
 {
-	Entry *invite;
-
 	if (!chan || mask.empty())
 	{
 		Alog(LOG_DEBUG) << "add_invite called with NULL values";
@@ -374,8 +362,8 @@ void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
 	 * Create a new invite and add it to the list.. ~ Viper */
 	if (!chan->invites)
 		chan->invites = list_create();
-	invite = entry_add(chan->invites, mask);
 
+	Entry *invite = entry_add(chan->invites, mask);
 	if (!invite)
 		fatal("Creating new exception entry failed");
 
@@ -389,14 +377,11 @@ void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
  */
 void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
 {
-	Entry *invite;
-
 	/* Sanity check as it seems some IRCD will just send -I without a mask */
 	if (mask.empty() || !chan->invites || !chan->invites->count)
 		return;
 
-	invite = elist_find_mask(chan->invites, mask);
-
+	Entry *invite = elist_find_mask(chan->invites, mask);
 	if (invite)
 	{
 		entry_delete(chan->invites, invite);
@@ -408,8 +393,6 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 {
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
-	std::list<std::pair<void *, Anope::string> > *list, *otherlist;
-	std::list<std::pair<void *, Anope::string > >::iterator it, it_end;
 	bool IsParam = false;
 
 	if (Type == ST_CHANNEL)
@@ -424,6 +407,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 		if (um->Type == MODE_PARAM)
 			IsParam = true;
 	}
+	std::list<std::pair<void *, Anope::string> > *list, *otherlist;
 	if (Set)
 	{
 		list = &AddModes;
@@ -436,6 +420,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 	}
 
 	/* Loop through the list and find if this mode is already on here */
+	std::list<std::pair<void *, Anope::string > >::iterator it, it_end;
 	for (it = list->begin(), it_end = list->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
@@ -482,7 +467,7 @@ StackerInfo *ModeManager::GetInfo(void *Item)
 			return PItem.second;
 	}
 
-	StackerInfo *s = new StackerInfo;
+	StackerInfo *s = new StackerInfo();
 	StackerObjects.push_back(std::make_pair(Item, s));
 	return s;
 }
@@ -495,12 +480,11 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 {
 	std::list<Anope::string> ret;
 	std::list<std::pair<void *, Anope::string> >::iterator it, it_end;
-	Anope::string buf, parambuf;
+	Anope::string buf = "+", parambuf;
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
 	unsigned NModes = 0;
 
-	buf = "+";
 	for (it = info->AddModes.begin(), it_end = info->AddModes.end(); it != it_end; ++it)
 	{
 		if (++NModes > ircd->maxmodes)
@@ -823,7 +807,6 @@ void ModeManager::ProcessModes()
 			StackerInfo *s = it->second;
 			User *u = NULL;
 			Channel *c = NULL;
-			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
 
 			if (s->Type == ST_USER)
 				u = static_cast<User *>(it->first);
@@ -832,6 +815,7 @@ void ModeManager::ProcessModes()
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 
+			std::list<Anope::string> ModeStrings = BuildModeStrings(s);
 			for (std::list<Anope::string>::iterator lit = ModeStrings.begin(), lit_end = ModeStrings.end(); lit != lit_end; ++lit)
 			{
 				if (c)

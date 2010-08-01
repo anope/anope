@@ -138,6 +138,7 @@ class ESHA256 : public Module
 		Anope::string buf2;
 		for (int i = 0; i < 8; ++i)
 			UNPACK32(iv[i], reinterpret_cast<unsigned char *>(&buf[i << 2]));
+		buf[32] = '\0';
 		b64_encode(buf, buf2);
 		return buf2;
 	}
@@ -262,7 +263,7 @@ class ESHA256 : public Module
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
-		char digest[SHA256_DIGEST_SIZE];
+		char digest[SHA256_DIGEST_SIZE+1];
 		Anope::string cpass;
 		SHA256Context ctx;
 		std::stringstream buf;
@@ -275,7 +276,7 @@ class ESHA256 : public Module
 		SHA256Init(&ctx);
 		SHA256Update(&ctx, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		SHA256Final(&ctx, reinterpret_cast<unsigned char *>(digest));
-
+		digest[SHA256_DIGEST_SIZE] = '\0';
 		b64_encode(digest, cpass);
 		buf << "sha256:" << cpass << ":" << GetIVString();
 		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";

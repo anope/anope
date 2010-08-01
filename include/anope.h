@@ -153,6 +153,11 @@ namespace Anope
 		inline size_type length() const { return this->_string.length(); }
 
 		/**
+		 * Resizes the string content to n characters.
+		 */
+		inline void resize(size_type n) { return this->_string.resize(n); }
+
+		/**
 		 * Erases characters from the string.
 		 */
 		inline iterator erase(const iterator &i) { return this->_string.erase(i); }
@@ -311,6 +316,12 @@ namespace Anope
 	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
 	 */
 	extern CoreExport std::vector<Message *> FindMessage(const string &name);
+
+	/** Converts a string to hex
+	 * @param the data to be converted
+	 * @return a anope::string containing the hex value
+	 */
+	extern CoreExport string Hex(const string &data);
 }
 
 /** sepstream allows for splitting token seperated lists.

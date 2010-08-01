@@ -24,14 +24,13 @@ class CommandMSCancel : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		int ischan;
-		int isforbid;
+		bool ischan, isforbid;
 		Anope::string name = params[0];
 		MemoInfo *mi;
 
 		if (!u->IsRecognized())
 			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
-		else if (!(mi = getmemoinfo(name, &ischan, &isforbid)))
+		else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 		{
 			if (isforbid)
 				notice_lang(Config.s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());

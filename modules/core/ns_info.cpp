@@ -29,7 +29,7 @@ class CommandNSInfo : public Command
 		}
 	}
  public:
-	CommandNSInfo() : Command("INFO", 1, 1)
+	CommandNSInfo() : Command("INFO", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}

@@ -27,7 +27,7 @@ class CommandOSQuit : public Command
 
 		if (Config.GlobalOnCycle)
 			oper_global("", "%s", Config.GlobalOnCycleMessage.c_str());
-		quitting = 1;
+		quitting = true;
 		return MOD_CONT;
 	}
 

@@ -26,7 +26,7 @@ class CommandOSShutdown : public Command
 
 		if (Config.GlobalOnCycle)
 			oper_global("", "%s", Config.GlobalOnCycleMessage.c_str());
-		shutting_down = 1;
+		shutting_down = true;
 		return MOD_CONT;
 	}
 

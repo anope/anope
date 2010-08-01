@@ -225,25 +225,25 @@ int init_primary(int ac, char **av)
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
-		nofork = 1;
+		nofork = true;
 
 	if (GetCommandLineArgument("support", 's'))
 	{
-		nofork = nothird = 1;
+		nofork = nothird = true;
 		++debug;
 	}
 
 	if (GetCommandLineArgument("readonly", 'r'))
-		readonly = 1;
+		readonly = true;
 
 	if (GetCommandLineArgument("nothird"))
-		nothird = 1;
+		nothird = true;
 
 	if (GetCommandLineArgument("noexpire", 'e'))
-		noexpire = 1;
+		noexpire = true;
 
 	if (GetCommandLineArgument("protocoldebug"))
-		protocoldebug = 1;
+		protocoldebug = true;
 
 	Anope::string Arg;
 	if (GetCommandLineArgument("debug", 'd', Arg))

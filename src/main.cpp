@@ -42,13 +42,12 @@ Anope::string services_bin;	/* Binary as specified by the user */
 Anope::string orig_cwd;		/* Original current working directory */
 Anope::string log_filename = "services.log"; /* -log filename */
 int debug = 0;				/* -debug */
-int readonly = 0;			/* -readonly */
+bool readonly = false;		/* -readonly */
 bool LogChan = false;		/* -logchan */
-int nofork = 0;				/* -nofork */
-int forceload = 0;			/* -forceload */
-int nothird = 0;			/* -nothrid */
-int noexpire = 0;			/* -noexpire */
-int protocoldebug = 0;		/* -protocoldebug */
+bool nofork = false;		/* -nofork */
+bool nothird = false;		/* -nothrid */
+bool noexpire = false;		/* -noexpire */
+bool protocoldebug = false;	/* -protocoldebug */
 
 Anope::string binary_dir; /* Used to store base path for Anope */
 #ifdef _WIN32
@@ -57,16 +56,16 @@ Anope::string binary_dir; /* Used to store base path for Anope */
 #endif
 
 /* Set to 1 if we are to quit */
-int quitting = 0;
+bool quitting = false;
 
 /* Set to 1 if we are to quit after saving databases */
-int shutting_down = 0;
+bool shutting_down = false;
 
 /* Contains a message as to why services is terminating */
 Anope::string quitmsg;
 
 /* Should we update the databases now? */
-int save_data = 0;
+bool save_data = false;
 
 /* At what time were we started? */
 time_t start_time;
@@ -77,7 +76,7 @@ char **my_av, **my_envp;
 /******** Local variables! ********/
 
 /* Set to 1 after we've set everything up */
-static int started = 0;
+static bool started = false;
 
 /*************************************************************************/
 
@@ -272,7 +271,7 @@ void sighandler(int signum)
 			if (!read_config(1))
 			{
 				quitmsg = "Error Reading Configuration File (Received SIGHUP)";
-				quitting = 1;
+				quitting = true;
 			}
 
 			FOREACH_MOD(I_OnReload, OnReload(true));
@@ -418,8 +417,6 @@ static bool Connect()
 
 int main(int ac, char **av, char **envp)
 {
-	int i;
-
 	my_av = av;
 	my_envp = envp;
 
@@ -456,7 +453,8 @@ int main(int ac, char **av, char **envp)
 	ModuleRunTimeDirCleanUp();
 
 	/* General initialization first */
-	if ((i = init_primary(ac, av)))
+	int i = init_primary(ac, av);
+	if (i)
 		return i;
 
 	Alog(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
@@ -467,7 +465,8 @@ int main(int ac, char **av, char **envp)
 #endif
 
 	/* Initialization stuff. */
-	if ((i = init_secondary(ac, av)))
+	i = init_secondary(ac, av);
+	if (i)
 		return i;
 
 	/* If the first connect fails give up, don't sit endlessly trying to reconnect */
@@ -477,7 +476,7 @@ int main(int ac, char **av, char **envp)
 	ircdproto->SendConnect();
 	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 
-	started = 1;
+	started = true;
 
 #ifndef _WIN32
 	if (Config.DumpCore)
@@ -515,12 +514,12 @@ int main(int ac, char **av, char **envp)
 				if (shutting_down)
 					ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
 				save_databases();
-				save_data = 0;
+				save_data = false;
 			}
 
 			if (shutting_down)
 			{
-				quitting = 1;
+				quitting = true;
 				break;
 			}
 
@@ -570,7 +569,7 @@ int main(int ac, char **av, char **envp)
 			if (Config.MaxRetries && j == Config.MaxRetries)
 			{
 				Alog() << "Max connection retry limit exceeded";
-				quitting = 1;
+				quitting = true;
 			}
 		}
 	}

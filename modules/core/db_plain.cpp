@@ -555,7 +555,7 @@ class DBPlain : public Module
 				Alog() << "Unable to back up database!";
 
 				if (!Config.NoBackupOkay)
-					quitting = 1;
+					quitting = true;
 
 				return;
 			}

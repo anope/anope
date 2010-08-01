@@ -23,7 +23,7 @@ class CommandOSUpdate : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		notice_lang(Config.s_OperServ, u, OPER_UPDATING);
-		save_data = 1;
+		save_data = true;
 		return MOD_CONT;
 	}
 

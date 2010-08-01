@@ -25,7 +25,7 @@ class CommandOSReload : public Command
 		if (!read_config(1))
 		{
 			quitmsg = "Error during the reload of the configuration file!";
-			quitting = 1;
+			quitting = true;
 		}
 
 		FOREACH_MOD(I_OnReload, OnReload(false));

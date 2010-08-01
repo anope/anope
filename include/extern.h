@@ -193,20 +193,17 @@ E Anope::string version_protocol;
 E Anope::string services_dir;
 E Anope::string log_filename;
 E int debug;
-E int readonly;
+E bool readonly;
 E bool LogChan;
-E int nofork;
-E int forceload;
-E int nothird;
-E int noexpire;
-E int protocoldebug;
+E bool nofork;
+E bool nothird;
+E bool noexpire;
+E bool protocoldebug;
 
-E int is44;
-E int quitting;
-E int shutting_down;
+E bool quitting;
+E bool shutting_down;
 E Anope::string quitmsg;
-E int save_data;
-E int got_alarm;
+E bool save_data;
 E time_t start_time;
 
 E Socket *UplinkSock;

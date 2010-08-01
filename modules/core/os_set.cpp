@@ -72,14 +72,14 @@ class CommandOSSet : public Command
 
 		if (setting.equals_ci("ON"))
 		{
-			readonly = 1;
+			readonly = true;
 			Alog() << "Read-only mode activated";
 			close_log();
 			notice_lang(Config.s_OperServ, u, OPER_SET_READONLY_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
-			readonly = 0;
+			readonly = false;
 			open_log();
 			Alog() << "Read-only mode deactivated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_READONLY_OFF);
@@ -219,13 +219,13 @@ class CommandOSSet : public Command
 
 		if (setting.equals_ci("ON"))
 		{
-			noexpire = 1;
+			noexpire = true;
 			Alog() << "No expire mode activated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_NOEXPIRE_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
-			noexpire = 0;
+			noexpire = false;
 			Alog() << "No expire mode deactivated";
 			notice_lang(Config.s_OperServ, u, OPER_SET_NOEXPIRE_OFF);
 		}

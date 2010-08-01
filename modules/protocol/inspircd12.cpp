@@ -1178,21 +1178,21 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 		{
 			send_cmd("", "ERROR :m_globops is not loaded. This is required by Anope");
 			quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
-			quitting = 1;
+			quitting = true;
 			return MOD_STOP;
 		}
 		if (!has_servicesmod)
 		{
 			send_cmd("", "ERROR :m_services_account.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
-			quitting = 1;
+			quitting = true;
 			return MOD_STOP;
 		}
 		if (!has_hidechansmod)
 		{
 			send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
 			quitmsg = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
-			quitting = 1;
+			quitting = true;
 			return MOD_STOP;
 		}
 		if (!has_svsholdmod)

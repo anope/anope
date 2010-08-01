@@ -123,7 +123,7 @@ void Channel::JoinUser(User *user)
 	 * But don't join the bot if the channel is persistant - Adam
 	 * But join persistant channels when syncing with our uplink- DP
 	 **/
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() == Config.BSMinUsers)
+	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config.BSMinUsers && !this->FindUser(this->ci->bi))
 		this->ci->bi->Join(this);
 	/* Only display the greet if the main uplink we're connected
 	 * to has synced, or we'll get greet-floods when the net
@@ -183,8 +183,10 @@ void Channel::DeleteUser(User *user)
 	if (this->ci && this->ci->HasFlag(CI_INHABIT))
 		return;
 
-	/* check for BSMinUsers and part the BotServ bot from the channel */
-	if (this->users.size() < Config.BSMinUsers && !Config.s_BotServ.empty() && this->ci && this->ci->bi && this->FindUser(this->ci->bi))
+	/* check for BSMinUsers and part the BotServ bot from the channel
+	 * Use <= because the bot is included in this->users.size()
+	 */
+	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && this->users.size() <= Config.BSMinUsers && this->FindUser(this->ci->bi))
 		this->ci->bi->Part(this->ci->c);
 	else if (this->users.empty())
 		delete this;
@@ -1345,8 +1347,8 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 		else if (voice && check_access(user, ci, CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
-	/* If this channel has secureops or the user matches autodeop or the channel is syncing and this is the first user and they are not ulined, check to remove modes */
-	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || (c->HasFlag(CH_SYNCING) && c->users.size() == (ci->bi ? 2 : 1))) && !user->server->IsULined())
+	/* If this channel has secureops or the user matches autodeop or the channel is syncing and they are not ulined, check to remove modes */
+	if ((ci->HasFlag(CI_SECUREOPS) || check_access(user, ci, CA_AUTODEOP) || c->HasFlag(CH_SYNCING)) && !user->server->IsULined())
 	{
 		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !check_access(user, ci, CA_FOUNDER))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);

@@ -233,10 +233,15 @@ bool ValidateBotServ(ServerConfig *, const Anope::string &tag, const Anope::stri
 			if (data.GetValue().empty())
 				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
-		else if (value.equals_ci("minusers") || value.equals_ci("badwordsmax") || value.equals_ci("keepdata"))
+		else if (value.equals_ci("badwordsmax") || value.equals_ci("keepdata"))
 		{
 			if (!data.GetInteger() && !dotime(data.GetValue()))
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
+		}
+		else if (value.equals_ci("minusers"))
+		{
+			if (data.GetInteger() < 0)
+				throw ConfigException("The value for <" + tag + ":" + value + "> must be greater than or equal to zero!");
 		}
 	}
 	return true;

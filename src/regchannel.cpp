@@ -72,7 +72,7 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->c)
 	{
-		if (this->bi && this->c->users.size() >= Config.BSMinUsers)
+		if (this->bi && this->c->FindUser(this->bi))
 			this->bi->Part(this->c);
 		this->c->ci = NULL;
 	}

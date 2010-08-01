@@ -16,7 +16,7 @@
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp() : Command("AUTOOP", 2)
+	CommandNSSetAutoOp() : Command("AUTOOP", 1)
 	{
 	}
 

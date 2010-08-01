@@ -227,9 +227,9 @@ E void ms_init();
 E void memoserv(User *u, const Anope::string &buf);
 E void rsend_notify(User *u, Memo *m, const Anope::string &chan);
 E void check_memos(User *u);
-E MemoInfo *getmemoinfo(const Anope::string &name, int *ischan, int *isforbid);
+E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
 E void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z);
-E int delmemo(MemoInfo *mi, int num);
+E bool delmemo(MemoInfo *mi, int num);
 
 /**** messages.c ****/
 

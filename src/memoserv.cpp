@@ -16,7 +16,6 @@
 /*************************************************************************/
 /* *INDENT-OFF* */
 
-E void moduleAddMemoServCmds();
 static bool SendMemoMail(NickCore *nc, Memo *m);
 
 /*************************************************************************/
@@ -77,19 +76,18 @@ void memoserv(User *u, const Anope::string &buf)
  */
 void check_memos(User *u)
 {
-	const NickCore *nc;
-	unsigned i, newcnt = 0;
-
 	if (!u)
 	{
 		Alog(LOG_DEBUG) << "check_memos called with NULL values";
 		return;
 	}
 
-	if (!(nc = u->Account()) || !u->IsRecognized() || !nc->HasFlag(NI_MEMO_SIGNON))
+	const NickCore *nc = u->Account();
+	if (!nc || !u->IsRecognized() || !nc->HasFlag(NI_MEMO_SIGNON))
 		return;
 
-	for (i = 0; i < nc->memos.memos.size(); ++i)
+	unsigned i = 0, end = nc->memos.memos.size(), newcnt = 0;
+	for (; i < end; ++i)
 	{
 		if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 			++newcnt;
@@ -101,7 +99,7 @@ void check_memos(User *u)
 			notice_lang(Config.s_MemoServ, u, MEMO_TYPE_READ_LAST, Config.s_MemoServ.c_str());
 		else if (newcnt == 1)
 		{
-			for (i = 0; i < nc->memos.memos.size(); ++i)
+			for (i = 0; i < end; ++i)
 			{
 				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
@@ -132,55 +130,51 @@ void check_memos(User *u)
  * @return `ischan' 1 if the name was a channel name, else 0.
  * @return `isforbid' 1 if the name is forbidden, else 0.
  */
-MemoInfo *getmemoinfo(const Anope::string &name, int *ischan, int *isforbid)
+MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid)
 {
 	if (name[0] == '#')
 	{
-		ChannelInfo *ci;
-		if (ischan)
-			*ischan = 1;
-		ci = cs_findchan(name);
+		ischan = true;
+		ChannelInfo *ci = cs_findchan(name);
 		if (ci)
 		{
 			if (!ci->HasFlag(CI_FORBIDDEN))
 			{
-				*isforbid = 0;
+				isforbid = false;
 				return &ci->memos;
 			}
 			else
 			{
-				*isforbid = 1;
+				isforbid = true;
 				return NULL;
 			}
 		}
 		else
 		{
-			*isforbid = 0;
+			isforbid = false;
 			return NULL;
 		}
 	}
 	else
 	{
-		NickAlias *na;
-		if (ischan)
-			*ischan = 0;
-		na = findnick(name);
+		ischan = false;
+		NickAlias *na = findnick(name);
 		if (na)
 		{
 			if (!na->HasFlag(NS_FORBIDDEN))
 			{
-				*isforbid = 0;
+				isforbid = false;
 				return &na->nc->memos;
 			}
 			else
 			{
-				*isforbid = 1;
+				isforbid = true;
 				return NULL;
 			}
 		}
 		else
 		{
-			*isforbid = 0;
+			isforbid = false;
 			return NULL;
 		}
 	}
@@ -202,9 +196,7 @@ MemoInfo *getmemoinfo(const Anope::string &name, int *ischan, int *isforbid)
  */
 void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z)
 {
-	int ischan;
-	int isforbid;
-	Memo *m;
+	bool ischan, isforbid;
 	MemoInfo *mi;
 	time_t now = time(NULL);
 	Anope::string source = u->Account()->display;
@@ -225,7 +217,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 		if (!z || z == 3)
 			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
 	}
-	else if (!(mi = getmemoinfo(name, &ischan, &isforbid)))
+	else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 	{
 		if (!z || z == 3)
 		{
@@ -257,7 +249,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 	else
 	{
 		u->lastmemosend = now;
-		m = new Memo;
+		Memo *m = new Memo();
 		mi->memos.push_back(m);
 		m->sender = source;
 		if (mi->memos.size() > 1)
@@ -265,7 +257,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
 			if (m->number < 1)
 			{
-				for (unsigned i = 0; i < mi->memos.size(); ++i)
+				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
 					mi->memos[i]->number = i + 1;
 			}
 		}
@@ -341,25 +333,23 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
  * @param num Memo number to delete
  * @return int 1 if the memo was found, else 0.
  */
-int delmemo(MemoInfo *mi, int num)
+bool delmemo(MemoInfo *mi, int num)
 {
-	unsigned i;
 	if (mi->memos.empty())
-		return 0;
+		return false;
 
-	for (i = 0; i < mi->memos.size(); ++i)
-	{
+	unsigned i = 0, end = mi->memos.size();
+	for (; i < end; ++i)
 		if (mi->memos[i]->number == num)
 			break;
-	}
-	if (i < mi->memos.size())
+	if (i < end)
 	{
 		delete mi->memos[i]; /* Deallocate the memo itself */
 		mi->memos.erase(mi->memos.begin() + i); /* Remove the memo pointer from the vector */
-		return 1;
+		return true;
 	}
 	else
-		return 0;
+		return false;
 }
 
 /*************************************************************************/
@@ -379,28 +369,25 @@ static bool SendMemoMail(NickCore *nc, Memo *m)
 
 void rsend_notify(User *u, Memo *m, const Anope::string &chan)
 {
-	NickAlias *na;
-	NickCore *nc;
-	char text[256];
-	const char *fmt;
-
 	/* Only send receipt if memos are allowed */
 	if (!readonly)
 	{
 		/* Get nick alias for sender */
-		na = findnick(m->sender);
+		NickAlias *na = findnick(m->sender);
 
 		if (!na)
 			return;
 
 		/* Get nick core for sender */
-		nc = na->nc;
+		NickCore *nc = na->nc;
 
 		if (!nc)
 			return;
 
 		/* Text of the memo varies if the recepient was a
 		   nick or channel */
+		const char *fmt;
+		char text[256];
 		if (!chan.empty())
 		{
 			fmt = getstring(na, MEMO_RSEND_CHAN_MEMO_TEXT);

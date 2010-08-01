@@ -1308,9 +1308,9 @@ Anope::string Anope::Hex(const Anope::string &data)
 {
 	const char hextable[] = "0123456789abcdef";
 
-	int l = data.length();
+	size_t l = data.length();
 	Anope::string rv;
-	for(int i=0; i < l; i++)
+	for (size_t i = 0; i < l; ++i)
 	{
 		unsigned char c = data[i];
 		rv += hextable[c >> 4];

@@ -176,7 +176,7 @@ class CoreExport User : public Extensible
 	void Logout();
 
 	/** Get the account the user is logged in using
-	 * @reurn The account or NULL
+	 * @return The account or NULL
 	 */
 	virtual NickCore *Account();
 	virtual const NickCore *Account() const;

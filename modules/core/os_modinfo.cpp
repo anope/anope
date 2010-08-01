@@ -67,13 +67,15 @@ class CommandOSModInfo : public Command
 
 class OSModInfo : public Module
 {
+	CommandOSModInfo commandosmodinfo;
+
  public:
 	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSModInfo());
+		this->AddCommand(OperServ, &commandosmodinfo);
 	}
 };
 

@@ -133,13 +133,15 @@ class CommandOSIgnore : public Command
 
 class OSIgnore : public Module
 {
+	CommandOSIgnore commandosignore;
+
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSIgnore());
+		this->AddCommand(OperServ, &commandosignore);
 
 		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 2);

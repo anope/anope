@@ -395,6 +395,8 @@ class CommandOSSQLine : public Command
 
 class OSSQLine : public Module
 {
+	CommandOSSQLine commandossqline;
+
  public:
 	OSSQLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -404,7 +406,7 @@ class OSSQLine : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSQLine());
+		this->AddCommand(OperServ, &commandossqline);
 	}
 };
 

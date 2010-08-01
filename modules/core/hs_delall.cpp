@@ -65,13 +65,15 @@ class CommandHSDelAll : public Command
 
 class HSDelAll : public Module
 {
+	CommandHSDelAll commandhsdelall;
+
  public:
 	HSDelAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSDelAll());
+		this->AddCommand(HostServ, &commandhsdelall);
 	}
 };
 

@@ -78,14 +78,16 @@ class CommandCSKick : public Command
 
 class CSKick : public Module
 {
+	CommandCSKick commandcskick, commandcsk;
+
  public:
-	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandcskick("KICK"), commandcsk("K")
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSKick("KICK"));
-		this->AddCommand(ChanServ, new CommandCSKick("K"));
+		this->AddCommand(ChanServ, &commandcskick);
+		this->AddCommand(ChanServ, &commandcsk);
 	}
 };
 

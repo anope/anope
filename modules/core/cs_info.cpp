@@ -146,13 +146,15 @@ class CommandCSInfo : public Command
 
 class CSInfo : public Module
 {
+	CommandCSInfo commandcsinfo;
+
  public:
 	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSInfo());
+		this->AddCommand(ChanServ, &commandcsinfo);
 	}
 };
 

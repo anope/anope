@@ -75,13 +75,15 @@ class CommandMSCancel : public Command
 
 class MSCancel : public Module
 {
+	CommandMSCancel commandmscancel;
+
  public:
 	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSCancel());
+		this->AddCommand(MemoServ, &commandmscancel);
 	}
 };
 

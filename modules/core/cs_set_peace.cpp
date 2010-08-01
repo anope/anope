@@ -16,7 +16,7 @@
 class CommandCSSetPeace : public Command
 {
  public:
-	CommandCSSetPeace(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPeace(const Anope::string &cpermission = "") : Command("PEACE", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetPeace : public Command
 class CommandCSSASetPeace : public CommandCSSetPeace
 {
  public:
-	CommandCSSASetPeace(const Anope::string &cname) : CommandCSSetPeace(cname, "chanserv/saset/peace")
+	CommandCSSASetPeace() : CommandCSSetPeace("chanserv/saset/peace")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetPeace : public CommandCSSetPeace
 
 class CSSetPeace : public Module
 {
+	CommandCSSetPeace commandcssetpeace;
+	CommandCSSASetPeace commandcssasetpeace;
+
  public:
 	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetPeace : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetPeace("PEACE"));
+			c->AddSubcommand(&commandcssetpeace);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetPeace("PEACE"));
+			c->AddSubcommand(&commandcssasetpeace);
 	}
 
 	~CSSetPeace()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("PEACE");
+			c->DelSubcommand(&commandcssetpeace);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("PEACE");
+			c->DelSubcommand(&commandcssasetpeace);
 	}
 };
 

@@ -81,13 +81,15 @@ class CommandNSLogout : public Command
 
 class NSLogout : public Module
 {
+	CommandNSLogout commandnslogout;
+
  public:
 	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSLogout());
+		this->AddCommand(NickServ, &commandnslogout);
 	}
 };
 

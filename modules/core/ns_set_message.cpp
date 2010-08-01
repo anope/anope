@@ -16,7 +16,7 @@
 class CommandNSSetMessage : public Command
 {
  public:
-	CommandNSSetMessage(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetMessage() : Command("MESSAGE", 1)
 	{
 	}
 
@@ -64,7 +64,7 @@ class CommandNSSetMessage : public Command
 class CommandNSSASetMessage : public Command
 {
  public:
-	CommandNSSASetMessage(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/message")
+	CommandNSSASetMessage() : Command("MESSAGE", 2, 2, "nickserv/saset/message")
 	{
 	}
 
@@ -117,6 +117,9 @@ class CommandNSSASetMessage : public Command
 
 class NSSetMessage : public Module
 {
+	CommandNSSetMessage commandnssetmessage;
+	CommandNSSASetMessage commandnssasetmessage;
+
  public:
 	NSSetMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -125,22 +128,22 @@ class NSSetMessage : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetMessage("MSG"));
+			c->AddSubcommand(&commandnssetmessage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetMessage("MSG"));
+			c->AddSubcommand(&commandnssasetmessage);
 	}
 
 	~NSSetMessage()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("MSG");
+			c->DelSubcommand(&commandnssetmessage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("MSG");
+			c->DelSubcommand(&commandnssasetmessage);
 	}
 };
 

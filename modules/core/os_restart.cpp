@@ -45,13 +45,15 @@ class CommandOSRestart : public Command
 
 class OSRestart : public Module
 {
+	CommandOSRestart commandosrestart;
+
  public:
 	OSRestart(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSRestart());
+		this->AddCommand(OperServ, &commandosrestart);
 	}
 };
 

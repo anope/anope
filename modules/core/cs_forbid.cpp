@@ -116,13 +116,15 @@ class CommandCSForbid : public Command
 
 class CSForbid : public Module
 {
+	CommandCSForbid commandcsforbid;
+
  public:
 	CSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSForbid());
+		this->AddCommand(ChanServ, &commandcsforbid);
 	}
 };
 

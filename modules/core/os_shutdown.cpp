@@ -44,13 +44,15 @@ class CommandOSShutdown : public Command
 
 class OSShutdown : public Module
 {
+	CommandOSShutdown commandosshutdown;
+
  public:
 	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSShutdown());
+		this->AddCommand(OperServ, &commandosshutdown);
 	}
 };
 

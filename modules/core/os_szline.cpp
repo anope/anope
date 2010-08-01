@@ -393,6 +393,8 @@ class CommandOSSZLine : public Command
 
 class OSSZLine : public Module
 {
+	CommandOSSZLine commandosszline;
+
  public:
 	OSSZLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -402,7 +404,7 @@ class OSSZLine : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSZLine());
+		this->AddCommand(OperServ, &commandosszline);
 	}
 };
 

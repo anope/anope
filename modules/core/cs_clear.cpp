@@ -162,13 +162,15 @@ class CommandCSClear : public Command
 
 class CSClear : public Module
 {
+	CommandCSClear commandcsclear;
+
  public:
 	CSClear(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSClear());
+		this->AddCommand(ChanServ, &commandcsclear);
 	}
 };
 

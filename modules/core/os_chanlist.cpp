@@ -86,13 +86,15 @@ class CommandOSChanList : public Command
 
 class OSChanList : public Module
 {
+	CommandOSChanList commandoschanlist;
+
  public:
 	OSChanList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSChanList());
+		this->AddCommand(OperServ, &commandoschanlist);
 	}
 };
 

@@ -29,6 +29,8 @@ class CommandSSHelp : public Command
 
 class SSMain : public Module
 {
+	CommandSSHelp commandsshelp;
+
  public:
 	SSMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -44,7 +46,7 @@ class SSMain : public Module
 		}
 		Alog() << "Done creating SS";
 
-		this->AddCommand(statserv, new CommandSSHelp());
+		this->AddCommand(statserv, &commandsshelp);
 	}
 
 	~SSMain()

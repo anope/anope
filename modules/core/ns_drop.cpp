@@ -114,13 +114,15 @@ class CommandNSDrop : public Command
 
 class NSDrop : public Module
 {
+	CommandNSDrop commandnsdrop;
+
  public:
 	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSDrop());
+		this->AddCommand(NickServ, &commandnsdrop);
 	}
 };
 

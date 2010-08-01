@@ -16,6 +16,8 @@ Command::Command(const Anope::string &sname, size_t min_params, size_t max_param
 
 Command::~Command()
 {
+	if (this->module)
+		this->module->DelCommand(this->service, this);
 }
 
 CommandReturn Command::Execute(User *u, const std::vector<Anope::string> &)
@@ -39,7 +41,13 @@ bool Command::AddSubcommand(Command *c)
 	return false;
 }
 
-bool Command::DelSubcommand(const Anope::string &cname)
+bool Command::DelSubcommand(Command *c)
 {
 	return false;
 }
+
+Command *Command::FindSubcommand(const Anope::string &name)
+{
+	return NULL;
+}
+

@@ -260,13 +260,15 @@ class CommandMSSet : public Command
 
 class MSSet : public Module
 {
+	CommandMSSet commandmsset;
+
  public:
 	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSSet());
+		this->AddCommand(MemoServ, &commandmsset);
 	}
 };
 

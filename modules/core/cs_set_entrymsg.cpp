@@ -16,7 +16,7 @@
 class CommandCSSetEntryMsg : public Command
 {
  public:
-	CommandCSSetEntryMsg(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetEntryMsg(const Anope::string &cpermission = "") : Command("ENTRYMSG", 1, 2, cpermission)
 	{
 	}
 
@@ -61,7 +61,7 @@ class CommandCSSetEntryMsg : public Command
 class CommandCSSASetEntryMsg : public CommandCSSetEntryMsg
 {
  public:
-	CommandCSSASetEntryMsg(const Anope::string &cname) : CommandCSSetEntryMsg(cname, "chanserv/saset/entrymsg")
+	CommandCSSASetEntryMsg() : CommandCSSetEntryMsg("chanserv/saset/entrymsg")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetEntryMsg : public CommandCSSetEntryMsg
 
 class CSSetEntryMsg : public Module
 {
+	CommandCSSetEntryMsg commandcssetentrymsg;
+	CommandCSSASetEntryMsg commandcssasetentrymsg;
+
  public:
 	CSSetEntryMsg(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetEntryMsg : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetEntryMsg("ENTRYMSG"));
+			c->AddSubcommand(&commandcssetentrymsg);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetEntryMsg("ENTRYMSG"));
+			c->AddSubcommand(&commandcssasetentrymsg);
 	}
 
 	~CSSetEntryMsg()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("ENTRYMSG");
+			c->DelSubcommand(&commandcssetentrymsg);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("ENTRYMSG");
+			c->DelSubcommand(&commandcssasetentrymsg);
 	}
 };
 

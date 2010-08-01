@@ -16,7 +16,7 @@
 class CommandCSSetSuccessor : public Command
 {
  public:
-	CommandCSSetSuccessor(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission)
+	CommandCSSetSuccessor(const Anope::string &cpermission = "") : Command("SUCCESSOR", 1, 2, cpermission)
 	{
 	}
 
@@ -91,7 +91,7 @@ class CommandCSSetSuccessor : public Command
 class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 {
  public:
-	CommandCSSASetSuccessor(const Anope::string &cname) : CommandCSSetSuccessor(cname, "chanserv/saset/successor")
+	CommandCSSASetSuccessor() : CommandCSSetSuccessor("chanserv/saset/successor")
 	{
 	}
 
@@ -110,6 +110,9 @@ class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 
 class CSSetSuccessor : public Module
 {
+	CommandCSSetSuccessor commandcssetsuccessor;
+	CommandCSSASetSuccessor commandcssasetsuccessor;
+
  public:
 	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -118,22 +121,22 @@ class CSSetSuccessor : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetSuccessor("SUCCESSOR"));
+			c->AddSubcommand(&commandcssetsuccessor);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetSuccessor("SUCCESSOR"));
+			c->AddSubcommand(&commandcssasetsuccessor);
 	}
 
 	~CSSetSuccessor()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("SUCCESSOR");
+			c->DelSubcommand(&commandcssetsuccessor);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("SUCCESSOR");
+			c->DelSubcommand(&commandcssasetsuccessor);
 	}
 };
 

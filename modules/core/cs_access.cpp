@@ -609,14 +609,17 @@ class CommandCSLevels : public Command
 
 class CSAccess : public Module
 {
+	CommandCSAccess commandcsaccess;
+	CommandCSLevels commandcslevels;
+
  public:
 	CSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSAccess());
-		this->AddCommand(ChanServ, new CommandCSLevels());
+		this->AddCommand(ChanServ, &commandcsaccess);
+		this->AddCommand(ChanServ, &commandcslevels);
 	}
 };
 

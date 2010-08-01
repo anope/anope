@@ -113,14 +113,16 @@ class CommandNSIdentify : public Command
 
 class NSIdentify : public Module
 {
+	CommandNSIdentify commandnsidentify, commandnsid;
+
  public:
-	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandnsidentify("IDENTIFY"), commandnsid("ID")
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSIdentify("IDENTIFY"));
-		this->AddCommand(NickServ, new CommandNSIdentify("ID"));
+		this->AddCommand(NickServ, &commandnsidentify);
+		this->AddCommand(NickServ, &commandnsid);
 	}
 };
 

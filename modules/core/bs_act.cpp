@@ -73,13 +73,15 @@ class CommandBSAct : public Command
 
 class BSAct : public Module
 {
+	CommandBSAct commandbsact;
+
  public:
 	BSAct(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSAct());
+		this->AddCommand(BotServ, &commandbsact);
 	}
 };
 

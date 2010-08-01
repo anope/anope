@@ -52,10 +52,10 @@ class DefConTimeout : public Timer
 };
 static DefConTimeout *timeout;
 
-class CommandOSDEFCON : public Command
+class CommandOSDefcon : public Command
 {
  public:
-	CommandOSDEFCON() : Command("DEFCON", 1, 1, "operserv/defcon")
+	CommandOSDefcon() : Command("DEFCON", 1, 1, "operserv/defcon")
 	{
 	}
 
@@ -130,10 +130,12 @@ class CommandOSDEFCON : public Command
 	}
 };
 
-class OSDEFCON : public Module
+class OSDefcon : public Module
 {
+	CommandOSDefcon commandosdefcon;
+
  public:
-	OSDEFCON(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!Config.DefConLevel)
 			throw ModuleException("Invalid configuration settings");
@@ -144,7 +146,7 @@ class OSDEFCON : public Module
 		Implementation i[] = { I_OnPreUserConnect, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, 8);
 
-		this->AddCommand(OperServ, new CommandOSDEFCON());
+		this->AddCommand(OperServ, &commandosdefcon);
 
 		defconParseModeString(Config.DefConChanModes);
 	}
@@ -489,4 +491,4 @@ static Anope::string defconReverseModes(const Anope::string &modes)
 	return newmodes;
 }
 
-MODULE_INIT(OSDEFCON)
+MODULE_INIT(OSDefcon)

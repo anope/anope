@@ -51,13 +51,15 @@ class CommandHSGroup : public Command
 
 class HSGroup : public Module
 {
+	CommandHSGroup commandhsgroup;
+
  public:
 	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSGroup());
+		this->AddCommand(HostServ, &commandhsgroup);
 	}
 };
 

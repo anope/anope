@@ -16,7 +16,7 @@
 class CommandCSSetOpNotice : public Command
 {
  public:
-	CommandCSSetOpNotice(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetOpNotice(const Anope::string &cpermission = "") : Command("OPNOTICE", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetOpNotice : public Command
 class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 {
  public:
-	CommandCSSASetOpNotice(const Anope::string &cname) : CommandCSSetOpNotice(cname, "chanserv/saset/opnotice")
+	CommandCSSASetOpNotice() : CommandCSSetOpNotice("chanserv/saset/opnotice")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 
 class CSSetOpNotice : public Module
 {
+	CommandCSSetOpNotice commandcssetopnotice;
+	CommandCSSASetOpNotice commandcssasetopnotice;
+
  public:
 	CSSetOpNotice(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetOpNotice : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetOpNotice("OPNOTICE"));
+			c->AddSubcommand(&commandcssetopnotice);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetOpNotice("OPNOTICE"));
+			c->AddSubcommand(&commandcssasetopnotice);
 	}
 
 	~CSSetOpNotice()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("OPNOTICE");
+			c->DelSubcommand(&commandcssetopnotice);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("OPNOTICE");
+			c->DelSubcommand(&commandcssasetopnotice);
 	}
 };
 

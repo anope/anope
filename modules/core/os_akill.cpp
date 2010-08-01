@@ -397,13 +397,15 @@ class CommandOSAKill : public Command
 
 class OSAKill : public Module
 {
+	CommandOSAKill commandosakill;
+
  public:
 	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSAKill());
+		this->AddCommand(OperServ, &commandosakill);
 	}
 };
 

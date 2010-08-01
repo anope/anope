@@ -77,6 +77,8 @@ class CommandNSGetPass : public Command
 
 class NSGetPass : public Module
 {
+	CommandNSGetPass commandnsgetpass;
+
  public:
 	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -87,7 +89,7 @@ class NSGetPass : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSGetPass());
+		this->AddCommand(NickServ, &commandnsgetpass);
 	}
 };
 

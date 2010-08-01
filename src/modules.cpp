@@ -185,7 +185,6 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 	if (it.second != true)
 	{
 		Alog() << "Error creating command " << c->name << ". Command already exists!";
-		delete c;
 		return MOD_ERR_EXISTS;
 	}
 

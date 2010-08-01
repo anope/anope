@@ -107,10 +107,23 @@ class NSSetMisc : public Module
 		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
 			if (set)
-				set->DelSubcommand(it->first);
+			{
+				Command *c = set->FindSubcommand(it->second->Name);
+				if (c)
+				{
+					set->DelSubcommand(c);
+					delete c;
+				}
+			}
 			if (saset)
-				saset->DelSubcommand(it->first);
-			delete it->second;
+			{
+				Command *c = saset->FindSubcommand(it->second->Name);
+				if (c)
+				{
+					saset->DelSubcommand(c);
+					delete c;
+				}
+			}
 		}
 
 		this->Commands.clear();

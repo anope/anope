@@ -113,13 +113,15 @@ class CommandCSRegister : public Command
 
 class CSRegister : public Module
 {
+	CommandCSRegister commandcsregister;
+
  public:
 	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSRegister());
+		this->AddCommand(ChanServ, &commandcsregister);
 	}
 };
 

@@ -460,14 +460,17 @@ class CommandOSException : public Command
 
 class OSSession : public Module
 {
+	CommandOSSession commandossession;
+	CommandOSException commandosexception;
+
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSession());
-		this->AddCommand(OperServ, new CommandOSException());
+		this->AddCommand(OperServ, &commandossession);
+		this->AddCommand(OperServ, &commandosexception);
 	}
 };
 

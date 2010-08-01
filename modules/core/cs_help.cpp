@@ -61,13 +61,15 @@ class CommandCSHelp : public Command
 
 class CSHelp : public Module
 {
+	CommandCSHelp commandcshelp;
+
  public:
 	CSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSHelp());
+		this->AddCommand(ChanServ, &commandcshelp);
 	}
 };
 

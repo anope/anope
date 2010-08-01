@@ -70,6 +70,8 @@ class CommandOSUMode : public Command
 
 class OSUMode : public Module
 {
+	CommandOSUMode commandosumode;
+
  public:
 	OSUMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -79,7 +81,7 @@ class OSUMode : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSUMode());
+		this->AddCommand(OperServ, &commandosumode);
 	}
 };
 

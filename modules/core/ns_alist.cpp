@@ -137,13 +137,15 @@ class CommandNSAList : public Command
 
 class NSAList : public Module
 {
+	CommandNSAList commandnsalist;
+
  public:
 	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSAList());
+		this->AddCommand(NickServ, &commandnsalist);
 	}
 };
 

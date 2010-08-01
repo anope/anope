@@ -16,7 +16,7 @@
 class CommandNSSASetNoexpire : public Command
 {
  public:
-	CommandNSSASetNoexpire(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/noexpire")
+	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 2, "nickserv/saset/noexpire")
 	{
 	}
 
@@ -63,6 +63,8 @@ class CommandNSSASetNoexpire : public Command
 
 class NSSASetNoexpire : public Module
 {
+	CommandNSSASetNoexpire commandnssasetnoexpire;
+
  public:
 	NSSASetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -71,14 +73,14 @@ class NSSASetNoexpire : public Module
 
 		Command *c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetNoexpire("NOEXPIRE"));
+			c->AddSubcommand(&commandnssasetnoexpire);
 	}
 
 	~NSSASetNoexpire()
 	{
 		Command *c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("NOEXPIRE");
+			c->DelSubcommand(&commandnssasetnoexpire);
 	}
 };
 

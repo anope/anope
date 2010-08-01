@@ -75,13 +75,15 @@ class CommandCSUnban : public Command
 
 class CSUnban : public Module
 {
+	CommandCSUnban commandcsunban;
+
  public:
 	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSUnban());
+		this->AddCommand(ChanServ, &commandcsunban);
 	}
 };
 

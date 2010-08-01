@@ -38,13 +38,15 @@ class CommandHSHelp : public Command
 
 class HSHelp : public Module
 {
+	CommandHSHelp commandhshelp;
+
  public:
 	HSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSHelp());
+		this->AddCommand(HostServ, &commandhshelp);
 	}
 };
 

@@ -16,7 +16,7 @@
 class CommandNSSetEmail : public Command
 {
  public:
-	CommandNSSetEmail(const Anope::string &cname) : Command(cname, 0)
+	CommandNSSetEmail() : Command("EMAIL", 0)
 	{
 	}
 
@@ -64,7 +64,7 @@ class CommandNSSetEmail : public Command
 class CommandNSSASetEmail : public Command
 {
  public:
-	CommandNSSASetEmail(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/email")
+	CommandNSSASetEmail() : Command("EMAIL", 1, 2, "nickserv/saset/email")
 	{
 	}
 
@@ -122,6 +122,9 @@ class CommandNSSASetEmail : public Command
 
 class NSSetEmail : public Module
 {
+	CommandNSSetEmail commandnssetemail;
+	CommandNSSASetEmail commandnssasetemail;
+
  public:
 	NSSetEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -130,22 +133,22 @@ class NSSetEmail : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetEmail("EMAIL"));
+			c->AddSubcommand(&commandnssetemail);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetEmail("EMAIL"));
+			c->AddSubcommand(&commandnssasetemail);
 	}
 
 	~NSSetEmail()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("EMAIL");
+			c->DelSubcommand(&commandnssetemail);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("EMAIL");
+			c->DelSubcommand(&commandnssasetemail);
 	}
 };
 

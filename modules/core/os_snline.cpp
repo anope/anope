@@ -415,6 +415,8 @@ class CommandOSSNLine : public Command
 
 class OSSNLine : public Module
 {
+	CommandOSSNLine commandossnline;
+
  public:
 	OSSNLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -424,7 +426,7 @@ class OSSNLine : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSNLine());
+		this->AddCommand(OperServ, &commandossnline);
 	}
 };
 

@@ -17,7 +17,7 @@
 class CommandCSSetXOP : public Command
 {
  public:
-	CommandCSSetXOP(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetXOP(const Anope::string &cpermission = "") : Command("XOP", 2, 2, cpermission)
 	{
 	}
 
@@ -100,7 +100,7 @@ class CommandCSSetXOP : public Command
 class CommandCSSASetXOP : public CommandCSSetXOP
 {
  public:
-	CommandCSSASetXOP(const Anope::string &cname) : CommandCSSetXOP(cname, "chanserv/saset/xop")
+	CommandCSSASetXOP() : CommandCSSetXOP("chanserv/saset/xop")
 	{
 	}
 
@@ -118,6 +118,9 @@ class CommandCSSASetXOP : public CommandCSSetXOP
 
 class CSSetXOP : public Module
 {
+	CommandCSSetXOP commandcssetxop;
+	CommandCSSASetXOP commandcssasetxop;
+
  public:
 	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -126,22 +129,22 @@ class CSSetXOP : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetXOP("XOP"));
+			c->AddSubcommand(&commandcssetxop);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetXOP("XOP"));
+			c->AddSubcommand(&commandcssasetxop);
 	}
 
 	~CSSetXOP()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("XOP");
+			c->DelSubcommand(&commandcssetxop);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("XOP");
+			c->DelSubcommand(&commandcssasetxop);
 	}
 };
 

@@ -276,15 +276,19 @@ class CommandNSGList : public Command
 
 class NSGroup : public Module
 {
+	CommandNSGroup commandnsgroup;
+	CommandNSUngroup commandnsungroup;
+	CommandNSGList commandnsglist;
+
  public:
 	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSGroup());
-		this->AddCommand(NickServ, new CommandNSUngroup());
-		this->AddCommand(NickServ, new CommandNSGList());
+		this->AddCommand(NickServ, &commandnsgroup);
+		this->AddCommand(NickServ, &commandnsungroup);
+		this->AddCommand(NickServ, &commandnsglist);
 	}
 };
 

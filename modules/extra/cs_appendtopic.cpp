@@ -130,6 +130,8 @@ class CommandCSAppendTopic : public Command
 
 class CSAppendTopic : public Module
 {
+	CommandCSAppendTopic commandcsappendtopic;
+
  public:
 	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -138,7 +140,7 @@ class CSAppendTopic : public Module
 		this->SetAuthor(AUTHOR);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(ChanServ, new CommandCSAppendTopic());
+		this->AddCommand(ChanServ, &commandcsappendtopic);
 
 		/* English (US) */
 		const char *langtable_en_us[] = {

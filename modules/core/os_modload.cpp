@@ -59,6 +59,8 @@ class CommandOSModLoad : public Command
 
 class OSModLoad : public Module
 {
+	CommandOSModLoad commandosmodload;
+
  public:
 	OSModLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -66,7 +68,7 @@ class OSModLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OperServ, new CommandOSModLoad());
+		this->AddCommand(OperServ, &commandosmodload);
 	}
 };
 

@@ -16,7 +16,7 @@
 class CommandCSSetSecureFounder : public Command
 {
  public:
-	CommandCSSetSecureFounder(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecureFounder(const Anope::string &cpermission = "") : Command("SECUREFOUNDER", 2, 2, cpermission)
 	{
 	}
 
@@ -68,7 +68,7 @@ class CommandCSSetSecureFounder : public Command
 class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 {
  public:
-	CommandCSSASetSecureFounder(const Anope::string &cname) : CommandCSSetSecureFounder(cname, "chanserv/saset/securefounder")
+	CommandCSSASetSecureFounder() : CommandCSSetSecureFounder("chanserv/saset/securefounder")
 	{
 	}
 
@@ -86,6 +86,9 @@ class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 
 class CSSetSecureFounder : public Module
 {
+	CommandCSSetSecureFounder commandcssetsecurefounder;
+	CommandCSSASetSecureFounder commandcssasetsecurefounder;
+
  public:
 	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -94,22 +97,22 @@ class CSSetSecureFounder : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetSecureFounder("SECUREFOUNDER"));
+			c->AddSubcommand(&commandcssetsecurefounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetSecureFounder("SECUREFOUNDER"));
+			c->AddSubcommand(&commandcssasetsecurefounder);
 	}
 
 	~CSSetSecureFounder()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("SECUREFOUNDER");
+			c->DelSubcommand(&commandcssetsecurefounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("SECUREFOUNDER");
+			c->DelSubcommand(&commandcssasetsecurefounder);
 	}
 };
 

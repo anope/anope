@@ -59,13 +59,15 @@ class CommandHSOn : public Command
 
 class HSOn : public Module
 {
+	CommandHSOn commandhson;
+
  public:
 	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSOn());
+		this->AddCommand(HostServ, &commandhson);
 	}
 };
 

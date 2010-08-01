@@ -69,13 +69,15 @@ class CommandOSStaff : public Command
 
 class OSStaff : public Module
 {
+	CommandOSStaff commandosstaff;
+
  public:
 	OSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSStaff());
+		this->AddCommand(OperServ, &commandosstaff);
 	}
 };
 

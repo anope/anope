@@ -342,15 +342,20 @@ class CommandHSWaiting : public HSListBase
 
 class HSRequest : public Module
 {
+	CommandHSRequest commandhsrequest;
+	CommandHSActivate commandhsactive;
+	CommandHSReject commandhsreject;
+	CommandHSWaiting commandhswaiting;
+
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
-		this->AddCommand(HostServ, new CommandHSRequest());
-		this->AddCommand(HostServ, new CommandHSActivate());
-		this->AddCommand(HostServ, new CommandHSReject());
-		this->AddCommand(HostServ, new CommandHSWaiting());
+		this->AddCommand(HostServ, &commandhsrequest);
+		this->AddCommand(HostServ, &commandhsactive);
+		this->AddCommand(HostServ, &commandhsreject);
+		this->AddCommand(HostServ, &commandhswaiting);
 
 		this->SetAuthor(AUTHOR);
 		this->SetType(SUPPORTED);

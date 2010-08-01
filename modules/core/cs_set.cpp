@@ -19,14 +19,12 @@ class CommandCSSet : public Command
 	subcommand_map subcommands;
 
  public:
-	CommandCSSet(const Anope::string &cname) : Command(cname, 2, 3)
+	CommandCSSet() : Command("SET", 2, 3)
 	{
 	}
 
 	~CommandCSSet()
 	{
-		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-			delete it->second;
 		this->subcommands.clear();
 	}
 
@@ -97,9 +95,9 @@ class CommandCSSet : public Command
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
-	bool DelSubcommand(const Anope::string &command)
+	bool DelSubcommand(Command *c)
 	{
-		return this->subcommands.erase(command);
+		return this->subcommands.erase(c->name);
 	}
 
 	Command *FindCommand(const Anope::string &subcommand)
@@ -115,13 +113,15 @@ class CommandCSSet : public Command
 
 class CSSet : public Module
 {
+	CommandCSSet commandcsset;
+
  public:
 	CSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSSet("SET"));
+		this->AddCommand(ChanServ, &commandcsset);
 	}
 };
 

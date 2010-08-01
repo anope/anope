@@ -103,13 +103,15 @@ class CommandOSChanKill : public Command
 
 class OSChanKill : public Module
 {
+	CommandOSChanKill commandoschankill;
+
  public:
 	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSChanKill());
+		this->AddCommand(OperServ, &commandoschankill);
 	}
 };
 

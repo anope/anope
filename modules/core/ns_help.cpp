@@ -54,13 +54,15 @@ class CommandNSHelp : public Command
 
 class NSHelp : public Module
 {
+	CommandNSHelp commandnshelp;
+
  public:
 	NSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSHelp());
+		this->AddCommand(NickServ, &commandnshelp);
 	}
 };
 

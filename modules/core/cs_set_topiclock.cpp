@@ -16,7 +16,7 @@
 class CommandCSSetTopicLock : public Command
 {
  public:
-	CommandCSSetTopicLock(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetTopicLock(const Anope::string &cpermission = "") : Command("TOPICLOCK", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetTopicLock : public Command
 class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 {
  public:
-	CommandCSSASetTopicLock(const Anope::string &cname) : CommandCSSetTopicLock(cname, "chanserv/saset/topiclock")
+	CommandCSSASetTopicLock() : CommandCSSetTopicLock("chanserv/saset/topiclock")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 
 class CSSetTopicLock : public Module
 {
+	CommandCSSetTopicLock commandcssettopiclock;
+	CommandCSSASetTopicLock commandcssasettopiclock;
+
  public:
 	CSSetTopicLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetTopicLock : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetTopicLock("TOPICLOCK"));
+			c->AddSubcommand(&commandcssettopiclock);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetTopicLock("TOPICLOCK"));
+			c->AddSubcommand(&commandcssasettopiclock);
 	}
 
 	~CSSetTopicLock()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("TOPICLOCK");
+			c->DelSubcommand(&commandcssettopiclock);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("TOPICLOCK");
+			c->DelSubcommand(&commandcssasettopiclock);
 	}
 };
 

@@ -63,13 +63,15 @@ class CommandMSSendAll : public Command
 
 class MSSendAll : public Module
 {
+	CommandMSSendAll commandmssendall;
+
  public:
 	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSSendAll());
+		this->AddCommand(MemoServ, &commandmssendall);
 	}
 };
 

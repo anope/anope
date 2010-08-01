@@ -16,7 +16,7 @@
 class CommandCSSetFounder : public Command
 {
  public:
-	CommandCSSetFounder(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetFounder(const Anope::string &cpermission = "") : Command("FOUNDER", 2, 2, cpermission)
 	{
 	}
 
@@ -89,7 +89,7 @@ class CommandCSSetFounder : public Command
 class CommandCSSASetFounder : public CommandCSSetFounder
 {
  public:
-	CommandCSSASetFounder(const Anope::string &cname) : CommandCSSetFounder(cname, "chanserv/saset/founder")
+	CommandCSSASetFounder() : CommandCSSetFounder("chanserv/saset/founder")
 	{
 	}
 
@@ -108,6 +108,9 @@ class CommandCSSASetFounder : public CommandCSSetFounder
 
 class CSSetFounder : public Module
 {
+	CommandCSSetFounder commandcssetfounder;
+	CommandCSSASetFounder commandcssasetfounder;
+
  public:
 	CSSetFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -116,22 +119,22 @@ class CSSetFounder : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetFounder("FOUNDER"));
+			c->AddSubcommand(&commandcssetfounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetFounder("FOUNDER"));
+			c->AddSubcommand(&commandcssasetfounder);
 	}
 
 	~CSSetFounder()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("FOUNDER");
+			c->DelSubcommand(&commandcssetfounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("FOUNDER");
+			c->DelSubcommand(&commandcssasetfounder);
 	}
 };
 

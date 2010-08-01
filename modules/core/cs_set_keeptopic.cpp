@@ -16,7 +16,7 @@
 class CommandCSSetKeepTopic : public Command
 {
  public:
-	CommandCSSetKeepTopic(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetKeepTopic(const Anope::string &cpermission = "") : Command("KEEPTOPIC", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetKeepTopic : public Command
 class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 {
  public:
-	CommandCSSASetKeepTopic(const Anope::string &cname) : CommandCSSetKeepTopic(cname, "chanserv/saset/keeptopic")
+	CommandCSSASetKeepTopic() : CommandCSSetKeepTopic("chanserv/saset/keeptopic")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 
 class CSSetKeepTopic : public Module
 {
+	CommandCSSetKeepTopic commandcssetkeeptopic;
+	CommandCSSASetKeepTopic commandcssasetkeeptopic;
+
  public:
 	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetKeepTopic : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetKeepTopic("KEEPTOPIC"));
+			c->AddSubcommand(&commandcssetkeeptopic);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetKeepTopic("KEEPTOPIC"));
+			c->AddSubcommand(&commandcssasetkeeptopic);
 	}
 
 	~CSSetKeepTopic()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("KEEPTOPIC");
+			c->DelSubcommand(&commandcssetkeeptopic);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("KEEPTOPIC");
+			c->DelSubcommand(&commandcssasetkeeptopic);
 	}
 };
 

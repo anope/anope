@@ -299,13 +299,15 @@ class CommandOSSet : public Command
 
 class OSSet : public Module
 {
+	CommandOSSet commandosset;
+
  public:
 	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSet());
+		this->AddCommand(OperServ, &commandosset);
 	}
 };
 

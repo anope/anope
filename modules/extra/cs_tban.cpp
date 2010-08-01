@@ -91,12 +91,14 @@ class CommandCSTBan : public Command
 
 class CSTBan : public Module
 {
+	CommandCSTBan commandcstban;
+
  public:
 	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		me = this;
 
-		this->AddCommand(ChanServ, new CommandCSTBan());
+		this->AddCommand(ChanServ, &commandcstban);
 
 		this->SetAuthor(AUTHOR);
 		this->SetType(SUPPORTED);

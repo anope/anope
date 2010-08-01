@@ -19,14 +19,12 @@ class CommandCSSASet : public Command
 	subcommand_map subcommands;
 
  public:
-	CommandCSSASet(const Anope::string &cname) : Command(cname, 2, 3)
+	CommandCSSASet() : Command("SASET", 2, 3)
 	{
 	}
 
 	~CommandCSSASet()
 	{
-		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-			delete it->second;
 		this->subcommands.clear();
 	}
 
@@ -92,9 +90,9 @@ class CommandCSSASet : public Command
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
-	bool DelSubcommand(const Anope::string &command)
+	bool DelSubcommand(Command *c)
 	{
-		return this->subcommands.erase(command);
+		return this->subcommands.erase(c->name);
 	}
 
 	Command *FindCommand(const Anope::string &subcommand)
@@ -110,13 +108,15 @@ class CommandCSSASet : public Command
 
 class CSSASet : public Module
 {
+	CommandCSSASet commandcssaset;
+
  public:
 	CSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSSASet("SASET"));
+		this->AddCommand(ChanServ, &commandcssaset);
 	}
 };
 

@@ -178,13 +178,15 @@ class CommandNSInfo : public Command
 
 class NSInfo : public Module
 {
+	CommandNSInfo commandnsinfo;
+
  public:
 	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSInfo());
+		this->AddCommand(NickServ, &commandnsinfo);
 	}
 };
 

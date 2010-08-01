@@ -83,6 +83,8 @@ class CommandOSSVSNick : public Command
 
 class OSSVSNick : public Module
 {
+	CommandOSSVSNick commandossvsnick;
+
  public:
 	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -92,7 +94,7 @@ class OSSVSNick : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSSVSNick());
+		this->AddCommand(OperServ, &commandossvsnick);
 	}
 };
 

@@ -61,6 +61,8 @@ class CommandOSModUnLoad : public Command
 
 class OSModUnLoad : public Module
 {
+	CommandOSModUnLoad commandosmodunload;
+
  public:
 	OSModUnLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -68,7 +70,7 @@ class OSModUnLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OperServ, new CommandOSModUnLoad());
+		this->AddCommand(OperServ, &commandosmodunload);
 	}
 };
 

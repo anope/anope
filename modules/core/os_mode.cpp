@@ -58,13 +58,15 @@ class CommandOSMode : public Command
 
 class OSMode : public Module
 {
+	CommandOSMode commandosmode;
+
  public:
 	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSMode());
+		this->AddCommand(OperServ, &commandosmode);
 	}
 };
 

@@ -626,15 +626,21 @@ class CommandCSVOP : public XOPBase
 
 class CSXOP : public Module
 {
+	CommandCSQOP commandcsqop;
+	CommandCSSOP commandcssop;
+	CommandCSAOP commandcsaop;
+	CommandCSHOP commandcshop;
+	CommandCSVOP commandcsvop;
+
  public:
 	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSSOP());
-		this->AddCommand(ChanServ, new CommandCSAOP());
-		this->AddCommand(ChanServ, new CommandCSVOP());
+		this->AddCommand(ChanServ, &commandcssop);
+		this->AddCommand(ChanServ, &commandcsaop);
+		this->AddCommand(ChanServ, &commandcsvop);
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
@@ -646,15 +652,15 @@ class CSXOP : public Module
 	void OnUplinkSync(Server *)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			this->AddCommand(ChanServ, new CommandCSQOP());
+			this->AddCommand(ChanServ, &commandcsqop);
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			this->AddCommand(ChanServ, new CommandCSHOP());
+			this->AddCommand(ChanServ, &commandcshop);
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "QOP"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "HOP"));
+		this->DelCommand(ChanServ, &commandcsqop);
+		this->DelCommand(ChanServ, &commandcshop);
 	}
 };
 

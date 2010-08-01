@@ -81,13 +81,15 @@ class CommandCSTopic : public Command
 
 class CSTopic : public Module
 {
+	CommandCSTopic commandcstopic;
+
  public:
 	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSTopic());
+		this->AddCommand(ChanServ, &commandcstopic);
 	}
 };
 

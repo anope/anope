@@ -45,13 +45,15 @@ class CommandOSQuit : public Command
 
 class OSQuit : public Module
 {
+	CommandOSQuit commandosquit;
+
  public:
 	OSQuit(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSQuit());
+		this->AddCommand(OperServ, &commandosquit);
 	}
 };
 

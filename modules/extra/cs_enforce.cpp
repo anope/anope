@@ -220,6 +220,8 @@ class CommandCSEnforce : public Command
 
 class CSEnforce : public Module
 {
+	CommandCSEnforce commandcsenforce;
+
  public:
 	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -228,7 +230,7 @@ class CSEnforce : public Module
 		this->SetAuthor(AUTHOR);
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(ChanServ, new CommandCSEnforce());
+		this->AddCommand(ChanServ, &commandcsenforce);
 
 		/* English (US) */
 		const char *langtable_en_us[] = {

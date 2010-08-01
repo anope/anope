@@ -67,13 +67,15 @@ class CommandOSKick : public Command
 
 class OSKick : public Module
 {
+	CommandOSKick commandoskick;
+
  public:
 	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSKick());
+		this->AddCommand(OperServ, &commandoskick);
 	}
 };
 

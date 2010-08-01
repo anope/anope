@@ -15,7 +15,7 @@
 class CommandCSSetRestricted : public Command
 {
  public:
-	CommandCSSetRestricted(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetRestricted(const Anope::string &cpermission = "") : Command("RESTRICTED", 2, 2, cpermission)
 	{
 	}
 
@@ -65,7 +65,7 @@ class CommandCSSetRestricted : public Command
 class CommandCSSASetRestricted : public CommandCSSetRestricted
 {
  public:
-	CommandCSSASetRestricted(const Anope::string &cname) : CommandCSSetRestricted(cname, "chanserv/saset/restricted")
+	CommandCSSASetRestricted() : CommandCSSetRestricted("chanserv/saset/restricted")
 	{
 	}
 
@@ -83,6 +83,9 @@ class CommandCSSASetRestricted : public CommandCSSetRestricted
 
 class CSSetRestricted : public Module
 {
+	CommandCSSetRestricted commandcssetrestricted;
+	CommandCSSASetRestricted commandcssasetrestricted;
+
  public:
 	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -91,22 +94,22 @@ class CSSetRestricted : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetRestricted("RESTRICTED"));
+			c->AddSubcommand(&commandcssetrestricted);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetRestricted("RESTRICTED"));
+			c->AddSubcommand(&commandcssasetrestricted);
 	}
 
 	~CSSetRestricted()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("RESTRICTED");
+			c->DelSubcommand(&commandcssetrestricted);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("RESTRICTED");
+			c->DelSubcommand(&commandcssasetrestricted);
 	}
 };
 

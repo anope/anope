@@ -19,14 +19,12 @@ class CommandNSSASet : public Command
 	subcommand_map subcommands;
 
  public:
-	CommandNSSASet(const Anope::string &cname) : Command(cname, 2, 4)
+	CommandNSSASet() : Command("SASET", 2, 4)
 	{
 	}
 
 	~CommandNSSASet()
 	{
-		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-			delete it->second;
 		this->subcommands.clear();
 	}
 
@@ -102,9 +100,9 @@ class CommandNSSASet : public Command
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
-	bool DelSubcommand(const Anope::string &command)
+	bool DelSubcommand(Command *c)
 	{
-		return this->subcommands.erase(command);
+		return this->subcommands.erase(c->name);
 	}
 
 	Command *FindCommand(const Anope::string &subcommand)
@@ -121,7 +119,7 @@ class CommandNSSASet : public Command
 class CommandNSSASetDisplay : public Command
 {
  public:
-	CommandNSSASetDisplay(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/display")
+	CommandNSSASetDisplay() : Command("DISPLAY", 2, 2, "nickserv/saset/display")
 	{
 	}
 
@@ -164,7 +162,7 @@ class CommandNSSASetDisplay : public Command
 class CommandNSSASetPassword : public Command
 {
  public:
-	CommandNSSASetPassword(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/password")
+	CommandNSSASetPassword() : Command("PASSWORD", 2, 2, "nickserv/saset/password")
 	{
 	}
 
@@ -232,16 +230,20 @@ class CommandNSSASetPassword : public Command
 
 class NSSASet : public Module
 {
-public:
+	CommandNSSASet commandnssaset;
+	CommandNSSASetDisplay commandnssasetdisplay;
+	CommandNSSASetPassword commandnssasetpassword;
+
+ public:
 	NSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = new CommandNSSASet("SASET");
-		this->AddCommand(NickServ, c);
-		c->AddSubcommand(new CommandNSSASetDisplay("DISPLAY"));
-		c->AddSubcommand(new CommandNSSASetPassword("PASSWORD"));
+		this->AddCommand(NickServ, &commandnssaset);
+
+		commandnssaset.AddSubcommand(&commandnssasetdisplay);
+		commandnssaset.AddSubcommand(&commandnssasetpassword);
 	}
 };
 

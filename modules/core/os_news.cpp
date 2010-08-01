@@ -398,15 +398,19 @@ class CommandOSRandomNews : public NewsBase
 
 class OSNews : public Module
 {
+	CommandOSLogonNews commandoslogonnews;
+	CommandOSOperNews commandosopernews;
+	CommandOSRandomNews commandosrandomnews;
+
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSLogonNews());
-		this->AddCommand(OperServ, new CommandOSOperNews());
-		this->AddCommand(OperServ, new CommandOSRandomNews());
+		this->AddCommand(OperServ, &commandoslogonnews);
+		this->AddCommand(OperServ, &commandosopernews);
+		this->AddCommand(OperServ, &commandosrandomnews);
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 4);

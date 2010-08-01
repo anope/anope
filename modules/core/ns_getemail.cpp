@@ -70,13 +70,14 @@ class CommandNSGetEMail : public Command
 
 class NSGetEMail : public Module
 {
+	CommandNSGetEMail commandnsgetemail;
  public:
 	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSGetEMail());
+		this->AddCommand(NickServ, &commandnsgetemail);
 	}
 };
 

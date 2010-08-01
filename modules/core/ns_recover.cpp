@@ -87,7 +87,6 @@ class CommandNSRecover : public Command
 		Anope::string relstr = duration(u->Account(), Config.NSReleaseTimeout);
 
 		notice_help(Config.s_NickServ, u, NICK_HELP_RECOVER, relstr.c_str());
-		//do_help_limited(Config.s_NickServ, u, this);
 
 		return true;
 	}
@@ -105,13 +104,15 @@ class CommandNSRecover : public Command
 
 class NSRecover : public Module
 {
+	CommandNSRecover commandnsrecover;
+
  public:
 	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSRecover());
+		this->AddCommand(NickServ, &commandnsrecover);
 	}
 };
 

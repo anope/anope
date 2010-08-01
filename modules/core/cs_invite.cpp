@@ -82,12 +82,15 @@ class CommandCSInvite : public Command
 
 class CSInvite : public Module
 {
+	CommandCSInvite commandcsinvite;
+
  public:
 	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
-		this->AddCommand(ChanServ, new CommandCSInvite());
+
+		this->AddCommand(ChanServ, &commandcsinvite);
 	}
 };
 

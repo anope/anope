@@ -16,7 +16,7 @@
 class CommandCSSetSecureOps : public Command
 {
  public:
-	CommandCSSetSecureOps(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSecureOps(const Anope::string &cpermission = "") : Command("SECUREOPS", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetSecureOps : public Command
 class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 {
  public:
-	CommandCSSASetSecureOps(const Anope::string &cname) : CommandCSSetSecureOps(cname, "chanserv/saset/secureops")
+	CommandCSSASetSecureOps() : CommandCSSetSecureOps("chanserv/saset/secureops")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 
 class CSSetSecureOps : public Module
 {
+	CommandCSSetSecureOps commandcssetsecureops;
+	CommandCSSASetSecureOps commandcssasetsecureops;
+
  public:
 	CSSetSecureOps(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetSecureOps : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetSecureOps("SECUREOPS"));
+			c->AddSubcommand(&commandcssetsecureops);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetSecureOps("SECUREOPS"));
+			c->AddSubcommand(&commandcssasetsecureops);
 	}
 
 	~CSSetSecureOps()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("SECUREOPS");
+			c->DelSubcommand(&commandcssetsecureops);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("SECUREOPS");
+			c->DelSubcommand(&commandcssasetsecureops);
 	}
 };
 

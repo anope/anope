@@ -399,16 +399,27 @@ class CommandCSDeOwner : public Command
 
 class CSModes : public Module
 {
+	CommandCSOwner commandcsowner;
+	CommandCSDeOwner commandcsdeowner;
+	CommandCSProtect commandcsprotect;
+	CommandCSDeProtect commandcsdeprotect;
+	CommandCSOp commandcsop;
+	CommandCSDeOp commandcsdeop;
+	CommandCSHalfOp commandcshalfop;
+	CommandCSDeHalfOp commandcsdehalfop;
+	CommandCSVoice commandcsvoice;
+	CommandCSDeVoice commandcsdevoice;
+
  public:
 	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSOp());
-		this->AddCommand(ChanServ, new CommandCSDeOp());
-		this->AddCommand(ChanServ, new CommandCSVoice());
-		this->AddCommand(ChanServ, new CommandCSDeVoice());
+		this->AddCommand(ChanServ, &commandcsop);
+		this->AddCommand(ChanServ, &commandcsdeop);
+		this->AddCommand(ChanServ, &commandcsvoice);
+		this->AddCommand(ChanServ, &commandcsdevoice);
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
@@ -421,31 +432,31 @@ class CSModes : public Module
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{
-			this->AddCommand(ChanServ, new CommandCSOwner());
-			this->AddCommand(ChanServ, new CommandCSDeOwner());
+			this->AddCommand(ChanServ, &commandcsowner);
+			this->AddCommand(ChanServ, &commandcsdeowner);
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
 		{
-			this->AddCommand(ChanServ, new CommandCSProtect());
-			this->AddCommand(ChanServ, new CommandCSDeProtect());
+			this->AddCommand(ChanServ, &commandcsprotect);
+			this->AddCommand(ChanServ, &commandcsdeprotect);
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 		{
-			this->AddCommand(ChanServ, new CommandCSHalfOp());
-			this->AddCommand(ChanServ, new CommandCSDeHalfOp());
+			this->AddCommand(ChanServ, &commandcshalfop);
+			this->AddCommand(ChanServ, &commandcsdehalfop);
 		}
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "OWNER"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEOWNER"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "PROTECT"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEPROTECT"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "HALFOP"));
-		this->DelCommand(ChanServ, FindCommand(ChanServ, "DEHALFOP"));
+		this->DelCommand(ChanServ, &commandcsowner);
+		this->DelCommand(ChanServ, &commandcsdeowner);
+		this->DelCommand(ChanServ, &commandcsprotect);
+		this->DelCommand(ChanServ, &commandcsdeprotect);
+		this->DelCommand(ChanServ, &commandcshalfop);
+		this->DelCommand(ChanServ, &commandcsdehalfop);
 	}
 };
 

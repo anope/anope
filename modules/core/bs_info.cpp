@@ -216,13 +216,15 @@ class CommandBSInfo : public Command
 
 class BSInfo : public Module
 {
+	CommandBSInfo commandbsinfo;
+
  public:
 	BSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSInfo());
+		this->AddCommand(BotServ, &commandbsinfo);
 	}
 };
 

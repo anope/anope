@@ -39,13 +39,15 @@ class CommandMSHelp : public Command
 
 class MSHelp : public Module
 {
+	CommandMSHelp commandmshelp;
+
  public:
 	MSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSHelp());
+		this->AddCommand(MemoServ, &commandmshelp);
 	}
 };
 

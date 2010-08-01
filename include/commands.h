@@ -106,9 +106,15 @@ class CoreExport Command : public Flags<CommandFlag>
 	virtual bool AddSubcommand(Command *c);
 
 	/** Delete a subcommand from this command
-	 * @param cname The subcommand name
+	 * @param c The command
 	 */
-	virtual bool DelSubcommand(const Anope::string &cname);
+	virtual bool DelSubcommand(Command *c);
+
+	/** Find a subcommand
+	 * @param name The subcommand name
+	 * @return The subcommand
+	 */
+	virtual Command *FindSubcommand(const Anope::string &name);
 };
 
 #endif // COMMANDS_H

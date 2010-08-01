@@ -203,13 +203,15 @@ class CommandBSSet : public Command
 
 class BSSet : public Module
 {
+	CommandBSSet commandbsset;
+
  public:
 	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSSet());
+		this->AddCommand(BotServ, &commandbsset);
 	}
 };
 

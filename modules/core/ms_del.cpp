@@ -146,13 +146,15 @@ class CommandMSDel : public Command
 
 class MSDel : public Module
 {
+	CommandMSDel commandmsdel;
+
  public:
 	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSDel());
+		this->AddCommand(MemoServ, &commandmsdel);
 	}
 };
 

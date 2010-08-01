@@ -16,7 +16,7 @@
 class CommandNSSetLanguage : public Command
 {
  public:
-	CommandNSSetLanguage(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetLanguage() : Command("LANGUAGE", 1)
 	{
 	}
 
@@ -63,7 +63,7 @@ class CommandNSSetLanguage : public Command
 class CommandNSSASetLanguage : public Command
 {
  public:
-	CommandNSSASetLanguage(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/language")
+	CommandNSSASetLanguage() : Command("LANGUAGE", 2, 2, "nickserv/saset/language")
 	{
 	}
 
@@ -111,6 +111,9 @@ class CommandNSSASetLanguage : public Command
 
 class NSSetLanguage : public Module
 {
+	CommandNSSetLanguage commandnssetlanguage;
+	CommandNSSASetLanguage commandnssasetlanguage;
+
  public:
 	NSSetLanguage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -119,22 +122,22 @@ class NSSetLanguage : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetLanguage("LANGUAGE"));
+			c->AddSubcommand(&commandnssetlanguage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetLanguage("LANGUAGE"));
+			c->AddSubcommand(&commandnssasetlanguage);
 	}
 
 	~NSSetLanguage()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("LANGUAGE");
+			c->DelSubcommand(&commandnssetlanguage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("LANGUAGE");
+			c->DelSubcommand(&commandnssasetlanguage);
 	}
 };
 

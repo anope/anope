@@ -376,13 +376,15 @@ class CommandBSKick : public Command
 
 class BSKick : public Module
 {
+	CommandBSKick commandbskick;
+
  public:
 	BSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSKick());
+		this->AddCommand(BotServ, &commandbskick);
 	}
 };
 

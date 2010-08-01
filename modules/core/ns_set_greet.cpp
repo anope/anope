@@ -16,7 +16,7 @@
 class CommandNSSetGreet : public Command
 {
  public:
-	CommandNSSetGreet(const Anope::string &cname) : Command(cname, 0)
+	CommandNSSetGreet() : Command("GREET", 0)
 	{
 	}
 
@@ -51,7 +51,7 @@ class CommandNSSetGreet : public Command
 class CommandNSSASetGreet : public Command
 {
  public:
-	CommandNSSASetGreet(const Anope::string &cname) : Command(cname, 1, 2, "nickserv/saset/greet")
+	CommandNSSASetGreet() : Command("GREET", 1, 2, "nickserv/saset/greet")
 	{
 	}
 
@@ -91,6 +91,9 @@ class CommandNSSASetGreet : public Command
 
 class NSSetGreet : public Module
 {
+	CommandNSSetGreet commandnssetgreet;
+	CommandNSSASetGreet commandnssasetgreet;
+
  public:
 	NSSetGreet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -99,22 +102,22 @@ class NSSetGreet : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetGreet("GREET"));
+			c->AddSubcommand(&commandnssetgreet);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetGreet("GREET"));
+			c->AddSubcommand(&commandnssasetgreet);
 	}
 
 	~NSSetGreet()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("GREET");
+			c->DelSubcommand(&commandnssetgreet);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("GREET");
+			c->DelSubcommand(&commandnssasetgreet);
 	}
 };
 

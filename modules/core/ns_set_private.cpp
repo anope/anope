@@ -16,7 +16,7 @@
 class CommandNSSetPrivate : public Command
 {
  public:
-	CommandNSSetPrivate(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetPrivate() : Command("PRIVATE", 1)
 	{
 	}
 
@@ -58,7 +58,7 @@ class CommandNSSetPrivate : public Command
 class CommandNSSASetPrivate : public Command
 {
  public:
-	CommandNSSASetPrivate(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/private")
+	CommandNSSASetPrivate() : Command("PRIVATE", 2, 2, "nickserv/saset/private")
 	{
 	}
 
@@ -105,6 +105,9 @@ class CommandNSSASetPrivate : public Command
 
 class NSSetPrivate : public Module
 {
+	CommandNSSetPrivate commandnssetprivate;
+	CommandNSSASetPrivate commandnssasetprivate;
+
  public:
 	NSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -113,22 +116,22 @@ class NSSetPrivate : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetPrivate("PRIVATE"));
+			c->AddSubcommand(&commandnssetprivate);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetPrivate("PRIVATE"));
+			c->AddSubcommand(&commandnssasetprivate);
 	}
 
 	~NSSetPrivate()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("PRIVATE");
+			c->DelSubcommand(&commandnssetprivate);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("PRIVATE");
+			c->DelSubcommand(&commandnssasetprivate);
 	}
 };
 

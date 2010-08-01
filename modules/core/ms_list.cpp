@@ -163,13 +163,15 @@ class CommandMSList : public Command
 
 class MSList : public Module
 {
+	CommandMSList commandmslist;
+
  public:
 	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSList());
+		this->AddCommand(MemoServ, &commandmslist);
 	}
 };
 

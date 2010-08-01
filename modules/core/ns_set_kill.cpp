@@ -16,7 +16,7 @@
 class CommandNSSetKill : public Command
 {
  public:
-	CommandNSSetKill(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetKill() : Command("KILL", 1)
 	{
 	}
 
@@ -81,7 +81,7 @@ class CommandNSSetKill : public Command
 class CommandNSSASetKill : public Command
 {
  public:
-	CommandNSSASetKill(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/kill")
+	CommandNSSASetKill() : Command("KILL", 2, 2, "nickserv/saset/kill")
 	{
 	}
 
@@ -151,6 +151,9 @@ class CommandNSSASetKill : public Command
 
 class NSSetKill : public Module
 {
+	CommandNSSetKill commandnssetkill;
+	CommandNSSASetKill commandnssasetkill;
+
  public:
 	NSSetKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -159,22 +162,22 @@ class NSSetKill : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetKill("KILL"));
+			c->AddSubcommand(&commandnssetkill);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetKill("KILL"));
+			c->AddSubcommand(&commandnssasetkill);
 	}
 
 	~NSSetKill()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("KILL");
+			c->DelSubcommand(&commandnssetkill);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("KILL");
+			c->DelSubcommand(&commandnssasetkill);
 	}
 };
 

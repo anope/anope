@@ -294,13 +294,15 @@ class CommandOSStats : public Command
 
 class OSStats : public Module
 {
+	CommandOSStats commandosstats;
+
  public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSStats());
+		this->AddCommand(OperServ, &commandosstats);
 	}
 };
 

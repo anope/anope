@@ -41,13 +41,15 @@ class CommandBSHelp : public Command
 
 class BSHelp : public Module
 {
+	CommandBSHelp commandbshelp;
+
  public:
 	BSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSHelp());
+		this->AddCommand(BotServ, &commandbshelp);
 	}
 };
 

@@ -61,13 +61,15 @@ class CommandBSUnassign : public Command
 
 class BSUnassign : public Module
 {
+	CommandBSUnassign commandbsunassign;
+
  public:
 	BSUnassign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSUnassign);
+		this->AddCommand(BotServ, &commandbsunassign);
 	}
 };
 

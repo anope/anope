@@ -47,13 +47,15 @@ class CommandMSSend : public Command
 
 class MSSend : public Module
 {
+	CommandMSSend commandmssend;
+
  public:
 	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSSend());
+		this->AddCommand(MemoServ, &commandmssend);
 	}
 };
 

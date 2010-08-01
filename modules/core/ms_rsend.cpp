@@ -73,6 +73,8 @@ class CommandMSRSend : public Command
 
 class MSRSend : public Module
 {
+	CommandMSRSend commandmsrsend;
+
  public:
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -82,7 +84,7 @@ class MSRSend : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSRSend());
+		this->AddCommand(MemoServ, &commandmsrsend);
 	}
 };
 

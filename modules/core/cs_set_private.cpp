@@ -16,7 +16,7 @@
 class CommandCSSetPrivate : public Command
 {
  public:
-	CommandCSSetPrivate(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPrivate(const Anope::string &cpermission = "") : Command("PRIVATE", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetPrivate : public Command
 class CommandCSSASetPrivate : public CommandCSSetPrivate
 {
  public:
-	CommandCSSASetPrivate(const Anope::string &cname) : CommandCSSetPrivate(cname, "chanserv/saset/private")
+	CommandCSSASetPrivate() : CommandCSSetPrivate("chanserv/saset/private")
 	{
 	}
 
@@ -80,6 +80,9 @@ class CommandCSSASetPrivate : public CommandCSSetPrivate
 
 class CSSetPrivate : public Module
 {
+	CommandCSSetPrivate commandcssetprivate;
+	CommandCSSASetPrivate commandcssasetprivate;
+
  public:
 	CSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -88,22 +91,22 @@ class CSSetPrivate : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetPrivate("PRIVATE"));
+			c->AddSubcommand(&commandcssetprivate);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetPrivate("PRIVATE"));
+			c->AddSubcommand(&commandcssasetprivate);
 	}
 
 	~CSSetPrivate()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("PRIVATE");
+			c->DelSubcommand(&commandcssetprivate);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("PRIVATE");
+			c->DelSubcommand(&commandcssasetprivate);
 	}
 };
 

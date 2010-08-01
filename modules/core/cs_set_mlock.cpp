@@ -16,7 +16,7 @@
 class CommandCSSetMLock : public Command
 {
  public:
-	CommandCSSetMLock(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 1, 0, cpermission)
+	CommandCSSetMLock(const Anope::string &cpermission = "") : Command("MLOCK", 1, 0, cpermission)
 	{
 	}
 
@@ -133,7 +133,7 @@ class CommandCSSetMLock : public Command
 class CommandCSSASetMLock : public CommandCSSetMLock
 {
  public:
-	CommandCSSASetMLock(const Anope::string &cname) : CommandCSSetMLock(cname, "chanserv/saset/mlock")
+	CommandCSSASetMLock() : CommandCSSetMLock("chanserv/saset/mlock")
 	{
 	}
 
@@ -152,6 +152,9 @@ class CommandCSSASetMLock : public CommandCSSetMLock
 
 class CSSetMLock : public Module
 {
+	CommandCSSetMLock commandcssetmlock;
+	CommandCSSASetMLock commandcssasetmlock;
+
  public:
 	CSSetMLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -160,22 +163,22 @@ class CSSetMLock : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetMLock("MLOCK"));
+			c->AddSubcommand(&commandcssetmlock);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetMLock("MLOCK"));
+			c->AddSubcommand(&commandcssasetmlock);
 	}
 
 	~CSSetMLock()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("MLOCK");
+			c->DelSubcommand(&commandcssetmlock);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("MLOCK");
+			c->DelSubcommand(&commandcssasetmlock);
 	}
 };
 

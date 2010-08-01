@@ -81,13 +81,15 @@ class CommandBSBotList : public Command
 
 class BSBotList : public Module
 {
+	CommandBSBotList commandbsbotlist;
+
  public:
 	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSBotList());
+		this->AddCommand(BotServ, &commandbsbotlist);
 	}
 };
 

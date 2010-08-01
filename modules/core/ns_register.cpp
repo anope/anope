@@ -368,15 +368,19 @@ class CommandNSResend : public Command
 
 class NSRegister : public Module
 {
+	CommandNSRegister commandnsregister;
+	CommandNSConfirm commandnsconfirm;
+	CommandNSResend commandnsrsend;
+
  public:
-	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandnsconfirm("CONFIRM", 1, 1)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSRegister());
-		this->AddCommand(NickServ, new CommandNSConfirm("CONFIRM", 1, 1));
-		this->AddCommand(NickServ, new CommandNSResend());
+		this->AddCommand(NickServ, &commandnsregister);
+		this->AddCommand(NickServ, &commandnsconfirm);
+		this->AddCommand(NickServ, &commandnsrsend);
 	}
 };
 

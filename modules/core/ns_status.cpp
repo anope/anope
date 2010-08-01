@@ -62,13 +62,15 @@ class CommandNSStatus : public Command
 
 class NSStatus : public Module
 {
+	CommandNSStatus commandnsstatus;
+
  public:
 	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSStatus());
+		this->AddCommand(NickServ, &commandnsstatus);
 	}
 };
 

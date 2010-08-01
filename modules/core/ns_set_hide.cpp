@@ -16,7 +16,7 @@
 class CommandNSSetHide : public Command
 {
  public:
-	CommandNSSetHide(const Anope::string &cname) : Command(cname, 2)
+	CommandNSSetHide() : Command("HIDE", 2)
 	{
 	}
 
@@ -91,7 +91,7 @@ class CommandNSSetHide : public Command
 class CommandNSSASetHide : public Command
 {
  public:
-	CommandNSSASetHide(const Anope::string &cname) : Command(cname, 3, 3, "nickserv/saset/command")
+	CommandNSSASetHide() : Command("HIDE", 3, 3, "nickserv/saset/command")
 	{
 	}
 
@@ -174,6 +174,9 @@ class CommandNSSASetHide : public Command
 
 class NSSetHide : public Module
 {
+	CommandNSSetHide commandnssethide;
+	CommandNSSASetHide commandnssasethide;
+
  public:
 	NSSetHide(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -182,22 +185,22 @@ class NSSetHide : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetHide("HIDE"));
+			c->AddSubcommand(&commandnssethide);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetHide("HIDE"));
+			c->AddSubcommand(&commandnssasethide);
 	}
 
 	~NSSetHide()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("HIDE");
+			c->DelSubcommand(&commandnssethide);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("HIDE");
+			c->DelSubcommand(&commandnssasethide);
 	}
 };
 

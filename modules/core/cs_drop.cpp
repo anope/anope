@@ -104,13 +104,15 @@ class CommandCSDrop : public Command
 
 class CSDrop : public Module
 {
+	CommandCSDrop commandcsdrop;
+
  public:
 	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, new CommandCSDrop());
+		this->AddCommand(ChanServ, &commandcsdrop);
 	}
 };
 

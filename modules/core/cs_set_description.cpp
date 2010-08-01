@@ -16,7 +16,7 @@
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetDescription(const Anope::string &cpermission = "") : Command("DESC", 2, 2, cpermission)
 	{
 	}
 
@@ -54,7 +54,7 @@ class CommandCSSetDescription : public Command
 class CommandCSSASetDescription : public CommandCSSetDescription
 {
  public:
-	CommandCSSASetDescription(const Anope::string &cname) : CommandCSSetDescription(cname, "chanserv/saset/description")
+	CommandCSSASetDescription() : CommandCSSetDescription("chanserv/saset/description")
 	{
 	}
 
@@ -73,6 +73,9 @@ class CommandCSSASetDescription : public CommandCSSetDescription
 
 class CSSetDescription : public Module
 {
+	CommandCSSetDescription commandcssetdescription;
+	CommandCSSASetDescription commandcssasetdescription;
+
  public:
 	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -81,22 +84,22 @@ class CSSetDescription : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetDescription("DESC"));
+			c->AddSubcommand(&commandcssetdescription);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetDescription("DESC"));
+			c->AddSubcommand(&commandcssasetdescription);
 	}
 
 	~CSSetDescription()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("DESC");
+			c->DelSubcommand(&commandcssetdescription);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("DESC");
+			c->DelSubcommand(&commandcssasetdescription);
 	}
 };
 

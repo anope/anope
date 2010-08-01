@@ -16,7 +16,7 @@
 class CommandCSSetPersist : public Command
 {
  public:
-	CommandCSSetPersist(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetPersist(const Anope::string &cpermission = "") : Command("PERSIST", 2, 2, cpermission)
 	{
 	}
 
@@ -107,7 +107,7 @@ class CommandCSSetPersist : public Command
 class CommandCSSASetPersist : public CommandCSSetPersist
 {
  public:
-	CommandCSSASetPersist(const Anope::string &cname) : CommandCSSetPersist(cname, "chanserv/saset/persist")
+	CommandCSSASetPersist() : CommandCSSetPersist("chanserv/saset/persist")
 	{
 	}
 
@@ -125,6 +125,9 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 
 class CSSetPersist : public Module
 {
+	CommandCSSetPersist commandcssetpeace;
+	CommandCSSASetPersist commandcssasetpeace;
+
  public:
 	CSSetPersist(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -133,22 +136,22 @@ class CSSetPersist : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetPersist("PERSIST"));
+			c->AddSubcommand(&commandcssetpeace);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetPersist("PERSIST"));
+			c->AddSubcommand(&commandcssasetpeace);
 	}
 
 	~CSSetPersist()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("PERSIST");
+			c->DelSubcommand(&commandcssetpeace);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("PERSIST");
+			c->DelSubcommand(&commandcssasetpeace);
 	}
 };
 

@@ -52,13 +52,15 @@ class CommandNSUpdate : public Command
 
 class NSUpdate : public Module
 {
+	CommandNSUpdate commandnsupdate;
+
  public:
 	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSUpdate());
+		this->AddCommand(NickServ, &commandnsupdate);
 	}
 };
 

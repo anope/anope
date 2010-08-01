@@ -93,13 +93,15 @@ class CommandMSCheck : public Command
 
 class MSCheck : public Module
 {
+	CommandMSCheck commandmscheck;
+
  public:
 	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSCheck());
+		this->AddCommand(MemoServ, &commandmscheck);
 	}
 };
 

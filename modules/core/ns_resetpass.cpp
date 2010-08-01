@@ -63,6 +63,8 @@ class CommandNSResetPass : public Command
 
 class NSResetPass : public Module
 {
+	CommandNSResetPass commandnsresetpass;
+
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -72,7 +74,7 @@ class NSResetPass : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSResetPass());
+		this->AddCommand(NickServ, &commandnsresetpass);
 
 		ModuleManager::Attach(I_OnPreCommand, this);
 	}

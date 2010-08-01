@@ -117,13 +117,15 @@ class CommandHSSetAll : public Command
 
 class HSSetAll : public Module
 {
+	CommandHSSetAll commandhssetall;
+
  public:
 	HSSetAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSSetAll());
+		this->AddCommand(HostServ, &commandhssetall);
 	}
 };
 

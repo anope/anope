@@ -64,13 +64,15 @@ class CommandOSJupe : public Command
 
 class OSJupe : public Module
 {
+	CommandOSJupe commandosjupe;
+
  public:
 	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSJupe());
+		this->AddCommand(OperServ, &commandosjupe);
 	}
 };
 

@@ -146,13 +146,15 @@ class CommandMSRead : public Command
 
 class MSRead : public Module
 {
+	CommandMSRead commandmsread;
+
  public:
 	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSRead());
+		this->AddCommand(MemoServ, &commandmsread);
 	}
 };
 

@@ -16,7 +16,7 @@
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp(const Anope::string &cname) : Command(cname, 2)
+	CommandNSSetAutoOp() : Command("AUTOOP", 2)
 	{
 	}
 
@@ -58,7 +58,7 @@ class CommandNSSetAutoOp : public Command
 class CommandNSSASetAutoOp : public Command
 {
  public:
-	CommandNSSASetAutoOp(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/autoop")
+	CommandNSSASetAutoOp() : Command("AUTOOP", 2, 2, "nickserv/saset/autoop")
 	{
 	}
 
@@ -105,6 +105,9 @@ class CommandNSSASetAutoOp : public Command
 
 class NSSetAutoOp : public Module
 {
+	CommandNSSetAutoOp commandnssetautoop;
+	CommandNSSASetAutoOp commandnssasetautoop;
+
  public:
 	NSSetAutoOp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -113,22 +116,22 @@ class NSSetAutoOp : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetAutoOp("AUTOOP"));
+			c->AddSubcommand(&commandnssetautoop);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetAutoOp("AUTOOP"));
+			c->AddSubcommand(&commandnssasetautoop);
 	}
 
 	~NSSetAutoOp()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("AUTOOP");
+			c->DelSubcommand(&commandnssetautoop);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("AUTOOP");
+			c->DelSubcommand(&commandnssasetautoop);
 	}
 };
 

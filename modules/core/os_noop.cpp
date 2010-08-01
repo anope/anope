@@ -76,13 +76,15 @@ class CommandOSNOOP : public Command
 
 class OSNOOP : public Module
 {
+	CommandOSNOOP commandosnoop;
+
  public:
 	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSNOOP());
+		this->AddCommand(OperServ, &commandosnoop);
 	}
 };
 

@@ -60,13 +60,15 @@ class CommandMSStaff : public Command
 
 class MSStaff : public Module
 {
+	CommandMSStaff commandmsstaff;
+
  public:
 	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, new CommandMSStaff());
+		this->AddCommand(MemoServ, &commandmsstaff);
 	}
 };
 

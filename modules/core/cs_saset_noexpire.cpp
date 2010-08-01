@@ -16,7 +16,7 @@
 class CommandCSSASetNoexpire : public Command
 {
  public:
-	CommandCSSASetNoexpire(const Anope::string &cname) : Command(cname, 2, 2, "chanserv/saset/noexpire")
+	CommandCSSASetNoexpire() : Command("NOEXPIRE", 2, 2, "chanserv/saset/noexpire")
 	{
 	}
 
@@ -61,6 +61,8 @@ class CommandCSSASetNoexpire : public Command
 
 class CSSetNoexpire : public Module
 {
+	CommandCSSASetNoexpire commandcssasetnoexpire;
+
  public:
 	CSSetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -69,14 +71,14 @@ class CSSetNoexpire : public Module
 
 		Command *c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetNoexpire("NOEXPIRE"));
+			c->AddSubcommand(&commandcssasetnoexpire);
 	}
 
 	~CSSetNoexpire()
 	{
 		Command *c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("NOEXPIRE");
+			c->DelSubcommand(&commandcssasetnoexpire);
 	}
 };
 

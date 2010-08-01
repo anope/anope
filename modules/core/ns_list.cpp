@@ -195,13 +195,15 @@ class CommandNSList : public Command
 
 class NSList : public Module
 {
+	CommandNSList commandnslist;
+
  public:
 	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSList());
+		this->AddCommand(NickServ, &commandnslist);
 	}
 };
 

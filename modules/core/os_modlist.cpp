@@ -217,13 +217,15 @@ class CommandOSModList : public Command
 
 class OSModList : public Module
 {
+	CommandOSModList commandosmodlist;
+
  public:
 	OSModList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSModList());
+		this->AddCommand(OperServ, &commandosmodlist);
 	}
 };
 

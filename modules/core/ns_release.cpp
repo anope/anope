@@ -91,13 +91,15 @@ class CommandNSRelease : public Command
 
 class NSRelease : public Module
 {
+	CommandNSRelease commandnsrelease;
+
  public:
 	NSRelease(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSRelease());
+		this->AddCommand(NickServ, &commandnsrelease);
 	}
 };
 

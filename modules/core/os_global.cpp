@@ -49,13 +49,15 @@ class CommandOSGlobal : public Command
 
 class OSGlobal : public Module
 {
+	CommandOSGlobal commandosglobal;
+
  public:
 	OSGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSGlobal());
+		this->AddCommand(OperServ, &commandosglobal);
 	}
 };
 

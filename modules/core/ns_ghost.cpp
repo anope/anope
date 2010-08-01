@@ -90,13 +90,15 @@ class CommandNSGhost : public Command
 
 class NSGhost : public Module
 {
+	CommandNSGhost commandnsghost;
+
  public:
 	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSGhost());
+		this->AddCommand(NickServ, &commandnsghost);
 	}
 };
 

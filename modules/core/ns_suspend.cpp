@@ -169,14 +169,17 @@ class CommandNSUnSuspend : public Command
 
 class NSSuspend : public Module
 {
+	CommandNSSuspend commandnssuspend;
+	CommandNSUnSuspend commandnsunsuspend;
+
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSSuspend());
-		this->AddCommand(NickServ, new CommandNSUnSuspend());
+		this->AddCommand(NickServ, &commandnssuspend);
+		this->AddCommand(NickServ, &commandnsunsuspend);
 	}
 };
 

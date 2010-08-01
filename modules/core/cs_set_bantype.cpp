@@ -16,7 +16,7 @@
 class CommandCSSetBanType : public Command
 {
  public:
-	CommandCSSetBanType(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetBanType(const Anope::string &cpermission = "") : Command("BANTYPE", 2, 2, cpermission)
 	{
 	}
 
@@ -62,7 +62,7 @@ class CommandCSSetBanType : public Command
 class CommandCSSASetBanType : public CommandCSSetBanType
 {
  public:
-	CommandCSSASetBanType(const Anope::string &cname) : CommandCSSetBanType(cname, "chanserv/saset/bantype")
+	CommandCSSASetBanType() : CommandCSSetBanType("chanserv/saset/bantype")
 	{
 	}
 
@@ -81,6 +81,9 @@ class CommandCSSASetBanType : public CommandCSSetBanType
 
 class CSSetBanType : public Module
 {
+	CommandCSSetBanType commandcssetbantype;
+	CommandCSSASetBanType commandcssasetbantype;
+
  public:
 	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -89,22 +92,22 @@ class CSSetBanType : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetBanType("BANTYPE"));
+			c->AddSubcommand(&commandcssetbantype);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetBanType("BANTYPE"));
+			c->AddSubcommand(&commandcssasetbantype);
 	}
 
 	~CSSetBanType()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("BANTYPE");
+			c->DelSubcommand(&commandcssetbantype);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("BANTYPE");
+			c->DelSubcommand(&commandcssasetbantype);
 	}
 };
 

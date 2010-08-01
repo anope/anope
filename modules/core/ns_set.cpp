@@ -19,14 +19,12 @@ class CommandNSSet : public Command
 	subcommand_map subcommands;
 
  public:
-	CommandNSSet(const Anope::string &cname) : Command(cname, 1, 3)
+	CommandNSSet() : Command("SET", 1, 3)
 	{
 	}
 
 	~CommandNSSet()
 	{
-		for (subcommand_map::const_iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-			delete it->second;
 		this->subcommands.clear();
 	}
 
@@ -116,7 +114,7 @@ class CommandNSSet : public Command
 class CommandNSSetDisplay : public Command
 {
  public:
-	CommandNSSetDisplay(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetDisplay() : Command("DISPLAY", 1)
 	{
 	}
 
@@ -156,7 +154,7 @@ class CommandNSSetDisplay : public Command
 class CommandNSSetPassword : public Command
 {
  public:
-	CommandNSSetPassword(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetPassword() : Command("PASSWORD", 1)
 	{
 	}
 
@@ -214,16 +212,20 @@ class CommandNSSetPassword : public Command
 
 class NSSet : public Module
 {
+	CommandNSSet commandnsset;
+	CommandNSSetDisplay commandnssetdisplay;
+	CommandNSSetPassword commandnssetpassword;
+
  public:
 	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *set = new CommandNSSet("SET");
-		this->AddCommand(NickServ, set);
-		set->AddSubcommand(new CommandNSSetDisplay("DISPLAY"));
-		set->AddSubcommand(new CommandNSSetPassword("PASSWORD"));
+		this->AddCommand(NickServ, &commandnsset);
+
+		commandnsset.AddSubcommand(&commandnssetdisplay);
+		commandnsset.AddSubcommand(&commandnssetpassword);
 	}
 };
 

@@ -49,13 +49,15 @@ class CommandHSOff : public Command
 
 class HSOff : public Module
 {
+	CommandHSOff commandhsoff;
+
  public:
 	HSOff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, new CommandHSOff());
+		this->AddCommand(HostServ, &commandhsoff);
 	}
 };
 

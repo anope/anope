@@ -70,6 +70,8 @@ class CommandNSSendPass : public Command
 
 class NSSendPass : public Module
 {
+	CommandNSSendPass commandnssendpass;
+
  public:
 	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -83,7 +85,7 @@ class NSSendPass : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSSendPass());
+		this->AddCommand(NickServ, &commandnssendpass);
 	}
 };
 

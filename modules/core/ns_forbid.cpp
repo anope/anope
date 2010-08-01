@@ -108,13 +108,15 @@ class CommandNSForbid : public Command
 
 class NSForbid : public Module
 {
+	CommandNSForbid commandnsforbid;
+
  public:
 	NSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, new CommandNSForbid());
+		this->AddCommand(NickServ, &commandnsforbid);
 	}
 };
 

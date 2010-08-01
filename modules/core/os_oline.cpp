@@ -67,6 +67,8 @@ class CommandOSOLine : public Command
 
 class OSOLine : public Module
 {
+	CommandOSOLine commandosoline;
+
  public:
 	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -76,7 +78,7 @@ class OSOLine : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSOLine());
+		this->AddCommand(OperServ, &commandosoline);
 	}
 };
 

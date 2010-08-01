@@ -16,7 +16,7 @@
 class CommandNSSetSecure : public Command
 {
  public:
-	CommandNSSetSecure(const Anope::string &cname) : Command(cname, 1)
+	CommandNSSetSecure() : Command("SECURE", 1)
 	{
 	}
 
@@ -58,7 +58,7 @@ class CommandNSSetSecure : public Command
 class CommandNSSASetSecure : public Command
 {
  public:
-	CommandNSSASetSecure(const Anope::string &cname) : Command(cname, 2, 2, "nickserv/saset/secure")
+	CommandNSSASetSecure() : Command("SECURE", 2, 2, "nickserv/saset/secure")
 	{
 	}
 
@@ -105,6 +105,9 @@ class CommandNSSASetSecure : public Command
 
 class NSSetSecure : public Module
 {
+	CommandNSSetSecure commandnssetsecure;
+	CommandNSSASetSecure commandnssasetsecure;
+
  public:
 	NSSetSecure(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -113,22 +116,22 @@ class NSSetSecure : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandNSSetSecure("SECURE"));
+			c->AddSubcommand(&commandnssetsecure);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandNSSASetSecure("SECURE"));
+			c->AddSubcommand(&commandnssasetsecure);
 	}
 
 	~NSSetSecure()
 	{
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->DelSubcommand("SECURE");
+			c->DelSubcommand(&commandnssetsecure);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->DelSubcommand("SECURE");
+			c->DelSubcommand(&commandnssasetsecure);
 	}
 };
 

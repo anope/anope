@@ -47,13 +47,15 @@ class CommandOSReload : public Command
 
 class OSReload : public Module
 {
+	CommandOSReload commandosreload;
+
  public:
 	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSReload());
+		this->AddCommand(OperServ, &commandosreload);
 	}
 };
 

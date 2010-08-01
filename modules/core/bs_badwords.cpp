@@ -270,13 +270,15 @@ class CommandBSBadwords : public Command
 
 class BSBadwords : public Module
 {
+	CommandBSBadwords commandbsbadwords;
+
  public:
 	BSBadwords(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, new CommandBSBadwords);
+		this->AddCommand(BotServ, &commandbsbadwords);
 	}
 };
 

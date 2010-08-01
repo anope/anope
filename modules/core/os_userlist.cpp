@@ -86,13 +86,15 @@ class CommandOSUserList : public Command
 
 class OSUserList : public Module
 {
+	CommandOSUserList commandosuserlist;
+
  public:
 	OSUserList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSUserList());
+		this->AddCommand(OperServ, &commandosuserlist);
 	}
 };
 

@@ -174,13 +174,15 @@ class CommandOSClearModes : public Command
 
 class OSClearModes : public Module
 {
+	CommandOSClearModes commandosclearmodes;
+
  public:
 	OSClearModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, new CommandOSClearModes());
+		this->AddCommand(OperServ, &commandosclearmodes);
 	}
 };
 

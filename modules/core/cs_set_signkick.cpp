@@ -16,7 +16,7 @@
 class CommandCSSetSignKick : public Command
 {
  public:
-	CommandCSSetSignKick(const Anope::string &cname, const Anope::string &cpermission = "") : Command(cname, 2, 2, cpermission)
+	CommandCSSetSignKick(const Anope::string &cpermission = "") : Command("SIGNKICK", 2, 2, cpermission)
 	{
 	}
 
@@ -70,7 +70,7 @@ class CommandCSSetSignKick : public Command
 class CommandCSSASetSignKick : public CommandCSSetSignKick
 {
  public:
-	CommandCSSASetSignKick(const Anope::string &cname) : CommandCSSetSignKick(cname, "chanserv/saset/signkick")
+	CommandCSSASetSignKick() : CommandCSSetSignKick("chanserv/saset/signkick")
 	{
 	}
 
@@ -88,6 +88,9 @@ class CommandCSSASetSignKick : public CommandCSSetSignKick
 
 class CSSetSignKick : public Module
 {
+	CommandCSSetSignKick commandcssetsignkick;
+	CommandCSSASetSignKick commandcssasetsignkick;
+
  public:
 	CSSetSignKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -96,22 +99,22 @@ class CSSetSignKick : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(new CommandCSSetSignKick("SIGNKICK"));
+			c->AddSubcommand(&commandcssetsignkick);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(new CommandCSSASetSignKick("SIGNKICK"));
+			c->AddSubcommand(&commandcssasetsignkick);
 	}
 
 	~CSSetSignKick()
 	{
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->DelSubcommand("SIGNKICK");
+			c->DelSubcommand(&commandcssetsignkick);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->DelSubcommand("SIGNKICK");
+			c->DelSubcommand(&commandcssasetsignkick);
 	}
 };
 

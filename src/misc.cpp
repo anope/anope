@@ -1296,3 +1296,26 @@ bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::stri
 
 	return true;
 }
+
+/********************************************************************************/
+
+/** Converts a string to hex
+ * @param the data to be converted
+ * @return a anope::string containing the hex value
+ */
+
+Anope::string Anope::Hex(const Anope::string &data)
+{
+	const char hextable[] = "0123456789abcdef";
+
+	int l = data.length();
+	Anope::string rv;
+	for(int i=0; i < l; i++)
+	{
+		unsigned char c = data[i];
+		rv += hextable[c >> 4];
+		rv += hextable[c & 0xF];
+	}
+	return rv;
+}
+

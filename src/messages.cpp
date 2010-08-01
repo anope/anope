@@ -25,9 +25,7 @@ int m_nickcoll(const Anope::string &user)
 
 int m_away(const Anope::string &source, const Anope::string &msg)
 {
-	User *u;
-
-	u = finduser(source);
+	User *u = finduser(source);
 
 	if (u && msg.empty()) /* un-away */
 		check_memos(u);
@@ -56,15 +54,13 @@ int m_kill(const Anope::string &nick, const Anope::string &msg)
 
 int m_time(const Anope::string &source, int ac, const char **av)
 {
-	time_t t;
-	struct tm *tm;
-	char buf[64];
-
 	if (source.empty())
 		return MOD_CONT;
 
-	time(&t);
-	tm = localtime(&t);
+	time_t *t;
+	time(t);
+	struct tm *tm = localtime(t);
+	char buf[64];
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
 	ircdproto->SendNumeric(Config.ServerName, 391, source, "%s :%s", Config.ServerName.c_str(), buf);
 	return MOD_CONT;
@@ -74,16 +70,14 @@ int m_time(const Anope::string &source, int ac, const char **av)
 
 int m_motd(const Anope::string &source)
 {
-	FILE *f;
-	char buf[BUFSIZE];
-
 	if (source.empty())
 		return MOD_CONT;
 
-	f = fopen(Config.MOTDFilename.c_str(), "r");
+	FILE *f = fopen(Config.MOTDFilename.c_str(), "r");
 	if (f)
 	{
 		ircdproto->SendNumeric(Config.ServerName, 375, source, ":- %s Message of the Day", Config.ServerName.c_str());
+		char buf[BUFSIZE];
 		while (fgets(buf, sizeof(buf), f))
 		{
 			buf[strlen(buf) - 1] = 0;
@@ -101,8 +95,6 @@ int m_motd(const Anope::string &source)
 
 int m_privmsg(const Anope::string &source, const Anope::string &receiver, const Anope::string &message)
 {
-	time_t starttime, stoptime; /* When processing started and finished */
-
 	if (source.empty() || receiver.empty() || message.empty())
 		return MOD_CONT;
 
@@ -160,9 +152,6 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 			return MOD_CONT;
 		}
 
-		if (allow_ignore)
-			starttime = time(NULL);
-
 		BotInfo *bi = findbot(botname);
 
 		if (bi)
@@ -203,16 +192,14 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 
 int m_stats(const Anope::string &source, int ac, const char **av)
 {
-	User *u;
-
 	if (ac < 1)
 		return MOD_CONT;
+
+	User *u = finduser(source);
 
 	switch (*av[0])
 	{
 		case 'l':
-			u = finduser(source);
-
 			if (u && is_oper(u))
 			{
 				ircdproto->SendNumeric(Config.ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
@@ -224,7 +211,6 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
-			u = finduser(source);
 			if (u && !is_oper(u) && Config.HideStatsO)
 				ircdproto->SendNumeric(Config.ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
 			else

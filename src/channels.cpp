@@ -183,7 +183,8 @@ void Channel::DeleteUser(User *user)
 	if (this->ci && this->ci->HasFlag(CI_INHABIT))
 		return;
 
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && this->FindUser(this->ci->bi))
+	/* check for BSMinUsers and part the BotServ bot from the channel */
+	if (this->users.size() < Config.BSMinUsers && !Config.s_BotServ.empty() && this->ci && this->ci->bi && this->FindUser(this->ci->bi))
 		this->ci->bi->Part(this->ci->c);
 	else if (this->users.empty())
 		delete this;

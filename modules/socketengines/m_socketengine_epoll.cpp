@@ -47,7 +47,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		memset(&ev, 0, sizeof(ev));
 
-		ev.events = EPOLLIN | EPOLLOUT;
+		ev.events = EPOLLIN;
 		ev.data.fd = s->GetSock();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
@@ -78,6 +78,32 @@ class SocketEngineEPoll : public SocketEngineBase
 		Sockets.erase(ev.data.fd);
 
 		--SocketCount;
+	}
+
+	void MarkWriteable(Socket *s)
+	{
+		epoll_event ev;
+
+		memset(&ev, 0, sizeof(ev));
+
+		ev.events = EPOLLIN | EPOLLOUT;
+		ev.data.fd = s->GetSock();
+
+		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
+			Alog() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
+	}
+
+	void ClearWriteable(Socket *s)
+	{
+		epoll_event ev;
+
+		memset(&ev, 0, sizeof(ev));
+
+		ev.events = EPOLLIN;
+		ev.data.fd = s->GetSock();
+
+		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
+			Alog() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
 	}
 
 	void Process()

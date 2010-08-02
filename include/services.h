@@ -667,6 +667,7 @@ enum ChannelAccess
 /* BotServ SET flags */
 enum BotServFlag
 {
+	BS_BEGIN,
 	/* BotServ won't kick ops */
 	BS_DONTKICKOPS,
 	/* BotServ won't kick voices */
@@ -694,7 +695,8 @@ enum BotServFlag
 	/* BotServ kicks for flood */
 	BS_KICK_FLOOD,
 	/* BotServ kicks for repeating */
-	BS_KICK_REPEAT
+	BS_KICK_REPEAT,
+	BS_END
 };
 
 /* Indices for TTB (Times To Ban) */

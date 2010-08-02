@@ -43,7 +43,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 			this->SetFlag(static_cast<ChannelInfoFlag>(t));
 
 	/* Set default bot flags */
-	for (t = BI_BEGIN + 1; t != BI_END; ++t)
+	for (t = BS_BEGIN + 1; t != BS_END; ++t)
 		if (Config.BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
 			this->botflags.SetFlag(static_cast<BotServFlag>(t));
 

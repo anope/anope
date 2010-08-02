@@ -53,7 +53,7 @@ class CommandNSSASet : public Command
 			if (c)
 			{
 				Anope::string cmdparams = na->nc->display;
-				for (std::vector<Anope::string>::const_iterator it = params.begin() + 1; it != params.end(); ++it)
+				for (std::vector<Anope::string>::const_iterator it = params.begin() + 2; it != params.end(); ++it)
 					cmdparams += " " + *it;
 				mod_run_cmd(NickServ, u, c, params[1], cmdparams);
 			}

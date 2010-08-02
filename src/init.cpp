@@ -355,7 +355,11 @@ int init_primary(int ac, char **av)
 	ModuleManager::LoadModuleList(Config.DBModuleList);
 
 	/* Load the socket engine */
-	ModuleManager::LoadModule(Config.SocketEngine, NULL);
+	if (ModuleManager::LoadModule(Config.SocketEngine, NULL))
+	{
+		Alog(LOG_TERMINAL) << "Unable to load socket engine " << Config.SocketEngine;
+		return -1;
+	}
 
 	return 0;
 }

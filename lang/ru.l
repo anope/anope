@@ -2053,6 +2053,8 @@ BOT_REASON_REVERSE
 	Использование инверсии у нас тут не приветствуется!
 BOT_REASON_UNDERLINE
 	Использование подчеркиваний у нас тут не приветствуется!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 
 # !seen replies
 BOT_SEEN_BOT
@@ -2182,6 +2184,10 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 	Цензор подчеркиваний.: %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	Цензор подчеркиваний.: %s (%d киков до бана)
+BOT_INFO_CHAN_KICK_ITALICS
+	Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	Italics kicker : %s (%d kick(s) to ban)
 BOT_INFO_ACTIVE
 	включен
 BOT_INFO_INACTIVE
@@ -2343,6 +2349,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	Дополнительно, после %d предупреждающих киков, бот забанит нарушителя.
 BOT_KICK_UNDERLINES_OFF
 	Режим кика за использование подчеркнутого текста отключен.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -6172,6 +6185,7 @@ BOT_HELP_KICK
 	                  инверсного текста
 	    UNDERLINES    настройка условия кика за чрезмерное использование
 	                  подчеркиваний
+	    ITALICS       Sets if the bot kicks italics
 	
 	Для более подробной информации о конкретной опции воспользуйтесь
 	командой %R%S HELP KICK опция.
@@ -6267,6 +6281,16 @@ BOT_HELP_KICK_FLOOD
 	Параметр ttb - это количество киков, по превышению которого бот
 	поставит бан. Укажите вместо положительного числа значение "0" или
 	"-" если не хотите чтобы бот банил нарушителя.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 
 BOT_HELP_KICK_REPEAT
 	Синтаксис: KICK #канал REPEAT {ON|OFF} [ttb [число_повторов]]

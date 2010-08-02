@@ -163,6 +163,14 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			bot_kick(ci, u, BOT_REASON_REVERSE);
 			return;
 		}
+		
+		/* Italics kicker */
+		if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_ITALICS);
+			bot_kick(ci, u, BOT_REASON_ITALIC);
+			return;
+		}
 
 		/* Underlines kicker */
 		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
@@ -694,6 +702,9 @@ Anope::string normalizeBuffer(const Anope::string &buf)
 				break;
 			/* Underline ctrl char */
 			case 31:
+				break;
+			/* Italic ctrl char */
+			case 29:
 				break;
 			/* A valid char gets copied into the new buffer */
 			default:

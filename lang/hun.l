@@ -2095,6 +2095,8 @@ BOT_REASON_REVERSE
 	Nem írj visszafelé ezen a csatornán!
 BOT_REASON_UNDERLINE
 	Nem használj aláhúzásokat ezen a csatornán!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 
 # !seen válaszok
 BOT_SEEN_BOT
@@ -2224,6 +2226,10 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 		Aláhúzásért kirúgás: %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 		Aláhúzásért kirúgás: %s (%d kirúgás után kitiltás)
+BOT_INFO_CHAN_KICK_ITALICS
+		Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+		Italics kicker : %s (%d kick(s) to ban)
 BOT_INFO_ACTIVE
 	engedélyezve
 BOT_INFO_INACTIVE
@@ -2382,6 +2388,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	%d kirúgás után a usert.
 BOT_KICK_UNDERLINES_OFF
 	Bot nem fog kirúgni aláhúzásos írás miatt.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 
 # BADWORDS üzenetek
 BOT_BADWORDS_SYNTAX
@@ -6040,6 +6053,7 @@ BOT_HELP_KICK
 	                  ismétlõket.
 	    REVERSES      A bot kirúgja visszafelé írókat
 	    UNDERLINES    A bot kirúgja aláhúzással írókat
+	    ITALICS       Sets if the bot kicks italics
 	
 	Írd be %R%S HELP KICK opció az adott opcióval
 	kapcsolatos bõvebb információkért.
@@ -6140,6 +6154,16 @@ BOT_HELP_KICK_BADWORDS
 	A ttb a banolás elotti kickek száma.
 	Ha nem adod meg, akkor csak kirúgást eszközöl a bot.
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 	
 BOT_HELP_BADWORDS
 	Syntax:BADWORDS #szoba ADD  szó  [SINGLE  |  START  |  END]

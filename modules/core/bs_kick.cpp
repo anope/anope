@@ -331,6 +331,36 @@ class CommandBSKick : public Command
 					notice_lang(Config.s_BotServ, u, BOT_KICK_UNDERLINES_OFF);
 				}
 			}
+			else if (option.equals_ci("ITALICS"))
+			{
+				if (value.equals_ci("ON"))
+				{
+					if (!ttb.empty())
+					{
+						Anope::string error;
+						ci->ttb[TTB_ITALICS] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_ITALICS] < 0)
+						{
+							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
+							ci->ttb[TTB_ITALICS] = 0;
+							notice_lang(Config.s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							return MOD_CONT;
+						}
+					}
+					else
+						ci->ttb[TTB_ITALICS] = 0;
+					ci->botflags.SetFlag(BS_KICK_ITALICS);
+					if (ci->ttb[TTB_ITALICS])
+						notice_lang(Config.s_BotServ, u, BOT_KICK_ITALICS_ON_BAN, ci->ttb[TTB_ITALICS]);
+					else
+						notice_lang(Config.s_BotServ, u, BOT_KICK_ITALICS_ON);
+				}
+				else
+				{
+					ci->botflags.UnsetFlag(BS_KICK_ITALICS);
+					notice_lang(Config.s_BotServ, u, BOT_KICK_ITALICS_OFF);
+				}
+			}
 			else
 				notice_help(Config.s_BotServ, u, BOT_KICK_UNKNOWN, option.c_str());
 		}
@@ -357,6 +387,8 @@ class CommandBSKick : public Command
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_REVERSES);
 		else if (subcommand.equals_ci("UNDERLINES"))
 			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
+		else if (subcommand.equals_ci("ITALICS"))
+			notice_help(Config.s_BotServ, u, BOT_HELP_KICK_ITALICS);
 		else
 			return false;
 

@@ -2105,6 +2105,8 @@ BOT_REASON_REVERSE
 	Gebruik geen inverteringen in dit kanaal!
 BOT_REASON_UNDERLINE
 	Gebruik geen onderstrepingen in dit kanaal!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 	
 # !seen replies
 BOT_SEEN_BOT
@@ -2234,6 +2236,10 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 	Onderstrepings kicker: %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	Onderstrepings kicker: %s (%d kick(s) om bannen)
+BOT_INFO_CHAN_KICK_ITALICS
+	      Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	      Italics kicker : %s (%d kick(s) to ban)
 BOT_INFO_ACTIVE
 	ingeschakeld
 BOT_INFO_INACTIVE
@@ -2393,6 +2399,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	%d kicks voor dezelfde gebruiker.
 BOT_KICK_UNDERLINES_OFF
 	Bot zal niet meer kicken op onderstrepingen.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 	
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -6107,6 +6120,7 @@ BOT_HELP_KICK
 	                       zichzelf herhalen
 	    REVERSES      Stelt in of de bot kickt op inverteringen
 	    UNDERLINES    Stelt in of de bot kickt op onderstrepingen
+	    ITALICS       Sets if the bot kicks italics
 	
 	Type %R%S HELP KICK optie voor meer informatie over
 	een specifieke optie.
@@ -6208,6 +6222,16 @@ BOT_HELP_KICK_BADWORDS
 	ttb is het aantal keren dat een gebruiker gekicked kan
 	worden voordat deze gebanned wordt. Geef geen ttb op om het
 	ban system uit te schakelen als deze kicker geactiveerd is.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 
 BOT_HELP_BADWORDS
 	Gebruik: BADWORDS kanaal ADD woord [SINGLE | START | END]

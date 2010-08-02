@@ -2121,6 +2121,8 @@ BOT_REASON_REVERSE
 	Μην είσαι αντίθετος μέσα στο κανάλι!
 BOT_REASON_UNDERLINE
 	Μην χρησιμοποιείς χαρακτήρες υπογράμμισης στο κανάλι!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 	
 # !seen replies
 BOT_SEEN_BOT
@@ -2250,6 +2252,10 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 	  Υπογράμμιση με kick : %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	  Υπογράμμιση με kick : %s (%d kick(s) to ban)
+BOT_INFO_CHAN_KICK_ITALICS
+	       Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	       Italics kicker : %s (%d kick(s) to ban)
 BOT_INFO_ACTIVE
 	ενεργοποιημένο
 BOT_INFO_INACTIVE
@@ -2409,6 +2415,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	kicks για τον ίδιο χρήστη.
 BOT_KICK_UNDERLINES_OFF
 	Το Bot δεν θα κάνει kick για υπογραμμισμένους χαρακτήρες πλέον.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 	
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -6141,6 +6154,7 @@ BOT_HELP_KICK
 	      είναι αντίθετοι(πχ αλλάζουν τα modes)
 	    UNDERLINES    Ρυθμίζει το bot αν θα κάνει kick αυτούς που
 	      γράφουν με υπογραμμισμένους χαρακτήρες
+	    ITALICS       Sets if the bot kicks italics
 	
 	Γράψε %R%S HELP KICK επιλογή για περισσότερες πληροφορίες
 	σε συγκεκριμένες εντολές.
@@ -6244,6 +6258,16 @@ BOT_HELP_KICK_BADWORDS
 	Το ttb είναι το νούμερο με το οποίο θα γίνεται ο χρήστης αρχικά kick
 	και μετά ban. Μην προσπαθήσετε να απενεργοποιήσετε το ttb
 	γιατί το σύστημα θα το ενεργοποιήσει ξανά.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 	
 BOT_HELP_BADWORDS
 	Σύνταξη: BADWORDS κανάλι ADD λέξη [SINGLE | START | END]

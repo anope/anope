@@ -63,6 +63,7 @@ BotFlagInfo BotFlags[] = {
 	{"KICK_CAPS", BS_KICK_CAPS},
 	{"KICK_FLOOD", BS_KICK_FLOOD},
 	{"KICK_REPEAT", BS_KICK_REPEAT},
+	{"KICK_ITALICS", BS_KICK_ITALICS},
 	{"", static_cast<BotServFlag>(-1)}
 };
 

@@ -2126,6 +2126,8 @@ BOT_REASON_REVERSE
 	N'utilisez pas de caractères inversés sur ce canal!
 BOT_REASON_UNDERLINE
 	N'utilisez pas de caractères soulignés sur ce canal!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 	
 # !seen replies
 BOT_SEEN_BOT
@@ -2255,6 +2257,11 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 	Kicker de car. soulignés : %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	Kicker de car. soulignés : %s (%d kick(s) pour un ban)
+BOT_INFO_CHAN_KICK_ITALICS
+	          Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	          Italics kicker : %s (%d kick(s) to ban)
+
 BOT_INFO_ACTIVE
 	actif
 BOT_INFO_INACTIVE
@@ -2421,6 +2428,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	utilisateur.
 BOT_KICK_UNDERLINES_OFF
 	Le bot ne kickera plus les caractères soulignés.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 	
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -6235,6 +6249,7 @@ BOT_HELP_KICK
 	    REVERSES      Détermine si le bot kicke les reverses
 	    UNDERLINES    Détermine si le bot kicke les caractères
 	                     soulignés
+	    ITALICS       Sets if the bot kicks italics
 	
 	Tapez %R%S HELP KICK option pour plus d'informations
 	sur une option en particulier.
@@ -6354,6 +6369,16 @@ BOT_HELP_KICK_BADWORDS
 	se faire kicker avant d'être banni. Ne donnez
 	pas ttb ou mettez le à 0 pour désactiver le système
 	de ban une fois activé.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 
 BOT_HELP_BADWORDS
 	Syntaxe: BADWORDS canal ADD mot [SINGLE | START | END]

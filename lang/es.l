@@ -2090,6 +2090,8 @@ BOT_REASON_REVERSE
 	No uses reversos en este canal!
 BOT_REASON_UNDERLINE
 	No uses subrayados en este canal!
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
 	
 # !seen replies
 BOT_SEEN_BOT
@@ -2219,6 +2221,10 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 	  Kicker por subrayados : %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	  Kicker por subrayados : %s (%d kick(s) para ban)
+BOT_INFO_CHAN_KICK_ITALICS
+	         Italics kicker : %s
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	         Italics kicker : %s (%d kick(s) to ban)
 BOT_INFO_ACTIVE
 	Activada
 BOT_INFO_INACTIVE
@@ -2378,6 +2384,13 @@ BOT_KICK_UNDERLINES_ON_BAN
 	kicks al mismo usuario.
 BOT_KICK_UNDERLINES_OFF
 	El bot ya no kickeara subrayados.
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 	
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -6207,6 +6220,7 @@ BOT_HELP_KICK
 	                       que repiten
 	    REVERSES      Setea si el bot kickea reversos
 	    UNDERLINES    Setea si el bot kickea subrayados
+	    ITALICS       Sets if the bot kicks italics
 	
 	Tipea %R%S HELP KICK opcion para mayor
 	informacion sobre una opcion especifica.
@@ -6313,6 +6327,16 @@ BOT_HELP_KICK_BADWORDS
 	ttb es el numero de veces que un usuario sera kickeado
 	antes de ser baneado. No des ttb para desabilitar
 	el sistema de ban una vez activado.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 
 BOT_HELP_BADWORDS
 	Sintaxis: BADWORDS canal ADD palabra [SINGLE | START | END]

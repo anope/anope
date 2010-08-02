@@ -1,5 +1,6 @@
 Anope Version 1.9.3
 --------------------
+A Added italics BotServ kicks support
 A Tell users when their nicks expire in /ns glist and /ns info
 A Added SSL support
 A Added official support for InspIRCd 2.0

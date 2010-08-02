@@ -2700,6 +2700,9 @@ BOT_REASON_REVERSE
 BOT_REASON_UNDERLINE
 	Nie u¿ywaj podkre¶leñ na tym kanale!
 
+BOT_REASON_ITALIC
+	Don't use italics on this channel!
+
 # !seen replies
 BOT_SEEN_BOT
 	Tak! Jestem tutaj %s!
@@ -2877,6 +2880,12 @@ BOT_INFO_CHAN_KICK_UNDERLINES
 
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
 	Kopanie za podkre¶lenia: %s (%d kop(y) do bana)
+
+BOT_INFO_CHAN_KICK_ITALICS
+	        Italics kicker : %s
+
+BOT_INFO_CHAN_KICK_ITALICS_BAN
+	        Italics kicker : %s (%d kick(s) to ban)
 
 BOT_INFO_ACTIVE
 	w³±czone
@@ -3089,6 +3098,16 @@ BOT_KICK_UNDERLINES_ON_BAN
 
 BOT_KICK_UNDERLINES_OFF
 	Bot nie bêdzie kopa³ za podkre¶lenia.
+
+BOT_KICK_ITALICS_ON
+	Bot will now kick italics.
+
+BOT_KICK_ITALICS_ON_BAN
+	Bot will now kick italics, and will place a ban after %d
+	kicks for the same user.
+
+BOT_KICK_ITALICS_OFF
+	Bot won't kick italics anymore.
 
 # BADWORDS messages
 BOT_BADWORDS_SYNTAX
@@ -7078,6 +7097,7 @@ BOT_HELP_KICK
 	   REPEAT       Kopanie za wielokrotne powtarzanie
 	   REVERSES     Kopanie za odwracanie kolorów
 	   UNDERLINES   Kopanie za u¿ywanie podkre¶leñ
+	   ITALICS      Sets if the bot kicks italics
 	
 	Aby uzyskaæ wiêcej informacji wpisz:
 	%R%S HELP KICK opcja
@@ -7170,6 +7190,16 @@ BOT_HELP_KICK_BADWORDS
 	ttb to liczba okre¶laj±ca ile razy u¿ytkownik
 	zostanie wykopany zanim bot za³o¿y bana.
 	Pominiêcie parametru ttb wy³±cza banowanie.
+
+BOT_HELP_KICK_ITALICS
+	Syntax: KICK channel ITALICS {ON|OFF} [ttb]
+
+	Sets the italics kicker on or off. When enabled, this
+	option tells the bot to kick users who use italics.
+
+	ttb is the number of times a user can be kicked
+	before it get banned. Don't give ttb to disable
+	the ban system once activated.
 
 BOT_HELP_BADWORDS
 	Sk³adnia: BADWORDS kana³ ADD s³owo [SINGLE | START | END]

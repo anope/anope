@@ -696,6 +696,8 @@ enum BotServFlag
 	BS_KICK_FLOOD,
 	/* BotServ kicks for repeating */
 	BS_KICK_REPEAT,
+	/* BotServ kicks for italics */
+	BS_KICK_ITALICS,
 	BS_END
 };
 
@@ -710,6 +712,7 @@ enum
 	TTB_CAPS,
 	TTB_FLOOD,
 	TTB_REPEAT,
+	TTB_ITALICS,
 	TTB_SIZE
 };
 

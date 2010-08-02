@@ -157,7 +157,16 @@ class CommandBSInfo : public Command
 			}
 			else
 				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_UNDERLINES, getstring(u, BOT_INFO_INACTIVE));
-
+                        if (ci->botflags.HasFlag(BS_KICK_ITALICS))
+			{
+				if (ci->ttb[TTB_ITALICS])
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_ITALICS_BAN, getstring(u, BOT_INFO_ACTIVE), ci->ttb[TTB_ITALICS]);
+				else
+					notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_ITALICS, getstring(u, BOT_INFO_ACTIVE));
+			}
+			else
+				notice_lang(Config.s_BotServ, u, BOT_INFO_CHAN_KICK_ITALICS, getstring(u, BOT_INFO_INACTIVE));
+			
 			end = buf;
 			*end = 0;
 			if (ci->botflags.HasFlag(BS_DONTKICKOPS))

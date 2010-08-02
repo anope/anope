@@ -249,7 +249,7 @@ void chanserv(User *u, const Anope::string &buf)
 	{
 		Anope::string command = buf;
 		command.erase(command.begin());
-		command.erase(command.end());
+		command.erase(command.end() - 1);
 		ircdproto->SendCTCP(ChanServ, u->nick, "%s", command.c_str());
 	}
 	else

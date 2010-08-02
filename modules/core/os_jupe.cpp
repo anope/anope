@@ -28,7 +28,7 @@ class CommandOSJupe : public Command
 
 		if (!isValidHost(jserver, 3))
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_HOST_ERROR);
-		else if (server && (server == Me || server == Me->GetUplink()))
+		else if (server && (server == Me || server == Me->GetLinks().front()))
 			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else
 		{

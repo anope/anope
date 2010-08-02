@@ -700,7 +700,7 @@ int anope_event_burst(const Anope::string &source, int ac, const char **av)
 		 * server finished bursting. -GD
 		 */
 		if (!s)
-			s = Me->GetUplink();
+			s = Me->GetLinks().front();
 		if (s)
 			s->Sync(true);
 	}

@@ -130,8 +130,8 @@ void server_global(const Server *s, const Anope::string &message)
 
 	if (!s->GetLinks().empty())
 	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks().begin(), it_end = s->GetLinks().end(); it != it_end; ++it)
-			server_global(*it, message);
+		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
+			server_global(s->GetLinks()[i], message);
 	}
 }
 
@@ -147,10 +147,10 @@ void oper_global(const Anope::string &nick, const char *fmt, ...)
 	if (!nick.empty() && !Config.AnonymousGlobal)
 	{
 		Anope::string rmsg = "[" + nick + "] " + msg;
-		server_global(Me->GetUplink(), rmsg);
+		server_global(Me->GetLinks().front(), rmsg);
 	}
 	else
-		server_global(Me->GetUplink(), msg);
+		server_global(Me->GetLinks().front(), msg);
 }
 
 /**************************************************************************/

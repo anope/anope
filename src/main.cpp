@@ -116,8 +116,6 @@ class UplinkSocket : public ClientSocket
 
 	~UplinkSocket()
 	{
-		/* Process the last bits of data before disconnecting */
-		SocketEngine->Process();
 		UplinkSock = NULL;
 	}
 
@@ -188,6 +186,7 @@ void do_restart_services()
 			UserListByUID.erase(it->second->GetUID());
 	}
 	ircdproto->SendSquit(Config.ServerName, quitmsg);
+	SocketEngine->Process();
 	delete UplinkSock;
 	close_log();
 	/* First don't unload protocol module, then do so */
@@ -236,6 +235,7 @@ static void services_shutdown()
 		while (!UserListByNick.empty())
 			delete UserListByNick.begin()->second;
 	}
+	SocketEngine->Process();
 	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	/* First don't unload protocol module, then do so */
@@ -552,6 +552,18 @@ int main(int ac, char **av, char **envp)
 				if (!findbot(u->nick))
 					delete u;
 			}
+
+			/* Nuke all channels */
+			for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end();)
+			{
+				Channel *c = it->second;
+				++it;
+
+				delete c;
+			}
+
+			Me->SetFlag(SERVER_SYNCING);
+			Me->ClearLinks();
 
 			unsigned j = 0;
 			for (; j < (Config.MaxRetries ? Config.MaxRetries : j + 1); ++j)

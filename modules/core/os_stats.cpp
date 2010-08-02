@@ -28,8 +28,8 @@ static int stats_count_servers(Server *s)
 	int count = 1;
 
 	if (!s->GetLinks().empty())
-		for (std::list<Server *>::const_iterator it = s->GetLinks().begin(), it_end = s->GetLinks().end(); it != it_end; ++it)
-			count += stats_count_servers(*it);
+		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
+			count += stats_count_servers(s->GetLinks()[i]);
 
 	return count;
 }
@@ -209,9 +209,9 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, Me->GetUplink()->GetName().c_str());
+		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
 		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf.c_str());
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetUplink()));
+		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
 		return MOD_CONT;
 	}
 

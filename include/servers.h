@@ -86,7 +86,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/* Server ID */
 	Anope::string SID;
 	/* Links for this server */
-	std::list<Server *> Links;
+	std::vector<Server *> Links;
 	/* Uplink for this server */
 	Server *UplinkServer;
 
@@ -140,7 +140,7 @@ class CoreExport Server : public Flags<ServerFlag>
 	/** Get the list of links this server has, or NULL if it has none
 	 * @return A list of servers
 	 */
-	const std::list<Server *> &GetLinks() const;
+	const std::vector<Server *> &GetLinks() const;
 
 	/** Get the uplink server for this server, if this is our uplink will be Me
 	 * @return The servers uplink
@@ -156,6 +156,10 @@ class CoreExport Server : public Flags<ServerFlag>
 	 * @param s The server
 	 */
 	void DelLink(Server *s);
+
+	/** Remove all links from this server
+	 */
+	void ClearLinks();
 
 	/** Finish syncing this server and optionally all links to it
 	 * @param SyncLinks True to sync the links for this server too (if any)

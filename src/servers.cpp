@@ -114,7 +114,7 @@ Server::~Server()
 	if (this->UplinkServer)
 		this->UplinkServer->DelLink(this);
 
-	for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
+	for (std::vector<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
 		delete *it;
 }
 
@@ -170,7 +170,7 @@ const Anope::string &Server::GetSID() const
 /** Get the list of links this server has, or NULL if it has none
  * @return A list of servers
  */
-const std::list<Server*> &Server::GetLinks() const
+const std::vector<Server *> &Server::GetLinks() const
 {
 	return this->Links;
 }
@@ -188,12 +188,6 @@ Server *Server::GetUplink()
  */
 void Server::AddLink(Server *s)
 {
-	/* This is only used for Me, initially we start services with an uplink of NULL, then
-	 * connect to the server which introduces itself and has us as the uplink, which calls this
-	 */
-	if (this == Me && !this->UplinkServer)
-		this->UplinkServer = s;
-
 	this->Links.push_back(s);
 
 	Alog() << "Server " << s->GetName() << " introduced from " << this->GetName();
@@ -207,16 +201,25 @@ void Server::DelLink(Server *s)
 	if (this->Links.empty())
 		throw CoreException("Server::DelLink called on " + this->GetName() + " for " + s->GetName() + " but we have no links?");
 
-	for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
+	for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
 	{
-		if (*it == s)
+		if (this->Links[i] == s)
 		{
-			this->Links.erase(it);
+			this->Links.erase(this->Links.begin() + i);
 			break;
 		}
 	}
 
 	Alog() << "Server " << s->GetName() << " quit from " << this->GetName();
+}
+
+/** Remov all links from this server
+ */
+void Server::ClearLinks()
+{
+	for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
+		delete this->Links[i];
+	this->Links.clear();
 }
 
 /** Finish syncing this server and optionally all links to it
@@ -231,11 +234,11 @@ void Server::Sync(bool SyncLinks)
 
 	if (SyncLinks && !this->Links.empty())
 	{
-		for (std::list<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
-			(*it)->Sync(true);
+		for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
+			this->Links[i]->Sync(true);
 	}
 
-	if (this == Me->GetUplink())
+	if (this == Me->GetLinks().front())
 	{
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 		ircdproto->SendEOB();
@@ -246,7 +249,7 @@ void Server::Sync(bool SyncLinks)
 
 	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
-	if (this == Me->GetUplink())
+	if (this == Me->GetLinks().front())
 	{
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
 		restore_unsynced_topics();
@@ -288,9 +291,9 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 	if (!s->GetLinks().empty())
 	{
-		for (std::list<Server *>::const_iterator it = s->GetLinks().begin(), it_end = s->GetLinks().end(); it != it_end; ++it)
+		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
 		{
-			Server *serv = *it;
+			Server *serv = s->GetLinks()[i];
 
 			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
 				return serv;
@@ -378,7 +381,7 @@ void do_squit(const Anope::string &source, int ac, const char **av)
 
 	buf = s->GetName() + " " + s->GetUplink()->GetName();
 
-	if (s->GetUplink() == Me->GetUplink() && Capab.HasFlag(CAPAB_UNCONNECT))
+	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
 	{
 		Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
 		/* need to fix */

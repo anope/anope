@@ -1036,7 +1036,7 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 
 int anope_event_endburst(const Anope::string &source, int ac, const char **av)
 {
-	Me->GetUplink()->Sync(true);
+	Me->GetLinks().front()->Sync(true);
 	return MOD_CONT;
 }
 

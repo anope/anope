@@ -39,34 +39,6 @@ void ms_init()
 }
 
 /*************************************************************************/
-
-/**
- * memoserv:  Main MemoServ routine.
- *			Note that the User structure passed to the do_* routines will
- *			always be valid (non-NULL) and will always have a valid
- *			NickInfo pointer in the `ni' field.
- * @param u User Struct
- * @param buf Buffer containing the privmsg
- * @return void
- */
-void memoserv(User *u, const Anope::string &buf)
-{
-	if (!u || buf.empty())
-		return;
-
-	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end());
-		ircdproto->SendCTCP(MemoServ, u->nick, "%s", command.c_str());
-	}
-	else
-		mod_run_cmd(MemoServ, u, buf);
-}
-
-/*************************************************************************/
-
 /**
  * check_memos:  See if the given user has any unread memos, and send a
  *               NOTICE to that user if so (and if the appropriate flag is

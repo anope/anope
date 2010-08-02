@@ -67,30 +67,6 @@ void hostserv_init()
 
 /*************************************************************************/
 
-/**
- * Main HostServ routine.
- * @param u User Struct
- * @param buf Buffer holding the message
- * @return void
- */
-void hostserv(User *u, const Anope::string &buf)
-{
-	if (!u || buf.empty())
-		return;
-
-	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end());
-		ircdproto->SendCTCP(HostServ, u->nick, "%s", command.c_str());
-	}
-	else if (!ircd->vhost)
-		notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ.c_str());
-	else
-		mod_run_cmd(HostServ, u, buf);
-}
-
 /** Set a vhost for the user
  * @param ident The ident
  * @param host The host

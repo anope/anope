@@ -238,26 +238,6 @@ void cs_init()
 
 /*************************************************************************/
 
-/* Main ChanServ routine. */
-
-void chanserv(User *u, const Anope::string &buf)
-{
-	if (!u || buf.empty())
-		return;
-
-	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end() - 1);
-		ircdproto->SendCTCP(ChanServ, u->nick, "%s", command.c_str());
-	}
-	else
-		mod_run_cmd(ChanServ, u, buf);
-}
-
-/*************************************************************************/
-
 /* Check the current modes on a channel; if they conflict with a mode lock,
  * fix them.
  */

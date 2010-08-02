@@ -43,7 +43,6 @@ E BotInfo *OperServ;
 
 E void get_botserv_stats(long *nrec, long *memuse);
 E void bs_init();
-E void botserv(User *u, BotInfo *bi, const Anope::string &buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf);
 E BotInfo *findbot(const Anope::string &nick);
 
@@ -105,7 +104,6 @@ E void get_chanserv_stats(long *nrec, long *memuse);
 
 E void reset_levels(ChannelInfo *ci);
 E void cs_init();
-E void chanserv(User *u, const Anope::string &buf);
 E void expire_chans();
 E void cs_remove_nick(const NickCore *nc);
 
@@ -137,7 +135,6 @@ E int read_config(int reload);
 
 /* hostserv.c */
 E void do_on_id(User *u);
-E void hostserv(User *u, const Anope::string &buf);
 E void HostServSyncVhosts(NickAlias *na);
 
 /**** encrypt.c ****/
@@ -221,7 +218,6 @@ E void *srealloc(void *oldptr, long newsize);
 /**** memoserv.c ****/
 
 E void ms_init();
-E void memoserv(User *u, const Anope::string &buf);
 E void rsend_notify(User *u, Memo *m, const Anope::string &chan);
 E void check_memos(User *u);
 E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
@@ -313,7 +309,6 @@ E void change_core_display(NickCore *nc, const Anope::string &newdisplay);
 E int do_setmodes(User *u);
 
 E void ns_init();
-E void nickserv(User *u, const Anope::string &buf);
 E int validate_user(User *u);
 E void expire_nicks();
 E void expire_requests();

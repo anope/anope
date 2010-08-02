@@ -67,26 +67,6 @@ void bs_init()
 
 /*************************************************************************/
 
-/* Main BotServ routine. */
-
-void botserv(User *u, BotInfo *bi, const Anope::string &buf)
-{
-	if (!u || !bi || buf.empty())
-		return;
-
-	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end());
-		ircdproto->SendCTCP(bi, u->nick, "%s", command.c_str());
-	}
-	else
-		mod_run_cmd(bi, u, buf);
-}
-
-/*************************************************************************/
-
 /* Handles all messages that are sent to registered channels where a
  * bot is on.
  */
@@ -101,7 +81,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	{
 		Anope::string ctcp = buf;
 		ctcp.erase(ctcp.begin());
-		ctcp.erase(ctcp.end());
+		ctcp.erase(ctcp.end() - 1);
 		ircdproto->SendCTCP(ci->bi, u->nick, "%s", ctcp.c_str());
 	}
 
@@ -366,7 +346,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 					if (!sep.StreamEnd())
 						bbuf += " " + sep.GetRemaining();
 
-					chanserv(u, bbuf);
+					mod_run_cmd(ChanServ, u, bbuf);
 				}
 
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(token, u, ci, sep.GetRemaining()));

@@ -156,7 +156,37 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 
 		if (bi)
 		{
-			if (bi->nick.equals_ci(Config.s_OperServ))
+			if (message[0] == '\1' && message[message.length() - 1] == '\1')
+			{
+				if (message.substr(0, 6).equals_ci("\1PING "))
+				{
+					Anope::string buf = message;
+					buf.erase(buf.begin());
+					buf.erase(buf.end() - 1);
+					ircdproto->SendCTCP(bi, u->nick, "%s", buf.c_str());
+				}
+				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
+				{
+					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config.ServerName.c_str(), ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
+				}
+			}
+			else if (bi->nick.equals_ci(Config.s_NickServ) || bi->nick.equals_ci(Config.s_MemoServ) || (!Config.s_BotServ.empty() && bi->nick.equals_ci(Config.s_BotServ)))
+				mod_run_cmd(bi, u, message);
+			else if (bi->nick.equals_ci(Config.s_ChanServ))
+			{
+				if (!is_oper(u) && Config.CSOpersOnly)
+					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+				else
+					mod_run_cmd(bi, u, message);
+			}
+			else if (!Config.s_HostServ.empty() && bi->nick.equals_ci(Config.s_HostServ))
+			{
+				if (!ircd->vhost)
+					notice_lang(Config.s_HostServ, u, SERVICE_OFFLINE, Config.s_HostServ.c_str());
+				else
+					mod_run_cmd(bi, u, message);
+			}
+			else if (bi->nick.equals_ci(Config.s_OperServ))
 			{
 				if (!is_oper(u) && Config.OSOpersOnly)
 				{
@@ -165,23 +195,11 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config.s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 				}
 				else
-					operserv(u, message);
+				{
+					Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  message;
+					mod_run_cmd(bi, u, message);
+				}
 			}
-			else if (bi->nick.equals_ci(Config.s_NickServ))
-				nickserv(u, message);
-			else if (bi->nick.equals_ci(Config.s_ChanServ))
-			{
-				if (!is_oper(u) && Config.CSOpersOnly)
-					notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
-				else
-					chanserv(u, message);
-			}
-			else if (bi->nick.equals_ci(Config.s_MemoServ))
-				memoserv(u, message);
-			else if (!Config.s_HostServ.empty() && bi->nick.equals_ci(Config.s_HostServ))
-				hostserv(u, message);
-			else if (!Config.s_BotServ.empty() && bi->nick.equals_ci(Config.s_BotServ))
-				botserv(u, bi, message);
 		}
 	}
 

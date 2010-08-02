@@ -37,24 +37,6 @@ void os_init()
 	XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
 }
 
-void operserv(User *u, const Anope::string &buf)
-{
-	if (!u || buf.empty())
-		return;
-
-	Alog() << Config.s_OperServ << ": " << u->nick << ": " <<  buf;
-
-	if (buf.substr(0, 6).equals_cs("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end());
-		ircdproto->SendCTCP(OperServ, u->nick, "%s", command.c_str());
-	}
-	else
-		mod_run_cmd(OperServ, u, buf);
-}
-
 bool SetDefConParam(ChannelModeName Name, const Anope::string &buf)
 {
 	return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;

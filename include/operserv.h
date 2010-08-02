@@ -30,7 +30,6 @@ extern CoreExport bool CheckDefCon(int level, DefconLevel Level);
 extern CoreExport void AddDefCon(int level, DefconLevel Level);
 extern CoreExport void DelDefCon(int level, DefconLevel Level);
 
-extern CoreExport void operserv(User *u, const Anope::string &message);
 extern CoreExport void os_init();
 
 extern CoreExport void oper_global(const Anope::string &nick, const char *fmt, ...);

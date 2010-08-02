@@ -153,26 +153,6 @@ void ns_init()
 
 /*************************************************************************/
 
-/* Main NickServ routine. */
-
-void nickserv(User *u, const Anope::string &buf)
-{
-	if (!u || buf.empty())
-		return;
-
-	if (buf.substr(0, 6).equals_ci("\1PING ") && buf[buf.length() - 1] == '\1')
-	{
-		Anope::string command = buf;
-		command.erase(command.begin());
-		command.erase(command.end());
-		ircdproto->SendCTCP(NickServ, u->nick, "%s", command.c_str());
-	}
-	else
-		mod_run_cmd(NickServ, u, buf);
-}
-
-/*************************************************************************/
-
 /* Check whether a user is on the access list of the nick they're using If
  * not, send warnings as appropriate.  If so (and not NI_SECURE), update
  * last seen info.

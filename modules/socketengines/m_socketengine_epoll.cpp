@@ -89,7 +89,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.events = EPOLLIN | EPOLLOUT;
 		ev.data.fd = s->GetSock();
 
-		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
+		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Alog() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
 	}
 
@@ -102,7 +102,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.events = EPOLLIN;
 		ev.data.fd = s->GetSock();
 
-		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
+		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Alog() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
 	}
 

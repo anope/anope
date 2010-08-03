@@ -1210,7 +1210,7 @@ uint32 str_is_ip(const Anope::string &str)
 
 	for (int i = 0; i < 4; ++i)
 	{
-		octets[i] = convertTo<int>(s, s, false);
+		octets[i] = s.empty() || !s.is_number_only() ? -1 : convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
 		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
 			return 0;
@@ -1243,7 +1243,7 @@ bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::stri
 
 	for (int i = 0; i < 4; ++i)
 	{
-		octets[i] = convertTo<int>(s, s, false);
+		octets[i] = s.empty() || !s.is_number_only() ? -1 : convertTo<int>(s, s, false);
 		/* Bail out if the octet is invalid or wrongly terminated */
 		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
 			return false;

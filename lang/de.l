@@ -692,7 +692,7 @@ NICK_SASET_HIDE_STATUS_OFF
 	
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SASET nickname PRIVATE {ON | OFF}
+	SASET nickname MSG {ON | OFF}
 NICK_SASET_MSG_ON
 	Die Services werden jetzt %s mit messages antworten.
 NICK_SASET_MSG_OFF

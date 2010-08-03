@@ -684,7 +684,7 @@ NICK_SASET_HIDE_STATUS_OFF
 	
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SASET nickname PRIVATE {ON | OFF}
+	SASET nickname MSG {ON | OFF}
 NICK_SASET_MSG_ON
 	Services bundan sonra %s rumuzuna mesajlar ile cevap verecek.
 NICK_SASET_MSG_OFF

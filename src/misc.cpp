@@ -511,23 +511,16 @@ bool isvalidchar(char c)
  * @param token_number the token number
  * @return token
  */
-Anope::string myStrGetToken(const Anope::string &str, char delim, int token_number)
+Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number)
 {
-	if (str.empty())
+	if (str.empty() || str.find(dilim) == Anope::string::npos)
 		return "";
 
 	Anope::string substring;
-	for (size_t idx = 0, len = str.length(), start_pos = 0, counter = 0; idx <= len; ++idx)
-	{
-		if (str[idx] == delim || idx == len)
-		{
-			if (counter == token_number)
-				substring = str.substr(start_pos, idx - start_pos - 1);
-			else
-				start_pos = idx + 1;
-			++counter;
-		}
-	}
+	sepstream sep(str, dilim);
+
+	for (int i = 0; i < token_number + 1 && !sep.StreamEnd() && sep.GetToken(substring); ++i);
+
 	return substring;
 }
 
@@ -542,21 +535,16 @@ Anope::string myStrGetToken(const Anope::string &str, char delim, int token_numb
  */
 Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim, int token_number)
 {
-	if (str.empty())
+	if (str.empty() || str.find(dilim) == Anope::string::npos)
 		return "";
 
 	Anope::string substring;
-	for (size_t idx = 0, len = str.length(), start_pos = 0, counter = 0; idx <= len; ++idx)
-	{
-		if (str[idx] == dilim || idx == len)
-		{
-			if (counter == token_number)
-				substring = str.substr(start_pos);
-			else
-				start_pos = idx + 1;
-			++counter;
-		}
-	}
+	sepstream sep(str, dilim);
+
+	for (int i = 0; i < token_number + 1 && !sep.StreamEnd() && sep.GetToken(substring); ++i);
+
+	if (!sep.StreamEnd())
+		substring += dilim + sep.GetRemaining();
 	return substring;
 }
 

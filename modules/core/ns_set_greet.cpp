@@ -16,21 +16,27 @@
 class CommandNSSetGreet : public Command
 {
  public:
-	CommandNSSetGreet() : Command("GREET", 0)
+	CommandNSSetGreet(const Anope::string &spermission = "") : Command("GREET", 1, 2, spermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (!params.empty())
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetGreet");
+
+		Anope::string param = params.size() > 1 ? params[1] : "";
+
+		if (!param.empty())
 		{
-			u->Account()->greet = params[0];
-			notice_lang(Config.s_NickServ, u, NICK_SET_GREET_CHANGED, u->Account()->greet.c_str());
+			nc->greet = param;
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
-			u->Account()->greet.clear();
-			notice_lang(Config.s_NickServ, u, NICK_SET_GREET_UNSET);
+			nc->greet.clear();
+			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -48,33 +54,11 @@ class CommandNSSetGreet : public Command
 	}
 };
 
-class CommandNSSASetGreet : public Command
+class CommandNSSASetGreet : public CommandNSSetGreet
 {
  public:
-	CommandNSSASetGreet() : Command("GREET", 1, 2, "nickserv/saset/greet")
+	CommandNSSASetGreet() : CommandNSSetGreet("nickserv/saset/greet")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetGreet");
-
-		Anope::string param = params.size() > 1 ? params[1] : "";
-
-		if (!param.empty())
-		{
-			nc->greet = param;
-			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
-		}
-		else
-		{
-			nc->greet.clear();
-			notice_lang(Config.s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display.c_str());
-		}
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

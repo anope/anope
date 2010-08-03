@@ -16,21 +16,27 @@
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp() : Command("AUTOOP", 1)
+	CommandNSSetAutoOp(const Anope::string &spermission = "") : Command("AUTOOP", 1, 2, spermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0].equals_ci("ON"))
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetAutoOp");
+		
+		Anope::string param = params.size() > 1 ? params[1] : "";
+
+		if (param.equals_ci("ON"))
 		{
-			u->Account()->SetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SET_AUTOOP_ON);
+			nc->SetFlag(NI_AUTOOP);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display.c_str());
 		}
-		else if (params[0].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
-			u->Account()->UnsetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SET_AUTOOP_OFF);
+			nc->UnsetFlag(NI_AUTOOP);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "AUTOOP");
@@ -55,35 +61,11 @@ class CommandNSSetAutoOp : public Command
 	}
 };
 
-class CommandNSSASetAutoOp : public Command
+class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 {
  public:
-	CommandNSSASetAutoOp() : Command("AUTOOP", 2, 2, "nickserv/saset/autoop")
+	CommandNSSASetAutoOp() : CommandNSSetAutoOp("nickserv/saset/autoop")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetAutoOp");
-
-		Anope::string param = params[1];
-
-		if (param.equals_ci("ON"))
-		{
-			nc->SetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			nc->UnsetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(u, "AUTOOP");
-
-		return MOD_CONT;
 	}
 
 	bool Help(User *u, const Anope::string &)

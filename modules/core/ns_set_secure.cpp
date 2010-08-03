@@ -16,21 +16,27 @@
 class CommandNSSetSecure : public Command
 {
  public:
-	CommandNSSetSecure() : Command("SECURE", 1)
+	CommandNSSetSecure(const Anope::string &cpermission = "") : Command("SECURE", 2, 2, cpermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0].equals_ci("ON"))
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetSecure");
+
+		Anope::string param = params[1];
+
+		if (param.equals_ci("ON"))
 		{
-			u->Account()->SetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SET_SECURE_ON);
+			nc->SetFlag(NI_SECURE);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_ON, nc->display.c_str());
 		}
-		else if (params[0].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
-			u->Account()->UnsetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SET_SECURE_OFF);
+			nc->UnsetFlag(NI_SECURE);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");
@@ -55,35 +61,11 @@ class CommandNSSetSecure : public Command
 	}
 };
 
-class CommandNSSASetSecure : public Command
+class CommandNSSASetSecure : public CommandNSSetSecure
 {
  public:
-	CommandNSSASetSecure() : Command("SECURE", 2, 2, "nickserv/saset/secure")
+	CommandNSSASetSecure() : CommandNSSetSecure("nickserv/saset/secure")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetSecure");
-
-		Anope::string param = params[1];
-
-		if (param.equals_ci("ON"))
-		{
-			nc->SetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_ON, nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			nc->UnsetFlag(NI_SECURE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(u, "SECURE");
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

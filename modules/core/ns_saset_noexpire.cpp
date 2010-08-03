@@ -16,7 +16,7 @@
 class CommandNSSASetNoexpire : public Command
 {
  public:
-	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 3, "nickserv/saset/noexpire")
+	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 2, "nickserv/saset/noexpire")
 	{
 	}
 
@@ -26,7 +26,7 @@ class CommandNSSASetNoexpire : public Command
 		if (!na)
 			throw CoreException("NULL na in CommandNSSASsetNoexpire");
 
-		Anope::string param = params.size() > 1 ? params[2] : "";
+		Anope::string param = params.size() > 1 ? params[1] : "";
 
 		if (param.equals_ci("ON"))
 		{

@@ -16,13 +16,17 @@
 class CommandNSSetLanguage : public Command
 {
  public:
-	CommandNSSetLanguage() : Command("LANGUAGE", 1)
+	CommandNSSetLanguage(const Anope::string &spermission = "") : Command("LANGUAGE", 2, 2, spermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		Anope::string param = params[0];
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetLanguage");
+
+		Anope::string param = params[1];
 
 		if (param.find_first_not_of("0123456789") != Anope::string::npos) /* i.e. not a number */
 		{
@@ -37,8 +41,8 @@ class CommandNSSetLanguage : public Command
 			return MOD_CONT;
 		}
 
-		u->Account()->language = langlist[langnum];
-		notice_lang(Config.s_NickServ, u, NICK_SET_LANGUAGE_CHANGED);
+		nc->language = langlist[langnum];
+		notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
 
 		return MOD_CONT;
 	}
@@ -60,36 +64,11 @@ class CommandNSSetLanguage : public Command
 	}
 };
 
-class CommandNSSASetLanguage : public Command
+class CommandNSSASetLanguage : public CommandNSSetLanguage
 {
  public:
-	CommandNSSASetLanguage() : Command("LANGUAGE", 2, 2, "nickserv/saset/language")
+	CommandNSSASetLanguage() : CommandNSSetLanguage("nickserv/saset/language")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetLanguage");
-
-		Anope::string param = params[1];
-
-		if (param.find_first_not_of("0123456789") != Anope::string::npos) /* i.e. not a number */
-		{
-			this->OnSyntaxError(u, "LANGUAGE");
-			return MOD_CONT;
-		}
-		int langnum = convertTo<int>(param) - 1;
-		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
-		{
-			notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ.c_str());
-			return MOD_CONT;
-		}
-		nc->language = langlist[langnum];
-		notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

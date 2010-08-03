@@ -16,27 +16,33 @@
 class CommandNSSetMessage : public Command
 {
  public:
-	CommandNSSetMessage() : Command("MESSAGE", 1)
+	CommandNSSetMessage(const Anope::string &spermission = "") : Command("MSG", 2, 2, spermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetMessage");
+
 		if (!Config.UsePrivmsg)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_OPTION_DISABLED, "MSG");
+			notice_lang(Config.s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
 			return MOD_CONT;
 		}
 
-		if (params[0].equals_ci("ON"))
+		Anope::string param = params.size() > 1 ? params[1] : "";
+
+		if (param.equals_ci("ON"))
 		{
-			u->Account()->SetFlag(NI_MSG);
-			notice_lang(Config.s_NickServ, u, NICK_SET_MSG_ON);
+			nc->SetFlag(NI_MSG);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_ON, nc->display.c_str());
 		}
-		else if (params[0].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
-			u->Account()->UnsetFlag(NI_MSG);
-			notice_lang(Config.s_NickServ, u, NICK_SET_MSG_OFF);
+			nc->UnsetFlag(NI_MSG);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "MSG");
@@ -61,41 +67,11 @@ class CommandNSSetMessage : public Command
 	}
 };
 
-class CommandNSSASetMessage : public Command
+class CommandNSSASetMessage : public CommandNSSetMessage
 {
  public:
-	CommandNSSASetMessage() : Command("MESSAGE", 2, 2, "nickserv/saset/message")
+	CommandNSSASetMessage() : CommandNSSetMessage("nickserv/saset/message")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetMessage");
-
-		Anope::string param = params[1];
-
-		if (!Config.UsePrivmsg)
-		{
-			notice_lang(Config.s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
-			return MOD_CONT;
-		}
-
-		if (param.equals_ci("ON"))
-		{
-			nc->SetFlag(NI_MSG);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_ON, nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			nc->UnsetFlag(NI_MSG);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_MSG_OFF, nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(u, "MSG");
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

@@ -16,55 +16,7 @@
 class CommandNSSetEmail : public Command
 {
  public:
-	CommandNSSetEmail() : Command("EMAIL", 0)
-	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		if (params.empty() && Config.NSForceEmail)
-		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
-			return MOD_CONT;
-		}
-		else if (!params.empty() && !MailValidate(params[0]))
-		{
-			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, params[0].c_str());
-			return MOD_CONT;
-		}
-
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed its e-mail to " << (!params.empty() ? params[0] : "none");
-
-		if (!params.empty())
-		{
-			u->Account()->email = params[0];
-			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_CHANGED, params[0].c_str());
-		}
-		else
-		{
-			u->Account()->email.clear();
-			notice_lang(Config.s_NickServ, u, NICK_SET_EMAIL_UNSET);
-		}
-
-		return MOD_CONT;
-	}
-
-	bool OnHelp(User *u, const Anope::string &)
-	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_EMAIL);
-		return true;
-	}
-
-	void OnServHelp(User *u)
-	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_EMAIL);
-	}
-};
-
-class CommandNSSASetEmail : public Command
-{
- public:
-	CommandNSSASetEmail() : Command("EMAIL", 1, 2, "nickserv/saset/email")
+	CommandNSSetEmail(const Anope::string &spermission = "") : Command("EMAIL", 1, 2, spermission)
 	{
 	}
 
@@ -72,7 +24,7 @@ class CommandNSSASetEmail : public Command
 	{
 		NickCore *nc = findcore(params[0]);
 		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetEmail");
+			throw CoreException("NULL nc in CommandNSSetEmail");
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 
@@ -92,7 +44,7 @@ class CommandNSSASetEmail : public Command
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used SASET EMAIL on " << nc->display << " (e-mail: " << (!nc->email.empty() ? nc->email : "none") << ")";
+		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed the e-mail of " << nc->display << " to " << (!param.empty() ? param : "none");
 
 		if (!param.empty())
 		{
@@ -106,6 +58,25 @@ class CommandNSSASetEmail : public Command
 		}
 
 		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const Anope::string &)
+	{
+		notice_help(Config.s_NickServ, u, NICK_HELP_SET_EMAIL);
+		return true;
+	}
+
+	void OnServHelp(User *u)
+	{
+		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_EMAIL);
+	}
+};
+
+class CommandNSSASetEmail : public CommandNSSetEmail
+{
+ public:
+	CommandNSSASetEmail() : CommandNSSetEmail("nickserv/saset/email")
+	{
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

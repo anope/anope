@@ -16,21 +16,27 @@
 class CommandNSSetPrivate : public Command
 {
  public:
-	CommandNSSetPrivate() : Command("PRIVATE", 1)
+	CommandNSSetPrivate(const Anope::string &spermission = "") : Command("PRIVATE", 2, 2, spermission)
 	{
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (params[0].equals_ci("ON"))
+		NickCore *nc = findcore(params[0]);
+		if (!nc)
+			throw CoreException("NULL nc in CommandNSSetPrivate");
+
+		Anope::string param = params[1];
+
+		if (param.equals_ci("ON"))
 		{
-			u->Account()->SetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SET_PRIVATE_ON);
+			nc->SetFlag(NI_PRIVATE);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display.c_str());
 		}
-		else if (params[0].equals_ci("OFF"))
+		else if (param.equals_ci("OFF"))
 		{
-			u->Account()->UnsetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SET_PRIVATE_OFF);
+			nc->UnsetFlag(NI_PRIVATE);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PRIVATE");
@@ -55,35 +61,11 @@ class CommandNSSetPrivate : public Command
 	}
 };
 
-class CommandNSSASetPrivate : public Command
+class CommandNSSASetPrivate : public CommandNSSetPrivate
 {
  public:
-	CommandNSSASetPrivate() : Command("PRIVATE", 2, 2, "nickserv/saset/private")
+	CommandNSSASetPrivate() : CommandNSSetPrivate("nickserv/saset/private")
 	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetPrivate");
-
-		Anope::string param = params[1];
-
-		if (param.equals_ci("ON"))
-		{
-			nc->SetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display.c_str());
-		}
-		else if (param.equals_ci("OFF"))
-		{
-			nc->UnsetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display.c_str());
-		}
-		else
-			this->OnSyntaxError(u, "PRIVATE");
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)

@@ -46,11 +46,9 @@ class CommandNSSet : public Command
 
 		if (c)
 		{
-			Anope::string cmdparams;
+			Anope::string cmdparams = u->Account()->display;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 1, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
-			if (!cmdparams.empty())
-				cmdparams.erase(cmdparams.begin());
 			mod_run_cmd(NickServ, u, c, params[0], cmdparams);
 		}
 		else
@@ -124,7 +122,7 @@ class CommandNSSetDisplay : public Command
 
 		if (!na || na->nc != u->Account())
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_DISPLAY_INVALID);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_DISPLAY_INVALID, u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -178,15 +176,15 @@ class CommandNSSetPassword : public Command
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
 			Alog() << Config.s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
-			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_FAILED);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
-			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass.c_str());
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, u->Account()->display.c_str(), tmp_pass.c_str());
 		else
-			notice_lang(Config.s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
+			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, u->Account()->display.c_str());
 
 		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none") << ") changed its password.";
 		return MOD_CONT;

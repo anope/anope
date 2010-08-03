@@ -333,7 +333,7 @@ class EOld : public Module
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		MD5_CTX context;
-		char digest[33] = "", digest2[33];
+		char digest[33] = "", digest2[16] = "";
 		Anope::string cpass;
 		int i;
 		Anope::string buf = "oldmd5:";

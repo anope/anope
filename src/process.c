@@ -309,7 +309,7 @@ void process()
     Message *current = NULL;
     char source[64];
     char cmd[64];
-    char buf[1024];              /* Most need only 512, InspIRCd 2.0 needs more though.. */
+    char buf[4096];             /* Most need only 512, InspIRCd 2.0 is seriously oversized though.. */
     char *s;
     int ac;                     /* Parameters for the command */
     char **av;

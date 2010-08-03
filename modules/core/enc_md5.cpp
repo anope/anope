@@ -328,19 +328,18 @@ class EMD5 : public Module
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		MD5_CTX context;
-		char *digest = new char[Config.PassLen];
+		unsigned char digest[16] = "";
 		Anope::string buf = "md5:";
 		Anope::string cpass;
 
 		MD5Init(&context);
 		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		MD5Final(reinterpret_cast<unsigned char *>(digest), &context);
+		MD5Final(digest, &context);
 
-		b64_encode(digest, cpass);
+		b64_encode(reinterpret_cast<char *>(digest), cpass);
 		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
-		delete [] digest;
 		return EVENT_ALLOW;
 	}
 

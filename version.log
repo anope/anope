@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3018"
+VERSION_BUILD="3019"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3019 - Properly track users hosts when a user is -x and has a vhost via chghost
 #Revision 3018 - Accommodate for the InspIRCd 2.0 protocol being even more oversized then we previously thought..
 #Revision 3017 - Log out super admins when someone forces them to logout
 #Revision 3016 - Fixed a potential crash from receiving a very long FMODE from InspIRCd

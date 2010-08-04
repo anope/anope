@@ -240,7 +240,7 @@ char *common_get_vhost(User * u)
     if (!u)
         return NULL;
 
-    if (ircd->vhostmode && (u->mode & ircd->vhostmode) && u->vhost)
+    if (u->vhost)
         return u->vhost;
     else if (ircd->vhostmode && (u->mode & ircd->vhostmode) && u->chost)
         return u->chost;

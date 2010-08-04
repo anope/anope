@@ -845,9 +845,9 @@ Anope::string host_resolve(const Anope::string &host)
  * @param src The source string
  * @return a list of strings
  */
-std::list<Anope::string> BuildStringList(const Anope::string &src)
+std::list<Anope::string> BuildStringList(const Anope::string &src, char delim)
 {
-	spacesepstream tokens(src);
+	sepstream tokens(src, delim);
 	Anope::string token;
 	std::list<Anope::string> Ret;
 
@@ -857,9 +857,9 @@ std::list<Anope::string> BuildStringList(const Anope::string &src)
 	return Ret;
 }
 
-std::vector<Anope::string> BuildStringVector(const Anope::string &src)
+std::vector<Anope::string> BuildStringVector(const Anope::string &src, char delim)
 {
-	spacesepstream tokens(src);
+	sepstream tokens(src, delim);
 	Anope::string token;
 	std::vector<Anope::string> Ret;
 
@@ -1206,13 +1206,21 @@ bool str_is_pure_wildcard(const Anope::string &str)
 uint32 str_is_ip(const Anope::string &str)
 {
 	int octets[4] = { -1, -1, -1, -1 };
-	Anope::string s = str;
+	std::vector<Anope::string> octets_str = BuildStringVector(str, '.');
 
-	for (int i = 0; i < 4; ++i)
+	if (octets_str.size() != 4)
+		return false;
+
+	for (unsigned i = 0; i < 4; ++i)
 	{
-		octets[i] = s.empty() || !s.is_number_only() ? -1 : convertTo<int>(s, s, false);
+		Anope::string octet = octets_str[i];
+
+		if (!octet.is_number_only())
+			return 0;
+
+		octets[i] = convertTo<int>(octet);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
+		if (octets[i] < 0 || octets[i] > 255)
 			return 0;
 	}
 
@@ -1239,13 +1247,32 @@ uint32 str_is_ip(const Anope::string &str)
 bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host)
 {
 	int octets[4] = { -1, -1, -1, -1 };
-	Anope::string s = str;
+	std::vector<Anope::string> octets_str = BuildStringVector(str, '.');
 
-	for (int i = 0; i < 4; ++i)
+	if (octets_str.size() != 4)
+		return false;
+
+	Anope::string cidr_str;
+	for (unsigned i = 0; i < 4; ++i)
 	{
-		octets[i] = s.empty() || !s.is_number_only() ? -1 : convertTo<int>(s, s, false);
+		Anope::string octet = octets_str[i];
+
+		if (i == 3)
+		{
+			size_t slash = octet.find('/');
+			if (slash != Anope::string::npos)
+			{
+				cidr_str = octet.substr(slash + 1);
+				octet = octet.substr(0, slash);
+			}
+		}
+
+		if (!octet.is_number_only())
+			return false;
+
+		octets[i] = convertTo<int>(octet);
 		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255 || (i < 3 && s[0] != '.'))
+		if (octets[i] < 0 || octets[i] > 255)
 			return false;
 	}
 
@@ -1256,12 +1283,13 @@ bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::stri
 	ip += octets[0] * 16777216;
 
 	uint16 cidr;
-	if (s[0] == '/')
+	if (!cidr_str.empty())
 	{
+		Anope::string s;
 		/* There's a CIDR mask here! */
 		cidr = convertTo<uint16>(s.substr(1), s, false);
 		/* Bail out if the CIDR is invalid or the string isn't done yet */
-		if (cidr > 32 || s[0])
+		if (cidr > 32 || !s.empty())
 			return false;
 	}
 	else

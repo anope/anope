@@ -277,8 +277,8 @@ E char *str_signed(unsigned char *str);
 
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
-E std::list<Anope::string> BuildStringList(const Anope::string &);
-E std::vector<Anope::string> BuildStringVector(const Anope::string &);
+E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
+E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
 
 E uint32 cidr_to_netmask(uint16 cidr);
 E uint16 netmask_to_cidr(uint32 mask);

@@ -138,7 +138,7 @@ void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32 len)
 
 /* Add padding and return the message digest. */
 
-void SHA1Final(unsigned char digest[20], SHA1_CTX *context)
+void SHA1Final(unsigned char digest[21], SHA1_CTX *context)
 {
 	uint32 i;
 	unsigned char finalcount[8];
@@ -182,11 +182,9 @@ class ESHA1 : public Module
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		SHA1_CTX context;
-		char *digest = new char[Config.PassLen];
+		char digest[21] = "";
 		Anope::string buf = "sha1:";
 		Anope::string cpass;
-
-		memset(digest, 0, 32);
 
 		SHA1Init(&context);
 		SHA1Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
@@ -196,7 +194,6 @@ class ESHA1 : public Module
 		buf += cpass;
 		Alog(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
-		delete [] digest;
 		return EVENT_ALLOW;
 	}
 

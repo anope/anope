@@ -170,7 +170,7 @@ void MD5Update(MD5_CTX *context, const unsigned char *input, unsigned inputLen)
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
  * the message digest and zeroizing the context.
  */
-void MD5Final(unsigned char digest[16], MD5_CTX *context)
+void MD5Final(unsigned char digest[17], MD5_CTX *context)
 {
 	unsigned char bits[8];
 	unsigned index, padLen;
@@ -328,7 +328,7 @@ class EMD5 : public Module
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
 	{
 		MD5_CTX context;
-		unsigned char digest[16] = "";
+		unsigned char digest[17] = "";
 		Anope::string buf = "md5:";
 		Anope::string cpass;
 

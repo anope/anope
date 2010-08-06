@@ -5,31 +5,32 @@ Legend:
 
 1.9.3
 -----
- [x] Add in a subcommand system, ns_set, cs_set, etc.
- [x] Threading
-   [x] Mail sending needs to be threaded
- [x] process_numlist needs to die
- [x] SList needs to die
- [x] SSL
- [x] Command handling system needs to die, strtok() needs to die more
- [ ] Asynchronous DNS
- [ ] CIDR Akills, session exceptions, etc
- [x] Hashing system for storing just about everything needs to die
- [x] Add support for +k, +q, etc type umodes
- [ ] Language system is disgusting, it must die.
-   [ ] Modules should also have a way to add strings programatically
-   [ ] Should be able to add many strings by dropping a file in a set location.
- [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
- [ ] Config bailing on /os reload needs to be non fatal
- [ ] AutoID needs to be able to live through /os restart, current system is just annoying.
- [ ] SQL tables need to changed to have references etc
- [ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
- [ ] NS IDENTIFY changes
-   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
-   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
+[x] Add in a subcommand system, ns_set, cs_set, etc.
+[x] Threading
+  [x] Mail sending needs to be threaded
+[x] process_numlist needs to die
+[x] SList needs to die
+[x] SSL
+[x] Command handling system needs to die, strtok() needs to die more
+[ ] Asynchronous DNS
+[ ] CIDR Akills, session exceptions, etc
+[x] Hashing system for storing just about everything needs to die
+[x] Add support for +k, +q, etc type umodes
+[ ] Language system is disgusting, it must die.
+  [ ] Modules should also have a way to add strings programatically
+  [ ] Should be able to add many strings by dropping a file in a set location.
+[+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
+[ ] Config bailing on /os reload needs to be non fatal
+[ ] AutoID needs to be able to live through /os restart, current system is just annoying.
+[ ] SQL tables need to changed to have references etc
+[ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
+[ ] NS IDENTIFY changes
+  [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
+  [?] Last successful login time/ip? perhaps both of these should be a new nick setting
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
 [x] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
+[ ] Allow channel founders to change the fantasy trigger for their channel.
 
 Future
 ------

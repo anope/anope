@@ -1309,6 +1309,8 @@ void inspircd_cmd_chg_nick(char *oldnick, char *newnick)
     if (!ud)
         ud = find_uid(newnick);
 
+    if (ud)
+        strscpy(ud->nick, newnick, NICKMAX);
     send_cmd(ud ? ud->uid : oldnick, "NICK %s %ld", newnick, time(NULL));
 }
 

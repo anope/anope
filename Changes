@@ -17,6 +17,7 @@ Anope Version 1.8 - SVN
 06/24  F Fixed pseudo-client kills not being detected on some TS6 IRCDs. [  #00]
 07/01  F Fixed encrypting very long passwords when registering           [#1172]
 08/03  F Fixed tracking users vhosts when there is no vhost mode         [#1178]
+08/05  F Fixed tracking of our clients after nick changing on InspIRCd   [#1180]
 
 Anope Version 1.8.4
 -------------------

@@ -1692,9 +1692,15 @@ void charybdis_cmd_svid_umode3(User * u, char *ts)
 /* NICK <newnick>  */
 void charybdis_cmd_chg_nick(char *oldnick, char *newnick)
 {
+    Uid *ud;
+
     if (!oldnick || !newnick) {
         return;
     }
+
+    ud = find_uid(oldnick);
+    if (ud)
+        strscpy(ud->nick, newnick, NICKMAX);
 
     send_cmd(oldnick, "NICK %s", newnick);
 }

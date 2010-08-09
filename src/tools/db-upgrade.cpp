@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #ifndef _WIN32
 static const std::string C_LBLUE = "\033[1;34m";
@@ -193,9 +194,9 @@ int main(int argc, char *argv[])
 			size_t colon = password.find(':');
 			if (colon != std::string::npos && password.substr(0, colon) != "plain")
 			{
-				std::string hash = password.substr(colon + 1), iv;
+				std::string hash = password.substr(colon + 1), iv, hashm = password.substr(0, colon);
 				unsigned len;
-				if (password.substr(0, colon) == "sha256")
+				if (hashm == "sha256")
 				{
 					colon = hash.find(':');
 					iv = hash.substr(colon + 1);
@@ -218,7 +219,7 @@ int main(int argc, char *argv[])
 				else
 					hash.clear();
 				delete [] hash_decoded;
-				password = password.substr(0, colon + 1);
+				password = hashm + ":";
 				if (!hash.empty())
 					password += hash;
 				if (!iv.empty())
@@ -235,6 +236,8 @@ int main(int argc, char *argv[])
 		}
 		out << line << std::endl;
 	}
+
+	std::cout << "Upgrade complete!" << std::endl;
 
 	in.close();
 	out.close();

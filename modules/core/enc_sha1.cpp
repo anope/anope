@@ -184,14 +184,12 @@ class ESHA1 : public Module
 		SHA1_CTX context;
 		char digest[21] = "";
 		Anope::string buf = "sha1:";
-		Anope::string cpass;
 
 		SHA1Init(&context);
 		SHA1Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
 		SHA1Final(reinterpret_cast<unsigned char *>(digest), &context);
 
-		b64_encode(digest, cpass);
-		buf += cpass;
+		buf += Anope::Hex(digest, 20);
 		Alog(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;

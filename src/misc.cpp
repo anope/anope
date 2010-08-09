@@ -1319,7 +1319,6 @@ bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::stri
  * @param the data to be converted
  * @return a anope::string containing the hex value
  */
-
 Anope::string Anope::Hex(const Anope::string &data)
 {
 	const char hextable[] = "0123456789abcdef";
@@ -1335,3 +1334,47 @@ Anope::string Anope::Hex(const Anope::string &data)
 	return rv;
 }
 
+Anope::string Anope::Hex(const char *data, unsigned len)
+{
+	const char hextable[] = "0123456789abcdef";
+
+	Anope::string rv;
+	for (size_t i = 0; i < len; ++i)
+	{
+		unsigned char c = data[i];
+		rv += hextable[c >> 4];
+		rv += hextable[c & 0xF];
+	}
+	return rv;
+}
+
+/** Converts a string from hex
+ * @param src The data to be converted
+ * @param dest The destination string
+ */
+void Anope::Unhex(const Anope::string &src, Anope::string &dest)
+{
+	size_t len = src.length();
+	Anope::string rv;
+	for (size_t i = 0; i < len; i += 2)
+	{
+		char h = src[i], l = src[i + 1];
+		unsigned char byte = (h >= 'a' ? h - 'a' + 10 : h - '0') << 4;
+		byte += (l >= 'a' ? l - 'a' + 10 : l - '0');
+		rv += byte;
+	}
+	dest = rv;
+}
+
+void Anope::Unhex(const Anope::string &src, char *dest)
+{
+	size_t len = src.length(), destpos = 0;
+	for (size_t i = 0; i < len; i += 2)
+	{
+		char h = src[i], l = src[i + 1];
+		unsigned char byte = (h >= 'a' ? h - 'a' + 10 : h - '0') << 4;
+		byte += (l >= 'a' ? l - 'a' + 10 : l - '0');
+		dest[destpos++] = byte;
+	}
+	dest[destpos] = 0;
+}

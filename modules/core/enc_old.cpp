@@ -334,7 +334,6 @@ class EOld : public Module
 	{
 		MD5_CTX context;
 		char digest[33] = "", digest2[17] = "";
-		Anope::string cpass;
 		int i;
 		Anope::string buf = "oldmd5:";
 
@@ -346,8 +345,7 @@ class EOld : public Module
 		for (i = 0; i < 32; i += 2)
 			digest2[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
 
-		b64_encode(digest2, cpass);
-		buf += cpass;
+		buf += Anope::Hex(digest2, 16);
 		Alog(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;

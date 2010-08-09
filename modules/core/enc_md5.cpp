@@ -330,14 +330,12 @@ class EMD5 : public Module
 		MD5_CTX context;
 		char digest[17] = "";
 		Anope::string buf = "md5:";
-		Anope::string cpass;
 
 		MD5Init(&context);
 		MD5Update(&context, reinterpret_cast<const unsigned char *>(src.c_str()), src.length());
-		MD5Final(reinterpret_cast<char *>(digest), &context);
+		MD5Final(reinterpret_cast<unsigned char *>(digest), &context);
 
-		b64_encode(digest, cpass);
-		buf += cpass;
+		buf += Anope::Hex(digest, 16);
 		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;

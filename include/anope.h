@@ -322,6 +322,14 @@ namespace Anope
 	 * @return a anope::string containing the hex value
 	 */
 	extern CoreExport string Hex(const string &data);
+	extern CoreExport string Hex(const char *data, unsigned len);
+
+	/** Converts a string from hex
+	 * @param src The data to be converted
+	 * @param dest The destination string
+	 */
+	extern CoreExport void Unhex(const Anope::string &src, Anope::string &dest);
+	extern CoreExport void Unhex(const Anope::string &src, char *dest);
 }
 
 /** sepstream allows for splitting token seperated lists.

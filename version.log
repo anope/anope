@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3020"
+VERSION_BUILD="3021"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3021 - Removed Example.confs DefSessionLimit's reference to accepting 0, it doesn't.
 #Revision 3020 - Fixed bug #1180 - Fixed tracking of internal clients when they change nicks on TS6 IRCds
 #Revision 3019 - Properly track users hosts when a user is -x and has a vhost via chghost
 #Revision 3018 - Accommodate for the InspIRCd 2.0 protocol being even more oversized then we previously thought..

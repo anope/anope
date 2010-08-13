@@ -32,6 +32,7 @@ enum BotFlag
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 {
  public:
+	uint32 chancount;
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
 	CommandMap Commands;	/* Commands on this bot */

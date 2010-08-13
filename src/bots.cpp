@@ -27,6 +27,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->realname = nreal;
 	this->server = Me;
 
+	this->chancount = 0;
 	this->lastmsg = this->created = time(NULL);
 
 	if (!Config.s_ChanServ.empty() && nnick.equals_ci(Config.s_ChanServ))
@@ -107,6 +108,8 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 
 	if (ci->bi)
 		ci->bi->UnAssign(u, ci);
+	
+	++this->chancount;
 
 	ci->bi = this;
 	if (ci->c && ci->c->users.size() >= Config.BSMinUsers)
@@ -127,6 +130,8 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 		else
 			ci->bi->Part(ci->c);
 	}
+
+	--this->chancount;
 
 	ci->bi = NULL;
 }

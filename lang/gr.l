@@ -4375,6 +4375,11 @@ CHAN_HELP_SET_TAIL
 	Γράψε %R%S HELP επιλογή για περισσότερες πληροφορίες
 	για την κάθε εντολή.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Σύνταξη: %s κανάλι FOUNDER ψευδώνυμο
 	

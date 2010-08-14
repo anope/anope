@@ -4336,6 +4336,11 @@ CHAN_HELP_SET_TAIL
 	Type %R%S HELP option voor meer informatie over een
 	specifieke optie.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Gebruik: %s kanaal FOUNDER nick
 	

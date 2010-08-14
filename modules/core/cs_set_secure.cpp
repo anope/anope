@@ -44,7 +44,7 @@ class CommandCSSetSecure : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECURE, "SET");
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECURE, "SET", Config.s_NickServ.c_str());
 		return true;
 	}
 
@@ -55,7 +55,7 @@ class CommandCSSetSecure : public Command
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_SECURE);
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_SECURE);
 	}
 };
 
@@ -68,7 +68,7 @@ class CommandCSSASetSecure : public CommandCSSetSecure
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECURE, "SASET");
+		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SECURE, "SASET", Config.s_NickServ.c_str());
 		return true;
 	}
 

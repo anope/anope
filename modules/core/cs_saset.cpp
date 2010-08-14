@@ -61,7 +61,7 @@ class CommandCSSASet : public Command
 			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_TAIL);
+			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_TAIL);
 			return true;
 		}
 		else

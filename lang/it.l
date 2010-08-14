@@ -4253,6 +4253,11 @@ CHAN_HELP_SET_TAIL
 	Digita %R%S HELP option per ottenere maggiori
 	informazioni su un comando specifico.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Sintassi: %s canale FOUNDER nick
 	

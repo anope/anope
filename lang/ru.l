@@ -4316,6 +4316,11 @@ CHAN_HELP_SET_TAIL
 	Для более подробной информации о какой-либо конкретной опции, см.
 	справку по %R%S HELP опция
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Синтаксис: %s #канал FOUNDER ник
 	

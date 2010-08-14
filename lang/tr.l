@@ -4362,6 +4362,11 @@ CHAN_HELP_SET_TAIL
 	Belirli bir özellik hakkýnda daha fazla bilgi için
 	%R%S HELP özellik yazýn.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Kullanýmý: %s kanaladý FOUNDER nick
 	

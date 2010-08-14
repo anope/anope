@@ -4277,6 +4277,11 @@ CHAN_HELP_SET_TAIL
 	Escriu %R%S HELP opció per més informació
 	sobre una opció en particular.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Sintaxis: %s canal FOUNDER nick
 	

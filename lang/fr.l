@@ -4421,6 +4421,11 @@ CHAN_HELP_SET_TAIL
 	Tapez %R%S HELP SET option pour plus d'informations sur
 	une option particulière.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Syntaxe: %s canal FOUNDER pseudo
 	

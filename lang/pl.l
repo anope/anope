@@ -5338,6 +5338,11 @@ CHAN_HELP_SET_TAIL
 	Aby uzyskaæ wiêcej informacji o danej opcji wpisz:
 	%R%S HELP SET opcja
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Sk³adnia: %s kana³ FOUNDER nick
 	

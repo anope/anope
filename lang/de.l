@@ -4423,6 +4423,11 @@ CHAN_HELP_SET_TAIL
 	Tippe %R%S HELP Option für weitere Informationen
 	zu einem bestimmten Befehl.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Syntax: %s Channel FOUNDER Nickname
 	

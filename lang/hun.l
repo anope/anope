@@ -4296,6 +4296,11 @@ CHAN_HELP_SET_TAIL
 	Írd be: %R%S HELP SET opció bõvebb információért az
 	adott opcióról.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Syntax: %s #szoba FOUNDER nick
 	

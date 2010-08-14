@@ -4228,6 +4228,11 @@ CHAN_HELP_SET_TAIL
 	Type %R%S HELP SET option for more information on a
 	particular option.
 
+CHAN_HELP_SASET_TAIL
+	
+	Type %R%S HELP SASET option for more information on a
+	particular option.
+
 CHAN_HELP_SET_FOUNDER
 	Syntax: %s channel FOUNDER nick
 	
@@ -4274,8 +4279,8 @@ CHAN_HELP_SET_BANTYPE
 CHAN_HELP_SET_KEEPTOPIC
 	Syntax: %s channel KEEPTOPIC {ON | OFF}
 	
-	Enables or disables the topic retention option for a
-	channel.  When topic retention is set, the topic for the
+	Enables or disables the topic retention option for a	
+	channel. When topic retention is set, the topic for the
 	channel will be remembered by %S even after the
 	last user leaves the channel, and will be restored the
 	next time the channel is created.
@@ -4348,7 +4353,7 @@ CHAN_HELP_SET_SECURE
 	Syntax: %s channel SECURE {ON | OFF}
 	
 	Enables or disables %S's security features for a
-	channel.  When SECURE is set, only users who have
+	channel. When SECURE is set, only users who have
 	registered their nicknames with %s and IDENTIFY'd
 	with their password will be given access to the channel
 	as controlled by the access list.
@@ -4366,7 +4371,8 @@ CHAN_HELP_SET_SECUREFOUNDER
 	Enables or disables the secure founder option for a channel.
 	When secure founder is set, only the real founder will be
 	able to drop the channel, change its password, its founder and its
-	successor, and not those who are IDENTIFY'd with %S.
+	successor, and not those who have founder level access through
+	the access/qop command.
 	
 CHAN_HELP_SET_SIGNKICK
 	Syntax: %s channel SIGNKICK {ON | LEVEL | OFF}

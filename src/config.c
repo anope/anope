@@ -127,6 +127,7 @@ char *SendFrom;
 int RestrictMail;
 int MailDelay;
 int DontQuoteAddresses;
+int ForkForMail;
 
 static int NSDefNone;
 char *NSGuestNickPrefix;
@@ -429,6 +430,7 @@ Directive directives[] = {
     {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
+    {"ForkForMail", {{PARAM_SET, PARAM_RELOAD, &ForkForMail}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
     {"DefConLevel", {{PARAM_INT, PARAM_RELOAD, &DefConLevel}}},
     {"DefCon1", {{PARAM_INT, PARAM_RELOAD, &DefCon1}}},

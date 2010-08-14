@@ -370,6 +370,7 @@ E char *SendFrom;
 E int   RestrictMail;
 E int   MailDelay;
 E int  DontQuoteAddresses;
+E int  ForkForMail;
 
 E int   NSDefFlags;
 E int   NSDefLanguage;

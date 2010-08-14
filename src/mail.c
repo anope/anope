@@ -175,6 +175,7 @@ MailInfo *MailMemoBegin(NickCore * nc)
  */
 void MailEnd(MailInfo * mail)
 {
+   int pid = -1;
     /*  - param checking modified because we don't
        have an user sending this mail.
        Certus, 02.04.2004 */
@@ -187,7 +188,15 @@ void MailEnd(MailInfo * mail)
         return;
     }
 
-    pclose(mail->pipe);
+#ifdef HAVE_FORK
+    if (ForkForMail && !(pid = fork()))
+    {
+        pclose(mail->pipe);
+        exit(EXIT_SUCCESS);
+    }
+    else if (pid < 0)
+#endif
+        pclose(mail->pipe);
 
     if (mail->sender)           /* added sender check */
         mail->sender->lastmail = time(NULL);

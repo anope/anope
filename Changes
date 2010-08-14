@@ -6,6 +6,7 @@ Anope Version 1.8 - SVN
 05/22  A Added an internal event called when a nick is ghosted           [  #00]
 05/22  A Added an internal event called when a nick is recovered         [  #00]
 05/23  A Added old nick parameter to EVENT_CHANGE_NICK                   [  #00]
+08/13  A Added forking for mail sending on supporting operating systems  [  #00]
 04/15  F Fixed os_info to backup its database on Windows                 [  #00]
 04/15  F Fixed a potential crash in cs_clear ops when using UnrealIRCd   [#1154]
 04/16  F Fixed missing TS6SID on FJOIN in inspircd12                     [  #00]

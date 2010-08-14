@@ -8,13 +8,12 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3023"
+VERSION_BUILD="3025"
 
 # $Log$ # Changes since the 1.8.4 Release
-#Revision 3023 - Fixed minor wording error, and bumped version log from last 
-commit
-#Revision 3022 - Removed \'s that appeared in kick message when BSGentleBWReason 
-isn't used
+#Revision 3025 - Added in mail forking for operating systems that support it
+#Revision 3023 - Fixed minor wording error, and bumped version log from last commit
+#Revision 3022 - Removed \'s that appeared in kick message when BSGentleBWReason isn't used
 #Revision 3021 - Removed Example.confs DefSessionLimit's reference to accepting 0, it doesn't.
 #Revision 3020 - Fixed bug #1180 - Fixed tracking of internal clients when they change nicks on TS6 IRCds
 #Revision 3019 - Properly track users hosts when a user is -x and has a vhost via chghost

@@ -20,6 +20,9 @@ Anope Version 1.8 - SVN
 08/03  F Fixed tracking users vhosts when there is no vhost mode         [#1178]
 08/05  F Fixed tracking of our clients after nick changing on InspIRCd   [#1180]
 
+Provided by Han` <Han@mefalcon.org> - 2010
+8/14   F Updated german language file.                                   [  #00]
+
 Anope Version 1.8.4
 -------------------
 03/10  A Added support for tracking permanent channels                   [  #00]

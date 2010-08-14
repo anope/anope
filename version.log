@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3025"
+VERSION_BUILD="3026"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3026 - Updated german language file
 #Revision 3025 - Added in mail forking for operating systems that support it
 #Revision 3023 - Fixed minor wording error, and bumped version log from last commit
 #Revision 3022 - Removed \'s that appeared in kick message when BSGentleBWReason isn't used

@@ -194,7 +194,7 @@ User::~User()
 	{
 		Anope::string srealname = normalizeBuffer(this->realname);
 
-		Alog() << "LOGUSERS: " << this->GetMask() << (ircd->vhost ? " => " : " ") << (ircd->vhost ? this->GetDisplayedHost() : "") << " (" << srealname << ") left the network (" << this->server->GetName() << ").";
+		Alog() << "LOGUSERS: " << this->nick << " (" << this->GetIdent() << "@" << this->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? this->GetDisplayedHost() : "") << ") (" << srealname << ") left the network (" << this->server->GetName() << ").";
 	}
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));

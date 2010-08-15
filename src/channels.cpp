@@ -77,6 +77,10 @@ Channel::~Channel()
 
 void Channel::Sync()
 {
+	if (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi == this->users.front()->user))
+	{
+		new ChanServTimer(this);
+	}
 	if (this->ci)
 	{
 		check_modes(this);
@@ -115,24 +119,27 @@ void Channel::JoinUser(User *user)
 			user->SendMessage(whosends(this->ci)->nick, "[%s] %s", this->name.c_str(), this->ci->entry_message.c_str());
 	}
 
-	/**
-	 * We let the bot join even if it was an ignored user, as if we don't,
-	 * and the ignored user doesnt just leave, the bot will never
-	 * make it into the channel, leaving the channel botless even for
-	 * legit users - Rob
-	 * But don't join the bot if the channel is persistant - Adam
-	 * But join persistant channels when syncing with our uplink- DP
-	 **/
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && (!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config.BSMinUsers && !this->FindUser(this->ci->bi))
-		this->ci->bi->Join(this);
-	/* Only display the greet if the main uplink we're connected
-	 * to has synced, or we'll get greet-floods when the net
-	 * recovers from a netsplit. -GD
-	 */
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && this->FindUser(this->ci->bi) && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
+	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi)
 	{
-		ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
-		this->ci->bi->lastmsg = time(NULL);
+		/**
+		 * We let the bot join even if it was an ignored user, as if we don't,
+		 * and the ignored user doesnt just leave, the bot will never
+		 * make it into the channel, leaving the channel botless even for
+		 * legit users - Rob
+		 * But don't join the bot if the channel is persistant - Adam
+		 * But join persistant channels when syncing with our uplink- DP
+		 **/
+		if ((!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config.BSMinUsers && !this->FindUser(this->ci->bi))
+			this->ci->bi->Join(this);
+		/* Only display the greet if the main uplink we're connected
+		 * to has synced, or we'll get greet-floods when the net
+		 * recovers from a netsplit. -GD
+		 */
+		if (this->FindUser(this->ci->bi) && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
+		{
+			ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
+			this->ci->bi->lastmsg = time(NULL);
+		}
 	}
 }
 

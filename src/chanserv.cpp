@@ -967,6 +967,7 @@ ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config.CSInhabit), c(chan)
 {
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);
+	ChanServ->Join(c);
 }
 
 void ChanServTimer::Tick(time_t)
@@ -976,13 +977,7 @@ void ChanServTimer::Tick(time_t)
 
 	c->ci->UnsetFlag(CI_INHABIT);
 
-	/* If the channel has users again, don't part it and halt */
-	if (!c->users.empty())
-		return;
-
-	ChanServ->Part(c);
-
-	/* Now delete the channel as it is empty */
-	if (!c->HasFlag(CH_PERSIST) && !c->ci->HasFlag(CI_PERSIST))
-		delete c;
+	if (c->users.size() == 1 || c->ci->bi != ChanServ)
+		ChanServ->Part(c);
 }
+

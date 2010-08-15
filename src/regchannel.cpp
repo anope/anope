@@ -621,10 +621,7 @@ bool ChannelInfo::CheckKick(User *user)
 			c->SetMode(NULL, CMODE_INVITE);
 		}
 
-		/* Join ChanServ */
-		ChanServ->Join(this->c);
-
-		/* Set a timer for this channel to part ChanServ later */
+		/* Join ChanServ and set a timer for this channel to part ChanServ later */
 		new ChanServTimer(this->c);
 	}
 

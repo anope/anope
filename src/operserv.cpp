@@ -407,16 +407,15 @@ XLine *XLineManager::Check(User *u)
 {
 	const time_t now = time(NULL);
 
-	for (std::vector<XLine *>::iterator it = this->XLines.begin(), it_end = this->XLines.end(); it != it_end; ++it)
+	for (unsigned i = this->XLines.size(); i > 0; --i)
 	{
-		XLine *x = *it;
+		XLine *x = this->XLines[i - 1];
 
 		if (x->Expires && x->Expires < now)
 		{
 			OnExpire(x);
 			delete x;
-			it = XLines.erase(it);
-			--it;
+			this->XLines.erase(XLines.begin() + i - 1);
 			continue;
 		}
 

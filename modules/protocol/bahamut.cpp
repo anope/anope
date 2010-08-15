@@ -398,7 +398,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					Alog() << "Recieved unknown mode prefix " << buf[0] << " in SJOIN string";
+					Alog() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
 					continue;
 				}
 
@@ -443,13 +443,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 	{
 		/* Unset the syncing flag */
 		c->UnsetFlag(CH_SYNCING);
-
-		/* If there are users in the channel they are allowed to be, set topic mlock etc. */
-		if (!c->users.empty())
-			c->Sync();
-		/* If there are no users in the channel, there is a ChanServ timer set to part the service bot
-		 * and destroy the channel soon
-		 */
+		c->Sync();
 	}
 
 	return MOD_CONT;

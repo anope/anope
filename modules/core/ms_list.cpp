@@ -64,7 +64,7 @@ class CommandMSList : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = !params.empty() ? params[0] : "", chan;
-		ChannelInfo *ci;
+		ChannelInfo *ci = NULL;
 		const MemoInfo *mi;
 		int i, end;
 

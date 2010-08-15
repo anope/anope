@@ -187,6 +187,7 @@ int main(int argc, char *argv[])
 	std::string line;
 	while (getline(in, line))
 	{
+		std::string lang, memomax, chancount, bantype;
 		if (line.substr(0, 2) == "NC")
 		{
 			std::vector<std::string> parts = BuildStringVector(line);
@@ -226,6 +227,15 @@ int main(int argc, char *argv[])
 					password += ":" + iv;
 				parts[2] = password;
 			}
+			if (parts.size() == 6)
+			{
+				chancount = parts[5];
+				memomax = parts[4];
+				lang = parts[3];
+				parts.erase(parts.end());
+				parts.erase(parts.end());
+				parts.erase(parts.end());
+			}
 			line.clear();
 			for (unsigned part = 0, end = parts.size(); part < end; ++part)
 			{
@@ -234,7 +244,44 @@ int main(int argc, char *argv[])
 				line += parts[part];
 			}
 		}
+		else if (line.substr(0, 2) == "CH")
+		{
+			std::vector<std::string> parts = BuildStringVector(line);
+			memomax = parts[parts.size() - 1];
+			bantype = parts[parts.size() - 2];
+			parts.erase(parts.end());
+			parts.erase(parts.end());
+
+			line.clear();
+			for (unsigned part = 0, end = parts.size(); part < end; ++part)
+			{
+				if (part)
+					line += ' ';
+				line += parts[part];
+			}
+		}
+
 		out << line << std::endl;
+		if (!lang.empty())
+		{
+			out << "MD LANGUAGE  " << lang << std::endl;
+			lang.clear();
+		}
+		if (!memomax.empty())
+		{
+			out << "MD MEMOMAX " << memomax << std::endl;
+			memomax.clear();
+		}
+		if (!chancount.empty())
+		{
+			out << "MD CHANCOUNT " << chancount << std::endl;
+			chancount.clear();
+		}
+		if (!bantype.empty())
+		{
+			out << "MD BANTYPE " << bantype << std::endl;
+			bantype.clear();
+		}
 	}
 
 	std::cout << "Upgrade complete!" << std::endl;

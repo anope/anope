@@ -360,18 +360,7 @@ static void LoadNickCore(const std::vector<Anope::string> &params)
 	/* Clear default flags */
 	nc->ClearFlags();
 
-	if (params.size() <= 2)
-		/* This is a forbidden nick */
-		return;
-
 	nc->pass = params[1];
-
-	for (int i = 0; LangInfos[i].LanguageId != -1; ++i)
-		if (params[2].equals_ci(LangInfos[i].Name))
-			nc->language = LangInfos[i].LanguageId;
-
-	nc->memos.memomax = params[3].is_number_only() ? convertTo<int16>(params[3]) : 1;
-	nc->channelcount = params[4].is_number_only() ? convertTo<uint16>(params[4]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
 }
@@ -431,10 +420,6 @@ static void LoadChanInfo(const std::vector<Anope::string> &params)
 	ci->time_registered = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
 
 	ci->last_used = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
-
-	ci->bantype = params[3].is_number_only() ? convertTo<int16>(params[3]) : Config.CSDefBantype;
-
-	ci->memos.memomax = params[4].is_number_only() ? convertTo<int16>(params[4]) : 1;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
 }
@@ -612,7 +597,17 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key.equals_ci("EMAIL"))
+		if (key.equals_ci("LANGUAGE"))
+		{
+			for (int i = 0; LangInfos[i].LanguageId != -1; ++i)
+				if (params[0].equals_ci(LangInfos[i].Name))
+					nc->language = LangInfos[i].LanguageId;
+		}
+		else if (key.equals_ci("MEMOMAX"))
+			nc->memos.memomax = params[0].is_number_only() ? convertTo<int16>(params[0]) : 1;
+		else if (key.equals_ci("CHANCOUNT"))
+			nc->channelcount = params[0].is_number_only() ? convertTo<uint16>(params[0]) : 0;
+		else if (key.equals_ci("EMAIL"))
 			nc->email = params[0];
 		else if (key.equals_ci("GREET"))
 			nc->greet = params[0];
@@ -683,7 +678,11 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key.equals_ci("FOUNDER"))
+		if (key.equals_ci("BANTYPE"))
+			ci->bantype = params[0].is_number_only() ? convertTo<int16>(params[0]) : Config.CSDefBantype;
+		else if (key.equals_ci("MEMOMAX"))
+			ci->memos.memomax = params[0].is_number_only() ? convertTo<int16>(params[0]) : 1;
+		else if (key.equals_ci("FOUNDER"))
 		{
 			ci->founder = findcore(params[0]);
 			if (!ci->founder)
@@ -875,7 +874,7 @@ class DBPlain : public Module
 			return EVENT_CONTINUE;
 		}
 
-		db << "VER 1" << endl;
+		db << "VER 2" << endl;
 
 		for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
 		{
@@ -890,19 +889,16 @@ class DBPlain : public Module
 		{
 			NickCore *nc = nit->second;
 
-			if (nc->HasFlag(NI_FORBIDDEN))
-			{
-				db << "NC " << nc->display << endl;
-				db << "MD FLAGS FORBIDDEN" << endl;
-				FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
-				continue;
-			}
-			else
-				db << "NC " << nc->display << " " << nc->pass << " ";
+			db << "NC " << nc->display << " " << nc->pass << endl;
+
+			db << "MD LANGUAGE ";
 			for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
 				if (nc->language ==  LangInfos[j].LanguageId)
 					db << LangInfos[j].Name;
-			db << " " << nc->memos.memomax << " " << nc->channelcount << endl;
+			db << endl;
+
+			db << "MD MEMOMAX " << nc->memos.memomax << endl;
+			db << "MD CHANCOUNT " << nc->channelcount << endl;
 
 			if (!nc->email.empty())
 				db << "MD EMAIL " << nc->email << endl;
@@ -977,8 +973,9 @@ class DBPlain : public Module
 		{
 			ChannelInfo *ci = cit->second;
 
-			db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
-			db << " " << ci->bantype << " " << ci->memos.memomax << endl;
+			db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
+			db << "MD BANTYPE " << ci->bantype << endl;
+			db << "MD MEMOMAX " << ci->memos.memomax << endl;
 			if (ci->founder)
 				db << "MD FOUNDER " << ci->founder->display << endl;
 			if (ci->successor)
@@ -1041,13 +1038,13 @@ class DBPlain : public Module
 				}
 				db << endl;
 			}
-			Anope::string Param;
 			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 			{
 				if ((*it)->Class == MC_CHANNEL)
 				{
 					ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
+					Anope::string Param;
 					if (ci->GetParam(cm->Name, Param))
 						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
 				}

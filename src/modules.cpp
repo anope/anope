@@ -381,3 +381,19 @@ Version Module::GetVersion() const
 {
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
+
+std::list<dynamic_reference_base *> dyn_references;
+
+dynamic_reference_base::dynamic_reference_base()
+{
+	dyn_references.push_back(this);
+}
+
+dynamic_reference_base::~dynamic_reference_base()
+{
+	std::list<dynamic_reference_base *>::iterator it = std::find(dyn_references.begin(), dyn_references.end(), this);
+
+	if (it != dyn_references.end())
+		dyn_references.erase(it);
+}
+

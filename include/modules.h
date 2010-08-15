@@ -160,9 +160,6 @@ extern CoreExport message_map MessageMap;
 class Module;
 extern CoreExport std::list<Module *> Modules;
 
-/*************************************************************************/
-/* Structure for information about a *Serv command. */
-
 class Version
 {
  private:
@@ -1109,11 +1106,16 @@ enum Implementation
 	I_END
 };
 
+class Service;
 
 /** Used to manage modules.
  */
 class CoreExport ModuleManager
 {
+ private:
+	/** A map of service providers
+	 */
+	static std::map<Anope::string, Service *> ServiceProviders;
  public:
 	/** Event handler hooks.
 	 * This needs to be public to be used by FOREACH_MOD and friends.
@@ -1202,6 +1204,24 @@ class CoreExport ModuleManager
 	 */
 	static void UnloadAll(bool unload_proto);
 
+	/** Register a service
+	 * @param s The service
+	 * @return true if it was successfully registeed, else false (service name colision)
+	 */
+	static bool RegisterService(Service *s);
+
+	/** Unregister a service
+	 * @param s The service
+	 * @return true if it was unregistered successfully
+	 */
+	static bool UnregisterService(Service *s);
+
+	/** Get a service
+	 * @param name The service name
+	 * @return The services, or NULL
+	 */
+	static Service *GetService(const Anope::string &name);
+
  private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
@@ -1226,6 +1246,99 @@ class CallBack : public Timer
 		std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
 		if (it != m->CallBacks.end())
 			m->CallBacks.erase(it);
+	}
+};
+
+class Service
+{
+ public:
+	Module *owner;
+	Anope::string name;
+
+	Service(Module *o, const Anope::string &n);
+
+	virtual ~Service();
+};
+
+class dynamic_reference_base
+{
+ public:
+	dynamic_reference_base();
+
+	virtual ~dynamic_reference_base();
+};
+
+extern std::list<dynamic_reference_base *> dyn_references;
+
+template<typename T>
+class dynamic_reference : public dynamic_reference_base
+{
+ protected:
+	T *ref;
+ public:
+	dynamic_reference() : dynamic_reference_base(), ref(NULL) { }
+
+	dynamic_reference(T *obj) : dynamic_reference_base(), ref(obj) { }
+
+	virtual ~dynamic_reference() { }
+
+	virtual operator bool()
+	{
+		return this->ref;
+	}
+
+	virtual inline T *operator->()
+	{
+		return this->ref;
+	}
+
+	void Invalidate()
+	{
+		this->ref = NULL;
+	}
+
+	static void Invalidate(T *obj)
+	{
+		for (std::list<dynamic_reference_base *>::iterator it = dyn_references.begin(), it_end = dyn_references.end(); it != it_end;)
+		{
+			dynamic_reference<void *> *d = static_cast<dynamic_reference<void *> *>(*it);
+			++it;
+
+			if (d && d->ref == obj)
+			{
+				d->Invalidate();
+			}
+		}
+	}
+};
+
+template<typename T>
+class service_reference : public dynamic_reference<T>
+{
+	Module *owner;
+	Anope::string name;
+
+ public:
+	service_reference(Module *o, const Anope::string &n) : dynamic_reference<T>(), owner(o), name(n)
+	{
+	}
+
+	~service_reference()
+	{
+	}
+
+	operator bool()
+	{
+		if (!this->ref)
+			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
+		return this->ref;
+	}
+
+	inline T *operator->()
+	{
+		if (!this->ref)
+			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
+		return this->ref;
 	}
 };
 

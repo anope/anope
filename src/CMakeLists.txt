@@ -2,17 +2,21 @@
 file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
 
-# If using Windows, include windows.cpp, as it's Windows-specific
+# If using Windows, add the windows.cpp, the win32 threading engine, and the socket engine to the list
 if(WIN32)
   append_to_list(SRC_SRCS win32/windows.cpp)
-endif(WIN32)
-
-# If using Windows, add the win32 threading engine to the list
-if(WIN32)
   append_to_list(SRC_SRCS threadengines/threadengine_win32.cpp)
+  append_to_list(SRC_SRCS socketengines/socketengine_win32.cpp)
 # If not using Windows, add the pthread threading engine to the list
 else(WIN32)
   append_to_list(SRC_SRCS threadengines/threadengine_pthread.cpp)
+  # If we have eventfd, use it
+  if(HAVE_EVENTFD)
+    append_to_list(SRC_SRCS socketengines/socketengine_eventfd.cpp)
+  # Else fall back to pipe
+  else(HAVE_EVENTFD)
+    append_to_list(SRC_sRCS socketengines/socketengine_pipe.cpp)
+  endif(HAVE_EVENTFD)
 endif(WIN32)
 
 sort_list(SRC_SRCS)

@@ -5,7 +5,7 @@
 DBSQL="tables.sql"
 
 # Schema Version
-SVER="1"
+SVER="2"
 
 # Local Version, defaults to 0
 LVER="0"
@@ -132,6 +132,9 @@ rm -f $TFILE
 if test "x$FAILED" = "x" ; then
 	# Try to find out more about this installation
 	SQLPORT="$(mysql_config --port 2> /dev/null)"
+	if test "$SQLPORT" = "0" ; then
+		SQLPORT=3306
+	fi
 	echo ""
 	echo "Your MySQL setup is complete and your Anope schema is up to date. Make"
 	echo "sure you configure MySQL on your services.conf file prior to launching"

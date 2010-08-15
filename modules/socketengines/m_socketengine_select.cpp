@@ -73,6 +73,8 @@ class SocketEngineSelect : public SocketEngineBase
 			{
 				Socket *s = it->second;
 
+				if (s->HasFlag(SF_DEAD))
+					continue;
 				if (FD_ISSET(s->GetSock(), &efdset))
 				{
 					s->ProcessError();

@@ -25,9 +25,16 @@ SocketEngineBase::SocketEngineBase()
 
 SocketEngineBase::~SocketEngineBase()
 {
+	for (std::map<int, Socket *>::const_iterator it = this->Sockets.begin(), it_end = this->Sockets.end(); it != it_end; ++it)
+		delete it->second;
+	this->Sockets.clear();
 #ifdef _WIN32
 	WSACleanup();
 #endif
+}
+
+Socket::Socket()
+{
 }
 
 /** Constructor

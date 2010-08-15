@@ -92,3 +92,14 @@ unsigned Version::GetBuild() const
 {
 	return this->Build;
 }
+
+Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)
+{
+	ModuleManager::RegisterService(this);
+}
+
+Service::~Service()
+{
+	ModuleManager::UnregisterService(this);
+}
+

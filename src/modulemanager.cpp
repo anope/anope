@@ -11,6 +11,7 @@
 #include "version.h"
 #include <algorithm> // std::find
 
+std::map<Anope::string, Service *> ModuleManager::ServiceProviders;
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
 void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
@@ -430,3 +431,36 @@ void ModuleManager::UnloadAll(bool unload_proto)
 			DeleteModule(m);
 	}
 }
+
+/** Register a service
+ * @oaram s The service
+ * @return true if it was successfully registeed, else false (service name colision)
+ */
+bool ModuleManager::RegisterService(Service *s)
+{
+	return ModuleManager::ServiceProviders.insert(std::make_pair(s->name, s)).second;
+}
+
+/** Unregister a service
+ * @param s The service
+ * @return true if it was unregistered successfully
+ */
+bool ModuleManager::UnregisterService(Service *s)
+{
+	return ModuleManager::ServiceProviders.erase(s->name);
+}
+
+/** Get a service
+ * @param name The service name
+ * @param s The service
+ * @return The service
+ */
+Service *ModuleManager::GetService(const Anope::string &name)
+{
+	std::map<Anope::string, Service *>::const_iterator it = ModuleManager::ServiceProviders.find(name);
+
+	if (it != ModuleManager::ServiceProviders.end())
+		return it->second;
+	return NULL;
+}
+

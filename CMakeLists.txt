@@ -330,6 +330,7 @@ check_function_exists(strlcat HAVE_STRLCAT)
 check_function_exists(strlcpy HAVE_STRLCPY)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(backtrace HAVE_BACKTRACE)
+check_function_exists(eventfd HAVE_EVENTFD)
 
 # Check for the existance of the following types
 check_type_size(uint8_t UINT8_T)

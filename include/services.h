@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdexcept>
 #include <string.h>
 
 #include <signal.h>

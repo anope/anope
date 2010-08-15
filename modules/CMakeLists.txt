@@ -86,7 +86,6 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
     # Get a list of ALL files and directories within this modules directory
     file(GLOB SUBMODULE_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "${MODULE_FOLDER}/*")
     remove_item_from_list(SUBMODULE_DIRS "CMakeFiles")
-    remove_item_from_list(SUBMODULE_DIRS "extra/mysql") # XXX till sql is fixed
 
     foreach(SUBDIR ${SUBMODULE_DIRS})
       if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}")

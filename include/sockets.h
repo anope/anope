@@ -81,6 +81,10 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	/* Type this socket is */
 	SocketType Type;
 
+	/** Empty constructor, used for things such as the pipe socket
+	 */
+	Socket();
+
 	/** Default constructor
 	 * @param nsock The socket to use, 0 if we need to create our own
 	 * @param nIPv6 true if using ipv6
@@ -147,6 +151,26 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 */
 	void Write(const char *message, ...);
 	void Write(const Anope::string &message);
+};
+
+class CoreExport Pipe : public Socket
+{
+ private:
+ 	int WritePipe;
+
+	int RecvInternal(char *buf, size_t sz) const;
+
+	int SendInternal(const Anope::string &buf) const;
+ public:
+	Pipe();
+
+	bool ProcessRead();
+
+	bool Read(const Anope::string &);
+
+	void Notify();
+
+	virtual void OnNotify();
 };
 
 class CoreExport ClientSocket : public Socket

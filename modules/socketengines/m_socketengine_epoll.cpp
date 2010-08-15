@@ -121,6 +121,8 @@ class SocketEngineEPoll : public SocketEngineBase
 			epoll_event *ev = &events[i];
 			Socket *s = Sockets[ev->data.fd];
 
+			if (s->HasFlag(SF_DEAD))
+				continue;
 			if (ev->events & (EPOLLHUP | EPOLLERR))
 			{
 				s->ProcessError();
@@ -135,10 +137,10 @@ class SocketEngineEPoll : public SocketEngineBase
 				s->SetFlag(SF_DEAD);
 		}
 
-		for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; )
+		for (int i = 0; i < total; ++i)
 		{
-			Socket *s = it->second;
-			++it;
+			epoll_event *ev = &events[i];
+			Socket *s = Sockets[ev->data.fd];
 
 			if (s->HasFlag(SF_DEAD))
 				delete s;

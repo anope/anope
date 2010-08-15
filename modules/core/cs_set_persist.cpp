@@ -34,7 +34,7 @@ class CommandCSSetPersist : public Command
 			{
 				ci->SetFlag(CI_PERSIST);
 
-				/* Channel doesn't exist, create it internally */
+				/* Channel doesn't exist, create it */
 				if (!ci->c)
 				{
 					Channel *c = new Channel(ci->name);
@@ -47,7 +47,11 @@ class CommandCSSetPersist : public Command
 				 * Yes, this works fine with no Config.s_BotServ
 				 */
 				if (!ci->bi && !cm)
+				{
 					ChanServ->Assign(NULL, ci);
+					if (!ci->c->FindUser(ChanServ))
+						ChanServ->Join(ci->c);
+				}
 
 				/* Set the perm mode */
 				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
@@ -65,8 +69,6 @@ class CommandCSSetPersist : public Command
 				/* Unset perm mode */
 				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
 					ci->c->RemoveMode(NULL, cm);
-				if (!Config.s_BotServ.empty() && ci->bi && ci->c->FindUser(ci->bi))
-					ci->bi->Part(ci->c);
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
@@ -74,9 +76,6 @@ class CommandCSSetPersist : public Command
 				if (!cm && Config.s_BotServ.empty() && ci->bi)
 					/* Unassign bot */
 					ChanServ->UnAssign(NULL, ci);
-
-				if (ci->c && ci->c->users.empty())
-					delete ci->c;
 			}
 
 			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name.c_str());

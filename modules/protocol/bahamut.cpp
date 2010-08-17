@@ -101,19 +101,19 @@ class BahamutIRCdProto : public IRCDProto
 	{
 		if (buf.empty())
 			return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
+		send_cmd(bi ? bi->nick : Config->ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config.ServerName, "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config.NSReleaseTimeout));
+		send_cmd(Config->ServerName, "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config.ServerName, "SVSHOLD %s 0", nick.c_str());
+		send_cmd(Config->ServerName, "SVSHOLD %s 0", nick.c_str());
 	}
 
 	/* SVSMODE -b */
@@ -126,9 +126,9 @@ class BahamutIRCdProto : public IRCDProto
 	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
 	{
 		if (!nick.empty())
-			send_cmd(Config.ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
+			send_cmd(Config->ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
 		else
-			send_cmd(Config.ServerName, "SVSMODE %s %s", c->name.c_str(), mode.c_str());
+			send_cmd(Config->ServerName, "SVSMODE %s %s", c->name.c_str(), mode.c_str());
 	}
 
 	/* SQLINE */
@@ -248,8 +248,8 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
 	{
-		EnforceQlinedNick(nick, Config.s_BotServ);
-		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes.c_str(), user.c_str(), host.c_str(), Config.ServerName.c_str(), real.c_str());
+		EnforceQlinedNick(nick, Config->s_BotServ);
+		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick.c_str(), static_cast<long>(time(NULL)), modes.c_str(), user.c_str(), host.c_str(), Config->ServerName.c_str(), real.c_str());
 	}
 
 	/* SVSMODE +d */
@@ -501,7 +501,7 @@ int anope_event_os(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, Config.s_OperServ, av[0]);
+	m_privmsg(source, Config->s_OperServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -510,7 +510,7 @@ int anope_event_ns(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, Config.s_NickServ, av[0]);
+	m_privmsg(source, Config->s_NickServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -519,7 +519,7 @@ int anope_event_ms(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, Config.s_MemoServ, av[0]);
+	m_privmsg(source, Config->s_MemoServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -528,7 +528,7 @@ int anope_event_hs(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, Config.s_HostServ, av[0]);
+	m_privmsg(source, Config->s_HostServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -537,7 +537,7 @@ int anope_event_cs(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	m_privmsg(source, Config.s_ChanServ, av[0]);
+	m_privmsg(source, Config->s_ChanServ, av[0]);
 	return MOD_CONT;
 }
 
@@ -668,7 +668,7 @@ int anope_event_ping(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config->ServerName, av[0]);
 	return MOD_CONT;
 }
 

@@ -343,10 +343,10 @@ typedef std::deque<ValueItem> ValueList;
 typedef bool (*Validator)(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &);
 /** A callback for validating multiple value entries
  */
-typedef bool (*MultiValidator)(ServerConfig *, const Anope::string &, const Anope::string *, ValueList &, int *, bool);
+typedef bool (*MultiValidator)(ServerConfig *, const Anope::string &, const Anope::string *, ValueList &, int *);
 /** A callback indicating the end of a group of entries
  */
-typedef bool (*MultiNotify)(ServerConfig *, const Anope::string &, bool);
+typedef bool (*MultiNotify)(ServerConfig *, const Anope::string &);
 
 /** Holds a core configuration item and its callbacks
  */
@@ -395,18 +395,12 @@ struct MultiConfig
 class ServerConfig
 {
  private:
-	/** This variable holds the names of all
-	 * files included from the main one. This
-	 * is used to make sure that no files are
-	 * recursively included.
-	 */
-	std::vector<std::string> include_stack;
 	/** Check that there is only one of each configuration item
 	 */
 	bool CheckOnce(const Anope::string &);
  public:
+	/* Error from the config */
 	std::ostringstream errstr;
-	ConfigDataHash newconfig;
 	/** This holds all the information in the config file,
 	 * it's indexed by tag name to a vector of key/values.
 	 */
@@ -414,25 +408,15 @@ class ServerConfig
 	/** Construct a new ServerConfig
 	 */
 	ServerConfig();
-	/** Clears the include stack in preperation for a Read() call.
-	 */
-	void ClearStack();
 	/** Read the entire configuration into memory
 	 * and initialize this class. All other methods
 	 * should be used only by the core.
 	 */
-	int Read(bool);
-	/** Report a configuration error given in errormessage.
-	 * @param bail If this is set to true, the error is sent to the console, and the program exits
-	 * @param connection If this is set to a non-null value, and bail is false, the errors are spooled to
-	 * this connection as SNOTICEs.
-	 * If the parameter is NULL, the messages are spooled to all connections via WriteOpers as SNOTICEs.
-	 */
-	void ReportConfigError(const Anope::string &, bool);
+	void Read();
 	/** Load 'filename' into 'target', with the new config parser everything is parsed into
 	 * tag/key/value at load-time rather than at read-value time.
 	 */
-	bool LoadConf(ConfigDataHash &, const Anope::string &, std::ostringstream &);
+	bool LoadConf(ConfigDataHash &, const Anope::string &);
 	// Both these return true if the value existed or false otherwise
 	/** Writes 'length' chars into 'result' as a string
 	 */
@@ -454,7 +438,7 @@ class ServerConfig
 	bool ConfValueBool(ConfigDataHash &, const Anope::string &, const Anope::string &, const Anope::string &, int);
 	/** Returns the number of occurences of tag in the config file
 	 */
-	int ConfValueEnum(ConfigDataHash &, const Anope::string &);
+	int ConfValueEnum(const ConfigDataHash &, const Anope::string &);
 	/** Returns the numbers of vars inside the index'th 'tag in the config file
 	 */
 	int ConfVarEnum(ConfigDataHash &, const Anope::string &, int);
@@ -880,18 +864,6 @@ class ConfigException : public CoreException
 class CoreExport ConfigReader
 {
  protected:
-	/** The contents of the configuration file
-	 * This protected member should never be accessed by a module (and cannot be accessed unless the
-	 * core is changed). It will contain a pointer to the configuration file data with unneeded data
-	 * (such as comments) stripped from it.
-	 */
-	ConfigDataHash *data;
-	/** Used to store errors
-	 */
-	std::ostringstream *errorlog;
-	/** If we're using our own config data hash or not
-	 */
-	bool privatehash;
 	/** True if an error occured reading the config file
 	 */
 	bool readerror;
@@ -971,13 +943,6 @@ class CoreExport ConfigReader
 	 * file does not exist or could not be opened.
 	 */
 	bool Verify();
-	/** Dumps the list of errors in a config file to an output location. If bail is true,
-	 * then the program will abort. If bail is false and user points to a valid user
-	 * record, the error report will be spooled to the given user by means of NOTICE.
-	 * if bool is false AND user is false, the error report will be spooled to all opers
-	 * by means of a NOTICE to all opers.
-	 */
-	void DumpErrors(bool);
 	/** Returns the number of items within a tag.
 	 * For example if the tag was &lt;test tag="blah" data="foo"&gt; then this
 	 * function would return 2. Spaces and newlines both qualify as valid seperators

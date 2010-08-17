@@ -30,19 +30,19 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->chancount = 0;
 	this->lastmsg = this->created = time(NULL);
 
-	if (!Config.s_ChanServ.empty() && nnick.equals_ci(Config.s_ChanServ))
+	if (!Config->s_ChanServ.empty() && nnick.equals_ci(Config->s_ChanServ))
 		ChanServ = this;
-	else if (!Config.s_BotServ.empty() && nnick.equals_ci(Config.s_BotServ))
+	else if (!Config->s_BotServ.empty() && nnick.equals_ci(Config->s_BotServ))
 		BotServ = this;
-	else if (!Config.s_HostServ.empty() && nnick.equals_ci(Config.s_HostServ))
+	else if (!Config->s_HostServ.empty() && nnick.equals_ci(Config->s_HostServ))
 		HostServ = this;
-	else if (!Config.s_OperServ.empty() && nnick.equals_ci(Config.s_OperServ))
+	else if (!Config->s_OperServ.empty() && nnick.equals_ci(Config->s_OperServ))
 		OperServ = this;
-	else if (!Config.s_MemoServ.empty() && nnick.equals_ci(Config.s_MemoServ))
+	else if (!Config->s_MemoServ.empty() && nnick.equals_ci(Config->s_MemoServ))
 		MemoServ = this;
-	else if (!Config.s_NickServ.empty() && nnick.equals_ci(Config.s_NickServ))
+	else if (!Config->s_NickServ.empty() && nnick.equals_ci(Config->s_NickServ))
 		NickServ = this;
-	else if (!Config.s_GlobalNoticer.empty() && nnick.equals_ci(Config.s_GlobalNoticer))
+	else if (!Config->s_GlobalNoticer.empty() && nnick.equals_ci(Config->s_GlobalNoticer))
 		Global = this;
 
 	BotListByNick[this->nick] = this;
@@ -94,7 +94,7 @@ void BotInfo::RejoinAll()
 	{
 		ChannelInfo *ci = it->second;
 
-		if (ci->bi == this && ci->c && ci->c->users.size() >= Config.BSMinUsers)
+		if (ci->bi == this && ci->c && ci->c->users.size() >= Config->BSMinUsers)
 			this->Join(ci->c);
 	}
 }
@@ -112,7 +112,7 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	++this->chancount;
 
 	ci->bi = this;
-	if (ci->c && ci->c->users.size() >= Config.BSMinUsers)
+	if (ci->c && ci->c->users.size() >= Config->BSMinUsers)
 		this->Join(ci->c);
 }
 
@@ -138,7 +138,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 
 void BotInfo::Join(Channel *c)
 {
-	if (Config.BSSmartJoin)
+	if (Config->BSSmartJoin)
 	{
 		/* We check for bans */
 		if (c->bans && c->bans->count)

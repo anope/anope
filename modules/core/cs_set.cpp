@@ -32,12 +32,12 @@ class CommandCSSet : public Command
 	{
 		if (readonly)
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_DISABLED);
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
 		if (!check_access(u, cs_findchan(params[0]), CA_SET))
 		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -52,8 +52,8 @@ class CommandCSSet : public Command
 		}
 		else
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, params[1].c_str());
-			notice_lang(Config.s_ChanServ, u, MORE_INFO, Config.s_ChanServ.c_str(), "SET");
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, params[1].c_str());
+			notice_lang(Config->s_ChanServ, u, MORE_INFO, Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -63,10 +63,10 @@ class CommandCSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_HEAD);
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_TAIL);
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_TAIL);
 			return true;
 		}
 		else
@@ -82,12 +82,12 @@ class CommandCSSet : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET);
 	}
 
 	bool AddSubcommand(Command *c)

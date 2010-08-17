@@ -26,9 +26,9 @@ class CommandHSOn : public Command
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			if (!na->hostinfo.GetIdent().empty())
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				notice_lang(Config->s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+				notice_lang(Config->s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
 				u->vhost = na->hostinfo.GetHost();
@@ -40,20 +40,20 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
+			notice_lang(Config->s_HostServ, u, HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_HostServ, u, HOST_HELP_ON);
+		notice_help(Config->s_HostServ, u, HOST_HELP_ON);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_ON);
+		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_ON);
 	}
 };
 

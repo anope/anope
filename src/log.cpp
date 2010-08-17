@@ -45,11 +45,11 @@ static void remove_log()
 
 	Anope::string name;
 
-	if (!Config.KeepLogs)
+	if (!Config->KeepLogs)
 		return;
 
 	time(&t);
-	t -= (60 * 60 * 24 * Config.KeepLogs);
+	t -= (60 * 60 * 24 * Config->KeepLogs);
 	tm = *localtime(&t);
 
 	/* removed if from here cause get_logchan is always 1 */
@@ -258,7 +258,7 @@ Alog::~Alog()
 		std::cout << tbuf << " " << buf.str() << std::endl;
 	else if (Level == LOG_TERMINAL) // XXX dont use this yet unless you know we're at terminal and not daemonized
 		std::cout << buf.str() << std::endl;
-	if (!Config.LogChannel.empty() && LogChan && !debug && findchan(Config.LogChannel))
-		ircdproto->SendPrivmsg(Global, Config.LogChannel, "%s", buf.str().c_str());
+	if (Config && !Config->LogChannel.empty() && LogChan && !debug && findchan(Config->LogChannel))
+		ircdproto->SendPrivmsg(Global, Config->LogChannel, "%s", buf.str().c_str());
 	errno = errno_save;
 }

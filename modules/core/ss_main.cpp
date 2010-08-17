@@ -42,7 +42,7 @@ class SSMain : public Module
 		if (!statserv)
 		{
 			Alog() << "Creating SS";
-			statserv = new BotInfo("StatServ", Config.ServiceUser, Config.ServiceHost, "Stats Service");
+			statserv = new BotInfo("StatServ", Config->ServiceUser, Config->ServiceHost, "Stats Service");
 		}
 		Alog() << "Done creating SS";
 

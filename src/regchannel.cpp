@@ -39,16 +39,16 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	size_t t;
 	/* Set default channel flags */
 	for (t = CI_BEGIN + 1; t != CI_END; ++t)
-		if (Config.CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
+		if (Config->CSDefFlags.HasFlag(static_cast<ChannelInfoFlag>(t)))
 			this->SetFlag(static_cast<ChannelInfoFlag>(t));
 
 	/* Set default bot flags */
 	for (t = BS_BEGIN + 1; t != BS_END; ++t)
-		if (Config.BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
+		if (Config->BSDefFlags.HasFlag(static_cast<BotServFlag>(t)))
 			this->botflags.SetFlag(static_cast<BotServFlag>(t));
 
-	this->bantype = Config.CSDefBantype;
-	this->memos.memomax = Config.MSMaxMemos;
+	this->bantype = Config->CSDefBantype;
+	this->memos.memomax = Config->MSMaxMemos;
 	this->last_used = this->time_registered = time(NULL);
 
 	this->ttb = new int16[2 * TTB_SIZE];
@@ -586,7 +586,7 @@ bool ChannelInfo::CheckKick(User *user)
 					get_idealban(this, user, mask);
 				else
 					mask = autokick->mask;
-				reason = autokick->reason.empty() ? Config.CSAutokickReason : autokick->reason;
+				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
 				do_kick = true;
 				break;
 			}

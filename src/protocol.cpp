@@ -2,7 +2,7 @@
 
 void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
-	if (Config.NSDefFlags.HasFlag(NI_MSG))
+	if (Config->NSDefFlags.HasFlag(NI_MSG))
 		SendPrivmsgInternal(bi, dest, buf);
 	else
 		SendNoticeInternal(bi, dest, buf);
@@ -39,7 +39,7 @@ void IRCDProto::SendGlobopsInternal(const BotInfo *source, const Anope::string &
 	if (source)
 		send_cmd(ircd->ts6 ? source->GetUID() : source->nick, "GLOBOPS :%s", buf.c_str());
 	else
-		send_cmd(Config.ServerName, "GLOBOPS :%s", buf.c_str());
+		send_cmd(Config->ServerName, "GLOBOPS :%s", buf.c_str());
 }
 
 void IRCDProto::SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
@@ -178,9 +178,9 @@ void IRCDProto::SendQuit(const BotInfo *bi, const char *fmt, ...)
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PING %s", who.c_str());
+		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PING %s", who.c_str());
 	else
-		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PING %s %s", servname.c_str(), who.c_str());
+		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PING %s %s", servname.c_str(), who.c_str());
 }
 
 /**
@@ -192,9 +192,9 @@ void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who
 void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PONG %s", who.c_str());
+		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PONG %s", who.c_str());
 	else
-		send_cmd(ircd->ts6 ? TS6SID : Config.ServerName, "PONG %s %s", servname.c_str(), who.c_str());
+		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PONG %s %s", servname.c_str(), who.c_str());
 }
 
 void IRCDProto::SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick)

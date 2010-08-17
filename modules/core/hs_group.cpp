@@ -27,25 +27,25 @@ class CommandHSGroup : public Command
 		{
 			HostServSyncVhosts(na);
 			if (!na->hostinfo.GetIdent().empty())
-				notice_lang(Config.s_HostServ, u, HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				notice_lang(Config->s_HostServ, u, HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config.s_HostServ, u, HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
+				notice_lang(Config->s_HostServ, u, HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOT_ASSIGNED);
+			notice_lang(Config->s_HostServ, u, HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_HostServ, u, HOST_HELP_GROUP);
+		notice_help(Config->s_HostServ, u, HOST_HELP_GROUP);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_GROUP);
+		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_GROUP);
 	}
 };
 

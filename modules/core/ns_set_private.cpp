@@ -31,12 +31,12 @@ class CommandNSSetPrivate : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_PRIVATE_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_PRIVATE);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_PRIVATE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PRIVATE");
@@ -46,18 +46,18 @@ class CommandNSSetPrivate : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_PRIVATE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_PRIVATE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_CMD_SET_PRIVATE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_CMD_SET_PRIVATE);
 	}
 };
 
@@ -70,18 +70,18 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_PRIVATE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_PRIVATE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_CMD_SASET_PRIVATE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_CMD_SASET_PRIVATE);
 	}
 };
 

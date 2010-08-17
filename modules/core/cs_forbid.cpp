@@ -29,21 +29,21 @@ class CommandCSForbid : public Command
 
 		Channel *c;
 
-		if (Config.ForceForbidReason && reason.empty())
+		if (Config->ForceForbidReason && reason.empty())
 		{
-			syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
+			syntax_error(Config->s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
 			return MOD_CONT;
 		}
 
 		if (chan[0] != '#')
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+			notice_lang(Config->s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			notice_lang(Config.s_ChanServ, u, READ_ONLY_MODE);
+			notice_lang(Config->s_ChanServ, u, READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
@@ -53,8 +53,8 @@ class CommandCSForbid : public Command
 		ci = new ChannelInfo(chan);
 		if (!ci)
 		{
-			Alog() << Config.s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
-			notice_lang(Config.s_ChanServ, u, CHAN_FORBID_FAILED, chan.c_str());
+			Alog() << Config->s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
+			notice_lang(Config->s_ChanServ, u, CHAN_FORBID_FAILED, chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -80,7 +80,7 @@ class CommandCSForbid : public Command
 			}
 		}
 
-		if (Config.WallForbid)
+		if (Config->WallForbid)
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		if (ircd->chansqline)
@@ -89,8 +89,8 @@ class CommandCSForbid : public Command
 			ircdproto->SendSQLine(&x);
 		}
 
-		Alog() << Config.s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;
-		notice_lang(Config.s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan.c_str());
+		Alog() << Config->s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;
+		notice_lang(Config->s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
@@ -99,18 +99,18 @@ class CommandCSForbid : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
+		notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_FORBID);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_FORBID);
 	}
 };
 

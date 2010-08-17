@@ -24,7 +24,7 @@ class CommandOSGlobal : public Command
 	{
 		Anope::string msg = params[0];
 
-		if (Config.WallOSGlobal)
+		if (Config->WallOSGlobal)
 			ircdproto->SendGlobops(OperServ, "\2%s\2 just used GLOBAL command.", u->nick.c_str());
 		oper_global(u->nick, "%s", msg.c_str());
 		return MOD_CONT;
@@ -32,18 +32,18 @@ class CommandOSGlobal : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_GLOBAL, Config.s_GlobalNoticer.c_str());
+		notice_help(Config->s_OperServ, u, OPER_HELP_GLOBAL, Config->s_GlobalNoticer.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_GLOBAL);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_GLOBAL);
 	}
 };
 

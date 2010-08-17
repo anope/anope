@@ -28,7 +28,7 @@ XLineManager *SGLine, *SZLine, *SQLine, *SNLine;
 
 void os_init()
 {
-	ModuleManager::LoadModuleList(Config.OperServCoreModules);
+	ModuleManager::LoadModuleList(Config->OperServCoreModules);
 
 	/* Yes, these are in this order for a reason. Most violent->least violent. */
 	XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
@@ -71,8 +71,8 @@ void UnsetDefConParam(ChannelModeName Name)
  */
 bool CheckDefCon(DefconLevel Level)
 {
-	if (Config.DefConLevel)
-		return DefCon[Config.DefConLevel][Level];
+	if (Config->DefConLevel)
+		return DefCon[Config->DefConLevel][Level];
 	return false;
 }
 
@@ -108,7 +108,7 @@ void server_global(const Server *s, const Anope::string &message)
 {
 	/* Do not send the notice to ourselves our juped servers */
 	if (s != Me && !s->HasFlag(SERVER_JUPED))
-		notice_server(Config.s_GlobalNoticer, s, "%s", message.c_str());
+		notice_server(Config->s_GlobalNoticer, s, "%s", message.c_str());
 
 	if (!s->GetLinks().empty())
 	{
@@ -126,7 +126,7 @@ void oper_global(const Anope::string &nick, const char *fmt, ...)
 	vsnprintf(msg, sizeof(msg), fmt, args);
 	va_end(args);
 
-	if (!nick.empty() && !Config.AnonymousGlobal)
+	if (!nick.empty() && !Config->AnonymousGlobal)
 	{
 		Anope::string rmsg = "[" + nick + "] " + msg;
 		server_global(Me->GetLinks().front(), rmsg);
@@ -490,7 +490,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	}
 
 	Anope::string realreason = reason;
-	if (u && Config.AddAkiller)
+	if (u && Config->AddAkiller)
 		realreason = "[" + u->nick + "]" + reason;
 
 	XLine *x = new XLine(mask, u ? u->nick : "", expires, realreason);
@@ -505,7 +505,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 
 	this->AddXLine(x);
 
-	if (Config.AkillOnAdd)
+	if (Config->AkillOnAdd)
 		ircdproto->SendAkill(x);
 
 	return x;
@@ -523,7 +523,7 @@ void SGLineManager::OnMatch(User *u, XLine *x)
 
 void SGLineManager::OnExpire(XLine *x)
 {
-	if (Config.WallAkillExpire)
+	if (Config->WallAkillExpire)
 		ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
 }
 
@@ -564,7 +564,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 
 	this->AddXLine(x);
 
-	if (Config.KillonSNline && !ircd->sglineenforce)
+	if (Config->KillonSNline && !ircd->sglineenforce)
 	{
 		Anope::string rreason = "G-Lined: " + reason;
 
@@ -574,7 +574,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 			++it;
 
 			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
-				kill_user(Config.ServerName, user->nick, rreason);
+				kill_user(Config->ServerName, user->nick, rreason);
 		}
 	}
 
@@ -591,12 +591,12 @@ void SNLineManager::OnMatch(User *u, XLine *x)
 	ircdproto->SendSGLine(x);
 
 	Anope::string reason = "G-Lined: " + x->Reason;
-	kill_user(Config.s_OperServ, u->nick, reason);
+	kill_user(Config->s_OperServ, u->nick, reason);
 }
 
 void SNLineManager::OnExpire(XLine *x)
 {
-	if (Config.WallSNLineExpire)
+	if (Config->WallSNLineExpire)
 		ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
@@ -605,14 +605,14 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find_first_not_of("*") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			notice_lang(Config->s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
 	if (mask[0] == '#' && !ircd->chansqline)
 	{
 		if (bi && u)
-			notice_lang(Config.s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
+			notice_lang(Config->s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
 		return NULL;
 	}
 
@@ -644,7 +644,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 
 	this->AddXLine(x);
 
-	if (Config.KillonSQline)
+	if (Config->KillonSQline)
 	{
 		Anope::string rreason = "Q-Lined: " + reason;
 
@@ -675,7 +675,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				++it;
 
 				if (!is_oper(user) && Anope::Match(user->nick, x->Mask))
-					kill_user(Config.ServerName, user->nick, rreason);
+					kill_user(Config->ServerName, user->nick, rreason);
 			}
 		}
 	}
@@ -695,12 +695,12 @@ void SQLineManager::OnMatch(User *u, XLine *x)
 	ircdproto->SendSQLine(x);
 
 	Anope::string reason = "Q-Lined: " + x->Reason;
-	kill_user(Config.s_OperServ, u->nick, reason);
+	kill_user(Config->s_OperServ, u->nick, reason);
 }
 
 void SQLineManager::OnExpire(XLine *x)
 {
-	if (Config.WallSQLineExpire)
+	if (Config->WallSQLineExpire)
 		ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
@@ -724,13 +724,13 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 {
 	if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_ONLY_IPS);
+		notice_lang(Config->s_OperServ, u, OPER_SZLINE_ONLY_IPS);
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("*?") == Anope::string::npos)
 	{
-		notice_lang(Config.s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		notice_lang(Config->s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -779,6 +779,6 @@ void SZLineManager::OnMatch(User *u, XLine *x)
 
 void SZLineManager::OnExpire(XLine *x)
 {
-	if (Config.WallSZLineExpire)
+	if (Config->WallSZLineExpire)
 		ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
 }

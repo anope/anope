@@ -26,11 +26,11 @@ class SNLineDelCallback : public NumberList
 	~SNLineDelCallback()
 	{
 		if (!Deleted)
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_NO_MATCH);
 		else if (Deleted == 1)
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_DELETED_ONE);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_DELETED_ONE);
 		else
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_DELETED_SEVERAL, Deleted);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -63,7 +63,7 @@ class SNLineListCallback : public NumberList
 	~SNLineListCallback()
 	{
 		if (!SentHeader)
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_NO_MATCH);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -76,7 +76,7 @@ class SNLineListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_HEADER);
 		}
 
 		DoList(u, x, Number - 1);
@@ -84,7 +84,7 @@ class SNLineListCallback : public NumberList
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -105,7 +105,7 @@ class SNLineViewCallback : public SNLineListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_VIEW_HEADER);
 		}
 
 		DoList(u, x, Number - 1);
@@ -119,7 +119,7 @@ class SNLineViewCallback : public SNLineListCallback
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_SNLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -140,7 +140,7 @@ class CommandOSSNLine : public Command
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config.SNLineExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config->SNLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -149,7 +149,7 @@ class CommandOSSNLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config->s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -190,9 +190,9 @@ class CommandOSSNLine : public Command
 			if (!x)
 				return MOD_CONT;
 
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_ADDED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_ADDED, mask.c_str());
 
-			if (Config.WallOSSNLine)
+			if (Config->WallOSSNLine)
 			{
 				Anope::string buf;
 
@@ -222,11 +222,11 @@ class CommandOSSNLine : public Command
 					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(findbot(Config.s_OperServ), "%s added an SNLINE for %s (%s)", u->nick.c_str(), mask.c_str(), buf.c_str());
+				ircdproto->SendGlobops(findbot(Config->s_OperServ), "%s added an SNLINE for %s (%s)", u->nick.c_str(), mask.c_str(), buf.c_str());
 			}
 
 			if (readonly)
-				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 
 		}
 		else
@@ -239,7 +239,7 @@ class CommandOSSNLine : public Command
 	{
 		if (SNLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -262,18 +262,18 @@ class CommandOSSNLine : public Command
 
 			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_SNLINE_NOT_FOUND, mask.c_str());
+				notice_lang(Config->s_OperServ, u, OPER_SNLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SNLINE));
 
 			SNLineDelCallback::DoDel(u, x);
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_DELETED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -282,7 +282,7 @@ class CommandOSSNLine : public Command
 	{
 		if (SNLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -306,7 +306,7 @@ class CommandOSSNLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_HEADER);
 					}
 
 					SNLineListCallback::DoList(u, x, i);
@@ -314,9 +314,9 @@ class CommandOSSNLine : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_SNLINE_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_SNLINE_NO_MATCH);
 			else
-				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "SNLine");
+				notice_lang(Config->s_OperServ, u, END_OF_ANY_LIST, "SNLine");
 		}
 
 		return MOD_CONT;
@@ -326,7 +326,7 @@ class CommandOSSNLine : public Command
 	{
 		if (SNLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -350,7 +350,7 @@ class CommandOSSNLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_SNLINE_VIEW_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_SNLINE_VIEW_HEADER);
 					}
 
 					SNLineViewCallback::DoList(u, x, i);
@@ -358,7 +358,7 @@ class CommandOSSNLine : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_SNLINE_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_SNLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -368,7 +368,7 @@ class CommandOSSNLine : public Command
 	{
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SNLINE));
 		SNLine->Clear();
-		notice_lang(Config.s_OperServ, u, OPER_SNLINE_CLEAR);
+		notice_lang(Config->s_OperServ, u, OPER_SNLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -398,18 +398,18 @@ class CommandOSSNLine : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_SNLINE);
+		notice_help(Config->s_OperServ, u, OPER_HELP_SNLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "SNLINE", OPER_SNLINE_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "SNLINE", OPER_SNLINE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SNLINE);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SNLINE);
 	}
 };
 

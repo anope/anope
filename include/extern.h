@@ -94,7 +94,12 @@ E Entry *elist_match_user(EList *list, User *u);
 E Entry *elist_find_mask(EList *list, const Anope::string &mask);
 E long get_memuse(EList *list);
 
-#define whosends(ci) (!(ci) || !((ci)->botflags.HasFlag(BS_SYMBIOSIS)) || !(ci)->bi || !(ci)->c || (ci)->c->FindUser((ci)->bi) ? findbot(Config.s_ChanServ) : (ci)->bi)
+inline BotInfo *whosends(ChannelInfo *ci)
+{
+	if (!ci || !ci->bi || !ci->c || !ci->botflags.HasFlag(BS_SYMBIOSIS) || !ci->c->FindUser(ci->bi))
+		return ChanServ;
+	return ci->bi;
+}
 
 /**** chanserv.c ****/
 
@@ -130,8 +135,7 @@ E Anope::string get_mlock_modes(ChannelInfo *ci, int complete);
 /**** config.c ****/
 
 E Anope::string services_conf;
-E ServerConfig Config;
-E int read_config(int reload);
+E ServerConfig *Config;
 
 /* hostserv.c */
 E void do_on_id(User *u);
@@ -297,7 +301,7 @@ E Flags<ChannelModeName> DefMLockOff;
 E std::map<ChannelModeName, Anope::string> DefMLockParams;
 /* Modes to set on bots when they join the channel */
 E std::list<ChannelModeStatus *> BotModes;
-E void SetDefaultMLock();
+E void SetDefaultMLock(ServerConfig *config);
 
 /**** nickserv.c ****/
 

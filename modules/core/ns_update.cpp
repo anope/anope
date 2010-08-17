@@ -34,19 +34,19 @@ class CommandNSUpdate : public Command
 		na->last_seen = time(NULL);
 		if (ircd->vhost)
 			do_on_id(u);
-		notice_lang(Config.s_NickServ, u, NICK_UPDATE_SUCCESS, Config.s_NickServ.c_str());
+		notice_lang(Config->s_NickServ, u, NICK_UPDATE_SUCCESS, Config->s_NickServ.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_UPDATE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_UPDATE);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_UPDATE);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_UPDATE);
 	}
 };
 

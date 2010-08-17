@@ -25,11 +25,11 @@ class SZLineDelCallback : public NumberList
 	~SZLineDelCallback()
 	{
 		if (!Deleted)
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		else if (Deleted == 1)
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_ONE);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_DELETED_ONE);
 		else
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, Deleted);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -62,7 +62,7 @@ class SZLineListCallback : public NumberList
 	~SZLineListCallback()
 	{
 		if (!SentHeader)
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_NO_MATCH);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -75,7 +75,7 @@ class SZLineListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_HEADER);
 		}
 
 		DoList(u, x, Number - 1);
@@ -83,7 +83,7 @@ class SZLineListCallback : public NumberList
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -104,7 +104,7 @@ class SZLineViewCallback : public SZLineListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
 		}
 
 		DoList(u, x, Number - 1);
@@ -118,7 +118,7 @@ class SZLineViewCallback : public SZLineListCallback
 		tm = *localtime(&x->Created);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_SZLINE_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -139,7 +139,7 @@ class CommandOSSZLine : public Command
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config.SZLineExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config->SZLineExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -148,7 +148,7 @@ class CommandOSSZLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config->s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -170,9 +170,9 @@ class CommandOSSZLine : public Command
 			if (!x)
 				return MOD_CONT;
 
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_ADDED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_ADDED, mask.c_str());
 
-			if (Config.WallOSSZLine)
+			if (Config->WallOSSZLine)
 			{
 				Anope::string buf;
 
@@ -206,7 +206,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (readonly)
-				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 
 		}
 		else
@@ -219,7 +219,7 @@ class CommandOSSZLine : public Command
 	{
 		if (SZLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -242,18 +242,18 @@ class CommandOSSZLine : public Command
 
 			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask.c_str());
+				notice_lang(Config->s_OperServ, u, OPER_SZLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SZLINE));
 
 			SZLineDelCallback::DoDel(u, x);
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_DELETED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -262,7 +262,7 @@ class CommandOSSZLine : public Command
 	{
 		if (SZLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -286,7 +286,7 @@ class CommandOSSZLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_HEADER);
 					}
 
 					SZLineListCallback::DoList(u, x, i);
@@ -294,7 +294,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -304,7 +304,7 @@ class CommandOSSZLine : public Command
 	{
 		if (SZLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -328,7 +328,7 @@ class CommandOSSZLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_SZLINE_VIEW_HEADER);
 					}
 
 					SZLineViewCallback::DoList(u, x, i);
@@ -336,7 +336,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_SZLINE_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -346,7 +346,7 @@ class CommandOSSZLine : public Command
 	{
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SZLINE));
 		SZLine->Clear();
-		notice_lang(Config.s_OperServ, u, OPER_SZLINE_CLEAR);
+		notice_lang(Config->s_OperServ, u, OPER_SZLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -376,18 +376,18 @@ class CommandOSSZLine : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_SZLINE);
+		notice_help(Config->s_OperServ, u, OPER_HELP_SZLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SZLINE);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SZLINE);
 	}
 };
 

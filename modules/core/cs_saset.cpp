@@ -32,7 +32,7 @@ class CommandCSSASet : public Command
 	{
 		if (readonly)
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_DISABLED);
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -47,8 +47,8 @@ class CommandCSSASet : public Command
 		}
 		else
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, params[1].c_str());
-			notice_lang(Config.s_ChanServ, u, MORE_INFO, Config.s_ChanServ.c_str(), "SET");
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_UNKNOWN_OPTION, params[1].c_str());
+			notice_lang(Config->s_ChanServ, u, MORE_INFO, Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -58,10 +58,10 @@ class CommandCSSASet : public Command
 	{
 		if (subcommand.empty())
 		{
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_HEAD);
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_SASET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_SASET_TAIL);
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_SASET_TAIL);
 			return true;
 		}
 		else
@@ -77,12 +77,12 @@ class CommandCSSASet : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SASET);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SASET);
 	}
 
 	bool AddSubcommand(Command *c)

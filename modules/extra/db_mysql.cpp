@@ -298,13 +298,13 @@ class CommandSQLSync : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_SYNC);
+		notice_help(Config->s_OperServ, u, OPER_HELP_SYNC);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
 	}
 };
 
@@ -347,7 +347,7 @@ class DBMySQL : public Module
 		{
 			time_t now = time(NULL);
 
-			if (now - Config.UpdateTimeout > lastwarn)
+			if (now - Config->UpdateTimeout > lastwarn)
 			{
 				ircdproto->SendGlobops(OperServ, "Unable to locate SQL reference, is m_mysql loaded? Going to readonly...");
 				readonly = this->ro = true;
@@ -935,7 +935,7 @@ class DBMySQL : public Module
 
 	void OnPostCommand(User *u, const Anope::string &service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == Config.s_NickServ)
+		if (service == Config->s_NickServ)
 		{
 			if (u->Account() && ((command.equals_ci("SET") && !params.empty()) || (command.equals_ci("SASET") && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
@@ -965,7 +965,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == Config.s_ChanServ)
+		else if (service == Config->s_ChanServ)
 		{
 			if (command.equals_ci("SET") && u->Account() && params.size() > 1)
 			{
@@ -1006,7 +1006,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == Config.s_BotServ)
+		else if (service == Config->s_BotServ)
 		{
 			if (command.equals_ci("KICK") && params.size() > 2)
 			{
@@ -1542,7 +1542,7 @@ static void SaveDatabases()
 CommandReturn CommandSQLSync::Execute(User *u, const std::vector<Anope::string> &params)
 {
 	SaveDatabases();
-	notice_lang(Config.s_OperServ, u, OPER_SYNC_UPDATED);
+	notice_lang(Config->s_OperServ, u, OPER_SYNC_UPDATED);
 	return MOD_CONT;
 }
 

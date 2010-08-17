@@ -25,11 +25,11 @@ class AkillDelCallback : public NumberList
 	~AkillDelCallback()
 	{
 		if (!Deleted)
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_NO_MATCH);
 		else if (Deleted == 1)
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_ONE);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_DELETED_ONE);
 		else
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, Deleted);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -62,9 +62,9 @@ class AkillListCallback : public NumberList
 	~AkillListCallback()
 	{
 		if (!SentHeader)
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_NO_MATCH);
 		else
-			notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
+			notice_lang(Config->s_OperServ, u, END_OF_ANY_LIST, "Akill");
 	}
 
 	void HandleNumber(unsigned Number)
@@ -77,7 +77,7 @@ class AkillListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_HEADER);
 		}
 
 		DoList(u, x, Number);
@@ -85,7 +85,7 @@ class AkillListCallback : public NumberList
 
 	static void DoList(User *u, XLine *x, unsigned Number)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -106,7 +106,7 @@ class AkillViewCallback : public AkillListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_VIEW_HEADER);
 		}
 
 		DoList(u, x, Number);
@@ -121,7 +121,7 @@ class AkillViewCallback : public AkillListCallback
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
 		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
 
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_AKILL_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), timebuf, expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -142,7 +142,7 @@ class CommandOSAKill : public Command
 			last_param = 3;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config.AutokillExpiry;
+		expires = !expiry.empty() ? dotime(expiry) : Config->AutokillExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -151,7 +151,7 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			notice_lang(Config.s_OperServ, u, BAD_EXPIRY_TIME);
+			notice_lang(Config->s_OperServ, u, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -173,9 +173,9 @@ class CommandOSAKill : public Command
 			if (!x)
 				return MOD_CONT;
 
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_ADDED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_ADDED, mask.c_str());
 
-			if (Config.WallOSAkill)
+			if (Config->WallOSAkill)
 			{
 				Anope::string buf;
 
@@ -209,7 +209,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (readonly)
-				notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "ADD");
@@ -229,7 +229,7 @@ class CommandOSAKill : public Command
 
 		if (SGLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -244,18 +244,18 @@ class CommandOSAKill : public Command
 
 			if (!x)
 			{
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NOT_FOUND, mask.c_str());
+				notice_lang(Config->s_OperServ, u, OPER_AKILL_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, x));
 
 			AkillDelCallback::DoDel(u, x);
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_DELETED, mask.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			notice_lang(Config.s_OperServ, u, READ_ONLY_MODE);
+			notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -264,7 +264,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -288,7 +288,7 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_HEADER);
 					}
 
 					AkillListCallback::DoList(u, x, i);
@@ -296,9 +296,9 @@ class CommandOSAKill : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_AKILL_NO_MATCH);
 			else
-				notice_lang(Config.s_OperServ, u, END_OF_ANY_LIST, "Akill");
+				notice_lang(Config->s_OperServ, u, END_OF_ANY_LIST, "Akill");
 		}
 
 		return MOD_CONT;
@@ -308,7 +308,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_AKILL_LIST_EMPTY);
+			notice_lang(Config->s_OperServ, u, OPER_AKILL_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -332,7 +332,7 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config.s_OperServ, u, OPER_AKILL_VIEW_HEADER);
+						notice_lang(Config->s_OperServ, u, OPER_AKILL_VIEW_HEADER);
 					}
 
 					AkillViewCallback::DoList(u, x, i);
@@ -340,7 +340,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (!SentHeader)
-				notice_lang(Config.s_OperServ, u, OPER_AKILL_NO_MATCH);
+				notice_lang(Config->s_OperServ, u, OPER_AKILL_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -350,7 +350,7 @@ class CommandOSAKill : public Command
 	{
 		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
 		SGLine->Clear();
-		notice_lang(Config.s_OperServ, u, OPER_AKILL_CLEAR);
+		notice_lang(Config->s_OperServ, u, OPER_AKILL_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -380,18 +380,18 @@ class CommandOSAKill : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_AKILL);
+		notice_help(Config->s_OperServ, u, OPER_HELP_AKILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_AKILL);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_AKILL);
 	}
 };
 

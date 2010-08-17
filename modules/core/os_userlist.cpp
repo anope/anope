@@ -32,7 +32,7 @@ class CommandOSUserList : public Command
 
 		if (!pattern.empty() && (c = findchan(pattern)))
 		{
-			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern.c_str());
 
 			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
@@ -43,12 +43,12 @@ class CommandOSUserList : public Command
 						if (!uc->user->HasMode(*it))
 							continue;
 
-				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
+				notice_lang(Config->s_OperServ, u, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
 		}
 		else
 		{
-			notice_lang(Config.s_OperServ, u, OPER_USERLIST_HEADER);
+			notice_lang(Config->s_OperServ, u, OPER_USERLIST_HEADER);
 
 			for (user_map::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
 			{
@@ -64,23 +64,23 @@ class CommandOSUserList : public Command
 							if (!u2->HasMode(*it))
 								continue;
 				}
-				notice_lang(Config.s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+				notice_lang(Config->s_OperServ, u, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 			}
 		}
 
-		notice_lang(Config.s_OperServ, u, OPER_USERLIST_END);
+		notice_lang(Config->s_OperServ, u, OPER_USERLIST_END);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_USERLIST);
+		notice_help(Config->s_OperServ, u, OPER_HELP_USERLIST);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_USERLIST);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_USERLIST);
 	}
 };
 

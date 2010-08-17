@@ -29,26 +29,26 @@ class CommandMSRSend : public Command
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(nick)) && na->nc == u->Account())
 		{
-			notice_lang(Config.s_MemoServ, u, MEMO_NO_RSEND_SELF);
+			notice_lang(Config->s_MemoServ, u, MEMO_NO_RSEND_SELF);
 			return MOD_CONT;
 		}
 
-		if (Config.MSMemoReceipt == 1)
+		if (Config->MSMemoReceipt == 1)
 		{
 			/* Services opers and above can use rsend */
 			if (u->Account()->IsServicesOper())
 				memo_send(u, nick, text, 3);
 			else
-				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config->s_MemoServ, u, ACCESS_DENIED);
 		}
-		else if (Config.MSMemoReceipt == 2)
+		else if (Config->MSMemoReceipt == 2)
 			/* Everybody can use rsend */
 			memo_send(u, nick, text, 3);
 		else
 		{
 			/* rsend has been disabled */
-			Alog(LOG_DEBUG) << "MSMemoReceipt is set misconfigured to " << Config.MSMemoReceipt;
-			notice_lang(Config.s_MemoServ, u, MEMO_RSEND_DISABLED);
+			Alog(LOG_DEBUG) << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
+			notice_lang(Config->s_MemoServ, u, MEMO_RSEND_DISABLED);
 		}
 
 		return MOD_CONT;
@@ -56,18 +56,18 @@ class CommandMSRSend : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_RSEND);
+		notice_help(Config->s_MemoServ, u, MEMO_HELP_RSEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+		syntax_error(Config->s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_RSEND);
+		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_RSEND);
 	}
 };
 
@@ -78,7 +78,7 @@ class MSRSend : public Module
  public:
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		if (!Config.MSMemoReceipt)
+		if (!Config->MSMemoReceipt)
 			throw ModuleException("Don't like memo reciepts, or something.");
 
 		this->SetAuthor("Anope");

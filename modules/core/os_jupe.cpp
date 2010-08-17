@@ -27,9 +27,9 @@ class CommandOSJupe : public Command
 		Server *server = Server::Find(jserver);
 
 		if (!isValidHost(jserver, 3))
-			notice_lang(Config.s_OperServ, u, OPER_JUPE_HOST_ERROR);
+			notice_lang(Config->s_OperServ, u, OPER_JUPE_HOST_ERROR);
 		else if (server && (server == Me || server == Me->GetLinks().front()))
-			notice_lang(Config.s_OperServ, u, OPER_JUPE_INVALID_SERVER);
+			notice_lang(Config->s_OperServ, u, OPER_JUPE_INVALID_SERVER);
 		else
 		{
 			Anope::string rbuf = "Juped by " + u->nick + (!reason.empty() ? ": " + reason : "");
@@ -39,7 +39,7 @@ class CommandOSJupe : public Command
 			juped_server->SetFlag(SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
-			if (Config.WallOSJupe)
+			if (Config->WallOSJupe)
 				ircdproto->SendGlobops(OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver.c_str());
 		}
 		return MOD_CONT;
@@ -47,18 +47,18 @@ class CommandOSJupe : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_JUPE);
+		notice_help(Config->s_OperServ, u, OPER_HELP_JUPE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_JUPE);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_JUPE);
 	}
 };
 

@@ -192,7 +192,7 @@ class InspIRCdProto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(const XLine *x)
 	{
-		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config.s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -219,7 +219,7 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd(TS6SID, "BURST");
-		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config.ServerName.c_str(), ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
+		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
 	}
 
 	/* CHGIDENT */
@@ -234,7 +234,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(OperServ->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config.NSReleaseTimeout));
+		send_cmd(OperServ->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
@@ -1259,8 +1259,8 @@ class ProtoInspIRCd : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		if (!Config.Numeric.empty())
-			TS6SID = Config.Numeric;
+		if (!Config->Numeric.empty())
+			TS6SID = Config->Numeric;
 
 		pmodule_ircd_version("InspIRCd 2.0");
 		pmodule_ircd_var(myIrcd);

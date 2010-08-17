@@ -29,12 +29,12 @@ class CommandCSSASetNoexpire : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_NO_EXPIRE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_NOEXPIRE_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_NO_EXPIRE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "NOEXPIRE");
@@ -44,18 +44,18 @@ class CommandCSSASetNoexpire : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+		notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_NOEXPIRE);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_NOEXPIRE);
 	}
 };
 

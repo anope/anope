@@ -28,9 +28,9 @@ class CommandNSHelp : public Command
 		if (cmd.equals_ci("SET LANGUAGE"))
 		{
 			int i;
-			notice_help(Config.s_NickServ, u, NICK_HELP_SET_LANGUAGE);
+			notice_help(Config->s_NickServ, u, NICK_HELP_SET_LANGUAGE);
 			for (i = 0; i < NUM_LANGS && langlist[i] >= 0; ++i)
-				u->SendMessage(Config.s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
+				u->SendMessage(Config->s_NickServ, "    %2d) %s", i + 1, langnames[langlist[i]]);
 		}
 		else
 			mod_help_cmd(NickServ, u, cmd);
@@ -40,15 +40,15 @@ class CommandNSHelp : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP);
+		notice_help(Config->s_NickServ, u, NICK_HELP);
 		for (CommandMap::const_iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; ++it)
-			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(u);
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP);
-		if (Config.NSExpire >= 86400)
-			notice_help(Config.s_NickServ, u, NICK_HELP_EXPIRES, Config.NSExpire / 86400);
-		notice_help(Config.s_NickServ, u, NICK_HELP_FOOTER);
+			notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP);
+		if (Config->NSExpire >= 86400)
+			notice_help(Config->s_NickServ, u, NICK_HELP_EXPIRES, Config->NSExpire / 86400);
+		notice_help(Config->s_NickServ, u, NICK_HELP_FOOTER);
 	}
 };
 

@@ -44,7 +44,7 @@ class CommandCSSetPersist : public Command
 
 				/* No botserv bot, no channel mode */
 				/* Give them ChanServ
-				 * Yes, this works fine with no Config.s_BotServ
+				 * Yes, this works fine with no Config->s_BotServ
 				 */
 				if (!ci->bi && !cm)
 				{
@@ -58,7 +58,7 @@ class CommandCSSetPersist : public Command
 					ci->c->SetMode(NULL, cm);
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -73,12 +73,12 @@ class CommandCSSetPersist : public Command
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				if (!cm && Config.s_BotServ.empty() && ci->bi)
+				if (!cm && Config->s_BotServ.empty() && ci->bi)
 					/* Unassign bot */
 					ChanServ->UnAssign(NULL, ci);
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PERSIST");
@@ -88,18 +88,18 @@ class CommandCSSetPersist : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_PERSIST);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_PERSIST);
 	}
 };
 
@@ -112,13 +112,13 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SASET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
 	}
 };
 

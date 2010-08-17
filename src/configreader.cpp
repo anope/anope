@@ -1,4 +1,16 @@
-/*       +------------------------------------+
+/* Configuration file handling.
+ *
+ * (C) 2003-2010 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+/* Taken from:
+ *       +------------------------------------+
  *       | Inspire Internet Relay Chat Daemon |
  *       +------------------------------------+
  *
@@ -13,21 +25,16 @@
 
 #include "services.h"
 
-ConfigReader::ConfigReader() : data(&Config.config_data), errorlog(new std::ostringstream(std::stringstream::in | std::stringstream::out)), privatehash(false), error(CONF_NO_ERROR)
+ConfigReader::ConfigReader() : error(CONF_NO_ERROR)
+{
+}
+
+ConfigReader::ConfigReader(const Anope::string &filename) : error(CONF_NO_ERROR)
 {
 }
 
 ConfigReader::~ConfigReader()
 {
-	if (this->errorlog)
-		delete this->errorlog;
-	if (this->privatehash)
-		delete this->data;
-}
-
-ConfigReader::ConfigReader(const Anope::string &filename) : data(new ConfigDataHash), errorlog(new std::ostringstream(std::stringstream::in | std::stringstream::out)), privatehash(true), error(CONF_NO_ERROR)
-{
-	Config.ClearStack();
 }
 
 Anope::string ConfigReader::ReadValue(const Anope::string &tag, const Anope::string &name, const Anope::string &default_value, int index, bool allow_linefeeds)
@@ -35,7 +42,7 @@ Anope::string ConfigReader::ReadValue(const Anope::string &tag, const Anope::str
 	/* Don't need to strlcpy() tag and name anymore, ReadConf() takes const char* */
 	Anope::string result;
 
-	if (!Config.ConfValue(*this->data, tag, name, default_value, index, result, allow_linefeeds))
+	if (!Config->ConfValue(Config->config_data, tag, name, default_value, index, result, allow_linefeeds))
 		this->error = CONF_VALUE_NOT_FOUND;
 
 	return result;
@@ -48,7 +55,7 @@ Anope::string ConfigReader::ReadValue(const Anope::string &tag, const Anope::str
 
 bool ConfigReader::ReadFlag(const Anope::string &tag, const Anope::string &name, const Anope::string &default_value, int index)
 {
-	return Config.ConfValueBool(*this->data, tag, name, default_value, index);
+	return Config->ConfValueBool(Config->config_data, tag, name, default_value, index);
 }
 
 bool ConfigReader::ReadFlag(const Anope::string &tag, const Anope::string &name, int index)
@@ -60,7 +67,7 @@ int ConfigReader::ReadInteger(const Anope::string &tag, const Anope::string &nam
 {
 	int result;
 
-	if (!Config.ConfValueInteger(*this->data, tag, name, default_value, index, result))
+	if (!Config->ConfValueInteger(Config->config_data, tag, name, default_value, index, result))
 	{
 		this->error = CONF_VALUE_NOT_FOUND;
 		return 0;
@@ -87,19 +94,14 @@ long ConfigReader::GetError()
 	return olderr;
 }
 
-void ConfigReader::DumpErrors(bool bail)
-{
-	Config.ReportConfigError(this->errorlog->str(), bail);
-}
-
 int ConfigReader::Enumerate(const Anope::string &tag) const
 {
-	return Config.ConfValueEnum(*this->data, tag);
+	return Config->ConfValueEnum(Config->config_data, tag);
 }
 
 int ConfigReader::EnumerateValues(const Anope::string &tag, int index)
 {
-	return Config.ConfVarEnum(*this->data, tag, index);
+	return Config->ConfVarEnum(Config->config_data, tag, index);
 }
 
 bool ConfigReader::Verify()

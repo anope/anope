@@ -29,22 +29,22 @@ class CommandNSLogout : public Command
 		if (!u->Account()->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(u, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
-			notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick.c_str());
 		else
 		{
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
 				validate_user(u2);
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
-			Alog() << Config.s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;
+			Alog() << Config->s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
 			if (!nick.empty())
-				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
+				notice_lang(Config->s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
 			else
-				notice_lang(Config.s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
+				notice_lang(Config->s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
 			u2->RemoveMode(NickServ, UMODE_REGISTERED);
@@ -61,21 +61,21 @@ class CommandNSLogout : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
+			notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_LOGOUT);
 		else
-			notice_help(Config.s_NickServ, u, NICK_HELP_LOGOUT);
+			notice_help(Config->s_NickServ, u, NICK_HELP_LOGOUT);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_LOGOUT);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_LOGOUT);
 	}
 };
 

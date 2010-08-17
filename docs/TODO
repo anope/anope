@@ -20,7 +20,7 @@ Legend:
   [ ] Modules should also have a way to add strings programatically
   [ ] Should be able to add many strings by dropping a file in a set location.
 [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
-[ ] Config bailing on /os reload needs to be non fatal
+[x] Config bailing on /os reload needs to be non fatal
 [ ] AutoID needs to be able to live through /os restart, current system is just annoying.
 [ ] SQL tables need to changed to have references etc
 [ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?

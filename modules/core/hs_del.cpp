@@ -28,33 +28,33 @@ class CommandHSDel : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config.s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
+				notice_lang(Config->s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			Alog() << "vHost for user \2" << nick << "\2 deleted by oper \2" << u->nick << "\2";
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();
-			notice_lang(Config.s_HostServ, u, HOST_DEL, nick.c_str());
+			notice_lang(Config->s_HostServ, u, HOST_DEL, nick.c_str());
 		}
 		else
-			notice_lang(Config.s_HostServ, u, HOST_NOREG, nick.c_str());
+			notice_lang(Config->s_HostServ, u, HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_HostServ, u, HOST_HELP_DEL);
+		notice_help(Config->s_HostServ, u, HOST_HELP_DEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
+		syntax_error(Config->s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_HostServ, u, HOST_HELP_CMD_DEL);
+		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_DEL);
 	}
 };
 

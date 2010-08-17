@@ -22,26 +22,31 @@ class CommandOSReload : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		if (!read_config(1))
+		try
 		{
-			quitmsg = "Error during the reload of the configuration file!";
-			quitting = true;
+			ServerConfig *newconfig = new ServerConfig();
+			delete Config;
+			Config = newconfig;
+			FOREACH_MOD(I_OnReload, OnReload(false));
+		}
+		catch (const ConfigException &ex)
+		{
+			Alog() << "Error reloading configuration file: " << ex.GetReason();
 		}
 
-		FOREACH_MOD(I_OnReload, OnReload(false));
-		notice_lang(Config.s_OperServ, u, OPER_RELOAD);
+		notice_lang(Config->s_OperServ, u, OPER_RELOAD);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_RELOAD);
+		notice_help(Config->s_OperServ, u, OPER_HELP_RELOAD);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RELOAD);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_RELOAD);
 	}
 };
 

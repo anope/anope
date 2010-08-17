@@ -46,19 +46,19 @@ int protocol_module_init()
 {
 	int ret = 0;
 
-	Alog() << "Loading IRCD Protocol Module: [" << Config.IRCDModule << "]";
-	ret = ModuleManager::LoadModule(Config.IRCDModule, NULL);
+	Alog() << "Loading IRCD Protocol Module: [" << Config->IRCDModule << "]";
+	ret = ModuleManager::LoadModule(Config->IRCDModule, NULL);
 
 	if (ret == MOD_ERR_OK)
 	{
-		FindModule(Config.IRCDModule)->SetType(PROTOCOL);
+		FindModule(Config->IRCDModule)->SetType(PROTOCOL);
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
 		 */
 		if (ircd->ts6)
 		{
-			if (Config.Numeric.empty())
+			if (Config->Numeric.empty())
 			{
 				Alog() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
 				ret = -1;
@@ -256,7 +256,7 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 void Module::NoticeLang(const Anope::string &source, const User *u, int number, ...) const
 {
 	/* Find the users lang, and use it if we can */
-	int mlang = Config.NSDefLanguage;
+	int mlang = Config->NSDefLanguage;
 	if (u && u->Account())
 		mlang = u->Account()->language;
 
@@ -289,7 +289,7 @@ const char *Module::GetLangString(User *u, int number)
 {
 
 	/* Find the users lang, and use it if we can */
-	int mlang = Config.NSDefLanguage;
+	int mlang = Config->NSDefLanguage;
 	if (u && u->Account())
 		mlang = u->Account()->language;
 

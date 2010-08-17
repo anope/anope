@@ -24,8 +24,8 @@ class CommandOSRestart : public Command
 	{
 		quitmsg = "RESTART command received from " + u->nick;
 
-		if (Config.GlobalOnCycle)
-			oper_global("", "%s", Config.GlobalOnCycleMessage.c_str());
+		if (Config->GlobalOnCycle)
+			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
 		/*	raise(SIGHUP); */
 		do_restart_services();
 		return MOD_CONT;
@@ -33,13 +33,13 @@ class CommandOSRestart : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_RESTART);
+		notice_help(Config->s_OperServ, u, OPER_HELP_RESTART);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_RESTART);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_RESTART);
 	}
 };
 

@@ -72,12 +72,12 @@ void unreal_cmd_netinfo(int ac, const char **av)
    TKLEXT = Extended TKL we don't use it but best to have it
    SJB64  = Base64 encoded time stamps
    VL     = Version Info
-   NS     = Config.Numeric Server
+   NS     = Config->Numeric Server
 
 */
 void unreal_cmd_capab()
 {
-	if (!Config.Numeric.empty())
+	if (!Config->Numeric.empty())
 		send_cmd("", "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT VL");
 	else
 		send_cmd("", "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT");
@@ -94,7 +94,7 @@ void unreal_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 {
 	if (nick.empty() || vhost.empty())
 		return;
-	send_cmd(Config.ServerName, "AL %s %s", nick.c_str(), vhost.c_str());
+	send_cmd(Config->ServerName, "AL %s %s", nick.c_str(), vhost.c_str());
 }
 
 /* CHGIDENT */
@@ -102,7 +102,7 @@ void unreal_cmd_chgident(const Anope::string &nick, const Anope::string &vIdent)
 {
 	if (nick.empty() || vIdent.empty())
 		return;
-	send_cmd(Config.ServerName, "AZ %s %s", nick.c_str(), vIdent.c_str());
+	send_cmd(Config->ServerName, "AZ %s %s", nick.c_str(), vIdent.c_str());
 }
 
 class UnrealIRCdProto : public IRCDProto
@@ -115,7 +115,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config.s_OperServ.c_str());
+		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config->s_OperServ.c_str());
 	}
 
 	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
@@ -143,7 +143,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config.ServerName, "h %s :%s", user->nick.c_str(), buf.c_str());
+		send_cmd(source ? source->nick : Config->ServerName, "h %s :%s", user->nick.c_str(), buf.c_str());
 	}
 
 	/*
@@ -174,13 +174,13 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (buf.empty())
 			return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
+		send_cmd(bi ? bi->nick : Config->ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
 	}
 
 	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
 	{
-		EnforceQlinedNick(nick, Config.ServerName);
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config.ServerName.c_str(), modes.c_str(), host.c_str(), myIrcd->nickip ? " *" : "", real.c_str());
+		EnforceQlinedNick(nick, Config->ServerName);
+		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config->ServerName.c_str(), modes.c_str(), host.c_str(), myIrcd->nickip ? " *" : "", real.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
@@ -202,8 +202,8 @@ class UnrealIRCdProto : public IRCDProto
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
 	void SendServer(const Server *server)
 	{
-		if (!Config.Numeric.empty())
-			send_cmd("", "SERVER %s %d :U0-*-%s %s", server->GetName().c_str(), server->GetHops(), Config.Numeric.c_str(), server->GetDescription().c_str());
+		if (!Config->Numeric.empty())
+			send_cmd("", "SERVER %s %d :U0-*-%s %s", server->GetName().c_str(), server->GetHops(), Config->Numeric.c_str(), server->GetDescription().c_str());
 		else
 			send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
@@ -211,7 +211,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
-		send_cmd(Config.ServerName, "~ %ld %s :%s", static_cast<long>(chantime), channel.c_str(), user->nick.c_str());
+		send_cmd(Config->ServerName, "~ %ld %s :%s", static_cast<long>(chantime), channel.c_str(), user->nick.c_str());
 	}
 
 	/* unsqline
@@ -272,13 +272,13 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd("", "BD + Q H %s %s %ld %ld :Being held for registered user", nick.c_str(), Config.ServerName.c_str(), static_cast<long>(time(NULL) + Config.NSReleaseTimeout), static_cast<long>(time(NULL)));
+		send_cmd("", "BD + Q H %s %s %ld %ld :Being held for registered user", nick.c_str(), Config->ServerName.c_str(), static_cast<long>(time(NULL) + Config->NSReleaseTimeout), static_cast<long>(time(NULL)));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd("", "BD - Q * %s %s", nick.c_str(), Config.ServerName.c_str());
+		send_cmd("", "BD - Q * %s %s", nick.c_str(), Config->ServerName.c_str());
 	}
 
 	/* UNSGLINE */
@@ -293,7 +293,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config.s_OperServ.c_str());
+		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config->s_OperServ.c_str());
 	}
 
 	/* SZLINE */
@@ -324,9 +324,9 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
 	{
 		if (!nick.empty())
-			send_cmd(Config.ServerName, "n %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
+			send_cmd(Config->ServerName, "n %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
 		else
-			send_cmd(Config.ServerName, "n %s %s", c->name.c_str(), mode.c_str());
+			send_cmd(Config->ServerName, "n %s %s", c->name.c_str(), mode.c_str());
 	}
 
 	/* svsjoin
@@ -363,7 +363,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendEOB()
 	{
-		send_cmd(Config.ServerName, "ES");
+		send_cmd(Config->ServerName, "ES");
 	}
 
 	bool IsNickValid(const Anope::string &nick)
@@ -560,7 +560,7 @@ int anope_event_ping(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config->ServerName, av[0]);
 	return MOD_CONT;
 }
 
@@ -932,7 +932,7 @@ int anope_event_server(const Anope::string &source, int ac, const char **av)
 	}
 	else
 		do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
-	ircdproto->SendPing(Config.ServerName, av[0]);
+	ircdproto->SendPing(Config->ServerName, av[0]);
 
 	return MOD_CONT;
 }

@@ -110,7 +110,7 @@ int levelinfo_maxwidth = 0;
 
 void moduleAddChanServCmds()
 {
-	ModuleManager::LoadModuleList(Config.ChanServCoreModules);
+	ModuleManager::LoadModuleList(Config->ChanServCoreModules);
 }
 
 /*************************************************************************/
@@ -263,7 +263,7 @@ void check_modes(Channel *c)
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
 		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name.c_str());
-		Alog() << Config.s_ChanServ << ": Bouncy modes on channel " << c->name;
+		Alog() << Config->s_ChanServ << ": Bouncy modes on channel " << c->name;
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -355,7 +355,7 @@ int check_valid_admin(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT))
 	{
-		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ.c_str());
+		notice_lang(Config->s_ChanServ, user, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
 		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		return 0;
 	}
@@ -391,7 +391,7 @@ int check_valid_op(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP))
 	{
-		notice_lang(Config.s_ChanServ, user, CHAN_IS_REGISTERED, Config.s_ChanServ.c_str());
+		notice_lang(Config->s_ChanServ, user, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
 
 		if (owner)
 			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);
@@ -479,7 +479,7 @@ void restore_topic(const Anope::string &chan)
 	if (ircd->join2set && whosends(ci) == ChanServ)
 	{
 		ChanServ->Join(chan);
-		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
+		c->SetMode(NULL, CMODE_OP, Config->s_ChanServ);
 	}
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic);
 	if (ircd->join2set && whosends(ci) == ChanServ)
@@ -513,7 +513,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 	{
 		c->topic.clear();
 		/* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
-		/* Altough whosends() also checks for Config.BSMinUsers -GD */
+		/* Altough whosends() also checks for Config->BSMinUsers -GD */
 		c->topic_setter = whosends(ci)->nick;
 	}
 
@@ -538,7 +538,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 	if (ircd->join2set && whosends(ci) == ChanServ)
 	{
 		ChanServ->Join(c);
-		c->SetMode(NULL, CMODE_OP, Config.s_ChanServ);
+		c->SetMode(NULL, CMODE_OP, Config->s_ChanServ);
 	}
 
 	ircdproto->SendTopic(whosends(ci), c, c->topic_setter, c->topic);
@@ -554,7 +554,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 
 void expire_chans()
 {
-	if (!Config.CSExpire)
+	if (!Config->CSExpire)
 		return;
 
 	time_t now = time(NULL);
@@ -564,7 +564,7 @@ void expire_chans()
 		ChannelInfo *ci = it->second;
 		++it;
 
-		if (!ci->c && now - ci->last_used >= Config.CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
+		if (!ci->c && now - ci->last_used >= Config->CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
@@ -597,15 +597,15 @@ void cs_remove_nick(const NickCore *nc)
 			if (ci->successor)
 			{
 				NickCore *nc2 = ci->successor;
-				if (!nc2->IsServicesOper() && Config.CSMaxReg && nc2->channelcount >= Config.CSMaxReg)
+				if (!nc2->IsServicesOper() && Config->CSMaxReg && nc2->channelcount >= Config->CSMaxReg)
 				{
-					Alog() << Config.s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
+					Alog() << Config->s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
 					delete ci;
 					continue;
 				}
 				else
 				{
-					Alog() << Config.s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
+					Alog() << Config->s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
 					ci->founder = nc2;
 					ci->successor = NULL;
 					++nc2->channelcount;
@@ -613,7 +613,7 @@ void cs_remove_nick(const NickCore *nc)
 			}
 			else
 			{
-				Alog() << Config.s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
+				Alog() << Config->s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
 
 				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
@@ -963,7 +963,7 @@ void stick_all(ChannelInfo *ci)
 	}
 }
 
-ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config.CSInhabit), c(chan)
+ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);

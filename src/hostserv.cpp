@@ -19,7 +19,7 @@ E void moduleAddHostServCmds();
 
 void moduleAddHostServCmds()
 {
-	ModuleManager::LoadModuleList(Config.HostServCoreModules);
+	ModuleManager::LoadModuleList(Config->HostServCoreModules);
 }
 
 /*************************************************************************/
@@ -61,7 +61,7 @@ void get_hostserv_stats(long *nrec, long *memuse)
  */
 void hostserv_init()
 {
-	if (!Config.s_HostServ.empty())
+	if (!Config->s_HostServ.empty())
 		moduleAddHostServCmds();
 }
 
@@ -170,8 +170,8 @@ void do_on_id(User *u)
 		u->UpdateHost();
 
 		if (!na->hostinfo.GetIdent().empty())
-			notice_lang(Config.s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			notice_lang(Config->s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 		else
-			notice_lang(Config.s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+			notice_lang(Config->s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 	}
 }

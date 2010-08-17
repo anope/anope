@@ -156,35 +156,35 @@ class CommandCSEnforce : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_AKICK))
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			if (what.empty() || what.equals_ci("SET"))
 			{
 				this->DoSet(c);
-				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
+				me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_RESPONSE, !what.empty() ? what.c_str() : "SET");
 			}
 			else if (what.equals_ci("MODES"))
 			{
 				this->DoModes(c);
-				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what.equals_ci("SECUREOPS"))
 			{
 				this->DoSecureOps(c);
-				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what.equals_ci("RESTRICTED"))
 			{
 				this->DoRestricted(c);
-				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else if (what.equals_ci("+R"))
 			{
 				this->DoCModeR(c);
-				me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
+				me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_RESPONSE, what.c_str());
 			}
 			else
 				this->OnSyntaxError(u, "");
@@ -195,26 +195,26 @@ class CommandCSEnforce : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-		u->SendMessage(Config.s_ChanServ, " ");
-		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-		u->SendMessage(Config.s_ChanServ, " ");
+		me->NoticeLang(Config->s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		u->SendMessage(Config->s_ChanServ, " ");
+		me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
+		u->SendMessage(Config->s_ChanServ, " ");
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
+			me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
 		else
-			me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
+			me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		me->NoticeLang(Config->s_ChanServ, u, LNG_ENFORCE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
+		me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

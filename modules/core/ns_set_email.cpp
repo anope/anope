@@ -28,33 +28,33 @@ class CommandNSSetEmail : public Command
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 
-		if (param.empty() && Config.NSForceEmail)
+		if (param.empty() && Config->NSForceEmail)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
+			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
-		else if (Config.NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
+		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			notice_lang(Config.s_NickServ, u, MAIL_X_INVALID, param.c_str());
+			notice_lang(Config->s_NickServ, u, MAIL_X_INVALID, param.c_str());
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed the e-mail of " << nc->display << " to " << (!param.empty() ? param : "none");
+		Alog() << Config->s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed the e-mail of " << nc->display << " to " << (!param.empty() ? param : "none");
 
 		if (!param.empty())
 		{
 			nc->email = param;
-			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
 		}
 		else
 		{
 			nc->email.clear();
-			notice_lang(Config.s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -62,13 +62,13 @@ class CommandNSSetEmail : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_EMAIL);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_EMAIL);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_EMAIL);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_EMAIL);
 	}
 };
 
@@ -81,13 +81,13 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_EMAIL);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_EMAIL);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SASET_EMAIL);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_EMAIL);
 	}
 };
 

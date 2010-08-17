@@ -76,7 +76,7 @@ void NickServRelease::Tick(time_t ctime)
 /* *INDENT-OFF* */
 void moduleAddNickServCmds()
 {
-	ModuleManager::LoadModuleList(Config.NickServCoreModules);
+	ModuleManager::LoadModuleList(Config->NickServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/
@@ -166,7 +166,7 @@ int validate_user(User *u)
 	NickRequest *nr = findrequestnick(u->nick);
 	if (nr)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_IS_PREREG);
+		notice_lang(Config->s_NickServ, u, NICK_IS_PREREG);
 		return 0;
 	}
 
@@ -176,14 +176,14 @@ int validate_user(User *u)
 
 	if (na->HasFlag(NS_FORBIDDEN))
 	{
-		notice_lang(Config.s_NickServ, u, NICK_MAY_NOT_BE_USED);
+		notice_lang(Config->s_NickServ, u, NICK_MAY_NOT_BE_USED);
 		u->Collide(na);
 		return 0;
 	}
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
-		notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
+		notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
 		u->Collide(na);
 		return 0;
 	}
@@ -203,26 +203,26 @@ int validate_user(User *u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			notice_lang(Config.s_NickServ, u, NICK_IS_SECURE, Config.s_NickServ.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_IS_SECURE, Config->s_NickServ.c_str());
 		else
-			notice_lang(Config.s_NickServ, u, NICK_IS_REGISTERED, Config.s_NickServ.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_IS_REGISTERED, Config->s_NickServ.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 	{
 		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
-			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_NOW);
+			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_NOW);
 			u->Collide(na);
 		}
 		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
-			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
+			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
 			new NickServCollide(na->nick, 20);
 		}
 		else
 		{
-			notice_lang(Config.s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
+			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
 			new NickServCollide(na->nick, 60);
 		}
 	}
@@ -253,7 +253,7 @@ void expire_nicks()
 			continue;
 		}
 
-		if (Config.NSExpire && now - na->last_seen >= Config.NSExpire && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE) && !na->nc->HasFlag(NI_SUSPENDED))
+		if (Config->NSExpire && now - na->last_seen >= Config->NSExpire && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE) && !na->nc->HasFlag(NI_SUSPENDED))
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
@@ -275,7 +275,7 @@ void expire_requests()
 		NickRequest *nr = it->second;
 		++it;
 
-		if (Config.NSRExpire && now - nr->requested >= Config.NSRExpire)
+		if (Config->NSRExpire && now - nr->requested >= Config->NSRExpire)
 		{
 			Alog() << "Request for nick " << nr->nick << " expiring";
 			delete nr;
@@ -356,7 +356,7 @@ void change_core_display(NickCore *nc, const Anope::string &newdisplay)
 {
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
-	Alog() << Config.s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
+	Alog() << Config->s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
 
 	/* Remove the core from the list */
 	NickCoreList.erase(nc->display);

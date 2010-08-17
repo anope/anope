@@ -38,7 +38,7 @@ std::list<ChannelModeStatus *> BotModes;
 
 /** Parse the mode string from the config file and set the default mlocked modes
  */
-void SetDefaultMLock()
+void SetDefaultMLock(ServerConfig *config)
 {
 	DefMLockOn.ClearFlags();
 	DefMLockOff.ClearFlags();
@@ -46,7 +46,7 @@ void SetDefaultMLock()
 	Flags<ChannelModeName> *ptr = NULL;
 
 	Anope::string modes, param;
-	spacesepstream sep(Config.MLock);
+	spacesepstream sep(config->MLock);
 	sep.GetToken(modes);
 
 	for (unsigned i = 0, end_mode = modes.length(); i < end_mode; ++i)
@@ -82,9 +82,9 @@ void SetDefaultMLock()
 
 	/* Set Bot Modes */
 	BotModes.clear();
-	for (unsigned i = 0, end_mode = Config.BotModes.length(); i < end_mode; ++i)
+	for (unsigned i = 0, end_mode = config->BotModes.length(); i < end_mode; ++i)
 	{
-		ChannelMode *cm = ModeManager::FindChannelModeByChar(Config.BotModes[i]);
+		ChannelMode *cm = ModeManager::FindChannelModeByChar(config->BotModes[i]);
 
 		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
 			BotModes.push_back(debug_cast<ChannelModeStatus *>(cm));
@@ -266,7 +266,7 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
-	if (!Config.s_BotServ.empty() && Config.BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
+	if (!Config->s_BotServ.empty() && Config->BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
 	{
 		BotInfo *bi = chan->ci->bi;
 
@@ -634,7 +634,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 		ModeManager::Modes.push_back(cm);
 
 		/* Apply this mode to the new default mlock if its used */
-		SetDefaultMLock();
+		SetDefaultMLock(Config);
 
 		FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
 

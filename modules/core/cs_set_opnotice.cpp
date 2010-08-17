@@ -29,12 +29,12 @@ class CommandCSSetOpNotice : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_OPNOTICE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_OPNOTICE);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "OPNOTICE");
@@ -44,18 +44,18 @@ class CommandCSSetOpNotice : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_OPNOTICE, "SET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_OPNOTICE, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET OPNOTICE", CHAN_SET_OPNOTICE_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET OPNOTICE", CHAN_SET_OPNOTICE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_OPNOTICE);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_OPNOTICE);
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_OPNOTICE, "SASET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_OPNOTICE, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET OPNOTICE", CHAN_SASET_OPNOTICE_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET OPNOTICE", CHAN_SASET_OPNOTICE_SYNTAX);
 	}
 };
 

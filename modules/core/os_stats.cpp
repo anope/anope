@@ -41,81 +41,81 @@ class CommandOSStats : public Command
 	{
 		int timeout;
 		/* AKILLs */
-		notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_COUNT, SGLine->GetCount());
-		timeout = Config.AutokillExpiry + 59;
+		notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_COUNT, SGLine->GetCount());
+		timeout = Config->AutokillExpiry + 59;
 		if (timeout >= 172800)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
 		else if (timeout >= 86400)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_DAY);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_DAY);
 		else if (timeout >= 7200)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_HOURS, timeout / 3600);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_HOURS, timeout / 3600);
 		else if (timeout >= 3600)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_HOUR);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_HOUR);
 		else if (timeout >= 120)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MINS, timeout / 60);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MINS, timeout / 60);
 		else if (timeout >= 60)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MIN);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MIN);
 		else
-			notice_lang(Config.s_OperServ, u, OPER_STATS_AKILL_EXPIRE_NONE);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_AKILL_EXPIRE_NONE);
 		if (ircd->snline)
 		{
 			/* SNLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
-			timeout = Config.SNLineExpiry + 59;
+			notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
+			timeout = Config->SNLineExpiry + 59;
 			if (timeout >= 172800)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAY);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOUR);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MIN);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_MIN);
 			else
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_NONE);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SNLINE_EXPIRE_NONE);
 		}
 		if (ircd->sqline)
 		{
 			/* SQLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
-			timeout = Config.SQLineExpiry + 59;
+			notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
+			timeout = Config->SQLineExpiry + 59;
 			if (timeout >= 172800)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAY);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOURS, timeout / 3600);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOUR);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MINS, timeout / 60);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MIN);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MIN);
 			else
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_NONE);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_NONE);
 		}
 		if (ircd->szline)
 		{
 			/* SZLINEs */
-			notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
-			timeout = Config.SZLineExpiry + 59;
+			notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
+			timeout = Config->SZLineExpiry + 59;
 			if (timeout >= 172800)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAY);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOURS, timeout / 3600);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOUR);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MINS, timeout / 60);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MIN);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MIN);
 			else
-				notice_lang(Config.s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_NONE);
+				notice_lang(Config->s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_NONE);
 		}
 		return MOD_CONT;
 	}
@@ -123,7 +123,7 @@ class CommandOSStats : public Command
 	CommandReturn DoStatsReset(User *u)
 	{
 		maxusercnt = usercnt;
-		notice_lang(Config.s_OperServ, u, OPER_STATS_RESET);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_RESET);
 		return MOD_CONT;
 	}
 
@@ -132,14 +132,14 @@ class CommandOSStats : public Command
 		char timebuf[64];
 		time_t uptime = time(NULL) - start_time;
 		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
-		notice_lang(Config.s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
 		struct tm *tm = localtime(&maxusertime);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
 		if (days > 1)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
 		else if (days == 1)
-			notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
 		else
 		{
 			if (hours > 1)
@@ -147,16 +147,16 @@ class CommandOSStats : public Command
 				if (mins != 1)
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_HMS, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_HMS, hours, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_HM1S, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_HM1S, hours, mins, secs);
 				}
 				else
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_H1MS, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_H1MS, hours, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_H1M1S, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_H1M1S, hours, mins, secs);
 				}
 			}
 			else if (hours == 1)
@@ -164,16 +164,16 @@ class CommandOSStats : public Command
 				if (mins != 1)
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1HMS, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1HMS, hours, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1HM1S, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1HM1S, hours, mins, secs);
 				}
 				else
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1H1MS, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1H1MS, hours, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1H1M1S, hours, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1H1M1S, hours, mins, secs);
 				}
 			}
 			else
@@ -181,16 +181,16 @@ class CommandOSStats : public Command
 				if (mins != 1)
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_MS, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_MS, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_M1S, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_M1S, mins, secs);
 				}
 				else
 				{
 					if (secs != 1)
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1MS, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1MS, mins, secs);
 					else
-						notice_lang(Config.s_OperServ, u, OPER_STATS_UPTIME_1M1S, mins, secs);
+						notice_lang(Config->s_OperServ, u, OPER_STATS_UPTIME_1M1S, mins, secs);
 				}
 			}
 		}
@@ -209,9 +209,9 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf.c_str());
-		notice_lang(Config.s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
+		notice_lang(Config->s_OperServ, u, OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
+		notice_lang(Config->s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
 		return MOD_CONT;
 	}
 
@@ -219,33 +219,33 @@ class CommandOSStats : public Command
 	{
 		long count, mem;
 
-		notice_lang(Config.s_OperServ, u, OPER_STATS_BYTES_READ, TotalRead / 1024);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_BYTES_READ, TotalRead / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
 
 		get_user_stats(count, mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
 		get_channel_stats(&count, &mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
 		get_core_stats(count, mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
 		get_aliases_stats(count, mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
 		get_chanserv_stats(&count, &mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
-		if (!Config.s_BotServ.empty())
+		notice_lang(Config->s_OperServ, u, OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
+		if (!Config->s_BotServ.empty())
 		{
 			get_botserv_stats(&count, &mem);
-			notice_lang(Config.s_OperServ, u, OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
 		}
-		if (!Config.s_HostServ.empty())
+		if (!Config->s_HostServ.empty())
 		{
 			get_hostserv_stats(&count, &mem);
-			notice_lang(Config.s_OperServ, u, OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
+			notice_lang(Config->s_OperServ, u, OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
 		}
 		get_operserv_stats(&count, &mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
 		get_session_stats(count, mem);
-		notice_lang(Config.s_OperServ, u, OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
+		notice_lang(Config->s_OperServ, u, OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
 
 		return MOD_CONT;
 	}
@@ -265,7 +265,7 @@ class CommandOSStats : public Command
 			else if (extra.equals_ci("RESET"))
 				return this->DoStatsReset(u);
 			else if (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK"))
-				notice_lang(Config.s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra.c_str());
+				notice_lang(Config->s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra.c_str());
 		}
 
 		if (extra.empty() || (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK")))
@@ -282,13 +282,13 @@ class CommandOSStats : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_STATS);
+		notice_help(Config->s_OperServ, u, OPER_HELP_STATS);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_STATS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_STATS);
 	}
 };
 

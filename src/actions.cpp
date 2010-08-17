@@ -23,14 +23,14 @@ bool bad_password(User *u)
 {
 	time_t now = time(NULL);
 
-	if (!u || !Config.BadPassLimit)
+	if (!u || !Config->BadPassLimit)
 		return false;
 
-	if (Config.BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < now - Config.BadPassTimeout)
+	if (Config->BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < now - Config->BadPassTimeout)
 		u->invalid_pw_count = 0;
 	++u->invalid_pw_count;
 	u->invalid_pw_time = now;
-	if (u->invalid_pw_count >= Config.BadPassLimit)
+	if (u->invalid_pw_count >= Config->BadPassLimit)
 	{
 		kill_user("", u->nick, "Too many invalid passwords");
 		return true;
@@ -53,7 +53,7 @@ void kill_user(const Anope::string &source, const Anope::string &user, const Ano
 	if (user.empty())
 		return;
 
-	Anope::string real_source = source.empty() ? Config.ServerName : source;
+	Anope::string real_source = source.empty() ? Config->ServerName : source;
 
 	Anope::string buf = real_source + " (" + reason + ")";
 

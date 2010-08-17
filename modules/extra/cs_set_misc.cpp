@@ -30,22 +30,22 @@ class CommandCSSetMisc : public Command
 		if (params.size() > 1)
 		{
 			ci->Extend("chanserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			notice_lang(Config.s_ChanServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
-			notice_lang(Config.s_ChanServ, u, CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		u->SendMessage(Config.s_ChanServ, "    %-10s    %s", this->name.c_str(), this->Desc.c_str());
+		u->SendMessage(Config->s_ChanServ, "    %-10s    %s", this->name.c_str(), this->Desc.c_str());
 	}
 };
 
@@ -58,7 +58,7 @@ class CommandCSSASetMisc : public CommandCSSetMisc
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 
@@ -172,7 +172,7 @@ class CSSetMisc : public Module
 
 			Anope::string value;
 			if (ci->GetExtRegular("chanserv:" + it->first, value))
-				u->SendMessage(Config.s_ChanServ, "      %s: %s", it->first.c_str(), value.c_str());
+				u->SendMessage(Config->s_ChanServ, "      %s: %s", it->first.c_str(), value.c_str());
 		}
 	}
 

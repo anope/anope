@@ -73,7 +73,7 @@ void notice_server(const Anope::string &source, const Server *s, const char *fmt
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-		if (Config.NSDefFlags.HasFlag(NI_MSG))
+		if (Config->NSDefFlags.HasFlag(NI_MSG))
 			ircdproto->SendGlobalPrivmsg(findbot(source), s, buf);
 		else
 			ircdproto->SendGlobalNotice(findbot(source), s, buf);

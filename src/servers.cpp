@@ -75,7 +75,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 
 			/* And some IRCds needs Global joined in the logchan */
 			if (LogChan && ircd->join2msg)
-				Global->Join(Config.LogChannel);
+				Global->Join(Config->LogChannel);
 		}
 	}
 }
@@ -269,7 +269,7 @@ bool Server::IsSynced() const
  */
 bool Server::IsULined() const
 {
-	for (std::list<Anope::string>::const_iterator it = Config.Ulines.begin(), it_end = Config.Ulines.end(); it != it_end; ++it)
+	for (std::list<Anope::string>::const_iterator it = Config->Ulines.begin(), it_end = Config->Ulines.end(); it != it_end; ++it)
 		if (it->equals_ci(this->GetName()))
 			return true;
 	return false;
@@ -341,8 +341,8 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 	Server *newserver = new Server(s, servername, hops, descript, numeric);
 
 	/* Announce services being online. */
-	if (Config.GlobalOnCycle && !Config.GlobalOnCycleUP.empty())
-		notice_server(Config.s_GlobalNoticer, newserver, "%s", Config.GlobalOnCycleUP.c_str());
+	if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
+		notice_server(Config->s_GlobalNoticer, newserver, "%s", Config->GlobalOnCycleUP.c_str());
 
 	/* Let modules know about the connection */
 	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));

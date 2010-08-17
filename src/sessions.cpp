@@ -117,14 +117,14 @@ int add_session(const Anope::string &nick, const Anope::string &host, const Anop
 	{
 		exception = find_hostip_exception(host, hostip);
 
-		sessionlimit = exception ? exception->limit : Config.DefSessionLimit;
+		sessionlimit = exception ? exception->limit : Config->DefSessionLimit;
 
 		if (sessionlimit && session->count >= sessionlimit)
 		{
-			if (!Config.SessionLimitExceeded.empty())
-				ircdproto->SendMessage(OperServ, nick, Config.SessionLimitExceeded.c_str(), host.c_str());
-			if (!Config.SessionLimitDetailsLoc.empty())
-				ircdproto->SendMessage(OperServ, nick, "%s", Config.SessionLimitDetailsLoc.c_str());
+			if (!Config->SessionLimitExceeded.empty())
+				ircdproto->SendMessage(OperServ, nick, Config->SessionLimitExceeded.c_str(), host.c_str());
+			if (!Config->SessionLimitDetailsLoc.empty())
+				ircdproto->SendMessage(OperServ, nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
 			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
 			 * decremented in do_quit, which caused problems and fixed here
@@ -134,15 +134,15 @@ int add_session(const Anope::string &nick, const Anope::string &host, const Anop
 			 * decremented in do_kill or in do_quit - Adam
 			 */
 			++session->count;
-			kill_user(Config.s_OperServ, nick, "Session limit exceeded");
+			kill_user(Config->s_OperServ, nick, "Session limit exceeded");
 
 			++session->hits;
-			if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
+			if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 			{
 				Anope::string akillmask = "*@" + host;
-				XLine *x = new XLine(akillmask, Config.s_OperServ, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
+				XLine *x = new XLine(akillmask, Config->s_OperServ, time(NULL) + Config->SessionAutoKillExpiry, "Session limit exceeded");
 				if (x)
-					x->By = Config.s_OperServ;
+					x->By = Config->s_OperServ;
 				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 			}
 			return 0;
@@ -166,7 +166,7 @@ int add_session(const Anope::string &nick, const Anope::string &host, const Anop
 
 void del_session(const Anope::string &host)
 {
-	if (!Config.LimitSessions)
+	if (!Config->LimitSessions)
 	{
 		Alog(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
 		return;
@@ -222,7 +222,7 @@ void expire_exceptions()
 
 		if (!e->expires || e->expires > now)
 			continue;
-		if (Config.WallExceptionExpire)
+		if (Config->WallExceptionExpire)
 			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", e->mask.c_str());
 		delete e;
 		exceptions.erase(curr_it);
@@ -272,13 +272,13 @@ int exception_add(User *u, const Anope::string &mask, int limit, const Anope::st
 			{
 				e->limit = limit;
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
+					notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
 				return -2;
 			}
 			else
 			{
 				if (u)
-					notice_lang(Config.s_OperServ, u, OPER_EXCEPTION_EXISTS, mask.c_str());
+					notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_EXISTS, mask.c_str());
 				return -1;
 			}
 		}

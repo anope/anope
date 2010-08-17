@@ -31,12 +31,12 @@ class CommandNSSetAutoOp : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_AUTOOP);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "AUTOOP");
@@ -46,18 +46,18 @@ class CommandNSSetAutoOp : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_AUTOOP);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_AUTOOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_AUTOOP);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_AUTOOP);
 	}
 };
 
@@ -70,18 +70,18 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 
 	bool Help(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_AUTOOP);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_AUTOOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SASET_AUTOOP);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_AUTOOP);
 	}
 };
 

@@ -149,7 +149,7 @@ bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::st
 
 static void remove_pidfile()
 {
-	remove(Config.PIDFilename.c_str());
+	remove(Config->PIDFilename.c_str());
 }
 
 /*************************************************************************/
@@ -160,7 +160,7 @@ static void write_pidfile()
 {
 	FILE *pidfile;
 
-	pidfile = fopen(Config.PIDFilename.c_str(), "w");
+	pidfile = fopen(Config->PIDFilename.c_str(), "w");
 	if (pidfile)
 	{
 #ifdef _WIN32
@@ -172,7 +172,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		log_perror("Warning: cannot write to PID file %s", Config.PIDFilename.c_str());
+		log_perror("Warning: cannot write to PID file %s", Config->PIDFilename.c_str());
 }
 
 /*************************************************************************/
@@ -311,15 +311,26 @@ int init_primary(int ac, char **av)
 	}
 
 	/* Read configuration file; exit if there are problems. */
-	if (!read_config(0))
+	try
+	{
+		Config = new ServerConfig();
+	}
+	catch (const ConfigException &ex)
+	{
+		Alog(LOG_TERMINAL) << ex.GetReason();
+		Alog(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
+		Alog(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
+		Alog(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
+		Alog(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
 		return -1;
+	}
 
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
 		return -1;
 
 	/* Create me */
-	Me = new Server(NULL, Config.ServerName, 0, Config.ServerDesc, Config.Numeric);
+	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 
 	/* First thing, add our core bots internally. Before modules are loaded and before the database is read
 	 * This is used for modules adding commands and for the BotInfo* poiners in the command classes.
@@ -333,31 +344,31 @@ int init_primary(int ac, char **av)
 	 * Note that it is important this is after loading the protocol module. The ircd struct must exist for
 	 * the ts6_ functions
 	 */
-	if (!Config.s_OperServ.empty())
-		new BotInfo(Config.s_OperServ, Config.ServiceUser, Config.ServiceHost, Config.desc_OperServ);
-	if (!Config.s_NickServ.empty())
-		new BotInfo(Config.s_NickServ, Config.ServiceUser, Config.ServiceHost, Config.desc_NickServ);
-	if (!Config.s_ChanServ.empty())
-		new BotInfo(Config.s_ChanServ, Config.ServiceUser, Config.ServiceHost, Config.desc_ChanServ);
-	if (!Config.s_HostServ.empty())
-		new BotInfo(Config.s_HostServ, Config.ServiceUser, Config.ServiceHost, Config.desc_HostServ);
-	if (!Config.s_MemoServ.empty())
-		new BotInfo(Config.s_MemoServ, Config.ServiceUser, Config.ServiceHost, Config.desc_MemoServ);
-	if (!Config.s_BotServ.empty())
-		new BotInfo(Config.s_BotServ, Config.ServiceUser, Config.ServiceHost, Config.desc_BotServ);
-	if (!Config.s_GlobalNoticer.empty())
-		new BotInfo(Config.s_GlobalNoticer, Config.ServiceUser, Config.ServiceHost, Config.desc_GlobalNoticer);
+	if (!Config->s_OperServ.empty())
+		new BotInfo(Config->s_OperServ, Config->ServiceUser, Config->ServiceHost, Config->desc_OperServ);
+	if (!Config->s_NickServ.empty())
+		new BotInfo(Config->s_NickServ, Config->ServiceUser, Config->ServiceHost, Config->desc_NickServ);
+	if (!Config->s_ChanServ.empty())
+		new BotInfo(Config->s_ChanServ, Config->ServiceUser, Config->ServiceHost, Config->desc_ChanServ);
+	if (!Config->s_HostServ.empty())
+		new BotInfo(Config->s_HostServ, Config->ServiceUser, Config->ServiceHost, Config->desc_HostServ);
+	if (!Config->s_MemoServ.empty())
+		new BotInfo(Config->s_MemoServ, Config->ServiceUser, Config->ServiceHost, Config->desc_MemoServ);
+	if (!Config->s_BotServ.empty())
+		new BotInfo(Config->s_BotServ, Config->ServiceUser, Config->ServiceHost, Config->desc_BotServ);
+	if (!Config->s_GlobalNoticer.empty())
+		new BotInfo(Config->s_GlobalNoticer, Config->ServiceUser, Config->ServiceHost, Config->desc_GlobalNoticer);
 
 	/* Add Encryption Modules */
-	ModuleManager::LoadModuleList(Config.EncModuleList);
+	ModuleManager::LoadModuleList(Config->EncModuleList);
 
 	/* Add Database Modules */
-	ModuleManager::LoadModuleList(Config.DBModuleList);
+	ModuleManager::LoadModuleList(Config->DBModuleList);
 
 	/* Load the socket engine */
-	if (ModuleManager::LoadModule(Config.SocketEngine, NULL))
+	if (ModuleManager::LoadModule(Config->SocketEngine, NULL))
 	{
-		Alog(LOG_TERMINAL) << "Unable to load socket engine " << Config.SocketEngine;
+		Alog(LOG_TERMINAL) << "Unable to load socket engine " << Config->SocketEngine;
 		return -1;
 	}
 
@@ -448,7 +459,7 @@ int init_secondary(int ac, char **av)
 
 	/* load any custom modules */
 	if (!nothird)
-		ModuleManager::LoadModuleList(Config.ModulesAutoLoad);
+		ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
 
 	/* Initialize random number generator */
 	rand_init();

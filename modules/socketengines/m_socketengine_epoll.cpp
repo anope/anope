@@ -108,7 +108,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 	void Process()
 	{
-		int total = epoll_wait(EngineHandle, events, max - 1, Config.ReadTimeout * 1000);
+		int total = epoll_wait(EngineHandle, events, max - 1, Config->ReadTimeout * 1000);
 
 		if (total == -1)
 		{

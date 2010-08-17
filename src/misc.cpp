@@ -411,7 +411,7 @@ bool doValidHost(const Anope::string &host, int type)
 
 	size_t len = host.length();
 
-	if (len > Config.HostLen)
+	if (len > Config->HostLen)
 		return false;
 
 	size_t idx, sec_len = 0, dots = 1;
@@ -625,26 +625,26 @@ bool nickIsServices(const Anope::string &tempnick, bool bot)
 	if (at != Anope::string::npos)
 	{
 		Anope::string servername = nick.substr(at + 1);
-		if (!servername.equals_ci(Config.ServerName))
+		if (!servername.equals_ci(Config->ServerName))
 			return false;
 		nick = nick.substr(0, at);
 	}
 
-	if (!Config.s_NickServ.empty() && nick.equals_ci(Config.s_NickServ))
+	if (!Config->s_NickServ.empty() && nick.equals_ci(Config->s_NickServ))
 		return true;
-	else if (!Config.s_ChanServ.empty() && nick.equals_ci(Config.s_ChanServ))
+	else if (!Config->s_ChanServ.empty() && nick.equals_ci(Config->s_ChanServ))
 		return true;
-	else if (!Config.s_HostServ.empty() && nick.equals_ci(Config.s_HostServ))
+	else if (!Config->s_HostServ.empty() && nick.equals_ci(Config->s_HostServ))
 		return true;
-	else if (!Config.s_MemoServ.empty() && nick.equals_ci(Config.s_MemoServ))
+	else if (!Config->s_MemoServ.empty() && nick.equals_ci(Config->s_MemoServ))
 		return true;
-	else if (!Config.s_BotServ.empty() && nick.equals_ci(Config.s_BotServ))
+	else if (!Config->s_BotServ.empty() && nick.equals_ci(Config->s_BotServ))
 		return true;
-	else if (!Config.s_OperServ.empty() && nick.equals_ci(Config.s_OperServ))
+	else if (!Config->s_OperServ.empty() && nick.equals_ci(Config->s_OperServ))
 		return true;
-	else if (!Config.s_GlobalNoticer.empty() && nick.equals_ci(Config.s_GlobalNoticer))
+	else if (!Config->s_GlobalNoticer.empty() && nick.equals_ci(Config->s_GlobalNoticer))
 		return true;
-	else if (!Config.s_BotServ.empty() && bot)
+	else if (!Config->s_BotServ.empty() && bot)
 	{
 		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
@@ -743,9 +743,9 @@ void rand_init()
  */
 void add_entropy_userkeys()
 {
-	arc4_addrandom(&Config.UserKey1, sizeof(Config.UserKey1));
-	arc4_addrandom(&Config.UserKey2, sizeof(Config.UserKey2));
-	arc4_addrandom(&Config.UserKey3, sizeof(Config.UserKey3));
+	arc4_addrandom(&Config->UserKey1, sizeof(Config->UserKey1));
+	arc4_addrandom(&Config->UserKey2, sizeof(Config->UserKey2));
+	arc4_addrandom(&Config->UserKey3, sizeof(Config->UserKey3));
 	/* UserKey3 is also used in mysql_rand() */
 }
 

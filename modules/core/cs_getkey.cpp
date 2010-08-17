@@ -30,34 +30,34 @@ class CommandCSGetKey : public Command
 
 		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
 		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_NOKEY, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_GETKEY_NOKEY, chan.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config.s_ChanServ, u, CHAN_GETKEY_KEY, chan.c_str(), key.c_str());
+		notice_lang(Config->s_ChanServ, u, CHAN_GETKEY_KEY, chan.c_str(), key.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_GETKEY);
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_GETKEY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_GETKEY);
 	}
 };
 

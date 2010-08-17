@@ -32,9 +32,9 @@ class CommandCSTopic : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			ci->last_topic = topic;
@@ -49,11 +49,11 @@ class CommandCSTopic : public Command
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				Alog() << Config.s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
+				Alog() << Config->s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
 				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ.c_str()); // XXX
+				ircdproto->SendMode(NULL, c, "+o %s", Config->s_ChanServ.c_str()); // XXX
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
 			if (ircd->join2set && whosends(ci) == ChanServ)
@@ -64,18 +64,18 @@ class CommandCSTopic : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_TOPIC);
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_TOPIC);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
 	}
 };
 

@@ -35,33 +35,33 @@ class CommandCSClear : public Command
 		ChannelMode *voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!u || !check_access(u, ci, CA_CLEAR))
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else if (what.equals_ci("bans"))
 		{
 			c->ClearBans();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_BANS, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_BANS, chan.c_str());
 		}
 		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && what.equals_ci("excepts"))
 		{
 			c->ClearExcepts();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan.c_str());
 		}
 		else if (ModeManager::FindChannelModeByName(CMODE_INVITE) && what.equals_ci("invites"))
 		{
 			c->ClearInvites();
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_INVITES, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_INVITES, chan.c_str());
 		}
 		else if (what.equals_ci("modes"))
 		{
 			c->ClearModes();
 			check_modes(c);
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_MODES, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_MODES, chan.c_str());
 		}
 		else if (what.equals_ci("ops"))
 		{
@@ -101,7 +101,7 @@ class CommandCSClear : public Command
 				}
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_OPS, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_OPS, chan.c_str());
 		}
 		else if ((halfop && what.equals_ci("hops")) || (voice && what.equals_ci("voices")))
 		{
@@ -135,28 +135,28 @@ class CommandCSClear : public Command
 				c->Kick(NULL, uc->user, "%s", buf.c_str());
 			}
 
-			notice_lang(Config.s_ChanServ, u, CHAN_CLEARED_USERS, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_CLEARED_USERS, chan.c_str());
 		}
 		else
-			syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+			syntax_error(Config->s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_CLEAR);
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_CLEAR);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_CLEAR);
 	}
 };
 

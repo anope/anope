@@ -26,7 +26,7 @@ class CommandBSBotList : public Command
 
 		if (BotListByNick.empty())
 		{
-			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
+			notice_lang(Config->s_BotServ, u, BOT_BOTLIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -37,15 +37,15 @@ class CommandBSBotList : public Command
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
 				if (!count)
-					notice_lang(Config.s_BotServ, u, BOT_BOTLIST_HEADER);
+					notice_lang(Config->s_BotServ, u, BOT_BOTLIST_HEADER);
 				++count;
-				u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
+				u->SendMessage(Config->s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 			}
 		}
 
 		if (u->Account()->HasCommand("botserv/botlist") && count < BotListByNick.size())
 		{
-			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
+			notice_lang(Config->s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
 			for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
@@ -53,29 +53,29 @@ class CommandBSBotList : public Command
 
 				if (bi->HasFlag(BI_PRIVATE))
 				{
-					u->SendMessage(Config.s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
+					u->SendMessage(Config->s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 					++count;
 				}
 			}
 		}
 
 		if (!count)
-			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_EMPTY);
+			notice_lang(Config->s_BotServ, u, BOT_BOTLIST_EMPTY);
 		else
-			notice_lang(Config.s_BotServ, u, BOT_BOTLIST_FOOTER, count);
+			notice_lang(Config->s_BotServ, u, BOT_BOTLIST_FOOTER, count);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_BotServ, u, BOT_HELP_BOTLIST);
+		notice_help(Config->s_BotServ, u, BOT_HELP_BOTLIST);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_BOTLIST);
+		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_BOTLIST);
 	}
 };
 

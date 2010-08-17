@@ -32,13 +32,13 @@ class CommandNSSet : public Command
 	{
 		if (readonly)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_DISABLED);
+			notice_lang(Config->s_NickServ, u, NICK_SET_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (u->Account()->HasFlag(NI_SUSPENDED))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -52,7 +52,7 @@ class CommandNSSet : public Command
 			mod_run_cmd(NickServ, u, c, params[0], cmdparams);
 		}
 		else
-			notice_lang(Config.s_NickServ, u, NICK_SET_UNKNOWN_OPTION, params[0].c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SET_UNKNOWN_OPTION, params[0].c_str());
 
 		return MOD_CONT;
 	}
@@ -61,10 +61,10 @@ class CommandNSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			notice_help(Config.s_NickServ, u, NICK_HELP_SET_HEAD);
+			notice_help(Config->s_NickServ, u, NICK_HELP_SET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(u);
-			notice_help(Config.s_NickServ, u, NICK_HELP_SET_TAIL);
+			notice_help(Config->s_NickServ, u, NICK_HELP_SET_TAIL);
 			return true;
 		}
 		else
@@ -80,12 +80,12 @@ class CommandNSSet : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET);
 	}
 
 	bool AddSubcommand(Command *c)
@@ -122,30 +122,30 @@ class CommandNSSetDisplay : public Command
 
 		if (!na || na->nc != u->Account())
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SASET_DISPLAY_INVALID, u->Account()->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_DISPLAY_INVALID, u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
 		change_core_display(u->Account(), params[0]);
-		notice_lang(Config.s_NickServ, u, NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
+		notice_lang(Config->s_NickServ, u, NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_DISPLAY);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_DISPLAY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_DISPLAY);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_DISPLAY);
 	}
 };
 
@@ -162,49 +162,49 @@ class CommandNSSetPassword : public Command
 
 		int len = param.length();
 
-		if (u->Account()->display.equals_ci(param) || (Config.StrictPasswords && len < 5))
+		if (u->Account()->display.equals_ci(param) || (Config->StrictPasswords && len < 5))
 		{
-			notice_lang(Config.s_NickServ, u, MORE_OBSCURE_PASSWORD);
+			notice_lang(Config->s_NickServ, u, MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
-		else if (len > Config.PassLen)
+		else if (len > Config->PassLen)
 		{
-			notice_lang(Config.s_NickServ, u, PASSWORD_TOO_LONG);
+			notice_lang(Config->s_NickServ, u, PASSWORD_TOO_LONG);
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
-			Alog() << Config.s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_FAILED);
+			Alog() << Config->s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
+			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, u->Account()->display.c_str(), tmp_pass.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, u->Account()->display.c_str(), tmp_pass.c_str());
 		else
-			notice_lang(Config.s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, u->Account()->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, u->Account()->display.c_str());
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none") << ") changed its password.";
+		Alog() << Config->s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none") << ") changed its password.";
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_PASSWORD);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_PASSWORD);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_NickServ, u, "SET", NICK_SET_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_PASSWORD);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_PASSWORD);
 	}
 };
 

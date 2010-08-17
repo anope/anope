@@ -26,14 +26,14 @@ class CommandOSMode : public Command
 		Channel *c;
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config.s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (c->bouncy_modes)
-			notice_lang(Config.s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			notice_lang(Config->s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
 			c->SetModes(OperServ, false, modes.c_str());
 
-			if (Config.WallOSMode)
+			if (Config->WallOSMode)
 				ircdproto->SendGlobops(OperServ, "%s used MODE %s on %s", u->nick.c_str(), modes.c_str(), chan.c_str());
 		}
 		return MOD_CONT;
@@ -41,18 +41,18 @@ class CommandOSMode : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_MODE);
+		notice_help(Config->s_OperServ, u, OPER_HELP_MODE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "MODE", OPER_MODE_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "MODE", OPER_MODE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_MODE);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_MODE);
 	}
 };
 

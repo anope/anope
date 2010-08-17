@@ -185,7 +185,7 @@ void do_restart_services()
 		if (!it->second->GetUID().empty())
 			UserListByUID.erase(it->second->GetUID());
 	}
-	ircdproto->SendSquit(Config.ServerName, quitmsg);
+	ircdproto->SendSquit(Config->ServerName, quitmsg);
 	SocketEngine->Process();
 	delete UplinkSock;
 	close_log();
@@ -230,7 +230,7 @@ static void services_shutdown()
 				UserListByUID.erase(it->second->GetUID());
 		}
 
-		ircdproto->SendSquit(Config.ServerName, quitmsg);
+		ircdproto->SendSquit(Config->ServerName, quitmsg);
 
 		while (!UserListByNick.empty())
 			delete UserListByNick.begin()->second;
@@ -268,13 +268,17 @@ void sighandler(int signum)
 			expire_all();
 			save_databases();
 
-			if (!read_config(1))
+			try
 			{
-				quitmsg = "Error Reading Configuration File (Received SIGHUP)";
-				quitting = true;
+				ServerConfig *newconfig = new ServerConfig();
+				delete Config;
+				Config = newconfig;
+				FOREACH_MOD(I_OnReload, OnReload(true));
 			}
-
-			FOREACH_MOD(I_OnReload, OnReload(true));
+			catch (const ConfigException &ex)
+			{
+				Alog() << "Error reloading configuration file: " << ex.GetReason();
+			}
 			return;
 
 		}
@@ -379,7 +383,7 @@ static bool Connect()
 {
 	/* Connect to the remote server */
 	int servernum = 1;
-	for (std::list<Uplink *>::iterator curr_uplink = Config.Uplinks.begin(), end_uplink = Config.Uplinks.end(); curr_uplink != end_uplink; ++curr_uplink, ++servernum)
+	for (std::list<Uplink *>::iterator curr_uplink = Config->Uplinks.begin(), end_uplink = Config->Uplinks.end(); curr_uplink != end_uplink; ++curr_uplink, ++servernum)
 	{
 		uplink_server = *curr_uplink;
 
@@ -394,7 +398,7 @@ static bool Connect()
 
 		try
 		{
-			new UplinkSocket(uplink_server->host, uplink_server->port, Config.LocalHost, uplink_server->ipv6);
+			new UplinkSocket(uplink_server->host, uplink_server->port, Config->LocalHost, uplink_server->ipv6);
 		}
 		catch (const SocketException &ex)
 		{
@@ -479,7 +483,7 @@ int main(int ac, char **av, char **envp)
 	started = true;
 
 #ifndef _WIN32
-	if (Config.DumpCore)
+	if (Config->DumpCore)
 	{
 		rlimit rl;
 		if (getrlimit(RLIMIT_CORE, &rl) == -1)
@@ -495,8 +499,8 @@ int main(int ac, char **av, char **envp)
 
 	/* Set up timers */
 	time_t last_check = time(NULL);
-	ExpireTimer expireTimer(Config.ExpireTimeout, last_check);
-	UpdateTimer updateTimer(Config.UpdateTimeout, last_check);
+	ExpireTimer expireTimer(Config->ExpireTimeout, last_check);
+	UpdateTimer updateTimer(Config->UpdateTimeout, last_check);
 
 	/*** Main loop. ***/
 	while (!quitting)
@@ -523,7 +527,7 @@ int main(int ac, char **av, char **envp)
 				break;
 			}
 
-			if (t - last_check >= Config.TimeoutCheck)
+			if (t - last_check >= Config->TimeoutCheck)
 			{
 				TimerManager::TickTimers(t);
 				last_check = t;
@@ -566,11 +570,11 @@ int main(int ac, char **av, char **envp)
 			Me->ClearLinks();
 
 			unsigned j = 0;
-			for (; j < (Config.MaxRetries ? Config.MaxRetries : j + 1); ++j)
+			for (; j < (Config->MaxRetries ? Config->MaxRetries : j + 1); ++j)
 			{
-				Alog() << "Disconnected from the server, retrying in " << Config.RetryWait << " seconds";
+				Alog() << "Disconnected from the server, retrying in " << Config->RetryWait << " seconds";
 
-				sleep(Config.RetryWait);
+				sleep(Config->RetryWait);
 				if (Connect())
 				{
 					ircdproto->SendConnect();
@@ -578,7 +582,7 @@ int main(int ac, char **av, char **envp)
 					break;
 				}
 			}
-			if (Config.MaxRetries && j == Config.MaxRetries)
+			if (Config->MaxRetries && j == Config->MaxRetries)
 			{
 				Alog() << "Max connection retry limit exceeded";
 				quitting = true;

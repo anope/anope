@@ -17,7 +17,7 @@ NickCore::NickCore(const Anope::string &coredisplay)
 
 	/* Set default nick core flags */
 	for (size_t t = NI_BEGIN + 1; t != NI_END; ++t)
-		if (Config.NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
+		if (Config->NSDefFlags.HasFlag(static_cast<NickCoreFlag>(t)))
 			this->SetFlag(static_cast<NickCoreFlag>(t));
 
 	NickCoreList[this->display] = this;
@@ -50,7 +50,7 @@ NickCore::~NickCore()
 	NickCoreList.erase(this->display);
 
 	/* Log .. */
-	Alog() << Config.s_NickServ << ": deleting nickname group " << this->display;
+	Alog() << Config->s_NickServ << ": deleting nickname group " << this->display;
 
 	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();

@@ -26,7 +26,7 @@ class CommandMSStaff : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config.s_MemoServ, u, MEMO_SEND_DISABLED);
+			notice_lang(Config->s_MemoServ, u, MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -43,18 +43,18 @@ class CommandMSStaff : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_STAFF);
+		notice_help(Config->s_MemoServ, u, MEMO_HELP_STAFF);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
+		syntax_error(Config->s_MemoServ, u, "STAFF", MEMO_STAFF_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_STAFF);
+		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_STAFF);
 	}
 };
 

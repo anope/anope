@@ -104,7 +104,7 @@ class NSMaxEmail : public Module
 
 	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == findbot(Config.s_NickServ))
+		if (service == findbot(Config->s_NickServ))
 		{
 			if (command.equals_ci("REGISTER"))
 			{
@@ -152,9 +152,9 @@ bool check_email_limit_reached(const Anope::string &email, User *u)
 		return false;
 
 	if (NSEmailMax == 1)
-		me->NoticeLang(Config.s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
+		me->NoticeLang(Config->s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
 	else
-		me->NoticeLang(Config.s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
+		me->NoticeLang(Config->s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
 
 	return true;
 }

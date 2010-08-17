@@ -27,24 +27,24 @@ class CommandNSForbid : public Command
 		Anope::string reason = params.size() > 1 ? params[1] : "";
 
 		/* Assumes that permission checking has already been done. */
-		if (Config.ForceForbidReason && reason.empty())
+		if (Config->ForceForbidReason && reason.empty())
 		{
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			notice_lang(Config.s_NickServ, u, READ_ONLY_MODE);
+			notice_lang(Config->s_NickServ, u, READ_ONLY_MODE);
 		if (!ircdproto->IsNickValid(nick))
 		{
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, nick.c_str());
 			return MOD_CONT;
 		}
 		if ((na = findnick(nick)))
 		{
-			if (Config.NSSecureAdmins && na->nc->IsServicesOper())
+			if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 			{
-				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			delete na;
@@ -63,7 +63,7 @@ class CommandNSForbid : public Command
 
 			if (curr)
 			{
-				notice_lang(Config.s_NickServ, curr, FORCENICKCHANGE_NOW);
+				notice_lang(Config->s_NickServ, curr, FORCENICKCHANGE_NOW);
 				curr->Collide(na);
 			}
 
@@ -73,36 +73,36 @@ class CommandNSForbid : public Command
 				ircdproto->SendSQLine(&x);
 			}
 
-			if (Config.WallForbid)
+			if (Config->WallForbid)
 				ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick.c_str());
 
-			Alog() << Config.s_NickServ << ": " << u->nick << " set FORBID for nick " << nick;
-			notice_lang(Config.s_NickServ, u, NICK_FORBID_SUCCEEDED, nick.c_str());
+			Alog() << Config->s_NickServ << ": " << u->nick << " set FORBID for nick " << nick;
+			notice_lang(Config->s_NickServ, u, NICK_FORBID_SUCCEEDED, nick.c_str());
 
 			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 		}
 		else
 		{
-			Alog() << Config.s_NickServ << ": Valid FORBID for " << nick << " by " << u->nick << " failed";
-			notice_lang(Config.s_NickServ, u, NICK_FORBID_FAILED, nick.c_str());
+			Alog() << Config->s_NickServ << ": Valid FORBID for " << nick << " by " << u->nick << " failed";
+			notice_lang(Config->s_NickServ, u, NICK_FORBID_FAILED, nick.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
+		notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_NickServ, u, "FORBID", Config.ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "FORBID", Config->ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_FORBID);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_FORBID);
 	}
 };
 

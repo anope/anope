@@ -29,7 +29,7 @@ class CommandNSGetEMail : public Command
 		Anope::string email = params[0];
 		int j = 0;
 
-		Alog() << Config.s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
+		Alog() << Config->s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
 
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
@@ -38,13 +38,13 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
+				notice_lang(Config->s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,18 +53,18 @@ class CommandNSGetEMail : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
+		notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
 	}
 };
 

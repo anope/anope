@@ -30,18 +30,18 @@ class CommandMSSend : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_SEND);
+		notice_help(Config->s_MemoServ, u, MEMO_HELP_SEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+		syntax_error(Config->s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_SEND);
+		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_SEND);
 	}
 };
 

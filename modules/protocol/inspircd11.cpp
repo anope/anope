@@ -70,7 +70,7 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 	{
 		if (nick.empty() || vhost.empty())
 			return;
-		send_cmd(Config.s_OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+		send_cmd(Config->s_OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 	}
 	else
 		ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
@@ -95,7 +95,7 @@ class InspIRCdProto : public IRCDProto
 {
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd(Config.s_OperServ, "GLINE %s", x->Mask.c_str());
+		send_cmd(Config->s_OperServ, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
@@ -120,12 +120,12 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd(Config.ServerName, "ADDLINE G %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
+		send_cmd(Config->ServerName, "ADDLINE G %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config.ServerName, "KILL %s :%s", user->nick.c_str(), buf.c_str());
+		send_cmd(source ? source->nick : Config->ServerName, "KILL %s :%s", user->nick.c_str(), buf.c_str());
 	}
 
 	void SendSVSMode(const User *u, int ac, const char **av)
@@ -142,19 +142,19 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (buf.empty())
 			return;
-		send_cmd(source ? source->nick : Config.s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
+		send_cmd(source ? source->nick : Config->s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
 		if (buf.empty())
 			return;
-		send_cmd(bi ? bi->nick : Config.ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
+		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
 	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
 	{
-		send_cmd(Config.ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), modes.c_str(), real.c_str());
+		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), modes.c_str(), real.c_str());
 		send_cmd(nick, "OPERTYPE Service");
 	}
 
@@ -170,13 +170,13 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (buf.empty())
 			return;
-		send_cmd(Config.ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
+		send_cmd(Config->ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server)
 	{
-		send_cmd(Config.ServerName, "SERVER %s %s %d :%s", server->GetName().c_str(), currentpass.c_str(), server->GetHops(), server->GetDescription().c_str());
+		send_cmd(Config->ServerName, "SERVER %s %s %d :%s", server->GetName().c_str(), currentpass.c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */
@@ -188,13 +188,13 @@ class InspIRCdProto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd(Config.s_OperServ, "QLINE %s", x->Mask.c_str());
+		send_cmd(Config->s_OperServ, "QLINE %s", x->Mask.c_str());
 	}
 
 	/* SQLINE */
 	void SendSQLine(const XLine *x)
 	{
-		send_cmd(Config.ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config.s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd(Config->ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -202,7 +202,7 @@ class InspIRCdProto : public IRCDProto
 	{
 		if (servname.empty() || message.empty())
 			return;
-		send_cmd(Config.ServerName, "SQUIT %s :%s", servname.c_str(), message.c_str());
+		send_cmd(Config->ServerName, "SQUIT %s :%s", servname.c_str(), message.c_str());
 	}
 
 	/* Functions that use serval cmd functions */
@@ -220,7 +220,7 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd("", "BURST");
-		send_cmd(Config.ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config.ServerName.c_str(), ircd->name, Config.EncModuleList.begin()->c_str(), Anope::Build().c_str());
+		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
 	}
 
 	/* CHGIDENT */
@@ -230,7 +230,7 @@ class InspIRCdProto : public IRCDProto
 		{
 			if (nick.empty() || vIdent.empty())
 				return;
-			send_cmd(Config.s_OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
+			send_cmd(Config->s_OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
 		}
 		else
 			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
@@ -239,25 +239,25 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config.s_OperServ, "SVSHOLD %s %ds :Being held for registered user", nick.c_str(), static_cast<int>(Config.NSReleaseTimeout));
+		send_cmd(Config->s_OperServ, "SVSHOLD %s %ds :Being held for registered user", nick.c_str(), static_cast<int>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config.s_OperServ, "SVSHOLD %s", nick.c_str());
+		send_cmd(Config->s_OperServ, "SVSHOLD %s", nick.c_str());
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd(Config.s_OperServ, "ZLINE %s", x->Mask.c_str());
+		send_cmd(Config->s_OperServ, "ZLINE %s", x->Mask.c_str());
 	}
 
 	/* SZLINE */
 	void SendSZLine(const XLine *x)
 	{
-		send_cmd(Config.ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd(Config->ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)
@@ -507,7 +507,7 @@ int anope_event_ping(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(Config.ServerName, av[0]);
+	ircdproto->SendPong(Config->ServerName, av[0]);
 	return MOD_CONT;
 }
 
@@ -579,7 +579,7 @@ int anope_event_rsquit(const Anope::string &source, int ac, const char **av)
 		return MOD_CONT;
 
 	/* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
-	if (ac > 1 && Config.ServerName.equals_cs(av[0]))
+	if (ac > 1 && Config->ServerName.equals_cs(av[0]))
 		do_squit(source, ac - 1, av + 1);
 	else
 		do_squit(source, ac, av);

@@ -30,19 +30,19 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
 			ci->SetFlag(CI_SIGNKICK_LEVEL);
 			ci->UnsetFlag(CI_SIGNKICK);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SIGNKICK");
@@ -52,18 +52,18 @@ class CommandCSSetSignKick : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SIGNKICK, "SET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SIGNKICK, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SET SIGNKICK", CHAN_SET_SIGNKICK_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET SIGNKICK", CHAN_SET_SIGNKICK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_SIGNKICK);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_SIGNKICK);
 	}
 };
 
@@ -76,13 +76,13 @@ class CommandCSSASetSignKick : public CommandCSSetSignKick
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_SIGNKICK, "SASET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SIGNKICK, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_ChanServ, u, "SASET SIGNKICK", CHAN_SASET_SIGNKICK_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET SIGNKICK", CHAN_SASET_SIGNKICK_SYNTAX);
 	}
 };
 

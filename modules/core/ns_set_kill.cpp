@@ -34,33 +34,33 @@ class CommandNSSetKill : public Command
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_ON, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_KILL_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("QUICK"))
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->SetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_KILL_QUICK, nc->display.c_str());
 		}
 		else if (param.equals_ci("IMMED"))
 		{
-			if (Config.NSAllowKillImmed)
+			if (Config->NSAllowKillImmed)
 			{
 				nc->SetFlag(NI_KILLPROTECT);
 				nc->SetFlag(NI_KILL_IMMED);
 				nc->UnsetFlag(NI_KILL_QUICK);
-				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display.c_str());
+				notice_lang(Config->s_NickServ, u, NICK_SASET_KILL_IMMED, nc->display.c_str());
 			}
 			else
-				notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
+				notice_lang(Config->s_NickServ, u, NICK_SASET_KILL_IMMED_DISABLED);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			notice_lang(Config.s_NickServ, u, NICK_SASET_KILL_OFF, nc->display.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SASET_KILL_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "KILL");
@@ -70,18 +70,18 @@ class CommandNSSetKill : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_KILL);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_KILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SET KILL", Config.NSAllowKillImmed ? NICK_SET_KILL_IMMED_SYNTAX : NICK_SET_KILL_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET KILL", Config->NSAllowKillImmed ? NICK_SET_KILL_IMMED_SYNTAX : NICK_SET_KILL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_KILL);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_KILL);
 	}
 };
 
@@ -94,18 +94,18 @@ class CommandNSSASetKill : public CommandNSSetKill
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_KILL);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_KILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SASET KILL", Config.NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SASET KILL", Config->NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SASET_KILL);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_KILL);
 	}
 };
 

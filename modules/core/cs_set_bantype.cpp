@@ -31,11 +31,11 @@ class CommandCSSetBanType : public Command
 		int16 bantype = convertTo<int16>(params[1], end, false);
 
 		if (!end.empty() || bantype < 0 || bantype > 3)
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, params[1].c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_BANTYPE_INVALID, params[1].c_str());
 		else
 		{
 			ci->bantype = bantype;
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(), ci->bantype);
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(), ci->bantype);
 		}
 
 		return MOD_CONT;
@@ -43,19 +43,19 @@ class CommandCSSetBanType : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_BANTYPE);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_BANTYPE);
 	}
 };
 
@@ -68,14 +68,14 @@ class CommandCSSASetBanType : public CommandCSSetBanType
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SASET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_BANTYPE, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

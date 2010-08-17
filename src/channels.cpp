@@ -109,9 +109,9 @@ void Channel::JoinUser(User *user)
 		if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
 		{
 			if (this->ci->memos.memos.size() == 1)
-				notice_lang(Config.s_MemoServ, user, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+				notice_lang(Config->s_MemoServ, user, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 			else
-				notice_lang(Config.s_MemoServ, user, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+				notice_lang(Config->s_MemoServ, user, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 		}
 		/* Added channelname to entrymsg - 30.03.2004, Certus */
 		/* Also, don't send the entrymsg when bursting -GD */
@@ -119,7 +119,7 @@ void Channel::JoinUser(User *user)
 			user->SendMessage(whosends(this->ci)->nick, "[%s] %s", this->name.c_str(), this->ci->entry_message.c_str());
 	}
 
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi)
+	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)
 	{
 		/**
 		 * We let the bot join even if it was an ignored user, as if we don't,
@@ -129,7 +129,7 @@ void Channel::JoinUser(User *user)
 		 * But don't join the bot if the channel is persistant - Adam
 		 * But join persistant channels when syncing with our uplink- DP
 		 **/
-		if ((!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config.BSMinUsers && !this->FindUser(this->ci->bi))
+		if ((!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
 			this->ci->bi->Join(this);
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
@@ -193,7 +193,7 @@ void Channel::DeleteUser(User *user)
 	/* check for BSMinUsers and part the BotServ bot from the channel
 	 * Use <= because the bot is included in this->users.size()
 	 */
-	if (!Config.s_BotServ.empty() && this->ci && this->ci->bi && this->users.size() <= Config.BSMinUsers && this->FindUser(this->ci->bi))
+	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi && this->users.size() <= Config->BSMinUsers && this->FindUser(this->ci->bi))
 		this->ci->bi->Part(this->ci->c);
 	else if (this->users.empty())
 		delete this;
@@ -278,7 +278,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 		}
 
 		BotInfo *bi = NULL;
-		if (!Config.s_BotServ.empty())
+		if (!Config->s_BotServ.empty())
 			bi = findbot(param);
 		User *u = bi ? bi : finduser(param);
 
@@ -404,7 +404,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		}
 
 		BotInfo *bi = NULL;
-		if (!Config.s_BotServ.empty())
+		if (!Config->s_BotServ.empty())
 			bi = findbot(param);
 		User *u = bi ? bi : finduser(param);
 
@@ -460,7 +460,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		if (ci)
 		{
 			ci->UnsetFlag(CI_PERSIST);
-			if (!Config.s_BotServ.empty() && ci->bi && this->FindUser(ci->bi))
+			if (!Config->s_BotServ.empty() && ci->bi && this->FindUser(ci->bi))
 				this->ci->bi->Part(this);
 		}
 	}
@@ -865,7 +865,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 void Channel::KickInternal(const Anope::string &source, const Anope::string &nick, const Anope::string &reason)
 {
 	BotInfo *bi = NULL;
-	if (!Config.s_BotServ.empty() && this->ci)
+	if (!Config->s_BotServ.empty() && this->ci)
 		bi = findbot(nick);
 	User *user = bi ? bi : finduser(nick);
 	if (!user)

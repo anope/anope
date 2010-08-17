@@ -31,18 +31,18 @@ class CommandMSCheck : public Command
 
 		if (!u->IsRecognized())
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
+			notice_lang(Config->s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 		else if (!(na = findnick(recipient)))
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient.c_str());
+			notice_lang(Config->s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config.s_MemoServ, u, NICK_X_FORBIDDEN, recipient.c_str());
+			notice_lang(Config->s_MemoServ, u, NICK_X_FORBIDDEN, recipient.c_str());
 			return MOD_CONT;
 		}
 
@@ -61,33 +61,33 @@ class CommandMSCheck : public Command
 				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 
 				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick.c_str(), timebuf);
+					notice_lang(Config->s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick.c_str(), timebuf);
 				else
-					notice_lang(Config.s_MemoServ, u, MEMO_CHECK_READ, na->nick.c_str(), timebuf);
+					notice_lang(Config->s_MemoServ, u, MEMO_CHECK_READ, na->nick.c_str(), timebuf);
 				break;
 			}
 		}
 
 		if (!found)
-			notice_lang(Config.s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick.c_str());
+			notice_lang(Config->s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_CHECK);
+		notice_help(Config->s_MemoServ, u, MEMO_HELP_CHECK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+		syntax_error(Config->s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_CHECK);
+		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_CHECK);
 	}
 };
 

@@ -70,9 +70,9 @@ class CommandCSAppendTopic : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_TOPIC))
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
 			if (!ci->last_topic.empty())
@@ -95,11 +95,11 @@ class CommandCSAppendTopic : public Command
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				Alog() << Config.s_ChanServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
+				Alog() << Config->s_ChanServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
 				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config.s_ChanServ.c_str()); // XXX
+				ircdproto->SendMode(NULL, c, "+o %s", Config->s_ChanServ.c_str()); // XXX
 			}
 			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
 			if (ircd->join2set && whosends(ci) == ChanServ)
@@ -110,21 +110,21 @@ class CommandCSAppendTopic : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-		u->SendMessage(Config.s_ChanServ, " ");
-		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
+		me->NoticeLang(Config->s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		u->SendMessage(Config->s_ChanServ, " ");
+		me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
+		me->NoticeLang(Config->s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, LNG_CHAN_HELP);
+		me->NoticeLang(Config->s_ChanServ, u, LNG_CHAN_HELP);
 	}
 };
 

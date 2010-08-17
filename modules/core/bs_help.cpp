@@ -24,18 +24,18 @@ class CommandBSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(findbot(Config.s_BotServ), u, params[0]);
+		mod_help_cmd(findbot(Config->s_BotServ), u, params[0]);
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		// Abuse syntax error to display general list help.
-		notice_help(Config.s_BotServ, u, BOT_HELP);
+		notice_help(Config->s_BotServ, u, BOT_HELP);
 		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
-			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(u);
-		notice_help(Config.s_BotServ, u, BOT_HELP_FOOTER, Config.BSMinUsers);
+		notice_help(Config->s_BotServ, u, BOT_HELP_FOOTER, Config->BSMinUsers);
 	}
 };
 

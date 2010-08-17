@@ -120,19 +120,19 @@ class RatboxProto : public IRCDTS6Proto
 	void SendSGLineDel(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNXLINE * %s", x->Mask.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
 	void SendSQLineDel(const XLine *x)
@@ -148,7 +148,7 @@ class RatboxProto : public IRCDTS6Proto
 	void SendAkill(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->GetUID() : Config.s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -538,7 +538,7 @@ int anope_event_ping(const Anope::string &source, int ac, const char **av)
 {
 	if (ac < 1)
 		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : Config.ServerName, av[0]);
+	ircdproto->SendPong(ac > 1 ? av[1] : Config->ServerName, av[0]);
 	return MOD_CONT;
 }
 
@@ -811,8 +811,8 @@ class ProtoRatbox : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		if (!Config.Numeric.empty())
-			TS6SID = Config.Numeric;
+		if (!Config->Numeric.empty())
+			TS6SID = Config->Numeric;
 		UseTSMODE = 1;  /* TMODE */
 
 		pmodule_ircd_version("Ratbox IRCD 2.0+");

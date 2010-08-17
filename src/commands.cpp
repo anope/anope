@@ -57,7 +57,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config.s_NickServ.c_str());
+		notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 		Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << command;
 		return;
 	}
@@ -164,7 +164,7 @@ void mod_help_cmd(BotInfo *bi, User *u, const Anope::string &cmd)
 
 	Anope::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
 
-	if (!c || (Config.HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(u, subcommand))
+	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(u, subcommand))
 		notice_lang(bi->nick, u, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{

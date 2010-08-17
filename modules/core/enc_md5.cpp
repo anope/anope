@@ -359,7 +359,7 @@ class EMD5 : public Module
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (!this->name.equals_ci(Config.EncModuleList.front()))
+			if (!this->name.equals_ci(Config->EncModuleList.front()))
 				enc_encrypt(plaintext, password);
 			return EVENT_ALLOW;
 		}

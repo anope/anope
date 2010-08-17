@@ -24,26 +24,26 @@ class DefConTimeout : public Timer
 	int level;
 
  public:
-	DefConTimeout(int newlevel) : Timer(Config.DefConTimeOut), level(newlevel) { }
+	DefConTimeout(int newlevel) : Timer(Config->DefConTimeOut), level(newlevel) { }
 
 	void Tick(time_t)
 	{
-		if (Config.DefConLevel != level)
+		if (Config->DefConLevel != level)
 		{
-			Config.DefConLevel = level;
+			Config->DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			Alog() << "Defcon level timeout, returning to lvl " << level;
-			ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), Config.s_OperServ.c_str(), level);
+			ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), Config->s_OperServ.c_str(), level);
 
-			if (Config.GlobalOnDefcon)
+			if (Config->GlobalOnDefcon)
 			{
-				if (!Config.DefConOffMessage.empty())
-					oper_global("", "%s", Config.DefConOffMessage.c_str());
+				if (!Config->DefConOffMessage.empty())
+					oper_global("", "%s", Config->DefConOffMessage.c_str());
 				else
-					oper_global("", getstring(DEFCON_GLOBAL), Config.DefConLevel);
+					oper_global("", getstring(DEFCON_GLOBAL), Config->DefConLevel);
 
-				if (Config.GlobalOnDefconMore && Config.DefConOffMessage.empty())
-					oper_global("", "%s", Config.DefconMessage.c_str());
+				if (Config->GlobalOnDefconMore && Config->DefConOffMessage.empty())
+					oper_global("", "%s", Config->DefconMessage.c_str());
 			}
 
 			runDefCon();
@@ -67,7 +67,7 @@ class CommandOSDefcon : public Command
 
 		if (lvl.empty())
 		{
-			notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
+			notice_lang(Config->s_OperServ, u, OPER_DEFCON_CHANGED, Config->DefConLevel);
 			defcon_sendlvls(u);
 			return MOD_CONT;
 		}
@@ -77,7 +77,7 @@ class CommandOSDefcon : public Command
 			this->OnSyntaxError(u, "");
 			return MOD_CONT;
 		}
-		Config.DefConLevel = newLevel;
+		Config->DefConLevel = newLevel;
 
 		FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(newLevel));
 
@@ -87,26 +87,26 @@ class CommandOSDefcon : public Command
 			timeout = NULL;
 		}
 
-		if (Config.DefConTimeOut)
+		if (Config->DefConTimeOut)
 			timeout = new DefConTimeout(5);
 
-		notice_lang(Config.s_OperServ, u, OPER_DEFCON_CHANGED, Config.DefConLevel);
+		notice_lang(Config->s_OperServ, u, OPER_DEFCON_CHANGED, Config->DefConLevel);
 		defcon_sendlvls(u);
 		Alog() << "Defcon level changed to " << newLevel << " by Oper " << u->nick;
 		ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
-		if (Config.GlobalOnDefcon)
+		if (Config->GlobalOnDefcon)
 		{
-			if (Config.DefConLevel == 5 && !Config.DefConOffMessage.empty())
-				oper_global("", "%s", Config.DefConOffMessage.c_str());
+			if (Config->DefConLevel == 5 && !Config->DefConOffMessage.empty())
+				oper_global("", "%s", Config->DefConOffMessage.c_str());
 			else
-				oper_global("", langglobal, Config.DefConLevel);
+				oper_global("", langglobal, Config->DefConLevel);
 		}
-		if (Config.GlobalOnDefconMore)
+		if (Config->GlobalOnDefconMore)
 		{
-			if (Config.DefConOffMessage.empty() || Config.DefConLevel != 5)
-				oper_global("", "%s", Config.DefconMessage.c_str());
+			if (Config->DefConOffMessage.empty() || Config->DefConLevel != 5)
+				oper_global("", "%s", Config->DefconMessage.c_str());
 		}
 		/* Run any defcon functions, e.g. FORCE CHAN MODE */
 		runDefCon();
@@ -115,18 +115,18 @@ class CommandOSDefcon : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_DEFCON);
+		notice_help(Config->s_OperServ, u, OPER_HELP_DEFCON);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
+		syntax_error(Config->s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_DEFCON);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_DEFCON);
 	}
 };
 
@@ -137,7 +137,7 @@ class OSDefcon : public Module
  public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		if (!Config.DefConLevel)
+		if (!Config->DefConLevel)
 			throw ModuleException("Invalid configuration settings");
 
 		this->SetAuthor("Anope");
@@ -148,7 +148,7 @@ class OSDefcon : public Module
 
 		this->AddCommand(OperServ, &commandosdefcon);
 
-		defconParseModeString(Config.DefConChanModes);
+		defconParseModeString(Config->DefConChanModes);
 	}
 
 	EventReturn OnPreUserConnect(User *u)
@@ -158,13 +158,13 @@ class OSDefcon : public Module
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
 				Alog() << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config.DefConAKILL, !Config.DefConAkillReason.empty() ? Config.DefConAkillReason : "DEFCON AKILL");
+				XLine *x = SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config->DefConAKILL, !Config->DefConAkillReason.empty() ? Config->DefConAkillReason : "DEFCON AKILL");
 				if (x)
-					x->By = Config.s_OperServ;
+					x->By = Config->s_OperServ;
 			}
 
 			if (CheckDefCon(DEFCON_NO_NEW_CLIENTS) || CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-				kill_user(Config.s_OperServ, u->nick, Config.DefConAkillReason);
+				kill_user(Config->s_OperServ, u->nick, Config->DefConAkillReason);
 
 			return EVENT_STOP;
 		}
@@ -226,24 +226,24 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == findbot(Config.s_NickServ))
+		if (service == findbot(Config->s_NickServ))
 		{
 			if (command.equals_ci("REGISTER") || command.equals_ci("GROUP"))
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_NICKS))
 				{
-					notice_lang(Config.s_NickServ, u, OPER_DEFCON_DENIED);
+					notice_lang(Config->s_NickServ, u, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
 		}
-		else if (service == findbot(Config.s_ChanServ))
+		else if (service == findbot(Config->s_ChanServ))
 		{
 			if (command.equals_ci("SET"))
 			{
 				if (!params.empty() && params[0].equals_ci("MLOCK") && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					notice_lang(Config.s_ChanServ, u, OPER_DEFCON_DENIED);
+					notice_lang(Config->s_ChanServ, u, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -251,18 +251,18 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
 				{
-					notice_lang(Config.s_ChanServ, u, OPER_DEFCON_DENIED);
+					notice_lang(Config->s_ChanServ, u, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
 		}
-		else if (service == findbot(Config.s_MemoServ))
+		else if (service == findbot(Config->s_MemoServ))
 		{
 			if (command.equals_ci("SEND") || command.equals_ci("SENDALL"))
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
 				{
-					notice_lang(Config.s_MemoServ, u, OPER_DEFCON_DENIED);
+					notice_lang(Config->s_MemoServ, u, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -278,18 +278,18 @@ class OSDefcon : public Module
 
 		if (CheckDefCon(DEFCON_REDUCE_SESSION) && !exception)
 		{
-			if (session && session->count > Config.DefConSessionLimit)
+			if (session && session->count > Config->DefConSessionLimit)
 			{
-				if (!Config.SessionLimitExceeded.empty())
-					ircdproto->SendMessage(OperServ, u->nick, Config.SessionLimitExceeded.c_str(), u->host.c_str());
-				if (!Config.SessionLimitDetailsLoc.empty())
-					ircdproto->SendMessage(OperServ, u->nick, "%s", Config.SessionLimitDetailsLoc.c_str());
+				if (!Config->SessionLimitExceeded.empty())
+					ircdproto->SendMessage(OperServ, u->nick, Config->SessionLimitExceeded.c_str(), u->host.c_str());
+				if (!Config->SessionLimitDetailsLoc.empty())
+					ircdproto->SendMessage(OperServ, u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				kill_user(Config.s_OperServ, u->nick, "Session limit exceeded");
+				kill_user(Config->s_OperServ, u->nick, "Session limit exceeded");
 				++session->hits;
-				if (Config.MaxSessionKill && session->hits >= Config.MaxSessionKill)
+				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
-					SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config.SessionAutoKillExpiry, "Session limit exceeded");
+					SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config->SessionAutoKillExpiry, "Session limit exceeded");
 					ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
 				}
 			}
@@ -298,22 +298,22 @@ class OSDefcon : public Module
 
 	void OnChannelModeAdd(ChannelMode *cm)
 	{
-		if (!Config.DefConChanModes.empty())
+		if (!Config->DefConChanModes.empty())
 		{
-			Anope::string modes = Config.DefConChanModes;
+			Anope::string modes = Config->DefConChanModes;
 
 			if (modes.find(cm->ModeChar) != Anope::string::npos)
 				/* New mode has been added to Anope, check to see if defcon
 				 * requires it
 				 */
-				defconParseModeString(Config.DefConChanModes);
+				defconParseModeString(Config->DefConChanModes);
 		}
 	}
 
 	void OnChannelCreate(Channel *c)
 	{
 		if (CheckDefCon(DEFCON_FORCE_CHAN_MODES))
-			c->SetModes(OperServ, false, "%s", Config.DefConChanModes.c_str());
+			c->SetModes(OperServ, false, "%s", Config->DefConChanModes.c_str());
 	}
 };
 
@@ -323,49 +323,49 @@ class OSDefcon : public Module
 void defcon_sendlvls(User *u)
 {
 	if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
 	if (CheckDefCon(DEFCON_NO_NEW_NICKS))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_NICKS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_NICKS);
 	if (CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
-	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && !Config.DefConChanModes.empty())
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config.DefConChanModes.c_str());
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
+	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && !Config->DefConChanModes.empty())
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
 	if (CheckDefCon(DEFCON_REDUCE_SESSION))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_REDUCE_SESSION, Config.DefConSessionLimit);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
 	if (CheckDefCon(DEFCON_NO_NEW_CLIENTS))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_OPER_ONLY))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_OPER_ONLY);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_OPER_ONLY);
 	if (CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
 	if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
-		notice_lang(Config.s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
 }
 
 void runDefCon()
 {
 	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES))
 	{
-		if (!Config.DefConChanModes.empty() && !DefConModesSet)
+		if (!Config->DefConChanModes.empty() && !DefConModesSet)
 		{
-			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
+			if (Config->DefConChanModes[0] == '+' || Config->DefConChanModes[0] == '-')
 			{
-				Alog() << "DEFCON: setting " << Config.DefConChanModes << " on all channels";
+				Alog() << "DEFCON: setting " << Config->DefConChanModes << " on all channels";
 				DefConModesSet = true;
-				MassChannelModes(OperServ, Config.DefConChanModes);
+				MassChannelModes(OperServ, Config->DefConChanModes);
 			}
 		}
 	}
 	else
 	{
-		if (!Config.DefConChanModes.empty() && DefConModesSet)
+		if (!Config->DefConChanModes.empty() && DefConModesSet)
 		{
-			if (Config.DefConChanModes[0] == '+' || Config.DefConChanModes[0] == '-')
+			if (Config->DefConChanModes[0] == '+' || Config->DefConChanModes[0] == '-')
 			{
 				DefConModesSet = false;
-				Anope::string newmodes = defconReverseModes(Config.DefConChanModes);
+				Anope::string newmodes = defconReverseModes(Config->DefConChanModes);
 				if (!newmodes.empty())
 				{
 					Alog() << "DEFCON: setting " << newmodes << " on all channels";

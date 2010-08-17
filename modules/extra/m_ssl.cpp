@@ -128,7 +128,7 @@ class SSLModule : public Module
 		{
 			try
 			{
-				new SSLSocket(u->host, u->port, Config.LocalHost, u->ipv6);
+				new SSLSocket(u->host, u->port, Config->LocalHost, u->ipv6);
 				Alog() << "Connected to Server " << Number << " (" << u->host << ":" << u->port << ")";
 			}
 			catch (const SocketException &ex)

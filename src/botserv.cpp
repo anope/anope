@@ -26,7 +26,7 @@ E void moduleAddBotServCmds();
 
 void moduleAddBotServCmds()
 {
-	ModuleManager::LoadModuleList(Config.BotServCoreModules);
+	ModuleManager::LoadModuleList(Config->BotServCoreModules);
 }
 
 /*************************************************************************/
@@ -61,7 +61,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 
 void bs_init()
 {
-	if (!Config.s_BotServ.empty())
+	if (!Config->s_BotServ.empty())
 		moduleAddBotServCmds();
 }
 
@@ -198,25 +198,25 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			{
 				BadWord *bw = ci->GetBadWord(i);
 
-				if (bw->type == BW_ANY && ((Config.BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
+				if (bw->type == BW_ANY && ((Config->BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
 					mustkick = true;
 				else if (bw->type == BW_SINGLE)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config.BSCaseSensitive && bw->word.equals_ci(nbuf)))
+					if ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf)))
 						mustkick = true;
-					else if (nbuf.find(' ') == len && ((Config.BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config.BSCaseSensitive && bw->word.equals_ci(nbuf))))
+					else if (nbuf.find(' ') == len && ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf))))
 						mustkick = true;
 					else
 					{
-						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config.BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config.BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
+						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config->BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
 							mustkick = true;
 						else
 						{
 							Anope::string wordbuf = " " + bw->word + " ";
 
-							if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+							if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 								mustkick = true;
 						}
 					}
@@ -225,13 +225,13 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config.BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
+					if ((Config->BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
 						Anope::string wordbuf = " " + bw->word;
 
-						if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
 					}
 				}
@@ -239,13 +239,13 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 				{
 					size_t len = bw->word.length();
 
-					if ((Config.BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config.BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
+					if ((Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
 						mustkick = true;
 					else
 					{
 						Anope::string wordbuf = bw->word + " ";
 
-						if ((Config.BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config.BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
 							mustkick = true;
 					}
 				}
@@ -253,7 +253,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 				if (mustkick)
 				{
 					check_ban(ci, u, TTB_BADWORDS);
-					if (Config.BSGentleBWReason)
+					if (Config->BSGentleBWReason)
 						bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
 					else
 						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word.c_str());
@@ -320,12 +320,12 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		return;
 
 	/* Fantaisist commands */
-	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config.BSFantasyCharacter[0] && !was_action)
+	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config->BSFantasyCharacter[0] && !was_action)
 	{
 		spacesepstream sep(buf);
 		Anope::string token;
 
-		if (sep.GetToken(token) && token[0] == Config.BSFantasyCharacter[0])
+		if (sep.GetToken(token) && token[0] == Config->BSFantasyCharacter[0])
 		{
 			/* Strip off the fantasy character */
 			token.erase(token.begin());
@@ -396,7 +396,7 @@ static BanData *get_ban_data(Channel *c, User *u)
 
 	for (bd = c->bd; bd; bd = next)
 	{
-		if (now - bd->last_use > Config.BSKeepData)
+		if (now - bd->last_use > Config->BSKeepData)
 		{
 			if (bd->next)
 				bd->next->prev = bd->prev;
@@ -452,7 +452,7 @@ static UserData *get_user_data(Channel *c, User *u)
 			time_t now = time(NULL);
 
 			/* Checks whether data is obsolete */
-			if (now - uc->ud.last_use > Config.BSKeepData)
+			if (now - uc->ud.last_use > Config->BSKeepData)
 			{
 				/* We should not free and realloc, but reset to 0
 				   instead. */

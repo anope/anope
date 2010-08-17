@@ -11,13 +11,13 @@ MailThread::~MailThread()
 
 void MailThread::Run()
 {
-	FILE *pipe = popen(Config.SendMailPath.c_str(), "w");
+	FILE *pipe = popen(Config->SendMailPath.c_str(), "w");
 
 	if (!pipe)
 		return;
 
-	fprintf(pipe, "From: %s\n", Config.SendFrom.c_str());
-	if (Config.DontQuoteAddresses)
+	fprintf(pipe, "From: %s\n", Config->SendFrom.c_str());
+	if (Config->DontQuoteAddresses)
 		fprintf(pipe, "To: %s <%s>\n", MailTo.c_str(), Addr.c_str());
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\n", MailTo.c_str(), Addr.c_str());
@@ -37,9 +37,9 @@ bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::s
 
 	time_t t = time(NULL);
 
-	if (!Config.UseMail)
+	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
-	else if (t - u->lastmail < Config.MailDelay)
+	else if (t - u->lastmail < Config->MailDelay)
 		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
 	else if (nr->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nr->nick.c_str());
@@ -60,9 +60,9 @@ bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::stri
 
 	time_t t = time(NULL);
 
-	if (!Config.UseMail)
+	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
-	else if (t - u->lastmail < Config.MailDelay)
+	else if (t - u->lastmail < Config->MailDelay)
 		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
 	else if (nc->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nc->display.c_str());
@@ -78,7 +78,7 @@ bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::stri
 
 bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &message)
 {
-	if (!Config.UseMail || !nc || nc->email.empty() || subject.empty() || message.empty())
+	if (!Config->UseMail || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
 	nc->lastmail = time(NULL);

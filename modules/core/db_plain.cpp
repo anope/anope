@@ -539,7 +539,7 @@ class DBPlain : public Module
 				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
 				Alog() << "Unable to back up database!";
 
-				if (!Config.NoBackupOkay)
+				if (!Config->NoBackupOkay)
 					quitting = true;
 
 				return;
@@ -547,7 +547,7 @@ class DBPlain : public Module
 
 			Backups.push_back(newname);
 
-			unsigned KeepBackups = Config.KeepBackups;
+			unsigned KeepBackups = Config->KeepBackups;
 			if (KeepBackups && Backups.size() > KeepBackups)
 			{
 				DeleteFile(Backups.front().c_str());
@@ -679,7 +679,7 @@ class DBPlain : public Module
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
 		if (key.equals_ci("BANTYPE"))
-			ci->bantype = params[0].is_number_only() ? convertTo<int16>(params[0]) : Config.CSDefBantype;
+			ci->bantype = params[0].is_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
 		else if (key.equals_ci("MEMOMAX"))
 			ci->memos.memomax = params[0].is_number_only() ? convertTo<int16>(params[0]) : 1;
 		else if (key.equals_ci("FOUNDER"))

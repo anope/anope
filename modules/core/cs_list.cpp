@@ -31,9 +31,9 @@ public:
 		int count = 0, from = 0, to = 0;
 		bool forbidden = false, suspended = false, channoexpire = false;
 
-		if (Config.CSListOpersOnly && !is_oper(u))
+		if (Config->CSListOpersOnly && !is_oper(u))
 		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -42,28 +42,28 @@ public:
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
 			if (tmp.empty())
 			{
-				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (tmp.empty())
 			{
-				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				notice_lang(Config.s_ChanServ, u, LIST_INCORRECT_RANGE);
-				notice_lang(Config.s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, LIST_INCORRECT_RANGE);
+				notice_lang(Config->s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -89,7 +89,7 @@ public:
 
 		Anope::string spattern = "#" + pattern;
 
-		notice_lang(Config.s_ChanServ, u, CHAN_LIST_HEADER, pattern.c_str());
+		notice_lang(Config->s_ChanServ, u, CHAN_LIST_HEADER, pattern.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -106,7 +106,7 @@ public:
 
 			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern) || Anope::Match(ci->name, spattern))
 			{
-				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config.CSListMax)
+				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config->CSListMax)
 				{
 					char noexpire_char = ' ';
 					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
@@ -119,30 +119,30 @@ public:
 					else
 						snprintf(buf, sizeof(buf), "%-20s  %s", ci->name.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 
-					u->SendMessage(Config.s_ChanServ, "  %c%s", noexpire_char, buf);
+					u->SendMessage(Config->s_ChanServ, "  %c%s", noexpire_char, buf);
 				}
 				++count;
 			}
 		}
 
-		notice_lang(Config.s_ChanServ, u, CHAN_LIST_END, nchans > Config.CSListMax ? Config.CSListMax : nchans, nchans);
+		notice_lang(Config->s_ChanServ, u, CHAN_LIST_END, nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_LIST);
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_LIST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_ChanServ, u, "LIST", CHAN_LIST_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "LIST", CHAN_LIST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_LIST);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_LIST);
 	}
 };
 

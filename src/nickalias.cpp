@@ -39,14 +39,14 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 
 	NickAliasList[this->nick] = this;
 
-	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config.Opers.begin(), it_end = Config.Opers.end(); it != it_end; ++it)
+	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 	{
 		if (this->nc->ot)
 			break;
 		if (!this->nick.equals_ci(it->first))
 			continue;
 
-		for (std::list<OperType *>::iterator tit = Config.MyOperTypes.begin(), tit_end = Config.MyOperTypes.end(); tit != tit_end; ++tit)
+		for (std::list<OperType *>::iterator tit = Config->MyOperTypes.begin(), tit_end = Config->MyOperTypes.end(); tit != tit_end; ++tit)
 		{
 			OperType *ot = *tit;
 
@@ -135,8 +135,8 @@ void NickAlias::OnCancel(User *)
 		{
 			Anope::string uid = ircd->ts6 ? ts6_uid_retrieve() : "";
 
-			ircdproto->SendClientIntroduction(this->nick, Config.NSEnforcerUser, Config.NSEnforcerHost, "Services Enforcer", "+", uid);
-			new NickServRelease(this->nick, uid, Config.NSReleaseTimeout);
+			ircdproto->SendClientIntroduction(this->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "Services Enforcer", "+", uid);
+			new NickServRelease(this->nick, uid, Config->NSReleaseTimeout);
 		}
 	}
 }

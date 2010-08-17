@@ -37,30 +37,30 @@ class CommandNSSetLanguage : public Command
 		int langnum = convertTo<int>(param) - 1;
 		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
 		{
-			notice_lang(Config.s_NickServ, u, NICK_SET_LANGUAGE_UNKNOWN, langnum + 1, Config.s_NickServ.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_SET_LANGUAGE_UNKNOWN, langnum + 1, Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 
 		nc->language = langlist[langnum];
-		notice_lang(Config.s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
+		notice_lang(Config->s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SET_LANGUAGE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SET_LANGUAGE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SET_LANGUAGE);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_LANGUAGE);
 	}
 };
 
@@ -73,18 +73,18 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
+		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config.s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_SASET_LANGUAGE);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_LANGUAGE);
 	}
 };
 

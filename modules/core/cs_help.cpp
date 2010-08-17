@@ -29,7 +29,7 @@ class CommandCSHelp : public Command
 		if (cmd.equals_ci("LEVELS DESC"))
 		{
 			int i;
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
 			if (!levelinfo_maxwidth)
 				for (i = 0; levelinfo[i].what >= 0; ++i)
 				{
@@ -38,7 +38,7 @@ class CommandCSHelp : public Command
 						levelinfo_maxwidth = len;
 				}
 			for (i = 0; levelinfo[i].what >= 0; ++i)
-				notice_help(Config.s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), getstring(u, levelinfo[i].desc));
+				notice_help(Config->s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), getstring(u, levelinfo[i].desc));
 		}
 		else
 			mod_help_cmd(ChanServ, u, cmd);
@@ -48,14 +48,14 @@ class CommandCSHelp : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP);
+		notice_help(Config->s_ChanServ, u, CHAN_HELP);
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
-			if (!Config.HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(u);
-		if (Config.CSExpire >= 86400)
-			notice_help(Config.s_ChanServ, u, CHAN_HELP_EXPIRES, Config.CSExpire / 86400);
+		if (Config->CSExpire >= 86400)
+			notice_help(Config->s_ChanServ, u, CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config.s_ChanServ, u, CHAN_SERVADMIN_HELP);
+			notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP);
 	}
 };
 

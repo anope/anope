@@ -25,21 +25,21 @@ class CommandOSQuit : public Command
 	{
 		quitmsg = "QUIT command received from " + u->nick;
 
-		if (Config.GlobalOnCycle)
-			oper_global("", "%s", Config.GlobalOnCycleMessage.c_str());
+		if (Config->GlobalOnCycle)
+			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
 		quitting = true;
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_OperServ, u, OPER_HELP_QUIT);
+		notice_help(Config->s_OperServ, u, OPER_HELP_QUIT);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_OperServ, u, OPER_HELP_CMD_QUIT);
+		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_QUIT);
 	}
 };
 

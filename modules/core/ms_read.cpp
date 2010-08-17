@@ -38,10 +38,10 @@ class MemoListCallback : public NumberList
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
 		timebuf[sizeof(timebuf) - 1] = 0;
 		if (ci)
-			notice_lang(Config.s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ.c_str(), ci->name.c_str(), m->number);
+			notice_lang(Config->s_MemoServ, u, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), timebuf, Config->s_MemoServ.c_str(), ci->name.c_str(), m->number);
 		else
-			notice_lang(Config.s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config.s_MemoServ.c_str(), m->number);
-		notice_lang(Config.s_MemoServ, u, MEMO_TEXT, m->text.c_str());
+			notice_lang(Config->s_MemoServ, u, MEMO_HEADER, m->number, m->sender.c_str(), timebuf, Config->s_MemoServ.c_str(), m->number);
+		notice_lang(Config->s_MemoServ, u, MEMO_TEXT, m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
 		/* Check if a receipt notification was requested */
@@ -71,12 +71,12 @@ class CommandMSRead : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				notice_lang(Config.s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				notice_lang(Config->s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(Config.s_MemoServ, u, ACCESS_DENIED);
+				notice_lang(Config->s_MemoServ, u, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -89,9 +89,9 @@ class CommandMSRead : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				notice_lang(Config->s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				notice_lang(Config->s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 		}
 		else {
 			int i, end;
@@ -108,9 +108,9 @@ class CommandMSRead : public Command
 				if (!readcount)
 				{
 					if (!chan.empty())
-						notice_lang(Config.s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+						notice_lang(Config->s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
-						notice_lang(Config.s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
+						notice_lang(Config->s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -129,18 +129,18 @@ class CommandMSRead : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_MemoServ, u, MEMO_HELP_READ);
+		notice_help(Config->s_MemoServ, u, MEMO_HELP_READ);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
+		syntax_error(Config->s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_MemoServ, u, MEMO_HELP_CMD_READ);
+		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_READ);
 	}
 };
 

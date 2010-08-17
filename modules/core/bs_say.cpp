@@ -31,19 +31,19 @@ class CommandBSSay : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			notice_lang(Config.s_BotServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			notice_help(Config.s_BotServ, u, BOT_NOT_ASSIGNED);
+			notice_help(Config->s_BotServ, u, BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			notice_lang(Config.s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			notice_lang(Config->s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -55,25 +55,25 @@ class CommandBSSay : public Command
 
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
 		ci->bi->lastmsg = time(NULL);
-		if (Config.LogBot && !Config.LogChannel.empty() && LogChan && !debug && findchan(Config.LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config.LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text.c_str());
+		if (Config->LogBot && !Config->LogChannel.empty() && LogChan && !debug && findchan(Config->LogChannel))
+			ircdproto->SendPrivmsg(ci->bi, Config->LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_BotServ, u, BOT_HELP_SAY);
+		notice_help(Config->s_BotServ, u, BOT_HELP_SAY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
+		syntax_error(Config->s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_BotServ, u, BOT_HELP_CMD_SAY);
+		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_SAY);
 	}
 };
 

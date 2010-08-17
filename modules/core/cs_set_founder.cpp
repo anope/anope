@@ -28,7 +28,7 @@ class CommandCSSetFounder : public Command
 
 		if (this->permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 		{
-			notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -37,23 +37,23 @@ class CommandCSSetFounder : public Command
 
 		if (!na)
 		{
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_REGISTERED, params[1].c_str());
+			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_REGISTERED, params[1].c_str());
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config.s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			notice_lang(Config->s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		nc = na->nc;
-		if (Config.CSMaxReg && nc->channelcount >= Config.CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
+		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			notice_lang(Config.s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
 			return MOD_CONT;
 		}
 
-		Alog() << Config.s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display << " to " << nc->display << " by " << u->GetMask();
+		Alog() << Config->s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display << " to " << nc->display << " by " << u->GetMask();
 
 		/* Founder and successor must not be the same group */
 		if (nc == ci->successor)
@@ -63,26 +63,26 @@ class CommandCSSetFounder : public Command
 		ci->founder = nc;
 		++nc->channelcount;
 
-		notice_lang(Config.s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick.c_str());
+		notice_lang(Config->s_ChanServ, u, CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_ChanServ, u, CHAN_HELP_CMD_SET_FOUNDER);
+		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_FOUNDER);
 	}
 };
 
@@ -95,14 +95,14 @@ class CommandCSSASetFounder : public CommandCSSetFounder
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config.s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SASET");
+		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_FOUNDER, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config.s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

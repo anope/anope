@@ -28,30 +28,30 @@ class CommandNSGhost : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!finduser(nick))
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!na)
-			notice_lang(Config.s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config.s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config.s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
-			notice_lang(Config.s_NickServ, u, NICK_NO_GHOST_SELF);
+			notice_lang(Config->s_NickServ, u, NICK_NO_GHOST_SELF);
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
 				Anope::string buf = "GHOST command used by " + u->nick;
-				kill_user(Config.s_NickServ, nick, buf);
-				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
+				kill_user(Config->s_NickServ, nick, buf);
+				notice_lang(Config->s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
 			}
 			else
 			{
-				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					Alog() << Config.s_NickServ << ": GHOST: invalid password for " << nick << " by " << u->GetMask();
+					Alog() << Config->s_NickServ << ": GHOST: invalid password for " << nick << " by " << u->GetMask();
 					if (bad_password(u))
 						return MOD_STOP;
 				}
@@ -62,29 +62,29 @@ class CommandNSGhost : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				Anope::string buf = "GHOST command used by " + u->nick;
-				kill_user(Config.s_NickServ, nick, buf);
-				notice_lang(Config.s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
+				kill_user(Config->s_NickServ, nick, buf);
+				notice_lang(Config->s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
 			}
 			else
-				notice_lang(Config.s_NickServ, u, ACCESS_DENIED);
+				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config.s_NickServ, u, NICK_HELP_GHOST);
+		notice_help(Config->s_NickServ, u, NICK_HELP_GHOST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config.s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
+		syntax_error(Config->s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config.s_NickServ, u, NICK_HELP_CMD_GHOST);
+		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_GHOST);
 	}
 };
 

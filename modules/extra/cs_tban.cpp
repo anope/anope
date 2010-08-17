@@ -55,9 +55,9 @@ class CommandCSTBan : public Command
 		Anope::string time = params[2];
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config.s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!(u2 = finduser(nick)))
-			notice_lang(Config.s_ChanServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, nick.c_str());
 		else
 			if (canBanUser(c, u, u2))
 			{
@@ -72,20 +72,20 @@ class CommandCSTBan : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		this->OnSyntaxError(u, "");
-		u->SendMessage(Config.s_ChanServ, " ");
-		me->NoticeLang(Config.s_ChanServ, u, TBAN_HELP_DETAIL);
+		u->SendMessage(Config->s_ChanServ, " ");
+		me->NoticeLang(Config->s_ChanServ, u, TBAN_HELP_DETAIL);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, TBAN_SYNTAX);
+		me->NoticeLang(Config->s_ChanServ, u, TBAN_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		me->NoticeLang(Config.s_ChanServ, u, TBAN_HELP);
+		me->NoticeLang(Config->s_ChanServ, u, TBAN_HELP);
 	}
 };
 
@@ -164,7 +164,7 @@ class CSTBan : public Module
 
 void mySendResponse(User *u, const Anope::string &channel, const Anope::string &mask, const Anope::string &time)
 {
-	me->NoticeLang(Config.s_ChanServ, u, TBAN_RESPONSE, mask.c_str(), channel.c_str(), time.c_str());
+	me->NoticeLang(Config->s_ChanServ, u, TBAN_RESPONSE, mask.c_str(), channel.c_str(), time.c_str());
 }
 
 class TempBan : public CallBack
@@ -197,11 +197,11 @@ int canBanUser(Channel *c, User *u, User *u2)
 	ChannelInfo *ci = c->ci;
 	int ok = 0;
 	if (!check_access(u, ci, CA_BAN))
-		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 	else if (is_excepted(ci, u2))
-		notice_lang(Config.s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+		notice_lang(Config->s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 	else if (u2->IsProtected())
-		notice_lang(Config.s_ChanServ, u, ACCESS_DENIED);
+		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 	else
 		ok = 1;
 

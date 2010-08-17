@@ -54,7 +54,7 @@ User::User(const Anope::string &snick, const Anope::string &suid)
 	{
 		maxusercnt = usercnt;
 		maxusertime = time(NULL);
-		if (Config.LogMaxUsers)
+		if (Config->LogMaxUsers)
 			Alog() << "user: New maximum user count: "<< maxusercnt;
 	}
 
@@ -190,7 +190,7 @@ User::~User()
 
 	this->Logout();
 
-	if (Config.LogUsers)
+	if (Config->LogUsers)
 	{
 		Anope::string srealname = normalizeBuffer(this->realname);
 
@@ -207,7 +207,7 @@ User::~User()
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
 
-	if (Config.LimitSessions && !this->server->IsULined())
+	if (Config->LimitSessions && !this->server->IsULined())
 		del_session(this->host);
 
 	UserListByNick.erase(this->nick);
@@ -244,7 +244,7 @@ void User::SendMessage(const Anope::string &source, const Anope::string &msg) co
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	if (Config.UsePrivmsg && ((!this->nc && Config.NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
+	if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
 		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
 	else
 		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
@@ -317,14 +317,14 @@ void User::Collide(NickAlias *na)
 
 		do
 		{
-			guestnick = Config.NSGuestNickPrefix + stringify(getrandom16());
+			guestnick = Config->NSGuestNickPrefix + stringify(getrandom16());
 		} while (finduser(guestnick));
 
-		notice_lang(Config.s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
+		notice_lang(Config->s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
 		ircdproto->SendForceNickChange(this, guestnick, time(NULL));
 	}
 	else
-		kill_user(Config.s_NickServ, this->nick, "Services nickname-enforcer kill");
+		kill_user(Config->s_NickServ, this->nick, "Services nickname-enforcer kill");
 }
 
 /** Check if the user should become identified because
@@ -726,7 +726,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		Server *serv = Server::Find(server);
 
-		if (Config.LogUsers)
+		if (Config->LogUsers)
 		{
 			/**
 			 * Ugly swap routine for Flop's bug :)   XXX
@@ -770,7 +770,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		if (MOD_RESULT == EVENT_STOP)
 			return finduser(nick);
 
-		if (Config.LimitSessions && !serv->IsULined())
+		if (Config->LimitSessions && !serv->IsULined())
 			add_session(nick, host, ipbuf);
 
 		XLineManager::CheckAll(user);
@@ -794,7 +794,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
 		Alog(LOG_DEBUG) << source << " changes nick to " <<  nick;
 
-		if (Config.LogUsers)
+		if (Config->LogUsers)
 		{
 			Anope::string logrealname = normalizeBuffer(user->realname);
 			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" << logrealname << ") changed nick to "
@@ -837,7 +837,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 				user->UpdateHost();
 				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
-				Alog() << Config.s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
+				Alog() << Config->s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 
 			if (ircd->sqline)
@@ -1084,7 +1084,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 				if (add)
 				{
 					++opcnt;
-					if (Config.WallOper)
+					if (Config->WallOper)
 						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", user->nick.c_str());
 				}
 				else

@@ -1002,7 +1002,7 @@ Anope::string GetWindowsVersion()
 	ZeroMemory(&si, sizeof(SYSTEM_INFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))
+	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi));
 	if (!bOsVersionInfoEx)
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -1109,7 +1109,7 @@ bool SupportedWindowsVersion()
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi))
+	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi));
 	if (!bOsVersionInfoEx)
 	{
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);

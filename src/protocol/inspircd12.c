@@ -655,6 +655,7 @@ void inspircd_cmd_376(char *source)
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
     char *nicknumbuf = ts6_uid_retrieve();
+    send_cmd(TS6SID, "KILL %s :Services enforced kill", nick);
     send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld +%s :%s",
              nicknumbuf, (long int) time(NULL), nick, ServiceHost,
              ServiceHost, ServiceUser, (long int) time(NULL), modes, name);

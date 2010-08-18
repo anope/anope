@@ -193,6 +193,8 @@ class CommandOSModList : public Command
 						++count;
 					}
 					break;
+				default:
+					break;
 			}
 		}
 		if (!count)

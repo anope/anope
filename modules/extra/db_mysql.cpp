@@ -365,6 +365,8 @@ class DBMySQL : public Module
 	{
 		me = this;
 
+		this->SetType(DATABASE);
+
 		this->lastwarn = 0;
 		this->ro = false;
 

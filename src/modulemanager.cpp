@@ -419,16 +419,18 @@ void ModuleManager::ClearCallBacks(Module *m)
 
 /** Unloading all modules, NEVER call this when Anope isn't shutting down.
  * Ever.
- * @param unload_proto true to unload the protocol module
  */
-void ModuleManager::UnloadAll(bool unload_proto)
+void ModuleManager::UnloadAll()
 {
-	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
+	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)
 	{
-		Module *m = *it++;
+		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
+		{
+			Module *m = *it++;
 
-		if (unload_proto || m->type != PROTOCOL)
-			DeleteModule(m);
+			if (static_cast<MODType>(i) == m->type)
+				DeleteModule(m);
+		}
 	}
 }
 

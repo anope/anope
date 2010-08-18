@@ -152,7 +152,8 @@ enum ModuleReturn
 /** Priority types which can be returned from Module::Prioritize()
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
-enum MODType { CORE, PROTOCOL, THIRD, SUPPORTED, QATESTED, ENCRYPTION, DATABASE, SOCKETENGINE };
+/* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
+enum MODType { MT_BEGIN, THIRD, QATESTED, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, SOCKETENGINE, MT_END };
 
 struct Message;
 typedef std::multimap<Anope::string, Message *> message_map;
@@ -1200,9 +1201,8 @@ class CoreExport ModuleManager
 
 	/** Unloading all modules, NEVER call this when Anope isn't shutting down.
 	 * Ever.
-	 * @param unload_proto true to unload the protocol module
 	 */
-	static void UnloadAll(bool unload_proto);
+	static void UnloadAll();
 
 	/** Register a service
 	 * @param s The service

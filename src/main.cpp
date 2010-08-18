@@ -189,9 +189,7 @@ void do_restart_services()
 	SocketEngine->Process();
 	delete UplinkSock;
 	close_log();
-	/* First don't unload protocol module, then do so */
-	ModuleManager::UnloadAll(false);
-	ModuleManager::UnloadAll(true);
+	ModuleManager::UnloadAll();
 	chdir(binary_dir.c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly)
@@ -238,9 +236,7 @@ static void services_shutdown()
 	SocketEngine->Process();
 	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
-	/* First don't unload protocol module, then do so */
-	ModuleManager::UnloadAll(false);
-	ModuleManager::UnloadAll(true);
+	ModuleManager::UnloadAll();
 	/* just in case they weren't all removed at least run once */
 	ModuleRunTimeDirCleanUp();
 }

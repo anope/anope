@@ -187,8 +187,7 @@ class ModuleSQL : public Module
 		DThread->Wakeup();
 		DThread->Join();
 
-		if (SocketEngine)
-			delete SQLPipe;
+		delete SQLPipe;
 	}
 
 	void OnReload(bool startup)
@@ -278,9 +277,10 @@ MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::strin
 
 MySQLService::~MySQLService()
 {
+	me->DThread->Lock();
 	this->Lock.Lock();
-	this->Lock.Unlock();
 	mysql_close(this->sql);
+	this->sql = NULL;
 
 	for (unsigned i = me->QueryRequests.size(); i > 0; --i)
 	{
@@ -293,6 +293,8 @@ MySQLService::~MySQLService()
 			me->QueryRequests.erase(me->QueryRequests.begin() + i);
 		}
 	}
+	this->Lock.Unlock();
+	me->DThread->Unlock();
 }
 
 void MySQLService::Run(SQLInterface *i, const Anope::string &query)

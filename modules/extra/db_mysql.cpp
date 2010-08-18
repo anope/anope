@@ -900,7 +900,7 @@ class DBMySQL : public Module
 	{
 		this->RunQuery("TRUNCATE TABLE `anope_os_core`");
 
-		this->RunQuery("INSERT DELAYED INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, sglines_count, sqlines_count, szlines_count) VALUES( " + stringify(maxusercnt) + ", " + stringify(maxusertime) + ", " + stringify(SGLine ? SGLine->GetCount() : 0) + ", " + stringify(SQLine ? SQLine->GetCount() : 0) + ", " + stringify(SNLine ? SNLine->GetCount() : 0) + ", " + stringify(SZLine ? SZLine->GetCount() : 0) + ")");
+		this->RunQuery("INSERT DELAYED INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, snlines_count, sqlines_count, szlines_count) VALUES( " + stringify(maxusercnt) + ", " + stringify(maxusertime) + ", " + stringify(SGLine ? SGLine->GetCount() : 0) + ", " + stringify(SQLine ? SQLine->GetCount() : 0) + ", " + stringify(SNLine ? SNLine->GetCount() : 0) + ", " + stringify(SZLine ? SZLine->GetCount() : 0) + ")");
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			CurCore = it->second;
@@ -925,7 +925,7 @@ class DBMySQL : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
 
 			/* This is for the core bots, bots added by users are already handled by an event */
-			this->RunQuery("INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + CurBot->created + ", " +  CurBot->chancount + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(created)");
+			this->RunQuery("INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(created)");
 		}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));

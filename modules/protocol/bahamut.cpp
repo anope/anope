@@ -279,16 +279,10 @@ class BahamutIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		srand(time(NULL));
-		Anope::string svidbuf = stringify(rand());
-
-		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
-
-		BotInfo *bi = NickServ;
-		u->SetMode(bi, UMODE_REGISTERED);
-		ircdproto->SendMode(bi, u, "+d %s", svidbuf.c_str());
+		u->SetMode(NickServ, UMODE_REGISTERED);
+		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
+
 } ircd_proto;
 
 /* EVENT: SJOIN */
@@ -476,12 +470,16 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, Anope::string(av[8]).is_number_only() ? convertTo<uint32>(av[8]) : 0, "", "");
 		if (user)
 		{
-			/* Check to see if the user should be identified because their
-			 * services id matches the one in their nickcore
-			 */
-			user->CheckAuthenticationToken(av[7]);
-
 			UserSetInternalModes(user, 1, &av[3]);
+
+			NickAlias *na;
+			if (user->timestamp == convertTo<time_t>(av[7]) && (na = findnick(user->nick)))
+			{
+				user->Login(na->nc);
+				user->SetMode(NickServ, CMODE_REGISTERED);
+			}
+			else
+				validate_user(user);
 		}
 	}
 	else

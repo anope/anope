@@ -277,7 +277,6 @@ class InspIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-
 		if (!u->Account())
 			return;
 
@@ -288,6 +287,7 @@ class InspIRCdProto : public IRCDProto
 
 		u->SetMode(NickServ, UMODE_REGISTERED);
 	}
+
 } ircd_proto;
 
 int anope_event_ftopic(const Anope::string &source, int ac, const char **av)
@@ -734,13 +734,19 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			if (user)
 			{
 				user->hostip = av[6];
-				/* InspIRCd1.1 has no user mode +d so we
-				 * use nick timestamp to check for auth - Adam
-				 */
-				user->CheckAuthenticationToken(av[0]);
 
 				UserSetInternalModes(user, 1, &av[5]);
 				user->SetCloakedHost(av[3]);
+
+				NickAlias *na = findnick(user->nick);
+				Anope::string svidbuf;
+				if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == av[0])
+				{
+					user->Login(na->nc);
+					user->SetMode(NickServ, UMODE_REGISTERED);
+				}
+				else
+					validate_user(user);
 			}
 		}
 	}

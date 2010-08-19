@@ -384,19 +384,11 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SetAutoIdentificationToken(User *u)
 	{
-
 		if (!u->Account())
 			return;
 
-		srand(time(NULL));
-		Anope::string svidbuf = stringify(rand());
-
-		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
-
-		BotInfo *bi = NickServ;
-		u->SetMode(bi, UMODE_REGISTERED);
-		ircdproto->SendMode(bi, u, "+d %s", svidbuf.c_str());
+		u->SetMode(NickServ, UMODE_REGISTERED);
+		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
 
 	void SendUnregisteredNick(const User *u)
@@ -874,12 +866,17 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, ntohl(decode_ip(av[9])), av[8], "");
 			if (user)
 			{
-				/* Check to see if the user should be identified because their
-				 * services id matches the one in their nickcore
-				 */
-				user->CheckAuthenticationToken(av[6]);
-
 				UserSetInternalModes(user, 1, &av[7]);
+
+				NickAlias *na = findnick(user->nick);
+
+				if (na && user->timestamp == convertTo<time_t>(av[6]))
+				{
+					user->Login(na->nc);
+					user->SetMode(NickServ, UMODE_REGISTERED);
+				}
+				else
+					validate_user(user);
 			}
 		}
 		else
@@ -888,12 +885,17 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, 0, av[8], "");
 			if (user)
 			{
-				/* Check to see if the user should be identified because their
-				 * services id matches the one in their nickcore
-				 */
-				user->CheckAuthenticationToken(av[6]);
-
 				UserSetInternalModes(user, 1, &av[7]);
+
+				NickAlias *na = findnick(user->nick);
+
+				if (na && user->timestamp == convertTo<time_t>(av[6]))
+				{
+					user->Login(na->nc);
+					user->SetMode(NickServ, UMODE_REGISTERED);
+				}
+				else
+					validate_user(user);
 			}
 		}
 	}

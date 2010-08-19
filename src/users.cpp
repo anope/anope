@@ -327,53 +327,6 @@ void User::Collide(NickAlias *na)
 		kill_user(Config->s_NickServ, this->nick, "Services nickname-enforcer kill");
 }
 
-/** Check if the user should become identified because
- * their svid matches the one stored in their nickcore
- * @param svid Services id
- */
-void User::CheckAuthenticationToken(const Anope::string &svid)
-{
-	NickAlias *na;
-
-	if ((na = findnick(this->nick)))
-	{
-		Anope::string c;
-		if (na->nc && na->nc->GetExtRegular("authenticationtoken", c))
-		{
-			if (!svid.empty() && !c.empty() && svid.equals_cs(c))
-				/* Users authentication token matches so they should become identified */
-				this->Login(na->nc);
-		}
-	}
-
-	validate_user(this);
-}
-
-/** Auto identify the user to the given accountname.
- * @param account Display nick of account
- */
-void User::AutoID(const Anope::string &account)
-{
-	NickCore *core = findcore(account);
-
-	if (core)
-	{
-		this->Login(core);
-
-		NickAlias *na = findnick(this->nick);
-		if (na && na->nc == core)
-		{
-			na->last_realname = this->realname;
-			na->last_seen = time(NULL);
-			this->SetMode(NickServ, UMODE_REGISTERED);
-			this->UpdateHost();
-			check_memos(this);
-
-			FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
-		}
-	}
-}
-
 /** Login the user to a NickCore
  * @param core The account the user is useing
  */
@@ -382,6 +335,9 @@ void User::Login(NickCore *core)
 	this->Logout();
 	this->nc = core;
 	core->Users.push_back(this);
+
+	this->UpdateHost();
+	check_memos(this);
 }
 
 /** Logout the user

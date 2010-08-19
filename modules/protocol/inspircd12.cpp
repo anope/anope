@@ -855,15 +855,16 @@ int anope_event_whois(const Anope::string &source, int ac, const char **av)
 
 int anope_event_metadata(const Anope::string &source, int ac, const char **av)
 {
-	User *u;
-
 	if (ac < 3)
 		return MOD_CONT;
 	else if (!strcmp(av[1], "accountname"))
 	{
-		if ((u = finduser(av[0])))
-			/* Identify the user for this account - Adam */
-			u->AutoID(av[2]);
+		User *u = finduser(av[0]);
+		NickCore *nc = findcore(av[2]);
+		if (u && nc)
+		{
+			u->Login(nc);
+		}
 	}
 
 	return MOD_CONT;

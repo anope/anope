@@ -155,17 +155,6 @@ class CoreExport User : public Extensible
 	 */
 	void Collide(NickAlias *na);
 
-	/** Check if the user should become identified because
-	 * their svid matches the one stored in their nickcore
-	 * @param svid Services id
-	 */
-	void CheckAuthenticationToken(const Anope::string &svid);
-
-	/** Auto identify the user to the given accountname.
-	 * @param account Display nick of account
-	 */
-	void AutoID(const Anope::string &account);
-
 	/** Login the user to a NickCore
 	 * @param core The account the user is useing
 	 */

@@ -437,12 +437,16 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		user = do_nick("", av[0], av[4], av[5], s->GetName(), av[8], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", av[7]);
 		if (user)
 		{
-			/* No usermode +d on ratbox so we use
-			 * nick timestamp to check for auth - Adam
-			 */
-			user->CheckAuthenticationToken(av[2]);
-
 			UserSetInternalModes(user, 1, &av[3]);
+
+			NickAlias *na = findnick(user->nick);
+			Anope::string svidbuf;
+			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == av[2])
+			{
+				user->Login(na->nc);
+			}
+			else
+				validate_user(user);
 		}
 	}
 	else if (ac == 2)

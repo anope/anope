@@ -72,7 +72,7 @@ Anope for Windows
 
     4) You now need to configure Anope to your requirements. At the prompt type:
 
-        <path to source directory>\Config.bat
+        <path to source directory>\Config.exe
 
        NOTE: If you run an Anti-Virus program such as McAfee or Norton, you may
        be unable to run this command due to the protection in place. Some Anti-

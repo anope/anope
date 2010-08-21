@@ -553,15 +553,6 @@ int main(int ac, char **av, char **envp)
 					delete u;
 			}
 
-			/* Nuke all channels */
-			for (channel_map::const_iterator it = ChannelList.begin(); it != ChannelList.end();)
-			{
-				Channel *c = it->second;
-				++it;
-
-				delete c;
-			}
-
 			Me->SetFlag(SERVER_SYNCING);
 			Me->ClearLinks();
 

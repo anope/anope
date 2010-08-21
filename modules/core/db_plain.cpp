@@ -1011,43 +1011,33 @@ class DBPlain : public Module
 			if (ci->GetMLockCount(true))
 			{
 				db << "MD MLOCK_ON";
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 				{
-					if ((*it)->Class == MC_CHANNEL)
-					{
-						ChannelMode *cm = debug_cast<ChannelMode *>(*it);
-
-						if (ci->HasMLock(cm->Name, true))
-							db << " " << cm->NameAsString;
-					}
+					ChannelMode *cm = it->second;
+					if (ci->HasMLock(cm->Name, true))
+						db << " " << cm->NameAsString;
 				}
 				db << endl;
 			}
 			if (ci->GetMLockCount(false))
 			{
 				db << "MD MLOCK_OFF";
-				for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
-				{
-					if ((*it)->Class == MC_CHANNEL)
-					{
-						ChannelMode *cm = debug_cast<ChannelMode *>(*it);
 
-						if (ci->HasMLock(cm->Name, false))
-							db << " " << cm->NameAsString;
-					}
+				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+				{
+					ChannelMode *cm = it->second;
+					if (ci->HasMLock(cm->Name, false))
+						db << " " << cm->NameAsString;
 				}
 				db << endl;
 			}
-			for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+			for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 			{
-				if ((*it)->Class == MC_CHANNEL)
-				{
-					ChannelMode *cm = debug_cast<ChannelMode *>(*it);
+				ChannelMode *cm = it->second;
+				Anope::string Param;
 
-					Anope::string Param;
-					if (ci->GetParam(cm->Name, Param))
-						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
-				}
+				if (ci->GetParam(cm->Name, Param))
+					db << "MD MLP " << cm->NameAsString << " " << Param << endl;
 			}
 			if (!ci->memos.memos.empty())
 			{

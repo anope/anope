@@ -66,8 +66,6 @@ E void ChanSetInternalModes(Channel *c, int ac, const char **av);
 
 E User *nc_on_chan(Channel *c, const NickCore *nc);
 
-E Anope::string chan_get_modes(Channel *chan, int complete, int plus);
-
 E int get_access_level(ChannelInfo *ci, NickAlias *na);
 E int get_access_level(ChannelInfo *ci, NickCore *nc);
 E Anope::string get_xop_level(int level);

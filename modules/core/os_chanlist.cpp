@@ -46,7 +46,7 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), chan_get_modes(cc->chan, 1, 1).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
+				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
 			}
 		}
 		else
@@ -64,7 +64,7 @@ class CommandOSChanList : public Command
 						if (!c->HasMode(*it))
 							continue;
 
-				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), chan_get_modes(c, 1, 1).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
+				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
 			}
 		}
 

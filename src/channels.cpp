@@ -75,6 +75,28 @@ Channel::~Channel()
 	ChannelList.erase(this->name);
 }
 
+void Channel::Reset()
+{
+	this->ClearModes(NULL, false);
+	this->ClearBans(NULL, false);
+	this->ClearExcepts(NULL, false);
+	this->ClearInvites(NULL, false);
+
+	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+	{
+		UserContainer *uc = *it;
+
+		if (findbot(uc->user->nick))
+			continue;
+
+		uc->Status->ClearFlags();
+	}
+	
+	check_modes(this);
+	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
+		chan_set_correct_modes((*it)->user, this, 1);
+}
+
 void Channel::Sync()
 {
 	if (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi == this->users.front()->user))
@@ -84,7 +106,6 @@ void Channel::Sync()
 	if (this->ci)
 	{
 		check_modes(this);
-		stick_all(this->ci);
 	}
 
 	if (Me && Me->IsSynced() && !this->topic_sync)
@@ -95,7 +116,7 @@ void Channel::JoinUser(User *user)
 {
 	Alog(LOG_DEBUG) << user->nick << " joins " << this->name;
 
-	Flags<ChannelModeName> *Status = new Flags<ChannelModeName>;
+	ChannelStatus *Status = new ChannelStatus();
 	ChannelContainer *cc = new ChannelContainer(this);
 	cc->Status = Status;
 	user->chans.push_back(cc);
@@ -103,6 +124,14 @@ void Channel::JoinUser(User *user)
 	UserContainer *uc = new UserContainer(user);
 	uc->Status = Status;
 	this->users.push_back(uc);
+
+	bool update_ts = false;
+	if (this->ci && this->ci->HasFlag(CI_PERSIST) && this->creation_time > this->ci->time_registered)
+	{
+		Alog(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
+		this->creation_time = this->ci->time_registered;
+		update_ts = true;
+	}
 
 	if (!get_ignore(user->nick))
 	{
@@ -126,11 +155,9 @@ void Channel::JoinUser(User *user)
 		 * and the ignored user doesnt just leave, the bot will never
 		 * make it into the channel, leaving the channel botless even for
 		 * legit users - Rob
-		 * But don't join the bot if the channel is persistant - Adam
-		 * But join persistant channels when syncing with our uplink- DP
 		 **/
-		if ((!Me->IsSynced() || !this->ci->HasFlag(CI_PERSIST)) && this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
-			this->ci->bi->Join(this);
+		if (this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
+			this->ci->bi->Join(this, update_ts);
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
@@ -139,6 +166,16 @@ void Channel::JoinUser(User *user)
 		{
 			ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
 			this->ci->bi->lastmsg = time(NULL);
+		}
+	}
+
+	if (update_ts)
+	{
+		/* Send the updated TS */
+		if (!this->ci->bi || !this->FindUser(this->ci->bi))
+		{
+			whosends(this->ci)->Join(this, update_ts);
+			whosends(this->ci)->Part(this);
 		}
 	}
 }
@@ -296,7 +333,8 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 			cc->Status->SetFlag(cm->Name);
 
 		/* Enforce secureops, etc */
-		chan_set_correct_modes(u, this, 0);
+		if (EnforceMLock)
+			chan_set_correct_modes(u, this, 0);
 		return;
 	}
 	/* Setting b/e/I etc */
@@ -654,24 +692,31 @@ bool Channel::HasParam(ChannelModeName Name) const
 
 /** Clear all the modes from the channel
  * @param bi The client setting the modes
+ * @param internal Only remove the modes internally
  */
-void Channel::ClearModes(BotInfo *bi)
+void Channel::ClearModes(BotInfo *bi, bool internal)
 {
-	ChannelMode *cm;
-
 	for (size_t n = CMODE_BEGIN + 1; n != CMODE_END; ++n)
 	{
-		cm = ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(n));
+		ChannelMode *cm = ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(n));
 
 		if (cm && this->HasMode(cm->Name))
 		{
 			if (cm->Type == MODE_REGULAR)
-				this->RemoveMode(NULL, cm);
+			{
+				if (!internal)
+					this->RemoveMode(NULL, cm);
+				else
+					this->RemoveModeInternal(cm);
+			}
 			else if (cm->Type == MODE_PARAM)
 			{
 				Anope::string param;
 				this->GetParam(cm->Name, param);
-				this->RemoveMode(NULL, cm, param);
+				if (!internal)
+					this->RemoveMode(NULL, cm, param);
+				else
+					this->RemoveModeInternal(cm, param);
 			}
 		}
 	}
@@ -681,58 +726,67 @@ void Channel::ClearModes(BotInfo *bi)
 
 /** Clear all the bans from the channel
  * @param bi The client setting the modes
+ * @param internal Only remove the modes internally
  */
-void Channel::ClearBans(BotInfo *bi)
+void Channel::ClearBans(BotInfo *bi, bool internal)
 {
 	Entry *entry, *nexte;
-	ChannelModeList *cml;
 
-	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
+	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
 
 	if (cml && this->bans && this->bans->count)
 		for (entry = this->bans->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			this->RemoveMode(bi, CMODE_BAN, entry->mask);
+			if (!internal)
+				this->RemoveMode(bi, cml, entry->mask);
+			else
+				this->RemoveModeInternal(cml, entry->mask);
 		}
 }
 
 /** Clear all the excepts from the channel
  * @param bi The client setting the modes
+ * @param internal Only remove the modes internally
  */
-void Channel::ClearExcepts(BotInfo *bi)
+void Channel::ClearExcepts(BotInfo *bi, bool internal)
 {
 	Entry *entry, *nexte;
-	ChannelModeList *cml;
 
-	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
+	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
 
 	if (cml && this->excepts && this->excepts->count)
 		for (entry = this->excepts->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			this->RemoveMode(bi, CMODE_EXCEPT, entry->mask);
+			if (!internal)
+				this->RemoveMode(bi, cml, entry->mask);
+			else
+				this->RemoveModeInternal(cml, entry->mask);
 		}
 }
 
 /** Clear all the invites from the channel
  * @param bi The client setting the modes
+ * @param internal Only remove the modes internally
  */
-void Channel::ClearInvites(BotInfo *bi)
+void Channel::ClearInvites(BotInfo *bi, bool internal)
 {
 	Entry *entry, *nexte;
-	ChannelModeList *cml;
 
-	cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
+	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
 
 	if (cml && this->invites && this->invites->count)
 		for (entry = this->invites->entries; entry; entry = nexte)
 		{
 			nexte = entry->next;
 
-			this->RemoveMode(bi, CMODE_INVITEOVERRIDE, entry->mask);
+			if (!internal)
+				this->RemoveMode(bi, cml, entry->mask);
+			else
+				this->RemoveModeInternal(cml, entry->mask);
 		}
 }
 
@@ -922,24 +976,21 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	return true;
 }
 
-/* Returns a fully featured binary modes string. If complete is 0, the
- * eventual parameters won't be added to the string.
- */
-
-Anope::string chan_get_modes(Channel *chan, int complete, int plus)
+Anope::string Channel::GetModes(bool complete, bool plus)
 {
-	Anope::string res, params, param;
+	Anope::string res;
 
-	if (chan->HasModes())
+	if (this->HasModes())
 	{
-		for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+		Anope::string params;
+		for (std::map<Anope::string, Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
 		{
-			if ((*it)->Class != MC_CHANNEL)
+			if (it->second->Class != MC_CHANNEL)
 				continue;
 
-			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
+			ChannelMode *cm = debug_cast<ChannelMode *>(it->second);
 
-			if (chan->HasMode(cm->Name))
+			if (this->HasMode(cm->Name))
 			{
 				res += cm->ModeChar;
 
@@ -951,7 +1002,8 @@ Anope::string chan_get_modes(Channel *chan, int complete, int plus)
 
 						if (plus || !cmp->MinusNoArg)
 						{
-							chan->GetParam(cmp->Name, param);
+							Anope::string param;
+							this->GetParam(cmp->Name, param);
 
 							if (!param.empty())
 								params += " " + param;
@@ -1056,7 +1108,6 @@ User *nc_on_chan(Channel *c, const NickCore *nc)
 void do_join(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
-	Channel *chan;
 	time_t ctime = time(NULL);
 
 	user = finduser(source);
@@ -1085,7 +1136,7 @@ void do_join(const Anope::string &source, int ac, const char **av)
 			continue;
 		}
 
-		chan = findchan(buf);
+		Channel *chan = findchan(buf);
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
@@ -1099,19 +1150,10 @@ void do_join(const Anope::string &source, int ac, const char **av)
 			/* Their time is older, we lose */
 			if (chan->creation_time > ts)
 			{
-				Alog(LOG_DEBUG) << "recieved a new TS for JOIN: " << ts;
+				Alog(LOG_DEBUG) << "Recieved an older TS " << chan->name << " in JOIN, changing from " << chan->creation_time << " to " << ts;
+				chan->creation_time = ts;
 
-				if (chan->ci)
-				{
-					/* Cycle the bot to fix ts */
-					if (chan->ci->bi)
-					{
-						chan->ci->bi->Part(chan, "TS reop");
-						chan->ci->bi->Join(chan);
-					}
-					/* Be sure to set mlock again, else we could be -r etc.. */
-					check_modes(chan);
-				}
+				chan->Reset();
 			}
 		}
 

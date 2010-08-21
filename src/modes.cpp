@@ -13,7 +13,7 @@
 std::list<std::pair<void *, StackerInfo *> > ModeManager::StackerObjects;
 
 /* List of all modes Anope knows about */
-std::list<Mode *> ModeManager::Modes;
+std::map<Anope::string, Mode *> ModeManager::Modes;
 
 /* User modes */
 std::map<char, UserMode *> ModeManager::UserModesByChar;
@@ -89,6 +89,37 @@ void SetDefaultMLock(ServerConfig *config)
 		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
 			BotModes.push_back(debug_cast<ChannelModeStatus *>(cm));
 	}
+}
+
+Anope::string ChannelStatus::BuildCharPrefixList() const
+{
+	Anope::string ret;
+
+	for (std::map<char, ChannelMode *>::const_iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	{
+		if (this->HasFlag(it->second->Name))
+		{
+			ret += it->second->ModeChar;
+		}
+	}
+
+	return ret;
+}
+
+Anope::string ChannelStatus::BuildModePrefixList() const
+{
+	Anope::string ret;
+
+	for (std::map<char, ChannelMode *>::const_iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	{
+		if (this->HasFlag(it->second->Name))
+		{
+			ChannelModeStatus *cm = debug_cast<ChannelModeStatus *>(it->second);
+			ret += cm->Symbol;
+		}
+	}
+
+	return ret;
 }
 
 /** Default constructor
@@ -607,7 +638,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 			Alog() << "ModeManager: Added generic support for user mode " << um->ModeChar;
 		}
 		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um));
-		ModeManager::Modes.push_back(um);
+		ModeManager::Modes.insert(std::make_pair(um->NameAsString, um));
 
 		FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
 
@@ -631,7 +662,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 			Alog() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
 		}
 		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm));
-		ModeManager::Modes.push_back(cm);
+		ModeManager::Modes.insert(std::make_pair(cm->NameAsString, cm));
 
 		/* Apply this mode to the new default mlock if its used */
 		SetDefaultMLock(Config);
@@ -668,6 +699,20 @@ UserMode *ModeManager::FindUserModeByChar(char Mode)
 	if (it != ModeManager::UserModesByChar.end())
 		return it->second;
 
+	return NULL;
+}
+
+/** Find a mode by name
+ * @param name The mode name
+ * @return The mode
+ */
+Mode *ModeManager::FindModeByName(const Anope::string &name)
+{
+	std::map<Anope::string, Mode *>::const_iterator it = ModeManager::Modes.find(name);
+
+	if (it != ModeManager::Modes.end())
+		return it->second;
+	
 	return NULL;
 }
 

@@ -413,14 +413,6 @@ void CapabParse(int ac, const char **av)
 			}
 		}
 	}
-
-	/* Apply MLock now that we know what modes exist (capab is parsed after modes are added to Anope) */
-	for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
-	{
-		ChannelInfo *ci = it->second;
-
-		ci->LoadMLock();
-	}
 }
 
 /*************************************************************************/

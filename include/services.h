@@ -730,12 +730,12 @@ struct LevelInfo
 
 /*************************************************************************/
 
-#include "users.h"
-#include "bots.h"
-
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
  */
+
+#include "users.h"
+#include "bots.h"
 
 struct BanData
 {
@@ -973,7 +973,8 @@ class CoreExport IRCDProto
 	virtual void SendQuit(const BotInfo *bi, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
-	virtual void SendJoin(const BotInfo *bi, const Anope::string &, time_t) = 0;
+	virtual void SendJoin(const BotInfo *, const Anope::string &, time_t) = 0;
+	virtual void SendJoin(BotInfo *, const ChannelContainer *);
 	virtual void SendSQLineDel(const XLine *x) = 0;
 	virtual void SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
@@ -998,6 +999,7 @@ class CoreExport IRCDProto
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSVSPart(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendBOB() { }
 	virtual void SendEOB() { }
 	virtual void SendServer(const Server *) = 0;
 	virtual bool IsNickValid(const Anope::string &) { return true; }

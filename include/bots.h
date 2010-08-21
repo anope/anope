@@ -71,8 +71,22 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 */
 	void UnAssign(User *u, ChannelInfo *ci);
 
-	void Join(Channel *c);
-	void Join(const Anope::string &chname);
+	/** Join this bot to a channel
+	 * @param c The channel
+	 * @param update_ts Assume we're updating the TS for this channel
+	 */
+	void Join(Channel *c, bool update_ts = false);
+
+	/** Join this bot to a channel
+	 * @param chname The channel name
+	 * @param update_ts Assume we're updating the TS for this channel
+	 */
+	void Join(const Anope::string &chname, bool update_ts = false);
+
+	/** Part this bot from a channel
+	 * @param c The channel
+	 * @param reason The reason we're parting
+	 */
 	void Part(Channel *c, const Anope::string &reason = "");
 };
 

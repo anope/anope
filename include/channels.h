@@ -44,7 +44,7 @@ struct UserContainer
 {
 	User *user;
 	UserData ud;
-	Flags<ChannelModeName> *Status;
+	ChannelStatus *Status;
 
 	UserContainer(User *u) : user(u) { }
 	virtual ~UserContainer() { }
@@ -103,6 +103,11 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16 bouncy_modes;			/* Did we fail to set modes here? */
 	int16 topic_sync;			/* Is the topic in sync? */
+
+	/** Call if we need to unset all modes and clear all user status (internally).
+	 * Only useful if we get a SJOIN with a TS older than what we have here
+	 */
+	void Reset();
 
 	/** Restore the channel topic, set mlock (key), set stickied bans, etc
 	 */
@@ -217,23 +222,27 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 
 	/** Clear all the modes from the channel
 	 * @param bi The client unsetting the modes
+	 * @param internal Only remove the modes internally
 	 */
-	void ClearModes(BotInfo *bi = NULL);
+	void ClearModes(BotInfo *bi = NULL, bool internal = false);
 
 	/** Clear all the bans from the channel
 	 * @param bi The client unsetting the modes
+	 * @param internal Only remove the modes internally
 	 */
-	void ClearBans(BotInfo *bi = NULL);
+	void ClearBans(BotInfo *bi = NULL, bool internal = false);
 
 	/** Clear all the excepts from the channel
 	 * @param bi The client unsetting the modes
+	 * @param internal Only remove the modes internally
 	 */
-	void ClearExcepts(BotInfo *bi = NULL);
+	void ClearExcepts(BotInfo *bi = NULL, bool internal = false);
 
 	/** Clear all the invites from the channel
 	 * @param bi The client unsetting the modes
+	 * @param internal Only remove the modes internally
 	 */
-	void ClearInvites(BotInfo *bi = NULL);
+	void ClearInvites(BotInfo *bi = NULL, bool internal = false);
 
 	/** Get a param from the channel
 	 * @param Name The mode
@@ -268,6 +277,13 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @return true if the kick was scucessful, false if a module blocked the kick
 	 */
 	bool Kick(BotInfo *bi, User *u, const char *reason = NULL, ...);
+
+	/** Get a string of the modes set on this channel
+	 * @param complete Include mode parameters
+	 * @param plus If set to false (with complete), mode parameters will not be given for modes requring no parameters to be unset
+	 * @return A mode string
+	 */
+	Anope::string GetModes(bool complete, bool plus);
 };
 
 #endif // CHANNELS_H

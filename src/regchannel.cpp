@@ -343,65 +343,60 @@ void ChannelInfo::ClearBadWords()
  */
 void ChannelInfo::LoadMLock()
 {
-	std::vector<Anope::string> modenames;
+	std::vector<Anope::string> modenames_on, modenames_off;
 
-	if (this->GetExtRegular("db_mlock_modes_on", modenames))
+	// Force +r
+	this->SetMLock(CMODE_REGISTERED, true);
+	this->GetExtRegular("db_mlock_modes_on", modenames_on);
+	this->GetExtRegular("db_mlock_modes_off", modenames_off);
+
+	if (!modenames_on.empty() || !modenames_off.empty())
 	{
-		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
+		for (std::vector<Anope::string>::iterator it = modenames_on.begin(), it_end = modenames_on.end(); it != it_end; ++it)
 		{
-			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(), mit_end = ModeManager::Modes.end(); mit != mit_end; ++mit)
-			{
-				if ((*mit)->Class == MC_CHANNEL)
-				{
-					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
+			Mode *m = ModeManager::FindModeByName(*it);
 
-					if (cm->NameAsString.equals_ci(*it))
-						this->SetMLock(cm->Name, true);
-				}
+			if (m && m->NameAsString.equals_cs(*it))
+			{
+				ChannelMode *cm = debug_cast<ChannelMode *>(m);
+				this->SetMLock(cm->Name, true);
 			}
 		}
-
-		this->Shrink("db_mlock_modes_on");
-	}
-
-	if (this->GetExtRegular("db_mlock_modes_off", modenames))
-	{
-		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
+		for (std::vector<Anope::string>::iterator it = modenames_off.begin(), it_end = modenames_off.end(); it != it_end; ++it)
 		{
-			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(), mit_end = ModeManager::Modes.end(); mit != mit_end; ++mit)
-			{
-				if ((*mit)->Class == MC_CHANNEL)
-				{
-					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
+			Mode *m = ModeManager::FindModeByName(*it);
 
-					if (cm->NameAsString.equals_ci(*it))
-						this->SetMLock(cm->Name, false);
-				}
+			if (m && m->NameAsString.equals_cs(*it))
+			{
+				ChannelMode *cm = debug_cast<ChannelMode *>(m);
+				this->SetMLock(cm->Name, false);
 			}
 		}
-
-		this->Shrink("db_mlock_modes_off");
 	}
 
 	std::vector<std::pair<Anope::string, Anope::string> > params;
-
 	if (this->GetExtRegular("db_mlp", params))
 	{
 		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
 		{
-			for (std::list<Mode *>::iterator mit = ModeManager::Modes.begin(), mit_end = ModeManager::Modes.end(); mit != mit_end; ++mit)
+			Mode *m = ModeManager::FindModeByName(it->first);
+			if (m && m->Class == MC_CHANNEL)
 			{
-				if ((*mit)->Class == MC_CHANNEL)
-				{
-					ChannelMode *cm = debug_cast<ChannelMode *>(*mit);
-
-					if (cm->NameAsString.equals_ci(it->first))
-						this->SetMLock(cm->Name, true, it->second);
-				}
+				ChannelMode *cm = debug_cast<ChannelMode *>(m);
+				this->SetMLock(cm->Name, true, it->second);
 			}
 		}
+	}
 
-		this->Shrink("db_mlp");
+	/* Create perm channel */
+	if (this->HasFlag(CI_PERSIST) && !this->c)
+	{
+		this->c = new Channel(this->name, this->time_registered);
+		if (!this->bi)
+			ChanServ->Assign(NULL, this);
+		this->bi->Join(c);
+		check_modes(this->c);
+		restore_topic(this->name);
 	}
 }
 

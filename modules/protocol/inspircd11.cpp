@@ -185,6 +185,19 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(user->nick, "JOIN %s %ld", channel.c_str(), static_cast<long>(chantime));
 	}
 
+	void SendJoin(BotInfo *user, const ChannelContainer *cc)
+	{
+		SendJoin(user, cc->chan->name, cc->chan->creation_time);
+		for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+		{
+			if (cc->Status->HasFlag(it->second->Name))
+			{
+				cc->chan->SetMode(user, it->second, user->nick);
+			}
+		}
+		cc->chan->SetModes(user, false, "%s", cc->chan->GetModes(true, true).c_str());
+	}
+
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
@@ -268,6 +281,11 @@ class InspIRCdProto : public IRCDProto
 	void SendSVSPart(const Anope::string &source, const Anope::string &nick, const Anope::string &chan)
 	{
 		send_cmd(source, "SVSPART %s %s", nick.c_str(), chan.c_str());
+	}
+
+	void SendBOB()
+	{
+		send_cmd("", "BURST %ld", time(NULL));
 	}
 
 	void SendEOB()
@@ -386,55 +404,25 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
-	bool was_created = false;
 	bool keep_their_modes = true;
 
 	if (!c)
 	{
 		c = new Channel(av[0], ts);
-		was_created = true;
+		c->SetFlag(CH_SYNCING);
 	}
 	/* Our creation time is newer than what the server gave us */
 	else if (c->creation_time > ts)
 	{
 		c->creation_time = ts;
+		c->Reset();
 
-		/* Remove status from all of our users */
-		for (std::list<Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
-		{
-			Mode *m = *it;
-
-			if (m->Type != MODE_STATUS)
-				continue;
-
-			ChannelMode *cm = debug_cast<ChannelMode *>(m);
-
-			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
-			{
-				UserContainer *uc = *uit;
-
-				c->RemoveMode(NULL, cm, uc->user->nick);
-			}
-		}
-		if (c->ci)
-		{
-			/* Rejoin the bot to fix the TS */
-			if (c->ci->bi)
-			{
-				c->ci->bi->Part(c, "TS reop");
-				c->ci->bi->Join(c);
-			}
-			/* Reset mlock */
-			check_modes(c);
-		}
+		/* Reset mlock */
+		check_modes(c);
 	}
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-	else
+	else if (ts > c->creation_time)
 		keep_their_modes = false;
-
-	/* Mark the channel as syncing */
-	if (was_created)
-		c->SetFlag(CH_SYNCING);
 
 	spacesepstream sep(av[ac - 1]);
 	Anope::string buf;
@@ -456,7 +444,8 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 			}
 
 			buf.erase(buf.begin());
-			Status.push_back(cm);
+			if (keep_their_modes)
+				Status.push_back(cm);
 		}
 
 		User *u = finduser(buf);
@@ -492,7 +481,7 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 	}
 
 	/* Channel is done syncing */
-	if (was_created)
+	if (c->HasFlag(CH_SYNCING))
 	{
 		/* Unset the syncing flag */
 		c->UnsetFlag(CH_SYNCING);

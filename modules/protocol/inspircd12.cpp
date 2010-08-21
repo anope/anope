@@ -185,6 +185,11 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(TS6SID, "FJOIN %s %ld + :,%s", channel.c_str(), static_cast<long>(chantime), user->GetUID().c_str());
 	}
 
+	void SendJoin(BotInfo *user, const ChannelContainer *cc)
+	{
+		send_cmd(TS6SID, "FJOIN %s %ld +%s :%s,%s", cc->chan->name.c_str(), static_cast<long>(cc->chan->creation_time), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildCharPrefixList().c_str(), user->GetUID().c_str());
+	}
+
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
@@ -273,6 +278,11 @@ class InspIRCdProto : public IRCDProto
 		User *u = finduser(who);
 
 		send_cmd(TS6SID, "METADATA %s swhois :%s", u->GetUID().c_str(), mask.c_str());
+	}
+
+	void SendBOB()
+	{
+		send_cmd(TS6SID, "BURST %ld", time(NULL));
 	}
 
 	void SendEOB()
@@ -427,55 +437,25 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
-	bool was_created = false;
 	bool keep_their_modes = true;
 
 	if (!c)
 	{
 		c = new Channel(av[0], ts);
-		was_created = true;
+		c->SetFlag(CH_SYNCING);
 	}
 	/* Our creation time is newer than what the server gave us */
 	else if (c->creation_time > ts)
 	{
 		c->creation_time = ts;
+		c->Reset();
 
-		/* Remove status from all of our users */
-		for (std::list<Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
-		{
-			Mode *m = *it;
-
-			if (m->Type != MODE_STATUS)
-				continue;
-
-			ChannelMode *cm = debug_cast<ChannelMode *>(m);
-
-			for (CUserList::const_iterator uit = c->users.begin(), uit_end = c->users.end(); uit != uit_end; ++uit)
-			{
-				UserContainer *uc = *uit;
-
-				c->RemoveMode(NULL, cm, uc->user->nick);
-			}
-		}
-		if (c->ci)
-		{
-			/* Rejoin the bot to fix the TS */
-			if (c->ci->bi)
-			{
-				c->ci->bi->Part(c, "TS reop");
-				c->ci->bi->Join(c);
-			}
-			/* Reset mlock */
-			check_modes(c);
-		}
+		/* Reset mlock */
+		check_modes(c);
 	}
 	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-	else
+	else if (ts > c->creation_time)
 		keep_their_modes = false;
-
-	/* Mark the channel as syncing */
-	if (was_created)
-		c->SetFlag(CH_SYNCING);
 
 	/* If we need to keep their modes, and this FJOIN string contains modes */
 	if (keep_their_modes && ac >= 4)
@@ -502,7 +482,8 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 			}
 
 			buf.erase(buf.begin());
-			Status.push_back(cm);
+			if (keep_their_modes)
+				Status.push_back(cm);
 		}
 		buf.erase(buf.begin());
 
@@ -539,7 +520,7 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 	}
 
 	/* Channel is done syncing */
-	if (was_created)
+	if (c->HasFlag(CH_SYNCING))
 	{
 		/* Unset the syncing flag */
 		c->UnsetFlag(CH_SYNCING);

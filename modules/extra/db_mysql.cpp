@@ -199,15 +199,11 @@ static Anope::string MakeMLock(ChannelInfo *ci, bool status)
 {
 	Anope::string ret;
 
-	for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+	for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 	{
-		if ((*it)->Class == MC_CHANNEL)
-		{
-			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
-
-			if (ci->HasMLock(cm->Name, status))
-				ret += " " + cm->NameAsString;
-		}
+		ChannelMode *cm = it->second;
+		if (ci->HasMLock(cm->Name, status))
+			ret += " " + cm->NameAsString;
 	}
 
 	if (!ret.empty())
@@ -230,16 +226,13 @@ static Anope::string GetMLockParams(ChannelInfo *ci)
 {
 	Anope::string ret;
 
-	for (std::list<Mode *>::iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+	for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
 	{
-		if ((*it)->Class == MC_CHANNEL)
-		{
-			ChannelMode *cm = debug_cast<ChannelMode *>(*it);
+		ChannelMode *cm = it->second;
 
-			Anope::string param;
-			if (ci->GetParam(cm->Name, param))
-				ret += " " + cm->NameAsString + " " + param;
-		}
+		Anope::string param;
+		if (ci->GetParam(cm->Name, param))
+			ret += " " + cm->NameAsString + " " + param;
 	}
 
 	if (!ret.empty())

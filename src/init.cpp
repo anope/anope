@@ -22,16 +22,16 @@ extern void moduleAddIRCDMsgs();
 void introduce_user(const Anope::string &user)
 {
 	/* Watch out for infinite loops... */
-#define LTSIZE 20
-	static int lasttimes[LTSIZE];
-	if (lasttimes[0] >= time(NULL) - 3)
-		fatal("introduce_user() loop detected");
-	memmove(lasttimes, lasttimes + 1, sizeof(lasttimes) - sizeof(int));
-	lasttimes[LTSIZE - 1] = time(NULL);
-#undef LTSIZE
-	/* We make the bots go online */
+	time_t now = time(NULL);
+	static time_t lasttime = now - 4;
+	if (lasttime >= now - 3)
+		fatal("introduce_user loop detected");
+	lasttime = now;
 
-	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
+	if (user.empty())
+		ircdproto->SendBOB();
+
+	/* We make the bots go online */
 	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
 		BotInfo *bi = it->second;
@@ -41,7 +41,19 @@ void introduce_user(const Anope::string &user)
 			ircdproto->SendClientIntroduction(bi->nick, bi->GetIdent(), bi->host, bi->realname, ircd->pseudoclient_mode, bi->GetUID());
 			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(&x);
+
+			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+			{
+				ircdproto->SendJoin(bi, *cit);
+			}
 		}
+	}
+
+	if (user.empty())
+	{
+		/* Load MLock from the database now that we know what modes exist */
+		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+			it->second->LoadMLock();
 	}
 }
 
@@ -66,16 +78,14 @@ static int set_group()
 	if (gr)
 	{
 		setgid(gr->gr_gid);
-		return 0;
 	}
 	else
 	{
-		Alog() << "Unknown group `" << RUNGROUP << "'";
+		Alog() << "Unknown run group '" << RUNGROUP << "'";
 		return -1;
 	}
-#else
-	return 0;
 #endif
+	return 0;
 }
 
 /*************************************************************************/

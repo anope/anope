@@ -420,7 +420,7 @@ class CoreExport ModeManager
 
  public:
 	/* List of all modes Anope knows about */
-	static std::list<Mode *> Modes;
+	static std::map<Anope::string, Mode *> Modes;
 
 	/* User modes */
 	static std::map<char, UserMode *> UserModesByChar;
@@ -467,6 +467,12 @@ class CoreExport ModeManager
 	 * @return The mode class
 	 */
 	static UserMode *FindUserModeByName(UserModeName Name);
+
+	/** Find a mode by name
+	 * @param name The mode name
+	 * @return The mode
+	 */
+	static Mode *FindModeByName(const Anope::string &name);
 
 	/** Gets the channel mode char for a symbol (eg + returns v)
 	 * @param Value The symbol

@@ -49,7 +49,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	if (!this->uid.empty())
 		BotListByUID[this->uid] = this;
 
-	// If we're synchronised with the uplink already, call introduce_user() for this bot.
+	// If we're synchronised with the uplink already, send the bot.
 	if (Me && !Me->GetLinks().empty() && Me->GetLinks().front()->IsSynced())
 	{
 		ircdproto->SendClientIntroduction(this->nick, this->GetIdent(), this->host, this->realname, ircd->pseudoclient_mode, this->uid);
@@ -136,7 +136,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	ci->bi = NULL;
 }
 
-void BotInfo::Join(Channel *c)
+void BotInfo::Join(Channel *c, bool update_ts)
 {
 	if (Config->BSSmartJoin)
 	{
@@ -162,19 +162,39 @@ void BotInfo::Join(Channel *c)
 			if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
 				ircdproto->SendNoticeChanops(this, c, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
 		}
+
+		ModeManager::ProcessModes();
 	}
 
-	ircdproto->SendJoin(this, c->name, c->creation_time);
-	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(), it_end = BotModes.end(); it != it_end; ++it)
-		c->SetMode(this, *it, this->nick, false);
 	c->JoinUser(this);
+	ChannelContainer *cc = this->FindChannel(c);
+	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(), it_end = BotModes.end(); it != it_end; ++it)
+	{
+		if (!update_ts)
+		{
+			c->SetMode(this, *it, this->nick, false);
+		}
+		else
+		{
+			cc->Status->SetFlag((*it)->Name);
+			c->SetModeInternal(*it, this->nick, false);
+		}
+	}
+	if (!update_ts)
+		ircdproto->SendJoin(this, c->name, c->creation_time);
+	else
+	{
+		ircdproto->SendJoin(this, cc);
+		
+		c->Reset();
+	}
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c->ci, this));
 }
 
-void BotInfo::Join(const Anope::string &chname)
+void BotInfo::Join(const Anope::string &chname, bool update_ts)
 {
 	Channel *c = findchan(chname);
-	return this->Join(c ? c : new Channel(chname));
+	return this->Join(c ? c : new Channel(chname), update_ts);
 }
 
 void BotInfo::Part(Channel *c, const Anope::string &reason)

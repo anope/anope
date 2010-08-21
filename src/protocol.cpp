@@ -197,6 +197,11 @@ void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who
 		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PONG %s %s", servname.c_str(), who.c_str());
 }
 
+void IRCDProto::SendJoin(BotInfo *bi, const ChannelContainer *cc)
+{
+	SendJoin(bi, cc->chan->name, cc->chan->creation_time);
+}
+
 void IRCDProto::SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick)
 {
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "INVITE %s %s", nick.c_str(), chan.c_str());

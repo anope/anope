@@ -17,10 +17,17 @@ typedef unordered_map_namespace::unordered_map<Anope::string, User *, Anope::has
 extern CoreExport user_map UserListByNick;
 extern CoreExport user_uid_map UserListByUID;
 
+class ChannelStatus : public Flags<ChannelModeName>
+{
+ public:
+	Anope::string BuildCharPrefixList() const;
+	Anope::string BuildModePrefixList() const;
+};
+
 struct ChannelContainer
 {
 	Channel *chan;
-	Flags<ChannelModeName> *Status;
+	ChannelStatus *Status;
 
 	ChannelContainer(Channel *c) : chan(c) { }
 	virtual ~ChannelContainer() { }

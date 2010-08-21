@@ -33,6 +33,8 @@ class CommandCSSetPersist : public Command
 			if (!ci->HasFlag(CI_PERSIST))
 			{
 				ci->SetFlag(CI_PERSIST);
+				if (ci->c)
+					ci->c->SetFlag(CH_PERSIST);
 
 				/* Channel doesn't exist, create it */
 				if (!ci->c)
@@ -65,6 +67,8 @@ class CommandCSSetPersist : public Command
 			if (ci->HasFlag(CI_PERSIST))
 			{
 				ci->UnsetFlag(CI_PERSIST);
+				if (ci->c)
+					ci->c->UnsetFlag(CH_PERSIST);
 
 				/* Unset perm mode */
 				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))

@@ -290,8 +290,6 @@ void check_modes(Channel *c)
 		/* If this channel does not have the mode and the mode is mlocked */
 		if (cm->Type == MODE_REGULAR && !c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
 		{
-			c->SetMode(NULL, cm);
-
 			/* Add the eventual parameter and modify the Channel structure */
 			if (cm->Type == MODE_PARAM)
 			{
@@ -335,6 +333,8 @@ void check_modes(Channel *c)
 				c->RemoveMode(NULL, cm);
 		}
 	}
+
+	stick_all(ci);
 }
 
 /*************************************************************************/

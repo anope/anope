@@ -319,6 +319,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEB
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 check_include_file(sys/select.h HAVE_SYS_SELECT_H)
+check_include_file(sys/eventfd.h HAVE_SYS_EVENTFD_H)
 
 # Check for the existance of the following functions
 check_function_exists(gethostbyname HAVE_GETHOSTBYNAME)

@@ -40,75 +40,58 @@ Run_Build_System () {
 	WITH_INST=""
 	WITH_RUN=""
 	WITH_PERM=""
-	BUILD_TYPE=""
 	RUN_CC_PL=""
 	GEN_TYPE=""
 
 	if [ "$INSTDIR" != "" ] ; then
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			WITH_INST="-DINSTDIR:STRING=$INSTDIR"
-		fi
+		WITH_INST="-DINSTDIR:STRING=$INSTDIR"
 	fi
 
 	if [ "$RUNGROUP" != "" ] ; then
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
-		fi
+		WITH_RUN="-DRUNGROUP:STRING=$RUNGROUP"
 	fi
 
 	if [ "$UMASK" != "" ] ; then
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			WITH_PERM="-DDEFUMASK:STRING=$UMASK"
-		fi
+		WITH_PERM="-DDEFUMASK:STRING=$UMASK"
 	fi
 
 	if [ "$DEBUG" = "yes" ] ; then
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
-		fi
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=DEBUG"
 	else
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
-		fi
+		BUILD_TYPE="-DCMAKE_BUILD_TYPE:STRING=RELEASE"
 	fi
 
 	if [ "$USE_RUN_CC_PL" = "yes" ] ; then
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
-		fi
+		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=ON"
 	else
-		if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-			RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
-		fi
+		RUN_CC_PL="-DUSE_RUN_CC_PL:BOOLEAN=OFF"
 	fi
 
-	if [ "$BUILD_SYSTEM" = "cmake" ] ; then
-		case `uname -s` in
-			MINGW*)
-				GEN_TYPE="-G\"MSYS Makefiles\""
-				;;
-		esac
+	case `uname -s` in
+		MINGW*)
+			GEN_TYPE="-G\"MSYS Makefiles\""
+			;;
+	esac
 
-		if [ "$SOURCE_DIR" = "." ] ; then
-			pwdsave=`pwd`
-			test -d build || mkdir build
-			cd "build"
-			REAL_SOURCE_DIR=".."
-		else
-			REAL_SOURCE_DIR="$SOURCE_DIR"
-		fi
+	if [ "$SOURCE_DIR" = "." ] ; then
+		pwdsave=`pwd`
+		test -d build || mkdir build
+		cd "build"
+		REAL_SOURCE_DIR=".."
+	else
+		REAL_SOURCE_DIR="$SOURCE_DIR"
+	fi
 
-		echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
+	echo "cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR"
 
-		cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
+	cmake $GEN_TYPE $WITH_INST $WITH_RUN $WITH_PERM $BUILD_TYPE $RUN_CC_PL $EXTRA_CONFIG_ARGS $REAL_SOURCE_DIR
 
-		echo ""
-		if [ "$SOURCE_DIR" = "." ] ; then
-			echo "Now cd build, then run make to build Anope."
-			cd "$pwdsave"
-		else
-			echo "Now run make to build Anope."
-		fi
+	echo ""
+	if [ "$SOURCE_DIR" = "." ] ; then
+		echo "Now cd build, then run make to build Anope."
+		cd "$pwdsave"
+	else
+		echo "Now run make to build Anope."
 	fi
 }
 
@@ -129,7 +112,6 @@ export ECHO2 ECHO2SUF
 # Init values
 ###########################################################################
 
-BUILD_SYSTEM="cmake"
 INSTDIR=$HOME/services
 RUNGROUP=
 UMASK=
@@ -138,11 +120,6 @@ USE_RUN_CC_PL="no"
 EXTRA_CONFIG_ARGS=
 CAN_QUICK="no"
 SOURCE_DIR=`dirname $0`
-
-#which cmake > /dev/null
-#if [ $? -ne 0 ] ; then
-#	BUILD_SYSTEM="configure"
-#fi
 
 ###########################################################################
 # Check out the options
@@ -214,36 +191,6 @@ fi
 export ok INPUT
 
 ####
-
-ok=0
-#echo "Note: press Return for the default, or enter a new value."
-#echo "Are you using configure or cmake?"
-#while [ $ok -eq 0 ] ; do
-#	echo2 "[$BUILD_SYSTEM] "
-#	if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-#	if [ ! "$INPUT" ] ; then
-#		INPUT=$BUILD_SYSTEM
-#	fi
-#	case $INPUT in
-#		cmake)
-#			ok=1
-#			;;
-#		configure)
-#			ok=1
-#			;;
-#		*)
-#			echo "That is not a valid choice!"
-#			ok=0
-#			;;
-#	esac
-#done
-#BUILD_SYSTEM=$INPUT
-#echo ""
-
-#if [ "$SOURCE_DIR" != "." -a "$BUILD_SYSTEM" = "configure" ] ; then
-#	echo "You can not use configure unless you are in the same folder as Config!"
-#	exit 0
-#fi
 
 ok=0
 echo "In what directory do you want the binaries to be installed?"
@@ -392,7 +339,6 @@ echo ""
 echo2 "Saving configuration results in config.cache... "
 
 cat <<EOT >$SOURCE_DIR/config.cache
-BUILD_SYSTEM="$BUILD_SYSTEM"
 INSTDIR="$INSTDIR"
 RUNGROUP="$RUNGROUP"
 UMASK=$UMASK

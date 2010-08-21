@@ -1,5 +1,4 @@
-/autom4te.cache
-Makefile
 config.cache
-config.log
-config.status
+include/version.h
+include/sysconf.h
+build/

@@ -37,6 +37,8 @@ Module::~Module()
 	for (i = 0; i < NUM_LANGS; ++i)
 		this->DeleteLanguage(i);
 
+	/* Detach all event hooks for this module */
+	ModuleManager::DetachAll(this);
 	/* Clear any active callbacks this module has */
 	ModuleManager::ClearCallBacks(this);
 
@@ -91,15 +93,5 @@ unsigned Version::GetMinor() const
 unsigned Version::GetBuild() const
 {
 	return this->Build;
-}
-
-Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)
-{
-	ModuleManager::RegisterService(this);
-}
-
-Service::~Service()
-{
-	ModuleManager::UnregisterService(this);
 }
 

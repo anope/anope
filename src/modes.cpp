@@ -10,7 +10,7 @@
 #include "modules.h"
 
 /* List of pairs of user/channels and their stacker info */
-std::list<std::pair<void *, StackerInfo *> > ModeManager::StackerObjects;
+std::list<std::pair<Base *, StackerInfo *> > ModeManager::StackerObjects;
 
 /* List of all modes Anope knows about */
 std::map<Anope::string, Mode *> ModeManager::Modes;
@@ -420,7 +420,7 @@ void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
 	}
 }
 
-void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
+void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
 {
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
@@ -428,17 +428,17 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 
 	if (Type == ST_CHANNEL)
 	{
-		cm = static_cast<ChannelMode *>(Mode);
+		cm = debug_cast<ChannelMode *>(Mode);
 		if (cm->Type == MODE_PARAM)
 			IsParam = true;
 	}
 	else if (Type == ST_USER)
 	{
-		um = static_cast<UserMode *>(Mode);
+		um = debug_cast<UserMode *>(Mode);
 		if (um->Type == MODE_PARAM)
 			IsParam = true;
 	}
-	std::list<std::pair<void *, Anope::string> > *list, *otherlist;
+	std::list<std::pair<Base *, Anope::string> > *list, *otherlist;
 	if (Set)
 	{
 		list = &AddModes;
@@ -451,7 +451,7 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
 	}
 
 	/* Loop through the list and find if this mode is already on here */
-	std::list<std::pair<void *, Anope::string > >::iterator it, it_end;
+	std::list<std::pair<Base *, Anope::string > >::iterator it, it_end;
 	for (it = list->begin(), it_end = list->end(); it != it_end; ++it)
 	{
 		/* The param must match too (can have multiple status or list modes), but
@@ -489,11 +489,11 @@ void StackerInfo::AddMode(void *Mode, bool Set, const Anope::string &Param)
  * @param Item The user/channel etc
  * @return The stacker info
  */
-StackerInfo *ModeManager::GetInfo(void *Item)
+StackerInfo *ModeManager::GetInfo(Base *Item)
 {
-	for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
+	for (std::list<std::pair<Base *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
 	{
-		const std::pair<void *, StackerInfo *> &PItem = *it;
+		const std::pair<Base *, StackerInfo *> &PItem = *it;
 		if (PItem.first == Item)
 			return PItem.second;
 	}
@@ -510,7 +510,7 @@ StackerInfo *ModeManager::GetInfo(void *Item)
 std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 {
 	std::list<Anope::string> ret;
-	std::list<std::pair<void *, Anope::string> >::iterator it, it_end;
+	std::list<std::pair<Base *, Anope::string> >::iterator it, it_end;
 	Anope::string buf = "+", parambuf;
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
@@ -528,12 +528,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = static_cast<ChannelMode *>(it->first);
+			cm = debug_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = static_cast<UserMode *>(it->first);
+			um = debug_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -557,12 +557,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = static_cast<ChannelMode *>(it->first);
+			cm = debug_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = static_cast<UserMode *>(it->first);
+			um = debug_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -579,30 +579,6 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 	return ret;
 }
 
-/** Add a mode to the stacker, internal use only
- * @param bi The client to set the modes from
- * @param u The user
- * @param um The user mode
- * @param Set Adding or removing?
- * @param Param A param, if there is one
- */
-void ModeManager::StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
-{
-	StackerAddInternal(bi, u, um, Set, Param, ST_USER);
-}
-
-/** Add a mode to the stacker, internal use only
- * @param bi The client to set the modes from
- * @param c The channel
- * @param cm The channel mode
- * @param Set Adding or removing?
- * @param Param A param, if there is one
- */
-void ModeManager::StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
-{
-	StackerAddInternal(bi, c, cm, Set, Param, ST_CHANNEL);
-}
-
 /** Really add a mode to the stacker, internal use only
  * @param bi The client to set the modes from
  * @param Object The object, user/channel
@@ -611,7 +587,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, b
  * @param Param A param, if there is one
  * @param Type The type this is, user or channel
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const Anope::string &Param, StackerType Type)
+void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Base *Mode, bool Set, const Anope::string &Param, StackerType Type)
 {
 	StackerInfo *s = GetInfo(Object);
 	s->Type = Type;
@@ -619,7 +595,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool
 	if (bi)
 		s->bi = bi;
 	else if (Type == ST_CHANNEL)
-		s->bi = whosends(static_cast<Channel *>(Object)->ci);
+		s->bi = whosends(debug_cast<Channel *>(Object)->ci);
 	else if (Type == ST_USER)
 		s->bi = NULL;
 }
@@ -778,31 +754,7 @@ char ModeManager::GetStatusChar(char Value)
  */
 void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param)
 {
-	StackerAddInternal(bi, c, cm, Set, Param);
-}
-
-/** Add a mode to the stacker to be set on a channel
- * @param bi The client to set the modes from
- * @param c The channel
- * @param Name The channel mode name
- * @param Set true for setting, false for removing
- * @param Param The param, if there is one
- */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const Anope::string &Param)
-{
-	StackerAdd(bi, c, FindChannelModeByName(Name), Set, Param);
-}
-
-/** Add a mode to the stacker to be set on a channel
- * @param bi The client to set the modes from
- * @param c The channel
- * @param Mode The mode char
- * @param Set true for setting, false for removing
- * @param Param The param, if there is one
- */
-void ModeManager::StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const Anope::string &Param)
-{
-	StackerAdd(bi, c, FindChannelModeByChar(Mode), Set, Param);
+	StackerAddInternal(bi, c, cm, Set, Param, ST_CHANNEL);
 }
 
 /** Add a mode to the stacker to be set on a user
@@ -814,31 +766,7 @@ void ModeManager::StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set,
  */
 void ModeManager::StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param)
 {
-	StackerAddInternal(bi, u, um, Set, Param);
-}
-
-/** Add a mode to the stacker to be set on a user
- * @param bi The client to set the modes from
- * @param u The user
- * @param Name The user mode name
- * @param Set true for setting, false for removing
- * @param Param The param, if there is one
- */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const Anope::string &Param)
-{
-	StackerAdd(bi, u, FindUserModeByName(Name), Set, Param);
-}
-
-/** Add a mode to the stacker to be set on a user
- * @param bi The client to set the modes from
- * @param u The user
- * @param Mode The mode to be set
- * @param Set true for setting, false for removing
- * @param Param The param, if there is one
- */
-void ModeManager::StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const Anope::string &Param)
-{
-	StackerAdd(bi, u, FindUserModeByChar(Mode), Set, Param);
+	StackerAddInternal(bi, u, um, Set, Param, ST_USER);
 }
 
 /** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
@@ -847,16 +775,16 @@ void ModeManager::ProcessModes()
 {
 	if (!StackerObjects.empty())
 	{
-		for (std::list<std::pair<void *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
+		for (std::list<std::pair<Base *, StackerInfo *> >::const_iterator it = StackerObjects.begin(), it_end = StackerObjects.end(); it != it_end; ++it)
 		{
 			StackerInfo *s = it->second;
 			User *u = NULL;
 			Channel *c = NULL;
 
 			if (s->Type == ST_USER)
-				u = static_cast<User *>(it->first);
+				u = debug_cast<User *>(it->first);
 			else if (s->Type == ST_CHANNEL)
-				c = static_cast<Channel *>(it->first);
+				c = debug_cast<Channel *>(it->first);
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 

@@ -10,7 +10,7 @@
 
 #include "hashcomp.h"
 
-class CoreExport OperType
+class CoreExport OperType : public virtual Base
 {
  private:
 	/** The name of this opertype, e.g. "sra".

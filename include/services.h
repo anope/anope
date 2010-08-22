@@ -193,6 +193,21 @@ extern "C" void __pfnBkCheck() {}
 
 #include "anope.h"
 
+class dynamic_reference_base;
+
+/** The base class that most classes in Anope inherit from
+ */
+class CoreExport Base
+{
+	/* References to this base class */
+	std::set<dynamic_reference_base *> References;
+ public:
+	Base();
+	virtual ~Base();
+	void AddReference(dynamic_reference_base *r);
+	void DelReference(dynamic_reference_base *r);
+};
+
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
  * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not

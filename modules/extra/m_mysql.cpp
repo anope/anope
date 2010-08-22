@@ -251,17 +251,17 @@ class ModuleSQL : public Module
 
 		for (unsigned i = this->QueryRequests.size(); i > 0; --i)
 		{
-			QueryRequest &r = this->QueryRequests[i];
+			QueryRequest &r = this->QueryRequests[i - 1];
 
 			if (r.interface && r.interface->owner == m)
 			{
-				if (i == 0)
+				if (i == 1)
 				{
 					r.service->Lock.Lock();
 					r.service->Lock.Unlock();
 				}
 
-				this->QueryRequests.erase(this->QueryRequests.begin() + i);
+				this->QueryRequests.erase(this->QueryRequests.begin() + i - 1);
 			}
 		}
 

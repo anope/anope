@@ -57,7 +57,7 @@ template<typename T> class ExtensibleItemPointerArray : public ExtensibleItemBas
 	T *GetItem() const { return Item; }
 };
 
-class CoreExport Extensible
+class CoreExport Extensible : public virtual Base
 {
  private:
 	typedef std::map<Anope::string, ExtensibleItemBase *> extensible_map;

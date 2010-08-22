@@ -249,7 +249,6 @@ void ModuleManager::DeleteModule(Module *m)
 	if (!m || !m->handle)
 		return;
 
-	DetachAll(m);
 	ano_module_t handle = m->handle;
 	Anope::string filename = m->filename;
 

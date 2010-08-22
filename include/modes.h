@@ -74,7 +74,7 @@ enum ModeClass
 
 /** This class is the basis of all modes in Anope
  */
-class CoreExport Mode
+class CoreExport Mode : public virtual Base
 {
  public:
 	/* Class of mode this is */
@@ -350,9 +350,9 @@ class StackerInfo
 {
  public:
 	/* Modes to be added */
-	std::list<std::pair<void *, Anope::string> > AddModes;
+	std::list<std::pair<Base *, Anope::string> > AddModes;
 	/* Modes to be deleted */
-	std::list<std::pair<void *, Anope::string> > DelModes;
+	std::list<std::pair<Base *, Anope::string> > DelModes;
 	/* The type of object this stacker info is for */
 	StackerType Type;
 	/* Bot this is sent from */
@@ -363,7 +363,7 @@ class StackerInfo
 	 * @param Set true if setting, false if unsetting
 	 * @param Param The param for the mode
 	 */
-	void AddMode(void *Mode, bool Set, const Anope::string &Param);
+	void AddMode(Base *Mode, bool Set, const Anope::string &Param);
 };
 
 /** This is mode manager
@@ -376,37 +376,19 @@ class CoreExport ModeManager
 {
  protected:
 	/* List of pairs of user/channels and their stacker info */
-	static std::list<std::pair<void *, StackerInfo *> > StackerObjects;
+	static std::list<std::pair<Base *, StackerInfo *> > StackerObjects;
 
 	/** Get the stacker info for an item, if one doesnt exist it is created
 	 * @param Item The user/channel etc
 	 * @return The stacker info
 	 */
-	static StackerInfo *GetInfo(void *Item);
+	static StackerInfo *GetInfo(Base *Item);
 
 	/** Build a list of mode strings to send to the IRCd from the mode stacker
 	 * @param info The stacker info for a channel or user
 	 * @return a list of strings
 	 */
 	static std::list<Anope::string> BuildModeStrings(StackerInfo *info);
-
-	/** Add a mode to the stacker, internal use only
-	 * @param bi The client to set the modes from
-	 * @param u The user
-	 * @param um The user mode
-	 * @param Set Adding or removing?
-	 * @param Param A param, if there is one
-	 */
-	static void StackerAddInternal(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param);
-
-	/** Add a mode to the stacker, internal use only
-	 * @param bi The client to set the modes from
-	 * @param c The channel
-	 * @param cm The channel mode
-	 * @param Set Adding or removing?
-	 * @param Param A param, if there is one
-	 */
-	static void StackerAddInternal(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param);
 
 	/** Really add a mode to the stacker, internal use only
 	 * @param bi The client to set the modes from
@@ -416,7 +398,7 @@ class CoreExport ModeManager
 	 * @param Param A param, if there is one
 	 * @param Type The type this is, user or channel
 	 */
-	static void StackerAddInternal(BotInfo *bi, void *Object, void *Mode, bool Set, const Anope::string &Param, StackerType Type);
+	static void StackerAddInternal(BotInfo *bi, Base *Object, Base *Mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
 	/* List of all modes Anope knows about */
@@ -489,24 +471,6 @@ class CoreExport ModeManager
 	 */
 	static void StackerAdd(BotInfo *bi, Channel *c, ChannelMode *cm, bool Set, const Anope::string &Param = "");
 
-	/** Add a mode to the stacker to be set on a channel
-	 * @param bi The client to set the modes from
-	 * @param c The channel
-	 * @param Name The channel mode name
-	 * @param Set true for setting, false for removing
-	 * @param Param The param, if there is one
-	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, ChannelModeName Name, bool Set, const Anope::string &Param = "");
-
-	/** Add a mode to the stacker to be set on a channel
-	 * @param bi The client to set the modes from
-	 * @param c The channel
-	 * @param Mode The mode char
-	 * @param Set true for setting, false for removing
-	 * @param Param The param, if there is one
-	 */
-	static void StackerAdd(BotInfo *bi, Channel *c, const char Mode, bool Set, const Anope::string &Param = "");
-
 	/** Add a mode to the stacker to be set on a user
 	 * @param bi The client to set the modes from
 	 * @param u The user
@@ -515,24 +479,6 @@ class CoreExport ModeManager
 	 * @param param The param, if there is one
 	 */
 	static void StackerAdd(BotInfo *bi, User *u, UserMode *um, bool Set, const Anope::string &Param = "");
-
-	/** Add a mode to the stacker to be set on a user
-	 * @param bi The client to set the modes from
-	 * @param u The user
-	 * @param Name The user mode name
-	 * @param Set true for setting, false for removing
-	 * @param Param The param, if there is one
-	 */
-	static void StackerAdd(BotInfo *bi, User *u, UserModeName Name, bool Set, const Anope::string &Param = "");
-
-	/** Add a mode to the stacker to be set on a user
-	 * @param bi The client to set the modes from
-	 * @param u The user
-	 * @param Mode The mode to be set
-	 * @param Set true for setting, false for removing
-	 * @param Param The param, if there is one
-	 */
-	static void StackerAdd(BotInfo *bi, User *u, const char Mode, bool Set, const Anope::string &Param = "");
 
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */

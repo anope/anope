@@ -74,7 +74,7 @@ enum ServerFlag
 
 /** Class representing a server
  */
-class CoreExport Server : public Flags<ServerFlag>
+class CoreExport Server : public virtual Base, public Flags<ServerFlag>
 {
  private:
 	/* Server name */

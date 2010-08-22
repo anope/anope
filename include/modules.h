@@ -64,7 +64,7 @@ if (true) \
 		{ \
 			(*_i)->x ; \
 		} \
-		catch (const CoreException &modexcept) \
+		catch (const ModuleException &modexcept) \
 		{ \
 			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
@@ -96,7 +96,7 @@ if (true) \
 				break; \
 			} \
 		} \
-		catch (const CoreException &modexcept) \
+		catch (const ModuleException &modexcept) \
 		{ \
 			Alog() << "Exception caught: " << modexcept.GetReason(); \
 		} \
@@ -201,7 +201,7 @@ class CallBack;
 
 /** Every module in Anope is actually a class.
  */
-class CoreExport Module
+class CoreExport Module : public virtual Base
 {
  private:
 	bool permanent;
@@ -1249,7 +1249,7 @@ class CallBack : public Timer
 	}
 };
 
-class Service
+class Service : public virtual Base
 {
  public:
 	Module *owner;
@@ -1260,15 +1260,15 @@ class Service
 	virtual ~Service();
 };
 
-class dynamic_reference_base
+class dynamic_reference_base : public virtual Base
 {
+ protected:
+	bool invalid;
  public:
-	dynamic_reference_base();
-
-	virtual ~dynamic_reference_base();
+	dynamic_reference_base() : invalid(false) { }
+	virtual ~dynamic_reference_base() { }
+	inline void Invalidate() { this->invalid = true; }
 };
-
-extern std::list<dynamic_reference_base *> dyn_references;
 
 template<typename T>
 class dynamic_reference : public dynamic_reference_base
@@ -1276,39 +1276,50 @@ class dynamic_reference : public dynamic_reference_base
  protected:
 	T *ref;
  public:
-	dynamic_reference() : dynamic_reference_base(), ref(NULL) { }
+	dynamic_reference(T *obj) : ref(obj)
+	{
+		if (ref)
+			ref->AddReference(this);
+	}
 
-	dynamic_reference(T *obj) : dynamic_reference_base(), ref(obj) { }
-
-	virtual ~dynamic_reference() { }
+	virtual ~dynamic_reference()
+	{
+		if (this->invalid)
+		{
+			this->invalid = false;
+			this->ref = NULL;
+		}
+		else if (ref)
+			ref->DelReference(this);
+	}
 
 	virtual operator bool()
 	{
+		if (this->invalid)
+		{
+			this->invalid = false;
+			this->ref = NULL;
+		}
 		return this->ref;
+	}
+
+	virtual inline void operator=(T *newref)
+	{
+		if (this->invalid)
+		{
+			this->invalid = false;
+			this->ref = NULL;
+		}
+		else if (this->ref)
+			this->ref->DelReference(this);
+		this->ref = newref;
+		if (this->ref)
+			this->ref->AddReference(this);
 	}
 
 	virtual inline T *operator->()
 	{
 		return this->ref;
-	}
-
-	void Invalidate()
-	{
-		this->ref = NULL;
-	}
-
-	static void Invalidate(T *obj)
-	{
-		for (std::list<dynamic_reference_base *>::iterator it = dyn_references.begin(), it_end = dyn_references.end(); it != it_end;)
-		{
-			dynamic_reference<void *> *d = static_cast<dynamic_reference<void *> *>(*it);
-			++it;
-
-			if (d && d->ref == obj)
-			{
-				d->Invalidate();
-			}
-		}
 	}
 };
 
@@ -1319,25 +1330,43 @@ class service_reference : public dynamic_reference<T>
 	Anope::string name;
 
  public:
-	service_reference(Module *o, const Anope::string &n) : dynamic_reference<T>(), owner(o), name(n)
+	service_reference(Module *o, const Anope::string &n) : dynamic_reference<T>(static_cast<T *>(ModuleManager::GetService(this->name))), owner(o), name(n)
 	{
 	}
 
-	~service_reference()
+	virtual ~service_reference()
 	{
 	}
 
 	operator bool()
 	{
+		if (this->invalid)
+		{
+			this->invalid = false;
+			this->ref = NULL;
+		}
 		if (!this->ref)
+		{
 			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
+			if (this->ref)
+				this->ref->AddReference(this);
+		}
 		return this->ref;
 	}
 
 	inline T *operator->()
 	{
+		if (this->invalid)
+		{
+			this->invalid = false;
+			this->ref = NULL;
+		}
 		if (!this->ref)
+		{
 			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
+			if (this->ref)
+				this->ref->AddReference(this);
+		}
 		return this->ref;
 	}
 };

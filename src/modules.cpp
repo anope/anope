@@ -382,18 +382,13 @@ Version Module::GetVersion() const
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
-std::list<dynamic_reference_base *> dyn_references;
-
-dynamic_reference_base::dynamic_reference_base()
+Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)
 {
-	dyn_references.push_back(this);
+	ModuleManager::RegisterService(this);
 }
 
-dynamic_reference_base::~dynamic_reference_base()
+Service::~Service()
 {
-	std::list<dynamic_reference_base *>::iterator it = std::find(dyn_references.begin(), dyn_references.end(), this);
-
-	if (it != dyn_references.end())
-		dyn_references.erase(it);
+	ModuleManager::UnregisterService(this);
 }
 

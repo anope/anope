@@ -16,8 +16,12 @@ int Pipe::SendInternal(const Anope::string &) const
 Pipe::Pipe() : Socket()
 {
 	int fds[2];
-	if (pipe2(fds, O_NONBLOCK))
+	if (pipe(fds))
 		throw CoreException(Anope::string("Could not create pipe: ") + strerror(errno));
+	int flags = fcntl(fds[0], F_GETFL, 0);
+	fcntl(fds[0], F_SETFL, flags | O_NONBLOCK);
+	flags = fcntl(fds[1], F_GETFL, 0);
+	fcntl(fds[1], F_SETFL, flags | O_NONBLOCK);
 
 	this->Sock = fds[0];
 	this->WritePipe = fds[1];

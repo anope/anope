@@ -27,7 +27,7 @@ namespace Config
 {
 	class Config
 	{
-		static string InstallDirectory;
+		static string InstallDirectory, VSVersion, VSShortVer;
 		static bool UseNMake, BuildDebug;
 
 		static bool CheckResponse(string InstallerResponse)
@@ -130,7 +130,8 @@ namespace Config
 			Dictionary<int, string> InstallerQuestions = new Dictionary<int, string>();
 			InstallerQuestions.Add(0, "Where do you want Anope to be installed?");
 			InstallerQuestions.Add(1, "Would you like to build using NMake instead of using Visual Studio?\r\nNOTE: If you decide to use NMake, you must be in an environment where\r\nNMake can function, such as the Visual Studio command line. If you say\r\nyes to this while not in an environment that can run NMake, it can\r\ncause the CMake configuration to enter an endless loop. [y/n]");
-			InstallerQuestions.Add(2, "Would you like to build a debug version of Anope? [y/n]");
+			InstallerQuestions.Add(2, "Are you using Visual Studio 2008 or 2010? You can leave this blank\nand have CMake try and auto detect it, but this usually doesn't\nwork correctly. [2008/2010]");
+			InstallerQuestions.Add(3, "Would you like to build a debug version of Anope? [y/n]");
 
 			for (int i = 0; i < InstallerQuestions.Count; ++i)
 			{
@@ -173,8 +174,22 @@ namespace Config
 						break;
 					case 1:
 						UseNMake = CheckResponse(InstallerResponse);
+						if (UseNMake)
+							++i;
 						break;
 					case 2:
+						if (InstallerResponse == "2010")
+						{
+							VSVersion = "-G\"Visual Studio 10\" ";
+							VSShortVer = "2010";
+						}
+						else if (InstallerResponse == "2008")
+						{
+							VSVersion = "-G\"Visual Studio 9 2008\" ";
+							VSShortVer = "2008";
+						}
+						break;
+					case 3:
 						BuildDebug = CheckResponse(InstallerResponse);
 						break;
 					default:
@@ -185,7 +200,10 @@ namespace Config
 			Console.WriteLine("Anope will be compiled with the following options:");
 			Console.WriteLine("Install directory: {0}", InstallDirectory);
 			Console.WriteLine("Use NMake: {0}", UseNMake ? "Yes" : "No");
-			Console.WriteLine("Using Visual Studio 2010: {0}", !UseNMake ? "Yes" : "No");
+			if (VSShortVer != null)
+				Console.WriteLine("Using Visual Studio: {0}", VSShortVer);
+			else
+				Console.WriteLine("Using Visual Studio: No");
 			Console.WriteLine("Build debug: {0}", BuildDebug ? "Yes" : "No");
 			Console.WriteLine("Anope Version: {0}", AnopeVersion); ;
 			Console.WriteLine("Press Enter to continue...");
@@ -193,8 +211,7 @@ namespace Config
 			InstallDirectory = "-DINSTDIR:STRING=\"" + InstallDirectory.Replace('\\', '/') + "\" ";
 			string NMake = UseNMake ? "-G\"NMake Makefiles\" " : "";
 			string Debug = BuildDebug ? "-DCMAKE_BUILD_TYPE:STRING=DEBUG " : "-DCMAKE_BUILD_TYPE:STRING=RELEASE ";
-			string VisualStudio = !UseNMake ? "-G\"Visual Studio 10\" " : "";
-			string cMake = InstallDirectory + NMake + Debug + VisualStudio + Environment.CurrentDirectory.Replace('\\','/');
+			string cMake = InstallDirectory + NMake + Debug + VSVersion + Environment.CurrentDirectory.Replace('\\','/');
 			RunCMake(cMake);
 
 			return 0;

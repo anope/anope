@@ -498,7 +498,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		if (ci)
 		{
 			ci->UnsetFlag(CI_PERSIST);
-			if (!Config->s_BotServ.empty() && ci->bi && this->FindUser(ci->bi))
+			if (!Config->s_BotServ.empty() && ci->bi && this->FindUser(ci->bi) && Config->BSMinUsers && this->users.size() <= Config->BSMinUsers)
 				this->ci->bi->Part(this);
 		}
 	}

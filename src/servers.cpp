@@ -269,6 +269,9 @@ bool Server::IsSynced() const
  */
 bool Server::IsULined() const
 {
+	if (this == Me)
+		return true;
+
 	for (std::list<Anope::string>::const_iterator it = Config->Ulines.begin(), it_end = Config->Ulines.end(); it != it_end; ++it)
 		if (it->equals_ci(this->GetName()))
 			return true;

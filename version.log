@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3028"
+VERSION_BUILD="3029"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3029 - Fixed InspIRCd1.2 protocol module passing invalid users in the SJOIN string which made internal debug messages confusing/wrong
 #Revision 3028 - We tell everyone to use 127.0.0.1 instead of localhost, so we should too.
 #Revision 3027 - Kill users using our nicks when on InspIRCd 1.2
 #Revision 3026 - Updated german language file

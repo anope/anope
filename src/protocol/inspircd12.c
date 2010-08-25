@@ -848,10 +848,13 @@ endnick:
 
     newav[0] = av[1];           /* timestamp */
     newav[1] = av[0];           /* channel name */
-    for (i = 2; i != ac; i++)
+    for (i = 2; i < ac - 1; i++)
         newav[i] = av[i];       /* Modes */
     newav[i] = nicklist;        /* Nicknames */
     i++;
+
+    if (debug)
+    	alog("debug: Final FJOIN string: %s", merge_args(i, newav));
 
     do_sjoin(source, i, newav);
     return MOD_CONT;

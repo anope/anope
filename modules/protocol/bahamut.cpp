@@ -307,7 +307,7 @@ class BahamutIRCdProto : public IRCDProto
 int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[1]);
-	time_t ts = Anope::string(av[0]).is_number_only() ? convertTo<time_t>(av[0]) : 0;
+	time_t ts = Anope::string(av[0]).is_pos_number_only() ? convertTo<time_t>(av[0]) : 0;
 	bool keep_their_modes = false;
 
 	if (!c)
@@ -456,7 +456,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 
 	if (ac != 2)
 	{
-		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, Anope::string(av[8]).is_number_only() ? convertTo<uint32>(av[8]) : 0, "", "");
+		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, Anope::string(av[8]).is_pos_number_only() ? convertTo<uint32>(av[8]) : 0, "", "");
 		if (user)
 		{
 			UserSetInternalModes(user, 1, &av[3]);
@@ -472,7 +472,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
 	return MOD_CONT;
 }
 
@@ -540,7 +540,7 @@ int anope_event_436(const Anope::string &source, int ac, const char **av)
 /* EVENT : SERVER */
 int anope_event_server(const Anope::string &source, int ac, const char **av)
 {
-	do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
+	do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
 	return MOD_CONT;
 }
 

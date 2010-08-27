@@ -865,11 +865,11 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			   <codemastr> it's sent when a nick collision occurs
 			   - so we have to leave it around for now -TSL
 			 */
-			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", "");
+			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", "");
 		}
 		else if (ac == 11)
 		{
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, ntohl(decode_ip(av[9])), av[8], "");
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, ntohl(decode_ip(av[9])), av[8], "");
 			if (user)
 			{
 				UserSetInternalModes(user, 1, &av[7]);
@@ -888,7 +888,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		else
 		{
 			/* NON NICKIP */
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, 0, av[8], "");
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, 0, av[8], "");
 			if (user)
 			{
 				UserSetInternalModes(user, 1, &av[7]);
@@ -906,7 +906,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
 	return MOD_CONT;
 }
 
@@ -936,10 +936,10 @@ int anope_event_server(const Anope::string &source, int ac, const char **av)
 		Anope::string vl = myStrGetToken(av[2], ' ', 0);
 		Anope::string upnumeric = myStrGetToken(vl, '-', 2);
 		Anope::string desc = myStrGetTokenRemainder(av[2], ' ', 1);
-		do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, desc, upnumeric);
+		do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, desc, upnumeric);
 	}
 	else
-		do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
+		do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
 	ircdproto->SendPing(Config->ServerName, av[0]);
 
 	return MOD_CONT;
@@ -992,7 +992,7 @@ int anope_event_sdesc(const Anope::string &source, int ac, const char **av)
 int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[1]);
-	time_t ts = Anope::string(av[0]).is_number_only() ? convertTo<time_t>(av[0]) : 0;
+	time_t ts = Anope::string(av[0]).is_pos_number_only() ? convertTo<time_t>(av[0]) : 0;
 	bool keep_their_modes = true;
 
 	if (!c)

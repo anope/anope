@@ -153,7 +153,7 @@ class OSIgnore : public Module
 		{
 			IgnoreData *ign = new IgnoreData();
 			ign->mask = params[2];
-			ign->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
+			ign->time = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 			ignore.push_front(ign);
 
 			return EVENT_STOP;

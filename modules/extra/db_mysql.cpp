@@ -478,8 +478,8 @@ class DBMySQL : public Module
 			na->last_quit = r.Get(i, "last_quit");
 			na->last_realname = r.Get(i, "last_realname");
 			na->last_usermask = r.Get(i, "last_usermask");
-			na->time_registered = r.Get(i, "time_registered").is_number_only() ? convertTo<time_t>(r.Get(i, "time_registered")) : time(NULL);
-			na->last_seen = r.Get(i, "last_seen").is_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : time(NULL);
+			na->time_registered = r.Get(i, "time_registered").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time_registered")) : time(NULL);
+			na->last_seen = r.Get(i, "last_seen").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : time(NULL);
 
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string buf;
@@ -520,7 +520,7 @@ class DBMySQL : public Module
 			bi->SetIdent(r.Get(i, "user"));
 			bi->host = r.Get(i, "host");
 			bi->realname = r.Get(i, "rname");
-			bi->created = r.Get(i, "created").is_number_only() ? convertTo<time_t>(r.Get(i, "creeated")) : time(NULL);
+			bi->created = r.Get(i, "created").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "creeated")) : time(NULL);
 
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string buf;
@@ -571,8 +571,8 @@ class DBMySQL : public Module
 				if (!r.Get(i, "successor").empty())
 					ci->successor = findcore(r.Get(i, "successor"));
 				ci->desc = r.Get(i, "descr");
-				ci->time_registered = r.Get(i, "time_registered").is_number_only() ? convertTo<time_t>(r.Get(i, "time_registered")) : time(NULL);
-				ci->last_used = r.Get(i, "last_used").is_number_only() ? convertTo<time_t>(r.Get(i, "last_used")) : time(NULL);
+				ci->time_registered = r.Get(i, "time_registered").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time_registered")) : time(NULL);
+				ci->last_used = r.Get(i, "last_used").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_used")) : time(NULL);
 				ci->last_topic = r.Get(i, "last_topic");
 				ci->last_topic_setter = r.Get(i, "last_topic_setter");
 				ci->last_topic_time = r.Get(i, "last_topic_time").is_number_only() ? convertTo<int>(r.Get(i, "last_topic_time")) : time(NULL);
@@ -708,7 +708,7 @@ class DBMySQL : public Module
 				continue;
 			}
 
-			ci->AddAccess(nc, atoi(r.Get(i, "level").c_str()), r.Get(i, "creator"), (r.Get(i, "last_seen").is_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : time(NULL)));
+			ci->AddAccess(nc, atoi(r.Get(i, "level").c_str()), r.Get(i, "creator"), (r.Get(i, "last_seen").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : time(NULL)));
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_cs_akick`");
@@ -779,7 +779,7 @@ class DBMySQL : public Module
 			nr->password = r.Get(i, "passcode");
 			nr->password = r.Get(i, "password");
 			nr->email = r.Get(i, "email");
-			nr->requested = r.Get(i, "requested").is_number_only() ? convertTo<time_t>(r.Get(i, "requested")) : time(NULL);
+			nr->requested = r.Get(i, "requested").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "requested")) : time(NULL);
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_ms_info`");
@@ -814,7 +814,7 @@ class DBMySQL : public Module
 				}
 				else
 					m->number = 1;
-				m->time = r.Get(i, "time").is_number_only() ? convertTo<time_t>(r.Get(i, "time")) : time(NULL);
+				m->time = r.Get(i, "time").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time")) : time(NULL);
 				m->text = r.Get(i, "text");
 
 				if (!r.Get(i, "flags").empty())
@@ -845,8 +845,8 @@ class DBMySQL : public Module
 				Anope::string host = r.Get(i, "host");
 				Anope::string by = r.Get(i, "by");
 				Anope::string reason = r.Get(i, "reason");
-				time_t seton = r.Get(i, "seton").is_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : time(NULL);
-				time_t expires = r.Get(i, "expires").is_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : time(NULL);
+				time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : time(NULL);
+				time_t expires = r.Get(i, "expires").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : time(NULL);
 
 				XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
 				if (x)
@@ -863,8 +863,8 @@ class DBMySQL : public Module
 			Anope::string mask = r.Get(i, "mask");
 			Anope::string by = r.Get(i, "xby");
 			Anope::string reason = r.Get(i, "reason");
-			time_t seton = r.Get(i, "seton").is_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : time(NULL);
-			time_t expires = r.Get(i, "expires").is_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : time(NULL);
+			time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : time(NULL);
+			time_t expires = r.Get(i, "expires").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : time(NULL);
 
 			XLine *x = NULL;
 			if (SNLine && r.Get(i, "type").equals_cs("SNLINE"))

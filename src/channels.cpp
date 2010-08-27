@@ -1145,7 +1145,7 @@ void do_join(const Anope::string &source, int ac, const char **av)
 		/* Join came with a TS */
 		if (ac == 2)
 		{
-			time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
+			time_t ts = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
 
 			/* Their time is older, we lose */
 			if (chan->creation_time > ts)
@@ -1309,7 +1309,7 @@ void do_topic(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
 	ChannelInfo *ci;
-	time_t topic_time = Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0;
+	time_t topic_time = Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0;
 
 	if (!c)
 	{

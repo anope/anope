@@ -198,6 +198,7 @@ namespace Anope
 		 * Determine if string consists of only numbers.
 		 */
 		inline bool is_number_only() const { return this->find_first_not_of("0123456789.-") == npos; }
+		inline bool is_pos_number_only() const { return this->find_first_not_of("0123456789.") == npos; }
 
 		/**
 		 * Replace parts of the string.

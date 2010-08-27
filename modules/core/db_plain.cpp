@@ -376,9 +376,9 @@ static void LoadNickAlias(const std::vector<Anope::string> &params)
 
 	NickAlias *na = new NickAlias(params[1], nc);
 
-	na->time_registered = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
+	na->time_registered = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 
-	na->last_seen = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
+	na->last_seen = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
 }
@@ -389,7 +389,7 @@ static void LoadNickRequest(const std::vector<Anope::string> &params)
 	nr->passcode = params[1];
 	nr->password = params[2];
 	nr->email = params[3];
-	nr->requested = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
+	nr->requested = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
 }
@@ -401,8 +401,8 @@ static void LoadBotInfo(const std::vector<Anope::string> &params)
 		bi = new BotInfo(params[0]);
 	bi->SetIdent(params[1]);
 	bi->host = params[2];
-	bi->created = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
-	bi->chancount = params[4].is_number_only() ? convertTo<uint32>(params[4]) : 0;
+	bi->created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
+	bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32>(params[4]) : 0;
 	bi->realname = params[5];
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
@@ -417,9 +417,9 @@ static void LoadChanInfo(const std::vector<Anope::string> &params)
 	ci->ClearFlags();
 	ci->botflags.ClearFlags();
 
-	ci->time_registered = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
+	ci->time_registered = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 
-	ci->last_used = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
+	ci->last_used = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 
 	Alog(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
 }
@@ -428,15 +428,15 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 {
 	if (params[0].equals_ci("STATS"))
 	{
-		maxusercnt = params[1].is_number_only() ? convertTo<uint32>(params[1]) : 0;
-		maxusertime = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
+		maxusercnt = params[1].is_pos_number_only() ? convertTo<uint32>(params[1]) : 0;
+		maxusertime = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 	}
 	else if (params[0].equals_ci("SNLINE") || params[0].equals_ci("SQLINE") || params[0].equals_ci("SZLINE"))
 	{
 		Anope::string mask = params[1];
 		Anope::string by = params[2];
-		time_t seton = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
-		time_t expires = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
+		time_t seton = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
+		time_t expires = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
 		Anope::string reason = params[5];
 
 		XLine *x = NULL;
@@ -457,8 +457,8 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 		Anope::string user = params[1];
 		Anope::string host = params[2];
 		Anope::string by = params[3];
-		time_t seton = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
-		time_t expires = params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0;
+		time_t seton = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
+		time_t expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
 		Anope::string reason = params[6];
 
 		XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
@@ -472,10 +472,10 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 	{
 		Exception *exception = new Exception();
 		exception->mask = params[1];
-		exception->limit = params[2].is_number_only() ? convertTo<int>(params[2]) : 1;
+		exception->limit = params[2].is_pos_number_only() ? convertTo<int>(params[2]) : 1;
 		exception->who = params[3];
-		exception->time = params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0;
-		exception->expires = params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0;
+		exception->time = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
+		exception->expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
 		exception->reason = params[6];
 		exceptions.push_back(exception);
 	}
@@ -604,9 +604,9 @@ class DBPlain : public Module
 					nc->language = LangInfos[i].LanguageId;
 		}
 		else if (key.equals_ci("MEMOMAX"))
-			nc->memos.memomax = params[0].is_number_only() ? convertTo<int16>(params[0]) : 1;
+			nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : 1;
 		else if (key.equals_ci("CHANCOUNT"))
-			nc->channelcount = params[0].is_number_only() ? convertTo<uint16>(params[0]) : 0;
+			nc->channelcount = params[0].is_pos_number_only() ? convertTo<uint16>(params[0]) : 0;
 		else if (key.equals_ci("EMAIL"))
 			nc->email = params[0];
 		else if (key.equals_ci("GREET"))
@@ -623,8 +623,8 @@ class DBPlain : public Module
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			m->number = params[0].is_number_only() ? convertTo<uint32>(params[0]) : 0;
-			m->time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
+			m->number = params[0].is_pos_number_only() ? convertTo<uint32>(params[0]) : 0;
+			m->time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 			m->sender = params[2];
 			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
@@ -661,7 +661,7 @@ class DBPlain : public Module
 			}
 		}
 		else if (key.equals_ci("VHOST"))
-			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0);
+			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
 
 		return EVENT_CONTINUE;
 	}
@@ -679,9 +679,9 @@ class DBPlain : public Module
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
 		if (key.equals_ci("BANTYPE"))
-			ci->bantype = params[0].is_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
+			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
 		else if (key.equals_ci("MEMOMAX"))
-			ci->memos.memomax = params[0].is_number_only() ? convertTo<int16>(params[0]) : 1;
+			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : 1;
 		else if (key.equals_ci("FOUNDER"))
 		{
 			ci->founder = findcore(params[0]);
@@ -713,7 +713,7 @@ class DBPlain : public Module
 		else if (key.equals_ci("TOPIC"))
 		{
 			ci->last_topic_setter = params[0];
-			ci->last_topic_time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
+			ci->last_topic_time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 			ci->last_topic = params[2];
 		}
 		else if (key.equals_ci("FORBID"))
@@ -732,7 +732,7 @@ class DBPlain : public Module
 			}
 
 			int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
-			time_t last_seen = params[2].is_number_only() ? convertTo<time_t>(params[2]) : 0;
+			time_t last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 			ci->AddAccess(nc, level, params[3], last_seen);
 		}
 		else if (key.equals_ci("AKICK"))
@@ -752,9 +752,9 @@ class DBPlain : public Module
 			}
 			AutoKick *ak;
 			if (Nick)
-				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0);
+				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			else
-				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_number_only() ? convertTo<time_t>(params[5]) : 0);
+				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			if (Stuck)
 				ak->SetFlag(AK_STUCK);
 			if (Nick)
@@ -781,8 +781,8 @@ class DBPlain : public Module
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			m->number = params[0].is_number_only() ? convertTo<uint32>(params[0]) : 0;
-			m->time = params[1].is_number_only() ? convertTo<time_t>(params[1]) : 0;
+			m->number = params[0].is_pos_number_only() ? convertTo<uint32>(params[0]) : 0;
+			m->time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 			m->sender = params[2];
 			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
@@ -814,35 +814,35 @@ class DBPlain : public Module
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)
 				{
 					if (params[j].equals_ci("BOLDS"))
-						ci->ttb[0] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("COLORS"))
-						ci->ttb[1] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REVERSES"))
-						ci->ttb[2] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("UNDERLINES"))
-						ci->ttb[3] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("BADWORDS"))
-						ci->ttb[4] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("CAPS"))
-						ci->ttb[5] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("FLOOD"))
-						ci->ttb[6] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REPEAT"))
-						ci->ttb[7] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("ITALICS"))
-						ci->ttb[8] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 				}
 			}
 			else if (params[0].equals_ci("CAPSMIN"))
-				ci->capsmin = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
 			else if (params[0].equals_ci("CAPSPERCENT"))
-				ci->capspercent = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
 			else if (params[0].equals_ci("FLOODLINES"))
-				ci->floodlines = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
 			else if (params[0].equals_ci("FLOODSECS"))
-				ci->floodsecs = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
 			else if (params[0].equals_ci("REPEATTIMES"))
-				ci->repeattimes = params[1].is_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
 			else if (params[0].equals_ci("BADWORD"))
 			{
 				BadWordType Type;

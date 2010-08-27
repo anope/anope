@@ -285,7 +285,7 @@ class RatboxProto : public IRCDTS6Proto
 int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[1]);
-	time_t ts = Anope::string(av[0]).is_number_only() ? convertTo<time_t>(av[0]) : 0;
+	time_t ts = Anope::string(av[0]).is_pos_number_only() ? convertTo<time_t>(av[0]) : 0;
 	bool keep_their_modes = true;
 
 	if (!c)
@@ -410,7 +410,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 	{
 		Server *s = Server::Find(source);
 		/* Source is always the server */
-		user = do_nick("", av[0], av[4], av[5], s->GetName(), av[8], Anope::string(av[2]).is_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", av[7]);
+		user = do_nick("", av[0], av[4], av[5], s->GetName(), av[8], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", av[7]);
 		if (user)
 		{
 			UserSetInternalModes(user, 1, &av[3]);
@@ -426,7 +426,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else if (ac == 2)
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
 	return MOD_CONT;
 }
 
@@ -483,7 +483,7 @@ int anope_event_tburst(const Anope::string &source, int ac, const char **av)
 	Anope::string setter = myStrGetToken(av[2], '!', 0);
 
 	c = findchan(av[0]);
-	topic_time = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
+	topic_time = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
 
 	if (!c)
 	{
@@ -606,9 +606,9 @@ int anope_event_whois(const Anope::string &source, int ac, const char **av)
 int anope_event_server(const Anope::string &source, int ac, const char **av)
 {
 	if (!stricmp(av[1], "1"))
-		do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], TS6UPLINK);
+		do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], TS6UPLINK);
 	else
-		do_server(source, av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
+		do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
 	return MOD_CONT;
 }
 
@@ -617,7 +617,7 @@ int anope_event_sid(const Anope::string &source, int ac, const char **av)
 	/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
 	Server *s = Server::Find(source);
 
-	do_server(s->GetName(), av[0], Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]) : 0, av[3], av[2]);
+	do_server(s->GetName(), av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[3], av[2]);
 	return MOD_CONT;
 }
 

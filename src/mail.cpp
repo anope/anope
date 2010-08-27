@@ -40,7 +40,7 @@ bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::s
 	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
 	else if (t - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
+		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - t - u->lastmail);
 	else if (nr->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nr->nick.c_str());
 	else
@@ -63,7 +63,7 @@ bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::stri
 	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
 	else if (t - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, t - u->lastmail);
+		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - t - u->lastmail);
 	else if (nc->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nc->display.c_str());
 	else

@@ -676,7 +676,7 @@ class HSRequest : public Module
 		if (params[0].equals_ci("HS_REQUEST") && params.size() >= 5)
 		{
 			Anope::string vident = params[2].equals_ci("(null)") ? "" : params[2];
-			my_add_host_request(params[1], vident, params[3], params[1], params[4].is_number_only() ? convertTo<time_t>(params[4]) : 0);
+			my_add_host_request(params[1], vident, params[3], params[1], params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0);
 
 			return EVENT_STOP;
 		}

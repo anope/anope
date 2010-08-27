@@ -246,7 +246,7 @@ class NewsBase : public Command
 			}
 			if (!text.equals_ci("ALL"))
 			{
-				num = text.is_number_only() ? convertTo<unsigned>(text) : 0;
+				num = text.is_pos_number_only() ? convertTo<unsigned>(text) : 0;
 				if (num > 0 && del_newsitem(num, type))
 				{
 					notice_lang(Config->s_OperServ, u, msgs[MSG_DELETED], num);
@@ -440,7 +440,7 @@ class OSNews : public Module
 		if (params[0].equals_ci("OS") && params.size() >= 7 && params[1].equals_ci("NEWS"))
 		{
 			NewsItem *n = new NewsItem();
-			n->num = params[2].is_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			n->num = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
 			n->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 			n->who = params[4];
 			if (params[5].equals_ci("LOGON"))

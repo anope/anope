@@ -395,7 +395,7 @@ int anope_event_fmode(const Anope::string &source, int ac, const char **av)
 	/* Checking the TS for validity to avoid desyncs */
 	if ((c = findchan(av[0])))
 	{
-		time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
+		time_t ts = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
 		if (c->creation_time > ts)
 			/* Our TS is bigger, we should lower it */
 			c->creation_time = ts;
@@ -434,7 +434,7 @@ int anope_event_fmode(const Anope::string &source, int ac, const char **av)
 int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
-	time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
+	time_t ts = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
 	bool keep_their_modes = true;
 
 	if (!c)
@@ -750,7 +750,7 @@ int anope_event_uid(const Anope::string &source, int ac, const char **av)
 	User *user;
 	NickAlias *na;
 	Server *s = Server::Find(source);
-	time_t ts = Anope::string(av[1]).is_number_only() ? convertTo<time_t>(av[1]) : 0;
+	time_t ts = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
 
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user.  ~ Viper*/
@@ -806,7 +806,7 @@ int anope_event_chghost(const Anope::string &source, int ac, const char **av)
  */
 int anope_event_server(const Anope::string &source, int ac, const char **av)
 {
-	do_server(source, av[0], Anope::string(av[2]).is_number_only() ? convertTo<unsigned>(av[2]) : 0, av[4], av[3]);
+	do_server(source, av[0], Anope::string(av[2]).is_pos_number_only() ? convertTo<unsigned>(av[2]) : 0, av[4], av[3]);
 	return MOD_CONT;
 }
 
@@ -852,7 +852,7 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 {
 	if (!strcasecmp(av[0], "START"))
 	{
-		if (ac < 2 || (Anope::string(av[1]).is_number_only() ? convertTo<unsigned>(av[1]): 0) < 1202)
+		if (ac < 2 || (Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]): 0) < 1202)
 		{
 			send_cmd("", "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START");
 			quitmsg = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
@@ -1124,7 +1124,7 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 			else if (capab.find("MAXMODES=") != Anope::string::npos)
 			{
 				Anope::string maxmodes(capab.begin() + 9, capab.end());
-				ircd->maxmodes = maxmodes.is_number_only() ? convertTo<unsigned>(maxmodes) : 3;
+				ircd->maxmodes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
 			}
 		}
 	}

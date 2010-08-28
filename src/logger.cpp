@@ -17,7 +17,7 @@ void InitLogChannels(ServerConfig *config)
 	{
 		LogInfo *l = config->LogInfos[i];
 
-		if (!l->Inhabit)
+		if (!ircd->join2msg && !l->Inhabit)
 			continue;
 
 		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)

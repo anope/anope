@@ -441,13 +441,11 @@ struct IRCDVar
 	const char *name;				/* Name of the IRCd command */
 	const char *pseudoclient_mode;	/* Mode used by BotServ Bots */
 	int max_symbols;				/* Chan Max Symbols */
-	const char *botchanumode;		/* Modes set when botserv joins a channel */
 	int svsnick;					/* Supports SVSNICK */
 	int vhost;						/* Supports vhost */
 	int snline;						/* Supports SNline */
 	int sqline;						/* Supports SQline */
 	int szline;						/* Supports SZline */
-	int numservargs;				/* Number of Server Args */
 	int join2set;					/* Join 2 Set Modes */
 	int join2msg;					/* Join 2 Message */
 	int topictsforward;				/* TS on Topics Forward */
@@ -463,13 +461,10 @@ struct IRCDVar
 	int omode;						/* On the fly o:lines */
 	int umode;						/* change user modes */
 	int nickvhost;					/* Users vhost sent during NICK */
-	int chgreal;					/* Change RealName */
 	int knock_needs_i;				/* Check if we needed +i when setting NOKNOCK */
-	int token;						/* Does Anope support the tokens for the ircd */
 	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	int ts6;						/* ircd is TS6 */
-	int p10;						/* ircd is P10  */
 	int cidrchanbei;				/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 									 * 0 for no support, 1 for strict cidr support, anything else
 									 * for ircd specific support (nefarious only cares about first /mask) */

@@ -16,15 +16,13 @@
 
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x",	/* ircd name */
-	 "+",				/* Modes used by pseudoclients */
+	"+",					/* Modes used by pseudoclients */
 	 2,					/* Chan Max Symbols */
-	 "+o",				/* Channel Umode used by Botserv bots */
 	 1,					/* SVSNICK */
 	 0,					/* Vhost */
 	 1,					/* Supports SNlines */
 	 1,					/* Supports SQlines */
 	 1,					/* Supports SZlines */
-	 3,					/* Number of server args */
 	 0,					/* Join 2 Set */
 	 0,					/* Join 2 Message */
 	 0,					/* TS Topic Forward */
@@ -40,13 +38,10 @@ IRCDVar myIrcd[] = {
 	 0,					/* O:LINE */
 	 1,					/* UMODE */
 	 0,					/* VHOST ON NICK */
-	 0,					/* Change RealName */
 	 1,					/* No Knock requires +i */
-	 0,					/* We support TOKENS */
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
 	 0,					/* ts6 */
-	 0,					/* p10 */
 	 0,					/* CIDR channelbans */
 	 "$",				/* TLD Prefix for Global */
 	 6,					/* Max number of modes we can send per line */
@@ -772,9 +767,7 @@ class ProtoBahamut : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		pmodule_ircd_version("BahamutIRCd 1.4.*/1.8.*");
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_useTSMode(0);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_TSMODE, CAPAB_UNCONNECT, CAPAB_BURST, CAPAB_DKEY, CAPAB_DOZIP };
 		for (unsigned i = 0; i < 6; ++i)

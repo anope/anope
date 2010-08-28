@@ -18,13 +18,11 @@ IRCDVar myIrcd[] = {
 	{"Ratbox 2.0+",	/* ircd name */
 	 "+oi",			/* Modes used by pseudoclients */
 	 2,				/* Chan Max Symbols */
-	 "+o",			/* Channel Umode used by Botserv bots */
 	 0,				/* SVSNICK */
 	 0,				/* Vhost */
 	 1,				/* Supports SNlines */
 	 1,				/* Supports SQlines */
 	 0,				/* Supports SZlines */
-	 3,				/* Number of server args */
 	 1,				/* Join 2 Set */
 	 1,				/* Join 2 Message */
 	 0,				/* TS Topic Forward */
@@ -40,13 +38,10 @@ IRCDVar myIrcd[] = {
 	 0,				/* UMODE */
 	 0,				/* O:LINE */
 	 0,				/* VHOST ON NICK */
-	 0,				/* Change RealName */
 	 0,				/* No Knock requires +i */
-	 0,				/* We support TOKENS */
 	 0,				/* Can remove User Channel Modes with SVSMODE */
 	 0,				/* Sglines are not enforced until user reconnects */
 	 1,				/* ts6 */
-	 0,				/* p10 */
 	 0,				/* CIDR channelbans */
 	 "$$",			/* TLD Prefix for Global */
 	 4,				/* Max number of modes we can send per line */
@@ -793,14 +788,11 @@ class ProtoRatbox : public Module
 
 		if (!Config->Numeric.empty())
 			TS6SID = Config->Numeric;
-		UseTSMODE = 1;  /* TMODE */
 
-		pmodule_ircd_version("Ratbox IRCD 2.0+");
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_useTSMode(1);
 
-		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK };
-		for (unsigned i = 0; i < 5; ++i)
+		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK, CAPAB_TSMODE };
+		for (unsigned i = 0; i < 6; ++i)
 			Capab.SetFlag(c[i]);
 
 		AddModes();

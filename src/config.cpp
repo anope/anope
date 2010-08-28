@@ -835,33 +835,30 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 	{
 		LogInfo *l = config->LogInfos[i];
 
-		if (l->Inhabit)
+		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
 		{
-			for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+			const Anope::string &target = *sit;
+
+			if (target[0] == '#')
 			{
-				const Anope::string &target = *sit;
-
-				if (target[0] == '#')
+				Channel *c = findchan(target);
+				if (c && c->HasFlag(CH_LOGCHAN))
 				{
-					Channel *c = findchan(target);
-					if (c && c->HasFlag(CH_LOGCHAN))
+					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 					{
-						for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+						UserContainer *uc = *cit;
+						BotInfo *bi = findbot(uc->user->nick);
+
+						if (bi && bi->HasFlag(BI_CORE))
 						{
-							UserContainer *uc = *cit;
-							BotInfo *bi = findbot(uc->user->nick);
-
-							if (bi && bi->HasFlag(BI_CORE))
-							{
-								bi->Part(c, "Reloading");
-							}
+							bi->Part(c, "Reloading configuration");
 						}
-
-						c->UnsetFlag(CH_PERSIST);
-						c->UnsetFlag(CH_LOGCHAN);
-						if (c->users.empty())
-							delete c;
 					}
+
+					c->UnsetFlag(CH_PERSIST);
+					c->UnsetFlag(CH_LOGCHAN);
+					if (c->users.empty())
+						delete c;
 				}
 			}
 		}
@@ -875,7 +872,7 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 
 bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
-	//{"target", "source", "logage", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug"},
+	//{"target", "source", "logage", "inhabit", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug"},
 	Anope::string targets = values[0].GetValue();
 	ValueItem vi(targets);
 	if (!ValidateNotEmpty(config, "log", "target", vi))
@@ -911,7 +908,8 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 
 bool DoneLogs(ServerConfig *config, const Anope::string &)
 {
-	InitLogChannels(config);
+	if (ircd)
+		InitLogChannels(config);
 
 	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
 

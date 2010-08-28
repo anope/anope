@@ -19,13 +19,11 @@ IRCDVar myIrcd[] = {
 	{"InspIRCd 1.2",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
 	 5,					/* Chan Max Symbols */
-	 "+ao",				/* Channel Umode used by Botserv bots */
 	 1,					/* SVSNICK */
 	 1,					/* Vhost */
 	 0,					/* Supports SNlines */
 	 1,					/* Supports SQlines */
 	 1,					/* Supports SZlines */
-	 4,					/* Number of server args */
 	 0,					/* Join 2 Set */
 	 0,					/* Join 2 Message */
 	 1,					/* TS Topic Forward */
@@ -41,13 +39,10 @@ IRCDVar myIrcd[] = {
 	 0,					/* O:LINE */
 	 1,					/* UMODE */
 	 1,					/* VHOST ON NICK */
-	 0,					/* Change RealName */
 	 1,					/* No Knock requires +i */
-	 0,					/* We support inspircd TOKENS */
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
 	 1,					/* ts6 */
-	 0,					/* p10 */
 	 1,					/* CIDR channelbans */
 	 "$",				/* TLD Prefix for Global */
 	 20,				/* Max number of modes we can send per line */
@@ -1270,9 +1265,7 @@ class ProtoInspIRCd : public Module
 		if (!Config->Numeric.empty())
 			TS6SID = Config->Numeric;
 
-		pmodule_ircd_version("InspIRCd 1.2");
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_useTSMode(0);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT };
 		for (unsigned i = 0; i < 5; ++i)

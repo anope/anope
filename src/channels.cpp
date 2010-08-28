@@ -1252,7 +1252,7 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 	unsigned i, end;
 	const char *t;
 
-	if (Capab.HasFlag(CAPAB_TSMODE) || UseTSMODE)
+	if (Capab.HasFlag(CAPAB_TSMODE))
 	{
 		for (i = 0, end = strlen(av[1]); i < end; ++i)
 			if (!isdigit(av[1][i]))

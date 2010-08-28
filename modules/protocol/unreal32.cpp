@@ -18,13 +18,11 @@ IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */
 	 "+Soi",				/* Modes used by pseudoclients */
 	 5,						/* Chan Max Symbols */
-	 "+ao",					/* Channel Umode used by Botserv bots */
 	 1,						/* SVSNICK */
 	 1,						/* Vhost */
 	 1,						/* Supports SNlines */
 	 1,						/* Supports SQlines */
 	 1,						/* Supports SZlines */
-	 3,						/* Number of server args */
 	 0,						/* Join 2 Set */
 	 0,						/* Join 2 Message */
 	 1,						/* TS Topic Forward */
@@ -40,13 +38,10 @@ IRCDVar myIrcd[] = {
 	 1,						/* O:LINE */
 	 1,						/* UMODE */
 	 1,						/* VHOST ON NICK */
-	 1,						/* Change RealName */
 	 1,						/* No Knock requires +i */
-	 1,						/* We support Unreal TOKENS */
 	 1,						/* Can remove User Channel Modes with SVSMODE */
 	 0,						/* Sglines are not enforced until user reconnects */
 	 0,						/* ts6 */
-	 0,						/* p10 */
 	 0,						/* CIDR channelbans */
 	 "$",					/* TLD Prefix for Global */
 	 12,					/* Max number of modes we can send per line */
@@ -1265,9 +1260,7 @@ class ProtoUnreal : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		pmodule_ircd_version("UnrealIRCd 3.2+");
 		pmodule_ircd_var(myIrcd);
-		pmodule_ircd_useTSMode(0);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_NICKCHARS };
 		for (unsigned i = 0; i < 10; ++i)

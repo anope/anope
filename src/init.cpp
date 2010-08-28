@@ -54,8 +54,6 @@ void introduce_user(const Anope::string &user)
 		/* Load MLock from the database now that we know what modes exist */
 		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			it->second->LoadMLock();
-		/* Setup log chanels */
-		InitLogChannels(Config);
 	}
 }
 
@@ -355,6 +353,9 @@ void Init(int ac, char **av)
 	if (!Config->s_GlobalNoticer.empty())
 		new BotInfo(Config->s_GlobalNoticer, Config->ServiceUser, Config->ServiceHost, Config->desc_GlobalNoticer);
 
+	/* Init the log channels */
+	InitLogChannels(Config);
+
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config->EncModuleList);
 
@@ -404,7 +405,7 @@ void Init(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	Log() << "Anope " << Anope::Version() << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Log() << "Anope " << Anope::Version() << " (ircd protocol: " << ircd->name << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = time(NULL);
 
 	/* Set signal handlers.  Catch certain signals to let us do things or

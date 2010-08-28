@@ -22,7 +22,6 @@ E void ModuleRunTimeDirCleanUp();
 /* IRC Variables */
 
 E IRCDVar *ircd;
-E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
 E IRCDProto *ircdproto;
 
 /**** actions.c ****/
@@ -159,8 +158,6 @@ E Uplink *uplink_server;
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar *ircdvar);
-E void pmodule_ircd_version(const Anope::string &version);
-E void pmodule_ircd_useTSMode(int use);
 
 /**** language.c ****/
 
@@ -180,8 +177,6 @@ E const char *getstring(int index);
 E void InitLogChannels(ServerConfig *);
 
 /**** main.c ****/
-
-E Anope::string version_protocol;
 
 E Anope::string services_dir;
 E Anope::string log_filename;

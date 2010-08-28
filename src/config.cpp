@@ -835,30 +835,33 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 	{
 		LogInfo *l = config->LogInfos[i];
 
-		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+		if (l->Inhabit)
 		{
-			const Anope::string &target = *sit;
-
-			if (target[0] == '#')
+			for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
 			{
-				Channel *c = findchan(target);
-				if (c && c->HasFlag(CH_LOGCHAN))
+				const Anope::string &target = *sit;
+
+				if (target[0] == '#')
 				{
-					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+					Channel *c = findchan(target);
+					if (c && c->HasFlag(CH_LOGCHAN))
 					{
-						UserContainer *uc = *cit;
-						BotInfo *bi = findbot(uc->user->nick);
-
-						if (bi && bi->HasFlag(BI_CORE))
+						for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
 						{
-							bi->Part(c, "Reloading");
-						}
-					}
+							UserContainer *uc = *cit;
+							BotInfo *bi = findbot(uc->user->nick);
 
-					c->UnsetFlag(CH_PERSIST);
-					c->UnsetFlag(CH_LOGCHAN);
-					if (c->users.empty())
-						delete c;
+							if (bi && bi->HasFlag(BI_CORE))
+							{
+								bi->Part(c, "Reloading");
+							}
+						}
+
+						c->UnsetFlag(CH_PERSIST);
+						c->UnsetFlag(CH_LOGCHAN);
+						if (c->users.empty())
+							delete c;
+					}
 				}
 			}
 		}
@@ -880,17 +883,18 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 	
 	Anope::string source = values[1].GetValue();
 	int logage = values[2].GetInteger();
-	Anope::string admin = values[3].GetValue();
-	Anope::string override = values[4].GetValue();
-	Anope::string commands = values[5].GetValue();
-	Anope::string servers = values[6].GetValue();
-	Anope::string channels = values[7].GetValue();
-	Anope::string users = values[8].GetValue();
-	bool normal = values[9].GetBool();
-	bool rawio = values[10].GetBool();
-	bool ldebug = values[11].GetBool();
+	bool inhabit = values[3].GetBool();
+	Anope::string admin = values[4].GetValue();
+	Anope::string override = values[5].GetValue();
+	Anope::string commands = values[6].GetValue();
+	Anope::string servers = values[7].GetValue();
+	Anope::string channels = values[8].GetValue();
+	Anope::string users = values[9].GetValue();
+	bool normal = values[10].GetBool();
+	bool rawio = values[11].GetBool();
+	bool ldebug = values[12].GetBool();
 
-	LogInfo *l = new LogInfo(logage, normal, rawio, ldebug);
+	LogInfo *l = new LogInfo(logage, inhabit, normal, rawio, ldebug);
 	l->Targets = BuildStringList(targets);
 	l->Sources = BuildStringList(source);
 	l->Admin = BuildStringList(admin);
@@ -1143,9 +1147,9 @@ void ServerConfig::Read()
 			{DT_CHARPTR},
 			InitModules, DoModule, DoneModules},
 		{"log",
-			{"target", "source", "logage", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug", ""},
-			{"", "", "7", "", "", "", "", "", "", "", "no", "no", ""},
-			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN, DT_BOOLEAN},
+			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug", ""},
+			{"", "", "7", "yes", "", "", "", "", "", "", "no", "no", ""},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"opertype",
 			{"name", "inherits", "commands", "privs", ""},

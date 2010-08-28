@@ -50,7 +50,7 @@ class CommandNSIdentify : public Command
 			res = enc_check_password(pass, na->nc->pass);
 			if (!res)
 			{
-				Log(LOG_COMMAND, u, this) << "failed to identify";
+				Log(LOG_COMMAND, u, this) << "and failed to identify";
 				notice_lang(Config->s_NickServ, u, PASSWORD_INCORRECT);
 				if (bad_password(u))
 					return MOD_STOP;
@@ -60,7 +60,7 @@ class CommandNSIdentify : public Command
 			else
 			{
 				if (u->IsIdentified())
-					Log(LOG_COMMAND, "nickserv/identify") << "logged out of account " << u->Account()->display;
+					Log(LOG_COMMAND, "nickserv/identify") << "to log out of account " << u->Account()->display;
 
 				na->last_realname = u->realname;
 				na->last_seen = time(NULL);
@@ -73,7 +73,7 @@ class CommandNSIdentify : public Command
 
 				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-				Log(LOG_COMMAND, u, this) << "identified for account " << u->Account()->display;
+				Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display;
 				notice_lang(Config->s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
 				if (ircd->vhost)
 					do_on_id(u);

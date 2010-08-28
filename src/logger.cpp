@@ -17,6 +17,9 @@ void InitLogChannels(ServerConfig *config)
 	{
 		LogInfo *l = config->LogInfos[i];
 
+		if (!l->Inhabit)
+			continue;
+
 		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
 		{
 			const Anope::string &target = *sit;
@@ -195,7 +198,7 @@ Log::~Log()
 	}
 }
 
-LogInfo::LogInfo(int logage, bool normal, bool rawio, bool ldebug) : LogAge(logage), Normal(normal), RawIO(rawio), Debug(ldebug)
+LogInfo::LogInfo(int logage, bool inhabit, bool normal, bool rawio, bool ldebug) : LogAge(logage), Inhabit(inhabit), Normal(normal), RawIO(rawio), Debug(ldebug)
 {
 }
 
@@ -327,7 +330,7 @@ void LogInfo::ProcessMessage(const Log *l)
 
 		if (target[0] == '#')
 		{
-			if (UplinkSock && !debug && Me && Me->IsSynced())
+			if (UplinkSock && l->Type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
 				Channel *c = findchan(target);
 				if (!c || !l->bi)

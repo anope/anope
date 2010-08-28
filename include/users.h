@@ -76,10 +76,12 @@ class CoreExport User : public Extensible
 	/** Create a new user object, initialising necessary fields and
 	 * adds it to the hash
 	 *
-	 * @param nick The nickname of the user.
-	 * @param uid The unique identifier of the user.
+	 * @param snick The nickname of the user.
+	 * @param sident The username of the user
+	 * @param shost The hostname of the user
+	 * @param suid The unique identifier of the user.
 	 */
-	User(const Anope::string &nick, const Anope::string &uid);
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid);
 
 	/** Destroy a user.
 	 */

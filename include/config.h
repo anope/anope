@@ -465,8 +465,6 @@ class ServerConfig
 	/* The hostname if services clients */
 	Anope::string ServiceHost;
 
-	/* Log channel */
-	Anope::string LogChannel;
 	/* Name of the network were on */
 	Anope::string NetworkName;
 	/* The max legnth of nicks */
@@ -544,8 +542,6 @@ class ServerConfig
 	bool UseStrictPrivMsg;
 	/* Dump a core file if we crash */
 	bool DumpCore;
-	/* Log users connecting/existing/changing nicks */
-	bool LogUsers;
 	/* Number of seconds between consecutive uses of the REGISTER command
 	 * Not to be confused with NSRegDelay */
 	unsigned NickRegDelay;
@@ -555,12 +551,17 @@ class ServerConfig
 	Anope::string MLock;
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
+	/* THe actual modes */
+	std::vector<ChannelModeStatus *> BotModeList;
 	/* How many times to try and reconnect to the uplink before giving up */
 	unsigned MaxRetries;
 	/* How long to wait between connection attempts */
 	int RetryWait;
 	/* If services should hide unprivileged commands */
 	bool HidePrivilegedCommands;
+
+	/* A vector of our logfile options */
+	std::vector<LogInfo *> LogInfos;
 
 	/* Services can use email */
 	bool UseMail;
@@ -684,10 +685,6 @@ class ServerConfig
 	Anope::string GlobalOnCycleUP;
 	/* Super admin is allowed */
 	bool SuperAdmin;
-	/* Log things said through ACT/SAY */
-	bool LogBot;
-	/* Log when new user max is reached */
-	bool LogMaxUsers;
 	/* Default expiry time for akills */
 	time_t AutokillExpiry;
 	/* Default expiry time for chan kills */

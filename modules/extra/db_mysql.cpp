@@ -405,7 +405,7 @@ class DBMySQL : public Module
 	{
 		if (!SQL)
 		{
-			Alog() << "Error, unable to find service reference for SQL, is m_mysql loaded and configured properly?";
+			Log() << "Error, unable to find service reference for SQL, is m_mysql loaded and configured properly?";
 			return EVENT_CONTINUE;
 		}
 
@@ -442,7 +442,7 @@ class DBMySQL : public Module
 			NickCore *nc = findcore(r.Get(i, "display"));
 			if (!nc)
 			{
-				Alog() << "MySQL: Got NickCore access entry for nonexistant core " << r.Get(i, "display");
+				Log() << "MySQL: Got NickCore access entry for nonexistant core " << r.Get(i, "display");
 				continue;
 			}
 
@@ -455,7 +455,7 @@ class DBMySQL : public Module
 			NickCore *nc = findcore(r.Get(i, "display"));
 			if (!nc)
 			{
-				Alog() << "MySQL: Got NickCore access entry for nonexistant core " << r.Get(i, "display");
+				Log() << "MySQL: Got NickCore access entry for nonexistant core " << r.Get(i, "display");
 				continue;
 			}
 
@@ -470,7 +470,7 @@ class DBMySQL : public Module
 			NickCore *nc = findcore(r.Get(i, "display"));
 			if (!nc)
 			{
-				Alog() << "MySQL: Got NickAlias for nick " << r.Get(i, "nick") << " with nonexistant core " << r.Get(i, "display");
+				Log() << "MySQL: Got NickAlias for nick " << r.Get(i, "nick") << " with nonexistant core " << r.Get(i, "display");
 				continue;
 			}
 
@@ -502,7 +502,7 @@ class DBMySQL : public Module
 			NickAlias *na = findnick(r.Get(i, "nick"));
 			if (!na)
 			{
-				Alog() << "MySQL: Got metadata for nonexistant nick " << r.Get(i, "nick");
+				Log() << "MySQL: Got metadata for nonexistant nick " << r.Get(i, "nick");
 				continue;
 			}
 
@@ -516,9 +516,7 @@ class DBMySQL : public Module
 		{
 			BotInfo *bi = findbot(r.Get(i, "nick"));
 			if (!bi)
-				bi = new BotInfo(r.Get(i, "nick"));
-			bi->SetIdent(r.Get(i, "user"));
-			bi->host = r.Get(i, "host");
+				bi = new BotInfo(r.Get(i, "nick"), r.Get(i, "user"), r.Get(i, "host"));
 			bi->realname = r.Get(i, "rname");
 			bi->created = r.Get(i, "created").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "creeated")) : time(NULL);
 
@@ -543,7 +541,7 @@ class DBMySQL : public Module
 			BotInfo *bi = findbot(r.Get(i, "botname"));
 			if (!bi)
 			{
-				Alog() << "MySQL: BotInfo metadata for nonexistant bot " << r.Get(i, "botname");
+				Log() << "MySQL: BotInfo metadata for nonexistant bot " << r.Get(i, "botname");
 				continue;
 			}
 
@@ -562,7 +560,7 @@ class DBMySQL : public Module
 				nc = findcore(r.Get(i, "founder"));
 				if (!nc)
 				{
-					Alog() << "MySQL: Channel " << r.Get(i, "name") << " with nonexistant founder " << r.Get(i, "founder");
+					Log() << "MySQL: Channel " << r.Get(i, "name") << " with nonexistant founder " << r.Get(i, "founder");
 					continue;
 				}
 
@@ -664,7 +662,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel ttb for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel ttb for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
@@ -677,7 +675,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel badwords entry for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel badwords entry for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
@@ -697,14 +695,14 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel access entry for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel access entry for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
 			NickCore *nc = findcore(r.Get(i, "display"));
 			if (!nc)
 			{
-				Alog() << "MySQL: Channel access entry for " << ci->name << " with nonexistant nick " << r.Get(i, "display");
+				Log() << "MySQL: Channel access entry for " << ci->name << " with nonexistant nick " << r.Get(i, "display");
 				continue;
 			}
 
@@ -717,7 +715,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel access entry for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel access entry for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
@@ -750,7 +748,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel level entry for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel level entry for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
@@ -763,7 +761,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
 			if (!ci)
 			{
-				Alog() << "MySQL: Channel metadata for nonexistant channel " << r.Get(i, "channel");
+				Log() << "MySQL: Channel metadata for nonexistant channel " << r.Get(i, "channel");
 				continue;
 			}
 
@@ -1379,15 +1377,15 @@ class DBMySQL : public Module
 
 void MySQLInterface::OnResult(const SQLResult &r)
 {
-	Alog(LOG_DEBUG) << "MySQL successfully executed query: " << r.GetQuery();
+	Log(LOG_DEBUG) << "MySQL successfully executed query: " << r.GetQuery();
 }
 
 void MySQLInterface::OnError(const SQLResult &r)
 {
 	if (!r.GetQuery().empty())
-		Alog(LOG_DEBUG) << "Error executing query " << r.GetQuery() << ": " << r.GetError();
+		Log(LOG_DEBUG) << "Error executing query " << r.GetQuery() << ": " << r.GetError();
 	else
-		Alog(LOG_DEBUG) << "Error executing query: " << r.GetError();
+		Log(LOG_DEBUG) << "Error executing query: " << r.GetError();
 }
 
 

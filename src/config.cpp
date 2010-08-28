@@ -82,7 +82,7 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 			else if (option.equals_ci("msg"))
 			{
 				if (!this->UsePrivmsg)
-					Alog() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
+					Log() << "msg in <nickserv:defaults> can only be used when UsePrivmsg is set";
 				else
 					this->NSDefFlags.SetFlag(NI_MSG);
 			}
@@ -262,7 +262,7 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 
 	/* Check the user keys */
 	if (this->UserKey1 == this->UserKey2 || this->UserKey1 == this->UserKey3 || this->UserKey3 == this->UserKey2)
-		Alog() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
+		Log() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
 
 	/**
 	 * Check all DEFCON dependiencies...
@@ -349,10 +349,6 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 	}
 
 	SetDefaultMLock(this);
-
-	/* Disable the log channel if its defined in the conf, but not enabled */
-	if (this->LogChannel.empty() && LogChan)
-		LogChan = false;
 }
 
 bool ServerConfig::CheckOnce(const Anope::string &tag)
@@ -614,13 +610,13 @@ bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string 
 	int nicklen = data.GetInteger();
 	if (!nicklen)
 	{
-		Alog() << "You have not defined the <networkinfo:nicklen> directive. It is strongly";
-		Alog() << "adviced that you do configure this correctly in your services.conf";
+		Log() << "You have not defined the <networkinfo:nicklen> directive. It is strongly";
+		Log() << "adviced that you do configure this correctly in your services.conf";
 		data.Set(31);
 	}
 	else if (nicklen < 1)
 	{
-		Alog() << "<networkinfo:nicklen> has an invalid value; setting to 31";
+		Log() << "<networkinfo:nicklen> has an invalid value; setting to 31";
 		data.Set(31);
 	}
 	return true;
@@ -645,7 +641,7 @@ bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const
 	{
 		if (data.GetValue().empty())
 		{
-			Alog() << "<" << tag << ":" << value << "> was undefined, disabling <options:globaloncycle>";
+			Log() << "<" << tag << ":" << value << "> was undefined, disabling <options:globaloncycle>";
 			config->GlobalOnCycle = false;
 		}
 	}
@@ -733,7 +729,7 @@ static bool DoOperType(ServerConfig *config, const Anope::string &, const Anope:
 		{
 			if ((*it)->GetName().equals_ci(tok))
 			{
-				Alog() << "Inheriting commands and privs from " << (*it)->GetName() << " to " << ot->GetName();
+				Log() << "Inheriting commands and privs from " << (*it)->GetName() << " to " << ot->GetName();
 				ot->Inherits(*it);
 				break;
 			}
@@ -797,7 +793,7 @@ static bool DoneOpers(ServerConfig *config, const Anope::string &)
 			OperType *ot = *tit;
 			if (ot->GetName().equals_ci(type))
 			{
-				Alog() << "Tied oper " << na->nc->display << " to type " << type;
+				Log() << "Tied oper " << na->nc->display << " to type " << type;
 				na->nc->ot = ot;
 			}
 		}
@@ -830,6 +826,91 @@ bool DoModule(ServerConfig *conf, const Anope::string &, const Anope::string *, 
 
 bool DoneModules(ServerConfig *, const Anope::string &)
 {
+	return true;
+}
+
+bool InitLogs(ServerConfig *config, const Anope::string &)
+{
+	for (unsigned i = 0; i < config->LogInfos.size(); ++i)
+	{
+		LogInfo *l = config->LogInfos[i];
+
+		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+		{
+			const Anope::string &target = *sit;
+
+			if (target[0] == '#')
+			{
+				Channel *c = findchan(target);
+				if (c && c->HasFlag(CH_LOGCHAN))
+				{
+					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+					{
+						UserContainer *uc = *cit;
+						BotInfo *bi = findbot(uc->user->nick);
+
+						if (bi && bi->HasFlag(BI_CORE))
+						{
+							bi->Part(c, "Reloading");
+						}
+					}
+
+					c->UnsetFlag(CH_PERSIST);
+					c->UnsetFlag(CH_LOGCHAN);
+					if (c->users.empty())
+						delete c;
+				}
+			}
+		}
+
+		delete config->LogInfos[i];
+	}
+	config->LogInfos.clear();
+
+	return true;
+}
+
+bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	//{"target", "source", "logage", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug"},
+	Anope::string targets = values[0].GetValue();
+	ValueItem vi(targets);
+	if (!ValidateNotEmpty(config, "log", "target", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+	
+	Anope::string source = values[1].GetValue();
+	int logage = values[2].GetInteger();
+	Anope::string admin = values[3].GetValue();
+	Anope::string override = values[4].GetValue();
+	Anope::string commands = values[5].GetValue();
+	Anope::string servers = values[6].GetValue();
+	Anope::string channels = values[7].GetValue();
+	Anope::string users = values[8].GetValue();
+	bool normal = values[9].GetBool();
+	bool rawio = values[10].GetBool();
+	bool ldebug = values[11].GetBool();
+
+	LogInfo *l = new LogInfo(logage, normal, rawio, ldebug);
+	l->Targets = BuildStringList(targets);
+	l->Sources = BuildStringList(source);
+	l->Admin = BuildStringList(admin);
+	l->Override = BuildStringList(override);
+	l->Commands = BuildStringList(commands);
+	l->Servers = BuildStringList(servers);
+	l->Channels = BuildStringList(channels);
+	l->Users = BuildStringList(users);
+
+	config->LogInfos.push_back(l);
+
+	return true;
+}
+
+bool DoneLogs(ServerConfig *config, const Anope::string &)
+{
+	InitLogChannels(config);
+
+	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
+
 	return true;
 }
 
@@ -902,8 +983,6 @@ void ServerConfig::Read()
 		{"serverinfo", "hostname", "", new ValueContainerString(&this->ServiceHost), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "pid", "services.pid", new ValueContainerString(&this->PIDFilename), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "motd", "services.motd", new ValueContainerString(&this->MOTDFilename), DT_STRING, ValidateNotEmpty},
-		{"networkinfo", "logchannel", "", new ValueContainerString(&this->LogChannel), DT_STRING, NoValidation},
-		{"networkinfo", "logbot", "no", new ValueContainerBool(&this->LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerString(&this->NetworkName), DT_STRING, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&this->NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&this->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
@@ -930,7 +1009,6 @@ void ServerConfig::Read()
 		{"options", "useprivmsg", "no", new ValueContainerBool(&this->UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&this->UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
 		{"options", "dumpcore", "yes", new ValueContainerBool(&this->DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
-		{"options", "logusers", "no", new ValueContainerBool(&this->LogUsers), DT_BOOLEAN, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&this->HideStatsO), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycle", "no", new ValueContainerBool(&this->GlobalOnCycle), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycledown", "", new ValueContainerString(&this->GlobalOnCycleMessage), DT_STRING, ValidateGlobalOnCycle},
@@ -940,7 +1018,6 @@ void ServerConfig::Read()
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&this->RestrictOperNicks), DT_BOOLEAN, NoValidation},
 		{"options", "newscount", "3", new ValueContainerUInt(&this->NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerString(&UlineServers), DT_STRING, NoValidation},
-		{"options", "enablelogchannel", "no", new ValueContainerBool(&LogChan), DT_BOOLEAN, NoValidation},
 		{"options", "mlock", "+nrt", new ValueContainerString(&this->MLock), DT_STRING, NoValidation},
 		{"options", "botmodes", "", new ValueContainerString(&this->BotModes), DT_STRING, NoValidation},
 		{"options", "maxretries", "10", new ValueContainerUInt(&this->MaxRetries), DT_UINTEGER, NoValidation},
@@ -1017,7 +1094,6 @@ void ServerConfig::Read()
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&this->SuperAdmin), DT_BOOLEAN, NoValidation},
-		{"operserv", "logmaxusers", "no", new ValueContainerBool(&this->LogMaxUsers), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&this->AutokillExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&this->ChankillExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "snlineexpiry", "0", new ValueContainerTime(&this->SNLineExpiry), DT_TIME, ValidateNotZero},
@@ -1067,6 +1143,11 @@ void ServerConfig::Read()
 			{"", ""},
 			{DT_CHARPTR},
 			InitModules, DoModule, DoneModules},
+		{"log",
+			{"target", "source", "logage", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug", ""},
+			{"", "", "7", "", "", "", "", "", "", "", "no", "no", ""},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN, DT_BOOLEAN},
+			InitLogs, DoLogs, DoneLogs},
 		{"opertype",
 			{"name", "inherits", "commands", "privs", ""},
 			{"", "", "", "", ""},
@@ -1339,10 +1420,10 @@ void ServerConfig::Read()
 		}
 		throw ConfigException(ce);
 	}
-	Alog(LOG_DEBUG) << "End config";
+	Log(LOG_DEBUG) << "End config";
 	for (int Index = 0; !Once[Index].empty(); ++Index)
 		CheckOnce(Once[Index]);
-	Alog() << "Done reading configuration file.";
+	Log() << "Done reading configuration file.";
 }
 
 bool ServerConfig::LoadConf(ConfigDataHash &target, const Anope::string &filename)
@@ -1358,7 +1439,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const Anope::string &filenam
 		errstr << "File " << filename << " could not be opened." << std::endl;
 		return false;
 	}
-	Alog(LOG_DEBUG) << "Start to read conf " << filename;
+	Log(LOG_DEBUG) << "Start to read conf " << filename;
 	// Start reading characters...
 	while (getline(conf, line.str()))
 	{
@@ -1462,7 +1543,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const Anope::string &filenam
 						return false;
 					}
 					// this is the same as the below section for testing if itemname is non-empty after the loop, but done inside it to allow the above construct
-					Alog(LOG_DEBUG) << "ln "<< linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
+					Log(LOG_DEBUG) << "ln "<< linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
 					sectiondata.push_back(KeyVal(itemname, wordbuffer));
 					wordbuffer.clear();
 					itemname.clear();
@@ -1504,7 +1585,7 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const Anope::string &filenam
 				errstr << "Item without value: " << filename << ":" << linenumber << std::endl;
 				return false;
 			}
-			Alog(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
+			Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
 			sectiondata.push_back(KeyVal(itemname, wordbuffer));
 			wordbuffer.clear();
 			itemname.clear();
@@ -1555,7 +1636,7 @@ bool ServerConfig::ConfValue(ConfigDataHash &target, const Anope::string &tag, c
 			{
 				if (!allow_linefeeds && j->second.find('\n') != Anope::string::npos)
 				{
-					Alog(LOG_DEBUG) << "Value of <" << tag << ":" << var << "> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.";
+					Log(LOG_DEBUG) << "Value of <" << tag << ":" << var << "> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.";
 					j->second.replace_all_cs("\n", " ");
 				}
 				else

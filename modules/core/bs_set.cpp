@@ -64,6 +64,9 @@ class CommandBSSet : public Command
 			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
 		else
 		{
+			bool override = !check_access(u, ci, CA_SET);
+			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << option << value;
+
 			if (option.equals_ci("DONTKICKOPS"))
 			{
 				if (value.equals_ci("ON"))

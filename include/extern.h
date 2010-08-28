@@ -153,8 +153,7 @@ E void hostserv_init();
 E void introduce_user(const Anope::string &user);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname = 0);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param);
-E int init_primary(int ac, char **av);
-E int init_secondary(int ac, char **av);
+E void Init(int ac, char **av);
 E Uplink *uplink_server;
 
 /**** ircd.c ****/
@@ -177,13 +176,8 @@ E const char *getstring(const NickCore *nc, int index);
 E const char *getstring(const User *nc, int index);
 E const char *getstring(int index);
 
-/**** log.c ****/
-
-E int open_log();
-E void close_log();
-E void log_perror(const char *fmt, ...) FORMAT(printf, 1, 2);
-E void fatal(const char *fmt, ...) FORMAT(printf, 1, 2);
-E void fatal_perror(const char *fmt, ...) FORMAT(printf, 1, 2);
+/*** logger.cpp ***/
+E void InitLogChannels(ServerConfig *);
 
 /**** main.c ****/
 
@@ -193,7 +187,6 @@ E Anope::string services_dir;
 E Anope::string log_filename;
 E int debug;
 E bool readonly;
-E bool LogChan;
 E bool nofork;
 E bool nothird;
 E bool noexpire;
@@ -297,8 +290,6 @@ E unsigned GenericChannelModes, GenericUserModes;
 E Flags<ChannelModeName> DefMLockOn;
 E Flags<ChannelModeName> DefMLockOff;
 E std::map<ChannelModeName, Anope::string> DefMLockParams;
-/* Modes to set on bots when they join the channel */
-E std::list<ChannelModeStatus *> BotModes;
 E void SetDefaultMLock(ServerConfig *config);
 
 /**** nickserv.c ****/

@@ -53,8 +53,6 @@ class CommandCSDrop : public Command
 			return MOD_CONT;
 		}
 
-		int level = get_access(u, ci);
-
 		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 
@@ -64,15 +62,12 @@ class CommandCSDrop : public Command
 			ircdproto->SendSQLineDel(&x);
 		}
 
-		Alog() << Config->s_ChanServ << ": Channel " << ci->name << " dropped by " << u->GetMask() << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";
+		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER));
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "founder: " << (ci->founder ? ci->founder->display : "none");
+		if (override)
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		delete ci;
-
-		/* We must make sure that the Services admin has not normally the right to
-		 * drop the channel before issuing the wallops.
-		 */
-		if (Config->WallDrop && (level < ACCESS_FOUNDER || (!IsFounder(u, ci) && ci->HasFlag(CI_SECUREFOUNDER))))
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used DROP on channel \2%s\2", u->nick.c_str(), chan.c_str());
 
 		notice_lang(Config->s_ChanServ, u, CHAN_DROPPED, chan.c_str());
 

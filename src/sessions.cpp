@@ -168,17 +168,17 @@ void del_session(const Anope::string &host)
 {
 	if (!Config->LimitSessions)
 	{
-		Alog(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
+		Log(LOG_DEBUG) << "del_session called when LimitSessions is disabled";
 		return;
 	}
 
 	if (host.empty())
 	{
-		Alog(LOG_DEBUG) << "del_session called with NULL values";
+		Log(LOG_DEBUG) << "del_session called with NULL values";
 		return;
 	}
 
-	Alog(LOG_DEBUG_2) << "del_session() called";
+	Log(LOG_DEBUG_2) << "del_session() called";
 
 	Session *session = findsession(host);
 
@@ -187,7 +187,7 @@ void del_session(const Anope::string &host)
 		if (debug)
 		{
 			ircdproto->SendGlobops(OperServ, "WARNING: Tried to delete non-existant session: \2%s", host.c_str());
-			Alog(LOG_DEBUG) << "session: Tried to delete non-existant session: " << host;
+			Log() << "session: Tried to delete non-existant session: " << host;
 		}
 		return;
 	}
@@ -200,11 +200,11 @@ void del_session(const Anope::string &host)
 
 	SessionList.erase(session->host);
 
-	Alog(LOG_DEBUG_2) << "del_session(): free session structure";
+	Log(LOG_DEBUG_2) << "del_session(): free session structure";
 
 	delete session;
 
-	Alog(LOG_DEBUG_2) << "del_session() done";
+	Log(LOG_DEBUG_2) << "del_session() done";
 }
 
 /*************************************************************************/

@@ -150,11 +150,13 @@ class XOPDelCallback : public NumberList
 {
 	User *u;
 	ChannelInfo *ci;
+	Command *c;
 	int *messages;
 	unsigned Deleted;
 	Anope::string Nicks;
+	bool override;
  public:
-	XOPDelCallback(User *_u, ChannelInfo *_ci, int *_messages, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), messages(_messages), Deleted(0)
+	XOPDelCallback(User *_u, Command *_c, ChannelInfo *_ci, int *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), messages(_messages), Deleted(0), override(_override)
 	{
 	}
 
@@ -164,7 +166,7 @@ class XOPDelCallback : public NumberList
 			 notice_lang(Config->s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
 		else
 		{
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of users " << Nicks << " on " << ci->name;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
 				notice_lang(Config->s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
@@ -263,7 +265,8 @@ class XOPBase : public Command
 			access->creator = u->nick;
 		}
 
-		Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") " << (change ? "changed" : "set") << " access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
+		bool override = (level >= ulev || ulev < ACCESS_AOP || (access && access->level > ulev));
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") as level " << level;
 
 		if (!change)
 		{
@@ -313,7 +316,8 @@ class XOPBase : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPDelCallback list(u, ci, messages, nick);
+			bool override = level >= ulev || ulev < ACCESS_AOP;
+			XOPDelCallback list(u, this, ci, messages, override, nick);
 			list.Process();
 		}
 		else
@@ -325,7 +329,6 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
-
 			unsigned i, end;
 			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
@@ -345,7 +348,8 @@ class XOPBase : public Command
 				notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			else
 			{
-				Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user " << access->nc->display << " on " << ci->name;
+				bool override = ulev <= access->level;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->nc->display;
 
 				notice_lang(Config->s_ChanServ, u, messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
 
@@ -367,6 +371,9 @@ class XOPBase : public Command
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
+
+		bool override = !get_access(u, ci);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		if (!ci->GetAccessCount())
 		{
@@ -425,6 +432,9 @@ class XOPBase : public Command
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
 		}
+
+		bool override = !check_access(u, ci, CA_FOUNDER);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR level " << level;
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{

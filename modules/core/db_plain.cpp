@@ -46,7 +46,7 @@ static void ReadDatabase(Module *m = NULL)
 
 	if (!db.is_open())
 	{
-		Alog() << "Unable to open " << DatabaseFile << " for reading!";
+		Log() << "Unable to open " << DatabaseFile << " for reading!";
 		return;
 	}
 
@@ -132,7 +132,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const DatabaseException &ex)
 					{
-						Alog() << "[db_plain]: " << ex.GetReason();
+						Log() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (Type == MD_NA && na)
@@ -146,7 +146,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const DatabaseException &ex)
 					{
-						Alog() << "[db_plain]: " << ex.GetReason();
+						Log() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (Type == MD_NR && nr)
@@ -160,7 +160,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const DatabaseException &ex)
 					{
-						Alog() << "[db_plain]: " << ex.GetReason();
+						Log() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (Type == MD_BI && bi)
@@ -174,7 +174,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const DatabaseException &ex)
 					{
-						Alog() << "[db_plain]: " << ex.GetReason();
+						Log() << "[db_plain]: " << ex.GetReason();
 					}
 				}
 				else if (Type == MD_CH && ci)
@@ -188,7 +188,7 @@ static void ReadDatabase(Module *m = NULL)
 					}
 					catch (const DatabaseException &ex)
 					{
-						Alog() << "[db_plain]: " << ex.GetReason();
+						Log() << "[db_plain]: " << ex.GetReason();
 						if (!ci->founder)
 						{
 							delete ci;
@@ -362,7 +362,7 @@ static void LoadNickCore(const std::vector<Anope::string> &params)
 
 	nc->pass = params[1];
 
-	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
+	Log(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
 }
 
 static void LoadNickAlias(const std::vector<Anope::string> &params)
@@ -370,7 +370,7 @@ static void LoadNickAlias(const std::vector<Anope::string> &params)
 	NickCore *nc = findcore(params[0]);
 	if (!nc)
 	{
-		Alog() << "[db_plain]: Unable to find core " << params[0];
+		Log() << "[db_plain]: Unable to find core " << params[0];
 		return;
 	}
 
@@ -380,7 +380,7 @@ static void LoadNickAlias(const std::vector<Anope::string> &params)
 
 	na->last_seen = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 
-	Alog(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
+	Log(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
 }
 
 static void LoadNickRequest(const std::vector<Anope::string> &params)
@@ -391,21 +391,20 @@ static void LoadNickRequest(const std::vector<Anope::string> &params)
 	nr->email = params[3];
 	nr->requested = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
 
-	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
+	Log(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
 }
 
 static void LoadBotInfo(const std::vector<Anope::string> &params)
 {
 	BotInfo *bi = findbot(params[0]);
 	if (!bi)
-		bi = new BotInfo(params[0]);
-	bi->SetIdent(params[1]);
-	bi->host = params[2];
+		bi = new BotInfo(params[0], params[1], params[2]);
+
 	bi->created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 	bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32>(params[4]) : 0;
 	bi->realname = params[5];
 
-	Alog(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
+	Log(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
 }
 
 static void LoadChanInfo(const std::vector<Anope::string> &params)
@@ -421,7 +420,7 @@ static void LoadChanInfo(const std::vector<Anope::string> &params)
 
 	ci->last_used = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 
-	Alog(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
+	Log(LOG_DEBUG_2) << "[db_plain]: loaded channel " << ci->name;
 }
 
 static void LoadOperInfo(const std::vector<Anope::string> &params)
@@ -533,11 +532,11 @@ class DBPlain : public Module
 			if (IsFile(newname))
 				return;
 
-			Alog(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
+			Log(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
 				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
-				Alog() << "Unable to back up database!";
+				Log() << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
 					quitting = true;

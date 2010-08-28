@@ -138,14 +138,18 @@ class AkickDelCallback : public NumberList
 {
 	User *u;
 	ChannelInfo *ci;
+	Command *c;
 	unsigned Deleted;
  public:
-	AkickDelCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
+	AkickDelCallback(User *_u, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), c(_c), Deleted(0)
 	{
 	}
 
 	~AkickDelCallback()
 	{
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
+
 		if (!Deleted)
 			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 		else if (Deleted == 1)
@@ -266,6 +270,9 @@ class CommandCSAKick : public Command
 		else
 			akick = ci->AddAkick(u->nick, mask, reason);
 
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << ": " << reason;
+
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
 
 		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
@@ -305,6 +312,9 @@ class CommandCSAKick : public Command
 			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
 			return;
 		}
+
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "STICK " << akick->mask;
 
 		akick->SetFlag(AK_STUCK);
 		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name.c_str());
@@ -346,6 +356,9 @@ class CommandCSAKick : public Command
 			return;
 		}
 
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "UNSTICK " << akick->mask;
+
 		akick->UnsetFlag(AK_STUCK);
 		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name.c_str());
 	}
@@ -365,7 +378,7 @@ class CommandCSAKick : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickDelCallback list(u, ci, mask);
+			AkickDelCallback list(u, ci, this, mask);
 			list.Process();
 		}
 		else
@@ -387,6 +400,9 @@ class CommandCSAKick : public Command
 				return;
 			}
 
+			bool override = !check_access(u, ci, CA_AKICK);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << mask;
+
 			ci->EraseAkick(i);
 
 			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
@@ -396,6 +412,9 @@ class CommandCSAKick : public Command
 	void DoList(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
+
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
 
 		if (!ci->GetAkickCount())
 		{
@@ -441,6 +460,9 @@ class CommandCSAKick : public Command
 	void DoView(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
+
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "VIEW";
 
 		if (!ci->GetAkickCount())
 		{
@@ -502,11 +524,17 @@ class CommandCSAKick : public Command
 				++count;
 		}
 
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
+
 		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
 	}
 
 	void DoClear(User *u, ChannelInfo *ci)
 	{
+		bool override = !check_access(u, ci, CA_AKICK);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+
 		ci->ClearAkick();
 		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name.c_str());
 	}

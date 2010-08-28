@@ -58,7 +58,7 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Alog() << Config->s_ChanServ << ": Changing successor of " << ci->name << " from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none") << " by " << u->GetMask();
+		Log(!this->permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none");
 
 		ci->successor = nc;
 

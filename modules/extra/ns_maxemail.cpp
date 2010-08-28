@@ -163,7 +163,7 @@ void my_load_config()
 {
 	ConfigReader config;
 	NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
-	Alog(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
+	Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
 }
 
 MODULE_INIT(NSMaxEmail)

@@ -735,7 +735,7 @@ int anope_event_setname(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -753,7 +753,7 @@ int anope_event_chgname(const Anope::string &source, int ac, const char **av)
 	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "CHGNAME for nonexistent user " << av[0];
+		Log(LOG_DEBUG) << "CHGNAME for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -771,7 +771,7 @@ int anope_event_setident(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -789,7 +789,7 @@ int anope_event_chgident(const Anope::string &source, int ac, const char **av)
 	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
+		Log(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -807,7 +807,7 @@ int anope_event_sethost(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -920,7 +920,7 @@ int anope_event_chghost(const Anope::string &source, int ac, const char **av)
 	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "debug: CHGHOST for nonexistent user " << av[0];
+		Log(LOG_DEBUG) << "debug: CHGHOST for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -972,9 +972,9 @@ int anope_event_error(const Anope::string &source, int ac, const char **av)
 {
 	if (av[0])
 	{
-		Alog(LOG_DEBUG) << av[0];
+		Log(LOG_DEBUG) << av[0];
 		if (strstr(av[0], "No matching link configuration"))
-			Alog() << "Error: Your IRCD's link block may not be setup correctly, please check unrealircd.conf";
+			Log() << "Error: Your IRCD's link block may not be setup correctly, please check unrealircd.conf";
 	}
 	return MOD_CONT;
 }
@@ -1063,7 +1063,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					Alog() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
+					Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
 					continue;
 				}
 
@@ -1074,7 +1074,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 			User *u = finduser(buf);
 			if (!u)
 			{
-				Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
+				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 				continue;
 			}
 

@@ -81,7 +81,8 @@ class CommandHSSet : public Command
 				notice_lang(Config->s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
-			Alog() << "vHost for user \2" << nick << "\2 set to \2" << (!vIdent.empty() && ircd->vident ? vIdent : "") << (!vIdent.empty() && ircd->vident ? "@" : "") << hostmask << " \2 by oper \2" << u->nick << "\2";
+
+			Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
 			na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));

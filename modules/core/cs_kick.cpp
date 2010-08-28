@@ -51,6 +51,9 @@ class CommandCSKick : public Command
 			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		else
 		{
+			 // XXX
+			Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
+
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
 				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else

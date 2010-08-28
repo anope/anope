@@ -23,6 +23,8 @@ enum BotFlag
 {
 	BI_BEGIN,
 
+	/* This bot is a core bot. NickServ, ChanServ, etc */
+	BI_CORE,
 	/* This bot can only be assigned by IRCops */
 	BI_PRIVATE,
 

@@ -28,7 +28,7 @@ class ENone : public Module
 		Anope::string cpass;
 		b64_encode(src, cpass);
 		buf += cpass;
-		Alog(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
+		Log(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}

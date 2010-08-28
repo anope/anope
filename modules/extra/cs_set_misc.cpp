@@ -151,7 +151,7 @@ class CSSetMisc : public Module
 			CommandInfo *info = new CommandInfo(cname, desc, showhidden);
 			if (!this->Commands.insert(std::make_pair(cname, info)).second)
 			{
-				Alog() << "cs_set_misc: Warning, unable to add duplicate entry " << cname;
+				Log() << "cs_set_misc: Warning, unable to add duplicate entry " << cname;
 				delete info;
 				continue;
 			}

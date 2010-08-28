@@ -25,7 +25,7 @@ void introduce_user(const Anope::string &user)
 	time_t now = time(NULL);
 	static time_t lasttime = now - 4;
 	if (lasttime >= now - 3)
-		fatal("introduce_user loop detected");
+		throw FatalException("introduce_user loop detected");
 	lasttime = now;
 
 	if (user.empty())
@@ -54,6 +54,8 @@ void introduce_user(const Anope::string &user)
 		/* Load MLock from the database now that we know what modes exist */
 		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			it->second->LoadMLock();
+		/* Setup log chanels */
+		InitLogChannels(Config);
 	}
 }
 
@@ -81,7 +83,7 @@ static int set_group()
 	}
 	else
 	{
-		Alog() << "Unknown run group '" << RUNGROUP << "'";
+		Log() << "Unknown run group '" << RUNGROUP << "'";
 		return -1;
 	}
 #endif
@@ -182,7 +184,7 @@ static void write_pidfile()
 		atexit(remove_pidfile);
 	}
 	else
-		log_perror("Warning: cannot write to PID file %s", Config->PIDFilename.c_str());
+		throw FatalException("Can not write to PID file " + Config->PIDFilename);
 }
 
 /*************************************************************************/
@@ -191,7 +193,7 @@ static void write_pidfile()
 
 int openlog_failed = 0, openlog_errno = 0;
 
-int init_primary(int ac, char **av)
+void Init(int ac, char **av)
 {
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);
 
@@ -200,38 +202,38 @@ int init_primary(int ac, char **av)
 	umask(DEFUMASK);
 #endif
 	if (set_group() < 0)
-		return -1;
+		throw FatalException("set_group() fail");
 
 	/* Parse command line arguments */
 	ParseCommandLineArguments(ac, av);
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
-		return -1;
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
+		throw FatalException();
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Alog(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
-		Alog(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
-		Alog(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
-		Alog(LOG_TERMINAL) << "-c, --config=filename.conf";
-		Alog(LOG_TERMINAL) << "-d, --debug[=level]";
-		Alog(LOG_TERMINAL) << "    --dir=services_directory";
-		Alog(LOG_TERMINAL) << "-h, --help";
-		Alog(LOG_TERMINAL) << "    --log=log_filename";
-		Alog(LOG_TERMINAL) << "-e, --noexpire";
-		Alog(LOG_TERMINAL) << "-n, --nofork";
-		Alog(LOG_TERMINAL) << "    --nothird";
-		Alog(LOG_TERMINAL) << "    --protocoldebug";
-		Alog(LOG_TERMINAL) << "-r, --readonly";
-		Alog(LOG_TERMINAL) << "-s, --support";
-		Alog(LOG_TERMINAL) << "-v, --version";
-		Alog(LOG_TERMINAL) << "";
-		Alog(LOG_TERMINAL) << "Further support is available from http://www.anope.org";
-		Alog(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
-		return -1;
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
+		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
+		Log(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
+		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
+		Log(LOG_TERMINAL) << "-d, --debug[=level]";
+		Log(LOG_TERMINAL) << "    --dir=services_directory";
+		Log(LOG_TERMINAL) << "-h, --help";
+		Log(LOG_TERMINAL) << "    --log=log_filename";
+		Log(LOG_TERMINAL) << "-e, --noexpire";
+		Log(LOG_TERMINAL) << "-n, --nofork";
+		Log(LOG_TERMINAL) << "    --nothird";
+		Log(LOG_TERMINAL) << "    --protocoldebug";
+		Log(LOG_TERMINAL) << "-r, --readonly";
+		Log(LOG_TERMINAL) << "-s, --support";
+		Log(LOG_TERMINAL) << "-v, --version";
+		Log(LOG_TERMINAL) << "";
+		Log(LOG_TERMINAL) << "Further support is available from http://www.anope.org";
+		Log(LOG_TERMINAL) << "Or visit us on IRC at irc.anope.org #anope";
+		throw FatalException();
 	}
 
 	if (GetCommandLineArgument("nofork", 'n'))
@@ -264,10 +266,7 @@ int init_primary(int ac, char **av)
 			if (level > 0)
 				debug = level;
 			else
-			{
-				Alog(LOG_TERMINAL) << "Invalid option given to --debug";
-				return -1;
-			}
+				throw FatalException("Invalid option given to --debug");
 		}
 		else
 			++debug;
@@ -276,49 +275,36 @@ int init_primary(int ac, char **av)
 	if (GetCommandLineArgument("config", 'c', Arg))
 	{
 		if (Arg.empty())
-		{
-			Alog(LOG_TERMINAL) << "The --config option requires a file name";
-			return -1;
-		}
+			throw FatalException("The --config option requires a file name");
 		services_conf = Arg;
 	}
 
 	if (GetCommandLineArgument("dir", 0, Arg))
 	{
 		if (Arg.empty())
-		{
-			Alog(LOG_TERMINAL) << "The --dir option requires a directory name";
-			return -1;
-		}
+			throw FatalException("The --dir option requires a directory name");
 		services_dir = Arg;
 	}
 
 	if (GetCommandLineArgument("log", 0, Arg))
 	{
 		if (Arg.empty())
-		{
-			Alog(LOG_TERMINAL) << "The --log option requires a file name";
-			return -1;
-		}
+			throw FatalException("The --log option requires a file name");
 		log_filename = Arg;
 	}
 
 	/* Chdir to Services data directory. */
 	if (chdir(services_dir.c_str()) < 0)
 	{
-		fprintf(stderr, "chdir(%s): %s\n", services_dir.c_str(), strerror(errno));
-		return -1;
+		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::string(strerror(errno)));
 	}
 
-	/* Open logfile, and complain if we didn't. */
-	if (open_log() < 0)
-	{
-		openlog_errno = errno;
-		if (started_from_term)
-			fprintf(stderr, "Warning: unable to open log file %s: %s\n", log_filename.c_str(), strerror(errno));
-		else
-			openlog_failed = 1;
-	}
+	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
+#ifdef _WIN32
+	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
+#else
+	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf;
+#endif
 
 	/* Read configuration file; exit if there are problems. */
 	try
@@ -327,17 +313,17 @@ int init_primary(int ac, char **av)
 	}
 	catch (const ConfigException &ex)
 	{
-		Alog(LOG_TERMINAL) << ex.GetReason();
-		Alog(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
-		Alog(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
-		Alog(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
-		Alog(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
-		return -1;
+		Log(LOG_TERMINAL) << ex.GetReason();
+		Log(LOG_TERMINAL) << "*** Support resources: Read through the services.conf self-contained";
+		Log(LOG_TERMINAL) << "*** documentation. Read the documentation files found in the 'docs'";
+		Log(LOG_TERMINAL) << "*** folder. Visit our portal located at http://www.anope.org/. Join";
+		Log(LOG_TERMINAL) << "*** our support channel on /server irc.anope.org channel #anope.";
+		throw FatalException("Configuration file failed to validate");
 	}
 
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
-		return -1;
+		throw FatalException("Unable to load protocol module");
 
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
@@ -377,19 +363,7 @@ int init_primary(int ac, char **av)
 
 	/* Load the socket engine */
 	if (ModuleManager::LoadModule(Config->SocketEngine, NULL))
-	{
-		Alog(LOG_TERMINAL) << "Unable to load socket engine " << Config->SocketEngine;
-		return -1;
-	}
-
-	return 0;
-}
-
-int init_secondary(int ac, char **av)
-{
-#ifndef _WIN32
-	int started_from_term = isatty(0) && isatty(1) && isatty(2);
-#endif
+		throw FatalException("Unable to load socket engine " + Config->SocketEngine);
 
 	/* Add Core MSG handles */
 	moduleAddMsgs();
@@ -399,15 +373,13 @@ int init_secondary(int ac, char **av)
 	{
 		int i;
 		if ((i = fork()) < 0)
-		{
-			perror("fork()");
-			return -1;
-		}
+			throw FatalException("Unable to fork");
 		else if (i != 0)
 		{
-			Alog(LOG_TERMINAL) << "PID " << i;
+			Log(LOG_TERMINAL) << "PID " << i;
 			exit(0);
 		}
+
 		if (started_from_term)
 		{
 			close(0);
@@ -415,22 +387,15 @@ int init_secondary(int ac, char **av)
 			close(2);
 		}
 		if (setpgid(0, 0) < 0)
-		{
-			perror("setpgid()");
-			return -1;
-		}
+			throw FatalException("Unable to setpgid()");
 	}
 #else
 	if (!SupportedWindowsVersion())
-	{
-		Alog() << GetWindowsVersion() << " is not a supported version of Windows";
-
-		return -1;
-	}
+		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
 	if (!nofork)
 	{
-		Alog(LOG_TERMINAL) << "PID " << GetCurrentProcessId();
-		Alog() << "Launching Anope into the background";
+		Log(LOG_TERMINAL) << "PID " << GetCurrentProcessId();
+		Log() << "Launching Anope into the background";
 		FreeConsole();
 	}
 #endif
@@ -439,12 +404,8 @@ int init_secondary(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	Alog() << "Anope " << Anope::Version() << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Log() << "Anope " << Anope::Version() << " (ircd protocol: " << version_protocol << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = time(NULL);
-
-	/* If in read-only mode, close the logfile again. */
-	if (readonly)
-		close_log();
 
 	/* Set signal handlers.  Catch certain signals to let us do things or
 	 * panic as necessary, and ignore all others.
@@ -457,7 +418,7 @@ int init_secondary(int ac, char **av)
 
 	/* Initialize multi-language support */
 	lang_init();
-	Alog(LOG_DEBUG) << "Loaded languages";
+	Log(LOG_DEBUG) << "Loaded languages";
 
 	/* Initialize subservices */
 	ns_init();
@@ -476,14 +437,12 @@ int init_secondary(int ac, char **av)
 	add_entropy_userkeys();
 
 	/* Load up databases */
-	Alog() << "Loading databases...";
+	Log() << "Loading databases...";
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
-	Alog() << "Databases loaded";
+	Log() << "Databases loaded";
 
 	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
-
-	return 0;
 }
 
 /*************************************************************************/

@@ -57,7 +57,9 @@ enum ChannelFlags
 	/* Channel still exists when emptied */
 	CH_PERSIST,
 	/* If set the channel is syncing users (channel was just created) and it should not be deleted */
-	CH_SYNCING
+	CH_SYNCING,
+	/* Is a services log channel */
+	CH_LOGCHAN
 };
 
 class CoreExport Channel : public Extensible, public Flags<ChannelFlags>

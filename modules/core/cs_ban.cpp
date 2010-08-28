@@ -56,8 +56,11 @@ class CommandCSBan : public Command
 		else
 		{
 			Anope::string mask;
-
 			get_idealban(ci, u2, mask);
+
+			// XXX need a way to detect if someone is overriding
+			Log(LOG_COMMAND, u, this, ci) << "for " << mask;
+
 			c->SetMode(NULL, CMODE_BAN, mask);
 
 			/* We still allow host banning while not allowing to kick */

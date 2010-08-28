@@ -52,7 +52,7 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
 
 			if (ot->GetName().equals_ci(it->second))
 			{
-				Alog() << "Tied oper " << this->nc->display << " to type " << ot->GetName();
+				Log() << "Tied oper " << this->nc->display << " to type " << ot->GetName();
 				this->nc->ot = ot;
 				break;
 			}

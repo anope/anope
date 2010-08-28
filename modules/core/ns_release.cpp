@@ -40,7 +40,7 @@ class CommandNSRelease : public Command
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
-				na->Release();
+				Log(LOG_COMMAND, u, this) << "released " << na->nick;
 				notice_lang(Config->s_NickServ, u, NICK_RELEASED);
 			}
 			else
@@ -48,7 +48,7 @@ class CommandNSRelease : public Command
 				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					Alog() << Config->s_NickServ << ": RELEASE: invalid password for " << nick << " by " << u->GetMask();
+					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
 					if (bad_password(u))
 						return MOD_STOP;
 				}

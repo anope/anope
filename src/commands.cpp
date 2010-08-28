@@ -58,7 +58,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
 		notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
-		Alog() << "Access denied for unregistered user " << u->nick << " with service " << bi->nick << " and command " << command;
+		Log(LOG_COMMAND, "denied", bi) << "Access denied for unregistered user " << u->GetMask() << " with command " << command;
 		return;
 	}
 
@@ -103,13 +103,13 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command << " because of FORBIDDEN channel " << ci->name;
+					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
 					return;
 				}
 				else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 				{
 					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
-					Alog() << "Access denied for user " << u->nick << " with service " << bi->nick <<" and command " << command << " because of SUSPENDED channel " << ci->name;
+					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
 					return;
 				}
 			}
@@ -131,7 +131,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
 	{
 		notice_lang(bi->nick, u, ACCESS_DENIED);
-		Alog() << "Access denied for user " << u->nick << " with service " << bi->nick << " and command " << command;
+		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		return;
 	}
 

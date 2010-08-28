@@ -46,7 +46,7 @@ int protocol_module_init()
 {
 	int ret = 0;
 
-	Alog() << "Loading IRCD Protocol Module: [" << Config->IRCDModule << "]";
+	Log() << "Loading IRCD Protocol Module: [" << Config->IRCDModule << "]";
 	ret = ModuleManager::LoadModule(Config->IRCDModule, NULL);
 
 	if (ret == MOD_ERR_OK)
@@ -60,7 +60,7 @@ int protocol_module_init()
 		{
 			if (Config->Numeric.empty())
 			{
-				Alog() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
+				Log() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
 				ret = -1;
 			}
 		}
@@ -73,7 +73,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 {
 	int i;
 
-	Alog(LOG_DEBUG) << this->name << " Adding " << ac << " texts for language " << langNumber;
+	Log(LOG_DEBUG) << this->name << " Adding " << ac << " texts for language " << langNumber;
 
 	if (this->lang[langNumber].argc > 0)
 		this->DeleteLanguage(langNumber);
@@ -184,7 +184,7 @@ int Module::AddCommand(BotInfo *bi, Command *c)
 
 	if (it.second != true)
 	{
-		Alog() << "Error creating command " << c->name << ". Command already exists!";
+		Log() << "Error creating command " << c->name << ". Command already exists!";
 		return MOD_ERR_EXISTS;
 	}
 
@@ -282,7 +282,7 @@ void Module::NoticeLang(const Anope::string &source, const User *u, int number, 
 		va_end(va);
 	}
 	else
-		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
+		Log() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 }
 
 const char *Module::GetLangString(User *u, int number)
@@ -306,7 +306,7 @@ const char *Module::GetLangString(User *u, int number)
 	 */
 	else
 	{
-		Alog() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
+		Log() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
 		return "";
 	}
 }
@@ -326,13 +326,13 @@ void ModuleRunTimeDirCleanUp()
 {
 	Anope::string dirbuf = services_dir + "/modules/runtime";
 
-	Alog(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
+	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
 #ifndef _WIN32
 	DIR *dirp = opendir(dirbuf.c_str());
 	if (!dirp)
 	{
-		Alog(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
+		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
 		return;
 	}
 	struct dirent *dp;
@@ -360,7 +360,7 @@ void ModuleRunTimeDirCleanUp()
 			{
 				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
 				if (!DeleteFile(filebuf.c_str()))
-					Alog(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << dlerror();
+					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << dlerror();
 			}
 			if (!FindNextFile(hList, &FileData))
 			{
@@ -370,11 +370,11 @@ void ModuleRunTimeDirCleanUp()
 		}
 	}
 	else
-		Alog(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
+		Log(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
 
 	FindClose(hList);
 #endif
-	Alog(LOG_DEBUG) << "Module run time directory has been cleaned out";
+	Log(LOG_DEBUG) << "Module run time directory has been cleaned out";
 }
 
 Version Module::GetVersion() const

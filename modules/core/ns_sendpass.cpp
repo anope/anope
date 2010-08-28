@@ -40,7 +40,7 @@ class CommandNSSendPass : public Command
 			{
 				if (SendPassMail(u, na, tmp_pass))
 				{
-					Alog() << Config->s_NickServ << ": " << u->GetMask() << " used SENDPASS on " << nick;
+					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
 					notice_lang(Config->s_NickServ, u, NICK_SENDPASS_OK, nick.c_str());
 				}
 			}

@@ -34,9 +34,13 @@ class CommandCSClear : public Command
 		ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 		ChannelMode *voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
+		if (c)
+			// XXX
+			Log(LOG_COMMAND, u, this, ci) << what;
+
 		if (!c)
 			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!u || !check_access(u, ci, CA_CLEAR))
+		else if (!check_access(u, ci, CA_CLEAR))
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else if (what.equals_ci("bans"))
 		{

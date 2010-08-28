@@ -417,7 +417,7 @@ int anope_event_fmode(const Anope::string &source, int ac, const char **av)
 		{
 			newav[o] = av[n];
 			++o;
-			Alog(LOG_DEBUG) << "Param: " << newav[o - 1];
+			Log(LOG_DEBUG) << "Param: " << newav[o - 1];
 		}
 		++n;
 	}
@@ -476,7 +476,7 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(buf[0]);
 			if (!cm)
 			{
-				Alog() << "Receeved unknown mode prefix " << buf[0] << " in FJOIN string";
+				Log() << "Receeved unknown mode prefix " << buf[0] << " in FJOIN string";
 				buf.erase(buf.begin());
 				continue;
 			}
@@ -490,7 +490,7 @@ int anope_event_fjoin(const Anope::string &source, int ac, const char **av)
 		User *u = finduser(buf);
 		if (!u)
 		{
-			Alog(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
+			Log(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
 			continue;
 		}
 
@@ -575,7 +575,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+		Log(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return MOD_CONT;
 	}
 
@@ -660,7 +660,7 @@ int anope_event_setname(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -675,7 +675,7 @@ int anope_event_chgname(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "FNAME for nonexistent user " << source;
+		Log(LOG_DEBUG) << "FNAME for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -690,7 +690,7 @@ int anope_event_setident(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -705,7 +705,7 @@ int anope_event_chgident(const Anope::string &source, int ac, const char **av)
 	u = finduser(av[0]);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
+		Log(LOG_DEBUG) << "CHGIDENT for nonexistent user " << av[0];
 		return MOD_CONT;
 	}
 
@@ -720,7 +720,7 @@ int anope_event_sethost(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
+		Log(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -791,7 +791,7 @@ int anope_event_chghost(const Anope::string &source, int ac, const char **av)
 	u = finduser(source);
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "FHOST for nonexistent user " << source;
+		Log(LOG_DEBUG) << "FHOST for nonexistent user " << source;
 		return MOD_CONT;
 	}
 
@@ -1206,7 +1206,7 @@ int anope_event_endburst(const Anope::string &source, int ac, const char **av)
 			u->RemoveMode(NickServ, UMODE_REGISTERED);
 	}
 
-	Alog() << "Processed ENDBURST for " << s->GetName();
+	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
 
 	s->Sync(true);
 	return MOD_CONT;

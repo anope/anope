@@ -53,7 +53,7 @@ class CommandCSSetFounder : public Command
 			return MOD_CONT;
 		}
 
-		Alog() << Config->s_ChanServ << ": Changing founder of " << ci->name << " from " << ci->founder->display << " to " << nc->display << " by " << u->GetMask();
+		Log(!this->permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder to " << nc->display;
 
 		/* Founder and successor must not be the same group */
 		if (nc == ci->successor)

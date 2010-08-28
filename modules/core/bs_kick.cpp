@@ -42,6 +42,9 @@ class CommandBSKick : public Command
 			notice_help(Config->s_BotServ, u, BOT_NOT_ASSIGNED);
 		else
 		{
+			bool override = !check_access(u, ci, CA_SET);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << option << " " << value;
+
 			if (option.equals_ci("BADWORDS"))
 			{
 				if (value.equals_ci("ON"))
@@ -54,7 +57,7 @@ class CommandBSKick : public Command
 						if (!error.empty() || ci->ttb[TTB_BADWORDS] < 0)
 						{
 							/* leaving the debug behind since we might want to know what these are */
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BADWORDS];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BADWORDS];
 							/* reset the value back to 0 - TSL */
 							ci->ttb[TTB_BADWORDS] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
@@ -85,7 +88,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_BOLDS] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_BOLDS] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BOLDS];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BOLDS];
 							ci->ttb[TTB_BOLDS] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -118,7 +121,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_CAPS] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_CAPS] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_CAPS];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_CAPS];
 							ci->ttb[TTB_CAPS] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -163,7 +166,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_COLORS] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_COLORS] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_COLORS];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_COLORS];
 							ci->ttb[TTB_COLORS] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -196,7 +199,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_FLOOD] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_FLOOD] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_FLOOD];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_FLOOD];
 							ci->ttb[TTB_FLOOD] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -243,7 +246,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_REPEAT] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REPEAT];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REPEAT];
 							ci->ttb[TTB_REPEAT] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -281,7 +284,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_REVERSES] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_REVERSES] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REVERSES];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REVERSES];
 							ci->ttb[TTB_REVERSES] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -311,7 +314,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_UNDERLINES] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_UNDERLINES] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_UNDERLINES];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_UNDERLINES];
 							ci->ttb[TTB_UNDERLINES] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
@@ -341,7 +344,7 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_ITALICS] = convertTo<int16>(ttb, error, false);
 						if (!error.empty() || ci->ttb[TTB_ITALICS] < 0)
 						{
-							Alog(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
 							ci->ttb[TTB_ITALICS] = 0;
 							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;

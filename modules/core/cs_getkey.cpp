@@ -40,6 +40,9 @@ class CommandCSGetKey : public Command
 			return MOD_CONT;
 		}
 
+		bool override = !check_access(u, ci, CA_GETKEY);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
+
 		notice_lang(Config->s_ChanServ, u, CHAN_GETKEY_KEY, chan.c_str(), key.c_str());
 		return MOD_CONT;
 	}

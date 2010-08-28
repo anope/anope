@@ -4,9 +4,9 @@
 MailThread::~MailThread()
 {
 	if (Success)
-		Alog() << "Successfully delivered mail for " << MailTo << " (" << Addr << ")";
+		Log() << "Successfully delivered mail for " << MailTo << " (" << Addr << ")";
 	else
-		Alog() << "Error delivering mail for " << MailTo << " (" << Addr << ")";
+		Log() << "Error delivering mail for " << MailTo << " (" << Addr << ")";
 }
 
 void MailThread::Run()

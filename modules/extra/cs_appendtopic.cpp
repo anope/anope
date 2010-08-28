@@ -95,7 +95,7 @@ class CommandCSAppendTopic : public Command
 				c->topic_time = ci->last_topic_time;
 
 			if (!check_access(u, ci, CA_TOPIC))
-				Alog() << Config->s_ChanServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
+				Log(LOG_OVERRIDE, u, this, ci) << "changed topic to " << topic;
 			if (ircd->join2set && whosends(ci) == ChanServ)
 			{
 				ChanServ->Join(c);

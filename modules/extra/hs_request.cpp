@@ -139,7 +139,7 @@ class CommandHSRequest : public Command
 
 			me->NoticeLang(Config->s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);
-			Alog() << "New vHost Requested by " << nick;
+			Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 		}
 		else
 			notice_lang(Config->s_HostServ, u, HOST_NOREG, nick.c_str());
@@ -185,14 +185,14 @@ class CommandHSActivate : public Command
 			if (it != Requests.end())
 			{
 				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
-				delete it->second;
-				Requests.erase(it);
 
 				if (HSRequestMemoUser)
 					my_memo_lang(u, na->nick, 2, LNG_ACTIVATE_MEMO);
 
-				me->NoticeLang(Config->s_HostServ, u, LNG_ACTIVATED, nick.c_str());
-				Alog() << "Host Request for " << nick << " activated by " << u->nick;
+				me->NoticeLang(Config->s_HostServ, u, LNG_ACTIVATED, na->nick.c_str());
+				Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!it->second->ident.empty() ? it->second->ident + "@" : "") << it->second->host;
+				delete it->second;
+				Requests.erase(it);
 			}
 			else
 				me->NoticeLang(Config->s_HostServ, u, LNG_NO_REQUEST, nick.c_str());
@@ -252,7 +252,7 @@ class CommandHSReject : public Command
 			}
 
 			me->NoticeLang(Config->s_HostServ, u, LNG_REJECTED, nick.c_str());
-			Alog() << "Host Request for " << nick << " rejected by " << u->nick << " (" << (!reason.empty() ? reason : "") << ")";
+			Log(LOG_COMMAND, u, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
 		}
 		else
 			me->NoticeLang(Config->s_HostServ, u, LNG_NO_REQUEST, nick.c_str());
@@ -737,7 +737,7 @@ void my_memo_lang(User *u, const Anope::string &name, int z, int number, ...)
 		free(buf); // XXX
 	}
 	else
-		Alog() << me->name << ": INVALID language string call, language: [" << lang << "], String [" << number << "]";
+		Log() << me->name << ": INVALID language string call, language: [" << lang << "], String [" << number << "]";
 }
 
 void req_send_memos(User *u, const Anope::string &vIdent, const Anope::string &vHost)
@@ -794,7 +794,7 @@ void my_load_config()
 	HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
 	HSRequestMemoSetters = config.ReadFlag("hs_request", "memosetters", "no", 0);
 
-	Alog(LOG_DEBUG) << "[hs_request] Set config vars: MemoUser=" << HSRequestMemoUser << " MemoOper=" <<  HSRequestMemoOper << " MemoSetters=" << HSRequestMemoSetters;
+	Log(LOG_DEBUG) << "[hs_request] Set config vars: MemoUser=" << HSRequestMemoUser << " MemoOper=" <<  HSRequestMemoOper << " MemoSetters=" << HSRequestMemoSetters;
 }
 
 MODULE_INIT(HSRequest)

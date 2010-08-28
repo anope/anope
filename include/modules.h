@@ -66,7 +66,7 @@ if (true) \
 		} \
 		catch (const ModuleException &modexcept) \
 		{ \
-			Alog() << "Exception caught: " << modexcept.GetReason(); \
+			Log() << "Exception caught: " << modexcept.GetReason(); \
 		} \
 		_i = safei; \
 	} \
@@ -98,7 +98,7 @@ if (true) \
 		} \
 		catch (const ModuleException &modexcept) \
 		{ \
-			Alog() << "Exception caught: " << modexcept.GetReason(); \
+			Log() << "Exception caught: " << modexcept.GetReason(); \
 		} \
 		_i = safei; \
 	} \

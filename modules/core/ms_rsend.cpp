@@ -47,7 +47,7 @@ class CommandMSRSend : public Command
 		else
 		{
 			/* rsend has been disabled */
-			Alog(LOG_DEBUG) << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
+			Log() << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
 			notice_lang(Config->s_MemoServ, u, MEMO_RSEND_DISABLED);
 		}
 

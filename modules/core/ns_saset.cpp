@@ -55,6 +55,7 @@ class CommandNSSASet : public Command
 				Anope::string cmdparams = na->nc->display;
 				for (std::vector<Anope::string>::const_iterator it = params.begin() + 2; it != params.end(); ++it)
 					cmdparams += " " + *it;
+				Log(LOG_ADMIN, u, this) << params[1] << " " << cmdparams;
 				mod_run_cmd(NickServ, u, c, params[1], cmdparams);
 			}
 			else
@@ -192,7 +193,8 @@ class CommandNSSASetPassword : public Command
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
-			Alog() << Config->s_NickServ << ": Failed to encrypt password for " << nc->display << " (saset)";
+			// XXX 
+			//Alog() << Config->s_NickServ << ": Failed to encrypt password for " << nc->display << " (saset)";
 			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
 			return MOD_CONT;
 		}
@@ -202,8 +204,6 @@ class CommandNSSASetPassword : public Command
 			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
 		else
 			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
-
-		Alog() << Config->s_NickServ << ": " << u->GetMask() << " used SASET PASSWORD on " << nc->display << " (e-mail: "<< (!nc->email.empty() ? nc->email : "none")  << ")";
 
 		if (Config->WallSetpass)
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display.c_str());

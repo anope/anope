@@ -49,8 +49,10 @@ class CommandBSAct : public Command
 
 		ircdproto->SendAction(ci->bi, ci->name, "%s", message.c_str());
 		ci->bi->lastmsg = time(NULL);
-		if (Config->LogBot && !Config->LogChannel.empty() && LogChan && !debug && findchan(Config->LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config->LogChannel, "ACT %s %s %s", u->nick.c_str(), ci->name.c_str(), message.c_str());
+
+		// XXX Need to be able to find if someone is overriding this.
+		Log(LOG_COMMAND, u, this, ci) << message;
+
 		return MOD_CONT;
 	}
 

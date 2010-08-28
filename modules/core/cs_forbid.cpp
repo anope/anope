@@ -53,7 +53,8 @@ class CommandCSForbid : public Command
 		ci = new ChannelInfo(chan);
 		if (!ci)
 		{
-			Alog() << Config->s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
+			 // this cant happen?
+			//Alog() << Config->s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
 			notice_lang(Config->s_ChanServ, u, CHAN_FORBID_FAILED, chan.c_str());
 			return MOD_CONT;
 		}
@@ -80,16 +81,16 @@ class CommandCSForbid : public Command
 			}
 		}
 
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
-
 		if (ircd->chansqline)
 		{
 			XLine x(chan, "Forbidden");
 			ircdproto->SendSQLine(&x);
 		}
 
-		Alog() << Config->s_ChanServ << ": " << u->nick << " set FORBID for channel " << ci->name;
+		if (Config->WallForbid)
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+		Log(LOG_ADMIN, u, this, ci) << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
+
 		notice_lang(Config->s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));

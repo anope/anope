@@ -40,9 +40,11 @@ class CommandCSSASet : public Command
 
 		if (c)
 		{
-			Anope::string cmdparams = cs_findchan(params[0])->name;
+			ChannelInfo *ci = cs_findchan(params[0]);
+			Anope::string cmdparams = ci->name;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
+			Log(LOG_ADMIN, u, this, ci) << params[1] << " " << cmdparams;
 			mod_run_cmd(ChanServ, u, c, params[1], cmdparams);
 		}
 		else

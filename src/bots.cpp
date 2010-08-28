@@ -20,16 +20,15 @@ BotInfo *MemoServ = NULL;
 BotInfo *NickServ = NULL;
 BotInfo *OperServ = NULL;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, ts6_uid_retrieve())
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, nuser, nhost, ts6_uid_retrieve())
 {
-	this->ident = nuser;
-	this->host = nhost;
 	this->realname = nreal;
 	this->server = Me;
 
 	this->chancount = 0;
 	this->lastmsg = this->created = time(NULL);
 
+	this->SetFlag(BI_CORE);
 	if (!Config->s_ChanServ.empty() && nnick.equals_ci(Config->s_ChanServ))
 		ChanServ = this;
 	else if (!Config->s_BotServ.empty() && nnick.equals_ci(Config->s_BotServ))
@@ -44,6 +43,8 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 		NickServ = this;
 	else if (!Config->s_GlobalNoticer.empty() && nnick.equals_ci(Config->s_GlobalNoticer))
 		Global = this;
+	else
+		this->UnsetFlag(BI_CORE);
 
 	BotListByNick[this->nick] = this;
 	if (!this->uid.empty())
@@ -168,16 +169,16 @@ void BotInfo::Join(Channel *c, bool update_ts)
 
 	c->JoinUser(this);
 	ChannelContainer *cc = this->FindChannel(c);
-	for (std::list<ChannelModeStatus *>::iterator it = BotModes.begin(), it_end = BotModes.end(); it != it_end; ++it)
+	for (int i = 0; i < Config->BotModeList.size(); ++i)
 	{
 		if (!update_ts)
 		{
-			c->SetMode(this, *it, this->nick, false);
+			c->SetMode(this, Config->BotModeList[i], this->nick, false);
 		}
 		else
 		{
-			cc->Status->SetFlag((*it)->Name);
-			c->SetModeInternal(*it, this->nick, false);
+			cc->Status->SetFlag(Config->BotModeList[i]->Name);
+			c->SetModeInternal(Config->BotModeList[i], this->nick, false);
 		}
 	}
 	if (!update_ts)

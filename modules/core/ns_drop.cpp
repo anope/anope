@@ -42,7 +42,7 @@ class CommandNSDrop : public Command
 				{
 					if (Config->WallDrop)
 						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-					Alog() << Config->s_NickServ << ": " << u->GetMask() << " dropped nickname " << nr->nick << " (e-mail: " << nr->email << ")";
+					Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
 					delete nr;
 					notice_lang(Config->s_NickServ, u, NICK_X_DROPPED, nick.c_str());
 				}
@@ -73,7 +73,7 @@ class CommandNSDrop : public Command
 				ircdproto->SendSQLineDel(&x);
 			}
 
-			Alog() << Config->s_NickServ << ": " << u->GetMask() << " dropped nickname " << na->nick << " (group " << na->nc->display << ") (e-mail: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
 
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(!my_nick.empty() ? my_nick : nick));

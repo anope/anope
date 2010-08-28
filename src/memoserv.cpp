@@ -50,7 +50,7 @@ void check_memos(User *u)
 {
 	if (!u)
 	{
-		Alog(LOG_DEBUG) << "check_memos called with NULL values";
+		Log() << "check_memos called with NULL values";
 		return;
 	}
 

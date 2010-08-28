@@ -15,6 +15,7 @@
 
 /** do_util: not a command, but does the job of others
  * @param u The user doing the command
+ * @param com The command calling this function
  * @param cm A channel mode class
  * @param chan The channel its being set on
  * @param nick The nick the modes being set on
@@ -24,22 +25,14 @@
  * @param name The name, eg "OP" or "HALFOP"
  * @param notice Flag required on a channel to send a notice
  */
-static CommandReturn do_util(User *u, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, const Anope::string &name, ChannelInfoFlag notice)
+static CommandReturn do_util(User *u, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, const Anope::string &name, ChannelInfoFlag notice)
 {
 	Channel *c = findchan(chan);
-	ChannelInfo *ci;
+	ChannelInfo *ci = c ? c->ci : NULL;
 	User *u2;
-	Anope::string realnick = nick;
 
-	int is_same;
-
-	if (realnick.empty())
-		realnick = u->nick;
-
-	is_same = u->nick.equals_cs(realnick) ? 1 : u->nick.equals_ci(realnick);
-
-	if (c)
-		ci = c->ci;
+	Anope::string realnick = (!nick.empty() ? nick : u->nick);
+	bool is_same = u->nick.equals_ci(realnick);
 
 	if (!c)
 		notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
@@ -60,6 +53,7 @@ static CommandReturn do_util(User *u, ChannelMode *cm, const Anope::string &chan
 		else
 			c->RemoveMode(NULL, cm, u2->nick);
 
+		Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
 		if (notice && ci->HasFlag(notice))
 			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s", name.c_str(), u2->nick.c_str(), u->nick.c_str());
 	}
@@ -78,7 +72,7 @@ class CommandCSOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -109,7 +103,7 @@ class CommandCSDeOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -140,7 +134,7 @@ class CommandCSVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -171,7 +165,7 @@ class CommandCSDeVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -207,7 +201,7 @@ class CommandCSHalfOp : public Command
 			return MOD_CONT;
 		}
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -241,7 +235,7 @@ class CommandCSDeHalfOp : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -275,7 +269,7 @@ class CommandCSProtect : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -309,7 +303,7 @@ class CommandCSDeProtect : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -343,7 +337,7 @@ class CommandCSOwner : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -377,7 +371,7 @@ class CommandCSDeOwner : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(u, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
+		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)

@@ -19,7 +19,7 @@ SocketEngineBase::SocketEngineBase()
 {
 #ifdef _WIN32
 	if (WSAStartup(MAKEWORD(2, 0), &wsa))
-		Alog() << "Failed to initialize WinSock library";
+		Log() << "Failed to initialize WinSock library";
 #endif
 }
 

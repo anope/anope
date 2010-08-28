@@ -175,7 +175,8 @@ class CommandNSSetPassword : public Command
 
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
-			Alog() << Config->s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
+			 // XXX ?
+			//Alog() << Config->s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
 			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}
@@ -186,7 +187,6 @@ class CommandNSSetPassword : public Command
 		else
 			notice_lang(Config->s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, u->Account()->display.c_str());
 
-		Alog() << Config->s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none") << ") changed its password.";
 		return MOD_CONT;
 	}
 

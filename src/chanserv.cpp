@@ -252,7 +252,7 @@ void check_modes(Channel *c)
 
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "check_modes called with NULL values";
+		Log() << "check_modes called with NULL values";
 		return;
 	}
 
@@ -263,7 +263,7 @@ void check_modes(Channel *c)
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
 		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name.c_str());
-		Alog() << Config->s_ChanServ << ": Bouncy modes on channel " << c->name;
+		Log() << "Bouncy modes on channel " << c->name;
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -497,7 +497,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "check_topiclock called with NULL values";
+		Log() << "check_topiclock called with NULL values";
 		return 0;
 	}
 
@@ -572,7 +572,7 @@ void expire_chans()
 				continue;
 
 			Anope::string chname = ci->name;
-			Alog() << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
+			Log(LOG_NORMAL, "chanserv/expire") << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
 			delete ci;
 			FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
 		}
@@ -599,13 +599,13 @@ void cs_remove_nick(const NickCore *nc)
 				NickCore *nc2 = ci->successor;
 				if (!nc2->IsServicesOper() && Config->CSMaxReg && nc2->channelcount >= Config->CSMaxReg)
 				{
-					Alog() << Config->s_ChanServ << ": Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
+					Log(LOG_NORMAL, "chanserv/expire") << "Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
 					delete ci;
 					continue;
 				}
 				else
 				{
-					Alog() << Config->s_ChanServ << ": Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
+					Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
 					ci->founder = nc2;
 					ci->successor = NULL;
 					++nc2->channelcount;
@@ -613,7 +613,7 @@ void cs_remove_nick(const NickCore *nc)
 			}
 			else
 			{
-				Alog() << Config->s_ChanServ << ": Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
+				Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
 
 				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
@@ -712,7 +712,7 @@ void reset_levels(ChannelInfo *ci)
 
 	if (!ci)
 	{
-		Alog(LOG_DEBUG) << "reset_levels() called with NULL values";
+		Log() << "reset_levels() called with NULL values";
 		return;
 	}
 

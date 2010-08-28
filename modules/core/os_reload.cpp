@@ -31,7 +31,7 @@ class CommandOSReload : public Command
 		}
 		catch (const ConfigException &ex)
 		{
-			Alog() << "Error reloading configuration file: " << ex.GetReason();
+			Log() << "Error reloading configuration file: " << ex.GetReason();
 		}
 
 		notice_lang(Config->s_OperServ, u, OPER_RELOAD);

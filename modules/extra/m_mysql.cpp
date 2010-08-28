@@ -58,7 +58,7 @@ class MySQLResult : public SQLResult
 		if (!num_fields)
 			return;
 
-		Alog(LOG_DEBUG) << "SQL query returned " << num_fields << " fields";
+		Log(LOG_DEBUG) << "SQL query returned " << num_fields << " fields";
 
 		for (MYSQL_ROW row; (row = mysql_fetch_row(res));)
 		{
@@ -70,7 +70,7 @@ class MySQLResult : public SQLResult
 
 				for (unsigned field_count = 0; field_count < num_fields; ++field_count)
 				{
-					Alog(LOG_DEBUG) << "Field count " << field_count << " name is: " << (fields[field_count].name ? fields[field_count].name : "") << ", data is: " << (row[field_count] ? row[field_count] : "");
+					Log(LOG_DEBUG) << "Field count " << field_count << " name is: " << (fields[field_count].name ? fields[field_count].name : "") << ", data is: " << (row[field_count] ? row[field_count] : "");
 					Anope::string column = (fields[field_count].name ? fields[field_count].name : "");
 					Anope::string data = (row[field_count] ? row[field_count] : "");
 
@@ -211,7 +211,7 @@ class ModuleSQL : public Module
 
 			if (i == num)
 			{
-				Alog() << "MySQL: Removing server connection " << cname;
+				Log(LOG_NORMAL, "mysql") << "MySQL: Removing server connection " << cname;
 
 				delete s;
 				this->MySQLServices.erase(cname);
@@ -235,11 +235,11 @@ class ModuleSQL : public Module
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
 					this->MySQLServices.insert(std::make_pair(connname, ss));
 
-					Alog() << "MySQL: Sucessfully connected to server " << connname << " (" << server << ")";
+					Log(LOG_NORMAL, "mysql") << "MySQL: Sucessfully connected to server " << connname << " (" << server << ")";
 				}
 				catch (const SQLException &ex)
 				{
-					Alog() << "MySQL: " << ex.GetReason();
+					Log(LOG_NORMAL, "mysql") << "MySQL: " << ex.GetReason();
 				}
 			}
 		}

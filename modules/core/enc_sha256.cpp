@@ -275,7 +275,7 @@ class ESHA256 : public Module
 		SHA256Final(&ctx, reinterpret_cast<unsigned char *>(digest));
 		digest[SHA256_DIGEST_SIZE] = '\0';
 		buf << "sha256:" << Anope::Hex(digest, SHA256_DIGEST_SIZE) << ":" << GetIVString();
-		Alog(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
+		Log(LOG_DEBUG_2) << "(enc_sha256) hashed password from [" << src << "] to [" << buf.str() << " ]";
 		dest = buf.str();
 		return EVENT_ALLOW;
 	}

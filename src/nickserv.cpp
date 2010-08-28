@@ -248,7 +248,7 @@ void expire_nicks()
 		User *u = finduser(na->nick);
 		if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
 		{
-			Alog(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
+			Log(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
 			na->last_seen = now;
 			continue;
 		}
@@ -259,7 +259,7 @@ void expire_nicks()
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
 			if (MOD_RESULT == EVENT_STOP)
 				continue;
-			Alog() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
+			Log() << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 			FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
 			delete na;
 		}
@@ -277,7 +277,7 @@ void expire_requests()
 
 		if (Config->NSRExpire && now - nr->requested >= Config->NSRExpire)
 		{
-			Alog() << "Request for nick " << nr->nick << " expiring";
+			Log() << "Request for nick " << nr->nick << " expiring";
 			delete nr;
 		}
 	}
@@ -356,7 +356,7 @@ void change_core_display(NickCore *nc, const Anope::string &newdisplay)
 {
 	/* Log ... */
 	FOREACH_MOD(I_OnChangeCoreDisplay, OnChangeCoreDisplay(nc, newdisplay));
-	Alog() << Config->s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
+	Log() << Config->s_NickServ << ": changing " << nc->display << " nickname group display to " << newdisplay;
 
 	/* Remove the core from the list */
 	NickCoreList.erase(nc->display);

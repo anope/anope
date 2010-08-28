@@ -36,6 +36,9 @@ class CommandBSUnassign : public Command
 			notice_help(Config->s_BotServ, u, BOT_UNASSIGN_PERSISTANT_CHAN);
 		else
 		{
+			bool override = !check_access(u, ci, CA_ASSIGN);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
+
 			ci->bi->UnAssign(u, ci);
 			notice_lang(Config->s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
 		}

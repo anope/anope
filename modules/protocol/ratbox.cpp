@@ -102,7 +102,7 @@ void ratbox_cmd_pass(const Anope::string &pass)
 	send_cmd("", "PASS %s TS 6 :%s", pass.c_str(), TS6SID.c_str());
 }
 
-class RatboxProto : public IRCDTS6Proto
+class RatboxProto : public IRCDProto
 {
 	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
 	{
@@ -327,7 +327,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 			if (!cm)
 			{
-				Alog() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
+				Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
 				continue;
 			}
 
@@ -338,7 +338,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		User *u = finduser(buf);
 		if (!u)
 		{
-			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
+			Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 			continue;
 		}
 
@@ -443,7 +443,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 
 		if (!c)
 		{
-			Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+			Log(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 			return MOD_CONT;
 		}
 
@@ -487,7 +487,7 @@ int anope_event_tburst(const Anope::string &source, int ac, const char **av)
 
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+		Log(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return MOD_CONT;
 	}
 
@@ -721,7 +721,7 @@ int anope_event_bmask(const Anope::string &source, int ac, const char **av)
 int anope_event_error(const Anope::string &source, int ac, const char **av)
 {
 	if (ac >= 1)
-		Alog(LOG_DEBUG) << av[0];
+		Log(LOG_DEBUG) << av[0];
 	return MOD_CONT;
 }
 

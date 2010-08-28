@@ -41,10 +41,10 @@ class SSMain : public Module
 		statserv = findbot("StatServ");
 		if (!statserv)
 		{
-			Alog() << "Creating SS";
+			Log() << "Creating SS";
 			statserv = new BotInfo("StatServ", Config->ServiceUser, Config->ServiceHost, "Stats Service");
 		}
-		Alog() << "Done creating SS";
+		Log() << "Done creating SS";
 
 		this->AddCommand(statserv, &commandsshelp);
 	}

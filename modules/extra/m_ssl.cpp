@@ -84,7 +84,7 @@ class SSLModule : public Module
 			}
 		}
 		else
-			Alog() << "m_ssl: No certificate file found";
+			Log() << "m_ssl: No certificate file found";
 
 		if (IsFile(KEYFILE))
 		{
@@ -102,7 +102,7 @@ class SSLModule : public Module
 				throw ModuleException("Error loading private key - file not found");
 			}
 			else
-				Alog() << "m_ssl: No private key found";
+				Log() << "m_ssl: No private key found";
 		}
 
 		this->SetAuthor("Anope");
@@ -129,11 +129,11 @@ class SSLModule : public Module
 			try
 			{
 				new SSLSocket(u->host, u->port, Config->LocalHost, u->ipv6);
-				Alog() << "Connected to Server " << Number << " (" << u->host << ":" << u->port << ")";
+				Log() << "Connected to Server " << Number << " (" << u->host << ":" << u->port << ")";
 			}
 			catch (const SocketException &ex)
 			{
-				Alog() << "Unable to connect with SSL to server" << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
+				Log() << "Unable to connect with SSL to server" << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
 			}
 
 			return EVENT_ALLOW;

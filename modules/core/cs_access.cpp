@@ -108,12 +108,16 @@ class AccessDelCallback : public NumberList
 {
 	User *u;
 	ChannelInfo *ci;
+	Command *c;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool Denied;
+	bool override;
  public:
-	AccessDelCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), Deleted(0), Denied(false)
+	AccessDelCallback(User *_u, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), Deleted(0), Denied(false)
 	{
+		if (!check_access(u, ci, CA_ACCESS_CHANGE) && u->Account()->HasPriv("chanserv/access/modify"))
+			this->override = true;
 	}
 
 	~AccessDelCallback()
@@ -124,7 +128,7 @@ class AccessDelCallback : public NumberList
 			notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
 		else
 		{
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of user" << (Deleted == 1 ? " " : "s ") << Nicks << " on " << ci->name;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
 
 			if (Deleted == 1)
 				notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_DELETED_ONE, ci->name.c_str());
@@ -183,6 +187,8 @@ class CommandCSAccess : public Command
 			return MOD_CONT;
 		}
 
+		bool override = !check_access(u, ci, CA_ACCESS_CHANGE) || level >= ulev;
+
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
@@ -214,7 +220,7 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
 
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << access->level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << "(group: " << nc->display << ") as level " << ulev;
 			notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
@@ -229,7 +235,7 @@ class CommandCSAccess : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 
-		Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << ulev << ") set access level " << level << " to " << na->nick << " (group " << nc->display << ") on channel " << ci->name;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << "(group: " << nc->display << ") as level " << ulev;
 		notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display.c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
@@ -243,7 +249,7 @@ class CommandCSAccess : public Command
 			notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessDelCallback list(u, ci, nick);
+			AccessDelCallback list(u, ci, this, nick);
 			list.Process();
 		}
 		else
@@ -274,7 +280,9 @@ class CommandCSAccess : public Command
 			else
 			{
 				notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
-				Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << ") deleted access of " << na->nick << " (group " << access->nc->display << ") on " << ci->name;
+				bool override = !check_access(u, ci, CA_ACCESS_CHANGE);
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << "(group: " << access->nc->display << ") from level " << access->level;
+
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
 				ci->EraseAccess(i);
@@ -375,7 +383,9 @@ class CommandCSAccess : public Command
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
 			notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name.c_str());
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " (level " << get_access(u, ci) << " cleared access list on " << ci->name;
+
+			bool override = !IsFounder(u, ci);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 		}
 
 		return MOD_CONT;
@@ -471,7 +481,10 @@ class CommandCSLevels : public Command
 				{
 					ci->levels[levelinfo[i].what] = level;
 					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
-					Alog() << Config->s_ChanServ << ": " << u->GetMask() << " set level " << levelinfo[i].name << " on channel " << ci->name << " to " << level;
+
+					bool override = !check_access(u, ci, CA_FOUNDER);
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << levelinfo[i].name << " to " << level;
+
 					if (level == ACCESS_FOUNDER)
 						notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name.c_str(), ci->name.c_str());
 					else
@@ -498,7 +511,9 @@ class CommandCSLevels : public Command
 					ci->levels[levelinfo[i].what] = ACCESS_INVALID;
 					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, levelinfo[i].what));
 
-					Alog() << Config->s_ChanServ << ": " << u->GetMask() << " disabled level " << levelinfo[i].name << " on channel " << ci->name;
+					bool override = !check_access(u, ci, CA_FOUNDER);
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << levelinfo[i].name;
+
 					notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_DISABLED, levelinfo[i].name.c_str(), ci->name.c_str());
 					return MOD_CONT;
 				}
@@ -547,7 +562,10 @@ class CommandCSLevels : public Command
 	{
 		reset_levels(ci);
 		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
-		Alog() << Config->s_ChanServ << ": " << u->GetMask() << " reset levels definitions on channel " << ci->name;
+
+		bool override = !check_access(u, ci, CA_FOUNDER);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
+
 		notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_RESET, ci->name.c_str());
 		return MOD_CONT;
 	}

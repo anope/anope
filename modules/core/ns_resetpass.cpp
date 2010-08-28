@@ -36,7 +36,7 @@ class CommandNSResetPass : public Command
 		{
 			if (SendResetEmail(u, na))
 			{
-				Alog() << Config->s_NickServ <<  ": " << u->GetMask() << " used RESETPASS on " << na->nick << " (" << na->nc->display << ")";
+				Log(LOG_COMMAND, u, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
 				notice_lang(Config->s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick.c_str());
 			}
 		}
@@ -111,7 +111,7 @@ class NSResetPass : public Module
 					ircdproto->SetAutoIdentificationToken(u);
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-					Alog() << Config->s_NickServ << ": " << u->GetMask() << " used CONFIRM with RESETPASS to forcefully identify to " << na->nick;
+					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
 					notice_lang(Config->s_NickServ, u, NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
 
 					if (ircd->vhost)
@@ -122,7 +122,7 @@ class NSResetPass : public Module
 				}
 				else
 				{
-					Alog() << Config->s_NickServ << ": Invalid CONFIRM passcode for " << na->nick << " from " << u->GetMask();
+					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
 					notice_lang(Config->s_NickServ, u, NICK_CONFIRM_INVALID);
 					bad_password(u);
 				}

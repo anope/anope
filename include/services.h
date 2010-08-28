@@ -181,6 +181,7 @@ extern "C" void __pfnBkCheck() {}
 
 /* Pull in the various bits of STL */
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <map>
@@ -251,6 +252,14 @@ class CoreException : public std::exception
 	{
 		return source;
 	}
+};
+
+class FatalException : public CoreException
+{
+ public:
+	FatalException(const Anope::string &reason = "") : CoreException(reason) { }
+
+	virtual ~FatalException() throw() { }
 };
 
 class ModuleException : public CoreException
@@ -939,6 +948,7 @@ class ServerConfig;
 #include "operserv.h"
 #include "mail.h"
 #include "servers.h"
+#include "logger.h"
 #include "config.h"
 
 class CoreExport IRCDProto
@@ -1039,10 +1049,6 @@ class CoreExport IRCDProto
 	virtual void SetAutoIdentificationToken(User *u) { }
 };
 
-class IRCDTS6Proto : public IRCDProto
-{
-};
-
 /*************************************************************************/
 
 struct Uplink
@@ -1054,33 +1060,6 @@ struct Uplink
 
 	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
 };
-
-enum LogLevel
-{
-	LOG_NORMAL,
-	LOG_TERMINAL,
-	LOG_DEBUG,
-	LOG_DEBUG_2,
-	LOG_DEBUG_3,
-	LOG_DEBUG_4
-};
-
-class CoreExport Alog
-{
- private:
-	std::stringstream buf;
-	LogLevel Level;
- public:
-	Alog(LogLevel val = LOG_NORMAL);
-	~Alog();
-	template<typename T> Alog &operator<<(T val)
-	{
-		buf << val;
-		return *this;
-	}
-};
-
-/*************************************************************************/
 
 #include "timers.h"
 

@@ -20,7 +20,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (max <= 0)
 		{
-			Alog() << "Can't determine maximum number of open sockets";
+			Log() << "Can't determine maximum number of open sockets";
 			throw ModuleException("Can't determine maximum number of open sockets");
 		}
 
@@ -28,7 +28,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (EngineHandle == -1)
 		{
-			Alog() << "Could not initialize epoll socket engine: " << strerror(errno);
+			Log() << "Could not initialize epoll socket engine: " << strerror(errno);
 			throw ModuleException(Anope::string("Could not initialize epoll socket engine: ") + strerror(errno));
 		}
 
@@ -52,7 +52,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
 		{
-			Alog() << "Unable to add fd " << ev.data.fd << " to socketengine epoll: " << strerror(errno);
+			Log() << "Unable to add fd " << ev.data.fd << " to socketengine epoll: " << strerror(errno);
 			return;
 		}
 
@@ -71,7 +71,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_DEL, ev.data.fd, &ev) == -1)
 		{
-			Alog() << "Unable to delete fd " << ev.data.fd << " from socketengine epoll: " << strerror(errno);
+			Log() << "Unable to delete fd " << ev.data.fd << " from socketengine epoll: " << strerror(errno);
 			return;
 		}
 
@@ -90,7 +90,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.data.fd = s->GetSock();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-			Alog() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
+			Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
 	}
 
 	void ClearWriteable(Socket *s)
@@ -103,7 +103,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.data.fd = s->GetSock();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-			Alog() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
+			Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
 	}
 
 	void Process()
@@ -112,7 +112,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (total == -1)
 		{
-			Alog() << "SockEngine::Process(): error " << strerror(errno);
+			Log() << "SockEngine::Process(): error " << strerror(errno);
 			return;
 		}
 

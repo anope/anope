@@ -33,21 +33,21 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
 	if (!UplinkSock)
 	{
 		if (!source.empty())
-			Alog(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
+			Log(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
 		else
-			Alog(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
+			Log(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
 		return;
 	}
 
 	if (!source.empty())
 	{
 		UplinkSock->Write(":%s %s", source.c_str(), buf);
-		Alog(LOG_DEBUG) << "Sent: :" << source << " " << buf;
+		Log(LOG_RAWIO) << "Sent: :" << source << " " << buf;
 	}
 	else
 	{
 		UplinkSock->Write("%s", buf);
-		Alog(LOG_DEBUG) << "Sent: "<< buf;
+		Log(LOG_RAWIO) << "Sent: "<< buf;
 	}
 
 	va_end(args);

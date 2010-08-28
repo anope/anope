@@ -25,11 +25,8 @@ class CommandCSTopic : public Command
 		Anope::string chan = params[0];
 		Anope::string topic = params.size() > 1 ? params[1] : "";
 
-		Channel *c;
-		ChannelInfo *ci;
-
-		if ((c = findchan(chan)))
-			ci = c->ci;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		Channel *c = ci->c;
 
 		if (!c)
 			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
@@ -48,9 +45,10 @@ class CommandCSTopic : public Command
 			else
 				c->topic_time = ci->last_topic_time;
 
-			if (!check_access(u, ci, CA_TOPIC))
-				Alog() << Config->s_NickServ << ": " << u->GetMask() << " changed topic of " << c->name << " as services admin.";
-			if (ircd->join2set && whosends(ci) == ChanServ)
+			bool override = !check_access(u, ci, CA_TOPIC);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change the topic to " << (!topic.empty() ? topic : "No topic");
+
+			if (ircd->join2set && whosends(ci) == ChanServ) // XXX what if the service bot is chanserv?
 			{
 				ChanServ->Join(c);
 				ircdproto->SendMode(NULL, c, "+o %s", Config->s_ChanServ.c_str()); // XXX

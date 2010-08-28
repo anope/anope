@@ -38,7 +38,7 @@ class CommandNSLogout : public Command
 				validate_user(u2);
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
-			Alog() << Config->s_NickServ << ": " << u->GetMask() << " logged out nickname " << u2->nick;
+			Log(LOG_COMMAND, u, this) << "to logout " << u2->nick;
 
 			/* Remove founder status from this user in all channels */
 			if (!nick.empty())

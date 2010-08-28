@@ -44,8 +44,6 @@ class CommandNSSetEmail : public Command
 			return MOD_CONT;
 		}
 
-		Alog() << Config->s_NickServ << ": " << u->GetMask() << " (e-mail: " << (!u->Account()->email.empty() ? u->Account()->email : "none")  << ") changed the e-mail of " << nc->display << " to " << (!param.empty() ? param : "none");
-
 		if (!param.empty())
 		{
 			nc->email = param;

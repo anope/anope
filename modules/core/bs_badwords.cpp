@@ -53,10 +53,14 @@ class BadwordsDelCallback : public NumberList
 {
 	User *u;
 	ChannelInfo *ci;
+	Command *c;
 	unsigned Deleted;
+	bool override;
  public:
-	BadwordsDelCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), Deleted(0)
+	BadwordsDelCallback(User *_u, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), c(_c), Deleted(0), override(false)
 	{
+		if (!check_access(u, ci, CA_BADWORDS) && u->Account()->HasPriv("botserv/administration"))
+			this->override = true;
 	}
 
 	~BadwordsDelCallback()
@@ -74,6 +78,7 @@ class BadwordsDelCallback : public NumberList
 		if (Number > ci->GetBadWordCount())
 			return;
 
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL " << ci->GetBadWord(Number -1 )->word;
 		++Deleted;
 		ci->EraseBadWord(Number - 1);
 	}
@@ -84,6 +89,9 @@ class CommandBSBadwords : public Command
  private:
 	CommandReturn DoList(User *u, ChannelInfo *ci, const Anope::string &word)
 	{
+		bool override = !check_access(u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
+
 		if (!ci->GetBadWordCount())
 			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
@@ -156,6 +164,8 @@ class CommandBSBadwords : public Command
 			}
 		}
 
+		bool override = !check_access(u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << realword;
 		ci->AddBadWord(realword, type);
 
 		notice_lang(Config->s_BotServ, u, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
@@ -168,7 +178,7 @@ class CommandBSBadwords : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsDelCallback list(u, ci, word);
+			BadwordsDelCallback list(u, ci, this, word);
 			list.Process();
 		}
 		else
@@ -190,6 +200,8 @@ class CommandBSBadwords : public Command
 				return MOD_CONT;
 			}
 
+			bool override = !check_access(u, ci, CA_BADWORDS);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << badword->word;
 			ci->EraseBadWord(i);
 
 			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
@@ -200,6 +212,9 @@ class CommandBSBadwords : public Command
 
 	CommandReturn DoClear(User *u, ChannelInfo *ci)
 	{
+		bool override = !check_access(u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+
 		ci->ClearBadWords();
 		notice_lang(Config->s_BotServ, u, BOT_BADWORDS_CLEAR);
 		return MOD_CONT;

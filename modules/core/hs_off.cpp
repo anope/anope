@@ -29,6 +29,7 @@ class CommandHSOff : public Command
 		else
 		{
 			ircdproto->SendVhostDel(u);
+			Log(LOG_COMMAND, u, this) << "to disable their vhost";
 			notice_lang(Config->s_HostServ, u, HOST_OFF);
 		}
 

@@ -76,7 +76,7 @@ void add_ignore(const Anope::string &nick, time_t delta)
 		newign->mask = mask;
 		newign->time = delta ? now + delta : 0;
 		ignore.push_front(newign);
-		Alog(LOG_DEBUG) << "Added new ignore entry for " << mask;
+		Log(LOG_DEBUG) << "Added new ignore entry for " << mask;
 	}
 }
 
@@ -137,13 +137,13 @@ IgnoreData *get_ignore(const Anope::string &nick)
 	/* Check whether the entry has timed out */
 	if (ign != ign_end && (*ign)->time && (*ign)->time <= now)
 	{
-		Alog(LOG_DEBUG) << "Expiring ignore entry " << (*ign)->mask;
+		Log(LOG_DEBUG) << "Expiring ignore entry " << (*ign)->mask;
 		delete *ign;
 		ignore.erase(ign);
 		ign = ign_end = ignore.end();
 	}
-	if (ign != ign_end && debug)
-		Alog(LOG_DEBUG) << "Found ignore entry (" << (*ign)->mask << ") for " << nick;
+	if (ign != ign_end)
+		Log(LOG_DEBUG) << "Found ignore entry (" << (*ign)->mask << ") for " << nick;
 	return ign == ign_end ? NULL : *ign;
 }
 
@@ -189,7 +189,7 @@ int delete_ignore(const Anope::string &nick)
 	/* No matching ignore found. */
 	if (ign == ign_end)
 		return 0;
-	Alog(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
+	Log(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
 	/* Delete the entry and all references to it. */
 	delete *ign;
 	ignore.erase(ign);
@@ -208,7 +208,7 @@ int clear_ignores()
 		return 0;
 	for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
 	{
-		Alog(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
+		Log(LOG_DEBUG) << "Deleting ignore entry " << (*ign)->mask;
 		delete *ign;
 	}
 	int deleted = ignore.size();
@@ -278,7 +278,7 @@ void process(const Anope::string &buffer)
 	const char **av;
 
 	/* If debugging, log the buffer */
-	Alog(LOG_DEBUG) << "Received: " << buffer;
+	Log(LOG_RAWIO) << "Received: " << buffer;
 
 	/* First make a copy of the buffer so we have the original in case we
 	 * crash - in that case, we want to know what we crashed on. */
@@ -315,17 +315,17 @@ void process(const Anope::string &buffer)
 	if (protocoldebug)
 	{
 		if (*source)
-			Alog() << "Source " << source;
+			Log() << "Source " << source;
 		if (*cmd)
-			Alog() << "Token " << cmd;
+			Log() << "Token " << cmd;
 		if (ac)
 		{
 			int i;
 			for (i = 0; i < ac; ++i)
-				Alog() << "av[" << i << "] = " << av[i];
+				Log() << "av[" << i << "] = " << av[i];
 		}
 		else
-			Alog() << "av[0] = NULL";
+			Log() << "av[0] = NULL";
 	}
 
 	/* Do something with the message. */
@@ -344,7 +344,7 @@ void process(const Anope::string &buffer)
 		}
 	}
 	else
-		Alog(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
+		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
 
 	/* Free argument list we created */
 	free(av);

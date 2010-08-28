@@ -26,10 +26,10 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const Anope::string &snick, const Anope::string &suid)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid)
 {
-	if (snick.empty())
-		throw CoreException("what the craq, empty nick passed to constructor");
+	if (snick.empty() || sident.empty() || shost.empty())
+		throw CoreException("Bad args passed to User::User");
 
 	// XXX: we should also duplicate-check here.
 
@@ -40,7 +40,10 @@ User::User(const Anope::string &snick, const Anope::string &suid)
 	OnAccess = false;
 
 	this->nick = snick;
+	this->ident = sident;
+	this->host = shost;
 	this->uid = suid;
+	this->isSuperAdmin = 0;
 
 	UserListByNick[snick] = this;
 	if (!suid.empty())
@@ -54,11 +57,8 @@ User::User(const Anope::string &snick, const Anope::string &suid)
 	{
 		maxusercnt = usercnt;
 		maxusertime = time(NULL);
-		if (Config->LogMaxUsers)
-			Alog() << "user: New maximum user count: "<< maxusercnt;
+		Log(this, "maxusers") << "connected - new maximum user count: " << maxusercnt;
 	}
-
-	this->isSuperAdmin = 0;	 /* always set SuperAdmin to 0 for new users */
 }
 
 void User::SetNewNick(const Anope::string &newnick)
@@ -67,7 +67,7 @@ void User::SetNewNick(const Anope::string &newnick)
 	if (newnick.empty())
 		throw CoreException("User::SetNewNick() got a bad argument");
 
-	Alog(LOG_DEBUG) << this->nick << " changed nick to " << newnick;
+	Log(this, "nick") << "changed nick to " << newnick;
 
 	UserListByNick.erase(this->nick);
 
@@ -88,7 +88,7 @@ void User::SetDisplayedHost(const Anope::string &shost)
 
 	this->vhost = shost;
 
-	Alog(LOG_DEBUG) << this->nick << " changed vhost to " << shost;
+	Log(this, "host") << "changed vhost to " << shost;
 
 	this->UpdateHost();
 }
@@ -116,7 +116,7 @@ void User::SetCloakedHost(const Anope::string &newhost)
 
 	chost = newhost;
 
-	Alog(LOG_DEBUG) << this->nick << " changed cloaked host to " << newhost;
+	Log(this, "host") << "changed cloaked host to " << newhost;
 
 	this->UpdateHost();
 }
@@ -138,7 +138,7 @@ void User::SetVIdent(const Anope::string &sident)
 {
 	this->vident = sident;
 
-	Alog(LOG_DEBUG) << this->nick << " changed vident to " << sident;
+	Log(this, "ident") << "changed vident to " << sident;
 
 	this->UpdateHost();
 }
@@ -155,7 +155,7 @@ void User::SetIdent(const Anope::string &sident)
 {
 	this->ident = sident;
 
-	Alog(LOG_DEBUG) << this->nick << " changed real ident to " << sident;
+	Log(this, "ident") << "changed real ident to " << sident;
 
 	this->UpdateHost();
 }
@@ -181,21 +181,16 @@ void User::SetRealname(const Anope::string &srealname)
 	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
 		na->last_realname = srealname;
 
-	Alog(LOG_DEBUG) << this->nick << " changed realname to " << srealname;
+	Log(this, "realname") << "changed realname to " << srealname;
 }
 
 User::~User()
 {
-	Alog(LOG_DEBUG_2) << "User::~User() called";
+	Log(LOG_DEBUG_2) << "User::~User() called";
+
+	Log(this, "disconnect") << " (" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
 
 	this->Logout();
-
-	if (Config->LogUsers)
-	{
-		Anope::string srealname = normalizeBuffer(this->realname);
-
-		Alog() << "LOGUSERS: " << this->nick << " (" << this->GetIdent() << "@" << this->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? this->GetDisplayedHost() : "") << ") (" << srealname << ") left the network (" << this->server->GetName() << ").";
-	}
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
 
@@ -218,7 +213,7 @@ User::~User()
 	if (na)
 		na->OnCancel(this);
 
-	Alog(LOG_DEBUG_2) << "User::~User() done";
+	Log(LOG_DEBUG_2) << "User::~User() done";
 }
 
 void User::SendMessage(const Anope::string &source, const char *fmt, ...) const
@@ -659,20 +654,13 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		char ipbuf[16];
 		struct in_addr addr;
 
-		if (ircd->nickvhost)
+		if (ircd->nickvhost && !vhost2.empty() && vhost2.equals_cs("*"))
 		{
-			if (!vhost2.empty())
-			{
-				if (vhost2.equals_cs("*"))
-				{
-					vhost2.clear();
-					Alog(LOG_DEBUG) << "new user with no vhost in NICK command: " << nick;
-				}
-			}
+			vhost2.clear();
 		}
 
 		/* This is a new user; create a User structure for it. */
-		Alog(LOG_DEBUG) << "new user: " << nick;
+		Log(LOG_DEBUG) << "new user: " << nick;
 
 		if (ircd->nickip)
 		{
@@ -682,31 +670,8 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		Server *serv = Server::Find(server);
 
-		if (Config->LogUsers)
-		{
-			/**
-			 * Ugly swap routine for Flop's bug :)   XXX
-			 **/
-			Anope::string logrealname = realname;
-			if (!logrealname.empty())
-			{
-				size_t tmp;
-				while ((tmp = logrealname.find('%')) != Anope::string::npos)
-					logrealname[tmp] = '-';
-			}
-			logrealname = normalizeBuffer(logrealname);
-
-			/**
-			 * End of ugly swap
-			 **/
-			Alog() << "LOGUSERS: " << nick << " (" << username << "@" << host << (ircd->nickvhost && !vhost2.empty() ? " => " : "") << (ircd->nickvhost && !vhost2.empty() ? vhost2 : "") << ") (" << logrealname << ") "
-				<< (ircd->nickip ? "[" : "") << (ircd->nickip ? ipbuf : "") << (ircd->nickip ? "]" : "") << " connected to the network (" << serv->GetName() << ").";
-		}
-
 		/* Allocate User structure and fill it in. */
-		user = new User(nick, !uid.empty() ? uid : "");
-		user->SetIdent(username);
-		user->host = host;
+		user = new User(nick, username, host, uid);
 		user->server = serv;
 		user->realname = realname;
 		user->timestamp = ts;
@@ -720,6 +685,8 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			user->hostip = ipbuf;
 		else
 			user->hostip = "";
+
+		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << ") (" << user->realname << ") " << (ircd->nickip ? Anope::string("[") + ipbuf + "] " : "") << "connected to the network (" << serv->GetName() << ")";
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
@@ -744,18 +711,12 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		if (!user)
 		{
-			Alog() << "user: NICK from nonexistent nick " << source;
+			Log() << "user: NICK from nonexistent nick " << source;
 			return NULL;
 		}
 		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
-		Alog(LOG_DEBUG) << source << " changes nick to " <<  nick;
 
-		if (Config->LogUsers)
-		{
-			Anope::string logrealname = normalizeBuffer(user->realname);
-			Alog() << "LOGUSERS: " << user->nick << " (" << user->GetIdent() << "@" << user->host << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" << logrealname << ") changed nick to "
-				<< nick << " (" << user->server->GetName() << ").";
-		}
+		Log(user, "nick") << " " << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" << user->realname << ") changed nick to " << nick;
 
 		user->timestamp = ts;
 
@@ -793,7 +754,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 				user->UpdateHost();
 				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
-				Alog() << Config->s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
+				Log() << Config->s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 
 			if (ircd->sqline)
@@ -819,7 +780,7 @@ void do_umode(const Anope::string &source, int ac, const char **av)
 	User *user = finduser(av[0]);
 	if (!user)
 	{
-		Alog() << "user: MODE "<< av[1] << " for nonexistent nick "<< av[0] << ":" << merge_args(ac, av);
+		Log() << "user: MODE "<< av[1] << " for nonexistent nick "<< av[0] << ":" << merge_args(ac, av);
 		return;
 	}
 
@@ -837,10 +798,11 @@ void do_quit(const Anope::string &source, int ac, const char **av)
 	User *user = finduser(source);
 	if (!user)
 	{
-		Alog() << "user: QUIT from nonexistent user " << source << ":" << merge_args(ac, av);
+		Log() << "user: QUIT from nonexistent user " << source << ":" << merge_args(ac, av);
 		return;
 	}
-	Alog(LOG_DEBUG) << source << " quits";
+
+	Log(user, "quit") << "for " << (*av[0] ? av[0] : "no reason");
 
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
@@ -864,10 +826,11 @@ void do_kill(const Anope::string &nick, const Anope::string &msg)
 	User *user = finduser(nick);
 	if (!user)
 	{
-		Alog(LOG_DEBUG) << "KILL of nonexistent nick: " <<  nick;
+		Log() << "KILL of nonexistent nick: " <<  nick;
 		return;
 	}
-	Alog(LOG_DEBUG) << nick << " killed";
+
+	Log(user, "killed") << "for " << msg;
 
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
@@ -997,7 +960,7 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 	if (!user || !modes)
 		return;
 
-	Alog(LOG_DEBUG) << "Changing user modes for " << user->nick << " to " << merge_args(ac, av);
+	Log(user, "mode") << "changes modes to " << merge_args(ac, av);
 
 	for (; *modes; ++modes)
 	{
@@ -1042,9 +1005,14 @@ void UserSetInternalModes(User *user, int ac, const char **av)
 					++opcnt;
 					if (Config->WallOper)
 						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", user->nick.c_str());
+					Log(OperServ) << user->nick << " is now an IRC operator";
 				}
 				else
+				{
 					--opcnt;
+
+					Log(OperServ) << user->nick << " is no longer an IRC operator";
+				}
 				break;
 			case UMODE_REGISTERED:
 				if (add && !user->IsIdentified())

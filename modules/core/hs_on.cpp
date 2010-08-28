@@ -29,6 +29,7 @@ class CommandHSOn : public Command
 				notice_lang(Config->s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
 				notice_lang(Config->s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->hostinfo.GetIdent().empty() ? na->hostinfo.GetIdent() + "@" : "") << na->hostinfo.GetHost();
 			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
 				u->vhost = na->hostinfo.GetHost();

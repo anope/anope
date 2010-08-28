@@ -90,10 +90,7 @@ static void DisplayNews(User *u, NewsType Type)
 	else if (Type == NEWS_RANDOM)
 		msg = NEWS_RANDOM_TEXT;
 	else
-	{
-		Alog() << "news: Invalid type (" << Type << ") to display_news()";
-		return;
-	}
+		throw CoreException("news: Invalid type (" + stringify(Type) + ") to display_news()");
 
 	unsigned displayed = 0;
 	bool NewsExists = false;
@@ -277,10 +274,7 @@ class NewsBase : public Command
 
 		msgs = findmsgs(type, type_name);
 		if (!msgs)
-		{
-			Alog() << "news: Invalid type to do_news()";
-			return MOD_CONT;
-		}
+			throw CoreException("news: Invalid type to do_news()");
 
 		if (cmd.equals_ci("LIST"))
 			return this->DoList(u, type, msgs);

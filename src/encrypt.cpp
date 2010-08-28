@@ -38,7 +38,7 @@ int enc_decrypt(const Anope::string &src, Anope::string &dest)
 	size_t pos = src.find(':');
 	if (pos == Anope::string::npos)
 	{
-		Alog() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
+		Log() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
 		return -1;
 	}
 	Anope::string hashm(src.begin(), src.begin() + pos);
@@ -62,7 +62,7 @@ int enc_check_password(Anope::string &plaintext, Anope::string &password)
 	size_t pos = password.find(':');
 	if (pos == Anope::string::npos)
 	{
-		Alog() << "Error: enc_check_password() called with invalid password string (" << password << ")";
+		Log() << "Error: enc_check_password() called with invalid password string (" << password << ")";
 		return 0;
 	}
 	Anope::string hashm(password.begin(), password.begin() + pos);

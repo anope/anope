@@ -170,7 +170,7 @@ class OSIgnore : public Module
 		{
 			if ((*ign)->time && (*ign)->time <= now)
 			{
-				Alog(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << (*ign)->mask;
+				Log(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << (*ign)->mask;
 				delete *ign;
 				ign = ignore.erase(ign);
 			}

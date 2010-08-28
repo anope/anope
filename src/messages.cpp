@@ -102,7 +102,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 
 	if (!u)
 	{
-		Alog() << message << ": user record for " << source << " not found";
+		Log() << message << ": user record for " << source << " not found";
 
 		BotInfo *bi = findbot(receiver);
 		if (bi)
@@ -129,7 +129,9 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 			if (get_ignore(source))
 			{
 				Anope::string target = myStrGetToken(message, ' ', 0);
-				Alog() << "Ignored message from " << source << " to " << receiver << " using command " << target;
+				BotInfo *bi = findbot(target);
+				if (bi)
+					Log(bi) << "Ignored message from " << source << " using command " << target;
 				return MOD_CONT;
 			}
 		}
@@ -147,7 +149,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 		}
 		else if (Config->UseStrictPrivMsg)
 		{
-			Alog(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
+			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
 			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
 			return MOD_CONT;
 		}
@@ -196,7 +198,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 				}
 				else
 				{
-					Alog() << Config->s_OperServ << ": " << u->nick << ": " <<  message;
+					Log(OperServ) << u->nick << ": " <<  message;
 					mod_run_cmd(bi, u, message);
 				}
 			}

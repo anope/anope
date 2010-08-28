@@ -346,7 +346,7 @@ class EOld : public Module
 			digest2[i / 2] = XTOI(digest[i]) << 4 | XTOI(digest[i + 1]);
 
 		buf += Anope::Hex(digest2, 16);
-		Alog(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
+		Log(LOG_DEBUG_2) << "(enc_old) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}

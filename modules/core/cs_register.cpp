@@ -49,16 +49,12 @@ class CommandCSRegister : public Command
 			notice_lang(Config->s_ChanServ, u, u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else if (!(ci = new ChannelInfo(chan)))
 		{
-			Alog() << Config->s_ChanServ << ": makechan() failed for REGISTER " << chan;
+			 // not possible ?
+			//Alog() << Config->s_ChanServ << ": makechan() failed for REGISTER " << chan;
 			notice_lang(Config->s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 		}
 		else
 		{
-			if (c)
-			{
-				c->ci = ci;
-				ci->c = c;
-			}
 			ci->founder = u->Account();
 			ci->desc = desc;
 
@@ -73,7 +69,7 @@ class CommandCSRegister : public Command
 
 			ci->bi = NULL;
 			++ci->founder->channelcount;
-			Alog() << Config->s_ChanServ << ": Channel '" << chan << "' registered by " << u->GetMask();
+			Log(LOG_COMMAND, u, this, ci);
 			notice_lang(Config->s_ChanServ, u, CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
 
 			/* Implement new mode lock */

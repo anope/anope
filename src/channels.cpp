@@ -37,6 +37,8 @@ Channel::Channel(const Anope::string &name, time_t ts)
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
 		this->ci->c = this;
+	
+	Log(NULL, this, "create");
 
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
 }
@@ -49,7 +51,7 @@ Channel::~Channel()
 
 	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
 
-	Alog(LOG_DEBUG) << "Deleting channel " << this->name;
+	Log(NULL, this, "destroy");
 
 	for (bd = this->bd; bd; bd = next)
 	{
@@ -114,7 +116,7 @@ void Channel::Sync()
 
 void Channel::JoinUser(User *user)
 {
-	Alog(LOG_DEBUG) << user->nick << " joins " << this->name;
+	Log(user, this, "join");
 
 	ChannelStatus *Status = new ChannelStatus();
 	ChannelContainer *cc = new ChannelContainer(this);
@@ -128,7 +130,7 @@ void Channel::JoinUser(User *user)
 	bool update_ts = false;
 	if (this->ci && this->ci->HasFlag(CI_PERSIST) && this->creation_time > this->ci->time_registered)
 	{
-		Alog(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
+		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
 		this->creation_time = this->ci->time_registered;
 		update_ts = true;
 	}
@@ -188,13 +190,13 @@ void Channel::DeleteUser(User *user)
 	if (this->ci)
 		update_cs_lastseen(user, this->ci);
 
-	Alog(LOG_DEBUG) << user->nick << " leaves " << this->name;
+	Log(user, this, "leaves");
 
 	CUserList::iterator cit, cit_end = this->users.end();
 	for (cit = this->users.begin(); (*cit)->user != user && cit != cit_end; ++cit);
 	if (cit == cit_end)
 	{
-		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant user " << user->nick << " from channel " << this->name;
 		return;
 	}
 
@@ -206,7 +208,7 @@ void Channel::DeleteUser(User *user)
 	for (uit = user->chans.begin(); (*uit)->chan != this && uit != uit_end; ++uit);
 	if (uit == uit_end)
 	{
-		Alog(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
+		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
 		return;
 	}
 
@@ -310,7 +312,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	{
 		if (param.empty())
 		{
-			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
+			Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -321,11 +323,11 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 
 		if (!u)
 		{
-			Alog(LOG_DEBUG) << "MODE " << this->name << " +" << cm->ModeChar << " for nonexistant user " << param;
+			Log() << "MODE " << this->name << " +" << cm->ModeChar << " for nonexistant user " << param;
 			return;
 		}
 
-		Alog(LOG_DEBUG) << "Setting +" << cm->ModeChar << " on " << this->name << " for " << u->nick;
+		Log(LOG_DEBUG) << "Setting +" << cm->ModeChar << " on " << this->name << " for " << u->nick;
 
 		/* Set the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
@@ -342,7 +344,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	{
 		if (param.empty())
 		{
-			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
+			Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -357,7 +359,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	{
 		if (cm->Type != MODE_PARAM)
 		{
-			Alog() << "Channel::SetModeInternal() mode " << cm->ModeChar << " for " << this->name << " with a paramater, but its not a param mode";
+			Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " for " << this->name << " with a paramater, but its not a param mode";
 			return;
 		}
 
@@ -437,7 +439,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 	{
 		if (param.empty())
 		{
-			Alog() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
+			Log() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -449,17 +451,17 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		/* Reset modes on bots if we're supposed to */
 		if (bi)
 		{
-			if (std::find(BotModes.begin(), BotModes.end(), cm) != BotModes.end())
+			if (std::find(Config->BotModeList.begin(), Config->BotModeList.end(), cm) != Config->BotModeList.end())
 				this->SetMode(bi, cm, bi->nick);
 		}
 
 		if (!u)
 		{
-			Alog() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->ModeChar << " for nonexistant user " << param;
+			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->ModeChar << " for nonexistant user " << param;
 			return;
 		}
 
-		Alog(LOG_DEBUG) << "Setting -" << cm->ModeChar << " on " << this->name << " for " << u->nick;
+		Log(LOG_DEBUG) << "Setting -" << cm->ModeChar << " on " << this->name << " for " << u->nick;
 
 		/* Remove the status on the user */
 		ChannelContainer *cc = u->FindChannel(this);
@@ -473,7 +475,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 	{
 		if (param.empty())
 		{
-			Alog() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
+			Log() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
 			return;
 		}
 
@@ -904,11 +906,11 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 				c->RemoveModeInternal(cm, av[j]);
 		}
 		else
-			Alog() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
+			Log() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
 	}
 
 	if (j + k + 1 < ac)
-		Alog() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
+		Log() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
 }
 
 /** Kick a user from a channel internally
@@ -924,11 +926,11 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 	User *user = bi ? bi : finduser(nick);
 	if (!user)
 	{
-		Alog(LOG_DEBUG) << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
+		Log() << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
 		return;
 	}
 
-	Alog(LOG_DEBUG) << "Channel::KickInternal kicking " << user->nick << " from " << this->name;
+	Log(user, this, "kick") << "by " << source << " (" << reason << ")";
 
 	Anope::string chname = this->name;
 
@@ -938,7 +940,7 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 		this->DeleteUser(user);
 	}
 	else
-		Alog(LOG_DEBUG) << "Channel::KickInternal got kick for user " << user->nick << " who isn't on channel " << this->name << " ?";
+		Log() << "Channel::KickInternal got kick for user " << user->nick << " who isn't on channel " << this->name << " ?";
 
 	/* Bots get rejoined */
 	if (bi)
@@ -1113,7 +1115,7 @@ void do_join(const Anope::string &source, int ac, const char **av)
 	user = finduser(source);
 	if (!user)
 	{
-		Alog(LOG_DEBUG) << "JOIN from nonexistent user " << source << ": " << merge_args(ac, av);
+		Log() << "JOIN from nonexistent user " << source << ": " << merge_args(ac, av);
 		return;
 	}
 
@@ -1150,7 +1152,7 @@ void do_join(const Anope::string &source, int ac, const char **av)
 			/* Their time is older, we lose */
 			if (chan->creation_time > ts)
 			{
-				Alog(LOG_DEBUG) << "Recieved an older TS " << chan->name << " in JOIN, changing from " << chan->creation_time << " to " << ts;
+				Log(LOG_DEBUG) << "Recieved an older TS " << chan->name << " in JOIN, changing from " << chan->creation_time << " to " << ts;
 				chan->creation_time = ts;
 
 				chan->Reset();
@@ -1188,7 +1190,7 @@ void do_kick(const Anope::string &source, int ac, const char **av)
 	Channel *c = findchan(av[0]);
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "Recieved kick for nonexistant channel " << av[0];
+		Log() << "Recieved kick for nonexistant channel " << av[0];
 		return;
 	}
 
@@ -1210,7 +1212,7 @@ void do_part(const Anope::string &source, int ac, const char **av)
 	User *user = finduser(source);
 	if (!user)
 	{
-		Alog(LOG_DEBUG) << "PART from nonexistent user " << source << ": " << merge_args(ac, av);
+		Log() << "PART from nonexistent user " << source << ": " << merge_args(ac, av);
 		return;
 	}
 
@@ -1221,17 +1223,17 @@ void do_part(const Anope::string &source, int ac, const char **av)
 		Channel *c = findchan(buf);
 
 		if (!c)
-			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
-
-		if (user->FindChannel(c))
+			Log() << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
+		else if (user->FindChannel(c))
 		{
+			Log(user, c, "part") << "Reason: " << (av[1] ? av[1] : "No reason");
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));
 			Anope::string ChannelName = c->name;
 			c->DeleteUser(user);
 			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName), ChannelName, av[1] ? av[1] : ""));
 		}
 		else
-			Alog(LOG_DEBUG) << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";
+			Log() << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";
 	}
 }
 
@@ -1264,7 +1266,7 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 			++av;
 		}
 		else
-			Alog() << "TSMODE enabled but MODE has no valid TS";
+			Log() << "TSMODE enabled but MODE has no valid TS";
 	}
 
 	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
@@ -1281,7 +1283,7 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 		{
 			ci = cs_findchan(av[0]);
 			if (!ci || ci->HasFlag(CI_FORBIDDEN))
-				Alog(LOG_DEBUG) << "MODE " << merge_args(ac - 1, av + 1) << " for nonexistant channel " << av[0];
+				Log(LOG_DEBUG) << "MODE " << merge_args(ac - 1, av + 1) << " for nonexistant channel " << av[0];
 		}
 		return;
 	}
@@ -1298,6 +1300,10 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 
 	--ac;
 	++av;
+
+	User *u = finduser(source);
+	if (u)
+		Log(u, c, "mode") << merge_args(ac, av);
 	ChanSetInternalModes(c, ac, av);
 }
 
@@ -1313,7 +1319,7 @@ void do_topic(const Anope::string &source, int ac, const char **av)
 
 	if (!c)
 	{
-		Alog(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+		Log() << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return;
 	}
 
@@ -1380,7 +1386,7 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 	if (ci->HasFlag(CI_FORBIDDEN) || c->name[0] == '+')
 		return;
 
-	Alog(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
+	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
 	if (give_modes && !get_ignore(user->nick) && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{

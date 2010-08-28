@@ -29,7 +29,7 @@ class CommandNSGetEMail : public Command
 		Anope::string email = params[0];
 		int j = 0;
 
-		Alog() << Config->s_NickServ << ": " << u->GetMask() << " used GETEMAIL on " << email;
+		Log(LOG_ADMIN, u, this) << "on " << email;
 
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{

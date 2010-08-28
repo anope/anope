@@ -43,7 +43,6 @@ Anope::string orig_cwd;		/* Original current working directory */
 Anope::string log_filename = "services.log"; /* -log filename */
 int debug = 0;				/* -debug */
 bool readonly = false;		/* -readonly */
-bool LogChan = false;		/* -logchan */
 bool nofork = false;		/* -nofork */
 bool nothird = false;		/* -nothrid */
 bool noexpire = false;		/* -noexpire */
@@ -138,7 +137,7 @@ extern void expire_all()
 
 	FOREACH_MOD(I_OnPreDatabaseExpire, OnPreDatabaseExpire());
 
-	Alog(LOG_DEBUG) << "Running expire routines";
+	Log(LOG_DEBUG) << "Running expire routines";
 	expire_nicks();
 	expire_chans();
 	expire_requests();
@@ -156,7 +155,7 @@ void save_databases()
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
-	Alog(LOG_DEBUG) << "Saving FFF databases";
+	Log(LOG_DEBUG) << "Saving databases";
 }
 
 /*************************************************************************/
@@ -169,7 +168,7 @@ void do_restart_services()
 		expire_all();
 		save_databases();
 	}
-	Alog() << "Restarting";
+	Log() << "Restarting";
 
 	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
 
@@ -188,15 +187,12 @@ void do_restart_services()
 	ircdproto->SendSquit(Config->ServerName, quitmsg);
 	SocketEngine->Process();
 	delete UplinkSock;
-	close_log();
 	ModuleManager::UnloadAll();
 	chdir(binary_dir.c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly)
 	{
-		open_log();
-		log_perror("Restart failed");
-		close_log();
+		throw FatalException("Restart failed");
 	}
 
 	FOREACH_MOD(I_OnRestart, OnRestart());
@@ -214,7 +210,7 @@ static void services_shutdown()
 
 	if (quitmsg.empty())
 		quitmsg = "Terminating, reason unknown";
-	Alog() << quitmsg;
+	Log() << quitmsg;
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
@@ -259,7 +255,7 @@ void sighandler(int signum)
 #ifndef _WIN32
 		if (signum == SIGHUP)
 		{
-			Alog() << "Received SIGHUP: Saving Databases & Rehash Configuration";
+			Log() << "Received SIGHUP: Saving Databases & Rehash Configuration";
 
 			expire_all();
 			save_databases();
@@ -273,7 +269,7 @@ void sighandler(int signum)
 			}
 			catch (const ConfigException &ex)
 			{
-				Alog() << "Error reloading configuration file: " << ex.GetReason();
+				Log() << "Error reloading configuration file: " << ex.GetReason();
 			}
 			return;
 
@@ -287,7 +283,7 @@ void sighandler(int signum)
 			signal(SIGHUP, SIG_IGN);
 #endif
 
-			Alog() << "Received SIGTERM, exiting.";
+			Log() << "Received SIGTERM, exiting.";
 
 			expire_all();
 			save_databases();
@@ -300,7 +296,7 @@ void sighandler(int signum)
 			if (nofork)
 			{
 				signal(SIGINT, SIG_IGN);
-				Alog() << "Received SIGINT, exiting.";
+				Log() << "Received SIGINT, exiting.";
 				expire_all();
 				save_databases();
 				quitmsg = "Shutting down on SIGINT";
@@ -323,7 +319,7 @@ void sighandler(int signum)
 		if (isatty(2))
 			fprintf(stderr, "%s\n", quitmsg.c_str());
 		else
-			Alog() << quitmsg;
+			Log() << quitmsg;
 
 		exit(1);
 	}
@@ -398,11 +394,11 @@ static bool Connect()
 		}
 		catch (const SocketException &ex)
 		{
-			Alog() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
+			Log() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
 			continue;
 		}
 
-		Alog() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
+		Log() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
 		return true;
 	}
 
@@ -417,175 +413,175 @@ static bool Connect()
 
 int main(int ac, char **av, char **envp)
 {
-	my_av = av;
-	my_envp = envp;
+	try
+	{
+		my_av = av;
+		my_envp = envp;
 
-	char cwd[PATH_MAX] = "";
+		char cwd[PATH_MAX] = "";
 #ifdef _WIN32
-	GetCurrentDirectory(PATH_MAX, cwd);
+		GetCurrentDirectory(PATH_MAX, cwd);
 #else
-	getcwd(cwd, PATH_MAX);
+		getcwd(cwd, PATH_MAX);
 #endif
-	orig_cwd = cwd;
+		orig_cwd = cwd;
 
 #ifndef _WIN32
-	/* If we're root, issue a warning now */
-	if (!getuid() && !getgid())
-	{
-		fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
-		fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
-		fprintf(stderr, "    as the root superuser.\n");
-	}
+		/* If we're root, issue a warning now */
+		if (!getuid() && !getgid())
+		{
+			fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
+			fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
+			fprintf(stderr, "    as the root superuser.\n");
+		}
 #endif
 
-	binary_dir = GetFullProgDir(av[0]);
-	if (binary_dir[binary_dir.length() - 1] == '.')
-		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
+		binary_dir = GetFullProgDir(av[0]);
+		if (binary_dir[binary_dir.length() - 1] == '.')
+			binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
 #ifdef _WIN32
-	Anope::string::size_type n = binary_dir.rfind('\\');
-	services_dir = binary_dir.substr(0, n) + "\\data";
+		Anope::string::size_type n = binary_dir.rfind('\\');
+		services_dir = binary_dir.substr(0, n) + "\\data";
 #else
-	Anope::string::size_type n = binary_dir.rfind('/');
-	services_dir = binary_dir.substr(0, n) + "/data";
+		Anope::string::size_type n = binary_dir.rfind('/');
+		services_dir = binary_dir.substr(0, n) + "/data";
 #endif
 
-	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
-	ModuleRunTimeDirCleanUp();
+		/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
+		ModuleRunTimeDirCleanUp();
 
-	/* General initialization first */
-	int i = init_primary(ac, av);
-	if (i)
-		return i;
+		/* General initialization first */
+		Init(ac, av);
 
-	Alog(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
-#ifdef _WIN32
-	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
-#else
-	Alog(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf;
-#endif
+		/* If the first connect fails give up, don't sit endlessly trying to reconnect */
+		if (!Connect())
+		{
+			Log() << "Can't connect to any servers";
+			return 0;
+		}
 
-	/* Initialization stuff. */
-	i = init_secondary(ac, av);
-	if (i)
-		return i;
+		ircdproto->SendConnect();
+		FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 
-	/* If the first connect fails give up, don't sit endlessly trying to reconnect */
-	if (!Connect())
-		fatal_perror("Can't connect to any servers");
-
-	ircdproto->SendConnect();
-	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
-
-	started = true;
+		started = true;
 
 #ifndef _WIN32
-	if (Config->DumpCore)
-	{
-		rlimit rl;
-		if (getrlimit(RLIMIT_CORE, &rl) == -1)
-			Alog() << "Failed to getrlimit()!";
-		else
+		if (Config->DumpCore)
 		{
-			rl.rlim_cur = rl.rlim_max;
-			if (setrlimit(RLIMIT_CORE, &rl) == -1)
-				Alog() << "setrlimit() failed, cannot increase coredump size";
+			rlimit rl;
+			if (getrlimit(RLIMIT_CORE, &rl) == -1)
+				Log() << "Failed to getrlimit()!";
+			else
+			{
+				rl.rlim_cur = rl.rlim_max;
+				if (setrlimit(RLIMIT_CORE, &rl) == -1)
+					Log() << "setrlimit() failed, cannot increase coredump size";
+			}
 		}
-	}
 #endif
 
-	/* Set up timers */
-	time_t last_check = time(NULL);
-	ExpireTimer expireTimer(Config->ExpireTimeout, last_check);
-	UpdateTimer updateTimer(Config->UpdateTimeout, last_check);
+		/* Set up timers */
+		time_t last_check = time(NULL);
+		ExpireTimer expireTimer(Config->ExpireTimeout, last_check);
+		UpdateTimer updateTimer(Config->UpdateTimeout, last_check);
 
-	/*** Main loop. ***/
-	while (!quitting)
-	{
-		while (!quitting && UplinkSock)
+		/*** Main loop. ***/
+		while (!quitting)
 		{
-			time_t t = time(NULL);
-
-			Alog(LOG_DEBUG_2) << "Top of main loop";
-
-			if (!readonly && (save_data || shutting_down))
+			while (!quitting && UplinkSock)
 			{
-				if (!noexpire)
-					expire_all();
-				if (shutting_down)
-					ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
-				save_databases();
-				save_data = false;
-			}
+				time_t t = time(NULL);
 
-			if (shutting_down)
-			{
-				quitting = true;
-				break;
-			}
+				Log(LOG_DEBUG_2) << "Top of main loop";
 
-			if (t - last_check >= Config->TimeoutCheck)
-			{
-				TimerManager::TickTimers(t);
-				last_check = t;
-			}
-
-			/* Process any modes that need to be (un)set */
-			ModeManager::ProcessModes();
-
-			/* Process the socket engine */
-			SocketEngine->Process();
-		}
-
-		if (quitting)
-			/* Disconnect and exit */
-			services_shutdown();
-		else
-		{
-			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
-
-			/* Clear all of our users, but not our bots */
-			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
-			{
-				User *u = it->second;
-				++it;
-
-				if (!findbot(u->nick))
-					delete u;
-			}
-
-			Me->SetFlag(SERVER_SYNCING);
-			Me->ClearLinks();
-
-			unsigned j = 0;
-			for (; j < (Config->MaxRetries ? Config->MaxRetries : j + 1); ++j)
-			{
-				Alog() << "Disconnected from the server, retrying in " << Config->RetryWait << " seconds";
-
-				sleep(Config->RetryWait);
-				if (Connect())
+				if (!readonly && (save_data || shutting_down))
 				{
-					ircdproto->SendConnect();
-					FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+					if (!noexpire)
+						expire_all();
+					if (shutting_down)
+						ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
+					save_databases();
+					save_data = false;
+				}
+
+				if (shutting_down)
+				{
+					quitting = true;
 					break;
 				}
+
+				if (t - last_check >= Config->TimeoutCheck)
+				{
+					TimerManager::TickTimers(t);
+					last_check = t;
+				}
+
+				/* Process any modes that need to be (un)set */
+				ModeManager::ProcessModes();
+
+				/* Process the socket engine */
+				SocketEngine->Process();
 			}
-			if (Config->MaxRetries && j == Config->MaxRetries)
+
+			if (quitting)
+				/* Disconnect and exit */
+				services_shutdown();
+			else
 			{
-				Alog() << "Max connection retry limit exceeded";
-				quitting = true;
+				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
+
+				/* Clear all of our users, but not our bots */
+				for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+				{
+					User *u = it->second;
+					++it;
+
+					if (!findbot(u->nick))
+						delete u;
+				}
+
+				Me->SetFlag(SERVER_SYNCING);
+				Me->ClearLinks();
+
+				unsigned j = 0;
+				for (; j < (Config->MaxRetries ? Config->MaxRetries : j + 1); ++j)
+				{
+					Log() << "Disconnected from the server, retrying in " << Config->RetryWait << " seconds";
+
+					sleep(Config->RetryWait);
+					if (Connect())
+					{
+						ircdproto->SendConnect();
+						FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+						break;
+					}
+				}
+				if (Config->MaxRetries && j == Config->MaxRetries)
+				{
+					Log() << "Max connection retry limit exceeded";
+					quitting = true;
+				}
 			}
 		}
+	}
+	catch (const FatalException &ex)
+	{
+		if (!ex.GetReason().empty())
+			Log(LOG_TERMINAL) << ex.GetReason();
+		return -1;
 	}
 
 	return 0;
 }
 
-inline Anope::string Anope::Version()
+Anope::string Anope::Version()
 {
 	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + stringify(VERSION_BUILD) + ")";
 }
 
-inline Anope::string Anope::Build()
+Anope::string Anope::Build()
 {
 	return "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
 }
+
+

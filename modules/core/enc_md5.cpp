@@ -336,7 +336,7 @@ class EMD5 : public Module
 		MD5Final(reinterpret_cast<unsigned char *>(digest), &context);
 
 		buf += Anope::Hex(digest, 16);
-		Alog(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
+		Log(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}

@@ -74,14 +74,15 @@ class CommandCSSuspend : public Command
 			if (Config->WallForbid)
 				ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " set SUSPEND for channel " << ci->name;
+			Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
 			notice_lang(Config->s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
 
 			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
 		else
 		{
-			Alog() << Config->s_ChanServ << ": Valid SUSPEND for " << ci->name << " by " << u->GetMask() << " failed";
+			// cant happen?
+			//Alog() << Config->s_ChanServ << ": Valid SUSPEND for " << ci->name << " by " << u->GetMask() << " failed";
 			notice_lang(Config->s_ChanServ, u, CHAN_SUSPEND_FAILED, chan.c_str());
 		}
 		return MOD_CONT;
@@ -134,6 +135,8 @@ class CommandCSUnSuspend : public Command
 
 		if (ci)
 		{
+			Log(LOG_ADMIN, u, this, ci) << " was suspended for: " << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
+
 			ci->UnsetFlag(CI_SUSPENDED);
 			ci->forbidreason.clear();
 			ci->forbidby.clear();
@@ -141,14 +144,14 @@ class CommandCSUnSuspend : public Command
 			if (Config->WallForbid)
 				ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " set UNSUSPEND for channel " << ci->name;
 			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
 
 			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
 		else
 		{
-			Alog() << Config->s_ChanServ << ": Valid UNSUSPEND for " << chan << " by " << u->nick << " failed";
+			// cant happen ?
+			//Alog() << Config->s_ChanServ << ": Valid UNSUSPEND for " << chan << " by " << u->nick << " failed";
 			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan.c_str());
 		}
 		return MOD_CONT;

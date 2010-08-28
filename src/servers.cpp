@@ -60,7 +60,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 {
 	SetFlag(SERVER_SYNCING);
 
-	Alog(LOG_DEBUG) << "Creating " << this->GetName() << " (" << this->GetSID() << ") uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink");
+	Log(this, "connect") << "uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " connected to the network";
 
 	/* Add this server to our uplinks leaf list */
 	if (this->UplinkServer)
@@ -72,10 +72,6 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		{
 			/* Bring in our pseudo-clients */
 			introduce_user("");
-
-			/* And some IRCds needs Global joined in the logchan */
-			if (LogChan && ircd->join2msg)
-				Global->Join(Config->LogChannel);
 		}
 	}
 }
@@ -84,7 +80,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
  */
 Server::~Server()
 {
-	Alog(LOG_DEBUG) << "Deleting server " << this->GetName() << " (" << this->GetSID() << ") uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink");
+	Log(this, "quit") << "quit from " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " for " << this->QReason;
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{
@@ -108,7 +104,7 @@ Server::~Server()
 			}
 		}
 
-		Alog(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
+		Log(LOG_DEBUG) << "Finished removing all users for " << this->GetName();
 	}
 
 	if (this->UplinkServer)
@@ -190,7 +186,7 @@ void Server::AddLink(Server *s)
 {
 	this->Links.push_back(s);
 
-	Alog() << "Server " << s->GetName() << " introduced from " << this->GetName();
+	Log(this, "connect") << "introduced " << s->GetName();
 }
 
 /** Delinks a server from this server
@@ -210,7 +206,7 @@ void Server::DelLink(Server *s)
 		}
 	}
 
-	Alog() << "Server " << s->GetName() << " quit from " << this->GetName();
+	Log(this, "quit") << "quit " << s->GetName();
 }
 
 /** Remov all links from this server
@@ -245,7 +241,7 @@ void Server::Sync(bool SyncLinks)
 		Me->UnsetFlag(SERVER_SYNCING);
 	}
 
-	Alog() << "Server " << this->GetName() << " is done syncing";
+	Log(this, "sync") << "is done syncing";
 
 	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
@@ -285,7 +281,7 @@ bool Server::IsULined() const
  */
 Server *Server::Find(const Anope::string &name, Server *s)
 {
-	Alog(LOG_DEBUG) << "Server::Find called for " << name;
+	Log(LOG_DEBUG) << "Server::Find called for " << name;
 
 	if (!s)
 		s = Me;
@@ -300,7 +296,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
 				return serv;
-			Alog(LOG_DEBUG) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
+			Log(LOG_DEBUG) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);
 			if (server)
 				return server;
@@ -324,9 +320,9 @@ Server *Server::Find(const Anope::string &name, Server *s)
 void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric)
 {
 	if (source.empty())
-		Alog(LOG_DEBUG) << "Server " << servername << " introduced";
+		Log(LOG_DEBUG) << "Server " << servername << " introduced";
 	else
-		Alog(LOG_DEBUG) << "Server introduced (" << servername << ")" << " from " << source;
+		Log(LOG_DEBUG) << "Server introduced (" << servername << ")" << " from " << source;
 
 	Server *s = NULL;
 
@@ -366,7 +362,7 @@ void do_squit(const Anope::string &source, int ac, const char **av)
 
 	if (!s)
 	{
-		Alog() << "SQUIT for nonexistent server (" << av[0] << ")!!";
+		Log() << "SQUIT for nonexistent server (" << av[0] << ")!!";
 		return;
 	}
 
@@ -386,7 +382,7 @@ void do_squit(const Anope::string &source, int ac, const char **av)
 
 	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
 	{
-		Alog(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
+		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
 		/* need to fix */
 		ircdproto->SendSquit(s->GetName(), buf);
 	}
@@ -459,7 +455,6 @@ const char *ts6_uid_retrieve()
 {
 	if (!ircd->ts6)
 	{
-		Alog(LOG_DEBUG) << "ts6_uid_retrieve(): TS6 not supported on this ircd";
 		return "";
 	}
 
@@ -525,7 +520,6 @@ const char *ts6_sid_retrieve()
 {
 	if (!ircd->ts6)
 	{
-		Alog(LOG_DEBUG) << "ts6_sid_retrieve(): TS6 not supported on this ircd";
 		return "";
 	}
 

@@ -76,7 +76,7 @@ class CommandNSSuspend : public Command
 		if (Config->WallForbid)
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
-		Alog() << Config->s_NickServ << ": " << u->nick << " set SUSPEND for nick " << nick;
+		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << ")";
 		notice_lang(Config->s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
@@ -142,7 +142,7 @@ class CommandNSUnSuspend : public Command
 		if (Config->WallForbid)
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
-		Alog() << Config->s_NickServ << ": " << u->nick << " set UNSUSPEND for nick " << nick;
+		Log(LOG_ADMIN, u, this) << "for " << na->nick;
 		notice_lang(Config->s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick.c_str());
 
 		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));

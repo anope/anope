@@ -342,7 +342,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 	{
 		User *u = finduser(source);
 		if (!u)
-			Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
+			Log(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
 		else
 		{
 			EventReturn MOD_RESULT;
@@ -380,7 +380,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					Alog() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
+					Log() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
 					continue;
 				}
 
@@ -391,7 +391,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 			User *u = finduser(buf);
 			if (!u)
 			{
-				Alog(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
+				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 				continue;
 			}
 
@@ -662,7 +662,7 @@ int anope_event_ping(const Anope::string &source, int ac, const char **av)
 int anope_event_error(const Anope::string &source, int ac, const char **av)
 {
 	if (ac >= 1)
-		Alog(LOG_DEBUG) << av[0];
+		Log(LOG_DEBUG) << av[0];
 	return MOD_CONT;
 }
 

@@ -95,9 +95,12 @@ class CommandBSBot : public Command
 
 		if (!(bi = new BotInfo(nick, user, host, real)))
 		{
+			// XXX this cant happen?
 			notice_lang(Config->s_BotServ, u, BOT_BOT_CREATION_FAILED);
 			return MOD_CONT;
 		}
+
+		Log(LOG_ADMIN, u, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
 		notice_lang(Config->s_BotServ, u, BOT_BOT_ADDED, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
@@ -260,6 +263,7 @@ class CommandBSBot : public Command
 		}
 
 		notice_lang(Config->s_BotServ, u, BOT_BOT_CHANGED, oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
+		Log(LOG_ADMIN, u, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
 		return MOD_CONT;
@@ -293,6 +297,8 @@ class CommandBSBot : public Command
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick.c_str());
 		XLine x(bi->nick);
 		ircdproto->SendSQLineDel(&x);
+
+		Log(LOG_ADMIN, u, this) << "DEL " << bi->nick;
 
 		delete bi;
 		notice_lang(Config->s_BotServ, u, BOT_BOT_DELETED, nick.c_str());

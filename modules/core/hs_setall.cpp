@@ -86,7 +86,7 @@ class CommandHSSetAll : public Command
 
 		tmp_time = time(NULL);
 
-		Alog() << "vHost for all nicks in group \2" << nick << "\2 set to \2" << (!vIdent.empty() && ircd->vident ? vIdent : "") << (!vIdent.empty() && ircd->vident ? "@" : "") << hostmask << " \2 by oper \2" << u->nick << "\2";
+		Log(LOG_ADMIN, u, this) << "to set the vhost for all nicks in group " << na->nc->display << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
 		na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
 		HostServSyncVhosts(na);

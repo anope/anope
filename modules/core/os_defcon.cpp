@@ -32,7 +32,7 @@ class DefConTimeout : public Timer
 		{
 			Config->DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
-			Alog() << "Defcon level timeout, returning to lvl " << level;
+			Log(OperServ, "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 			ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), Config->s_OperServ.c_str(), level);
 
 			if (Config->GlobalOnDefcon)
@@ -92,7 +92,7 @@ class CommandOSDefcon : public Command
 
 		notice_lang(Config->s_OperServ, u, OPER_DEFCON_CHANGED, Config->DefConLevel);
 		defcon_sendlvls(u);
-		Alog() << "Defcon level changed to " << newLevel << " by Oper " << u->nick;
+		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
 		ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
@@ -157,7 +157,7 @@ class OSDefcon : public Module
 		{
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
-				Alog() << "DEFCON: adding akill for *@" << u->host;
+				Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
 				XLine *x = SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config->DefConAKILL, !Config->DefConAkillReason.empty() ? Config->DefConAkillReason : "DEFCON AKILL");
 				if (x)
 					x->By = Config->s_OperServ;
@@ -352,7 +352,7 @@ void runDefCon()
 		{
 			if (Config->DefConChanModes[0] == '+' || Config->DefConChanModes[0] == '-')
 			{
-				Alog() << "DEFCON: setting " << Config->DefConChanModes << " on all channels";
+				Log(OperServ, "operserv/defcon") << "DEFCON: setting " << Config->DefConChanModes << " on all channels";
 				DefConModesSet = true;
 				MassChannelModes(OperServ, Config->DefConChanModes);
 			}
@@ -368,7 +368,7 @@ void runDefCon()
 				Anope::string newmodes = defconReverseModes(Config->DefConChanModes);
 				if (!newmodes.empty())
 				{
-					Alog() << "DEFCON: setting " << newmodes << " on all channels";
+					Log(OperServ, "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
 					MassChannelModes(OperServ, newmodes);
 				}
 			}
@@ -420,7 +420,7 @@ void defconParseModeString(const Anope::string &str)
 		{
 			if (cm->Type == MODE_STATUS || cm->Type == MODE_LIST || !cm->CanSet(NULL))
 			{
-				Alog() << "DefConChanModes mode character '" << mode << "' cannot be locked";
+				Log() << "DefConChanModes mode character '" << mode << "' cannot be locked";
 				continue;
 			}
 			else if (add)
@@ -434,7 +434,7 @@ void defconParseModeString(const Anope::string &str)
 
 					if (!ss.GetToken(param))
 					{
-						Alog() << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
+						Log() << "DefConChanModes mode character '" << mode << "' has no parameter while one is expected";
 						continue;
 					}
 
@@ -462,7 +462,7 @@ void defconParseModeString(const Anope::string &str)
 	{
 		DefConModesOn.UnsetFlag(CMODE_REDIRECT);
 
-		Alog() << "DefConChanModes must lock mode +l as well to lock mode +L";
+		Log() << "DefConChanModes must lock mode +l as well to lock mode +L";
 	}
 
 	/* Some ircd we can't set NOKNOCK without INVITE */
@@ -470,7 +470,7 @@ void defconParseModeString(const Anope::string &str)
 	if (ircd->knock_needs_i && (cm = ModeManager::FindChannelModeByName(CMODE_NOKNOCK)) && DefConModesOn.HasFlag(cm->Name) && !DefConModesOn.HasFlag(CMODE_INVITE))
 	{
 		DefConModesOn.UnsetFlag(CMODE_NOKNOCK);
-		Alog() << "DefConChanModes must lock mode +i as well to lock mode +K";
+		Log() << "DefConChanModes must lock mode +i as well to lock mode +K";
 	}
 }
 

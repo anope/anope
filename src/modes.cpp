@@ -33,8 +33,6 @@ Flags<ChannelModeName> DefMLockOn;
 Flags<ChannelModeName> DefMLockOff;
 /* Map for default mlocked mode parameters */
 std::map<ChannelModeName, Anope::string> DefMLockParams;
-/* Modes to set on bots when they join the channel */
-std::list<ChannelModeStatus *> BotModes;
 
 /** Parse the mode string from the config file and set the default mlocked modes
  */
@@ -72,7 +70,7 @@ void SetDefaultMLock(ServerConfig *config)
 						DefMLockParams.insert(std::make_pair(cm->Name, param));
 					else
 					{
-						Alog() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
+						Log() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
 						ptr->UnsetFlag(cm->Name);
 					}
 				}
@@ -81,13 +79,13 @@ void SetDefaultMLock(ServerConfig *config)
 	}
 
 	/* Set Bot Modes */
-	BotModes.clear();
-	for (unsigned i = 0, end_mode = config->BotModes.length(); i < end_mode; ++i)
+	config->BotModeList.clear();
+	for (unsigned i = 0; i < config->BotModes.length(); ++i)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(config->BotModes[i]);
 
-		if (cm && cm->Type == MODE_STATUS && std::find(BotModes.begin(), BotModes.end(), cm) == BotModes.end())
-			BotModes.push_back(debug_cast<ChannelModeStatus *>(cm));
+		if (cm && cm->Type == MODE_STATUS && std::find(config->BotModeList.begin(), config->BotModeList.end(), cm) == config->BotModeList.end())
+			config->BotModeList.push_back(debug_cast<ChannelModeStatus *>(cm));
 	}
 }
 
@@ -282,7 +280,7 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 	/* check for NULL values otherwise we will segfault */
 	if (!chan || mask.empty())
 	{
-		Alog(LOG_DEBUG) << "add_ban called with NULL values";
+		Log() << "add_ban called with NULL values";
 		return;
 	}
 
@@ -293,7 +291,7 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 
 	Entry *ban = entry_add(chan->bans, mask);
 	if (!ban)
-		fatal("Creating new ban entry failed");
+		throw CoreException("Creating new ban entry failed");
 
 	/* Check whether it matches a botserv bot after adding internally
 	 * and parsing it through cidr support. ~ Viper */
@@ -309,7 +307,7 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
 		}
 	}
 
-	Alog(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
+	Log(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
 }
 
 /** Remove a ban from the channel
@@ -327,7 +325,7 @@ void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
 	{
 		entry_delete(chan->bans, ban);
 
-		Alog(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
+		Log(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
 	}
 
 	AutoKick *akick;
@@ -343,7 +341,7 @@ void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
 {
 	if (!chan || mask.empty())
 	{
-		Alog(LOG_DEBUG) << "add_exception called with NULL values";
+		Log() << "add_exception called with NULL values";
 		return;
 	}
 
@@ -354,9 +352,9 @@ void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
 
 	Entry *exception = entry_add(chan->excepts, mask);
 	if (!exception)
-		fatal("Creating new exception entry failed");
+		throw CoreException("Creating new exception entry failed");
 
-	Alog(LOG_DEBUG) << "Added except " << mask << " to channel " << chan->name;
+	Log(LOG_DEBUG) << "Added except " << mask << " to channel " << chan->name;
 }
 
 /** Remove an except from the channel
@@ -373,7 +371,7 @@ void ChannelModeExcept::DelMask(Channel *chan, const Anope::string &mask)
 	if (exception)
 	{
 		entry_delete(chan->excepts, exception);
-		Alog(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
+		Log(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
 	}
 }
 
@@ -385,7 +383,7 @@ void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
 {
 	if (!chan || mask.empty())
 	{
-		Alog(LOG_DEBUG) << "add_invite called with NULL values";
+		Log() << "add_invite called with NULL values";
 		return;
 	}
 
@@ -396,9 +394,9 @@ void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
 
 	Entry *invite = entry_add(chan->invites, mask);
 	if (!invite)
-		fatal("Creating new exception entry failed");
+		throw CoreException("Creating new invex entry failed");
 
-	Alog(LOG_DEBUG) << "Added invite " << mask << " to channel " << chan->name;
+	Log(LOG_DEBUG) << "Added invite " << mask << " to channel " << chan->name;
 
 }
 
@@ -416,7 +414,7 @@ void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
 	if (invite)
 	{
 		entry_delete(chan->invites, invite);
-		Alog(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
+		Log(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
 	}
 }
 
@@ -611,7 +609,7 @@ bool ModeManager::AddUserMode(UserMode *um)
 		if (um->Name == UMODE_END)
 		{
 			um->Name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
-			Alog() << "ModeManager: Added generic support for user mode " << um->ModeChar;
+			Log() << "ModeManager: Added generic support for user mode " << um->ModeChar;
 		}
 		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um));
 		ModeManager::Modes.insert(std::make_pair(um->NameAsString, um));
@@ -635,7 +633,7 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
 		if (cm->Name == CMODE_END)
 		{
 			cm->Name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
-			Alog() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
+			Log() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
 		}
 		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm));
 		ModeManager::Modes.insert(std::make_pair(cm->NameAsString, cm));

@@ -190,7 +190,7 @@ class ESHA1 : public Module
 		SHA1Final(reinterpret_cast<unsigned char *>(digest), &context);
 
 		buf += Anope::Hex(digest, 20);
-		Alog(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
+		Log(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
 	}

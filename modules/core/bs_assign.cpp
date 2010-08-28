@@ -59,6 +59,9 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
+		bool override = !check_access(u, ci, CA_ASSIGN);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << bi->nick;
+
 		bi->Assign(u, ci);
 		notice_lang(Config->s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick.c_str(), ci->name.c_str());
 		return MOD_CONT;

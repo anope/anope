@@ -38,7 +38,7 @@ class CommandHSDelAll : public Command
 				na = *it;
 				na->hostinfo.RemoveVhost();
 			}
-			Alog() << "vHosts for all nicks in group \2" << nc->display << "\2 deleted by oper \2" << u->nick << "\2";
+			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
 			notice_lang(Config->s_HostServ, u, HOST_DELALL, nc->display.c_str());
 		}
 		else

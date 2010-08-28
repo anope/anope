@@ -64,14 +64,14 @@ class CommandCSSetXOP : public Command
 				ci->SetFlag(CI_XOP);
 			}
 
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " enabled XOP for " << ci->name;
+			Log(LOG_COMMAND, u, this, ci) << "to enable XOP";
 			notice_lang(Config->s_ChanServ, u, CHAN_SET_XOP_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
-			Alog() << Config->s_ChanServ << ": " << u->GetMask() << " disabled XOP for " << ci->name;
+			Log(LOG_COMMAND, u, this, ci) << "to disable XOP";
 			notice_lang(Config->s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else

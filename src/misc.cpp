@@ -601,7 +601,7 @@ void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
 
 	if (u2)
 	{
-		Alog() << "Killed Q-lined nick: " << u2->GetMask();
+		Log() << "Killed Q-lined nick: " << u2->GetMask();
 		kill_user(killer, u2->nick, "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
 }
@@ -834,7 +834,7 @@ Anope::string host_resolve(const Anope::string &host)
 		char ipbuf[16];
 		ntoa(addr, ipbuf, sizeof(ipbuf));
 		ipreturn = ipbuf;
-		Alog(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
+		Log(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
 	}
 	return ipreturn;
 }

@@ -42,6 +42,7 @@ class CommandNSGhost : public Command
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
+				Log(LOG_COMMAND, u, this) << "for " << nick;
 				Anope::string buf = "GHOST command used by " + u->nick;
 				kill_user(Config->s_NickServ, nick, buf);
 				notice_lang(Config->s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());
@@ -51,7 +52,7 @@ class CommandNSGhost : public Command
 				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 				if (!res)
 				{
-					Alog() << Config->s_NickServ << ": GHOST: invalid password for " << nick << " by " << u->GetMask();
+					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
 					if (bad_password(u))
 						return MOD_STOP;
 				}
@@ -61,6 +62,7 @@ class CommandNSGhost : public Command
 		{
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
+				Log(LOG_COMMAND, u, this) << "for " << nick;
 				Anope::string buf = "GHOST command used by " + u->nick;
 				kill_user(Config->s_NickServ, nick, buf);
 				notice_lang(Config->s_NickServ, u, NICK_GHOST_KILLED, nick.c_str());

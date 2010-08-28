@@ -50,7 +50,7 @@ NickCore::~NickCore()
 	NickCoreList.erase(this->display);
 
 	/* Log .. */
-	Alog() << Config->s_NickServ << ": deleting nickname group " << this->display;
+	Log() << Config->s_NickServ << ": deleting nickname group " << this->display;
 
 	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();

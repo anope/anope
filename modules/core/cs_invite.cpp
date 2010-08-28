@@ -35,7 +35,7 @@ class CommandCSInvite : public Command
 
 		ci = c->ci;
 
-		if (!u || !check_access(u, ci, CA_INVITE))
+		if (!check_access(u, ci, CA_INVITE))
 		{
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 			return MOD_CONT;
@@ -51,6 +51,9 @@ class CommandCSInvite : public Command
 				return MOD_CONT;
 			}
 		}
+
+		// XXX need a check for override...
+		Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
 
 		if (c->FindUser(u2))
 			notice_lang(Config->s_ChanServ, u, CHAN_INVITE_ALREADY_IN, c->name.c_str());

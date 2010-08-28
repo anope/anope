@@ -24,7 +24,9 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	this->founder = this->successor = NULL;
 	this->last_topic_time = 0;
 	this->levels = NULL;
-	this->c = NULL;
+	this->c = findchan(chname);
+	if (this->c)
+		this->c->ci = this;
 	this->capsmin = this->capspercent = 0;
 	this->floodlines = this->floodsecs = 0;
 	this->repeattimes = 0;
@@ -68,7 +70,7 @@ ChannelInfo::~ChannelInfo()
 
 	FOREACH_MOD(I_OnDelChan, OnDelChan(this));
 
-	Alog(LOG_DEBUG) << "Deleting channel " << this->name;
+	Log(LOG_DEBUG) << "Deleting channel " << this->name;
 
 	if (this->c)
 	{
@@ -575,7 +577,7 @@ bool ChannelInfo::CheckKick(User *user)
 
 			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc) || (!autokick->HasFlag(AK_ISNICK) && match_usermask(autokick->mask, user)))
 			{
-				Alog(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
+				Log(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
 				autokick->last_used = time(NULL);
 				if (autokick->HasFlag(AK_ISNICK))
 					get_idealban(this, user, mask);
@@ -598,7 +600,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!do_kick)
 		return false;
 
-	Alog(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
+	Log(LOG_DEBUG) << "Autokicking "<< user->GetMask() <<  " from " << this->name;
 
 	/* If the channel isn't syncing and doesn't have any users, join ChanServ
 	 * Note that the user AND POSSIBLY the botserv bot exist here

@@ -65,7 +65,7 @@ static void load_lang(int index, const char *filename)
 	FILE *f;
 	int32 num, i;
 
-	Alog(LOG_DEBUG) << "Loading language " << index << " from file `languages/" << filename << "'";
+	Log(LOG_DEBUG) << "Loading language " << index << " from file `languages/" << filename << "'";
 	snprintf(buf, sizeof(buf), "languages/%s", filename);
 #ifndef _WIN32
 	const char *mode = "r";
@@ -74,16 +74,15 @@ static void load_lang(int index, const char *filename)
 #endif
 	if (!(f = fopen(buf, mode)))
 	{
-		log_perror("Failed to load language %d (%s)", index, filename);
-		return;
+		throw CoreException("Failed to load language " + stringify(index) + " (" + stringify(filename) + ")");
 	}
 	else if (read_int32(&num, f) < 0)
 	{
-		Alog() << "Failed to read number of strings for language " << index << "(" << filename << ")";
+		Log() << "Failed to read number of strings for language " << index << "(" << filename << ")";
 		return;
 	}
 	else if (num != NUM_STRINGS)
-		Alog() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") for language " << index << " (" << filename << ")";
+		Log() << "Warning: Bad number of strings (" << num << " , wanted " << NUM_STRINGS << ") for language " << index << " (" << filename << ")";
 	langtexts[index] = static_cast<char **>(scalloc(sizeof(char *), NUM_STRINGS));
 	if (num > NUM_STRINGS)
 		num = NUM_STRINGS;
@@ -93,7 +92,7 @@ static void load_lang(int index, const char *filename)
 		fseek(f, i * 8 + 4, SEEK_SET);
 		if (read_int32(&pos, f) < 0 || read_int32(&len, f) < 0)
 		{
-			Alog() << "Failed to read entry " << i << " in language " << index << " (" << filename << ") TOC";
+			Log() << "Failed to read entry " << i << " in language " << index << " (" << filename << ") TOC";
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
@@ -107,7 +106,7 @@ static void load_lang(int index, const char *filename)
 			langtexts[index][i] = NULL;
 		else if (len >= 65536)
 		{
-			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") is too long (over 64k) -- corrupt TOC?";
+			Log() << "Entry " << i << " in language " << index << " (" << filename << ") is too long (over 64k) -- corrupt TOC?";
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
@@ -119,7 +118,7 @@ static void load_lang(int index, const char *filename)
 		}
 		else if (len < 0)
 		{
-			Alog() << "Entry " << i << " in language " << index << " (" << filename << ") has negative length -- corrupt TOC?";
+			Log() << "Entry " << i << " in language " << index << " (" << filename << ") has negative length -- corrupt TOC?";
 			while (--i >= 0)
 			{
 				if (langtexts[index][i])
@@ -135,7 +134,7 @@ static void load_lang(int index, const char *filename)
 			fseek(f, pos, SEEK_SET);
 			if (fread(langtexts[index][i], 1, len, f) != len)
 			{
-				Alog() << "Failed to read string " << i << " in language " << index << "(" << filename << ")";
+				Log() << "Failed to read string " << i << " in language " << index << "(" << filename << ")";
 				while (--i >= 0)
 				{
 					if (langtexts[index][i])
@@ -225,7 +224,7 @@ void lang_init()
 		Config->NSDefLanguage = DEF_LANGUAGE;
 
 	if (!langtexts[DEF_LANGUAGE])
-		fatal("Unable to load default language");
+		throw CoreException("Unable to load default language");
 	for (i = 0; i < NUM_LANGS; ++i)
 	{
 		if (!langtexts[i])

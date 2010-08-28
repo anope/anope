@@ -65,7 +65,7 @@ class SocketEngineSelect : public SocketEngineBase
 #ifdef WIN32
 			errno = WSAGetLastError();
 #endif
-			Alog() << "SockEngine::Process(): error" << strerror(errno);
+			Log() << "SockEngine::Process(): error" << strerror(errno);
 		}
 		else if (sresult)
 		{

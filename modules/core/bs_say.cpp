@@ -55,8 +55,10 @@ class CommandBSSay : public Command
 
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
 		ci->bi->lastmsg = time(NULL);
-		if (Config->LogBot && !Config->LogChannel.empty() && LogChan && !debug && findchan(Config->LogChannel))
-			ircdproto->SendPrivmsg(ci->bi, Config->LogChannel, "SAY %s %s %s", u->nick.c_str(), ci->name.c_str(), text.c_str());
+
+		// XXX need a way to find if someone is overriding this
+		Log(LOG_COMMAND, u, this, ci) << text;
+
 		return MOD_CONT;
 	}
 

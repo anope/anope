@@ -143,7 +143,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			bot_kick(ci, u, BOT_REASON_REVERSE);
 			return;
 		}
-		
+
 		/* Italics kicker */
 		if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
 		{
@@ -386,48 +386,34 @@ BotInfo *findbot(const Anope::string &nick)
 
 static BanData *get_ban_data(Channel *c, User *u)
 {
-	BanData *bd, *next;
-	time_t now = time(NULL);
-
 	if (!c || !u)
 		return NULL;
 
 	Anope::string mask = u->GetIdent() + "@" + u->GetDisplayedHost();
-
-	for (bd = c->bd; bd; bd = next)
+	time_t now = time(NULL);
+	for (std::list<BanData *>::iterator it = c->bd.begin(), it_end = c->bd.end(); it != it_end; ++it)
 	{
-		if (now - bd->last_use > Config->BSKeepData)
+		if (now - (*it)->last_use > Config->BSKeepData)
 		{
-			if (bd->next)
-				bd->next->prev = bd->prev;
-			if (bd->prev)
-				bd->prev->next = bd->next;
-			else
-				c->bd = bd->next;
-			next = bd->next;
-			delete bd;
+			delete *it;
+			c->bd.erase(it);
 			continue;
 		}
-		if (bd->mask.equals_ci(mask))
+		if ((*it)->mask.equals_ci(mask))
 		{
-			bd->last_use = now;
-			return bd;
+			(*it)->last_use = now;
+			return *it;
 		}
-		next = bd->next;
 	}
 
 	/* If we fall here it is that we haven't found the record */
-	bd = new BanData;
+	BanData *bd = new BanData();
 	bd->mask = mask;
 	bd->last_use = now;
 	for (int x = 0; x < TTB_SIZE; ++x)
 		bd->ttb[x] = 0;
 
-	bd->prev = NULL;
-	bd->next = c->bd;
-	if (bd->next)
-		bd->next->prev = bd;
-	c->bd = bd;
+	c->bd.push_front(bd);
 
 	return bd;
 }

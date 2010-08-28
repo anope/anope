@@ -758,8 +758,6 @@ struct LevelInfo
 
 struct BanData
 {
-	BanData *next, *prev;
-
 	Anope::string mask;	/* Since a nick is unsure and a User structure is unsafe */
 	time_t last_use;	/* Since time is the only way to check whether it's still useful */
 	int16 ttb[TTB_SIZE];

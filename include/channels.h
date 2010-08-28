@@ -77,7 +77,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
-	Channel(const Anope::string &name, time_t ts = time(NULL));
+	Channel(const Anope::string &nname, time_t ts = time(NULL));
 
 	/** Default destructor
 	 */
@@ -97,7 +97,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	/* List of users in the channel */
 	CUserList users;
 
-	BanData *bd;
+	std::list<BanData *> bd;
 
 	time_t server_modetime;		/* Time of last server MODE */
 	time_t chanserv_modetime;	/* Time of last check_modes() */

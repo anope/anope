@@ -19,25 +19,24 @@ channel_map ChannelList;
  * @param name The channel name
  * @param ts The time the channel was created
  */
-Channel::Channel(const Anope::string &name, time_t ts)
+Channel::Channel(const Anope::string &nname, time_t ts)
 {
-	if (name.empty())
+	if (nname.empty())
 		throw CoreException("A channel without a name ?");
 
-	this->name = name;
+	this->name = nname;
 
 	ChannelList[this->name] = this;
 
 	this->creation_time = ts;
 	this->bans = this->excepts = this->invites = NULL;
-	this->bd = NULL;
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = this->topic_time = 0;
 
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
 		this->ci->c = this;
-	
+
 	Log(NULL, this, "create");
 
 	FOREACH_MOD(I_OnChannelCreate, OnChannelCreate(this));
@@ -47,17 +46,12 @@ Channel::Channel(const Anope::string &name, time_t ts)
  */
 Channel::~Channel()
 {
-	BanData *bd, *next;
-
 	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
 
 	Log(NULL, this, "destroy");
 
-	for (bd = this->bd; bd; bd = next)
-	{
-		next = bd->next;
-		delete bd;
-	}
+	for (std::list<BanData *>::iterator it = this->bd.begin(), it_end = this->bd.end(); it != it_end; ++it)
+		delete *it;
 
 	if (this->ci)
 		this->ci->c = NULL;
@@ -93,7 +87,7 @@ void Channel::Reset()
 
 		uc->Status->ClearFlags();
 	}
-	
+
 	check_modes(this);
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		chan_set_correct_modes((*it)->user, this, 1);
@@ -1039,7 +1033,6 @@ Channel *findchan(const Anope::string &chan)
 void get_channel_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	BanData *bd;
 	Anope::string buf;
 
 	for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
@@ -1068,11 +1061,11 @@ void get_channel_stats(long *nrec, long *memuse)
 			if (!(*it)->ud.lastline.empty())
 				mem += (*it)->ud.lastline.length() + 1;
 		}
-		for (bd = chan->bd; bd; bd = bd->next)
+		for (std::list<BanData *>::iterator it = chan->bd.begin(), it_end = chan->bd.end(); it != it_end; ++it)
 		{
-			if (!bd->mask.empty())
-				mem += bd->mask.length() + 1;
-			mem += sizeof(*bd);
+			if (!(*it)->mask.empty())
+				mem += (*it)->mask.length() + 1;
+			mem += sizeof(*it);
 		}
 	}
 	*nrec = count;

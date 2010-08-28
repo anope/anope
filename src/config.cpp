@@ -1003,7 +1003,6 @@ void ServerConfig::Read()
 		{"options", "readtimeout", "0", new ValueContainerTime(&this->ReadTimeout), DT_TIME, ValidateNotZero},
 		{"options", "warningtimeout", "0", new ValueContainerTime(&this->WarningTimeout), DT_TIME, ValidateNotZero},
 		{"options", "timeoutcheck", "0", new ValueContainerTime(&this->TimeoutCheck), DT_TIME, NoValidation},
-		{"options", "keeplogs", "0", new ValueContainerInt(&this->KeepLogs), DT_INTEGER, NoValidation},
 		{"options", "keepbackups", "0", new ValueContainerInt(&this->KeepBackups), DT_INTEGER, NoValidation},
 		{"options", "forceforbidreason", "no", new ValueContainerBool(&this->ForceForbidReason), DT_BOOLEAN, NoValidation},
 		{"options", "useprivmsg", "no", new ValueContainerBool(&this->UsePrivmsg), DT_BOOLEAN, NoValidation},

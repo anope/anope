@@ -530,8 +530,6 @@ class ServerConfig
 	time_t WarningTimeout;
 	/* How long to process things such as timers to see if there is anything to calll */
 	time_t TimeoutCheck;
-	/* Num of days logfiles are kept */
-	int KeepLogs;
 	/* Number of days backups are kept */
 	int KeepBackups;
 	/* Forbidding requires a reason */

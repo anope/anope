@@ -29,12 +29,7 @@ class CommandMSCheck : public Command
 		struct tm *tm;
 		char timebuf[64];
 
-		if (!u->IsRecognized())
-		{
-			notice_lang(Config->s_MemoServ, u, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
-			return MOD_CONT;
-		}
-		else if (!(na = findnick(recipient)))
+		if (!(na = findnick(recipient)))
 		{
 			notice_lang(Config->s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient.c_str());
 			return MOD_CONT;

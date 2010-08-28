@@ -20,6 +20,7 @@ class CommandNSSendPass : public Command
  public:
 	CommandNSSendPass() : Command("SENDPASS", 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
@@ -27,7 +28,7 @@ class CommandNSSendPass : public Command
 		Anope::string nick = params[0];
 		NickAlias *na;
 
-		if (Config->RestrictMail && !u->Account()->HasCommand("nickserv/sendpass"))
+		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
 			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
 			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());

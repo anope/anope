@@ -20,13 +20,14 @@ class CommandNSResetPass : public Command
  public:
 	CommandNSResetPass() : Command("RESETPASS", 1, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na;
 
-		if (Config->RestrictMail && !u->Account()->HasCommand("nickserv/resetpass"))
+		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
 			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
 		if (!(na = findnick(params[0])))
 			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, params[0].c_str());

@@ -112,7 +112,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (total == -1)
 		{
-			Log() << "SockEngine::Process(): error " << strerror(errno);
+			Log() << "SockEngine::Process(): error: " << strerror(errno);
 			return;
 		}
 

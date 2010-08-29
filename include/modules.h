@@ -659,9 +659,10 @@ class CoreExport Module : public virtual Base
 	virtual void OnShutdown() { }
 
 	/** Called on signal
+	 * @param signum The signum
 	 * @param msg The quitmsg
 	 */
-	virtual void OnSignal(const Anope::string &msg) { }
+	virtual void OnSignal(int signum, const Anope::string &msg) { }
 
 	/** Called before a nick expires
 	 * @param na The nick

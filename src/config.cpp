@@ -1009,7 +1009,6 @@ void ServerConfig::Read()
 		{"options", "forceforbidreason", "no", new ValueContainerBool(&this->ForceForbidReason), DT_BOOLEAN, NoValidation},
 		{"options", "useprivmsg", "no", new ValueContainerBool(&this->UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&this->UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
-		{"options", "dumpcore", "yes", new ValueContainerBool(&this->DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&this->HideStatsO), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycle", "no", new ValueContainerBool(&this->GlobalOnCycle), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycledown", "", new ValueContainerString(&this->GlobalOnCycleMessage), DT_STRING, ValidateGlobalOnCycle},

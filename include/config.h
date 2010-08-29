@@ -538,8 +538,6 @@ class ServerConfig
 	bool UsePrivmsg;
 	/* Services only respond to full PRIVMSG client@services.server.name messages */
 	bool UseStrictPrivMsg;
-	/* Dump a core file if we crash */
-	bool DumpCore;
 	/* Number of seconds between consecutive uses of the REGISTER command
 	 * Not to be confused with NSRegDelay */
 	unsigned NickRegDelay;

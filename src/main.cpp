@@ -248,81 +248,55 @@ void sighandler(int signum)
 	 * QUIT code without having a valid quitmsg. -GD
 	 */
 	if (quitmsg.empty())
-		quitmsg = "Services terminating via a signal.";
+		quitmsg = Anope::string("Services terminating via signal ") + strsignal(signum) + " (" + stringify(signum) + ")";
+	bool fatal = false;
 
 	if (started)
 	{
+		switch (signum)
+		{
 #ifndef _WIN32
-		if (signum == SIGHUP)
-		{
-			Log() << "Received SIGHUP: Saving Databases & Rehash Configuration";
+			case SIGHUP:
+				Log() << "Received SIGHUP: Saving Databases & Rehash Configuration";
 
-			expire_all();
-			save_databases();
-
-			try
-			{
-				ServerConfig *newconfig = new ServerConfig();
-				delete Config;
-				Config = newconfig;
-				FOREACH_MOD(I_OnReload, OnReload(true));
-			}
-			catch (const ConfigException &ex)
-			{
-				Log() << "Error reloading configuration file: " << ex.GetReason();
-			}
-			return;
-
-		}
-		else
-#endif
-		if (signum == SIGTERM)
-		{
-			signal(SIGTERM, SIG_IGN);
-#ifndef _WIN32
-			signal(SIGHUP, SIG_IGN);
-#endif
-
-			Log() << "Received SIGTERM, exiting.";
-
-			expire_all();
-			save_databases();
-			quitmsg = "Shutting down on SIGTERM";
-			services_shutdown();
-			exit(0);
-		}
-		else if (signum == SIGINT)
-		{
-			if (nofork)
-			{
-				signal(SIGINT, SIG_IGN);
-				Log() << "Received SIGINT, exiting.";
 				expire_all();
 				save_databases();
-				quitmsg = "Shutting down on SIGINT";
-				services_shutdown();
-				exit(0);
-			}
+
+				try
+				{
+					ServerConfig *newconfig = new ServerConfig();
+					delete Config;
+					Config = newconfig;
+					FOREACH_MOD(I_OnReload, OnReload(true));
+				}
+				catch (const ConfigException &ex)
+				{
+					Log() << "Error reloading configuration file: " << ex.GetReason();
+				}
+				break;
+#endif
+			case SIGINT:
+			case SIGTERM:
+				signal(signum, SIG_IGN);
+#ifndef _WIN32
+				signal(SIGHUP, SIG_IGN);
+#endif
+
+				Log() << "Received " << strsignal(signum) << " signal (" << signum << "), exiting.";
+
+				expire_all();
+				save_databases();
+				quitmsg = "shutting down on sigterm";
+			default:
+				fatal = true;
+				break;
 		}
 	}
 
-	/* Should we send the signum here as well? -GD */
-	FOREACH_MOD(I_OnSignal, OnSignal(quitmsg));
+	FOREACH_MOD(I_OnSignal, OnSignal(signum, quitmsg));
 
-	if (started)
-	{
-		services_shutdown();
-		exit(0);
-	}
-	else
-	{
-		if (isatty(2))
-			fprintf(stderr, "%s\n", quitmsg.c_str());
-		else
-			Log() << quitmsg;
-
-		exit(1);
-	}
+	if (fatal)
+		throw FatalException(quitmsg);
 }
 
 /*************************************************************************/
@@ -465,21 +439,6 @@ int main(int ac, char **av, char **envp)
 
 		started = true;
 
-#ifndef _WIN32
-		if (Config->DumpCore)
-		{
-			rlimit rl;
-			if (getrlimit(RLIMIT_CORE, &rl) == -1)
-				Log() << "Failed to getrlimit()!";
-			else
-			{
-				rl.rlim_cur = rl.rlim_max;
-				if (setrlimit(RLIMIT_CORE, &rl) == -1)
-					Log() << "setrlimit() failed, cannot increase coredump size";
-			}
-		}
-#endif
-
 		/* Set up timers */
 		time_t last_check = time(NULL);
 		ExpireTimer expireTimer(Config->ExpireTimeout, last_check);
@@ -570,6 +529,8 @@ int main(int ac, char **av, char **envp)
 	{
 		if (!ex.GetReason().empty())
 			Log(LOG_TERMINAL) << ex.GetReason();
+		if (started)
+			services_shutdown();
 		return -1;
 	}
 

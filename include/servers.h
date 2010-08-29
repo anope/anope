@@ -66,6 +66,7 @@ extern CoreExport CapabInfo Capab_Info[];
  */
 enum ServerFlag
 {
+	SERVER_NONE,
 	/* Server is syncing */
 	SERVER_SYNCING,
 	/* This server was juped */
@@ -100,8 +101,9 @@ class CoreExport Server : public virtual Base, public Flags<ServerFlag>
 	 * @param hops Hops from services server
 	 * @param description Server rdescription
 	 * @param sid Server sid/numeric
+	 * @param flag An optional server flag
 	 */
-	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid);
+	Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag = SERVER_NONE);
 
 	/** Destructor
 	 */

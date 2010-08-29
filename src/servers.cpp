@@ -55,10 +55,12 @@ Flags<CapabType, CAPAB_END> Capab;
  * @param hops Hops from services server
  * @param description Server rdescription
  * @param sid Server sid/numeric
+ * @param flag An optional server flag
  */
-Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
+Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
 {
-	SetFlag(SERVER_SYNCING);
+	this->SetFlag(SERVER_SYNCING);
+	this->SetFlag(flag);
 
 	Log(this, "connect") << "uplinked to " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " connected to the network";
 
@@ -68,7 +70,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		this->UplinkServer->AddLink(this);
 
 		/* Check to be sure the uplink server only has one uplink, otherwise we introduce our clients if we jupe servers */
-		if (Me == this->UplinkServer && this->UplinkServer->GetLinks().size() == 1)
+		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
 			/* Bring in our pseudo-clients */
 			introduce_user("");

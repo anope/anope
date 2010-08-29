@@ -30,6 +30,16 @@ void introduce_user(const Anope::string &user)
 
 	if (user.empty())
 		ircdproto->SendBOB();
+	
+	for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
+	{
+		Server *s = Me->GetLinks()[i];
+
+		if (s->HasFlag(SERVER_JUPED))
+		{
+			ircdproto->SendServer(s);
+		}
+	}
 
 	/* We make the bots go online */
 	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)

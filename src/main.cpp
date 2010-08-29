@@ -541,7 +541,9 @@ int main(int ac, char **av, char **envp)
 				}
 
 				Me->SetFlag(SERVER_SYNCING);
-				Me->ClearLinks();
+				for (unsigned i = Me->GetLinks().size(); i > 0; --i)
+					if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
+						delete Me->GetLinks()[i - 1];
 
 				unsigned j = 0;
 				for (; j < (Config->MaxRetries ? Config->MaxRetries : j + 1); ++j)

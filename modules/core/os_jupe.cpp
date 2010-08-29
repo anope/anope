@@ -35,8 +35,7 @@ class CommandOSJupe : public Command
 			Anope::string rbuf = "Juped by " + u->nick + (!reason.empty() ? ": " + reason : "");
 			if (server)
 				ircdproto->SendSquit(jserver, rbuf);
-			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "");
-			juped_server->SetFlag(SERVER_JUPED);
+			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "", SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
 			if (Config->WallOSJupe)

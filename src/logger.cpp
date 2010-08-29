@@ -27,8 +27,12 @@ void InitLogChannels(ServerConfig *config)
 			if (target[0] == '#')
 			{
 				Channel *c = findchan(target);
+				bool created = false;
 				if (!c)
+				{
 					c = new Channel(target);
+					created = true;
+				}
 				c->SetFlag(CH_LOGCHAN);
 				c->SetFlag(CH_PERSIST);
 
@@ -38,9 +42,7 @@ void InitLogChannels(ServerConfig *config)
 
 					if (bi->HasFlag(BI_CORE) && !c->FindUser(bi))
 					{
-						bi->Join(c);
-						for (unsigned j = 0; j < config->BotModeList.size(); ++j)
-							c->SetMode(OperServ, config->BotModeList[j], bi->nick, false);
+						bi->Join(c, created);
 					}
 				}
 			}

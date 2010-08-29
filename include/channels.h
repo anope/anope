@@ -70,7 +70,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	std::map<ChannelModeName, Anope::string> Params;
 
 	/* Modes set on the channel */
-	Flags<ChannelModeName> modes;
+	Flags<ChannelModeName, CMODE_END * 2> modes;
 
  public:
 	/** Default constructor

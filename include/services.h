@@ -301,7 +301,7 @@ template<typename T, typename O> inline T debug_cast(O ptr)
 {
 #ifdef DEBUG_BUILD
 	T ret = dynamic_cast<T>(ptr);
-	if (ret == NULL)
+	if (ptr != NULL && ret == NULL)
 		throw CoreException(Anope::string("debug_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
 	return ret;
 #else
@@ -342,7 +342,7 @@ template<typename T, size_t Size = 32> class Flags
 	 */
 	bool HasFlag(T Value) const
 	{
-		return Flag_Values[Value];
+		return Flag_Values.test(Value);
 	}
 
 	/** Check how many flags are set

@@ -282,8 +282,8 @@ E bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::st
 /**** modes.cpp ****/
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E Flags<ChannelModeName> DefMLockOn;
-E Flags<ChannelModeName> DefMLockOff;
+E Flags<ChannelModeName, CMODE_END * 2> DefMLockOn;
+E Flags<ChannelModeName, CMODE_END * 2> DefMLockOff;
 E std::map<ChannelModeName, Anope::string> DefMLockParams;
 E void SetDefaultMLock(ServerConfig *config);
 

@@ -82,10 +82,21 @@ void Channel::Reset()
 	{
 		UserContainer *uc = *it;
 
-		if (findbot(uc->user->nick))
-			continue;
-
+		Flags<ChannelModeName, CMODE_END * 2> flags = *debug_cast<Flags<ChannelModeName, CMODE_END * 2> *>(uc->Status);
 		uc->Status->ClearFlags();
+
+		if (findbot(uc->user->nick))
+		{
+			for (std::map<char, ChannelMode *>::iterator mit = ModeManager::ChannelModesByChar.begin(), mit_end = ModeManager::ChannelModesByChar.end(); mit != mit_end; ++mit)
+			{
+				ChannelMode *cm = mit->second;
+
+				if (flags.HasFlag(cm->Name))
+				{
+					this->SetMode(NULL, cm, uc->user->nick, false);
+				}
+			}
+		}
 	}
 
 	check_modes(this);

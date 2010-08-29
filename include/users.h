@@ -17,7 +17,7 @@ typedef unordered_map_namespace::unordered_map<Anope::string, User *, Anope::has
 extern CoreExport user_map UserListByNick;
 extern CoreExport user_uid_map UserListByUID;
 
-class ChannelStatus : public Flags<ChannelModeName>
+class ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {
  public:
 	Anope::string BuildCharPrefixList() const;
@@ -43,7 +43,7 @@ class CoreExport User : public Extensible
 	Anope::string ident;
 	Anope::string uid;
 	bool OnAccess; /* If the user is on the access list of the nick theyre on */
-	Flags<UserModeName> modes; /* Bitset of mode names the user has set on them */
+	Flags<UserModeName, UMODE_END * 2> modes; /* Bitset of mode names the user has set on them */
 	std::map<UserModeName, Anope::string> Params; /* Map of user modes and the params this user has */
 	NickCore *nc; /* NickCore account the user is currently loggged in as */
 

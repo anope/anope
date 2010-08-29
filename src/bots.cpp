@@ -183,7 +183,7 @@ void BotInfo::Join(Channel *c, bool update_ts)
 	}
 	if (!update_ts)
 		ircdproto->SendJoin(this, c->name, c->creation_time);
-	else
+	else if (Me && Me->IsSynced())
 	{
 		ircdproto->SendJoin(this, cc);
 		

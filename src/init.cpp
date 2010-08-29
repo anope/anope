@@ -353,9 +353,6 @@ void Init(int ac, char **av)
 	if (!Config->s_GlobalNoticer.empty())
 		new BotInfo(Config->s_GlobalNoticer, Config->ServiceUser, Config->ServiceHost, Config->desc_GlobalNoticer);
 
-	/* Init the log channels */
-	InitLogChannels(Config);
-
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config->EncModuleList);
 
@@ -436,6 +433,9 @@ void Init(int ac, char **av)
 	/* Initialize random number generator */
 	rand_init();
 	add_entropy_userkeys();
+
+	/* Init log channels */
+	InitLogChannels(Config);
 
 	/* Load up databases */
 	Log() << "Loading databases...";

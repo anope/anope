@@ -67,8 +67,6 @@ void User::SetNewNick(const Anope::string &newnick)
 	if (newnick.empty())
 		throw CoreException("User::SetNewNick() got a bad argument");
 
-	Log(this, "nick") << "changed nick to " << newnick;
-
 	UserListByNick.erase(this->nick);
 
 	this->nick = newnick;
@@ -716,7 +714,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		}
 		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
 
-		Log(user, "nick") << " " << (ircd->vhost ? " => " : "") << (ircd->vhost ? user->GetDisplayedHost() : "") << ") (" << user->realname << ") changed nick to " << nick;
+		Log(user, "nick") << "(" << user->realname << ") changed nick to " << nick;
 
 		user->timestamp = ts;
 

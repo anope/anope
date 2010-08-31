@@ -794,7 +794,7 @@ void do_sjoin(const char *source, int ac, char **av)
 {
     Channel *c;
     User *user;
-    Server *serv;
+    Server *serv = NULL;
     struct c_userlist *cu;
     char *s = NULL;
     char *end, cubuf[7], *end2, *cumodes[6], *buf;
@@ -803,7 +803,10 @@ void do_sjoin(const char *source, int ac, char **av)
     int is_created = 0;
     int keep_their_modes = 1;
 
-    serv = findserver(servlist, source);
+    if (UseTS6 && ircd->ts6)
+        serv = findserver_uid(servlist, source);
+    if (!serv)
+        serv = findserver(servlist, source);
 
     if (ircd->sjb64) {
         ts = base64dects(av[0]);

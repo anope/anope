@@ -105,21 +105,26 @@ Session *findsession(const Anope::string &host)
  * Returns 1 if the host was added or 0 if the user was killed.
  */
 
-int add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip)
+void add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip)
 {
-	Session *session;
-	Exception *exception;
-	int sessionlimit = 0;
-
-	session = findsession(host);
+	Session *session = findsession(host);
 
 	if (session)
 	{
-		exception = find_hostip_exception(host, hostip);
+		bool kill = false;
+		if (Config->DefSessionLimit && session->count >= Config->DefSessionLimit)
+		{
+			kill = true;
+			Exception *exception = find_hostip_exception(host, hostip);
+			if (exception)
+			{
+				kill = false;
+				if (session->count >= exception->limit)
+					kill = true;
+			}
+		}
 
-		sessionlimit = exception ? exception->limit : Config->DefSessionLimit;
-
-		if (sessionlimit && session->count >= sessionlimit)
+		if (kill)
 		{
 			if (!Config->SessionLimitExceeded.empty())
 				ircdproto->SendMessage(OperServ, nick, Config->SessionLimitExceeded.c_str(), host.c_str());
@@ -129,39 +134,36 @@ int add_session(const Anope::string &nick, const Anope::string &host, const Anop
 			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
 			 * decremented in do_quit, which caused problems and fixed here
 			 *
-			 * Now, we create the user struture before calling this (to fix some user tracking issues..
-			 * read users.c), so we must increment this here no matter what because it will either be
+			 * Now, we create the user struture before calling this to fix some user tracking issues,
+			 * so we must increment this here no matter what because it will either be
 			 * decremented in do_kill or in do_quit - Adam
 			 */
 			++session->count;
 			kill_user(Config->s_OperServ, nick, "Session limit exceeded");
 
 			++session->hits;
-			if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
+			if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)
 			{
 				Anope::string akillmask = "*@" + host;
 				XLine *x = new XLine(akillmask, Config->s_OperServ, time(NULL) + Config->SessionAutoKillExpiry, "Session limit exceeded");
-				if (x)
-					x->By = Config->s_OperServ;
+				SGLine->AddXLine(x);
 				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 			}
-			return 0;
 		}
 		else
 		{
 			++session->count;
-			return 1;
 		}
 	}
+	else
+	{
+		session = new Session();
+		session->host = host;
+		session->count = 1;
+		session->hits = 0;
 
-	session = new Session();
-	session->host = host;
-	session->count = 1;
-	session->hits = 0;
-
-	SessionList[session->host] = session;
-
-	return 1;
+		SessionList[session->host] = session;
+	}
 }
 
 void del_session(const Anope::string &host)

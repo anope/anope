@@ -865,8 +865,8 @@ extern CoreExport session_map SessionList;
 struct Session
 {
 	Anope::string host;
-	int count;	/* Number of clients with this host */
-	int hits;	/* Number of subsequent kills for a host */
+	unsigned count;	/* Number of clients with this host */
+	unsigned hits;	/* Number of subsequent kills for a host */
 };
 
 /*************************************************************************/

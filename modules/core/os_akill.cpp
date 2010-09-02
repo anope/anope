@@ -219,7 +219,7 @@ class CommandOSAKill : public Command
 
 	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
 	{
-		Anope::string mask = params.size() > 1 ? params[0] : "";
+		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{

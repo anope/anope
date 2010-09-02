@@ -333,7 +333,7 @@ E std::vector<Exception *> exceptions;
 E void get_session_stats(long &count, long &mem);
 E void get_exception_stats(long &count, long &mem);
 
-E int add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip);
+E void add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip);
 E void del_session(const Anope::string &host);
 
 E void expire_exceptions();

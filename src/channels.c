@@ -77,7 +77,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
         do {
             if (chan->mode & cbmi->flag)
                 *end++ = cbmi->mode;
-        } while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+        } while ((++cbmi)->mode != 0 && ++n < sizeof(res) - 1);
 
         if (complete) {
             cbmi = cbmodeinfos;
@@ -93,7 +93,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
                             *end++ = *value++;
                     }
                 }
-            } while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+            } while ((++cbmi)->mode != 0 && ++n < sizeof(res) - 1);
         }
     }
 

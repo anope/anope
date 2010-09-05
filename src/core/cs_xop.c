@@ -97,11 +97,8 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    if (ircd->halfop) {
-        c = createCommand("HOP", do_hop, NULL, CHAN_HELP_HOP, -1, -1, -1,
-                          -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
+    c = createCommand("HOP", do_hop, NULL, CHAN_HELP_HOP, -1, -1, -1, -1);
+    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("SOP", do_sop, NULL, CHAN_HELP_SOP, -1, -1, -1, -1);
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
     c = createCommand("VOP", do_vop, NULL, CHAN_HELP_VOP, -1, -1, -1, -1);
@@ -150,7 +147,9 @@ int do_aop(User * u)
 
 int do_hop(User * u)
 {
-    return do_xop(u, "HOP", ACCESS_HOP, xop_msgs[3]);
+    if (ircd->halfop)
+        return do_xop(u, "HOP", ACCESS_HOP, xop_msgs[3]);
+    return MOD_CONT;
 }
 
 /*************************************************************************/

@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3030"
+VERSION_BUILD="3031"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3031 - Added InspIRCd 2.0 support
 #Revision 3030 - Fixed do_sjoin to properly find the server source on TS6 IRCds
 #Revision 3029 - Fixed InspIRCd1.2 protocol module passing invalid users in the SJOIN string which made internal debug messages confusing/wrong
 #Revision 3028 - We tell everyone to use 127.0.0.1 instead of localhost, so we should too.

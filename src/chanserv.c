@@ -144,7 +144,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
             do {
                 if (ci->mlock_on & cbmi->flag)
                     *end++ = cbmi->mode;
-            } while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+            } while ((++cbmi)->mode != 0 && ++n < sizeof(res) - 1);
 
             cbmi = cbmodeinfos;
         }
@@ -156,7 +156,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
             do {
                 if (ci->mlock_off & cbmi->flag)
                     *end++ = cbmi->mode;
-            } while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+            } while ((++cbmi)->mode != 0 && ++n < sizeof(res) - 1);
 
             cbmi = cbmodeinfos;
         }
@@ -172,7 +172,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
                             *end++ = *value++;
                     }
                 }
-            } while ((++cbmi)->flag != 0 && ++n < sizeof(res) - 1);
+            } while ((++cbmi)->mode != 0 && ++n < sizeof(res) - 1);
         }
     }
 
@@ -1196,7 +1196,7 @@ void check_modes(Channel * c)
                     *end2++ = *csvalue++;
             }
         }
-    } while ((++cbmi)->flag != 0);
+    } while ((++cbmi)->mode != 0);
 
     if (*(end - 1) == '+')
         end--;
@@ -1237,7 +1237,7 @@ void check_modes(Channel * c)
                     cbm->setvalue(c, NULL);
                 }
             }
-        } while ((++cbmi)->flag != 0);
+        } while ((++cbmi)->mode != 0);
     }
 
     if (end == modebuf)

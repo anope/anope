@@ -1,0 +1,7 @@
+Makefile
+autom4te.cache/
+config.cache
+config.log
+config.status
+include/sysconf.h
+src/bin/anoperc

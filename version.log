@@ -8,7 +8,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3031"
+VERSION_BUILD="3032"
 
 # $Log$ # Changes since the 1.8.4 Release
 #Revision 3031 - Added InspIRCd 2.0 support

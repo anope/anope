@@ -385,7 +385,7 @@ static void new_memo_mail(NickCore * nc, Memo * m)
     fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT2), m->sender,
             m->number);
     fprintf(mail->pipe, "\n\n");
-    fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT3));
+    fprintf(mail->pipe, "%s", getstring2(NULL, MEMO_MAIL_TEXT3));
     fprintf(mail->pipe, "\n\n");
     fprintf(mail->pipe, "%s", m->text);
     fprintf(mail->pipe, "\n");
@@ -425,10 +425,10 @@ void rsend_notify(User * u, Memo * m, const char *chan)
            nick or channel */
         if (chan) {
             fmt = getstring(na, MEMO_RSEND_CHAN_MEMO_TEXT);
-            sprintf(text, fmt, chan);
+            snprintf(text, sizeof(text), fmt, chan);
         } else {
             fmt = getstring(na, MEMO_RSEND_NICK_MEMO_TEXT);
-            sprintf(text, fmt);
+            snprintf(text, sizeof(text), "%s", fmt);
         }
 
         /* Send notification */

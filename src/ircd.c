@@ -274,24 +274,24 @@ void anope_cmd_notice2(char *source, char *dest, char *msg)
 
 void anope_cmd_action(char *source, char *dest, const char *fmt, ...) 
 {
-    va_list args;
-    char buf[BUFSIZE];
-    char actionbuf[BUFSIZE];
-    *buf = '\0';
-    *actionbuf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    } else {
-        return;
-    }
-    if (!buf) {
-        return;
-    }
-    snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
-    ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
-}
+    va_list args;
+    char buf[BUFSIZE];
+    char actionbuf[BUFSIZE];
+    *buf = '\0';
+    *actionbuf = '\0';
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+
+    if (!*buf) {
+        return;
+    }
+    snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
+    ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
+}
+
 void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;

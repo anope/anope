@@ -299,7 +299,7 @@ void modules_unload_all(boolean fini, boolean unload_proto)
 			        }
 				
 		        	if ((ano_modclose(mh->m->handle)) != 0)
-			            alog(ano_moderr());
+			            alog("%s", ano_moderr());
 			        else
 			            delModule(mh->m);
 		    	} else {
@@ -641,7 +641,7 @@ int loadModule(Module * m, User * u)
     ano_modclearerr();
     m->handle = ano_modopen(m->filename);
     if ( m->handle == NULL && (err = ano_moderr()) != NULL) {
-        alog(err);
+        alog("%s", err);
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
@@ -760,7 +760,7 @@ int unloadModule(Module * m, User * u)
     }
 
     if ((ano_modclose(m->handle)) != 0) {
-        alog(ano_moderr());
+        alog("%s", ano_moderr());
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
         }

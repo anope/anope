@@ -472,16 +472,16 @@ int do_sendregmail(User * u, NickRequest * nr)
     if (!mail) {
         return -1;
     }
-    fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_HEAD));
+    fprintf(mail->pipe, "%s", getstring2(NULL, NICK_REG_MAIL_HEAD));
     fprintf(mail->pipe, "\n\n");
     fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_1), nr->nick);
     fprintf(mail->pipe, "\n\n");
     fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_2), s_NickServ,
             nr->passcode);
     fprintf(mail->pipe, "\n\n");
-    fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_3));
+    fprintf(mail->pipe, "%s", getstring2(NULL, NICK_REG_MAIL_LINE_3));
     fprintf(mail->pipe, "\n\n");
-    fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_4));
+    fprintf(mail->pipe, "%s", getstring2(NULL, NICK_REG_MAIL_LINE_4));
     fprintf(mail->pipe, "\n\n");
     fprintf(mail->pipe, getstring2(NULL, NICK_REG_MAIL_LINE_5),
             NetworkName);

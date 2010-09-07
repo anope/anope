@@ -152,7 +152,7 @@ void alog(const char *fmt, ...)
     time(&t);
     tm = *localtime(&t);
     strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
-    if (logfile && args) {
+    if (logfile) {
         fputs(buf, logfile);
         vfprintf(logfile, fmt, args);
         fputc('\n', logfile);

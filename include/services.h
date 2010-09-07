@@ -87,6 +87,7 @@
 #include <winsock.h>
 #include <windows.h>
 #endif
+#define h_addr h_addr_list[0]   /* for backwards compatability, see man gethostbyname */
 
 #include <sys/stat.h>	/* for umask() on some systems */
 #include <sys/types.h>

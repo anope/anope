@@ -45,7 +45,6 @@ void moduleAddHostServCmds(void)
 void get_hostserv_stats(long *nrec, long *memuse)
 {
     long count = 0, mem = 0;
-    int i;
     HostCore *hc;
 
     for (hc = head; hc; hc = hc->next) {

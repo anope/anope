@@ -92,16 +92,16 @@ int do_sendpass(User * u)
             if (!mail)
                 return MOD_CONT;
 
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_HEAD));
+            fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_HEAD));
             fprintf(mail->pipe, "\n\n");
             fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_1), na->nick);
             fprintf(mail->pipe, "\n\n");
             fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2),
                     tmp_pass);
             fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_3));
+            fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_3));
             fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_4));
+            fprintf(mail->pipe, "%s", getstring(na, NICK_SENDPASS_LINE_4));
             fprintf(mail->pipe, "\n\n");
             fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5),
                     NetworkName);

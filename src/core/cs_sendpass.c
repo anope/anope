@@ -95,7 +95,7 @@ int do_sendpass(User * u)
             if (!mail)
                 return MOD_CONT;
 
-            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_HEAD));
+            fprintf(mail->pipe, "%s", getstring2(founder, CHAN_SENDPASS_HEAD));
             fprintf(mail->pipe, "\n\n");
             fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_1),
                     ci->name);
@@ -103,9 +103,9 @@ int do_sendpass(User * u)
             fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_2),
                     tmp_pass);
             fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_3));
+            fprintf(mail->pipe, "%s", getstring2(founder, CHAN_SENDPASS_LINE_3));
             fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_4));
+            fprintf(mail->pipe, "%s", getstring2(founder, CHAN_SENDPASS_LINE_4));
             fprintf(mail->pipe, "\n\n");
             fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_5),
                     NetworkName);

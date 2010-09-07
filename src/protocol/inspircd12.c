@@ -1882,8 +1882,7 @@ int anope_event_whois(char *source, int ac, char **av)
 
 int anope_event_capab(char *source, int ac, char **av)
 {
-    int argc;
-    char **argv;
+    char *argv[6];
     CBModeInfo *cbmi;
 
     if (strcasecmp(av[0], "START") == 0) {
@@ -2248,8 +2247,6 @@ int anope_event_capab(char *source, int ac, char **av)
         /* Generate a fake capabs parsing call so things like NOQUIT work
          * fine. It's ugly, but it works....
          */
-        argc = 6;
-        argv = scalloc(argc, sizeof(char *));
         argv[0] = "NOQUIT";
         argv[1] = "SSJ3";
         argv[2] = "NICK2";
@@ -2257,7 +2254,16 @@ int anope_event_capab(char *source, int ac, char **av)
         argv[4] = "TLKEXT";
         argv[5] = "UNCONNECT";
 
-        capab_parse(argc, argv);
+        capab_parse(6, argv);
+
+	/* check defcon */
+	if (DefConLevel && !defconParseModeString(DefConChanModes))
+	{
+		send_cmd(TS6SID, "ERROR :Defcon modes failed to validate");
+		quitmsg = "Defcon modes failed to validate";
+		quitting = 1;		
+		return MOD_CONT;
+	}
 
         /* We have received our CAPAB, now we can introduce our clients. */
         init_tertiary();

@@ -99,8 +99,9 @@ AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to fin
 		fi
 		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
 		LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
+		LIBS="$MYSQL_LDFLAGS"
 		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
-		AC_TRY_RUN([
+		AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <mysql.h>
 
 int main()
@@ -109,7 +110,7 @@ int main()
 	
 	return 0;
 }
-		], ac_cv_mysql_valid=yes, ac_cv_mysql_valid=no)
+		]])],[ac_cv_mysql_valid=yes],[ac_cv_mysql_valid=no],[])
 		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
 			AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
@@ -127,7 +128,7 @@ int main()
 ])
 
 AC_MSG_CHECKING(whether this is a bit or little endian system)
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 int main()
 {
 	short s = 1;
@@ -135,12 +136,12 @@ int main()
 	unsigned char c = *((char*)ptr);
 	return c;	
 }
-]
-, AC_DEFINE(BIG_ENDIAN)
+
+]])],[AC_DEFINE(BIG_ENDIAN)
   AC_MSG_RESULT(big)
-, AC_DEFINE(LITTLE_ENDIAN) 
+],[AC_DEFINE(LITTLE_ENDIAN) 
   AC_MSG_RESULT(little)
-)
+],[])
 
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)

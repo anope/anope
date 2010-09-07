@@ -485,7 +485,7 @@ int init_secondary(int ac, char **av)
     parse_options(ac, av);
 
     /* Parse the defcon mode string if needed */
-    if (DefConLevel) {
+    if (DefConLevel && !ircd->delay_cl_intro) {
         if (!defconParseModeString(DefConChanModes)) {
             fprintf(stderr,
                     "services.conf: The given DefConChanModes mode string was incorrect (see log for exact errors)\n");

@@ -48,7 +48,21 @@ static int16 get_new_statusmode()
 	if (last_mode == CUS_DEOPPED)
 		last_mode = last_mode << 1; // get around CUS_DEOPPED
 	return last_mode;
-};
+}
+
+uint32 get_mode_from_char(const char c)
+{
+	struct chmodeinfo *p = chmodes;
+
+	while (p->modechar != 0)
+	{
+		if (p->modechar == c)
+			return p->mode;
+		++p;
+	}
+
+	return 0;
+}
 
 static char flood_mode_set[3];
 static char flood_mode_unset[3];
@@ -233,7 +247,7 @@ char myCsmodes[128] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static inline char sym_from_char(const char c)
+static char sym_from_char(const char c)
 {
 	int i;
 	for (i = 0; i < 128; ++i)

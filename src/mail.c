@@ -188,7 +188,7 @@ void MailEnd(MailInfo * mail)
         return;
     }
 
-#ifdef HAVE_FORK
+#if HAVE_FORK
     if (ForkForMail && !(pid = fork()))
     {
         pclose(mail->pipe);

@@ -110,20 +110,6 @@ struct chmodeinfo
 	{0, 0}
 };
 
-inline uint32 get_mode_from_char(const char c)
-{
-	struct chmodeinfo *p = chmodes;
-
-	while (p->modechar != 0)
-	{
-		if (p->modechar == c)
-			return p->mode;
-		++p;
-	}
-
-	return 0;
-}
-
 void inspircd_set_umode(User * user, int ac, char **av);
 void inspircd_cmd_svsnoop(char *server, int set);
 void inspircd_cmd_remove_akill(char *user, char *host);

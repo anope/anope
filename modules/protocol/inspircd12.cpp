@@ -767,9 +767,7 @@ int anope_event_uid(const Anope::string &source, int ac, const char **av)
 	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, 0, av[4], av[0]);
 	if (user)
 	{
-		user->host = av[6];
 		UserSetInternalModes(user, 1, &av[8]);
-		user->SetCloakedHost(av[4]);
 		if (!user->server->IsSynced())
 			prev_u_intro = user;
 		else

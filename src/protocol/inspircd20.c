@@ -71,25 +71,25 @@ static void do_nothing(Channel *c, char *mask) { }
 
 IRCDVar myIrcd[] = {
 	{"InspIRCd 2.0",			/* ircd name */
-	 "+oI",					 /* nickserv mode */
-	 "+oI",					 /* chanserv mode */
-	 "+I",					  /* memoserv mode */
-	 "+oI",					 /* hostserv mode */
-	 "+ioI",					/* operserv mode */
-	 "+I",					  /* botserv mode  */
-	 "+I",					  /* helpserv mode */
-	 "+iI",					 /* Dev/Null mode */
-	 "+iI",					 /* Global mode   */
-	 "+oI",					 /* nickserv alias mode */
-	 "+oI",					 /* chanserv alias mode */
-	 "+I",					  /* memoserv alias mode */
-	 "+oI",					 /* hostserv alias mode */
-	 "+ioI",					/* operserv alias mode */
-	 "+I",					  /* botserv alias mode  */
-	 "+I",					  /* helpserv alias mode */
-	 "+iI",					 /* Dev/Null alias mode */
-	 "+iI",					 /* Global alias mode   */
-	 "+I",					  /* Used by BotServ Bots */
+	 "+I",					/* nickserv mode */
+	 "+I",					/* chanserv mode */
+	 "+I",					/* memoserv mode */
+	 "+I",					/* hostserv mode */
+	 "+ioI",				/* operserv mode */
+	 "+I",					/* botserv mode  */
+	 "+I",					/* helpserv mode */
+	 "+iI",					/* Dev/Null mode */
+	 "+iI",					/* Global mode   */
+	 "+I",					/* nickserv alias mode */
+	 "+I",					/* chanserv alias mode */
+	 "+I",					/* memoserv alias mode */
+	 "+I",					/* hostserv alias mode */
+	 "+ioI",				/* operserv alias mode */
+	 "+I",					/* botserv alias mode  */
+	 "+I",					/* helpserv alias mode */
+	 "+iI",					/* Dev/Null alias mode */
+	 "+iI",					/* Global alias mode   */
+	 "+I",					/* Used by BotServ Bots */
 	 5,						 /* Chan Max Symbols	 */
 	 "-cijlmnpstuzACGHKNOQRSV", /* Modes to Remove */
 	 "+oa",					 /* Channel Umode used by Botserv bots */
@@ -707,7 +707,8 @@ void inspircd_cmd_nick(char *nick, char *name, char *modes)
 			 nicknumbuf, (long int) time(NULL), nick, ServiceHost,
 			 ServiceHost, ServiceUser, (long int) time(NULL), modes, name);
 	new_uid(nick, nicknumbuf);
-	send_cmd(nicknumbuf, "OPERTYPE Service");
+	if (strchr(modes, 'o') != NULL)
+		send_cmd(nicknumbuf, "OPERTYPE Service");
 }
 
 void inspircd_cmd_guest_nick(char *nick, char *user, char *host,
@@ -875,7 +876,8 @@ void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 			 nicknumbuf, (long int) time(NULL), nick, host, host, user,
 			 (long int) time(NULL), modes, real);
 	new_uid(nick, nicknumbuf);
-	send_cmd(nicknumbuf, "OPERTYPE Bot");
+	if (strchr(modes, 'o') != NULL)
+		send_cmd(nicknumbuf, "OPERTYPE Bot");
 }
 
 void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)

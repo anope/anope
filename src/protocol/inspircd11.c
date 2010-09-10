@@ -37,25 +37,25 @@ int inet_aton(const char *name, struct in_addr *addr)
 
 IRCDVar myIrcd[] = {
     {"InspIRCd 1.1",            /* ircd name */
-     "+oI",                     /* nickserv mode */
-     "+oI",                     /* chanserv mode */
-     "+oI",                     /* memoserv mode */
-     "+oI",                     /* hostserv mode */
+     "+I",                      /* nickserv mode */
+     "+I",                      /* chanserv mode */
+     "+I",                      /* memoserv mode */
+     "+I",                      /* hostserv mode */
      "+ioI",                    /* operserv mode */
-     "+oI",                     /* botserv mode  */
-     "+oI",                     /* helpserv mode */
+     "+I",                      /* botserv mode  */
+     "+I",                      /* helpserv mode */
      "+iI",                     /* Dev/Null mode */
-     "+ioI",                    /* Global mode   */
-     "+oI",                     /* nickserv alias mode */
-     "+oI",                     /* chanserv alias mode */
-     "+oI",                     /* memoserv alias mode */
-     "+ioI",                    /* hostserv alias mode */
+     "+iI",                     /* Global mode   */
+     "+I",                      /* nickserv alias mode */
+     "+I",                      /* chanserv alias mode */
+     "+I",                      /* memoserv alias mode */
+     "+I",                      /* hostserv alias mode */
      "+ioI",                    /* operserv alias mode */
-     "+oI",                     /* botserv alias mode  */
-     "+oI",                     /* helpserv alias mode */
+     "+I",                      /* botserv alias mode  */
+     "+I",                      /* helpserv alias mode */
      "+iI",                     /* Dev/Null alias mode */
-     "+ioI",                    /* Global alias mode   */
-     "+sI",                     /* Used by BotServ Bots */
+     "+iI",                     /* Global alias mode   */
+     "+I",                      /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
      "-cijlmnpstuzACGHKNOQRSV", /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
@@ -616,8 +616,9 @@ void inspircd_cmd_nick(char *nick, char *name, char *modes)
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
              (long int) time(NULL), nick, ServiceHost, ServiceHost,
              ServiceUser, modes, name);
-    /* Don't send ServerName as the source here... -GD */
-    send_cmd(nick, "OPERTYPE Service");
+    if (strchr(modes, 'o') != NULL)
+        /* Don't send ServerName as the source here... -GD */
+        send_cmd(nick, "OPERTYPE Service");
 }
 
 void
@@ -784,7 +785,8 @@ inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 {
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
              (long int) time(NULL), nick, host, host, user, modes, real);
-    send_cmd(nick, "OPERTYPE Bot");
+    if (strchr(modes, 'o') != NULL)
+        send_cmd(nick, "OPERTYPE Bot");
 }
 
 void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)

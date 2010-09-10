@@ -8,9 +8,11 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3033"
+VERSION_BUILD="3035"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3035 - Fixed InspIRCd 1.1,1.2 and 2.0 protocol modules to oper pseudo-clients only when needed.
+#Revision 3034 - Fixed comments in insp20 protocol module to be accepted by all supported compilers.
 #Revision 3031 - Added InspIRCd 2.0 support
 #Revision 3030 - Fixed do_sjoin to properly find the server source on TS6 IRCds
 #Revision 3029 - Fixed InspIRCd1.2 protocol module passing invalid users in the SJOIN string which made internal debug messages confusing/wrong

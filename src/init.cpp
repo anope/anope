@@ -42,19 +42,24 @@ void introduce_user(const Anope::string &user)
 	}
 
 	/* We make the bots go online */
-	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
-		BotInfo *bi = it->second;
+		User *u = it->second;
 
-		if (user.empty() || bi->nick.equals_ci(user))
+		if (user.empty() || u->nick.equals_ci(user))
 		{
-			ircdproto->SendClientIntroduction(bi->nick, bi->GetIdent(), bi->host, bi->realname, ircd->pseudoclient_mode, bi->GetUID());
-			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
 
-			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+			BotInfo *bi = findbot(u->nick);
+			if (bi)
 			{
-				ircdproto->SendJoin(bi, *cit);
+				XLine x(bi->nick, "Reserved for services");
+				ircdproto->SendSQLine(&x);
+
+				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+				{
+					ircdproto->SendJoin(bi, *cit);
+				}
 			}
 		}
 	}

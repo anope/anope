@@ -75,10 +75,8 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 int anope_event_idle(const Anope::string &source, int ac, const char **av)
 {
 	BotInfo *bi = findbot(av[0]);
-	if (!bi)
-		return MOD_CONT;
 
-	send_cmd(bi->GetUID(), "IDLE %s %ld %ld", source.c_str(), static_cast<long>(start_time), static_cast<long>(time(NULL) - bi->lastmsg));
+	send_cmd(bi ? bi->GetUID() : av[0], "IDLE %s %ld %ld", source.c_str(), static_cast<long>(start_time), bi ? (static_cast<long>(time(NULL) - bi->lastmsg)) : 0);
 	return MOD_CONT;
 }
 
@@ -149,9 +147,9 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->GetUID() : TS6SID, "MODE %s %s", u->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &uid)
+	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", uid.c_str(), static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), static_cast<long>(time(NULL)), modes.c_str(), real.c_str());
+		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", u->GetUID().c_str(), u->timestamp, u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), u->my_signon, modes.c_str(), u->realname.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)

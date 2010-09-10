@@ -175,10 +175,10 @@ class RatboxProto : public IRCDProto
 		ratbox_cmd_svinfo();
 	}
 
-	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &uid)
+	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		EnforceQlinedNick(nick, "");
-		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick.c_str(), static_cast<long>(time(NULL)), modes.c_str(), user.c_str(), host.c_str(), uid.c_str(), real.c_str());
+		EnforceQlinedNick(u->nick, "");
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", u->nick.c_str(), u->timestamp, modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->realname.c_str());
 	}
 
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
@@ -221,15 +221,6 @@ class RatboxProto : public IRCDProto
 	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
-	}
-
-	/* QUIT */
-	void SendQuitInternal(BotInfo *bi, const Anope::string &buf)
-	{
-		if (!buf.empty())
-			send_cmd(bi->GetUID(), "QUIT :%s", buf.c_str());
-		else
-			send_cmd(bi->GetUID(), "QUIT");
 	}
 
 	/* INVITE */

@@ -1261,69 +1261,6 @@ class Service : public virtual Base
 	virtual ~Service();
 };
 
-class dynamic_reference_base : public virtual Base
-{
- protected:
-	bool invalid;
- public:
-	dynamic_reference_base() : invalid(false) { }
-	virtual ~dynamic_reference_base() { }
-	inline void Invalidate() { this->invalid = true; }
-};
-
-template<typename T>
-class dynamic_reference : public dynamic_reference_base
-{
- protected:
-	T *ref;
- public:
-	dynamic_reference(T *obj) : ref(obj)
-	{
-		if (ref)
-			ref->AddReference(this);
-	}
-
-	virtual ~dynamic_reference()
-	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (ref)
-			ref->DelReference(this);
-	}
-
-	virtual operator bool()
-	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		return this->ref;
-	}
-
-	virtual inline void operator=(T *newref)
-	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (this->ref)
-			this->ref->DelReference(this);
-		this->ref = newref;
-		if (this->ref)
-			this->ref->AddReference(this);
-	}
-
-	virtual inline T *operator->()
-	{
-		return this->ref;
-	}
-};
-
 template<typename T>
 class service_reference : public dynamic_reference<T>
 {

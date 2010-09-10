@@ -865,14 +865,6 @@ char *str_signed(unsigned char *str)
 	return nstr;
 }
 
-/* Equivalent to inet_ntoa */
-
-void ntoa(struct in_addr addr, char *ipaddr, int len)
-{
-	unsigned char *bytes = reinterpret_cast<unsigned char *>(&addr.s_addr);
-	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2], bytes[3]);
-}
-
 /*
 * strlcat and strlcpy were ripped from openssh 2.5.1p2
 * They had the following Copyright info:

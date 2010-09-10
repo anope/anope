@@ -23,10 +23,10 @@ typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
 static nickservcollides_map NickServCollides;
 static nickservreleases_map NickServReleases;
 
-NickServCollide::NickServCollide(const Anope::string &_nick, time_t delay) : Timer(delay), nick(_nick)
+NickServCollide::NickServCollide(User *user, time_t delay) : Timer(delay), u(user), nick(u->nick)
 {
 	/* Erase the current collide and use the new one */
-	nickservcollides_map::iterator nit = NickServCollides.find(this->nick);
+	nickservcollides_map::iterator nit = NickServCollides.find(user->nick);
 	if (nit != NickServCollides.end())
 		delete nit->second;
 
@@ -40,36 +40,43 @@ NickServCollide::~NickServCollide()
 
 void NickServCollide::Tick(time_t ctime)
 {
+	if (!u)
+		return;
 	/* If they identified or don't exist anymore, don't kill them. */
-	User *u = finduser(this->nick);
-	NickAlias *na = findnick(this->nick);
-	if (!u || !na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
+	NickAlias *na = findnick(u->nick);
+	if (!na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
 		return;
 
 	u->Collide(na);
 }
 
-NickServRelease::NickServRelease(const Anope::string &_nick, const Anope::string &_uid, time_t delay) : Timer(delay), nick(_nick), uid(_uid)
+NickServRelease::NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, ts6_uid_retrieve()), Timer(delay), nick(na->nick)
 {
+	this->realname = "Services Enforcer";
+	this->server = Me;
+
 	/* Erase the current release timer and use the new one */
 	nickservreleases_map::iterator nit = NickServReleases.find(this->nick);
 	if (nit != NickServReleases.end())
 		delete nit->second;
 
-	NickServReleases.insert(std::make_pair(nick, this));
+	NickServReleases.insert(std::make_pair(this->nick, this));
+
+	ircdproto->SendClientIntroduction(this, "+");
 }
 
 NickServRelease::~NickServRelease()
 {
 	NickServReleases.erase(this->nick);
+
+	ircdproto->SendQuit(debug_cast<User *>(this), NULL);
 }
 
-void NickServRelease::Tick(time_t ctime)
+void NickServRelease::Tick(time_t)
 {
-	NickAlias *na = findnick(this->nick);
-
-	if (na)
-		na->Release();
+	/* Do not do anything here,
+	 * The timer manager will delete this timer which will do the necessary cleanup
+	 */
 }
 
 /*************************************************************************/
@@ -218,12 +225,12 @@ int validate_user(User *u)
 		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
 			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
-			new NickServCollide(na->nick, 20);
+			new NickServCollide(u, 20);
 		}
 		else
 		{
 			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
-			new NickServCollide(na->nick, 60);
+			new NickServCollide(u, 60);
 		}
 	}
 

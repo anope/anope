@@ -256,7 +256,7 @@ class CommandBSBot : public Command
 
 		if (!user.empty())
 		{
-			ircdproto->SendClientIntroduction(bi->nick, bi->GetIdent(), bi->host, bi->realname, ircd->pseudoclient_mode, bi->GetUID());
+			ircdproto->SendClientIntroduction(bi, ircd->pseudoclient_mode);
 			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(&x);
 			bi->RejoinAll();

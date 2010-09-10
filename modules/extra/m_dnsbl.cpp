@@ -54,6 +54,9 @@ class ModuleDNSBL : public Module
  public:
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
+		this->SetAuthor("Anope");
+		this->SetType(SUPPORTED);
+
 		OnReload(false);
 
 		Implementation i[] = { I_OnReload, I_OnPreUserConnect };

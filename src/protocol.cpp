@@ -18,12 +18,12 @@ void IRCDProto::SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s :%s", dest.c_str(), buf.c_str());
 }
 
-void IRCDProto::SendQuitInternal(const BotInfo *bi, const Anope::string &buf)
+void IRCDProto::SendQuitInternal(const User *u, const Anope::string &buf)
 {
 	if (!buf.empty())
-		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT :%s", buf.c_str());
+		send_cmd(ircd->ts6 ? u->GetUID() : u->nick, "QUIT :%s", buf.c_str());
 	else
-		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "QUIT");
+		send_cmd(ircd->ts6 ? u->GetUID() : u->nick, "QUIT");
 }
 
 void IRCDProto::SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
@@ -160,19 +160,14 @@ void IRCDProto::SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const A
 	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
 }
 
-void IRCDProto::SendQuit(const Anope::string &nick, const Anope::string &)
-{
-	send_cmd(nick, "QUIT");
-}
-
-void IRCDProto::SendQuit(const BotInfo *bi, const char *fmt, ...)
+void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
 	va_start(args, fmt);
 	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 	va_end(args);
-	SendQuitInternal(bi, buf);
+	SendQuitInternal(u, buf);
 }
 
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)

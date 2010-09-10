@@ -224,4 +224,51 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	void ClearAccess();
 };
 
+/** Timer for colliding nicks to force people off of nicknames
+ */
+class NickServCollide : public Timer
+{
+	dynamic_reference<User> u;
+	Anope::string nick;
+
+ public:
+	/** Default constructor
+	 * @param nick The nick we're colliding
+	 * @param delay How long to delay before kicking the user off the nick
+	 */
+	NickServCollide(User *user, time_t delay);
+
+	/** Default destructor
+	 */
+	virtual ~NickServCollide();
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t);
+};
+
+/** Timers for releasing nicks to be available for use
+ */
+class NickServRelease : public User, public Timer
+{
+	Anope::string nick;
+
+ public:
+	/** Default constructor
+	 * @param na The nick
+	 * @param delay The delay before the nick is released
+	 */
+	NickServRelease(NickAlias *na, time_t delay);
+
+	/** Default destructor
+	 */
+	virtual ~NickServRelease();
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t);
+};
+
 #endif // ACCOUNT_H

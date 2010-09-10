@@ -146,10 +146,10 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
+	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick.c_str(), host.c_str(), host.c_str(), user.c_str(), modes.c_str(), real.c_str());
-		send_cmd(nick, "OPERTYPE Service");
+		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", u->timestamp, u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), modes.c_str(), u->realname.c_str());
+		send_cmd(u->nick, "OPERTYPE Service");
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)

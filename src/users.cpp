@@ -36,8 +36,9 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	/* we used to do this by calloc, no more. */
 	server = NULL;
 	nc = NULL;
-	invalid_pw_count = timestamp = my_signon = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
+	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
+	timestamp = my_signon = time(NULL);
 
 	this->nick = snick;
 	this->ident = sident;

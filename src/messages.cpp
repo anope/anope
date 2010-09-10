@@ -281,7 +281,7 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 {
 	if (!source.empty() && !who.empty())
 	{
-		NickAlias *na;
+		User *u;
 		BotInfo *bi = findbot(who);
 		if (bi)
 		{
@@ -291,15 +291,11 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
-		else if (!ircd->svshold && (na = findnick(who)) && na->HasFlag(NS_HELD))
+		else if (!ircd->svshold && (u = finduser(who)) && u->server == Me)
 		{
-			/* We have a nick enforcer client here that we need to respond to.
-			 * We can't just say it doesn't exist here, even tho it does for
-			 * other servers :) -GD
-			 */
-			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick.c_str(), Config->NSEnforcerUser.c_str(), Config->NSEnforcerHost.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", na->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", u->nick.c_str());
 		}
 		else
 			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such service.", who.c_str());

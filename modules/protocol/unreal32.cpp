@@ -171,10 +171,10 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config->ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
+	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		EnforceQlinedNick(nick, Config->ServerName);
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config->ServerName.c_str(), modes.c_str(), host.c_str(), real.c_str());
+		EnforceQlinedNick(u->nick, Config->ServerName);
+		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), u->timestamp, u->GetIdent().c_str(), u->host.c_str(), Config->ServerName.c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)

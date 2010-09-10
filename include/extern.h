@@ -265,8 +265,6 @@ E uint32 getrandom32();
 
 E char *str_signed(unsigned char *str);
 
-E void ntoa(struct in_addr addr, char *ipaddr, int len);
-
 E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
 E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
 

@@ -112,7 +112,13 @@ void NickAlias::Release()
 		if (ircd->svshold)
 			ircdproto->SendSVSHoldDel(this->nick);
 		else
-			ircdproto->SendQuit(this->nick, "");
+		{
+			User *u = finduser(this->nick);
+			if (u && u->server == Me)
+			{
+				delete u;
+			}
+		}
 
 		this->UnsetFlag(NS_HELD);
 	}
@@ -133,10 +139,7 @@ void NickAlias::OnCancel(User *)
 			ircdproto->SendSVSHold(this->nick);
 		else
 		{
-			Anope::string uid = ircd->ts6 ? ts6_uid_retrieve() : "";
-
-			ircdproto->SendClientIntroduction(this->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, "Services Enforcer", "+", uid);
-			new NickServRelease(this->nick, uid, Config->NSReleaseTimeout);
+			new NickServRelease(this, Config->NSReleaseTimeout);
 		}
 	}
 }

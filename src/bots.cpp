@@ -51,9 +51,9 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 		BotListByUID[this->uid] = this;
 
 	// If we're synchronised with the uplink already, send the bot.
-	if (Me && !Me->GetLinks().empty() && Me->GetLinks().front()->IsSynced())
+	if (Me && Me->IsSynced())
 	{
-		ircdproto->SendClientIntroduction(this->nick, this->GetIdent(), this->host, this->realname, ircd->pseudoclient_mode, this->uid);
+		ircdproto->SendClientIntroduction(this, ircd->pseudoclient_mode);
 		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(&x);
 	}

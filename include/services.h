@@ -194,21 +194,6 @@ extern "C" void __pfnBkCheck() {}
 
 #include "anope.h"
 
-class dynamic_reference_base;
-
-/** The base class that most classes in Anope inherit from
- */
-class CoreExport Base
-{
-	/* References to this base class */
-	std::set<dynamic_reference_base *> References;
- public:
-	Base();
-	virtual ~Base();
-	void AddReference(dynamic_reference_base *r);
-	void DelReference(dynamic_reference_base *r);
-};
-
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
  * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not
@@ -423,6 +408,9 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 /*************************************************************************/
 
 class User;
+class NickCore;
+class NickAlias;
+class NickRequest;
 class BotInfo;
 class ChannelInfo;
 class Channel;
@@ -552,11 +540,6 @@ class CoreExport HostInfo
 	 */
 	const time_t GetTime() const;
 };
-
-// For NickServ
-#include "account.h"
-
-/*************************************************************************/
 
 enum AccessLevel
 {
@@ -755,6 +738,7 @@ struct LevelInfo
  */
 
 #include "users.h"
+#include "account.h"
 #include "bots.h"
 
 struct BanData
@@ -956,7 +940,7 @@ class CoreExport IRCDProto
 	virtual void SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
 	virtual void SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendQuitInternal(const BotInfo *bi, const Anope::string &buf);
+	virtual void SendQuitInternal(const User *u, const Anope::string &buf);
 	virtual void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf);
 	virtual void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf);
 	virtual void SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
@@ -973,7 +957,7 @@ class CoreExport IRCDProto
 	virtual void SendSVSMode(const User *, int, const char **) = 0;
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
-	virtual void SendClientIntroduction(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &uid) = 0;
+	virtual void SendClientIntroduction(const User *u, const Anope::string &) = 0;
 	virtual void SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...);
 	virtual void SendNoticeChanops(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
@@ -983,13 +967,7 @@ class CoreExport IRCDProto
 	virtual void SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg);
 	virtual void SendGlobalPrivmsg(const BotInfo *bi, const Server *desc, const Anope::string &msg);
 
-	/** XXX: This is a hack for NickServ enforcers. It is deprecated.
-	 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
-	 * Thanks.
-	 * -- w00t
-	 */
-	virtual void SendQuit(const Anope::string &nick, const Anope::string &) MARK_DEPRECATED;
-	virtual void SendQuit(const BotInfo *bi, const char *fmt, ...);
+	virtual void SendQuit(const User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 	virtual void SendJoin(const BotInfo *, const Anope::string &, time_t) = 0;
@@ -1053,58 +1031,6 @@ struct Uplink
 	bool ipv6;
 
 	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
-};
-
-/** Timer for colliding nicks to force people off of nicknames
- */
-class NickServCollide : public Timer
-{
-	/* The nick */
-	Anope::string nick;
-
- public:
-	/** Default constructor
-	 * @param _nick The nick were colliding
-	 * @param delay How long to delay before kicking the user off the nick
-	 */
-	NickServCollide(const Anope::string &_nick, time_t delay);
-
-	/** Default destructor
-	 */
-	virtual ~NickServCollide();
-
-	/** Called when the delay is up
-	 * @param t The current time
-	 */
-	void Tick(time_t t);
-};
-
-/** Timers for releasing nicks to be available for use
- */
-class NickServRelease : public Timer
-{
-	/* The nick */
-	Anope::string nick;
-
- public:
-	/* The uid of the services enforcer client (used for TS6 ircds) */
-	Anope::string uid;
-
-	/** Default constructor
-	 * @param _nick The nick
-	 * @param _uid the uid of the enforcer, if any
-	 * @param delay The delay before the nick is released
-	 */
-	NickServRelease(const Anope::string &_nick, const Anope::string &_uid, time_t delay);
-
-	/** Default destructor
-	 */
-	virtual ~NickServRelease();
-
-	/** Called when the delay is up
-	 * @param t The current time
-	 */
-	void Tick(time_t t);
 };
 
 /** A timer used to keep the BotServ bot/ChanServ in the channel

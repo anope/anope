@@ -41,12 +41,12 @@ int inet_aton(const char *name, struct in_addr *addr)
 
 static int16 get_new_statusmode()
 {
-	static int16 last_mode = CUS_PROTECT; // highest value in services.h
+	static int16 last_mode = CUS_PROTECT; /* highest value in services.h */
 	if (last_mode == 0x8000)
 		return 0;
 	last_mode = last_mode << 1;
 	if (last_mode == CUS_DEOPPED)
-		last_mode = last_mode << 1; // get around CUS_DEOPPED
+		last_mode = last_mode << 1; /* get around CUS_DEOPPED */
 	return last_mode;
 }
 
@@ -829,7 +829,7 @@ int anope_event_fmode(char *source, int ac, char **av)
 int anope_event_fjoin(char *source, int ac, char **av)
 {
 	char *newav[64];
-	char nicklist[4096] = ""; // inspircd thing
+	char nicklist[4096] = ""; /* inspircd thing */
 
 	char **argv;
 	int i, argc;
@@ -2056,7 +2056,7 @@ int anope_event_capab(char *source, int ac, char **av)
 				continue;
 			*value++ = 0;
 
-			// PREFIX=(yqaohvV)!~&@%+-
+			/* PREFIX=(yqaohvV)!~&@%+- */
 			if (!strcasecmp(name, "PREFIX") && value)
 			{
 				int prefixlen = strlen(value), j;
@@ -2082,8 +2082,9 @@ int anope_event_capab(char *source, int ac, char **av)
 					}
 				}
 			}
-			// CHANMODES=IXYZbegw,k,FHJLdfjl,ABCDGKMNOPQRSTcimnprstuz
-			//           listmodes, unset with param, unset no param, regular
+			/* CHANMODES=IXYZbegw,k,FHJLdfjl,ABCDGKMNOPQRSTcimnprstuz
+			 *           listmodes, unset with param, unset no param, regular
+			 */
 			else if (!strcasecmp(name, "CHANMODES"))
 			{
 				char *listmodes = myStrGetToken(value, ',', 0);

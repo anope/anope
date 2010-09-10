@@ -15,11 +15,147 @@ static void TrimBuf(std::string &buffer)
 		buffer.erase(buffer.length() - 1);
 }
 
+/** Get the size of the sockaddr we represent
+ * @return The size
+ */
+size_t sockaddrs::size() const
+{
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+			return sizeof(sa4);
+		case AF_INET6:
+			return sizeof(sa6);
+		default:
+			break;
+	}
+
+	return 0;
+}
+
+/** Get the port represented by this addr
+ * @return The port, or -1 on fail
+ */
+int sockaddrs::port() const
+{
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+			return ntohs(sa4.sin_port);
+		case AF_INET6:
+			return ntohs(sa6.sin6_port);
+		default:
+			break;
+	}
+
+	return -1;
+}
+
+/** Get the address represented by this addr
+ * @return The address
+ */
+Anope::string sockaddrs::addr() const
+{
+	char address[INET6_ADDRSTRLEN + 1] = "";
+
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+			if (!inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
+				throw SocketException(strerror(errno));
+			return address;
+		case AF_INET6:
+			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
+				throw SocketException(strerror(errno));
+			return address;
+		default:
+			break;
+	}
+
+	return address;
+}
+
+/** Construct the object, sets everything to 0
+ */
+sockaddrs::sockaddrs()
+{
+	memset(this, 0, sizeof(*this));
+}
+
+/** Check if this sockaddr has data in it
+ */
+bool sockaddrs::operator()() const
+{
+	return this->sa.sa_family != 0;
+}
+
+/** Compares with sockaddr with another. Compares address type, port, and address
+ * @return true if they are the same
+ */
+bool sockaddrs::operator==(const sockaddrs &other) const
+{
+	if (sa.sa_family != other.sa.sa_family)
+		return false;
+	switch (sa.sa_family)
+	{
+		case AF_INET:
+			return (sa4.sin_port == other.sa4.sin_port) && (sa4.sin_addr.s_addr == other.sa4.sin_addr.s_addr);
+		case AF_INET6:
+			return (sa6.sin6_port == other.sa6.sin6_port) && !memcmp(sa6.sin6_addr.s6_addr, other.sa6.sin6_addr.s6_addr, 16);
+		default:
+			return !memcmp(this, &other, sizeof(*this));
+	}
+
+	return false;
+}
+
+void sockaddrs::pton(int type, const Anope::string &address, int pport)
+{
+	switch (type)
+	{
+		case AF_INET:
+			if (inet_pton(type, address.c_str(), &sa4.sin_addr) < 1)
+				throw SocketException(Anope::string("Invalid host: ") + strerror(errno));
+			sa4.sin_family = type;
+			sa4.sin_port = htons(pport);
+			return;
+		case AF_INET6:
+			if (inet_pton(type, address.c_str(), &sa6.sin6_addr) < 1)
+				throw SocketException(Anope::string("Invalid host: ") + strerror(errno));
+			sa6.sin6_family = type;
+			sa6.sin6_port = htons(pport);
+			return;
+		default:
+			break;
+	}
+
+	throw CoreException("Invalid socket type");
+}
+
+void sockaddrs::ntop(int type, const void *src)
+{
+	switch (type)
+	{
+		case AF_INET:
+			sa4.sin_addr = *reinterpret_cast<const in_addr *>(src);
+			sa4.sin_family = type;
+			return;
+		case AF_INET6:
+			sa6.sin6_addr = *reinterpret_cast<const in6_addr *>(src);
+			sa6.sin6_family = type;
+			return;
+		default:
+			break;
+	}
+
+	throw CoreException("Invalid socket type");
+}
+
 SocketEngineBase::SocketEngineBase()
 {
 #ifdef _WIN32
 	if (WSAStartup(MAKEWORD(2, 0), &wsa))
-		Log() << "Failed to initialize WinSock library";
+		throw FatalException("Failed to initialize WinSock library");
 #endif
 }
 
@@ -40,13 +176,14 @@ Socket::Socket()
 /** Constructor
  * @param nsock The socket
  * @param nIPv6 IPv6?
+ * @param type The socket type, defaults to SOCK_STREAM
  */
-Socket::Socket(int nsock, bool nIPv6)
+Socket::Socket(int nsock, bool nIPv6, int type)
 {
 	Type = SOCKTYPE_CLIENT;
 	IPv6 = nIPv6;
 	if (nsock == 0)
-		Sock = socket(IPv6 ? AF_INET6 : AF_INET, SOCK_STREAM, 0);
+		Sock = socket(IPv6 ? AF_INET6 : AF_INET, type, 0);
 	else
 		Sock = nsock;
 	SocketEngine->AddSocket(this);
@@ -56,7 +193,8 @@ Socket::Socket(int nsock, bool nIPv6)
 */
 Socket::~Socket()
 {
-	SocketEngine->DelSocket(this);
+	if (SocketEngine)
+		SocketEngine->DelSocket(this);
 	CloseSocket(Sock);
 }
 
@@ -183,7 +321,7 @@ bool Socket::ProcessRead()
 	return true;
 }
 
-/** Called when there is something to be written to this socket
+/** Called when the socket is ready to be written to
  * @return true on success, false to drop this socket
  */
 bool Socket::ProcessWrite()
@@ -197,7 +335,7 @@ bool Socket::ProcessWrite()
 		return false;
 	}
 	WriteBuffer.clear();
-	SocketEngine->ClearWriteable(this);
+	SocketEngine->ClearWritable(this);
 
 	return true;
 }
@@ -243,7 +381,7 @@ void Socket::Write(const char *message, ...)
 void Socket::Write(const Anope::string &message)
 {
 	WriteBuffer.append(message.str() + "\r\n");
-	SocketEngine->MarkWriteable(this);
+	SocketEngine->MarkWritable(this);
 }
 
 /** Constructor
@@ -251,103 +389,22 @@ void Socket::Write(const Anope::string &message)
  * @param nu The user using this socket
  * @param nsock The socket
  * @param nIPv6 IPv6
+ * @param type The socket type, defaults to SOCK_STREAM
  */
-ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6) : Socket(0, nIPv6), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
+ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6, int type) : Socket(0, nIPv6, type), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
 {
-	addrinfo hints;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = 0;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_family = IPv6 ? AF_INET6 : AF_INET;
-
 	if (!BindHost.empty())
 	{
-		addrinfo *bindar;
-		sockaddr_in bindaddr;
-		sockaddr_in6 bindaddr6;
-
-		if (!getaddrinfo(BindHost.c_str(), NULL, &hints, &bindar))
-		{
-			if (IPv6)
-				memcpy(&bindaddr6, bindar->ai_addr, bindar->ai_addrlen);
-			else
-				memcpy(&bindaddr, bindar->ai_addr, bindar->ai_addrlen);
-
-			freeaddrinfo(bindar);
-		}
-		else
-		{
-			if (IPv6)
-			{
-				bindaddr6.sin6_family = AF_INET6;
-
-				if (inet_pton(AF_INET6, BindHost.c_str(), &bindaddr6.sin6_addr) < 1)
-					throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
-			}
-			else
-			{
-				bindaddr.sin_family = AF_INET;
-
-				if (inet_pton(AF_INET, BindHost.c_str(), &bindaddr.sin_addr) < 1)
-					throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
-			}
-		}
-
-		if (IPv6)
-		{
-			if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr6), sizeof(bindaddr6)) == -1)
-				throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
-		}
-		else
-		{
-			if (bind(Sock, reinterpret_cast<sockaddr *>(&bindaddr), sizeof(bindaddr)) == -1)
-				throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
-		}
+		sockaddrs bindaddr;
+		bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, BindHost, 0);
+		if (bind(Sock, &bindaddr.sa, bindaddr.size()) == -1)
+			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 	}
 
-	addrinfo *conar;
-	sockaddr_in6 addr6;
-	sockaddr_in addr;
-
-	if (!getaddrinfo(TargetHost.c_str(), NULL, &hints, &conar))
-	{
-		if (IPv6)
-			memcpy(&addr6, conar->ai_addr, conar->ai_addrlen);
-		else
-			memcpy(&addr, conar->ai_addr, conar->ai_addrlen);
-
-		freeaddrinfo(conar);
-	}
-	else
-	{
-		if (IPv6)
-		{
-			if (inet_pton(AF_INET6, TargetHost.c_str(), &addr6.sin6_addr) < 1)
-				throw SocketException(Anope::string("Invalid server host: ") + strerror(errno));
-		}
-		else
-		{
-			if (inet_pton(AF_INET, TargetHost.c_str(), &addr.sin_addr) < 1)
-				throw SocketException(Anope::string("Invalid server host: ") + strerror(errno));
-		}
-	}
-
-	if (IPv6)
-	{
-		addr6.sin6_family = AF_INET6;
-		addr6.sin6_port = htons(nPort);
-
-		if (connect(Sock, reinterpret_cast<sockaddr *>(&addr6), sizeof(addr6)) == -1)
-			throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
-	}
-	else
-	{
-		addr.sin_family = AF_INET;
-		addr.sin_port = htons(nPort);
-
-		if (connect(Sock, reinterpret_cast<sockaddr *>(&addr), sizeof(addr)) == -1)
-			throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
-	}
+	sockaddrs conaddr;
+	conaddr.pton(IPv6 ? AF_INET6 : AF_INET, TargetHost, Port);
+	if (connect(Sock, &conaddr.sa, conaddr.size()) == -1)
+		throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
 
 	this->SetNonBlocking();
 }
@@ -377,36 +434,11 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (b
 	BindIP = bindip;
 	Port = port;
 
-	sockaddr_in sock_addr;
-	sockaddr_in6 sock_addr6;
+	sockaddrs sockaddr;
+	sockaddr.pton(IPv6 ? AF_INET6 : AF_INET, BindIP, Port);
 
-	if (IPv6)
-	{
-		sock_addr6.sin6_family = AF_INET6;
-		sock_addr6.sin6_port = htons(port);
-
-		if (inet_pton(AF_INET6, bindip.c_str(), &sock_addr6.sin6_addr) < 1)
-			throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
-	}
-	else
-	{
-		sock_addr.sin_family = AF_INET;
-		sock_addr.sin_port = htons(port);
-
-		if (inet_pton(AF_INET, bindip.c_str(), &sock_addr.sin_addr) < 1)
-			throw SocketException(Anope::string("Invalid bind host: ") + strerror(errno));
-	}
-
-	if (IPv6)
-	{
-		if (bind(Sock, reinterpret_cast<sockaddr *>(&sock_addr6), sizeof(sock_addr6)) == -1)
-			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
-	}
-	else
-	{
-		if (bind(Sock, reinterpret_cast<sockaddr *>(&sock_addr), sizeof(sock_addr)) == -1)
-			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
-	}
+	if (bind(Sock, &sockaddr.sa, sockaddr.size()) == -1)
+		throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
 
 	if (listen(Sock, 5) == -1)
 		throw SocketException(Anope::string("Unable to listen: ") + strerror(errno));
@@ -426,7 +458,7 @@ bool ListenSocket::ProcessRead()
 {
 	int newsock = accept(Sock, NULL, NULL);
 
-#ifndef _WIN32
+#ifndef INVALID_SOCKET
 # define INVALID_SOCKET 0
 #endif
 

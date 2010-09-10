@@ -35,7 +35,6 @@ IRCDVar myIrcd[] = {
 	 1,					/* vidents */
 	 1,					/* svshold */
 	 0,					/* time stamp on mode */
-	 0,					/* NICKIP */
 	 0,					/* O:LINE */
 	 1,					/* UMODE */
 	 1,					/* VHOST ON NICK */
@@ -722,7 +721,7 @@ int anope_event_sethost(const Anope::string &source, int ac, const char **av)
 
 int anope_event_nick(const Anope::string &source, int ac, const char **av)
 {
-	do_nick(source, av[0], "", "", "", "", 0, 0, "", "");
+	do_nick(source, av[0], "", "", "", "", 0, "", "", "");
 	return MOD_CONT;
 }
 
@@ -761,7 +760,7 @@ int anope_event_uid(const Anope::string &source, int ac, const char **av)
 	}
 	user = NULL;
 
-	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, 0, av[4], av[0]);
+	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, av[6], av[4], av[0]);
 	if (user)
 	{
 		UserSetInternalModes(user, 1, &av[8]);

@@ -22,6 +22,49 @@
 # define CloseSocket close
 #endif
 
+/** A sockaddr union used to combine IPv4 and IPv6 sockaddrs
+ */
+union CoreExport sockaddrs
+{
+	sockaddr sa;
+	sockaddr_in sa4;
+	sockaddr_in6 sa6;
+
+	/** Get the size of the sockaddr we represent
+	 * @return The size
+	 */
+	size_t size() const;
+
+	/** Get the port represented by this addr
+	 * @return The port, or -1 on fail
+	 */
+	int port() const;
+
+	/** Get the address represented by this addr
+	 * @return The address
+	 */
+	Anope::string addr() const;
+
+	/** Construct the object, sets everything to 0
+	 */
+	sockaddrs();
+
+	/** Check if this sockaddr has data in it
+	 */
+	bool operator()() const;
+
+	/** Compares with sockaddr with another. Compares address type, port, and address
+	 * @return true if they are the same
+	 */
+	bool operator==(const sockaddrs &other) const;
+	/* The same as above but not */
+	inline bool operator!=(const sockaddrs &other) const { return !(*this == other); }
+
+	void pton(int type, const Anope::string &address, int pport = 0);
+
+	void ntop(int type, const void *src);
+};
+
 class SocketException : public CoreException
 {
  public:
@@ -44,12 +87,13 @@ enum SocketType
 
 enum SocketFlag
 {
-	SF_DEAD
+	SF_DEAD,
+	SF_WRITABLE
 };
 
-class CoreExport Socket : public Flags<SocketFlag, 1>
+class CoreExport Socket : public Flags<SocketFlag, 2>
 {
- private:
+ protected:
 	/** Really recieve something from the buffer
 	 * @param buf The buf to read to
 	 * @param sz How much to read
@@ -63,7 +107,6 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 */
 	virtual int SendInternal(const Anope::string &buf) const;
 
- protected:
 	/* Socket FD */
 	int Sock;
 	/* Port we're connected to */
@@ -88,8 +131,9 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	/** Default constructor
 	 * @param nsock The socket to use, 0 if we need to create our own
 	 * @param nIPv6 true if using ipv6
+	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
- 	Socket(int nsock, bool nIPv6);
+ 	Socket(int nsock, bool nIPv6, int type = SOCK_STREAM);
 
 	/** Default destructor
 	 */
@@ -130,7 +174,7 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 	 */
 	virtual bool ProcessRead();
 
-	/** Called when there is something to be written to this socket
+	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
 	virtual bool ProcessWrite();
@@ -156,20 +200,37 @@ class CoreExport Socket : public Flags<SocketFlag, 1>
 class CoreExport Pipe : public Socket
 {
  private:
+ 	/** The FD of the write pipe (if this isn't evenfd)
+	 * this->Sock is the readfd
+	 */
  	int WritePipe;
 
+	/** Our overloaded RecvInternal call
+	 */
 	int RecvInternal(char *buf, size_t sz) const;
 
+	/** Our overloaded SendInternal call
+	 */
 	int SendInternal(const Anope::string &buf) const;
  public:
+ 	/** Constructor
+	 */
 	Pipe();
 
+	/** Called when data is to be read
+	 */
 	bool ProcessRead();
 
+	/** Function that calls OnNotify
+	 */
 	bool Read(const Anope::string &);
 
+	/** Called when this pipe needs to be woken up
+	 */
 	void Notify();
 
+	/** Should be overloaded to do something useful
+	 */
 	virtual void OnNotify();
 };
 
@@ -190,8 +251,9 @@ class CoreExport ClientSocket : public Socket
 	 * @param nPort The target port to connect to
 	 * @param nBindHost The host to bind to for connecting
 	 * @param nIPv6 true to use IPv6
+	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6);
+	ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost = "", bool nIPv6 = false, int type = SOCK_STREAM);
 
 	/** Default destructor
 	 */

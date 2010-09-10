@@ -373,6 +373,15 @@ void Init(int ac, char **av)
 	if (ModuleManager::LoadModule(Config->SocketEngine, NULL))
 		throw FatalException("Unable to load socket engine " + Config->SocketEngine);
 
+	try
+	{
+		DNSEngine = new DNSManager();
+	}
+	catch (const SocketException &ex)
+	{
+		throw FatalException(ex.GetReason());
+	}
+
 	/* Add Core MSG handles */
 	moduleAddMsgs();
 

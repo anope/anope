@@ -243,10 +243,6 @@ static void services_shutdown()
 
 void sighandler(int signum)
 {
-	/* We set the quit message to something default, just to be sure it is
-	 * always set when we need it. It seems some signals slip through to the
-	 * QUIT code without having a valid quitmsg. -GD
-	 */
 	if (quitmsg.empty())
 		quitmsg = Anope::string("Services terminating via signal ") + strsignal(signum) + " (" + stringify(signum) + ")";
 	bool fatal = false;
@@ -286,7 +282,6 @@ void sighandler(int signum)
 
 				expire_all();
 				save_databases();
-				quitmsg = "shutting down on sigterm";
 			default:
 				fatal = true;
 				break;

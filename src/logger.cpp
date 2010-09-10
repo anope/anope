@@ -290,7 +290,7 @@ bool LogInfo::HasType(LogType type)
 		case LOG_RAWIO:
 			return this->RawIO;
 		case LOG_DEBUG:
-			return this->Debug;
+			return debug ? true : this->Debug;
 		// LOG_DEBUG_[234]
 		default:
 			break;

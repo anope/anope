@@ -322,7 +322,6 @@ check_include_file(sys/select.h HAVE_SYS_SELECT_H)
 check_include_file(sys/eventfd.h HAVE_SYS_EVENTFD_H)
 
 # Check for the existance of the following functions
-check_function_exists(gethostbyname HAVE_GETHOSTBYNAME)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_function_exists(setgrent HAVE_SETGRENT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)

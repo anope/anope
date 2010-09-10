@@ -363,6 +363,9 @@ template<typename T, size_t Size = 32> class Flags
 
 #include "sockets.h"
 #include "socketengine.h"
+#include "extensible.h"
+#include "timers.h"
+#include "dns.h"
 
 /*************************************************************************/
 
@@ -427,7 +430,6 @@ class Server;
 struct EList;
 struct Session;
 
-#include "extensible.h"
 #include "threadengine.h"
 #include "opertype.h"
 #include "modes.h"
@@ -457,7 +459,6 @@ struct IRCDVar
 	int vident;						/* Supports vidents */
 	int svshold;					/* Supports svshold */
 	int tsonmode;					/* Timestamp on mode changes */
-	int nickip;						/* Sends IP on NICK */
 	int omode;						/* On the fly o:lines */
 	int umode;						/* change user modes */
 	int nickvhost;					/* Users vhost sent during NICK */
@@ -1053,8 +1054,6 @@ struct Uplink
 
 	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
 };
-
-#include "timers.h"
 
 /** Timer for colliding nicks to force people off of nicknames
  */

@@ -43,12 +43,12 @@ class CoreExport SocketEngineBase
 	/** Mark a socket as writeable
 	 * @param s The socket
 	 */
-	virtual void MarkWriteable(Socket *s) { }
+	virtual void MarkWritable(Socket *s) { }
 
 	/** Unmark a socket as writeable
 	 * @param s The socket
 	 */
-	virtual void ClearWriteable(Socket *s) { }
+	virtual void ClearWritable(Socket *s) { }
 
 	/** Read from sockets and do things
 	 */

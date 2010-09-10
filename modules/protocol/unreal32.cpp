@@ -34,7 +34,6 @@ IRCDVar myIrcd[] = {
 	 1,						/* vidents */
 	 1,						/* svshold */
 	 1,						/* time stamp on mode */
-	 1,						/* NICKIP */
 	 1,						/* O:LINE */
 	 1,						/* UMODE */
 	 1,						/* VHOST ON NICK */
@@ -133,7 +132,7 @@ class UnrealIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - time(NULL);
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Expires), x->Reason.c_str());
+		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -175,7 +174,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendClientIntroduction(const Anope::string &nick, const Anope::string &user, const Anope::string &host, const Anope::string &real, const Anope::string &modes, const Anope::string &)
 	{
 		EnforceQlinedNick(nick, Config->ServerName);
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config->ServerName.c_str(), modes.c_str(), host.c_str(), myIrcd->nickip ? " *" : "", real.c_str());
+		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", nick.c_str(), static_cast<long>(time(NULL)), user.c_str(), host.c_str(), Config->ServerName.c_str(), modes.c_str(), host.c_str(), real.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
@@ -860,11 +859,17 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			   <codemastr> it's sent when a nick collision occurs
 			   - so we have to leave it around for now -TSL
 			 */
-			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, 0, "*", "");
+			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", "*", "");
 		}
 		else if (ac == 11)
 		{
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, ntohl(decode_ip(av[9])), av[8], "");
+			Anope::string decoded_ip;
+			b64_decode(av[9], decoded_ip);
+
+			sockaddrs ip;
+			ip.ntop(strlen(av[9]) == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+		
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, ip.addr(), av[8], "");
 			if (user)
 			{
 				UserSetInternalModes(user, 1, &av[7]);
@@ -883,7 +888,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		else
 		{
 			/* NON NICKIP */
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, 0, av[8], "");
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", av[8], "");
 			if (user)
 			{
 				UserSetInternalModes(user, 1, &av[7]);
@@ -901,7 +906,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "");
 	return MOD_CONT;
 }
 
@@ -1136,7 +1141,7 @@ void moduleAddIRCDMsgs()
 	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
 	Anope::AddMessage("!", anope_event_privmsg);
 	Anope::AddMessage("QUIT", anope_event_quit);
-	Anope::AddMessage("),", anope_event_quit);
+	Anope::AddMessage(",", anope_event_quit);
 	Anope::AddMessage("SERVER", anope_event_server);
 	Anope::AddMessage("'", anope_event_server);
 	Anope::AddMessage("SQUIT", anope_event_squit);

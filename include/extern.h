@@ -276,7 +276,6 @@ E uint16 netmask_to_cidr(uint32 mask);
 E bool str_is_wildcard(const Anope::string &str);
 E bool str_is_pure_wildcard(const Anope::string &str);
 
-E uint32 str_is_ip(const Anope::string &str);
 E bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host);
 
 /**** modes.cpp ****/
@@ -362,7 +361,7 @@ E User *finduser(const Anope::string &nick);
 
 E Anope::string TS6SID;
 
-E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, uint32 ip, const Anope::string &vhost, const Anope::string &uid);
+E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid);
 
 E void do_umode(const Anope::string &source, int ac, const char **av);
 E void do_quit(const Anope::string &source, int ac, const char **av);
@@ -382,9 +381,6 @@ E void UserSetInternalModes(User *user, int ac, const char **av);
 
 E void b64_encode(const Anope::string &src, Anope::string &target);
 E void b64_decode(const Anope::string &src, Anope::string &target);
-E int decode_ip(const Anope::string &buf);
-
-E Anope::string host_resolve(const Anope::string &host);
 
 #ifdef _WIN32
 E Anope::string GetWindowsVersion();

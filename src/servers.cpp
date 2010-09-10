@@ -236,18 +236,18 @@ void Server::Sync(bool SyncLinks)
 			this->Links[i]->Sync(true);
 	}
 
-	if (this == Me->GetLinks().front())
+	if (this->GetUplink() && this->GetUplink() == Me)
 	{
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 		ircdproto->SendEOB();
-		Me->UnsetFlag(SERVER_SYNCING);
+		Me->Sync(false);
 	}
 
 	Log(this, "sync") << "is done syncing";
 
 	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
-	if (this == Me->GetLinks().front())
+	if (this->GetUplink() && this->GetUplink() == Me)
 	{
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
 		restore_unsynced_topics();
@@ -407,9 +407,6 @@ void CapabParse(int ac, const char **av)
 			if (Capab_Info[j].Token.equals_ci(av[i]))
 			{
 				Capab.SetFlag(Capab_Info[j].Flag);
-
-				if (Capab_Info[j].Token.equals_ci("NICKIP") && !ircd->nickip)
-					ircd->nickip = 1;
 				break;
 			}
 		}

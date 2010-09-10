@@ -239,7 +239,7 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 		if (x)
 		{
 			ret.first = xlm;
-			ret.second = x;;
+			ret.second = x;
 			break;
 		}
 	}
@@ -425,7 +425,7 @@ XLine *XLineManager::Check(User *u)
 		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent(), x->GetUser()))
 			continue;
 
-		if (x->GetHost().empty() || (!u->hostip.empty() && Anope::Match(u->hostip, x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost, x->GetHost())) || (!u->vhost.empty() && Anope::Match(u->vhost, x->GetHost())))
+		if (x->GetHost().empty() || (u->ip() && Anope::Match(u->ip.addr(), x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost, x->GetHost())) || (!u->vhost.empty() && Anope::Match(u->vhost, x->GetHost())))
 		{
 			OnMatch(u, x);
 			return x;
@@ -486,14 +486,14 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				notice_lang(bi->nick, u, OPER_AKILL_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
-		return canAdd.second;
+		return NULL;
 	}
 
 	Anope::string realreason = reason;
 	if (u && Config->AddAkiller)
 		realreason = "[" + u->nick + "]" + reason;
 
-	XLine *x = new XLine(mask, u ? u->nick : "", expires, realreason);
+	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, realreason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, x));
@@ -549,10 +549,10 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				notice_lang(bi->nick, u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
-		return canAdd.second;
+		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SNLINE));
@@ -629,10 +629,10 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				notice_lang(bi->nick, u, OPER_SQLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
-		return canAdd.second;
+		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SQLINE));
@@ -747,10 +747,10 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				notice_lang(bi->nick, u, OPER_SZLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
-		return canAdd.second;
+		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : "", expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SZLINE));

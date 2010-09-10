@@ -51,10 +51,10 @@ class CoreExport User : public Extensible
 	Anope::string nick;		/* User's current nick */
 
 	Anope::string host;		/* User's real hostname */
-	Anope::string hostip;	/* User's IP number */
-	Anope::string vhost;	/* User's virtual hostname */
-	Anope::string chost;	/* User's cloaked hostname */
-	Anope::string realname;	/* Realname */
+	Anope::string vhost;		/* User's virtual hostname */
+	Anope::string chost;		/* User's cloaked hostname */
+	Anope::string realname;		/* Realname */
+	sockaddrs ip;			/* User's IP */
 	Server *server;			/* Server user is connected to */
 	time_t timestamp;		/* Timestamp of the nick */
 	time_t my_signon;		/* When did _we_ see the user? */

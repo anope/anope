@@ -8,7 +8,6 @@
 #cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_STDDEF_H 1
 #cmakedefine HAVE_BACKTRACE 1
-#cmakedefine HAVE_GETHOSTBYNAME 1
 #cmakedefine HAVE_GETTIMEOFDAY 1
 #cmakedefine HAVE_SETGRENT 1
 #cmakedefine HAVE_STRCASECMP 1

@@ -572,6 +572,11 @@ class ServerConfig
 	/* Don't quote the To: address */
 	bool DontQuoteAddresses;
 
+	/* Nameserver to use for resolving hostnames */
+	Anope::string NameServer;
+	/* TIme before a DNS query is considered dead */
+	time_t DNSTimeout;
+
 	/* Prefix of guest nicks when a user gets forced off of a nick */
 	Anope::string NSGuestNickPrefix;
 	/* Allow users to set kill immed on */

@@ -815,32 +815,6 @@ int myNumToken(const Anope::string &str, char dilim)
 
 /*************************************************************************/
 
-/**
- * Resolve a host to an IP
- * @param host to convert
- * @return ip address
- */
-Anope::string host_resolve(const Anope::string &host)
-{
-	struct hostent *hentp = gethostbyname(host.c_str());
-	Anope::string ipreturn;
-
-	if (hentp)
-	{
-		uint32 ip;
-		memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
-		struct in_addr addr;
-		addr.s_addr = ip;
-		char ipbuf[16];
-		ntoa(addr, ipbuf, sizeof(ipbuf));
-		ipreturn = ipbuf;
-		Log(LOG_DEBUG) << "resolved " << host << " to " << ipbuf;
-	}
-	return ipreturn;
-}
-
-/*************************************************************************/
-
 /** Build a string list from a source string
  * @param src The source string
  * @return a list of strings
@@ -1194,43 +1168,6 @@ bool str_is_pure_wildcard(const Anope::string &str)
 			return false;
 
 	return true;
-}
-
-/*************************************************************************/
-
-/**
- * Check if the given string is an IP, and return the IP.
- * @param str String to check
- * @return The IP, if one found. 0 if none.
- */
-uint32 str_is_ip(const Anope::string &str)
-{
-	int octets[4] = { -1, -1, -1, -1 };
-	std::vector<Anope::string> octets_str = BuildStringVector(str, '.');
-
-	if (octets_str.size() != 4)
-		return false;
-
-	for (unsigned i = 0; i < 4; ++i)
-	{
-		Anope::string octet = octets_str[i];
-
-		if (!octet.is_number_only())
-			return 0;
-
-		octets[i] = convertTo<int>(octet);
-		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255)
-			return 0;
-	}
-
-	/* Fill the IP - the dirty way */
-	uint32 ip = octets[3];
-	ip += octets[2] * 256;
-	ip += octets[1] * 65536;
-	ip += octets[0] * 16777216;
-
-	return ip;
 }
 
 /*************************************************************************/

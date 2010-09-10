@@ -80,8 +80,11 @@ class SocketEngineEPoll : public SocketEngineBase
 		--SocketCount;
 	}
 
-	void MarkWriteable(Socket *s)
+	void MarkWritable(Socket *s)
 	{
+		if (s->HasFlag(SF_WRITABLE))
+			return;
+
 		epoll_event ev;
 
 		memset(&ev, 0, sizeof(ev));
@@ -91,10 +94,15 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
+		else
+			s->SetFlag(SF_WRITABLE);
 	}
 
-	void ClearWriteable(Socket *s)
+	void ClearWriteble(Socket *s)
 	{
+		if (!s->HasFlag(SF_WRITABLE))
+			return;
+
 		epoll_event ev;
 
 		memset(&ev, 0, sizeof(ev));
@@ -104,6 +112,8 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
+		else
+			s->UnsetFlag(SF_WRITABLE);
 	}
 
 	void Process()
@@ -150,7 +160,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 class ModuleSocketEngineEPoll : public Module
 {
-	SocketEngineEPoll *engine;
+	SocketEngineEPoll engine;
 
  public:
 	ModuleSocketEngineEPoll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
@@ -159,13 +169,11 @@ class ModuleSocketEngineEPoll : public Module
 		this->SetPermanent(true);
 		this->SetType(SOCKETENGINE);
 
-		engine = new SocketEngineEPoll();
-		SocketEngine = engine;
+		SocketEngine = &engine;
 	}
 
 	~ModuleSocketEngineEPoll()
 	{
-		delete engine;
 		SocketEngine = NULL;
 	}
 };

@@ -161,17 +161,3 @@ void b64_decode(const Anope::string &src, Anope::string &target)
 		target.erase(target.length() - 1);
 }
 
-int decode_ip(const Anope::string &buf)
-{
-	int len = buf.length();
-	Anope::string targ;
-
-	b64_decode(buf, targ);
-	const struct in_addr ia = *reinterpret_cast<const struct in_addr *>(targ.c_str());
-	if (len == 24) /* IPv6 */
-		return 0;
-	else if (len == 8) /* IPv4 */
-		return ia.s_addr;
-	else /* Error?? */
-		return 0;
-}

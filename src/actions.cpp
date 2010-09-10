@@ -73,8 +73,7 @@ void kill_user(const Anope::string &source, const Anope::string &user, const Ano
  */
 void common_unban(ChannelInfo *ci, const Anope::string &nick)
 {
-	Anope::string host;
-	uint32 ip = 0;
+	//uint32 ip = 0;
 	User *u;
 	Entry *ban, *next;
 
@@ -87,27 +86,13 @@ void common_unban(ChannelInfo *ci, const Anope::string &nick)
 	if (!ci->c->bans || !ci->c->bans->count)
 		return;
 
-	if (u->hostip.empty())
-	{
-		host = host_resolve(u->host);
-		/* we store the just resolved hostname so we don't
-		 * need to do this again */
-		if (!host.empty())
-			u->hostip = host;
-	}
-	else
-		host = u->hostip;
-	/* Convert the host to an IP.. */
-	if (!host.empty())
-		ip = str_is_ip(host);
-
 	if (ircd->svsmode_unban)
 		ircdproto->SendBanDel(ci->c, nick);
 	else
 		for (ban = ci->c->bans->entries; ban; ban = next)
 		{
 			next = ban->next;
-			if (entry_match(ban, u->nick, u->GetIdent(), u->host, ip) || entry_match(ban, u->nick, u->GetIdent(), u->GetDisplayedHost(), ip))
+			if (entry_match(ban, u->nick, u->GetIdent(), u->host, /*ip XXX */ 0) || entry_match(ban, u->nick, u->GetIdent(), u->GetDisplayedHost(), /*ip XXX */0))
 				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
 		}
 }

@@ -34,7 +34,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* vidents */
 	 1,					/* svshold */
 	 1,					/* time stamp on mode */
-	 1,					/* NICKIP */
 	 0,					/* O:LINE */
 	 1,					/* UMODE */
 	 0,					/* VHOST ON NICK */
@@ -451,7 +450,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 
 	if (ac != 2)
 	{
-		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, Anope::string(av[8]).is_pos_number_only() ? convertTo<uint32>(av[8]) : 0, "", "");
+		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, av[8], "", "");
 		if (user)
 		{
 			UserSetInternalModes(user, 1, &av[3]);
@@ -467,7 +466,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, 0, "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "");
 	return MOD_CONT;
 }
 

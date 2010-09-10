@@ -274,7 +274,7 @@ class OSDefcon : public Module
 	void OnUserConnect(User *u)
 	{
 		Session *session = findsession(u->host);
-		Exception *exception = find_hostip_exception(u->host, u->hostip);
+		Exception *exception = find_hostip_exception(u->host, u->ip.addr());
 
 		if (CheckDefCon(DEFCON_REDUCE_SESSION) && !exception)
 		{

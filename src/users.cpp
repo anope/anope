@@ -186,7 +186,7 @@ User::~User()
 {
 	Log(LOG_DEBUG_2) << "User::~User() called";
 
-	Log(this, "disconnect") << " (" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
+	Log(this, "disconnect") << "(" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
 
 	this->Logout();
 
@@ -642,16 +642,13 @@ User *finduser(const Anope::string &nick)
 
 /* Handle a server NICK command. */
 
-User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, uint32 ip, const Anope::string &vhost, const Anope::string &uid)
+User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid)
 {
 	User *user = NULL;
 	Anope::string vhost2 = vhost;
 
 	if (source.empty())
 	{
-		char ipbuf[16];
-		struct in_addr addr;
-
 		if (ircd->nickvhost && !vhost2.empty() && vhost2.equals_cs("*"))
 		{
 			vhost2.clear();
@@ -659,12 +656,6 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		/* This is a new user; create a User structure for it. */
 		Log(LOG_DEBUG) << "new user: " << nick;
-
-		if (ircd->nickip)
-		{
-			addr.s_addr = htonl(ip);
-			ntoa(addr, ipbuf, sizeof(ipbuf));
-		}
 
 		Server *serv = Server::Find(server);
 
@@ -677,14 +668,24 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		if (!vhost2.empty())
 			user->SetCloakedHost(vhost2);
 		user->SetVIdent(username);
-		/* We now store the user's ip in the user_ struct,
-		 * because we will use it in serveral places -- DrStein */
-		if (ircd->nickip)
-			user->hostip = ipbuf;
-		else
-			user->hostip = "";
 
-		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << ") (" << user->realname << ") " << (ircd->nickip ? Anope::string("[") + ipbuf + "] " : "") << "connected to the network (" << serv->GetName() << ")";
+		if (!ip.empty())
+		{
+			try
+			{
+				if (ip.find(':') != Anope::string::npos)
+					user->ip.pton(AF_INET6, ip);
+				else
+					user->ip.pton(AF_INET, ip);
+			}
+			catch (const SocketException &ex)
+			{
+				Log() << "Received an invalid IP for user " << user->nick << " (" << ip << ")";
+				Log() << ex.GetReason();
+			}
+		}
+
+		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << ") (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
@@ -692,7 +693,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			return finduser(nick);
 
 		if (Config->LimitSessions && !serv->IsULined())
-			add_session(nick, host, ipbuf);
+			add_session(nick, host, user->ip() ? user->ip.addr() : "");
 
 		XLineManager::CheckAll(user);
 

@@ -41,14 +41,20 @@ class SocketEngineSelect : public SocketEngineBase
 		Sockets.erase(s->GetSock());
 	}
 
-	void MarkWriteable(Socket *s)
+	void MarkWritable(Socket *s)
 	{
+		if (s->HasFlag(SF_WRITABLE))
+			return;
 		FD_SET(s->GetSock(), &WriteFDs);
+		s->SetFlag(SF_WRITABLE);
 	}
 
-	void ClearWriteable(Socket *s)
+	void ClearWritable(Socket *s)
 	{
+		if (!s->HasFlag(SF_WRITABLE))
+			return;
 		FD_CLR(s->GetSock(), &WriteFDs);
+		s->UnsetFlag(SF_WRITABLE);
 	}
 
 	void Process()
@@ -101,7 +107,7 @@ class SocketEngineSelect : public SocketEngineBase
 
 class ModuleSocketEngineSelect : public Module
 {
-	SocketEngineSelect *engine;
+	SocketEngineSelect engine;
 
  public:
 	ModuleSocketEngineSelect(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
@@ -110,13 +116,11 @@ class ModuleSocketEngineSelect : public Module
 		this->SetPermanent(true);
 		this->SetType(SOCKETENGINE);
 
-		engine = new SocketEngineSelect();
-		SocketEngine = engine;
+		SocketEngine = &engine;
 	}
 
 	~ModuleSocketEngineSelect()
 	{
-		delete engine;
 		SocketEngine = NULL;
 	}
 };

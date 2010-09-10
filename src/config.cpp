@@ -349,6 +349,36 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 	}
 
 	SetDefaultMLock(this);
+
+	if (IsFile(this->NameServer))
+	{
+		std::ifstream f(this->NameServer.c_str());
+		Anope::string server;
+		bool success = false;
+
+		while (f.is_open() && getline(f, server.str()))
+		{
+			if (server.find("nameserver ") == 0 && getline(f, server.str()))
+			{
+				if (server.substr(11).is_pos_number_only())
+				{
+					this->NameServer = server.substr(11);
+					Log(LOG_DEBUG) << "Nameserver set to " << this->NameServer;
+					success = true;
+					break;
+				}
+			}
+		}
+
+		if (f.is_open())
+			f.close();
+
+		if (!success)
+		{
+			Log() << "Unable to find nameserver, defaulting to 127.0.0.1";
+			this->NameServer = "127.0.0.1";
+		}
+	}
 }
 
 bool ServerConfig::CheckOnce(const Anope::string &tag)
@@ -1053,6 +1083,8 @@ void ServerConfig::Read()
 		{"mail", "restrict", "no", new ValueContainerBool(&this->RestrictMail), DT_BOOLEAN, NoValidation},
 		{"mail", "delay", "0", new ValueContainerTime(&this->MailDelay), DT_TIME, NoValidation},
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&this->DontQuoteAddresses), DT_BOOLEAN, NoValidation},
+		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&this->NameServer), DT_STRING, NoValidation},
+		{"dns", "timeout", "5", new ValueContainerTime(&this->DNSTimeout), DT_TIME, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerString(&this->s_ChanServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerString(&this->desc_ChanServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},

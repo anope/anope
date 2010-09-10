@@ -1765,33 +1765,17 @@ Entry *elist_match_mask(EList *list, const Anope::string &mask, uint32 ip)
 Entry *elist_match_user(EList *list, User *u)
 {
 	Entry *res;
-	Anope::string host;
-	uint32 ip = 0;
+	//uint32 ip = 0;
 
 	if (!list || !list->entries || !u)
 		return NULL;
 
-	if (u->hostip.empty())
-	{
-		host = host_resolve(u->host);
-		/* we store the just resolved hostname so we don't
-		 * need to do this again */
-		if (!host.empty())
-			u->hostip = host;
-	}
-	else
-		host = u->hostip;
-
-	/* Convert the host to an IP.. */
-	if (!host.empty())
-		ip = str_is_ip(host);
-
 	/* Match what we ve got against the lists.. */
-	res = elist_match(list, u->nick, u->GetIdent(), u->host, ip);
+	res = elist_match(list, u->nick, u->GetIdent(), u->host, /*ip XXX*/0);
 	if (!res)
-		res = elist_match(list, u->nick, u->GetIdent(), u->GetDisplayedHost(), ip);
+		res = elist_match(list, u->nick, u->GetIdent(), u->GetDisplayedHost(), /*ip XXX*/0);
 	if (!res && !u->GetCloakedHost().empty() && !u->GetCloakedHost().equals_cs(u->GetDisplayedHost()))
-		res = elist_match(list, u->nick, u->GetIdent(), u->GetCloakedHost(), ip);
+		res = elist_match(list, u->nick, u->GetIdent(), u->GetCloakedHost(), /*ip XXX*/ 0);
 
 	return res;
 }

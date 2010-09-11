@@ -1570,20 +1570,16 @@ int main(int argc, char *argv[])
                         }
                         if (input[0] == '2') { /* free() hcptr and get it out of the list, put hc into the list */
                             printf("Deleting vHost %s (vIdent: %s) for nick %s (#1).\n", hcptr->vHost, (hcptr->vIdent) ? hcptr->vIdent : "none", hcptr->nick);
-                            if (hcptr->last)
-                                hcptr->last->next = hcptr->next;
-                            if (hcptr->next)
-                                hcptr->next->last = hcptr->last;
                             free(hcptr->nick);
+                            hcptr->nick = hc->nick;
                             free(hcptr->vHost);
+                            hcptr->vHost = hc->vHost;
                             free(hcptr->vIdent);
+                            hcptr->vIdent = hc->vIdent;
                             free(hcptr->creator);
-                            free(hcptr);
-                            hc->next = firsthc;
-                            if (firsthc)
-                                firsthc->last = hc;
-                            hc->last = NULL;
-                            firsthc = hc;
+                            hcptr->creator = hc->creator;
+                            hcptr->time = hc->time;
+                            free(hc);
                         } else if (input[0] == '1') { /* free() hc */
                             printf("Deleting vHost %s (vIdent: %s) for nick %s (#2).\n", hc->vHost, (hc->vIdent) ? hc->vIdent : "none", hc->nick);
                             free(hc->nick);

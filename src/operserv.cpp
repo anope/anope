@@ -144,7 +144,7 @@ XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask
 {
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason) : Mask(mask), By(by), Created(time(NULL)), Expires(expires), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason)
 {
 }
 
@@ -405,13 +405,11 @@ XLine *XLineManager::HasEntry(const Anope::string &mask)
  */
 XLine *XLineManager::Check(User *u)
 {
-	const time_t now = time(NULL);
-
 	for (unsigned i = this->XLines.size(); i > 0; --i)
 	{
 		XLine *x = this->XLines[i - 1];
 
-		if (x->Expires && x->Expires < now)
+		if (x->Expires && x->Expires < Anope::CurTime)
 		{
 			OnExpire(x);
 			delete x;

@@ -65,6 +65,7 @@ class SocketEngineSelect : public SocketEngineBase
 		tval.tv_usec = 0;
 
 		int sresult = select(MaxFD + 1, &rfdset, &wfdset, &efdset, &tval);
+		Anope::CurTime = time(NULL);
 
 		if (sresult == -1)
 		{

@@ -32,7 +32,7 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_ci("%i", user->ip.addr());
 		reason = reason.replace_all_ci("%h", user->host);
 
-		XLine *x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, time(NULL) + this->blacklist.bantime, reason);
+		XLine *x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason);
 		if (x)
 		{
 			static Command command_akill("AKILL", 0);

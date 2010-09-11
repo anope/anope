@@ -354,17 +354,15 @@ Anope::string duration(const NickCore *nc, time_t seconds)
  */
 Anope::string expire_left(const NickCore *nc, time_t expires)
 {
-	time_t now = time(NULL);
-
 	char buf[256];
 
 	if (!expires)
 		strlcpy(buf, getstring(nc, NO_EXPIRE), sizeof(buf));
-	else if (expires <= now)
+	else if (expires <= Anope::CurTime)
 		strlcpy(buf, getstring(nc, EXPIRES_SOON), sizeof(buf));
 	else
 	{
-		time_t diff = expires - now + 59;
+		time_t diff = expires - Anope::CurTime + 59;
 
 		if (diff >= 86400)
 		{

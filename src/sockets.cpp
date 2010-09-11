@@ -109,6 +109,12 @@ bool sockaddrs::operator==(const sockaddrs &other) const
 	return false;
 }
 
+/** The equivalent of inet_pton
+ * @param type AF_INET or AF_INET6
+ * @param address The address to place in the sockaddr structures
+ * @param pport An option port to include in the  sockaddr structures
+ * @throws A socket exception if given invalid IPs
+ */
 void sockaddrs::pton(int type, const Anope::string &address, int pport)
 {
 	switch (type)
@@ -132,6 +138,11 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 	throw CoreException("Invalid socket type");
 }
 
+/** The equivalent of inet_ntop
+ * @param type AF_INET or AF_INET6
+ * @param address The in_addr or in_addr6 structure
+ * @throws A socket exception if given an invalid structure
+ */
 void sockaddrs::ntop(int type, const void *src)
 {
 	switch (type)

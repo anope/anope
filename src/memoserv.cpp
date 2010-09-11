@@ -170,7 +170,6 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 {
 	bool ischan, isforbid;
 	MemoInfo *mi;
-	time_t now = time(NULL);
 	Anope::string source = u->Account()->display;
 	int is_servoper = u->Account() && u->Account()->IsServicesOper();
 
@@ -199,9 +198,9 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 				notice_lang(Config->s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
 		}
 	}
-	else if (z != 2 && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > now)
+	else if (z != 2 && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 	{
-		u->lastmemosend = now;
+		u->lastmemosend = Anope::CurTime;
 		if (!z)
 			notice_lang(Config->s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, Config->MSSendDelay);
 
@@ -220,7 +219,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 	}
 	else
 	{
-		u->lastmemosend = now;
+		u->lastmemosend = Anope::CurTime;
 		Memo *m = new Memo();
 		mi->memos.push_back(m);
 		m->sender = source;
@@ -235,7 +234,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 		}
 		else
 			m->number = 1;
-		m->time = time(NULL);
+		m->time = Anope::CurTime;
 		m->text = text;
 		m->SetFlag(MF_UNREAD);
 		/* Set notify sent flag - DrStein */

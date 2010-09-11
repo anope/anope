@@ -64,7 +64,7 @@ void bahamut_cmd_burst()
  */
 void bahamut_cmd_svinfo()
 {
-	send_cmd("", "SVINFO 3 1 0 :%ld", static_cast<long>(time(NULL)));
+	send_cmd("", "SVINFO 3 1 0 :%ld", static_cast<long>(Anope::CurTime));
 }
 
 /* PASS */
@@ -152,7 +152,7 @@ class BahamutIRCdProto : public IRCDProto
 		/* this will likely fail so its only here for legacy */
 		send_cmd("", "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd("", "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd("", "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SVSNOOP */
@@ -207,10 +207,10 @@ class BahamutIRCdProto : public IRCDProto
 	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->Expires - time(NULL);
+		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd("", "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd("", "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/*

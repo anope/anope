@@ -54,7 +54,7 @@ class CommandBSSay : public Command
 		}
 
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text.c_str());
-		ci->bi->lastmsg = time(NULL);
+		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX need a way to find if someone is overriding this
 		Log(LOG_COMMAND, u, this, ci) << text;

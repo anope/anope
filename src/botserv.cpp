@@ -266,15 +266,13 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		/* Flood kicker */
 		if (ci->botflags.HasFlag(BS_KICK_FLOOD))
 		{
-			time_t now = time(NULL);
-
 			UserData *ud = get_user_data(ci->c, u);
 			if (!ud)
 				return;
 
-			if (now - ud->last_start > ci->floodsecs)
+			if (Anope::CurTime - ud->last_start > ci->floodsecs)
 			{
-				ud->last_start = time(NULL);
+				ud->last_start = Anope::CurTime;
 				ud->lines = 0;
 			}
 
@@ -390,10 +388,9 @@ static BanData *get_ban_data(Channel *c, User *u)
 		return NULL;
 
 	Anope::string mask = u->GetIdent() + "@" + u->GetDisplayedHost();
-	time_t now = time(NULL);
 	for (std::list<BanData *>::iterator it = c->bd.begin(), it_end = c->bd.end(); it != it_end; ++it)
 	{
-		if (now - (*it)->last_use > Config->BSKeepData)
+		if (Anope::CurTime - (*it)->last_use > Config->BSKeepData)
 		{
 			delete *it;
 			c->bd.erase(it);
@@ -401,7 +398,7 @@ static BanData *get_ban_data(Channel *c, User *u)
 		}
 		if ((*it)->mask.equals_ci(mask))
 		{
-			(*it)->last_use = now;
+			(*it)->last_use = Anope::CurTime;
 			return *it;
 		}
 	}
@@ -409,7 +406,7 @@ static BanData *get_ban_data(Channel *c, User *u)
 	/* If we fall here it is that we haven't found the record */
 	BanData *bd = new BanData();
 	bd->mask = mask;
-	bd->last_use = now;
+	bd->last_use = Anope::CurTime;
 	for (int x = 0; x < TTB_SIZE; ++x)
 		bd->ttb[x] = 0;
 
@@ -435,15 +432,13 @@ static UserData *get_user_data(Channel *c, User *u)
 
 		if (uc->user == u)
 		{
-			time_t now = time(NULL);
-
 			/* Checks whether data is obsolete */
-			if (now - uc->ud.last_use > Config->BSKeepData)
+			if (Anope::CurTime - uc->ud.last_use > Config->BSKeepData)
 			{
 				/* We should not free and realloc, but reset to 0
 				   instead. */
 				uc->ud.Clear();
-				uc->ud.last_use = now;
+				uc->ud.last_use = Anope::CurTime;
 			}
 
 			return &uc->ud;
@@ -590,7 +585,7 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, c
 	if (!u || !ci->c->FindUser(u))
 		return;
 
-	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(time(NULL)));
+	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(Anope::CurTime));
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && mode[0] == '-' && requester != u)
 	{

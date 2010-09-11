@@ -35,17 +35,15 @@ bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::s
 	if (!u || !nr || subject.empty() || service.empty() || message.empty())
 		return false;
 
-	time_t t = time(NULL);
-
 	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
-	else if (t - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - t - u->lastmail);
+	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
+		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
 	else if (nr->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nr->nick.c_str());
 	else
 	{
-		u->lastmail = nr->lastmail = t;
+		u->lastmail = nr->lastmail = Anope::CurTime;
 		threadEngine.Start(new MailThread(nr->nick, nr->email, subject, message));
 		return true;
 	}
@@ -58,17 +56,15 @@ bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::stri
 	if (!u || !nc || subject.empty() || service.empty() || message.empty())
 		return false;
 
-	time_t t = time(NULL);
-
 	if (!Config->UseMail)
 		notice_lang(service, u, MAIL_DISABLED);
-	else if (t - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - t - u->lastmail);
+	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
+		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
 	else if (nc->email.empty())
 		notice_lang(service, u, MAIL_INVALID, nc->display.c_str());
 	else
 	{
-		u->lastmail = nc->lastmail = t;
+		u->lastmail = nc->lastmail = Anope::CurTime;
 		threadEngine.Start(new MailThread(nc->display, nc->email, subject, message));
 		return true;
 	}
@@ -81,7 +77,7 @@ bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &messa
 	if (!Config->UseMail || !nc || nc->email.empty() || subject.empty() || message.empty())
 		return false;
 
-	nc->lastmail = time(NULL);
+	nc->lastmail = Anope::CurTime;
 	threadEngine.Start(new MailThread(nc->display, nc->email, subject, message));
 
 	return true;

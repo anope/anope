@@ -51,7 +51,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 
 	this->bantype = Config->CSDefBantype;
 	this->memos.memomax = Config->MSMaxMemos;
-	this->last_used = this->time_registered = time(NULL);
+	this->last_used = this->time_registered = Anope::CurTime;
 
 	this->ttb = new int16[2 * TTB_SIZE];
 	for (int i = 0; i < TTB_SIZE; ++i)
@@ -578,7 +578,7 @@ bool ChannelInfo::CheckKick(User *user)
 			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc) || (!autokick->HasFlag(AK_ISNICK) && match_usermask(autokick->mask, user)))
 			{
 				Log(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
-				autokick->last_used = time(NULL);
+				autokick->last_used = Anope::CurTime;
 				if (autokick->HasFlag(AK_ISNICK))
 					get_idealban(this, user, mask);
 				else

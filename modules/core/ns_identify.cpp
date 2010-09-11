@@ -63,7 +63,7 @@ class CommandNSIdentify : public Command
 					Log(LOG_COMMAND, "nickserv/identify") << "to log out of account " << u->Account()->display;
 
 				na->last_realname = u->realname;
-				na->last_seen = time(NULL);
+				na->last_seen = Anope::CurTime;
 
 				u->Login(na->nc);
 				ircdproto->SendAccountLogin(u, u->Account());

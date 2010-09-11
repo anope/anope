@@ -42,7 +42,7 @@ class CoreExport Timer : public Extensible
 	 * @param now The time now
 	 * @param repeating Repeat this timer every time_from_now if this is true
 	 */
-	Timer(long time_from_now, time_t now = time(NULL), bool repeating = false);
+	Timer(long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
 
 	/** Default destructor, removes the timer from the list
 	 */
@@ -103,7 +103,7 @@ class CoreExport TimerManager : public Extensible
 	/** Tick all pending timers
 	 * @param ctime The current time
 	 */
-	static void TickTimers(time_t ctime = time(NULL));
+	static void TickTimers(time_t ctime = Anope::CurTime);
 
 	/** Compares two timers
 	 */

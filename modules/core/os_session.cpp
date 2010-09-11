@@ -114,7 +114,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 		char timebuf[32];
 		struct tm tm;
-		time_t t = time(NULL);
+		time_t t = Anope::CurTime;
 
 		tm = *localtime(exceptions[index]->time ? &exceptions[index]->time : &t);
 		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
@@ -249,7 +249,7 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 		else if (expires > 0)
-			expires += time(NULL);
+			expires += Anope::CurTime;
 
 		int limit = !limitstr.empty() && limitstr.is_number_only() ? convertTo<int>(limitstr) : -1;
 

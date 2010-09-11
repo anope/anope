@@ -84,7 +84,6 @@ class CommandHSRequest : public Command
 		Anope::string rawhostmask = params[0];
 		Anope::string hostmask;
 		NickAlias *na;
-		time_t now = time(NULL);
 
 		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (!vIdent.empty())
@@ -129,13 +128,13 @@ class CommandHSRequest : public Command
 
 		if ((na = findnick(nick)))
 		{
-			if ((HSRequestMemoOper || HSRequestMemoSetters) && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > now)
+			if ((HSRequestMemoOper || HSRequestMemoSetters) && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 			{
 				me->NoticeLang(Config->s_HostServ, u, LNG_REQUEST_WAIT, Config->MSSendDelay);
-				u->lastmemosend = now;
+				u->lastmemosend = Anope::CurTime;
 				return MOD_CONT;
 			}
-			my_add_host_request(nick, vIdent, hostmask, u->nick, now);
+			my_add_host_request(nick, vIdent, hostmask, u->nick, Anope::CurTime);
 
 			me->NoticeLang(Config->s_HostServ, u, LNG_REQUESTED);
 			req_send_memos(u, vIdent, hostmask);

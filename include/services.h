@@ -509,7 +509,7 @@ class CoreExport HostInfo
 	 * @param creator Who created the vhost
 	 * @param time When the vhost was craated
 	 */
-	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = time(NULL));
+	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
 
 	/** Remove a users vhost
 	 **/

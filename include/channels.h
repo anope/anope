@@ -23,7 +23,7 @@ struct UserData
 
 	void Clear()
 	{
-		last_use = last_start = time(NULL);
+		last_use = last_start = Anope::CurTime;
 		lines = times = 0;
 		lastline.clear();
 	}
@@ -77,7 +77,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param name The channel name
 	 * @param ts The time the channel was created
 	 */
-	Channel(const Anope::string &nname, time_t ts = time(NULL));
+	Channel(const Anope::string &nname, time_t ts = Anope::CurTime);
 
 	/** Default destructor
 	 */

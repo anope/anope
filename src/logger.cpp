@@ -76,7 +76,7 @@ static Anope::string GetTimeStamp()
 	return tbuf;
 }
 
-static Anope::string GetLogDate(time_t t = time(NULL))
+static Anope::string GetLogDate(time_t t = Anope::CurTime)
 {
 	char timestamp[32];
 
@@ -88,7 +88,7 @@ static Anope::string GetLogDate(time_t t = time(NULL))
 	return timestamp;
 }
 
-static inline Anope::string CreateLogName(const Anope::string &file, time_t t = time(NULL))
+static inline Anope::string CreateLogName(const Anope::string &file, time_t t = Anope::CurTime)
 {
 	return "logs/" + file + "." + GetLogDate(t);
 }
@@ -301,7 +301,7 @@ bool LogInfo::HasType(LogType type)
 
 void LogInfo::ProcessMessage(const Log *l)
 {
-	static time_t lastwarn = time(NULL);
+	static time_t lastwarn = Anope::CurTime;
 
 	if (!l)
 		throw CoreException("Bad values passed to LogInfo::ProcessMessages");
@@ -354,7 +354,7 @@ void LogInfo::ProcessMessage(const Log *l)
 
 					if (this->LogAge)
 					{
-						Anope::string oldlog = CreateLogName(target, time(NULL) - 86400 * this->LogAge);
+						Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->LogAge);
 						if (IsFile(oldlog))
 						{
 							DeleteFile(oldlog.c_str());
@@ -364,10 +364,9 @@ void LogInfo::ProcessMessage(const Log *l)
 				}
 				if (!log || !log->stream.is_open())
 				{
-					time_t now = time(NULL);
-					if (log && lastwarn + 300 > now)
+					if (log && lastwarn + 300 > Anope::CurTime)
 					{
-						lastwarn = now;
+						lastwarn = Anope::CurTime;
 						Log() << "Unable to open logfile " << log->GetName();
 					}
 					delete log;
@@ -382,10 +381,9 @@ void LogInfo::ProcessMessage(const Log *l)
 
 				if (!log->stream.is_open())
 				{
-					time_t now = time(NULL);
-					if (lastwarn + 300 > now)
+					if (lastwarn + 300 > Anope::CurTime)
 					{
-						lastwarn = now;
+						lastwarn = Anope::CurTime;
 						Log() << "Unable to open logfile " << log->GetName();
 						delete log;
 						log = NULL;

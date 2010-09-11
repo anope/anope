@@ -145,7 +145,7 @@ void add_session(const Anope::string &nick, const Anope::string &host, const Ano
 			if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)
 			{
 				Anope::string akillmask = "*@" + host;
-				XLine *x = new XLine(akillmask, Config->s_OperServ, time(NULL) + Config->SessionAutoKillExpiry, "Session limit exceeded");
+				XLine *x = new XLine(akillmask, Config->s_OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded");
 				SGLine->AddXLine(x);
 				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 			}
@@ -215,14 +215,12 @@ void del_session(const Anope::string &host)
 
 void expire_exceptions()
 {
-	time_t now = time(NULL);
-
 	for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; )
 	{
 		Exception *e = *it;
 		std::vector<Exception *>::iterator curr_it = it++;
 
-		if (!e->expires || e->expires > now)
+		if (!e->expires || e->expires > Anope::CurTime)
 			continue;
 		if (Config->WallExceptionExpire)
 			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", e->mask.c_str());
@@ -290,7 +288,7 @@ int exception_add(User *u, const Anope::string &mask, int limit, const Anope::st
 	exception->mask = mask;
 	exception->limit = limit;
 	exception->reason = reason;
-	exception->time = time(NULL);
+	exception->time = Anope::CurTime;
 	exception->who = who;
 	exception->expires = expires;
 

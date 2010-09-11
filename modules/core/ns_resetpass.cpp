@@ -90,7 +90,7 @@ class NSResetPass : public Module
 			Anope::string c;
 			if (na && na->nc->GetExtRegular("ns_resetpass_code", c) && na->nc->GetExtRegular("ns_resetpass_time", t))
 			{
-				if (t < time(NULL) - 3600)
+				if (t < Anope::CurTime - 3600)
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
@@ -106,7 +106,7 @@ class NSResetPass : public Module
 
 					u->UpdateHost();
 					na->last_realname = u->realname;
-					na->last_seen = time(NULL);
+					na->last_seen = Anope::CurTime;
 					u->Login(na->nc);
 					ircdproto->SendAccountLogin(u, u->Account());
 					ircdproto->SetAutoIdentificationToken(u);
@@ -162,7 +162,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	na->nc->Shrink("ns_resetpass_time");
 
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
-	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(time(NULL)));
+	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));
 
 	return Mail(u, na->nc, Config->s_NickServ, subject, message);
 }

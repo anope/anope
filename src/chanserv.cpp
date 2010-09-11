@@ -244,7 +244,6 @@ void cs_init()
 
 void check_modes(Channel *c)
 {
-	time_t t = time(NULL);
 	ChannelInfo *ci;
 	ChannelMode *cm;
 	std::map<char, ChannelMode *>::iterator it, it_end;
@@ -268,10 +267,10 @@ void check_modes(Channel *c)
 		return;
 	}
 
-	if (c->chanserv_modetime != t)
+	if (c->chanserv_modetime != Anope::CurTime)
 	{
 		c->chanserv_modecount = 0;
-		c->chanserv_modetime = t;
+		c->chanserv_modetime = Anope::CurTime;
 	}
 	c->chanserv_modecount++;
 
@@ -462,7 +461,7 @@ void restore_topic(const Anope::string &chan)
 		 */
 		ci->last_topic.clear();
 		ci->last_topic_setter = whosends(ci)->nick;
-		ci->last_topic_time = time(NULL);
+		ci->last_topic_time = Anope::CurTime;
 		return;
 	}
 	if (!ci->last_topic.empty())
@@ -522,7 +521,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 		/* Because older timestamps are rejected */
 		/* Some how the topic_time from do_topic is 0 set it to current + 1 */
 		if (!topic_time)
-			c->topic_time = time(NULL) + 1;
+			c->topic_time = Anope::CurTime + 1;
 		else
 			c->topic_time = topic_time + 1;
 	}
@@ -532,7 +531,7 @@ int check_topiclock(Channel *c, time_t topic_time)
 		if (!ci->last_topic.empty())
 			c->topic_time = ci->last_topic_time;
 		else
-			c->topic_time = time(NULL) + 1;
+			c->topic_time = Anope::CurTime + 1;
 	}
 
 	if (ircd->join2set && whosends(ci) == ChanServ)
@@ -557,14 +556,12 @@ void expire_chans()
 	if (!Config->CSExpire)
 		return;
 
-	time_t now = time(NULL);
-
 	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
 	{
 		ChannelInfo *ci = it->second;
 		++it;
 
-		if (!ci->c && now - ci->last_used >= Config->CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
+		if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
@@ -678,7 +675,7 @@ int check_access(User *user, ChannelInfo *ci, int what)
 
 	/* Resetting the last used time */
 	if (level > 0)
-		ci->last_used = time(NULL);
+		ci->last_used = Anope::CurTime;
 
 	/* Superadmin always wins. Always. */
 	if (user->isSuperAdmin)
@@ -794,7 +791,7 @@ void update_cs_lastseen(User *user, ChannelInfo *ci)
 
 	if (IsFounder(user, ci) || user->IsIdentified() || (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
 		if ((access = ci->GetAccess(user->Account())))
-			access->last_seen = time(NULL);
+			access->last_seen = Anope::CurTime;
 }
 
 /*************************************************************************/

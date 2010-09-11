@@ -130,7 +130,7 @@ class CommandOSStats : public Command
 	CommandReturn DoStatsUptime(User *u)
 	{
 		char timebuf[64];
-		time_t uptime = time(NULL) - start_time;
+		time_t uptime = Anope::CurTime - start_time;
 		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
 		notice_lang(Config->s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
 		struct tm *tm = localtime(&maxusertime);

@@ -172,7 +172,7 @@ void Channel::JoinUser(User *user)
 		if (this->FindUser(this->ci->bi) && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
 		{
 			ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
-			this->ci->bi->lastmsg = time(NULL);
+			this->ci->bi->lastmsg = Anope::CurTime;
 		}
 	}
 
@@ -1114,7 +1114,6 @@ User *nc_on_chan(Channel *c, const NickCore *nc)
 void do_join(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
-	time_t ctime = time(NULL);
 
 	user = finduser(source);
 	if (!user)
@@ -1146,7 +1145,7 @@ void do_join(const Anope::string &source, int ac, const char **av)
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
-			chan = new Channel(av[0], ctime);
+			chan = new Channel(av[0], Anope::CurTime);
 
 		/* Join came with a TS */
 		if (ac == 2)
@@ -1292,12 +1291,12 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 		return;
 	}
 
-	if (source.find('.') != Anope::string::npos && Anope::string(av[1]).find_first_of("bovahq") == Anope::string::npos)
+	if (source.find('.') != Anope::string::npos && Anope::string(av[1]).find_first_of("bovahq") == Anope::string::npos) // XXX
 	{
-		if (time(NULL) != c->server_modetime)
+		if (Anope::CurTime != c->server_modetime)
 		{
 			c->server_modecount = 0;
-			c->server_modetime = time(NULL);
+			c->server_modetime = Anope::CurTime;
 		}
 		++c->server_modecount;
 	}

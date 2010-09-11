@@ -57,8 +57,8 @@ class CommandNSGroup : public Command
 		na = findnick(u->nick);
 		if (!(target = findnick(nick)))
 			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
-		else if (time(NULL) < u->lastnickreg + Config->NSRegDelay)
-			notice_lang(Config->s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (Config->NSRegDelay + u->lastnickreg) - time(NULL));
+		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
+			notice_lang(Config->s_NickServ, u, NICK_GROUP_PLEASE_WAIT, (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
 		{
 			//Alog() << Config->s_NickServ << ": " << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
@@ -113,7 +113,7 @@ class CommandNSGroup : public Command
 					Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
 					na->last_usermask = last_usermask;
 					na->last_realname = u->realname;
-					na->time_registered = na->last_seen = time(NULL);
+					na->time_registered = na->last_seen = Anope::CurTime;
 
 					u->Login(na->nc);
 					FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
@@ -122,7 +122,7 @@ class CommandNSGroup : public Command
 					Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 					notice_lang(Config->s_NickServ, u, NICK_GROUP_JOINED, target->nick.c_str());
 
-					u->lastnickreg = time(NULL);
+					u->lastnickreg = Anope::CurTime;
 
 					check_memos(u);
 				}

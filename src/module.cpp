@@ -23,7 +23,7 @@ Module::Module(const Anope::string &mname, const Anope::string &creator)
 	if (FindModule(this->name))
 		throw CoreException("Module already exists!");
 
-	this->created = time(NULL);
+	this->created = Anope::CurTime;
 
 	this->SetVersion(Anope::Version());
 

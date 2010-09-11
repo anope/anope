@@ -1237,7 +1237,7 @@ class CallBack : public Timer
  private:
 	Module *m;
  public:
-	CallBack(Module *mod, long time_from_now, time_t now = time(NULL), bool repeating = false) : Timer(time_from_now, now, repeating),  m(mod)
+	CallBack(Module *mod, long time_from_now, time_t now = Anope::CurTime, bool repeating = false) : Timer(time_from_now, now, repeating),  m(mod)
 	{
 		m->CallBacks.push_back(this);
 	}

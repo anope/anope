@@ -38,7 +38,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	nc = NULL;
 	invalid_pw_count = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 	OnAccess = false;
-	timestamp = my_signon = time(NULL);
+	timestamp = my_signon = Anope::CurTime;
 
 	this->nick = snick;
 	this->ident = sident;
@@ -57,7 +57,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	if (usercnt > maxusercnt)
 	{
 		maxusercnt = usercnt;
-		maxusertime = time(NULL);
+		maxusertime = Anope::CurTime;
 		Log(this, "maxusers") << "connected - new maximum user count: " << maxusercnt;
 	}
 }
@@ -315,7 +315,7 @@ void User::Collide(NickAlias *na)
 		} while (finduser(guestnick));
 
 		notice_lang(Config->s_NickServ, this, FORCENICKCHANGE_CHANGING, guestnick.c_str());
-		ircdproto->SendForceNickChange(this, guestnick, time(NULL));
+		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 	}
 	else
 		kill_user(Config->s_NickServ, this->nick, "Services nickname-enforcer kill");
@@ -665,7 +665,6 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		user->server = serv;
 		user->realname = realname;
 		user->timestamp = ts;
-		user->my_signon = time(NULL);
 		if (!vhost2.empty())
 			user->SetCloakedHost(vhost2);
 		user->SetVIdent(username);
@@ -726,11 +725,11 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		else
 		{
 			/* Update this only if nicks aren't the same */
-			user->my_signon = time(NULL);
+			user->my_signon = Anope::CurTime;
 
 			NickAlias *old_na = findnick(user->nick);
 			if (old_na && (old_na->nc == user->Account() || user->IsRecognized()))
-				old_na->last_seen = time(NULL);
+				old_na->last_seen = Anope::CurTime;
 
 			Anope::string oldnick = user->nick;
 			user->SetNewNick(nick);
@@ -750,7 +749,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			}
 			else
 			{
-				na->last_seen = time(NULL);
+				na->last_seen = Anope::CurTime;
 				user->UpdateHost();
 				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
@@ -807,7 +806,7 @@ void do_quit(const Anope::string &source, int ac, const char **av)
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
-		na->last_seen = time(NULL);
+		na->last_seen = Anope::CurTime;
 		na->last_quit = *av[0] ? av[0] : "";
 	}
 	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
@@ -835,7 +834,7 @@ void do_kill(const Anope::string &nick, const Anope::string &msg)
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
-		na->last_seen = time(NULL);
+		na->last_seen = Anope::CurTime;
 		na->last_quit = msg;
 	}
 	delete user;

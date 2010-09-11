@@ -142,7 +142,7 @@ static int add_newsitem(User *u, const Anope::string &text, NewsType type)
 	news->type = type;
 	news->num = num + 1;
 	news->Text = text;
-	news->time = time(NULL);
+	news->time = Anope::CurTime;
 	news->who = u->nick;
 
 	News.push_back(news);

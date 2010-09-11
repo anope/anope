@@ -152,7 +152,7 @@ class CommandOSSQLine : public Command
 			return MOD_CONT;
 		}
 		else if (expires > 0)
-			expires += time(NULL);
+			expires += Anope::CurTime;
 
 		if (params.size() <= last_param)
 		{
@@ -180,7 +180,7 @@ class CommandOSSQLine : public Command
 					buf = "does not expire";
 				else
 				{
-					int wall_expiry = expires - time(NULL);
+					time_t wall_expiry = expires - Anope::CurTime;
 					Anope::string s;
 
 					if (wall_expiry >= 86400)

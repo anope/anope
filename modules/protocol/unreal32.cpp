@@ -51,7 +51,7 @@ IRCDVar myIrcd[] = {
 
 void unreal_cmd_netinfo(int ac, const char **av)
 {
-	send_cmd("", "AO %ld %ld %d %s 0 0 0 :%s", static_cast<long>(maxusercnt), static_cast<long>(time(NULL)), Anope::string(av[2]).is_number_only() ? convertTo<int>(av[2]) : 0, av[3], av[7]);
+	send_cmd("", "AO %ld %ld %d %s 0 0 0 :%s", static_cast<long>(maxusercnt), static_cast<long>(Anope::CurTime), Anope::string(av[2]).is_number_only() ? convertTo<int>(av[2]) : 0, av[3], av[7]);
 }
 
 /* PROTOCTL */
@@ -129,10 +129,10 @@ class UnrealIRCdProto : public IRCDProto
 	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->Expires - time(NULL);
+		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL) + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
+		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -249,7 +249,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (!oldnick || newnick.empty())
 			return;
-		send_cmd(oldnick->nick, "& %s %ld", newnick.c_str(), static_cast<long>(time(NULL)));
+		send_cmd(oldnick->nick, "& %s %ld", newnick.c_str(), static_cast<long>(Anope::CurTime));
 	}
 
 	/* Functions that use serval cmd functions */
@@ -272,7 +272,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd("", "BD + Q H %s %s %ld %ld :Being held for registered user", nick.c_str(), Config->ServerName.c_str(), static_cast<long>(time(NULL) + Config->NSReleaseTimeout), static_cast<long>(time(NULL)));
+		send_cmd("", "BD + Q H %s %s %ld %ld :Being held for registered user", nick.c_str(), Config->ServerName.c_str(), static_cast<long>(Anope::CurTime + Config->NSReleaseTimeout), static_cast<long>(Anope::CurTime));
 	}
 
 	/* SVSHOLD - release */
@@ -299,7 +299,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(const XLine *x)
 	{
-		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + 172800), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SGLINE */

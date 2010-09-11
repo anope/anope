@@ -85,7 +85,7 @@ class CommandCSAppendTopic : public Command
 
 			ci->last_topic = topic;
 			ci->last_topic_setter = u->nick;
-			ci->last_topic_time = time(NULL);
+			ci->last_topic_time = Anope::CurTime;
 
 			c->topic = topic;
 			c->topic_setter = u->nick;

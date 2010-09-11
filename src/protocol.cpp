@@ -234,7 +234,7 @@ void IRCDProto::SendSquit(const Anope::string &servname, const Anope::string &me
 
 void IRCDProto::SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NICK %s %ld", newnick.c_str(), static_cast<long>(time(NULL)));
+	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NICK %s %ld", newnick.c_str(), static_cast<long>(Anope::CurTime));
 }
 
 void IRCDProto::SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)

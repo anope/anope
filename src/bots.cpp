@@ -26,7 +26,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->server = Me;
 
 	this->chancount = 0;
-	this->lastmsg = this->created = time(NULL);
+	this->lastmsg = this->created = Anope::CurTime;
 
 	this->SetFlag(BI_CORE);
 	if (!Config->s_ChanServ.empty() && nnick.equals_ci(Config->s_ChanServ))

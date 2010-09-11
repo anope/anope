@@ -22,7 +22,7 @@ extern void moduleAddIRCDMsgs();
 void introduce_user(const Anope::string &user)
 {
 	/* Watch out for infinite loops... */
-	time_t now = time(NULL);
+	time_t now = Anope::CurTime;
 	static time_t lasttime = now - 4;
 	if (lasttime >= now - 3)
 		throw FatalException("introduce_user loop detected");
@@ -427,7 +427,7 @@ void Init(int ac, char **av)
 
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " (ircd protocol: " << ircd->name << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
-	start_time = time(NULL);
+	start_time = Anope::CurTime;
 
 	/* Set signal handlers.  Catch certain signals to let us do things or
 	 * panic as necessary, and ignore all others.

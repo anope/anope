@@ -435,17 +435,15 @@ int main(int ac, char **av, char **envp)
 		started = true;
 
 		/* Set up timers */
-		time_t last_check = time(NULL);
-		ExpireTimer expireTimer(Config->ExpireTimeout, last_check);
-		UpdateTimer updateTimer(Config->UpdateTimeout, last_check);
+		time_t last_check = Anope::CurTime;
+		ExpireTimer expireTimer(Config->ExpireTimeout, Anope::CurTime);
+		UpdateTimer updateTimer(Config->UpdateTimeout, Anope::CurTime);
 
 		/*** Main loop. ***/
 		while (!quitting)
 		{
 			while (!quitting && UplinkSock)
 			{
-				time_t t = time(NULL);
-
 				Log(LOG_DEBUG_2) << "Top of main loop";
 
 				if (!readonly && (save_data || shutting_down))
@@ -464,10 +462,10 @@ int main(int ac, char **av, char **envp)
 					break;
 				}
 
-				if (t - last_check >= Config->TimeoutCheck)
+				if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 				{
-					TimerManager::TickTimers(t);
-					last_check = t;
+					TimerManager::TickTimers(Anope::CurTime);
+					last_check = Anope::CurTime;
 				}
 
 				/* Process any modes that need to be (un)set */

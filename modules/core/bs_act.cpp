@@ -48,7 +48,7 @@ class CommandBSAct : public Command
 			message.erase(i, 1);
 
 		ircdproto->SendAction(ci->bi, ci->name, "%s", message.c_str());
-		ci->bi->lastmsg = time(NULL);
+		ci->bi->lastmsg = Anope::CurTime;
 
 		// XXX Need to be able to find if someone is overriding this.
 		Log(LOG_COMMAND, u, this, ci) << message;

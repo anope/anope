@@ -84,7 +84,7 @@ class CommandHSSetAll : public Command
 			return MOD_CONT;
 		}
 
-		tmp_time = time(NULL);
+		tmp_time = Anope::CurTime;
 
 		Log(LOG_ADMIN, u, this) << "to set the vhost for all nicks in group " << na->nc->display << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 

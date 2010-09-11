@@ -59,7 +59,7 @@ IRCDVar myIrcd[] = {
  */
 void ratbox_cmd_svinfo()
 {
-	send_cmd("", "SVINFO 6 3 0 :%ld", static_cast<long>(time(NULL)));
+	send_cmd("", "SVINFO 6 3 0 :%ld", static_cast<long>(Anope::CurTime));
 }
 
 void ratbox_cmd_svsinfo()
@@ -147,7 +147,7 @@ class RatboxProto : public IRCDProto
 	void SendAkill(const XLine *x)
 	{
 		BotInfo *bi = OperServ;
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - time(NULL)), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -424,7 +424,6 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 	else
 	{
 		Channel *c = findchan(av[0]);
-		time_t topic_time = time(NULL);
 
 		if (!c)
 		{
@@ -432,7 +431,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 			return MOD_CONT;
 		}
 
-		if (check_topiclock(c, topic_time))
+		if (check_topiclock(c, Anope::CurTime))
 			return MOD_CONT;
 
 		c->topic.clear();
@@ -441,7 +440,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 
 		u = finduser(source);
 		c->topic_setter = u ? u->nick : source;
-		c->topic_time = topic_time;
+		c->topic_time = Anope::CurTime;
 
 		record_topic(av[0]);
 

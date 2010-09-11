@@ -288,6 +288,11 @@ namespace Anope
 
 	static const char *const compiled = __TIME__ " " __DATE__;
 
+	/** The current system time, which is pretty close to being accurate.
+	 * Use this unless you need very specific time checks
+	 */
+	static time_t CurTime = time(NULL);
+
 	extern CoreExport string Version();
 
 	extern CoreExport string Build();

@@ -192,7 +192,7 @@ inline DNSRecord::DNSRecord()
 {
 	this->type = DNS_QUERY_NONE;
 	this->record_class = this->ttl = this->rdlength = 0;
-	this->created = time(NULL);
+	this->created = Anope::CurTime;
 }
 
 DNSSocket::DNSSocket(const Anope::string &nTargetHost, int nPort) : ClientSocket(nTargetHost, nPort, "", false, SOCK_DGRAM)
@@ -471,7 +471,7 @@ bool DNSSocket::ProcessWrite()
 	return cont;
 }
 
-DNSManager::DNSManager() : Timer(3600, time(NULL), true)
+DNSManager::DNSManager() : Timer(3600, Anope::CurTime, true)
 {
 	this->sock = NULL;
 
@@ -502,11 +502,10 @@ bool DNSManager::CheckCache(DNSRequest *request)
 	{
 		std::multimap<Anope::string, DNSRecord *>::iterator it_end = this->cache.upper_bound(request->address);
 		
-		time_t now = time(NULL);
 		for (; it != it_end; ++it)
 		{
 			DNSRecord *rec = it->second;
-			if (rec->created + rec->ttl >= now)
+			if (rec->created + rec->ttl >= Anope::CurTime)
 			{
 				request->OnLookupComplete(rec);
 			}

@@ -44,7 +44,7 @@ class CommandOSChanKill : public Command
 			return MOD_CONT;
 		}
 		else if (expires > 0)
-			expires += time(NULL);
+			expires += Anope::CurTime;
 
 		if (params.size() <= last_param)
 		{

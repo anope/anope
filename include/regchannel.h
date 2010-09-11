@@ -171,7 +171,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = time(NULL), time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, NickCore *akicknc, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Add an akick entry to the channel by reason
 	 * @param user The user who added the akick
@@ -180,7 +180,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param t The time the akick was added, defaults to now
 	 * @param lu The time the akick was last used, defaults to never
 	 */
-	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = time(NULL), time_t lu = 0);
+	AutoKick *AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t = Anope::CurTime, time_t lu = 0);
 
 	/** Get an entry from the channel akick list
 	 * @param index The index in the akick vector

@@ -119,6 +119,7 @@ class SocketEngineEPoll : public SocketEngineBase
 	void Process()
 	{
 		int total = epoll_wait(EngineHandle, events, max - 1, Config->ReadTimeout * 1000);
+		Anope::CurTime = time(NULL);
 
 		if (total == -1)
 		{

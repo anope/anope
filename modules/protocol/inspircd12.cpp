@@ -76,7 +76,7 @@ int anope_event_idle(const Anope::string &source, int ac, const char **av)
 {
 	BotInfo *bi = findbot(av[0]);
 
-	send_cmd(bi ? bi->GetUID() : av[0], "IDLE %s %ld %ld", source.c_str(), static_cast<long>(start_time), bi ? (static_cast<long>(time(NULL) - bi->lastmsg)) : 0);
+	send_cmd(bi ? bi->GetUID() : av[0], "IDLE %s %ld %ld", source.c_str(), static_cast<long>(start_time), bi ? (static_cast<long>(Anope::CurTime - bi->lastmsg)) : 0);
 	return MOD_CONT;
 }
 
@@ -114,10 +114,10 @@ class InspIRCdProto : public IRCDProto
 	void SendAkill(const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
-		time_t timeleft = x->Expires - time(NULL);
+		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(OperServ->GetUID(), "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(time(NULL)), static_cast<long>(timeleft), x->Reason.c_str());
+		send_cmd(OperServ->GetUID(), "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -191,7 +191,7 @@ class InspIRCdProto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(const XLine *x)
 	{
-		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -248,7 +248,7 @@ class InspIRCdProto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(const XLine *x)
 	{
-		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(time(NULL)), x->Reason.c_str());
+		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)
@@ -274,7 +274,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendBOB()
 	{
-		send_cmd(TS6SID, "BURST %ld", time(NULL));
+		send_cmd(TS6SID, "BURST %ld", Anope::CurTime);
 	}
 
 	void SendEOB()
@@ -539,7 +539,7 @@ int anope_event_time(const Anope::string &source, int ac, const char **av)
 	if (ac !=2)
 		return MOD_CONT;
 
-	send_cmd(TS6SID, "TIME %s %s %ld", source.c_str(), av[1], static_cast<long>(time(NULL)));
+	send_cmd(TS6SID, "TIME %s %s %ld", source.c_str(), av[1], static_cast<long>(Anope::CurTime));
 
 	/* We handled it, don't pass it on to the core..
 	 * The core doesn't understand our syntax anyways.. ~ Viper */
@@ -562,7 +562,6 @@ int anope_event_away(const Anope::string &source, int ac, const char **av)
 int anope_event_topic(const Anope::string &source, int ac, const char **av)
 {
 	Channel *c = findchan(av[0]);
-	time_t topic_time = time(NULL);
 	User *u = finduser(source);
 
 	if (!c)
@@ -571,7 +570,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	if (check_topiclock(c, topic_time))
+	if (check_topiclock(c, Anope::CurTime))
 		return MOD_CONT;
 
 	c->topic.clear();
@@ -579,7 +578,7 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 		c->topic = av[1];
 
 	c->topic_setter = u ? u->nick : source;
-	c->topic_time = topic_time;
+	c->topic_time = Anope::CurTime;
 
 	record_topic(av[0]);
 

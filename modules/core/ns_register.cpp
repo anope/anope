@@ -50,7 +50,7 @@ class CommandNSConfirm : public Command
 				na->nc->AddAccess(create_mask(u));
 		}
 
-		na->time_registered = na->last_seen = time(NULL);
+		na->time_registered = na->last_seen = Anope::CurTime;
 		na->nc->language = Config->NSDefLanguage;
 		if (!nr->email.empty())
 			na->nc->email = nr->email;
@@ -71,7 +71,7 @@ class CommandNSConfirm : public Command
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 				notice_lang(Config->s_NickServ, u, NICK_PASSWORD_IS, tmp_pass.c_str());
 
-			u->lastnickreg = time(NULL);
+			u->lastnickreg = Anope::CurTime;
 		}
 		else
 		{
@@ -201,7 +201,7 @@ class CommandNSRegister : public CommandNSConfirm
 			return MOD_CONT;
 		}
 
-		if (!is_oper(u) && Config->NickRegDelay && time(NULL) - u->my_signon < Config->NickRegDelay)
+		if (!is_oper(u) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
 		{
 			notice_lang(Config->s_NickServ, u, NICK_REG_DELAY, Config->NickRegDelay);
 			return MOD_CONT;
@@ -244,8 +244,8 @@ class CommandNSRegister : public CommandNSConfirm
 
 		if (Config->NSForceEmail && email.empty())
 			this->OnSyntaxError(u, "");
-		else if (time(NULL) < u->lastnickreg + Config->NSRegDelay)
-			notice_lang(Config->s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config->NSRegDelay) - time(NULL));
+		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
+			notice_lang(Config->s_NickServ, u, NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config->NSRegDelay) - Anope::CurTime);
 		else if ((na = findnick(u->nick)))
 		{
 			/* i.e. there's already such a nick regged */
@@ -273,7 +273,7 @@ class CommandNSRegister : public CommandNSConfirm
 			enc_encrypt(pass, nr->password);
 			if (!email.empty())
 				nr->email = email;
-			nr->requested = time(NULL);
+			nr->requested = Anope::CurTime;
 			FOREACH_MOD(I_OnMakeNickRequest, OnMakeNickRequest(nr));
 			if (Config->NSEmailReg)
 			{
@@ -335,14 +335,14 @@ class CommandNSResend : public Command
 		{
 			if ((nr = findrequestnick(u->nick)))
 			{
-				if (time(NULL) < nr->lastmail + Config->NSResendDelay)
+				if (Anope::CurTime < nr->lastmail + Config->NSResendDelay)
 				{
 					notice_lang(Config->s_NickServ, u, MAIL_LATER);
 					return MOD_CONT;
 				}
 				if (!SendRegmail(u, nr))
 				{
-					nr->lastmail = time(NULL);
+					nr->lastmail = Anope::CurTime;
 					notice_lang(Config->s_NickServ, u, NICK_REG_RESENT, nr->email.c_str());
 					Log(LOG_COMMAND, u, this) << "resend registration verification code for " << nr->nick;
 				}

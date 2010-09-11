@@ -59,7 +59,7 @@ class CommandOSSVSNick : public Command
 		{
 			notice_lang(Config->s_OperServ, u, OPER_SVSNICK_NEWNICK, nick.c_str(), newnick.c_str());
 			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
-			ircdproto->SendForceNickChange(u2, newnick, time(NULL));
+			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
 		return MOD_CONT;
 	}

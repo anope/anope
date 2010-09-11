@@ -21,15 +21,13 @@
  */
 bool bad_password(User *u)
 {
-	time_t now = time(NULL);
-
 	if (!u || !Config->BadPassLimit)
 		return false;
 
-	if (Config->BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < now - Config->BadPassTimeout)
+	if (Config->BadPassTimeout > 0 && u->invalid_pw_time > 0 && u->invalid_pw_time < Anope::CurTime - Config->BadPassTimeout)
 		u->invalid_pw_count = 0;
 	++u->invalid_pw_count;
-	u->invalid_pw_time = now;
+	u->invalid_pw_time = Anope::CurTime;
 	if (u->invalid_pw_count >= Config->BadPassLimit)
 	{
 		kill_user("", u->nick, "Too many invalid passwords");

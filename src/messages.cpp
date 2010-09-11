@@ -223,7 +223,7 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 			if (u && is_oper(u))
 			{
 				ircdproto->SendNumeric(Config->ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, time(NULL) - start_time);
+				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, Anope::CurTime - start_time);
 			}
 
 			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
@@ -253,7 +253,7 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 
 		case 'u':
 		{
-			int uptime = time(NULL) - start_time;
+			time_t uptime = Anope::CurTime - start_time;
 			ircdproto->SendNumeric(Config->ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 			ircdproto->SendNumeric(Config->ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
 			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
@@ -288,7 +288,7 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), time(NULL) - bi->lastmsg, start_time);
+			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), Anope::CurTime - bi->lastmsg, start_time);
 			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
 		else if (!ircd->svshold && (u = finduser(who)) && u->server == Me)

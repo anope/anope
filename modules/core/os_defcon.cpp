@@ -158,7 +158,7 @@ class OSDefcon : public Module
 			if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
 			{
 				Log(OperServ, "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config->DefConAKILL, !Config->DefConAkillReason.empty() ? Config->DefConAkillReason : "DEFCON AKILL");
+				XLine *x = SGLine->Add(NULL, NULL, "*@" + u->host, Anope::CurTime + Config->DefConAKILL, !Config->DefConAkillReason.empty() ? Config->DefConAkillReason : "DEFCON AKILL");
 				if (x)
 					x->By = Config->s_OperServ;
 			}
@@ -289,7 +289,7 @@ class OSDefcon : public Module
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
-					SGLine->Add(NULL, NULL, "*@" + u->host, time(NULL) + Config->SessionAutoKillExpiry, "Session limit exceeded");
+					SGLine->Add(NULL, NULL, "*@" + u->host, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded");
 					ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
 				}
 			}

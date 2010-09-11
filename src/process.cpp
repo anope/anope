@@ -60,21 +60,20 @@ void add_ignore(const Anope::string &nick, time_t delta)
 	for (; ign != ign_end; ++ign)
 		if (mask.equals_ci((*ign)->mask))
 			break;
-	time_t now = time(NULL);
 	/* Found one.. */
 	if (ign != ign_end)
 	{
 		if (!delta)
 			(*ign)->time = 0;
-		else if ((*ign)->time < now + delta)
-			(*ign)->time = now + delta;
+		else if ((*ign)->time < Anope::CurTime + delta)
+			(*ign)->time = Anope::CurTime + delta;
 	}
 	/* Create new entry.. */
 	else
 	{
 		IgnoreData *newign = new IgnoreData();
 		newign->mask = mask;
-		newign->time = delta ? now + delta : 0;
+		newign->time = delta ? Anope::CurTime + delta : 0;
 		ignore.push_front(newign);
 		Log(LOG_DEBUG) << "Added new ignore entry for " << mask;
 	}
@@ -133,9 +132,8 @@ IgnoreData *get_ignore(const Anope::string &nick)
 			if (Anope::Match(tmp, (*ign)->mask))
 				break;
 	}
-	time_t now = time(NULL);
 	/* Check whether the entry has timed out */
-	if (ign != ign_end && (*ign)->time && (*ign)->time <= now)
+	if (ign != ign_end && (*ign)->time && (*ign)->time <= Anope::CurTime)
 	{
 		Log(LOG_DEBUG) << "Expiring ignore entry " << (*ign)->mask;
 		delete *ign;

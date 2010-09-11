@@ -31,7 +31,7 @@ class CommandNSUpdate : public Command
 		check_memos(u);
 
 		na->last_realname = u->realname;
-		na->last_seen = time(NULL);
+		na->last_seen = Anope::CurTime;
 		if (ircd->vhost)
 			do_on_id(u);
 		notice_lang(Config->s_NickServ, u, NICK_UPDATE_SUCCESS, Config->s_NickServ.c_str());

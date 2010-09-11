@@ -520,7 +520,7 @@ class DBPlain : public Module
 		if (!IsFile(DatabaseFile))
 			return;
 
-		time_t now = time(NULL);
+		time_t now = Anope::CurTime;
 		tm *tm = localtime(&now);
 
 		if (tm->tm_mday != LastDay)

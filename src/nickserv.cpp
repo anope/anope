@@ -197,7 +197,7 @@ int validate_user(User *u)
 
 	if (!na->nc->HasFlag(NI_SECURE) && u->IsRecognized())
 	{
-		na->last_seen = time(NULL);
+		na->last_seen = Anope::CurTime;
 		Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
 		na->last_usermask = last_usermask;
 		na->last_realname = u->realname;
@@ -245,8 +245,6 @@ int validate_user(User *u)
 
 void expire_nicks()
 {
-	time_t now = time(NULL);
-
 	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; )
 	{
 		NickAlias *na = it->second;
@@ -256,11 +254,11 @@ void expire_nicks()
 		if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
 		{
 			Log(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
-			na->last_seen = now;
+			na->last_seen = Anope::CurTime;
 			continue;
 		}
 
-		if (Config->NSExpire && now - na->last_seen >= Config->NSExpire && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE) && !na->nc->HasFlag(NI_SUSPENDED))
+		if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE) && !na->nc->HasFlag(NI_SUSPENDED))
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
@@ -275,14 +273,12 @@ void expire_nicks()
 
 void expire_requests()
 {
-	time_t now = time(NULL);
-
 	for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; )
 	{
 		NickRequest *nr = it->second;
 		++it;
 
-		if (Config->NSRExpire && now - nr->requested >= Config->NSRExpire)
+		if (Config->NSRExpire && Anope::CurTime - nr->requested >= Config->NSRExpire)
 		{
 			Log() << "Request for nick " << nr->nick << " expiring";
 			delete nr;

@@ -164,11 +164,9 @@ class OSIgnore : public Module
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		time_t now = time(NULL);
-
 		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; )
 		{
-			if ((*ign)->time && (*ign)->time <= now)
+			if ((*ign)->time && (*ign)->time <= Anope::CurTime)
 			{
 				Log(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << (*ign)->mask;
 				delete *ign;

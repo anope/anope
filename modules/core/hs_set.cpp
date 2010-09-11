@@ -72,7 +72,7 @@ class CommandHSSet : public Command
 			return MOD_CONT;
 		}
 
-		tmp_time = time(NULL);
+		tmp_time = Anope::CurTime;
 
 		if ((na = findnick(nick)))
 		{

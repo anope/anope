@@ -86,8 +86,6 @@ Server::~Server()
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{
-		time_t t = time(NULL);
-
 		for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
 		{
 			User *u = it->second;
@@ -98,7 +96,7 @@ Server::~Server()
 				NickAlias *na = findnick(u->nick);
 				if (na && !na->HasFlag(NS_FORBIDDEN) && (!na->nc->HasFlag(NI_SUSPENDED)) && (u->IsRecognized() || u->IsIdentified()))
 				{
-					na->last_seen = t;
+					na->last_seen = Anope::CurTime;
 					na->last_quit = this->QReason;
 				}
 

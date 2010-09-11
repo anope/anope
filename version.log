@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="4"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3035"
+VERSION_BUILD="3036"
 
 # $Log$ # Changes since the 1.8.4 Release
+#Revision 3036 - Various windows build scripts fixes and to include ns_noop_convert & os_ignore_db.dll in builds
 #Revision 3035 - Fixed InspIRCd 1.1,1.2 and 2.0 protocol modules to oper pseudo-clients only when needed.
 #Revision 3034 - Fixed comments in insp20 protocol module to be accepted by all supported compilers.
 #Revision 3031 - Added InspIRCd 2.0 support

@@ -534,11 +534,12 @@ RMDir "$SMPROGRAMS\Anope\Advanced"
 
   RMDir "$SMPROGRAMS\Anope"
   RMDir "$INSTDIR\docs"
+  RMDir "$INSTDIR\data\modules\runtime"
   RMDir "$INSTDIR\data\modules"
   RMDir "$INSTDIR\data\logs"
   RMDir "$INSTDIR\data\languages"
   RMDir "$INSTDIR\data\bin"
-RMDir	"$INSTDIR\data\backups"
+  RMDir	"$INSTDIR\data\backups"
   RMDir "$INSTDIR\data"
   RMDir "$INSTDIR"
 

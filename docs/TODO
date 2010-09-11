@@ -12,7 +12,7 @@ Legend:
 [x] SList needs to die
 [x] SSL
 [x] Command handling system needs to die, strtok() needs to die more
-[ ] Asynchronous DNS
+[x] Asynchronous DNS
 [ ] CIDR Akills, session exceptions, etc
 [x] Hashing system for storing just about everything needs to die
 [x] Add support for +k, +q, etc type umodes
@@ -21,7 +21,7 @@ Legend:
   [ ] Should be able to add many strings by dropping a file in a set location.
 [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [x] Config bailing on /os reload needs to be non fatal
-[ ] AutoID needs to be able to live through /os restart, current system is just annoying.
+[x] AutoID needs to be able to live through /os restart, current system is just annoying.
 [ ] SQL tables need to changed to have references etc
 [ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 [ ] NS IDENTIFY changes

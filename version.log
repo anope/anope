@@ -7,10 +7,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
-VERSION_EXTRA=""
-VERSION_BUILD="3037"
+VERSION_EXTRA="-git"
+VERSION_BUILD="3038"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3038 - Initialise git for 1.8-git
+
+
+
 
 # Leading up to 1.8.5 Release
 #Revision 3036 - Various windows build scripts fixes and to include ns_noop_convert & os_ignore_db.dll in builds

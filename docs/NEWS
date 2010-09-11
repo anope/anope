@@ -1,5 +1,6 @@
 Highlighted News in Anope 1.8
 ============================================
+  * Added optional mail forking on non Windows OS
   * Added a new and improved ./Config script.
   * Added MySQL phase 2 implementation (see docs/MYSQL).
   * Added NickServ registration delays.

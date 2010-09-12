@@ -98,7 +98,7 @@ class SocketEngineEPoll : public SocketEngineBase
 			s->SetFlag(SF_WRITABLE);
 	}
 
-	void ClearWriteble(Socket *s)
+	void ClearWritable(Socket *s)
 	{
 		if (!s->HasFlag(SF_WRITABLE))
 			return;

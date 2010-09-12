@@ -40,7 +40,6 @@
 Anope::string services_dir;	/* -dir dirname */
 Anope::string services_bin;	/* Binary as specified by the user */
 Anope::string orig_cwd;		/* Original current working directory */
-Anope::string log_filename = "services.log"; /* -log filename */
 int debug = 0;				/* -debug */
 bool readonly = false;		/* -readonly */
 bool nofork = false;		/* -nofork */

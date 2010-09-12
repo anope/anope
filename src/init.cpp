@@ -235,7 +235,6 @@ void Init(int ac, char **av)
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
 		Log(LOG_TERMINAL) << "    --dir=services_directory";
 		Log(LOG_TERMINAL) << "-h, --help";
-		Log(LOG_TERMINAL) << "    --log=log_filename";
 		Log(LOG_TERMINAL) << "-e, --noexpire";
 		Log(LOG_TERMINAL) << "-n, --nofork";
 		Log(LOG_TERMINAL) << "    --nothird";
@@ -297,13 +296,6 @@ void Init(int ac, char **av)
 		if (Arg.empty())
 			throw FatalException("The --dir option requires a directory name");
 		services_dir = Arg;
-	}
-
-	if (GetCommandLineArgument("log", 0, Arg))
-	{
-		if (Arg.empty())
-			throw FatalException("The --log option requires a file name");
-		log_filename = Arg;
 	}
 
 	/* Chdir to Services data directory. */

@@ -179,7 +179,6 @@ E void InitLogChannels(ServerConfig *);
 /**** main.c ****/
 
 E Anope::string services_dir;
-E Anope::string log_filename;
 E int debug;
 E bool readonly;
 E bool nofork;

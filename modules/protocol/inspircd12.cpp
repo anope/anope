@@ -308,14 +308,6 @@ class InspIRCdProto : public IRCDProto
 
 		return true;
 	}
-
-	void SetAutoIdentificationToken(User *u)
-	{
-		if (!u->Account())
-			return;
-
-		u->SetMode(NickServ, UMODE_REGISTERED);
-	}
 } ircd_proto;
 
 int anope_event_ftopic(const Anope::string &source, int ac, const char **av)

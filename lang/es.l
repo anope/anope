@@ -3537,7 +3537,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Sintaxis: IDENTIFY clave
+	Sintaxis: IDENTIFY [account] clave
 	
 	Informa a %S que tu eres realmente el dueño de tu nick.
 	Muchos comandos requieren que te autentifiques con este

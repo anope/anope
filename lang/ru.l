@@ -3459,7 +3459,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Синтаксис: IDENTIFY пароль
+	Синтаксис: IDENTIFY [account] пароль
 	
 	Позволяет вам идентифицироваться на %S к зарегистрированному
 	ранее нику. Большинство сервисных команд, такие как SET, OP, BAN

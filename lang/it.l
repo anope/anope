@@ -3444,7 +3444,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Sintassi: IDENTIFY password
+	Sintassi: IDENTIFY [account] password
 	
 	Indica a %S che sei davvero il proprietario del nick.
 	Molti comandi richiedono che tu ti sia autentificato

@@ -387,7 +387,6 @@ class UnrealIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		u->SetMode(NickServ, UMODE_REGISTERED);
 		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
 

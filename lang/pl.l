@@ -4499,7 +4499,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Sk³adnia: IDENTIFY has³o
+	Sk³adnia: IDENTIFY [account] has³o
 	
 	Informuje %S, ¿e nick którego w³a¶nie u¿ywasz 
 	nale¿y do Ciebie. Wiele komend wymaga identyfikacji 

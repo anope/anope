@@ -16,21 +16,21 @@
 class CommandNSIdentify : public Command
 {
  public:
-	CommandNSIdentify(const Anope::string &cname) : Command(cname, 1, 1)
+	CommandNSIdentify(const Anope::string &cname) : Command(cname, 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		Anope::string pass = params[0];
-		NickAlias *na;
-		NickRequest *nr;
-		int res;
+		Anope::string nick = params.size() == 2 ? params[0] : u->nick;
+		Anope::string pass = params[params.size() - 1];
 
-		if (!(na = findnick(u->nick)))
+		NickAlias *na = findnick(nick), *this_na = findnick(u->nick);
+		if (!na)
 		{
-			if ((nr = findrequestnick(u->nick)))
+			NickRequest *nr = findrequestnick(nick);
+			if (nr)
 				notice_lang(Config->s_NickServ, u, NICK_IS_PREREG);
 			else
 				notice_lang(Config->s_NickServ, u, NICK_NOT_REGISTERED);
@@ -47,7 +47,7 @@ class CommandNSIdentify : public Command
 			notice_lang(Config->s_NickServ, u, NICK_ALREADY_IDENTIFIED);
 		else
 		{
-			res = enc_check_password(pass, na->nc->pass);
+			int res = enc_check_password(pass, na->nc->pass);
 			if (!res)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
@@ -68,6 +68,9 @@ class CommandNSIdentify : public Command
 				u->Login(na->nc);
 				ircdproto->SendAccountLogin(u, u->Account());
 				ircdproto->SetAutoIdentificationToken(u);
+
+				if (this_na && this_na->nc == na->nc)
+					u->SetMode(NickServ, UMODE_REGISTERED);
 
 				u->UpdateHost();
 

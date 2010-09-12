@@ -3536,7 +3536,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Syntax: IDENTIFY Passwort
+	Syntax: IDENTIFY [account] Passwort
 	
 	Beweist %S, dass du wirklich der Besitzer dieses 
 	Nicknamens bist. Viele Befehle erzwingen, dass 

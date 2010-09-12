@@ -753,6 +753,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 				user->UpdateHost();
 				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
+				user->SetMode(NickServ, UMODE_REGISTERED);
 				Log() << Config->s_NickServ << ": " << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 

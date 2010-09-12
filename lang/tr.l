@@ -3560,7 +3560,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Kullanýmý: IDENTIFY þifreniz
+	Kullanýmý: IDENTIFY [account] þifreniz
 	
 	%S 'e kullandýðýnýz nickin gerçek sahibinin siz olduðunu
 	belirtir. Çoðu komut kullanýlmadan önce bu komutla 

@@ -110,6 +110,7 @@ class NSResetPass : public Module
 					u->Login(na->nc);
 					ircdproto->SendAccountLogin(u, u->Account());
 					ircdproto->SetAutoIdentificationToken(u);
+					u->SetMode(NickServ, UMODE_REGISTERED);
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;

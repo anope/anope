@@ -3580,7 +3580,7 @@ NICK_HELP_GROUP
 	Note: tous les pseudos du groupe ont le même mot de passe.
 
 NICK_HELP_IDENTIFY
-	Syntaxe: IDENTIFY motdepasse
+	Syntaxe: IDENTIFY [account] motdepasse
 	
 	Informe %S que vous êtes vraiment le propriétaire de
 	ce pseudo. Beaucoup de commandes nécessitent que vous soyez

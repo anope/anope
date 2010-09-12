@@ -3482,7 +3482,7 @@ NICK_HELP_GROUP
 			 a jelszava.
 
 NICK_HELP_IDENTIFY
-	Syntax: IDENTIFY jelszó
+	Syntax: IDENTIFY [account] jelszó
 	
 	Tudatja a %S-vel, hogy te vagy a tulajdonosa ennek a 
 	nicknek. Jelszónak ugyanannak kell lennie amit a 

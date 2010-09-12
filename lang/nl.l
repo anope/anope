@@ -3519,7 +3519,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Gebruik: IDENTIFY wachtwoord
+	Gebruik: IDENTIFY [account] wachtwoord
 	
 	Vertelt %S dat je echt de eigenaar van deze nick bent. Veel
 	commandos vereisen dat je jezelf identificeert met dit commando

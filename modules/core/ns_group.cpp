@@ -118,6 +118,7 @@ class CommandNSGroup : public Command
 					u->Login(na->nc);
 					FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 					ircdproto->SetAutoIdentificationToken(u);
+					u->SetMode(NickServ, UMODE_REGISTERED);
 
 					Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 					notice_lang(Config->s_NickServ, u, NICK_GROUP_JOINED, target->nick.c_str());

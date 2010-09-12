@@ -3464,7 +3464,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Sintaxe: IDENTIFY senha
+	Sintaxe: IDENTIFY [account] senha
 	
 	Identifica você ao %S como sendo dono do nick.
 	Muitos comandos exigem que você se identifique com este

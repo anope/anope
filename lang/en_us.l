@@ -373,7 +373,7 @@ NICK_UNGROUP_SUCCESSFUL
 
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
-	IDENTIFY password
+	IDENTIFY [account] password
 NICK_IDENTIFY_FAILED
 	Sorry, identification failed.
 NICK_IDENTIFY_SUCCEEDED
@@ -3430,7 +3430,7 @@ NICK_HELP_UNGROUP
 	nick in your group.
 
 NICK_HELP_IDENTIFY
-	Syntax: IDENTIFY password
+	Syntax: IDENTIFY [account] password
 	
 	Tells %S that you are really the owner of this
 	nick.  Many commands require you to authenticate yourself

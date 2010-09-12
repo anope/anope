@@ -207,97 +207,51 @@ Table of Contents
 4) Command Line Options
 
     Normally, Anope can be run simply by invoking the "services" executable.
-    Anope will then use the defaults specified in the services.conf file, and
-    connect to the specified uplink server. Alternatively, any of the
-    following command-line options can be specified to change the default
-    values:
-
-        -remote server[:port]    Connect to the specified server
-        -local host  -or-        Connect from the specified address (e.g. for
-            [host]:[port]            multihomed servers)
-        -name servername         Our server name (e.g. services.some.net)
-        -desc string             Description of us (e.g. SomeNet Services)
-        -user username           Username for Services' nicks (e.g. services)
-        -host hostname           Hostname for Services' nicks (e.g. esper.net)
-        -dir directory           Directory containing Services' data files
-                                     (e.g. /usr/local/lib/services)
-        -log filename            Services log filename (e.g. services.log)
-        -update secs             How often to update databases (in seconds)
-        -expire secs             How often to check for nick/channel
-                                     expiration (in seconds)
-
-    Additionally, the following command-line options can be used to modify
+    Any of the following command-line options can be specified to change
     the behavior of Anope:
 
-        -debug          Enable debugging mode; more info sent to log (give
+        --debug         Enable debugging mode; more info sent to log (give
                             option more times for more info)
-        -readonly       Enable read-only mode; no changes to databases
-                            allowed, .db files and log not written
-        -skeleton       Enable skeleton mode; like read-only mode, but only
-                            OperServ is available
-        -nofork         Do not fork after startup; log messages will be
-                            written to terminal (as well as to the log file
-                            if not in read-only mode)
-        -forceload      Try to load as much of the databases as possible,
-                            even if errors are encountered
-        -noexpire       Expiration routines won't be run at all
-        -logchan        Startup with logchan enabled
-        -version        Display the version of Anope
-        -nothird        Do not load the modules specified in ModulesAutoload
-                            or ModulesDelayedAutoload in the config file
-        -protocoldebug  Debug each incoming message after protocol parsing
-        -support        Used for support, same as -debug -nofork -nothird
+        --readonly      Enable read-only mode; no changes to databases
+                            allowed
+        --nofork        Do not fork after startup; log messages will be
+                            written to terminal
+        --noexpire      Expiration routines won't be run at all
+        --version       Display the version of Anope
+        --nothird       Do not load the non-core modules specified
+        --protocoldebug Debug each incoming message after protocol parsing
+        --support       Used for support, same as -debug -nofork -nothird
 
-    Upon starting, Anope will parse its command-line parameters, open its
-    logfile, then (assuming the -nofork option is not given) detach itself
-    and run in the background. If Anope encounters a problem reading the
-    database files or cannot connect to its uplink server, it will terminate
-    immediately; otherwise, it will run until the connection is terminated
-    (or a QUIT, SHUTDOWN, or RESTART command is sent; see OperServ's help).
+    Upon starting, Anope will parse its command-line parameters then
+    (assuming the -nofork option is not given) detach itself and run in the
+    background. If Anope encounters a problem reading the database files or
+    cannot connect to its uplink server, it will terminate immediately;
+    otherwise, it will run until the connection is terminated (or a QUIT,
+    SHUTDOWN, or RESTART command is sent; see OperServ's help).
+
     In the case of an error, an appropriate error message will be written to
     the log file.
 
-    If Anope is run with the "-readonly" command-line option, it can serve as
+    If Anope is run with the "--readonly" command-line option, it can serve as
     a "backup" to the full version of services.  A "full" version of services
-    (run without -readonly) will automatically reintroduce its pseudo-clients
+    (run without --readonly) will automatically reintroduce its pseudo-clients
     (NickServ, ChanServ, etc.), while a "backup" services will not, thus
     allowing full services to be brought up at any time without disrupting
     the network (and without having to take backup services down beforehand).
 
-    If Anope is run with the "-skeleton" command-line option, it will not try
-    to load the nickname or channel databases, and will respond with "service
-    is inactive" messages to any commands sent to NickServ, ChanServ,
-    MemoServ or BotServ. This can be useful as an emergency stopgap measure
-    when the main copy of Anope cannot be started.
-
-    The "-debug" option is useful if you find or suspect a problem in Anope.
+    The "--debug" option is useful if you find or suspect a problem in Anope.
     Giving it once on the command line will cause all traffic to and from
     services as well as some other debugging information to be recorded in
     the log file; if you send a bug report, PLEASE include an excerpt from
     the log file WITH DEBUGGING ACTIVE; we cannot emphasize enough how
     important this is to tracking down problems. (You can also enable
     debugging while Services is running using OperServ's SET DEBUG command.)
-    If you repeat the -debug option more than once, the debugging level will
-    be increased, which provides more detailed information but may also slow
-    Anope down considerably and make the log file grow dramatically faster
-    (in particular, at debug level 4 a message is written to the log for
-    every character received from the server). In general, a debug level of 1
-    is sufficient for the coding team to be able to trace a problem, because
-    all network traffic is included and we can usually reproduce the problem.
-
-    The "-forceload" option is provided to attempt recovery of data from
-    corrupted or truncated databases. Normally, if Anope encounters an error
-    writing to a database file, it will attempt to restore the original
-    version of the file and report an error to the logfile and through
-    WALLOPS. However, if this should fail (which normally should not happen),
-    or if Anope is terminated abruptly e.g. by kill -9 or a power failure,
-    then one or more of the databases may be corrupt. Normally, this will
-    cause Anope to abort the next time you try to run it; however, if yo
-    give the -forceload option to Anope, it will instead read as much as it
-    can, then skip to the next database. For obvious reasons, it's highly
-    recommended to keep backup copies of your databases in case something
-    does happen (since Anope will stop at the first error in a database, even
-    with -forceload, meaning you lose any data after that).
+    If you repeat use --debug=<level>, the debugging level will be increased,
+    which provides more detailed information but may also slow Anope down
+    considerably and make the log file grow dramatically faster. In general,
+    a debug level of 1 is sufficient for the coding team to be able to trace
+    a problem, because all network traffic is included and we can usually
+    reproduce the problem.
 
 5) Messages Translations
 

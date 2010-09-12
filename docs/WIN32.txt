@@ -134,22 +134,10 @@ Anope for Windows
     edit the file correctly.
 
     Open services.conf, and read through it carefully and adjust the settings
-    you think you need to adjust. Pay special attention to these settings:
-
-    A) IRCDModule:   This is the name of an IRCd Module that Anope will use
-                     to communicate with your server. Anope supports 15 IRCds,
-                     so ensure you set the right value here.
-    B) RemoteServer: This is the address to your ircd, along with the port
-                     and password. You should consult your ircd
-                     documentation on how to link ircds.
-    C) ServicesRoot: Remove the # and change the names to your nick so you
-                     can take control of services once they are online.
-    D) UserKey1/2/3: Remove the # infront of the three UserKey settings, and
-                     change the parameters to numbers; around 6-7 digits will
-                     do.
+    you think you need to adjust.
 
     If you are unsure of the settings, you can go to the dos command prompt
-    and run "anope.exe -nofork -debug" and watch the information as it
+    and run "anope.exe --nofork --debug" and watch the information as it
     attempts to connect.
 
     You can launch services in two ways. If you are sure that the entered
@@ -162,31 +150,7 @@ Anope for Windows
 3) Compiling Modules
 
     If you want to build other modules than the ones shipped by default, you
-    will need to modify the Makefile.inc.win32 file, in the src\modules folder.
-
-    A) Add modules; find the line stating "SRCS=" and add the name of the
-       file to the end of the line. So if you have two files:
-
-        SRCS=file.c file2.c
-
-       If you are compiling a folder of module components, such as the example
-       "catserv", you will need to add/change the "SUBS=" line. If you were
-       compiling the "catserv" example, the line would look like this:
-
-        SUBS=catserv
-
-    B) When you've done this, use the same command prompt you set up in part
-       1, change directories to the src\modules folder, and type:
-
-        nmake -f Makefile.win32
-
-       followed afterwards, by:
-
-        nmake -f Makefile.win32 install
-
-    C) You should now be able to load your modules on IRC via OperServ, or via
-       the services.conf file.
-
+    will need to rerun Config.exe
 
 4) Other compile options
 

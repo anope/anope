@@ -20,20 +20,22 @@ class DNSBLResolver : public DNSRequest
 {
 	dynamic_reference<User> user;
 	Blacklist blacklist;
+	bool add_to_akill;
+
  public:
-	DNSBLResolver(User *u, const Blacklist &b, const Anope::string &host) : DNSRequest(host, DNS_QUERY_A, true), user(u), blacklist(b) { }
+	DNSBLResolver(User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
 
 	void OnLookupComplete(const DNSRecord *)
 	{
-		if (!user || !SGLine)
+		if (!user)
 			return;
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_ci("%i", user->ip.addr());
 		reason = reason.replace_all_ci("%h", user->host);
 
-		XLine *x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason);
-		if (x)
+		XLine *x = NULL;
+		if (this->add_to_akill && SGLine && (x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason)))
 		{
 			static Command command_akill("AKILL", 0);
 			command_akill.service = OperServ;
@@ -41,6 +43,12 @@ class DNSBLResolver : public DNSRequest
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
 				ircdproto->SendAkill(x);
+		}
+		else
+		{
+			Log(OperServ) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
+			XLine xline(Anope::string("*@") + user->host, OperServ->nick, Anope::CurTime + this->blacklist.bantime, reason);
+			ircdproto->SendAkill(&xline);
 		}
 	}
 };
@@ -50,6 +58,7 @@ class ModuleDNSBL : public Module
 	std::vector<Blacklist> blacklists;
 	bool check_on_connect;
 	bool check_on_netburst;
+	bool add_to_akill;
 
  public:
 	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
@@ -69,6 +78,7 @@ class ModuleDNSBL : public Module
 
 		this->check_on_connect = config.ReadFlag("m_dnsbl", "check_on_connect", "no", 0);
 		this->check_on_netburst = config.ReadFlag("m_dnsbl", "check_on_netburst", "no", 0);
+		this->add_to_akill = config.ReadFlag("m_dnsbl", "add_to_akill", "yes", 0);
 
 		this->blacklists.clear();
 		for (int i = 0, num = config.Enumerate("blacklist"); i < num; ++i)
@@ -110,7 +120,7 @@ class ModuleDNSBL : public Module
 			try
 			{
 				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
-				new DNSBLResolver(u, b, dnsbl_host);
+				new DNSBLResolver(u, b, dnsbl_host, this->add_to_akill);
 			}
 			catch (const SocketException &ex)
 			{

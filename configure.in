@@ -123,6 +123,7 @@ int main()
 		else
 			CFLAGS="$hold_cflags"
 			LDFLAGS="$hold_ldflags"
+			LIBS=""
 		fi
 	fi
 ])

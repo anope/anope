@@ -7,7 +7,7 @@ static inline unsigned short GetRandomID()
 	return random();
 }
 
-DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache) : address(addr), QT(qt)
+DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : address(addr), QT(qt), creator(c)
 {
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
@@ -527,6 +527,22 @@ void DNSManager::Tick(time_t now)
 		{
 			delete req;
 			this->cache.erase(it);
+		}
+	}
+}
+
+void DNSManager::Cleanup(Module *mod)
+{
+	for (std::map<short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
+	{
+		short id = it->first;
+		DNSRequest *req = it->second;
+		++it;
+
+		if (req->creator && req->creator == mod)
+		{
+			delete req;
+			this->requests.erase(id);
 		}
 	}
 }

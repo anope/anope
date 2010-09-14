@@ -48,6 +48,7 @@ enum DNSError
 
 class DNSRequestTimeout; // Forward declarations
 struct DNSRecord;
+class Module;
 
 /** The request
  */
@@ -57,12 +58,14 @@ class DNSRequest
 	DNSRequestTimeout *timeout;
 
  public:
+	Module *creator;
+
 	/* Address we're looking up */
 	Anope::string address;
 	/* QueryType, A, AAAA, PTR etc */
 	QueryType QT;
 
-	DNSRequest(const Anope::string &addr, QueryType qt, bool cache = false);
+	DNSRequest(const Anope::string &addr, QueryType qt, bool cache = false, Module *c = NULL);
 
 	virtual ~DNSRequest();
 
@@ -158,6 +161,8 @@ class DNSManager : public Timer
 	void AddCache(DNSRecord *rr);
 	bool CheckCache(DNSRequest *request);
 	void Tick(time_t now);
+
+	void Cleanup(Module *mod);
 };
 
 /** A DNS timeout, one is made for every DNS request to detect timeouts

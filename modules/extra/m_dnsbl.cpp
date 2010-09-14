@@ -23,7 +23,7 @@ class DNSBLResolver : public DNSRequest
 	bool add_to_akill;
 
  public:
-	DNSBLResolver(User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true), user(u), blacklist(b), add_to_akill(add_akill) { }
+	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
 
 	void OnLookupComplete(const DNSRecord *)
 	{
@@ -120,7 +120,7 @@ class ModuleDNSBL : public Module
 			try
 			{
 				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
-				new DNSBLResolver(u, b, dnsbl_host, this->add_to_akill);
+				new DNSBLResolver(this, u, b, dnsbl_host, this->add_to_akill);
 			}
 			catch (const SocketException &ex)
 			{

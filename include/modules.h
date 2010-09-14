@@ -1294,17 +1294,6 @@ class service_reference : public dynamic_reference<T>
 
 	inline T *operator->()
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		if (!this->ref)
-		{
-			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
-			if (this->ref)
-				this->ref->AddReference(this);
-		}
 		return this->ref;
 	}
 };

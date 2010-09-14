@@ -240,6 +240,9 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 
 	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));
 
+	if (DNSEngine)
+		DNSEngine->Cleanup(m);
+
 	DeleteModule(m);
 	return MOD_ERR_OK;
 }

@@ -7,7 +7,7 @@ static inline unsigned short GetRandomID()
 	return random();
 }
 
-DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : address(addr), QT(qt), creator(c)
+DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : creator(c), address(addr), QT(qt)
 {
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
@@ -541,6 +541,7 @@ void DNSManager::Cleanup(Module *mod)
 
 		if (req->creator && req->creator == mod)
 		{
+			req->OnError(DNS_ERROR_UNLOADED, "Module is being unloaded");
 			delete req;
 			this->requests.erase(id);
 		}

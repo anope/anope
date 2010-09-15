@@ -23,10 +23,7 @@ IRCDVar myIrcd[] = {
 	 1,				/* Supports SNlines */
 	 1,				/* Supports SQlines */
 	 0,				/* Supports SZlines */
-	 1,				/* Join 2 Set */
 	 1,				/* Join 2 Message */
-	 0,				/* TS Topic Forward */
-	 0,				/* TS Topci Backward */
 	 1,				/* Chan SQlines */
 	 0,				/* Quit on Kill */
 	 0,				/* SVSMODE unban */
@@ -249,9 +246,22 @@ class RatboxProto : public IRCDProto
 		return true;
 	}
 
-	void SendTopic(const BotInfo *bi, const Channel *c, const Anope::string &, const Anope::string &topic)
+	void SendTopic(BotInfo *bi, Channel *c)
 	{
-		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), topic.c_str());
+		bool needjoin = c->FindUser(bi) != NULL;
+		if (needjoin)
+		{
+			ChannelStatus status;
+			status .SetFlag(CMODE_OP);
+			ChannelContainer cc(c);
+			cc.Status = &status;
+			ircdproto->SendJoin(bi, &cc);
+		}
+		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
+		if (needjoin)
+		{
+			ircdproto->SendPart(bi, c, NULL);
+		}
 	}
 
 	void SetAutoIdentificationToken(User *u)
@@ -417,75 +427,41 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 
 int anope_event_topic(const Anope::string &source, int ac, const char **av)
 {
-	User *u;
+	Channel *c = findchan(av[0]);
+	if (!c)
+	{
+		Log() << "TOPIC for nonexistant channel " << av[0];
+		return MOD_CONT;
+	}
 
 	if (ac == 4)
-		do_topic(source, ac, av);
+	{
+		c->ChangeTopicInternal(av[1], av[3], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : Anope::CurTime);
+	}
 	else
 	{
-		Channel *c = findchan(av[0]);
-
-		if (!c)
-		{
-			Log(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
-			return MOD_CONT;
-		}
-
-		if (check_topiclock(c, Anope::CurTime))
-			return MOD_CONT;
-
-		c->topic.clear();
-		if (ac > 1 && *av[1])
-			c->topic = av[1];
-
-		u = finduser(source);
-		c->topic_setter = u ? u->nick : source;
-		c->topic_time = Anope::CurTime;
-
-		record_topic(av[0]);
-
-		if (ac > 1 && *av[1])
-		{
-			FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[1]));
-		}
-		else
-		{
-			FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, ""));
-		}
+		c->ChangeTopicInternal(source, (ac > 1 && *av[1] ? av[1] : ""));
 	}
 	return MOD_CONT;
 }
 
 int anope_event_tburst(const Anope::string &source, int ac, const char **av)
 {
-	Channel *c;
-	time_t topic_time;
-
 	if (ac != 4)
 		return MOD_CONT;
 
 	Anope::string setter = myStrGetToken(av[2], '!', 0);
-
-	c = findchan(av[0]);
-	topic_time = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
+	time_t topic_time = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : Anope::CurTime;
+	Channel *c = findchan(av[0]);
 
 	if (!c)
 	{
-		Log(LOG_DEBUG) << "debug: TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+		Log() << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return MOD_CONT;
 	}
 
-	if (check_topiclock(c, topic_time))
-		return MOD_CONT;
+	c->ChangeTopicInternal(setter, ac > 3 && *av[3] ? av[3] : "", topic_time);
 
-	c->topic.clear();
-	if (ac > 1 && *av[3])
-		c->topic = av[3];
-
-	c->topic_setter = setter;
-	c->topic_time = topic_time;
-
-	record_topic(av[0]);
 	return MOD_CONT;
 }
 

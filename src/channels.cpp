@@ -31,7 +31,7 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	this->creation_time = ts;
 	this->bans = this->excepts = this->invites = NULL;
 	this->server_modetime = this->chanserv_modetime = 0;
-	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_sync = this->topic_time = 0;
+	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_time = 0;
 
 	this->ci = cs_findchan(this->name);
 	if (this->ci)
@@ -113,10 +113,10 @@ void Channel::Sync()
 	if (this->ci)
 	{
 		check_modes(this);
-	}
 
-	if (Me && Me->IsSynced() && !this->topic_sync)
-		restore_topic(name);
+		if (Me && Me->IsSynced())
+			this->ci->RestoreTopic();
+	}
 }
 
 void Channel::JoinUser(User *user)
@@ -1026,6 +1026,38 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 	return res;
 }
 
+void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
+{
+	this->topic = newtopic;
+	this->topic_setter = user;
+	this->topic_time = ts;
+
+	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << user << " to " << newtopic;
+
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, this->topic));
+
+	if (this->ci)
+	{
+		this->ci->CheckTopic();
+	}
+}
+
+void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
+{
+	this->topic = newtopic;
+	this->topic_setter = user;
+	this->topic_time = ts;
+
+	ircdproto->SendTopic(whosends(this->ci), this);
+
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, this->topic));
+
+	if (this->ci)
+	{
+		this->ci->CheckTopic();
+	}
+}
+
 /*************************************************************************/
 
 Channel *findchan(const Anope::string &chan)
@@ -1312,57 +1344,6 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 
 /*************************************************************************/
 
-/* Handle a TOPIC command. */
-
-void do_topic(const Anope::string &source, int ac, const char **av)
-{
-	Channel *c = findchan(av[0]);
-	ChannelInfo *ci;
-	time_t topic_time = Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0;
-
-	if (!c)
-	{
-		Log() << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
-		return;
-	}
-
-	/* We can be sure that the topic will be in sync here -GD */
-	c->topic_sync = 1;
-
-	ci = c->ci;
-
-	/* For Unreal, cut off the ! and any futher part of the topic setter.
-	 * This way, nick!ident@host setters will only show the nick. -GD
-	 */
-	Anope::string topicsetter = myStrGetToken(av[1], '!', 0);
-
-	/* If the current topic we have matches the last known topic for this
-	 * channel exactly, there's no need to update anything and we can as
-	 * well just return silently without updating anything. -GD
-	 */
-	if (ac > 3 && *av[3] && ci && !ci->last_topic.empty() && ci->last_topic.equals_cs(av[3]) && ci->last_topic_setter.equals_cs(topicsetter))
-		return;
-
-	if (check_topiclock(c, topic_time))
-		return;
-
-	if (!c->topic.empty())
-		c->topic.clear();
-	if (ac > 3 && *av[3])
-		c->topic = av[3];
-
-	c->topic_setter = topicsetter;
-	c->topic_time = topic_time;
-
-	record_topic(av[0]);
-
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[0]));
-}
-
-/*************************************************************************/
-/**************************** Internal Calls *****************************/
-/*************************************************************************/
-
 /**
  * Set the correct modes, or remove the ones granted without permission,
  * for the specified user on ths specified channel. This doesn't give
@@ -1438,19 +1419,6 @@ void MassChannelModes(BotInfo *bi, const Anope::string &modes)
 		if (c->bouncy_modes)
 			return;
 		c->SetModes(bi, false, "%s", modes.c_str());
-	}
-}
-
-/*************************************************************************/
-
-void restore_unsynced_topics()
-{
-	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-	{
-		Channel *c = it->second;
-
-		if (!c->topic_sync)
-			restore_topic(c->name);
 	}
 }
 

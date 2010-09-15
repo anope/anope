@@ -248,7 +248,9 @@ void Server::Sync(bool SyncLinks)
 	if (this->GetUplink() && this->GetUplink() == Me)
 	{
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
-		restore_unsynced_topics();
+		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+			if (it->second->ci)
+				it->second->ci->RestoreTopic();
 	}
 }
 

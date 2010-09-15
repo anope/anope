@@ -73,11 +73,9 @@ E void do_cmode(const Anope::string &source, int ac, const char **av);
 E void do_join(const Anope::string &source, int ac, const char **av);
 E void do_kick(const Anope::string &source, int ac, const char **av);
 E void do_part(const Anope::string &source, int ac, const char **av);
-E void do_topic(const Anope::string &source, int ac, const char **av);
 E void MassChannelModes(BotInfo *bi, const Anope::string &modes);
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
-E void restore_unsynced_topics();
 
 E Entry *entry_create(const Anope::string &mask);
 E Entry *entry_add(EList *list, const Anope::string &mask);
@@ -112,9 +110,6 @@ E void cs_remove_nick(const NickCore *nc);
 E void check_modes(Channel *c);
 E int check_valid_admin(User *user, Channel *chan, int servermode);
 E int check_valid_op(User *user, Channel *chan, int servermode);
-E void record_topic(const Anope::string &chan);
-E void restore_topic(const Anope::string &chan);
-E int check_topiclock(Channel *c, time_t topic_time);
 
 E ChannelInfo *cs_findchan(const Anope::string &chan);
 E int check_access(User *user, ChannelInfo *ci, int what);

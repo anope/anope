@@ -436,10 +436,7 @@ struct IRCDVar
 	int snline;						/* Supports SNline */
 	int sqline;						/* Supports SQline */
 	int szline;						/* Supports SZline */
-	int join2set;					/* Join 2 Set Modes */
 	int join2msg;					/* Join 2 Message */
-	int topictsforward;				/* TS on Topics Forward */
-	int topictsbackward;			/* TS on Topics Backward */
 	int chansqline;					/* Supports Channel Sqlines */
 	int quitonkill;					/* IRCD sends QUIT when kill */
 	int svsmode_unban;				/* svsmode can be used to unban */
@@ -949,7 +946,7 @@ class CoreExport IRCDProto
 	virtual ~IRCDProto() { }
 
 	virtual void SendSVSNOOP(const Anope::string &, int) { }
-	virtual void SendTopic(const BotInfo *, const Channel *, const Anope::string &, const Anope::string &) = 0;
+	virtual void SendTopic(BotInfo *, Channel *) = 0;
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(const XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;

@@ -34,28 +34,14 @@ class CommandCSTopic : public Command
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
-			ci->last_topic = topic;
-			ci->last_topic_setter = u->nick;
-			ci->last_topic_time = Anope::CurTime;
-
-			c->topic = topic;
-			c->topic_setter = u->nick;
-			if (ircd->topictsbackward)
-				c->topic_time = c->topic_time - 1;
-			else
-				c->topic_time = ci->last_topic_time;
-
+			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
+			ci->UnsetFlag(CI_TOPICLOCK);
+			c->ChangeTopic(u->nick, topic, Anope::CurTime);
+			if (has_topiclock)
+				ci->SetFlag(CI_TOPICLOCK);
+	
 			bool override = !check_access(u, ci, CA_TOPIC);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change the topic to " << (!topic.empty() ? topic : "No topic");
-
-			if (ircd->join2set && whosends(ci) == ChanServ) // XXX what if the service bot is chanserv?
-			{
-				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config->s_ChanServ.c_str()); // XXX
-			}
-			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
-			if (ircd->join2set && whosends(ci) == ChanServ)
-				ChanServ->Part(c);
 		}
 		return MOD_CONT;
 	}

@@ -71,7 +71,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 
 	/* Modes set on the channel */
 	Flags<ChannelModeName, CMODE_END * 2> modes;
-
+	
  public:
 	/** Default constructor
 	 * @param name The channel name
@@ -86,9 +86,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	Anope::string name;		/* Channel name */
 	ChannelInfo *ci;		/* Corresponding ChannelInfo */
 	time_t creation_time;	/* When channel was created */
-	Anope::string topic;
-	Anope::string topic_setter;
-	time_t topic_time;		/* When topic was set */
 
 	EList *bans;
 	EList *excepts;
@@ -97,6 +94,10 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	/* List of users in the channel */
 	CUserList users;
 
+	Anope::string topic;		/* Current topic of the channel */
+	Anope::string topic_setter;	/* Who set the topic */
+	time_t topic_time;		/* When the topic was set*/
+
 	std::list<BanData *> bd;
 
 	time_t server_modetime;		/* Time of last server MODE */
@@ -104,7 +105,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	int16 server_modecount;		/* Number of server MODEs this second */
 	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
 	int16 bouncy_modes;			/* Did we fail to set modes here? */
-	int16 topic_sync;			/* Is the topic in sync? */
 
 	/** Call if we need to unset all modes and clear all user status (internally).
 	 * Only useful if we get a SJOIN with a TS older than what we have here
@@ -286,6 +286,20 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @return A mode string
 	 */
 	Anope::string GetModes(bool complete, bool plus);
+
+	/** Update the topic of the channel internally, and reset it if topiclock etc says to
+	 * @param user THe user setting the new topic
+	 * @param newtopic The new topic
+	 * @param ts The time the new topic is being set
+	 */
+	void ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts = Anope::CurTime);
+
+	/** Update the topic of the channel, and reset it if topiclock etc says to
+	 * @param user The user setting the topic
+	 * @param newtopic The new topic
+	 * @param ts The time when the new topic is being set
+	 */
+	void ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts = Anope::CurTime);
 };
 
 #endif // CHANNELS_H

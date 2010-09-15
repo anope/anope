@@ -62,12 +62,8 @@ class CommandCSAppendTopic : public Command
 	{
 		Anope::string chan = params[0];
 		Anope::string newtopic = params[1];
-		Anope::string topic;
-		Channel *c = findchan(chan);
-		ChannelInfo *ci;
-
-		if (c)
-			ci = c->ci;
+		ChannelInfo *ci = cs_findchan(chan);
+		Channel *c = ci ? ci->c : NULL;
 
 		if (!c)
 			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
@@ -75,6 +71,7 @@ class CommandCSAppendTopic : public Command
 			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
 		else
 		{
+			Anope::string topic;
 			if (!ci->last_topic.empty())
 			{
 				topic = ci->last_topic + " " + newtopic;
@@ -83,27 +80,14 @@ class CommandCSAppendTopic : public Command
 			else
 				topic = newtopic;
 
-			ci->last_topic = topic;
-			ci->last_topic_setter = u->nick;
-			ci->last_topic_time = Anope::CurTime;
+			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
+			ci->UnsetFlag(CI_TOPICLOCK);
+			c->ChangeTopic(u->nick, topic, Anope::CurTime);
+			if (has_topiclock)
+				ci->SetFlag(CI_TOPICLOCK);
 
-			c->topic = topic;
-			c->topic_setter = u->nick;
-			if (ircd->topictsbackward)
-				c->topic_time = c->topic_time - 1;
-			else
-				c->topic_time = ci->last_topic_time;
-
-			if (!check_access(u, ci, CA_TOPIC))
-				Log(LOG_OVERRIDE, u, this, ci) << "changed topic to " << topic;
-			if (ircd->join2set && whosends(ci) == ChanServ)
-			{
-				ChanServ->Join(c);
-				ircdproto->SendMode(NULL, c, "+o %s", Config->s_ChanServ.c_str()); // XXX
-			}
-			ircdproto->SendTopic(whosends(ci), c, u->nick, topic);
-			if (ircd->join2set && whosends(ci) == ChanServ)
-				ChanServ->Part(c);
+			bool override = !check_access(u, ci, CA_TOPIC);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "changed topic to " << topic;
 		}
 		return MOD_CONT;
 	}

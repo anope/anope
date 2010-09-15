@@ -23,10 +23,7 @@ IRCDVar myIrcd[] = {
 	 1,					/* Supports SNlines */
 	 1,					/* Supports SQlines */
 	 1,					/* Supports SZlines */
-	 0,					/* Join 2 Set */
 	 0,					/* Join 2 Message */
-	 0,					/* TS Topic Forward */
-	 0,					/* TS Topci Backward */
 	 1,					/* Chan SQlines */
 	 1,					/* Quit on Kill */
 	 1,					/* SVSMODE unban */
@@ -174,9 +171,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* TOPIC */
-	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
+	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), whosetit.c_str(), static_cast<unsigned long>(c->topic_time), topic.c_str());
+		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time), c->topic.c_str());
 	}
 
 	/* UNSQLINE */
@@ -565,7 +562,16 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 {
 	if (ac != 4)
 		return MOD_CONT;
-	do_topic(source, ac, av);
+
+	Channel *c = findchan(av[0]);
+	if (!c)
+	{
+		Log() << "TOPIC for nonexistant channel " << av[0];
+		return MOD_CONT;
+	}
+
+	c->ChangeTopicInternal(av[1], av[3], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : Anope::CurTime);
+
 	return MOD_CONT;
 }
 

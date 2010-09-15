@@ -398,7 +398,7 @@ void ChannelInfo::LoadMLock()
 			ChanServ->Assign(NULL, this);
 		this->bi->Join(c);
 		check_modes(this->c);
-		restore_topic(this->name);
+		this->CheckTopic();
 	}
 }
 
@@ -607,7 +607,7 @@ bool ChannelInfo::CheckKick(User *user)
 	 * ChanServ always enforces channels like this to keep people from deleting bots etc
 	 * that are holding channels.
 	 */
-	if (this->c->users.size() == (this->bi ? 2 : 1) && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
+	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
 	{
 		/* If channel was forbidden, etc, set it +si to prevent rejoin */
 		if (set_modes)
@@ -627,3 +627,37 @@ bool ChannelInfo::CheckKick(User *user)
 
 	return true;
 }
+
+void ChannelInfo::CheckTopic()
+{
+	if (!this->c)
+		return;
+	
+	/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
+	 * allow us to set the topic as someone else, meaning we have to bump the TS and change the setter to us.
+	 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
+	 * it is not required
+	 */
+	if (this->HasFlag(CI_TOPICLOCK) && this->last_topic != this->c->topic)
+	{
+		this->c->ChangeTopic(this->last_topic_setter, this->last_topic, this->last_topic_time);
+	}
+	else
+	{
+		this->last_topic = this->c->topic;
+		this->last_topic_setter = this->c->topic_setter;
+		this->last_topic_time = this->c->topic_time;
+	}
+}
+
+void ChannelInfo::RestoreTopic()
+{
+	if (!this->c)
+		return;
+
+	if ((this->HasFlag(CI_KEEPTOPIC) || this->HasFlag(CI_TOPICLOCK)) && this->last_topic != this->c->topic)
+	{
+		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : whosends(this)->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
+	}
+}
+

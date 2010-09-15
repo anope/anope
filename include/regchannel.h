@@ -89,9 +89,10 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 
 	time_t time_registered;
 	time_t last_used;
-	Anope::string last_topic;			/* Last topic on the channel */
-	Anope::string last_topic_setter;	/* Who set the last topic */
-	time_t last_topic_time;				/* When the last topic was set */
+
+	Anope::string last_topic;		/* The last topic that was set on this channel */
+	Anope::string last_topic_setter;	/* Setter */
+	time_t last_topic_time;			/* Time */
 
 	Anope::string forbidby;
 	Anope::string forbidreason;
@@ -286,6 +287,17 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @return true if they are allowed, false if they aren't and were kicked
 	 */
 	bool CheckKick(User *user);
+
+	/** Check the channel topic
+	 * If topic lock is enabled will change the topic back, else it records
+	 * the new topic in the ChannelInfo
+	 */
+	void CheckTopic();
+	
+	/** Restore the channel topic, used on channel creation when not syncing with the uplink
+	 * and after uplink sync
+	 */
+	void RestoreTopic();
 };
 
 #endif // REGCHANNEL_H

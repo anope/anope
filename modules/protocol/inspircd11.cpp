@@ -24,10 +24,7 @@ IRCDVar myIrcd[] = {
 	 1,					/* Supports SNlines */
 	 1,					/* Supports SQlines */
 	 1,					/* Supports SZlines */
-	 0,					/* Join 2 Set */
 	 1,					/* Join 2 Message */
-	 1,					/* TS Topic Forward */
-	 0,					/* TS Topci Backward */
 	 0,					/* Chan SQlines */
 	 0,					/* Quit on Kill */
 	 0,					/* SVSMODE unban */
@@ -92,9 +89,9 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(Config->s_OperServ, "GLINE %s", x->Mask.c_str());
 	}
 
-	void SendTopic(const BotInfo *whosets, const Channel *c, const Anope::string &whosetit, const Anope::string &topic)
+	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time), whosetit.c_str(), topic.c_str());
+		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic_setter.c_str(), c->topic.c_str());
 	}
 
 	void SendVhostDel(User *u)
@@ -303,13 +300,18 @@ class InspIRCdProto : public IRCDProto
 int anope_event_ftopic(const Anope::string &source, int ac, const char **av)
 {
 	/* :source FTOPIC channel ts setby :topic */
-	const char *temp;
 	if (ac < 4)
 		return MOD_CONT;
-	temp = av[1]; /* temp now holds ts */
-	av[1] = av[2]; /* av[1] now holds set by */
-	av[2] = temp; /* av[2] now holds ts */
-	do_topic(source, ac, av);
+	
+	Channel *c = findchan(av[0]);
+	if (!c)
+	{
+		Log() << "TOPIC for nonexistant channel " << av[0];
+		return MOD_CONT;
+	}
+
+	c->ChangeTopicInternal(av[2], av[3], Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : Anope::CurTime);
+
 	return MOD_CONT;
 }
 
@@ -517,30 +519,11 @@ int anope_event_topic(const Anope::string &source, int ac, const char **av)
 
 	if (!c)
 	{
-		Log(LOG_DEBUG) << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
+		Log() << "TOPIC " << merge_args(ac - 1, av + 1) << " for nonexistent channel " << av[0];
 		return MOD_CONT;
 	}
 
-	if (check_topiclock(c, Anope::CurTime))
-		return MOD_CONT;
-
-	c->topic.clear();
-	if (ac > 1 && *av[1])
-		c->topic = av[1];
-
-	c->topic_setter = source;
-	c->topic_time = Anope::CurTime;
-
-	record_topic(av[0]);
-
-	if (ac > 1 && *av[1])
-	{
-		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, av[1]));
-	}
-	else
-	{
-		FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(c, ""));
-	}
+	c->ChangeTopicInternal(source, (ac > 1 && *av[1] ? av[1] : ""), Anope::CurTime);
 
 	return MOD_CONT;
 }

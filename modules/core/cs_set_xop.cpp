@@ -39,9 +39,9 @@ class CommandCSSetXOP : public Command
 			{
 				ChanAccess *access;
 
-				for (unsigned i = ci->GetAccessCount() - 1; 0 <= i; --i)
+				for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 				{
-					access = ci->GetAccess(i);
+					access = ci->GetAccess(i - 1);
 
 					/* This will probably cause wrong levels to be set, but hey,
 					 * it's better than losing it altogether.
@@ -57,7 +57,7 @@ class CommandCSSetXOP : public Command
 					else if (CHECKLEV(CA_AUTOVOICE) || CHECKLEV(CA_VOICE) || CHECKLEV(CA_VOICEME))
 						access->level = ACCESS_VOP;
 					else
-						ci->EraseAccess(i);
+						ci->EraseAccess(i - 1);
 				}
 
 				reset_levels(ci);

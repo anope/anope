@@ -300,4 +300,25 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	void RestoreTopic();
 };
 
+/** A timer used to keep the BotServ bot/ChanServ in the channel
+ * after kicking the last user in a channel
+ */
+class ChanServTimer : public Timer
+{
+ private:
+	dynamic_reference<Channel> c;
+
+ public:
+ 	/** Default constructor
+	 * @param chan The channel
+	 */
+	ChanServTimer(Channel *chan);
+
+	/** Called when the delay is up
+	 * @param The current time
+	 */
+	void Tick(time_t);
+};
+
+
 #endif // REGCHANNEL_H

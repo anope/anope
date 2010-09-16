@@ -291,7 +291,7 @@ namespace Anope
 	/** The current system time, which is pretty close to being accurate.
 	 * Use this unless you need very specific time checks
 	 */
-	static time_t CurTime = time(NULL);
+	extern time_t CurTime;
 
 	extern CoreExport string Version();
 
@@ -474,6 +474,11 @@ class dynamic_reference : public dynamic_reference_base
 	}
 
 	virtual inline T *operator->()
+	{
+		return this->ref;
+	}
+
+	virtual inline T *operator*()
 	{
 		return this->ref;
 	}

@@ -71,6 +71,8 @@ time_t start_time;
 /* Parameters and environment */
 char **my_av, **my_envp;
 
+time_t Anope::CurTime = time(NULL);
+
 /******** Local variables! ********/
 
 /* Set to 1 after we've set everything up */

@@ -837,17 +837,22 @@ ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);
-	ChanServ->Join(c);
+	if (!c->ci->bi)
+		ChanServ->Join(*c);
+	else if (!c->FindUser(c->ci->bi))
+		c->ci->bi->Join(*c);
 }
 
 void ChanServTimer::Tick(time_t)
 {
-	if (!c->ci)
+	if (!c || !c->ci)
 		return;
 
 	c->ci->UnsetFlag(CI_INHABIT);
 
-	if (c->users.size() == 1 || c->ci->bi != ChanServ)
-		ChanServ->Part(c);
+	if (!c->ci->bi)
+		ChanServ->Part(*c);
+	else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
+		c->ci->bi->Part(*c);
 }
 

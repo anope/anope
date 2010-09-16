@@ -1030,26 +1030,6 @@ struct Uplink
 	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
 };
 
-/** A timer used to keep the BotServ bot/ChanServ in the channel
- * after kicking the last user in a channel
- */
-class ChanServTimer : public Timer
-{
- private:
-	Channel *c;
-
- public:
- 	/** Default constructor
-	 * @param chan The channel
-	 */
-	ChanServTimer(Channel *chan);
-
-	/** Called when th edelay is up
-	 * @param The current time
-	 */
-	void Tick(time_t);
-};
-
 /** A class to process numbered lists (passed to most DEL/LIST/VIEW commands).
  * The function HandleNumber is called for every number in the list. Note that
  * if descending is true it gets called in descending order. This is so deleting

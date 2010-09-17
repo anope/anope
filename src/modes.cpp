@@ -232,7 +232,7 @@ ChannelModeStatus::~ChannelModeStatus()
  */
 bool ChannelModeKey::IsValid(const Anope::string &value) const
 {
-	if (!value.empty() && value.find(':') != Anope::string::npos && value.find(',') != Anope::string::npos)
+	if (!value.empty() && value.find(':') == Anope::string::npos && value.find(',') == Anope::string::npos)
 		return true;
 
 	return false;

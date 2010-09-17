@@ -89,12 +89,10 @@ class CoreExport Extensible : public virtual Base
 	 *
 	 * @return Returns true on success, false if otherwise
 	 */
-	bool Extend(const Anope::string &key, ExtensibleItemBase *p)
+	void Extend(const Anope::string &key, ExtensibleItemBase *p)
 	{
-		bool Ret = this->Extension_Items.insert(std::make_pair(key, p)).second;
-		if (!Ret)
-			delete p;
-		return Ret;
+		this->Shrink(key);
+		this->Extension_Items.insert(std::make_pair(key, p));
 	}
 
 	/** Extend an Extensible class.
@@ -108,13 +106,9 @@ class CoreExport Extensible : public virtual Base
 	 *
 	 * @return Returns true on success, false if otherwise
 	 */
-	bool Extend(const Anope::string &key)
+	void Extend(const Anope::string &key)
 	{
-		/* This will only add an item if it doesnt already exist,
-		 * the return value is a std::pair of an iterator to the
-		 * element, and a bool saying if it was actually inserted.
-		 */
-		return this->Extend(key, new ExtensibleItemRegular<char *>(NULL));
+		this->Extend(key, new ExtensibleItemRegular<char *>(NULL));
 	}
 
 	/** Shrink an Extensible class.

@@ -57,7 +57,7 @@ class CommandCSInfo : public Command
 		}
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (has_auspex && check_access(u, ci, CA_INFO))
+		if (has_auspex || check_access(u, ci, CA_INFO))
 			show_all = true;
 
 		notice_lang(Config->s_ChanServ, u, CHAN_INFO_HEADER, chan.c_str());

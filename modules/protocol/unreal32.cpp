@@ -1191,34 +1191,36 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
 	if (value.empty())
 		return false;
-	Anope::string rest;
-	if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
-		return true;
-	else
+	try
 	{
-		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-		size_t end_bracket = value.find(']', 1);
-		if (end_bracket == Anope::string::npos)
-			return false;
-		Anope::string xbuf = value.substr(0, end_bracket);
-		if (value[end_bracket + 1] != ':')
-			return false;
-		commasepstream args(xbuf.substr(1));
-		Anope::string arg;
-		while (args.GetToken(arg))
-		{
-			/* <number><1 letter>[optional: '#'+1 letter] */
-			size_t p = 0;
-			while (p < arg.length() && isdigit(arg[p]))
-				++p;
-			if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
-				continue; /* continue instead of break for forward compatability. */
-			int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
-			if (v < 1 || v > 999)
-				return false;
-		}
-		return true;
+		Anope::string rest;
+		if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
+			return true;
 	}
+	catch (const CoreException &) { } // convertTo fail
+	
+	/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
+	size_t end_bracket = value.find(']', 1);
+	if (end_bracket == Anope::string::npos)
+		return false;
+	Anope::string xbuf = value.substr(0, end_bracket);
+	if (value[end_bracket + 1] != ':')
+		return false;
+	commasepstream args(xbuf.substr(1));
+	Anope::string arg;
+	while (args.GetToken(arg))
+	{
+		/* <number><1 letter>[optional: '#'+1 letter] */
+		size_t p = 0;
+		while (p < arg.length() && isdigit(arg[p]))
+			++p;
+		if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
+			continue; /* continue instead of break for forward compatability. */
+		int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
+		if (v < 1 || v > 999)
+			return false;
+	}
+	return true;
 }
 
 static void AddModes()

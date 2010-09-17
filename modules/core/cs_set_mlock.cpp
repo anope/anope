@@ -65,7 +65,7 @@ class CommandCSSetMLock : public Command
 						if (paramcount >= params.size())
 							continue;
 
-						Anope::string param = params[paramcount];
+						Anope::string param = params[paramcount++];
 
 						ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 

@@ -462,7 +462,9 @@ class CommandCSLevels : public Command
 		Anope::string lev = params[3];
 
 		Anope::string error;
-		int level = convertTo<int>(lev, error, false);
+		int level = (lev.is_number_only() ? convertTo<int>(lev, error, false) : 0);
+		if (!lev.is_number_only())
+			error = "1";
 
 		if (lev.equals_ci("FOUNDER"))
 		{
@@ -475,6 +477,7 @@ class CommandCSLevels : public Command
 		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
 			notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
+		{
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
 			{
 				if (what.equals_ci(levelinfo[i].name))
@@ -493,7 +496,8 @@ class CommandCSLevels : public Command
 				}
 			}
 
-		notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+			notice_lang(Config->s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+		}
 
 		return MOD_CONT;
 	}

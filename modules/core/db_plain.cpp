@@ -770,9 +770,9 @@ class DBPlain : public Module
 		else if (key.equals_ci("MLP"))
 		{
 			std::vector<std::pair<Anope::string, Anope::string> > mlp;
-
-			for (unsigned j = 0, end = params.size(); j < end; j += 2)
-				mlp.push_back(std::make_pair(params[j], params[j + 1]));
+			ci->GetExtRegular("db_mlp", mlp);
+	
+			mlp.push_back(std::make_pair(params[0], params[1]));
 
 			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
 			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));

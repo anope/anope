@@ -134,7 +134,7 @@ class DNSSocket : public ClientSocket
 	int SendTo(const unsigned char *buf, size_t len) const;
 	int RecvFrom(char *buf, size_t size, sockaddrs &addrs) const;
  public:
-	DNSSocket(const Anope::string &nTargetHost, int nPort);
+	DNSSocket(const Anope::string &nTargetHost, int Port);
 	virtual ~DNSSocket();
 
 	bool ProcessRead();

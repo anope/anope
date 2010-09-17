@@ -337,6 +337,11 @@ namespace Anope
 	 */
 	extern CoreExport void Unhex(const Anope::string &src, Anope::string &dest);
 	extern CoreExport void Unhex(const Anope::string &src, char *dest);
+
+	/** Return the last error, uses errno/GetLastError() to determin this
+	 * @return An error message
+	 */
+	extern CoreExport const Anope::string LastError();
 }
 
 /** sepstream allows for splitting token seperated lists.

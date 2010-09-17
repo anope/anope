@@ -77,7 +77,7 @@ bool DNSPacket::AddQuestion(const Anope::string &name, const QueryType qt)
 				in6_addr ip;
 				if (!inet_pton(AF_INET6, working_name.c_str(), &ip))
 				{
-					Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for PTR lookup (" << working_name << "): " << strerror(errno);
+					Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for PTR lookup (" << working_name << "): " << Anope::LastError();
 					return false;
 				}
 
@@ -102,14 +102,14 @@ bool DNSPacket::AddQuestion(const Anope::string &name, const QueryType qt)
 				in_addr ip;
 				if (!inet_pton(AF_INET, working_name.c_str(), &ip))
 				{
-					Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for PTR lookup (" << working_name << "): " << strerror(errno);
+					Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for PTR lookup (" << working_name << "): " << Anope::LastError();
 					return false;
 				}
 				unsigned long reverse_ip = ((ip.s_addr & 0xFF) << 24) | ((ip.s_addr & 0xFF00) << 8) | ((ip.s_addr & 0xFF0000) >> 8) | ((ip.s_addr & 0xFF000000) >> 24);
 				char ipbuf[INET_ADDRSTRLEN];
 				if (!inet_ntop(AF_INET, &reverse_ip, ipbuf, sizeof(ipbuf)))
 				{
-					Log(LOG_DEBUG_2) << "Resolver: Reformatted IP " << working_name << " back into an invalid IP: " << strerror(errno);
+					Log(LOG_DEBUG_2) << "Resolver: Reformatted IP " << working_name << " back into an invalid IP: " << Anope::LastError();
 					return false;
 				}
 
@@ -197,7 +197,7 @@ inline DNSRecord::DNSRecord()
 	this->created = Anope::CurTime;
 }
 
-DNSSocket::DNSSocket(const Anope::string &nTargetHost, int nPort) : ClientSocket(nTargetHost, nPort, "", false, SOCK_DGRAM)
+DNSSocket::DNSSocket(const Anope::string &TargetHost, int Port) : ClientSocket(TargetHost, Port, "", false, SOCK_DGRAM)
 {
 	this->server_addr.pton(AF_INET, TargetHost, Port);
 }
@@ -370,8 +370,8 @@ bool DNSSocket::ProcessRead()
 					char ipbuf[INET_ADDRSTRLEN];
 					if (!inet_ntop(AF_INET, &ip, ipbuf, sizeof(ipbuf)))
 					{
-						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << strerror(errno);
-						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + stringify(strerror(errno)));
+						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << Anope::LastError();
+						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + Anope::LastError());
 						delete rr;
 						rr = NULL;
 					}
@@ -389,8 +389,8 @@ bool DNSSocket::ProcessRead()
 					char ipbuf[INET6_ADDRSTRLEN];
 					if (!inet_ntop(AF_INET6, &ip, ipbuf, sizeof(ipbuf)))
 					{
-						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << strerror(errno);
-						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + stringify(strerror(errno)));
+						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << Anope::LastError();
+						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + Anope::LastError());
 						delete rr;
 						rr = NULL;
 					}

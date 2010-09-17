@@ -9,18 +9,8 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "services.h"
-
-const char *dlerror()
-{
-	static char errbuf[513];
-	DWORD err = GetLastError();
-	if (!err)
-		return NULL;
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
-	return errbuf;
-}
 
 /** This is inet_pton, but it works on Windows
  * @param af The protocol type, AF_INET or AF_INET6

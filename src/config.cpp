@@ -404,7 +404,7 @@ void ServerConfig::ValidateNoSpaces(const Anope::string &p, const Anope::string 
 }
 
 /* NOTE: Before anyone asks why we're not using inet_pton for this, it is because inet_pton and friends do not return so much detail,
- * even in strerror(errno). They just return 'yes' or 'no' to an address without such detail as to whats WRONG with the address.
+ * even in LastError(). They just return 'yes' or 'no' to an address without such detail as to whats WRONG with the address.
  * Because ircd users arent as technical as they used to be (;)) we are going to give more of a useful error message.
  */
 void ServerConfig::ValidateIP(const Anope::string &p, const Anope::string &tag, const Anope::string &val, bool wild) const

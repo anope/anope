@@ -1305,3 +1305,18 @@ void Anope::Unhex(const Anope::string &src, char *dest)
 	}
 	dest[destpos] = 0;
 }
+
+const Anope::string Anope::LastError()
+{
+#ifndef _WIN32
+	return LastError();
+#else
+	char errbuf[513];
+	DWORD err = GetLastError();
+	if (!err)
+		return NULL;
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
+	return errbuf;
+#endif
+}
+

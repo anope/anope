@@ -16,7 +16,7 @@ Pipe::Pipe() : Socket()
 {
 	this->Sock = eventfd(0, EFD_NONBLOCK);
 	if (this->Sock < 0)
-		throw CoreException(Anope::string("Could not create pipe: ") + strerror(errno));
+		throw CoreException(Anope::string("Could not create pipe: ") + Anope::LastError());
 
 	this->IPv6 = false;
 	this->Type = SOCKTYPE_CLIENT;

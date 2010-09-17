@@ -69,10 +69,7 @@ class SocketEngineSelect : public SocketEngineBase
 
 		if (sresult == -1)
 		{
-#ifdef WIN32
-			errno = WSAGetLastError();
-#endif
-			Log() << "SockEngine::Process(): error: " << strerror(errno);
+			Log() << "SockEngine::Process(): error: " << Anope::LastError();
 		}
 		else if (sresult)
 		{

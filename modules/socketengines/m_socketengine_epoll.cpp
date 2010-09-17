@@ -28,8 +28,8 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (EngineHandle == -1)
 		{
-			Log() << "Could not initialize epoll socket engine: " << strerror(errno);
-			throw ModuleException(Anope::string("Could not initialize epoll socket engine: ") + strerror(errno));
+			Log() << "Could not initialize epoll socket engine: " << Anope::LastError();
+			throw ModuleException(Anope::string("Could not initialize epoll socket engine: ") + Anope::LastError());
 		}
 
 		events = new epoll_event[max];
@@ -52,7 +52,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
 		{
-			Log() << "Unable to add fd " << ev.data.fd << " to socketengine epoll: " << strerror(errno);
+			Log() << "Unable to add fd " << ev.data.fd << " to socketengine epoll: " << Anope::LastError();
 			return;
 		}
 
@@ -71,7 +71,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_DEL, ev.data.fd, &ev) == -1)
 		{
-			Log() << "Unable to delete fd " << ev.data.fd << " from socketengine epoll: " << strerror(errno);
+			Log() << "Unable to delete fd " << ev.data.fd << " from socketengine epoll: " << Anope::LastError();
 			return;
 		}
 
@@ -93,7 +93,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.data.fd = s->GetSock();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-			Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << strerror(errno);
+			Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << Anope::LastError();
 		else
 			s->SetFlag(SF_WRITABLE);
 	}
@@ -111,7 +111,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		ev.data.fd = s->GetSock();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-			Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << strerror(errno);
+			Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << Anope::LastError();
 		else
 			s->UnsetFlag(SF_WRITABLE);
 	}
@@ -123,7 +123,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		if (total == -1)
 		{
-			Log() << "SockEngine::Process(): error: " << strerror(errno);
+			Log() << "SockEngine::Process(): error: " << Anope::LastError();
 			return;
 		}
 

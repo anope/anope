@@ -1,6 +1,6 @@
 #include "services.h"
 
-SocketEngineBase *SocketEngine;
+SocketEngineBase *SocketEngine = NULL;
 int32 TotalRead = 0;
 int32 TotalWritten = 0;
 
@@ -62,11 +62,11 @@ Anope::string sockaddrs::addr() const
 	{
 		case AF_INET:
 			if (!inet_ntop(AF_INET, &sa4.sin_addr, address, sizeof(address)))
-				throw SocketException(strerror(errno));
+				throw SocketException(Anope::LastError());
 			return address;
 		case AF_INET6:
 			if (!inet_ntop(AF_INET6, &sa6.sin6_addr, address, sizeof(address)))
-				throw SocketException(strerror(errno));
+				throw SocketException(Anope::LastError());
 			return address;
 		default:
 			break;
@@ -121,13 +121,13 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 	{
 		case AF_INET:
 			if (inet_pton(type, address.c_str(), &sa4.sin_addr) < 1)
-				throw SocketException(Anope::string("Invalid host: ") + strerror(errno));
+				throw SocketException(Anope::string("Invalid host: ") + Anope::LastError());
 			sa4.sin_family = type;
 			sa4.sin_port = htons(pport);
 			return;
 		case AF_INET6:
 			if (inet_pton(type, address.c_str(), &sa6.sin6_addr) < 1)
-				throw SocketException(Anope::string("Invalid host: ") + strerror(errno));
+				throw SocketException(Anope::string("Invalid host: ") + Anope::LastError());
 			sa6.sin6_family = type;
 			sa6.sin6_port = htons(pport);
 			return;
@@ -162,6 +162,8 @@ void sockaddrs::ntop(int type, const void *src)
 	throw CoreException("Invalid socket type");
 }
 
+/** Default constructor
+ */
 SocketEngineBase::SocketEngineBase()
 {
 #ifdef _WIN32
@@ -170,6 +172,8 @@ SocketEngineBase::SocketEngineBase()
 #endif
 }
 
+/** Default destructor
+ */
 SocketEngineBase::~SocketEngineBase()
 {
 	for (std::map<int, Socket *>::const_iterator it = this->Sockets.begin(), it_end = this->Sockets.end(); it != it_end; ++it)
@@ -180,6 +184,8 @@ SocketEngineBase::~SocketEngineBase()
 #endif
 }
 
+/** Empty constructor, used for things such as the pipe socket
+ */
 Socket::Socket()
 {
 }
@@ -209,10 +215,10 @@ Socket::~Socket()
 	CloseSocket(Sock);
 }
 
-/** Really recieve something from the buffer
+/** Really receive something from the buffer
  * @param buf The buf to read to
  * @param sz How much to read
- * @return Number of bytes recieved
+ * @return Number of bytes received
  */
 int Socket::RecvInternal(char *buf, size_t sz) const
 {
@@ -256,7 +262,7 @@ bool Socket::SetBlocking()
 bool Socket::SetNonBlocking()
 {
 #ifdef _WIN32
-	unsigned long opt = 0;
+	unsigned long opt = 1;
 	return !ioctlsocket(this->GetSock(), FIONBIO, &opt);
 #else
 	int flags = fcntl(this->GetSock(), F_GETFL, 0);
@@ -288,7 +294,7 @@ size_t Socket::WriteBufferLen() const
 	return WriteBuffer.length();
 }
 
-/** Called when there is something to be recieved for this socket
+/** Called when there is something to be received for this socket
  * @return true on success, false to drop this socket
  */
 bool Socket::ProcessRead()
@@ -358,7 +364,7 @@ void Socket::ProcessError()
 {
 }
 
-/** Called with a line recieved from the socket
+/** Called with a line received from the socket
  * @param buf The line
  * @return true to continue reading, false to drop the socket
  */
@@ -396,28 +402,26 @@ void Socket::Write(const Anope::string &message)
 }
 
 /** Constructor
- * @param nLS The listen socket this connection came from
- * @param nu The user using this socket
- * @param nsock The socket
- * @param nIPv6 IPv6
+ * @param TargetHost The target host to connect to
+ * @param Port The target port to connect to
+ * @param BindHost The host to bind to for connecting
+ * @param nIPv6 true to use IPv6
  * @param type The socket type, defaults to SOCK_STREAM
  */
-ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6, int type) : Socket(0, nIPv6, type), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
+ClientSocket::ClientSocket(const Anope::string &TargetHost, int Port, const Anope::string &BindHost, bool nIPv6, int type) : Socket(0, nIPv6, type)
 {
 	this->SetNonBlocking();
 
 	if (!BindHost.empty())
 	{
-		sockaddrs bindaddr;
-		bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, BindHost, 0);
-		if (bind(Sock, &bindaddr.sa, bindaddr.size()) == -1)
-			throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
+		this->bindaddrs.pton(IPv6 ? AF_INET6 : AF_INET, BindHost, 0);
+		if (bind(Sock, &this->bindaddrs.sa, this->bindaddrs.size()) == -1)
+			throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
 	}
 
-	sockaddrs conaddr;
-	conaddr.pton(IPv6 ? AF_INET6 : AF_INET, TargetHost, Port);
-	if (connect(Sock, &conaddr.sa, conaddr.size()) == -1 && errno != EINPROGRESS)
-		throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
+	this->conaddrs.pton(IPv6 ? AF_INET6 : AF_INET, TargetHost, Port);
+	if (connect(Sock, &this->conaddrs.sa, this->conaddrs.size()) == -1 && errno != EINPROGRESS)
+		throw SocketException(Anope::string("Error connecting to server: ") + Anope::LastError());
 }
 
 /** Default destructor
@@ -426,7 +430,7 @@ ClientSocket::~ClientSocket()
 {
 }
 
-/** Called with a line recieved from the socket
+/** Called with a line received from the socket
  * @param buf The line
  * @return true to continue reading, false to drop the socket
  */
@@ -436,25 +440,22 @@ bool ClientSocket::Read(const Anope::string &buf)
 }
 
 /** Constructor
- * @param bind The IP to bind to
+ * @param bindip The IP to bind to
  * @param port The port to listen on
  */
 ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (bindip.find(':') != Anope::string::npos ? true : false))
 {
 	Type = SOCKTYPE_LISTEN;
-	BindIP = bindip;
-	Port = port;
 
 	this->SetNonBlocking();
 
-	sockaddrs sockaddr;
-	sockaddr.pton(IPv6 ? AF_INET6 : AF_INET, BindIP, Port);
+	this->listenaddrs.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
 
-	if (bind(Sock, &sockaddr.sa, sockaddr.size()) == -1)
-		throw SocketException(Anope::string("Unable to bind to address: ") + strerror(errno));
+	if (bind(Sock, &this->listenaddrs.sa, this->listenaddrs.size()) == -1)
+		throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
 
 	if (listen(Sock, 5) == -1)
-		throw SocketException(Anope::string("Unable to listen: ") + strerror(errno));
+		throw SocketException(Anope::string("Unable to listen: ") + Anope::LastError());
 }
 
 /** Destructor
@@ -488,18 +489,3 @@ bool ListenSocket::OnAccept(Socket *s)
 	return true;
 }
 
-/** Get the bind IP for this socket
- * @return the bind ip
- */
-const Anope::string &ListenSocket::GetBindIP() const
-{
-	return BindIP;
-}
-
-/** Get the port this socket is bound to
- * @return The port
- */
-int ListenSocket::GetPort() const
-{
-	return Port;
-}

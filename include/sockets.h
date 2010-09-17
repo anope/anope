@@ -105,10 +105,10 @@ enum SocketFlag
 class CoreExport Socket : public Flags<SocketFlag, 2>
 {
  protected:
-	/** Really recieve something from the buffer
+	/** Really receive something from the buffer
 	 * @param buf The buf to read to
 	 * @param sz How much to read
-	 * @return Number of bytes recieved
+	 * @return Number of bytes received
 	 */
 	virtual int RecvInternal(char *buf, size_t sz) const;
 
@@ -120,13 +120,11 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 
 	/* Socket FD */
 	int Sock;
-	/* Port we're connected to */
-	int Port;
 	/* Is this an IPv6 socket? */
 	bool IPv6;
 	/* Things to be written to the socket */
 	std::string WriteBuffer;
-	/* Part of a message sent from the server, but not totally recieved */
+	/* Part of a message sent from the server, but not totally received */
 	std::string extrabuf;
 	/* How much data was received from this socket */
 	size_t RecvLen;
@@ -180,7 +178,7 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	 */
 	size_t WriteBufferLen() const;
 
-	/** Called when there is something to be recieved for this socket
+	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
 	virtual bool ProcessRead();
@@ -195,7 +193,7 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	 */
 	virtual void ProcessError();
 
-	/** Called with a line recieved from the socket
+	/** Called with a line received from the socket
 	 * @param buf The line
 	 * @return true to continue reading, false to drop the socket
 	 */
@@ -248,29 +246,27 @@ class CoreExport Pipe : public Socket
 class CoreExport ClientSocket : public Socket
 {
  protected:
-	/* Target host we're connected to */
-	Anope::string TargetHost;
-	/* Target port we're connected to */
-	int Port;
-	/* The host to bind to */
-	Anope::string BindHost;
+	/* Sockaddrs for bindip (if there is one) */
+	sockaddrs bindaddrs;
+	/* Sockaddrs for connection ip/port */
+	sockaddrs conaddrs;
 
  public:
 
 	/** Constructor
-	 * @param nTargetHost The target host to connect to
-	 * @param nPort The target port to connect to
-	 * @param nBindHost The host to bind to for connecting
+	 * @param TargetHost The target host to connect to
+	 * @param Port The target port to connect to
+	 * @param BindHost The host to bind to for connecting
 	 * @param nIPv6 true to use IPv6
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost = "", bool nIPv6 = false, int type = SOCK_STREAM);
+	ClientSocket(const Anope::string &TargetHost, int Port, const Anope::string &BindHost = "", bool nIPv6 = false, int type = SOCK_STREAM);
 
 	/** Default destructor
 	 */
 	virtual ~ClientSocket();
 
-	/** Called with a line recieved from the socket
+	/** Called with a line received from the socket
 	 * @param buf The line
 	 * @return true to continue reading, false to drop the socket
 	 */
@@ -280,17 +276,15 @@ class CoreExport ClientSocket : public Socket
 class CoreExport ListenSocket : public Socket
 {
  protected:
-	/* Bind IP */
-	Anope::string BindIP;
-	/* Port to bind to */
-	int Port;
+	/* Sockaddrs for bindip/port */
+	sockaddrs listenaddrs;
 
  public:
 	/** Constructor
-	 * @param bind The IP to bind to
+	 * @param bindip The IP to bind to
 	 * @param port The port to listen on
 	 */
-	ListenSocket(const Anope::string &bind, int port);
+	ListenSocket(const Anope::string &bindip, int port);
 
 	/** Destructor
 	 */
@@ -306,16 +300,6 @@ class CoreExport ListenSocket : public Socket
 	 * @return true if the listen socket should remain alive
 	 */
 	virtual bool OnAccept(Socket *s);
-
-	/** Get the bind IP for this socket
-	 * @return the bind ip
-	 */
-	const Anope::string &GetBindIP() const;
-
-	/** Get the port this socket is bound to
-	 * @return The port
-	 */
-	int GetPort() const;
 };
 
 #endif // SOCKET_H

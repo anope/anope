@@ -360,7 +360,7 @@ void ModuleRunTimeDirCleanUp()
 			{
 				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
 				if (!DeleteFile(filebuf.c_str()))
-					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << dlerror();
+					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << LastError();
 			}
 			if (!FindNextFile(hList, &FileData))
 			{

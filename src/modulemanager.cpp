@@ -134,8 +134,8 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	ano_modclearerr();
 
 	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
-	const char *err;
-	if (!handle && (err = dlerror()))
+	const char *err = ano_moderr();
+	if (!handle && err && *err)
 	{
 		Log() << err;
 		return MOD_ERR_NOLOAD;
@@ -143,7 +143,8 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 	ano_modclearerr();
 	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
-	if (!func && (err = dlerror()))
+	err = ano_moderr();
+	if (!func && err && *err)
 	{
 		Log() << "No init function found, not an Anope module";
 		dlclose(handle);
@@ -257,8 +258,8 @@ void ModuleManager::DeleteModule(Module *m)
 
 	ano_modclearerr();
 	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
-	const char *err;
-	if (!destroy_func && (err = dlerror()))
+	const char *err = ano_moderr();
+	if (!destroy_func && err && *err)
 	{
 		Log() << "No destroy function found, chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
@@ -269,7 +270,7 @@ void ModuleManager::DeleteModule(Module *m)
 	if (handle)
 	{
 		if (dlclose(handle))
-			Log() << dlerror();
+			Log() << ano_moderr();
 	}
 
 	if (!filename.empty())

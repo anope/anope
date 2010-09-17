@@ -27,6 +27,7 @@
 # define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
 # define dlclose(file) FreeLibrary(file) ? 0 : 1
 # define ano_modclearerr() SetLastError(0)
+# define ano_moderr() LastError().c_str()
 #else
 	typedef void * ano_module_t;
 
@@ -36,6 +37,7 @@
  * to be cleared, POSIX-wise. -GD
  */
 # define ano_modclearerr() dlerror()
+# define ano_moderr() dlerror()
 #endif
 
 /** Possible return types from events.

@@ -301,7 +301,7 @@ void Init(int ac, char **av)
 	/* Chdir to Services data directory. */
 	if (chdir(services_dir.c_str()) < 0)
 	{
-		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::string(strerror(errno)));
+		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::LastError());
 	}
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
@@ -367,7 +367,7 @@ void Init(int ac, char **av)
 	ModuleManager::LoadModuleList(Config->DBModuleList);
 
 	/* Load the socket engine */
-	if (ModuleManager::LoadModule(Config->SocketEngine, NULL))
+	if (ModuleManager::LoadModule(Config->SocketEngine, NULL) || !SocketEngine)
 		throw FatalException("Unable to load socket engine " + Config->SocketEngine);
 
 	try

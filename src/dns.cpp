@@ -1,6 +1,6 @@
 #include "services.h"
 
-DNSManager *DNSEngine;
+DNSManager *DNSEngine = NULL;
 
 static inline unsigned short GetRandomID()
 {
@@ -11,6 +11,8 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 {
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
+	if (!DNSEngine->sock)
+		DNSEngine->sock = new DNSSocket(Config->NameServer, DNSManager::DNSPort);
 	if (DNSEngine->packets.size() == 65535)
 		throw SocketException("DNS queue full");
 	
@@ -474,15 +476,6 @@ bool DNSSocket::ProcessWrite()
 DNSManager::DNSManager() : Timer(3600, Anope::CurTime, true)
 {
 	this->sock = NULL;
-
-	try
-	{
-		this->sock = new DNSSocket(Config->NameServer, DNSManager::DNSPort);
-	}
-	catch (const SocketException &ex)
-	{
-		throw SocketException("Unable to connect to nameserver: " + ex.GetReason());
-	}
 }
 
 DNSManager::~DNSManager()

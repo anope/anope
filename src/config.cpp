@@ -358,7 +358,7 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 
 		while (f.is_open() && getline(f, server.str()))
 		{
-			if (server.find("nameserver ") == 0 && getline(f, server.str()))
+			if (server.find("nameserver ") == 0)
 			{
 				if (server.substr(11).is_pos_number_only())
 				{

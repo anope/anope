@@ -394,9 +394,10 @@ void ChannelInfo::LoadMLock()
 	if (this->HasFlag(CI_PERSIST) && !this->c)
 	{
 		this->c = new Channel(this->name, this->time_registered);
-		if (!this->bi)
+		if (!this->bi && ModeManager::FindChannelModeByName(CMODE_PERM) == NULL)
 			ChanServ->Assign(NULL, this);
-		this->bi->Join(c);
+		else if (this->bi)
+			this->bi->Join(c);
 		check_modes(this->c);
 		this->CheckTopic();
 	}

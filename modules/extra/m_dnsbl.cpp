@@ -27,8 +27,10 @@ class DNSBLResolver : public DNSRequest
 
 	void OnLookupComplete(const DNSRecord *)
 	{
-		if (!user)
+		if (!user || user->GetExt("m_dnsbl_akilled"))
 			return;
+
+		user->Extend("m_dnsbl_akilled");
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_ci("%i", user->ip.addr());

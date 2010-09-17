@@ -404,6 +404,8 @@ void Socket::Write(const Anope::string &message)
  */
 ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost, bool nIPv6, int type) : Socket(0, nIPv6, type), TargetHost(nTargetHost), Port(nPort), BindHost(nBindHost)
 {
+	this->SetNonBlocking();
+
 	if (!BindHost.empty())
 	{
 		sockaddrs bindaddr;
@@ -414,10 +416,8 @@ ClientSocket::ClientSocket(const Anope::string &nTargetHost, int nPort, const An
 
 	sockaddrs conaddr;
 	conaddr.pton(IPv6 ? AF_INET6 : AF_INET, TargetHost, Port);
-	if (connect(Sock, &conaddr.sa, conaddr.size()) == -1)
+	if (connect(Sock, &conaddr.sa, conaddr.size()) == -1 && errno != EINPROGRESS)
 		throw SocketException(Anope::string("Error connecting to server: ") + strerror(errno));
-
-	this->SetNonBlocking();
 }
 
 /** Default destructor
@@ -445,6 +445,8 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (b
 	BindIP = bindip;
 	Port = port;
 
+	this->SetNonBlocking();
+
 	sockaddrs sockaddr;
 	sockaddr.pton(IPv6 ? AF_INET6 : AF_INET, BindIP, Port);
 
@@ -453,8 +455,6 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (b
 
 	if (listen(Sock, 5) == -1)
 		throw SocketException(Anope::string("Unable to listen: ") + strerror(errno));
-
-	this->SetNonBlocking();
 }
 
 /** Destructor

@@ -78,6 +78,7 @@
 # define inet_pton inet_pton_
 # define inet_ntop inet_ntop_
 # define MARK_DEPRECATED
+# define EINPROGRESS WSAEWOULDBLOCK
 
 extern CoreExport const char *dlerror();
 extern CoreExport int inet_pton(int af, const char *src, void *dst);

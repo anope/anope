@@ -199,7 +199,6 @@ inline DNSRecord::DNSRecord()
 
 DNSSocket::DNSSocket(const Anope::string &TargetHost, int Port) : ClientSocket(TargetHost, Port, "", false, SOCK_DGRAM)
 {
-	this->server_addr.pton(AF_INET, TargetHost, Port);
 }
 
 DNSSocket::~DNSSocket()
@@ -210,7 +209,7 @@ DNSSocket::~DNSSocket()
 
 int DNSSocket::SendTo(const unsigned char *buf, size_t len) const
 {
-	return sendto(this->GetSock(), buf, len, 0, &this->server_addr.sa, this->server_addr.size());
+	return sendto(this->GetSock(), buf, len, 0, &this->conaddrs.sa, this->conaddrs.size());
 }
 
 int DNSSocket::RecvFrom(char *buf, size_t len, sockaddrs &addrs) const
@@ -230,9 +229,9 @@ bool DNSSocket::ProcessRead()
 	if (length < 0)
 		return false;
 
-	if (this->server_addr != from_server)
+	if (this->conaddrs != from_server)
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->server_addr.addr() << "' != '" << from_server.addr() << "'";
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->conaddrs.addr() << "' != '" << from_server.addr() << "'";
 		return true;
 	}
 

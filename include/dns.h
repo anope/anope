@@ -129,8 +129,6 @@ struct DNSRecord
 class DNSSocket : public ClientSocket
 {
  private:
- 	sockaddrs server_addr;
-
 	int SendTo(const unsigned char *buf, size_t len) const;
 	int RecvFrom(char *buf, size_t size, sockaddrs &addrs) const;
  public:

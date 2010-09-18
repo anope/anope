@@ -508,7 +508,7 @@ bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anop
 	{
 		if (value.equals_ci("preregexpire"))
 		{
-			if (!data.GetInteger())
+			if (!data.GetInteger() && !dotime(data.GetValue()))
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
 		}
 		else

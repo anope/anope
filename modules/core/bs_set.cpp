@@ -65,7 +65,7 @@ class CommandBSSet : public Command
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
-			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << option << value;
+			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << option << " " << value;
 
 			if (option.equals_ci("DONTKICKOPS"))
 			{

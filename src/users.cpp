@@ -685,7 +685,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			}
 		}
 
-		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << ") (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
+		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));

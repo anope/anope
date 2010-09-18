@@ -220,7 +220,7 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << "(group: " << nc->display << ") as level " << ulev;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
 			notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED, nc->display.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
@@ -235,7 +235,7 @@ class CommandCSAccess : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << "(group: " << nc->display << ") as level " << ulev;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
 		notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display.c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
@@ -281,7 +281,7 @@ class CommandCSAccess : public Command
 			{
 				notice_lang(Config->s_ChanServ, u, CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
 				bool override = !check_access(u, ci, CA_ACCESS_CHANGE);
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << "(group: " << access->nc->display << ") from level " << access->level;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << " (group: " << access->nc->display << ") from level " << access->level;
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 

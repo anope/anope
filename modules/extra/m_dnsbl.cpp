@@ -12,8 +12,9 @@ struct Blacklist
 	Anope::string name;
 	time_t bantime;
 	Anope::string reason;
+	std::map<int, Anope::string> replies;
 
-	Blacklist(const Anope::string &n, time_t b, const Anope::string &r) : name(n), bantime(b), reason(r) { }
+	Blacklist(const Anope::string &n, time_t b, const Anope::string &r, const std::map<int, Anope::string> &re) : name(n), bantime(b), reason(r), replies(re) { }
 };
 
 class DNSBLResolver : public DNSRequest
@@ -25,19 +26,32 @@ class DNSBLResolver : public DNSRequest
  public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const DNSRecord *)
+	void OnLookupComplete(const DNSRecord *record)
 	{
 		if (!user || user->GetExt("m_dnsbl_akilled"))
 			return;
+
+		Anope::string record_reason;
+		if (!this->blacklist.replies.empty())
+		{
+			sockaddrs sresult;
+			sresult.pton(AF_INET, record->result);
+			int result = (sresult.sa4.sin_addr.s_addr & 0xFF000000) >> 24;
+
+			if (!this->blacklist.replies.count(result))
+				return;
+			record_reason = this->blacklist.replies[result];
+		}
 
 		user->Extend("m_dnsbl_akilled");
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_ci("%n", user->nick);
 		reason = reason.replace_all_ci("%u", user->GetIdent());
-		reason = reason.replace_all_ci("%r", user->realname);
+		reason = reason.replace_all_ci("%g", user->realname);
 		reason = reason.replace_all_ci("%h", user->host);
 		reason = reason.replace_all_ci("%i", user->ip.addr());
+		reason = reason.replace_all_ci("%r", record_reason);
 
 		XLine *x = NULL;
 		if (this->add_to_akill && SGLine && (x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason)))
@@ -96,8 +110,15 @@ class ModuleDNSBL : public Module
 			if (bantime < 0)
 				bantime = 9000;
 			Anope::string reason = config.ReadValue("blacklist", "reason", "", i);
+			std::map<int, Anope::string> replies;
+			for (int j = 0; j < 256; ++j)
+			{
+				Anope::string k = config.ReadValue("blacklist", stringify(j), "", i);
+				if (!k.empty())
+					replies[j] = k;
+			}
 
-			this->blacklists.push_back(Blacklist(bname, bantime, reason));
+			this->blacklists.push_back(Blacklist(bname, bantime, reason, replies));
 		}
 	}
 

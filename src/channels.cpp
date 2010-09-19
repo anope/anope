@@ -106,7 +106,7 @@ void Channel::Reset()
 
 void Channel::Sync()
 {
-	if (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi == this->users.front()->user))
+	if (!this->HasMode(CMODE_PERM) && (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi == this->users.front()->user)))
 	{
 		new ChanServTimer(this);
 	}

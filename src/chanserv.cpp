@@ -837,7 +837,7 @@ ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);
-	if (!c->ci->bi)
+	if (!c->ci || !c->ci->bi)
 		ChanServ->Join(*c);
 	else if (!c->FindUser(c->ci->bi))
 		c->ci->bi->Join(*c);

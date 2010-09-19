@@ -90,9 +90,9 @@ static int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, User 
 	{
 		Command *c = it->second;
 
-		if (c->module && c->module->name.equals_ci(mod_name))
+		if (c->module && c->module->name.equals_ci(mod_name) && c->service)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_CMD_LIST, c->service, c->name.c_str());
+			notice_lang(Config->s_OperServ, u, OPER_MODULE_CMD_LIST, c->service->nick.c_str(), c->name.c_str());
 			++display;
 		}
 	}

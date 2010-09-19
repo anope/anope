@@ -802,7 +802,7 @@ void do_quit(const Anope::string &source, int ac, const char **av)
 		return;
 	}
 
-	Log(user, "quit") << "for " << (*av[0] ? av[0] : "no reason");
+	Log(user, "quit") << "quit (Reason: " << (*av[0] ? av[0] : "no reason") << ")";
 
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
@@ -830,7 +830,7 @@ void do_kill(const Anope::string &nick, const Anope::string &msg)
 		return;
 	}
 
-	Log(user, "killed") << "for " << msg;
+	Log(user, "killed") << "was killed (Reason: " << msg << ")";
 
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))

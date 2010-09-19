@@ -716,7 +716,6 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 int anope_event_uid(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
-	NickAlias *na;
 	Server *s = Server::Find(source);
 	int ts = strtoul(av[1], NULL, 10);
 
@@ -724,15 +723,20 @@ int anope_event_uid(const Anope::string &source, int ac, const char **av)
 	 * If not, validate the user.  ~ Viper*/
 	user = prev_u_intro;
 	prev_u_intro = NULL;
-	if (user)
-		na = findnick(user->nick);
-	if (user && !user->server->IsSynced() && (!na || na->nc != user->Account()))
+	if (user && !user->server->IsSynced())
 	{
-		validate_user(user);
-		if (user->HasMode(UMODE_REGISTERED))
-			user->RemoveMode(NickServ, UMODE_REGISTERED);
+		NickAlias *na = findnick(user->nick);
+
+		if (!na || na->nc != user->Account())
+		{
+			validate_user(user);
+			if (user->HasMode(UMODE_REGISTERED))
+				user->RemoveMode(NickServ, UMODE_REGISTERED);
+		}
+		else
+			/* Set them +r (to negate a possible -r on the stack) */
+			user->SetMode(NickServ, UMODE_REGISTERED);
 	}
-	user = NULL;
 
 	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, av[6], av[4], av[0]);
 	if (user)
@@ -1150,7 +1154,6 @@ int anope_event_capab(const Anope::string &source, int ac, const char **av)
 
 int anope_event_endburst(const Anope::string &source, int ac, const char **av)
 {
-	NickAlias *na;
 	User *u = prev_u_intro;
 	Server *s = Server::Find(source);
 
@@ -1160,13 +1163,19 @@ int anope_event_endburst(const Anope::string &source, int ac, const char **av)
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user. ~ Viper*/
 	prev_u_intro = NULL;
-	if (u)
-		na = findnick(u->nick);
-	if (u && !u->server->IsSynced() && (!na || na->nc != u->Account()))
+	if (u && !u->server->IsSynced())
 	{
-		validate_user(u);
-		if (u->HasMode(UMODE_REGISTERED))
-			u->RemoveMode(NickServ, UMODE_REGISTERED);
+		NickAlias *na = findnick(u->nick);
+
+		if (!na || na->nc != u->Account())
+		{
+			validate_user(u);
+			if (u->HasMode(UMODE_REGISTERED))
+				u->RemoveMode(NickServ, UMODE_REGISTERED);
+		}
+		else
+			/* Set them +r (to negate a possible -r on the stack) */
+			u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
 	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();

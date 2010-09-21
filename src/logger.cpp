@@ -350,7 +350,9 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (log && log->GetName() != CreateLogName(target))
 				{
 					delete log;
+					this->Logfiles.erase(lit);
 					log = new LogFile(CreateLogName(target));
+					this->Logfiles[target] = log;
 
 					if (this->LogAge)
 					{
@@ -364,15 +366,14 @@ void LogInfo::ProcessMessage(const Log *l)
 				}
 				if (!log || !log->stream.is_open())
 				{
-					if (log && lastwarn + 300 > Anope::CurTime)
+					if (log && lastwarn + 300 < Anope::CurTime)
 					{
 						lastwarn = Anope::CurTime;
 						Log() << "Unable to open logfile " << log->GetName();
 					}
 					delete log;
-					log = NULL;
 					this->Logfiles.erase(lit);
-					continue;
+					log = NULL;
 				}
 			}
 			else if (lit == this->Logfiles.end())
@@ -381,17 +382,16 @@ void LogInfo::ProcessMessage(const Log *l)
 
 				if (!log->stream.is_open())
 				{
-					if (lastwarn + 300 > Anope::CurTime)
+					if (lastwarn + 300 < Anope::CurTime)
 					{
 						lastwarn = Anope::CurTime;
 						Log() << "Unable to open logfile " << log->GetName();
-						delete log;
-						log = NULL;
-						continue;
 					}
+					delete log;
+					log = NULL;
 				}
-
-				this->Logfiles[target] = log;
+				else
+					this->Logfiles[target] = log;
 			}
 
 			if (log)

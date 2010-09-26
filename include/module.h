@@ -5,7 +5,7 @@
 #include "commands.h"
 #include "modules.h"
 
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 # include <libintl.h>
 # define _(x) gettext(x)
 #else

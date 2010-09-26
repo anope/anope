@@ -8,7 +8,7 @@
 
 #include "modules.h"
 
-#ifdef HAVE_GETTEXT
+#ifdef GETTEXT_FOUND
 # include <libintl.h>
 #endif
 
@@ -29,11 +29,9 @@ Module::Module(const Anope::string &mname, const Anope::string &creator)
 
 	Modules.push_back(this);
 
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 	if (!bindtextdomain(this->name.c_str(), (services_dir + "/languages/").c_str()))
-	{
 		Log() << "Error calling bindtextdomain, " << Anope::LastError();
-	}
 #endif
 }
 

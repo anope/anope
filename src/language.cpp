@@ -1,6 +1,6 @@
 #include "services.h"
 
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 # include <libintl.h>
 # define _(x) gettext(x)
 #else
@@ -11,7 +11,7 @@ std::vector<Anope::string> languages;
 
 void InitLanguages()
 {
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 	languages.clear();
 	spacesepstream sep(Config->Languages);
 	Anope::string language;
@@ -40,7 +40,7 @@ void InitLanguages()
 
 const Anope::string GetString(Anope::string language, LanguageString string)
 {
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 	/* For older databases */
 	if (language == "en")
 		language.clear();
@@ -53,7 +53,7 @@ const Anope::string GetString(Anope::string language, LanguageString string)
 #endif
 		return language_strings[string];
 
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 	setlocale(LC_ALL, language.c_str());
 	const char *ret = dgettext("anope", language_strings[string].c_str());
 	setlocale(LC_ALL, "");

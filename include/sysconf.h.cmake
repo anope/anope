@@ -18,7 +18,7 @@
 #cmakedefine HAVE_SYS_SELECT_H 1
 #cmakedefine HAVE_UMASK 1
 #cmakedefine HAVE_EVENTFD 1
-#cmakedefine HAVE_GETTEXT 1
+#cmakedefine GETTEXT_FOUND 1
 #cmakedefine RUNGROUP "@RUNGROUP@"
 #cmakedefine SERVICES_BIN "@SERVICES_BIN@"
 

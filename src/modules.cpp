@@ -308,7 +308,7 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 		language = Config->NSDefLanguage;
 
 	const char *message = fmt;
-#if HAVE_GETTEXT
+#if GETTEXT_FOUND
 	if (!language.empty())
 	{
 		setlocale(LC_ALL, language.c_str());

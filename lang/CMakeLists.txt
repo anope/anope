@@ -1,6 +1,3 @@
-# Find gettext
-INCLUDE(FindGettext)
-
 # Only do this if gettext is installed
 if(GETTEXT_FOUND)
   # Get all of the .po files

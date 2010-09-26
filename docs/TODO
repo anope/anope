@@ -16,9 +16,9 @@ Legend:
 [ ] CIDR Akills, session exceptions, etc
 [x] Hashing system for storing just about everything needs to die
 [x] Add support for +k, +q, etc type umodes
-[ ] Language system is disgusting, it must die.
-  [ ] Modules should also have a way to add strings programatically
-  [ ] Should be able to add many strings by dropping a file in a set location.
+[x] Language system is disgusting, it must die.
+  [x] Modules should also have a way to add strings programatically
+  [x] Should be able to add many strings by dropping a file in a set location.
 [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [x] Config bailing on /os reload needs to be non fatal
 [x] AutoID needs to be able to live through /os restart, current system is just annoying.

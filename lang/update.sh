@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pushd ../src > /dev/null
-xgettext -s -d Anope -o ../lang/anope.pot --from-code=utf-8 language.cpp
+xgettext -C -s -d Anope -o ../lang/anope.pot --from-code=utf-8 --keyword=_ language.cpp
 popd > /dev/null
 
 for f in *.po

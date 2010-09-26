@@ -39,7 +39,7 @@ class CommandNSSetLanguage : public Command
 			}
 		}
 
-		nc->language = param;
+		nc->language = param != "en" ? param : "";
 		u->SendMessage(NickServ, NICK_SET_LANGUAGE_CHANGED);
 
 		return MOD_CONT;

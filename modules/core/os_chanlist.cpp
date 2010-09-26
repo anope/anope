@@ -35,7 +35,7 @@ class CommandOSChanList : public Command
 
 		if (!pattern.empty() && (u2 = finduser(pattern)))
 		{
-			notice_lang(Config->s_OperServ, u, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
+			u->SendMessage(OperServ, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
 			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
@@ -46,12 +46,12 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
+				u->SendMessage(OperServ, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
 			}
 		}
 		else
 		{
-			notice_lang(Config->s_OperServ, u, OPER_CHANLIST_HEADER);
+			u->SendMessage(OperServ, OPER_CHANLIST_HEADER);
 
 			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
@@ -64,23 +64,23 @@ class CommandOSChanList : public Command
 						if (!c->HasMode(*it))
 							continue;
 
-				notice_lang(Config->s_OperServ, u, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
+				u->SendMessage(OperServ, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
 			}
 		}
 
-		notice_lang(Config->s_OperServ, u, OPER_CHANLIST_END);
+		u->SendMessage(OperServ, OPER_CHANLIST_END);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_CHANLIST);
+		u->SendMessage(OperServ, OPER_HELP_CHANLIST);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_CHANLIST);
+		u->SendMessage(OperServ, OPER_HELP_CMD_CHANLIST);
 	}
 };
 

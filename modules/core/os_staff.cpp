@@ -22,7 +22,7 @@ class CommandOSStaff : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_STAFF_LIST_HEADER);
+		u->SendMessage(OperServ, OPER_STAFF_LIST_HEADER);
 
 		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 		{
@@ -41,29 +41,29 @@ class CommandOSStaff : public Command
 					{
 						found = 1;
 						if (na->nick.equals_ci(u2->nick))
-							notice_lang(Config->s_OperServ, u, OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
+							u->SendMessage(OperServ, OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
 						else
-							notice_lang(Config->s_OperServ, u, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
+							u->SendMessage(OperServ, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
 					}
 				}
 				if (!found)
-					notice_lang(Config->s_OperServ, u, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
+					u->SendMessage(OperServ, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
 			}
 		}
 
-		notice_lang(Config->s_OperServ, u, END_OF_ANY_LIST, "Staff");
+		u->SendMessage(OperServ, END_OF_ANY_LIST, "Staff");
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_STAFF);
+		u->SendMessage(OperServ, OPER_HELP_STAFF);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_STAFF);
+		u->SendMessage(OperServ, OPER_HELP_CMD_STAFF);
 	}
 };
 

@@ -35,12 +35,12 @@ class CommandHSSet : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (rawhostmask.empty())
 			{
-				notice_lang(Config->s_HostServ, u, HOST_SET_SYNTAX, Config->s_HostServ.c_str());
+				u->SendMessage(HostServ, HOST_SET_SYNTAX, Config->s_HostServ.c_str());
 				return MOD_CONT;
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				notice_lang(Config->s_HostServ, u, HOST_SET_IDENTTOOLONG, Config->UserLen);
+				u->SendMessage(HostServ, HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return MOD_CONT;
 			}
 			else
@@ -48,13 +48,13 @@ class CommandHSSet : public Command
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						notice_lang(Config->s_HostServ, u, HOST_SET_IDENT_ERROR);
+						u->SendMessage(HostServ, HOST_SET_IDENT_ERROR);
 						return MOD_CONT;
 					}
 			}
 			if (!ircd->vident)
 			{
-				notice_lang(Config->s_HostServ, u, HOST_NO_VIDENT);
+				u->SendMessage(HostServ, HOST_NO_VIDENT);
 				return MOD_CONT;
 			}
 		}
@@ -62,13 +62,13 @@ class CommandHSSet : public Command
 			hostmask = rawhostmask;
 		else
 		{
-			notice_lang(Config->s_HostServ, u, HOST_SET_TOOLONG, Config->HostLen);
+			u->SendMessage(HostServ, HOST_SET_TOOLONG, Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			notice_lang(Config->s_HostServ, u, HOST_SET_ERROR);
+			u->SendMessage(HostServ, HOST_SET_ERROR);
 			return MOD_CONT;
 		}
 
@@ -78,7 +78,7 @@ class CommandHSSet : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config->s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
+				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -87,29 +87,29 @@ class CommandHSSet : public Command
 			na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 			if (!vIdent.empty())
-				notice_lang(Config->s_HostServ, u, HOST_IDENT_SET, nick.c_str(), vIdent.c_str(), hostmask.c_str());
+				u->SendMessage(HostServ, HOST_IDENT_SET, nick.c_str(), vIdent.c_str(), hostmask.c_str());
 			else
-				notice_lang(Config->s_HostServ, u, HOST_SET, nick.c_str(), hostmask.c_str());
+				u->SendMessage(HostServ, HOST_SET, nick.c_str(), hostmask.c_str());
 		}
 		else
-			notice_lang(Config->s_HostServ, u, HOST_NOREG, nick.c_str());
+			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_SET);
+		u->SendMessage(HostServ, HOST_HELP_SET);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_HostServ, u, "SET", HOST_SET_SYNTAX);
+		SyntaxError(HostServ, u, "SET", HOST_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_SET);
+		u->SendMessage(HostServ, HOST_HELP_CMD_SET);
 	}
 };
 

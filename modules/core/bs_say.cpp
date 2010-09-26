@@ -31,19 +31,19 @@ class CommandBSSay : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
+			u->SendMessage(BotServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			notice_help(Config->s_BotServ, u, BOT_NOT_ASSIGNED);
+			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			notice_lang(Config->s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -64,18 +64,18 @@ class CommandBSSay : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_BotServ, u, BOT_HELP_SAY);
+		u->SendMessage(BotServ, BOT_HELP_SAY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
+		SyntaxError(BotServ, u, "SAY", BOT_SAY_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_SAY);
+		u->SendMessage(BotServ, BOT_HELP_CMD_SAY);
 	}
 };
 

@@ -25,7 +25,7 @@ class CommandCSSetXOP : public Command
 	{
 		if (!FindModule("cs_xop"))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, "XOP");
+			u->SendMessage(ChanServ, CHAN_XOP_NOT_AVAILABLE, "XOP");
 			return MOD_CONT;
 		}
 
@@ -65,14 +65,14 @@ class CommandCSSetXOP : public Command
 			}
 
 			Log(LOG_COMMAND, u, this, ci) << "to enable XOP";
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_XOP_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_XOP_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
 			Log(LOG_COMMAND, u, this, ci) << "to disable XOP";
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "XOP");
@@ -82,18 +82,18 @@ class CommandCSSetXOP : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_XOP, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_XOP, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
+		SyntaxError(ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_XOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_XOP);
 	}
 };
 
@@ -106,13 +106,13 @@ class CommandCSSASetXOP : public CommandCSSetXOP
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_XOP, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_XOP, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
 	}
 };
 

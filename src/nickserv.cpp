@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 nickalias_map NickAliasList;
 nickcore_map NickCoreList;
@@ -173,7 +172,7 @@ int validate_user(User *u)
 	NickRequest *nr = findrequestnick(u->nick);
 	if (nr)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_IS_PREREG);
+		u->SendMessage(NickServ, NICK_IS_PREREG);
 		return 0;
 	}
 
@@ -183,14 +182,14 @@ int validate_user(User *u)
 
 	if (na->HasFlag(NS_FORBIDDEN))
 	{
-		notice_lang(Config->s_NickServ, u, NICK_MAY_NOT_BE_USED);
+		u->SendMessage(NickServ, NICK_MAY_NOT_BE_USED);
 		u->Collide(na);
 		return 0;
 	}
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
-		notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, u->nick.c_str());
+		u->SendMessage(NickServ, NICK_X_SUSPENDED, u->nick.c_str());
 		u->Collide(na);
 		return 0;
 	}
@@ -210,26 +209,26 @@ int validate_user(User *u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			notice_lang(Config->s_NickServ, u, NICK_IS_SECURE, Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, NICK_IS_SECURE, Config->s_NickServ.c_str());
 		else
-			notice_lang(Config->s_NickServ, u, NICK_IS_REGISTERED, Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->s_NickServ.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 	{
 		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
-			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_NOW);
+			u->SendMessage(NickServ, FORCENICKCHANGE_NOW);
 			u->Collide(na);
 		}
 		else if (na->nc->HasFlag(NI_KILL_QUICK))
 		{
-			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
+			u->SendMessage(NickServ, FORCENICKCHANGE_IN_20_SECONDS);
 			new NickServCollide(u, 20);
 		}
 		else
 		{
-			notice_lang(Config->s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
+			u->SendMessage(NickServ, FORCENICKCHANGE_IN_1_MINUTE);
 			new NickServCollide(u, 60);
 		}
 	}

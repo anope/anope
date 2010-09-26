@@ -41,7 +41,7 @@ enum
 	XOP_MESSAGES
 };
 
-int xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
+LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	{CHAN_AOP_DISABLED,
 	 CHAN_AOP_NICKS_ONLY,
 	 CHAN_AOP_ADDED,
@@ -114,10 +114,10 @@ class XOPListCallback : public NumberList
 	User *u;
 	ChannelInfo *ci;
 	int level;
-	int *messages;
+	LanguageString *messages;
 	bool SentHeader;
  public:
-	XOPListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist, int _level, int *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
+	XOPListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist, int _level, LanguageString *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
 	{
 	}
 
@@ -134,15 +134,15 @@ class XOPListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_ChanServ, u, messages[XOP_LIST_HEADER], ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_LIST_HEADER], ci->name.c_str());
 		}
 
 		DoList(u, ci, access, Number - 1, level, messages);
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, ChanAccess *access, unsigned index, int level, int *messages)
+	static void DoList(User *u, ChannelInfo *ci, ChanAccess *access, unsigned index, int level, LanguageString *messages)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
+		u->SendMessage(ChanServ, CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
 	}
 };
 
@@ -151,27 +151,27 @@ class XOPDelCallback : public NumberList
 	User *u;
 	ChannelInfo *ci;
 	Command *c;
-	int *messages;
+	LanguageString *messages;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool override;
  public:
-	XOPDelCallback(User *_u, Command *_c, ChannelInfo *_ci, int *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), messages(_messages), Deleted(0), override(_override)
+	XOPDelCallback(User *_u, Command *_c, ChannelInfo *_ci, LanguageString *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), messages(_messages), Deleted(0), override(_override)
 	{
 	}
 
 	~XOPDelCallback()
 	{
 		if (!Deleted)
-			 notice_lang(Config->s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
+			 u->SendMessage(ChanServ, messages[XOP_NO_MATCH], ci->name.c_str());
 		else
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
-				notice_lang(Config->s_ChanServ, u, messages[XOP_DELETED_ONE], ci->name.c_str());
+				u->SendMessage(ChanServ, messages[XOP_DELETED_ONE], ci->name.c_str());
 			else
-				notice_lang(Config->s_ChanServ, u, messages[XOP_DELETED_SEVERAL], Deleted, ci->name.c_str());
+				u->SendMessage(ChanServ, messages[XOP_DELETED_SEVERAL], Deleted, ci->name.c_str());
 		}
 	}
 
@@ -197,7 +197,7 @@ class XOPDelCallback : public NumberList
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
 	{
 		Anope::string nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
@@ -211,7 +211,7 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_DISABLED]);
+			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
@@ -219,19 +219,19 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_NICKS_ONLY]);
+			u->SendMessage(ChanServ, messages[XOP_NICKS_ONLY]);
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config->s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(ChanServ, NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -244,7 +244,7 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+				u->SendMessage(ChanServ, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			++change;
@@ -252,7 +252,7 @@ class XOPBase : public Command
 
 		if (!change && ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_XOP_REACHED_LIMIT, Config->CSAccessMax);
+			u->SendMessage(ChanServ, CHAN_XOP_REACHED_LIMIT, Config->CSAccessMax);
 			return MOD_CONT;
 		}
 
@@ -271,18 +271,18 @@ class XOPBase : public Command
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
-			notice_lang(Config->s_ChanServ, u, messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
-			notice_lang(Config->s_ChanServ, u, messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
 	{
 		Anope::string nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
@@ -295,13 +295,13 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_DISABLED]);
+			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -309,7 +309,7 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -325,7 +325,7 @@ class XOPBase : public Command
 			NickAlias *na = findnick(nick);
 			if (!na)
 			{
-				notice_lang(Config->s_ChanServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
@@ -340,18 +340,18 @@ class XOPBase : public Command
 
 			if (i == end)
 			{
-				notice_lang(Config->s_ChanServ, u, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
+				u->SendMessage(ChanServ, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 
 			if (ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+				u->SendMessage(ChanServ, ACCESS_DENIED);
 			else
 			{
 				bool override = ulev <= access->level;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->nc->display;
 
-				notice_lang(Config->s_ChanServ, u, messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
+				u->SendMessage(ChanServ, messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
@@ -362,13 +362,13 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoList(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
 	{
 		Anope::string nick = params.size() > 2 ? params[2] : "";
 
 		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -377,7 +377,7 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -400,36 +400,36 @@ class XOPBase : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					notice_lang(Config->s_ChanServ, u, messages[XOP_LIST_HEADER], ci->name.c_str());
+					u->SendMessage(ChanServ, messages[XOP_LIST_HEADER], ci->name.c_str());
 				}
 
 				XOPListCallback::DoList(u, ci, access, i, level, messages);
 			}
 
 			if (!SentHeader)
-				notice_lang(Config->s_ChanServ, u, messages[XOP_NO_MATCH], ci->name.c_str());
+				u->SendMessage(ChanServ, messages[XOP_NO_MATCH], ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, ChannelInfo *ci, int level, int *messages)
+	CommandReturn DoClear(User *u, ChannelInfo *ci, int level, LanguageString *messages)
 	{
 		if (readonly)
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_DISABLED]);
+			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			notice_lang(Config->s_ChanServ, u, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -445,12 +445,12 @@ class XOPBase : public Command
 
 		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-		notice_lang(Config->s_ChanServ, u, messages[XOP_CLEAR], ci->name.c_str());
+		u->SendMessage(ChanServ, messages[XOP_CLEAR], ci->name.c_str());
 
 		return MOD_CONT;
 	}
  protected:
-	CommandReturn DoXop(User *u, const std::vector<Anope::string> &params, int level, int *messages)
+	CommandReturn DoXop(User *u, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
 		Anope::string chan = params[0];
 		Anope::string cmd = params[1];
@@ -458,7 +458,7 @@ class XOPBase : public Command
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (!ci->HasFlag(CI_XOP))
-			notice_lang(Config->s_ChanServ, u, CHAN_XOP_ACCESS, Config->s_ChanServ.c_str());
+			u->SendMessage(ChanServ, CHAN_XOP_ACCESS, Config->s_ChanServ.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, params, ci, level, messages);
 		else if (cmd.equals_ci("DEL"))
@@ -503,18 +503,18 @@ class CommandCSQOP : public XOPBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_QOP);
+		u->SendMessage(ChanServ, CHAN_HELP_QOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
+		SyntaxError(ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_QOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_QOP);
 	}
 };
 
@@ -532,18 +532,18 @@ class CommandCSAOP : public XOPBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_AOP);
+		u->SendMessage(ChanServ, CHAN_HELP_AOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
+		SyntaxError(ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_AOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_AOP);
 	}
 };
 
@@ -561,18 +561,18 @@ class CommandCSHOP : public XOPBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_HOP);
+		u->SendMessage(ChanServ, CHAN_HELP_HOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
+		SyntaxError(ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_HOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_HOP);
 	}
 };
 
@@ -590,18 +590,18 @@ class CommandCSSOP : public XOPBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SOP);
+		u->SendMessage(ChanServ, CHAN_HELP_SOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
+		SyntaxError(ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SOP);
 	}
 };
 
@@ -619,18 +619,18 @@ class CommandCSVOP : public XOPBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_VOP);
+		u->SendMessage(ChanServ, CHAN_HELP_VOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
+		SyntaxError(ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_VOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_VOP);
 	}
 };
 

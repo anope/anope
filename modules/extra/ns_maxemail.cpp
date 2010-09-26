@@ -15,91 +15,61 @@
 
 #include "module.h"
 
-#define AUTHOR "Anope"
-
-void my_load_config();
-void my_add_languages();
-bool check_email_limit_reached(const Anope::string &email, User *u);
-
-int NSEmailMax = 0;
-
-enum
-{
-	LNG_NSEMAILMAX_REACHED,
-	LNG_NSEMAILMAX_REACHED_ONE,
-	LNG_NUM_STRINGS
-};
-
-static Module *me;
-
 class NSMaxEmail : public Module
 {
+	int NSEmailMax;
+
+	bool CheckLimitReached(const Anope::string &email, User *u)
+	{
+		if (this->NSEmailMax < 1 || email.empty())
+			return false;
+
+		if (this->CountEmail(email, u) < this->NSEmailMax)
+			return false;
+
+		if (this->NSEmailMax == 1)
+			this->SendMessage(NickServ, u, _("The given email address has reached it's usage limit of 1 user."));
+		else
+			this->SendMessage(NickServ, u, _("The given email address has reached it's usage limit of %d users."), this->NSEmailMax);
+
+		return true;
+	}
+
+	int CountEmail(const Anope::string &email, User *u)
+	{
+		int count = 0;
+
+		if (email.empty())
+			return 0;
+
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
+		{
+			NickCore *nc = it->second;
+
+			if (!(u->Account() && u->Account() == nc) && !nc->email.empty() && nc->email.equals_ci(email))
+				++count;
+		}
+
+		return count;
+	}
+
  public:
 	NSMaxEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		me = this;
-
-		this->SetAuthor(AUTHOR);
+		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
 		ModuleManager::Attach(I_OnReload, this);
 		ModuleManager::Attach(I_OnPreCommand, this);
 
-		my_load_config();
-
-		const char *langtable_en_us[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"The given email address has reached it's usage limit of %d users.",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"The given email address has reached it's usage limit of 1 user."
-		};
-
-		const char *langtable_nl[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
-		};
-
-		const char *langtable_de[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
-		};
-
-		const char *langtable_pt[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"O endereço de email fornecido alcançou seu limite de uso de %d usuários.",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"O endereço de email fornecido alcançou seu limite de uso de 1 usuário."
-		};
-
-		const char *langtable_ru[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"Óêàçàííûé âàìè email-àäðåñ èñïîëüçóåòñÿ ìàêñèìàëüíî äîïóñòèìîå êîë-âî ðàç: %d",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"Óêàçàííûé âàìè email-àäðåñ óæå êåì-òî èñïîëüçóåòñÿ."
-		};
-
-		const char *langtable_it[] = {
-			/* LNG_NSEMAILMAX_REACHED */
-			"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
-			/* LNG_NSEMAILMAX_REACHED_ONE */
-			"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
-		};
-
-		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
-		this->InsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
-		this->InsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
-		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
-		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+		OnReload(false);
 	}
 
-	void OnReload(bool started)
+	void OnReload(bool)
 	{
-		my_load_config();
+		ConfigReader config;
+		this->NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
+		Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
 	}
 
 	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
@@ -108,7 +78,7 @@ class NSMaxEmail : public Module
 		{
 			if (command.equals_ci("REGISTER"))
 			{
-				if (check_email_limit_reached(params.size() > 1 ? params[1] : "", u))
+				if (CheckLimitReached(params.size() > 1 ? params[1] : "", u))
 					return EVENT_STOP;
 			}
 			else if (command.equals_ci("SET"))
@@ -116,7 +86,7 @@ class NSMaxEmail : public Module
 				Anope::string set = params[0];
 				Anope::string email = params.size() > 1 ? params[1] : "";
 
-				if (set.equals_ci("email") && check_email_limit_reached(email, u))
+				if (set.equals_ci("email") && CheckLimitReached(email, u))
 					return EVENT_STOP;
 			}
 		}
@@ -124,46 +94,5 @@ class NSMaxEmail : public Module
 		return EVENT_CONTINUE;
 	}
 };
-
-int count_email_in_use(const Anope::string &email, User *u)
-{
-	int count = 0;
-
-	if (email.empty())
-		return 0;
-
-	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
-	{
-		NickCore *nc = it->second;
-
-		if (!(u->Account() && u->Account() == nc) && !nc->email.empty() && nc->email.equals_ci(email))
-			++count;
-	}
-
-	return count;
-}
-
-bool check_email_limit_reached(const Anope::string &email, User *u)
-{
-	if (NSEmailMax < 1 || email.empty())
-		return false;
-
-	if (count_email_in_use(email, u) < NSEmailMax)
-		return false;
-
-	if (NSEmailMax == 1)
-		me->NoticeLang(Config->s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
-	else
-		me->NoticeLang(Config->s_NickServ, u, LNG_NSEMAILMAX_REACHED, NSEmailMax);
-
-	return true;
-}
-
-void my_load_config()
-{
-	ConfigReader config;
-	NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
-	Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
-}
 
 MODULE_INIT(NSMaxEmail)

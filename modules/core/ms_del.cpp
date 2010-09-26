@@ -59,17 +59,17 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				notice_lang(Config->s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				u->SendMessage(MemoServ, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
 			{
-				notice_lang(Config->s_MemoServ, u, READ_ONLY_MODE);
+				u->SendMessage(MemoServ, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(Config->s_MemoServ, u, ACCESS_DENIED);
+				u->SendMessage(MemoServ, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -81,9 +81,9 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				notice_lang(Config->s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				u->SendMessage(MemoServ, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(Config->s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				u->SendMessage(MemoServ, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -102,7 +102,7 @@ class CommandMSDel : public Command
 				else
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, last));
 				delmemo(mi, last);
-				notice_lang(Config->s_MemoServ, u, MEMO_DELETED_ONE, last);
+				u->SendMessage(MemoServ, MEMO_DELETED_ONE, last);
 			}
 			else
 			{
@@ -115,9 +115,9 @@ class CommandMSDel : public Command
 					delete mi->memos[i];
 				mi->memos.clear();
 				if (!chan.empty())
-					notice_lang(Config->s_MemoServ, u, MEMO_CHAN_DELETED_ALL, chan.c_str());
+					u->SendMessage(MemoServ, MEMO_CHAN_DELETED_ALL, chan.c_str());
 				else
-					notice_lang(Config->s_MemoServ, u, MEMO_DELETED_ALL);
+					u->SendMessage(MemoServ, MEMO_DELETED_ALL);
 			}
 
 			/* Reset the order */
@@ -129,18 +129,18 @@ class CommandMSDel : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_MemoServ, u, MEMO_HELP_DEL);
+		u->SendMessage(MemoServ, MEMO_HELP_DEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
+		SyntaxError(MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_DEL);
+		u->SendMessage(MemoServ, MEMO_HELP_CMD_DEL);
 	}
 };
 

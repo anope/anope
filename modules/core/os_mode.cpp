@@ -26,9 +26,9 @@ class CommandOSMode : public Command
 		Channel *c;
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config->s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (c->bouncy_modes)
-			notice_lang(Config->s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			u->SendMessage(OperServ, OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
 			c->SetModes(OperServ, false, modes.c_str());
@@ -41,18 +41,18 @@ class CommandOSMode : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_MODE);
+		u->SendMessage(OperServ, OPER_HELP_MODE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "MODE", OPER_MODE_SYNTAX);
+		SyntaxError(OperServ, u, "MODE", OPER_MODE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_MODE);
+		u->SendMessage(OperServ, OPER_HELP_CMD_MODE);
 	}
 };
 

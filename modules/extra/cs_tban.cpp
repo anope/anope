@@ -17,25 +17,39 @@
 
 #include "module.h"
 
-#define AUTHOR "Rob"
+static Module *me;
 
-void mySendResponse(User *u, const Anope::string &channel, const Anope::string &mask, const Anope::string &time);
-
-void addBan(Channel *c, time_t timeout, const Anope::string &banmask);
-int canBanUser(Channel *c, User *u, User *u2);
-
-void mAddLanguages();
-
-static Module *me = NULL;
-
-enum
+class TempBan : public CallBack
 {
-	TBAN_HELP,
-	TBAN_SYNTAX,
-	TBAN_HELP_DETAIL,
-	TBAN_RESPONSE,
-	LANG_NUM_STRINGS
+ private:
+	dynamic_reference<Channel> chan;
+	Anope::string mask;
+
+ public:
+	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : CallBack(me, seconds), chan(c), mask(banmask) { }
+
+	void Tick(time_t ctime)
+	{
+		if (chan && chan->ci)
+			chan->RemoveMode(NULL, CMODE_BAN, mask);
+	}
 };
+
+static bool CanBanUser(Channel *c, User *u, User *u2)
+{
+	ChannelInfo *ci = c->ci;
+	bool ok = false;
+	if (!check_access(u, ci, CA_BAN))
+		u->SendMessage(ChanServ, ACCESS_DENIED);
+	else if (is_excepted(ci, u2))
+		u->SendMessage(ChanServ, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+	else if (u2->IsProtected())
+		u->SendMessage(ChanServ, ACCESS_DENIED);
+	else
+		ok = true;
+
+	return ok;
+}
 
 class CommandCSTBan : public Command
 {
@@ -55,15 +69,16 @@ class CommandCSTBan : public Command
 		Anope::string time = params[2];
 
 		if (!(c = findchan(chan)))
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!(u2 = finduser(nick)))
-			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, nick.c_str());
 		else
-			if (canBanUser(c, u, u2))
+			if (CanBanUser(c, u, u2))
 			{
 				get_idealban(c->ci, u2, mask);
-				addBan(c, dotime(time), mask);
-				mySendResponse(u, chan, mask, time);
+				c->SetMode(NULL, CMODE_BAN, mask);
+				new TempBan(dotime(time), c, mask);
+				me->SendMessage(ChanServ, u, _("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
 			}
 
 		return MOD_CONT;
@@ -72,20 +87,21 @@ class CommandCSTBan : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		this->OnSyntaxError(u, "");
-		u->SendMessage(Config->s_ChanServ, " ");
-		me->NoticeLang(Config->s_ChanServ, u, TBAN_HELP_DETAIL);
+		me->SendMessage(ChanServ, u, " ");
+		me->SendMessage(ChanServ, u, _("Bans the given user from a channel for a specified length of\n"
+			"time. If the ban is removed before by hand, it will NOT be replaced."));
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		me->NoticeLang(Config->s_ChanServ, u, TBAN_SYNTAX);
+		me->SendMessage(ChanServ, u, _("Syntax: TBAN channel nick time"));
 	}
 
 	void OnServHelp(User *u)
 	{
-		me->NoticeLang(Config->s_ChanServ, u, TBAN_HELP);
+		me->SendMessage(ChanServ, u, _("    TBAN       Bans the user for a given length of time"));
 	}
 };
 
@@ -100,112 +116,9 @@ class CSTBan : public Module
 
 		this->AddCommand(ChanServ, &commandcstban);
 
-		this->SetAuthor(AUTHOR);
+		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
-
-		const char *langtable_en_us[] = {
-			"    TBAN       Bans the user for a given length of time",
-			"Syntax: TBAN channel nick time",
-			"Bans the given user from a channel for a specified length of\n"
-			"time. If the ban is removed before by hand, it will NOT be replaced.",
-			"%s banned from %s, will auto-expire in %s"
-		};
-
-		const char *langtable_nl[] = {
-			"    TBAN       Verban een gebruiker voor een bepaalde tijd",
-			"Syntax: TBAN kanaal nick tijd",
-			"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
-			"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
-			"zal deze NIET worden vervangen.",
-			"%s verbannen van %s, zal verlopen in %s"
-		};
-
-		const char *langtable_de[] = {
-			"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
-			"Syntax: TBAN Channel Nickname Zeit",
-			"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
-			"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
-			"%s gebannt von %s, wird auto-auslaufen in %s"
-		};
-
-		const char *langtable_pt[] = {
-			"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
-			"Sintaxe: TBAN canal nick tempo",
-			"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
-			"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
-			"%s foi banido do %s, irб auto-expirar em %s"
-		};
-
-		const char *langtable_ru[] = {
-			"    TBAN       Банит пользователя на указанный промежуток времени",
-			"Синтаксис: TBAN #канал ник время",
-			"Банит пользователя на указанный промежуток времени в секундах\n"
-			"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
-			"переустановлен сервисами автоматически!",
-			"Установленный бан %s на канале %s истечет через %s секунд"
-		};
-
-		const char *langtable_it[] = {
-			"    TBAN       Banna l'utente per un periodo di tempo specificato",
-			"Sintassi: TBAN canale nick tempo",
-			"Banna l'utente specificato da un canale per un periodo di tempo\n"
-			"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
-			"%s bannato da %s, scadrа automaticamente tra %s"
-		};
-
-		this->InsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
-		this->InsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
-		this->InsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
-		this->InsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
-		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 	}
 };
-
-void mySendResponse(User *u, const Anope::string &channel, const Anope::string &mask, const Anope::string &time)
-{
-	me->NoticeLang(Config->s_ChanServ, u, TBAN_RESPONSE, mask.c_str(), channel.c_str(), time.c_str());
-}
-
-class TempBan : public CallBack
-{
- private:
-	Anope::string chan;
-	Anope::string mask;
-
- public:
-	TempBan(time_t seconds, const Anope::string &channel, const Anope::string &banmask) : CallBack(me, seconds), chan(channel), mask(banmask) { }
-
-	void Tick(time_t ctime)
-	{
-		Channel *c;
-
-		if ((c = findchan(chan)) && c->ci)
-			c->RemoveMode(NULL, CMODE_BAN, mask);
-	}
-};
-
-void addBan(Channel *c, time_t timeout, const Anope::string &banmask)
-{
-	c->SetMode(NULL, CMODE_BAN, banmask);
-
-	new TempBan(timeout, c->name, banmask);
-}
-
-int canBanUser(Channel *c, User *u, User *u2)
-{
-	ChannelInfo *ci = c->ci;
-	int ok = 0;
-	if (!check_access(u, ci, CA_BAN))
-		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
-	else if (is_excepted(ci, u2))
-		notice_lang(Config->s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
-	else if (u2->IsProtected())
-		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
-	else
-		ok = 1;
-
-	return ok;
-}
 
 MODULE_INIT(CSTBan)

@@ -31,12 +31,12 @@ class CommandNSSetGreet : public Command
 		if (!param.empty())
 		{
 			nc->greet = param;
-			notice_lang(Config->s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
+			u->SendMessage(NickServ, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
 			nc->greet.clear();
-			notice_lang(Config->s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_GREET_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -44,13 +44,13 @@ class CommandNSSetGreet : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_GREET);
+		u->SendMessage(NickServ, NICK_HELP_SET_GREET);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_GREET);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_GREET);
 	}
 };
 
@@ -63,13 +63,13 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_GREET);
+		u->SendMessage(NickServ, NICK_HELP_SASET_GREET);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_GREET);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_GREET);
 	}
 };
 

@@ -33,11 +33,11 @@ class MemoListCallback : public NumberList
 		{
 			SentHeader = true;
 			if (ci)
-				notice_lang(Config->s_MemoServ, u, MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+				u->SendMessage(MemoServ, MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 			else
-				notice_lang(Config->s_MemoServ, u, MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
+				u->SendMessage(MemoServ, MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
 
-			notice_lang(Config->s_MemoServ, u, MEMO_LIST_HEADER);
+			u->SendMessage(MemoServ, MEMO_LIST_HEADER);
 		}
 
 		DoList(u, ci, mi, Number - 1);
@@ -46,11 +46,7 @@ class MemoListCallback : public NumberList
 	static void DoList(User *u, ChannelInfo *ci, const MemoInfo *mi, unsigned index)
 	{
 		Memo *m = mi->memos[index];
-		struct tm tm = *localtime(&m->time);
-		char timebuf[64];
-		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, &tm);
-		timebuf[sizeof(timebuf) - 1] = 0;   /* just in case */
-		notice_lang(Config->s_MemoServ, u, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), timebuf);
+		u->SendMessage(MemoServ, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), do_strftime(m->time).c_str());
 	}
 };
 
@@ -75,12 +71,12 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				notice_lang(Config->s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan.c_str());
+				u->SendMessage(MemoServ, CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				notice_lang(Config->s_MemoServ, u, ACCESS_DENIED);
+				u->SendMessage(MemoServ, ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -92,9 +88,9 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				notice_lang(Config->s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				u->SendMessage(MemoServ, MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				notice_lang(Config->s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+				u->SendMessage(MemoServ, MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -113,9 +109,9 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							notice_lang(Config->s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							u->SendMessage(MemoServ, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
-							notice_lang(Config->s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
+							u->SendMessage(MemoServ, MEMO_HAVE_NO_NEW_MEMOS);
 						return MOD_CONT;
 					}
 				}
@@ -131,10 +127,10 @@ class CommandMSList : public Command
 					{
 						SentHeader = true;
 						if (ci)
-							notice_lang(Config->s_MemoServ, u, !param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+							u->SendMessage(MemoServ, !param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 						else
-							notice_lang(Config->s_MemoServ, u, !param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
-						notice_lang(Config->s_MemoServ, u, MEMO_LIST_HEADER);
+							u->SendMessage(MemoServ, !param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
+						u->SendMessage(MemoServ, MEMO_LIST_HEADER);
 					}
 
 					MemoListCallback::DoList(u, ci, mi, i);
@@ -146,18 +142,18 @@ class CommandMSList : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_MemoServ, u, MEMO_HELP_LIST);
+		u->SendMessage(MemoServ, MEMO_HELP_LIST);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
+		SyntaxError(MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
 	}
 
 	void OnServCommand(User *u)
 	{
-		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_LIST);
+		u->SendMessage(MemoServ, MEMO_HELP_CMD_LIST);
 	}
 };
 

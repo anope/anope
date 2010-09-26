@@ -431,8 +431,8 @@ void Init(int ac, char **av)
 	signal(SIGINT, sighandler);
 
 	/* Initialize multi-language support */
-	lang_init();
-	Log(LOG_DEBUG) << "Loaded languages";
+	Log(LOG_DEBUG) << "Loading Languages...";
+	InitLanguages();
 
 	/* Initialize subservices */
 	ns_init();

@@ -20,16 +20,16 @@ class CommandOSSet : public Command
 	{
 		Log(LOG_ADMIN, u, this);
 
-		int index;
+		LanguageString index;
 
 		index = allow_ignore ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		notice_lang(Config->s_OperServ, u, index, "IGNORE");
+		u->SendMessage(OperServ, index, "IGNORE");
 		index = readonly ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		notice_lang(Config->s_OperServ, u, index, "READONLY");
+		u->SendMessage(OperServ, index, "READONLY");
 		index = debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		notice_lang(Config->s_OperServ, u, index, "DEBUG");
+		u->SendMessage(OperServ, index, "DEBUG");
 		index = noexpire ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		notice_lang(Config->s_OperServ, u, index, "NOEXPIRE");
+		u->SendMessage(OperServ, index, "NOEXPIRE");
 
 		return MOD_CONT;
 	}
@@ -48,16 +48,16 @@ class CommandOSSet : public Command
 		{
 			Log(LOG_ADMIN, u, this) << "IGNORE ON";
 			allow_ignore = 1;
-			notice_lang(Config->s_OperServ, u, OPER_SET_IGNORE_ON);
+			u->SendMessage(OperServ, OPER_SET_IGNORE_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, u, this) << "IGNORE OFF";
 			allow_ignore = 0;
-			notice_lang(Config->s_OperServ, u, OPER_SET_IGNORE_OFF);
+			u->SendMessage(OperServ, OPER_SET_IGNORE_OFF);
 		}
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SET_IGNORE_ERROR);
+			u->SendMessage(OperServ, OPER_SET_IGNORE_ERROR);
 
 		return MOD_CONT;
 	}
@@ -76,16 +76,16 @@ class CommandOSSet : public Command
 		{
 			readonly = true;
 			Log(LOG_ADMIN, u, this) << "READONLY ON";
-			notice_lang(Config->s_OperServ, u, OPER_SET_READONLY_ON);
+			u->SendMessage(OperServ, OPER_SET_READONLY_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			readonly = false;
 			Log(LOG_ADMIN, u, this) << "READONLY OFF";
-			notice_lang(Config->s_OperServ, u, OPER_SET_READONLY_OFF);
+			u->SendMessage(OperServ, OPER_SET_READONLY_OFF);
 		}
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SET_READONLY_ERROR);
+			u->SendMessage(OperServ, OPER_SET_READONLY_ERROR);
 
 		return MOD_CONT;
 	}
@@ -106,23 +106,23 @@ class CommandOSSet : public Command
 		 * Rob
 		 **/
 		if (!Config->SuperAdmin)
-			notice_lang(Config->s_OperServ, u, OPER_SUPER_ADMIN_NOT_ENABLED);
+			u->SendMessage(OperServ, OPER_SUPER_ADMIN_NOT_ENABLED);
 		else if (setting.equals_ci("ON"))
 		{
 			u->isSuperAdmin = 1;
-			notice_lang(Config->s_OperServ, u, OPER_SUPER_ADMIN_ON);
+			u->SendMessage(OperServ, OPER_SUPER_ADMIN_ON);
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
-			ircdproto->SendGlobops(OperServ, getstring(OPER_SUPER_ADMIN_WALL_ON), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_ON).c_str(), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			u->isSuperAdmin = 0;
-			notice_lang(Config->s_OperServ, u, OPER_SUPER_ADMIN_OFF);
+			u->SendMessage(OperServ, OPER_SUPER_ADMIN_OFF);
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
-			ircdproto->SendGlobops(OperServ, getstring(OPER_SUPER_ADMIN_WALL_OFF), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_OFF).c_str(), u->nick.c_str());
 		}
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);
+			u->SendMessage(OperServ, OPER_SUPER_ADMIN_SYNTAX);
 
 		return MOD_CONT;
 	}
@@ -141,22 +141,22 @@ class CommandOSSet : public Command
 		{
 			debug = 1;
 			Log(LOG_ADMIN, u, this) << "DEBUG ON";
-			notice_lang(Config->s_OperServ, u, OPER_SET_DEBUG_ON);
+			u->SendMessage(OperServ, OPER_SET_DEBUG_ON);
 		}
 		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
 		{
 			Log(LOG_ADMIN, u, this) << "DEBUG OFF";
 			debug = 0;
-			notice_lang(Config->s_OperServ, u, OPER_SET_DEBUG_OFF);
+			u->SendMessage(OperServ, OPER_SET_DEBUG_OFF);
 		}
 		else if (setting.is_number_only() && convertTo<int>(setting) > 0)
 		{
 			debug = convertTo<int>(setting);
 			Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
-			notice_lang(Config->s_OperServ, u, OPER_SET_DEBUG_LEVEL, debug);
+			u->SendMessage(OperServ, OPER_SET_DEBUG_LEVEL, debug);
 		}
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SET_DEBUG_ERROR);
+			u->SendMessage(OperServ, OPER_SET_DEBUG_ERROR);
 
 		return MOD_CONT;
 	}
@@ -175,16 +175,16 @@ class CommandOSSet : public Command
 		{
 			noexpire = true;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE ON";
-			notice_lang(Config->s_OperServ, u, OPER_SET_NOEXPIRE_ON);
+			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			noexpire = false;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE OFF";
-			notice_lang(Config->s_OperServ, u, OPER_SET_NOEXPIRE_OFF);
+			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_OFF);
 		}
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SET_NOEXPIRE_ERROR);
+			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_ERROR);
 
 		return MOD_CONT;
 	}
@@ -210,26 +210,26 @@ class CommandOSSet : public Command
 		else if (option.equals_ci("NOEXPIRE"))
 			return this->DoSetNoExpire(u, params);
 		else
-			notice_lang(Config->s_OperServ, u, OPER_SET_UNKNOWN_OPTION, option.c_str());
+			u->SendMessage(OperServ, OPER_SET_UNKNOWN_OPTION, option.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET);
+			u->SendMessage(OperServ, OPER_HELP_SET);
 		else if (subcommand.equals_ci("LIST"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_LIST);
+			u->SendMessage(OperServ, OPER_HELP_SET_LIST);
 		else if (subcommand.equals_ci("READONLY"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_READONLY);
+			u->SendMessage(OperServ, OPER_HELP_SET_READONLY);
 		else if (subcommand.equals_ci("DEBUG"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_DEBUG);
+			u->SendMessage(OperServ, OPER_HELP_SET_DEBUG);
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_NOEXPIRE);
+			u->SendMessage(OperServ, OPER_HELP_SET_NOEXPIRE);
 		else if (subcommand.equals_ci("IGNORE"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_IGNORE);
+			u->SendMessage(OperServ, OPER_HELP_SET_IGNORE);
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			notice_help(Config->s_OperServ, u, OPER_HELP_SET_SUPERADMIN);
+			u->SendMessage(OperServ, OPER_HELP_SET_SUPERADMIN);
 		else
 			return false;
 
@@ -238,12 +238,12 @@ class CommandOSSet : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "SET", OPER_SET_SYNTAX);
+		SyntaxError(OperServ, u, "SET", OPER_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SET);
+		u->SendMessage(OperServ, OPER_HELP_CMD_SET);
 	}
 };
 

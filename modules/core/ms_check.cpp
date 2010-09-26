@@ -26,18 +26,16 @@ class CommandMSCheck : public Command
 		MemoInfo *mi = NULL;
 		int i, found = 0;
 		Anope::string recipient = params[0];
-		struct tm *tm;
-		char timebuf[64];
 
 		if (!(na = findnick(recipient)))
 		{
-			notice_lang(Config->s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient.c_str());
+			u->SendMessage(MemoServ, NICK_X_NOT_REGISTERED, recipient.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			notice_lang(Config->s_MemoServ, u, NICK_X_FORBIDDEN, recipient.c_str());
+			u->SendMessage(MemoServ, NICK_X_FORBIDDEN, recipient.c_str());
 			return MOD_CONT;
 		}
 
@@ -52,37 +50,34 @@ class CommandMSCheck : public Command
 			{
 				found = 1; /* Yes, we've found the memo */
 
-				tm = localtime(&mi->memos[i]->time);
-				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-
 				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					notice_lang(Config->s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick.c_str(), timebuf);
+					u->SendMessage(MemoServ, MEMO_CHECK_NOT_READ, na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
 				else
-					notice_lang(Config->s_MemoServ, u, MEMO_CHECK_READ, na->nick.c_str(), timebuf);
+					u->SendMessage(MemoServ, MEMO_CHECK_READ, na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
 				break;
 			}
 		}
 
 		if (!found)
-			notice_lang(Config->s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick.c_str());
+			u->SendMessage(MemoServ, MEMO_CHECK_NO_MEMO, na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_MemoServ, u, MEMO_HELP_CHECK);
+		u->SendMessage(MemoServ, MEMO_HELP_CHECK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+		SyntaxError(MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_CHECK);
+		u->SendMessage(MemoServ, MEMO_HELP_CMD_CHECK);
 	}
 };
 

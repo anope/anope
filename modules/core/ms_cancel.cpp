@@ -31,9 +31,9 @@ class CommandMSCancel : public Command
 		if (!(mi = getmemoinfo(name, ischan, isforbid)))
 		{
 			if (isforbid)
-				notice_lang(Config->s_MemoServ, u, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
+				u->SendMessage(MemoServ, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
 			else
-				notice_lang(Config->s_MemoServ, u, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
+				u->SendMessage(MemoServ, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
 		}
 		else
 		{
@@ -44,29 +44,29 @@ class CommandMSCancel : public Command
 				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number));
 					delmemo(mi, mi->memos[i]->number);
-					notice_lang(Config->s_MemoServ, u, MEMO_CANCELLED, name.c_str());
+					u->SendMessage(MemoServ, MEMO_CANCELLED, name.c_str());
 					return MOD_CONT;
 				}
 
-			notice_lang(Config->s_MemoServ, u, MEMO_CANCEL_NONE);
+			u->SendMessage(MemoServ, MEMO_CANCEL_NONE);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_MemoServ, u, MEMO_HELP_CANCEL);
+		u->SendMessage(MemoServ, MEMO_HELP_CANCEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
+		SyntaxError(MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
+		u->SendMessage(MemoServ, MEMO_HELP_CMD_CANCEL);
 	}
 };
 

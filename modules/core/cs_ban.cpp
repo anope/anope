@@ -38,21 +38,21 @@ class CommandCSBan : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
-			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, target.c_str());
+			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		/*
 		 * Dont ban/kick the user on channels where he is excepted
 		 * to prevent services <-> server wars.
 		 */
 		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2))
-			notice_lang(Config->s_ChanServ, u, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 		else if (u2->IsProtected())
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else
 		{
 			Anope::string mask;
@@ -78,18 +78,18 @@ class CommandCSBan : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_BAN);
+		u->SendMessage(ChanServ, CHAN_HELP_BAN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
+		SyntaxError(ChanServ, u, "BAN", CHAN_BAN_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_BAN);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_BAN);
 	}
 };
 

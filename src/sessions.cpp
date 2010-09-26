@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 /*************************************************************************/
 
@@ -39,10 +38,7 @@
  * "Session Limiting" is likely to slow down services when there are frequent
  * client connects and disconnects. The size of the exception list can also
  * play a large role in this performance decrease. It is therefore recommened
- * that you keep the number of exceptions to a minimum. A very simple hashing
- * method is currently used to store the list of sessions. I'm sure there is
- * room for improvement and optimisation of this, along with the storage of
- * exceptions. Comments and suggestions are more than welcome!
+ * that you keep the number of exceptions to a minimum. 
  *
  * -TheShadow (02 April 1999)
  */
@@ -272,13 +268,13 @@ int exception_add(User *u, const Anope::string &mask, int limit, const Anope::st
 			{
 				e->limit = limit;
 				if (u)
-					notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
+					u->SendMessage(OperServ, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
 				return -2;
 			}
 			else
 			{
 				if (u)
-					notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_EXISTS, mask.c_str());
+					u->SendMessage(OperServ, OPER_EXCEPTION_EXISTS, mask.c_str());
 				return -1;
 			}
 		}

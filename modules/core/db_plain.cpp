@@ -203,12 +203,6 @@ static void ReadDatabase(Module *m = NULL)
 	db.close();
 }
 
-struct LangInfo
-{
-	Anope::string Name;
-	int LanguageId;
-};
-
 struct ChannelFlagInfo
 {
 	Anope::string Name;
@@ -231,23 +225,6 @@ struct NickCoreFlagInfo
 {
 	Anope::string Name;
 	NickCoreFlag Flag;
-};
-
-LangInfo LangInfos[] = {
-	{"en", LANG_EN_US},
-	{"es", LANG_ES},
-	{"pt", LANG_PT},
-	{"fr", LANG_FR},
-	{"tr", LANG_TR},
-	{"it", LANG_IT},
-	{"de", LANG_DE},
-	{"ca", LANG_CAT},
-	{"gr", LANG_GR},
-	{"nl", LANG_NL},
-	{"ru", LANG_RU},
-	{"hu", LANG_HUN},
-	{"pl", LANG_PL},
-	{"", -1}
 };
 
 ChannelFlagInfo ChannelInfoFlags[] = {
@@ -597,11 +574,7 @@ class DBPlain : public Module
 	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
 		if (key.equals_ci("LANGUAGE"))
-		{
-			for (int i = 0; LangInfos[i].LanguageId != -1; ++i)
-				if (params[0].equals_ci(LangInfos[i].Name))
-					nc->language = LangInfos[i].LanguageId;
-		}
+			nc->language = params[0];
 		else if (key.equals_ci("MEMOMAX"))
 			nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : 1;
 		else if (key.equals_ci("CHANCOUNT"))
@@ -890,15 +863,11 @@ class DBPlain : public Module
 
 			db << "NC " << nc->display << " " << nc->pass << endl;
 
-			db << "MD LANGUAGE ";
-			for (int j = 0; LangInfos[j].LanguageId != -1; ++j)
-				if (nc->language ==  LangInfos[j].LanguageId)
-					db << LangInfos[j].Name;
-			db << endl;
-
 			db << "MD MEMOMAX " << nc->memos.memomax << endl;
 			db << "MD CHANCOUNT " << nc->channelcount << endl;
 
+			if (!nc->language.empty())
+				db << "MD LANGUAGE " << nc->language << endl;
 			if (!nc->email.empty())
 				db << "MD EMAIL " << nc->email << endl;
 			if (!nc->greet.empty())

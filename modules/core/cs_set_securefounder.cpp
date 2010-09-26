@@ -28,19 +28,19 @@ class CommandCSSetSecureFounder : public Command
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREFOUNDER);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREFOUNDER);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREFOUNDER");
@@ -50,18 +50,18 @@ class CommandCSSetSecureFounder : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECUREFOUNDER, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREFOUNDER, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(ChanServ, u, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_SECUREFOUNDER);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SECUREFOUNDER);
 	}
 };
 
@@ -74,13 +74,13 @@ class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECUREFOUNDER, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREFOUNDER, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET SECUREFOUNDER", CHAN_SASET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET SECUREFOUNDER", CHAN_SASET_SECUREFOUNDER_SYNTAX);
 	}
 };
 

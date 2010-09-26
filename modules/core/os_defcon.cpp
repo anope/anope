@@ -33,14 +33,14 @@ class DefConTimeout : public Timer
 			Config->DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			Log(OperServ, "operserv/defcon") << "Defcon level timeout, returning to level " << level;
-			ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), Config->s_OperServ.c_str(), level);
+			ircdproto->SendGlobops(OperServ, GetString(OPER_DEFCON_WALL).c_str(), Config->s_OperServ.c_str(), level);
 
 			if (Config->GlobalOnDefcon)
 			{
 				if (!Config->DefConOffMessage.empty())
 					oper_global("", "%s", Config->DefConOffMessage.c_str());
 				else
-					oper_global("", getstring(DEFCON_GLOBAL), Config->DefConLevel);
+					oper_global("", GetString(DEFCON_GLOBAL).c_str(), Config->DefConLevel);
 
 				if (Config->GlobalOnDefconMore && Config->DefConOffMessage.empty())
 					oper_global("", "%s", Config->DefconMessage.c_str());
@@ -63,11 +63,10 @@ class CommandOSDefcon : public Command
 	{
 		Anope::string lvl = params[0];
 		int newLevel = 0;
-		const char *langglobal = getstring(DEFCON_GLOBAL);
 
 		if (lvl.empty())
 		{
-			notice_lang(Config->s_OperServ, u, OPER_DEFCON_CHANGED, Config->DefConLevel);
+			u->SendMessage(OperServ, OPER_DEFCON_CHANGED, Config->DefConLevel);
 			defcon_sendlvls(u);
 			return MOD_CONT;
 		}
@@ -90,10 +89,10 @@ class CommandOSDefcon : public Command
 		if (Config->DefConTimeOut)
 			timeout = new DefConTimeout(5);
 
-		notice_lang(Config->s_OperServ, u, OPER_DEFCON_CHANGED, Config->DefConLevel);
+		u->SendMessage(OperServ, OPER_DEFCON_CHANGED, Config->DefConLevel);
 		defcon_sendlvls(u);
 		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
-		ircdproto->SendGlobops(OperServ, getstring(OPER_DEFCON_WALL), u->nick.c_str(), newLevel);
+		ircdproto->SendGlobops(OperServ, GetString(OPER_DEFCON_WALL).c_str(), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (Config->GlobalOnDefcon)
@@ -101,7 +100,7 @@ class CommandOSDefcon : public Command
 			if (Config->DefConLevel == 5 && !Config->DefConOffMessage.empty())
 				oper_global("", "%s", Config->DefConOffMessage.c_str());
 			else
-				oper_global("", langglobal, Config->DefConLevel);
+				oper_global("", GetString(DEFCON_GLOBAL).c_str(), Config->DefConLevel);
 		}
 		if (Config->GlobalOnDefconMore)
 		{
@@ -115,18 +114,18 @@ class CommandOSDefcon : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_DEFCON);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
+		SyntaxError(OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_DEFCON);
+		u->SendMessage(OperServ, OPER_HELP_CMD_DEFCON);
 	}
 };
 
@@ -216,7 +215,7 @@ class OSDefcon : public Module
 		if ((CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)) && !is_oper(u))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-				notice_lang(bi->nick, u, OPER_DEFCON_DENIED);
+				u->SendMessage(bi, OPER_DEFCON_DENIED);
 
 			return EVENT_STOP;
 		}
@@ -232,7 +231,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_NICKS))
 				{
-					notice_lang(Config->s_NickServ, u, OPER_DEFCON_DENIED);
+					u->SendMessage(NickServ, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -243,7 +242,7 @@ class OSDefcon : public Module
 			{
 				if (!params.empty() && params[0].equals_ci("MLOCK") && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					notice_lang(Config->s_ChanServ, u, OPER_DEFCON_DENIED);
+					u->SendMessage(ChanServ, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -251,7 +250,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
 				{
-					notice_lang(Config->s_ChanServ, u, OPER_DEFCON_DENIED);
+					u->SendMessage(ChanServ, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -262,7 +261,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
 				{
-					notice_lang(Config->s_MemoServ, u, OPER_DEFCON_DENIED);
+					u->SendMessage(MemoServ, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -323,25 +322,25 @@ class OSDefcon : public Module
 void defcon_sendlvls(User *u)
 {
 	if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
 	if (CheckDefCon(DEFCON_NO_NEW_NICKS))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_NICKS);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_NICKS);
 	if (CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
 	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && !Config->DefConChanModes.empty())
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
 	if (CheckDefCon(DEFCON_REDUCE_SESSION))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
 	if (CheckDefCon(DEFCON_NO_NEW_CLIENTS))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_OPER_ONLY))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_OPER_ONLY);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_OPER_ONLY);
 	if (CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
 	if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
-		notice_lang(Config->s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
+		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_MEMOS);
 }
 
 void runDefCon()

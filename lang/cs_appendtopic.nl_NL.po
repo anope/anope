@@ -1,0 +1,37 @@
+# Dutch translations for cs_appendtopic
+# Engelse vertalingen voor het cs_appendtopic
+# Copyright (C) 2010 Anope Team
+# This file is distributed under the same license as Anope IRC Services
+# Adam <adam@anope.org>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Anope\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-09-25 20:53-0400\n"
+"PO-Revision-Date: 2010-09-25 20:55-0400\n"
+"Last-Translator: Adam <adam@anope.org>\n"
+"Language-Team: Dutch\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: cs_appendtopic.cpp:105
+msgid "   APPENDTOPIC Add text to a channels topic"
+msgstr "   APPENDTOPIC Voeg tekst aan een kanaal onderwerp toe"
+
+#: cs_appendtopic.cpp:89 cs_appendtopic.cpp:100
+msgid "Syntax: APPENDTOPIC channel text"
+msgstr "Gebruik: APPENDTOPIC kanaal tekst"
+
+#: cs_appendtopic.cpp:91
+msgid ""
+"This command allows users to append text to a currently set\n"
+"channel topic. When TOPICLOCK is on, the topic is updated and\n"
+"the new, updated topic is locked."
+msgstr ""
+"Dit command stelt gebruikers in staat om text toe te voegen\n"
+"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
+"staat, zal het onderwerp worden bijgewerkt en zal het nieuwe,\n"
+"bijgewerkte topic worden geforceerd."

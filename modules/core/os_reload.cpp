@@ -34,19 +34,19 @@ class CommandOSReload : public Command
 			Log() << "Error reloading configuration file: " << ex.GetReason();
 		}
 
-		notice_lang(Config->s_OperServ, u, OPER_RELOAD);
+		u->SendMessage(OperServ, OPER_RELOAD);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_RELOAD);
+		u->SendMessage(OperServ, OPER_HELP_RELOAD);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_RELOAD);
+		u->SendMessage(OperServ, OPER_HELP_CMD_RELOAD);
 	}
 };
 

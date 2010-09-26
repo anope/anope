@@ -37,19 +37,19 @@ class CommandCSSuspend : public Command
 
 		if (chan[0] != '#')
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
+			u->SendMessage(ChanServ, CHAN_UNSUSPEND_ERROR);
 			return MOD_CONT;
 		}
 
 		/* You should not SUSPEND a FORBIDEN channel */
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_MAY_NOT_BE_REGISTERED, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			notice_lang(Config->s_ChanServ, u, READ_ONLY_MODE);
+			u->SendMessage(ChanServ, READ_ONLY_MODE);
 
 		if (ci)
 		{
@@ -67,7 +67,7 @@ class CommandCSSuspend : public Command
 					if (is_oper(uc->user))
 						continue;
 
-					c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : getstring(uc->user->Account(), CHAN_SUSPEND_REASON));
+					c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), CHAN_SUSPEND_REASON).c_str());
 				}
 			}
 
@@ -75,7 +75,7 @@ class CommandCSSuspend : public Command
 				ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 			Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
-			notice_lang(Config->s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
 
 			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
@@ -83,25 +83,25 @@ class CommandCSSuspend : public Command
 		{
 			// cant happen?
 			//Alog() << Config->s_ChanServ << ": Valid SUSPEND for " << ci->name << " by " << u->GetMask() << " failed";
-			notice_lang(Config->s_ChanServ, u, CHAN_SUSPEND_FAILED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_SUSPEND_FAILED, chan.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_SUSPEND);
+		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "SUSPEND", Config->ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
+		SyntaxError(ChanServ, u, "SUSPEND", Config->ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SUSPEND);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SUSPEND);
 	}
 };
 
@@ -120,16 +120,16 @@ class CommandCSUnSuspend : public Command
 
 		if (chan[0] != '#')
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
+			u->SendMessage(ChanServ, CHAN_UNSUSPEND_ERROR);
 			return MOD_CONT;
 		}
 		if (readonly)
-			notice_lang(Config->s_ChanServ, u, READ_ONLY_MODE);
+			u->SendMessage(ChanServ, READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasFlag(CI_SUSPENDED))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_UNSUSPEND_FAILED, chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -144,7 +144,7 @@ class CommandCSUnSuspend : public Command
 			if (Config->WallForbid)
 				ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
 
 			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 		}
@@ -152,25 +152,25 @@ class CommandCSUnSuspend : public Command
 		{
 			// cant happen ?
 			//Alog() << Config->s_ChanServ << ": Valid UNSUSPEND for " << chan << " by " << u->nick << " failed";
-			notice_lang(Config->s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_UNSUSPEND_FAILED, chan.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_UNSUSPEND);
+		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
+		SyntaxError(ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_UNSUSPEND);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_UNSUSPEND);
 	}
 };
 

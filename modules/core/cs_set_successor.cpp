@@ -28,7 +28,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -40,17 +40,17 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				notice_lang(Config->s_ChanServ, u, NICK_X_NOT_REGISTERED, params[1].c_str());
+				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, params[1].c_str());
 				return MOD_CONT;
 			}
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config->s_ChanServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+				u->SendMessage(ChanServ, NICK_X_FORBIDDEN, na->nick.c_str());
 				return MOD_CONT;
 			}
 			if (na->nc == ci->founder)
 			{
-				notice_lang(Config->s_ChanServ, u, CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
+				u->SendMessage(ChanServ, CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			nc = na->nc;
@@ -63,28 +63,28 @@ class CommandCSSetSuccessor : public Command
 		ci->successor = nc;
 
 		if (nc)
-			notice_lang(Config->s_ChanServ, u, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
+			u->SendMessage(ChanServ, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
 		else
-			notice_lang(Config->s_ChanServ, u, CHAN_SUCCESSOR_UNSET, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SUCCESSOR_UNSET, ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SUCCESSOR, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_SUCCESSOR);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SUCCESSOR);
 	}
 };
 
@@ -97,14 +97,14 @@ class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SUCCESSOR, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SUCCESSOR, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

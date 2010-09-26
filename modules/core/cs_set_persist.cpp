@@ -60,7 +60,7 @@ class CommandCSSetPersist : public Command
 					ci->c->SetMode(NULL, cm);
 			}
 
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PERSIST_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PERSIST_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -82,7 +82,7 @@ class CommandCSSetPersist : public Command
 					ChanServ->UnAssign(NULL, ci);
 			}
 
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PERSIST_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PERSIST_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PERSIST");
@@ -92,18 +92,18 @@ class CommandCSSetPersist : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PERSIST, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+		SyntaxError(ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_PERSIST);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PERSIST);
 	}
 };
 
@@ -116,13 +116,13 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PERSIST, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PERSIST, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
 	}
 };
 

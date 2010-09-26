@@ -27,38 +27,38 @@ class CommandBSUnassign : public Command
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
 		if (readonly)
-			notice_lang(Config->s_BotServ, u, BOT_ASSIGN_READONLY);
+			u->SendMessage(BotServ, BOT_ASSIGN_READONLY);
 		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
-			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
+			u->SendMessage(BotServ, ACCESS_DENIED);
 		else if (!ci->bi)
-			notice_help(Config->s_BotServ, u, BOT_NOT_ASSIGNED);
+			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
-			notice_help(Config->s_BotServ, u, BOT_UNASSIGN_PERSISTANT_CHAN);
+			u->SendMessage(BotServ, BOT_UNASSIGN_PERSISTANT_CHAN);
 		else
 		{
 			bool override = !check_access(u, ci, CA_ASSIGN);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
 
 			ci->bi->UnAssign(u, ci);
-			notice_lang(Config->s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_BotServ, u, BOT_HELP_UNASSIGN);
+		u->SendMessage(BotServ, BOT_HELP_UNASSIGN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
+		SyntaxError(BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_UNASSIGN);
+		u->SendMessage(BotServ, BOT_HELP_CMD_UNASSIGN);
 	}
 };
 

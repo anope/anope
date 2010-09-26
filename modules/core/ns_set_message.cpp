@@ -28,7 +28,7 @@ class CommandNSSetMessage : public Command
 
 		if (!Config->UsePrivmsg)
 		{
-			notice_lang(Config->s_NickServ, u, NICK_SASET_OPTION_DISABLED, "MSG");
+			u->SendMessage(NickServ, NICK_SET_OPTION_DISABLED, "MSG");
 			return MOD_CONT;
 		}
 
@@ -37,12 +37,12 @@ class CommandNSSetMessage : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_MSG);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_MSG_ON, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_MSG_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_MSG);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_MSG_OFF, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_MSG_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "MSG");
@@ -52,18 +52,18 @@ class CommandNSSetMessage : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_MSG);
+		u->SendMessage(NickServ, NICK_HELP_SET_MSG);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SET MSG", NICK_SET_MSG_SYNTAX);
+		SyntaxError(NickServ, u, "SET MSG", NICK_SET_MSG_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_MSG);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_MSG);
 	}
 };
 
@@ -76,18 +76,18 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_MSG);
+		u->SendMessage(NickServ, NICK_HELP_SASET_MSG);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET MSG", NICK_SASET_MSG_SYNTAX);
+		SyntaxError(NickServ, u, "SASET MSG", NICK_SASET_MSG_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_MSG);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_MSG);
 	}
 };
 

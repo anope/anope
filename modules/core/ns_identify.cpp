@@ -31,32 +31,32 @@ class CommandNSIdentify : public Command
 		{
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
-				notice_lang(Config->s_NickServ, u, NICK_IS_PREREG);
+				u->SendMessage(NickServ, NICK_IS_PREREG);
 			else
-				notice_lang(Config->s_NickServ, u, NICK_NOT_REGISTERED);
+				u->SendMessage(NickServ, NICK_NOT_REGISTERED);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
 		 * identified as
 		 */
 		else if (u->Account() && u->Account() == na->nc)
-			notice_lang(Config->s_NickServ, u, NICK_ALREADY_IDENTIFIED);
+			u->SendMessage(NickServ, NICK_ALREADY_IDENTIFIED);
 		else
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (!res)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
-				notice_lang(Config->s_NickServ, u, PASSWORD_INCORRECT);
+				u->SendMessage(NickServ, PASSWORD_INCORRECT);
 				if (bad_password(u))
 					return MOD_STOP;
 			}
 			else if (res == -1)
-				notice_lang(Config->s_NickServ, u, NICK_IDENTIFY_FAILED);
+				u->SendMessage(NickServ, NICK_IDENTIFY_FAILED);
 			else
 			{
 				if (u->IsIdentified())
@@ -77,7 +77,7 @@ class CommandNSIdentify : public Command
 				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 				Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display;
-				notice_lang(Config->s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
+				u->SendMessage(NickServ, NICK_IDENTIFY_SUCCEEDED);
 				if (ircd->vhost)
 					do_on_id(u);
 				if (Config->NSModeOnID)
@@ -85,8 +85,8 @@ class CommandNSIdentify : public Command
 
 				if (Config->NSForceEmail && u->Account() && u->Account()->email.empty())
 				{
-					notice_lang(Config->s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
-					notice_help(Config->s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
+					u->SendMessage(NickServ, NICK_IDENTIFY_EMAIL_REQUIRED);
+					u->SendMessage(NickServ, NICK_IDENTIFY_EMAIL_HOWTO);
 				}
 
 				if (u->IsIdentified())
@@ -98,19 +98,19 @@ class CommandNSIdentify : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_IDENTIFY);
+		u->SendMessage(NickServ, NICK_HELP_IDENTIFY);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
+		SyntaxError(NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
 		if (this->name.equals_ci("IDENTIFY"))
-			notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
+			u->SendMessage(NickServ, NICK_HELP_CMD_IDENTIFY);
 	}
 };
 

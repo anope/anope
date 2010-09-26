@@ -29,7 +29,7 @@ class CommandCSDrop : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_DROP_DISABLED); // XXX: READ_ONLY_MODE?
+			u->SendMessage(ChanServ, CHAN_DROP_DISABLED); // XXX: READ_ONLY_MODE?
 			return MOD_CONT;
 		}
 
@@ -37,19 +37,19 @@ class CommandCSDrop : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_X_FORBIDDEN, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_X_FORBIDDEN, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -69,7 +69,7 @@ class CommandCSDrop : public Command
 
 		delete ci;
 
-		notice_lang(Config->s_ChanServ, u, CHAN_DROPPED, chan.c_str());
+		u->SendMessage(ChanServ, CHAN_DROPPED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
@@ -79,21 +79,21 @@ class CommandCSDrop : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_DROP);
+			u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_DROP);
 		else
-			notice_help(Config->s_ChanServ, u, CHAN_HELP_DROP);
+			u->SendMessage(ChanServ, CHAN_HELP_DROP);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DROP", CHAN_DROP_SYNTAX);
+		SyntaxError(ChanServ, u, "DROP", CHAN_DROP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DROP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DROP);
 	}
 };
 

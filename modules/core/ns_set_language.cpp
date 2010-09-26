@@ -28,39 +28,46 @@ class CommandNSSetLanguage : public Command
 
 		Anope::string param = params[1];
 
-		if (param.find_first_not_of("0123456789") != Anope::string::npos) /* i.e. not a number */
+		for (unsigned j = 0; j < languages.size(); ++j)
 		{
-			this->OnSyntaxError(u, "");
-			return MOD_CONT;
+			if (param == "en" || languages[j] == param)
+				break;
+			else if (j + 1 == languages.size())
+			{
+				this->OnSyntaxError(u, "");
+				return MOD_CONT;
+			}
 		}
 
-		int langnum = convertTo<int>(param) - 1;
-		if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0)
-		{
-			notice_lang(Config->s_NickServ, u, NICK_SET_LANGUAGE_UNKNOWN, langnum + 1, Config->s_NickServ.c_str());
-			return MOD_CONT;
-		}
-
-		nc->language = langlist[langnum];
-		notice_lang(Config->s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
+		nc->language = param;
+		u->SendMessage(NickServ, NICK_SET_LANGUAGE_CHANGED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_LANGUAGE);
+		u->SendMessage(NickServ, NICK_HELP_SET_LANGUAGE);
+		u->SendMessage(Config->s_NickServ, "         en (English)");
+		for (unsigned j = 0; j < languages.size(); ++j)
+		{
+			const Anope::string &langname = GetString(languages[j], LANGUAGE_NAME);
+			if (langname == "English")
+				continue;
+			u->SendMessage(Config->s_NickServ, "         %s (%s)", languages[j].c_str(), langname.c_str());
+		}
+
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
+		SyntaxError(NickServ, u, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_LANGUAGE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_LANGUAGE);
 	}
 };
 
@@ -73,18 +80,18 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_LANGUAGE);
+		u->SendMessage(NickServ, NICK_HELP_SASET_LANGUAGE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
+		SyntaxError(NickServ, u, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_LANGUAGE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_LANGUAGE);
 	}
 };
 

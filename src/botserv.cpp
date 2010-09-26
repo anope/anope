@@ -13,12 +13,11 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 static UserData *get_user_data(Channel *c, User *u);
 
 static void check_ban(ChannelInfo *ci, User *u, int ttbtype);
-static void bot_kick(ChannelInfo *ci, User *u, int message, ...);
+static void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...);
 
 E void moduleAddBotServCmds();
 
@@ -488,20 +487,19 @@ static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 
 /* This makes a bot kick an user. Works somewhat like notice_lang in fact ;) */
 
-static void bot_kick(ChannelInfo *ci, User *u, int message, ...)
+static void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
 {
 	va_list args;
 	char buf[1024];
-	const char *fmt;
 
 	if (!ci || !ci->bi || !ci->c || !u)
 		return;
 
+	Anope::string fmt = GetString(u, message);
 	va_start(args, message);
-	fmt = getstring(u, message);
-	if (!fmt)
+	if (fmt.empty())
 		return;
-	vsnprintf(buf, sizeof(buf), fmt, args);
+	vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 	va_end(args);
 
 	ci->c->Kick(ci->bi, u, "%s", buf);
@@ -521,7 +519,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
 		return;
 	}
 
@@ -530,7 +528,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u) == 1)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(BOT_EXCEPT));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, BOT_EXCEPT).c_str());
 		return;
 	}
 
@@ -558,7 +556,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, c
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
 		return;
 	}
 
@@ -589,7 +587,7 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, c
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && mode[0] == '-' && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", getstring(ACCESS_DENIED));
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
 		return;
 	}
 

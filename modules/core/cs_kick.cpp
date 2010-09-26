@@ -38,17 +38,17 @@ class CommandCSKick : public Command
 			ci = c->ci;
 
 		if (!c)
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
-			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, target.c_str());
+			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && get_access(u2, ci) >= get_access(u, ci))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else if (u2->IsProtected())
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else if (!c->FindUser(u2))
-			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
+			u->SendMessage(ChanServ, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		else
 		{
 			 // XXX
@@ -64,18 +64,18 @@ class CommandCSKick : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_KICK);
+		u->SendMessage(ChanServ, CHAN_HELP_KICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
+		SyntaxError(ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_KICK);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_KICK);
 	}
 };
 

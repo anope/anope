@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 E void moduleAddHostServCmds();
 
@@ -170,8 +169,8 @@ void do_on_id(User *u)
 		u->UpdateHost();
 
 		if (!na->hostinfo.GetIdent().empty())
-			notice_lang(Config->s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			u->SendMessage(HostServ, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 		else
-			notice_lang(Config->s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+			u->SendMessage(HostServ, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 	}
 }

@@ -33,18 +33,18 @@ class CommandOSIgnore : public Command
 
 			if (t <= -1)
 			{
-				notice_lang(Config->s_OperServ, u, OPER_IGNORE_VALID_TIME);
+				u->SendMessage(OperServ, OPER_IGNORE_VALID_TIME);
 				return MOD_CONT;
 			}
 			else if (!t)
 			{
 				add_ignore(nick, t);
-				notice_lang(Config->s_OperServ, u, OPER_IGNORE_PERM_DONE, nick.c_str());
+				u->SendMessage(OperServ, OPER_IGNORE_PERM_DONE, nick.c_str());
 			}
 			else
 			{
 				add_ignore(nick, t);
-				notice_lang(Config->s_OperServ, u, OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
+				u->SendMessage(OperServ, OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
 			}
 		}
 
@@ -55,11 +55,11 @@ class CommandOSIgnore : public Command
 	{
 		if (ignore.empty())
 		{
-			notice_lang(Config->s_OperServ, u, OPER_IGNORE_LIST_EMPTY);
+			u->SendMessage(OperServ, OPER_IGNORE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		notice_lang(Config->s_OperServ, u, OPER_IGNORE_LIST);
+		u->SendMessage(OperServ, OPER_IGNORE_LIST);
 		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
 			u->SendMessage(Config->s_OperServ, "%s", (*ign)->mask.c_str());
 
@@ -75,10 +75,10 @@ class CommandOSIgnore : public Command
 		{
 			if (delete_ignore(nick))
 			{
-				notice_lang(Config->s_OperServ, u, OPER_IGNORE_DEL_DONE, nick.c_str());
+				u->SendMessage(OperServ, OPER_IGNORE_DEL_DONE, nick.c_str());
 				return MOD_CONT;
 			}
-			notice_lang(Config->s_OperServ, u, OPER_IGNORE_LIST_NOMATCH, nick.c_str());
+			u->SendMessage(OperServ, OPER_IGNORE_LIST_NOMATCH, nick.c_str());
 		}
 
 		return MOD_CONT;
@@ -87,7 +87,7 @@ class CommandOSIgnore : public Command
 	CommandReturn DoClear(User *u)
 	{
 		clear_ignores();
-		notice_lang(Config->s_OperServ, u, OPER_IGNORE_LIST_CLEARED);
+		u->SendMessage(OperServ, OPER_IGNORE_LIST_CLEARED);
 
 		return MOD_CONT;
 	}
@@ -116,18 +116,18 @@ class CommandOSIgnore : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_IGNORE);
+		u->SendMessage(OperServ, OPER_HELP_IGNORE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
+		SyntaxError(OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_IGNORE);
+		u->SendMessage(OperServ, OPER_HELP_CMD_IGNORE);
 	}
 };
 

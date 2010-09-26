@@ -1,5 +1,4 @@
 #include "services.h"
-#include "language.h"
 
 MailThread::~MailThread()
 {
@@ -30,17 +29,17 @@ void MailThread::Run()
 	Success = true;
 }
 
-bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::string &subject, const Anope::string &message)
+bool Mail(User *u, NickRequest *nr, BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
-	if (!u || !nr || subject.empty() || service.empty() || message.empty())
+	if (!u || !nr || !service || subject.empty() || message.empty())
 		return false;
 
 	if (!Config->UseMail)
-		notice_lang(service, u, MAIL_DISABLED);
+		u->SendMessage(service, MAIL_DISABLED);
 	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
+		u->SendMessage(service, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
 	else if (nr->email.empty())
-		notice_lang(service, u, MAIL_INVALID, nr->nick.c_str());
+		u->SendMessage(service, MAIL_INVALID, nr->nick.c_str());
 	else
 	{
 		u->lastmail = nr->lastmail = Anope::CurTime;
@@ -51,17 +50,17 @@ bool Mail(User *u, NickRequest *nr, const Anope::string &service, const Anope::s
 	return false;
 }
 
-bool Mail(User *u, NickCore *nc, const Anope::string &service, const Anope::string &subject, const Anope::string &message)
+bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
-	if (!u || !nc || subject.empty() || service.empty() || message.empty())
+	if (!u || !nc || !service || subject.empty() || message.empty())
 		return false;
 
 	if (!Config->UseMail)
-		notice_lang(service, u, MAIL_DISABLED);
+		u->SendMessage(service, MAIL_DISABLED);
 	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
-		notice_lang(service, u, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
+		u->SendMessage(service, MAIL_DELAYED, Config->MailDelay - Anope::CurTime - u->lastmail);
 	else if (nc->email.empty())
-		notice_lang(service, u, MAIL_INVALID, nc->display.c_str());
+		u->SendMessage(service, MAIL_INVALID, nc->display.c_str());
 	else
 	{
 		u->lastmail = nc->lastmail = Anope::CurTime;

@@ -35,17 +35,17 @@ static CommandReturn do_util(User *u, Command *com, ChannelMode *cm, const Anope
 	bool is_same = u->nick.equals_ci(realnick);
 
 	if (!c)
-		notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+		u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 	else if (is_same ? !(u2 = u) : !(u2 = finduser(realnick)))
-		notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, realnick.c_str());
+		u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, realnick.c_str());
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
-		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+		u->SendMessage(ChanServ, ACCESS_DENIED);
 	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
-		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+		u->SendMessage(ChanServ, ACCESS_DENIED);
 	else if (!set && u2->IsProtected() && !is_same)
-		notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+		u->SendMessage(ChanServ, ACCESS_DENIED);
 	else if (!c->FindUser(u2))
-		notice_lang(Config->s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
+		u->SendMessage(ChanServ, NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 	else
 	{
 		if (set)
@@ -77,18 +77,18 @@ class CommandCSOp : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_OP);
+		u->SendMessage(ChanServ, CHAN_HELP_OP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "OP", CHAN_OP_SYNTAX);
+		SyntaxError(ChanServ, u, "OP", CHAN_OP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_OP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_OP);
 	}
 };
 
@@ -108,18 +108,18 @@ class CommandCSDeOp : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_DEOP);
+		u->SendMessage(ChanServ, CHAN_HELP_DEOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
+		SyntaxError(ChanServ, u, "DEOP", CHAN_DEOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DEOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DEOP);
 	}
 };
 
@@ -139,18 +139,18 @@ class CommandCSVoice : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_VOICE);
+		u->SendMessage(ChanServ, CHAN_HELP_VOICE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
+		SyntaxError(ChanServ, u, "VOICE", CHAN_VOICE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_VOICE);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_VOICE);
 	}
 };
 
@@ -170,18 +170,18 @@ class CommandCSDeVoice : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_DEVOICE);
+		u->SendMessage(ChanServ, CHAN_HELP_DEVOICE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
+		SyntaxError(ChanServ, u, "DEVOICE", CHAN_DEVOICE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DEVOICE);
 	}
 };
 
@@ -206,18 +206,18 @@ class CommandCSHalfOp : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_HALFOP);
+		u->SendMessage(ChanServ, CHAN_HELP_HALFOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
+		SyntaxError(ChanServ, u, "HALFOP", CHAN_HALFOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_HALFOP);
 	}
 };
 
@@ -240,18 +240,18 @@ class CommandCSDeHalfOp : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_DEHALFOP);
+		u->SendMessage(ChanServ, CHAN_HELP_DEHALFOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
+		SyntaxError(ChanServ, u, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DEHALFOP);
 	}
 };
 
@@ -274,18 +274,18 @@ class CommandCSProtect : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_PROTECT);
+		u->SendMessage(ChanServ, CHAN_HELP_PROTECT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
+		SyntaxError(ChanServ, u, "PROTECT", CHAN_PROTECT_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_PROTECT);
 	}
 };
 
@@ -308,18 +308,18 @@ class CommandCSDeProtect : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_DEPROTECT);
+		u->SendMessage(ChanServ, CHAN_HELP_DEPROTECT);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
+		SyntaxError(ChanServ, u, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DEPROTECT);
 	}
 };
 
@@ -342,18 +342,18 @@ class CommandCSOwner : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_OWNER);
+		u->SendMessage(ChanServ, CHAN_HELP_OWNER);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
+		SyntaxError(ChanServ, u, "OWNER", CHAN_OWNER_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_OWNER);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_OWNER);
 	}
 };
 
@@ -376,18 +376,18 @@ class CommandCSDeOwner : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_DEOWNER);
+		u->SendMessage(ChanServ, CHAN_HELP_DEOWNER);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
+		SyntaxError(ChanServ, u, "DEOWNER", CHAN_DEOWNER_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_DEOWNER);
 	}
 };
 

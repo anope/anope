@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 std::vector<NewsItem *> News;
 
@@ -453,21 +452,21 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find('!') != Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick, u, OPER_AKILL_NO_NICK);
+			u->SendMessage(bi, OPER_AKILL_NO_NICK);
 		return NULL;
 	}
 
 	if (mask.find('@') == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick, u, BAD_USERHOST_MASK);
+			u->SendMessage(bi, BAD_USERHOST_MASK);
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -477,11 +476,11 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick, u, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick, u, OPER_AKILL_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick, u, OPER_AKILL_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -530,7 +529,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (!mask.empty() && mask.find_first_not_of("*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(bi->nick, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -540,11 +539,11 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick, u, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick, u, OPER_SNLINE_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick, u, OPER_SNLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -603,14 +602,14 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find_first_not_of("*") == Anope::string::npos)
 	{
 		if (bi && u)
-			notice_lang(Config->s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
 	if (mask[0] == '#' && !ircd->chansqline)
 	{
 		if (bi && u)
-			notice_lang(Config->s_OperServ, u, OPER_SQLINE_CHANNELS_UNSUPPORTED);
+			u->SendMessage(OperServ, OPER_SQLINE_CHANNELS_UNSUPPORTED);
 		return NULL;
 	}
 
@@ -620,11 +619,11 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick, u, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick, u, OPER_SQLINE_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick, u, OPER_SQLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -722,13 +721,13 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 {
 	if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_SZLINE_ONLY_IPS);
+		u->SendMessage(OperServ, OPER_SZLINE_ONLY_IPS);
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("*?") == Anope::string::npos)
 	{
-		notice_lang(Config->s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -738,11 +737,11 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				notice_lang(bi->nick, u, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				notice_lang(bi->nick, u, OPER_SZLINE_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				notice_lang(bi->nick, u, OPER_SZLINE_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;

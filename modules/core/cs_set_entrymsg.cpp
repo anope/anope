@@ -29,12 +29,12 @@ class CommandCSSetEntryMsg : public Command
 		if (params.size() > 1)
 		{
 			ci->entry_message = params[1];
-			notice_lang(Config->s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name.c_str(), ci->entry_message.c_str());
+			u->SendMessage(ChanServ, CHAN_ENTRY_MSG_CHANGED, ci->name.c_str(), ci->entry_message.c_str());
 		}
 		else
 		{
 			ci->entry_message.clear();
-			notice_lang(Config->s_ChanServ, u, CHAN_ENTRY_MSG_UNSET, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_ENTRY_MSG_UNSET, ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -42,19 +42,19 @@ class CommandCSSetEntryMsg : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_ENTRYMSG, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_ENTRYMSG);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_ENTRYMSG);
 	}
 };
 
@@ -67,14 +67,14 @@ class CommandCSSASetEntryMsg : public CommandCSSetEntryMsg
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_ENTRYMSG, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_ENTRYMSG, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

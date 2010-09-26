@@ -240,12 +240,6 @@ class CoreExport Module : public virtual Base
 	 */
 	MODType type;
 
-	struct ModuleLang
-	{
-		int argc;
-		char **argv;
-	} lang[NUM_LANGS];
-
 	/** Creates and initialises a new module.
 	 * @param loadernick The nickname of the user loading the module.
 	 */
@@ -290,36 +284,12 @@ class CoreExport Module : public virtual Base
 	 */
 	Version GetVersion() const;
 
-	/**
-	 * Allow a module to add a set of language strings to anope
-	 * @param langNumber the language number for the strings
-	 * @param ac The language count for the strings
-	 * @param av The language sring list.
-	 **/
-	void InsertLanguage(int langNumber, int ac, const char **av);
-
-	/**
-	 * Delete a language from a module
-	 * @param langNumber the language Number to delete
-	 **/
-	void DeleteLanguage(int langNumber);
-
-	/**
-	 * Get the text of the given lanugage string in the corrent language, or
-	 * in english.
-	 * @param u The user to send the message to
-	 * @param number The message number
-	 **/
-	const char *GetLangString(User *u, int number);
-
-	/**
-	 * Send a notice to the user in the correct language, or english.
-	 * @param source Who sends the notice
-	 * @param u The user to send the message to
-	 * @param number The message number
-	 * @param ... The argument list
-	 **/
-	void NoticeLang(const Anope::string &source, const User *u, int number, ...) const;
+	/** Send a message to a user in their language, if a translation is available
+	 * @param from Client to send the message from
+	 * @param to User to send the message to
+	 * @param fmt The message
+	 */
+	void SendMessage(BotInfo *from, User *to, const char *fmt, ...);
 
 	/**
 	 * Add a module provided command to the given service.

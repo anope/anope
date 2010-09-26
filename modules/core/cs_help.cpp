@@ -24,38 +24,21 @@ class CommandCSHelp : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
-
-		if (cmd.equals_ci("LEVELS DESC"))
-		{
-			int i;
-			notice_help(Config->s_ChanServ, u, CHAN_HELP_LEVELS_DESC);
-			if (!levelinfo_maxwidth)
-				for (i = 0; levelinfo[i].what >= 0; ++i)
-				{
-					int len = levelinfo[i].name.length();
-					if (len > levelinfo_maxwidth)
-						levelinfo_maxwidth = len;
-				}
-			for (i = 0; levelinfo[i].what >= 0; ++i)
-				notice_help(Config->s_ChanServ, u, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), getstring(u, levelinfo[i].desc));
-		}
-		else
-			mod_help_cmd(ChanServ, u, cmd);
+		mod_help_cmd(ChanServ, u, params[0]);
 
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP);
+		u->SendMessage(ChanServ, CHAN_HELP);
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(u);
 		if (Config->CSExpire >= 86400)
-			notice_help(Config->s_ChanServ, u, CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
+			u->SendMessage(ChanServ, CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP);
+			u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP);
 	}
 };
 

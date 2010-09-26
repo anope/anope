@@ -30,29 +30,29 @@ class CommandNSSetEmail : public Command
 
 		if (param.empty() && Config->NSForceEmail)
 		{
-			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_UNSET_IMPOSSIBLE);
+			u->SendMessage(NickServ, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			notice_lang(Config->s_NickServ, u, MAIL_X_INVALID, param.c_str());
+			u->SendMessage(NickServ, MAIL_X_INVALID, param.c_str());
 			return MOD_CONT;
 		}
 
 		if (!param.empty())
 		{
 			nc->email = param;
-			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
+			u->SendMessage(NickServ, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
 		}
 		else
 		{
 			nc->email.clear();
-			notice_lang(Config->s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -60,13 +60,13 @@ class CommandNSSetEmail : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_EMAIL);
+		u->SendMessage(NickServ, NICK_HELP_SET_EMAIL);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_EMAIL);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_EMAIL);
 	}
 };
 
@@ -79,13 +79,13 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_EMAIL);
+		u->SendMessage(NickServ, NICK_HELP_SASET_EMAIL);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_EMAIL);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_EMAIL);
 	}
 };
 

@@ -26,7 +26,7 @@ class CommandNSSetHide : public Command
 		if (!nc)
 			throw CoreException("NULL nc in CommandNSSetHide");
 
-		int onmsg, offmsg;
+		LanguageString onmsg, offmsg;
 		NickCoreFlag flag;
 
 		Anope::string param = params[1];
@@ -65,12 +65,12 @@ class CommandNSSetHide : public Command
 		if (arg.equals_ci("ON"))
 		{
 			nc->SetFlag(flag);
-			notice_lang(Config->s_NickServ, u, onmsg, nc->display.c_str(), Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, onmsg, nc->display.c_str(), Config->s_NickServ.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(flag);
-			notice_lang(Config->s_NickServ, u, offmsg, nc->display.c_str(), Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, offmsg, nc->display.c_str(), Config->s_NickServ.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "HIDE");
@@ -80,18 +80,18 @@ class CommandNSSetHide : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_HIDE);
+		u->SendMessage(NickServ, NICK_HELP_SET_HIDE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
+		SyntaxError(NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_HIDE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_HIDE);
 	}
 };
 
@@ -104,18 +104,18 @@ class CommandNSSASetHide : public CommandNSSetHide
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_HIDE);
+		u->SendMessage(NickServ, NICK_HELP_SASET_HIDE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
+		SyntaxError(NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_HIDE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_HIDE);
 	}
 };
 

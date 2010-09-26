@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 /*************************************************************************/
 
@@ -106,7 +105,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 
 		BotInfo *bi = findbot(receiver);
 		if (bi)
-			ircdproto->SendMessage(bi, source, "%s", getstring(USER_RECORD_NOT_FOUND));
+			ircdproto->SendMessage(bi, source, "%s", GetString(USER_RECORD_NOT_FOUND).c_str());
 
 		return MOD_CONT;
 	}
@@ -149,8 +148,11 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 		}
 		else if (Config->UseStrictPrivMsg)
 		{
+			BotInfo *bi = findbot(receiver);
+			if (!bi)
+				return MOD_CONT;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
-			notice_lang(receiver, u, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
+			u->SendMessage(bi, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
 			return MOD_CONT;
 		}
 
@@ -177,14 +179,14 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 			else if (bi->nick.equals_ci(Config->s_ChanServ))
 			{
 				if (!is_oper(u) && Config->CSOpersOnly)
-					notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+					u->SendMessage(ChanServ, ACCESS_DENIED);
 				else
 					mod_run_cmd(bi, u, message);
 			}
 			else if (!Config->s_HostServ.empty() && bi->nick.equals_ci(Config->s_HostServ))
 			{
 				if (!ircd->vhost)
-					notice_lang(Config->s_HostServ, u, SERVICE_OFFLINE, Config->s_HostServ.c_str());
+					u->SendMessage(HostServ, SERVICE_OFFLINE, Config->s_HostServ.c_str());
 				else
 					mod_run_cmd(bi, u, message);
 			}
@@ -192,7 +194,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 			{
 				if (!is_oper(u) && Config->OSOpersOnly)
 				{
-					notice_lang(Config->s_OperServ, u, ACCESS_DENIED);
+					u->SendMessage(OperServ, ACCESS_DENIED);
 					if (Config->WallBadOS)
 						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 				}

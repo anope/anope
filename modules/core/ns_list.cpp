@@ -49,7 +49,7 @@ class CommandNSList : public Command
 
 		if (Config->NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
 		{
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -58,24 +58,24 @@ class CommandNSList : public Command
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
 			if (tmp.empty())
 			{
-				notice_lang(Config->s_NickServ, u, LIST_INCORRECT_RANGE);
+				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				notice_lang(Config->s_NickServ, u, LIST_INCORRECT_RANGE);
+				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (tmp.empty())
 			{
-				notice_lang(Config->s_NickServ, u, LIST_INCORRECT_RANGE);
+				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				notice_lang(Config->s_NickServ, u, LIST_INCORRECT_RANGE);
+				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -103,7 +103,7 @@ class CommandNSList : public Command
 
 		mync = u->Account();
 
-		notice_lang(Config->s_NickServ, u, NICK_LIST_HEADER, pattern.c_str());
+		u->SendMessage(NickServ, NICK_LIST_HEADER, pattern.c_str());
 		if (!unconfirmed)
 		{
 			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
@@ -165,16 +165,16 @@ class CommandNSList : public Command
 				}
 			}
 		}
-		notice_lang(Config->s_NickServ, u, NICK_LIST_RESULTS, nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
+		u->SendMessage(NickServ, NICK_LIST_RESULTS, nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_LIST);
+			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_LIST);
 		else
-			notice_help(Config->s_NickServ, u, NICK_HELP_LIST);
+			u->SendMessage(NickServ, NICK_HELP_LIST);
 
 		return true;
 	}
@@ -182,14 +182,14 @@ class CommandNSList : public Command
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account()->IsServicesOper())
-			syntax_error(Config->s_NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
+			SyntaxError(NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
 		else
-			syntax_error(Config->s_NickServ, u, "LIST", NICK_LIST_SYNTAX);
+			SyntaxError(NickServ, u, "LIST", NICK_LIST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_LIST);
+		u->SendMessage(NickServ, NICK_HELP_CMD_LIST);
 	}
 };
 

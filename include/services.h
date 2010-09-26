@@ -708,19 +708,11 @@ enum
 
 /*************************************************************************/
 
-struct LevelInfo
-{
-	int what;
-	Anope::string name;
-	int desc;
-};
-
-/*************************************************************************/
-
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
  */
 
+#include "language.h"
 #include "users.h"
 #include "account.h"
 #include "bots.h"
@@ -730,6 +722,13 @@ struct BanData
 	Anope::string mask;	/* Since a nick is unsure and a User structure is unsafe */
 	time_t last_use;	/* Since time is the only way to check whether it's still useful */
 	int16 ttb[TTB_SIZE];
+};
+
+struct LevelInfo
+{
+	int what;
+	Anope::string name;
+	LanguageString desc;
 };
 
 #include "channels.h"
@@ -777,8 +776,6 @@ struct IgnoreData
 
 /* News stuff */
 
-#define MSG_MAX 11
-
 enum NewsType
 {
 	NEWS_LOGON,
@@ -786,11 +783,11 @@ enum NewsType
 	NEWS_OPER
 };
 
-struct newsmsgs
+struct NewsMessages
 {
 	NewsType type;
 	Anope::string name;
-	int msgs[MSG_MAX + 1];
+	LanguageString msgs[10];
 };
 
 struct NewsItem
@@ -854,37 +851,6 @@ enum DefconLevel
 	DEFCON_AKILL_NEW_CLIENTS,
 	DEFCON_NO_NEW_MEMOS
 };
-
-/*************************************************************************/
-
-/* Languages.  Never insert anything in the middle of this list, or
- * everybody will start getting the wrong language!  If you want to change
- * the order the languages are displayed in for NickServ HELP SET LANGUAGE,
- * do it in language.c.
- */
-enum Languages
-{
-	LANG_EN_US,		/* United States English */
-	LANG_JA_JIS,	/* Japanese (JIS encoding) */
-	LANG_JA_EUC,	/* Japanese (EUC encoding) */
-	LANG_JA_SJIS,	/* Japanese (SJIS encoding) */
-	LANG_ES,		/* Spanish */
-	LANG_PT,		/* Portugese */
-	LANG_FR,		/* French */
-	LANG_TR,		/* Turkish */
-	LANG_IT,		/* Italian */
-	LANG_DE,		/* German */
-	LANG_CAT,		/* Catalan */
-	LANG_GR,		/* Greek */
-	LANG_NL,		/* Dutch */
-	LANG_RU,		/* Russian */
-	LANG_HUN,		/* Hungarian */
-	LANG_PL,		/* Polish */
-	NUM_LANGS		/* Number of languages */
-};
-static const int USED_LANGS = 13; /* Number of languages provided */
-
-static const int DEF_LANGUAGE = LANG_EN_US;
 
 /*************************************************************************/
 

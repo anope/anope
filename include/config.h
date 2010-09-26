@@ -585,8 +585,10 @@ class ServerConfig
 	bool NSNoGroupChange;
 	/* Default flags for newly registered nicks */
 	Flags<NickCoreFlag, NI_END> NSDefFlags;
+	/* All languages Anope is aware about */
+	Anope::string Languages;
 	/* Default language used by services */
-	unsigned NSDefLanguage;
+	Anope::string NSDefLanguage;
 	/* Users must be connected this long before they can register
 	 * Not to be confused with NickRegDelay */
 	time_t NSRegDelay;

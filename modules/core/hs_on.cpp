@@ -26,9 +26,9 @@ class CommandHSOn : public Command
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			if (!na->hostinfo.GetIdent().empty())
-				notice_lang(Config->s_HostServ, u, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				u->SendMessage(HostServ, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				notice_lang(Config->s_HostServ, u, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+				u->SendMessage(HostServ, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->hostinfo.GetIdent().empty() ? na->hostinfo.GetIdent() + "@" : "") << na->hostinfo.GetHost();
 			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
@@ -41,20 +41,20 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			notice_lang(Config->s_HostServ, u, HOST_NOT_ASSIGNED);
+			u->SendMessage(HostServ, HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_ON);
+		u->SendMessage(HostServ, HOST_HELP_ON);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_ON);
+		u->SendMessage(HostServ, HOST_HELP_CMD_ON);
 	}
 };
 

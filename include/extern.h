@@ -154,19 +154,15 @@ E Uplink *uplink_server;
 E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar *ircdvar);
 
-/**** language.c ****/
-
-E char **langtexts[NUM_LANGS];
-E char *langnames[NUM_LANGS];
-E int langlist[NUM_LANGS];
-
-E void lang_init();
-E int strftime_lang(char *buf, int size, User *u, int format, struct tm *tm);
-E void syntax_error(const Anope::string &service, User *u, const Anope::string &command, int msgnum);
-E const char *getstring(NickAlias *na, int index);
-E const char *getstring(const NickCore *nc, int index);
-E const char *getstring(const User *nc, int index);
-E const char *getstring(int index);
+/**** language.cpp ****/
+E std::vector<Anope::string> languages;
+E void InitLanguages();
+E const Anope::string GetString(Anope::string language, LanguageString string);
+E const Anope::string GetString(LanguageString string);
+E const Anope::string GetString(const NickCore *nc, LanguageString string);
+E const Anope::string GetString(const User *u, LanguageString string);
+E Anope::string language_strings[LANG_STRING_COUNT];
+E void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message);
 
 /*** logger.cpp ***/
 E void InitLogChannels(ServerConfig *);
@@ -239,6 +235,7 @@ E const char *merge_args(int argc, const char **argv);
 E time_t dotime(const Anope::string &s);
 E Anope::string duration(const NickCore *nc, time_t seconds);
 E Anope::string expire_left(const NickCore *nc, time_t expires);
+E Anope::string do_strftime(const time_t &t);
 E bool doValidHost(const Anope::string &host, int type);
 
 E bool isValidHost(const Anope::string &host, int type);
@@ -313,9 +310,6 @@ E void process(const Anope::string &buf);
 E void send_cmd(const Anope::string &source, const char *fmt, ...) FORMAT(printf, 2, 3);
 
 E void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...) FORMAT(printf, 3, 4);
-
-E void notice_lang(const Anope::string &source, const User *dest, int message, ...); // MARK_DEPRECATED;
-E void notice_help(const Anope::string &source, const User *dest, int message, ...); // MARK_DEPRECATED;
 
 /**** sessions.c ****/
 

@@ -23,17 +23,17 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			notice_lang(Config->s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_X_SUSPENDED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config->s_NickServ, u, NICK_ACCESS_LIST_X, params[1].c_str());
+		u->SendMessage(NickServ, NICK_ACCESS_LIST_X, params[1].c_str());
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
@@ -55,18 +55,18 @@ class CommandNSAccess : public Command
 
 		if (nc->access.size() >= Config->NSAccessMax)
 		{
-			notice_lang(Config->s_NickServ, u, NICK_ACCESS_REACHED_LIMIT, Config->NSAccessMax);
+			u->SendMessage(NickServ, NICK_ACCESS_REACHED_LIMIT, Config->NSAccessMax);
 			return MOD_CONT;
 		}
 
 		if (nc->FindAccess(mask))
 		{
-			notice_lang(Config->s_NickServ, u, NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
+			u->SendMessage(NickServ, NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
 			return MOD_CONT;
 		}
 
 		nc->AddAccess(mask);
-		notice_lang(Config->s_NickServ, u, NICK_ACCESS_ADDED, mask.c_str());
+		u->SendMessage(NickServ, NICK_ACCESS_ADDED, mask.c_str());
 
 		return MOD_CONT;
 	}
@@ -81,11 +81,11 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			notice_lang(Config->s_NickServ, u, NICK_ACCESS_NOT_FOUND, mask.c_str());
+			u->SendMessage(NickServ, NICK_ACCESS_NOT_FOUND, mask.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config->s_NickServ, u, NICK_ACCESS_DELETED, mask.c_str());
+		u->SendMessage(NickServ, NICK_ACCESS_DELETED, mask.c_str());
 		nc->EraseAccess(mask);
 
 		return MOD_CONT;
@@ -97,11 +97,11 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			notice_lang(Config->s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
+			u->SendMessage(NickServ, NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
 			return MOD_CONT;
 		}
 
-		notice_lang(Config->s_NickServ, u, NICK_ACCESS_LIST);
+		u->SendMessage(NickServ, NICK_ACCESS_LIST);
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
@@ -128,15 +128,15 @@ class CommandNSAccess : public Command
 
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
-			notice_lang(Config->s_NickServ, u, BAD_USERHOST_MASK);
-			notice_lang(Config->s_NickServ, u, MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
+			u->SendMessage(NickServ, BAD_USERHOST_MASK);
+			u->SendMessage(NickServ, MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
 		}
 		/*
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick);
 			*/
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
-			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, u->Account()->display.c_str());
+			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(u, u->Account(), mask);
 		else if (cmd.equals_ci("DEL"))
@@ -150,18 +150,18 @@ class CommandNSAccess : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_ACCESS);
+		u->SendMessage(NickServ, NICK_HELP_ACCESS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
+		SyntaxError(NickServ, u, "ACCESS", NICK_ACCESS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_ACCESS);
+		u->SendMessage(NickServ, NICK_HELP_CMD_ACCESS);
 	}
 };
 

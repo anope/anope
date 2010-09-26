@@ -65,7 +65,7 @@ class AkickListCallback : public NumberList
 	~AkickListCallback()
 	{
 		if (!SentHeader)
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -76,7 +76,7 @@ class AkickListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
 		}
 
 		DoList(u, ci, Number - 1, ci->GetAkick(Number - 1));
@@ -84,7 +84,7 @@ class AkickListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() :akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
+		u->SendMessage(ChanServ, CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() :akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u, NO_REASON).c_str());
 	}
 };
 
@@ -103,7 +103,7 @@ class AkickViewCallback : public AkickListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
 		}
 
 		DoList(u, ci, Number - 1, ci->GetAkick(Number - 1));
@@ -111,26 +111,16 @@ class AkickViewCallback : public AkickListCallback
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		char timebuf[64] = "";
-		struct tm tm;
-
+		Anope::string timebuf;
 		if (akick->addtime)
-		{
-			tm = *localtime(&akick->addtime);
-			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-		}
+			timebuf = do_strftime(akick->addtime);
 		else
-			snprintf(timebuf, sizeof(timebuf), "%s", getstring(u, UNKNOWN));
+			timebuf = GetString(u, UNKNOWN);
 
-		notice_lang(Config->s_ChanServ, u, akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : getstring(u, UNKNOWN), timebuf, !akick->reason.empty() ? akick->reason.c_str() : getstring(u, NO_REASON));
+		u->SendMessage(ChanServ, akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u, UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u, NO_REASON).c_str());
 
 		if (akick->last_used)
-		{
-			char last_used[64];
-			tm = *localtime(&akick->last_used);
-			strftime_lang(last_used, sizeof(last_used), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LAST_USED, last_used);
-		}
+			u->SendMessage(ChanServ, CHAN_AKICK_LAST_USED, do_strftime(akick->last_used).c_str());
 	}
 };
 
@@ -151,11 +141,11 @@ class AkickDelCallback : public NumberList
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
 
 		if (!Deleted)
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 		else if (Deleted == 1)
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_DELETED_ONE, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_DELETED_ONE, ci->name.c_str());
 		else
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_DELETED_SEVERAL, Deleted, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_DELETED_SEVERAL, Deleted, ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
@@ -189,7 +179,7 @@ class CommandCSAKick : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config->s_ChanServ, u, NICK_X_FORBIDDEN, mask.c_str());
+				u->SendMessage(ChanServ, NICK_X_FORBIDDEN, mask.c_str());
 				return;
 			}
 
@@ -199,7 +189,7 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 			return;
 		}
 
@@ -209,7 +199,7 @@ class CommandCSAKick : public Command
 		{
 			if (nc == ci->founder || get_access_level(ci, nc) >= get_access(u, ci))
 			{
-				notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+				u->SendMessage(ChanServ, ACCESS_DENIED);
 				return;
 			}
 		}
@@ -223,7 +213,7 @@ class CommandCSAKick : public Command
 
 				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask, u2))
 				{
-					notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+					u->SendMessage(ChanServ, ACCESS_DENIED);
 					return;
 				}
 			}
@@ -242,7 +232,7 @@ class CommandCSAKick : public Command
 					Anope::string buf = na2->nick + "!" + na2->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
-						notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+						u->SendMessage(ChanServ, ACCESS_DENIED);
 						return;
 					}
 				}
@@ -254,14 +244,14 @@ class CommandCSAKick : public Command
 			akick = ci->GetAkick(j);
 			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : mask.equals_ci(akick->mask))
 			{
-				notice_lang(Config->s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
+				u->SendMessage(ChanServ, CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
 				return;
 			}
 		}
 
 		if (ci->GetAkickCount() >= Config->CSAutokickMax)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, Config->CSAutokickMax);
+			u->SendMessage(ChanServ, CHAN_AKICK_REACHED_LIMIT, Config->CSAutokickMax);
 			return;
 		}
 
@@ -275,7 +265,7 @@ class CommandCSAKick : public Command
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
 
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
+		u->SendMessage(ChanServ, CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
 
 		this->DoEnforce(u, ci);
 	}
@@ -290,7 +280,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
 			return;
 		}
 
@@ -309,7 +299,7 @@ class CommandCSAKick : public Command
 
 		if (i == end)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
 			return;
 		}
 
@@ -317,7 +307,7 @@ class CommandCSAKick : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "STICK " << akick->mask;
 
 		akick->SetFlag(AK_STUCK);
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name.c_str());
+		u->SendMessage(ChanServ, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name.c_str());
 
 		if (ci->c)
 			stick_mask(ci, akick);
@@ -333,7 +323,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
 			return;
 		}
 
@@ -352,7 +342,7 @@ class CommandCSAKick : public Command
 
 		if (i == end)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
 			return;
 		}
 
@@ -360,7 +350,7 @@ class CommandCSAKick : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "UNSTICK " << akick->mask;
 
 		akick->UnsetFlag(AK_STUCK);
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name.c_str());
+		u->SendMessage(ChanServ, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name.c_str());
 	}
 
 	void DoDel(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -371,7 +361,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
 			return;
 		}
 
@@ -396,7 +386,7 @@ class CommandCSAKick : public Command
 
 			if (i == ci->GetAkickCount())
 			{
-				notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+				u->SendMessage(ChanServ, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
 				return;
 			}
 
@@ -405,7 +395,7 @@ class CommandCSAKick : public Command
 
 			ci->EraseAkick(i);
 
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
 		}
 	}
 
@@ -418,7 +408,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
 			return;
 		}
 
@@ -446,14 +436,14 @@ class CommandCSAKick : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+					u->SendMessage(ChanServ, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
 				}
 
 				AkickListCallback::DoList(u, ci, i, akick);
 			}
 
 			if (!SentHeader)
-				notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
+				u->SendMessage(ChanServ, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 		}
 	}
 
@@ -466,7 +456,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
 			return;
 		}
 
@@ -494,14 +484,14 @@ class CommandCSAKick : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					notice_lang(Config->s_ChanServ, u, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+					u->SendMessage(ChanServ, CHAN_AKICK_LIST_HEADER, ci->name.c_str());
 				}
 
 				AkickViewCallback::DoList(u, ci, i, akick);
 			}
 
 			if (!SentHeader)
-				notice_lang(Config->s_ChanServ, u, CHAN_AKICK_NO_MATCH, ci->name.c_str());
+				u->SendMessage(ChanServ, CHAN_AKICK_NO_MATCH, ci->name.c_str());
 		}
 	}
 
@@ -512,7 +502,7 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, ci->name.c_str());
 			return;
 		}
 
@@ -527,7 +517,7 @@ class CommandCSAKick : public Command
 		bool override = !check_access(u, ci, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
 
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
+		u->SendMessage(ChanServ, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
 	}
 
 	void DoClear(User *u, ChannelInfo *ci)
@@ -536,7 +526,7 @@ class CommandCSAKick : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		ci->ClearAkick();
-		notice_lang(Config->s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name.c_str());
+		u->SendMessage(ChanServ, CHAN_AKICK_CLEAR, ci->name.c_str());
 	}
 
  public:
@@ -555,9 +545,9 @@ class CommandCSAKick : public Command
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("STICK") || cmd.equals_ci("UNSTICK") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(u, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
-			notice_lang(Config->s_ChanServ, u, CHAN_AKICK_DISABLED);
+			u->SendMessage(ChanServ, CHAN_AKICK_DISABLED);
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(u, ci, params);
 		else if (cmd.equals_ci("STICK"))
@@ -582,18 +572,18 @@ class CommandCSAKick : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_AKICK);
+		u->SendMessage(ChanServ, CHAN_HELP_AKICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
+		SyntaxError(ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_AKICK);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_AKICK);
 	}
 };
 

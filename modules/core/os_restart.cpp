@@ -33,13 +33,13 @@ class CommandOSRestart : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_RESTART);
+		u->SendMessage(OperServ, OPER_HELP_RESTART);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_RESTART);
+		u->SendMessage(OperServ, OPER_HELP_CMD_RESTART);
 	}
 };
 

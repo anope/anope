@@ -25,12 +25,12 @@ class CommandHSOff : public Command
 		NickAlias *na = findnick(u->nick);
 
 		if (!na || !na->hostinfo.HasVhost())
-			notice_lang(Config->s_HostServ, u, HOST_NOT_ASSIGNED);
+			u->SendMessage(HostServ, HOST_NOT_ASSIGNED);
 		else
 		{
 			ircdproto->SendVhostDel(u);
 			Log(LOG_COMMAND, u, this) << "to disable their vhost";
-			notice_lang(Config->s_HostServ, u, HOST_OFF);
+			u->SendMessage(HostServ, HOST_OFF);
 		}
 
 		return MOD_CONT;
@@ -38,13 +38,13 @@ class CommandHSOff : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_OFF);
+		u->SendMessage(HostServ, HOST_HELP_OFF);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_OFF);
+		u->SendMessage(HostServ, HOST_HELP_CMD_OFF);
 	}
 };
 

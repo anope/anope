@@ -10,7 +10,6 @@
  */
 
 #include "services.h"
-#include "language.h"
 #include "modules.h"
 
 channel_map ChannelList;
@@ -145,9 +144,9 @@ void Channel::JoinUser(User *user)
 		if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
 		{
 			if (this->ci->memos.memos.size() == 1)
-				notice_lang(Config->s_MemoServ, user, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+				user->SendMessage(MemoServ, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 			else
-				notice_lang(Config->s_MemoServ, user, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+				user->SendMessage(MemoServ, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 		}
 		/* Added channelname to entrymsg - 30.03.2004, Certus */
 		/* Also, don't send the entrymsg when bursting -GD */
@@ -453,13 +452,6 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 			bi = findbot(param);
 		User *u = bi ? bi : finduser(param);
 
-		/* Reset modes on bots if we're supposed to */
-		if (bi)
-		{
-			if (std::find(Config->BotModeList.begin(), Config->BotModeList.end(), cm) != Config->BotModeList.end())
-				this->SetMode(bi, cm, bi->nick);
-		}
-
 		if (!u)
 		{
 			Log() << "Channel::RemoveModeInternal() MODE " << this->name << "-" << cm->ModeChar << " for nonexistant user " << param;
@@ -472,6 +464,13 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		ChannelContainer *cc = u->FindChannel(this);
 		if (cc)
 			cc->Status->UnsetFlag(cm->Name);
+
+		/* Reset modes on bots if we're supposed to */
+		if (bi)
+		{
+			if (std::find(Config->BotModeList.begin(), Config->BotModeList.end(), cm) != Config->BotModeList.end())
+				this->SetMode(bi, cm, bi->nick);
+		}
 
 		return;
 	}

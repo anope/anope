@@ -31,12 +31,12 @@ class CommandNSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_SECURE);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_SECURE_ON, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_SECURE_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_SECURE);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display.c_str());
+			u->SendMessage(NickServ, NICK_SASET_SECURE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");
@@ -46,18 +46,18 @@ class CommandNSSetSecure : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SET_SECURE);
+		u->SendMessage(NickServ, NICK_HELP_SET_SECURE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SET SECURE", NICK_SET_SECURE_SYNTAX);
+		SyntaxError(NickServ, u, "SET SECURE", NICK_SET_SECURE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SET_SECURE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_SECURE);
 	}
 };
 
@@ -70,18 +70,18 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_SECURE);
+		u->SendMessage(NickServ, NICK_HELP_SASET_SECURE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
+		SyntaxError(NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_SECURE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SET_SECURE);
 	}
 };
 

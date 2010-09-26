@@ -26,11 +26,11 @@ class ExceptionDelCallback : public NumberList
 	~ExceptionDelCallback()
 	{
 		if (!Deleted)
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+			u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
 		else if (Deleted == 1)
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_DELETED_ONE);
+			u->SendMessage(OperServ, OPER_EXCEPTION_DELETED_ONE);
 		else
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
+			u->SendMessage(OperServ, OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -70,8 +70,8 @@ class ExceptionListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
+			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_COLHEAD);
 		}
 
 		DoList(u, Number - 1);
@@ -82,7 +82,7 @@ class ExceptionListCallback : public NumberList
 		if (index >= exceptions.size())
 			return;
 
-		notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
+		u->SendMessage(OperServ, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
 	}
 };
 
@@ -101,7 +101,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
 		}
 
 		DoList(u, Number - 1);
@@ -112,16 +112,9 @@ class ExceptionViewCallback : public ExceptionListCallback
 		if (index >= exceptions.size())
 			return;
 
-		char timebuf[32];
-		struct tm tm;
-		time_t t = Anope::CurTime;
-
-		tm = *localtime(exceptions[index]->time ? &exceptions[index]->time : &t);
-		strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, &tm);
-
 		Anope::string expirebuf = expire_left(u->Account(), exceptions[index]->expires);
 
-		notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", timebuf, expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
+		u->SendMessage(OperServ, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
 	}
 };
 
@@ -134,18 +127,18 @@ class CommandOSSession : public Command
 		Anope::string param = params[1];
 
 		if ((mincount = (param.is_number_only() ? convertTo<int>(param) : 0)) <= 1)
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_INVALID_THRESHOLD);
+			u->SendMessage(OperServ, OPER_SESSION_INVALID_THRESHOLD);
 		else
 		{
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_LIST_HEADER, mincount);
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_LIST_COLHEAD);
+			u->SendMessage(OperServ, OPER_SESSION_LIST_HEADER, mincount);
+			u->SendMessage(OperServ, OPER_SESSION_LIST_COLHEAD);
 
 			for (session_map::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 			{
 				Session *session = it->second;
 
 				if (session->count >= mincount)
-					notice_lang(Config->s_OperServ, u, OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
+					u->SendMessage(OperServ, OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
 			}
 		}
 
@@ -158,11 +151,11 @@ class CommandOSSession : public Command
 		Session *session = findsession(param);
 
 		if (!session)
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_NOT_FOUND, param.c_str());
+			u->SendMessage(OperServ, OPER_SESSION_NOT_FOUND, param.c_str());
 		else
 		{
 			Exception *exception = find_host_exception(param);
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
+			u->SendMessage(OperServ, OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
 		}
 
 		return MOD_CONT;
@@ -178,7 +171,7 @@ class CommandOSSession : public Command
 
 		if (!Config->LimitSessions)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_SESSION_DISABLED);
+			u->SendMessage(OperServ, OPER_EXCEPTION_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -193,18 +186,18 @@ class CommandOSSession : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_SESSION);
+		u->SendMessage(OperServ, OPER_HELP_SESSION);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
+		SyntaxError(OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SESSION);
+		u->SendMessage(OperServ, OPER_HELP_CMD_SESSION);
 	}
 };
 
@@ -245,7 +238,7 @@ class CommandOSException : public Command
 		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
-			notice_lang(Config->s_OperServ, u, BAD_EXPIRY_TIME);
+			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -255,24 +248,24 @@ class CommandOSException : public Command
 
 		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
 		{
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_INVALID_LIMIT, Config->MaxSessionLimit);
+			u->SendMessage(OperServ, OPER_EXCEPTION_INVALID_LIMIT, Config->MaxSessionLimit);
 			return MOD_CONT;
 		}
 		else
 		{
 			if (mask.find('!') == Anope::string::npos || mask.find('@') == Anope::string::npos)
 			{
-				notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_INVALID_HOSTMASK);
+				u->SendMessage(OperServ, OPER_EXCEPTION_INVALID_HOSTMASK);
 				return MOD_CONT;
 			}
 
 			x = exception_add(u, mask, limit, reason, u->nick, expires);
 
 			if (x == 1)
-				notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_ADDED, mask.c_str(), limit);
+				u->SendMessage(OperServ, OPER_EXCEPTION_ADDED, mask.c_str(), limit);
 
 			if (readonly)
-				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
+				u->SendMessage(OperServ, READ_ONLY_MODE);
 		}
 
 		return MOD_CONT;
@@ -300,15 +293,15 @@ class CommandOSException : public Command
 				if (mask.equals_ci(exceptions[i]->mask))
 				{
 					ExceptionDelCallback::DoDel(u, i);
-					notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_DELETED, mask.c_str());
+					u->SendMessage(OperServ, OPER_EXCEPTION_DELETED, mask.c_str());
 					break;
 				}
 			if (i == end)
-				notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask.c_str());
+				u->SendMessage(OperServ, OPER_EXCEPTION_NOT_FOUND, mask.c_str());
 		}
 
 		if (readonly)
-			notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
+			u->SendMessage(OperServ, READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -334,10 +327,10 @@ class CommandOSException : public Command
 			exceptions[n1] = exceptions[n2];
 			exceptions[n2] = temp;
 
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
+			u->SendMessage(OperServ, OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
-				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
+				u->SendMessage(OperServ, READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "MOVE");
@@ -365,15 +358,15 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
-						notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_COLHEAD);
+						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
+						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_COLHEAD);
 					}
 
 					ExceptionListCallback::DoList(u, i);
 				}
 
 			if (!SentHeader)
-				notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+				u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -399,14 +392,14 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_LIST_HEADER);
+						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
 					}
 
 					ExceptionViewCallback::DoList(u, i);
 				}
 
 			if (!SentHeader)
-				notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_NO_MATCH);
+				u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -422,7 +415,7 @@ class CommandOSException : public Command
 
 		if (!Config->LimitSessions)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_EXCEPTION_DISABLED);
+			u->SendMessage(OperServ, OPER_EXCEPTION_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -443,18 +436,18 @@ class CommandOSException : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_EXCEPTION);
+		u->SendMessage(OperServ, OPER_HELP_EXCEPTION);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
+		SyntaxError(OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
+		u->SendMessage(OperServ, OPER_HELP_CMD_EXCEPTION);
 	}
 };
 

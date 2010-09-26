@@ -29,12 +29,12 @@ class CommandCSSetTopicLock : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_TOPICLOCK);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_TOPICLOCK_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_TOPICLOCK);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_TOPICLOCK_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "TOPICLOCK");
@@ -44,18 +44,18 @@ class CommandCSSetTopicLock : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_TOPICLOCK, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_TOPICLOCK, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_TOPICLOCK_SYNTAX);;
+		SyntaxError(ChanServ, u, "SET", CHAN_SET_TOPICLOCK_SYNTAX);;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_TOPICLOCK);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_TOPICLOCK);
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_TOPICLOCK, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_TOPICLOCK, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_TOPICLOCK_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_TOPICLOCK_SYNTAX);
 	}
 };
 

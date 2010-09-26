@@ -29,9 +29,9 @@ class CommandCSTopic : public Command
 		Channel *c = ci->c;
 
 		if (!c)
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
@@ -48,18 +48,18 @@ class CommandCSTopic : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_TOPIC);
+		u->SendMessage(ChanServ, CHAN_HELP_TOPIC);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
+		SyntaxError(ChanServ, u, "TOPIC", CHAN_TOPIC_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_TOPIC);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_TOPIC);
 	}
 };
 

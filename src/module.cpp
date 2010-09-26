@@ -7,7 +7,10 @@
  */
 
 #include "modules.h"
-#include "language.h"
+
+#ifdef HAVE_GETTEXT
+# include <libintl.h>
+#endif
 
 Module::Module(const Anope::string &mname, const Anope::string &creator)
 {
@@ -17,9 +20,6 @@ Module::Module(const Anope::string &mname, const Anope::string &creator)
 
 	this->permanent = false;
 
-	for (int i = 0; i < NUM_LANGS; ++i)
-		this->lang[i].argc = 0;
-
 	if (FindModule(this->name))
 		throw CoreException("Module already exists!");
 
@@ -28,15 +28,17 @@ Module::Module(const Anope::string &mname, const Anope::string &creator)
 	this->SetVersion(Anope::Version());
 
 	Modules.push_back(this);
+
+#if HAVE_GETTEXT
+	if (!bindtextdomain(this->name.c_str(), (services_dir + "/languages/").c_str()))
+	{
+		Log() << "Error calling bindtextdomain, " << Anope::LastError();
+	}
+#endif
 }
 
 Module::~Module()
 {
-	int i = 0;
-
-	for (i = 0; i < NUM_LANGS; ++i)
-		this->DeleteLanguage(i);
-
 	/* Detach all event hooks for this module */
 	ModuleManager::DetachAll(this);
 	/* Clear any active callbacks this module has */

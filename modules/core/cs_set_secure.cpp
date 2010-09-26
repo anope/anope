@@ -29,12 +29,12 @@ class CommandCSSetSecure : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECURE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECURE_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECURE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECURE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");
@@ -44,18 +44,18 @@ class CommandCSSetSecure : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECURE, "SET", Config->s_NickServ.c_str());
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECURE, "SET", Config->s_NickServ.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
+		SyntaxError(ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_SECURE);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SECURE);
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetSecure : public CommandCSSetSecure
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECURE, "SASET", Config->s_NickServ.c_str());
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECURE, "SASET", Config->s_NickServ.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET SECURE", CHAN_SASET_SECURE_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET SECURE", CHAN_SASET_SECURE_SYNTAX);
 	}
 };
 

@@ -291,13 +291,13 @@ class CommandSQLSync : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_SYNC);
+		u->SendMessage(OperServ, OPER_HELP_SYNC);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_SQLSYNC);
+		u->SendMessage(OperServ, OPER_HELP_CMD_SQLSYNC);
 	}
 };
 
@@ -429,7 +429,7 @@ class DBMySQL : public Module
 				}
 			}
 
-			nc->language = r.Get(i, "language").is_number_only() ? convertTo<int>(r.Get(i, "language")) : LANG_EN_US;
+			nc->language = r.Get(i, "language");
 			nc->channelcount = r.Get(i, "channelcount").is_number_only() ? convertTo<int>(r.Get(i, "channelcount")) : 0;
 			nc->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int>(r.Get(i, "memomax")) : 20;
 		}
@@ -1533,7 +1533,7 @@ static void SaveDatabases()
 CommandReturn CommandSQLSync::Execute(User *u, const std::vector<Anope::string> &params)
 {
 	SaveDatabases();
-	notice_lang(Config->s_OperServ, u, OPER_SYNC_UPDATED);
+	u->SendMessage(OperServ, OPER_SYNC_UPDATED);
 	return MOD_CONT;
 }
 

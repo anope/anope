@@ -38,13 +38,13 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				notice_lang(Config->s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
+				u->SendMessage(NickServ, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			notice_lang(Config->s_NickServ, u, NICK_GETEMAIL_NOT_USED, email.c_str());
+			u->SendMessage(NickServ, NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,18 +53,18 @@ class CommandNSGetEMail : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_GETEMAIL);
+		u->SendMessage(NickServ, NICK_SERVADMIN_HELP_GETEMAIL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+		SyntaxError(NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
+		u->SendMessage(NickServ, NICK_HELP_CMD_GETEMAIL);
 	}
 };
 

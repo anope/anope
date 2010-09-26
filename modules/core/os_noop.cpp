@@ -35,7 +35,7 @@ class CommandOSNOOP : public Command
 			reason = "NOOP command used by " + u->nick;
 			if (Config->WallOSNoOp)
 				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server.c_str());
-			notice_lang(Config->s_OperServ, u, OPER_NOOP_SET, server.c_str());
+			u->SendMessage(OperServ, OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
 			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
@@ -50,7 +50,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("REVOKE"))
 		{
 			ircdproto->SendSVSNOOP(server, 0);
-			notice_lang(Config->s_OperServ, u, OPER_NOOP_REVOKE, server.c_str());
+			u->SendMessage(OperServ, OPER_NOOP_REVOKE, server.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "");
@@ -59,18 +59,18 @@ class CommandOSNOOP : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_NOOP);
+		u->SendMessage(OperServ, OPER_HELP_NOOP);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
+		SyntaxError(OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_NOOP);
+		u->SendMessage(OperServ, OPER_HELP_CMD_NOOP);
 	}
 };
 

@@ -28,13 +28,13 @@ class CommandCSUnban : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, c->ci, CA_UNBAN))
 		{
-			notice_lang(Config->s_ChanServ, u, ACCESS_DENIED);
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -44,32 +44,32 @@ class CommandCSUnban : public Command
 
 		if (!u2)
 		{
-			notice_lang(Config->s_ChanServ, u, NICK_X_NOT_IN_USE, params[1].c_str());
+			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, params[1].c_str());
 			return MOD_CONT;
 		}
 
 		common_unban(c->ci, u2->nick);
 		if (u2 == u)
-			notice_lang(Config->s_ChanServ, u, CHAN_UNBANNED, c->name.c_str());
+			u->SendMessage(ChanServ, CHAN_UNBANNED, c->name.c_str());
 		else
-			notice_lang(Config->s_ChanServ, u, CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
+			u->SendMessage(ChanServ, CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_UNBAN);
+		u->SendMessage(ChanServ, CHAN_HELP_UNBAN);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
+		SyntaxError(ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_UNBAN);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_UNBAN);
 	}
 };
 

@@ -29,11 +29,11 @@ class CommandNSSendPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;
@@ -42,11 +42,11 @@ class CommandNSSendPass : public Command
 				if (SendPassMail(u, na, tmp_pass))
 				{
 					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
-					notice_lang(Config->s_NickServ, u, NICK_SENDPASS_OK, nick.c_str());
+					u->SendMessage(NickServ, NICK_SENDPASS_OK, nick.c_str());
 				}
 			}
 			else
-				notice_lang(Config->s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
+				u->SendMessage(NickServ, NICK_SENDPASS_UNAVAILABLE);
 		}
 
 		return MOD_CONT;
@@ -54,18 +54,18 @@ class CommandNSSendPass : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SENDPASS);
+		u->SendMessage(NickServ, NICK_HELP_SENDPASS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
+		SyntaxError(NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SENDPASS);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SENDPASS);
 	}
 };
 
@@ -94,10 +94,10 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), getstring(na, NICK_SENDPASS_SUBJECT), na->nick.c_str());
-	snprintf(message, sizeof(message), getstring(na, NICK_SENDPASS), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
+	snprintf(subject, sizeof(subject), GetString(na->nc, NICK_SENDPASS_SUBJECT).c_str(), na->nick.c_str());
+	snprintf(message, sizeof(message), GetString(na->nc, NICK_SENDPASS).c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, na->nc, Config->s_NickServ, subject, message);
+	return Mail(u, na->nc, NickServ, subject, message);
 }
 
 MODULE_INIT(NSSendPass)

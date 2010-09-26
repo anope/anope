@@ -11,7 +11,6 @@
  */
 
 #include "services.h"
-#include "language.h"
 
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)
@@ -312,11 +311,10 @@ Anope::string duration(const NickCore *nc, time_t seconds)
 
 	char buf[64];
 	Anope::string buffer;
-	const char *comma = getstring(nc, COMMA_SPACE);
 
 	if (!days && !hours && !minutes)
 	{
-		snprintf(buf, sizeof(buf), getstring(nc, seconds <= 1 ? DURATION_SECOND : DURATION_SECONDS), seconds);
+		snprintf(buf, sizeof(buf), GetString(nc, seconds <= 1 ? DURATION_SECOND : DURATION_SECONDS).c_str(), seconds);
 		buffer = buf;
 	}
 	else
@@ -324,24 +322,35 @@ Anope::string duration(const NickCore *nc, time_t seconds)
 		bool need_comma = false;
 		if (days)
 		{
-			snprintf(buf, sizeof(buf), getstring(nc, days == 1 ? DURATION_DAY : DURATION_DAYS), days);
+			snprintf(buf, sizeof(buf), GetString(nc, days == 1 ? DURATION_DAY : DURATION_DAYS).c_str(), days);
 			buffer = buf;
 			need_comma = true;
 		}
 		if (hours)
 		{
-			snprintf(buf, sizeof(buf), getstring(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS), hours);
-			buffer += Anope::string(need_comma ? comma : "") + buf;
+			snprintf(buf, sizeof(buf), GetString(nc, hours == 1 ? DURATION_HOUR : DURATION_HOURS).c_str(), hours);
+			buffer += Anope::string(need_comma ? ", " : "") + buf;
 			need_comma = true;
 		}
 		if (minutes)
 		{
-			snprintf(buf, sizeof(buf), getstring(nc, minutes == 1 ? DURATION_MINUTE : DURATION_MINUTES), minutes);
-			buffer += Anope::string(need_comma ? comma : "") + buf;
+			snprintf(buf, sizeof(buf), GetString(nc, minutes == 1 ? DURATION_MINUTE : DURATION_MINUTES).c_str(), minutes);
+			buffer += Anope::string(need_comma ? ", " : "") + buf;
 		}
 	}
 
 	return buffer;
+}
+
+Anope::string do_strftime(const time_t &t)
+{
+	tm tm = *localtime(&t);
+	char buf[BUFSIZE];
+	strftime(buf, sizeof(buf), "%b %d %H:%M:%S %Y %Z", &tm);
+	if (t < Anope::CurTime)
+		return Anope::string(buf) + " (" + duration(NULL, Anope::CurTime - t) + " ago)";
+	else
+		return Anope::string(buf) + " (" + duration(NULL, t - Anope::CurTime) + " from now)";
 }
 
 /*************************************************************************/
@@ -354,39 +363,38 @@ Anope::string duration(const NickCore *nc, time_t seconds)
  */
 Anope::string expire_left(const NickCore *nc, time_t expires)
 {
-	char buf[256];
-
 	if (!expires)
-		strlcpy(buf, getstring(nc, NO_EXPIRE), sizeof(buf));
+		return GetString(nc, NO_EXPIRE);
 	else if (expires <= Anope::CurTime)
-		strlcpy(buf, getstring(nc, EXPIRES_SOON), sizeof(buf));
+		return GetString(nc, EXPIRES_SOON);
 	else
 	{
+		char buf[256];
 		time_t diff = expires - Anope::CurTime + 59;
 
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), getstring(nc, days == 1 ? EXPIRES_1D : EXPIRES_D), days);
+			snprintf(buf, sizeof(buf), GetString(nc, days == 1 ? EXPIRES_1D : EXPIRES_D).c_str(), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), getstring(nc, minutes == 1 ? EXPIRES_1M : EXPIRES_M), minutes);
+				snprintf(buf, sizeof(buf), GetString(nc, minutes == 1 ? EXPIRES_1M : EXPIRES_M).c_str(), minutes);
 			}
 			else
 			{
 				int hours = diff / 3600, minutes;
 				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), getstring(nc, hours == 1 && minutes == 1 ? EXPIRES_1H1M : (hours == 1 && minutes != 1 ? EXPIRES_1HM : (hours != 1 && minutes == 1 ? EXPIRES_H1M : EXPIRES_HM))), hours, minutes);
+				snprintf(buf, sizeof(buf), GetString(nc, hours == 1 && minutes == 1 ? EXPIRES_1H1M : (hours == 1 && minutes != 1 ? EXPIRES_1HM : (hours != 1 && minutes == 1 ? EXPIRES_H1M : EXPIRES_HM))).c_str(), hours, minutes);
 			}
 		}
-	}
 
-	return buf;
+		return buf;
+	}
 }
 
 /*************************************************************************/

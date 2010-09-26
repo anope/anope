@@ -27,14 +27,14 @@ class CommandOSModLoad : public Command
 		Module *m = FindModule(mname);
 		if (m)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_ALREADY_LOADED, mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_ALREADY_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
 
 		int status = ModuleManager::LoadModule(mname, u);
 		if (status != MOD_ERR_OK)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_LOAD_FAIL, mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
 		}
 
 		return MOD_CONT;
@@ -42,18 +42,18 @@ class CommandOSModLoad : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_MODLOAD);
+		u->SendMessage(OperServ, OPER_HELP_MODLOAD);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
+		SyntaxError(OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_MODLOAD);
+		u->SendMessage(OperServ, OPER_HELP_CMD_MODLOAD);
 	}
 };
 

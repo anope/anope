@@ -101,9 +101,6 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 		}
 	}
 
-	if ((this->NSDefLanguage = langlist[this->NSDefLanguage]) < 0)
-		this->NSDefLanguage = DEF_LANGUAGE;
-
 	if (this->CSDefBantype < 0 || this->CSDefBantype > 3)
 	{
 		throw ConfigException("Value of CSDefBantype must be between 0 and 3 included");
@@ -527,15 +524,6 @@ bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string 
 		return true;
 	if (port < 1 || port > 65535)
 		throw ConfigException("The value for <" + tag + ":" + value + "> is not a value port, it must be between 1 and 65535!");
-	return true;
-}
-
-bool ValidateLanguage(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
-{
-	int language = data.GetInteger();
-	if (language < 1 || language > USED_LANGS)
-		throw ConfigException("The value for <nickserv:defaultlanguage> must be between 1 and " + stringify(USED_LANGS) + "!");
-	data.Set(--language);
 	return true;
 }
 
@@ -1059,7 +1047,8 @@ void ServerConfig::Read()
 		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&this->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
-		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&this->NSDefLanguage), DT_UINTEGER, ValidateLanguage},
+		{"nickserv", "languages", "", new ValueContainerString(&this->Languages), DT_STRING, NoValidation},
+		{"nickserv", "defaultlanguage", "0", new ValueContainerString(&this->NSDefLanguage), DT_STRING, NoValidation},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&this->NSRegDelay), DT_TIME, NoValidation},
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&this->NSResendDelay), DT_TIME, NoValidation},
 		{"nickserv", "expire", "21d", new ValueContainerTime(&this->NSExpire), DT_TIME, NoValidation},

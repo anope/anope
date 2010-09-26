@@ -28,17 +28,17 @@ class CommandOSKick : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config->s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			u->SendMessage(OperServ, OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			notice_lang(Config->s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -50,18 +50,18 @@ class CommandOSKick : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_KICK);
+		u->SendMessage(OperServ, OPER_HELP_KICK);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
+		SyntaxError(OperServ, u, "KICK", OPER_KICK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_KICK);
+		u->SendMessage(OperServ, OPER_HELP_CMD_KICK);
 	}
 };
 

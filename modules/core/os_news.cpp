@@ -21,10 +21,8 @@ enum
 {
 	MSG_SYNTAX,
 	MSG_LIST_HEADER,
-	MSG_LIST_ENTRY,
 	MSG_LIST_NONE,
 	MSG_ADD_SYNTAX,
-	MSG_ADD_FULL,
 	MSG_ADDED,
 	MSG_DEL_SYNTAX,
 	MSG_DEL_NOT_FOUND,
@@ -33,14 +31,12 @@ enum
 	MSG_DELETED_ALL
 };
 
-struct newsmsgs msgarray[] = {
+struct NewsMessages msgarray[] = {
 	{NEWS_LOGON, "LOGON",
 	 {NEWS_LOGON_SYNTAX,
 	  NEWS_LOGON_LIST_HEADER,
-	  NEWS_LOGON_LIST_ENTRY,
 	  NEWS_LOGON_LIST_NONE,
 	  NEWS_LOGON_ADD_SYNTAX,
-	  NEWS_LOGON_ADD_FULL,
 	  NEWS_LOGON_ADDED,
 	  NEWS_LOGON_DEL_SYNTAX,
 	  NEWS_LOGON_DEL_NOT_FOUND,
@@ -51,10 +47,8 @@ struct newsmsgs msgarray[] = {
 	{NEWS_OPER, "OPER",
 	 {NEWS_OPER_SYNTAX,
 	  NEWS_OPER_LIST_HEADER,
-	  NEWS_OPER_LIST_ENTRY,
 	  NEWS_OPER_LIST_NONE,
 	  NEWS_OPER_ADD_SYNTAX,
-	  NEWS_OPER_ADD_FULL,
 	  NEWS_OPER_ADDED,
 	  NEWS_OPER_DEL_SYNTAX,
 	  NEWS_OPER_DEL_NOT_FOUND,
@@ -65,10 +59,8 @@ struct newsmsgs msgarray[] = {
 	{NEWS_RANDOM, "RANDOM",
 	 {NEWS_RANDOM_SYNTAX,
 	  NEWS_RANDOM_LIST_HEADER,
-	  NEWS_RANDOM_LIST_ENTRY,
 	  NEWS_RANDOM_LIST_NONE,
 	  NEWS_RANDOM_ADD_SYNTAX,
-	  NEWS_RANDOM_ADD_FULL,
 	  NEWS_RANDOM_ADDED,
 	  NEWS_RANDOM_DEL_SYNTAX,
 	  NEWS_RANDOM_DEL_NOT_FOUND,
@@ -80,7 +72,7 @@ struct newsmsgs msgarray[] = {
 
 static void DisplayNews(User *u, NewsType Type)
 {
-	int msg;
+	LanguageString msg;
 	static unsigned current_news = 0;
 
 	if (Type == NEWS_LOGON)
@@ -98,17 +90,12 @@ static void DisplayNews(User *u, NewsType Type)
 	{
 		if (News[i]->type == Type)
 		{
-			tm *tm;
-			char timebuf[64];
-
 			NewsExists = true;
 
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			tm = localtime(&News[i]->time);
-			strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_SHORT_DATE_FORMAT, tm);
-			notice_lang(Config->s_GlobalNoticer, u, msg, timebuf, News[i]->Text.c_str());
+			u->SendMessage(Global, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 
@@ -165,7 +152,7 @@ static int del_newsitem(unsigned num, NewsType type)
 	return count;
 }
 
-static int *findmsgs(NewsType type, Anope::string &type_name)
+static LanguageString *findmsgs(NewsType type, Anope::string &type_name)
 {
 	for (unsigned i = 0; i < lenof(msgarray); ++i)
 		if (msgarray[i].type == type)
@@ -179,31 +166,27 @@ static int *findmsgs(NewsType type, Anope::string &type_name)
 class NewsBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u, NewsType type, int *msgs)
+	CommandReturn DoList(User *u, NewsType type, LanguageString *msgs)
 	{
 		int count = 0;
-		char timebuf[64];
-		struct tm *tm;
 
 		for (unsigned i = 0, end = News.size(); i < end; ++i)
 			if (News[i]->type == type)
 			{
 				if (!count)
-					notice_lang(Config->s_OperServ, u, msgs[MSG_LIST_HEADER]);
-				tm = localtime(&News[i]->time);
-				strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(Config->s_OperServ, u, msgs[MSG_LIST_ENTRY], News[i]->num, timebuf, !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
+					u->SendMessage(OperServ, msgs[MSG_LIST_HEADER]);
+				u->SendMessage(OperServ, NEWS_LIST_ENTRY, News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		if (!count)
-			notice_lang(Config->s_OperServ, u, msgs[MSG_LIST_NONE]);
+			u->SendMessage(OperServ, msgs[MSG_LIST_NONE]);
 		else
-			notice_lang(Config->s_OperServ, u, END_OF_ANY_LIST, "News");
+			u->SendMessage(OperServ, END_OF_ANY_LIST, "News");
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, NewsType type, int *msgs)
+	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
 	{
 		Anope::string text = params.size() > 1 ? params[1] : "";
 		int n;
@@ -214,20 +197,20 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
+				u->SendMessage(OperServ, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			n = add_newsitem(u, text, type);
 			if (n < 0)
-				notice_lang(Config->s_OperServ, u, msgs[MSG_ADD_FULL]);
+				u->SendMessage(OperServ, NEWS_ADD_FULL);
 			else
-				notice_lang(Config->s_OperServ, u, msgs[MSG_ADDED], n);
+				u->SendMessage(OperServ, msgs[MSG_ADDED], n);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, NewsType type, int *msgs)
+	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
 	{
 		Anope::string text = params.size() > 1 ? params[1] : "";
 		unsigned num;
@@ -238,7 +221,7 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				notice_lang(Config->s_OperServ, u, READ_ONLY_MODE);
+				u->SendMessage(OperServ, READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			if (!text.equals_ci("ALL"))
@@ -246,20 +229,20 @@ class NewsBase : public Command
 				num = text.is_pos_number_only() ? convertTo<unsigned>(text) : 0;
 				if (num > 0 && del_newsitem(num, type))
 				{
-					notice_lang(Config->s_OperServ, u, msgs[MSG_DELETED], num);
+					u->SendMessage(OperServ, msgs[MSG_DELETED], num);
 					for (unsigned i = 0, end = News.size(); i < end; ++i)
 						if (News[i]->type == type && News[i]->num > num)
 							--News[i]->num;
 				}
 				else
-					notice_lang(Config->s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
+					u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], num);
 			}
 			else
 			{
 				if (del_newsitem(0, type))
-					notice_lang(Config->s_OperServ, u, msgs[MSG_DELETED_ALL]);
+					u->SendMessage(OperServ, msgs[MSG_DELETED_ALL]);
 				else
-					notice_lang(Config->s_OperServ, u, msgs[MSG_DEL_NONE]);
+					u->SendMessage(OperServ, msgs[MSG_DEL_NONE]);
 			}
 		}
 
@@ -270,9 +253,8 @@ class NewsBase : public Command
 	{
 		Anope::string cmd = params[0];
 		Anope::string type_name;
-		int *msgs;
 
-		msgs = findmsgs(type, type_name);
+		LanguageString *msgs = findmsgs(type, type_name);
 		if (!msgs)
 			throw CoreException("news: Invalid type to do_news()");
 
@@ -317,18 +299,18 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, NEWS_HELP_LOGON, Config->NewsCount);
+		u->SendMessage(OperServ, NEWS_HELP_LOGON, Config->NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
+		SyntaxError(OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_LOGONNEWS);
+		u->SendMessage(OperServ, OPER_HELP_CMD_LOGONNEWS);
 	}
 };
 
@@ -346,18 +328,18 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, NEWS_HELP_OPER, Config->NewsCount);
+		u->SendMessage(OperServ, NEWS_HELP_OPER, Config->NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
+		SyntaxError(OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
+		u->SendMessage(OperServ, OPER_HELP_CMD_OPERNEWS);
 	}
 };
 
@@ -375,18 +357,18 @@ class CommandOSRandomNews : public NewsBase
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, NEWS_HELP_RANDOM);
+		u->SendMessage(OperServ, NEWS_HELP_RANDOM);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
+		SyntaxError(OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
+		u->SendMessage(OperServ, OPER_HELP_CMD_RANDOMNEWS);
 	}
 };
 

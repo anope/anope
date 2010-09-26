@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 #include "hashcomp.h"
 
 Command *FindCommand(BotInfo *bi, const Anope::string &name)
@@ -50,14 +49,14 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 
 	if (!c)
 	{
-		notice_lang(bi->nick, u, UNKNOWN_COMMAND_HELP, command.c_str(), bi->nick.c_str());
+		u->SendMessage(bi, UNKNOWN_COMMAND_HELP, command.c_str(), bi->nick.c_str());
 		return;
 	}
 
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		notice_lang(bi->nick, u, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+		u->SendMessage(bi, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for unregistered user " << u->GetMask() << " with command " << command;
 		return;
 	}
@@ -102,27 +101,27 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 			{
 				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
 				{
-					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
+					u->SendMessage(bi, CHAN_X_FORBIDDEN, ci->name.c_str());
 					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
 					return;
 				}
 				else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 				{
-					notice_lang(bi->nick, u, CHAN_X_FORBIDDEN, ci->name.c_str());
+					u->SendMessage(bi, CHAN_X_FORBIDDEN, ci->name.c_str());
 					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
 					return;
 				}
 			}
 			else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
 			{
-				notice_lang(bi->nick, u, CHAN_X_NOT_REGISTERED, params[0].c_str());
+				u->SendMessage(bi, CHAN_X_NOT_REGISTERED, params[0].c_str());
 				return;
 			}
 		}
 		/* A user not giving a channel name for a param that should be a channel */
 		else
 		{
-			notice_lang(bi->nick, u, CHAN_X_INVALID, params[0].c_str());
+			u->SendMessage(bi, CHAN_X_INVALID, params[0].c_str());
 			return;
 		}
 	}
@@ -130,7 +129,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
 	{
-		notice_lang(bi->nick, u, ACCESS_DENIED);
+		u->SendMessage(bi, ACCESS_DENIED);
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		return;
 	}
@@ -165,23 +164,23 @@ void mod_help_cmd(BotInfo *bi, User *u, const Anope::string &cmd)
 	Anope::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
 
 	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(u, subcommand))
-		notice_lang(bi->nick, u, NO_HELP_AVAILABLE, cmd.c_str());
+		u->SendMessage(bi, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{
 		u->SendMessage(bi->nick, " ");
 
 		/* Inform the user what permission is required to use the command */
 		if (!c->permission.empty())
-			notice_lang(bi->nick, u, COMMAND_REQUIRES_PERM, c->permission.c_str());
+			u->SendMessage(bi, COMMAND_REQUIRES_PERM, c->permission.c_str());
 
 		/* User isn't identified and needs to be to use this command */
 		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
-			notice_lang(bi->nick, u, COMMAND_IDENTIFY_REQUIRED);
+			u->SendMessage(bi, COMMAND_IDENTIFY_REQUIRED);
 		/* User doesn't have the proper permission to use this command */
 		else if (!c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission)))
-			notice_lang(bi->nick, u, COMMAND_CANNOT_USE);
+			u->SendMessage(bi, COMMAND_CANNOT_USE);
 		/* User can use this command */
 		else
-			notice_lang(bi->nick, u, COMMAND_CAN_USE);
+			u->SendMessage(bi, COMMAND_CAN_USE);
 	}
 }

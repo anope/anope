@@ -31,15 +31,15 @@ class CommandBSKick : public Command
 		ChannelInfo *ci = cs_findchan(chan);
 
 		if (readonly)
-			notice_lang(Config->s_BotServ, u, BOT_KICK_DISABLED);
+			u->SendMessage(BotServ, BOT_KICK_DISABLED);
 		else if (chan.empty() || option.empty() || value.empty())
-			syntax_error(Config->s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
+			SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
-			syntax_error(Config->s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
+			SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
 		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
-			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
+			u->SendMessage(BotServ, ACCESS_DENIED);
 		else if (!ci->bi)
-			notice_help(Config->s_BotServ, u, BOT_NOT_ASSIGNED);
+			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -60,7 +60,7 @@ class CommandBSKick : public Command
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BADWORDS];
 							/* reset the value back to 0 - TSL */
 							ci->ttb[TTB_BADWORDS] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -68,14 +68,14 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_BADWORDS] = 0;
 					ci->botflags.SetFlag(BS_KICK_BADWORDS);
 					if (ci->ttb[TTB_BADWORDS])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_BADWORDS_ON_BAN, ci->ttb[TTB_BADWORDS]);
+						u->SendMessage(BotServ, BOT_KICK_BADWORDS_ON_BAN, ci->ttb[TTB_BADWORDS]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_BADWORDS_ON);
+						u->SendMessage(BotServ, BOT_KICK_BADWORDS_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_BADWORDS);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_BADWORDS_OFF);
+					u->SendMessage(BotServ, BOT_KICK_BADWORDS_OFF);
 				}
 			}
 			else if (option.equals_ci("BOLDS"))
@@ -90,7 +90,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BOLDS];
 							ci->ttb[TTB_BOLDS] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -98,14 +98,14 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_BOLDS] = 0;
 					ci->botflags.SetFlag(BS_KICK_BOLDS);
 					if (ci->ttb[TTB_BOLDS])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_BOLDS_ON_BAN, ci->ttb[TTB_BOLDS]);
+						u->SendMessage(BotServ, BOT_KICK_BOLDS_ON_BAN, ci->ttb[TTB_BOLDS]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_BOLDS_ON);
+						u->SendMessage(BotServ, BOT_KICK_BOLDS_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_BOLDS);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_BOLDS_OFF);
+					u->SendMessage(BotServ, BOT_KICK_BOLDS_OFF);
 				}
 			}
 			else if (option.equals_ci("CAPS"))
@@ -123,7 +123,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_CAPS];
 							ci->ttb[TTB_CAPS] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -146,14 +146,14 @@ class CommandBSKick : public Command
 
 					ci->botflags.SetFlag(BS_KICK_CAPS);
 					if (ci->ttb[TTB_CAPS])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_CAPS_ON_BAN, ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
+						u->SendMessage(BotServ, BOT_KICK_CAPS_ON_BAN, ci->capsmin, ci->capspercent, ci->ttb[TTB_CAPS]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_CAPS_ON, ci->capsmin, ci->capspercent);
+						u->SendMessage(BotServ, BOT_KICK_CAPS_ON, ci->capsmin, ci->capspercent);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_CAPS);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_CAPS_OFF);
+					u->SendMessage(BotServ, BOT_KICK_CAPS_OFF);
 				}
 			}
 			else if (option.equals_ci("COLORS"))
@@ -168,7 +168,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_COLORS];
 							ci->ttb[TTB_COLORS] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -176,14 +176,14 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_COLORS] = 0;
 					ci->botflags.SetFlag(BS_KICK_COLORS);
 					if (ci->ttb[TTB_COLORS])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_COLORS_ON_BAN, ci->ttb[TTB_COLORS]);
+						u->SendMessage(BotServ, BOT_KICK_COLORS_ON_BAN, ci->ttb[TTB_COLORS]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_COLORS_ON);
+						u->SendMessage(BotServ, BOT_KICK_COLORS_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_COLORS);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_COLORS_OFF);
+					u->SendMessage(BotServ, BOT_KICK_COLORS_OFF);
 				}
 			}
 			else if (option.equals_ci("FLOOD"))
@@ -201,7 +201,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_FLOOD];
 							ci->ttb[TTB_FLOOD] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -224,14 +224,14 @@ class CommandBSKick : public Command
 
 					ci->botflags.SetFlag(BS_KICK_FLOOD);
 					if (ci->ttb[TTB_FLOOD])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_FLOOD_ON_BAN, ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
+						u->SendMessage(BotServ, BOT_KICK_FLOOD_ON_BAN, ci->floodlines, ci->floodsecs, ci->ttb[TTB_FLOOD]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_FLOOD_ON, ci->floodlines, ci->floodsecs);
+						u->SendMessage(BotServ, BOT_KICK_FLOOD_ON, ci->floodlines, ci->floodsecs);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_FLOOD);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_FLOOD_OFF);
+					u->SendMessage(BotServ, BOT_KICK_FLOOD_OFF);
 				}
 			}
 			else if (option.equals_ci("REPEAT"))
@@ -248,7 +248,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REPEAT];
 							ci->ttb[TTB_REPEAT] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -264,14 +264,14 @@ class CommandBSKick : public Command
 
 					ci->botflags.SetFlag(BS_KICK_REPEAT);
 					if (ci->ttb[TTB_REPEAT])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_REPEAT_ON_BAN, ci->repeattimes, ci->ttb[TTB_REPEAT]);
+						u->SendMessage(BotServ, BOT_KICK_REPEAT_ON_BAN, ci->repeattimes, ci->ttb[TTB_REPEAT]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_REPEAT_ON, ci->repeattimes);
+						u->SendMessage(BotServ, BOT_KICK_REPEAT_ON, ci->repeattimes);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_REPEAT);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_REPEAT_OFF);
+					u->SendMessage(BotServ, BOT_KICK_REPEAT_OFF);
 				}
 			}
 			else if (option.equals_ci("REVERSES"))
@@ -286,7 +286,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REVERSES];
 							ci->ttb[TTB_REVERSES] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -294,14 +294,14 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_REVERSES] = 0;
 					ci->botflags.SetFlag(BS_KICK_REVERSES);
 					if (ci->ttb[TTB_REVERSES])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_REVERSES_ON_BAN, ci->ttb[TTB_REVERSES]);
+						u->SendMessage(BotServ, BOT_KICK_REVERSES_ON_BAN, ci->ttb[TTB_REVERSES]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_REVERSES_ON);
+						u->SendMessage(BotServ, BOT_KICK_REVERSES_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_REVERSES);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_REVERSES_OFF);
+					u->SendMessage(BotServ, BOT_KICK_REVERSES_OFF);
 				}
 			}
 			else if (option.equals_ci("UNDERLINES"))
@@ -316,7 +316,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_UNDERLINES];
 							ci->ttb[TTB_UNDERLINES] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -324,14 +324,14 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_UNDERLINES] = 0;
 					ci->botflags.SetFlag(BS_KICK_UNDERLINES);
 					if (ci->ttb[TTB_UNDERLINES])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_UNDERLINES_ON_BAN, ci->ttb[TTB_UNDERLINES]);
+						u->SendMessage(BotServ, BOT_KICK_UNDERLINES_ON_BAN, ci->ttb[TTB_UNDERLINES]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_UNDERLINES_ON);
+						u->SendMessage(BotServ, BOT_KICK_UNDERLINES_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_UNDERLINES);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_UNDERLINES_OFF);
+					u->SendMessage(BotServ, BOT_KICK_UNDERLINES_OFF);
 				}
 			}
 			else if (option.equals_ci("ITALICS"))
@@ -346,7 +346,7 @@ class CommandBSKick : public Command
 						{
 							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
 							ci->ttb[TTB_ITALICS] = 0;
-							notice_lang(Config->s_BotServ, u, BOT_KICK_BAD_TTB, ttb.c_str());
+							u->SendMessage(BotServ, BOT_KICK_BAD_TTB, ttb.c_str());
 							return MOD_CONT;
 						}
 					}
@@ -354,18 +354,18 @@ class CommandBSKick : public Command
 						ci->ttb[TTB_ITALICS] = 0;
 					ci->botflags.SetFlag(BS_KICK_ITALICS);
 					if (ci->ttb[TTB_ITALICS])
-						notice_lang(Config->s_BotServ, u, BOT_KICK_ITALICS_ON_BAN, ci->ttb[TTB_ITALICS]);
+						u->SendMessage(BotServ, BOT_KICK_ITALICS_ON_BAN, ci->ttb[TTB_ITALICS]);
 					else
-						notice_lang(Config->s_BotServ, u, BOT_KICK_ITALICS_ON);
+						u->SendMessage(BotServ, BOT_KICK_ITALICS_ON);
 				}
 				else
 				{
 					ci->botflags.UnsetFlag(BS_KICK_ITALICS);
-					notice_lang(Config->s_BotServ, u, BOT_KICK_ITALICS_OFF);
+					u->SendMessage(BotServ, BOT_KICK_ITALICS_OFF);
 				}
 			}
 			else
-				notice_help(Config->s_BotServ, u, BOT_KICK_UNKNOWN, option.c_str());
+				u->SendMessage(BotServ, BOT_KICK_UNKNOWN, option.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -373,25 +373,25 @@ class CommandBSKick : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK);
+			u->SendMessage(BotServ, BOT_HELP_KICK);
 		else if (subcommand.equals_ci("BADWORDS"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_BADWORDS);
+			u->SendMessage(BotServ, BOT_HELP_KICK_BADWORDS);
 		else if (subcommand.equals_ci("BOLDS"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_BOLDS);
+			u->SendMessage(BotServ, BOT_HELP_KICK_BOLDS);
 		else if (subcommand.equals_ci("CAPS"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_CAPS);
+			u->SendMessage(BotServ, BOT_HELP_KICK_CAPS);
 		else if (subcommand.equals_ci("COLORS"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_COLORS);
+			u->SendMessage(BotServ, BOT_HELP_KICK_COLORS);
 		else if (subcommand.equals_ci("FLOOD"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_FLOOD);
+			u->SendMessage(BotServ, BOT_HELP_KICK_FLOOD);
 		else if (subcommand.equals_ci("REPEAT"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_REPEAT);
+			u->SendMessage(BotServ, BOT_HELP_KICK_REPEAT);
 		else if (subcommand.equals_ci("REVERSES"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_REVERSES);
+			u->SendMessage(BotServ, BOT_HELP_KICK_REVERSES);
 		else if (subcommand.equals_ci("UNDERLINES"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_UNDERLINES);
+			u->SendMessage(BotServ, BOT_HELP_KICK_UNDERLINES);
 		else if (subcommand.equals_ci("ITALICS"))
-			notice_help(Config->s_BotServ, u, BOT_HELP_KICK_ITALICS);
+			u->SendMessage(BotServ, BOT_HELP_KICK_ITALICS);
 		else
 			return false;
 
@@ -400,12 +400,12 @@ class CommandBSKick : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_BotServ, u, "KICK", BOT_KICK_SYNTAX);
+		SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_KICK);
+		u->SendMessage(BotServ, BOT_HELP_CMD_KICK);
 	}
 };
 

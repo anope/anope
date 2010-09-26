@@ -26,7 +26,7 @@ class CommandMSSendAll : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_MemoServ, u, MEMO_SEND_DISABLED);
+			u->SendMessage(MemoServ, MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -40,24 +40,24 @@ class CommandMSSendAll : public Command
 				memo_send(u, nc->display, text, 1);
 		}
 
-		notice_lang(Config->s_MemoServ, u, MEMO_MASS_SENT);
+		u->SendMessage(MemoServ, MEMO_MASS_SENT);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_MemoServ, u, MEMO_HELP_SENDALL);
+		u->SendMessage(MemoServ, MEMO_HELP_SENDALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
+		SyntaxError(MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
+		u->SendMessage(MemoServ, MEMO_HELP_CMD_SENDALL);
 	}
 };
 

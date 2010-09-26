@@ -28,19 +28,19 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			notice_lang(Config->s_OperServ, u, NICK_X_NOT_IN_USE, nick.c_str());
+			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
 			u2->SetMode(OperServ, UMODE_OPER);
-			notice_lang(Config->s_OperServ, u2, OPER_OLINE_IRCOP);
-			notice_lang(Config->s_OperServ, u, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			u2->SendMessage(OperServ, OPER_OLINE_IRCOP);
+			u->SendMessage(OperServ, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
-			notice_lang(Config->s_OperServ, u, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			u->SendMessage(OperServ, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
@@ -50,18 +50,18 @@ class CommandOSOLine : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_OLINE);
+		u->SendMessage(OperServ, OPER_HELP_OLINE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
+		SyntaxError(OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_OLINE);
+		u->SendMessage(OperServ, OPER_HELP_CMD_OLINE);
 	}
 };
 

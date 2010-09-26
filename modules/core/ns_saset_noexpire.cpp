@@ -31,12 +31,12 @@ class CommandNSSASetNoexpire : public Command
 		if (param.equals_ci("ON"))
 		{
 			na->SetFlag(NS_NO_EXPIRE);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_NOEXPIRE_ON, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_SASET_NOEXPIRE_ON, na->nick.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			na->UnsetFlag(NS_NO_EXPIRE);
-			notice_lang(Config->s_NickServ, u, NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "NOEXPIRE");
@@ -46,18 +46,18 @@ class CommandNSSASetNoexpire : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_SASET_NOEXPIRE);
+		u->SendMessage(NickServ, NICK_HELP_SASET_NOEXPIRE);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
+		SyntaxError(NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_SASET_NOEXPIRE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_NOEXPIRE);
 	}
 };
 

@@ -26,7 +26,7 @@ class BadwordsListCallback : public NumberList
 	~BadwordsListCallback()
 	{
 		if (!SentHeader)
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
@@ -37,7 +37,7 @@ class BadwordsListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
 		}
 
 		DoList(u, ci, Number - 1, ci->GetBadWord(Number - 1));
@@ -45,7 +45,7 @@ class BadwordsListCallback : public NumberList
 
 	static void DoList(User *u, ChannelInfo *ci, unsigned Number, BadWord *bw)
 	{
-		notice_lang(Config->s_BotServ, u, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
+		u->SendMessage(BotServ, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
 	}
 };
 
@@ -66,11 +66,11 @@ class BadwordsDelCallback : public NumberList
 	~BadwordsDelCallback()
 	{
 		if (!Deleted)
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 		else if (Deleted == 1)
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
 		else
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_DELETED_SEVERAL, Deleted, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_DELETED_SEVERAL, Deleted, ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
@@ -93,7 +93,7 @@ class CommandBSBadwords : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
 
 		if (!ci->GetBadWordCount())
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			BadwordsListCallback list(u, ci, word);
@@ -113,14 +113,14 @@ class CommandBSBadwords : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					notice_lang(Config->s_BotServ, u, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+					u->SendMessage(BotServ, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
 				}
 
 				BadwordsListCallback::DoList(u, ci, i, bw);
 			}
 
 			if (!SentHeader)
-				notice_lang(Config->s_BotServ, u, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+				u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -149,7 +149,7 @@ class CommandBSBadwords : public Command
 
 		if (ci->GetBadWordCount() >= Config->BSBadWordsMax)
 		{
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_REACHED_LIMIT, Config->BSBadWordsMax);
+			u->SendMessage(BotServ, BOT_BADWORDS_REACHED_LIMIT, Config->BSBadWordsMax);
 			return MOD_CONT;
 		}
 
@@ -159,7 +159,7 @@ class CommandBSBadwords : public Command
 
 			if (!bw->word.empty() && ((Config->BSCaseSensitive && realword.equals_cs(bw->word)) || (!Config->BSCaseSensitive && realword.equals_ci(bw->word))))
 			{
-				notice_lang(Config->s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
+				u->SendMessage(BotServ, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 		}
@@ -168,7 +168,7 @@ class CommandBSBadwords : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << realword;
 		ci->AddBadWord(realword, type);
 
-		notice_lang(Config->s_BotServ, u, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
+		u->SendMessage(BotServ, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
@@ -196,7 +196,7 @@ class CommandBSBadwords : public Command
 
 			if (i == end)
 			{
-				notice_lang(Config->s_BotServ, u, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
+				u->SendMessage(BotServ, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 
@@ -204,7 +204,7 @@ class CommandBSBadwords : public Command
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << badword->word;
 			ci->EraseBadWord(i);
 
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
+			u->SendMessage(BotServ, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -216,7 +216,7 @@ class CommandBSBadwords : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		ci->ClearBadWords();
-		notice_lang(Config->s_BotServ, u, BOT_BADWORDS_CLEAR);
+		u->SendMessage(BotServ, BOT_BADWORDS_CLEAR);
 		return MOD_CONT;
 	}
  public:
@@ -242,13 +242,13 @@ class CommandBSBadwords : public Command
 
 		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->Account()->HasPriv("botserv/administration")))
 		{
-			notice_lang(Config->s_BotServ, u, ACCESS_DENIED);
+			u->SendMessage(BotServ, ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			notice_lang(Config->s_BotServ, u, BOT_BADWORDS_DISABLED);
+			u->SendMessage(BotServ, BOT_BADWORDS_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -268,18 +268,18 @@ class CommandBSBadwords : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_BotServ, u, BOT_HELP_BADWORDS);
+		u->SendMessage(BotServ, BOT_HELP_BADWORDS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
+		SyntaxError(BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_BotServ, u, BOT_HELP_CMD_BADWORDS);
+		u->SendMessage(BotServ, BOT_HELP_CMD_BADWORDS);
 	}
 };
 

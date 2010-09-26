@@ -29,12 +29,12 @@ class CommandCSSetPeace : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PEACE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PEACE_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PEACE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PEACE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PEACE");
@@ -44,18 +44,18 @@ class CommandCSSetPeace : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PEACE, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PEACE, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
+		SyntaxError(ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_PEACE, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PEACE, "SET");
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetPeace : public CommandCSSetPeace
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PEACE, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PEACE, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
 	}
 };
 

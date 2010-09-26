@@ -28,24 +28,24 @@ class CommandNSRelease : public Command
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			notice_lang(Config->s_NickServ, u, NICK_X_SUSPENDED, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))
-			notice_lang(Config->s_NickServ, u, NICK_RELEASE_NOT_HELD, nick.c_str());
+			u->SendMessage(NickServ, NICK_RELEASE_NOT_HELD, nick.c_str());
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
-				notice_lang(Config->s_NickServ, u, NICK_RELEASED);
+				u->SendMessage(NickServ, NICK_RELEASED);
 			}
 			else
 			{
-				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+				u->SendMessage(NickServ, ACCESS_DENIED);
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
@@ -59,10 +59,10 @@ class CommandNSRelease : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				na->Release();
-				notice_lang(Config->s_NickServ, u, NICK_RELEASED);
+				u->SendMessage(NickServ, NICK_RELEASED);
 			}
 			else
-				notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+				u->SendMessage(NickServ, ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
@@ -72,20 +72,19 @@ class CommandNSRelease : public Command
 		/* Convert Config->NSReleaseTimeout seconds to string format */
 		Anope::string relstr = duration(u->Account(), Config->NSReleaseTimeout);
 
-		notice_help(Config->s_NickServ, u, NICK_HELP_RELEASE, relstr.c_str());
-		//do_help_limited(Config->s_NickServ, u, this);
+		u->SendMessage(NickServ, NICK_HELP_RELEASE, relstr.c_str());
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
+		SyntaxError(NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_RELEASE);
+		u->SendMessage(NickServ, NICK_HELP_CMD_RELEASE);
 	}
 };
 

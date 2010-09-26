@@ -28,7 +28,7 @@ class CommandHSDelAll : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config->s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
+				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
@@ -39,27 +39,27 @@ class CommandHSDelAll : public Command
 				na->hostinfo.RemoveVhost();
 			}
 			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
-			notice_lang(Config->s_HostServ, u, HOST_DELALL, nc->display.c_str());
+			u->SendMessage(HostServ, HOST_DELALL, nc->display.c_str());
 		}
 		else
-			notice_lang(Config->s_HostServ, u, HOST_NOREG, nick.c_str());
+			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_DELALL);
+		u->SendMessage(HostServ, HOST_HELP_DELALL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
+		SyntaxError(HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_DELALL);
+		u->SendMessage(HostServ, HOST_HELP_CMD_DELALL);
 	}
 };
 

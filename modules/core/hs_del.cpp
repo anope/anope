@@ -28,33 +28,33 @@ class CommandHSDel : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				notice_lang(Config->s_HostServ, u, NICK_X_FORBIDDEN, nick.c_str());
+				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();
-			notice_lang(Config->s_HostServ, u, HOST_DEL, nick.c_str());
+			u->SendMessage(HostServ, HOST_DEL, nick.c_str());
 		}
 		else
-			notice_lang(Config->s_HostServ, u, HOST_NOREG, nick.c_str());
+			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_DEL);
+		u->SendMessage(HostServ, HOST_HELP_DEL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_HostServ, u, "DEL", HOST_DEL_SYNTAX);
+		SyntaxError(HostServ, u, "DEL", HOST_DEL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_DEL);
+		u->SendMessage(HostServ, HOST_HELP_CMD_DEL);
 	}
 };
 

@@ -7,7 +7,6 @@
  */
 
 #include "modules.h"
-#include "language.h"
 #include "version.h"
 #include <algorithm> // std::find
 
@@ -204,7 +203,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	if (u)
 	{
 		ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), modname.c_str());
-		notice_lang(Config->s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
+		u->SendMessage(OperServ, OPER_MODULE_LOADED, modname.c_str());
 
 		/* If a user is loading this module, then the core databases have already been loaded
 		 * so trigger the event manually
@@ -222,21 +221,21 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 	if (!m || !m->handle)
 	{
 		if (u)
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
 		return MOD_ERR_PARAMS;
 	}
 
 	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION || m->type == DATABASE)
 	{
 		if (u)
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_NO_UNLOAD);
+			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
 		return MOD_ERR_NOUNLOAD;
 	}
 
 	if (u)
 	{
 		ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), m->name.c_str());
-		notice_lang(Config->s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
+		u->SendMessage(OperServ, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 
 	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));

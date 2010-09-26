@@ -30,12 +30,12 @@ class CommandOSClearModes : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			notice_lang(Config->s_OperServ, u, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+			u->SendMessage(OperServ, OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
 		else
@@ -148,27 +148,27 @@ class CommandOSClearModes : public Command
 		}
 
 		if (all)
-			notice_lang(Config->s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan.c_str());
+			u->SendMessage(OperServ, OPER_CLEARMODES_ALL_DONE, chan.c_str());
 		else
-			notice_lang(Config->s_OperServ, u, OPER_CLEARMODES_DONE, chan.c_str());
+			u->SendMessage(OperServ, OPER_CLEARMODES_DONE, chan.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_CLEARMODES);
+		u->SendMessage(OperServ, OPER_HELP_CLEARMODES);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
+		SyntaxError(OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_CLEARMODES);
+		u->SendMessage(OperServ, OPER_HELP_CMD_CLEARMODES);
 	}
 };
 

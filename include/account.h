@@ -155,7 +155,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	Anope::string pass;		/* Password of the nicks */
 	Anope::string email;	/* E-mail associated to the nick */
 	Anope::string greet;	/* Greet associated to the nick */
-	uint16 language;		/* Language selected by nickname owner (LANG_*) */
+	Anope::string language;	/* Language name */
 	std::vector<Anope::string> access; /* Access list, vector of strings */
 	MemoInfo memos;
 	uint16 channelcount; /* Number of channels currently registered */

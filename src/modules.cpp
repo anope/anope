@@ -10,8 +10,8 @@
  */
 
 #include "modules.h"
-#include "language.h"
 #include "version.h"
+#include <libintl.h>
 
 message_map MessageMap;
 std::list<Module *> Modules;
@@ -67,21 +67,6 @@ int protocol_module_init()
 	}
 
 	return ret;
-}
-
-void Module::InsertLanguage(int langNumber, int ac, const char **av)
-{
-	int i;
-
-	Log(LOG_DEBUG) << this->name << " Adding " << ac << " texts for language " << langNumber;
-
-	if (this->lang[langNumber].argc > 0)
-		this->DeleteLanguage(langNumber);
-
-	this->lang[langNumber].argc = ac;
-	this->lang[langNumber].argv = new char *[ac];
-	for (i = 0; i < ac; ++i)
-		this->lang[langNumber].argv[i] = strdup(av[i]);
 }
 
 /**
@@ -253,75 +238,6 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
 	return ret;
 }
 
-void Module::NoticeLang(const Anope::string &source, const User *u, int number, ...) const
-{
-	/* Find the users lang, and use it if we can */
-	int mlang = Config->NSDefLanguage;
-	if (u && u->Account())
-		mlang = u->Account()->language;
-
-	/* If the users lang isnt supported, drop back to English */
-	if (!this->lang[mlang].argc)
-		mlang = LANG_EN_US;
-
-	/* If the requested lang string exists for the language */
-	if (this->lang[mlang].argc > number)
-	{
-		const char *fmt = this->lang[mlang].argv[number];
-
-		va_list va;
-		va_start(va, number);
-
-		char buf[4096] = "";
-		vsnprintf(buf, sizeof(buf), fmt, va);
-
-		sepstream lines(buf, '\n');
-		Anope::string line;
-		while (lines.GetToken(line))
-			u->SendMessage(source, "%s", line.empty() ? " " : line.c_str());
-		va_end(va);
-	}
-	else
-		Log() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
-}
-
-const char *Module::GetLangString(User *u, int number)
-{
-
-	/* Find the users lang, and use it if we can */
-	int mlang = Config->NSDefLanguage;
-	if (u && u->Account())
-		mlang = u->Account()->language;
-
-	/* If the users lang isnt supported, drop back to English */
-	if (!this->lang[mlang].argc)
-		mlang = LANG_EN_US;
-
-	/* If the requested lang string exists for the language */
-	if (this->lang[mlang].argc > number)
-		return this->lang[mlang].argv[number];
-	/* Return an empty string otherwise, because we might be used without
-	 * the return value being checked. If we would return NULL, bad things
-	 * would happen!
-	 */
-	else
-	{
-		Log() << this->name << ": INVALID language string call, language: [" << mlang << "], String [" << number << "]";
-		return "";
-	}
-}
-
-void Module::DeleteLanguage(int langNumber)
-{
-	if (this->lang[langNumber].argc)
-	{
-		for (int idx = 0; idx > this->lang[langNumber].argc; ++idx)
-			free(this->lang[langNumber].argv[idx]); // XXX
-		delete [] this->lang[langNumber].argv;
-		this->lang[langNumber].argc = 0;
-	}
-}
-
 void ModuleRunTimeDirCleanUp()
 {
 	Anope::string dirbuf = services_dir + "/modules/runtime";
@@ -380,6 +296,38 @@ void ModuleRunTimeDirCleanUp()
 Version Module::GetVersion() const
 {
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+}
+
+void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
+{
+	Anope::string language = (to && to->Account() ? to->Account()->language : "");
+	/* For older databases */
+	if (language == "en")
+		language.clear();
+	if (language.empty() && !Config->NSDefLanguage.empty())
+		language = Config->NSDefLanguage;
+
+	const char *message = fmt;
+#if HAVE_GETTEXT
+	if (!language.empty())
+	{
+		setlocale(LC_ALL, language.c_str());
+		message = dgettext(this->name.c_str(), fmt);
+		setlocale(LC_ALL, "");
+	}
+#endif
+
+	va_list args;
+	char buf[4096];
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf) - 1, message, args);
+	va_end(args);
+
+	sepstream sep(buf, '\n');
+	Anope::string token;
+
+	while (sep.GetToken(token))
+		to->SendMessage(from->nick, token);
 }
 
 Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)

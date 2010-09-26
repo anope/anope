@@ -13,7 +13,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "language.h"
 
 registered_channel_map RegisteredChannelList;
 
@@ -354,7 +353,7 @@ int check_valid_admin(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT))
 	{
-		notice_lang(Config->s_ChanServ, user, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
+		user->SendMessage(ChanServ, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
 		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		return 0;
 	}
@@ -390,7 +389,7 @@ int check_valid_op(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP))
 	{
-		notice_lang(Config->s_ChanServ, user, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
+		user->SendMessage(ChanServ, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
 
 		if (owner)
 			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);

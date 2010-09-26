@@ -25,8 +25,6 @@ class CommandHSList : public Command
 		Anope::string key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
 		unsigned display_counter = 0;
-		tm *tm;
-		char buf[BUFSIZE];
 
 		/**
 		 * Do a check for a range here, then in the next loop
@@ -37,14 +35,14 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				notice_lang(Config->s_HostServ, u, LIST_INCORRECT_RANGE);
+				u->SendMessage(HostServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					notice_lang(Config->s_HostServ, u, LIST_INCORRECT_RANGE);
+					u->SendMessage(HostServ, LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 				from = convertTo<int>(key.substr(1, tmp - 1));
@@ -64,13 +62,10 @@ class CommandHSList : public Command
 				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key)) && display_counter < Config->NSListMax)
 				{
 					++display_counter;
-					time_t time = na->hostinfo.GetTime();
-					tm = localtime(&time);
-					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 					if (!na->hostinfo.GetIdent().empty())
-						notice_lang(Config->s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						u->SendMessage(HostServ, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						notice_lang(Config->s_HostServ, u, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						u->SendMessage(HostServ, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			else
@@ -82,38 +77,35 @@ class CommandHSList : public Command
 				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config->NSListMax)
 				{
 					++display_counter;
-					time_t time = na->hostinfo.GetTime();
-					tm = localtime(&time);
-					strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
 					if (!na->hostinfo.GetIdent().empty())
-						notice_lang(Config->s_HostServ, u, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						u->SendMessage(HostServ, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						notice_lang(Config->s_HostServ, u, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), buf);
+						u->SendMessage(HostServ, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			++counter;
 		}
 		if (!key.empty())
-			notice_lang(Config->s_HostServ, u, HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
+			u->SendMessage(HostServ, HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
 		else
 		{
 			if (from)
-				notice_lang(Config->s_HostServ, u, HOST_LIST_RANGE_FOOTER, from, to);
+				u->SendMessage(HostServ, HOST_LIST_RANGE_FOOTER, from, to);
 			else
-				notice_lang(Config->s_HostServ, u, HOST_LIST_FOOTER, display_counter);
+				u->SendMessage(HostServ, HOST_LIST_FOOTER, display_counter);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_HostServ, u, HOST_HELP_LIST);
+		u->SendMessage(HostServ, HOST_HELP_LIST);
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_HostServ, u, HOST_HELP_CMD_LIST);
+		u->SendMessage(HostServ, HOST_HELP_CMD_LIST);
 	}
 };
 

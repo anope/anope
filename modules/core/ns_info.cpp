@@ -21,9 +21,8 @@ class CommandNSInfo : public Command
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
-			const char *commastr = getstring(nc, COMMA_SPACE);
 			if (!buf.empty())
-				buf += commastr;
+				buf += ", ";
 
 			buf += str;
 		}
@@ -46,28 +45,25 @@ class CommandNSInfo : public Command
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
 			{
-				notice_lang(Config->s_NickServ, u, NICK_IS_PREREG);
+				u->SendMessage(NickServ, NICK_IS_PREREG);
 				if (has_auspex)
-					notice_lang(Config->s_NickServ, u, NICK_INFO_EMAIL, nr->email.c_str());
+					u->SendMessage(NickServ, NICK_INFO_EMAIL, nr->email.c_str());
 			}
 			else if (nickIsServices(nick, true))
-				notice_lang(Config->s_NickServ, u, NICK_X_IS_SERVICES, nick.c_str());
+				u->SendMessage(NickServ, NICK_X_IS_SERVICES, nick.c_str());
 			else
-				notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+				u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			if (is_oper(u) && !na->last_usermask.empty())
-				notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : getstring(u, NO_REASON));
+				u->SendMessage(NickServ, NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : GetString(u, NO_REASON).c_str());
 			else
-				notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, nick.c_str());
+				u->SendMessage(NickServ, NICK_X_FORBIDDEN, nick.c_str());
 		}
 		else
 		{
-			struct tm *tm;
-			char buf[BUFSIZE];
 			bool nick_online = false, show_hidden = false;
-			time_t expt;
 
 			/* Is the real owner of the nick we're looking up online? -TheShadow */
 			User *u2 = finduser(na->nick);
@@ -77,80 +73,71 @@ class CommandNSInfo : public Command
 			if (has_auspex || (u->Account() && na->nc == u->Account()))
 				show_hidden = true;
 
-			notice_lang(Config->s_NickServ, u, NICK_INFO_REALNAME, na->nick.c_str(), na->last_realname.c_str());
+			u->SendMessage(NickServ, NICK_INFO_REALNAME, na->nick.c_str(), na->last_realname.c_str());
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
-				notice_lang(Config->s_NickServ, u, NICK_INFO_SERVICES_OPERTYPE, na->nick.c_str(), na->nc->ot->GetName().c_str());
+				u->SendMessage(NickServ, NICK_INFO_SERVICES_OPERTYPE, na->nick.c_str(), na->nc->ot->GetName().c_str());
 
 			if (nick_online)
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					notice_lang(Config->s_NickServ, u, NICK_INFO_ADDRESS_ONLINE, na->last_usermask.c_str());
+					u->SendMessage(NickServ, NICK_INFO_ADDRESS_ONLINE, na->last_usermask.c_str());
 				else
-					notice_lang(Config->s_NickServ, u, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick.c_str());
+					u->SendMessage(NickServ, NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick.c_str());
 			}
 			else
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					notice_lang(Config->s_NickServ, u, NICK_INFO_ADDRESS, na->last_usermask.c_str());
+					u->SendMessage(NickServ, NICK_INFO_ADDRESS, na->last_usermask.c_str());
 			}
 
-			tm = localtime(&na->time_registered);
-			strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-			notice_lang(Config->s_NickServ, u, NICK_INFO_TIME_REGGED, buf);
+			u->SendMessage(NickServ, NICK_INFO_TIME_REGGED, do_strftime(na->time_registered).c_str());
 
 			if (!nick_online)
 			{
-				tm = localtime(&na->last_seen);
-				strftime_lang(buf, sizeof(buf), u, STRFTIME_DATE_TIME_FORMAT, tm);
-				notice_lang(Config->s_NickServ, u, NICK_INFO_LAST_SEEN, buf);
+				u->SendMessage(NickServ, NICK_INFO_LAST_SEEN, do_strftime(na->last_seen).c_str());
 			}
 
 			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
-				notice_lang(Config->s_NickServ, u, NICK_INFO_LAST_QUIT, na->last_quit.c_str());
+				u->SendMessage(NickServ, NICK_INFO_LAST_QUIT, na->last_quit.c_str());
 
 			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_EMAIL)))
-				notice_lang(Config->s_NickServ, u, NICK_INFO_EMAIL, na->nc->email.c_str());
+				u->SendMessage(NickServ, NICK_INFO_EMAIL, na->nc->email.c_str());
 
 			if (show_hidden)
 			{
 				if (!Config->s_HostServ.empty() && ircd->vhost && na->hostinfo.HasVhost())
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
-						notice_lang(Config->s_NickServ, u, NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+						u->SendMessage(NickServ, NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 					else
-						notice_lang(Config->s_NickServ, u, NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
+						u->SendMessage(NickServ, NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
 				}
 				if (!na->nc->greet.empty())
-					notice_lang(Config->s_NickServ, u, NICK_INFO_GREET, na->nc->greet.c_str());
+					u->SendMessage(NickServ, NICK_INFO_GREET, na->nc->greet.c_str());
 
 				Anope::string optbuf;
 
-				CheckOptStr(optbuf, NI_KILLPROTECT, getstring(u, NICK_INFO_OPT_KILL), na->nc);
-				CheckOptStr(optbuf, NI_SECURE, getstring(u, NICK_INFO_OPT_SECURE), na->nc);
-				CheckOptStr(optbuf, NI_PRIVATE, getstring(u, NICK_INFO_OPT_PRIVATE), na->nc);
-				CheckOptStr(optbuf, NI_MSG, getstring(u, NICK_INFO_OPT_MSG), na->nc);
-				CheckOptStr(optbuf, NI_AUTOOP, getstring(u, NICK_INFO_OPT_AUTOOP), na->nc);
+				CheckOptStr(optbuf, NI_KILLPROTECT, GetString(u, NICK_INFO_OPT_KILL).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_SECURE, GetString(u, NICK_INFO_OPT_SECURE).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_PRIVATE, GetString(u, NICK_INFO_OPT_PRIVATE).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_MSG, GetString(u, NICK_INFO_OPT_MSG).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_AUTOOP, GetString(u, NICK_INFO_OPT_AUTOOP).c_str(), na->nc);
 
-				notice_lang(Config->s_NickServ, u, NICK_INFO_OPTIONS, optbuf.empty() ? getstring(u, NICK_INFO_OPT_NONE) : optbuf.c_str());
+				u->SendMessage(NickServ, NICK_INFO_OPTIONS, optbuf.empty() ? GetString(u, NICK_INFO_OPT_NONE).c_str() : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
 					if (!na->last_quit.empty())
-						notice_lang(Config->s_NickServ, u, NICK_INFO_SUSPENDED, na->last_quit.c_str());
+						u->SendMessage(NickServ, NICK_INFO_SUSPENDED, na->last_quit.c_str());
 					else
-						notice_lang(Config->s_NickServ, u, NICK_INFO_SUSPENDED_NO_REASON);
+						u->SendMessage(NickServ, NICK_INFO_SUSPENDED_NO_REASON);
 				}
 
 				if (na->HasFlag(NS_NO_EXPIRE))
-					notice_lang(Config->s_NickServ, u, NICK_INFO_NO_EXPIRE);
+					u->SendMessage(NickServ, NICK_INFO_NO_EXPIRE);
 				else
-				{
-					expt = na->last_seen + Config->NSExpire;
-					tm = localtime(&expt);
-					strftime_lang(buf, sizeof(buf), finduser(na->nick), STRFTIME_DATE_TIME_FORMAT, tm);
-					notice_lang(Config->s_NickServ, u, NICK_INFO_EXPIRE, buf);
-				}
+					u->SendMessage(NickServ, NICK_INFO_EXPIRE, do_strftime(na->last_seen + Config->NSExpire).c_str());
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(u, na, show_hidden));
@@ -160,19 +147,19 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_INFO);
+		u->SendMessage(NickServ, NICK_HELP_INFO);
 
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
+		SyntaxError(NickServ, u, "INFO", NICK_INFO_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_INFO);
+		u->SendMessage(NickServ, NICK_HELP_CMD_INFO);
 	}
 };
 

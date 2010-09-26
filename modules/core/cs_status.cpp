@@ -36,28 +36,28 @@ class CommandCSStatus : public Command
 			ci = cs_findchan(chan);
 		}
 		if (!ci)
-			notice_lang(Config->s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp.c_str());
+			u->SendMessage(ChanServ, CHAN_STATUS_NOT_REGGED, temp.c_str());
 		else if ((u2 = finduser(nick)))
-			notice_lang(Config->s_ChanServ, u, CHAN_STATUS_INFO, chan.c_str(), nick.c_str(), get_access(u2, ci));
+			u->SendMessage(ChanServ, CHAN_STATUS_INFO, chan.c_str(), nick.c_str(), get_access(u2, ci));
 		else /* !u2 */
-			notice_lang(Config->s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick.c_str());
+			u->SendMessage(ChanServ, CHAN_STATUS_NOTONLINE, nick.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_SERVADMIN_HELP_STATUS);
+		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
+		SyntaxError(ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_STATUS);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_STATUS);
 	}
 };
 

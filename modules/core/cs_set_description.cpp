@@ -28,26 +28,26 @@ class CommandCSSetDescription : public Command
 
 		ci->desc = params[1];
 
-		notice_lang(Config->s_ChanServ, u, CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
+		u->SendMessage(ChanServ, CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_DESC, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_DESC, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_DESC);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_DESC);
 	}
 };
 
@@ -60,14 +60,14 @@ class CommandCSSASetDescription : public CommandCSSetDescription
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_DESC, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_DESC, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		// XXX
-		syntax_error(Config->s_ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

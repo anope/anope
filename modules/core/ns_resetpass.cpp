@@ -28,17 +28,17 @@ class CommandNSResetPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 		if (!(na = findnick(params[0])))
-			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, params[0].c_str());
+			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, params[0].c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
 			if (SendResetEmail(u, na))
 			{
 				Log(LOG_COMMAND, u, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
-				notice_lang(Config->s_NickServ, u, NICK_RESETPASS_COMPLETE, na->nick.c_str());
+				u->SendMessage(NickServ, NICK_RESETPASS_COMPLETE, na->nick.c_str());
 			}
 		}
 
@@ -47,18 +47,18 @@ class CommandNSResetPass : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_NickServ, u, NICK_HELP_RESETPASS);
+		u->SendMessage(NickServ, NICK_HELP_RESETPASS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_NickServ, u, "RESETPASS", NICK_RESETPASS_SYNTAX);
+		SyntaxError(NickServ, u, "RESETPASS", NICK_RESETPASS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_RESETPASS);
+		u->SendMessage(NickServ, NICK_HELP_CMD_RESETPASS);
 	}
 };
 
@@ -94,7 +94,7 @@ class NSResetPass : public Module
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
-					notice_lang(Config->s_NickServ, u, NICK_CONFIRM_EXPIRED);
+					u->SendMessage(NickServ, NICK_CONFIRM_EXPIRED);
 					return EVENT_STOP;
 				}
 
@@ -114,7 +114,7 @@ class NSResetPass : public Module
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
-					notice_lang(Config->s_NickServ, u, NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
+					u->SendMessage(NickServ, NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
 
 					if (ircd->vhost)
 						do_on_id(u);
@@ -125,7 +125,7 @@ class NSResetPass : public Module
 				else
 				{
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
-					notice_lang(Config->s_NickServ, u, NICK_CONFIRM_INVALID);
+					u->SendMessage(NickServ, NICK_CONFIRM_INVALID);
 					bad_password(u);
 				}
 
@@ -141,7 +141,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), getstring(na, NICK_RESETPASS_SUBJECT), na->nick.c_str());
+	snprintf(subject, sizeof(subject), GetString(na->nc, NICK_RESETPASS_SUBJECT).c_str(), na->nick.c_str());
 
 	int min = 1, max = 62;
 	int chars[] = {
@@ -157,7 +157,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 
-	snprintf(message, sizeof(message), getstring(na, NICK_RESETPASS_MESSAGE), na->nick.c_str(), Config->s_NickServ.c_str(), passcode.c_str(), Config->NetworkName.c_str());
+	snprintf(message, sizeof(message), GetString(na->nc, NICK_RESETPASS_MESSAGE).c_str(), na->nick.c_str(), Config->s_NickServ.c_str(), passcode.c_str(), Config->NetworkName.c_str());
 
 	na->nc->Shrink("ns_resetpass_code");
 	na->nc->Shrink("ns_resetpass_time");
@@ -165,7 +165,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
 	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));
 
-	return Mail(u, na->nc, Config->s_NickServ, subject, message);
+	return Mail(u, na->nc, NickServ, subject, message);
 }
 
 MODULE_INIT(NSResetPass)

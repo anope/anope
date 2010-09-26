@@ -30,14 +30,14 @@ class CommandCSSetRestricted : public Command
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_RESTRICTED_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "RESTRICTED");
@@ -47,18 +47,18 @@ class CommandCSSetRestricted : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_RESTRICTED, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_RESTRICTED, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
+		SyntaxError(ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_RESTRICTED);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_RESTRICTED);
 	}
 };
 
@@ -71,13 +71,13 @@ class CommandCSSASetRestricted : public CommandCSSetRestricted
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_RESTRICTED, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_RESTRICTED, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
 	}
 };
 

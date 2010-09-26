@@ -29,12 +29,12 @@ class CommandCSSetPrivate : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PRIVATE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PRIVATE_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PRIVATE);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_PRIVATE_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PRIVATE");
@@ -44,18 +44,18 @@ class CommandCSSetPrivate : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PRIVATE, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
+		SyntaxError(ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_PRIVATE);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PRIVATE);
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetPrivate : public CommandCSSetPrivate
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_PRIVATE, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
 	}
 };
 

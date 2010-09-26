@@ -77,18 +77,18 @@ class CommandNSAList : public Command
 		}
 
 		if (!na)
-			notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			notice_lang(Config->s_NickServ, u, NICK_X_FORBIDDEN, na->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
-			notice_lang(Config->s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			u->SendMessage(NickServ, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			int level;
 			int chan_count = 0;
 			int match_count = 0;
 
-			notice_lang(Config->s_NickServ, u, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick.c_str());
+			u->SendMessage(NickServ, is_servadmin ? NICK_ALIST_HEADER_X : NICK_ALIST_HEADER, na->nick.c_str());
 
 			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			{
@@ -107,14 +107,14 @@ class CommandNSAList : public Command
 					{
 						Anope::string xop = get_xop_level(level);
 
-						notice_lang(Config->s_NickServ, u, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
+						u->SendMessage(NickServ, NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 					}
 					else
-						notice_lang(Config->s_NickServ, u, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, !ci->desc.empty() ? ci->desc.c_str() : "");
+						u->SendMessage(NickServ, NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, !ci->desc.empty() ? ci->desc.c_str() : "");
 				}
 			}
 
-			notice_lang(Config->s_NickServ, u, NICK_ALIST_FOOTER, match_count, chan_count);
+			u->SendMessage(NickServ, NICK_ALIST_FOOTER, match_count, chan_count);
 		}
 		return MOD_CONT;
 	}
@@ -122,16 +122,16 @@ class CommandNSAList : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->IsServicesOper())
-			notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_ALIST);
+			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_ALIST);
 		else
-			notice_help(Config->s_NickServ, u, NICK_HELP_ALIST);
+			u->SendMessage(NickServ, NICK_HELP_ALIST);
 
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_ALIST);
+		u->SendMessage(NickServ, NICK_HELP_CMD_ALIST);
 	}
 };
 

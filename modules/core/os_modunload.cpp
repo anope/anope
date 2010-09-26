@@ -28,7 +28,7 @@ class CommandOSModUnLoad : public Command
 		Module *m = FindModule(mname);
 		if (!m)
 		{
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_ISNT_LOADED, mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_ISNT_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
 
@@ -37,25 +37,25 @@ class CommandOSModUnLoad : public Command
 		status = ModuleManager::UnloadModule(m, u);
 
 		if (status != MOD_ERR_OK)
-			notice_lang(Config->s_OperServ, u, OPER_MODULE_REMOVE_FAIL, mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, mname.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_MODUNLOAD);
+		u->SendMessage(OperServ, OPER_HELP_MODUNLOAD);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+		SyntaxError(OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_MODUNLOAD);
+		u->SendMessage(OperServ, OPER_HELP_CMD_MODUNLOAD);
 	}
 };
 

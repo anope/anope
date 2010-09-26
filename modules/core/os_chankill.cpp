@@ -40,7 +40,7 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			notice_lang(Config->s_OperServ, u, BAD_EXPIRY_TIME);
+			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -79,25 +79,25 @@ class CommandOSChanKill : public Command
 					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel.c_str(), realreason.c_str());
 			}
 			else
-				notice_lang(Config->s_OperServ, u, CHAN_X_NOT_IN_USE, channel.c_str());
+				u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, channel.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_OperServ, u, OPER_HELP_CHANKILL);
+		u->SendMessage(OperServ, OPER_HELP_CHANKILL);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
+		SyntaxError(OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_OperServ, u, OPER_HELP_CMD_CHANKILL);
+		u->SendMessage(OperServ, OPER_HELP_CMD_CHANKILL);
 	}
 };
 

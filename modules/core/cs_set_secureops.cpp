@@ -29,12 +29,12 @@ class CommandCSSetSecureOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREOPS);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECUREOPS_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREOPS);
-			notice_lang(Config->s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
+			u->SendMessage(ChanServ, CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREOPS");
@@ -44,18 +44,18 @@ class CommandCSSetSecureOps : public Command
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECUREOPS, "SET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREOPS, "SET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
+		SyntaxError(ChanServ, u, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_ChanServ, u, CHAN_HELP_CMD_SET_SECUREOPS);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SECUREOPS);
 	}
 };
 
@@ -68,13 +68,13 @@ class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 
 	bool OnHelp(User *u, const Anope::string &)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_SET_SECUREOPS, "SASET");
+		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREOPS, "SASET");
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_ChanServ, u, "SASET SECUREOPS", CHAN_SASET_SECUREOPS_SYNTAX);
+		SyntaxError(ChanServ, u, "SASET SECUREOPS", CHAN_SASET_SECUREOPS_SYNTAX);
 	}
 };
 

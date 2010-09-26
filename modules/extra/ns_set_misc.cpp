@@ -29,10 +29,10 @@ class CommandNSSetMisc : public Command
 		if (params.size() > 1)
 		{
 			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			notice_lang(Config->s_NickServ, u, CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), params[1].c_str());
+			u->SendMessage(NickServ, CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), params[1].c_str());
 		}
 		else
-			notice_lang(Config->s_NickServ, u, CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
+			u->SendMessage(NickServ, CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
 
 		return MOD_CONT;
 	}
@@ -51,7 +51,7 @@ class CommandNSSetMisc : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
@@ -76,7 +76,7 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
-		syntax_error(Config->s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(NickServ, u, "SASET", NICK_SASET_SYNTAX);
 	}
 };
 

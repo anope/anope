@@ -31,30 +31,25 @@ class CommandCSRegister : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_ChanServ, u, CHAN_REGISTER_DISABLED);
+			u->SendMessage(ChanServ, CHAN_REGISTER_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (chan[0] == '&')
-			notice_lang(Config->s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
+			u->SendMessage(ChanServ, CHAN_REGISTER_NOT_LOCAL);
 		else if (chan[0] != '#')
-			notice_lang(Config->s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+			u->SendMessage(ChanServ, CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			notice_lang(Config->s_ChanServ, u, CHAN_X_INVALID, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_INVALID, chan.c_str());
 		else if ((ci = cs_findchan(chan)))
-			notice_lang(Config->s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_ALREADY_REGISTERED, chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
-			notice_lang(Config->s_ChanServ, u, CHAN_MUST_BE_CHANOP);
+			u->SendMessage(ChanServ, CHAN_MUST_BE_CHANOP);
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
-			notice_lang(Config->s_ChanServ, u, u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
-		else if (!(ci = new ChannelInfo(chan)))
-		{
-			 // not possible ?
-			//Alog() << Config->s_ChanServ << ": makechan() failed for REGISTER " << chan;
-			notice_lang(Config->s_ChanServ, u, CHAN_REGISTRATION_FAILED);
-		}
+			u->SendMessage(ChanServ, u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else
 		{
+			ci = new ChannelInfo(chan);
 			ci->founder = u->Account();
 			ci->desc = desc;
 
@@ -70,7 +65,7 @@ class CommandCSRegister : public Command
 			ci->bi = NULL;
 			++ci->founder->channelcount;
 			Log(LOG_COMMAND, u, this, ci);
-			notice_lang(Config->s_ChanServ, u, CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
+			u->SendMessage(ChanServ, CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
 
 			/* Implement new mode lock */
 			if (c)
@@ -97,13 +92,13 @@ class CommandCSRegister : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		notice_help(Config->s_ChanServ, u, CHAN_HELP_REGISTER, Config->s_ChanServ.c_str());
+		u->SendMessage(ChanServ, CHAN_HELP_REGISTER, Config->s_ChanServ.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		syntax_error(Config->s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
+		SyntaxError(ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
 };
 

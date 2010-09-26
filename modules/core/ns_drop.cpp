@@ -30,7 +30,7 @@ class CommandNSDrop : public Command
 
 		if (readonly)
 		{
-			notice_lang(Config->s_NickServ, u, NICK_DROP_DISABLED);
+			u->SendMessage(NickServ, NICK_DROP_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -44,13 +44,13 @@ class CommandNSDrop : public Command
 						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
 					Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
 					delete nr;
-					notice_lang(Config->s_NickServ, u, NICK_X_DROPPED, nick.c_str());
+					u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
 				}
 				else
-					notice_lang(Config->s_NickServ, u, NICK_X_NOT_REGISTERED, nick.c_str());
+					u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
 			}
 			else
-				notice_lang(Config->s_NickServ, u, NICK_NOT_REGISTERED);
+				u->SendMessage(NickServ, NICK_NOT_REGISTERED);
 			return MOD_CONT;
 		}
 
@@ -59,13 +59,13 @@ class CommandNSDrop : public Command
 			my_nick = na->nick;
 
 		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			notice_lang(Config->s_NickServ, u, ACCESS_DENIED);
+			u->SendMessage(NickServ, ACCESS_DENIED);
 		else
 		{
 			if (readonly)
-				notice_lang(Config->s_NickServ, u, READ_ONLY_MODE);
+				u->SendMessage(NickServ, READ_ONLY_MODE);
 
 			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
 			{
@@ -82,14 +82,14 @@ class CommandNSDrop : public Command
 			{
 				if (Config->WallDrop)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-				notice_lang(Config->s_NickServ, u, NICK_X_DROPPED, nick.c_str());
+				u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
 			}
 			else
 			{
 				if (!nick.empty())
-					notice_lang(Config->s_NickServ, u, NICK_X_DROPPED, nick.c_str());
+					u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
 				else
-					notice_lang(Config->s_NickServ, u, NICK_DROPPED);
+					u->SendMessage(NickServ, NICK_DROPPED);
 			}
 		}
 
@@ -99,16 +99,16 @@ class CommandNSDrop : public Command
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
 		if (u->Account() && u->Account()->HasPriv("nickserv/drop"))
-			notice_help(Config->s_NickServ, u, NICK_SERVADMIN_HELP_DROP);
+			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_DROP);
 		else
-			notice_help(Config->s_NickServ, u, NICK_HELP_DROP);
+			u->SendMessage(NickServ, NICK_HELP_DROP);
 
 		return true;
 	}
 
 	void OnServHelp(User *u)
 	{
-		notice_lang(Config->s_NickServ, u, NICK_HELP_CMD_DROP);
+		u->SendMessage(NickServ, NICK_HELP_CMD_DROP);
 	}
 };
 

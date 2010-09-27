@@ -33,7 +33,6 @@ IRCDVar myIrcd[] = {
 	 0,				/* time stamp on mode */
 	 0,				/* UMODE */
 	 0,				/* O:LINE */
-	 0,				/* VHOST ON NICK */
 	 0,				/* No Knock requires +i */
 	 0,				/* Can remove User Channel Modes with SVSMODE */
 	 0,				/* Sglines are not enforced until user reconnects */
@@ -405,11 +404,9 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 	{
 		Server *s = Server::Find(source);
 		/* Source is always the server */
-		user = do_nick("", av[0], av[4], av[5], s->GetName(), av[8], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, av[6], "*", av[7]);
+		user = do_nick("", av[0], av[4], av[5], s->GetName(), av[8], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, av[6], "*", av[7], av[3]);
 		if (user)
 		{
-			UserSetInternalModes(user, 1, &av[3]);
-
 			NickAlias *na = findnick(user->nick);
 			Anope::string svidbuf;
 			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == av[2])
@@ -421,7 +418,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else if (ac == 2)
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "", "");
 	return MOD_CONT;
 }
 

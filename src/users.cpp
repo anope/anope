@@ -507,16 +507,6 @@ void User::SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param)
 	SetMode(bi, ModeManager::FindUserModeByName(Name), Param);
 }
 
-/* Set a mode on the user
- * @param bi The client setting the mode
- * @param ModeChar The mode char
- * @param param Optional param for the mode
- */
-void User::SetMode(BotInfo *bi, char ModeChar, const Anope::string &Param)
-{
-	SetMode(bi, ModeManager::FindUserModeByChar(ModeChar), Param);
-}
-
 /** Remove a mode on the user
  * @param bi The client setting the mode
  * @param um The user mode
@@ -537,15 +527,6 @@ void User::RemoveMode(BotInfo *bi, UserMode *um)
 void User::RemoveMode(BotInfo *bi, UserModeName Name)
 {
 	RemoveMode(bi, ModeManager::FindUserModeByName(Name));
-}
-
-/** Remove a mode from the user
- * @param bi The client setting the mode
- * @param ModeChar The mode char
- */
-void User::RemoveMode(BotInfo *bi, char ModeChar)
-{
-	RemoveMode(bi, ModeManager::FindUserModeByChar(ModeChar));
 }
 
 /** Set a string of modes on a user
@@ -593,6 +574,80 @@ void User::SetModes(BotInfo *bi, const char *umodes, ...)
 		}
 		else
 			this->RemoveMode(bi, um);
+	}
+}
+
+void User::SetModesInternal(const char *umodes, ...)
+{
+	char buf[BUFSIZE] = "";
+	va_list args;
+	Anope::string modebuf, sbuf;
+	int add = -1;
+	va_start(args, umodes);
+	vsnprintf(buf, BUFSIZE - 1, umodes, args);
+	va_end(args);
+
+	spacesepstream sep(buf);
+	sep.GetToken(modebuf);
+	for (unsigned i = 0, end = modebuf.length(); i < end; ++i)
+	{
+		UserMode *um;
+
+		switch (modebuf[i])
+		{
+			case '+':
+				add = 1;
+				continue;
+			case '-':
+				add = 0;
+				continue;
+			default:
+				if (add == -1)
+					continue;
+				um = ModeManager::FindUserModeByChar(modebuf[i]);
+				if (!um)
+					continue;
+		}
+
+		if (add)
+		{
+			if (um->Type == MODE_PARAM && sep.GetToken(sbuf))
+				this->SetModeInternal(um, sbuf);
+			else
+				this->SetModeInternal(um);
+		}
+		else
+			this->RemoveModeInternal(um);
+
+		switch (um->Name)
+		{
+			case UMODE_OPER:
+				if (add)
+				{
+					++opcnt;
+					if (Config->WallOper)
+						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", this->nick.c_str());
+					Log(OperServ) << this->nick << " is now an IRC operator";
+				}
+				else
+				{
+					--opcnt;
+
+					Log(OperServ) << this->nick << " is no longer an IRC operator";
+				}
+				break;
+			case UMODE_REGISTERED:
+				if (add && !this->IsIdentified())
+					this->RemoveMode(NickServ, UMODE_REGISTERED);
+				break;
+			case UMODE_CLOAK:
+			case UMODE_VHOST:
+				if (!add && !this->vhost.empty())
+					this->vhost.clear();
+				this->UpdateHost();
+			default:
+				break;
+		}
 	}
 }
 
@@ -669,30 +724,22 @@ User *finduser(const Anope::string &nick)
 
 /* Handle a server NICK command. */
 
-User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid)
+User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes)
 {
-	User *user = NULL;
-	Anope::string vhost2 = vhost;
-
 	if (source.empty())
 	{
-		if (ircd->nickvhost && !vhost2.empty() && vhost2.equals_cs("*"))
-		{
-			vhost2.clear();
-		}
-
 		/* This is a new user; create a User structure for it. */
 		Log(LOG_DEBUG) << "new user: " << nick;
 
 		Server *serv = Server::Find(server);
 
 		/* Allocate User structure and fill it in. */
-		user = new User(nick, username, host, uid);
+		dynamic_reference<User> user = new User(nick, username, host, uid);
 		user->server = serv;
 		user->realname = realname;
 		user->timestamp = ts;
-		if (!vhost2.empty())
-			user->SetCloakedHost(vhost2);
+		if (!vhost.empty())
+			user->SetCloakedHost(vhost);
 		user->SetVIdent(username);
 
 		if (!ip.empty())
@@ -711,28 +758,33 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			}
 		}
 
-		Log(user, "connect") << (ircd->nickvhost && !vhost2.empty() ? Anope::string("(") + vhost2 + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
+		Log(*user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
 
 		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(user));
+		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(*user));
 		if (MOD_RESULT == EVENT_STOP)
-			return finduser(nick);
+			return *user;
 
 		if (Config->LimitSessions && !serv->IsULined())
 			add_session(nick, host, user->ip() ? user->ip.addr() : "");
 
-		XLineManager::CheckAll(user);
-
-		/* User is no longer connected, return */
-		if (!finduser(nick))
+		if (!user)
 			return NULL;
 
-		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user));
+		XLineManager::CheckAll(*user);
+
+		/* User is no longer connected, return */
+		if (!user)
+			return NULL;
+
+		FOREACH_MOD(I_OnUserConnect, OnUserConnect(*user));
+		
+		return user ? *user : NULL;
 	}
 	else
 	{
 		/* An old user changing nicks. */
-		user = finduser(source);
+		User *user = finduser(source);
 
 		if (!user)
 		{
@@ -789,9 +841,9 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 					return NULL;
 			}
 		}
-	}
 
-	return user;
+		return user;
+	}
 }
 
 /*************************************************************************/
@@ -810,7 +862,12 @@ void do_umode(const Anope::string &source, int ac, const char **av)
 		return;
 	}
 
-	UserSetInternalModes(user, ac - 1, &av[1]);
+	Log(user, "mode") << "changes modes to " << merge_args(ac - 1, av + 1);
+
+	Anope::string modes = av[1];
+	for (int i = 2; i < ac; ++i)
+		modes += Anope::string(" ") + av[i];
+	user->SetModesInternal(modes.c_str());
 }
 
 /*************************************************************************/
@@ -972,85 +1029,3 @@ Anope::string create_mask(User *u)
 	return mask;
 }
 
-/*************************************************************************/
-
-/** Set modes internally on a user
- * @param user The user
- * @param ac Number of args
- * @param av Args
- */
-void UserSetInternalModes(User *user, int ac, const char **av)
-{
-	int add = -1, j = 0;
-	const char *modes = av[0];
-	if (!user || !modes)
-		return;
-
-	Log(user, "mode") << "changes modes to " << merge_args(ac, av);
-
-	for (; *modes; ++modes)
-	{
-		UserMode *um;
-
-		switch (*modes)
-		{
-			case '+':
-				add = 1;
-				continue;
-			case '-':
-				add = 0;
-				continue;
-			default:
-				if (add == -1)
-					continue;
-				um = ModeManager::FindUserModeByChar(*modes);
-				if (!um)
-					continue;
-		}
-
-		if (um->Type == MODE_REGULAR)
-		{
-			if (add)
-				user->SetModeInternal(um);
-			else
-				user->RemoveModeInternal(um);
-		}
-		else if (++j < ac)
-		{
-			if (add)
-				user->SetModeInternal(um, av[j]);
-			else
-				user->RemoveModeInternal(um);
-		}
-
-		switch (um->Name)
-		{
-			case UMODE_OPER:
-				if (add)
-				{
-					++opcnt;
-					if (Config->WallOper)
-						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", user->nick.c_str());
-					Log(OperServ) << user->nick << " is now an IRC operator";
-				}
-				else
-				{
-					--opcnt;
-
-					Log(OperServ) << user->nick << " is no longer an IRC operator";
-				}
-				break;
-			case UMODE_REGISTERED:
-				if (add && !user->IsIdentified())
-					user->RemoveMode(NickServ, UMODE_REGISTERED);
-				break;
-			case UMODE_CLOAK:
-			case UMODE_VHOST:
-				if (!add && !user->vhost.empty())
-					user->vhost.clear();
-				user->UpdateHost();
-			default:
-				break;
-		}
-	}
-}

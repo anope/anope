@@ -347,7 +347,7 @@ E User *finduser(const Anope::string &nick);
 
 E Anope::string TS6SID;
 
-E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid);
+E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
 
 E void do_umode(const Anope::string &source, int ac, const char **av);
 E void do_quit(const Anope::string &source, int ac, const char **av);
@@ -360,8 +360,6 @@ E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
 
 E bool match_usermask(const Anope::string &mask, User *user);
 E Anope::string create_mask(User *u);
-
-E void UserSetInternalModes(User *user, int ac, const char **av);
 
 /******************************************************************************/
 

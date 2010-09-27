@@ -33,7 +33,6 @@ IRCDVar myIrcd[] = {
 	 1,						/* time stamp on mode */
 	 1,						/* O:LINE */
 	 1,						/* UMODE */
-	 1,						/* VHOST ON NICK */
 	 1,						/* No Knock requires +i */
 	 1,						/* Can remove User Channel Modes with SVSMODE */
 	 0,						/* Sglines are not enforced until user reconnects */
@@ -679,10 +678,10 @@ int anope_event_umode2(const Anope::string &source, int ac, const char **av)
 	if (ac < 1)
 		return MOD_CONT;
 
-	const char *newav[4];
+	const char *newav[2];
 	newav[0] = source.c_str();
 	newav[1] = av[0];
-	do_umode(source, ac, newav);
+	do_umode(source, 2, newav);
 	return MOD_CONT;
 }
 
@@ -841,11 +840,6 @@ int anope_event_sethost(const Anope::string &source, int ac, const char **av)
 **	parv[0] = new nickname
 **	  parv[1] = hopcount
 */
-/*
- do_nick(const char *source, char *nick, char *username, char *host,
-			  char *server, char *realname, time_t ts,
-			  uint32 ip, char *vhost, char *uid)
-*/
 int anope_event_nick(const Anope::string &source, int ac, const char **av)
 {
 	User *user;
@@ -860,7 +854,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 			   <codemastr> it's sent when a nick collision occurs
 			   - so we have to leave it around for now -TSL
 			 */
-			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", "*", "");
+			do_nick(source, av[0], av[3], av[4], av[5], av[6], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", "*", "", "");
 		}
 		else if (ac == 11)
 		{
@@ -869,12 +863,13 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 
 			sockaddrs ip;
 			ip.ntop(strlen(av[9]) == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());
+
+			if (av[8] && !strcmp(av[8], "*"))
+				av[8] = "";
 		
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, ip.addr(), av[8], "");
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[10], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, ip.addr(), av[8], "", av[7]);
 			if (user)
 			{
-				UserSetInternalModes(user, 1, &av[7]);
-
 				NickAlias *na = findnick(user->nick);
 
 				if (na && user->timestamp == convertTo<time_t>(av[6]))
@@ -888,12 +883,13 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 		else
 		{
+			if (av[8] && !strcmp(av[8], "*"))
+				av[8] = "";
+
 			/* NON NICKIP */
-			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", av[8], "");
+			user = do_nick(source, av[0], av[3], av[4], av[5], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, "", av[8], "", av[7]);
 			if (user)
 			{
-				UserSetInternalModes(user, 1, &av[7]);
-
 				NickAlias *na = findnick(user->nick);
 
 				if (na && user->timestamp == convertTo<time_t>(av[6]))
@@ -907,7 +903,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "");
+		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "", "");
 	return MOD_CONT;
 }
 

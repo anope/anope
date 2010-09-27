@@ -433,7 +433,6 @@ struct IRCDVar
 	int tsonmode;					/* Timestamp on mode changes */
 	int omode;						/* On the fly o:lines */
 	int umode;						/* change user modes */
-	int nickvhost;					/* Users vhost sent during NICK */
 	int knock_needs_i;				/* Check if we needed +i when setting NOKNOCK */
 	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;

@@ -233,13 +233,6 @@ class CoreExport User : public Extensible
 	 */
 	void SetMode(BotInfo *bi, UserModeName Name, const Anope::string &Param = "");
 
-	/* Set a mode on the user
-	 * @param bi The client setting the mode
-	 * @param ModeChar The mode char
-	 * @param param Optional param for the mode
-	 */
-	void SetMode(BotInfo *bi, char ModeChar, const Anope::string &Param = "");
-
 	/** Remove a mode on the user
 	 * @param bi The client setting the mode
 	 * @param um The user mode
@@ -252,17 +245,16 @@ class CoreExport User : public Extensible
 	 */
 	void RemoveMode(BotInfo *bi, UserModeName Name);
 
-	/** Remove a mode from the user
-	 * @param bi The client setting the mode
-	 * @param ModeChar The mode char
-	 */
-	void RemoveMode(BotInfo *bi, char ModeChar);
-
 	/** Set a string of modes on a user
-	 * @param bi The client setting the mode
+	 * @param bi The client setting the modes
 	 * @param umodes The modes
 	 */
 	void SetModes(BotInfo *bi, const char *umodes, ...);
+
+	/** Set a string of modes on a user internally
+	 * @param umodes The modes
+	 */
+	void SetModesInternal(const char *umodes, ...);
 
 	/** Find the channel container for Channel c that the user is on
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel

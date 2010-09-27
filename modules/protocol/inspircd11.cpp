@@ -34,7 +34,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* time stamp on mode */
 	 1,					/* O:LINE */
 	 1,					/* UMODE */
-	 1,					/* VHOST ON NICK */
 	 1,					/* No Knock requires +i */
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
@@ -693,10 +692,9 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		{
 			time_t ts = Anope::string(av[0]).is_pos_number_only() ? convertTo<time_t>(av[0]) : 0;
 
-			user = do_nick("", av[1], av[4], av[2], source, av[7], ts, av[6], av[3], "");
+			user = do_nick("", av[1], av[4], av[2], source, av[7], ts, av[6], av[3], "", av[5]);
 			if (user)
 			{
-				UserSetInternalModes(user, 1, &av[5]);
 				user->SetCloakedHost(av[3]);
 
 				NickAlias *na = findnick(user->nick);
@@ -712,7 +710,7 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", 0, "", "", "");
+		do_nick(source, av[0], "", "", "", "", 0, "", "", "", "");
 	return MOD_CONT;
 }
 

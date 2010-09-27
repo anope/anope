@@ -98,7 +98,6 @@ Session *findsession(const Anope::string &host)
 
 /* Attempt to add a host to the session list. If the addition of the new host
  * causes the the session limit to be exceeded, kill the connecting user.
- * Returns 1 if the host was added or 0 if the user was killed.
  */
 
 void add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip)

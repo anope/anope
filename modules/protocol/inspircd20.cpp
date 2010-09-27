@@ -34,7 +34,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* time stamp on mode */
 	 0,					/* O:LINE */
 	 1,					/* UMODE */
-	 1,					/* VHOST ON NICK */
 	 1,					/* No Knock requires +i */
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
@@ -692,7 +691,7 @@ int anope_event_sethost(const Anope::string &source, int ac, const char **av)
 
 int anope_event_nick(const Anope::string &source, int ac, const char **av)
 {
-	do_nick(source, av[0], "", "", "", "", 0, "", "", "");
+	do_nick(source, av[0], "", "", "", "", 0, "", "", "", "");
 	return MOD_CONT;
 }
 
@@ -735,10 +734,12 @@ int anope_event_uid(const Anope::string &source, int ac, const char **av)
 			user->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
-	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, av[6], av[4], av[0]);
+	Anope::string modes = av[8];
+	for (int i = 9; i < ac - 1; ++i)
+		modes += Anope::string(" ") + av[i];
+	user = do_nick("", av[2], av[5], av[3], s->GetName(), av[ac - 1], ts, av[6], av[4], av[0], modes);
 	if (user)
 	{
-		UserSetInternalModes(user, 1, &av[8]);
 		if (!user->server->IsSynced())
 			prev_u_intro = user;
 		else

@@ -188,15 +188,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	void SetMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
-	/**
-	 * Set a mode on a channel
-	 * @param bi The client setting the modes
-	 * @param Mode The mode
-	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
-	 */
-	void SetMode(BotInfo *bi, char Mode, const Anope::string &param = "", bool EnforceMLock = true);
-
 	/** Remove a mode from a channel
 	 * @param bi The client setting the modes
 	 * @param cm The mode
@@ -213,14 +204,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
 	void RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
-	/**
-	 * Remove a mode from a channel
-	 * @param bi The client setting the modes
-	 * @param Mode The mode
-	 * @param param Optional param arg for the mode
-	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
-	 */
-	void RemoveMode(BotInfo *bi, char Mode, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Clear all the modes from the channel
 	 * @param bi The client unsetting the modes

@@ -43,13 +43,23 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
         notice_lang(service, u, MAIL_INVALID, nr->nick);
     } else {
         MailInfo *mail;
+        int pipefds[2];
 
         mail = scalloc(sizeof(MailInfo), 1);
         mail->sender = u;
         mail->recipient = NULL;
         mail->recip = nr;
+        mail->pipe = mail->writepipe = mail->readpipe = NULL;
 
-        if (!(mail->pipe = popen(SendMailPath, "w"))) {
+#if HAVE_FORK
+	if (ForkForMail && !pipe(pipefds))
+	{
+		mail->writepipe = fdopen(pipefds[1], "w");
+		mail->readpipe = fdopen(pipefds[0], "r");
+		mail->pipe = mail->writepipe;
+	}
+#endif
+        if (!mail->pipe && !(mail->pipe = popen(SendMailPath, "w"))) {
             free(mail);
             notice_lang(service, u, MAIL_LATER);
             return NULL;
@@ -96,13 +106,23 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
         notice_lang(service, u, MAIL_INVALID, nc->display);
     } else {
         MailInfo *mail;
+        int pipefds[2];
 
         mail = scalloc(sizeof(MailInfo), 1);
         mail->sender = u;
         mail->recipient = nc;
         mail->recip = NULL;
+        mail->pipe = mail->writepipe = mail->readpipe = NULL;
 
-        if (!(mail->pipe = popen(SendMailPath, "w"))) {
+#if HAVE_FORK
+	if (ForkForMail && !pipe(pipefds))
+	{
+		mail->writepipe = fdopen(pipefds[1], "w");
+		mail->readpipe = fdopen(pipefds[0], "r");
+		mail->pipe = mail->writepipe;
+	}
+#endif
+        if (!mail->pipe && !(mail->pipe = popen(SendMailPath, "w"))) {
             free(mail);
             notice_lang(service, u, MAIL_LATER);
             return NULL;
@@ -141,13 +161,23 @@ MailInfo *MailMemoBegin(NickCore * nc)
 
     } else {
         MailInfo *mail;
+        int pipefds[2];
 
         mail = scalloc(sizeof(MailInfo), 1);
         mail->sender = NULL;
         mail->recipient = nc;
         mail->recip = NULL;
+        mail->pipe = mail->writepipe = mail->readpipe = NULL;
 
-        if (!(mail->pipe = popen(SendMailPath, "w"))) {
+#if HAVE_FORK
+	if (ForkForMail && !pipe(pipefds))
+	{
+		mail->writepipe = fdopen(pipefds[1], "w");
+		mail->readpipe = fdopen(pipefds[0], "r");
+		mail->pipe = mail->writepipe;
+	}
+#endif
+        if (!mail->pipe && !(mail->pipe = popen(SendMailPath, "w"))) {
             free(mail);
             return NULL;
         }
@@ -189,14 +219,38 @@ void MailEnd(MailInfo * mail)
     }
 
 #if HAVE_FORK
-    if (ForkForMail && !(pid = fork()))
+    if (ForkForMail && mail->writepipe && mail->readpipe && !(pid = fork()))
     {
-        pclose(mail->pipe);
+	FILE *fd;
+	int ret;
+
+	fputc(255, mail->writepipe);
+	fclose(mail->writepipe);
+
+    	fd = popen(SendMailPath, "w");
+	if (!fd)
+		return;
+
+	while ((ret = fgetc(mail->readpipe)) != 255)
+		fputc(ret, fd);
+
+	fclose(mail->readpipe);
+	pclose(fd);
         exit(EXIT_SUCCESS);
     }
     else if (pid < 0)
 #endif
-        pclose(mail->pipe);
+    {
+	if (mail->pipe != mail->writepipe)
+		pclose(mail->pipe);
+	else
+	{
+		if (mail->writepipe)
+			fclose(mail->writepipe);
+		if (mail->readpipe)
+			fclose(mail->readpipe);
+	}
+    }
 
     if (mail->sender)           /* added sender check */
         mail->sender->lastmail = time(NULL);

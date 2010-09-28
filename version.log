@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3040"
+VERSION_BUILD="3041"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3041 - Rewrote the mail forking code to use pipes, sometimes mails wouldn't work with the old method
 #Revision 3040 - Fixed configure failing on some systems which have a partial MySQL installation
 #Revision 3039 - Fixed db-merger handling some hostserv collisions
 #Revision 3038 - Initialise git for 1.8-git

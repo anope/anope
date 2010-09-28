@@ -1059,6 +1059,9 @@ typedef struct ignore_data {
 
 struct mailinfo_ {
 	FILE *pipe;
+	/* Used only with mail forking */
+	FILE *writepipe;
+	FILE *readpipe;
 	User *sender;
 	NickCore *recipient;
 	NickRequest *recip;

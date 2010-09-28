@@ -252,6 +252,10 @@ int do_group(User * u)
             }
 
             check_memos(u);
+
+            /* Enable nick tracking if enabled */
+            if (NSNickTracking)
+                nsStartNickTracking(u);
         } else {
             alog("%s: makealias(%s) failed", s_NickServ, u->nick);
             notice_lang(s_NickServ, u, NICK_GROUP_FAILED);

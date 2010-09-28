@@ -215,9 +215,13 @@ int do_saset_display(User * u, NickCore * nc, char *param)
     change_core_display(nc, param);
     notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_CHANGED, nc->display);
 
-    /* Enable nick tracking if enabled */
-    if (NSNickTracking)
-        nsStartNickTracking(u);
+    if (NSNickTracking) {
+        for (i = 0; i < nc->aliases.count; ++i) {
+            na = nc->aliases.list[i];
+            if (na->u && nick_identified(na->u))
+                nsStartNickTracking(na->u);
+        }
+    }
 
     return MOD_CONT;
 }

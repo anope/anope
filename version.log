@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3042"
+VERSION_BUILD="3043"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3043 - Fixed /nickserv saset display to change the nicktracking of the users affected by it, not the user executing it
 #Revision 3042 - Fixed /nickserv group to use nicktracking if enabled
 #Revision 3041 - Rewrote the mail forking code to use pipes, sometimes mails wouldn't work with the old method
 #Revision 3040 - Fixed configure failing on some systems which have a partial MySQL installation

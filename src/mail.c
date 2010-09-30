@@ -228,14 +228,15 @@ void MailEnd(MailInfo * mail)
 	fclose(mail->writepipe);
 
     	fd = popen(SendMailPath, "w");
-	if (!fd)
-		return;
 
-	while ((ret = fgetc(mail->readpipe)) != 255)
-		fputc(ret, fd);
+	if (fd)
+	{
+		while ((ret = fgetc(mail->readpipe)) != 255)
+			fputc(ret, fd);
+		pclose(fd);
+	}
 
 	fclose(mail->readpipe);
-	pclose(fd);
         exit(EXIT_SUCCESS);
     }
     else if (pid < 0)

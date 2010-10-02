@@ -12,21 +12,7 @@
 #include "services.h"
 #include "modules.h"
 
-/*************************************************************************/
-/* *INDENT-OFF* */
-
 static bool SendMemoMail(NickCore *nc, Memo *m);
-
-/*************************************************************************/
-
-void moduleAddMemoServCmds()
-{
-	ModuleManager::LoadModuleList(Config->MemoServCoreModules);
-}
-
-/*************************************************************************/
-/*************************************************************************/
-/* *INDENT-ON* */
 
 /**
  * MemoServ initialization.
@@ -34,7 +20,8 @@ void moduleAddMemoServCmds()
  */
 void ms_init()
 {
-	moduleAddMemoServCmds();
+	if (!Config->s_MemoServ.empty())
+		ModuleManager::LoadModuleList(Config->MemoServCoreModules);
 }
 
 /*************************************************************************/
@@ -47,6 +34,9 @@ void ms_init()
  */
 void check_memos(User *u)
 {
+	if (Config->s_MemoServ.empty())
+		return;
+
 	if (!u)
 	{
 		Log() << "check_memos called with NULL values";
@@ -167,6 +157,9 @@ MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid)
  */
 void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z)
 {
+	if (Config->s_MemoServ.empty())
+		return;
+
 	bool ischan, isforbid;
 	MemoInfo *mi;
 	Anope::string source = u->Account()->display;

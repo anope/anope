@@ -543,6 +543,19 @@ bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string 
 	return true;
 }
 
+bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+{
+	if (!config->s_MemoServ.empty())
+	{
+		if (value.equals_ci("description"))
+		{
+			if (data.GetValue().empty())
+				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when MemoServ is enabled!");
+		}
+	}
+	return true;
+}
+
 bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->s_BotServ.empty())
@@ -1088,8 +1101,8 @@ void ServerConfig::Read()
 		{"chanserv", "listopersonly", "no", new ValueContainerBool(&this->CSListOpersOnly), DT_BOOLEAN, NoValidation},
 		{"chanserv", "listmax", "0", new ValueContainerUInt(&this->CSListMax), DT_UINTEGER, ValidateNotZero},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&this->CSOpersOnly), DT_BOOLEAN, NoValidation},
-		{"memoserv", "nick", "MemoServ", new ValueContainerString(&this->s_MemoServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"memoserv", "description", "Memo Service", new ValueContainerString(&this->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"memoserv", "nick", "", new ValueContainerString(&this->s_MemoServ), DT_STRING | DT_NORELOAD, NoValidation},
+		{"memoserv", "description", "Memo Service", new ValueContainerString(&this->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateMemoServ},
 		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&this->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&this->MSSendDelay), DT_TIME, NoValidation},

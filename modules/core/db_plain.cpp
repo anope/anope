@@ -928,12 +928,9 @@ class DBPlain : public Module
 			BotInfo *bi = it->second;
 
 			db << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
-			if (bi->FlagCount())
+			if (bi->HasFlag(BI_PRIVATE))
 			{
-				db << "MD FLAGS";
-				if (bi->HasFlag(BI_PRIVATE))
-					db << " PRIVATE";
-				db << endl;
+				db << "MD FLAGS PRIVATE" << endl;
 			}
 		}
 

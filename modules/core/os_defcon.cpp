@@ -225,7 +225,7 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == findbot(Config->s_NickServ))
+		if (service == NickServ)
 		{
 			if (command.equals_ci("REGISTER") || command.equals_ci("GROUP"))
 			{
@@ -236,7 +236,7 @@ class OSDefcon : public Module
 				}
 			}
 		}
-		else if (service == findbot(Config->s_ChanServ))
+		else if (ChanServ && service == ChanServ)
 		{
 			if (command.equals_ci("SET"))
 			{
@@ -255,7 +255,7 @@ class OSDefcon : public Module
 				}
 			}
 		}
-		else if (service == findbot(Config->s_MemoServ))
+		else if (MemoServ && service == MemoServ)
 		{
 			if (command.equals_ci("SEND") || command.equals_ci("SENDALL"))
 			{

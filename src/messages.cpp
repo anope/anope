@@ -174,23 +174,23 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
 				}
 			}
-			else if (bi->nick.equals_ci(Config->s_NickServ) || bi->nick.equals_ci(Config->s_MemoServ) || (!Config->s_BotServ.empty() && bi->nick.equals_ci(Config->s_BotServ)))
+			if (bi == NickServ || bi == MemoServ || bi == BotServ)
 				mod_run_cmd(bi, u, message);
-			else if (bi->nick.equals_ci(Config->s_ChanServ))
+			else if (bi == ChanServ)
 			{
 				if (!is_oper(u) && Config->CSOpersOnly)
 					u->SendMessage(ChanServ, ACCESS_DENIED);
 				else
 					mod_run_cmd(bi, u, message);
 			}
-			else if (!Config->s_HostServ.empty() && bi->nick.equals_ci(Config->s_HostServ))
+			else if (bi == HostServ)
 			{
 				if (!ircd->vhost)
 					u->SendMessage(HostServ, SERVICE_OFFLINE, Config->s_HostServ.c_str());
 				else
 					mod_run_cmd(bi, u, message);
 			}
-			else if (bi->nick.equals_ci(Config->s_OperServ))
+			else if (bi == OperServ)
 			{
 				if (!is_oper(u) && Config->OSOpersOnly)
 				{

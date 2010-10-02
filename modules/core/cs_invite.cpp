@@ -61,7 +61,7 @@ class CommandCSInvite : public Command
 		{
 			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
 			u->SendMessage(whosends(ci), CHAN_INVITE_OTHER_SUCCESS, u2->nick.c_str(), c->name.c_str());
-			u->SendMessage(whosends(ci), CHAN_INVITE_SUCCESS, c->name.c_str());
+			u2->SendMessage(whosends(ci), CHAN_INVITE_SUCCESS, c->name.c_str());
 		}
 		return MOD_CONT;
 	}

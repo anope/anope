@@ -13,7 +13,7 @@ int Pipe::SendInternal(const Anope::string &) const
 	return write(this->WritePipe, &dummy, 1);
 }
 
-Pipe::Pipe() : Socket()
+Pipe::Pipe() : BufferedSocket()
 {
 	int fds[2];
 	if (pipe(fds))
@@ -26,7 +26,6 @@ Pipe::Pipe() : Socket()
 	this->Sock = fds[0];
 	this->WritePipe = fds[1];
 	this->IPv6 = false;
-	this->Type = SOCKTYPE_CLIENT;
 
 	SocketEngine->AddSocket(this);
 }

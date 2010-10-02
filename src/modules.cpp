@@ -332,7 +332,6 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 
 Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)
 {
-	ModuleManager::RegisterService(this);
 }
 
 Service::~Service()

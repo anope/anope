@@ -20,6 +20,9 @@ extern CoreExport ThreadEngine threadEngine;
 class ThreadEngine
 {
  public:
+	/* Vector of threads */
+	std::vector<Thread *> threads;
+
 	/** Threadengines constructor
 	 */
 	ThreadEngine();
@@ -32,6 +35,10 @@ class ThreadEngine
 	 * @param thread A pointer to a newley allocated thread
 	 */
 	void Start(Thread *thread);
+
+	/** Check for finished threads
+	 */
+	void Process();
 };
 
 class Thread : public Extensible

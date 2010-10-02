@@ -147,7 +147,6 @@ if test "x$FAILED" = "x" ; then
 	echo "	username = \"$SQLUSER\""
 	echo "	password = \"$SQLPASS\""
 	echo "	port = \"$SQLPORT\""
-	echo "	updatedelay = \"60\""
 	echo "}"
 	echo ""
 else

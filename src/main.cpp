@@ -104,27 +104,23 @@ class UpdateTimer : public Timer
 	}
 };
 
-Socket *UplinkSock = NULL;
+ConnectionSocket *UplinkSock = NULL;
 
-class UplinkSocket : public ClientSocket
+UplinkSocket::UplinkSocket(bool ipv6) : ConnectionSocket(ipv6)
 {
- public:
-	UplinkSocket(const Anope::string &nTargetHost, int nPort, const Anope::string &nBindHost = "", bool nIPv6 = false) : ClientSocket(nTargetHost, nPort, nBindHost, nIPv6)
-	{
-		UplinkSock = this;
-	}
+	UplinkSock = this;
+}
 
-	~UplinkSocket()
-	{
-		UplinkSock = NULL;
-	}
+UplinkSocket::~UplinkSocket()
+{
+	UplinkSock = NULL;
+}
 
-	bool Read(const Anope::string &buf)
-	{
-		process(buf);
-		return true;
-	}
-};
+bool UplinkSocket::Read(const Anope::string &buf)
+{
+	process(buf);
+	return true;
+}
 
 /*************************************************************************/
 
@@ -354,13 +350,14 @@ static bool Connect()
 		if (MOD_RESULT != EVENT_CONTINUE)
 		{
 			if (MOD_RESULT == EVENT_STOP)
-				break;
+				continue;
 			return true;
 		}
 
 		try
 		{
-			new UplinkSocket(uplink_server->host, uplink_server->port, Config->LocalHost, uplink_server->ipv6);
+			new UplinkSocket(uplink_server->ipv6);
+			UplinkSock->Connect(uplink_server->host, uplink_server->port, Config->LocalHost);
 		}
 		catch (const SocketException &ex)
 		{
@@ -368,7 +365,7 @@ static bool Connect()
 			continue;
 		}
 
-		Log() << "Connected to Server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
+		Log() << "Connected to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
 		return true;
 	}
 
@@ -468,6 +465,9 @@ int main(int ac, char **av, char **envp)
 					TimerManager::TickTimers(Anope::CurTime);
 					last_check = Anope::CurTime;
 				}
+
+				/* Free up any finished threads */
+				threadEngine.Process();
 
 				/* Process any modes that need to be (un)set */
 				ModeManager::ProcessModes();

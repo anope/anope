@@ -741,6 +741,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		if (!vhost.empty())
 			user->SetCloakedHost(vhost);
 		user->SetVIdent(username);
+		user->SetModesInternal(modes.c_str());
 
 		if (!ip.empty())
 		{

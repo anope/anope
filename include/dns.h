@@ -126,13 +126,14 @@ struct DNSRecord
 
 /** The socket used to talk to the nameserver, uses UDP
  */
-class DNSSocket : public ClientSocket
+class DNSSocket : public ConnectionSocket
 {
  private:
 	int SendTo(const unsigned char *buf, size_t len) const;
 	int RecvFrom(char *buf, size_t size, sockaddrs &addrs) const;
+
  public:
-	DNSSocket(const Anope::string &nTargetHost, int Port);
+	DNSSocket();
 	virtual ~DNSSocket();
 
 	bool ProcessRead();

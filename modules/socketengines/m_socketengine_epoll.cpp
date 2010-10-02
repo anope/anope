@@ -48,7 +48,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		memset(&ev, 0, sizeof(ev));
 
 		ev.events = EPOLLIN;
-		ev.data.fd = s->GetSock();
+		ev.data.fd = s->GetFD();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
 		{
@@ -67,7 +67,7 @@ class SocketEngineEPoll : public SocketEngineBase
 
 		memset(&ev, 0, sizeof(ev));
 
-		ev.data.fd = s->GetSock();
+		ev.data.fd = s->GetFD();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_DEL, ev.data.fd, &ev) == -1)
 		{
@@ -90,7 +90,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		memset(&ev, 0, sizeof(ev));
 
 		ev.events = EPOLLIN | EPOLLOUT;
-		ev.data.fd = s->GetSock();
+		ev.data.fd = s->GetFD();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << Anope::LastError();
@@ -108,7 +108,7 @@ class SocketEngineEPoll : public SocketEngineBase
 		memset(&ev, 0, sizeof(ev));
 
 		ev.events = EPOLLIN;
-		ev.data.fd = s->GetSock();
+		ev.data.fd = s->GetFD();
 
 		if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
 			Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << Anope::LastError();

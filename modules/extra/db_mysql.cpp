@@ -352,7 +352,7 @@ class DBMySQL : public Module
 		return SQL ? SQL->Escape(query) : query;
 	}
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), interface(this), SQL(this, "mysql/main")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), interface(this), SQL("mysql/main")
 	{
 		me = this;
 

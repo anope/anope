@@ -1236,11 +1236,10 @@ class Service : public virtual Base
 template<typename T>
 class service_reference : public dynamic_reference<T>
 {
-	Module *owner;
 	Anope::string name;
 
  public:
-	service_reference(Module *o, const Anope::string &n) : dynamic_reference<T>(static_cast<T *>(ModuleManager::GetService(this->name))), owner(o), name(n)
+	service_reference(const Anope::string &n) : dynamic_reference<T>(static_cast<T *>(ModuleManager::GetService(n))), name(n)
 	{
 	}
 
@@ -1261,11 +1260,6 @@ class service_reference : public dynamic_reference<T>
 			if (this->ref)
 				this->ref->AddReference(this);
 		}
-		return this->ref;
-	}
-
-	inline T *operator->()
-	{
 		return this->ref;
 	}
 };

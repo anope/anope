@@ -186,6 +186,7 @@ class ModuleSQL : public Module
 		DThread->SetExitState();
 		DThread->Wakeup();
 		DThread->Join();
+		delete DThread;
 
 		delete SQLPipe;
 	}
@@ -234,6 +235,7 @@ class ModuleSQL : public Module
 				{
 					MySQLService *ss = new MySQLService(this, connname, database, server, user, password, port);
 					this->MySQLServices.insert(std::make_pair(connname, ss));
+					ModuleManager::RegisterService(ss);
 
 					Log(LOG_NORMAL, "mysql") << "MySQL: Sucessfully connected to server " << connname << " (" << server << ")";
 				}
@@ -284,13 +286,13 @@ MySQLService::~MySQLService()
 
 	for (unsigned i = me->QueryRequests.size(); i > 0; --i)
 	{
-		QueryRequest &r = me->QueryRequests[i];
+		QueryRequest &r = me->QueryRequests[i - 1];
 
 		if (r.service == this)
 		{
 			if (r.interface)
 				r.interface->OnError(SQLResult("", "SQL Interface is going away"));
-			me->QueryRequests.erase(me->QueryRequests.begin() + i);
+			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
 	this->Lock.Unlock();
@@ -373,7 +375,7 @@ void DispatcherThread::Run()
 			r.service->Lock.Unlock();
 
 			this->Lock();
-			if (me->QueryRequests.front().query == r.query)
+			if (!me->QueryRequests.empty() && me->QueryRequests.front().query == r.query)
 			{
 				if (r.interface)
 					me->FinishedRequests.push_back(QueryResult(r.interface, sresult));

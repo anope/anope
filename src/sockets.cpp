@@ -4,6 +4,8 @@ SocketEngineBase *SocketEngine = NULL;
 int32 TotalRead = 0;
 int32 TotalWritten = 0;
 
+SocketIO normalSocketIO;
+
 /** Trims all the \r and \ns from the begining and end of a string
  * @param buffer The buffer to trim
  */
@@ -13,6 +15,20 @@ static void TrimBuf(std::string &buffer)
 		buffer.erase(buffer.begin());
 	while (!buffer.empty() && (buffer[buffer.length() - 1] == '\r' || buffer[buffer.length() - 1] == '\n'))
 		buffer.erase(buffer.length() - 1);
+}
+
+/** Construct the object, sets everything to 0
+ */
+sockaddrs::sockaddrs()
+{
+	this->clear();
+}
+
+/** Memset the object to 0
+ */
+void sockaddrs::clear()
+{
+	memset(this, 0, sizeof(*this));
 }
 
 /** Get the size of the sockaddr we represent
@@ -73,13 +89,6 @@ Anope::string sockaddrs::addr() const
 	}
 
 	return address;
-}
-
-/** Construct the object, sets everything to 0
- */
-sockaddrs::sockaddrs()
-{
-	memset(this, 0, sizeof(*this));
 }
 
 /** Check if this sockaddr has data in it
@@ -184,25 +193,96 @@ SocketEngineBase::~SocketEngineBase()
 #endif
 }
 
+/** Receive something from the buffer
+ * @param s The socket
+ * @param buf The buf to read to
+ * @param sz How much to read
+ * @return Number of bytes received
+ */
+int SocketIO::Recv(Socket *s, char *buf, size_t sz) const
+{
+	size_t i = recv(s->GetFD(), buf, sz, 0);
+	TotalRead += i;
+	return i;
+}
+
+/** Write something to the socket
+ * @param s The socket
+ * @param buf What to write
+ * @return Number of bytes written
+ */
+int SocketIO::Send(Socket *s, const Anope::string &buf) const
+{
+	size_t i = send(s->GetFD(), buf.c_str(), buf.length(), 0);
+	TotalWritten += i;
+	return i;
+}
+
+/** Accept a connection from a socket
+ * @param s The socket
+ */
+void SocketIO::Accept(ListenSocket *s)
+{
+	sockaddrs conaddr;
+
+	socklen_t size = conaddr.size();
+	int newsock = accept(s->GetFD(), &conaddr.sa, &size);
+
+#ifndef INVALID_SOCKET
+# define INVALID_SOCKET 0
+#endif
+
+	if (newsock > 0 && newsock != INVALID_SOCKET)
+		s->OnAccept(newsock, conaddr);
+	else
+		throw SocketException("Unable to accept connection: " + Anope::LastError());
+}
+
+/** Connect the socket
+  * @param s THe socket
+  * @param target IP to connect to
+  * @param port to connect to
+  * @param bindip IP to bind to, if any
+  */
+void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port, const Anope::string &bindip)
+{
+	s->bindaddr.clear();
+	s->conaddr.clear();
+
+	if (!bindip.empty())
+	{
+		s->bindaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, bindip, 0);
+		if (bind(s->GetFD(), &s->bindaddr.sa, s->bindaddr.size()) == -1)
+			throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
+	}
+
+	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
+	if (connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size()) == -1 && errno != EINPROGRESS)
+		throw SocketException(Anope::string("Error connecting to server: ") + Anope::LastError());
+}
+
 /** Empty constructor, used for things such as the pipe socket
  */
 Socket::Socket()
 {
+	this->Type = SOCKTYPE_BASE;
+	this->IO = &normalSocketIO;
 }
 
 /** Constructor
- * @param nsock The socket
- * @param nIPv6 IPv6?
+ * @param sock The socket
+ * @param ipv6 IPv6?
  * @param type The socket type, defaults to SOCK_STREAM
  */
-Socket::Socket(int nsock, bool nIPv6, int type)
+Socket::Socket(int sock, bool ipv6, int type)
 {
-	Type = SOCKTYPE_CLIENT;
-	IPv6 = nIPv6;
-	if (nsock == 0)
-		Sock = socket(IPv6 ? AF_INET6 : AF_INET, type, 0);
+	this->Type = SOCKTYPE_BASE;
+	this->IO = &normalSocketIO;
+	this->IPv6 = ipv6;
+	if (sock == 0)
+		this->Sock = socket(this->IPv6 ? AF_INET6 : AF_INET, type, 0);
 	else
-		Sock = nsock;
+		this->Sock = sock;
 	SocketEngine->AddSocket(this);
 }
 
@@ -212,62 +292,16 @@ Socket::~Socket()
 {
 	if (SocketEngine)
 		SocketEngine->DelSocket(this);
-	CloseSocket(Sock);
-}
-
-/** Really receive something from the buffer
- * @param buf The buf to read to
- * @param sz How much to read
- * @return Number of bytes received
- */
-int Socket::RecvInternal(char *buf, size_t sz) const
-{
-	return recv(GetSock(), buf, sz, 0);
-}
-
-/** Really write something to the socket
- * @param buf What to write
- * @return Number of bytes written
- */
-int Socket::SendInternal(const Anope::string &buf) const
-{
-	return send(GetSock(), buf.c_str(), buf.length(), 0);
+	CloseSocket(this->Sock);
+	this->IO->Destroy();
 }
 
 /** Get the socket FD for this socket
  * @return the fd
  */
-int Socket::GetSock() const
+int Socket::GetFD() const
 {
 	return Sock;
-}
-
-/** Mark a socket as blockig
- * @return true if the socket is now blocking
- */
-bool Socket::SetBlocking()
-{
-#ifdef _WIN32
-	unsigned long opt = 0;
-	return !ioctlsocket(this->GetSock(), FIONBIO, &opt);
-#else
-	int flags = fcntl(this->GetSock(), F_GETFL, 0);
-	return !fcntl(this->GetSock(), F_SETFL, flags & ~O_NONBLOCK);
-#endif
-}
-
-/** Mark a socket as non-blocking
- * @return true if the socket is now non-blocking
- */
-bool Socket::SetNonBlocking()
-{
-#ifdef _WIN32
-	unsigned long opt = 1;
-	return !ioctlsocket(this->GetSock(), FIONBIO, &opt);
-#else
-	int flags = fcntl(this->GetSock(), F_GETFL, 0);
-	return !fcntl(this->GetSock(), F_SETFL, flags | O_NONBLOCK);
-#endif
 }
 
 /** Check if this socket is IPv6
@@ -278,20 +312,32 @@ bool Socket::IsIPv6() const
 	return IPv6;
 }
 
-/** Get the length of the read buffer
- * @return The length of the read buffer
+/** Mark a socket as blockig
+ * @return true if the socket is now blocking
  */
-size_t Socket::ReadBufferLen() const
+bool Socket::SetBlocking()
 {
-	return RecvLen;
+#ifdef _WIN32
+	unsigned long opt = 0;
+	return !ioctlsocket(this->GetFD(), FIONBIO, &opt);
+#else
+	int flags = fcntl(this->GetFD(), F_GETFL, 0);
+	return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
+#endif
 }
 
-/** Get the length of the write buffer
- * @return The length of the write buffer
+/** Mark a socket as non-blocking
+ * @return true if the socket is now non-blocking
  */
-size_t Socket::WriteBufferLen() const
+bool Socket::SetNonBlocking()
 {
-	return WriteBuffer.length();
+#ifdef _WIN32
+	unsigned long opt = 1;
+	return !ioctlsocket(this->GetFD(), FIONBIO, &opt);
+#else
+	int flags = fcntl(this->GetFD(), F_GETFL, 0);
+	return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
+#endif
 }
 
 /** Called when there is something to be received for this socket
@@ -299,9 +345,55 @@ size_t Socket::WriteBufferLen() const
  */
 bool Socket::ProcessRead()
 {
+	return true;
+}
+
+/** Called when the socket is ready to be written to
+ * @return true on success, false to drop this socket
+ */
+bool Socket::ProcessWrite()
+{
+	return true;
+}
+
+/** Called when there is an error for this socket
+ * @return true on success, false to drop this socket
+ */
+void Socket::ProcessError()
+{
+}
+
+/** Constructor for pipe socket
+ */
+BufferedSocket::BufferedSocket() : Socket()
+{
+	this->Type = SOCKTYPE_BUFFERED;
+}
+
+/** Constructor
+ * @param fd FD to use
+ * @param ipv6 true for ipv6
+ * @param type socket type, defaults to SOCK_STREAM
+ */
+BufferedSocket::BufferedSocket(int fd, bool ipv6, int type) : Socket(fd, ipv6, type)
+{
+	this->Type = SOCKTYPE_BUFFERED;
+}
+
+/** Default destructor
+ */
+BufferedSocket::~BufferedSocket()
+{
+}
+
+/** Called when there is something to be received for this socket
+ * @return true on success, false to drop this socket
+ */
+bool BufferedSocket::ProcessRead()
+{
 	char tbuffer[NET_BUFSIZE] = "";
 
-	RecvLen = RecvInternal(tbuffer, sizeof(tbuffer) - 1);
+	RecvLen = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
 	if (RecvLen <= 0)
 		return false;
 
@@ -341,13 +433,13 @@ bool Socket::ProcessRead()
 /** Called when the socket is ready to be written to
  * @return true on success, false to drop this socket
  */
-bool Socket::ProcessWrite()
+bool BufferedSocket::ProcessWrite()
 {
 	if (WriteBuffer.empty())
 	{
 		return true;
 	}
-	if (SendInternal(WriteBuffer) == -1)
+	if (this->IO->Send(this, WriteBuffer) == -1)
 	{
 		return false;
 	}
@@ -357,18 +449,11 @@ bool Socket::ProcessWrite()
 	return true;
 }
 
-/** Called when there is an error for this socket
- * @return true on success, false to drop this socket
- */
-void Socket::ProcessError()
-{
-}
-
 /** Called with a line received from the socket
  * @param buf The line
  * @return true to continue reading, false to drop the socket
  */
-bool Socket::Read(const Anope::string &buf)
+bool BufferedSocket::Read(const Anope::string &buf)
 {
 	return false;
 }
@@ -376,7 +461,7 @@ bool Socket::Read(const Anope::string &buf)
 /** Write to the socket
  * @param message The message
  */
-void Socket::Write(const char *message, ...)
+void BufferedSocket::Write(const char *message, ...)
 {
 	va_list vi;
 	char tbuffer[BUFSIZE];
@@ -395,58 +480,36 @@ void Socket::Write(const char *message, ...)
 /** Write to the socket
  * @param message The message
  */
-void Socket::Write(const Anope::string &message)
+void BufferedSocket::Write(const Anope::string &message)
 {
 	WriteBuffer.append(message.str() + "\r\n");
 	SocketEngine->MarkWritable(this);
 }
 
-/** Constructor
- * @param TargetHost The target host to connect to
- * @param Port The target port to connect to
- * @param BindHost The host to bind to for connecting
- * @param nIPv6 true to use IPv6
- * @param type The socket type, defaults to SOCK_STREAM
+/** Get the length of the read buffer
+ * @return The length of the read buffer
  */
-ClientSocket::ClientSocket(const Anope::string &TargetHost, int Port, const Anope::string &BindHost, bool nIPv6, int type) : Socket(0, nIPv6, type)
+size_t BufferedSocket::ReadBufferLen() const
 {
-	this->SetNonBlocking();
-
-	if (!BindHost.empty())
-	{
-		this->bindaddrs.pton(IPv6 ? AF_INET6 : AF_INET, BindHost, 0);
-		if (bind(Sock, &this->bindaddrs.sa, this->bindaddrs.size()) == -1)
-			throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
-	}
-
-	this->conaddrs.pton(IPv6 ? AF_INET6 : AF_INET, TargetHost, Port);
-	if (connect(Sock, &this->conaddrs.sa, this->conaddrs.size()) == -1 && errno != EINPROGRESS)
-		throw SocketException(Anope::string("Error connecting to server: ") + Anope::LastError());
+	return RecvLen;
 }
 
-/** Default destructor
+/** Get the length of the write buffer
+ * @return The length of the write buffer
  */
-ClientSocket::~ClientSocket()
+size_t BufferedSocket::WriteBufferLen() const
 {
-}
-
-/** Called with a line received from the socket
- * @param buf The line
- * @return true to continue reading, false to drop the socket
- */
-bool ClientSocket::Read(const Anope::string &buf)
-{
-	return true;
+	return WriteBuffer.length();
 }
 
 /** Constructor
  * @param bindip The IP to bind to
  * @param port The port to listen on
+ * @param ipv6 true for ipv6
  */
-ListenSocket::ListenSocket(const Anope::string &bindip, int port) : Socket(0, (bindip.find(':') != Anope::string::npos ? true : false))
+ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6) : Socket(0, ipv6)
 {
-	Type = SOCKTYPE_LISTEN;
-
+	this->Type = SOCKTYPE_LISTEN;
 	this->SetNonBlocking();
 
 	this->listenaddrs.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
@@ -468,24 +531,61 @@ ListenSocket::~ListenSocket()
  */
 bool ListenSocket::ProcessRead()
 {
-	int newsock = accept(Sock, NULL, NULL);
-
-#ifndef INVALID_SOCKET
-# define INVALID_SOCKET 0
-#endif
-
-	if (newsock > 0 && newsock != INVALID_SOCKET)
-		return this->OnAccept(new Socket(newsock, IPv6));
-
+	try
+	{
+		this->IO->Accept(this);
+	}
+	catch (const SocketException &ex)
+	{
+		Log() << ex.GetReason();
+	}
 	return true;
 }
 
 /** Called when a connection is accepted
- * @param s The socket for the new connection
- * @return true if the listen socket should remain alive
+ * @param fd The FD for the new connection
+ * @param addr The sockaddr for where the connection came from
+ * @return The new socket
  */
-bool ListenSocket::OnAccept(Socket *s)
+ClientSocket *ListenSocket::OnAccept(int fd, const sockaddrs &addr)
 {
-	return true;
+	return new ClientSocket(this, fd, addr);
+}
+
+/** Constructor
+ * @param ipv6 true to use IPv6
+ * @param type The socket type, defaults to SOCK_STREAM
+ */
+ConnectionSocket::ConnectionSocket(bool ipv6, int type) : BufferedSocket(0, ipv6, type)
+{
+	this->Type = SOCKTYPE_CONNECTION;
+}
+
+/** Connect the socket
+ * @param TargetHost The target host to connect to
+ * @param Port The target port to connect to
+ * @param BindHost The host to bind to for connecting
+ */
+void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port, const Anope::string &BindHost)
+{
+	try
+	{
+		this->IO->Connect(this, TargetHost, Port, BindHost);
+	}
+	catch (const SocketException &)
+	{
+		delete this;
+		throw;
+	}
+}
+
+/** Constructor
+ * @param ls Listen socket this connection is from
+ * @param fd New FD for this socket
+ * @param addr Address the connection came from
+ */
+ClientSocket::ClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr) : BufferedSocket(fd, ls->IsIPv6()), LS(ls), clientaddr(addr)
+{
+	this->Type = SOCKTYPE_CLIENT;
 }
 

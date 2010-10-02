@@ -7,9 +7,9 @@ class LSocket : public ListenSocket
  public:
 	LSocket(const Anope::string &host, int port) : ListenSocket(host, port) { }
 
-	bool OnAccept(Socket *s)
+	bool OnAccept(int fd, const sockaddrs &)
 	{
-		newsocket = s;
+		newsocket = new Socket(fd, this->IPv6);
 		return true;
 	}
 };
@@ -26,7 +26,7 @@ int Pipe::SendInternal(const Anope::string &) const
 	return write(this->WritePipe, &dummy, 1);
 }
 
-Pipe::Pipe() : Socket()
+Pipe::Pipe() : BufferedSocket()
 {
 	LSocket lfs("127.0.0.1", 0);
 
@@ -47,7 +47,6 @@ Pipe::Pipe() : Socket()
 	this->Sock = cfd;
 	this->WritePipe = newsocket->GetSock();
 	this->IPv6 = false;
-	this->Type = SOCKTYPE_CLIENT;
 
 	SocketEngine->AddSocket(this);
 	newsocket = NULL;

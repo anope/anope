@@ -10,9 +10,7 @@ static void *entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
-	if (!thread->GetExitState())
-		thread->Join();
-	delete thread;
+	thread->SetExitState();
 	pthread_exit(0);
 }
 
@@ -22,6 +20,8 @@ ThreadEngine::ThreadEngine()
 {
 	if (pthread_attr_init(&threadengine_attr))
 		throw CoreException("ThreadEngine: Error calling pthread_attr_init");
+	if (pthread_attr_setdetachstate(&threadengine_attr, PTHREAD_CREATE_JOINABLE))
+		throw CoreException("ThreadEngine: Unable to mark threads as joinable");
 }
 
 /** Threadengines destructor
@@ -35,7 +35,7 @@ ThreadEngine::~ThreadEngine()
  */
 void Thread::Join()
 {
-	SetExitState();
+	this->SetExitState();
 	pthread_join(Handle, NULL);
 }
 

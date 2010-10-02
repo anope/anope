@@ -1,32 +1,47 @@
 #include "services.h"
 #include <sys/eventfd.h>
 
-int Pipe::RecvInternal(char *buf, size_t sz) const
+class PipeIO : public SocketIO
 {
-	static eventfd_t dummy;
-	return !eventfd_read(this->Sock, &dummy);
-}
+ public:
+	/** Receive something from the buffer
+ 	 * @param s The socket
+	 * @param buf The buf to read to
+	 * @param sz How much to read
+	 * @return Number of bytes received
+	 */
+	int Recv(Socket *s, char *buf, size_t sz) const
+	{
+		static eventfd_t dummy;
+		return !eventfd_read(s->GetFD(), &dummy);
+	}
 
-int Pipe::SendInternal(const Anope::string &) const
-{
-	return !eventfd_write(this->Sock, 1);
-}
+	/** Write something to the socket
+ 	 * @param s The socket
+	 * @param buf What to write
+	 * @return Number of bytes written
+	 */
+	int Send(Socket *s, const Anope::string &buf) const
+	{
+		return !eventfd_write(s->GetFD(), 1);
+	}
+} pipeSocketIO;
 
-Pipe::Pipe() : Socket()
+Pipe::Pipe() : BufferedSocket()
 {
+	this->IO = &pipeSocketIO;
 	this->Sock = eventfd(0, EFD_NONBLOCK);
 	if (this->Sock < 0)
 		throw CoreException(Anope::string("Could not create pipe: ") + Anope::LastError());
 
 	this->IPv6 = false;
-	this->Type = SOCKTYPE_CLIENT;
 
 	SocketEngine->AddSocket(this);
 }
 
 bool Pipe::ProcessRead()
 {
-	this->RecvInternal(NULL, 0);
+	this->IO->Recv(this, NULL, 0);
 	return this->Read("");
 }
 

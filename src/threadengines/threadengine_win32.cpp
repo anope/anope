@@ -7,9 +7,7 @@ static DWORD WINAPI entry_point(void *parameter)
 {
 	Thread *thread = static_cast<Thread *>(parameter);
 	thread->Run();
-	if (!thread->GetExitState())
-		thread->Join();
-	delete thread;
+	thread->SetExitState();
 	return 0;
 }
 
@@ -29,7 +27,7 @@ ThreadEngine::~ThreadEngine()
  */
 void Thread::Join()
 {
-	SetExitState();
+	this->SetExitState();
 	WaitForSingleObject(Handle, INFINITE);
 }
 

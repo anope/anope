@@ -26,26 +26,26 @@ class SocketEngineSelect : public SocketEngineBase
 
 	void AddSocket(Socket *s)
 	{
-		if (s->GetSock() > MaxFD)
-			MaxFD = s->GetSock();
-		FD_SET(s->GetSock(), &ReadFDs);
-		Sockets.insert(std::make_pair(s->GetSock(), s));
+		if (s->GetFD() > MaxFD)
+			MaxFD = s->GetFD();
+		FD_SET(s->GetFD(), &ReadFDs);
+		Sockets.insert(std::make_pair(s->GetFD(), s));
 	}
 
 	void DelSocket(Socket *s)
 	{
-		if (s->GetSock() == MaxFD)
+		if (s->GetFD() == MaxFD)
 			--MaxFD;
-		FD_CLR(s->GetSock(), &ReadFDs);
-		FD_CLR(s->GetSock(), &WriteFDs);
-		Sockets.erase(s->GetSock());
+		FD_CLR(s->GetFD(), &ReadFDs);
+		FD_CLR(s->GetFD(), &WriteFDs);
+		Sockets.erase(s->GetFD());
 	}
 
 	void MarkWritable(Socket *s)
 	{
 		if (s->HasFlag(SF_WRITABLE))
 			return;
-		FD_SET(s->GetSock(), &WriteFDs);
+		FD_SET(s->GetFD(), &WriteFDs);
 		s->SetFlag(SF_WRITABLE);
 	}
 
@@ -53,7 +53,7 @@ class SocketEngineSelect : public SocketEngineBase
 	{
 		if (!s->HasFlag(SF_WRITABLE))
 			return;
-		FD_CLR(s->GetSock(), &WriteFDs);
+		FD_CLR(s->GetFD(), &WriteFDs);
 		s->UnsetFlag(SF_WRITABLE);
 	}
 
@@ -79,15 +79,15 @@ class SocketEngineSelect : public SocketEngineBase
 
 				if (s->HasFlag(SF_DEAD))
 					continue;
-				if (FD_ISSET(s->GetSock(), &efdset))
+				if (FD_ISSET(s->GetFD(), &efdset))
 				{
 					s->ProcessError();
 					s->SetFlag(SF_DEAD);
 					continue;
 				}
-				if (FD_ISSET(s->GetSock(), &rfdset) && !s->ProcessRead())
+				if (FD_ISSET(s->GetFD(), &rfdset) && !s->ProcessRead())
 					s->SetFlag(SF_DEAD);
-				if (FD_ISSET(s->GetSock(), &wfdset) && !s->ProcessWrite())
+				if (FD_ISSET(s->GetFD(), &wfdset) && !s->ProcessWrite())
 					s->SetFlag(SF_DEAD);
 			}
 

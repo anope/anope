@@ -1317,7 +1317,7 @@ void Anope::Unhex(const Anope::string &src, char *dest)
 const Anope::string Anope::LastError()
 {
 #ifndef _WIN32
-	return LastError();
+	return strerror(errno);
 #else
 	char errbuf[513];
 	DWORD err = GetLastError();

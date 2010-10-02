@@ -12,7 +12,10 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
 	if (!DNSEngine->sock)
-		DNSEngine->sock = new DNSSocket(Config->NameServer, DNSManager::DNSPort);
+	{
+		DNSEngine->sock = new DNSSocket();
+		DNSEngine->sock->Connect(Config->NameServer, DNSManager::DNSPort);
+	}
 	if (DNSEngine->packets.size() == 65535)
 		throw SocketException("DNS queue full");
 	
@@ -197,7 +200,7 @@ inline DNSRecord::DNSRecord()
 	this->created = Anope::CurTime;
 }
 
-DNSSocket::DNSSocket(const Anope::string &TargetHost, int Port) : ClientSocket(TargetHost, Port, "", false, SOCK_DGRAM)
+DNSSocket::DNSSocket() : ConnectionSocket(false, SOCK_DGRAM)
 {
 }
 
@@ -209,13 +212,13 @@ DNSSocket::~DNSSocket()
 
 int DNSSocket::SendTo(const unsigned char *buf, size_t len) const
 {
-	return sendto(this->GetSock(), buf, len, 0, &this->conaddrs.sa, this->conaddrs.size());
+	return sendto(this->GetFD(), buf, len, 0, &this->conaddr.sa, this->conaddr.size());
 }
 
 int DNSSocket::RecvFrom(char *buf, size_t len, sockaddrs &addrs) const
 {
 	socklen_t x = sizeof(addrs);
-	return recvfrom(this->GetSock(), buf, len, 0, &addrs.sa, &x);
+	return recvfrom(this->GetFD(), buf, len, 0, &addrs.sa, &x);
 }
 
 bool DNSSocket::ProcessRead()
@@ -229,9 +232,9 @@ bool DNSSocket::ProcessRead()
 	if (length < 0)
 		return false;
 
-	if (this->conaddrs != from_server)
+	if (this->conaddr != from_server)
 	{
-		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->conaddrs.addr() << "' != '" << from_server.addr() << "'";
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->conaddr.addr() << "' != '" << from_server.addr() << "'";
 		return true;
 	}
 

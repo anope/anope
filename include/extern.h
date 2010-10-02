@@ -183,12 +183,23 @@ E Anope::string quitmsg;
 E bool save_data;
 E time_t start_time;
 
-E Socket *UplinkSock;
+E ConnectionSocket *UplinkSock;
 
 E void save_databases();
 E void expire_all();
 E void sighandler(int signum);
 E void do_restart_services();
+
+/* The socket to our uplink */
+class UplinkSocket : public ConnectionSocket
+{
+ public:
+	UplinkSocket(bool ipv6 = false);
+
+	virtual ~UplinkSocket();
+
+	bool Read(const Anope::string &buf);
+};
 
 /**** memory.c ****/
 
@@ -334,6 +345,7 @@ E int exception_add(User *u, const Anope::string &mask, int limit, const Anope::
 E SocketEngineBase *SocketEngine;
 E int32 TotalRead;
 E int32 TotalWritten;
+E SocketIO normalSocketIO;
 
 /**** users.c ****/
 

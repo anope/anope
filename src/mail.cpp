@@ -13,7 +13,10 @@ void MailThread::Run()
 	FILE *pipe = popen(Config->SendMailPath.c_str(), "w");
 
 	if (!pipe)
+	{
+		SetExitState();
 		return;
+	}
 
 	fprintf(pipe, "From: %s\n", Config->SendFrom.c_str());
 	if (Config->DontQuoteAddresses)
@@ -27,6 +30,7 @@ void MailThread::Run()
 	pclose(pipe);
 
 	Success = true;
+	SetExitState();
 }
 
 bool Mail(User *u, NickRequest *nr, BotInfo *service, const Anope::string &subject, const Anope::string &message)

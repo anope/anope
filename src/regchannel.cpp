@@ -393,7 +393,7 @@ void ChannelInfo::LoadMLock()
 	if (this->HasFlag(CI_PERSIST) && !this->c)
 	{
 		this->c = new Channel(this->name, this->time_registered);
-		if (!this->bi && ModeManager::FindChannelModeByName(CMODE_PERM) == NULL)
+		if (!this->bi && ChanServ && ModeManager::FindChannelModeByName(CMODE_PERM) == NULL)
 			ChanServ->Assign(NULL, this);
 		else if (this->bi)
 			this->bi->Join(c);

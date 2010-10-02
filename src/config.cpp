@@ -543,6 +543,20 @@ bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string 
 	return true;
 }
 
+bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+{
+	if (!config->s_ChanServ.empty())
+	{
+		if ((value.equals_ci("decription") || value.equals_ci("autokickreason")) && data.GetValue().empty())
+			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when ChanServ is enabled!");
+		else if (value.equals_ci("defbantype"))
+			return ValidateBantype(config, tag, value, data);
+		else if (value.equals_ci("accessmax") || value.equals_ci("autokickmax") || value.equals_ci("inhabit") || value.equals_ci("listmax"))
+			return ValidateNotZero(config, tag, value, data);
+	}
+	return true;
+}
+
 bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
 	if (!config->s_MemoServ.empty())
@@ -969,7 +983,7 @@ void ServerConfig::Read()
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", ""};
+	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", "nickserv", ""};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -1105,20 +1119,20 @@ void ServerConfig::Read()
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&this->DontQuoteAddresses), DT_BOOLEAN, NoValidation},
 		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&this->NameServer), DT_STRING, NoValidation},
 		{"dns", "timeout", "5", new ValueContainerTime(&this->DNSTimeout), DT_TIME, NoValidation},
-		{"chanserv", "nick", "ChanServ", new ValueContainerString(&this->s_ChanServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "description", "Channel Registration Service", new ValueContainerString(&this->desc_ChanServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, NoValidation},
-		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
-		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&this->CSMaxReg), DT_UINTEGER, NoValidation},
-		{"chanserv", "expire", "14d", new ValueContainerTime(&this->CSExpire), DT_TIME, NoValidation},
-		{"chanserv", "defbantype", "2", new ValueContainerInt(&this->CSDefBantype), DT_INTEGER, ValidateBantype},
-		{"chanserv", "accessmax", "0", new ValueContainerUInt(&this->CSAccessMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&this->CSAutokickMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerString(&this->CSAutokickReason), DT_STRING, ValidateNotEmpty},
-		{"chanserv", "inhabit", "0", new ValueContainerTime(&this->CSInhabit), DT_TIME, ValidateNotZero},
-		{"chanserv", "listopersonly", "no", new ValueContainerBool(&this->CSListOpersOnly), DT_BOOLEAN, NoValidation},
-		{"chanserv", "listmax", "0", new ValueContainerUInt(&this->CSListMax), DT_UINTEGER, ValidateNotZero},
-		{"chanserv", "opersonly", "no", new ValueContainerBool(&this->CSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"chanserv", "nick", "", new ValueContainerString(&this->s_ChanServ), DT_STRING | DT_NORELOAD, NoValidation},
+		{"chanserv", "description", "Channel Registration Service", new ValueContainerString(&this->desc_ChanServ), DT_STRING | DT_NORELOAD, ValidateChanServ},
+		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, ValidateChanServ},
+		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
+		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&this->CSMaxReg), DT_UINTEGER, ValidateChanServ},
+		{"chanserv", "expire", "14d", new ValueContainerTime(&this->CSExpire), DT_TIME, ValidateChanServ},
+		{"chanserv", "defbantype", "2", new ValueContainerInt(&this->CSDefBantype), DT_INTEGER, ValidateChanServ},
+		{"chanserv", "accessmax", "0", new ValueContainerUInt(&this->CSAccessMax), DT_UINTEGER, ValidateChanServ},
+		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&this->CSAutokickMax), DT_UINTEGER, ValidateChanServ},
+		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerString(&this->CSAutokickReason), DT_STRING, ValidateChanServ},
+		{"chanserv", "inhabit", "0", new ValueContainerTime(&this->CSInhabit), DT_TIME, ValidateChanServ},
+		{"chanserv", "listopersonly", "no", new ValueContainerBool(&this->CSListOpersOnly), DT_BOOLEAN, ValidateChanServ},
+		{"chanserv", "listmax", "0", new ValueContainerUInt(&this->CSListMax), DT_UINTEGER, ValidateChanServ},
+		{"chanserv", "opersonly", "no", new ValueContainerBool(&this->CSOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"memoserv", "nick", "", new ValueContainerString(&this->s_MemoServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"memoserv", "description", "Memo Service", new ValueContainerString(&this->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateMemoServ},
 		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
@@ -1140,7 +1154,7 @@ void ServerConfig::Read()
 		{"hostserv", "nick", "", new ValueContainerString(&this->s_HostServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerString(&this->desc_HostServ), DT_STRING | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
-		{"operserv", "nick", "", new ValueContainerString(&this->s_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
+		{"operserv", "nick", "", new ValueContainerString(&this->s_OperServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"operserv", "description", "Operator Service", new ValueContainerString(&this->desc_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
 		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&this->SuperAdmin), DT_BOOLEAN, NoValidation},
@@ -1163,7 +1177,7 @@ void ServerConfig::Read()
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&this->SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&this->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&this->OSOpersOnly), DT_BOOLEAN, NoValidation},
-		{"global", "globalnick", "", new ValueContainerString(&this->s_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
+		{"global", "globalnick", "", new ValueContainerString(&this->s_GlobalNoticer), DT_STRING | DT_NORELOAD, NoValidation},
 		{"global", "globaldescription", "Global Noticer",  new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},

@@ -107,14 +107,7 @@ int levelinfo_maxwidth = 0;
 
 /*************************************************************************/
 
-void moduleAddChanServCmds()
-{
-	ModuleManager::LoadModuleList(Config->ChanServCoreModules);
-}
-
-/*************************************************************************/
-
-/* Returns modes for mlock in a nice way. */
+/*  Returns modes for mlock in a nice way. */
 
 Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 {
@@ -232,7 +225,8 @@ void get_chanserv_stats(long *nrec, long *memuse)
 
 void cs_init()
 {
-	moduleAddChanServCmds();
+	if (!Config->s_ChanServ.empty())
+		ModuleManager::LoadModuleList(Config->ChanServCoreModules);
 }
 
 /*************************************************************************/
@@ -834,6 +828,8 @@ void stick_all(ChannelInfo *ci)
 
 ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
+	if (!ChanServ)
+		return;
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);
 	if (!c->ci || !c->ci->bi)
@@ -844,12 +840,12 @@ ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 
 void ChanServTimer::Tick(time_t)
 {
-	if (!c || !c->ci)
+	if (!c || !c->ci || !ChanServ)
 		return;
 
 	c->ci->UnsetFlag(CI_INHABIT);
 
-	if (!c->ci->bi)
+	if (!c->ci->bi && ChanServ)
 		ChanServ->Part(*c);
 	else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
 		c->ci->bi->Part(*c);

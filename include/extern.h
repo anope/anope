@@ -92,7 +92,7 @@ E long get_memuse(EList *list);
 inline BotInfo *whosends(ChannelInfo *ci)
 {
 	if (!ci || !ci->bi || !ci->c || !ci->botflags.HasFlag(BS_SYMBIOSIS) || !ci->c->FindUser(ci->bi))
-		return ChanServ;
+		return ChanServ ? ChanServ : NickServ;
 	return ci->bi;
 }
 

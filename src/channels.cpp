@@ -1585,11 +1585,11 @@ int entry_match(Entry *e, const Anope::string &nick, const Anope::string &user, 
 
 	if (ircd->cidrchanbei && e->HasFlag(ENTRYTYPE_CIDR4) && (!ip || (ip && (ip & e->cidr_mask) != e->cidr_ip)))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_NICK) && (nick.empty() || e->nick.equals_ci(nick)))
+	if (e->HasFlag(ENTRYTYPE_NICK) && (nick.empty() || !e->nick.equals_ci(nick)))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_USER) && (user.empty() || e->user.equals_ci(user)))
+	if (e->HasFlag(ENTRYTYPE_USER) && (user.empty() || !e->user.equals_ci(user)))
 		return 0;
-	if (e->HasFlag(ENTRYTYPE_HOST) && (host.empty() || e->host.equals_ci(host)))
+	if (e->HasFlag(ENTRYTYPE_HOST) && (host.empty() || !e->host.equals_ci(host)))
 		return 0;
 	if (e->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(nick, e->nick))
 		return 0;

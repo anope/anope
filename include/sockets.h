@@ -346,13 +346,12 @@ class ClientSocket : public BufferedSocket
 
 class CoreExport Pipe : public BufferedSocket
 {
- private:
+ public:
  	/** The FD of the write pipe (if this isn't evenfd)
 	 * this->Sock is the readfd
 	 */
  	int WritePipe;
 
- public:
  	/** Constructor
 	 */
 	Pipe();

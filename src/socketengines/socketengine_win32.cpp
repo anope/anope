@@ -1,30 +1,46 @@
 #include "services.h"
 
-static Socket *newsocket = NULL;
+static ClientSocket *newsocket = NULL;
 
 class LSocket : public ListenSocket
 {
  public:
-	LSocket(const Anope::string &host, int port) : ListenSocket(host, port) { }
+	LSocket(const Anope::string &host, int port) : ListenSocket(host, port, false) { }
 
-	bool OnAccept(int fd, const sockaddrs &)
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr)
 	{
-		newsocket = new Socket(fd, this->IPv6);
-		return true;
+		newsocket = new ClientSocket(this, fd, addr);
+		return newsocket;
 	}
 };
 
-int Pipe::RecvInternal(char *buf, size_t sz) const
+class PipeIO : public SocketIO
 {
-	static char dummy[512];
-	return read(this->Sock, &dummy, 512);
-}
+ public:
+	/** Receive something from the buffer
+ 	 * @param s The socket
+	 * @param buf The buf to read to
+	 * @param sz How much to read
+	 * @return Number of bytes received
+	 */
+	int Recv(Socket *s, char *buf, size_t sz) const
+	{
+		static char dummy[512];
+		return read(s->GetFD(), &dummy, 512);
+	}
 
-int Pipe::SendInternal(const Anope::string &) const
-{
-	static const char dummy = '*';
-	return write(this->WritePipe, &dummy, 1);
-}
+	/** Write something to the socket
+ 	 * @param s The socket
+	 * @param buf What to write
+	 * @return Number of bytes written
+	 */
+	int Send(Socket *s, const Anope::string &buf) const
+	{
+		static const char dummy = '*';
+		Pipe *pipe = debug_cast<Pipe *>(s);
+		return write(pipe->WritePipe, &dummy, 1);
+	}
+} pipeSocketIO;
 
 Pipe::Pipe() : BufferedSocket()
 {
@@ -36,7 +52,7 @@ Pipe::Pipe() : BufferedSocket()
 
 	sockaddr_in addr;
 	socklen_t sz = sizeof(addr);
-	getsockname(lfs.GetSock(), reinterpret_cast<sockaddr *>(&addr), &sz);
+	getsockname(lfs.GetFD(), reinterpret_cast<sockaddr *>(&addr), &sz);
 
 	if (connect(cfd, reinterpret_cast<sockaddr *>(&addr), sz))
 		throw CoreException("Error accepting new socket for Pipe");
@@ -44,8 +60,9 @@ Pipe::Pipe() : BufferedSocket()
 	if (!newsocket)
 		throw CoreException("Error accepting new socket for Pipe");
 	
+	this->IO = &pipeSocketIO;
 	this->Sock = cfd;
-	this->WritePipe = newsocket->GetSock();
+	this->WritePipe = newsocket->GetFD();
 	this->IPv6 = false;
 
 	SocketEngine->AddSocket(this);
@@ -54,7 +71,7 @@ Pipe::Pipe() : BufferedSocket()
 
 bool Pipe::ProcessRead()
 {
-	this->RecvInternal(NULL, 0);
+	this->IO->Recv(this, NULL, 0);
 	return this->Read("");
 }
 
@@ -66,7 +83,7 @@ bool Pipe::Read(const Anope::string &)
 
 void Pipe::Notify()
 {
-	this->SendInternal("");
+	this->IO->Send(this, "");
 }
 
 void Pipe::OnNotify()

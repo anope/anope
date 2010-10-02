@@ -762,18 +762,18 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(*user));
-		if (MOD_RESULT == EVENT_STOP)
-			return *user;
 
-		if (Config->LimitSessions && !serv->IsULined())
-			add_session(nick, host, user->ip() ? user->ip.addr() : "");
+		if (user && MOD_RESULT != EVENT_STOP)
+		{
+			if (Config->LimitSessions && !serv->IsULined())
+				add_session(nick, host, user->ip() ? user->ip.addr() : "");
 
-		if (!user)
-			return NULL;
+			if (!user)
+				return NULL;
 
-		XLineManager::CheckAll(*user);
+			XLineManager::CheckAll(*user);
+		}
 
-		/* User is no longer connected, return */
 		if (!user)
 			return NULL;
 

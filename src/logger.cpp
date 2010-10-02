@@ -104,6 +104,8 @@ Anope::string LogFile::GetName() const
 
 Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), Type(type), Category(category)
 {
+	if (!b)
+		b = Global;
 	if (b)
 		this->Sources.push_back(b->nick);
 }
@@ -118,7 +120,8 @@ Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
 
 	this->bi = c->service ? c->service : Global;
 	this->Category = (c->service ? c->service->nick + "/" : "") + c->name;
-	this->Sources.push_back(this->bi->nick);
+	if (this->bi)
+		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
 	this->Sources.push_back(c->name);
 	if (ci)
@@ -172,6 +175,8 @@ Log::Log(Server *s, const Anope::string &category) : bi(OperServ), Type(LOG_SERV
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
+	if (!this->bi)
+		this->bi = Global;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(s->GetName());
@@ -182,9 +187,9 @@ Log::Log(Server *s, const Anope::string &category) : bi(OperServ), Type(LOG_SERV
 Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_USER), Category(category)
 {
 	if (!b)
-		throw CoreException("Invalid opinter passed to Log::Log");
-	
-	this->Sources.push_back(bi->nick);
+		b = Global;
+	if (this->bi)
+		this->Sources.push_back(bi->nick);
 }
 
 Log::~Log()

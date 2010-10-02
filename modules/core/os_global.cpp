@@ -57,6 +57,10 @@ class OSGlobal : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
+		if (Config->s_GlobalNoticer.empty())
+			throw ModuleException("Global is disabled");
+
+		// Maybe we should put this ON Global?
 		this->AddCommand(OperServ, &commandosglobal);
 	}
 };

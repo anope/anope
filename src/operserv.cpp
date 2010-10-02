@@ -23,17 +23,20 @@ Flags<ChannelModeName, CMODE_END * 2> DefConModesOff;
 /* Map of Modesa and Params for DefCon */
 std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 
-XLineManager *SGLine, *SZLine, *SQLine, *SNLine;
+XLineManager *SGLine = NULL, *SZLine = NULL, *SQLine = NULL, *SNLine = NULL;
 
 void os_init()
 {
-	ModuleManager::LoadModuleList(Config->OperServCoreModules);
+	if (!Config->s_OperServ.empty())
+	{
+		ModuleManager::LoadModuleList(Config->OperServCoreModules);
 
-	/* Yes, these are in this order for a reason. Most violent->least violent. */
-	XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
-	XLineManager::RegisterXLineManager(SZLine = new SZLineManager());
-	XLineManager::RegisterXLineManager(SQLine = new SQLineManager());
-	XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
+		/* Yes, these are in this order for a reason. Most violent->least violent. */
+		XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
+		XLineManager::RegisterXLineManager(SZLine = new SZLineManager());
+		XLineManager::RegisterXLineManager(SQLine = new SQLineManager());
+		XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
+	}
 }
 
 bool SetDefConParam(ChannelModeName Name, const Anope::string &buf)
@@ -105,6 +108,9 @@ void DelDefCon(int level, DefconLevel Level)
 
 void server_global(const Server *s, const Anope::string &message)
 {
+	if (Config->s_GlobalNoticer.empty())
+		return;
+
 	/* Do not send the notice to ourselves our juped servers */
 	if (s != Me && !s->HasFlag(SERVER_JUPED))
 		notice_server(Config->s_GlobalNoticer, s, "%s", message.c_str());
@@ -490,7 +496,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (u && Config->AddAkiller)
 		realreason = "[" + u->nick + "]" + reason;
 
-	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, realreason);
+	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, realreason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, x));
@@ -549,7 +555,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SNLINE));
@@ -629,7 +635,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SQLINE));
@@ -747,7 +753,7 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		return NULL;
 	}
 
-	XLine *x = new XLine(mask, u ? u->nick : OperServ->nick, expires, reason);
+	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SZLINE));

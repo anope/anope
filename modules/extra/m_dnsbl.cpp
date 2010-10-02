@@ -66,7 +66,7 @@ class DNSBLResolver : public DNSRequest
 		else
 		{
 			Log(OperServ) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
-			XLine xline(Anope::string("*@") + user->host, OperServ->nick, Anope::CurTime + this->blacklist.bantime, reason);
+			XLine xline(Anope::string("*@") + user->host, OperServ ? OperServ->nick : "OperServ", Anope::CurTime + this->blacklist.bantime, reason);
 			ircdproto->SendAkill(&xline);
 		}
 	}

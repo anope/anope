@@ -583,11 +583,8 @@ bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anop
 {
 	if (!config->s_HostServ.empty())
 	{
-		if (value.equals_ci("description"))
-		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
-		}
+		if (value.equals_ci("description") && data.GetValue().empty())
+			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
 	}
 	return true;
 }
@@ -602,6 +599,27 @@ bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
 		}
 	}
+	return true;
+}
+
+bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+{
+	if (!config->s_OperServ.empty())
+	{
+		if ((value.equals_ci("description") || value.equals_ci("globalnick") || value.equals_ci("globaldescription")) && data.GetValue().empty())
+			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when OperServ is enabled!");
+		else if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("szlineexpiry") || value.equals_ci("sqlineexpiry"))
+			return ValidateNotZero(config, tag, value, data);
+		else if (value.equals_ci("maxsessionlimit") || value.equals_ci("exceptionexpiry"))
+			return ValidateLimitSessions(config, tag, value, data);
+	}
+	return true;
+}
+
+bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+{
+	if (!config->s_GlobalNoticer.empty() && config->desc_GlobalNoticer.empty())
+		throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
 	return true;
 }
 
@@ -951,7 +969,7 @@ void ServerConfig::Read()
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", "memoserv", "operserv", ""};
+	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", ""};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -1122,31 +1140,31 @@ void ServerConfig::Read()
 		{"hostserv", "nick", "", new ValueContainerString(&this->s_HostServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerString(&this->desc_HostServ), DT_STRING | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
-		{"operserv", "nick", "OperServ", new ValueContainerString(&this->s_OperServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "description", "Operator Service", new ValueContainerString(&this->desc_OperServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "globalnick", "Global", new ValueContainerString(&this->s_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"operserv", "globaldescription", "Global Noticer", new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "nick", "", new ValueContainerString(&this->s_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
+		{"operserv", "description", "Operator Service", new ValueContainerString(&this->desc_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
 		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&this->SuperAdmin), DT_BOOLEAN, NoValidation},
-		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&this->AutokillExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&this->ChankillExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "snlineexpiry", "0", new ValueContainerTime(&this->SNLineExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&this->SQLineExpiry), DT_TIME, ValidateNotZero},
-		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&this->SZLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&this->AutokillExpiry), DT_TIME, ValidateOperServ},
+		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&this->ChankillExpiry), DT_TIME, ValidateOperServ},
+		{"operserv", "snlineexpiry", "0", new ValueContainerTime(&this->SNLineExpiry), DT_TIME, ValidateOperServ},
+		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&this->SQLineExpiry), DT_TIME, ValidateOperServ},
+		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&this->SZLineExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&this->AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsnline", "no", new ValueContainerBool(&this->KillonSNline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&this->KillonSQline), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&this->LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&this->DefSessionLimit), DT_UINTEGER, NoValidation},
-		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&this->MaxSessionLimit), DT_UINTEGER, ValidateLimitSessions},
-		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&this->ExceptionExpiry), DT_TIME, ValidateLimitSessions},
+		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&this->MaxSessionLimit), DT_UINTEGER, ValidateOperServ},
+		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&this->ExceptionExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "sessionlimitexceeded", "", new ValueContainerString(&this->SessionLimitExceeded), DT_STRING, NoValidation},
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerString(&this->SessionLimitDetailsLoc), DT_STRING, NoValidation},
 		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&this->MaxSessionKill), DT_INTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&this->SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&this->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&this->OSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"global", "globalnick", "", new ValueContainerString(&this->s_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
+		{"global", "globaldescription", "Global Noticer",  new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
 		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},

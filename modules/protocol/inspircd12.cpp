@@ -65,7 +65,7 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 		return;
 	}
 
-	send_cmd(OperServ->GetUID(), "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+	send_cmd(HostServ ? HostServ->GetUID() : TS6SID, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 }
 
 int anope_event_idle(const Anope::string &source, int ac, const char **av)
@@ -88,7 +88,7 @@ class InspIRCdProto : public IRCDProto
 {
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd(OperServ->GetUID(), "GLINE %s", x->Mask.c_str());
+		send_cmd(OperServ ? OperServ->GetUID() : TS6SID, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
@@ -113,7 +113,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(OperServ->GetUID(), "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
+		send_cmd(OperServ ? OperServ->GetUID() : TS6SID, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -220,19 +220,19 @@ class InspIRCdProto : public IRCDProto
 		if (!has_chgidentmod)
 			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
 		else
-			send_cmd(OperServ->GetUID(), "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
+			send_cmd(HostServ ? HostServ->GetUID() : TS6SID, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(OperServ->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
+		send_cmd(NickServ->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(OperServ->GetUID(), "SVSHOLD %s", nick.c_str());
+		send_cmd(NickServ->GetUID(), "SVSHOLD %s", nick.c_str());
 	}
 
 	/* UNSZLINE */

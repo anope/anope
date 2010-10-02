@@ -342,7 +342,7 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 	Server *newserver = new Server(s, servername, hops, descript, numeric);
 
 	/* Announce services being online. */
-	if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
+	if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty() && !Config->s_GlobalNoticer.empty())
 		notice_server(Config->s_GlobalNoticer, newserver, "%s", Config->GlobalOnCycleUP.c_str());
 
 	/* Let modules know about the connection */

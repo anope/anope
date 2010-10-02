@@ -260,7 +260,7 @@ void ModuleManager::DeleteModule(Module *m)
 	const char *err = ano_moderr();
 	if (!destroy_func && err && *err)
 	{
-		Log() << "No destroy function found, chancing delete...";
+		Log() << "No destroy function found for " << m->name << ", chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
 	}
 	else

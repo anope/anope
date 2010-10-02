@@ -169,7 +169,7 @@ void BotInfo::Join(Channel *c, bool update_ts)
 
 	c->JoinUser(this);
 	ChannelContainer *cc = this->FindChannel(c);
-	for (int i = 0; i < Config->BotModeList.size(); ++i)
+	for (unsigned i = 0; i < Config->BotModeList.size(); ++i)
 	{
 		if (!update_ts)
 		{
@@ -183,6 +183,7 @@ void BotInfo::Join(Channel *c, bool update_ts)
 	}
 	if (!update_ts)
 		ircdproto->SendJoin(this, c->name, c->creation_time);
+	/* This is sent later, when we burst to the uplink */
 	else if (Me && Me->IsSynced())
 	{
 		ircdproto->SendJoin(this, cc);

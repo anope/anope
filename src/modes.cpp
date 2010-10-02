@@ -87,6 +87,29 @@ void SetDefaultMLock(ServerConfig *config)
 		if (cm && cm->Type == MODE_STATUS && std::find(config->BotModeList.begin(), config->BotModeList.end(), cm) == config->BotModeList.end())
 			config->BotModeList.push_back(debug_cast<ChannelModeStatus *>(cm));
 	}
+
+	/* Apply the new modes to channels */
+	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+	{
+		BotInfo *bi = it->second;
+
+		for (UChannelList::const_iterator cit = bi->chans.begin(); cit != bi->chans.end(); ++cit)
+		{
+			ChannelContainer *cc = *cit;
+
+			if (!cc || !cc->chan)
+				continue;
+
+			for (unsigned i = 0; i < config->BotModeList.size(); ++i)
+			{
+				if (cc->Status->HasFlag(config->BotModeList[i]->Name))
+					continue;
+
+				cc->Status->SetFlag(config->BotModeList[i]->Name);
+				cc->chan->SetModeInternal(config->BotModeList[i], bi->nick, false);
+			}
+		}
+	}
 }
 
 Anope::string ChannelStatus::BuildCharPrefixList() const

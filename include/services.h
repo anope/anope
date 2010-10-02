@@ -140,26 +140,39 @@ extern "C" void __pfnBkCheck() {}
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
- * It defines the class factory and the external AnopeInit function.
+ * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
 #ifdef _WIN32
 # define MODULE_INIT(x) \
 	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
 	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
-		static x module(modname, creator); \
-		return &module; \
+		return new x(modname, creator); \
 	} \
-	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD, LPVOID) \
+	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
 	{ \
+		switch (nReason) \
+		{ \
+			case DLL_PROCESS_ATTACH: \
+			case DLL_PROCESS_DETACH: \
+				break; \
+		} \
 		return TRUE; \
+	} \
+	extern "C" DllExport void AnopeFini(x *); \
+	extern "C" void AnopeFini(x *m) \
+	{ \
+		delete m; \
 	}
 #else
 # define MODULE_INIT(x) \
 	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
 	{ \
-		static x module(modname, creator); \
-		return &module; \
+		return new x(modname, creator); \
+	} \
+	extern "C" DllExport void AnopeFini(x *m) \
+	{ \
+		delete m; \
 	}
 #endif
 

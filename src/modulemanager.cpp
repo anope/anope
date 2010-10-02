@@ -255,8 +255,22 @@ void ModuleManager::DeleteModule(Module *m)
 	ano_module_t handle = m->handle;
 	Anope::string filename = m->filename;
 
-	if (handle && dlclose(handle))
-		Log() << ano_moderr();
+	ano_modclearerr();
+	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
+	const char *err = ano_moderr();
+	if (!destroy_func && err && *err)
+	{
+		Log() << "No destroy function found, chancing delete...";
+		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
+	}
+	else
+		destroy_func(m); /* Let the module delete it self, just in case */
+
+	if (handle)
+	{
+		if (dlclose(handle))
+			Log() << ano_moderr();
+	}
 
 	if (!filename.empty())
 		DeleteFile(filename.c_str());

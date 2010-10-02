@@ -245,6 +245,12 @@ void User::SendMessage(const Anope::string &source, const Anope::string &msg) co
 
 void User::SendMessage(BotInfo *source, LanguageString message, ...) const
 {
+	if (!source)
+	{
+		Log(LOG_DEBUG) << "Tried to send message " << message << " with nonexistant source!";
+		return;
+	}
+
 	Anope::string m = GetString(this, message);
 
 	if (Config->UseStrictPrivMsg)

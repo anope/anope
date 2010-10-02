@@ -95,7 +95,7 @@ static void DisplayNews(User *u, NewsType Type)
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			u->SendMessage(Global, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
+			u->SendMessage(Global ? Global : NickServ, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 

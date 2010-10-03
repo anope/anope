@@ -148,7 +148,9 @@ enum ModuleReturn
 	MOD_ERR_UNKNOWN,
 	MOD_ERR_FILE_IO,
 	MOD_ERR_NOSERVICE,
-	MOD_ERR_NO_MOD_NAME
+	MOD_ERR_NO_MOD_NAME,
+	MOD_ERR_EXCEPTION,
+	MOD_ERR_VERSION
 };
 
 /** Priority types which can be returned from Module::Prioritize()
@@ -1106,14 +1108,14 @@ class CoreExport ModuleManager
 	 * @param u the user who loaded it, NULL for auto-load
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
-	static int LoadModule(const Anope::string &modname, User *u);
+	static ModuleReturn LoadModule(const Anope::string &modname, User *u);
 
 	/** Unload the given module.
 	 * @param m the module to unload
 	 * @param u the user who unloaded it
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
-	static int UnloadModule(Module *m, User * u);
+	static ModuleReturn UnloadModule(Module *m, User * u);
 
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this

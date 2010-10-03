@@ -23,7 +23,6 @@ class CommandOSModUnLoad : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		Anope::string mname = params[0];
-		int status;
 
 		Module *m = FindModule(mname);
 		if (!m)
@@ -31,12 +30,29 @@ class CommandOSModUnLoad : public Command
 			u->SendMessage(OperServ, OPER_MODULE_ISNT_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
+		
+		if (!m->handle)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			return MOD_CONT;
+		}
+	
+		if (m->GetPermanent() || m->type == PROTOCOL)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
+			return MOD_CONT;
+		}
 
 		Log() << "Trying to unload module [" << mname << "]";
 
-		status = ModuleManager::UnloadModule(m, u);
+		ModuleReturn status = ModuleManager::UnloadModule(m, u);
 
-		if (status != MOD_ERR_OK)
+		if (status == MOD_ERR_OK)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_UNLOADED, mname.c_str());
+			ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), mname.c_str());
+		}
+		else
 			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, mname.c_str());
 
 		return MOD_CONT;

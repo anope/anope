@@ -2430,6 +2430,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Module %s loaded"),
 	/* OPER_MODULE_UNLOADED */
 	_("Module %s unloaded"),
+	/* OPER_MODULE_RELOADED */
+	_("Module \002%s\002 reloaded"),
 	/* OPER_MODULE_LOAD_FAIL */
 	_("Unable to load module %s"),
 	/* OPER_MODULE_REMOVE_FAIL */
@@ -2444,6 +2446,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("MODLOAD FileName"),
 	/* OPER_MODULE_UNLOAD_SYNTAX */
 	_("MODUNLOAD FileName"),
+	/* OPER_MODULE_RELOAD_SYNTAX */
+	_("MODRELOAD \037FileName\037"),
 	/* OPER_MODULE_LIST_HEADER */
 	_("Current Module list:"),
 	/* OPER_MODULE_LIST */
@@ -4570,6 +4574,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("    MODLOAD     Load a module"),
 	/* OPER_HELP_CMD_MODUNLOAD */
 	_("    MODUNLOAD   Un-Load a module"),
+	/* OPER_HELP_CMD_MODRELOAD */
+	_("    MODRELOAD   Reload a module"),
 	/* OPER_HELP_CMD_MODINFO */
 	_("    MODINFO     Info about a loaded module"),
 	/* OPER_HELP_CMD_MODLIST */
@@ -4977,6 +4983,10 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"This command unloads the module named FileName from the modules\n"
 	"directory."),
+	/* OPER_HELP_MODRELOAD */
+	_("Syntax: \002MODRELOAD\002 \002FileName\002\n"
+	" \n"
+	"This command reloads the module named FileName."),
 	/* OPER_HELP_MODINFO */
 	_("Syntax: MODINFO FileName\n"
 	" \n"

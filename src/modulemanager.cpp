@@ -28,7 +28,7 @@ void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
  * @param output the destination to copy the module to
  * @return MOD_ERR_OK on success
  */
-static int moduleCopyFile(const Anope::string &name, Anope::string &output)
+static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
 	Anope::string input = services_dir + "/modules/" + name + ".so";
 	FILE *source = fopen(input.c_str(), "rb");
@@ -107,7 +107,7 @@ template <class TYPE> TYPE function_cast(ano_module_t symbol)
 	return cast.function;
 }
 
-int ModuleManager::LoadModule(const Anope::string &modname, User *u)
+ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 {
 	if (modname.empty())
 		return MOD_ERR_PARAMS;
@@ -121,7 +121,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	Anope::string pbuf = services_dir + "/modules/runtime/" + modname + ".so.XXXXXX";
 
 	/* Don't skip return value checking! -GD */
-	int ret = moduleCopyFile(modname, pbuf);
+	ModuleReturn ret = moduleCopyFile(modname, pbuf);
 	if (ret != MOD_ERR_OK)
 	{
 		/* XXX: This used to assign filename here, but I don't think that was correct..
@@ -167,7 +167,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	catch (const ModuleException &ex)
 	{
 		Log() << "Error while loading " << modname << ": " << ex.GetReason();
-		return MOD_STOP;
+		return MOD_ERR_EXCEPTION;
 	}
 
 	m->filename = pbuf;
@@ -178,13 +178,13 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
 		DeleteModule(m);
-		return MOD_STOP;
+		return MOD_ERR_VERSION;
 	}
 	else if (v.GetMajor() > VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() > VERSION_MINOR))
 	{
 		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
 		DeleteModule(m);
-		return MOD_STOP;
+		return MOD_ERR_VERSION;
 	}
 	else if (v.GetBuild() < VERSION_BUILD)
 		Log() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
@@ -197,18 +197,7 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	{
 		DeleteModule(m);
 		Log() << "You cannot load two protocol modules";
-		return MOD_STOP;
-	}
-
-	if (u)
-	{
-		ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), modname.c_str());
-		u->SendMessage(OperServ, OPER_MODULE_LOADED, modname.c_str());
-
-		/* If a user is loading this module, then the core databases have already been loaded
-		 * so trigger the event manually
-		 */
-		m->OnPostLoadDatabases();
+		return MOD_ERR_UNKNOWN;
 	}
 
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
@@ -216,28 +205,8 @@ int ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	return MOD_ERR_OK;
 }
 
-int ModuleManager::UnloadModule(Module *m, User *u)
+ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 {
-	if (!m || !m->handle)
-	{
-		if (u)
-			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
-		return MOD_ERR_PARAMS;
-	}
-
-	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION || m->type == DATABASE)
-	{
-		if (u)
-			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
-		return MOD_ERR_NOUNLOAD;
-	}
-
-	if (u)
-	{
-		ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), m->name.c_str());
-		u->SendMessage(OperServ, OPER_MODULE_UNLOADED, m->name.c_str());
-	}
-
 	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));
 
 	if (DNSEngine)

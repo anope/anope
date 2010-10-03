@@ -1,0 +1,112 @@
+/* OperServ core functions
+ *
+ * (C) 2003-2010 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+/*************************************************************************/
+
+#include "module.h"
+
+class CommandOSModReLoad : public Command
+{
+ public:
+	CommandOSModReLoad() : Command("MODRELOAD", 1, 1, "operserv/modload")
+	{
+	}
+
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	{
+		Anope::string mname = params[0];
+
+		Module *m = FindModule(mname);
+		if (!m)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_ISNT_LOADED, mname.c_str());
+			return MOD_CONT;
+		}
+
+		if (!m->handle)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			return MOD_CONT;
+		}
+
+		if (m->GetPermanent() || m->type == PROTOCOL) // TODO: make protocol modules reloadable
+		{
+			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
+			return MOD_CONT;
+		}
+
+		/* Unrecoverable */
+		bool fatal = m->type == PROTOCOL;
+		ModuleReturn status = ModuleManager::UnloadModule(m, u);
+
+		if (status != MOD_ERR_OK)
+		{
+			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, mname.c_str());
+			return MOD_CONT;
+		}
+
+		status = ModuleManager::LoadModule(mname, u);
+		if (status == MOD_ERR_OK)
+		{
+			ircdproto->SendGlobops(OperServ, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_RELOADED, mname.c_str());
+
+			/* If a user is loading this module, then the core databases have already been loaded
+			 * so trigger the event manually
+			 */
+			m = FindModule(mname);
+			if (m)
+				m->OnPostLoadDatabases();
+		}
+		else
+		{
+			if (fatal)
+				throw FatalException("Unable to reload module " + mname);
+			else
+				u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
+		}
+
+		return MOD_CONT;
+	}
+
+	bool OnHelp(User *u, const Anope::string &subcommand)
+	{
+		u->SendMessage(OperServ, OPER_HELP_MODRELOAD);
+		return true;
+	}
+
+	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	{
+		SyntaxError(OperServ, u, "MODLOAD", OPER_MODULE_RELOAD_SYNTAX);
+	}
+
+	void OnServHelp(User *u)
+	{
+		u->SendMessage(OperServ, OPER_HELP_CMD_MODRELOAD);
+	}
+};
+
+class OSModReLoad : public Module
+{
+	CommandOSModReLoad commandosmodreload;
+
+ public:
+	OSModReLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	{
+		this->SetAuthor("Anope");
+		this->SetType(CORE);
+		this->SetPermanent(true);
+
+		this->AddCommand(OperServ, &commandosmodreload);
+	}
+};
+
+MODULE_INIT(OSModReLoad)

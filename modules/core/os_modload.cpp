@@ -31,11 +31,21 @@ class CommandOSModLoad : public Command
 			return MOD_CONT;
 		}
 
-		int status = ModuleManager::LoadModule(mname, u);
-		if (status != MOD_ERR_OK)
+		ModuleReturn status = ModuleManager::LoadModule(mname, u);
+		if (status == MOD_ERR_OK)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
+			ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), mname.c_str());
+			u->SendMessage(OperServ, OPER_MODULE_LOADED, mname.c_str());
+
+			/* If a user is loading this module, then the core databases have already been loaded
+			 * so trigger the event manually
+			 */
+			m = FindModule(mname);
+			if (m)
+				m->OnPostLoadDatabases();
 		}
+		else
+			u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
 
 		return MOD_CONT;
 	}

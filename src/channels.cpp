@@ -833,11 +833,13 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
  * @param ac Number of args
  * @param av args
  */
-void ChanSetInternalModes(Channel *c, int ac, const char **av)
+void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter)
 {
 	if (!ac)
 		return;
 
+	Anope::string modestring;
+	Anope::string paramstring;
 	int k = 0, j = 0, add = -1;
 	for (unsigned int i = 0, end = strlen(av[0]); i < end; ++i)
 	{
@@ -846,9 +848,11 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		switch (av[0][i])
 		{
 			case '+':
+				modestring += '+';
 				add = 1;
 				continue;
 			case '-':
+				modestring += '-';
 				add = 0;
 				continue;
 			default:
@@ -857,6 +861,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 				cm = ModeManager::FindChannelModeByChar(av[0][i]);
 				if (!cm)
 					continue;
+				modestring += cm->ModeChar;
 		}
 
 		if (cm->Type == MODE_REGULAR)
@@ -880,6 +885,11 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		}
 		if (++j < ac)
 		{
+			User *u = NULL;
+			if (cm->Type == MODE_STATUS && (u = finduser(av[j])))
+				paramstring += " " + u->nick;
+			else
+				paramstring += " " + Anope::string(av[j]);
 			if (add)
 				c->SetModeInternal(cm, av[j]);
 			else
@@ -888,6 +898,9 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av)
 		else
 			Log() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
 	}
+
+	if (setter)
+		Log(setter, c, "mode") << modestring << paramstring;
 
 	if (j + k + 1 < ac)
 		Log() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
@@ -1311,9 +1324,6 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 	--ac;
 	++av;
 
-	User *u = finduser(source);
-	if (u)
-		Log(u, c, "mode") << merge_args(ac, av);
 	ChanSetInternalModes(c, ac, av);
 }
 

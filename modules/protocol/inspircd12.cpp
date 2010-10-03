@@ -319,7 +319,7 @@ int anope_event_ftopic(const Anope::string &source, int ac, const char **av)
 		return MOD_CONT;
 	}
 
-	c->ChangeTopicInternal(av[2], av[2], Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : Anope::CurTime);
+	c->ChangeTopicInternal(av[2], av[3], Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : Anope::CurTime);
 
 	return MOD_CONT;
 }

@@ -61,7 +61,7 @@ E void get_channel_stats(long *nrec, long *memuse);
 
 E Channel *findchan(const Anope::string &chan);
 
-E void ChanSetInternalModes(Channel *c, int ac, const char **av);
+E void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter = NULL); /* this is dieing soon anyway */
 
 E User *nc_on_chan(Channel *c, const NickCore *nc);
 

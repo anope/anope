@@ -143,7 +143,7 @@ Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	this->bi = whosends(c->ci);
+	this->bi = ChanServ;
 	this->Category = category;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);

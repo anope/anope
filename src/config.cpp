@@ -620,7 +620,7 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 {
 	if (!config->s_OperServ.empty())
 	{
-		if ((value.equals_ci("description") || value.equals_ci("globalnick") || value.equals_ci("globaldescription")) && data.GetValue().empty())
+		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when OperServ is enabled!");
 		else if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("szlineexpiry") || value.equals_ci("sqlineexpiry"))
 			return ValidateNotZero(config, tag, value, data);
@@ -632,8 +632,11 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 
 bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_GlobalNoticer.empty() && config->desc_GlobalNoticer.empty())
-		throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
+	if (!config->s_GlobalNoticer.empty())
+	{
+		if (value.equals_ci("description") && data.GetValue().empty())
+			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
+	}
 	return true;
 }
 
@@ -1178,7 +1181,7 @@ void ServerConfig::Read()
 		{"operserv", "addakiller", "no", new ValueContainerBool(&this->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&this->OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"global", "nick", "", new ValueContainerString(&this->s_GlobalNoticer), DT_STRING | DT_NORELOAD, NoValidation},
-		{"global", "description", "Global Noticer",  new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
+		{"global", "description", "Global Noticer", new ValueContainerString(&this->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
 		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},

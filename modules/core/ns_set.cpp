@@ -49,6 +49,11 @@ class CommandNSSet : public Command
 			Anope::string cmdparams = u->Account()->display;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 1, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
+			/* Don't log the whole message for set password */
+			if (c->name != "PASSWORD")
+				Log(LOG_COMMAND, u, this) << params[0] << " " << cmdparams;
+			else
+				Log(LOG_COMMAND, u, this) << params[0];
 			mod_run_cmd(NickServ, u, c, params[0], cmdparams);
 		}
 		else
@@ -118,7 +123,7 @@ class CommandNSSetDisplay : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(params[1]);
 
 		if (!na || na->nc != u->Account())
 		{
@@ -158,7 +163,7 @@ class CommandNSSetPassword : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		Anope::string param = params[0];
+		Anope::string param = params[1];
 
 		int len = param.length();
 

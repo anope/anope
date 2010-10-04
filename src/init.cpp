@@ -14,11 +14,6 @@
 
 Uplink *uplink_server;
 
-extern void moduleAddMsgs();
-extern void moduleAddIRCDMsgs();
-
-/*************************************************************************/
-
 void introduce_user(const Anope::string &user)
 {
 	/* Watch out for infinite loops... */
@@ -378,9 +373,6 @@ void Init(int ac, char **av)
 	{
 		throw FatalException(ex.GetReason());
 	}
-
-	/* Add Core MSG handles */
-	moduleAddMsgs();
 
 #ifndef _WIN32
 	if (!nofork)

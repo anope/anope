@@ -304,10 +304,7 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 	return MOD_CONT;
 }
 
-/* *INDENT-OFF* */
-void moduleAddMsgs()
-{
-	Anope::AddMessage("STATS", m_stats);
-	Anope::AddMessage("TIME", m_time);
-	Anope::AddMessage("VERSION", m_version);
-}
+Message message_stats("STATS", m_stats);
+Message message_time("TIME", m_time);
+Message message_verssion("VERSION", m_version);
+

@@ -304,20 +304,6 @@ namespace Anope
 	 */
 	extern CoreExport bool Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive = false);
 
-	/** Add a message to Anope
-	 * @param name The message name as sent by the IRCd
-	 * @param func A callback function that will be called when this message is received
-	 * @return The new message object
-	 */
-	extern CoreExport Message *AddMessage(const string &name, bool (*func)(const string &source, const std::vector<Anope::string> &params));
-
-	/** Deletes a message from Anope
-	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check
-	 * @param m The message
-	 * @return true if the message was found and deleted, else false
-	 */
-	extern CoreExport bool DelMessage(Message *m);
-
 	/** Returns a list of pointers to message handlers
 	 * @param The message name as sent by the IRCd
 	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)

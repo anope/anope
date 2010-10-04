@@ -1155,7 +1155,7 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	Server *s = Server::Find(source);
 
 	if (!s)
-		throw new CoreException("Got ENDBURST without a source");
+		throw CoreException("Got ENDBURST without a source");
 
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user. ~ Viper*/
@@ -1181,44 +1181,6 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	return true;
 }
 
-void moduleAddIRCDMsgs()
-{
-	Anope::AddMessage("ENDBURST", event_endburst);
-	Anope::AddMessage("436", event_436);
-	Anope::AddMessage("AWAY", event_away);
-	Anope::AddMessage("JOIN", event_join);
-	Anope::AddMessage("KICK", event_kick);
-	Anope::AddMessage("KILL", event_kill);
-	Anope::AddMessage("MODE", event_mode);
-	Anope::AddMessage("MOTD", event_motd);
-	Anope::AddMessage("NICK", event_nick);
-	Anope::AddMessage("UID", event_uid);
-	Anope::AddMessage("CAPAB", event_capab);
-	Anope::AddMessage("PART", event_part);
-	Anope::AddMessage("PING", event_ping);
-	Anope::AddMessage("TIME", event_time);
-	Anope::AddMessage("PRIVMSG", event_privmsg);
-	Anope::AddMessage("QUIT", event_quit);
-	Anope::AddMessage("SERVER", event_server);
-	Anope::AddMessage("SQUIT", event_squit);
-	Anope::AddMessage("RSQUIT", event_rsquit);
-	Anope::AddMessage("TOPIC", event_topic);
-	Anope::AddMessage("WHOIS", event_whois);
-	Anope::AddMessage("SVSMODE", event_mode);
-	Anope::AddMessage("FHOST", event_chghost);
-	Anope::AddMessage("CHGIDENT", event_chgident);
-	Anope::AddMessage("FNAME", event_chgname);
-	Anope::AddMessage("SETHOST", event_sethost);
-	Anope::AddMessage("SETIDENT", event_setident);
-	Anope::AddMessage("SETNAME", event_setname);
-	Anope::AddMessage("FJOIN", event_fjoin);
-	Anope::AddMessage("FMODE", event_fmode);
-	Anope::AddMessage("FTOPIC", event_ftopic);
-	Anope::AddMessage("OPERTYPE", event_opertype);
-	Anope::AddMessage("IDLE", event_idle);
-	Anope::AddMessage("METADATA", event_metadata);
-}
-
 bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
 	Anope::string rest;
@@ -1230,8 +1192,26 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 
 class ProtoInspIRCd : public Module
 {
+	Message message_endburst, message_436, message_away, message_join, message_kick, message_kill, message_mode, message_motd,
+		message_nick, message_uid, message_capab, message_part, message_ping, message_time, message_privmsg, message_quit,
+		message_server, message_squit, message_rsquit, message_topic, message_whois, message_svsmode, message_fhost,
+		message_chgident, message_fname, message_sethost, message_setident, message_setname, message_fjoin, message_fmode,
+		message_ftopic, message_opertype, message_idle, message_metadata;
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+		message_endburst("ENDBURST", event_endburst), message_436("436", event_436), message_away("AWAY", event_away),
+		message_join("JOIN", event_join), message_kick("KICK", event_kick), message_kill("KILL", event_kill),
+		message_mode("MODE", event_mode), message_motd("MOTD", event_motd), message_nick("NICK", event_nick),
+		message_uid("UID", event_uid), message_capab("CAPAB", event_capab), message_part("PART", event_part),
+		message_ping("PING", event_ping), message_time("TIME", event_time), message_privmsg("PRIVMSG", event_privmsg),
+		message_quit("QUIT", event_quit), message_server("SERVER", event_server), message_squit("SQUIT", event_squit),
+		message_rsquit("RSQUIT", event_rsquit), message_topic("TOPIC", event_topic), message_whois("WHOIS", event_whois),
+		message_svsmode("SVSMODE", event_mode), message_fhost("FHOST", event_chghost),
+		message_chgident("CHGIDENT", event_chgident), message_fname("FNAME", event_chgname),
+		message_sethost("SETHOST", event_sethost), message_setident("SETIDENT", event_setident),
+		message_setname("SETNAME", event_setname), message_fjoin("FJOIN", event_fjoin), message_fmode("FMODE", event_fmode),
+		message_ftopic("FTOPIC", event_ftopic), message_opertype("OPERTYPE", event_opertype), message_idle("IDLE", event_idle),
+		message_metadata("METADATA", event_metadata)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
@@ -1246,7 +1226,6 @@ class ProtoInspIRCd : public Module
 			Capab.SetFlag(c[i]);
 
 		pmodule_ircd_proto(&ircd_proto);
-		moduleAddIRCDMsgs();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

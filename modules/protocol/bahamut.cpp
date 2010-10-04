@@ -683,36 +683,6 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 	return false;
 }
 
-void moduleAddIRCDMsgs()
-{
-	Anope::AddMessage("436", event_436);
-	Anope::AddMessage("AWAY", event_away);
-	Anope::AddMessage("JOIN", event_join);
-	Anope::AddMessage("KICK", event_kick);
-	Anope::AddMessage("KILL", event_kill);
-	Anope::AddMessage("MODE", event_mode);
-	Anope::AddMessage("MOTD", event_motd);
-	Anope::AddMessage("NICK", event_nick);
-	Anope::AddMessage("PART", event_part);
-	Anope::AddMessage("PING", event_ping);
-	Anope::AddMessage("PRIVMSG", event_privmsg);
-	Anope::AddMessage("QUIT", event_quit);
-	Anope::AddMessage("SERVER", event_server);
-	Anope::AddMessage("SQUIT", event_squit);
-	Anope::AddMessage("TOPIC", event_topic);
-	Anope::AddMessage("WHOIS", event_whois);
-	Anope::AddMessage("SVSMODE", event_mode);
-	Anope::AddMessage("CAPAB", event_capab);
-	Anope::AddMessage("CS", event_cs);
-	Anope::AddMessage("HS", event_hs);
-	Anope::AddMessage("MS", event_ms);
-	Anope::AddMessage("NS", event_ns);
-	Anope::AddMessage("OS", event_os);
-	Anope::AddMessage("SJOIN", event_sjoin);
-	Anope::AddMessage("ERROR", event_error);
-	Anope::AddMessage("BURST", event_burst);
-}
-
 static void AddModes()
 {
 	/* Add user modes */
@@ -752,8 +722,21 @@ static void AddModes()
 
 class ProtoBahamut : public Module
 {
+	Message message_436, message_away, message_join, message_kick, message_kill, message_mode, message_motd, message_nick,
+		message_part, message_ping, message_privmsg, message_quit, message_server, message_squit, message_topic, message_whois,
+		message_svsmode, message_capab, message_cs, message_hs, message_ms, message_ns, message_os, message_sjoin, message_error,
+		message_burst;
  public:
-	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+		message_436("436", event_436), message_away("AWAY", event_away), message_join("JOIN", event_join),
+		message_kick("KICK", event_kick), message_kill("KILL", event_kill), message_mode("MODE", event_mode),
+		message_motd("MOTD", event_motd), message_nick("NICK", event_nick), message_part("PART", event_part),
+		message_ping("PING", event_ping), message_privmsg("PRIVMSG", event_privmsg), message_quit("QUIT", event_quit),
+		message_server("SERVER", event_server), message_squit("SQUIT", event_squit), message_topic("TOPIC", event_topic),
+		message_whois("WHOIS", event_whois), message_svsmode("SVSMODE", event_mode), message_capab("CAPAB", event_capab),
+		message_cs("CS", event_cs), message_hs("HS", event_hs), message_ms("MS", event_ms), message_ns("NS", event_ns),
+		message_os("OS", event_os), message_sjoin("SJOIN", event_sjoin), message_error("ERROR", event_error),
+		message_burst("BURST", event_burst)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
@@ -764,7 +747,6 @@ class ProtoBahamut : public Module
 		for (unsigned i = 0; i < 6; ++i)
 			Capab.SetFlag(c[i]);
 
-		moduleAddIRCDMsgs();
 		AddModes();
 
 		pmodule_ircd_proto(&ircd_proto);

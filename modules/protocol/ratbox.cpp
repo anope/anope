@@ -658,35 +658,6 @@ bool event_error(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-void moduleAddIRCDMsgs()
-{
-	Anope::AddMessage("436", event_436);
-	Anope::AddMessage("AWAY", event_away);
-	Anope::AddMessage("JOIN", event_join);
-	Anope::AddMessage("KICK", event_kick);
-	Anope::AddMessage("KILL", event_kill);
-	Anope::AddMessage("MODE", event_mode);
-	Anope::AddMessage("TMODE", event_tmode);
-	Anope::AddMessage("MOTD", event_motd);
-	Anope::AddMessage("NICK", event_nick);
-	Anope::AddMessage("BMASK", event_bmask);
-	Anope::AddMessage("UID", event_nick);
-	Anope::AddMessage("PART", event_part);
-	Anope::AddMessage("PASS", event_pass);
-	Anope::AddMessage("PING", event_ping);
-	Anope::AddMessage("PRIVMSG", event_privmsg);
-	Anope::AddMessage("QUIT", event_quit);
-	Anope::AddMessage("SERVER", event_server);
-	Anope::AddMessage("SQUIT", event_squit);
-	Anope::AddMessage("TOPIC", event_topic);
-	Anope::AddMessage("TB", event_tburst);
-	Anope::AddMessage("WHOIS", event_whois);
-	Anope::AddMessage("CAPAB", event_capab);
-	Anope::AddMessage("SJOIN", event_sjoin);
-	Anope::AddMessage("ERROR", event_error);
-	Anope::AddMessage("SID", event_sid);
-}
-
 static void AddModes()
 {
 	/* Add user modes */
@@ -718,8 +689,21 @@ static void AddModes()
 
 class ProtoRatbox : public Module
 {
+	Message message_436, message_away, message_join, message_kick, message_kill, message_mode, message_tmode, message_motd,
+		message_nick, message_bmask, message_uid, message_part, message_pass, message_ping, message_privmsg, message_quit,
+		message_server, message_squit, message_topic, message_tb, message_whois, message_capab, message_sjoin, message_error,
+		message_sid;
  public:
-	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+		message_436("436", event_436), message_away("AWAY", event_away), message_join("JOIN", event_join),
+		message_kick("KICK", event_kick), message_kill("KILL", event_kill), message_mode("MODE", event_mode),
+		message_tmode("TMODE", event_tmode), message_motd("MOTD", event_motd), message_nick("NICK", event_nick),
+		message_bmask("BMASK", event_bmask), message_uid("UID", event_nick), message_part("PART", event_part),
+		message_pass("PASS", event_pass), message_ping("PING", event_ping), message_privmsg("PRIVMSG", event_privmsg),
+		message_quit("QUIT", event_quit), message_server("SERVER", event_server), message_squit("SQUIT", event_squit),
+		message_topic("TOPIC", event_topic), message_tb("TB", event_tburst), message_whois("WHOIS", event_whois),
+		message_capab("CAPAB", event_capab), message_sjoin("SJOIN", event_sjoin), message_error("ERROR", event_error),
+		message_sid("SID", event_sid)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
@@ -736,7 +720,6 @@ class ProtoRatbox : public Module
 		AddModes();
 
 		pmodule_ircd_proto(&ircd_proto);
-		moduleAddIRCDMsgs();
 	}
 };
 

@@ -87,49 +87,34 @@ Module *FindModule(const Anope::string &name)
 	return NULL;
 }
 
-/** Add a message to Anope
- * @param name The message name as sent by the IRCd
- * @param func A callback function that will be called when this message is received
- * @return The new message object
+/** Message constructor, adds the message to Anope
+ * @param n The message name
+ * @param f A callback function
  */
-Message *Anope::AddMessage(const Anope::string &name, bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params))
+Message::Message(const Anope::string &n, bool (*f)(const Anope::string &, const std::vector<Anope::string> &)) : name(n), func(f)
 {
-	Message *m = new Message();
-
-	m->name = name;
-	m->func = func;
-
-	MessageMap.insert(std::make_pair(m->name, m));
-
-	return m;
+	MessageMap.insert(std::make_pair(this->name, this));
 }
 
-/** Deletes a message from Anope
- * XXX Im not sure what will happen if this function is called indirectly from a message function pointed to by this message and there
- * is more than one hook for this message.. must check
- * @param m The message
- * @return true if the message was found and deleted, else false
+/** Message destructor
  */
-bool Anope::DelMessage(Message *m)
+Message::~Message()
 {
-	message_map::iterator it = MessageMap.find(m->name);
+	message_map::iterator it = MessageMap.find(this->name);
 
 	if (it == MessageMap.end())
-		return false;
+		return;
 
-	message_map::iterator upper = MessageMap.upper_bound(m->name);
+	message_map::iterator upper = MessageMap.upper_bound(this->name);
 
 	for (; it != upper; ++it)
 	{
-		if (it->second == m)
+		if (it->second == this)
 		{
-			delete m;
 			MessageMap.erase(it);
-			return true;
+			break;
 		}
 	}
-
-	return false;
 }
 
 /** Find  message in the message table

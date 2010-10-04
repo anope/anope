@@ -917,9 +917,8 @@ bool event_privmsg(const Anope::string &source, const std::vector<Anope::string>
 
 bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params.size() < 1 || params.size() > 2)
-		return true;
-	do_part(source, params[0], params[1]);
+	if (!params.empty())
+		do_part(source, params[0], params.size() > 1 ? params[1] : "");
 	return true;
 }
 
@@ -1082,76 +1081,6 @@ bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-void moduleAddIRCDMsgs()
-{
-	Anope::AddMessage("436", event_436);
-	Anope::AddMessage("AWAY", event_away);
-	Anope::AddMessage("6", event_away);
-	Anope::AddMessage("JOIN", event_join);
-	Anope::AddMessage("C", event_join);
-	Anope::AddMessage("KICK", event_kick);
-	Anope::AddMessage("H", event_kick);
-	Anope::AddMessage("KILL", event_kill);
-	Anope::AddMessage(".", event_kill);
-	Anope::AddMessage("MODE", event_mode);
-	Anope::AddMessage("G", event_mode);
-	Anope::AddMessage("MOTD", event_motd);
-	Anope::AddMessage("F", event_motd);
-	Anope::AddMessage("NICK", event_nick);
-	Anope::AddMessage("&", event_nick);
-	Anope::AddMessage("PART", event_part);
-	Anope::AddMessage("D", event_part);
-	Anope::AddMessage("PING", event_ping);
-	Anope::AddMessage("8", event_ping);
-	Anope::AddMessage("PONG", event_pong);
-	Anope::AddMessage("9", event_pong);
-	Anope::AddMessage("PRIVMSG", event_privmsg);
-	Anope::AddMessage("!", event_privmsg);
-	Anope::AddMessage("QUIT", event_quit);
-	Anope::AddMessage(",", event_quit);
-	Anope::AddMessage("SERVER", event_server);
-	Anope::AddMessage("'", event_server);
-	Anope::AddMessage("SQUIT", event_squit);
-	Anope::AddMessage("-", event_squit);
-	Anope::AddMessage("TOPIC", event_topic);
-	Anope::AddMessage(")", event_topic);
-	Anope::AddMessage("SVSMODE", event_mode);
-	Anope::AddMessage("n", event_mode);
-	Anope::AddMessage("SVS2MODE", event_mode);
-	Anope::AddMessage("v", event_mode);
-	Anope::AddMessage("WHOIS", event_whois);
-	Anope::AddMessage("#", event_whois);
-	Anope::AddMessage("PROTOCTL", event_capab);
-	Anope::AddMessage("_", event_capab);
-	Anope::AddMessage("CHGHOST", event_chghost);
-	Anope::AddMessage("AL", event_chghost);
-	Anope::AddMessage("CHGIDENT", event_chgident);
-	Anope::AddMessage("AZ", event_chgident);
-	Anope::AddMessage("CHGNAME", event_chgname);
-	Anope::AddMessage("BK", event_chgname);
-	Anope::AddMessage("NETINFO", event_netinfo);
-	Anope::AddMessage("AO", event_netinfo);
-	Anope::AddMessage("SETHOST", event_sethost);
-	Anope::AddMessage("AA", event_sethost);
-	Anope::AddMessage("SETIDENT", event_setident);
-	Anope::AddMessage("AD", event_setident);
-	Anope::AddMessage("SETNAME", event_setname);
-	Anope::AddMessage("AE", event_setname);
-	Anope::AddMessage("ERROR", event_error);
-	Anope::AddMessage("5", event_error);
-	Anope::AddMessage("UMODE2", event_umode2);
-	Anope::AddMessage("|", event_umode2);
-	Anope::AddMessage("SJOIN", event_sjoin);
-	Anope::AddMessage("~", event_sjoin);
-	Anope::AddMessage("SDESC", event_sdesc);
-	Anope::AddMessage("AG", event_sdesc);
-
-	/* The non token version of these is in messages.c */
-	Anope::AddMessage("2", m_stats);
-	Anope::AddMessage(">", m_time);
-	Anope::AddMessage("+", m_version);
-}
-
 /* Borrowed part of this check from UnrealIRCd */
 bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
@@ -1228,8 +1157,44 @@ static void AddModes()
 
 class ProtoUnreal : public Module
 {
+	Message message_436, message_away, message_away2, message_join, message_join2, message_kick, message_kick2,
+		message_kill, message_kill2, message_mode, message_mode2, message_nick, message_nick2, message_part,
+		message_part2, message_ping, message_ping2, message_pong, message_pong2, message_privmsg, message_privmsg2,
+		message_quit, message_quit2, message_server, message_server2, message_squit, message_squit2, message_topic,
+		message_topic2, message_svsmode, message_svsmode2, message_svs2mode, message_svs2mode2, message_whois, message_whois2,
+		message_capab, message_capab2, message_chghost, message_chghost2, message_chgident, message_chgident2,
+		message_chgname, message_chgname2, message_netinfo, message_netinfo2, message_sethost, message_sethost2,
+		message_setident, message_setident2, message_setname, message_setname2, message_error, message_error2,
+		message_umode2, message_umode22, message_sjoin, message_sjoin2, message_sdesc, message_sdesc2;
+	
+	/* Non-token of these in messages.cpp */
+	Message message_stats, message_time, message_version;
  public:
-	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+		message_436("436", event_436), message_away("AWAY", event_away), message_away2("6", event_away),
+		message_join("JOIN", event_join), message_join2("C", event_join), message_kick("KICK", event_kick),
+		message_kick2("H", event_kick), message_kill("KILL", event_kill), message_kill2(".", event_kill),
+		message_mode("MODE", event_mode), message_mode2("G", event_mode), message_nick("NICK", event_nick),
+		message_nick2("&", event_nick), message_part("PART", event_part), message_part2("D", event_part),
+		message_ping("PING", event_ping), message_ping2("8", event_ping), message_pong("PONG", event_pong),
+		message_pong2("9", event_pong), message_privmsg("PRIVMSG", event_privmsg), message_privmsg2("!", event_privmsg),
+		message_quit("QUIT", event_quit), message_quit2(",", event_quit), message_server("SERVER", event_server),
+		message_server2("'", event_server), message_squit("SQUIT", event_squit), message_squit2("-", event_squit),
+		message_topic("TOPIC", event_topic), message_topic2(")", event_topic), message_svsmode("SVSMODE", event_mode),
+		message_svsmode2("n", event_mode), message_svs2mode("SVS2MODE", event_mode), message_svs2mode2("v", event_mode),
+		message_whois("WHOIS", event_whois), message_whois2("#", event_whois), message_capab("PROTOCTL", event_capab),
+		message_capab2("_", event_capab), message_chghost("CHGHOST", event_chghost), message_chghost2("AL", event_chghost),
+		message_chgident("CHGIDENT", event_chgident), message_chgident2("AZ", event_chgident),
+		message_chgname("CHGNAME", event_chgname), message_chgname2("BK", event_chgname),
+		message_netinfo("NETINFO", event_netinfo), message_netinfo2("AO", event_netinfo),
+		message_sethost("SETHOST", event_sethost), message_sethost2("AA", event_sethost),
+		message_setident("SETIDENT", event_setident), message_setident2("AD", event_setident),
+		message_setname("SETNAME", event_setname), message_setname2("AE", event_setname),
+		message_error("ERROR", event_error), message_error2("5", event_error), message_umode2("UMODE2", event_umode2),
+		message_umode22("|", event_umode2), message_sjoin("SJOIN", event_sjoin), message_sjoin2("~", event_sjoin),
+		message_sdesc("SDESC", event_sdesc), message_sdesc2("AG", event_sdesc),
+		
+		message_stats("2", m_stats), message_time(">", m_time), message_version("+", m_version)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
@@ -1243,7 +1208,6 @@ class ProtoUnreal : public Module
 		AddModes();
 
 		pmodule_ircd_proto(&ircd_proto);
-		moduleAddIRCDMsgs();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

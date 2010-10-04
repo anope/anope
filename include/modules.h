@@ -1269,6 +1269,9 @@ struct Message
 {
 	Anope::string name;
 	bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params);
+
+	Message(const Anope::string &n, bool (*f)(const Anope::string &, const std::vector<Anope::string> &));
+	~Message();
 };
 
 #endif // MODULES_H

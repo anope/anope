@@ -826,26 +826,26 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
 	}
 }
 
-/*************************************************************************/
-
-/** Set modes internally on the channel
- * @param c The channel
- * @param ac Number of args
- * @param av args
+/** Set a string of modes internally on a channel
+ * @param setter The setter, if it is a user
+ * @param mode the modes
+ * @param EnforceMLock true to enforce mlock
  */
-void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter)
+void Channel::SetModesInternal(User *setter, const Anope::string &modes, bool EnforceMLock)
 {
-	if (!ac)
-		return;
+	spacesepstream sep_modes(modes);
+	Anope::string m;
+
+	sep_modes.GetToken(m);
 
 	Anope::string modestring;
 	Anope::string paramstring;
-	int k = 0, j = 0, add = -1;
-	for (unsigned int i = 0, end = strlen(av[0]); i < end; ++i)
+	int add = -1;
+	for (unsigned int i = 0, end = m.length(); i < end; ++i)
 	{
 		ChannelMode *cm;
 
-		switch (av[0][i])
+		switch (m[i])
 		{
 			case '+':
 				modestring += '+';
@@ -858,7 +858,7 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter)
 			default:
 				if (add == -1)
 					continue;
-				cm = ModeManager::FindChannelModeByChar(av[0][i]);
+				cm = ModeManager::FindChannelModeByChar(m[i]);
 				if (!cm)
 					continue;
 				modestring += cm->ModeChar;
@@ -867,9 +867,9 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter)
 		if (cm->Type == MODE_REGULAR)
 		{
 			if (add)
-				c->SetModeInternal(cm);
+				this->SetModeInternal(cm, "", EnforceMLock);
 			else
-				c->RemoveModeInternal(cm);
+				this->RemoveModeInternal(cm, "", EnforceMLock);
 			continue;
 		}
 		else if (cm->Type == MODE_PARAM)
@@ -878,32 +878,32 @@ void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter)
 
 			if (!add && cmp->MinusNoArg)
 			{
-				c->RemoveModeInternal(cm);
-				++k;
+				this->RemoveModeInternal(cm, "", EnforceMLock);
 				continue;
 			}
 		}
-		if (++j < ac)
+		Anope::string token;
+		if (sep_modes.GetToken(token))
 		{
 			User *u = NULL;
-			if (cm->Type == MODE_STATUS && (u = finduser(av[j])))
+			if (cm->Type == MODE_STATUS && (u = finduser(token)))
 				paramstring += " " + u->nick;
 			else
-				paramstring += " " + Anope::string(av[j]);
+				paramstring += " " + token;
+
 			if (add)
-				c->SetModeInternal(cm, av[j]);
+				this->SetModeInternal(cm, token, EnforceMLock);
 			else
-				c->RemoveModeInternal(cm, av[j]);
+				this->RemoveModeInternal(cm, token, EnforceMLock);
 		}
 		else
-			Log() << "warning: ChanSetInternalModes() recieved more modes requiring params than params, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j;
+			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << modes;
 	}
 
 	if (setter)
-		Log(setter, c, "mode") << modestring << paramstring;
-
-	if (j + k + 1 < ac)
-		Log() << "warning: ChanSetInternalModes() recieved more params than modes requiring them, modes: " << merge_args(ac, av) << ", ac: " << ac << ", j: " << j << " k: " << k;
+		Log(setter, this, "mode") << modestring << paramstring;
+	else
+		Log(LOG_DEBUG) << "Setting " << this->name << " to " << modestring << paramstring;
 }
 
 /** Kick a user from a channel internally
@@ -1127,22 +1127,21 @@ User *nc_on_chan(Channel *c, const NickCore *nc)
 /*************************** Message Handling ****************************/
 /*************************************************************************/
 
-/* Handle a JOIN command.
- *	av[0] = channels to join
+/** Handle a JOIN command
+ * @param source user joining
+ * @param channels being joined
+ * @param ts TS for the join
  */
-
-void do_join(const Anope::string &source, int ac, const char **av)
+void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts)
 {
-	User *user;
-
-	user = finduser(source);
+	User *user = finduser(source);
 	if (!user)
 	{
-		Log() << "JOIN from nonexistent user " << source << ": " << merge_args(ac, av);
+		Log() << "JOIN from nonexistent user " << source << ": " << channels;
 		return;
 	}
 
-	commasepstream sep(av[0]);
+	commasepstream sep(channels);
 	Anope::string buf;
 	while (sep.GetToken(buf))
 	{
@@ -1165,18 +1164,18 @@ void do_join(const Anope::string &source, int ac, const char **av)
 
 		/* Channel doesn't exist, create it */
 		if (!chan)
-			chan = new Channel(av[0], Anope::CurTime);
+			chan = new Channel(buf, Anope::CurTime);
 
 		/* Join came with a TS */
-		if (ac == 2)
+		if (!ts.empty())
 		{
-			time_t ts = Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0;
+			time_t t = Anope::string(ts).is_pos_number_only() ? convertTo<time_t>(ts) : 0;
 
 			/* Their time is older, we lose */
-			if (chan->creation_time > ts)
+			if (t && chan->creation_time > t)
 			{
 				Log(LOG_DEBUG) << "Recieved an older TS " << chan->name << " in JOIN, changing from " << chan->creation_time << " to " << ts;
-				chan->creation_time = ts;
+				chan->creation_time = t;
 
 				chan->Reset();
 			}
@@ -1205,41 +1204,36 @@ void do_join(const Anope::string &source, int ac, const char **av)
 
 /** Handle a KICK command.
  * @param source The source of the kick
- * @param ac number of args
- * @param av The channel, nick(s) being kicked, and reason
+ * @param users the user(s) being kicked
+ * @param reason The reason for the kick
  */
-void do_kick(const Anope::string &source, int ac, const char **av)
+void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason)
 {
-	Channel *c = findchan(av[0]);
+	Channel *c = findchan(channel);
 	if (!c)
 	{
-		Log() << "Recieved kick for nonexistant channel " << av[0];
+		Log() << "Recieved kick for nonexistant channel " << channel;
 		return;
 	}
 
 	Anope::string buf;
-	commasepstream sep(av[1]);
+	commasepstream sep(users);
 	while (sep.GetToken(buf))
-		c->KickInternal(source, buf, av[2]);
+		c->KickInternal(source, buf, reason);
 }
 
 /*************************************************************************/
 
-/* Handle a PART command.
- *	av[0] = channels to leave
- *	av[1] = reason (optional)
- */
-
-void do_part(const Anope::string &source, int ac, const char **av)
+void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason)
 {
 	User *user = finduser(source);
 	if (!user)
 	{
-		Log() << "PART from nonexistent user " << source << ": " << merge_args(ac, av);
+		Log() << "PART from nonexistent user " << source << ": " << reason;
 		return;
 	}
 
-	commasepstream sep(av[0]);
+	commasepstream sep(channels);
 	Anope::string buf;
 	while (sep.GetToken(buf))
 	{
@@ -1249,11 +1243,11 @@ void do_part(const Anope::string &source, int ac, const char **av)
 			Log() << "Recieved PART from " << user->nick << " for nonexistant channel " << buf;
 		else if (user->FindChannel(c))
 		{
-			Log(user, c, "part") << "Reason: " << (av[1] ? av[1] : "No reason");
+			Log(user, c, "part") << "Reason: " << (!reason.empty() ? reason : "No reason");
 			FOREACH_MOD(I_OnPrePartChannel, OnPrePartChannel(user, c));
 			Anope::string ChannelName = c->name;
 			c->DeleteUser(user);
-			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName), ChannelName, av[1] ? av[1] : ""));
+			FOREACH_MOD(I_OnPartChannel, OnPartChannel(user, findchan(ChannelName), ChannelName, !reason.empty() ? reason : ""));
 		}
 		else
 			Log() << "Recieved PART from " << user->nick << " for " << c->name << ", but " << user->nick << " isn't in " << c->name << "?";
@@ -1265,53 +1259,22 @@ void do_part(const Anope::string &source, int ac, const char **av)
 /** Process a MODE command from the server, and set the modes on the user/channel
  * it was sent for
  * @param source The source of the command
- * @param ac Number of args in array..
- * @param av Array of args
+ * @param channel the channel to change modes on
+ * @param modes the mode changes
+ * @param ts the timestamp for the modes
  */
-void do_cmode(const Anope::string &source, int ac, const char **av)
+void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts)
 {
-	Channel *c;
-	ChannelInfo *ci;
-	unsigned i, end;
-	const char *t;
-
-	if (Capab.HasFlag(CAPAB_TSMODE))
-	{
-		for (i = 0, end = strlen(av[1]); i < end; ++i)
-			if (!isdigit(av[1][i]))
-				break;
-		if (!av[1][i])
-		{
-			t = av[0];
-			av[0] = av[1];
-			av[1] = t;
-			--ac;
-			++av;
-		}
-		else
-			Log() << "TSMODE enabled but MODE has no valid TS";
-	}
-
-	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
-	if (ircd->ts6 && isdigit(av[0][0]))
-	{
-		--ac;
-		++av;
-	}
-
-	c = findchan(av[0]);
+	Channel *c = findchan(channel);
 	if (!c)
 	{
-		if (debug)
-		{
-			ci = cs_findchan(av[0]);
-			if (!ci || ci->HasFlag(CI_FORBIDDEN))
-				Log(LOG_DEBUG) << "MODE " << merge_args(ac - 1, av + 1) << " for nonexistant channel " << av[0];
-		}
+		Log(LOG_DEBUG) << "MODE " << modes << " for nonexistant channel " << channel;
 		return;
 	}
 
-	if (source.find('.') != Anope::string::npos && Anope::string(av[1]).find_first_of("bovahq") == Anope::string::npos) // XXX
+	Log(LOG_DEBUG) << "MODE " << channel << " " << modes << " ts: " << ts;
+
+	if (source.find('.') != Anope::string::npos)
 	{
 		if (Anope::CurTime != c->server_modetime)
 		{
@@ -1321,10 +1284,7 @@ void do_cmode(const Anope::string &source, int ac, const char **av)
 		++c->server_modecount;
 	}
 
-	--ac;
-	++av;
-
-	ChanSetInternalModes(c, ac, av);
+	c->SetModesInternal(finduser(source), modes);
 }
 
 /*************************************************************************/

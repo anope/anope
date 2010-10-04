@@ -214,138 +214,82 @@ int clear_ignores()
 	return deleted;
 }
 
-/*************************************************************************/
-/* split_buf:  Split a buffer into arguments and store the arguments in an
- *             argument vector pointed to by argv (which will be malloc'd
- *             as necessary); return the argument count.  If colon_special
- *             is non-zero, then treat a parameter with a leading ':' as
- *             the last parameter of the line, per the IRC RFC.  Destroys
- *             the buffer by side effect.
+/** Main process routine
+ * @param buffer A raw line from the uplink to do things with
  */
-int split_buf(char *buf, const char ***argv, int colon_special)
-{
-	int argvsize = 8;
-	int argc;
-	char *s;
-
-	*argv = static_cast<const char **>(scalloc(sizeof(const char *) * argvsize, 1));
-	argc = 0;
-	while (*buf)
-	{
-		if (argc == argvsize)
-		{
-			argvsize += 8;
-			*argv = static_cast<const char **>(srealloc(*argv, sizeof(const char *) * argvsize));
-		}
-		if (*buf == ':')
-		{
-			(*argv)[argc++] = buf + 1;
-			buf = const_cast<char *>(""); // XXX: unsafe cast.
-		}
-		else
-		{
-			s = strpbrk(buf, " ");
-			if (s)
-			{
-				*s++ = 0;
-				while (*s == ' ')
-					++s;
-			}
-			else
-				s = buf + strlen(buf);
-			(*argv)[argc++] = buf;
-			buf = s;
-		}
-	}
-	return argc;
-}
-
-/*************************************************************************/
-
-/* process:  Main processing routine.  Takes the string in inbuf (global
- *           variable) and does something appropriate with it. */
-
 void process(const Anope::string &buffer)
 {
-	int retVal = 0;
-	char source[64] = "";
-	char cmd[64] = "";
-	char buf[1024] = ""; // XXX InspIRCd 2.0 can send messages longer than 512 characters to servers... how disappointing.
-	char *s;
-	int ac; /* Parameters for the command */
-	const char **av;
-
 	/* If debugging, log the buffer */
 	Log(LOG_RAWIO) << "Received: " << buffer;
 
-	/* First make a copy of the buffer so we have the original in case we
-	 * crash - in that case, we want to know what we crashed on. */
-	strscpy(buf, buffer.c_str(), sizeof(buf));
+	/* Strip all extra spaces */
+	Anope::string buf = buffer;
+	buf = buf.replace_all_cs("  ", " ");
 
-	doCleanBuffer(buf);
-
-	/* Split the buffer into pieces. */
-	if (*buf == ':')
-	{
-		s = strpbrk(buf, " ");
-		if (!s)
-			return;
-		*s = 0;
-		while (isspace(*++s));
-		strscpy(source, buf + 1, sizeof(source));
-		memmove(buf, s, strlen(s) + 1);
-	}
-	else
-		*source = 0;
-	if (!*buf)
+	if (buf.empty())
 		return;
-	s = strpbrk(buf, " ");
-	if (s)
+
+	Anope::string source;
+	if (buf[0] == ':')
 	{
-		*s = 0;
-		while (isspace(*++s));
+		size_t space = buf.find_first_of(" ");
+		if (space == Anope::string::npos)
+			return;
+		source = buf.substr(1, space - 1);
+		buf = buf.substr(space + 1);
+		if (source.empty() || buf.empty())
+			return;
 	}
-	else
-		s = buf + strlen(buf);
-	strscpy(cmd, buf, sizeof(cmd));
-	ac = split_buf(s, &av, 1);
+
+	spacesepstream buf_sep(buf);
+	Anope::string buf_token;
+
+	Anope::string command = buf;
+	if (buf_sep.GetToken(buf_token))
+		command = buf_token;
+	
+	std::vector<Anope::string> params;
+	while (buf_sep.GetToken(buf_token))
+	{
+		if (buf_token[0] == ':')
+		{
+			if (!buf_sep.StreamEnd())
+				params.push_back(buf_token.substr(1) + " " + buf_sep.GetRemaining());
+			else
+				params.push_back(buf_token.substr(1));
+			break;
+		}
+		else
+			params.push_back(buf_token);
+	}
 
 	if (protocoldebug)
 	{
-		if (*source)
-			Log() << "Source " << source;
-		if (*cmd)
-			Log() << "Token " << cmd;
-		if (ac)
-		{
-			int i;
-			for (i = 0; i < ac; ++i)
-				Log() << "av[" << i << "] = " << av[i];
-		}
+		Log() << "Source : " << (source.empty() ? "No source" : source);
+		Log() << "Command: " << command;
+
+		if (params.empty())
+			Log() << "No params";
 		else
-			Log() << "av[0] = NULL";
+			for (unsigned i = 0; i < params.size(); ++i)
+				Log() << "params " << i << ": " << params[i];
 	}
 
-	/* Do something with the message. */
-	std::vector<Message *> messages = Anope::FindMessage(cmd);
+	std::vector<Message *> messages = Anope::FindMessage(command);
 
 	if (!messages.empty())
 	{
-		retVal = MOD_CONT;
+		bool retVal = true;
 
-		for (std::vector<Message *>::iterator it = messages.begin(), it_end = messages.end(); retVal == MOD_CONT && it != it_end; ++it)
+		for (std::vector<Message *>::iterator it = messages.begin(), it_end = messages.end(); retVal == true && it != it_end; ++it)
 		{
 			Message *m = *it;
 
 			if (m->func)
-				retVal = m->func(source, ac, av);
+				retVal = m->func(source, params);
 		}
 	}
 	else
 		Log(LOG_DEBUG) << "unknown message from server (" << buffer << ")";
-
-	/* Free argument list we created */
-	free(av);
 }
 
-/*************************************************************************/

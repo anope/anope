@@ -557,42 +557,6 @@ Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim,
 /*************************************************************************/
 
 /**
- * Clean up the buffer for extra spaces
- * @param str to clean up
- * @return void
- */
-void doCleanBuffer(char *str)
-{
-	char *in, *out;
-	char ch;
-
-	if (!str)
-		return;
-
-	in = str;
-	out = str;
-
-	while (issp(ch = *in++));
-	if (ch)
-		for (;;)
-		{
-			*out++ = ch;
-			ch = *in++;
-			if (!ch)
-				break;
-			if (!issp(ch))
-				continue;
-			while (issp(ch = *in++));
-			if (!ch)
-				break;
-			*out++ = ' ';
-		}
-	*out = ch; /* == '\0' */
-}
-
-/*************************************************************************/
-
-/**
  * Kill the user to enforce the sqline
  * @param nick to kill
  * @param killer whom is doing the killing

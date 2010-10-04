@@ -51,14 +51,14 @@ int m_kill(const Anope::string &nick, const Anope::string &msg)
 
 /*************************************************************************/
 
-int m_time(const Anope::string &source, int ac, const char **av)
+bool m_time(const Anope::string &source, const std::vector<Anope::string> &)
 {
 	if (source.empty())
 		return MOD_CONT;
 
-	time_t *t;
-	time(t);
-	struct tm *tm = localtime(t);
+	time_t t;
+	time(&t);
+	struct tm *tm = localtime(&t);
 	char buf[64];
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
 	ircdproto->SendNumeric(Config->ServerName, 391, source, "%s :%s", Config->ServerName.c_str(), buf);
@@ -212,14 +212,14 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 
 /*************************************************************************/
 
-int m_stats(const Anope::string &source, int ac, const char **av)
+bool m_stats(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
+	if (params.size() < 1)
+		return true;
 
 	User *u = finduser(source);
 
-	switch (*av[0])
+	switch (params[0][0])
 	{
 		case 'l':
 			if (u && is_oper(u))
@@ -228,13 +228,13 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, Anope::CurTime - start_time);
 			}
 
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 			break;
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
 			if (u && !is_oper(u) && Config->HideStatsO)
-				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 			else
 			{
 				std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
@@ -248,7 +248,7 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 						ircdproto->SendNumeric(Config->ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
 				}
 
-				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 			}
 
 			break;
@@ -258,19 +258,18 @@ int m_stats(const Anope::string &source, int ac, const char **av)
 			time_t uptime = Anope::CurTime - start_time;
 			ircdproto->SendNumeric(Config->ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
 			ircdproto->SendNumeric(Config->ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 			break;
 		} /* case 'u' */
 
 		default:
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 	}
-	return MOD_CONT;
+
+	return true;
 }
 
-/*************************************************************************/
-
-int m_version(const Anope::string &source, int ac, const char **av)
+bool m_version(const Anope::string &source, const std::vector<Anope::string> &)
 {
 	if (!source.empty())
 		ircdproto->SendNumeric(Config->ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());

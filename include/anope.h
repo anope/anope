@@ -309,7 +309,7 @@ namespace Anope
 	 * @param func A callback function that will be called when this message is received
 	 * @return The new message object
 	 */
-	extern CoreExport Message *AddMessage(const string &name, int (*func)(const string &source, int ac, const char **av));
+	extern CoreExport Message *AddMessage(const string &name, bool (*func)(const string &source, const std::vector<Anope::string> &params));
 
 	/** Deletes a message from Anope
 	 * XXX Im not sure what will happen if this function is called indirectly from message function pointed to by this message.. must check

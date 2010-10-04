@@ -92,7 +92,7 @@ Module *FindModule(const Anope::string &name)
  * @param func A callback function that will be called when this message is received
  * @return The new message object
  */
-Message *Anope::AddMessage(const Anope::string &name, int (*func)(const Anope::string &source, int ac, const char **av))
+Message *Anope::AddMessage(const Anope::string &name, bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params))
 {
 	Message *m = new Message();
 

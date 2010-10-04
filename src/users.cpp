@@ -855,52 +855,44 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 /*************************************************************************/
 
-/* Handle a MODE command for a user.
- *  av[0] = nick to change mode for
- *  av[1] = modes
- */
-
-void do_umode(const Anope::string &source, int ac, const char **av)
+void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes)
 {
-	User *user = finduser(av[0]);
-	if (!user)
+	User *u = finduser(user);
+	if (!u)
 	{
-		Log() << "user: MODE "<< av[1] << " for nonexistent nick "<< av[0] << ":" << merge_args(ac, av);
+		Log() << "user: MODE "<< modes << " for nonexistent nick "<< user;
 		return;
 	}
 
-	Log(user, "mode") << "changes modes to " << merge_args(ac - 1, av + 1);
+	Log(u, "mode") << "changes modes to " << modes;
 
-	Anope::string modes = av[1];
-	for (int i = 2; i < ac; ++i)
-		modes += Anope::string(" ") + av[i];
-	user->SetModesInternal(modes.c_str());
+	u->SetModesInternal(modes.c_str());
 }
 
 /*************************************************************************/
 
-/* Handle a QUIT command.
- *  av[0] = reason
+/** Handle a QUIT command.
+ * @param source User quitting
+ * @param reason Quit reason
  */
-
-void do_quit(const Anope::string &source, int ac, const char **av)
+void do_quit(const Anope::string &source, const Anope::string &reason)
 {
 	User *user = finduser(source);
 	if (!user)
 	{
-		Log() << "user: QUIT from nonexistent user " << source << ":" << merge_args(ac, av);
+		Log() << "user: QUIT from nonexistent user " << source << " (" << reason << ")";
 		return;
 	}
 
-	Log(user, "quit") << "quit (Reason: " << (*av[0] ? av[0] : "no reason") << ")";
+	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
 
 	NickAlias *na = findnick(user->nick);
 	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
-		na->last_quit = *av[0] ? av[0] : "";
+		na->last_quit = reason;
 	}
-	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, *av[0] ? av[0] : ""));
+	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
 	delete user;
 }
 

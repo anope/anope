@@ -353,18 +353,17 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 
 /**
  * Handle removing the server from the Server struct
- * @param source Name of the server leaving
- * @param ac Number of arguments in av
- * @param av Agruments as part of the SQUIT
+ * @param source Name of the server sending the squit
+ * @param server Name of the server leaving
  * @return void
  */
-void do_squit(const Anope::string &source, int ac, const char **av)
+void do_squit(const Anope::string &source, const Anope::string &server)
 {
-	Server *s = Server::Find(av[0]);
+	Server *s = Server::Find(server);
 
 	if (!s)
 	{
-		Log() << "SQUIT for nonexistent server (" << av[0] << ")!!";
+		Log() << "SQUIT for nonexistent server " << server;
 		return;
 	}
 
@@ -395,16 +394,14 @@ void do_squit(const Anope::string &source, int ac, const char **av)
 /*************************************************************************/
 
 /** Handle parsing the CAPAB/PROTOCTL messages
- * @param ac Number of args
- * @param av Args
  */
-void CapabParse(int ac, const char **av)
+void CapabParse(const std::vector<Anope::string> &params)
 {
-	for (int i = 0; i < ac; ++i)
+	for (unsigned i = 0; i < params.size(); ++i)
 	{
 		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
 		{
-			if (Capab_Info[j].Token.equals_ci(av[i]))
+			if (Capab_Info[j].Token.equals_ci(params[i]))
 			{
 				Capab.SetFlag(Capab_Info[j].Flag);
 				break;

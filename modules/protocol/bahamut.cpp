@@ -293,15 +293,15 @@ class BahamutIRCdProto : public IRCDProto
 } ircd_proto;
 
 /* EVENT: SJOIN */
-int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
+bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	Channel *c = findchan(av[1]);
-	time_t ts = Anope::string(av[0]).is_pos_number_only() ? convertTo<time_t>(av[0]) : 0;
+	Channel *c = findchan(params[1]);
+	time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
 	bool keep_their_modes = false;
 
 	if (!c)
 	{
-		c = new Channel(av[1], ts);
+		c = new Channel(params[1], ts);
 		c->SetFlag(CH_SYNCING);
 	}
 	/* Our creation time is newer than what the server gave us */
@@ -318,16 +318,21 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		keep_their_modes = false;
 
 	/* If we need to keep their modes, and this SJOIN string contains modes */
-	if (keep_their_modes && ac >= 4)
+	if (keep_their_modes && params.size() >= 4)
 	{
 		/* Set the modes internally */
-		ChanSetInternalModes(c, ac - 3, av + 2);
+		Anope::string modes;
+		for (unsigned i = 2; i < params.size(); ++i)
+			modes += " " + params[i];
+		if (!modes.empty())
+			modes.erase(modes.begin());
+		c->SetModesInternal(NULL, modes);
 	}
 
 	/* For a reason unknown to me, bahamut will send a SJOIN from the user joining a channel
 	 * if the channel already existed
 	 */
-	if (!c->HasFlag(CH_SYNCING) && ac == 2)
+	if (!c->HasFlag(CH_SYNCING) && params.size() == 2)
 	{
 		User *u = finduser(source);
 		if (!u)
@@ -355,7 +360,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 	}
 	else
 	{
-		spacesepstream sep(av[ac - 1]);
+		spacesepstream sep(params[params.size() - 1]);
 		Anope::string buf;
 		while (sep.GetToken(buf))
 		{
@@ -418,7 +423,7 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 		c->Sync();
 	}
 
-	return MOD_CONT;
+	return true;
 }
 
 /*
@@ -439,17 +444,17 @@ int anope_event_sjoin(const Anope::string &source, int ac, const char **av)
 **	parv[0] = new nickname
 **	  parv[1] = hopcount
 */
-int anope_event_nick(const Anope::string &source, int ac, const char **av)
+bool event_nick(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	User *user;
 
-	if (ac != 2)
+	if (params.size() != 2)
 	{
-		user = do_nick(source, av[0], av[4], av[5], av[6], av[9], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : 0, av[8], "", "", av[3]);
+		user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[8], "", "", params[3]);
 		if (user)
 		{
 			NickAlias *na;
-			if (user->timestamp == convertTo<time_t>(av[7]) && (na = findnick(user->nick)))
+			if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
 			{
 				user->Login(na->nc);
 				user->SetMode(NickServ, UMODE_REGISTERED);
@@ -459,214 +464,199 @@ int anope_event_nick(const Anope::string &source, int ac, const char **av)
 		}
 	}
 	else
-		do_nick(source, av[0], "", "", "", "", Anope::string(av[1]).is_pos_number_only() ? convertTo<time_t>(av[1]) : 0, "", "", "", "");
-	return MOD_CONT;
+		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
+	return true;
 }
 
 /* EVENT : CAPAB */
-int anope_event_capab(const Anope::string &source, int ac, const char **av)
+bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	CapabParse(ac, av);
-	return MOD_CONT;
+	CapabParse(params);
+	return true;
 }
 
 /* EVENT : OS */
-int anope_event_os(const Anope::string &source, int ac, const char **av)
+bool event_os(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	m_privmsg(source, Config->s_OperServ, av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_privmsg(source, Config->s_OperServ, params[0]);
+	return true;
 }
 
 /* EVENT : NS */
-int anope_event_ns(const Anope::string &source, int ac, const char **av)
+bool event_ns(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	m_privmsg(source, Config->s_NickServ, av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_privmsg(source, Config->s_NickServ, params[0]);
+	return true;
 }
 
 /* EVENT : MS */
-int anope_event_ms(const Anope::string &source, int ac, const char **av)
+bool event_ms(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	m_privmsg(source, Config->s_MemoServ, av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_privmsg(source, Config->s_MemoServ, params[0]);
+	return true;
 }
 
 /* EVENT : HS */
-int anope_event_hs(const Anope::string &source, int ac, const char **av)
+bool event_hs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	m_privmsg(source, Config->s_HostServ, av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_privmsg(source, Config->s_HostServ, params[0]);
+	return true;
 }
 
 /* EVENT : CS */
-int anope_event_cs(const Anope::string &source, int ac, const char **av)
+bool event_cs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	m_privmsg(source, Config->s_ChanServ, av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_privmsg(source, Config->s_ChanServ, params[0]);
+	return true;
 }
 
-int anope_event_436(const Anope::string &source, int ac, const char **av)
+bool event_436(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-
-	m_nickcoll(av[0]);
-	return MOD_CONT;
+	if (!params.empty())
+		m_nickcoll(params[0]);
+	return true;
 }
 
 /* EVENT : SERVER */
-int anope_event_server(const Anope::string &source, int ac, const char **av)
+bool event_server(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	do_server(source, av[0], Anope::string(av[1]).is_pos_number_only() ? convertTo<unsigned>(av[1]) : 0, av[2], "");
-	return MOD_CONT;
+	do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+	return true;
 }
 
 /* EVENT : PRIVMSG */
-int anope_event_privmsg(const Anope::string &source, int ac, const char **av)
+bool event_privmsg(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 2)
-		return MOD_CONT;
-	m_privmsg(source, av[0], av[1]);
-	return MOD_CONT;
+	if (params.size() > 1)
+		m_privmsg(source, params[0], params[1]);
+	return true;
 }
 
-int anope_event_part(const Anope::string &source, int ac, const char **av)
+bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1 || ac > 2)
-		return MOD_CONT;
-	do_part(source, ac, av);
-	return MOD_CONT;
+	if (!params.empty())
+		do_part(source, params[0], params.size() > 1 ? params[1] : "");
+	return true;
 }
 
-int anope_event_whois(const Anope::string &source, int ac, const char **av)
+bool event_whois(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!source.empty() && ac >= 1)
-		m_whois(source, av[0]);
-	return MOD_CONT;
+	if (!source.empty() && params.size() > 0)
+		m_whois(source, params[0]);
+	return true;
 }
 
-int anope_event_topic(const Anope::string &source, int ac, const char **av)
+bool event_topic(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 4)
-		return MOD_CONT;
+	if (params.size() < 4)
+		return true;
 
-	Channel *c = findchan(av[0]);
+	Channel *c = findchan(params[0]);
 	if (!c)
 	{
-		Log() << "TOPIC for nonexistant channel " << av[0];
-		return MOD_CONT;
+		Log() << "TOPIC for nonexistant channel " << params[0];
+		return true;
 	}
 
-	c->ChangeTopicInternal(av[1], av[3], Anope::string(av[2]).is_pos_number_only() ? convertTo<time_t>(av[2]) : Anope::CurTime);
+	c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
 
-	return MOD_CONT;
+	return true;
 }
 
-int anope_event_squit(const Anope::string &source, int ac, const char **av)
+bool event_squit(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 2)
-		return MOD_CONT;
-	do_squit(source, ac, av);
-	return MOD_CONT;
+	if (params.size() > 0)
+		do_squit(source, params[0]);
+	return true;
 }
 
-int anope_event_quit(const Anope::string &source, int ac, const char **av)
+bool event_quit(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 1)
-		return MOD_CONT;
-	do_quit(source, ac, av);
-	return MOD_CONT;
+	if (params.size() > 0)
+		do_quit(source, params[0]);
+	return true;
 }
 
 /* EVENT: MODE */
-int anope_event_mode(const Anope::string &source, int ac, const char **av)
+bool event_mode(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 2)
-		return MOD_CONT;
+	if (params.size() < 3)
+		return true;
 
-	if (*av[0] == '#' || *av[0] == '&')
-		do_cmode(source, ac, av);
+	if (params[0][0] == '#' || params[0][0] == '&')
+		do_cmode(source, params[0], params[2], params[1]);
 	else
-		do_umode(source, ac, av);
-	return MOD_CONT;
+		do_umode(source, params[0], params[1]);
+	return true;
 }
 
 /* EVENT: KILL */
-int anope_event_kill(const Anope::string &source, int ac, const char **av)
+bool event_kill(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 2)
-		return MOD_CONT;
-
-	m_kill(av[0], av[1]);
-	return MOD_CONT;
+	if (params.size() > 1)
+		m_kill(params[0], params[1]);
+	return true;
 }
 
 /* EVENT: KICK */
-int anope_event_kick(const Anope::string &source, int ac, const char **av)
+bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 3)
-		return MOD_CONT;
-	do_kick(source, ac, av);
-	return MOD_CONT;
+	if (params.size() > 2)
+		do_kick(source, params[0], params[1], params[2]);
+	return true;
 }
 
 /* EVENT: JOIN */
-int anope_event_join(const Anope::string &source, int ac, const char **av)
+bool event_join(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac != 1)
-		return MOD_CONT;
-	do_join(source, ac, av);
-	return MOD_CONT;
+	if (params.size() >= 2)
+		do_join(source, params[0], params[1]);
+	return true;
 }
 
 /* EVENT: MOTD */
-int anope_event_motd(const Anope::string &source, int ac, const char **av)
+bool event_motd(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (source.empty())
-		return MOD_CONT;
+		return true;
 
 	m_motd(source);
-	return MOD_CONT;
+	return true;
 }
 
-int anope_event_away(const Anope::string &source, int ac, const char **av)
+bool event_away(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (source.empty())
-		return MOD_CONT;
-	m_away(source, ac ? av[0] : "");
-	return MOD_CONT;
+		return true;
+	m_away(source, !params.empty() ? params[0] : "");
+	return true;
 }
 
-int anope_event_ping(const Anope::string &source, int ac, const char **av)
+bool event_ping(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac < 1)
-		return MOD_CONT;
-	ircdproto->SendPong(ac > 1 ? av[1] : Config->ServerName, av[0]);
-	return MOD_CONT;
+	if (params.size() < 1)
+		return true;
+	ircdproto->SendPong(params.size() > 1 ? params[1] : Config->ServerName, params[0]);
+	return true;
 }
 
-int anope_event_error(const Anope::string &source, int ac, const char **av)
+bool event_error(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (ac >= 1)
-		Log(LOG_DEBUG) << av[0];
-	return MOD_CONT;
+	if (params.size() > 0)
+		Log(LOG_DEBUG) << params[0];
+	return true;
 }
 
-int anope_event_burst(const Anope::string &source, int ac, const char **av)
+bool event_burst(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	Server *s = Server::Find(source);
 
-	if (!ac)
+	if (params.empty())
 	{
 		/* for future use  - start burst */
 	}
@@ -681,7 +671,7 @@ int anope_event_burst(const Anope::string &source, int ac, const char **av)
 		if (s)
 			s->Sync(true);
 	}
-	return MOD_CONT;
+	return true;
 }
 
 bool ChannelModeFlood::IsValid(const Anope::string &value) const
@@ -695,32 +685,32 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 
 void moduleAddIRCDMsgs()
 {
-	Anope::AddMessage("436", anope_event_436);
-	Anope::AddMessage("AWAY", anope_event_away);
-	Anope::AddMessage("JOIN", anope_event_join);
-	Anope::AddMessage("KICK", anope_event_kick);
-	Anope::AddMessage("KILL", anope_event_kill);
-	Anope::AddMessage("MODE", anope_event_mode);
-	Anope::AddMessage("MOTD", anope_event_motd);
-	Anope::AddMessage("NICK", anope_event_nick);
-	Anope::AddMessage("PART", anope_event_part);
-	Anope::AddMessage("PING", anope_event_ping);
-	Anope::AddMessage("PRIVMSG", anope_event_privmsg);
-	Anope::AddMessage("QUIT", anope_event_quit);
-	Anope::AddMessage("SERVER", anope_event_server);
-	Anope::AddMessage("SQUIT", anope_event_squit);
-	Anope::AddMessage("TOPIC", anope_event_topic);
-	Anope::AddMessage("WHOIS", anope_event_whois);
-	Anope::AddMessage("SVSMODE", anope_event_mode);
-	Anope::AddMessage("CAPAB", anope_event_capab);
-	Anope::AddMessage("CS", anope_event_cs);
-	Anope::AddMessage("HS", anope_event_hs);
-	Anope::AddMessage("MS", anope_event_ms);
-	Anope::AddMessage("NS", anope_event_ns);
-	Anope::AddMessage("OS", anope_event_os);
-	Anope::AddMessage("SJOIN", anope_event_sjoin);
-	Anope::AddMessage("ERROR", anope_event_error);
-	Anope::AddMessage("BURST", anope_event_burst);
+	Anope::AddMessage("436", event_436);
+	Anope::AddMessage("AWAY", event_away);
+	Anope::AddMessage("JOIN", event_join);
+	Anope::AddMessage("KICK", event_kick);
+	Anope::AddMessage("KILL", event_kill);
+	Anope::AddMessage("MODE", event_mode);
+	Anope::AddMessage("MOTD", event_motd);
+	Anope::AddMessage("NICK", event_nick);
+	Anope::AddMessage("PART", event_part);
+	Anope::AddMessage("PING", event_ping);
+	Anope::AddMessage("PRIVMSG", event_privmsg);
+	Anope::AddMessage("QUIT", event_quit);
+	Anope::AddMessage("SERVER", event_server);
+	Anope::AddMessage("SQUIT", event_squit);
+	Anope::AddMessage("TOPIC", event_topic);
+	Anope::AddMessage("WHOIS", event_whois);
+	Anope::AddMessage("SVSMODE", event_mode);
+	Anope::AddMessage("CAPAB", event_capab);
+	Anope::AddMessage("CS", event_cs);
+	Anope::AddMessage("HS", event_hs);
+	Anope::AddMessage("MS", event_ms);
+	Anope::AddMessage("NS", event_ns);
+	Anope::AddMessage("OS", event_os);
+	Anope::AddMessage("SJOIN", event_sjoin);
+	Anope::AddMessage("ERROR", event_error);
+	Anope::AddMessage("BURST", event_burst);
 }
 
 static void AddModes()

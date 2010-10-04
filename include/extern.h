@@ -61,18 +61,16 @@ E void get_channel_stats(long *nrec, long *memuse);
 
 E Channel *findchan(const Anope::string &chan);
 
-E void ChanSetInternalModes(Channel *c, int ac, const char **av, User *setter = NULL); /* this is dieing soon anyway */
-
 E User *nc_on_chan(Channel *c, const NickCore *nc);
 
 E int get_access_level(ChannelInfo *ci, NickAlias *na);
 E int get_access_level(ChannelInfo *ci, NickCore *nc);
 E Anope::string get_xop_level(int level);
 
-E void do_cmode(const Anope::string &source, int ac, const char **av);
-E void do_join(const Anope::string &source, int ac, const char **av);
-E void do_kick(const Anope::string &source, int ac, const char **av);
-E void do_part(const Anope::string &source, int ac, const char **av);
+E void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
+E void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
+E void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
+E void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
 E void MassChannelModes(BotInfo *bi, const Anope::string &modes);
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
@@ -201,11 +199,6 @@ class UplinkSocket : public ConnectionSocket
 	bool Read(const Anope::string &buf);
 };
 
-/**** memory.c ****/
-
-E void *scalloc(long elsize, long els);
-E void *srealloc(void *oldptr, long newsize);
-
 /**** memoserv.c ****/
 
 E void ms_init();
@@ -222,10 +215,10 @@ E int m_away(const Anope::string &source, const Anope::string &msg);
 E int m_kill(const Anope::string &nick, const Anope::string &msg);
 E int m_motd(const Anope::string &source);
 E int m_privmsg(const Anope::string &source, const Anope::string &receiver, const Anope::string &message);
-E int m_stats(const Anope::string &source, int ac, const char **av);
+E bool m_stats(const Anope::string &source, const std::vector<Anope::string> &);
 E int m_whois(const Anope::string &source, const Anope::string &who);
-E int m_time(const Anope::string &source, int ac, const char **av);
-E int m_version(const Anope::string &source, int ac, const char **av);
+E bool m_time(const Anope::string &source, const std::vector<Anope::string> &);
+E bool m_version(const Anope::string &source, const std::vector<Anope::string> &);
 
 /**** misc.c ****/
 
@@ -255,7 +248,6 @@ E bool isvalidchar(char c);
 E Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number);
 E Anope::string myStrGetTokenRemainder(const Anope::string &str, char dilim, int token_number);
 E int myNumToken(const Anope::string &str, char dilim);
-E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer);
 E bool nickIsServices(const Anope::string &nick, bool bot);
 
@@ -313,7 +305,6 @@ E IgnoreData *get_ignore(const Anope::string &nick);
 E int delete_ignore(const Anope::string &nick);
 E int clear_ignores();
 
-E int split_buf(char *buf, const char ***argv, int colon_special);
 E void process(const Anope::string &buf);
 
 /**** send.c ****/
@@ -361,8 +352,8 @@ E Anope::string TS6SID;
 
 E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
 
-E void do_umode(const Anope::string &source, int ac, const char **av);
-E void do_quit(const Anope::string &source, int ac, const char **av);
+E void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes);
+E void do_quit(const Anope::string &source, const Anope::string &reason);
 E void do_kill(const Anope::string &source, const Anope::string &reason);
 
 E bool is_oper(User *user);

@@ -248,6 +248,13 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	void SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...);
 
+	/** Set a string of modes internally on a channel
+	 * @param setter the setter (if it is a user)
+	 * @param mode the modes
+	 * @param EnforceMLock true to enforce mlock
+	 */
+	void SetModesInternal(User *setter, const Anope::string &modes, bool EnforceMLock = false);
+
 	/** Kick a user from a channel internally
 	 * @param source The sender of the kick
 	 * @param nick The nick being kicked

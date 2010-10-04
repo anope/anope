@@ -159,7 +159,6 @@ enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFOR
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
 enum MODType { MT_BEGIN, THIRD, QATESTED, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, SOCKETENGINE, MT_END };
 
-struct Message;
 typedef std::multimap<Anope::string, Message *> message_map;
 extern CoreExport message_map MessageMap;
 class Module;
@@ -1269,7 +1268,7 @@ class service_reference : public dynamic_reference<T>
 struct Message
 {
 	Anope::string name;
-	int (*func)(const Anope::string &source, int ac, const char **av);
+	bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params);
 };
 
 #endif // MODULES_H

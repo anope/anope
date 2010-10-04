@@ -121,7 +121,8 @@ class SocketEngineEPoll : public SocketEngineBase
 		int total = epoll_wait(EngineHandle, events, max - 1, Config->ReadTimeout * 1000);
 		Anope::CurTime = time(NULL);
 
-		if (total == -1)
+		/* EINTR can be given if the read timeout expires */
+		if (total == -1 && errno != EINTR)
 		{
 			Log() << "SockEngine::Process(): error: " << Anope::LastError();
 			return;

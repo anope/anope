@@ -976,11 +976,20 @@ class DBPlain : public Module
 			if (ci->GetMLockCount(true))
 			{
 				db << "MD MLOCK_ON";
-				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+
+				Anope::string oldmodes;
+				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_on", oldmodes))
 				{
-					ChannelMode *cm = it->second;
-					if (ci->HasMLock(cm->Name, true))
-						db << " " << cm->NameAsString;
+					db << " " << oldmodes;
+				}
+				else
+				{
+					for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+					{
+						ChannelMode *cm = it->second;
+						if (ci->HasMLock(cm->Name, true))
+							db << " " << cm->NameAsString;
+					}
 				}
 				db << endl;
 			}
@@ -988,21 +997,40 @@ class DBPlain : public Module
 			{
 				db << "MD MLOCK_OFF";
 
-				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+				Anope::string oldmodes;
+				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_off", oldmodes))
 				{
-					ChannelMode *cm = it->second;
-					if (ci->HasMLock(cm->Name, false))
-						db << " " << cm->NameAsString;
+					db << " " << oldmodes;
+				}
+				else
+				{
+					for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+					{
+						ChannelMode *cm = it->second;
+						if (ci->HasMLock(cm->Name, false))
+							db << " " << cm->NameAsString;
+					}
 				}
 				db << endl;
 			}
-			for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+			std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
+			if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
 			{
-				ChannelMode *cm = it->second;
-				Anope::string Param;
+				for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
+				{
+					db << "MD MLP " << it->first << " " << it->second << endl;
+				}
+			}
+			else
+			{
+				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+				{
+					ChannelMode *cm = it->second;
+					Anope::string Param;
 
-				if (ci->GetParam(cm->Name, Param))
-					db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+					if (ci->GetParam(cm->Name, Param))
+						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+				}
 			}
 			if (!ci->memos.memos.empty())
 			{

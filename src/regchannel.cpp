@@ -387,7 +387,12 @@ void ChannelInfo::LoadMLock()
 				this->SetMLock(cm->Name, true, it->second);
 			}
 		}
+	
 	}
+
+	this->Shrink("db_mlock_modes_on");
+	this->Shrink("db_mlock_modes_off");
+	this->Shrink("db_mlp");
 
 	/* Create perm channel */
 	if (this->HasFlag(CI_PERSIST) && !this->c)

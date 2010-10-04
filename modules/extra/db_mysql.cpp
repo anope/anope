@@ -199,15 +199,20 @@ static Anope::string MakeMLock(ChannelInfo *ci, bool status)
 {
 	Anope::string ret;
 
-	for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	if ((!Me || !Me->IsSynced()) && ci->GetExtRegular(status ? "db_mlock_modes_on" : "db_mlock_modes_off", ret))
+		;
+	else
 	{
-		ChannelMode *cm = it->second;
-		if (ci->HasMLock(cm->Name, status))
-			ret += " " + cm->NameAsString;
-	}
+		for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+		{
+			ChannelMode *cm = it->second;
+			if (ci->HasMLock(cm->Name, status))
+				ret += " " + cm->NameAsString;
+		}
 
-	if (!ret.empty())
-		ret.erase(ret.begin());
+		if (!ret.empty())
+			ret.erase(ret.begin());
+	}
 
 	return ret;
 }
@@ -226,13 +231,24 @@ static Anope::string GetMLockParams(ChannelInfo *ci)
 {
 	Anope::string ret;
 
-	for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
+	if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
 	{
-		ChannelMode *cm = it->second;
+		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
+		{
+			ret += " " + it->first + " " + it->second;
+		}
+	}
+	else
+	{
+		for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+		{
+			ChannelMode *cm = it->second;
 
-		Anope::string param;
-		if (ci->GetParam(cm->Name, param))
-			ret += " " + cm->NameAsString + " " + param;
+			Anope::string param;
+			if (ci->GetParam(cm->Name, param))
+				ret += " " + cm->NameAsString + " " + param;
+		}
 	}
 
 	if (!ret.empty())

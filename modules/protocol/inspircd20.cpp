@@ -1128,7 +1128,7 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	Server *s = Server::Find(source);
 
 	if (!s)
-		throw new CoreException("Got ENDBURST without a source");
+		throw CoreException("Got ENDBURST without a source");
 
 	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
 	 * If not, validate the user. ~ Viper*/

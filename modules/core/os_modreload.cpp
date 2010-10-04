@@ -37,7 +37,7 @@ class CommandOSModReLoad : public Command
 			return MOD_CONT;
 		}
 
-		if (m->GetPermanent() || m->type == PROTOCOL) // TODO: make protocol modules reloadable
+		if (m->GetPermanent())
 		{
 			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
 			return MOD_CONT;

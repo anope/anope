@@ -225,7 +225,7 @@ void Init(int ac, char **av)
 	{
 		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
 		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
-		Log(LOG_TERMINAL) << "Usage ./" << SERVICES_BIN << " [options] ...";
+		Log(LOG_TERMINAL) << "Usage ./" << services_bin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
 		Log(LOG_TERMINAL) << "-d, --debug[=level]";
 		Log(LOG_TERMINAL) << "    --dir=services_directory";

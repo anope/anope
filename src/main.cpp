@@ -186,6 +186,7 @@ void do_restart_services()
 	delete UplinkSock;
 	ModuleManager::UnloadAll();
 	chdir(binary_dir.c_str());
+	my_av[0] = const_cast<char *>(("./" + services_bin).c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
 	if (!readonly)
 	{
@@ -309,7 +310,7 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 	if (GetModuleFileName(NULL, buffer, PATH_MAX))
 	{
 		Anope::string fullpath = buffer;
-		Anope::string::size_type n = fullpath.rfind("\\" SERVICES_BIN);
+		Anope::string::size_type n = fullpath.rfind("\\");
 		services_bin = fullpath.substr(n + 1, fullpath.length());
 		return fullpath.substr(0, n);
 	}
@@ -319,20 +320,15 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 	{
 		Anope::string remainder = argv0;
 
-		/* Does argv[0] start with /? If so, it's a full path, use it */
-		if (remainder[0] == '/')
-		{
-			Anope::string::size_type n = remainder.rfind("/" SERVICES_BIN);
-			services_bin = remainder.substr(n + 1, remainder.length());
-			return remainder.substr(0, n);
-		}
-
 		services_bin = remainder;
-		if (services_bin.substr(0, 2).equals_cs("./"))
-			services_bin = services_bin.substr(2);
-		Anope::string fullpath = Anope::string(buffer) + "/" + remainder;
-		Anope::string::size_type n = fullpath.rfind("/" SERVICES_BIN);
-		return fullpath.substr(0, n);
+		Anope::string::size_type n = services_bin.rfind("/");
+		Anope::string fullpath;
+		if (services_bin[0] == '/')
+			fullpath = services_bin.substr(0, n);
+		else
+			fullpath = Anope::string(buffer) + "/" + services_bin.substr(0, n);
+		services_bin = services_bin.substr(n + 1, remainder.length());
+		return fullpath;
 	}
 #endif
 	return "/";

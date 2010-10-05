@@ -88,7 +88,6 @@ add_dependencies(${PROGRAM_NAME} language headers)
 # Get the filename of the Anope executable as it is in on this system
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)
 get_filename_component(SERVICES_BINARY ${SERVICES_BINARY} NAME)
-set(SERVICES_BIN "${SERVICES_BINARY}")
 # Add the Anope executable to the list of files for CPack to ignore
 add_to_cpack_ignored_files("${SERVICES_BINARY}$" TRUE)
 

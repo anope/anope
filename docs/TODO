@@ -31,11 +31,12 @@ Legend:
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
 [x] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
 [ ] Allow channel founders to change the fantasy trigger for their channel.
+[x] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
+[?] Remote identification
+[x] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 
 Future
 ------
-[ ] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
-[?] Remote identification (1.9.1? will this break stuff?)
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
@@ -51,7 +52,4 @@ Future
   [x] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
-[?] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK? (AKA os_info)
-[?] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
-[?] OS INJECT
 [?] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)

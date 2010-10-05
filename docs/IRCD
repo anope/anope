@@ -64,90 +64,49 @@ How To Add IRCd Support
 
     8) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
 
-    10) Join to Set: Services must join a channel to set any modes on that
-                     channel. Use 1 for yes, 0 for no.
-
-    11) Join to Message: Services must join a channel to send any message to
+    10) Join to Message: Services must join a channel to send any message to
                          that channel (cannot override +n). Use 1 for yes,
                          0 for no.
 
-    12) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
-                          set forward by +1. Use 1 for yes, 0 for no.
-
-    13) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
-                           like their topic TS set back by -1. Use 1 for yes,
-                           0 for no.
-
-    14) SQline Channels: The IRCd's supports banning channel names via
+    11) SQline Channels: The IRCd's supports banning channel names via
                          SQLINES. Use 1 for yes, 0 for no.
 
-    15) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
+    12) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
                       QUIT message for that user? Use 1 for yes, 0 for no.
 
-    16) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
+    13) SVSMODE UNBAN: We can use SVSMODE to unban hosts from a channel. Use
                     1 for yes, 0 for no.
 
-    17) Reverse: We can do a reverse check when unbanning. For use with 
+    14) Reverse: We can do a reverse check when unbanning. For use with 
                  DreamForge based IRCd's. Use 1 for yes, 0 for no.
 
-    18) vIdent: Support for including a user's ident in their vHost. Use
+    15) vIdent: Support for including a user's ident in their vHost. Use
                 1 for yes, 0 for no.
 
-    19) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
+    16) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
                  a nick enforcer client. Use 1 for yes, 0 for no.
 
-    20) TS on MODE: We need to send a timestamp when modes are being changed.
+    17) TS on MODE: We need to send a timestamp when modes are being changed.
                     Use 1 for yes, 0 for no.
 
-    21) NICKIP: The IP address of new users is being sent along with their
-                hostname when new users are being introduced on the network.
-                Use 1 for yes, 0 for no.
-
-    22) OMODE: We can use OperServ to give some user a temporary O:LINE.
-                Use 1 for yes, 0 for no.
-
-    23) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
+    18) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
                0 for no.
 
-    24) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
-                       0 for no.
+    19) OMODE: We can use OperServ to give some user a temporary O:LINE.
+               Use 1 for yes, 0 for no.
 
-    25) Check Nick ID: Should we check if a user should remain identified when
-                       changing their nick? This is for IRCd's that remove
-                       their registered-user mode when someone changes their
-                       nick (like Bahamut does).
-                       Use 1 for yes, 0 for no.
-
-    26) No Knock Requires +i: Does the No Knock channel mode require invite
+    20) No Knock Requires +i: Does the No Knock channel mode require invite
                               only channels? Use 1 for yes, 0 for no.
     
-    27) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
-                0 for no.
-
-    28) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
-                         1 for yes, 0 for no.
-
-    29) SJOIN Ban Char: Character used to identify bans. Use ''.
-
-    30) SJOIN Except Char: Character used to identify exceptions. Use ''.
-    
-    31) SJOIN Invite char: Character used to idenfity invexs. Use ''.
-
-    32) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
+    21) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    33) SGline Enforce: Does the IRCd enforce SNLINES for us or do we need to
+    22) SGline Enforce: Does the IRCd enforce SNLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
-    34) Vhost Character: The character used to represent the vHost mode, if
-                         this is supported by the IRCd.
+    23) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    35) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
-
-    36) Character Set: Unreal passes the character set during PROTOCTL,
-                       the value is stored here. Set this NULL to start.
-
-    37) Channel CIDR: Set to 1 if channel bans, excepts and invites
+    24) Channel CIDR: Set to 1 if channel bans, excepts and invites
                       support CIDR masks. Expected syntax: *!*@ip/mask.
                       When set to 1, anope will only parse strict CIDR masks.
                       IRCd's that try to correct invalid CIDR's (like nefarious)
@@ -155,14 +114,14 @@ How To Add IRCd Support
                       Contact the anope Dev Team if this is the case.
                       Set to 0 if CIDR's are not supported by your IRCd.
 
-    38) Global TLD Prefix: Prefix used to send global messages, should probably
+    25) Global TLD Prefix: Prefix used to send global messages, should probably
                            be "$"
 
-    39) Max Modes: The max number of mode changes we can send in one line
+    26) Max Modes: The max number of mode changes we can send in one line
 
 3) Modes 
 
-   Anope is told about modes in the moduleAddModes() function.
+   Anope is told about modes in the protocol module.
    For the most part, the syntax for adding channel and user modes are:
    
    ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'N'));
@@ -204,38 +163,23 @@ How To Add IRCd Support
 
 4) Functions and Events
 
-    A brief word about functions and events. All events are captured using:
+    A brief word about functions and events. All events are captured by creating a Message struct
+    with the name of the message and the callback function:
 
-        void moduleAddIRCDMsgs(void)
-        {
-            Anope::AddMessage("NICK", anope_event_nick);
-        }
+    Message my_message("MESSAGE", do_my_messsage);
 
-    Each event should have a event handler if its important enough to be
+    Each message should have a message handler if its important enough to be
     processed by services. All event functions should be formed like this:
 
-        int anope_event_nick(char *source, int ac, char **av)
+	bool do_my_message(const Anope::string &source, const std::vector<Anope::string> &params)
         {
-            return MOD_CONT;
+		return true;
         }
 
-    They will receive the source; this can be NULL at times depending on the
-    event. Next, ac is the number of arguments that are in the event, and av
-    holds the values for each; so av[0] is the first variable, av[1] will be
-    the second one, and so on. Events are likely to pass to various upper
-    level event handlers; see the previous ircd source for how they handle
-    these events.
-
-    All commands are formed like this:
-
-        void anope_cmd_svsnoop(char *server, int set)
-        {
-            send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
-        }
-
-    They may take any number of arguments, depending on the command. They
-    should eventually come to a send_cmd(); this root function is how
-    commands are sent to the IRCd.
+    They will receive the source; this can be empty at times depending on the
+    event. Next, params holds the arguments for the event. Events are likely to
+    pass to various upper level event handlers; see the previous ircd source for
+    how they handle these events.
 
 5) CAPAB/PROTOCTL
 
@@ -290,30 +234,19 @@ How To Add IRCd Support
        CAPAB_SJB64     |  SJOIN timestamps are base64 encoded
        CAPAB_NICKCHARS |  Character set used by the IRCD for nicks
 
-    2) In the ircd.c find the function anope_cmd_capab(); this function will
-       send the CAPAB/PROTOCTL line (consult your ircd documentation for
-       which to send). In a single line type in the tokens that anope must
-       send. Here is an example of Hybrid's capab line:
-
-        /* CAPAB */
-        void anope_cmd_capab()
-        {
-            send_cmd(NULL, "CAPAB TS5 EX IE HOPS HUB AOPS");
-        }
-
-    3) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
+    2) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
 
         A) In the function module constructor make sure that you have the
            following two lines:
 
-           Anope::AddMessage("CAPAB", anope_event_capab);
+           Message message_capab("CAPAB", event_capab);	   
 
         B) Add the function to handle the event
 
-            int anope_event_capab(char *source, int ac, char **av)
+            bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
             {
-                CapabParse(ac, av);
-                return MOD_CONT;
+                CapabParse(params);
+                return true;
             }
 
            This function should call the CapabParse function which parses

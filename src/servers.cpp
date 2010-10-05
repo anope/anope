@@ -110,8 +110,8 @@ Server::~Server()
 	if (this->UplinkServer)
 		this->UplinkServer->DelLink(this);
 
-	for (std::vector<Server *>::iterator it = this->Links.begin(), it_end = this->Links.end(); it != it_end; ++it)
-		delete *it;
+	for (unsigned i = this->Links.size(); i > 0; --i)
+		delete this->Links[i - 1];
 }
 
 /** Delete this server with a reason

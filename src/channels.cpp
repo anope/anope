@@ -175,7 +175,8 @@ void Channel::JoinUser(User *user)
 		}
 	}
 
-	if (update_ts)
+	/* Update the TS, unless I'm joining a bot already */
+	if (update_ts && user->server != Me)
 	{
 		/* Send the updated TS */
 		if (!this->ci->bi || !this->FindUser(this->ci->bi))
@@ -831,9 +832,9 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
  * @param mode the modes
  * @param EnforceMLock true to enforce mlock
  */
-void Channel::SetModesInternal(User *setter, const Anope::string &modes, bool EnforceMLock)
+void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock)
 {
-	spacesepstream sep_modes(modes);
+	spacesepstream sep_modes(mode);
 	Anope::string m;
 
 	sep_modes.GetToken(m);
@@ -897,7 +898,7 @@ void Channel::SetModesInternal(User *setter, const Anope::string &modes, bool En
 				this->RemoveModeInternal(cm, token, EnforceMLock);
 		}
 		else
-			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << modes;
+			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
 	}
 
 	if (setter)

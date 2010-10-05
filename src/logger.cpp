@@ -93,7 +93,7 @@ static inline Anope::string CreateLogName(const Anope::string &file, time_t t = 
 	return "logs/" + file + "." + GetLogDate(t);
 }
 
-LogFile::LogFile(const Anope::string &name) : filename(name), stream(name.c_str(), std::ios_base::out)
+LogFile::LogFile(const Anope::string &name) : filename(name), stream(name.c_str(), std::ios_base::out | std::ios_base::app)
 {
 }
 

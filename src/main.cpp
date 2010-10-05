@@ -277,6 +277,9 @@ void sighandler(int signum)
 
 				Log() << "Received " << strsignal(signum) << " signal (" << signum << "), exiting.";
 
+				if (Config->GlobalOnCycle)
+					oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
+
 				expire_all();
 				save_databases();
 			default:
@@ -489,7 +492,7 @@ int main(int ac, char **av, char **envp)
 					User *u = it->second;
 					++it;
 
-					if (!findbot(u->nick))
+					if (u->server != Me)
 						delete u;
 				}
 

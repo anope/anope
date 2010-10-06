@@ -184,11 +184,16 @@ void common_unban(ChannelInfo * ci, char *nick)
                 entry_match(ban, u->nick, u->username, u->chost, ip)) {
                 anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
                 if (ircdcap->tsmode)
-                    av[3] = ban->mask;
+                    av[3] = sstrdup(ban->mask);
                 else
-                    av[2] = ban->mask;
+                    av[2] = sstrdup(ban->mask);
 
                 do_cmode(whosends(ci), ac, av);
+
+		if (ircdcap->tsmode)
+			free(av[3]);
+		else
+			free(av[2]);
             }
         }
 

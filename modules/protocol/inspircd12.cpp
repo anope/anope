@@ -360,7 +360,6 @@ bool event_opertype(const Anope::string &source, const std::vector<Anope::string
 	{
 		std::vector<Anope::string> newparams;
 		newparams.push_back(source);
-		newparams.push_back(Anope::CurTime);
 		newparams.push_back("+o");
 		return event_mode(source, newparams);
 	}

@@ -914,27 +914,31 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
  */
 void Channel::KickInternal(const Anope::string &source, const Anope::string &nick, const Anope::string &reason)
 {
+	User *sender = finduser(source);
 	BotInfo *bi = NULL;
 	if (!Config->s_BotServ.empty() && this->ci)
 		bi = findbot(nick);
-	User *user = bi ? bi : finduser(nick);
-	if (!user)
+	User *target = bi ? bi : finduser(nick);
+	if (!target)
 	{
 		Log() << "Channel::KickInternal got a nonexistent user " << nick << " on " << this->name << ": " << reason;
 		return;
 	}
 
-	Log(user, this, "kick") << "by " << source << " (" << reason << ")";
+	if (sender)
+		Log(sender, this, "kick") << "kicked " << target->nick << " (" << reason << ")";
+	else
+		Log(target, this, "kick") << "was kicked by " << source << " (" << reason << ")";
 
 	Anope::string chname = this->name;
 
-	if (user->FindChannel(this))
+	if (target->FindChannel(this))
 	{
-		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, user, source, reason));
-		this->DeleteUser(user);
+		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, target, source, reason));
+		this->DeleteUser(target);
 	}
 	else
-		Log() << "Channel::KickInternal got kick for user " << user->nick << " who isn't on channel " << this->name << " ?";
+		Log() << "Channel::KickInternal got kick for user " << target->nick << " from " << (sender ? sender->nick : source) << " who isn't on channel " << this->name;
 
 	/* Bots get rejoined */
 	if (bi)

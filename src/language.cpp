@@ -116,8 +116,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%R%s HELP %s for more information."),
 	/* NO_HELP_AVAILABLE */
 	_("No help available for %s."),
-	/* OBSOLETE_COMMAND */
-	_("This command is obsolete; use %s instead."),
 	/* BAD_USERHOST_MASK */
 	_("Mask must be in the form user@host."),
 	/* BAD_EXPIRY_TIME */
@@ -140,8 +138,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Your password is too long. Please try again with a shorter password."),
 	/* NICK_NOT_REGISTERED */
 	_("Your nick isn't registered."),
-	/* NICK_NOT_REGISTERED_HELP */
-	_("Your nick isn't registered.  Type %R%s HELP for information on registering your nickname."),
 	/* NICK_X_IS_SERVICES */
 	_("Nick %s is part of this Network's Services."),
 	/* NICK_X_NOT_REGISTERED */
@@ -177,9 +173,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* NICK_IDENTIFY_REQUIRED */
 	_("Password authentication required for that command.\n"
 	"Retry after typing %R%s IDENTIFY password."),
-	/* CHAN_IDENTIFY_REQUIRED */
-	_("Password authentication required for that command.\n"
-	"Retry after typing %R%s IDENTIFY %s password."),
 	/* MAIL_DISABLED */
 	_("Services have been configured to not send mail."),
 	/* MAIL_INVALID */
@@ -284,8 +277,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Sorry, grouping failed."),
 	/* NICK_GROUP_PLEASE_WAIT */
 	_("Please wait %d seconds before using the GROUP command again."),
-	/* NICK_GROUP_CHANGE_DISABLED */
-	_("Your nick is already registered; type %R%s DROP first."),
 	/* NICK_GROUP_SAME */
 	_("You are already a member of the group of %s."),
 	/* NICK_GROUP_TOO_MANY */
@@ -334,96 +325,40 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Nickname %s has been dropped."),
 	/* NICK_SET_SYNTAX */
 	_("SET option parameters"),
-	/* NICK_SET_SERVADMIN_SYNTAX */
-	_("SET [nick] option parameters"),
 	/* NICK_SET_DISABLED */
 	_("Sorry, nickname option setting is temporarily disabled."),
 	/* NICK_SET_UNKNOWN_OPTION */
 	_("Unknown SET option %s."),
 	/* NICK_SET_OPTION_DISABLED */
 	_("Option %s cannot be set on this network."),
-	/* NICK_SET_DISPLAY_INVALID */
-	_("The new display MUST be a nickname of your nickname group!"),
 	/* NICK_SET_DISPLAY_CHANGED */
 	_("The new display is now %s."),
-	/* NICK_SET_PASSWORD_FAILED */
-	_("Sorry, couldn't change password."),
-	/* NICK_SET_PASSWORD_CHANGED */
-	_("Password changed."),
-	/* NICK_SET_PASSWORD_CHANGED_TO */
-	_("Password changed to %s."),
 	/* NICK_SET_LANGUAGE_SYNTAX */
 	_("SET LANGUAGE language"),
-	/* NICK_SET_LANGUAGE_UNKNOWN */
-	_("Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages."),
 	/* NICK_SET_LANGUAGE_CHANGED */
 	_("Language changed to English."),
-	/* NICK_SET_EMAIL_CHANGED */
-	_("E-mail address changed to %s."),
 	/* NICK_SET_EMAIL_UNSET */
 	_("E-mail address unset."),
 	/* NICK_SET_EMAIL_UNSET_IMPOSSIBLE */
 	_("You cannot unset the e-mail on this network."),
-	/* NICK_SET_GREET_CHANGED */
-	_("Greet message changed to %s."),
-	/* NICK_SET_GREET_UNSET */
-	_("Greet message unset."),
 	/* NICK_SET_KILL_SYNTAX */
 	_("SET KILL {ON | QUICK | OFF}"),
 	/* NICK_SET_KILL_IMMED_SYNTAX */
 	_("SET KILL {ON | QUICK | IMMED | OFF}"),
-	/* NICK_SET_KILL_ON */
-	_("Protection is now ON."),
-	/* NICK_SET_KILL_QUICK */
-	_("Protection is now ON, with a reduced delay."),
 	/* NICK_SET_KILL_IMMED */
 	_("Protection is now ON, with no delay."),
 	/* NICK_SET_KILL_IMMED_DISABLED */
 	_("The IMMED option is not available on this network."),
-	/* NICK_SET_KILL_OFF */
-	_("Protection is now OFF."),
 	/* NICK_SET_SECURE_SYNTAX */
 	_("SET SECURE {ON | OFF}"),
-	/* NICK_SET_SECURE_ON */
-	_("Secure option is now ON."),
-	/* NICK_SET_SECURE_OFF */
-	_("Secure option is now OFF."),
 	/* NICK_SET_PRIVATE_SYNTAX */
 	_("SET PRIVATE {ON | OFF}"),
-	/* NICK_SET_PRIVATE_ON */
-	_("Private option is now ON."),
-	/* NICK_SET_PRIVATE_OFF */
-	_("Private option is now OFF."),
 	/* NICK_SET_HIDE_SYNTAX */
 	_("SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"),
-	/* NICK_SET_HIDE_EMAIL_ON */
-	_("Your E-mail address will now be hidden from %s INFO displays."),
-	/* NICK_SET_HIDE_EMAIL_OFF */
-	_("Your E-mail address will now be shown in %s INFO displays."),
-	/* NICK_SET_HIDE_MASK_ON */
-	_("Your last seen user@host mask will now be hidden from %s INFO displays."),
-	/* NICK_SET_HIDE_MASK_OFF */
-	_("Your last seen user@host mask will now be shown in %s INFO displays."),
-	/* NICK_SET_HIDE_QUIT_ON */
-	_("Your last quit message will now be hidden from %s INFO displays."),
-	/* NICK_SET_HIDE_QUIT_OFF */
-	_("Your last quit message will now be shown in %s INFO displays."),
-	/* NICK_SET_HIDE_STATUS_ON */
-	_("Your services access status will now be hidden from %s INFO displays."),
-	/* NICK_SET_HIDE_STATUS_OFF */
-	_("Your services access status will now be shown in %s INFO displays."),
 	/* NICK_SET_MSG_SYNTAX */
 	_("SET MSG {ON | OFF}"),
-	/* NICK_SET_MSG_ON */
-	_("Services will now reply to you with messages."),
-	/* NICK_SET_MSG_OFF */
-	_("Services will now reply to you with notices."),
 	/* NICK_SET_AUTOOP_SYNTAX */
 	_("SET AUTOOP {ON | OFF}"),
-	/* NICK_SET_AUTOOP_ON */
-	_("Services will now autoop you in channels."),
-	/* NICK_SET_AUTOOP_OFF */
-	_("Services will no longer autoop you in channels."),
 	/* NICK_SASET_SYNTAX */
 	_("SASET nickname option parameters"),
 	/* NICK_SASET_UNKNOWN_OPTION */
@@ -548,8 +483,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("   Last seen time: %s"),
 	/* NICK_INFO_LAST_QUIT */
 	_("Last quit message: %s"),
-	/* NICK_INFO_URL */
-	_("              URL: %s"),
 	/* NICK_INFO_EMAIL */
 	_("   E-mail address: %s"),
 	/* NICK_INFO_VHOST */
@@ -588,8 +521,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("List of entries matching %s:"),
 	/* NICK_LIST_RESULTS */
 	_("End of list - %d/%d matches shown."),
-	/* NICK_ALIST_SYNTAX */
-	_("ALIST nickname"),
 	/* NICK_ALIST_HEADER */
 	_("Channels that you have access on:\n"
 	"  Num  Channel              Level    Description"),
@@ -679,14 +610,10 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("SUSPEND nickname reason"),
 	/* NICK_SUSPEND_SUCCEEDED */
 	_("Nick %s is now suspended."),
-	/* NICK_SUSPEND_FAILED */
-	_("Couldn't suspend nick %s!"),
 	/* NICK_UNSUSPEND_SYNTAX */
 	_("UNSUSPEND nickname"),
 	/* NICK_UNSUSPEND_SUCCEEDED */
 	_("Nick %s is now released."),
-	/* NICK_UNSUSPEND_FAILED */
-	_("Couldn't release nick %s!"),
 	/* NICK_FORBID_SYNTAX */
 	_("FORBID nickname [reason]"),
 	/* NICK_FORBID_SYNTAX_REASON */
@@ -810,8 +737,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Allowed to issue commands restricted to channel founders"),
 	/* CHAN_IS_REGISTERED */
 	_("This channel has been registered with %s."),
-	/* CHAN_NOT_ALLOWED_OP */
-	_("You are not allowed chanop status on channel %s."),
 	/* CHAN_MAY_NOT_BE_USED */
 	_("This channel may not be used."),
 	/* CHAN_NOT_ALLOWED_TO_JOIN */
@@ -836,8 +761,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Sorry, you have already exceeded your limit of %d channels."),
 	/* CHAN_REGISTERED */
 	_("Channel %s registered under your nickname: %s"),
-	/* CHAN_REGISTER_NONE_CHANNEL */
-	_("You have attempted to register a nonexistent channel %s"),
 	/* CHAN_SYMBOL_REQUIRED */
 	_("Please use the symbol of # when attempting to register"),
 	/* CHAN_DROP_SYNTAX */
@@ -892,10 +815,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s cannot be the successor on channel %s because he is its founder."),
 	/* CHAN_DESC_CHANGED */
 	_("Description of %s changed to %s."),
-	/* CHAN_EMAIL_CHANGED */
-	_("E-mail address for %s changed to %s."),
-	/* CHAN_EMAIL_UNSET */
-	_("E-mail address for %s unset."),
 	/* CHAN_ENTRY_MSG_CHANGED */
 	_("Entry message for %s changed."),
 	/* CHAN_ENTRY_MSG_UNSET */
@@ -1175,8 +1094,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Access level for %s on %s changed to %d."),
 	/* CHAN_ACCESS_ADDED */
 	_("%s added to %s access list at level %d."),
-	/* CHAN_ACCESS_NO_SUCH_ENTRY */
-	_("No such entry (#%d) on %s access list."),
 	/* CHAN_ACCESS_NOT_FOUND */
 	_("%s not found on %s access list."),
 	/* CHAN_ACCESS_NO_MATCH */
@@ -1216,8 +1133,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Sorry, you can only have %d autokick masks on a channel."),
 	/* CHAN_AKICK_ADDED */
 	_("%s added to %s autokick list."),
-	/* CHAN_AKICK_NO_SUCH_ENTRY */
-	_("No such entry (#%d) on %s autokick list."),
 	/* CHAN_AKICK_NOT_FOUND */
 	_("%s not found on %s autokick list."),
 	/* CHAN_AKICK_NO_MATCH */
@@ -1278,8 +1193,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("STATUS channel item"),
 	/* CHAN_STATUS_NOT_REGGED */
 	_("STATUS ERROR Channel %s not registered"),
-	/* CHAN_STATUS_FORBIDDEN */
-	_("STATUS ERROR Channel %s forbidden"),
 	/* CHAN_STATUS_NOTONLINE */
 	_("STATUS ERROR Nick %s not online"),
 	/* CHAN_STATUS_INFO */
@@ -1288,12 +1201,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("INFO channel"),
 	/* CHAN_INFO_HEADER */
 	_("Information for channel %s:"),
-	/* CHAN_INFO_FOUNDER */
-	_("        Founder: %s (%s)"),
 	/* CHAN_INFO_NO_FOUNDER */
 	_("        Founder: %s"),
-	/* CHAN_INFO_SUCCESSOR */
-	_("      Successor: %s (%s)"),
 	/* CHAN_INFO_NO_SUCCESSOR */
 	_("      Successor: %s"),
 	/* CHAN_INFO_DESCRIPTION */
@@ -1308,14 +1217,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("     Last topic: %s"),
 	/* CHAN_INFO_TOPIC_SET_BY */
 	_("   Topic set by: %s"),
-	/* CHAN_INFO_URL */
-	_("            URL: %s"),
-	/* CHAN_INFO_EMAIL */
-	_(" E-mail address: %s"),
 	/* CHAN_INFO_BANTYPE */
 	_("       Ban type: %d"),
-	/* CHAN_INFO_OPTIONS */
-	_("        Options: %s"),
 	/* CHAN_INFO_OPT_KEEPTOPIC */
 	_("Topic Retention"),
 	/* CHAN_INFO_OPT_OPNOTICE */
@@ -1344,10 +1247,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("      Expires on: %s"),
 	/* CHAN_INFO_NO_EXPIRE */
 	_("This channel will not expire."),
-	/* CHAN_LIST_SERVADMIN_SYNTAX */
-	_("LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]"),
-	/* CHAN_LIST_FORMAT */
-	_("    %-20s  %s"),
 	/* CHAN_LIST_END */
 	_("End of list - %d/%d matches shown."),
 	/* CHAN_INVITE_SYNTAX */
@@ -1376,10 +1275,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("All modes on channel %s have been reset."),
 	/* CHAN_CLEARED_OPS */
 	_("Mode +o has been cleared from channel %s."),
-	/* CHAN_CLEARED_HOPS */
-	_("Mode +h has been cleared from channel %s."),
-	/* CHAN_CLEARED_VOICES */
-	_("Mode +v has been cleared from channel %s."),
 	/* CHAN_CLEARED_USERS */
 	_("All users have been kicked from channel %s."),
 	/* CHAN_CLEARED_INVITES */
@@ -1472,10 +1367,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("You have no memos."),
 	/* MEMO_X_HAS_NO_MEMOS */
 	_("%s has no memos."),
-	/* MEMO_DOES_NOT_EXIST */
-	_("Memo %d does not exist!"),
-	/* MEMO_LIST_NOT_FOUND */
-	_("No matching memos found."),
 	/* MEMO_SEND_SYNTAX */
 	_("SEND {nick | channel} memo-text"),
 	/* MEMO_SEND_DISABLED */
@@ -1494,8 +1385,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("STAFF memo-text"),
 	/* MEMO_CANCEL_SYNTAX */
 	_("CANCEL {nick | channel}"),
-	/* MEMO_CANCEL_DISABLED */
-	_("Sorry, memo canceling is temporarily disabled."),
 	/* MEMO_CANCEL_NONE */
 	_("No memo was cancelable."),
 	/* MEMO_CANCELLED */
@@ -1528,12 +1417,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s"),
 	/* MEMO_DEL_SYNTAX */
 	_("DEL [channel] {num | list | ALL}"),
-	/* MEMO_DELETED_NONE */
-	_("No memos were deleted."),
 	/* MEMO_DELETED_ONE */
 	_("Memo %d has been deleted."),
-	/* MEMO_DELETED_SEVERAL */
-	_("Memos %s have been deleted."),
 	/* MEMO_DELETED_ALL */
 	_("All of your memos have been deleted."),
 	/* MEMO_CHAN_DELETED_ALL */
@@ -1582,10 +1467,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Memo limit for %s set to 0."),
 	/* MEMO_UNSET_LIMIT */
 	_("Memo limit disabled for %s."),
-	/* MEMO_INFO_SYNTAX */
-	_("INFO [channel]"),
-	/* MEMO_INFO_SERVADMIN_SYNTAX */
-	_("INFO [nick | channel]"),
 	/* MEMO_INFO_NO_MEMOS */
 	_("You currently have no memos."),
 	/* MEMO_INFO_MEMO */
@@ -1706,20 +1587,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Don't use underlines on this channel!"),
 	/* BOT_REASON_ITALIC */
 	_("Don't use italics on this channel!"),
-	/* BOT_SEEN_BOT */
-	_("You found me, %s!"),
-	/* BOT_SEEN_YOU */
-	_("Looking for yourself, eh %s?"),
-	/* BOT_SEEN_ON_CHANNEL */
-	_("%s is on the channel right now!"),
-	/* BOT_SEEN_ON_CHANNEL_AS */
-	_("%s is on the channel right now (as %s) ! "),
-	/* BOT_SEEN_ON */
-	_("%s was last seen here %s ago."),
-	/* BOT_SEEN_NEVER */
-	_("I've never seen %s on this channel."),
-	/* BOT_SEEN_UNKNOWN */
-	_("I don't know who %s is."),
 	/* BOT_BOT_SYNTAX */
 	_("BOT ADD nick user host real\n"
 	"BOT CHANGE oldnick newnick [user [host [real]]]\n"
@@ -1980,8 +1847,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s already exists in %s bad words list."),
 	/* BOT_BADWORDS_ADDED */
 	_("%s added to %s bad words list."),
-	/* BOT_BADWORDS_NO_SUCH_ENTRY */
-	_("No such entry (#%d) on %s bad words list."),
 	/* BOT_BADWORDS_NOT_FOUND */
 	_("%s not found on %s bad words list."),
 	/* BOT_BADWORDS_NO_MATCH */
@@ -2175,8 +2040,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s already exists on the AKILL list."),
 	/* OPER_AKILL_ALREADY_COVERED */
 	_("%s is already covered by %s."),
-	/* OPER_AKILL_REACHED_LIMIT */
-	_("Sorry, you can only have %d AKILLs."),
 	/* OPER_AKILL_NO_NICK */
 	_("Reminder: AKILL masks cannot contain nicknames; make sure you have not included a nick portion in your mask."),
 	/* OPER_AKILL_ADDED */
@@ -2211,12 +2074,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("CHANKILL [+expiry] {#channel} [reason]"),
 	/* OPER_SNLINE_SYNTAX */
 	_("SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]"),
-	/* OPER_SNLINE_UNSUPPORTED */
-	_("Sorry, SNLINE is not available on this network."),
 	/* OPER_SNLINE_EXISTS */
 	_("%s already exists on the SNLINE list."),
-	/* OPER_SNLINE_REACHED_LIMIT */
-	_("Sorry, you can only have %d SNLINEs."),
 	/* OPER_SNLINE_ADDED */
 	_("%s added to the SNLINE list."),
 	/* OPER_SNLINE_NOT_FOUND */
@@ -2244,8 +2103,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Channel SQLINEs are not supported by your IRCd, so you can't use them."),
 	/* OPER_SQLINE_EXISTS */
 	_("%s already exists on the SQLINE list."),
-	/* OPER_SQLINE_REACHED_LIMIT */
-	_("Sorry, you can only have %d SQLINEs."),
 	/* OPER_SQLINE_ADDED */
 	_("%s added to the SQLINE list."),
 	/* OPER_SQLINE_NOT_FOUND */
@@ -2269,12 +2126,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("The SQLINE list has been cleared."),
 	/* OPER_SZLINE_SYNTAX */
 	_("SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list} [reason]]"),
-	/* OPER_SZLINE_UNSUPPORTED */
-	_("Sorry, SZLINE is not available on this network."),
 	/* OPER_SZLINE_EXISTS */
 	_("%s already exists on the SZLINE list."),
-	/* OPER_SZLINE_REACHED_LIMIT */
-	_("Sorry, you can only have %d SZLINEs."),
 	/* OPER_SZLINE_ONLY_IPS */
 	_("Reminder: you can only add IP masks to the SZLINE list."),
 	/* OPER_SZLINE_ADDED */
@@ -2312,12 +2165,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Services are now in read-write mode."),
 	/* OPER_SET_READONLY_ERROR */
 	_("Setting for READONLY must be ON or OFF."),
-	/* OPER_SET_LOGCHAN_ON */
-	_("Services are now reporting log messages to %s."),
-	/* OPER_SET_LOGCHAN_OFF */
-	_("Services are no longer reporting log messages to a channel."),
-	/* OPER_SET_LOGCHAN_ERROR */
-	_("Setting for LOGCHAN must be ON or OFF and LogChannel must be defined."),
 	/* OPER_SET_DEBUG_ON */
 	_("Services are now in debug mode."),
 	/* OPER_SET_DEBUG_OFF */
@@ -2354,8 +2201,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Updating databases."),
 	/* OPER_RELOAD */
 	_("Services' configuration file has been reloaded."),
-	/* OPER_CANNOT_RESTART */
-	_("SERVICES_BIN not defined; cannot restart.  Rerun the \2configure\2 script and recompile Services to enable the RESTART command."),
 	/* OPER_IGNORE_SYNTAX */
 	_("IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]"),
 	/* OPER_IGNORE_VALID_TIME */
@@ -2374,10 +2219,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Ignore list is empty."),
 	/* OPER_IGNORE_LIST_CLEARED */
 	_("Ignore list has been cleared."),
-	/* OPER_KILLCLONES_SYNTAX */
-	_("KILLCLONES nick"),
-	/* OPER_KILLCLONES_UNKNOWN_NICK */
-	_("Could not find user %s."),
 	/* OPER_CHANLIST_HEADER */
 	_("Channel list:\n"
 	"Name                 Users Modes   Topic"),
@@ -2408,8 +2249,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s is now a Super-Admin"),
 	/* OPER_SUPER_ADMIN_WALL_OFF */
 	_("%s is no longer a Super-Admin"),
-	/* OPER_SUPER_ADMIN_ONLY */
-	_("Only Super-Admins can use this command."),
 	/* OPER_STAFF_LIST_HEADER */
 	_("On Level Nick"),
 	/* OPER_STAFF_FORMAT */
@@ -2458,36 +2297,20 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Module: %s Version: %s Author: %s loaded: %s"),
 	/* OPER_MODULE_CMD_LIST */
 	_("Providing command: %R%s %s"),
-	/* OPER_MODULE_MSG_LIST */
-	_("Providing IRCD handler for: %s"),
 	/* OPER_MODULE_NO_LIST */
 	_("No modules currently loaded"),
 	/* OPER_MODULE_NO_INFO */
 	_("No information about module %s is available"),
 	/* OPER_MODULE_INFO_SYNTAX */
 	_("MODINFO FileName"),
-	/* MODULE_HELP_HEADER */
-	_("The following commands have been loaded by a module:"),
 	/* OPER_EXCEPTION_SYNTAX */
 	_("EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [params]"),
-	/* OPER_EXCEPTION_ADD_SYNTAX */
-	_("EXCEPTION ADD [+expiry] mask limit reason"),
-	/* OPER_EXCEPTION_DEL_SYNTAX */
-	_("EXCEPTION DEL {mask | list}"),
-	/* OPER_EXCEPTION_MOVE_SYNTAX */
-	_("EXCEPTION MOVE num position"),
 	/* OPER_EXCEPTION_DISABLED */
 	_("Session limiting is disabled."),
-	/* OPER_EXCEPTION_ALREADY_PRESENT */
-	_("Mask %s already present on exception list."),
-	/* OPER_EXCEPTION_TOO_MANY */
-	_("Session-limit exception list is full!"),
 	/* OPER_EXCEPTION_ADDED */
 	_("Session limit for %s set to %d."),
 	/* OPER_EXCEPTION_MOVED */
 	_("Exception for %s (#%d) moved to position %d."),
-	/* OPER_EXCEPTION_NO_SUCH_ENTRY */
-	_("No such entry (#%d) session-limit exception list."),
 	/* OPER_EXCEPTION_NOT_FOUND */
 	_("%s not found on session-limit exception list."),
 	/* OPER_EXCEPTION_NO_MATCH */
@@ -2515,12 +2338,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s already exists on the EXCEPTION list."),
 	/* OPER_EXCEPTION_CHANGED */
 	_("Exception for %s has been updated to %d."),
-	/* OPER_SESSION_SYNTAX */
-	_("SESSION {LIST limit | VIEW host}"),
 	/* OPER_SESSION_LIST_SYNTAX */
 	_("SESSION LIST limit"),
-	/* OPER_SESSION_VIEW_SYNTAX */
-	_("SESSION VIEW host"),
 	/* OPER_SESSION_INVALID_THRESHOLD */
 	_("Invalid threshold value. It must be a valid integer greater than 1."),
 	/* OPER_SESSION_NOT_FOUND */
@@ -3406,8 +3225,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* NICK_SERVADMIN_HELP_UNSUSPEND */
 	_("Syntax: UNSUSPEND nickname\n"
 	"UNSUSPENDS a nickname from being used."),
-	/* CHAN_HELP_CMD_GETPASS */
-	_("    GETPASS    Retrieve the founder password for a channel"),
 	/* CHAN_HELP_CMD_FORBID */
 	_("    FORBID     Prevent a channel from being used"),
 	/* CHAN_HELP_CMD_SUSPEND */
@@ -3418,8 +3235,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_HELP_CMD_STATUS */
 	_("    STATUS     Returns the current access level of a user\n"
 	"               on a channel"),
-	/* CHAN_HELP_CMD_REGISTER */
-	_("    REGISTER   Register a channel"),
 	/* CHAN_HELP_CMD_SET */
 	_("    SET        Set channel options and information"),
 	/* CHAN_HELP_CMD_SASET */
@@ -4272,26 +4087,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Sets whether the given channel will expire.  Setting this\n"
 	"to ON prevents the channel from expiring."),
-	/* CHAN_SERVADMIN_HELP_LIST */
-	_("Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]\n"
-	" \n"
-	"Lists all registered channels matching the given pattern.\n"
-	"Channels with the PRIVATE option set will only be displayed\n"
-	"to Services Operators. Channels with the NOEXPIRE option set \n"
-	"will have a ! appended to the channel name for Services Operators.\n"
-	" \n"
-	"If the FORBIDDEN, SUSPENDED or NOEXPIRE options are given, only \n"
-	"channels which, respectively, are FORBIDden, SUSPENDed or have \n"
-	"the NOEXPIRE flag set will be displayed.  If multiple options are \n"
-	"given, more types of channels will be displayed. These options are \n"
-	"limited to Services Operators."),
-	/* CHAN_SERVADMIN_HELP_GETPASS */
-	_("Syntax: GETPASS channel\n"
-	" \n"
-	"Returns the password for the given channel.  Note that\n"
-	"whenever this command is used, a message including the\n"
-	"person who issued the command and the channel it was used\n"
-	"on will be logged and sent out as a WALLOPS/GLOBOPS."),
 	/* CHAN_SERVADMIN_HELP_FORBID */
 	_("Syntax: FORBID channel [reason]\n"
 	" \n"
@@ -4352,8 +4147,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	"nickname and the target nickname or channel must be\n"
 	"registered in order to send a memo.\n"
 	"%S's commands include:"),
-	/* MEMO_HELP_ADMIN */
-	_("not used."),
 	/* MEMO_HELP_FOOTER */
 	_("Type %R%S HELP command for help on any of the\n"
 	"above commands.\n"
@@ -4515,8 +4308,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("    KICK        Kick a user from a channel"),
 	/* OPER_HELP_CMD_CLEARMODES */
 	_("    CLEARMODES  Clear modes of a channel"),
-	/* OPER_HELP_CMD_KILLCLONES */
-	_("    KILLCLONES  Kill all users that have a certain host"),
 	/* OPER_HELP_CMD_AKILL */
 	_("    AKILL       Manipulate the AKILL list"),
 	/* OPER_HELP_CMD_SNLINE */
@@ -4863,17 +4654,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"This option is equivalent to the command-line option\n"
 	"-readonly."),
-	/* OPER_HELP_SET_LOGCHAN */
-	_("Syntax: SET LOGCHAN {ON | OFF}\n"
-	"With this setting on, Services will send its logs to a specified\n"
-	"channel as well as the log file. LogChannel must also be defined\n"
-	"in the Services configuration file for this setting to be of any\n"
-	"use.\n"
-	" \n"
-	"This option is equivalent to the command-line option -logchan.\n"
-	" \n"
-	"Note: This can have strong security implications if your log\n"
-	"channel is not properly secured."),
 	/* OPER_HELP_SET_DEBUG */
 	_("Syntax: SET DEBUG {ON | OFF | num}\n"
 	" \n"
@@ -5286,8 +5066,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Syntax: SET bot-nick PRIVATE {ON|OFF}\n"
 	"This option prevents a bot from being assigned to a\n"
 	"channel by users that aren't IRC operators."),
-	/* HOST_EMPTY */
-	_("The vhost list is empty."),
 	/* HOST_ENTRY */
 	_("#%d Nick:%s, vhost:%s (%s - %s)"),
 	/* HOST_IDENT_ENTRY */
@@ -5318,8 +5096,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("SET <nick> <hostmask>."),
 	/* HOST_SETALL_SYNTAX */
 	_("SETALL <nick> <hostmask>."),
-	/* HOST_DENIED */
-	_("Access Denied."),
 	/* HOST_NOT_ASSIGNED */
 	_("Please contact an Operator to get a vhost assigned to this nick."),
 	/* HOST_ACTIVATED */
@@ -5409,14 +5185,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	"This command allows users to set the vhost of their\n"
 	"CURRENT nick to be the vhost for all nicks in the same\n"
 	"group."),
-	/* OPER_SVSNICK_UNSUPPORTED */
-	_("Sorry, SVSNICK is not available on this network."),
-	/* OPER_SQLINE_UNSUPPORTED */
-	_("Sorry, SQLINE is not available on this network."),
-	/* OPER_SVSO_UNSUPPORTED */
-	_("Sorry, OLINE is not available on this network."),
-	/* OPER_UMODE_UNSUPPORTED */
-	_("Sorry, UMODE is not available on this network."),
 	/* OPER_SUPER_ADMIN_NOT_ENABLED */
 	_("SuperAdmin setting not enabled in services.conf"),
 	/* OPER_HELP_SYNC */

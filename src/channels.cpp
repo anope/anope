@@ -1017,8 +1017,9 @@ Anope::string Channel::GetModes(bool complete, bool plus)
 
 void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
+	User *u = finduser(user);
 	this->topic = newtopic;
-	this->topic_setter = user;
+	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
 
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << user << " to " << newtopic;
@@ -1033,8 +1034,9 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 
 void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts)
 {
+	User *u = finduser(user);
 	this->topic = newtopic;
-	this->topic_setter = user;
+	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
 
 	ircdproto->SendTopic(whosends(this->ci), this);

@@ -75,6 +75,8 @@ class CommandNSGroup : public Command
 			u->SendMessage(NickServ, NICK_GROUP_SAME, target->nick.c_str());
 		else if (na && na->nc != u->Account())
 			u->SendMessage(NickServ, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+		else if (na && Config->NSNoGroupChange)
+			u->SendMessage(NickServ, NICK_GROUP_CHANGE_DISABLED, Config->s_NickServ.c_str());
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
 			u->SendMessage(NickServ, NICK_GROUP_TOO_MANY, target->nick.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		else

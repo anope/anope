@@ -277,6 +277,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("Sorry, grouping failed."),
 	/* NICK_GROUP_PLEASE_WAIT */
 	_("Please wait %d seconds before using the GROUP command again."),
+	/* NICK_GROUP_CHANGE_DISABLED */
+	_("Your nick is already registered; type \002%R%s DROP\002 first."),
 	/* NICK_GROUP_SAME */
 	_("You are already a member of the group of %s."),
 	/* NICK_GROUP_TOO_MANY */

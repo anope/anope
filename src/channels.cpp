@@ -179,7 +179,7 @@ void Channel::JoinUser(User *user)
 	if (update_ts && user->server != Me)
 	{
 		/* Send the updated TS */
-		if (!this->ci->bi || !this->FindUser(this->ci->bi))
+		if (!this->FindUser(whosends(this->ci)))
 		{
 			whosends(this->ci)->Join(this, update_ts);
 			whosends(this->ci)->Part(this);

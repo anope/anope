@@ -782,7 +782,7 @@ bool event_privmsg(const Anope::string &source, const std::vector<Anope::string>
 
 bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	do_part(source, params[0], params[1]);
+	do_part(source, params[0], (params.size() > 1 ? params[1] : ""));
 	return true;
 }
 

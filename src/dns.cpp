@@ -27,19 +27,21 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 		return;
 	}
 	
-	DNSPacket *p = new DNSPacket();
+	DNSPacket *p = new DNSPacket();	
+	p->flags = DNS_QUERYFLAGS_RD;
+
+	if (!p->AddQuestion(addr, qt))
+	{
+		Log() << "Resolver: Unable to lookup host " << addr << " of type " << qt << " - internal error";
+		delete p;
+		delete this;
+		return;
+	}
 
 	while (DNSEngine->requests.count((p->id = GetRandomID())));
 
 	DNSEngine->requests[p->id] = this;
 	DNSEngine->packets.push_back(p);
-
-	p->flags = DNS_QUERYFLAGS_RD;
-	if (!p->AddQuestion(addr, qt))
-	{
-		delete this;
-		return;
-	}
 
 	SocketEngine->MarkWritable(DNSEngine->sock);
 

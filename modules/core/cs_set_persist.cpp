@@ -56,8 +56,13 @@ class CommandCSSetPersist : public Command
 				}
 
 				/* Set the perm mode */
-				if (cm && ci->c && !ci->c->HasMode(CMODE_PERM))
-					ci->c->SetMode(NULL, cm);
+				if (cm)
+				{
+					if (ci->c && !ci->c->HasMode(CMODE_PERM))
+						ci->c->SetMode(NULL, cm);
+					/* Add it to the channels mlock */
+					ci->SetMLock(CMODE_PERM, true);
+				}
 			}
 
 			u->SendMessage(ChanServ, CHAN_SET_PERSIST_ON, ci->name.c_str());
@@ -71,8 +76,13 @@ class CommandCSSetPersist : public Command
 					ci->c->UnsetFlag(CH_PERSIST);
 
 				/* Unset perm mode */
-				if (cm && ci->c && ci->c->HasMode(CMODE_PERM))
-					ci->c->RemoveMode(NULL, cm);
+				if (cm)
+				{
+					if (ci->c && ci->c->HasMode(CMODE_PERM))
+						ci->c->RemoveMode(NULL, cm);
+					/* Remove from mlock */
+					ci->RemoveMLock(CMODE_PERM);
+				}
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on

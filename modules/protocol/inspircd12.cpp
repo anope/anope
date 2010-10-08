@@ -374,34 +374,29 @@ bool event_fmode(const Anope::string &source, const std::vector<Anope::string> &
 		return true;
 
 	Channel *c = findchan(params[0]);
+	if (!c)
+		return true;
+	
 	/* Checking the TS for validity to avoid desyncs */
-	if ((c = findchan(params[0])))
+	time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
+	if (c->creation_time > ts)
 	{
-		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
-		if (c->creation_time > ts)
-		{
-			/* Our TS is bigger, we should lower it */
-			c->creation_time = ts;
-			c->Reset();
-		}
-		else if (c->creation_time < ts)
-			/* The TS we got is bigger, we should ignore this message. */
-			return true;
+		/* Our TS is bigger, we should lower it */
+		c->creation_time = ts;
+		c->Reset();
 	}
-	else
-		/* Got FMODE for a non-existing channel */
+	else if (c->creation_time < ts)
+		/* The TS we got is bigger, we should ignore this message. */
 		return true;
 
 	/* TS's are equal now, so we can proceed with parsing */
 	std::vector<Anope::string> newparams;
-	for (unsigned n = 0; n < params.size(); ++n)
-	{
-		if (n != 1)
-		{
-			newparams.push_back(params[n]);
-			Log(LOG_DEBUG) << "Param: " << params[n];
-		}
-	}
+	newparams.push_back(params[0]);
+	newparams.push_back(params[1]);
+	Anope::string modes = params[2];
+	for (unsigned n = 3; n < params.size(); ++n)
+		modes += " " + params[n];
+	newparams.push_back(modes);
 
 	return event_mode(source, newparams);
 }

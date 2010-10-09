@@ -935,6 +935,7 @@ class DBMySQL : public Module
 			this->RunQuery("INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
 		}
 
+		this->RunQuery("TRUNCATE TABLE `anope_extra`");
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 
 		return EVENT_CONTINUE;

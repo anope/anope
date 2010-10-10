@@ -38,9 +38,11 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 		return;
 	}
 
-	while (DNSEngine->requests.count((p->id = GetRandomID())));
+	short packet_id;
+	while (DNSEngine->requests.count((packet_id = GetRandomID())));
 
-	DNSEngine->requests[p->id] = this;
+	p->id = this->id = packet_id;
+	DNSEngine->requests[this->id] = this;
 	DNSEngine->packets.push_back(p);
 
 	SocketEngine->MarkWritable(DNSEngine->sock);
@@ -50,9 +52,16 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 
 DNSRequest::~DNSRequest()
 {
+	/* DNSRequest came back, delete the timeout */
 	if (!this->timeout->done)
 	{
 		delete this->timeout;
+	}
+	/* Timeout timed us out, delete us from the requests map */
+	else
+	{
+		/* We can leave the packet, if it comes back later we will drop it */
+		DNSEngine->requests.erase(this->id);
 	}
 }
 
@@ -208,6 +217,9 @@ DNSSocket::DNSSocket() : ConnectionSocket(false, SOCK_DGRAM)
 
 DNSSocket::~DNSSocket()
 {
+	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
+		delete DNSEngine->packets[i - 1];
+	DNSEngine->packets.clear();
 	Log() << "Resolver: Lost connection to nameserver";
 	DNSEngine->sock = NULL;
 }
@@ -458,17 +470,14 @@ bool DNSSocket::ProcessWrite()
 	Log(LOG_DEBUG_2) << "Resolver: Writing to UDP socket";
 
 	bool cont = true;
-	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
+	for (unsigned i = DNSEngine->packets.size(); cont && i > 0; --i)
 	{
 		DNSPacket *r = DNSEngine->packets[i - 1];
 
 		unsigned char buffer[524];
 		r->FillBuffer(buffer);
 
-		cont = this->SendTo(buffer, r->payload_count + 12) >= 0;
-
-		if (!cont)
-			break;
+		cont = this->SendTo(buffer, r->payload_count + 12) == r->payload_count + 12;
 
 		delete r;
 		DNSEngine->packets.erase(DNSEngine->packets.begin() + i - 1);

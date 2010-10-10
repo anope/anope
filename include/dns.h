@@ -59,6 +59,9 @@ class DNSRequest
 	DNSRequestTimeout *timeout;
 
  public:
+	/* Request id */
+ 	unsigned short id;
+ 	/* Creator of this request */
 	Module *creator;
 
 	/* Address we're looking up */

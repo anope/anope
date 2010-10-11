@@ -17,7 +17,7 @@ typedef unordered_map_namespace::unordered_map<Anope::string, User *, Anope::has
 extern CoreExport user_map UserListByNick;
 extern CoreExport user_uid_map UserListByUID;
 
-class ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
+class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {
  public:
 	Anope::string BuildCharPrefixList() const;

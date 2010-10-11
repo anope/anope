@@ -1286,7 +1286,7 @@ const Anope::string Anope::LastError()
 	char errbuf[513];
 	DWORD err = GetLastError();
 	if (!err)
-		return NULL;
+		return "";
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512, NULL);
 	return errbuf;
 #endif

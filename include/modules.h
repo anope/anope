@@ -27,7 +27,7 @@
 # define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
 # define dlclose(file) FreeLibrary(file) ? 0 : 1
 # define ano_modclearerr() SetLastError(0)
-# define ano_moderr() LastError().c_str()
+# define ano_moderr() Anope::LastError().c_str()
 #else
 	typedef void * ano_module_t;
 
@@ -123,11 +123,9 @@ else \
 # ifndef RTLD_LOCAL
 #  define RTLD_LOCAL 0
 # endif
-#else
-	const char *ano_moderr();
 #endif
 
-struct Message;
+class Message;
 
 extern CoreExport Module *FindModule(const Anope::string &name);
 int protocol_module_init();
@@ -1265,8 +1263,9 @@ class service_reference : public dynamic_reference<T>
 	}
 };
 
-struct Message
+class CoreExport Message
 {
+public:
 	Anope::string name;
 	bool (*func)(const Anope::string &source, const std::vector<Anope::string> &params);
 

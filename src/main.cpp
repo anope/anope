@@ -242,7 +242,11 @@ static void services_shutdown()
 void sighandler(int signum)
 {
 	if (quitmsg.empty())
+#ifndef _WIN32
 		quitmsg = Anope::string("Services terminating via signal ") + strsignal(signum) + " (" + stringify(signum) + ")";
+#else
+		quitmsg = Anope::string("Services terminating via signal ") + stringify(signum);
+#endif
 	bool fatal = false;
 
 	if (started)
@@ -276,7 +280,11 @@ void sighandler(int signum)
 				signal(SIGHUP, SIG_IGN);
 #endif
 
+#ifndef _WIN32
 				Log() << "Received " << strsignal(signum) << " signal (" << signum << "), exiting.";
+#else
+				Log() << "Received signal " << signum << ", exiting.";
+#endif
 
 				if (Config->GlobalOnCycle)
 					oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());

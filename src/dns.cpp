@@ -4,7 +4,7 @@ DNSManager *DNSEngine = NULL;
 
 static inline unsigned short GetRandomID()
 {
-	return random();
+	return rand();
 }
 
 DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : creator(c), address(addr), QT(qt)
@@ -226,7 +226,7 @@ DNSSocket::~DNSSocket()
 
 int DNSSocket::SendTo(const unsigned char *buf, size_t len) const
 {
-	return sendto(this->GetFD(), buf, len, 0, &this->conaddr.sa, this->conaddr.size());
+	return sendto(this->GetFD(), reinterpret_cast<const char *>(buf), len, 0, &this->conaddr.sa, this->conaddr.size());
 }
 
 int DNSSocket::RecvFrom(char *buf, size_t len, sockaddrs &addrs) const
@@ -443,7 +443,7 @@ bool DNSSocket::ProcessRead()
 				}
 				default:
 					delete rr;
-					request->OnError(DNS_ERROR_INVALID_TYPE, "Invalid query type");
+					request->OnError(DNS_ERROR_INVALIDTYPE, "Invalid query type");
 					rr = NULL;
 			}
 

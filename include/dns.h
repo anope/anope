@@ -44,7 +44,7 @@ enum DNSError
 	DNS_ERROR_NOT_IMPLEMENTED,
 	DNS_ERROR_REFUSED,
 	DNS_ERROR_NO_RECORDS,
-	DNS_ERROR_INVALID_TYPE
+	DNS_ERROR_INVALIDTYPE
 };
 
 class DNSRequestTimeout; // Forward declarations
@@ -53,7 +53,7 @@ class Module;
 
 /** The request
  */
-class DNSRequest
+class CoreExport DNSRequest
 {
 	/* Timeout timer for this request */
 	DNSRequestTimeout *timeout;

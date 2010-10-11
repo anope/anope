@@ -16,7 +16,7 @@
 #include <set>
 #include "hashcomp.h"
 
-struct Message;
+class Message;
 
 namespace Anope
 {
@@ -291,7 +291,7 @@ namespace Anope
 	/** The current system time, which is pretty close to being accurate.
 	 * Use this unless you need very specific time checks
 	 */
-	extern time_t CurTime;
+	extern CoreExport time_t CurTime;
 
 	extern CoreExport string Version();
 

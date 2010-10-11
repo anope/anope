@@ -11,7 +11,10 @@
 
 #include "modules.h"
 #include "version.h"
-#include <libintl.h>
+
+#if GETTEXT_FOUND
+# include <libintl.h>
+#endif
 
 message_map MessageMap;
 std::list<Module *> Modules;
@@ -261,7 +264,7 @@ void ModuleRunTimeDirCleanUp()
 			{
 				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
 				if (!DeleteFile(filebuf.c_str()))
-					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << LastError();
+					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << Anope::LastError();
 			}
 			if (!FindNextFile(hList, &FileData))
 			{

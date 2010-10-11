@@ -387,12 +387,11 @@ struct MultiConfig
 	MultiNotify finish_function;
 };
 
-/** This class holds the bulk of the runtime configuration for the ircd.
+/** This class holds the bulk of the runtime configuration for Anope.
  * It allows for reading new config values, accessing configuration files,
- * and storage of the configuration data needed to run the ircd, such as
- * the servername, connect classes, /ADMIN data, MOTDs and filenames etc.
+ * and storage of the configuration data needed to run Anope.
  */
-class ServerConfig
+class CoreExport ServerConfig
 {
  private:
 	/** Check that there is only one of each configuration item

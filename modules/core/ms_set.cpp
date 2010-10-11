@@ -163,7 +163,7 @@ class CommandMSSet : public Command
 			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
-			if (limit < 0 || (Config->MSMaxMemos > 0 && convertTo<unsigned>(limit) > Config->MSMaxMemos))
+			if (limit < 0 || (Config->MSMaxMemos > 0 && static_cast<unsigned>(limit) > Config->MSMaxMemos))
 			{
 				if (!chan.empty())
 					u->SendMessage(MemoServ, MEMO_SET_LIMIT_TOO_HIGH, chan.c_str(), Config->MSMaxMemos);

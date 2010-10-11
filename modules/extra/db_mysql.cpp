@@ -333,7 +333,7 @@ class DBMySQL : public Module
 {
  private:
 	CommandSQLSync commandsqlsync;
-	MySQLInterface interface;
+	MySQLInterface sqlinterface;
 	service_reference<SQLProvider> SQL;
 
  public:
@@ -350,7 +350,7 @@ class DBMySQL : public Module
 				ircdproto->SendGlobops(OperServ, "Found SQL again, going out of readonly mode...");
 			}
 
-			SQL->Run(&interface, query);
+			SQL->Run(&sqlinterface, query);
 		}
 		else
 		{
@@ -368,7 +368,7 @@ class DBMySQL : public Module
 		return SQL ? SQL->Escape(query) : query;
 	}
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), interface(this), SQL("mysql/main")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), sqlinterface(this), SQL("mysql/main")
 	{
 		me = this;
 

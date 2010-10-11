@@ -41,7 +41,7 @@ void ThreadEngine::Start(Thread *thread)
 	if (!thread->Handle)
 	{
 		delete thread;
-		throw CoreException(Anope::string("Unable to create thread: ") + LastError());
+		throw CoreException(Anope::string("Unable to create thread: ") + Anope::LastError());
 	}
 }
 

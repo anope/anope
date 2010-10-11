@@ -601,7 +601,7 @@ class ServerConfig
 	/* Force email when registering */
 	bool NSForceEmail;
 	/* Max number of nicks in a group */
-	int NSMaxAliases;
+	unsigned NSMaxAliases;
 	/* Max number of allowed strings on the access list */
 	unsigned NSAccessMax;
 	/* Enforcer client user name */
@@ -756,7 +756,7 @@ class ServerConfig
 	/* How long before exceptions expire */
 	time_t ExceptionExpiry;
 	/* How many times to kill before adding an KILL */
-	int MaxSessionKill;
+	unsigned MaxSessionKill;
 	/* Max limit that can be used for exceptions */
 	unsigned MaxSessionLimit;
 	/* How long session akills should last */
@@ -792,7 +792,7 @@ class ServerConfig
 	/* Timeout before defcon is reset */
 	time_t DefConTimeOut;
 	/* Session limiit to use when using defcon */
-	int DefConSessionLimit;
+	unsigned DefConSessionLimit;
 	/* How long to add akills for defcon */
 	time_t DefConAKILL;
 	/* Chan modes for defcon */

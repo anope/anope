@@ -114,7 +114,7 @@ class CoreExport Command : public Flags<CommandFlag>
 	 * @param name The subcommand name
 	 * @return The subcommand
 	 */
-	virtual Command *FindSubcommand(const Anope::string &name);
+	virtual Command *FindSubcommand(const Anope::string &subcommand);
 };
 
 #endif // COMMANDS_H

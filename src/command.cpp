@@ -46,7 +46,7 @@ bool Command::DelSubcommand(Command *c)
 	return false;
 }
 
-Command *Command::FindSubcommand(const Anope::string &name)
+Command *Command::FindSubcommand(const Anope::string &subcommand)
 {
 	return NULL;
 }

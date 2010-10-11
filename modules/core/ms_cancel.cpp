@@ -25,15 +25,15 @@ class CommandMSCancel : public Command
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		bool ischan, isforbid;
-		Anope::string name = params[0];
+		Anope::string nname = params[0];
 		MemoInfo *mi;
 
-		if (!(mi = getmemoinfo(name, ischan, isforbid)))
+		if (!(mi = getmemoinfo(nname, ischan, isforbid)))
 		{
 			if (isforbid)
-				u->SendMessage(MemoServ, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
+				u->SendMessage(MemoServ, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, nname.c_str());
 			else
-				u->SendMessage(MemoServ, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
+				u->SendMessage(MemoServ, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nname.c_str());
 		}
 		else
 		{
@@ -42,9 +42,9 @@ class CommandMSCancel : public Command
 			for (i = mi->memos.size() - 1; i >= 0; --i)
 				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(name)->nc, mi, mi->memos[i]->number));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]->number));
 					delmemo(mi, mi->memos[i]->number);
-					u->SendMessage(MemoServ, MEMO_CANCELLED, name.c_str());
+					u->SendMessage(MemoServ, MEMO_CANCELLED, nname.c_str());
 					return MOD_CONT;
 				}
 

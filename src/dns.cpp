@@ -38,7 +38,7 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 		return;
 	}
 
-	short packet_id;
+	unsigned short packet_id;
 	while (DNSEngine->requests.count((packet_id = GetRandomID())));
 
 	p->id = this->id = packet_id;

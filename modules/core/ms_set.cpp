@@ -134,7 +134,7 @@ class CommandMSSet : public Command
 				else
 					nc->UnsetFlag(NI_MEMO_HARDMAX);
 			}
-			limit = p1.is_number_only() ? convertTo<int32>(p1) : -1;
+			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
 			if (limit < 0 || limit > 32767)
 			{
 				u->SendMessage(MemoServ, MEMO_SET_LIMIT_OVERFLOW, 32767);
@@ -160,10 +160,10 @@ class CommandMSSet : public Command
 				u->SendMessage(MemoServ, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;
 			}
-			limit = p1.is_number_only() ? convertTo<int32>(p1) : -1;
+			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
-			if (limit < 0 || (Config->MSMaxMemos > 0 && limit > Config->MSMaxMemos))
+			if (limit < 0 || (Config->MSMaxMemos > 0 && convertTo<unsigned>(limit) > Config->MSMaxMemos))
 			{
 				if (!chan.empty())
 					u->SendMessage(MemoServ, MEMO_SET_LIMIT_TOO_HIGH, chan.c_str(), Config->MSMaxMemos);

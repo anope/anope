@@ -123,10 +123,11 @@ class CommandOSSession : public Command
  private:
 	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
 	{
-		int mincount;
 		Anope::string param = params[1];
 
-		if ((mincount = (param.is_number_only() ? convertTo<int>(param) : 0)) <= 1)
+		unsigned mincount = param.is_pos_number_only() ? convertTo<unsigned>(param) : 0;
+
+		if (mincount <= 1)
 			u->SendMessage(OperServ, OPER_SESSION_INVALID_THRESHOLD);
 		else
 		{
@@ -318,8 +319,8 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		n1 = n1str.is_number_only() ? convertTo<int>(n1str) - 1 : -1;
-		n2 = n2str.is_number_only() ? convertTo<int>(n2str) - 1 : -1;
+		n1 = n1str.is_pos_number_only() ? convertTo<int>(n1str) - 1 : -1;
+		n2 = n2str.is_pos_number_only() ? convertTo<int>(n2str) - 1 : -1;
 
 		if (n1 >= 0 && n1 < exceptions.size() && n2 >= 0 && n2 < exceptions.size() && n1 != n2)
 		{

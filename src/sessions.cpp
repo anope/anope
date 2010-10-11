@@ -255,7 +255,7 @@ Exception *find_hostip_exception(const Anope::string &host, const Anope::string 
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 
-int exception_add(User *u, const Anope::string &mask, int limit, const Anope::string &reason, const Anope::string &who, time_t expires)
+int exception_add(User *u, const Anope::string &mask, unsigned limit, const Anope::string &reason, const Anope::string &who, time_t expires)
 {
 	/* Check if an exception already exists for this mask */
 	for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)

@@ -484,7 +484,7 @@ class Memo : public Flags<MemoFlag>
 
 struct MemoInfo
 {
-	int16 memomax;
+	unsigned memomax;
 	std::vector<Memo *> memos;
 };
 
@@ -828,7 +828,7 @@ struct MailInfo
 struct Exception
 {
 	Anope::string mask;		/* Hosts to which this exception applies */
-	int limit;				/* Session limit for exception */
+	unsigned limit;				/* Session limit for exception */
 	Anope::string who;		/* Nick of person who added the exception */
 	Anope::string reason;	/* Reason for exception's addition */
 	time_t time;			/* When this exception was added */

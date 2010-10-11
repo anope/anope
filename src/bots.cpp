@@ -155,9 +155,9 @@ void BotInfo::Join(Channel *c, bool update_ts)
 			}
 
 			Anope::string Limit;
-			int limit = 0;
-			if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_number_only())
-				limit = convertTo<int>(Limit);
+			unsigned limit = 0;
+			if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_pos_number_only())
+				limit = convertTo<unsigned>(Limit);
 
 			/* Should we be invited? */
 			if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))

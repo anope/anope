@@ -165,7 +165,7 @@ class CommandNSSetPassword : public Command
 	{
 		Anope::string param = params[1];
 
-		int len = param.length();
+		unsigned len = param.length();
 
 		if (u->Account()->display.equals_ci(param) || (Config->StrictPasswords && len < 5))
 		{

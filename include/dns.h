@@ -119,11 +119,12 @@ struct DNSRecord
 	/* Record class, should always be 1 */
 	unsigned short record_class;
 	/* Time to live */
-	unsigned long ttl;
+	time_t ttl;
 	/* Record length */
 	unsigned short rdlength;
 
 	inline DNSRecord();
+	/* When this record was created in our cache */
 	time_t created;
 };
 

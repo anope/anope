@@ -296,7 +296,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
  * @param num Memo number to delete
  * @return int 1 if the memo was found, else 0.
  */
-bool delmemo(MemoInfo *mi, int num)
+bool delmemo(MemoInfo *mi, unsigned num)
 {
 	if (mi->memos.empty())
 		return false;

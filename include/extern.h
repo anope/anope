@@ -207,7 +207,7 @@ E void rsend_notify(User *u, Memo *m, const Anope::string &chan);
 E void check_memos(User *u);
 E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
 E void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z);
-E bool delmemo(MemoInfo *mi, int num);
+E bool delmemo(MemoInfo *mi, unsigned num);
 
 /**** messages.c ****/
 
@@ -330,7 +330,7 @@ E Session *findsession(const Anope::string &host);
 
 E Exception *find_host_exception(const Anope::string &host);
 E Exception *find_hostip_exception(const Anope::string &host, const Anope::string &hostip);
-E int exception_add(User *u, const Anope::string &mask, int limit, const Anope::string &reason, const Anope::string &who, time_t expires);
+E int exception_add(User *u, const Anope::string &mask, unsigned limit, const Anope::string &reason, const Anope::string &who, time_t expires);
 
 /**** sockets.cpp ****/
 

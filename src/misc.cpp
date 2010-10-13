@@ -260,35 +260,39 @@ bool NumberList::InvalidRange(const Anope::string &)
  */
 time_t dotime(const Anope::string &s)
 {
-	int amount;
-
 	if (s.empty())
 		return -1;
 
+	int amount = 0;
 	Anope::string end;
-	amount = convertTo<int>(s, end, false);
-	if (!end.empty())
+
+	try
 	{
-		switch (end[0])
+		amount = convertTo<int>(s, end, false);
+		if (!end.empty())
 		{
-			case 's':
-				return amount;
-			case 'm':
-				return amount * 60;
-			case 'h':
-				return amount * 3600;
-			case 'd':
-				return amount * 86400;
-			case 'w':
-				return amount * 86400 * 7;
-			case 'y':
-				return amount * 86400 * 365;
-			default:
-				return -1;
+			switch (end[0])
+			{
+				case 's':
+					return amount;
+				case 'm':
+					return amount * 60;
+				case 'h':
+					return amount * 3600;
+				case 'd':
+					return amount * 86400;
+				case 'w':
+					return amount * 86400 * 7;
+				case 'y':
+					return amount * 86400 * 365;
+				default:
+					return -1;
+			}
 		}
 	}
-	else
-		return amount;
+	catch (const CoreException &) { }
+
+	return amount;
 }
 
 /*************************************************************************/

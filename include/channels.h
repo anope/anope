@@ -253,7 +253,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 * @param mode the modes
 	 * @param EnforceMLock true to enforce mlock
 	 */
-	void SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock = false);
+	void SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock = true);
 
 	/** Kick a user from a channel internally
 	 * @param source The sender of the kick

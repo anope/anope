@@ -907,7 +907,7 @@ class DBMySQL : public Module
 	{
 		this->RunQuery("TRUNCATE TABLE `anope_os_core`");
 
-		this->RunQuery("INSERT DELAYED INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, snlines_count, sqlines_count, szlines_count) VALUES( " + stringify(maxusercnt) + ", " + stringify(maxusertime) + ", " + stringify(SGLine ? SGLine->GetCount() : 0) + ", " + stringify(SQLine ? SQLine->GetCount() : 0) + ", " + stringify(SNLine ? SNLine->GetCount() : 0) + ", " + stringify(SZLine ? SZLine->GetCount() : 0) + ")");
+		this->RunQuery("INSERT INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, snlines_count, sqlines_count, szlines_count) VALUES( " + stringify(maxusercnt) + ", " + stringify(maxusertime) + ", " + stringify(SGLine ? SGLine->GetCount() : 0) + ", " + stringify(SQLine ? SQLine->GetCount() : 0) + ", " + stringify(SNLine ? SNLine->GetCount() : 0) + ", " + stringify(SZLine ? SZLine->GetCount() : 0) + ")");
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			CurCore = it->second;
@@ -932,7 +932,7 @@ class DBMySQL : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
 
 			/* This is for the core bots, bots added by users are already handled by an event */
-			this->RunQuery("INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
+			this->RunQuery("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
 		}
 
 		this->RunQuery("TRUNCATE TABLE `anope_extra`");
@@ -1029,7 +1029,7 @@ class DBMySQL : public Module
 					{
 						for (int i = 0; i < TTB_SIZE; ++i)
 						{
-							this->RunQuery("INSERT DELAYED INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES('" + this->Escape(ci->name) + "', " + stringify(i) + ", " + stringify(ci->ttb[i]) + ") ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)");
+							this->RunQuery("INSERT INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES('" + this->Escape(ci->name) + "', " + stringify(i) + ", " + stringify(ci->ttb[i]) + ") ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)");
 						}
 						this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + GetBotFlags(ci->botflags) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 
@@ -1072,7 +1072,7 @@ class DBMySQL : public Module
 
 	void OnNickAddAccess(NickCore *nc, const Anope::string &entry)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES('" + this->Escape(nc->display) + "', '" + this->Escape(entry) + "')");
+		this->RunQuery("INSERT INTO `anope_ns_access` (display, access) VALUES('" + this->Escape(nc->display) + "', '" + this->Escape(entry) + "')");
 	}
 
 	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry)
@@ -1087,12 +1087,7 @@ class DBMySQL : public Module
 
 	void OnDelCore(NickCore *nc)
 	{
-		this->RunQuery("DELETE FROM `anope_cs_access` WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("DELETE FROM `anope_cs_akick` WHERE `mask` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("DELETE FROM `anope_ns_access` WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("DELETE FROM `anope_ns_alias` WHERE `display` = '" + this->Escape(nc->display) + "'");
 		this->RunQuery("DELETE FROM `anope_ns_core` WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "'");
 	}
 
 	void OnNickForbidden(NickAlias *na)
@@ -1107,7 +1102,7 @@ class DBMySQL : public Module
 
 	void OnMakeNickRequest(NickRequest *nr)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ns_request` (nick, passcode, password, email, requested) VALUES('" + this->Escape(nr->nick) + "', '" + this->Escape(nr->passcode) + "', '" + this->Escape(nr->password) + "', '" + this->Escape(nr->email) + "', " + stringify(nr->requested) + ")");
+		this->RunQuery("INSERT INTO `anope_ns_request` (nick, passcode, password, email, requested) VALUES('" + this->Escape(nr->nick) + "', '" + this->Escape(nr->passcode) + "', '" + this->Escape(nr->password) + "', '" + this->Escape(nr->email) + "', " + stringify(nr->requested) + ")");
 	}
 
 	void OnDelNickRequest(NickRequest *nr)
@@ -1117,7 +1112,7 @@ class DBMySQL : public Module
 
 	void InsertAlias(NickAlias *na)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, time_registered, last_seen, flags, display) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, time_registered, last_seen, flags, display) VALUES('" +
 			this->Escape(na->nick) + "', '" + this->Escape(na->last_quit) + "', '" +
 			this->Escape(na->last_realname) + "', '" + this->Escape(na->last_usermask) + "', " + stringify(na->time_registered) + ", " + stringify(na->last_seen) +
 			", '" + BuildFlagsList(na) + "', '" + this->Escape(na->nc->display) + "') " + "ON DUPLICATE KEY UPDATE last_quit=VALUES(last_quit), "
@@ -1127,7 +1122,7 @@ class DBMySQL : public Module
 
 	void InsertCore(NickCore *nc)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES('" +
 			this->Escape(nc->display) + "', '" + this->Escape(nc->pass) + "', '" +
 			this->Escape(nc->email) + "', '" + this->Escape(nc->greet) + "', '" +
 			BuildFlagsList(nc) + "', " + stringify(nc->language) + ", " + stringify(nc->channelcount) + ", " +
@@ -1138,19 +1133,13 @@ class DBMySQL : public Module
 
 	void OnNickRegister(NickAlias *na)
 	{
-		this->InsertAlias(na);
 		this->InsertCore(na->nc);
+		this->InsertAlias(na);
 	}
 
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
 	{
 		this->RunQuery("UPDATE `anope_ns_core` SET `display` = '" + this->Escape(newdisplay) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_ns_alias` SET `display` = '" + this->Escape(newdisplay) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_ns_access` SET `display` = '" + this->Escape(newdisplay) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_cs_access` SET `display` = '" + this->Escape(newdisplay) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_cs_info` SET `founder` = '" + this->Escape(newdisplay) + "' WHERE `founder` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_cs_info` SET `successor` = '" + this->Escape(newdisplay) + "' WHERE `successor` = '" + this->Escape(nc->display) + "'");
-		this->RunQuery("UPDATE `anope_ms_info` SET `receiver` = '" + this->Escape(newdisplay) + "' WHERE `receiver` = '" + this->Escape(nc->display) + "'");
 	}
 
 	void OnNickSuspend(NickAlias *na)
@@ -1158,9 +1147,9 @@ class DBMySQL : public Module
 		this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + BuildFlagsList(na->nc) + "' WHERE `display` = '" + this->Escape(na->nc->display) + "'");
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, User *u, NickAlias *na, int level)
+	void OnAccessAdd(ChannelInfo *ci, User *u, NickCore *nc, int level)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(level) + ", '" + this->Escape(na->nc->display) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "')");
+		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(level) + ", '" + this->Escape(nc->display) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "')");
 	}
 
 	void OnAccessDel(ChannelInfo *ci, User *u, NickCore *nc)
@@ -1170,7 +1159,7 @@ class DBMySQL : public Module
 
 	void OnAccessChange(ChannelInfo *ci, User *u, NickAlias *na, int level)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(level) + ", '" + this->Escape(na->nc->display) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(level) + ", '" + this->Escape(na->nc->display) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 	}
 
 	void OnAccessClear(ChannelInfo *ci, User *u)
@@ -1189,25 +1178,20 @@ class DBMySQL : public Module
 
 	void OnChanForbidden(ChannelInfo *ci)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_cs_info` (name, time_registered, last_used, flags, forbidby, forbidreason) VALUES ('" +
+		this->RunQuery("INSERT INTO `anope_cs_info` (name, time_registered, last_used, flags, forbidby, forbidreason) VALUES ('" +
 			this->Escape(ci->name) + "', " + stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + BuildFlagsList(ci) + "', '" +  this->Escape(ci->forbidby) + "', '"
 			+ this->Escape(ci->forbidreason) + "')");
 	}
 
 	void OnDelChan(ChannelInfo *ci)
 	{
-		this->Escape("DELETE FROM `anope_cs_access` WHERE `channel` = '" + this->Escape(ci->name) + "'");
-		this->Escape("DELETE FROM `anope_cs_akick` WHERE `channel` = '" + this->Escape(ci->name) + "'");
-		this->Escape("DELETE FROM `anope_cs_info` WHERE `name` = '" + this->Escape(ci->name) + "'");
-		this->Escape("DELETE FROM `anope_cs_levels` WHERE `channel` = '" + this->Escape(ci->name) + "'");
-		this->Escape("DELETE From `anope_cs_ttb` WHERE `channel` = '" + this->Escape(ci->name) + "'");
-		this->Escape("DELETE FROM `anope_bs_badwords` WHERE `channel` = '" + this->Escape(ci->name) + "'");
+		this->RunQuery("DELETE FROM `anope_cs_info` WHERE `name` = '" + this->Escape(ci->name) + "'");
 	}
 
 	void OnChanRegistered(ChannelInfo *ci)
 	{
 		Anope::string flags = BuildFlagsList(ci), mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci);
-		this->RunQuery("INSERT DELAYED INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, entry_message, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, entry_message, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
 			this->Escape(ci->name) + "', '" + this->Escape(ci->founder ? ci->founder->display : "") + "', '" +
 			this->Escape(ci->successor ? ci->successor->display : "") + "', '" + this->Escape(ci->desc) + "', " +
 			stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + this->Escape(ci->last_topic) + "', '" +
@@ -1228,7 +1212,7 @@ class DBMySQL : public Module
 
 	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_cs_akick` (channel, flags, mask, reason, creator, created, last_used) VALUES('" + this->Escape(ci->name) + "', '" +
+		this->RunQuery("INSERT INTO `anope_cs_akick` (channel, flags, mask, reason, creator, created, last_used) VALUES('" + this->Escape(ci->name) + "', '" +
 			(ak->HasFlag(AK_ISNICK) ? "ISNICK " : "") + (ak->HasFlag(AK_STUCK) ? "STUCK " : "") + "', '" +
 			this->Escape(ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask) + "', '" + this->Escape(ak->reason) + "', '" +
 			this->Escape(ak->creator) + "', " + stringify(ak->addtime) + ", " + stringify(ak->last_used) + ")");
@@ -1241,7 +1225,7 @@ class DBMySQL : public Module
 
 	void OnBotCreate(BotInfo *bi)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" +
 			this->Escape(bi->nick) + "', '" + this->Escape(bi->GetIdent()) + "', '" + this->Escape(bi->host) + "', '" +
 			this->Escape(bi->realname) + "', '" + GetBotServFlags(bi) + "', " + stringify(bi->created) + ", " + stringify(bi->chancount) + ") " +
 			"ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
@@ -1254,7 +1238,6 @@ class DBMySQL : public Module
 
 	void OnBotDelete(BotInfo *bi)
 	{
-		this->RunQuery("DELETE FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(bi->nick) + "'");
 		this->RunQuery("UPDATE `anope_cs_info` SET `botnick` = '' WHERE `botnick` = '" + this->Escape(bi->nick) + "'");
 	}
 
@@ -1272,7 +1255,7 @@ class DBMySQL : public Module
 
 	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
 	{
-		Anope::string query = "INSERT DELAYED INTO `anope_bs_badwords` (channel, word, type) VALUES('" + this->Escape(ci->name) + "', '" + this->Escape(bw->word) + "', '";
+		Anope::string query = "INSERT INTO `anope_bs_badwords` (channel, word, type) VALUES('" + this->Escape(ci->name) + "', '" + this->Escape(bw->word) + "', '";
 		switch (bw->type)
 		{
 			case BW_SINGLE:
@@ -1314,14 +1297,14 @@ class DBMySQL : public Module
 
 	void OnMemoSend(User *, NickCore *nc, Memo *m)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
 			this->Escape(nc->display) + "', " + stringify(m->number) + ", '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'NICK')");
 	}
 
 	void OnMemoSend(User *, ChannelInfo *ci, Memo *m)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
 			this->Escape(ci->name) + "', " + stringify(m->number) + ", '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
 	}
@@ -1344,7 +1327,7 @@ class DBMySQL : public Module
 
 	EventReturn OnAddAkill(User *, XLine *ak)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES('" +
 			this->Escape(ak->GetUser()) + "', '" + this->Escape(ak->GetHost()) + "', '" + this->Escape(ak->By) + "', '" +
 			this->Escape(ak->Reason) + "', " + stringify(ak->Created) + ", " + stringify(ak->Expires) + ")");
 		return EVENT_CONTINUE;
@@ -1360,7 +1343,7 @@ class DBMySQL : public Module
 
 	EventReturn OnExceptionAdd(User *, Exception *ex)
 	{
-		this->RunQuery("INSERT DELAYED INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES('" +
 			this->Escape(ex->mask) + "', " + stringify(ex->limit) + ", '" + this->Escape(ex->who) + "', '" + this->Escape(ex->reason) + "', " +
 			stringify(ex->time) + ", " + stringify(ex->expires) + ")");
 		return EVENT_CONTINUE;
@@ -1373,7 +1356,7 @@ class DBMySQL : public Module
 
 	EventReturn OnAddXLine(User *, XLine *x, XLineType Type)
 	{
-		this->RunQuery(Anope::string("INSERT DELAYED INTO `anope_os_sxlines` (type, mask, xby, reason, seton, expire) VALUES('") +
+		this->RunQuery(Anope::string("INSERT INTO `anope_os_sxlines` (type, mask, xby, reason, seton, expire) VALUES('") +
 			(Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) + "', '" +
 			this->Escape(x->Mask) + "', '" + this->Escape(x->By) + "', '" + this->Escape(x->Reason) + "', " +
 			stringify(x->Created) + ", " + stringify(x->Expires) + ")");
@@ -1406,7 +1389,7 @@ void MySQLInterface::OnError(const SQLResult &r)
 
 static void Write(const Anope::string &data)
 {
-	me->RunQuery("INSERT DELAYED INTO `anope_extra` (data) VALUES('" + me->Escape(data) + "')");
+	me->RunQuery("INSERT INTO `anope_extra` (data) VALUES('" + me->Escape(data) + "')");
 }
 
 static void WriteNickMetadata(const Anope::string &key, const Anope::string &data)
@@ -1414,7 +1397,7 @@ static void WriteNickMetadata(const Anope::string &key, const Anope::string &dat
 	if (!CurNick)
 		throw CoreException(Anope::string("WriteNickMetadata without a nick to write"));
 
-	me->RunQuery("INSERT DELAYED INTO `anope_ns_alias_metadata` (nick, name, value) VALUES('" + me->Escape(CurNick->nick) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
+	me->RunQuery("INSERT INTO `anope_ns_alias_metadata` (nick, name, value) VALUES('" + me->Escape(CurNick->nick) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
 }
 
 static void WriteCoreMetadata(const Anope::string &key, const Anope::string &data)
@@ -1422,7 +1405,7 @@ static void WriteCoreMetadata(const Anope::string &key, const Anope::string &dat
 	if (!CurCore)
 		throw CoreException(Anope::string("WritCoreMetadata without a core to write"));
 
-	me->RunQuery("INSERT DELAYED INTO `anope_ns_core_metadata` (nick, name, value) VALUES('" + me->Escape(CurCore->display) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
+	me->RunQuery("INSERT INTO `anope_ns_core_metadata` (nick, name, value) VALUES('" + me->Escape(CurCore->display) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
 }
 
 static void WriteChannelMetadata(const Anope::string &key, const Anope::string &data)
@@ -1430,7 +1413,7 @@ static void WriteChannelMetadata(const Anope::string &key, const Anope::string &
 	if (!CurChannel)
 		throw CoreException(Anope::string("WriteChannelMetadata without a channel to write"));
 
-	me->RunQuery("INSERT DELAYED INTO `anope_cs_info_metadata` (channel, name, value) VALUES('" + me->Escape(CurChannel->name) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
+	me->RunQuery("INSERT INTO `anope_cs_info_metadata` (channel, name, value) VALUES('" + me->Escape(CurChannel->name) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
 }
 
 static void WriteBotMetadata(const Anope::string &key, const Anope::string &data)
@@ -1438,7 +1421,7 @@ static void WriteBotMetadata(const Anope::string &key, const Anope::string &data
 	if (!CurBot)
 		throw CoreException(Anope::string("WriteBotMetadata without a bot to write"));
 
-	me->RunQuery("INSERT DELAYED INTO `anope_bs_info_metadata` (botname, name, value) VALUES('" + me->Escape(CurBot->nick) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
+	me->RunQuery("INSERT INTO `anope_bs_info_metadata` (botname, name, value) VALUES('" + me->Escape(CurBot->nick) + "', '" + me->Escape(key) + "', '" + me->Escape(data) + "')");
 }
 
 static void SaveDatabases()
@@ -1457,7 +1440,7 @@ static void SaveDatabases()
 
 		for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 		{
-			me->RunQuery("INSERT DELAYED INTO `anope_ns_access` (display, access) VALUES(" + me->Escape(nc->display) + ", " + me->Escape(*it) + ")");
+			me->RunQuery("INSERT INTO `anope_ns_access` (display, access) VALUES(" + me->Escape(nc->display) + ", " + me->Escape(*it) + ")");
 		}
 
 		for (unsigned j = 0, end = nc->memos.memos.size(); j < end; ++j)
@@ -1499,7 +1482,7 @@ static void SaveDatabases()
 		{
 			ChanAccess *access = ci->GetAccess(j);
 
-			me->RunQuery(Anope::string("INSERT DELAYED INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES('") + access->level + "', " + me->Escape(access->nc->display) + ", " + me->Escape(ci->name) + ", " + access->last_seen + ", " + me->Escape(access->creator) + ") ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+			me->RunQuery(Anope::string("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES('") + access->level + "', " + me->Escape(access->nc->display) + ", " + me->Escape(ci->name) + ", " + access->last_seen + ", " + me->Escape(access->creator) + ") ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 		}
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
@@ -1511,7 +1494,7 @@ static void SaveDatabases()
 
 		for (int k = 0; k < CA_SIZE; ++k)
 		{
-			me->RunQuery("INSERT DELAYED INTO `anope_cs_levels` (channel, position, level) VALUES(" + me->Escape(ci->name) + ", '" + stringify(k) + "', '" + stringify(ci->levels[k]) + "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)");
+			me->RunQuery("INSERT INTO `anope_cs_levels` (channel, position, level) VALUES(" + me->Escape(ci->name) + ", '" + stringify(k) + "', '" + stringify(ci->levels[k]) + "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)");
 		}
 
 		for (unsigned j = 0, end = ci->memos.memos.size(); j < end; ++j)

@@ -146,7 +146,7 @@ class CSSetMisc : public Module
 			if (cname.empty())
 				continue;
 			Anope::string desc = config.ReadValue("cs_set_misc", "desc", "", i);
-			bool showhidden = config.ReadFlag("cs_set_misc", "operonly", "no", i);
+			bool showhidden = config.ReadFlag("cs_set_misc", "privileged", "no", i);
 
 			CommandInfo *info = new CommandInfo(cname, desc, showhidden);
 			if (!this->Commands.insert(std::make_pair(cname, info)).second)

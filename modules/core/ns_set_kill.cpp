@@ -22,9 +22,10 @@ class CommandNSSetKill : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSetKill");
+		NickAlias *na = findnick(params[0]);
+		if (!na)
+			throw CoreException("NULL na in CommandNSSetKill");
+		NickCore *nc = na->nc;
 
 		Anope::string param = params[1];
 		Anope::string arg = params.size() > 2 ? params[2] : "";

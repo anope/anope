@@ -52,7 +52,7 @@ class CommandNSSASet : public Command
 
 			if (c)
 			{
-				Anope::string cmdparams = na->nc->display;
+				Anope::string cmdparams = na->nick;
 				for (std::vector<Anope::string>::const_iterator it = params.begin() + 2; it != params.end(); ++it)
 					cmdparams += " " + *it;
 				/* Don't log the whole message for saset password */
@@ -130,9 +130,10 @@ class CommandNSSASetDisplay : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetDisplay");
+		NickAlias *setter_na = findnick(params[0]);
+		if (!setter_na)
+			throw CoreException("NULL na in CommandNSSASetDisplay");
+		NickCore *nc = setter_na->nc;
 
 		NickAlias *na = findnick(params[1]);
 		if (!na || na->nc != nc)
@@ -173,9 +174,10 @@ class CommandNSSASetPassword : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSASetPassword");
+		NickAlias *setter_na = findnick(params[0]);
+		if (!setter_na)
+			throw CoreException("NULL na in CommandNSSASetPassword");
+		NickCore *nc = setter_na->nc;
 
 		size_t len = params[1].length();
 

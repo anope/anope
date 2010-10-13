@@ -22,9 +22,10 @@ class CommandNSSetMessage : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSetMessage");
+		NickAlias *na = findnick(params[0]);
+		if (!na)
+			throw CoreException("NULL na in CommandNSSetMessage");
+		NickCore *nc = na->nc;
 
 		if (!Config->UsePrivmsg)
 		{

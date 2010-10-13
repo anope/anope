@@ -21,9 +21,10 @@ class CommandNSSetMisc : public Command
  protected:
 	CommandReturn RealExecute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSetMisc");
+		NickAlias *na = findnick(params[0]);
+		if (!na)
+			throw CoreException("NULL na in CommandNSSetMisc");
+		NickCore *nc = na->nc;
 
 		nc->Shrink("nickserv:" + this->name);
 		if (params.size() > 1)

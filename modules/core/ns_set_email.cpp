@@ -22,9 +22,10 @@ class CommandNSSetEmail : public Command
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
-		NickCore *nc = findcore(params[0]);
-		if (!nc)
-			throw CoreException("NULL nc in CommandNSSetEmail");
+		NickAlias *na = findnick(params[0]);
+		if (!na)
+			throw CoreException("NULL na in CommandNSSetEmail");
+		NickCore *nc = na->nc;
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 

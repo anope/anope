@@ -6569,9 +6569,9 @@ HOST_OFF_UNREAL
 HOST_NO_VIDENT
 	Je IRCD ondersteunt geen vIdent's. Als dit niet klopt, rapporteer dit dan als een mogelijke bug
 HOST_GROUP
-	Alle vhost's in de groep %s zijn ingesteld op %s
+	Alle vhosts in de groep %s zijn ingesteld op %s
 HOST_IDENT_GROUP
-	Alle vhost's in de groep %s zijn ingesteld op %s@%s
+	Alle vhosts in de groep %s zijn ingesteld op %s@%s
 
 ###########################################################################
 #

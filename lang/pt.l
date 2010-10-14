@@ -6535,9 +6535,9 @@ HOST_OFF_UNREAL
 HOST_NO_VIDENT
 	Seu IRCD não suporta vIdent's, se isto não está certo, por favor reporte isso como um possível bug.
 HOST_GROUP
-	Todos os vhost's no grupo %s foram ajustados para %s
+	Todos os vhosts no grupo %s foram ajustados para %s
 HOST_IDENT_GROUP
-	Todos os vhost's no grupo %s foram ajustados para %s@%s
+	Todos os vhosts no grupo %s foram ajustados para %s@%s
 HOST_LIST_FOOTER
 	Exibidos todos os registros (Contador: %d)
 HOST_LIST_RANGE_FOOTER

@@ -6390,9 +6390,9 @@ HOST_OFF_UNREAL
 HOST_NO_VIDENT
 	Your IRCD does not support vIdent's, if this is incorrect, please report this as a possible bug
 HOST_GROUP
-	All vhost's in the group %s have been set to %s
+	All vhosts in the group %s have been set to %s
 HOST_IDENT_GROUP
-	All vhost's in the group %s have been set to %s@%s
+	All vhosts in the group %s have been set to %s@%s
 HOST_LIST_FOOTER
 	Displayed all records (Count: %d)
 HOST_LIST_RANGE_FOOTER

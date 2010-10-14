@@ -6651,9 +6651,9 @@ HOST_NO_VIDENT
 #
 ###########################################################################
 HOST_GROUP
-	All vhost's in the group %s have been set to %s
+	All vhosts in the group %s have been set to %s
 HOST_IDENT_GROUP
-	All vhost's in the group %s have been set to %s@%s
+	All vhosts in the group %s have been set to %s@%s
 
 ###########################################################################
 #

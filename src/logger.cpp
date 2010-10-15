@@ -184,10 +184,10 @@ Log::Log(Server *s, const Anope::string &category) : bi(OperServ), Type(LOG_SERV
 	buf << "SERVER: " << s->GetName() << " (" << s->GetDescription() << ") ";
 }
 
-Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_USER), Category(category)
+Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_NORMAL), Category(category)
 {
 	if (!b)
-		b = Global;
+		this->bi = Global;
 	if (this->bi)
 		this->Sources.push_back(bi->nick);
 }

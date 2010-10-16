@@ -608,7 +608,7 @@ class CommandCSLevels : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		if (subcommand == "DESC")
+		if (subcommand.equals_ci("DESC"))
 		{
 			int i;
 			u->SendMessage(ChanServ, CHAN_HELP_LEVELS_DESC);

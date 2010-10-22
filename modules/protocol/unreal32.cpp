@@ -165,7 +165,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
 		EnforceQlinedNick(u->nick, Config->ServerName);
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), u->timestamp, u->GetIdent().c_str(), u->host.c_str(), Config->ServerName.c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
+		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), static_cast<long>(u->timestamp), u->GetIdent().c_str(), u->host.c_str(), Config->ServerName.c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)

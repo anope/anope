@@ -46,8 +46,8 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
 	}
 	else
 	{
-		UplinkSock->Write("%s", buf);
-		Log(LOG_RAWIO) << "Sent: "<< buf;
+		UplinkSock->Write(buf);
+		Log(LOG_RAWIO) << "Sent: " << buf;
 	}
 
 	va_end(args);

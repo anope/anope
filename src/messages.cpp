@@ -225,7 +225,7 @@ bool m_stats(const Anope::string &source, const std::vector<Anope::string> &para
 			if (u && is_oper(u))
 			{
 				ircdproto->SendNumeric(Config->ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, Anope::CurTime - start_time);
+				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - start_time));
 			}
 
 			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
@@ -289,7 +289,7 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), Anope::CurTime - bi->lastmsg, start_time);
+			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
 			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
 		else if (!ircd->svshold && (u = finduser(who)) && u->server == Me)
@@ -304,7 +304,10 @@ int m_whois(const Anope::string &source, const Anope::string &who)
 	return MOD_CONT;
 }
 
-Message message_stats("STATS", m_stats);
-Message message_time("TIME", m_time);
-Message message_verssion("VERSION", m_version);
+void init_core_messages()
+{
+	static Message message_stats("STATS", m_stats);
+	static Message message_time("TIME", m_time);
+	static Message message_verssion("VERSION", m_version);
+}
 

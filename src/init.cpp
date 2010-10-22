@@ -299,6 +299,8 @@ void Init(int ac, char **av)
 		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::LastError());
 	}
 
+	init_core_messages();
+
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
 #ifdef _WIN32
 	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;

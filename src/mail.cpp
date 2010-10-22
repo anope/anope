@@ -1,6 +1,6 @@
 #include "services.h"
 
-MailThread::MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message) : Thread(), MailTo(mailto), Addr(addr), Subject(subject), Message(message), Success(false), DontQuoteAddresses(Config->DontQuoteAddresses)
+MailThread::MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message) : Thread(), MailTo(mailto), Addr(addr), Subject(subject), Message(message), DontQuoteAddresses(Config->DontQuoteAddresses), Success(false)
 {
 }
 

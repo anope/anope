@@ -144,7 +144,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", u->timestamp, u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), modes.c_str(), u->realname.c_str());
+		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(u->timestamp), u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), modes.c_str(), u->realname.c_str());
 		send_cmd(u->nick, "OPERTYPE Service");
 	}
 
@@ -275,7 +275,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendBOB()
 	{
-		send_cmd("", "BURST %ld", Anope::CurTime);
+		send_cmd("", "BURST %ld", static_cast<long>(Anope::CurTime));
 	}
 
 	void SendEOB()

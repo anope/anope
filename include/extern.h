@@ -220,6 +220,7 @@ E bool m_stats(const Anope::string &source, const std::vector<Anope::string> &);
 E int m_whois(const Anope::string &source, const Anope::string &who);
 E bool m_time(const Anope::string &source, const std::vector<Anope::string> &);
 E bool m_version(const Anope::string &source, const std::vector<Anope::string> &);
+E void init_core_messages();
 
 /**** misc.c ****/
 

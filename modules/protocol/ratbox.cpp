@@ -174,7 +174,7 @@ class RatboxProto : public IRCDProto
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
 		EnforceQlinedNick(u->nick, "");
-		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", u->nick.c_str(), u->timestamp, modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->realname.c_str());
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->realname.c_str());
 	}
 
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)

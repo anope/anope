@@ -145,7 +145,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", u->GetUID().c_str(), u->timestamp, u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), u->my_signon, modes.c_str(), u->realname.c_str());
+		send_cmd(TS6SID, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", u->GetUID().c_str(), static_cast<long>(u->timestamp), u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), static_cast<long>(u->my_signon), modes.c_str(), u->realname.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
@@ -270,7 +270,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendBOB()
 	{
-		send_cmd(TS6SID, "BURST %ld", Anope::CurTime);
+		send_cmd(TS6SID, "BURST %ld", static_cast<long>(Anope::CurTime));
 	}
 
 	void SendEOB()

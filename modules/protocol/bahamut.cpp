@@ -257,7 +257,7 @@ class BahamutIRCdProto : public IRCDProto
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
 		EnforceQlinedNick(u->nick, Config->s_BotServ);
-		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), u->timestamp, modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
+		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
 	}
 
 	/* SVSMODE +d */

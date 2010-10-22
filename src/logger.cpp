@@ -205,7 +205,7 @@ Log::~Log()
 	}
 }
 
-LogInfo::LogInfo(int logage, bool inhabit, bool normal, bool rawio, bool ldebug) : LogAge(logage), Inhabit(inhabit), Normal(normal), RawIO(rawio), Debug(ldebug)
+LogInfo::LogInfo(int logage, bool inhabit, bool rawio, bool ldebug) : LogAge(logage), Inhabit(inhabit), RawIO(rawio), Debug(ldebug)
 {
 }
 
@@ -272,6 +272,8 @@ std::list<Anope::string> &LogInfo::GetList(LogType type)
 			return this->Channels;
 		case LOG_USER:
 			return this->Users;
+		case LOG_NORMAL:
+			return this->Normal;
 		default:
 			return empty;
 	}
@@ -287,9 +289,8 @@ bool LogInfo::HasType(LogType type)
 		case LOG_SERVER:
 		case LOG_CHANNEL:
 		case LOG_USER:
-			return !this->GetList(type).empty();
 		case LOG_NORMAL:
-			return this->Normal;
+			return !this->GetList(type).empty();
 		case LOG_TERMINAL:
 			return true;
 		case LOG_RAWIO:

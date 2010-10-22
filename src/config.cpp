@@ -938,7 +938,7 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 
 bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
-	//{"target", "source", "logage", "inhabit", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug"},
+	//{"target", "source", "logage", "inhabit", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug"},
 	Anope::string targets = values[0].GetValue();
 	ValueItem vi(targets);
 	if (!ValidateNotEmpty(config, "log", "target", vi))
@@ -953,11 +953,11 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 	Anope::string servers = values[7].GetValue();
 	Anope::string channels = values[8].GetValue();
 	Anope::string users = values[9].GetValue();
-	bool normal = values[10].GetBool();
+	Anope::string normal = values[10].GetValue();
 	bool rawio = values[11].GetBool();
 	bool ldebug = values[12].GetBool();
 
-	LogInfo *l = new LogInfo(logage, inhabit, normal, rawio, ldebug);
+	LogInfo *l = new LogInfo(logage, inhabit, rawio, ldebug);
 	l->Targets = BuildStringList(targets);
 	l->Sources = BuildStringList(source);
 	l->Admin = BuildStringList(admin);
@@ -966,6 +966,7 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 	l->Servers = BuildStringList(servers);
 	l->Channels = BuildStringList(channels);
 	l->Users = BuildStringList(users);
+	l->Normal = BuildStringList(normal);
 
 	config->LogInfos.push_back(l);
 
@@ -1213,9 +1214,9 @@ void ServerConfig::Read()
 			{DT_CHARPTR},
 			InitModules, DoModule, DoneModules},
 		{"log",
-			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "normal", "rawio", "debug", ""},
+			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
 			{"", "", "7", "yes", "", "", "", "", "", "", "no", "no", ""},
-			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN, DT_BOOLEAN},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"opertype",
 			{"name", "inherits", "commands", "privs", ""},

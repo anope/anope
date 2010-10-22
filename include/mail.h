@@ -15,12 +15,11 @@ class MailThread : public Thread
 	Anope::string Addr;
 	Anope::string Subject;
 	Anope::string Message;
+	bool DontQuoteAddresses;
 
 	bool Success;
  public:
-	MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message) : Thread(), MailTo(mailto), Addr(addr), Subject(subject), Message(message), Success(false)
-	{
-	}
+	MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message);
 
 	~MailThread();
 

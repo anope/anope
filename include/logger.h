@@ -78,11 +78,11 @@ class CoreExport LogInfo
 	std::list<Anope::string> Servers;
 	std::list<Anope::string> Users;
 	std::list<Anope::string> Channels;
-	bool Normal;
+	std::list<Anope::string> Normal;
 	bool RawIO;
 	bool Debug;
 
-	LogInfo(int logage, bool inhabit, bool normal, bool rawio, bool debug);
+	LogInfo(int logage, bool inhabit, bool rawio, bool debug);
 
 	~LogInfo();
 

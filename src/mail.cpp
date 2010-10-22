@@ -1,11 +1,15 @@
 #include "services.h"
 
+MailThread::MailThread(const Anope::string &mailto, const Anope::string &addr, const Anope::string &subject, const Anope::string &message) : Thread(), MailTo(mailto), Addr(addr), Subject(subject), Message(message), Success(false), DontQuoteAddresses(Config->DontQuoteAddresses)
+{
+}
+
 MailThread::~MailThread()
 {
 	if (Success)
-		Log() << "Successfully delivered mail for " << MailTo << " (" << Addr << ")";
+		Log(LOG_NORMAL, "mail") << "Successfully delivered mail for " << MailTo << " (" << Addr << ")";
 	else
-		Log() << "Error delivering mail for " << MailTo << " (" << Addr << ")";
+		Log(LOG_NORMAL, "mail") << "Error delivering mail for " << MailTo << " (" << Addr << ")";
 }
 
 void MailThread::Run()
@@ -19,7 +23,7 @@ void MailThread::Run()
 	}
 
 	fprintf(pipe, "From: %s\n", Config->SendFrom.c_str());
-	if (Config->DontQuoteAddresses)
+	if (this->DontQuoteAddresses)
 		fprintf(pipe, "To: %s <%s>\n", MailTo.c_str(), Addr.c_str());
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\n", MailTo.c_str(), Addr.c_str());

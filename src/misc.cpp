@@ -575,7 +575,7 @@ void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
 
 	if (u2)
 	{
-		Log() << "Killed Q-lined nick: " << u2->GetMask();
+		Log(LOG_NORMAL, "xline") << "Killed Q-lined nick: " << u2->GetMask();
 		kill_user(killer, u2->nick, "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
 }

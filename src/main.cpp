@@ -255,7 +255,7 @@ void sighandler(int signum)
 		{
 #ifndef _WIN32
 			case SIGHUP:
-				Log() << "Received SIGHUP: Saving Databases & Rehash Configuration";
+				Log() << "Received SIGHUP: Saving databases & rehashing configuration";
 
 				expire_all();
 				save_databases();

@@ -220,7 +220,7 @@ DNSSocket::~DNSSocket()
 	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
 		delete DNSEngine->packets[i - 1];
 	DNSEngine->packets.clear();
-	Log() << "Resolver: Lost connection to nameserver";
+	Log(LOG_NORMAL, "dns") << "Resolver: Lost connection to nameserver";
 	DNSEngine->sock = NULL;
 }
 

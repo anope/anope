@@ -91,7 +91,7 @@ class AkickListCallback : public NumberList
 class AkickViewCallback : public AkickListCallback
 {
  public:
-	AkickViewCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : AkickListCallback(u, ci, numlist)
+	AkickViewCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : AkickListCallback(_u, _ci, numlist)
 	{
 	}
 

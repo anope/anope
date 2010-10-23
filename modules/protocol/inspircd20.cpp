@@ -600,7 +600,7 @@ bool event_kick(const Anope::string &source, const std::vector<Anope::string> &p
 
 bool event_join(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	do_join(source, params[0], params[1]);
+	do_join(source, params[0], (params.size() > 1 ? params[1] : ""));
 	return true;
 }
 

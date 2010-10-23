@@ -299,9 +299,12 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 #if GETTEXT_FOUND
 	if (!language.empty())
 	{
-		setlocale(LC_ALL, language.c_str());
+		extern int _nl_msg_cat_cntr;
+		++_nl_msg_cat_cntr;
+		setenv("LANGUAGE", language.c_str(), 1);
+		setlocale(LC_ALL, "en_US");
 		message = dgettext(this->name.c_str(), fmt);
-		setlocale(LC_ALL, "");
+		unsetenv("LANGUAGE");
 	}
 #endif
 

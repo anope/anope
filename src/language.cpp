@@ -54,9 +54,12 @@ const Anope::string GetString(Anope::string language, LanguageString string)
 		return language_strings[string];
 
 #if GETTEXT_FOUND
-	setlocale(LC_ALL, language.c_str());
+	extern int _nl_msg_cat_cntr;
+	++_nl_msg_cat_cntr;
+	setenv("LANGUAGE", language.c_str(), 1);
+	setlocale(LC_ALL, "en_US");
 	const char *ret = dgettext("anope", language_strings[string].c_str());
-	setlocale(LC_ALL, "");
+	unsetenv("LANGUAGE");
 
 	return ret ? ret : "";
 #endif

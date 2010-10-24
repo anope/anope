@@ -394,7 +394,9 @@ class XOPBase : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+				if (access->level != level)
+					continue;
+				else if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
 					continue;
 
 				if (!SentHeader)

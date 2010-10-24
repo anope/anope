@@ -34,6 +34,9 @@ class SZLineDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SZLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -67,6 +70,9 @@ class SZLineListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SZLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -96,6 +102,9 @@ class SZLineViewCallback : public SZLineListCallback
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SZLine->GetEntry(Number - 1);
 
 		if (!x)

@@ -70,7 +70,7 @@ class AkickListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		if (!SentHeader)
@@ -97,7 +97,7 @@ class AkickViewCallback : public AkickListCallback
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		if (!SentHeader)
@@ -150,7 +150,7 @@ class AkickDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		++Deleted;

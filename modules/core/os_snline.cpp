@@ -35,6 +35,9 @@ class SNLineDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SNLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -68,6 +71,9 @@ class SNLineListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SNLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -97,6 +103,9 @@ class SNLineViewCallback : public SNLineListCallback
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SNLine->GetEntry(Number - 1);
 
 		if (!x)

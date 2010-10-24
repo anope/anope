@@ -24,7 +24,7 @@ class MemoListCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > mi->memos.size())
+		if (!Number || Number > mi->memos.size())
 			return;
 
 		MemoListCallback::DoRead(u, mi, NULL, Number - 1);

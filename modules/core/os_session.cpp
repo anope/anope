@@ -35,7 +35,7 @@ class ExceptionDelCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > exceptions.size())
+		if (!Number || Number > exceptions.size())
 			return;
 
 		++Deleted;
@@ -64,7 +64,7 @@ class ExceptionListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > exceptions.size())
+		if (!Number || Number > exceptions.size())
 			return;
 
 		if (!SentHeader)
@@ -95,7 +95,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > exceptions.size())
+		if (!Number || Number > exceptions.size())
 			return;
 
 		if (!SentHeader)

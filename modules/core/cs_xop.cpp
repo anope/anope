@@ -123,7 +123,7 @@ class XOPListCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
@@ -177,7 +177,7 @@ class XOPDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
@@ -403,7 +403,7 @@ class XOPBase : public Command
 					u->SendMessage(ChanServ, messages[XOP_LIST_HEADER], ci->name.c_str());
 				}
 
-				XOPListCallback::DoList(u, ci, access, i, level, messages);
+				XOPListCallback::DoList(u, ci, access, i + 1, level, messages);
 			}
 
 			if (!SentHeader)

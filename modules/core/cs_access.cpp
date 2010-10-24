@@ -34,7 +34,7 @@ class AccessListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
 		if (!SentHeader)
@@ -67,7 +67,7 @@ class AccessViewCallback : public AccessListCallback
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
 		if (!SentHeader)
@@ -134,7 +134,7 @@ class AccessDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
 		ChanAccess *access = ci->GetAccess(Number - 1);

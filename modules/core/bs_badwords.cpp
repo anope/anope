@@ -31,7 +31,7 @@ class BadwordsListCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetBadWordCount())
+		if (!Number || Number > ci->GetBadWordCount())
 			return;
 
 		if (!SentHeader)
@@ -75,7 +75,7 @@ class BadwordsDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > ci->GetBadWordCount())
+		if (!Number || Number > ci->GetBadWordCount())
 			return;
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL " << ci->GetBadWord(Number -1 )->word;

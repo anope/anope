@@ -34,6 +34,9 @@ class AkillDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SGLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -69,6 +72,9 @@ class AkillListCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SGLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -98,6 +104,9 @@ class AkillViewCallback : public AkillListCallback
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SGLine->GetEntry(Number - 1);
 
 		if (!x)

@@ -26,7 +26,7 @@ class MemoListCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (Number > mi->memos.size())
+		if (!Number || Number > mi->memos.size())
 			return;
 
 		if (!SentHeader)

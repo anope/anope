@@ -34,6 +34,9 @@ class SQLineDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SQLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -67,6 +70,9 @@ class SQLineListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SQLine->GetEntry(Number - 1);
 
 		if (!x)
@@ -96,6 +102,9 @@ class SQLineViewCallback : public SQLineListCallback
 
 	void HandleNumber(unsigned Number)
 	{
+		if (!Number)
+			return;
+
 		XLine *x = SQLine->GetEntry(Number - 1);
 
 		if (!x)

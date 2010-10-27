@@ -38,6 +38,10 @@ void InitLanguages()
 #endif
 }
 
+#if GETTEXT_FOUND
+/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
+extern "C" int _nl_msg_cat_cntr;
+#endif
 const Anope::string GetString(Anope::string language, LanguageString string)
 {
 #if GETTEXT_FOUND
@@ -54,7 +58,6 @@ const Anope::string GetString(Anope::string language, LanguageString string)
 		return language_strings[string];
 
 #if GETTEXT_FOUND
-	extern int _nl_msg_cat_cntr;
 	++_nl_msg_cat_cntr;
 	setenv("LANGUAGE", language.c_str(), 1);
 	setlocale(LC_ALL, "en_US");

@@ -286,6 +286,10 @@ Version Module::GetVersion() const
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
+#if GETTEXT_FOUND
+/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
+extern "C" int _nl_msg_cat_cntr;
+#endif
 void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 {
 	Anope::string language = (to && to->Account() ? to->Account()->language : "");
@@ -299,7 +303,6 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 #if GETTEXT_FOUND
 	if (!language.empty())
 	{
-		extern int _nl_msg_cat_cntr;
 		++_nl_msg_cat_cntr;
 		setenv("LANGUAGE", language.c_str(), 1);
 		setlocale(LC_ALL, "en_US");

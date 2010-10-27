@@ -77,6 +77,8 @@
 /* We have our own inet_pton and inet_ntop (Windows doesn't have its own) */
 # define inet_pton inet_pton_
 # define inet_ntop inet_ntop_
+# define setenv(x, y, z) SetEnvironmentVariable(x, y)
+# define unsetenv(x) SetEnvironmentVariable(x, NULL)
 # define MARK_DEPRECATED
 
 extern CoreExport int inet_pton(int af, const char *src, void *dst);

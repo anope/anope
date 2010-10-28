@@ -427,7 +427,7 @@ int main(int argc, char *argv[])
 				{
 					if (!memos->text)
 						break;
-					fs << "MD MI " << " " << memos->time << " " << memos->sender;
+					fs << "MD MI " << memos->time << " " << memos->sender;
 					if (memos->flags & MF_UNREAD)
 						fs << " UNREAD";
 					if (memos->flags & MF_RECEIPT)

@@ -260,6 +260,12 @@ int main(int argc, char *argv[])
 				line += parts[part];
 			}
 		}
+		else if (line.substr(0, 5) == "MD MI")
+		{
+			while (isdigit(line[6]))
+				line.erase(line.begin() + 6);
+			line.erase(line.begin() + 6);
+		}
 
 		out << line << std::endl;
 		if (!lang.empty())

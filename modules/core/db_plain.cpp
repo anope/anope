@@ -595,10 +595,9 @@ class DBPlain : public Module
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			// params[0] is the old number of the memo, no longer used
-			m->time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
-			m->sender = params[2];
-			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+			m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+			m->sender = params[1];
+			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
 				if (params[j].equals_ci("UNREAD"))
 					m->SetFlag(MF_UNREAD);
@@ -753,10 +752,9 @@ class DBPlain : public Module
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
-			// params[0] is the old number of the memo, no longer used
-			m->time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
-			m->sender = params[2];
-			for (unsigned j = 3; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+			m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+			m->sender = params[1];
+			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
 			{
 				if (params[j].equals_ci("UNREAD"))
 					m->SetFlag(MF_UNREAD);
@@ -891,7 +889,7 @@ class DBPlain : public Module
 				MemoInfo *mi = &nc->memos;
 				for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
 				{
-					db << "MD MI 0 " << mi->memos[k]->time << " " << mi->memos[k]->sender;
+					db << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
 					if (mi->memos[k]->HasFlag(MF_UNREAD))
 						db << " UNREAD";
 					if (mi->memos[k]->HasFlag(MF_RECEIPT))
@@ -1038,7 +1036,7 @@ class DBPlain : public Module
 
 				for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
 				{
-					db << "MD MI 0 " << memos->memos[k]->time << " " << memos->memos[k]->sender;
+					db << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
 					if (memos->memos[k]->HasFlag(MF_UNREAD))
 						db << " UNREAD";
 					if (memos->memos[k]->HasFlag(MF_RECEIPT))

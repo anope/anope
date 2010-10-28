@@ -42,8 +42,8 @@ class CommandMSCancel : public Command
 			for (i = mi->memos.size() - 1; i >= 0; --i)
 				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
 				{
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]->number));
-					delmemo(mi, mi->memos[i]->number);
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]));
+					mi->Del(mi->memos[i]);
 					u->SendMessage(MemoServ, MEMO_CANCELLED, nname.c_str());
 					return MOD_CONT;
 				}

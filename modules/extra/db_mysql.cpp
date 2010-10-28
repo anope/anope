@@ -815,17 +815,6 @@ class DBMySQL : public Module
 				Memo *m = new Memo();
 				mi->memos.push_back(m);
 				m->sender = r.Get(i, "sender");
-				if (mi->memos.size() > 1)
-				{
-					m->number = mi->memos[mi->memos.size() - 1]->number + 1;
-					if (m->number < 1)
-					{
-						for (unsigned j = 0; j < mi->memos.size(); ++j)
-							mi->memos[j]->number = j + 1;
-					}
-				}
-				else
-					m->number = 1;
 				m->time = r.Get(i, "time").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time")) : Anope::CurTime;
 				m->text = r.Get(i, "text");
 
@@ -1297,30 +1286,30 @@ class DBMySQL : public Module
 
 	void OnMemoSend(User *, NickCore *nc, Memo *m)
 	{
-		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(nc->display) + "', " + stringify(m->number) + ", '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
+		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
+			this->Escape(nc->display) + "', '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'NICK')");
 	}
 
 	void OnMemoSend(User *, ChannelInfo *ci, Memo *m)
 	{
-		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, number, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(ci->name) + "', " + stringify(m->number) + ", '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
+		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
+			this->Escape(ci->name) + "', '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
 	}
 
-	void OnMemoDel(NickCore *nc, MemoInfo *mi, int number)
+	void OnMemoDel(NickCore *nc, MemoInfo *mi, Memo *m)
 	{
-		if (number)
-			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "' AND `number` = " + stringify(number));
+		if (m)
+			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "' AND `time` = " + stringify(m->time));
 		else
 			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "'");
 	}
 
-	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, int number)
+	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m)
 	{
-		if (number)
-			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(ci->name) + "' AND `number` = " + stringify(number));
+		if (m)
+			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(ci->name) + "' AND `time` = " + stringify(m->time));
 		else
 			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(ci->name) + "'");
 	}

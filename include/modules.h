@@ -939,16 +939,18 @@ class CoreExport Module : public virtual Base
 	/** Called when a memo is deleted
 	 * @param nc The nickcore of the memo being deleted
 	 * @param mi The memo info
+	 * @param m The memo
 	 * @param number What memo number is being deleted, can be 0 for all memos
 	 */
-	virtual void OnMemoDel(const NickCore *nc, MemoInfo *mi, int number) { }
+	virtual void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m) { }
 
 	/** Called when a memo is deleted
 	 * @param ci The channel of the memo being deleted
 	 * @param mi The memo info
+	 * @param m The memo
 	 * @param number What memo number is being deleted, can be 0 for all memos
 	 */
-	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, int number) { }
+	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m) { }
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel

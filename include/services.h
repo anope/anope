@@ -477,7 +477,6 @@ enum MemoFlag
 class Memo : public Flags<MemoFlag>
 {
  public:
-	uint32 number;	/* Index number -- not necessarily array position! */
 	time_t time;	/* When it was sent */
 	Anope::string sender;
 	Anope::string text;
@@ -487,6 +486,10 @@ struct MemoInfo
 {
 	unsigned memomax;
 	std::vector<Memo *> memos;
+
+	unsigned GetIndex(Memo *m) const;
+	void Del(unsigned index);
+	void Del(Memo *m);
 };
 
 /*************************************************************************/

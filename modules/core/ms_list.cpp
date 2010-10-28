@@ -46,7 +46,7 @@ class MemoListCallback : public NumberList
 	static void DoList(User *u, ChannelInfo *ci, const MemoInfo *mi, unsigned index)
 	{
 		Memo *m = mi->memos[index];
-		u->SendMessage(MemoServ, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', m->number, m->sender.c_str(), do_strftime(m->time).c_str());
+		u->SendMessage(MemoServ, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
 	}
 };
 

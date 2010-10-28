@@ -191,7 +191,6 @@ CREATE TABLE IF NOT EXISTS `anope_info` (
 
 CREATE TABLE IF NOT EXISTS `anope_ms_info` (
   `receiver` varchar(255) NOT NULL,
-  `number` int(11) NOT NULL DEFAULT '0',
   `flags` int(11) NOT NULL DEFAULT '0',
   `time` int(10) unsigned NOT NULL DEFAULT '0',
   `sender` text NOT NULL,

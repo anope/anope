@@ -29,11 +29,12 @@ class MemoDelCallback : public NumberList
 			return;
 
 		if (ci)
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, Number - 1));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[Number - 1]));
 		else
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, Number - 1));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[Number - 1]));
 
-		delmemo(mi, Number - 1);
+		mi->Del(Number - 1);
+		u->SendMessage(MemoServ, MEMO_DELETED_ONE, Number);
 	}
 };
 
@@ -50,7 +51,6 @@ class CommandMSDel : public Command
 		ChannelInfo *ci = NULL;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
 		unsigned i, end;
-		int last;
 
 		if (!numstr.empty() && numstr[0] == '#')
 		{
@@ -95,21 +95,19 @@ class CommandMSDel : public Command
 			else if (numstr.equals_ci("LAST"))
 			{
 				/* Delete last memo. */
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
-					last = mi->memos[i]->number;
 				if (ci)
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, last));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[mi->memos.size() - 1]));
 				else
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, last));
-				delmemo(mi, last);
-				u->SendMessage(MemoServ, MEMO_DELETED_ONE, last);
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[mi->memos.size() - 1]));
+				mi->Del(mi->memos[mi->memos.size() - 1]);
+				u->SendMessage(MemoServ, MEMO_DELETED_ONE, mi->memos.size() + 1);
 			}
 			else
 			{
 				if (ci)
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, 0));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, NULL));
 				else
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, 0));
+					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, NULL));
 				/* Delete all memos. */
 				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					delete mi->memos[i];
@@ -119,10 +117,6 @@ class CommandMSDel : public Command
 				else
 					u->SendMessage(MemoServ, MEMO_DELETED_ALL);
 			}
-
-			/* Reset the order */
-			for (i = 0, end = mi->memos.size(); i < end; ++i)
-				mi->memos[i]->number = i + 1;
 		}
 		return MOD_CONT;
 	}

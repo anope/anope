@@ -34,9 +34,9 @@ class MemoListCallback : public NumberList
 	{
 		Memo *m = mi->memos[index];
 		if (ci)
-			u->SendMessage(MemoServ, MEMO_CHAN_HEADER, m->number, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), m->number);
+			u->SendMessage(MemoServ, MEMO_CHAN_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
-			u->SendMessage(MemoServ, MEMO_HEADER, m->number, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), m->number);
+			u->SendMessage(MemoServ, MEMO_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), index + 1);
 		u->SendMessage(MemoServ, MEMO_TEXT, m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 

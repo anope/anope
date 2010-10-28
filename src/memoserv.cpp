@@ -12,7 +12,7 @@
 #include "services.h"
 #include "modules.h"
 
-static bool SendMemoMail(NickCore *nc, Memo *m);
+static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m);
 
 /**
  * MemoServ initialization.
@@ -65,7 +65,7 @@ void check_memos(User *u)
 				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
 			}
-			u->SendMessage(MemoServ, MEMO_TYPE_READ_NUM, Config->s_MemoServ.c_str(), nc->memos.memos[i]->number);
+			u->SendMessage(MemoServ, MEMO_TYPE_READ_NUM, Config->s_MemoServ.c_str(), i);
 		}
 		else
 			u->SendMessage(MemoServ, MEMO_TYPE_LIST_NEW, Config->s_MemoServ.c_str());
@@ -215,17 +215,6 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 		Memo *m = new Memo();
 		mi->memos.push_back(m);
 		m->sender = source;
-		if (mi->memos.size() > 1)
-		{
-			m->number = mi->memos[mi->memos.size() - 2]->number + 1;
-			if (m->number < 1)
-			{
-				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
-					mi->memos[i]->number = i + 1;
-			}
-		}
-		else
-			m->number = 1;
 		m->time = Anope::CurTime;
 		m->text = text;
 		m->SetFlag(MF_UNREAD);
@@ -252,19 +241,19 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), m->number);
+							user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						u->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), m->number);
+						u->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
 			/* let's get out the mail if set in the nickcore - certus */
 			if (nc->HasFlag(NI_MEMO_MAIL))
-				SendMemoMail(nc, m);
+				SendMemoMail(nc, mi, m);
 		}
 		else
 		{
@@ -281,7 +270,7 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 					if (check_access(cu->user, c->ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE) && !get_ignore(cu->user->nick))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), m->number);
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
 					}
 				}
 			} /* MSNotifyAll */
@@ -290,38 +279,41 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 }
 
 /*************************************************************************/
-/**
- * Delete a memo by number.
- * @param mi Memoinfo struct
- * @param num Memo number to delete
- * @return int 1 if the memo was found, else 0.
- */
-bool delmemo(MemoInfo *mi, unsigned num)
-{
-	if (mi->memos.empty())
-		return false;
 
-	unsigned i = 0, end = mi->memos.size();
-	for (; i < end; ++i)
-		if (mi->memos[i]->number == num)
-			break;
-	if (i < end)
+unsigned MemoInfo::GetIndex(Memo *m) const
+{
+	for (unsigned i = 0; i < this->memos.size(); ++i)
+		if (this->memos[i] == m)
+			return i;
+	return -1;
+}
+
+void MemoInfo::Del(unsigned index)
+{
+	if (index >= this->memos.size())
+		return;
+	delete this->memos[index];
+	this->memos.erase(this->memos.begin() + index);
+}
+
+void MemoInfo::Del(Memo *memo)
+{
+	std::vector<Memo *>::iterator it = std::find(this->memos.begin(), this->memos.end(), memo);
+
+	if (it != this->memos.end())
 	{
-		delete mi->memos[i]; /* Deallocate the memo itself */
-		mi->memos.erase(mi->memos.begin() + i); /* Remove the memo pointer from the vector */
-		return true;
+		delete memo;
+		this->memos.erase(it);
 	}
-	else
-		return false;
 }
 
 /*************************************************************************/
 
-static bool SendMemoMail(NickCore *nc, Memo *m)
+static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
 	char message[BUFSIZE];
 
-	snprintf(message, sizeof(message), GetString(nc, NICK_MAIL_TEXT).c_str(), nc->display.c_str(), m->sender.c_str(), m->number, m->text.c_str());
+	snprintf(message, sizeof(message), GetString(nc, NICK_MAIL_TEXT).c_str(), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
 
 	return Mail(nc, GetString(nc, MEMO_MAIL_SUBJECT), message);
 }

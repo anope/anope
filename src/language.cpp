@@ -30,9 +30,9 @@ void InitLanguages()
 	}
 
 	if (!bindtextdomain("anope", (services_dir + "/languages/").c_str()))
-	{
 		Log() << "Error calling bindtextdomain, " << Anope::LastError();
-	}
+	else
+		Log(LOG_DEBUG) << "Successfully bound anope to " << services_dir << "/languages/";
 #else
 	Log() << "Can not load languages, gettext is not installed";
 #endif
@@ -60,9 +60,10 @@ const Anope::string GetString(Anope::string language, LanguageString string)
 #if GETTEXT_FOUND
 	++_nl_msg_cat_cntr;
 	setenv("LANGUAGE", language.c_str(), 1);
-	setlocale(LC_ALL, "en_US");
+	setlocale(LC_ALL, language.c_str()); // This is only required by some systems, but must not be C or POSIX
 	const char *ret = dgettext("anope", language_strings[string].c_str());
 	unsetenv("LANGUAGE");
+	setlocale(LC_ALL, "");
 
 	return ret ? ret : "";
 #endif

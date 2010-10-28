@@ -305,9 +305,10 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 	{
 		++_nl_msg_cat_cntr;
 		setenv("LANGUAGE", language.c_str(), 1);
-		setlocale(LC_ALL, "en_US");
+		setlocale(LC_ALL, language.c_str()); // This is only required by some systems, but must not be C or POSIX
 		message = dgettext(this->name.c_str(), fmt);
 		unsetenv("LANGUAGE");
+		setlocale(LC_ALL, "");
 	}
 #endif
 

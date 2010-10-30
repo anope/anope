@@ -359,11 +359,11 @@ class StackerInfo
 	BotInfo *bi;
 
 	/** Add a mode to this object
-	 * @param Mode The mode
+	 * @param mode The mode
 	 * @param Set true if setting, false if unsetting
 	 * @param Param The param for the mode
 	 */
-	void AddMode(Base *Mode, bool Set, const Anope::string &Param);
+	void AddMode(Mode *mode, bool Set, const Anope::string &Param);
 };
 
 /** This is mode manager
@@ -393,12 +393,12 @@ class CoreExport ModeManager
 	/** Really add a mode to the stacker, internal use only
 	 * @param bi The client to set the modes from
 	 * @param Object The object, user/channel
-	 * @param Mode The mode
+	 * @param mode The mode
 	 * @param Set Adding or removing?
 	 * @param Param A param, if there is one
 	 * @param Type The type this is, user or channel
 	 */
-	static void StackerAddInternal(BotInfo *bi, Base *Object, Base *Mode, bool Set, const Anope::string &Param, StackerType Type);
+	static void StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
 	/* List of all modes Anope knows about */

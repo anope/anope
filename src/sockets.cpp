@@ -225,7 +225,7 @@ void SocketIO::Accept(ListenSocket *s)
 {
 	sockaddrs conaddr;
 
-	socklen_t size = conaddr.size();
+	socklen_t size = sizeof(conaddr);
 	int newsock = accept(s->GetFD(), &conaddr.sa, &size);
 
 #ifndef INVALID_SOCKET

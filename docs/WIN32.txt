@@ -91,6 +91,23 @@ Anope for Windows
        If you cannot find whats causing the error, please visit our forums or
        our IRC Support channel for assistance.
 
+       Some Anope modules require third party libraries, such as m_mysql and
+       m_ssl. If these libraries are installed in nonstandard locations, cmake
+       will probably not find them and should be told where they are by passing
+       additional search paths to the last question in Config, such as:
+
+       -DEXTRA_INCLUDES:STRING=c:/openssl/include;c:/openssl/lib
+
+       Which would have cmake search both C:\openssl\include and
+       C:\openssl\lib.
+
+       Building Anope with gettext requires libintl, libiconv, libgcc and
+       libmingex. We have precompiled these libraries for you that you may
+       use if you want, they are avaiable at http://someurlwhichidonthaveXXX.
+       The OpenSSL and MySQL header files and libraries are also included in
+       this package. Once downloaded and extracted, you should pass the include,
+       bin, and lib paths to cmake as seen above.
+
     5) You are now ready to compile. If you said you wanted to use NMake in step 4,
        at the prompt type:
 

@@ -114,7 +114,7 @@ class ClientSocket;
 class ListenSocket;
 class ConnectionSocket;
 
-class SocketIO
+class CoreExport SocketIO
 {
  public:
 	/** Receive something from the buffer
@@ -306,7 +306,7 @@ class CoreExport ListenSocket : public Socket
 	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr);
 };
 
-class ConnectionSocket : public BufferedSocket
+class CoreExport ConnectionSocket : public BufferedSocket
 {
  public:
 	/* Sockaddrs for bindip (if there is one) */

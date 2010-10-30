@@ -207,6 +207,12 @@ else(CMAKE244_OR_BETTER)
   include(TestCXXAcceptsFlag)
 endif(CMAKE244_OR_BETTER)
 
+# If extra directories were specified, tell cmake about them.
+if(EXTRA_INCLUDE)
+  include_directories(${EXTRA_INCLUDE})
+  link_directories(${EXTRA_INCLUDE})
+endif(EXTRA_INCLUDE)
+
 # Find gettext
 find_package(Gettext)
 

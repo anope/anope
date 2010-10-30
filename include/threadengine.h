@@ -17,7 +17,7 @@ class Thread;
 
 extern CoreExport ThreadEngine threadEngine;
 
-class ThreadEngine
+class CoreExport ThreadEngine
 {
  public:
 	/* Vector of threads */
@@ -41,7 +41,7 @@ class ThreadEngine
 	void Process();
 };
 
-class Thread : public Extensible
+class CoreExport Thread : public Extensible
 {
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
@@ -77,7 +77,7 @@ class Thread : public Extensible
 	virtual void Run();
 };
 
-class Mutex
+class CoreExport Mutex
 {
  protected:
 	/* A mutex, used to keep threads in sync */
@@ -101,7 +101,7 @@ class Mutex
 	void Unlock();
 };
 
-class Condition : public Mutex
+class CoreExport Condition : public Mutex
 {
  private:
 	/* A condition */

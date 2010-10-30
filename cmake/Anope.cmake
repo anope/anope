@@ -386,9 +386,9 @@ macro(calculate_depends SRC SKIP)
       if(CHECK_ANGLE_INCLUDES)
         # Find the path of the include file
         if(DEFAULT_INCLUDE_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME} PATHS ${DEFAULT_INCLUDE_DIRS} ${WSDK_PATH}/include $ENV{VCINSTALLDIR}/include)
+          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME} PATHS ${DEFAULT_INCLUDE_DIRS} ${WSDK_PATH}/include $ENV{VCINSTALLDIR}/include ${EXTRA_INCLUDE})
         else(DEFAULT_INCLUDE_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME})
+          find_path(FOUND_${FILENAME}_INCLUDE NAMES ${FILENAME} ${EXTRA_INCLUDE})
         endif(DEFAULT_INCLUDE_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
         # If the include file was found, add it's path to the list of include paths, but only if it doesn't already exist and isn't in the defaults for the compiler
         if(FOUND_${FILENAME}_INCLUDE)
@@ -437,9 +437,9 @@ macro(calculate_libraries SRC SKIP SRC_LDFLAGS EXTRA_DEPENDS)
     foreach(LIBRARY ${REQUIRED_LIBRARY})
       # Locate the library to see if it exists
       if(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib)
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} PATHS ${DEFAULT_LIBRARY_DIRS} ${WSDK_PATH}/lib $ENV{VCINSTALLDIR}/lib ${EXTRA_INCLUDE})
       else(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
-        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY})
+        find_library(FOUND_${LIBRARY}_LIBRARY NAMES ${LIBRARY} ${EXTRA_INCLUDE})
       endif(DEFAULT_LIBRARY_DIRS OR WSDK_PATH OR DEFINED $ENV{VCINSTALLDIR})
       # If the library was found, we will add it to the linker flags
       if(FOUND_${LIBRARY}_LIBRARY)

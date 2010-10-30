@@ -1429,7 +1429,7 @@ static void SaveDatabases()
 
 		for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 		{
-			me->RunQuery("INSERT INTO `anope_ns_access` (display, access) VALUES(" + me->Escape(nc->display) + ", " + me->Escape(*it) + ")");
+			me->RunQuery("INSERT INTO `anope_ns_access` (display, access) VALUES('" + me->Escape(nc->display) + "', '" + me->Escape(*it) + "')");
 		}
 
 		for (unsigned j = 0, end = nc->memos.memos.size(); j < end; ++j)

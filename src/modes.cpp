@@ -441,7 +441,7 @@ void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
 	}
 }
 
-void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
+void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
 {
 	ChannelMode *cm = NULL;
 	UserMode *um = NULL;
@@ -449,13 +449,13 @@ void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
 
 	if (Type == ST_CHANNEL)
 	{
-		cm = debug_cast<ChannelMode *>(Mode);
+		cm = debug_cast<ChannelMode *>(mode);
 		if (cm->Type == MODE_PARAM)
 			IsParam = true;
 	}
 	else if (Type == ST_USER)
 	{
-		um = debug_cast<UserMode *>(Mode);
+		um = debug_cast<UserMode *>(mode);
 		if (um->Type == MODE_PARAM)
 			IsParam = true;
 	}
@@ -478,7 +478,7 @@ void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == Mode && (Param.equals_cs(it->second) || IsParam))
+		if (it->first == mode && (Param.equals_cs(it->second) || IsParam))
 		{
 			list->erase(it);
 			/* It can only be on this list once */
@@ -491,7 +491,7 @@ void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
 		/* The param must match too (can have multiple status or list modes), but
 		 * if it is a param mode it can match no matter what the param is
 		 */
-		if (it->first == Mode && (Param.equals_cs(it->second) || IsParam))
+		if (it->first == mode && (Param.equals_cs(it->second) || IsParam))
 		{
 			otherlist->erase(it);
 			return;
@@ -503,7 +503,7 @@ void StackerInfo::AddMode(Base *Mode, bool Set, const Anope::string &Param)
 	}
 
 	/* Add this mode and its param to our list */
-	list->push_back(std::make_pair(Mode, Param));
+	list->push_back(std::make_pair(mode, Param));
 }
 
 /** Get the stacker info for an item, if one doesnt exist it is created
@@ -549,12 +549,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = debug_cast<ChannelMode *>(it->first);
+			cm = dynamic_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = debug_cast<UserMode *>(it->first);
+			um = dynamic_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -578,12 +578,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = debug_cast<ChannelMode *>(it->first);
+			cm = dynamic_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = debug_cast<UserMode *>(it->first);
+			um = dynamic_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -603,20 +603,20 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 /** Really add a mode to the stacker, internal use only
  * @param bi The client to set the modes from
  * @param Object The object, user/channel
- * @param Mode The mode
+ * @param mode The mode
  * @param Set Adding or removing?
  * @param Param A param, if there is one
  * @param Type The type this is, user or channel
  */
-void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Base *Mode, bool Set, const Anope::string &Param, StackerType Type)
+void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type)
 {
 	StackerInfo *s = GetInfo(Object);
 	s->Type = Type;
-	s->AddMode(Mode, Set, Param);
+	s->AddMode(mode, Set, Param);
 	if (bi)
 		s->bi = bi;
 	else if (Type == ST_CHANNEL)
-		s->bi = whosends(debug_cast<Channel *>(Object)->ci);
+		s->bi = whosends(dynamic_cast<Channel *>(Object)->ci);
 	else if (Type == ST_USER)
 		s->bi = NULL;
 }
@@ -803,9 +803,9 @@ void ModeManager::ProcessModes()
 			Channel *c = NULL;
 
 			if (s->Type == ST_USER)
-				u = debug_cast<User *>(it->first);
+				u = dynamic_cast<User *>(it->first);
 			else if (s->Type == ST_CHANNEL)
-				c = debug_cast<Channel *>(it->first);
+				c = dynamic_cast<Channel *>(it->first);
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 

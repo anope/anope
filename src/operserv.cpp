@@ -494,7 +494,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 
 	Anope::string realreason = reason;
 	if (u && Config->AddAkiller)
-		realreason = "[" + u->nick + "]" + reason;
+		realreason = "[" + u->nick + "] " + reason;
 
 	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, realreason);
 

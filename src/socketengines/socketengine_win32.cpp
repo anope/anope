@@ -26,7 +26,7 @@ class PipeIO : public SocketIO
 	int Recv(Socket *s, char *buf, size_t sz) const
 	{
 		static char dummy[512];
-		return read(s->GetFD(), &dummy, 512);
+		return recv(s->GetFD(), dummy, 512, 0);
 	}
 
 	/** Write something to the socket
@@ -38,7 +38,7 @@ class PipeIO : public SocketIO
 	{
 		static const char dummy = '*';
 		Pipe *pipe = debug_cast<Pipe *>(s);
-		return write(pipe->WritePipe, &dummy, 1);
+		return send(pipe->WritePipe, &dummy, 1, 0);
 	}
 } pipeSocketIO;
 

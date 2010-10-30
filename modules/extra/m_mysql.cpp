@@ -24,21 +24,21 @@ struct QueryRequest
 	/* The connection to the database */
 	MySQLService *service;
 	/* The interface to use once we have the result to send the data back */
-	SQLInterface *interface;
+	SQLInterface *sqlinterface;
 	/* The actual query */
 	Anope::string query;
 
-	QueryRequest(MySQLService *s, SQLInterface *i, const Anope::string &q) : service(s), interface(i), query(q) { }
+	QueryRequest(MySQLService *s, SQLInterface *i, const Anope::string &q) : service(s), sqlinterface(i), query(q) { }
 };
 
 struct QueryResult
 {
 	/* The interface to send the data back on */
-	SQLInterface *interface;
+	SQLInterface *sqlinterface;
 	/* The result */
 	SQLResult result;
 
-	QueryResult(SQLInterface *i, SQLResult &r) : interface(i), result(r) { }
+	QueryResult(SQLInterface *i, SQLResult &r) : sqlinterface(i), result(r) { }
 };
 
 /** A MySQL result
@@ -255,7 +255,7 @@ class ModuleSQL : public Module
 		{
 			QueryRequest &r = this->QueryRequests[i - 1];
 
-			if (r.interface && r.interface->owner == m)
+			if (r.sqlinterface && r.sqlinterface->owner == m)
 			{
 				if (i == 1)
 				{
@@ -290,8 +290,8 @@ MySQLService::~MySQLService()
 
 		if (r.service == this)
 		{
-			if (r.interface)
-				r.interface->OnError(SQLResult("", "SQL Interface is going away"));
+			if (r.sqlinterface)
+				r.sqlinterface->OnError(SQLResult("", "SQL Interface is going away"));
 			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
@@ -377,8 +377,8 @@ void DispatcherThread::Run()
 			this->Lock();
 			if (!me->QueryRequests.empty() && me->QueryRequests.front().query == r.query)
 			{
-				if (r.interface)
-					me->FinishedRequests.push_back(QueryResult(r.interface, sresult));
+				if (r.sqlinterface)
+					me->FinishedRequests.push_back(QueryResult(r.sqlinterface, sresult));
 				me->QueryRequests.pop_front();
 			}
 		}
@@ -401,13 +401,13 @@ void MySQLPipe::OnNotify()
 	{
 		const QueryResult &qr = *it;
 
-		if (!qr.interface)
+		if (!qr.sqlinterface)
 			throw SQLException("NULL qr.interface in MySQLPipe::OnNotify() ?");
 
 		if (qr.result.GetError().empty())
-			qr.interface->OnResult(qr.result);
+			qr.sqlinterface->OnResult(qr.result);
 		else
-			qr.interface->OnError(qr.result);
+			qr.sqlinterface->OnError(qr.result);
 	}
 	me->FinishedRequests.clear();
 

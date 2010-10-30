@@ -1,7 +1,7 @@
 #include "services.h"
 
 #if GETTEXT_FOUND
-# include <libintl.h>
+# include LIBINTL
 # define _(x) gettext(x)
 #else
 # define _(x) x
@@ -38,40 +38,14 @@ void InitLanguages()
 #endif
 }
 
-#if GETTEXT_FOUND
-/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
-extern "C" int _nl_msg_cat_cntr;
-#endif
-const Anope::string GetString(Anope::string language, LanguageString string)
+const Anope::string GetString(const Anope::string &language, LanguageString string)
 {
-#if GETTEXT_FOUND
-	/* For older databases */
-	if (language == "en")
-		language.clear();
-
-	/* Apply def language */
-	if (language.empty() && !Config->NSDefLanguage.empty())
-		language = Config->NSDefLanguage;
-
-	if (language.empty())
-#endif
-		return language_strings[string];
-
-#if GETTEXT_FOUND
-	++_nl_msg_cat_cntr;
-	setenv("LANGUAGE", language.c_str(), 1);
-	setlocale(LC_ALL, language.c_str()); // This is only required by some systems, but must not be C or POSIX
-	const char *ret = dgettext("anope", language_strings[string].c_str());
-	unsetenv("LANGUAGE");
-	setlocale(LC_ALL, "");
-
-	return ret ? ret : "";
-#endif
+	return GetString("anope", language, language_strings[string]);
 }
 
 const Anope::string GetString(LanguageString string)
 {
-	return GetString("", string);
+	return GetString("anope", "", language_strings[string]);
 }
 
 const Anope::string GetString(const NickCore *nc, LanguageString string)
@@ -89,6 +63,53 @@ const Anope::string GetString(const User *u, LanguageString string)
 		na = findnick(u->nick);
 	return GetString(nc ? nc : (na ? na->nc : NULL), string);
 }
+
+#if GETTEXT_FOUND
+/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
+extern "C" int _nl_msg_cat_cntr;
+const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string)
+{
+	if (language == "en")
+		language.clear();
+
+	/* Apply def language */
+	if (language.empty() && !Config->NSDefLanguage.empty())
+		language = Config->NSDefLanguage;
+
+	if (language.empty())
+		return string;
+
+	++_nl_msg_cat_cntr;
+#ifdef _WIN32
+	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(language.c_str()), SUBLANG_DEFAULT), SORT_DEFAULT));
+#else
+	/* First, set LANGUAGE env variable.
+	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL aswell.
+	 * BUT if this call fails because the LANGUAGE env variable is set, setlocale resets
+	 * the locale to "C", which short circuits gettext and causes it to fail on systems that
+	 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not
+	 * C or POSIX) then.
+	 */
+	setenv("LANGUAGE", language.c_str(), 1);
+	if (setlocale(LC_ALL, language.c_str()) == NULL)
+		setlocale(LC_ALL, "en_US");
+#endif
+	const char *ret = dgettext(domain, string.c_str());
+#ifdef _WIN32
+	SetThreadLocale(MAKELCID(MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
+#else
+	unsetenv("LANGUAGE");
+	setlocale(LC_ALL, "");
+#endif
+
+	return ret ? ret : "";
+}
+#else
+const Anope::string GetString(const char *domain, const Anope::string &language, const Anope::string &string)
+{
+	return language_strings[string];
+}
+#endif
 
 void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message)
 {

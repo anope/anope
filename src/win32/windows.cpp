@@ -12,6 +12,36 @@
 #ifdef _WIN32
 #include "services.h"
 
+struct WindowsLanguage
+{
+	const char *languageName;
+	USHORT windowsLanguageName;
+};
+
+WindowsLanguage WindowsLanguages[] = {
+	{"ca_ES", LANG_CATALAN},
+	{"de_DE", LANG_GERMAN},
+	{"el_GR", LANG_GREEK},
+	{"es_ES", LANG_SPANISH},
+	{"fr_FR", LANG_FRENCH},
+	{"hu_HU", LANG_HUNGARIAN},
+	{"it_IT", LANG_ITALIAN},
+	{"nl_NL", LANG_DUTCH},
+	{"pl_PL", LANG_POLISH},
+	{"pt_PT", LANG_PORTUGUESE},
+	{"ru_RU", LANG_RUSSIAN},
+	{"tr_TR", LANG_TURKISH},
+	{NULL, 0}
+};
+
+USHORT WindowsGetLanguage(const char *lang)
+{
+	for (int i = 0; WindowsLanguages[i].languageName; ++i)
+		if (!strcmp(lang, WindowsLanguages[i].languageName))
+			return WindowsLanguages[i].windowsLanguageName;
+	return LANG_NEUTRAL;
+}
+
 /** This is inet_pton, but it works on Windows
  * @param af The protocol type, AF_INET or AF_INET6
  * @param src The address

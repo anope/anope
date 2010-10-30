@@ -19,6 +19,7 @@ Anope Mutli Language Support
     install gettext and run `msginit -l language -o anope.language.po -i anope.pot`. For example if I was translating to
     Spanish I could run `msginit -l es_ES -o anope.es_ES.po -i anope.pot`. Open the newly generating .po file and start
     translating. Once you are done simply rerun ./Config; make && make install and add the language to your services.conf.
+    Note that on Windows it is not quite this simple, windows.cpp must be edited and Anope recompiled and restarted.
 
     Poedit (http://www.poedit.net/) is a popular po file editor, and we recommend using it or another editor designed to edit
     po files (especially on Windows).

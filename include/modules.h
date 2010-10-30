@@ -1223,7 +1223,7 @@ class CallBack : public Timer
 	}
 };
 
-class Service : public virtual Base
+class CoreExport Service : public virtual Base
 {
  public:
 	Module *owner;

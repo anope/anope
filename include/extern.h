@@ -155,10 +155,11 @@ E void pmodule_ircd_var(IRCDVar *ircdvar);
 /**** language.cpp ****/
 E std::vector<Anope::string> languages;
 E void InitLanguages();
-E const Anope::string GetString(Anope::string language, LanguageString string);
+E const Anope::string GetString(const Anope::string &language, LanguageString string);
 E const Anope::string GetString(LanguageString string);
 E const Anope::string GetString(const NickCore *nc, LanguageString string);
 E const Anope::string GetString(const User *u, LanguageString string);
+E const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string);
 E Anope::string language_strings[LANG_STRING_COUNT];
 E void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message);
 
@@ -190,7 +191,7 @@ E void sighandler(int signum);
 E void do_restart_services();
 
 /* The socket to our uplink */
-class UplinkSocket : public ConnectionSocket
+class CoreExport UplinkSocket : public ConnectionSocket
 {
  public:
 	UplinkSocket(bool ipv6 = false);

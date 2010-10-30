@@ -320,9 +320,10 @@ echo ""
 
 ####
 
-echo "Are there any extra arguments you wish to pass to $BUILD_SYSTEM?"
-echo "(You may only need to do this if $BUILD_SYSTEM is unable to locate"
-echo "missing dependencies without hints)"
+echo "Are there any extra arguments you wish to pass to cmake?"
+echo "You may only need to do this if cmake is unable to locate"
+echo "missing dependencies without hints."
+echo "You can do this by: -DEXTRA_INCLUDE:STRING=/path/to/files;/path/to/more/files"
 echo2 "[$EXTRA_CONFIG_ARGS] "
 if read INPUT ; then : ; else echo "" ; exit 1 ; fi
 if [ "$INPUT" ] ; then

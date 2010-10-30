@@ -81,6 +81,7 @@
 # define unsetenv(x) SetEnvironmentVariable(x, NULL)
 # define MARK_DEPRECATED
 
+extern CoreExport USHORT WindowsGetLanguage(const char *lang);
 extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
 #endif
@@ -482,7 +483,7 @@ class Memo : public Flags<MemoFlag>
 	Anope::string text;
 };
 
-struct MemoInfo
+struct CoreExport MemoInfo
 {
 	unsigned memomax;
 	std::vector<Memo *> memos;

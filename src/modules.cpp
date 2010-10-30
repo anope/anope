@@ -12,10 +12,6 @@
 #include "modules.h"
 #include "version.h"
 
-#if GETTEXT_FOUND
-# include <libintl.h>
-#endif
-
 message_map MessageMap;
 std::list<Module *> Modules;
 
@@ -286,36 +282,16 @@ Version Module::GetVersion() const
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
-#if GETTEXT_FOUND
-/* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
-extern "C" int _nl_msg_cat_cntr;
-#endif
 void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 {
 	Anope::string language = (to && to->Account() ? to->Account()->language : "");
-	/* For older databases */
-	if (language == "en")
-		language.clear();
-	if (language.empty() && !Config->NSDefLanguage.empty())
-		language = Config->NSDefLanguage;
-
-	const char *message = fmt;
-#if GETTEXT_FOUND
-	if (!language.empty())
-	{
-		++_nl_msg_cat_cntr;
-		setenv("LANGUAGE", language.c_str(), 1);
-		setlocale(LC_ALL, language.c_str()); // This is only required by some systems, but must not be C or POSIX
-		message = dgettext(this->name.c_str(), fmt);
-		unsetenv("LANGUAGE");
-		setlocale(LC_ALL, "");
-	}
-#endif
+	
+	Anope::string message = GetString(this->name.c_str(), language, fmt);
 
 	va_list args;
 	char buf[4096];
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf) - 1, message, args);
+	vsnprintf(buf, sizeof(buf) - 1, message.c_str(), args);
 	va_end(args);
 
 	sepstream sep(buf, '\n');

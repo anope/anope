@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 12, 2010 at 06:36 PM
+-- Generation Time: Oct 31, 2010 at 03:02 AM
 -- Server version: 5.1.50
--- PHP Version: 5.2.14-pl0-gentoo
+-- PHP Version: 5.3.3-pl1-gentoo
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -170,6 +170,21 @@ CREATE TABLE IF NOT EXISTS `anope_cs_ttb` (
 
 CREATE TABLE IF NOT EXISTS `anope_extra` (
   `data` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `anope_hs_core`
+--
+
+CREATE TABLE IF NOT EXISTS `anope_hs_core` (
+  `nick` varchar(255) NOT NULL,
+  `vident` varchar(64) NOT NULL,
+  `vhost` varchar(255) NOT NULL,
+  `creator` varchar(255) NOT NULL,
+  `time` int(11) NOT NULL,
+  KEY `FK_anope_hs_core_nick` (`nick`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -358,8 +373,8 @@ CREATE TABLE IF NOT EXISTS `anope_os_xlines` (
 -- Constraints for table `anope_bs_badwords`
 --
 ALTER TABLE `anope_bs_badwords`
-  ADD CONSTRAINT `FK_anope_bs_badwords_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE 
-CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_bs_badwords_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE 
+ON UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_bs_info_metadata`
@@ -372,15 +387,15 @@ CASCADE ON UPDATE CASCADE;
 -- Constraints for table `anope_cs_access`
 --
 ALTER TABLE `anope_cs_access`
-  ADD CONSTRAINT `FK_anope_cs_access_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE 
-ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_cs_access_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE ON 
+UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_cs_akick`
 --
 ALTER TABLE `anope_cs_akick`
-  ADD CONSTRAINT `FK_anope_cs_akick_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE 
-ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_cs_akick_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE ON 
+UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_cs_info_metadata`
@@ -393,8 +408,8 @@ CASCADE ON UPDATE CASCADE;
 -- Constraints for table `anope_cs_levels`
 --
 ALTER TABLE `anope_cs_levels`
-  ADD CONSTRAINT `FK_anope_cs_levels_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE 
-ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_cs_levels_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE ON 
+UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_cs_ttb`
@@ -404,30 +419,37 @@ ALTER TABLE `anope_cs_ttb`
 UPDATE CASCADE;
 
 --
+-- Constraints for table `anope_hs_core`
+--
+ALTER TABLE `anope_hs_core`
+  ADD CONSTRAINT `FK_anope_hs_core_nick` FOREIGN KEY (`nick`) REFERENCES `anope_ns_alias` (`nick`) ON DELETE CASCADE ON UPDATE 
+CASCADE;
+
+--
 -- Constraints for table `anope_ms_info`
 --
 ALTER TABLE `anope_ms_info`
-  ADD CONSTRAINT `FK_anope_ms_info_receiver` FOREIGN KEY (`receiver`) REFERENCES `anope_ns_alias` (`nick`) ON DELETE CASCADE 
-ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_ms_info_receiver` FOREIGN KEY (`receiver`) REFERENCES `anope_ns_alias` (`nick`) ON DELETE CASCADE ON 
+UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_ns_access`
 --
 ALTER TABLE `anope_ns_access`
-  ADD CONSTRAINT `FK_anope_ns_access_display` FOREIGN KEY (`display`) REFERENCES `anope_ns_core` (`display`) ON DELETE 
-CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_ns_access_display` FOREIGN KEY (`display`) REFERENCES `anope_ns_core` (`display`) ON DELETE CASCADE 
+ON UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_ns_alias`
 --
 ALTER TABLE `anope_ns_alias`
-  ADD CONSTRAINT `FK_anope_ns_alias_display` FOREIGN KEY (`display`) REFERENCES `anope_ns_core` (`display`) ON DELETE 
-CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_ns_alias_display` FOREIGN KEY (`display`) REFERENCES `anope_ns_core` (`display`) ON DELETE CASCADE 
+ON UPDATE CASCADE;
 
 --
 -- Constraints for table `anope_ns_alias_metadata`
 --
 ALTER TABLE `anope_ns_alias_metadata`
-  ADD CONSTRAINT `FK_anope_ns_alias_metadata_nick` FOREIGN KEY (`nick`) REFERENCES `anope_ns_alias` (`nick`) ON DELETE 
-CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `FK_anope_ns_alias_metadata_nick` FOREIGN KEY (`nick`) REFERENCES `anope_ns_alias` (`nick`) ON DELETE CASCADE 
+ON UPDATE CASCADE;
 

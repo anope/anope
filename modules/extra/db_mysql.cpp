@@ -410,9 +410,11 @@ class DBMySQL : public Module
 			I_OnMemoSend, I_OnMemoDel,
 			/* OperServ */
 			I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
-			I_OnAddXLine, I_OnDelXLine
+			I_OnAddXLine, I_OnDelXLine,
+			/* HostServ */
+			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 39);
+		ModuleManager::Attach(i, this, 41);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -523,6 +525,20 @@ class DBMySQL : public Module
 			EventReturn MOD_RESULT;
 			std::vector<Anope::string> Params = MakeVector(r.Get(i, "value"));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, na->nick, Params));
+		}
+
+		r = SQL->RunQuery("SELECT * FROM `anope_hs_core`");
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			NickAlias *na = findnick(r.Get(i, "nick"));
+			if (!na)
+			{
+				Log() << "MySQL: Got vhost entry for nonexistant nick " << r.Get(i, "nick");
+				continue;
+			}
+
+			time_t creation = r.Get(i, "time").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time")) : Anope::CurTime;
+			na->hostinfo.SetVhost(r.Get(i, "vident"), r.Get(i, "vhost"), r.Get(i, "creator"), creation);
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_bs_core`");
@@ -1360,6 +1376,16 @@ class DBMySQL : public Module
 		else
 			this->RunQuery(Anope::string("DELETE FROM `anope_os_xlines` WHERE `type` = '") + (Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) + "'");
 	}
+
+	void OnDeleteVhost(NickAlias *na)
+	{
+		this->RunQuery("DELETE FROM `anope_hs_core` WHERE `nick` = '" + na->nick + "'");
+	}
+
+	void OnSetVhost(NickAlias *na)
+	{
+		this->RunQuery("INSERT INTO `anope_hs_core` (nick, vident, vhost, creator, time) VALUES('" + na->nick + "', '" + na->hostinfo.GetIdent() + "', '" + na->hostinfo.GetHost() + "', '" + na->hostinfo.GetCreator() + "', " + stringify(na->hostinfo.GetTime()) + ")");
+	}
 };
 
 void MySQLInterface::OnResult(const SQLResult &r)
@@ -1418,7 +1444,11 @@ static void SaveDatabases()
 	me->RunQuery("TRUNCATE TABLE `anope_ns_alias`");
 
 	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+	{
 		me->InsertAlias(it->second);
+		if (it->second->hostinfo.HasVhost())
+			me->OnSetVhost(it->second);
+	}
 
 	me->RunQuery("TRUNCATE TABLE `anope_ns_core`");
 	me->RunQuery("TRUNCATE TABLE `anope_ms_info`");

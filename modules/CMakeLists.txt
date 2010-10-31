@@ -68,7 +68,13 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           endif(MSVC)
           # Generate the module and set it's linker flags, also set it to depend on the main Anope executable to be built beforehand
           add_library(${SO} MODULE ${SRC})
-          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${TEMP_LDFLAGS} /nodefaultlib:\"libcmt.lib\"")
+          # Windows requires this because it's weird
+          if(WIN32)
+            set(WIN32_NO_LIBS "/nodefaultlib:\"libcmt.lib\"")
+          else(WIN32)
+            set(WIN32_NO_LIBS)
+          endif(WIN32)
+          set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}")
           add_dependencies(${SO} ${PROGRAM_NAME})
           # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
           if(WIN32)

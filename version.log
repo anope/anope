@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3045"
+VERSION_BUILD="3046"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3046 - Fixed bug #1202 - Made Anope aware of plexus3's channel mode +z
 #Revision 3045 - Fixed some improper english in the HOST_GROUP language strings
 #Revision 3044 - Fixed a potential crash from accessing invalid memory after unbanning people when checking whether a host is akick stuck. Fixes /cs unban not reapplying stuck ban masks.
 #Revision 3043 - Fixed /nickserv saset display to change the nicktracking of the users affected by it, not the user executing it

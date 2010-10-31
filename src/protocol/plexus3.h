@@ -36,8 +36,9 @@
 #define CMODE_N 0x00010000
 #define CMODE_B 0x00020000
 #define CMODE_S 0x00040000
+#define CMODE_z 0x00080000
 
-#define DEFAULT_MLOCK CMODE_n | CMODE_t
+#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_z
 
 void plexus_set_umode(User * user, int ac, char **av);
 void plexus_cmd_svsnoop(char *server, int set);

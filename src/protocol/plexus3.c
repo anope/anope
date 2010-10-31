@@ -68,8 +68,8 @@ IRCDVar myIrcd[] = {
    0,				/* SVSMODE unban        */
    1,				/* Has Protect          */
    0,				/* Reverse              */
-   0,				/* Chan Reg             */
-   0,				/* Channel Mode         */
+   1,				/* Chan Reg             */
+   CMODE_z,			/* Channel Mode         */
    0,				/* vidents              */
    1,				/* svshold              */
    1,				/* time stamp on mode   */
@@ -406,7 +406,7 @@ CBMode myCbmodes[128] = {
   {0},				/* w */
   {0},				/* x */
   {0},				/* y */
-  {0},				/* z */
+  {CMODE_z, CBM_NO_MLOCK, NULL, NULL},	/* z */
   {0}, {0}, {0}, {0}
 };
 
@@ -420,6 +420,7 @@ CBModeInfo myCbmodeinfos[] = {
   {'p', CMODE_p, 0, NULL, NULL},
   {'s', CMODE_s, 0, NULL, NULL},
   {'t', CMODE_t, 0, NULL, NULL},
+  {'z', CMODE_z, 0, NULL, NULL},
   {'B', CMODE_B, 0, NULL, NULL},
   {'M', CMODE_M, 0, NULL, NULL},
   {'N', CMODE_N, 0, NULL, NULL},
@@ -1858,7 +1859,7 @@ AnopeInit (int argc, char **argv)
   pmodule_private_cmode (CMODE_p);
   pmodule_key_mode (CMODE_k);
   pmodule_limit_mode (CMODE_l);
-  pmodule_permchan_mode(0);
+  pmodule_permchan_mode(CMODE_z);
 
   moduleAddAnopeCmds ();
   moduleAddIRCDMsgs ();

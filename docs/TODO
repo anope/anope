@@ -18,7 +18,6 @@ Legend:
 [x] Language system is disgusting, it must die.
   [x] Modules should also have a way to add strings programatically
   [x] Should be able to add many strings by dropping a file in a set location.
-[+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [x] Config bailing on /os reload needs to be non fatal
 [x] AutoID needs to be able to live through /os restart, current system is just annoying.
 [x] SQL tables need to changed to have references etc
@@ -26,10 +25,11 @@ Legend:
 [x] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
 [?] Remote identification
 [x] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
-[ ] Store vhosts in SQL.
+[x] Store vhosts in SQL.
 
 Future
 ------
+[+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [ ] XMLRPC to execute commands and get data from Anope
 [ ] NS IDENTIFY changes
   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried

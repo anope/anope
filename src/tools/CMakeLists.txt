@@ -15,11 +15,6 @@ foreach(SRC ${TOOLS_SRCS})
   calculate_depends(${SRC} SKIP)
   # Only continue if this file isn't skipped
   if(NOT SKIP)
-    # For anoptsmtp, we also want base.cpp and hashcomp.cpp included, so we force it into the sources
-    if(SRC STREQUAL anopesmtp.cpp)
-      set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/base.cpp)
-      set(SRC ${SRC} ${Anope_SOURCE_DIR}/src/hashcomp.cpp)
-    endif(SRC STREQUAL anopesmtp.cpp)
     # Generate the executable and set its linker flags, also set it to depend on the main Anope executable to be built beforehand
     add_executable(${EXE} ${SRC})
     set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")

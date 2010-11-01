@@ -12,14 +12,91 @@
  * *nix port by Trystan Scott Lee <trystan@nomadirc.net>
  */
 
-#include "smtp.h"
+#include "sysconf.h"
 
-static FILE *logfile;
-static int curday = 0;
+/* Some Linux boxes (or maybe glibc includes) require this for the
+ * prototype of strsignal(). */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
+#include <string>
+#include <vector>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cerrno>
+#include <iostream>
+#include <fstream>
+
+#ifndef _WIN32
+# include <unistd.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <sys/socket.h>
+# include <arpa/inet.h>
+# include <sys/time.h>
+#else
+# include <winsock.h>
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+#endif
+
+#include <sys/types.h>
+
+#ifdef _AIX
+extern int strcasecmp(const char *, const char *);
+extern int strncasecmp(const char *, const char *, size_t);
+# if 0 /* These break on some AIX boxes (4.3.1 reported). */
+extern int socket(int, int, int);
+extern int connect(int, struct sockaddr *, int);
+# endif
+#endif /* _AIX */
+
+/* Some SUN fixs */
+#ifdef __sun
+/* Solaris specific code, types that do not exist in Solaris'
+ *  * sys/types.h
+ *   **/
+# ifndef INADDR_NONE
+#  define INADDR_NONE (-1)
+# endif
+#endif
 
 /*************************************************************************/
 
-static int get_logname(std::string &name, struct tm *tm = NULL)
+#ifdef _WIN32
+typedef SOCKET ano_socket_t;
+#define ano_sockclose(fd) closesocket(fd)
+#define ano_sockread(fd, buf, len) recv(fd, buf, len, 0)
+#define ano_sockwrite(fd, buf, len) send(fd, buf, len, 0)
+#else
+typedef int ano_socket_t;
+#define ano_sockclose(fd) close(fd)
+#define ano_sockread(fd, buf, len) read(fd, buf, len)
+#define ano_sockwrite(fd, buf, len) write(fd, buf, len)
+#define SOCKET_ERROR -1
+#endif
+
+/* Data structures */
+struct smtp_message
+{
+	std::vector<std::string> smtp_headers;
+	std::vector<std::string> smtp_body;
+	std::string from;
+	std::string to;
+	ano_socket_t sock;
+};
+
+
+/* set this to 1 if you want to get a log otherwise it runs silent */
+int smtp_debug = 0;
+
+struct smtp_message smail;
+
+static const char *get_logname(struct tm *tm = NULL)
 {
 	char timestamp[32];
 
@@ -30,71 +107,9 @@ static int get_logname(std::string &name, struct tm *tm = NULL)
 	}
 
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-	name = std::string("logs/anopesmtp.") + timestamp;
-	curday = tm->tm_yday;
-
-	return 1;
+	std::string name = std::string("logs/anopesmtp.") + timestamp;
+	return name.c_str();
 }
-
-/*************************************************************************/
-
-/* Close the log file. */
-
-void close_log()
-{
-	if (!logfile)
-		return;
-	fclose(logfile);
-	logfile = NULL;
-}
-
-/*************************************************************************/
-
-static void remove_log()
-{
-	time_t t = time(NULL);
-	t -= 2592000; // 30 days ago
-	struct tm *tm = localtime(&t);
-
-	std::string name;
-	if (!get_logname(name, tm))
-		return;
-	unlink(name.c_str());
-}
-
-/*************************************************************************/
-
-/* Open the log file.  Return -1 if the log file could not be opened, else
- * return 0. */
-
-int open_log()
-{
-	if (logfile)
-		return 0;
-
-	std::string name;
-	if (!get_logname(name))
-		return 0;
-	logfile = fopen(name.c_str(), "w");
-	return logfile ? 0 : -1;
-}
-
-/*************************************************************************/
-
-static void checkday()
-{
-	time_t t = time(NULL);
-	struct tm *tm = localtime(&t);
-
-	if (curday != tm->tm_yday)
-	{
-		close_log();
-		remove_log();
-		open_log();
-	}
-}
-
-/*************************************************************************/
 
 /* Log stuff to the log file with a datestamp.  Note that errno is
  * preserved by this routine and log_perror().
@@ -102,14 +117,13 @@ static void checkday()
 
 void alog(const char *fmt, ...)
 {
-	int errno_save = errno;
-
-	if (!smtp_debug)
+	if (!smtp_debug || !fmt)
 		return;
 
-	checkday();
+	std::fstream file;
+	file.open(get_logname(), std::ios_base::out);
 
-	if (!fmt)
+	if (!file.is_open())
 		return;
 
 	va_list args;
@@ -120,22 +134,21 @@ void alog(const char *fmt, ...)
 
 	char buf[256];
 	strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", tm);
-	if (logfile)
-	{
-		fputs(buf, logfile);
-		vfprintf(logfile, fmt, args);
-		fputc('\n', logfile);
-	}
+	file << buf;
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	file << buf << std::endl;
 	va_end(args);
-	errno = errno_save;
+	va_end(args);
+
+	file.close();
 }
 
 /*************************************************************************/
 
 /* Remove a trailing \r\n */
-ci::string strip(const ci::string &buf)
+std::string strip(const std::string &buf)
 {
-	ci::string newbuf = buf;
+	std::string newbuf = buf;
 	char c = newbuf[newbuf.size() - 1];
 	while (c == '\n' || c == '\r')
 	{
@@ -148,14 +161,14 @@ ci::string strip(const ci::string &buf)
 /*************************************************************************/
 
 /* Is the buffer a header? */
-bool smtp_is_header(const ci::string &buf)
+bool smtp_is_header(const std::string &buf)
 {
 	size_t tmp = buf.find(' ');
 
-	if (tmp == ci::string::npos)
+	if (tmp == std::string::npos)
 		return false;
 
-	if (buf[tmp + 1] == ':')
+	if (tmp > 0 && buf[tmp - 1] == ':')
 		return true;
 	return false;
 }
@@ -163,12 +176,12 @@ bool smtp_is_header(const ci::string &buf)
 /*************************************************************************/
 
 /* Parse a header into a name and value */
-void smtp_parse_header(const ci::string &buf, ci::string &header, ci::string &value)
+void smtp_parse_header(const std::string &buf, std::string &header, std::string &value)
 {
-	ci::string newbuf = strip(buf);
+	std::string newbuf = strip(buf);
 
 	size_t space = newbuf.find(' ');
-	if (space != ci::string::npos)
+	if (space != std::string::npos)
 	{
 		header = newbuf.substr(0, space);
 		value = newbuf.substr(space + 1);
@@ -183,7 +196,7 @@ void smtp_parse_header(const ci::string &buf, ci::string &header, ci::string &va
 /*************************************************************************/
 
 /* Have we reached the end of input? */
-bool smtp_is_end(const ci::string &buf)
+bool smtp_is_end(const std::string &buf)
 {
 	if (buf[0] == '.')
 		if (buf[1] == '\r' || buf[1] == '\n')
@@ -195,14 +208,14 @@ bool smtp_is_end(const ci::string &buf)
 /*************************************************************************/
 
 /* Set who the email is to */
-void smtp_set_to(const ci::string &to)
+void smtp_set_to(const std::string &to)
 {
-	mail.to = to;
-	size_t c = mail.to.rfind('<');
-	if (c != ci::string::npos && c + 1 < mail.to.size())
+	smail.to = to;
+	size_t c = smail.to.rfind('<');
+	if (c != std::string::npos && c + 1 < smail.to.size())
 	{
-		mail.to = mail.to.substr(c + 1);
-		mail.to.erase(mail.to.end() - 1);
+		smail.to = smail.to.substr(c + 1);
+		smail.to.erase(smail.to.end() - 1);
 	}
 }
 
@@ -213,7 +226,7 @@ int smtp_connect(const char *host, unsigned short port)
 {
 	struct sockaddr_in addr;
 
-	if ((mail.sock = socket(AF_INET, SOCK_STREAM, 0)) == SOCKET_ERROR)
+	if ((smail.sock = socket(AF_INET, SOCK_STREAM, 0)) == SOCKET_ERROR)
 		return 0;
 
 	if ((addr.sin_addr.s_addr = inet_addr(host)) == INADDR_NONE)
@@ -225,9 +238,9 @@ int smtp_connect(const char *host, unsigned short port)
 	}
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port ? port : 25);
-	if (connect(mail.sock, reinterpret_cast<struct sockaddr *>(&addr), sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+	if (connect(smail.sock, reinterpret_cast<struct sockaddr *>(&addr), sizeof(struct sockaddr_in)) == SOCKET_ERROR)
 	{
-		ano_sockclose(mail.sock);
+		ano_sockclose(smail.sock);
 		return 0;
 	}
 
@@ -239,12 +252,12 @@ int smtp_connect(const char *host, unsigned short port)
 /* Send a line of text */
 int smtp_send(const char *text)
 {
-	int result = ano_sockwrite(mail.sock, text, strlen(text));
+	int result = ano_sockwrite(smail.sock, text, strlen(text));
 
 	alog("SMTP: sent %s",text);
 
 	if (result == SOCKET_ERROR)
-		ano_sockclose(mail.sock);
+		ano_sockclose(smail.sock);
 
 	return result;
 }
@@ -257,10 +270,10 @@ int smtp_read(char *buf, int len)
 	int result;
 
 	memset(buf, 0, len);
-	result = ano_sockread(mail.sock, buf, len);
+	result = ano_sockread(smail.sock, buf, len);
 
 	if (result == SOCKET_ERROR)
-		ano_sockclose(mail.sock);
+		ano_sockclose(smail.sock);
 
 	return result;
 }
@@ -272,10 +285,10 @@ int smtp_get_code(const std::string &text)
 {
 	size_t tmp = text.find(' ');
 
-	if (tmp == ci::string::npos)
+	if (tmp == std::string::npos)
 		return 0;
 
-	return atol(text.c_str());
+	return atol(text.substr(0, tmp).c_str());
 }
 
 /*************************************************************************/
@@ -317,7 +330,7 @@ int smtp_send_email()
 	}
 
 	strcpy(buf, "MAIL FROM: <");
-	strcat(buf, mail.from.c_str());
+	strcat(buf, smail.from.c_str());
 	strcat(buf, ">\r\n");
 
 	if (!smtp_send(buf))
@@ -337,7 +350,7 @@ int smtp_send_email()
 		return 0;
 
 	strcpy(buf, "RCPT TO: <");
-	strcat(buf, mail.to.c_str());
+	strcat(buf, smail.to.c_str());
 	strcat(buf, ">\r\n");
 
 	if (!smtp_send(buf))
@@ -378,7 +391,7 @@ int smtp_send_email()
 		return 0;
 	}
 
-	for (std::vector<ci::string>::const_iterator it = mail.smtp_headers.begin(), it_end = mail.smtp_headers.end(); it != it_end; ++it)
+	for (std::vector<std::string>::const_iterator it = smail.smtp_headers.begin(), it_end = smail.smtp_headers.end(); it != it_end; ++it)
 		if (!smtp_send(it->c_str()))
 		{
 			alog("SMTP: error writting to socket");
@@ -392,7 +405,7 @@ int smtp_send_email()
 	}
 
 	bool skip_done = false;
-	for (std::vector<ci::string>::const_iterator it = mail.smtp_body.begin(), it_end = mail.smtp_body.end(); it != it_end; ++it)
+	for (std::vector<std::string>::const_iterator it = smail.smtp_body.begin(), it_end = smail.smtp_body.end(); it != it_end; ++it)
 		if (skip_done)
 		{
 			if (!smtp_send(it->c_str()))
@@ -418,19 +431,7 @@ int smtp_send_email()
 void smtp_disconnect()
 {
 	smtp_send("QUIT\r\n");
-	ano_sockclose(mail.sock);
-}
-
-/*************************************************************************/
-
-void mail_cleanup()
-{
-	mail.from.clear();
-	mail.to.clear();
-
-	mail.smtp_headers.clear();
-
-	mail.smtp_body.clear();
+	ano_sockclose(smail.sock);
 }
 
 /*************************************************************************/
@@ -461,8 +462,6 @@ int main(int argc, char *argv[])
 	else
 		alog("SMTP: server %s port %d",server,port);
 
-	memset(&mail, 0, sizeof(mail));
-
 	/* The WSAStartup function initiates use of WS2_32.DLL by a process. */
 	/* guessing we can skip it under *nix */
 #ifdef _WIN32
@@ -477,15 +476,15 @@ int main(int argc, char *argv[])
 	{
 		if (smtp_is_header(buf) && !headers_done)
 		{
-			mail.smtp_headers.push_back(strip(buf) + "\r\n");
-			ci::string header, value;
+			smail.smtp_headers.push_back(strip(buf) + "\r\n");
+			std::string header, value;
 			smtp_parse_header(buf, header, value);
-			if (header == "from")
+			if (header == "From:")
 			{
 				alog("SMTP: from: %s", value.c_str());
-				mail.from = value;
+				smail.from = value;
 			}
-			else if (header == "to")
+			else if (header == "To:")
 			{
 				alog("SMTP: to: %s", value.c_str());
 				smtp_set_to(value);
@@ -495,27 +494,24 @@ int main(int argc, char *argv[])
 			else
 			{
 				headers_done = true;
-				mail.smtp_body.push_back(strip(buf) + "\r\n");
+				smail.smtp_body.push_back(strip(buf) + "\r\n");
 			}
 		}
 		else
-			mail.smtp_body.push_back(strip(buf) + "\r\n");
+			smail.smtp_body.push_back(strip(buf) + "\r\n");
 	}
 
 	if (!smtp_connect(server, port))
 	{
 		alog("SMTP: failed to connect to %s:%d", server, port);
-		mail_cleanup();
 		return 0;
 	}
 	if (!smtp_send_email())
 	{
 		alog("SMTP: error during sending of mail");
-		mail_cleanup();
 		return 0;
 	}
 	smtp_disconnect();
-	mail_cleanup();
 
 	return 1;
 }

@@ -253,11 +253,6 @@ void User::SendMessage(BotInfo *source, LanguageString message, ...) const
 
 	Anope::string m = GetString(this, message);
 
-	if (Config->UseStrictPrivMsg)
-		m = m.replace_all_cs("%R", "/");
-	else
-		m = m.replace_all_cs("%R", "/msg ");
-
 	m = m.replace_all_cs("%S", source->nick);
 
 	if (m.length() >= 4096)

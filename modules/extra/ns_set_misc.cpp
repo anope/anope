@@ -18,8 +18,12 @@ class CommandNSSetMisc : public Command
  private:
 	Anope::string Desc;
 
- protected:
-	CommandReturn RealExecute(User *u, const std::vector<Anope::string> &params)
+ public:
+	CommandNSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(desc)
+	{
+	}
+
+	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
 		if (!na)
@@ -38,18 +42,6 @@ class CommandNSSetMisc : public Command
 		return MOD_CONT;
 	}
 
- public:
-	CommandNSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 0, 1, cpermission), Desc(desc)
-	{
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		std::vector<Anope::string> realparams = params;
-		realparams.insert(realparams.begin(), u->Account()->display);
-		return RealExecute(u, realparams);
-	}
-
 	void OnSyntaxError(User *u, const Anope::string &)
 	{
 		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
@@ -66,13 +58,6 @@ class CommandNSSASetMisc : public CommandNSSetMisc
  public:
 	CommandNSSASetMisc(const Anope::string &cname, const Anope::string &desc) : CommandNSSetMisc(cname, desc, "nickserv/saset/" + cname)
 	{
-		this->MinParams = 1;
-		this->MaxParams = 2;
-	}
-
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
-	{
-		return RealExecute(u, params);
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &)

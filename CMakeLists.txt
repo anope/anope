@@ -474,9 +474,6 @@ if(WIN32)
   install(FILES ${Anope_SOURCE_DIR}/src/win32/anope.bat
     DESTINATION bin
   )
-  install(FILES ${Anope_SOURCE_DIR}/docs/Changes ${Anope_SOURCE_DIR}/docs/Changes.conf ${Anope_SOURCE_DIR}/docs/Changes.lang
-    DESTINATION .
-  )
 endif(WIN32)
 
 # Only process the CPack section if we have CPack

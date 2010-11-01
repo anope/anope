@@ -112,9 +112,9 @@ const Anope::string GetString(const char *domain, Anope::string language, const 
 	return translated;
 }
 #else
-const Anope::string GetString(const char *domain, const Anope::string &language, const Anope::string &string)
+const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string)
 {
-	return language_strings[string];
+	return string;
 }
 #endif
 
@@ -4671,7 +4671,6 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	"Sets various global Services options.  Option names\n"
 	"currently defined are:\n"
 	"    READONLY   Set read-only or read-write mode\n"
-	"    LOGCHAN    Report log messages to a channel\n"
 	"    DEBUG      Activate or deactivate debug mode\n"
 	"    NOEXPIRE   Activate or deactivate no expire mode\n"
 	"    SUPERADMIN Activate or deactivate super-admin mode\n"

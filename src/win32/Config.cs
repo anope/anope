@@ -220,7 +220,8 @@ namespace Config
 				if (CacheResponse != null && (InstallerResponse == null || InstallerResponse.Length < 1))
 					InstallerResponse = CacheResponse;
 
-				if (InstallerResponse == null || InstallerResponse.Length < 1)
+				// Question 4 is optional
+				if (i != 4 && (InstallerResponse == null || InstallerResponse.Length < 1))
 				{
 					Console.WriteLine("Invlaid option");
 					--i;

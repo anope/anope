@@ -53,7 +53,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
       set(SKIP_LIBRARIES)
       # Calculate the library dependencies for the given source file
       calculate_libraries(${SRC} SKIP_LIBRARIES TEMP_LDFLAGS TEMP_DEPENDENCIES)
-      if(NOT SKIP AND NOT SKIP_LIBRARIES)
+      if(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
         # Reset has_function
         set(HAS_FUNCTION)
         # Check the function dependencies for the given source file
@@ -86,7 +86,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             DESTINATION data/modules
           )
         endif(HAS_FUNCTION)
-      endif(NOT SKIP AND NOT SKIP_LIBRARIES)
+      endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
     endforeach(SRC)
 
     # Get a list of ALL files and directories within this modules directory

@@ -365,12 +365,12 @@ endmacro(find_includes)
 #   header file dependencies for the given source file.
 ###############################################################################
 macro(calculate_depends SRC SKIP)
-  # Temporarily set that we didn't get a 2nd argument before we actually check if we did get one or not
+  # Temporarily set that we didn't get a 3nd argument before we actually check if we did get one or not
   set(CHECK_ANGLE_INCLUDES FALSE)
-  # Check for a second argument
-  if(${ARGC} GREATER 1)
+  # Check for a third argument
+  if(${ARGC} GREATER 2)
     set(CHECK_ANGLE_INCLUDES TRUE)
-  endif(${ARGC} GREATER 1)
+  endif(${ARGC} GREATER 2)
   # Find all the lines in the given source file that have any form of #include on them, regardless of whitespace, but only if they are valid for the platform we are on
   find_includes(${SRC} INCLUDES)
   # Reset the list of headers to empty

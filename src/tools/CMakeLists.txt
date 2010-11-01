@@ -19,6 +19,10 @@ foreach(SRC ${TOOLS_SRCS})
     add_executable(${EXE} ${SRC})
     set_target_properties(${EXE} PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLAGS}")
     add_dependencies(${EXE} ${PROGRAM_NAME})
+    # Only for Windows, set anopesmtp to require the wsock32 library
+    if(WIN32 AND ${EXE} STREQUAL anopesmtp)
+      target_link_libraries(${EXE} wsock32)
+    endif(WIN32 AND ${EXE} STREQUAL anopesmtp)
     # Set the executable to be installed to the bin directory under the main directory
     install(TARGETS ${EXE}
       DESTINATION bin
@@ -29,11 +33,6 @@ foreach(SRC ${TOOLS_SRCS})
     add_to_cpack_ignored_files("${EXE_BINARY}$" TRUE)
   endif(NOT SKIP)
 endforeach(SRC)
-
-# Only for Windows, set anopesmtp to require the wsock32 library
-if(WIN32)
-  target_link_libraries(anopesmtp wsock32)
-endif(WIN32)
 
 # On non-Windows platforms, if RUNGROUP is set, change the permissions of the tools directory
 if(NOT WIN32 AND RUNGROUP)

@@ -96,7 +96,7 @@ int smtp_debug = 0;
 
 struct smtp_message smail;
 
-static const char *get_logname(struct tm *tm = NULL)
+static std::string get_logname(struct tm *tm = NULL)
 {
 	char timestamp[32];
 
@@ -108,7 +108,7 @@ static const char *get_logname(struct tm *tm = NULL)
 
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
 	std::string name = std::string("logs/anopesmtp.") + timestamp;
-	return name.c_str();
+	return name;
 }
 
 /* Log stuff to the log file with a datestamp.  Note that errno is
@@ -121,7 +121,7 @@ void alog(const char *fmt, ...)
 		return;
 
 	std::fstream file;
-	file.open(get_logname(), std::ios_base::out);
+	file.open(get_logname().c_str(), std::ios_base::out);
 
 	if (!file.is_open())
 		return;

@@ -150,7 +150,7 @@ class CoreExport SocketIO
 	virtual void Destroy() { }
 };
 
-class CoreExport Socket : public Flags<SocketFlag, 2>, public virtual Base
+class CoreExport Socket : public Flags<SocketFlag, 2>
 {
  protected:
 	/* Socket FD */

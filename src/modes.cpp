@@ -549,12 +549,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = dynamic_cast<ChannelMode *>(it->first);
+			cm = debug_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = dynamic_cast<UserMode *>(it->first);
+			um = debug_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -578,12 +578,12 @@ std::list<Anope::string> ModeManager::BuildModeStrings(StackerInfo *info)
 
 		if (info->Type == ST_CHANNEL)
 		{
-			cm = dynamic_cast<ChannelMode *>(it->first);
+			cm = debug_cast<ChannelMode *>(it->first);
 			buf += cm->ModeChar;
 		}
 		else if (info->Type == ST_USER)
 		{
-			um = dynamic_cast<UserMode *>(it->first);
+			um = debug_cast<UserMode *>(it->first);
 			buf += um->ModeChar;
 		}
 
@@ -616,7 +616,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
 	if (bi)
 		s->bi = bi;
 	else if (Type == ST_CHANNEL)
-		s->bi = whosends(dynamic_cast<Channel *>(Object)->ci);
+		s->bi = whosends(debug_cast<Channel *>(Object)->ci);
 	else if (Type == ST_USER)
 		s->bi = NULL;
 }
@@ -803,9 +803,9 @@ void ModeManager::ProcessModes()
 			Channel *c = NULL;
 
 			if (s->Type == ST_USER)
-				u = dynamic_cast<User *>(it->first);
+				u = debug_cast<User *>(it->first);
 			else if (s->Type == ST_CHANNEL)
-				c = dynamic_cast<Channel *>(it->first);
+				c = debug_cast<Channel *>(it->first);
 			else
 				throw CoreException("ModeManager::ProcessModes got invalid Stacker Info type");
 

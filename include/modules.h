@@ -202,7 +202,7 @@ class CallBack;
 
 /** Every module in Anope is actually a class.
  */
-class CoreExport Module : public virtual Base
+class CoreExport Module : public Extensible
 {
  private:
 	bool permanent;
@@ -1223,7 +1223,7 @@ class CallBack : public Timer
 	}
 };
 
-class CoreExport Service : public virtual Base
+class CoreExport Service : public Base
 {
  public:
 	Module *owner;

@@ -407,7 +407,7 @@ class CoreExport Base
 	void DelReference(dynamic_reference_base *r);
 };
 
-class dynamic_reference_base : public virtual Base
+class dynamic_reference_base : public Base
 {
  protected:
 	bool invalid;

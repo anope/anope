@@ -1406,6 +1406,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("%s has no memos."),
 	/* MEMO_SEND_SYNTAX */
 	_("SEND {nick | channel} memo-text"),
+	/* MEMO_SENDALL_SYNTAX */
+	_("SENDALL memo-text"),
 	/* MEMO_SEND_DISABLED */
 	_("Sorry, memo sending is temporarily disabled."),
 	/* MEMO_SEND_PLEASE_WAIT */

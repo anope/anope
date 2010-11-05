@@ -52,7 +52,7 @@ class CommandMSSendAll : public Command
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
+		SyntaxError(MemoServ, u, "SENDALL", MEMO_SENDALL_SYNTAX);
 	}
 
 	void OnServHelp(User *u)

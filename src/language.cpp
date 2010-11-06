@@ -604,6 +604,8 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("You can't ghost yourself!"),
 	/* NICK_GHOST_KILLED */
 	_("Ghost with your nick has been killed."),
+	/* NICK_GHOST_UNIDENTIFIED */
+	_("You may not ghost an unidentified user, use RECOVER instead."),
 	/* NICK_GETPASS_SYNTAX */
 	_("GETPASS nickname"),
 	/* NICK_GETPASS_UNAVAILABLE */

@@ -1,3 +1,268 @@
+Revision 07e2ec0 - Sat, 6 Nov 2010 04:24:27 -0400 - Regenerated lang files
+Revision f5d2057 - Fri, 5 Nov 2010 03:34:44 -0400 - Fixed /ms sendall syntax error message
+Revision cbd0f52 - Thu, 4 Nov 2010 00:36:53 -0400 - Made Base not virtual, prevents us from having to dynamic cast in the mode stacker on release builds
+Revision 4fb4858 - Tue, 2 Nov 2010 00:58:24 -0400 - Fixed anopesmtp. Again. It works on Windows now
+Revision 477ff30 - Mon, 1 Nov 2010 18:43:46 -0400 - Fixed calculate_depends again, now it works
+Revision daa97f0 - Mon, 1 Nov 2010 17:36:30 -0400 - Fixed make install because Changes.lang is dead
+Revision 3edc6d7 - Mon, 1 Nov 2010 16:07:18 -0400 - Fixed building anopesmtp on Windows, fixed some cmake problems with calculate_depends, and fixed building without gettext
+Revision 9db8537 - Sun, 31 Oct 2010 21:46:23 -0400 - Made ns_set_misc work
+Revision e3f368f - Sun, 31 Oct 2010 20:47:34 -0400 - Fixed replacing %R's in email messages and fixed anopesmtp to really work
+Revision 2170823 - Sun, 31 Oct 2010 13:37:31 -0400 - Updated Changes
+Revision 011582f - Sun, 31 Oct 2010 13:03:10 -0400 - Fixed bug #1197 - Store vhosts in MySQL
+Revision 98bdd97 - Sat, 30 Oct 2010 20:12:52 -0400 - Fixed build on cmake2.6
+Revision cd21bd7 - Sat, 30 Oct 2010 19:49:09 -0400 - Updated TODO
+Revision fb9f41b - Sat, 30 Oct 2010 19:41:13 -0400 - Made gettext work on most OSs. Tested on Debian, FreeBSD, Gentoo, and Windows. Added a search path option to the Config script for cmake to use when finding libraries for modules or for gettext. Fixed m_mysql and m_ssl to work under Windows, made the Windows Config program remember the last used options, and fixed Windows release builds.
+Revision a7e5d51 - Fri, 29 Oct 2010 20:53:34 -0400 - Removed the example anope_commands php code, it was removed in favor of xmlrpc
+Revision b8df88a - Thu, 28 Oct 2010 16:25:33 -0400 - Made gettext work on Debian and updated some documentation
+Revision 257fb25 - Thu, 28 Oct 2010 07:31:59 +0200 - removed an extra space from db-convert
+Revision 8ff0b0e - Thu, 28 Oct 2010 07:14:49 +0200 - do not store memo numbers on db-convert
+Revision 180aa6b - Wed, 27 Oct 2010 23:02:20 -0400 - Removed memo number from databases. Since we already have db-upgrade we might as well make that update memos too. Users using the top of git will need to run sed -i 's/MD MI [0-9]* /MD MI /' anope.db on their database.
+Revision a26f119 - Wed, 27 Oct 2010 22:29:34 -0400 - Do not store memo number in memo structs, fixes some bugs with deleting memos
+Revision a79da4b - Tue, 26 Oct 2010 22:02:08 -0400 - Modules to not need to include libintl.h because they are not linked to libintl and do not directly call its code. #define _(x) to x just so xgettext is able to pick out language strings.
+Revision 09160d1 - Tue, 26 Oct 2010 20:14:39 -0400 - Fixed Windows build with gettext
+Revision 1d93140 - Sun, 24 Oct 2010 13:46:56 -0400 - Fixed the other half of bug #1200
+Revision bd7b6b1 - Sun, 24 Oct 2010 12:56:20 -0400 - Fixed bug #1200
+Revision ec5fa9e - Sat, 23 Oct 2010 16:12:15 -0400 - Made the language system still work even if the locales are not installed on the system
+Revision 7e47b97 - Sat, 23 Oct 2010 03:10:15 -0400 - Fixed a crash on some usages of /cs akick view
+Revision 1bd975b - Sat, 23 Oct 2010 02:40:46 -0400 - Fixed a crash on inspircd if we get a join without a TS
+Revision eb8f3a7 - Fri, 22 Oct 2010 04:20:34 -0400 - Fixed some Windows problems
+Revision 791c2b8 - Thu, 21 Oct 2010 23:20:48 -0400 - Changed the log:normal config directive to a list like the other log values, and fixed a potential crash from rehashing while sending mail
+Revision 4f317a2 - Sat, 16 Oct 2010 17:46:56 -0400 - Made /cs help levels desc not case sensitive
+Revision f3c2933 - Fri, 15 Oct 2010 13:25:14 -0400 - Fixed an wrong logging example in example.conf and fixed misc messages being not logged as normal
+Revision 4ddb469 - Wed, 13 Oct 2010 18:46:25 -0400 - Added ns_set_hide to the example configuration, for some reason it was missing
+Revision d24e810 - Wed, 13 Oct 2010 15:09:19 -0400 - Fixed mlock, broken since revision cf98cd3e06e4de0f9902824b0ef8239e947c5b6a
+Revision bc812ee - Wed, 13 Oct 2010 14:46:53 -0400 - Fixed a crash if an invalid expiry time is given to a number of commands
+Revision 5e9db23 - Wed, 13 Oct 2010 14:33:27 -0400 - Fixed saset noexpire to set noexpire on the nick it is used on not just the display name
+Revision c4075c0 - Wed, 13 Oct 2010 13:25:34 -0400 - Changed cs/ns_set_misc operonly config directive to better reflect what it really does
+Revision dc0c07b - Tue, 12 Oct 2010 21:43:39 -0400 - Made the SQL tables use foriegn keys and references to each other, removed many now unnecessary queries from db_mysql
+Revision afb55a1 - Mon, 11 Oct 2010 19:21:59 -0400 - Fixed Windows again
+Revision d7aa5f6 - Mon, 11 Oct 2010 18:47:54 -0400 - Fixed Windows build
+Revision 717c123 - Mon, 11 Oct 2010 15:37:39 -0400 - Fixed some warnings
+Revision 0ac77d0 - Sat, 9 Oct 2010 20:02:19 -0400 - Fixed a crash in the dns engine if we receive a reply after a request has timedout
+Revision 5ca2df1 - Sat, 9 Oct 2010 12:22:55 -0400 - Fixed bug #1196 - truncate anope_extra before flushing data into it again
+Revision b3dd566 - Fri, 8 Oct 2010 16:21:23 -0400 - Set +P on mlock when channels are set as persistant
+Revision 63b1f9c - Fri, 8 Oct 2010 16:16:11 -0400 - Do not join our clients to enforce TS if they are already in the channel
+Revision d5e6bd8 - Fri, 8 Oct 2010 16:03:48 -0400 - Fixed a crash on insp12 if we receeve a part without a reason
+Revision 7e62fcf - Fri, 8 Oct 2010 15:59:26 -0400 - Fixed handling fmodes on inspircd12
+Revision 21a61f1 - Thu, 7 Oct 2010 21:27:32 -0400 - Fixed a crash if the dns engine is unable to add questions into DNS packets
+Revision 7df7175 - Thu, 7 Oct 2010 18:25:24 -0400 - Log the kicker as the source of kicking log messages, not the target
+Revision b4f675a - Thu, 7 Oct 2010 16:02:23 -0400 - Do now show topics being set by UIDs on TS6 IRCds
+Revision 5298107 - Thu, 7 Oct 2010 14:17:20 +0200 - fixed internally setting +o on OPERTYPE
+Revision 7f43621 - Wed, 6 Oct 2010 21:47:01 -0400 - Made nickserv:nogroupchange work
+Revision 4da258f - Wed, 6 Oct 2010 20:36:08 -0400 - Added lang/unused.sh, used to find unused language strings. Also removed a lot of unused language strings.
+Revision 9ab50ee - Tue, 5 Oct 2010 19:46:33 -0400 - Fixed restarting Anope when it is started from outside of the services binary dir
+Revision 64a3bda - Tue, 5 Oct 2010 16:25:52 -0400 - Fixed two types in db_mysql
+Revision acec166 - Tue, 5 Oct 2010 16:16:39 -0400 - Use safe iteration when deleting servers off of hubs
+Revision 00ed18b - Tue, 5 Oct 2010 02:11:14 -0400 - Updated docs and TODO
+Revision 10833f9 - Mon, 4 Oct 2010 21:46:15 -0400 - Made anoperc stop/restart send the cycleonglobal, and fixed logfiles to be opened with append not truncate
+Revision 592060a - Mon, 4 Oct 2010 18:57:54 -0400 - Attempt to write back the old mlock to the databases if we try and fail to connect to the uplink. Because we may not know modes until after we are synced we could accidentally nuke all of the mlocks
+Revision 92338c1 - Mon, 4 Oct 2010 17:36:53 -0400 - Fixed /ns set password/display and made saset not log the new password on saset password
+Revision 3fa2659 - Mon, 4 Oct 2010 16:57:11 -0400 - Ignore the EINTR error from epoll_wait, it isnt always a real error
+Revision 58a3e2b - Mon, 4 Oct 2010 16:54:39 -0400 - Allow reloading of the protocol module with /operserv modreload
+Revision ab5ebc2 - Mon, 4 Oct 2010 16:38:25 -0400 - Automatically destruct messages when modules are unloaded
+Revision cf98cd3 - Mon, 4 Oct 2010 13:59:30 -0400 - Changed the protocol handling system to use a vector of strings instead of C style arrays. Burned the old process/split_buf/memory.c code
+Revision 632f8df - Sun, 3 Oct 2010 15:59:19 -0400 - Fixed checking the global block in the config to work ok, fixed having non-core service bots logging messages, fixed setting the topic to the topic setter on inspircd12/20, and fixed logging status mode changes on ts6 ircds
+Revision 663a8b9 - Sat, 2 Oct 2010 21:10:27 -0400 - Updated language files
+Revision 90f0a7c - Sat, 2 Oct 2010 21:09:11 -0400 - Added os_modreload. Also allow unloading database and encryption modules since there isn't a reason we cant allow reloading them. Soon os_modreload will allow reloading the protocol modules.
+Revision 0d68419 - Sat, 2 Oct 2010 16:43:24 -0400 - Made os_news send news notices from NickServ if global is disabled
+Revision 3499edc - Sat, 2 Oct 2010 16:11:58 -0400 - Replaced globalnick and globaldescription with just nick and description, since it's in its own block now
+Revision 8a0cf62 - Sat, 2 Oct 2010 15:24:00 -0400 - Set the botmodes on bots in the log channel(s) when using ircds that have dynamic modes
+Revision 59f3573 - Sat, 2 Oct 2010 15:24:00 -0400 - Made entry_match work once again
+Revision 76b1062 - Sat, 2 Oct 2010 15:24:00 -0400 - Fixed cs_invite to send the invite notice to the person invited
+Revision b0070bb - Sat, 2 Oct 2010 15:23:55 -0400 - Made ChanServ optional
+Revision 0a8bb88 - Sat, 2 Oct 2010 03:08:29 -0400 - Made OperServ and Global optional
+Revision a62d824 - Sat, 2 Oct 2010 00:07:39 -0400 - Made MemoServ optional
+Revision e3afb11 - Fri, 1 Oct 2010 21:45:46 -0400 - Fixed pipe and win32 socketengine builds
+Revision d44f797 - Fri, 1 Oct 2010 21:01:49 -0400 - Rewrote some of the socket code to allow m_ssl to be a service. This allows modules (xmlrpc) to create and accept SSL connections. Also fixed unloading m_mysql at certain times and made the threading engine always work correctly on Windows.
+Revision 70056dd - Fri, 1 Oct 2010 20:25:55 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 5d9df2b - Fri, 1 Oct 2010 20:24:25 -0400 - Revert "Do not use new/delete to allocate modules, allows modules to always destruct properly and automatically" This does not work as expected, it causes objects allocated by modules to be freed by the operating system when the module is unloaded, giving no chance to the module to deallocate it itself.
+Revision 9d2ef3f - Wed, 29 Sep 2010 14:02:17 -0400 - Allow OnPreConnect to kill users correctly and made session/xline exempt users not bypass the OnConnect event
+Revision 6ca09be - Mon, 27 Sep 2010 17:02:36 -0400 - Cleaned up some unused code, moved handling of user modes around so we dont get log messages about user modes when users connect, and fixed tracking some umodes on Unreal
+Revision 7db5e19 - Sun, 26 Sep 2010 15:35:24 -0400 - Partial fix for finding gettext with CMake, still doesn't fix the lack of finding non-standard paths though.
+Revision f3840ed - Sun, 26 Sep 2010 15:09:39 -0400 - Added a short docs/LANGUAGES file explaining how to add translations for the core and modules, updated TODO, and fixed a few small bugs
+Revision 7d5893a - Sun, 26 Sep 2010 03:21:00 -0400 - Properly detect gettext and dont build langfiles on systems without it
+Revision d646d45 - Sun, 26 Sep 2010 02:33:01 -0400 - Changed the language system to use gettext
+Revision 05e6815 - Wed, 22 Sep 2010 14:56:43 -0400 - Do not use new/delete to allocate modules, allows modules to always destruct properly and automatically
+Revision 3459206 - Tue, 21 Sep 2010 01:20:28 -0400 - Fixed some problems with cycling logfiles
+Revision 6f70792 - Sun, 19 Sep 2010 17:41:50 -0400 - Fixed log messages from when a user quits or gets killed
+Revision ce69f29 - Sun, 19 Sep 2010 17:21:08 -0400 - Added configuration for m_dnsbl for what return values get banned
+Revision f8ee95e - Sun, 19 Sep 2010 16:20:56 -0400 - Added some more variable fields for dnsbl akill reasons
+Revision 1e3d2f3 - Sun, 19 Sep 2010 16:08:21 -0400 - Fixed /os modinfo command output
+Revision aa9ab7c - Sun, 19 Sep 2010 16:06:22 -0400 - Keep users +r on InspIRCd if their account name matches their login name
+Revision 22f2b25 - Sun, 19 Sep 2010 12:42:08 -0400 - Fixed joining chanserv enforcers to unregistered channels
+Revision ebd2997 - Sat, 18 Sep 2010 17:27:58 -0400 - DNSSocket doesn't need to save the server addr anymore
+Revision 06faf6a - Sat, 18 Sep 2010 03:36:44 +0100 - Fixed bug #1191
+Revision 5ec605e - Sat, 18 Sep 2010 03:35:33 +0100 - Fixed some minor punctuation and logging
+Revision 227909e - Fri, 17 Sep 2010 19:20:07 -0400 - Rejig of some of the socket stuff. Fixed marking sockets as nonblocking on Windows. Added in a LastError function to keep having to use strerror/GetLastError everywhere.
+Revision f71fb6e - Fri, 17 Sep 2010 17:22:14 -0400 - Connect using nonblocking sockets
+Revision 74566d8 - Fri, 17 Sep 2010 14:32:46 -0400 - Fixed bug #1190 and prevent m_dnsbl from akilling a user multiple times if they are in multiple blacklists
+Revision 61e7564 - Thu, 16 Sep 2010 22:21:55 -0400 - Fixed connecting back to the nameserver if we lose connection, and detecting the nameserver
+Revision 86c1dab - Thu, 16 Sep 2010 21:16:20 -0400 - Fixed many bugs and crashes
+Revision cd1e9f3 - Thu, 16 Sep 2010 18:12:12 -0400 - Fixed Anope::CurTime to really work, and made ChanServ timers allow using the channels botserv bot instead of only ChanServ
+Revision ccc6109 - Thu, 16 Sep 2010 12:41:17 -0400 - Fixed crash on setting XOP on
+Revision 8131851 - Wed, 15 Sep 2010 16:40:55 -0400 - Rewrote all of the topic code, fixes a few topic related problems on some older IRCds
+Revision 6239b5a - Tue, 14 Sep 2010 19:31:22 -0400 - Give DNS requests an error when their creator is being unloaded instead of just deleting them, and fixed a compile warning
+Revision e7ac33f - Tue, 14 Sep 2010 18:24:14 -0400 - Cleanup DNS requests when modules are unloaded, fixes unloading m_dnsbl during the middle of queries
+Revision 630f381 - Tue, 14 Sep 2010 16:12:47 -0400 - Added a config option to make operserv not add users found in the dsnbl to the akill list
+Revision 4da2af6 - Sun, 12 Sep 2010 04:06:08 -0400 - Updated a bit of the README that was out of date
+Revision 22b9da7 - Sun, 12 Sep 2010 01:37:32 -0400 - Fixed a typo in the epoll socket engine with clearing events
+Revision 47872e5 - Sun, 12 Sep 2010 00:02:22 -0400 - Removed the --log command line option because its no longer necessary, and updated example.conf
+Revision e30370a - Sat, 11 Sep 2010 22:47:36 -0400 - Allow identifying to other accounts using /nickserv id account pass
+Revision 89c5b20 - Sat, 11 Sep 2010 16:11:37 -0400 - Updated TODO
+Revision f00e76d - Fri, 10 Sep 2010 20:31:31 -0400 - Added Anope::CurTime to keep us from calling time() everywhere
+Revision 9eb7562 - Fri, 10 Sep 2010 15:46:19 -0400 - Fixed bug #1187 - Fixed releasing enforcer clients on TS6 IRCds
+Revision 46813cc - Thu, 9 Sep 2010 23:43:11 -0400 - Added an asynchronous DNS system and m_dnsbl, which checks clients against DNS blacklists. Rewrote internal handling of IPs, we now properly support users using IPv6. Fixed a few problems with the UnrealIRCd protocol module.
+Revision fdd196e - Thu, 9 Sep 2010 18:29:22 +0200 - fixed cs_unban on inspircd 1.2 and 2.0
+Revision 7a522d1 - Wed, 1 Sep 2010 21:01:52 -0400 - Only look up session exceptions if the user exceeds the session limit, really send akills for exceeding session limits, and fixed os akill del to really work
+Revision f276927 - Sun, 29 Aug 2010 19:28:04 -0400 - Redo some of the sighandling code, and made anoperc rehash actually work.
+Revision d70f1a4 - Sat, 28 Aug 2010 23:17:52 -0400 - Removed a duplicate log message when a user changes nick
+Revision 4319319 - Sat, 28 Aug 2010 23:17:33 -0400 - Burst back our juped servers if we disconnect
+Revision e820e1a - Sat, 28 Aug 2010 20:56:45 -0400 - Properly store our clients internal channel status's and burst them if needed. Also made Flag::HasFlag use test() instead of operator[] to catch errors, and fixed an out of bounds access to a Flags bitset causing crashes on some systems.
+Revision 26ba944 - Sat, 28 Aug 2010 13:58:23 -0400 - Allow unidentified users to use sendpass and resetpasss if configured properly
+Revision 4cc6604 - Sat, 28 Aug 2010 11:00:02 -0400 - Changed Channel's BanData C-style linked list to std::list, got rid of shadowed variables in channels.cpp.
+Revision 5fbe0c8 - Sat, 28 Aug 2010 02:25:33 -0400 - Clean up some of the old now unused IRCDVar struct vars, and made the logchan bots join if the IRCd requires them to
+Revision 2aac8b0 - Sat, 28 Aug 2010 00:16:12 -0400 - Fixed two typos in example.conf
+Revision 10d9010 - Sat, 28 Aug 2010 00:14:06 -0400 - Do not log RAWIO messages to services log channels, added a config option on whether or not to join bots to the log channels, and fixed two log messages in ns_identify
+Revision 334e5a4 - Fri, 27 Aug 2010 23:05:22 -0400 - Removed options:keeplogs because its no longer used
+Revision 56045af - Fri, 27 Aug 2010 21:30:16 -0400 - Removed some problematic IsRecognized checks in ms_cancel and ms_check, and fixed a variable name in logger.cpp to make clang happy
+Revision c2ddecc - Fri, 27 Aug 2010 20:56:28 -0400 - Added a new logging system
+Revision 73fb94c - Fri, 27 Aug 2010 13:44:30 -0400 - Added an Anope::string::is_pos_number_only function to use everywhere we convertTo unsigned values, and fixed the mail delay error message to give the correct time.
+Revision ea9b945 - Tue, 24 Aug 2010 21:34:08 -0400 - Internally ULine our server, and fixed a user count check for botserv when setting -P on channels
+Revision 2803190 - Sun, 22 Aug 2010 12:56:31 -0400 - Made Config ask what version of Visual Studio you are using so cmake can generate the correct files
+Revision f20512c - Sun, 22 Aug 2010 12:23:43 -0400 - Use pipe() instead of pipe2() - some systems dont have pipe2()
+Revision ada65a3 - Sun, 22 Aug 2010 00:34:02 -0400 - Added a classbase for the major classes, makes dynamic_reference invalidation really work. This also cleans up a bit of the code in the modestacker.
+Revision 8a4c6ae - Sat, 21 Aug 2010 19:39:54 -0400 - Updated .gitignore and removed the rest of the old autotools system
+Revision 88d3338 - Sat, 21 Aug 2010 18:52:12 -0400 - Better check for eventfd.
+Revision 32c31f2 - Sat, 21 Aug 2010 09:15:42 +0100 - Change default encryption module to enc_md5
+Revision 6608f16 - Sat, 21 Aug 2010 03:47:01 -0400 - Removed Config.bat and install.js and replaced it with a small C# program that tends to fail less.
+Revision fb551f0 - Sat, 21 Aug 2010 01:40:36 -0400 - Made Anope keep track of channels its clients are in if it splits from its uplink, then burst them back to its uplink once connection is reestablished. Also made Anope use TS enforcement to change persistant channels creation time to the time they were registered.
+Revision 931b077 - Thu, 19 Aug 2010 16:27:38 -0400 - Changed the svid system back to using user timestamps for IRCds limited to just usermode +d. This allows us to keep people logged in once again when Anope is restarted.
+Revision b180d5f - Tue, 17 Aug 2010 22:19:36 -0400 - Always unload socketengines/database/protocl etc modules last, and fixed a potential crash in m_mysql when unloading when not in GDB
+Revision fa7684b - Tue, 17 Aug 2010 20:54:06 -0400 - Fixed a few SQL queries
+Revision e65d8b2 - Tue, 17 Aug 2010 19:27:37 -0400 - Rewrote the config reader to better handle invalid configs. This prevents Anope from exploding when /os reload has errors.
+Revision 2575008 - Mon, 16 Aug 2010 23:33:03 -0400 - Fixed part of the Windows build. The SQL modules still don't build due to some weird VS bug... will fix it later.
+Revision 5fb10d2 - Sun, 15 Aug 2010 19:53:06 -0400 - Changed a few small things in the db format because it already changed anyway, bumped DB version to 2
+Revision de8eeab - Sun, 15 Aug 2010 17:15:15 -0400 - Fixed persist to work correctly with the new bot tracking system
+Revision c2a97d9 - Sun, 15 Aug 2010 14:08:05 -0400 - Cleanup of various different crashes/inconsistancies
+Revision a950ed8 - Sun, 15 Aug 2010 01:45:38 -0400 - Rewrote the MySQL API to use threads. This acts similar to before, but is faster. Removed db_mysql_execute for now.
+Revision 4d0a1aa - Sat, 14 Aug 2010 14:16:21 +0100 - Fixed some chanserv help set/saset replies
+Revision c24ec06 - Fri, 13 Aug 2010 18:52:48 -0400 - And fixed /bs info to show the correct chancount
+Revision d4c7f67 - Fri, 13 Aug 2010 18:45:50 -0400 - Readded in BotInfo::chancount, it never should have been removed in the first place
+Revision d05afb3 - Sun, 8 Aug 2010 22:30:00 -0400 - Fix an error in db-upgrade on sha256 encrypted passwords.
+Revision bbff5ae - Sun, 8 Aug 2010 21:53:32 -0400 - Add a db-upgrade to convert base64-encoded encrypted passwords to hexadecimal strings of the raw data, add in Anope::Hex for C-style strings and added Anope::Unhex, modified the encryption modules to use Hex and Unhex.
+Revision de7643a - Thu, 5 Aug 2010 21:05:06 -0400 - Update TODO, and minor change to enc_md5 (no, it doesn't fix encryption with 1.9 git yet, I'll get to that eventually)
+Revision 46e88e3 - Wed, 4 Aug 2010 22:05:45 -0400 - Remove need to have a dynmaically allocated C-string in enc_sha1, it was being made too big (by the default config PassLen of 32) anyways.
+Revision f78243b - Wed, 4 Aug 2010 21:51:48 -0400 - Also fix enc_old using the previous commit's fix.
+Revision 9da9278 - Wed, 4 Aug 2010 21:48:40 -0400 - Fix enc_md5 to work with the way the new b64_encode does things with Anope::string, by making sure that the string is null terminated properly.
+Revision 8703afe - Wed, 4 Aug 2010 18:01:45 -0400 - Add a delimiter argument to BuildStringList and BuildStringVector, and use it with str_is_ip and str_is_cidr to better fix the earlier crash bug found by Cronus.
+Revision 9696118 - Tue, 3 Aug 2010 18:02:16 -0400 - Fixed enc_old, it has been broken since revision ae38212c1ce829c783edf971081c90137abb49a0
+Revision 263f69a - Tue, 3 Aug 2010 16:59:24 -0400 - Fixed enc_md5, it has been broken since revision ae38212c1ce829c783edf971081c90137abb49a0
+Revision a659f82 - Tue, 3 Aug 2010 07:26:43 -0400 - Fix str_is_ip() and str_is_cidr(), bug found by Cronus.
+Revision 44387a2 - Tue, 3 Aug 2010 03:25:50 -0400 - Rewrote the GetToken functions to act like they did back in 1.8, fixes many problems with commands using them (hs_set, hs_setall, hs_request)
+Revision 59ee16c - Tue, 3 Aug 2010 01:49:15 -0400 - Made ns set/saset work like cs set/saset, cleans up a lot of code
+Revision 7b27a4e - Mon, 2 Aug 2010 19:17:17 -0400 - Fix NS SASET to actually work.
+Revision 4ffdd7c - Mon, 2 Aug 2010 22:37:41 +0200 - saset noexpire works now
+Revision 503215f - Mon, 2 Aug 2010 19:42:00 +0200 - changed the way how CTCP PINGs are processed, all services clients can now reply to CTCP PING and CTCP VERSION requests
+Revision ddb886a - Mon, 2 Aug 2010 15:13:37 +0100 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 48d58d9 - Mon, 2 Aug 2010 01:17:58 -0400 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 15a0f99 - Mon, 2 Aug 2010 01:17:50 -0400 - Log an error message if we are unable to load the socket engine module, and changed the default engine to be select
+Revision ca26c4d - Mon, 2 Aug 2010 07:09:46 +0200 - fixed segfault on ctcp ping
+Revision 80f0351 - Mon, 2 Aug 2010 04:04:11 +0100 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 5258549 - Sun, 1 Aug 2010 22:43:48 -0400 - Fixed the epoll engine so it really works
+Revision 94371e6 - Mon, 2 Aug 2010 03:35:12 +0100 - Added Italics support to the BotSev kickers
+Revision f887b37 - Sun, 1 Aug 2010 21:17:52 -0400 - Set the correct bs default flags on new channels
+Revision fd31d4a - Sun, 1 Aug 2010 20:52:16 -0400 - Mark our clients as protected, prevents users from using /cs kick etc to kick services clients
+Revision 4fe1c92 - Sun, 1 Aug 2010 20:43:48 -0400 - Made the epoll socket engine handle MarkWriteable and ClearWriteable events
+Revision 90976b6 - Sun, 1 Aug 2010 20:05:52 -0400 - Fixed some issues with reconnecting if we disconnect from the uplink
+Revision e8d6524 - Sun, 1 Aug 2010 16:47:43 -0400 - Fixed botserv bots parting empty channels. This also allows setting bsminusers to 0, which keeps the botserv bot in the channel at all times.
+Revision d59c1b9 - Sun, 1 Aug 2010 13:42:35 -0400 - Cleanup in main.cpp.
+Revision 2f6c0e4 - Sun, 1 Aug 2010 18:48:40 +0200 - some code cleanup in misc.cpp and fixed a small typo
+Revision cb3a18e - Sun, 1 Aug 2010 18:39:06 +0200 - Merge branch '1.9' of ssh://anope.git.sourceforge.net/gitroot/anope/anope into 1.9
+Revision 5b68782 - Sun, 1 Aug 2010 18:30:11 +0200 - fixed a problem with parting botserv bots
+Revision 0847660 - Sun, 1 Aug 2010 12:21:42 -0400 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 1175ef3 - Sun, 1 Aug 2010 12:21:17 -0400 - Cleanup in memoserv.cpp.
+Revision a65e9df - Sun, 1 Aug 2010 14:50:07 +0200 - ns_info now ignores any extra parameters
+Revision bfd9413 - Sun, 1 Aug 2010 09:56:34 +0200 - fixed enc_sha256
+Revision 1166376 - Sun, 1 Aug 2010 03:21:53 -0400 - Cleanup in messages.cpp.
+Revision c770c47 - Sat, 31 Jul 2010 21:37:45 -0400 - Don't dynamically allocate commands in modules anymore, instead made them members of modules. This means the commands are automatically destructed when the module is unloaded. Cleans up some old ugly code.
+Revision 9d0d44d - Sat, 31 Jul 2010 11:57:42 +0200 - fixed some database issues
+Revision 602d237 - Fri, 30 Jul 2010 21:47:28 -0400 - Cleanup in misc.cpp.
+Revision afb3782 - Fri, 30 Jul 2010 20:00:52 -0400 - Some more slight cleanups, this time in modes.cpp and module.cpp.
+Revision ef651b6 - Fri, 30 Jul 2010 19:47:22 -0400 - Fixed a typo in hashcomp.h for detecting what version of VC is in use
+Revision 7a7b893 - Fri, 30 Jul 2010 19:24:41 -0400 - Cleanup in modulemanager.cpp, make it so CMake only includes the -fno-leading-underscore flag on a GNU compiler, changed the hash compare functions to use struct to appease clang, and made it so hashcomp.h uses tr1/unordered_map with g++ 4.x or up.
+Revision a68e215 - Fri, 30 Jul 2010 17:34:33 -0400 - Slight cleanup in modules.cpp.
+Revision 174cc58 - Fri, 30 Jul 2010 13:15:35 -0400 - Slight code cleanup in nickalias.cpp and nickcore.cpp.
+Revision 527304e - Fri, 30 Jul 2010 08:09:07 -0400 - Some code cleanup and constification in nickserv.cpp.
+Revision 0cacbf3 - Fri, 30 Jul 2010 03:56:14 -0400 - Fixed hash_map code to build on VS 2008
+Revision 8e6fe99 - Fri, 30 Jul 2010 01:11:19 -0400 - Fixed some Windows issues with hashing and sockets. This currently limits building to VS 2010, will look at 2008 later
+Revision e353b15 - Fri, 30 Jul 2010 00:05:19 -0400 - Slight cleanup in operserv.cpp.
+Revision 5ed69ed - Thu, 29 Jul 2010 23:34:39 -0400 - Used std::list for ignore's IgnoreData instead of using the old C-style double-linked list, also removed the addition of an ignore when a command "takes too long".
+Revision abfc992 - Thu, 29 Jul 2010 23:08:47 -0400 - Added support for tracking inspircd2.0 usermode +Q and cahnged the Flags bitsets for modes to not use a max defined value, it can go over
+Revision cc64903 - Thu, 29 Jul 2010 18:38:56 -0400 - Rewrote the hashing systems to properly handle the new Anope::strings which we have everywhere.
+Revision 04200cc - Thu, 29 Jul 2010 08:12:54 -0400 - Made all of IRCDProto use const pointers, with the exception of SendVhostDel because of the Unreal protocol module, it makes me sad.
+Revision 06cb137 - Wed, 28 Jul 2010 17:44:42 -0400 - Some code cleanup in regchannel.cpp.
+Revision 971df48 - Wed, 28 Jul 2010 08:16:33 -0400 - Clean up send.cpp a bit to use Anope::string, as well as fix Anope::string's replace_all_* functions to actually work if the original and replacement strings are not the same length.
+Revision aa9610a - Wed, 28 Jul 2010 00:28:59 -0400 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 4700c96 - Wed, 28 Jul 2010 00:19:19 -0400 - Yet more annoying code cleanup, plus made Server's Links list into a normal variable and not a pointer.
+Revision a2573a2 - Tue, 27 Jul 2010 22:12:20 -0400 - Removed some assertions, replaced with throwing CoreExceptions
+Revision 4b870cc - Tue, 27 Jul 2010 21:31:13 -0400 - Added debug_cast which uses dynamic_cast on debug builds, and static_cast on release builds
+Revision 66c0e28 - Tue, 27 Jul 2010 20:03:10 -0400 - A few more random annoyances cleaned up.
+Revision 92edce8 - Tue, 27 Jul 2010 18:28:16 -0400 - Cleaned up some code in src/users.cpp that kinda annoyed me.
+Revision 502c985 - Tue, 27 Jul 2010 18:13:56 -0400 - Fix bug in User::CheckAuthenticationToken since it should've been getting an Anope::string out of the extensible, not a char *.  Oops.
+Revision 1144744 - Tue, 27 Jul 2010 18:06:36 -0400 - Rewrote Anope::Match to use Anope::string instead of doing an ugly reinterpret_cast to unsigned char pointers.
+Revision d404813 - Tue, 27 Jul 2010 02:03:10 -0400 - Some windows fixes from the Anope::string commit
+Revision 57bb759 - Mon, 26 Jul 2010 23:32:03 -0400 - Trying to make things a little more const-safe, a work in progress but this is a bit better.
+Revision 6e6b6b4 - Mon, 26 Jul 2010 20:10:33 -0400 - Added hostserv/del command permission, fixed example.conf to show that hostserv/* is a command, not a permission
+Revision 8ea033d - Mon, 26 Jul 2010 00:22:45 -0400 - Missed changing a couple of these, it seems.
+Revision aa2c100 - Mon, 26 Jul 2010 00:20:00 -0400 - Removed std::string and ci::string versions of LoadModuleList, we only need the Anope::string version now.
+Revision 707268f - Sun, 25 Jul 2010 23:03:06 -0400 - Some windows fixes caused by the last commit
+Revision ae38212 - Sun, 25 Jul 2010 21:58:20 -0400 - Epic commit to replace most of the strings in Anope with a single Anope::string class, plus some other little fixes here and there.  If you follow 1.9.x development and are testing things, THIS is one of those things that NEEDS testing.
+Revision 15d7f0f - Sun, 25 Jul 2010 04:22:15 -0400 - Added support for m_customprefix in inspircd20
+Revision 5cd986e - Sun, 25 Jul 2010 02:35:17 -0400 - Properly handle FMODEs from InspIRCd with more than 25 arguments.. reported by Angel-SL
+Revision 2328c3e - Sat, 24 Jul 2010 13:45:54 -0400 - Always use non-blocking sockets
+Revision b218d52 - Sat, 24 Jul 2010 03:32:27 -0400 - Removed MARK_DEPRECATED from the OnDatabaseExpire events
+Revision b899a5c - Sat, 24 Jul 2010 03:31:41 -0400 - Properly handle single messages received that have no newline
+Revision f9cd3f4 - Sat, 17 Jul 2010 17:32:38 -0400 - Allow clearing of access lists while in XOP
+Revision a22f8d3 - Thu, 15 Jul 2010 22:55:02 -0400 - Moved some files and diretories around, made cmake skip files it knows it can't compile because of missing dependices.
+Revision 43b1e43 - Sun, 11 Jul 2010 00:43:36 -0400 - Added ns_set_misc.cpp which was missing from a previous commit
+Revision 63d7142 - Sat, 10 Jul 2010 22:50:18 -0400 - Added options:hideprivilegedcommands config option to hide privileged commands from normal users
+Revision a495213 - Sat, 10 Jul 2010 21:18:22 -0400 - Properly set up our clients as on our server internally. Fixes crashes when trying to akick our own clients etc
+Revision fa622aa - Sat, 10 Jul 2010 20:58:29 -0400 - Fixed tracking of introducing and quitting juped servers
+Revision 07ec79e - Sat, 10 Jul 2010 19:36:28 -0400 - Fixed de.l so it actually compiles
+Revision 4b1e76c - Sat, 10 Jul 2010 19:08:16 -0400 - Added ns_set_misc and cs_set_misc. These modules allows users to configure settable options in /ns and /cs set that will be displayed in /ns and /cs info. Removed os_info, cs_set_url, ns_set_url, cs_set_email, ns_set_icq
+Revision 166d6f5 - Fri, 9 Jul 2010 02:27:02 -0400 - Removed autotools and the makefiles. This will be reintroduced differently before the 1.9.3 release.
+Revision 7e20659 - Fri, 9 Jul 2010 00:20:00 -0400 - No need to allocate the numberlist callback classes with new
+Revision 1cf4ebb - Thu, 8 Jul 2010 22:19:13 -0400 - Added an epoll socket engine
+Revision 8f8b1e4 - Tue, 6 Jul 2010 14:07:06 -0400 - Fixed bug #1173, Made hs_request reject actually reject vhosts
+Revision f71d5b4 - Mon, 5 Jul 2010 16:14:17 -0400 - Removed OnEncryptInPlace, although it currently causes no problems it is just redundant.
+Revision de1bf10 - Tue, 29 Jun 2010 08:21:20 -0400 - Missed OCDing over src/protocol/*, plus fixed a minor lack of braces and fixed Config to work in an out-of-source build.
+Revision 950cfcd - Mon, 28 Jun 2010 23:15:16 -0400 - Some OCDing over version.cpp, and make it so module.cpp doesn't need version.h (only main.cpp, modulemanager.cpp, and modules.cpp need version.h, to avoid rebuilding EVERYTHING every build)
+Revision 1037a46 - Mon, 28 Jun 2010 20:02:35 +0200 - added some missing includes to src/tools/smtp.h
+Revision d99ee2d - Mon, 28 Jun 2010 13:27:14 -0400 - This was in the wrong place, better now.
+Revision f1cb4b8 - Mon, 28 Jun 2010 11:24:19 -0400 - Delete all users when we disconnect from the uplink
+Revision 4502038 - Mon, 28 Jun 2010 10:59:40 -0400 - Unset all known status modes when we recieve a ts older than ours, and remove split servers from their uplinks
+Revision 85b07a9 - Mon, 28 Jun 2010 01:28:51 -0400 - Fix version system so it doesn't cause the entire build tree to get rebuilt just because version.h gets regenerated, thanks to Adam for initial patch.
+Revision 2e4099e - Mon, 28 Jun 2010 00:56:37 -0400 - No need for BotInfo to have its own ChangeNick function
+Revision 00aa4a0 - Mon, 28 Jun 2010 00:32:50 -0400 - Fixed the makefiles to correctly build and install the new anopesmtp and db-convert
+Revision 28e12bc - Sun, 27 Jun 2010 23:15:05 -0400 - The next of a few "CBX OCDing over code style" commits, maybe the last. NOTES: I have been unable to compile the db_mysql_* functions on my system here, so those are untested. db-convert seems to be badly programmed and needs more work in my opinion.
+Revision 051ebe3 - Sun, 27 Jun 2010 22:21:49 -0400 - Fixed unordered_map to build on VS 2008
+Revision f17c4d4 - Sun, 27 Jun 2010 20:34:09 -0400 - Made Windows install.js correctly detect the Anope version and made version.cpp correctly generate version.h on Windows
+Revision 0eb007a - Sun, 27 Jun 2010 20:21:11 -0400 - Made the langfiles build
+Revision 1e53c2d - Sun, 27 Jun 2010 19:55:19 -0400 - Removed nickserv/chanserv info all, just have info show all information
+Revision ccc9237 - Sun, 27 Jun 2010 17:59:48 -0400 - Log out users when they log in to another account.
+Revision 8cf8faf - Sun, 27 Jun 2010 16:26:35 -0400 - Don't attempt to enforce sqlines on our own clients
+Revision 6e1fa85 - Sun, 27 Jun 2010 14:45:14 -0400 - Log out users from their groups when they disconnect, keeps us from storing invalid pointers in the nickcore user list
+Revision 9269d20 - Sun, 27 Jun 2010 11:55:39 -0400 - The next of a few "CBX OCDing over code style" commits, focusing on src/core/ns_*.
+Revision 57caa0b - Sun, 27 Jun 2010 02:41:48 -0400 - Made Anope track its own clients internally as if they were real users
+Revision d49aee6 - Sat, 26 Jun 2010 22:50:02 -0400 - Made the flags class take an optional size arg
+Revision e51d6e2 - Sat, 26 Jun 2010 21:47:35 -0400 - Added in the rest of the InspIRCd 2.0 changes to the protocol module
+Revision 36c646c - Sat, 26 Jun 2010 21:12:31 -0400 - Added support for InspIRCd 2.0s dynamic modes. Note that this changes the maximum length of an acceptable IRC message from 512 to 1024 because InspIRCd sends messages longer than 512 characters.
+Revision 4e31757 - Sat, 26 Jun 2010 01:39:11 -0400 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 6dc3af5 - Sat, 26 Jun 2010 01:38:19 -0400 - The next of a few "CBX OCDing over code style" commits, focusing on src/core/hs_* and src/core/ms_*, plus some tiny fallout caused by changing the FOREACH_* macros.
+Revision c7cb889 - Fri, 25 Jun 2010 22:53:26 -0400 - docs/TOOlS -> docs/TOOLS
+Revision d5ee411 - Fri, 25 Jun 2010 22:13:32 -0400 - Moved src/tools/README to docs/TOOLS
+Revision 03fbc7d - Fri, 25 Jun 2010 20:00:21 -0400 - Changed the versioning system to use git
+Revision cbcead4 - Fri, 25 Jun 2010 19:14:05 -0500 - Made db-convert handle old corrupted databases from 1.8 that used mysql with rdb
 Revision e447933 - Thu, 24 Jun 2010 07:38:20 +0200 - fixed some typos in example.conf
 Revision 7bb90e1 - Thu, 24 Jun 2010 00:34:04 -0400 - The next of a few "CBX OCDing over code style" commits, focusing on src/core/enc_*, plus fixing unintentional broken logic in said modules caused by my first OCD commit. Also added a note to example.conf about enc_sha1 being potentially broken, and slight code style OCD in hashcomp.cpp found by Adam.
 Revision c4233e9 - Tue, 22 Jun 2010 16:21:57 -0400 - Made db-convert really convert nickalias lastseen/lastused/lastquit

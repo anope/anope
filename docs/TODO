@@ -3,32 +3,12 @@ Legend:
 	? = unsure
 	+ = in progress
 
-1.9.3
+1.9.4
 -----
-[x] Add in a subcommand system, ns_set, cs_set, etc.
-[x] Threading
-  [x] Mail sending needs to be threaded
-[x] process_numlist needs to die
-[x] SList needs to die
-[x] SSL
-[x] Command handling system needs to die, strtok() needs to die more
-[x] Asynchronous DNS
-[x] Hashing system for storing just about everything needs to die
-[x] Add support for +k, +q, etc type umodes
-[x] Language system is disgusting, it must die.
-  [x] Modules should also have a way to add strings programatically
-  [x] Should be able to add many strings by dropping a file in a set location.
-[x] Config bailing on /os reload needs to be non fatal
-[x] AutoID needs to be able to live through /os restart, current system is just annoying.
-[x] SQL tables need to changed to have references etc
-[x] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
-[x] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
-[?] Remote identification
-[x] Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
-[x] Store vhosts in SQL.
 
 Future
 ------
+[?] Remote identification
 [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [ ] XMLRPC to execute commands and get data from Anope
 [ ] NS IDENTIFY changes

@@ -330,11 +330,11 @@ class CoreExport ConnectionSocket : public BufferedSocket
 
 class ClientSocket : public BufferedSocket
 {
+ public:
 	/* Listen socket this connection came from */
 	ListenSocket *LS;
 	/* Clients address */
 	sockaddrs clientaddr;
- public:
 
 	/** Constructor
 	 * @param ls Listen socket this connection is from

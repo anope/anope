@@ -304,7 +304,7 @@ time_t dotime(const Anope::string &s)
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string duration(const NickCore *nc, time_t seconds)
+Anope::string duration(NickCore *nc, time_t seconds)
 {
 	/* We first calculate everything */
 	int days = seconds / 86400;
@@ -365,7 +365,7 @@ Anope::string do_strftime(const time_t &t)
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string expire_left(const NickCore *nc, time_t expires)
+Anope::string expire_left(NickCore *nc, time_t expires)
 {
 	if (!expires)
 		return GetString(nc, NO_EXPIRE);

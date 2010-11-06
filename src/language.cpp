@@ -48,16 +48,16 @@ const Anope::string GetString(LanguageString string)
 	return GetString("anope", "", language_strings[string]);
 }
 
-const Anope::string GetString(const NickCore *nc, LanguageString string)
+const Anope::string GetString(NickCore *nc, LanguageString string)
 {
 	return GetString(nc ? nc->language : "", string);
 }
 
-const Anope::string GetString(const User *u, LanguageString string)
+const Anope::string GetString(User *u, LanguageString string)
 {
 	if (!u)
 		return GetString(string);
-	const NickCore *nc = u->Account();
+	NickCore *nc = u->Account();
 	NickAlias *na = NULL;
 	if (!nc)
 		na = findnick(u->nick);

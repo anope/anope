@@ -216,7 +216,7 @@ User::~User()
 	Log(LOG_DEBUG_2) << "User::~User() done";
 }
 
-void User::SendMessage(const Anope::string &source, const char *fmt, ...) const
+void User::SendMessage(const Anope::string &source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -232,7 +232,7 @@ void User::SendMessage(const Anope::string &source, const char *fmt, ...) const
 	}
 }
 
-void User::SendMessage(const Anope::string &source, const Anope::string &msg) const
+void User::SendMessage(const Anope::string &source, const Anope::string &msg)
 {
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
@@ -245,7 +245,7 @@ void User::SendMessage(const Anope::string &source, const Anope::string &msg) co
 		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
 }
 
-void User::SendMessage(BotInfo *source, LanguageString message, ...) const
+void User::SendMessage(BotInfo *source, LanguageString message, ...)
 {
 	if (!source)
 	{
@@ -385,16 +385,11 @@ NickCore *User::Account()
 	return this->nc;
 }
 
-const NickCore *User::Account() const
-{
-	return this->nc;
-}
-
 /** Check if the user is identified for their nick
  * @param CheckNick True to check if the user is identified to the nickname they are on too
  * @return true or false
  */
-bool User::IsIdentified(bool CheckNick) const
+bool User::IsIdentified(bool CheckNick)
 {
 	if (CheckNick && this->nc)
 	{
@@ -413,7 +408,7 @@ bool User::IsIdentified(bool CheckNick) const
  * @param CheckSecure Only returns true if the user has secure off
  * @return true or false
  */
-bool User::IsRecognized(bool CheckSecure) const
+bool User::IsRecognized(bool CheckSecure)
 {
 	if (CheckSecure && OnAccess)
 	{

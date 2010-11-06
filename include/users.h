@@ -90,7 +90,7 @@ class CoreExport User : public Extensible
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 */
-	virtual void SetNewNick(const Anope::string &newnick);
+	void SetNewNick(const Anope::string &newnick);
 
 	/** Update the displayed (vhost) of a user record.
 	 * This is used (if set) instead of real host.
@@ -155,15 +155,15 @@ class CoreExport User : public Extensible
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	virtual void SendMessage(const Anope::string &source, const char *fmt, ...) const;
-	virtual void SendMessage(const Anope::string &source, const Anope::string &msg) const;
+	void SendMessage(const Anope::string &source, const char *fmt, ...);
+	virtual void SendMessage(const Anope::string &source, const Anope::string &msg);
 
 	/** Send a language string message to a user
 	 * @param source Sender
 	 * @param message The message num
 	 * @param ... parameters
 	 */
-	void SendMessage(BotInfo *source, LanguageString message, ...) const;
+	void SendMessage(BotInfo *source, LanguageString message, ...);
 
 	/** Collide a nick
 	 * See the comment in users.cpp
@@ -184,19 +184,18 @@ class CoreExport User : public Extensible
 	 * @return The account or NULL
 	 */
 	virtual NickCore *Account();
-	virtual const NickCore *Account() const;
 
 	/** Check if the user is identified for their nick
 	 * @param CheckNick True to check if the user is identified to the nickname they are on too
 	 * @return true or false
 	 */
-	virtual bool IsIdentified(bool CheckNick = false) const;
+	virtual bool IsIdentified(bool CheckNick = false);
 
 	/** Check if the user is recognized for their nick (on the nicks access list)
 	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual bool IsRecognized(bool CheckSecure = false) const;
+	virtual bool IsRecognized(bool CheckSecure = false);
 
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */

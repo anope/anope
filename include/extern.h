@@ -157,8 +157,8 @@ E std::vector<Anope::string> languages;
 E void InitLanguages();
 E const Anope::string GetString(const Anope::string &language, LanguageString string);
 E const Anope::string GetString(LanguageString string);
-E const Anope::string GetString(const NickCore *nc, LanguageString string);
-E const Anope::string GetString(const User *u, LanguageString string);
+E const Anope::string GetString(NickCore *nc, LanguageString string);
+E const Anope::string GetString(User *u, LanguageString string);
 E const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string);
 E Anope::string language_strings[LANG_STRING_COUNT];
 E void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message);
@@ -239,8 +239,8 @@ E const char *merge_args(int argc, char **argv);
 E const char *merge_args(int argc, const char **argv);
 
 E time_t dotime(const Anope::string &s);
-E Anope::string duration(const NickCore *nc, time_t seconds);
-E Anope::string expire_left(const NickCore *nc, time_t expires);
+E Anope::string duration(NickCore *nc, time_t seconds);
+E Anope::string expire_left(NickCore *nc, time_t expires);
 E Anope::string do_strftime(const time_t &t);
 E bool doValidHost(const Anope::string &host, int type);
 

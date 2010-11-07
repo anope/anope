@@ -946,9 +946,9 @@ class DBMySQL : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostCommand(User *u, const Anope::string &service, const Anope::string &command, const std::vector<Anope::string> &params)
+	void OnPostCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (service == Config->s_NickServ)
+		if (service == NickServ)
 		{
 			if (u->Account() && ((command.equals_ci("SET") && !params.empty()) || (command.equals_ci("SASET") && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
@@ -978,7 +978,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == Config->s_ChanServ)
+		else if (service == ChanServ)
 		{
 			if (command.equals_ci("SET") && u->Account() && params.size() > 1)
 			{
@@ -1019,7 +1019,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == Config->s_BotServ)
+		else if (service == BotServ)
 		{
 			if (command.equals_ci("KICK") && params.size() > 2)
 			{

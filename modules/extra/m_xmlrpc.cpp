@@ -256,8 +256,11 @@ void MyXMLRPCClientSocket::HandleMessage()
 	{
 		if (name == "methodName")
 			request.name = data;
-		else if (name == "id")
+		else if (name == "name" && data == "id")
+		{
+			this->GetData(name, data);
 			request.id = data;
+		}
 		else if (name == "string")
 			request.data.push_back(data);
 	}

@@ -447,36 +447,56 @@ void expire_chans()
 // XXX this is slightly inefficient
 void cs_remove_nick(const NickCore *nc)
 {
-	int j;
-	ChanAccess *ca;
-	AutoKick *akick;
-
 	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
+		for (unsigned j = ci->GetAccessCount(); j > 0; --j)
+		{
+			ChanAccess *ca = ci->GetAccess(j - 1);
+
+			if (ca->nc == nc)
+				ci->EraseAccess(j - 1);
+		}
+
+		for (unsigned j = ci->GetAkickCount(); j > 0; --j)
+		{
+			AutoKick *akick = ci->GetAkick(j - 1);
+			if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
+				ci->EraseAkick(j - 1);
+		}
+
 		if (ci->founder == nc)
 		{
-			if (ci->successor)
+			NickCore *newowner = NULL;
+			if (ci->successor && (ci->successor->IsServicesOper() || !Config->CSMaxReg || ci->successor->channelcount < Config->CSMaxReg))
+				newowner = ci->successor;
+			else
 			{
-				NickCore *nc2 = ci->successor;
-				if (!nc2->IsServicesOper() && Config->CSMaxReg && nc2->channelcount >= Config->CSMaxReg)
+				ChanAccess *highest = NULL;
+				for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 				{
-					Log(LOG_NORMAL, "chanserv/expire") << "Successor (" << nc2->display << " ) of " << ci->name << " owns too many channels, deleting channel",
-					delete ci;
-					continue;
+					ChanAccess *ca = ci->GetAccess(j);
+					
+					if (!ca->nc->IsServicesOper() && Config->CSMaxReg && ca->nc->channelcount >= Config->CSMaxReg)
+						continue;
+					if (!highest || ca->level > highest->level)
+						highest = ca;
 				}
-				else
-				{
-					Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to successor " << nc2->display;
-					ci->founder = nc2;
-					ci->successor = NULL;
-					++nc2->channelcount;
-				}
+				if (highest)
+					newowner = highest->nc;
+			}
+
+			if (newowner)
+			{
+				Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
+				ci->founder = newowner;
+				ci->successor = NULL;
+				++newowner->channelcount;
 			}
 			else
 			{
-				Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << "owned by deleted nick " << nc->display;
+				Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
 
 				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 				{
@@ -492,21 +512,6 @@ void cs_remove_nick(const NickCore *nc)
 
 		if (ci->successor == nc)
 			ci->successor = NULL;
-
-		for (j = ci->GetAccessCount(); j > 0; --j)
-		{
-			ca = ci->GetAccess(j - 1);
-
-			if (ca->nc == nc)
-				ci->EraseAccess(j - 1);
-		}
-
-		for (j = ci->GetAkickCount(); j > 0; --j)
-		{
-			akick = ci->GetAkick(j - 1);
-			if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-				ci->EraseAkick(j - 1);
-		}
 	}
 }
 

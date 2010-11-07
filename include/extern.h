@@ -160,7 +160,7 @@ E const Anope::string GetString(LanguageString string);
 E const Anope::string GetString(NickCore *nc, LanguageString string);
 E const Anope::string GetString(User *u, LanguageString string);
 E const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string);
-E Anope::string language_strings[LANG_STRING_COUNT];
+E const char *const language_strings[LANG_STRING_COUNT];
 E void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message);
 
 /*** logger.cpp ***/

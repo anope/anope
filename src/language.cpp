@@ -133,8 +133,7 @@ void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageStr
 	u->SendMessage(bi, MORE_INFO, bi->nick.c_str(), command.c_str());
 }
 
-Anope::string language_strings[LANG_STRING_COUNT] = {
-	/* LANGUAGE_NAME */
+const char *const language_strings[LANG_STRING_COUNT] = {
 	_("English"),
 	/* COMMAND_REQUIRES_PERM */
 	_("Access to this command requires the permission %s to be present in your opertype."),

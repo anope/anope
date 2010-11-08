@@ -255,7 +255,6 @@ CREATE TABLE IF NOT EXISTS `anope_ns_alias_metadata` (
   `nick` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
   `value` text NOT NULL,
-  PRIMARY KEY (`name`),
   KEY `FK_anope_ns_alias_metadata_nick` (`nick`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -286,8 +285,7 @@ CREATE TABLE IF NOT EXISTS `anope_ns_core` (
 CREATE TABLE IF NOT EXISTS `anope_ns_core_metadata` (
   `nick` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `value` text NOT NULL,
-  PRIMARY KEY (`name`)
+  `value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

@@ -211,6 +211,11 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 	}
 	else
 	{
+		if (!z || z == 3)
+			u->SendMessage(MemoServ, MEMO_SENT, name.c_str());
+		if ((!u->Account() || !u->Account()->IsServicesOper()) && mi->HasIgnore(u))
+			return;
+
 		u->lastmemosend = Anope::CurTime;
 		Memo *m = new Memo();
 		mi->memos.push_back(m);
@@ -224,8 +229,6 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 		/* Set receipt request flag */
 		if (z == 3)
 			m->SetFlag(MF_RECEIPT);
-		if (!z || z == 3)
-			u->SendMessage(MemoServ, MEMO_SENT, name.c_str());
 		if (!ischan)
 		{
 			NickCore *nc = findnick(name)->nc;
@@ -305,6 +308,14 @@ void MemoInfo::Del(Memo *memo)
 		delete memo;
 		this->memos.erase(it);
 	}
+}
+
+bool MemoInfo::HasIgnore(User *u)
+{
+	for (unsigned i = 0; i < this->ignores.size(); ++i)
+		if (u->nick.equals_ci(this->ignores[i]) || (u->Account() && u->Account()->display.equals_ci(this->ignores[i])) || Anope::Match(u->GetMask(), Anope::string(this->ignores[i])))
+			return true;
+	return false;
 }
 
 /*************************************************************************/

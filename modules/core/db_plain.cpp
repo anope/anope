@@ -609,6 +609,8 @@ class DBPlain : public Module
 			m->text = params[params.size() - 1];
 			nc->memos.memos.push_back(m);
 		}
+		else if (key.equals_ci("MIG"))
+			nc->memos.ignores.push_back(params[0].ci_str());
 
 		return EVENT_CONTINUE;
 	}
@@ -766,6 +768,8 @@ class DBPlain : public Module
 			m->text = params[params.size() - 1];
 			ci->memos.memos.push_back(m);
 		}
+		else if (key.equals_ci("MIG"))
+			ci->memos.ignores.push_back(params[0].ci_str());
 		else if (key.equals_ci("ENTRYMSG"))
 			ci->entry_message = params[0];
 		else if (key.equals_ci("BI"))
@@ -884,21 +888,20 @@ class DBPlain : public Module
 						db << " " << NickCoreFlags[j].Name;
 				db << endl;
 			}
-			if (!nc->memos.memos.empty())
+			MemoInfo *mi = &nc->memos;
+			for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
 			{
-				MemoInfo *mi = &nc->memos;
-				for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
-				{
-					db << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
-					if (mi->memos[k]->HasFlag(MF_UNREAD))
-						db << " UNREAD";
-					if (mi->memos[k]->HasFlag(MF_RECEIPT))
-						db << " RECEIPT";
-					if (mi->memos[k]->HasFlag(MF_NOTIFYS))
-						db << " NOTIFYS";
-					db << " :" << mi->memos[k]->text << endl;
-				}
+				db << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
+				if (mi->memos[k]->HasFlag(MF_UNREAD))
+					db << " UNREAD";
+				if (mi->memos[k]->HasFlag(MF_RECEIPT))
+					db << " RECEIPT";
+				if (mi->memos[k]->HasFlag(MF_NOTIFYS))
+					db << " NOTIFYS";
+				db << " :" << mi->memos[k]->text << endl;
 			}
+			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
+				db << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
 		}
 
@@ -1030,22 +1033,20 @@ class DBPlain : public Module
 						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
 				}
 			}
-			if (!ci->memos.memos.empty())
+			MemoInfo *memos = &ci->memos;
+			for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
 			{
-				MemoInfo *memos = &ci->memos;
-
-				for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
-				{
-					db << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
-					if (memos->memos[k]->HasFlag(MF_UNREAD))
-						db << " UNREAD";
-					if (memos->memos[k]->HasFlag(MF_RECEIPT))
-						db << " RECEIPT";
-					if (memos->memos[k]->HasFlag(MF_NOTIFYS))
-						db << " NOTIFYS";
-					db << " :" << memos->memos[k]->text << endl;
-				}
+				db << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
+				if (memos->memos[k]->HasFlag(MF_UNREAD))
+					db << " UNREAD";
+				if (memos->memos[k]->HasFlag(MF_RECEIPT))
+					db << " RECEIPT";
+				if (memos->memos[k]->HasFlag(MF_NOTIFYS))
+					db << " NOTIFYS";
+				db << " :" << memos->memos[k]->text << endl;
 			}
+			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
+				db << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
 			if (!ci->entry_message.empty())
 				db << "MD ENTRYMSG :" << ci->entry_message << endl;
 			if (ci->bi)

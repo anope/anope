@@ -1605,6 +1605,20 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Nick %s doesn't have a memo from you."),
 	/* MEMO_NO_RSEND_SELF */
 	_("You can not request a receipt when sending a memo to yourself."),
+	/* MEMO_IGNORE_SYNTAX */
+	_("IGNORE [\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"),
+	/* MEMO_IGNORE_ADD */
+	_("\002%s\002 added to your ignore list."),
+	/* MEMO_IGNORE_ALREADY_IGNORED */
+	_("\002%s\002 is already on your ignore list."),
+	/* MEMO_IGNORE_DEL */
+	_("\002%s\002 removed from your ignore list."),
+	/* MEMO_IGNORE_NOT_IGNORED */
+	_("\002%s\002 is not on your ignore list."),
+	/* MEMO_IGNORE_LIST_EMPTY */
+	_("Your memo ignore list is empty."),
+	/* MEMO_IGNORE_LIST_HEADER */
+	_("Ignore list:"),
 	/* BOT_DOES_NOT_EXIST */
 	_("Bot %s does not exist."),
 	/* BOT_NOT_ASSIGNED */
@@ -4185,6 +4199,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    SENDALL  Send a memo to all registered users"),
 	/* MEMO_HELP_CMD_STAFF */
 	_("    STAFF  Send a memo to all opers/admins"),
+	/* MEMO_HELP_CMD_IGNORE */
+	_("    IGNORE Manage your memo ignore list"),
 	/* MEMO_HELP_HEADER */
 	_("%S is a utility allowing IRC users to send short\n"
 	"messages to other IRC users, whether they are online at\n"
@@ -4341,6 +4357,11 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Checks whether the _last_ memo you sent to nick has been read\n"
 	"or not. Note that this does only work with nicks, not with chans."),
+	/* MEMO_HELP_IGNORE */
+	_("Syntax: \002IGNORE [\037channek\037] {\002ADD|DEL|LIST\002} [\037entry\037]\n"
+	" \n"
+	"Allows you to ignore users by nick or host from memoing you. If someone on your\n"
+	"memo ignore list tries to memo you, they will not be told that you have them ignored."),
 	/* OPER_HELP_CMD_GLOBAL */
 	_("    GLOBAL      Send a message to all users"),
 	/* OPER_HELP_CMD_STATS */

@@ -905,6 +905,26 @@ class DBMySQL : public Module
 			FOREACH_RESULT(I_OnDatabaseRead, OnDatabaseRead(params));
 		}
 
+		r = SQL->RunQuery("SELECT * FROM `anope_ns_core_metadata`");
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			NickCore *nc = findcore(r.Get(i, "nick"));
+			if (!nc)
+				continue;
+			if (r.Get(i, "name") == "MEMO_IGNORE")
+				nc->memos.ignores.push_back(r.Get(i, "value").ci_str());
+		}
+
+		r = SQL->RunQuery("SELECT * FROM `anope_cs_info_metadata`");
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
+			if (!ci)
+				continue;
+			if (r.Get(i, "name") == "MEMO_IGNORE")
+				ci->memos.ignores.push_back(r.Get(i, "value").ci_str());
+		}
+
 		return EVENT_STOP;
 	}
 
@@ -1071,6 +1091,36 @@ class DBMySQL : public Module
 				{
 					this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + GetBotFlags(ci->botflags) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
+			}
+		}
+		else if (service == MemoServ)
+		{
+			if (command.equals_ci("IGNORE") && params.size() > 0)
+			{
+				Anope::string target = params[0];
+				NickCore *nc = NULL;
+				ChannelInfo *ci = NULL;
+				if (target[0] != '#')
+				{
+					target = u->nick;
+					nc = u->Account();
+					if (!nc)
+						return;
+				}
+				else
+				{
+					ci = cs_findchan(target);
+					if (!ci || !check_access(u, ci, CA_MEMO))
+						return;
+				}
+
+				MemoInfo *mi = ci ? &ci->memos : &nc->memos;
+				Anope::string table = ci ? "anope_cs_info_metadata" : "anope_ns_core_metadata";
+				Anope::string ename = ci ? "channel" : "nick";
+
+				this->RunQuery("DELETE FROM `" + table + "` WHERE `" + ename + "` = '" + this->Escape(target) + "' AND `name` = 'MEMO_IGNORE'");
+				for (unsigned j = 0; j < mi->ignores.size(); ++j)
+					this->RunQuery("INSERT INTO `" + table + "` VALUES(" + ename + ", name, value) ('" + this->Escape(target) + "', 'MEMO_IGNORE', '" + this->Escape(mi->ignores[j]) + "')");
 			}
 		}
 	}

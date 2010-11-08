@@ -5,6 +5,7 @@ Legend:
 
 1.9.4
 -----
+[x] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 
 Future
 ------
@@ -16,7 +17,6 @@ Future
   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
-[ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
 [ ] Allow channel founders to change the fantasy trigger for their channel.
 [ ] CIDR Akills, session exceptions, etc
 [ ] Language charset stuff, including collation (1.9.1? phoenix?)

@@ -487,10 +487,12 @@ struct CoreExport MemoInfo
 {
 	unsigned memomax;
 	std::vector<Memo *> memos;
+	std::vector<ci::string> ignores;
 
 	unsigned GetIndex(Memo *m) const;
 	void Del(unsigned index);
 	void Del(Memo *m);
+	bool HasIgnore(User *u);
 };
 
 /*************************************************************************/

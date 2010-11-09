@@ -7,7 +7,7 @@ static inline unsigned short GetRandomID()
 	return rand();
 }
 
-DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : creator(c), address(addr), QT(qt)
+DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : timeout(NULL), id(0), creator(c), address(addr), QT(qt)
 {
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
@@ -52,6 +52,9 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 
 DNSRequest::~DNSRequest()
 {
+	/* We never got a chance to fire off a query or create a timer */
+	if (!this->timeout)
+		return;
 	/* DNSRequest came back, delete the timeout */
 	if (!this->timeout->done)
 	{

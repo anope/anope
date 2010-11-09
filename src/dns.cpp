@@ -559,6 +559,7 @@ void DNSManager::Tick(time_t now)
 
 	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_next; it != this->cache.end(); it = it_next)
 	{
+		Anope::string host = it->first;
 		DNSRecord *req = it->second;
 		it_next = it;
 		++it_next;

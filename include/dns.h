@@ -33,6 +33,7 @@ enum QueryFlags
 
 enum DNSError
 {
+	DNS_ERROR_NONE,
 	DNS_ERROR_UNKNOWN,
 	DNS_ERROR_UNLOADED,
 	DNS_ERROR_TIMEOUT,
@@ -57,6 +58,8 @@ class CoreExport DNSRequest
 {
 	/* Timeout timer for this request */
 	DNSRequestTimeout *timeout;
+	/* Use result cache if available */
+	bool use_cache;
 
  public:
 	/* Request id */
@@ -73,9 +76,11 @@ class CoreExport DNSRequest
 
 	virtual ~DNSRequest();
 
+	void Process();
+
 	virtual void OnLookupComplete(const DNSRecord *r) = 0;
 
-	virtual void OnError(DNSError error, const Anope::string &message);
+	virtual void OnError(const DNSRecord *r);
 };
 
 /** A full packet sent to the nameserver, may contain multiple queries
@@ -116,6 +121,8 @@ struct DNSRecord
 	Anope::string result;
 	/* Type of query this was */
 	QueryType type;
+	/* Error, if there was one */
+	DNSError error;
 	/* Record class, should always be 1 */
 	unsigned short record_class;
 	/* Time to live */
@@ -123,7 +130,7 @@ struct DNSRecord
 	/* Record length */
 	unsigned short rdlength;
 
-	inline DNSRecord();
+	inline DNSRecord(const Anope::string &n);
 	/* When this record was created in our cache */
 	time_t created;
 };

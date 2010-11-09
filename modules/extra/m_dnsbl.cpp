@@ -146,11 +146,12 @@ class ModuleDNSBL : public Module
 			try
 			{
 				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
-				new DNSBLResolver(this, u, b, dnsbl_host, this->add_to_akill);
+				DNSBLResolver *res = new DNSBLResolver(this, u, b, dnsbl_host, this->add_to_akill);
+				res->Process();
 			}
 			catch (const SocketException &ex)
 			{
-				Log() << "Resolver: " << ex.GetReason();
+				Log() << "m_dnsbl: " << ex.GetReason();
 			}
 		}
 

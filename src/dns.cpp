@@ -7,7 +7,7 @@ static inline unsigned short GetRandomID()
 	return rand();
 }
 
-DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : timeout(NULL), id(0), creator(c), address(addr), QT(qt)
+DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : timeout(NULL), use_cache(cache), id(0), creator(c), address(addr), QT(qt)
 {
 	if (!DNSEngine)
 		DNSEngine = new DNSManager();
@@ -18,36 +18,6 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 	}
 	if (DNSEngine->packets.size() == 65535)
 		throw SocketException("DNS queue full");
-	
-	Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << addr << ", of type " << qt;
-
-	if (cache && DNSEngine->CheckCache(this))
-	{
-		delete this;
-		return;
-	}
-	
-	DNSPacket *p = new DNSPacket();	
-	p->flags = DNS_QUERYFLAGS_RD;
-
-	if (!p->AddQuestion(addr, qt))
-	{
-		Log() << "Resolver: Unable to lookup host " << addr << " of type " << qt << " - internal error";
-		delete p;
-		delete this;
-		return;
-	}
-
-	unsigned short packet_id;
-	while (DNSEngine->requests.count((packet_id = GetRandomID())));
-
-	p->id = this->id = packet_id;
-	DNSEngine->requests[this->id] = this;
-	DNSEngine->packets.push_back(p);
-
-	SocketEngine->MarkWritable(DNSEngine->sock);
-
-	this->timeout = new DNSRequestTimeout(this, Config->DNSTimeout);
 }
 
 DNSRequest::~DNSRequest()
@@ -68,7 +38,43 @@ DNSRequest::~DNSRequest()
 	}
 }
 
-void DNSRequest::OnError(DNSError error, const Anope::string &message)
+void DNSRequest::Process()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << this->address << ", of type " << this->QT;
+
+	if (this->use_cache && DNSEngine->CheckCache(this))
+	{
+		Log(LOG_DEBUG_2) << "Resolver: Using cached result";
+		delete this;
+		return;
+	}
+	
+	DNSPacket *p = new DNSPacket();	
+	p->flags = DNS_QUERYFLAGS_RD;
+
+	if (!p->AddQuestion(this->address, this->QT))
+	{
+		Log() << "Resolver: Unable to lookup host " << this->address << " of type " << this->QT << " - internal error";
+		delete p;
+		delete this;
+		throw SocketException("Unable to lookup host " + this->address + " of type " + stringify(this->QT) + " - internal error");
+	}
+
+	unsigned short packet_id;
+	do
+		packet_id = GetRandomID();
+	while (DNSEngine->requests.count(packet_id));
+
+	p->id = this->id = packet_id;
+	DNSEngine->requests[this->id] = this;
+	DNSEngine->packets.push_back(p);
+
+	SocketEngine->MarkWritable(DNSEngine->sock);
+
+	this->timeout = new DNSRequestTimeout(this, Config->DNSTimeout);
+}
+
+void DNSRequest::OnError(const DNSRecord *r)
 {
 }
 
@@ -207,9 +213,10 @@ inline void DNSPacket::FillBuffer(unsigned char *buffer)
 	memcpy(&buffer[12], this->payload, this->payload_count);
 }
 
-inline DNSRecord::DNSRecord()
+inline DNSRecord::DNSRecord(const Anope::string &n) : name(n)
 {
 	this->type = DNS_QUERY_NONE;
+	this->error = DNS_ERROR_NONE;
 	this->record_class = this->ttl = this->rdlength = 0;
 	this->created = Anope::CurTime;
 }
@@ -279,46 +286,59 @@ bool DNSSocket::ProcessRead()
 	if (!(recv_packet.flags & DNS_QUERYFLAGS_QR))
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received a non-answer";
-		request->OnError(DNS_ERROR_NOT_AN_ANSWER, "Received a non-answer");
+		DNSRecord rr(request->address);
+		rr.error = DNS_ERROR_NOT_AN_ANSWER;
+		request->OnError(&rr);
 	}
 	else if (recv_packet.flags & DNS_QUERYFLAGS_OPCODE)
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received a nonstandard query";
-		request->OnError(DNS_ERROR_NONSTANDARD_QUERY, "Received a nonstandard query");
+		DNSRecord rr(request->address);
+		rr.error = DNS_ERROR_NONSTANDARD_QUERY;
+		request->OnError(&rr);
 	}
 	else if (recv_packet.flags & DNS_QUERYFLAGS_RCODE)
 	{
+		DNSError error = DNS_ERROR_UNKNOWN;
+
 		switch (recv_packet.flags & DNS_QUERYFLAGS_RCODE)
 		{
 			case 1:
-				Log(LOG_DEBUG_2) << "Resolver: Format error";
-				request->OnError(DNS_ERROR_FORMAT_ERROR, "Format error");
+				Log(LOG_DEBUG_2) << "Resolver: format error";
+				error = DNS_ERROR_FORMAT_ERROR;
 				break;
 			case 2:
-				Log(LOG_DEBUG_2) << "Resolver: Server failure";
-				request->OnError(DNS_ERROR_SERVER_FAILURE, "Server failure");
+				Log(LOG_DEBUG_2) << "Resolver: server error";
+				error = DNS_ERROR_SERVER_FAILURE;
 				break;
 			case 3:
-				Log(LOG_DEBUG_2) << "Resolver: Domain name not found";
-				request->OnError(DNS_ERROR_DOMAIN_NOT_FOUND, "Domain not found");
+				Log(LOG_DEBUG_2) << "Resolver: domain not found";
+				error = DNS_ERROR_DOMAIN_NOT_FOUND;
 				break;
 			case 4:
-				Log(LOG_DEBUG_2) << "Resolver: Not Implemented - The name server does not support the requested kind of query.";
-				request->OnError(DNS_ERROR_NOT_IMPLEMENTED, "Not Implemented - The name server does not support the requested kind of query.");
+				Log(LOG_DEBUG_2) << "Resolver: not implemented";
+				error = DNS_ERROR_NOT_IMPLEMENTED;
 				break;
 			case 5:
-				Log(LOG_DEBUG_2) << "Resolver: Server refused to perform the specificed operation";
-				request->OnError(DNS_ERROR_REFUSED, "Server refused to perform the specified operation");
+				Log(LOG_DEBUG_2) << "Resolver: refused";
+				error = DNS_ERROR_REFUSED;
 				break;
 			default:
-				Log(LOG_DEBUG_2) << "Resolver: Unknown error";
-				request->OnError(DNS_ERROR_UNKNOWN, "Unknown error");
+				break;
 		}
+
+		DNSRecord *rr = new DNSRecord(request->address);
+		rr->ttl = 300;
+		rr->error = error;
+		request->OnError(rr);
+		DNSEngine->AddCache(rr);
 	}
 	else if (recv_packet.ancount < 1)
 	{
 		Log(LOG_DEBUG_2) << "Resolver: No resource records returned";
-		request->OnError(DNS_ERROR_NO_RECORDS, "No resource records returned");
+		DNSRecord rr(request->address);
+		rr.error = DNS_ERROR_NO_RECORDS;
+		request->OnError(&rr);
 	}
 	else
 	{
@@ -362,8 +382,7 @@ bool DNSSocket::ProcessRead()
 			else
 				packet_pos = packet_pos_ptr + 1;
 
-			DNSRecord *rr = new DNSRecord;
-			rr->name = name;
+			DNSRecord *rr = new DNSRecord(name);
 
 			Log(LOG_DEBUG_2) << "Resolver: Received answer for " << name;
 
@@ -390,7 +409,8 @@ bool DNSSocket::ProcessRead()
 					if (!inet_ntop(AF_INET, &ip, ipbuf, sizeof(ipbuf)))
 					{
 						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << Anope::LastError();
-						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + Anope::LastError());
+						rr->error = DNS_ERROR_FORMAT_ERROR;
+						request->OnError(rr);
 						delete rr;
 						rr = NULL;
 					}
@@ -409,7 +429,8 @@ bool DNSSocket::ProcessRead()
 					if (!inet_ntop(AF_INET6, &ip, ipbuf, sizeof(ipbuf)))
 					{
 						Log(LOG_DEBUG_2) << "Resolver: Received an invalid IP for DNS_QUERY_A: " << Anope::LastError();
-						request->OnError(DNS_ERROR_FORMAT_ERROR, "Received an invalid IP from the nameserver: " + Anope::LastError());
+						rr->error = DNS_ERROR_FORMAT_ERROR;
+						request->OnError(rr);
 						delete rr;
 						rr = NULL;
 					}
@@ -445,8 +466,9 @@ bool DNSSocket::ProcessRead()
 					break;
 				}
 				default:
+					rr->error = DNS_ERROR_INVALIDTYPE;
+					request->OnError(rr);
 					delete rr;
-					request->OnError(DNS_ERROR_INVALIDTYPE, "Invalid query type");
 					rr = NULL;
 			}
 
@@ -489,7 +511,7 @@ bool DNSSocket::ProcessWrite()
 	return cont;
 }
 
-DNSManager::DNSManager() : Timer(3600, Anope::CurTime, true)
+DNSManager::DNSManager() : Timer(300, Anope::CurTime, true)
 {
 	this->sock = NULL;
 }
@@ -510,17 +532,22 @@ bool DNSManager::CheckCache(DNSRequest *request)
 	if (it != this->cache.end())
 	{
 		std::multimap<Anope::string, DNSRecord *>::iterator it_end = this->cache.upper_bound(request->address);
+		bool ret = false;
 		
 		for (; it != it_end; ++it)
 		{
 			DNSRecord *rec = it->second;
 			if (rec->created + rec->ttl >= Anope::CurTime)
 			{
-				request->OnLookupComplete(rec);
+				if (rec->error == DNS_ERROR_NONE)
+					request->OnLookupComplete(rec);
+				else
+					request->OnError(rec);
+				ret = true;
 			}
 		}
 		
-		return true;
+		return ret;
 	}
 
 	return false;
@@ -528,14 +555,18 @@ bool DNSManager::CheckCache(DNSRequest *request)
 
 void DNSManager::Tick(time_t now)
 {
-	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_end = this->cache.end(); it != it_end; ++it)
+	Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
+
+	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_end = this->cache.end(); it != it_end;)
 	{
+		Anope::string host = it->first;
 		DNSRecord *req = it->second;
+		++it;
 
 		if (req->created + req->ttl < now)
 		{
+			this->cache.erase(host);
 			delete req;
-			this->cache.erase(it);
 		}
 	}
 }
@@ -550,7 +581,9 @@ void DNSManager::Cleanup(Module *mod)
 
 		if (req->creator && req->creator == mod)
 		{
-			req->OnError(DNS_ERROR_UNLOADED, "Module is being unloaded");
+			DNSRecord rr(req->address);
+			rr.error = DNS_ERROR_UNLOADED;
+			req->OnError(&rr);
 			delete req;
 			this->requests.erase(id);
 		}
@@ -569,7 +602,9 @@ DNSRequestTimeout::~DNSRequestTimeout()
 void DNSRequestTimeout::Tick(time_t)
 {
 	this->done = true;
-	this->request->OnError(DNS_ERROR_TIMEOUT, "Request timed out");
+	DNSRecord rr(this->request->address);
+	rr.error = DNS_ERROR_TIMEOUT;
+	this->request->OnError(&rr);
 	delete this->request;
 }
 

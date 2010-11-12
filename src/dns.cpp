@@ -557,15 +557,16 @@ void DNSManager::Tick(time_t now)
 {
 	Log(LOG_DEBUG_2) << "Resolver: Purging DNS cache";
 
-	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_end = this->cache.end(); it != it_end;)
+	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_next; it != this->cache.end(); it = it_next)
 	{
 		Anope::string host = it->first;
 		DNSRecord *req = it->second;
-		++it;
+		it_next = it;
+		++it_next;
 
 		if (req->created + req->ttl < now)
 		{
-			this->cache.erase(host);
+			this->cache.erase(it);
 			delete req;
 		}
 	}

@@ -12,10 +12,8 @@
 
 class BotInfo;
 
-typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, ci::hash, std::equal_to<ci::string> > botinfo_map;
-typedef unordered_map_namespace::unordered_map<Anope::string, BotInfo *, Anope::hash> botinfo_uid_map;
-extern CoreExport botinfo_map BotListByNick;
-extern CoreExport botinfo_uid_map BotListByUID;
+extern CoreExport patricia_tree<BotInfo, std::equal_to<ci::string> > BotListByNick;
+extern CoreExport patricia_tree<BotInfo> BotListByUID;
 
 /** Flags settable on a bot
  */

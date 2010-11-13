@@ -37,9 +37,9 @@ void introduce_user(const Anope::string &user)
 	}
 
 	/* We make the bots go online */
-	for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
-		User *u = it->second;
+		User *u = *it;
 
 		if (user.empty() || u->nick.equals_ci(user))
 		{

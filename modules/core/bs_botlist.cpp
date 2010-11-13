@@ -30,9 +30,9 @@ class CommandBSBotList : public Command
 			return MOD_CONT;
 		}
 
-		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
-			BotInfo *bi = it->second;
+			BotInfo *bi = *it;
 
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
@@ -47,9 +47,9 @@ class CommandBSBotList : public Command
 		{
 			u->SendMessage(BotServ, BOT_BOTLIST_PRIVATE_HEADER);
 
-			for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+			for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
-				BotInfo *bi = it->second;
+				BotInfo *bi = *it;
 
 				if (bi->HasFlag(BI_PRIVATE))
 				{

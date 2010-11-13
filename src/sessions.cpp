@@ -45,7 +45,7 @@
 
 /*************************************************************************/
 
-session_map SessionList;
+patricia_tree<Session> SessionList;
 
 std::vector<Exception *> exceptions;
 
@@ -58,9 +58,9 @@ void get_session_stats(long &count, long &mem)
 	count = SessionList.size();
 	mem = sizeof(Session) * SessionList.size();
 
-	for (session_map::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
+	for (patricia_tree<Session>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 	{
-		Session *session = it->second;
+		Session *session = *it;
 
 		mem += session->host.length() + 1;
 	}
@@ -89,11 +89,7 @@ void get_exception_stats(long &count, long &mem)
 
 Session *findsession(const Anope::string &host)
 {
-	session_map::const_iterator it = SessionList.find(host);
-
-	if (it != SessionList.end())
-		return it->second;
-	return NULL;
+	return SessionList.find(host);
 }
 
 /* Attempt to add a host to the session list. If the addition of the new host
@@ -157,7 +153,7 @@ void add_session(const Anope::string &nick, const Anope::string &host, const Ano
 		session->count = 1;
 		session->hits = 0;
 
-		SessionList[session->host] = session;
+		SessionList.insert(session->host, session);
 	}
 }
 

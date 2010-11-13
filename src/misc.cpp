@@ -618,16 +618,8 @@ bool nickIsServices(const Anope::string &tempnick, bool bot)
 		return true;
 	else if (!Config->s_GlobalNoticer.empty() && nick.equals_ci(Config->s_GlobalNoticer))
 		return true;
-	else if (!Config->s_BotServ.empty() && bot)
-	{
-		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-		{
-			BotInfo *bi = it->second;
-
-			if (nick.equals_ci(bi->nick))
-				return true;
-		}
-	}
+	else if (!Config->s_BotServ.empty() && bot && BotListByNick.find(nick))
+		return true;
 
 	return false;
 }

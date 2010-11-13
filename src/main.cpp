@@ -172,14 +172,16 @@ void do_restart_services()
 	if (quitmsg.empty())
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
+		BotInfo *bi = *it;
+
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
-		ircdproto->SendQuit(it->second, "Restarting");
+		ircdproto->SendQuit(bi, "Restarting");
 		/* Erase bots from the user list so they don't get nuked later on */
-		UserListByNick.erase(it->second->nick);
-		if (!it->second->GetUID().empty())
-			UserListByUID.erase(it->second->GetUID());
+		UserListByNick.erase(bi->nick);
+		if (!bi->GetUID().empty())
+			UserListByUID.erase(bi->GetUID());
 	}
 	ircdproto->SendSquit(Config->ServerName, quitmsg);
 	SocketEngine->Process();
@@ -212,20 +214,22 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
+			BotInfo *bi = *it;
+
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
-			ircdproto->SendQuit(it->second, "Shutting down");
+			ircdproto->SendQuit(bi, "Shutting down");
 			/* Erase bots from the user list so they don't get nuked later on */
-			UserListByNick.erase(it->second->nick);
-			if (!it->second->GetUID().empty())
-				UserListByUID.erase(it->second->GetUID());
+			UserListByNick.erase(bi->nick);
+			if (!bi->GetUID().empty())
+				UserListByUID.erase(bi->GetUID());
 		}
 
 		ircdproto->SendSquit(Config->ServerName, quitmsg);
 
 		while (!UserListByNick.empty())
-			delete UserListByNick.begin()->second;
+			delete UserListByNick.front();
 	}
 	SocketEngine->Process();
 	delete UplinkSock;
@@ -491,9 +495,9 @@ int main(int ac, char **av, char **envp)
 				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
 				/* Clear all of our users, but not our bots */
-				for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+				for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 				{
-					User *u = it->second;
+					User *u = *it;
 					++it;
 
 					if (u->server != Me)

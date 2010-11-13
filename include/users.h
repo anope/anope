@@ -8,14 +8,8 @@
 #ifndef USERS_H
 #define USERS_H
 
-/* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
- * be assumed to have users
- */
-typedef unordered_map_namespace::unordered_map<Anope::string, User *, ci::hash, std::equal_to<ci::string> > user_map;
-typedef unordered_map_namespace::unordered_map<Anope::string, User *, Anope::hash> user_uid_map;
-
-extern CoreExport user_map UserListByNick;
-extern CoreExport user_uid_map UserListByUID;
+extern CoreExport patricia_tree<User, std::equal_to<ci::string> > UserListByNick;
+extern CoreExport patricia_tree<User> UserListByUID;
 
 class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {

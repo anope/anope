@@ -207,9 +207,9 @@ class CommandCSAKick : public Command
 		{
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
-			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
-				User *u2 = it->second;
+				User *u2 = *it;
 
 				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask, u2))
 				{

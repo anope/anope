@@ -571,9 +571,9 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	{
 		Anope::string rreason = "G-Lined: " + reason;
 
-		for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+		for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 		{
-			User *user = it->second;
+			User *user = *it;
 			++it;
 
 			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
@@ -672,9 +672,9 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		}
 		else
 		{
-			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 			{
-				User *user = it->second;
+				User *user = *it;
 				++it;
 
 				if (!is_oper(user) && Anope::Match(user->nick, x->Mask))

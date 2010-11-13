@@ -9,8 +9,8 @@
 #include "modules.h"
 #include "commands.h"
 
-botinfo_map BotListByNick;
-botinfo_uid_map BotListByUID;
+patricia_tree<BotInfo, std::equal_to<ci::string> > BotListByNick;
+patricia_tree<BotInfo> BotListByUID;
 
 BotInfo *BotServ = NULL;
 BotInfo *ChanServ = NULL;
@@ -46,9 +46,9 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	else
 		this->UnsetFlag(BI_CORE);
 
-	BotListByNick[this->nick] = this;
+	BotListByNick.insert(this->nick, this);
 	if (!this->uid.empty())
-		BotListByUID[this->uid] = this;
+		BotListByUID.insert(this->uid, this);
 
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
@@ -85,8 +85,8 @@ void BotInfo::SetNewNick(const Anope::string &newnick)
 
 	this->nick = newnick;
 
-	UserListByNick[this->nick] = this;
-	BotListByNick[this->nick] = this;
+	UserListByNick.insert(this->nick, this);
+	BotListByNick.insert(this->nick, this);
 }
 
 void BotInfo::RejoinAll()

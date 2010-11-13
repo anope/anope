@@ -50,9 +50,9 @@ class CommandOSUserList : public Command
 		{
 			u->SendMessage(OperServ, OPER_USERLIST_HEADER);
 
-			for (user_map::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
+			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
-				User *u2 = uit->second;
+				User *u2 = *it;
 
 				if (!pattern.empty())
 				{
@@ -60,8 +60,8 @@ class CommandOSUserList : public Command
 					if (!Anope::Match(mask, pattern))
 						continue;
 					if (!Modes.empty())
-						for (std::list<UserModeName>::iterator it = Modes.begin(), it_end = Modes.end(); it != it_end; ++it)
-							if (!u2->HasMode(*it))
+						for (std::list<UserModeName>::iterator mit = Modes.begin(), mit_end = Modes.end(); mit != mit_end; ++mit)
+							if (!u2->HasMode(*mit))
 								continue;
 				}
 				u->SendMessage(OperServ, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());

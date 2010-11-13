@@ -38,9 +38,9 @@ class CommandOSNOOP : public Command
 			u->SendMessage(OperServ, OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
-			for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; )
+			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
-				User *u2 = it->second;
+				User *u2 = *it;
 				++it;
 
 				if (u2 && is_oper(u2) && Anope::Match(u2->server->GetName(), server, true))

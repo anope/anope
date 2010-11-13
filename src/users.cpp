@@ -12,11 +12,8 @@
 #include "services.h"
 #include "modules.h"
 
-/* Hash maps used for users. Note UserListByUID will not be used on non-TS6 IRCds, and should never
- * be assumed to have users
- */
-user_map UserListByNick;
-user_uid_map UserListByUID;
+patricia_tree<User, std::equal_to<ci::string> > UserListByNick;
+patricia_tree<User> UserListByUID;
 
 int32 opcnt = 0;
 uint32 usercnt = 0, maxusercnt = 0;
@@ -45,9 +42,9 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->uid = suid;
 	this->isSuperAdmin = 0;
 
-	UserListByNick[snick] = this;
+	UserListByNick.insert(snick, this);
 	if (!suid.empty())
-		UserListByUID[suid] = this;
+		UserListByUID.insert(suid, this);
 
 	this->nc = NULL;
 
@@ -71,7 +68,7 @@ void User::SetNewNick(const Anope::string &newnick)
 
 	this->nick = newnick;
 
-	UserListByNick[this->nick] = this;
+	UserListByNick.insert(this->nick, this);
 
 	OnAccess = false;
 	NickAlias *na = findnick(this->nick);
@@ -680,9 +677,9 @@ void get_user_stats(long &count, long &mem)
 {
 	count = mem = 0;
 
-	for (user_map::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
-		User *user = it->second;
+		User *user = *it;
 
 		++count;
 		mem += sizeof(*user);
@@ -703,19 +700,9 @@ void get_user_stats(long &count, long &mem)
 User *finduser(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircd->ts6)
-	{
-		user_uid_map::const_iterator it = UserListByUID.find(nick);
+		return UserListByUID.find(nick);
 
-		if (it != UserListByUID.end())
-			return it->second;
-		return NULL;
-	}
-
-	user_map::const_iterator it = UserListByNick.find(nick);
-
-	if (it != UserListByNick.end())
-		return it->second;
-	return NULL;
+	return UserListByNick.find(nick);
 }
 
 /*************************************************************************/

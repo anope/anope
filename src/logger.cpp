@@ -36,9 +36,9 @@ void InitLogChannels(ServerConfig *config)
 				c->SetFlag(CH_LOGCHAN);
 				c->SetFlag(CH_PERSIST);
 
-				for (botinfo_map::const_iterator bit = BotListByNick.begin(), bit_end = BotListByNick.end(); bit != bit_end; ++bit)
+				for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 				{
-					BotInfo *bi = bit->second;
+					BotInfo *bi = *it;
 
 					if (bi->HasFlag(BI_CORE) && !c->FindUser(bi))
 					{

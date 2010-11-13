@@ -89,9 +89,9 @@ void SetDefaultMLock(ServerConfig *config)
 	}
 
 	/* Apply the new modes to channels */
-	for (botinfo_map::const_iterator it = BotListByNick.begin(); it != BotListByNick.end(); ++it)
+	for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
-		BotInfo *bi = it->second;
+		BotInfo *bi = *it;
 
 		for (UChannelList::const_iterator cit = bi->chans.begin(); cit != bi->chans.end(); ++cit)
 		{

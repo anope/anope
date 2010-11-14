@@ -89,7 +89,8 @@ class CommandCSBan : public Command
 
 	void OnServHelp(User *u)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_BAN);
+		if (this->name.equals_ci("BAN"))
+			u->SendMessage(ChanServ, CHAN_HELP_CMD_BAN);
 	}
 };
 

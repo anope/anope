@@ -75,7 +75,8 @@ class CommandCSKick : public Command
 
 	void OnServHelp(User *u)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_KICK);
+		if (this->name.equals_ci("KICK"))
+			u->SendMessage(ChanServ, CHAN_HELP_CMD_KICK);
 	}
 };
 

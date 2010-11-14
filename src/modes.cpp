@@ -822,3 +822,18 @@ void ModeManager::ProcessModes()
 		StackerObjects.clear();
 	}
 }
+
+/** Delete a user or channel from the stacker
+ * @param b The user/channel
+ */
+void ModeManager::StackerDel(Base *b)
+{
+	for (std::list<std::pair<Base *, StackerInfo *> >::iterator it = ModeManager::StackerObjects.begin(), it_end = ModeManager::StackerObjects.end(); it != it_end; ++it)
+	{
+		if (b == it->first)
+		{
+			ModeManager::StackerObjects.erase(it);
+			break;
+		}
+	}
+}

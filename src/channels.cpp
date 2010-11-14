@@ -47,6 +47,8 @@ Channel::~Channel()
 {
 	FOREACH_MOD(I_OnChannelDelete, OnChannelDelete(this));
 
+	ModeManager::StackerDel(this);
+
 	Log(NULL, this, "destroy");
 
 	for (std::list<BanData *>::iterator it = this->bd.begin(), it_end = this->bd.end(); it != it_end; ++it)

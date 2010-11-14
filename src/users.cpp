@@ -188,9 +188,11 @@ User::~User()
 
 	Log(this, "disconnect") << "(" << this->realname << ") " << "disconnected from the network (" << this->server->GetName() << ")";
 
-	this->Logout();
 
 	FOREACH_MOD(I_OnUserLogoff, OnUserLogoff(this));
+
+	ModeManager::StackerDel(this);
+	this->Logout();
 
 	--usercnt;
 

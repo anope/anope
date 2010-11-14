@@ -483,6 +483,11 @@ class CoreExport ModeManager
 	/** Process all of the modes in the stacker and send them to the IRCd to be set on channels/users
 	 */
 	static void ProcessModes();
+
+	/** Delete a user or channel from the stacker
+	 * @param b The user/channel
+	 */
+	static void StackerDel(Base *b);
 };
 
 #endif // MODES_H

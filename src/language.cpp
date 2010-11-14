@@ -2094,7 +2094,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* OPER_SVSNICK_NEWNICK */
 	_("The nick %s is now being changed to %s."),
 	/* OPER_AKILL_SYNTAX */
-	_("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list} [reason]]"),
+	_("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {\037nick\037 | mask | entry-list} [reason]]"),
 	/* OPER_AKILL_EXISTS */
 	_("%s already exists on the AKILL list."),
 	/* OPER_ALREADY_COVERED */
@@ -2157,7 +2157,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* OPER_SNLINE_CLEAR */
 	_("The SNLINE list has been cleared."),
 	/* OPER_SQLINE_SYNTAX */
-	_("SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list} [reason]]"),
+	_("SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {\037nick\037 | mask | entry-list} [reason]]"),
 	/* OPER_SQLINE_CHANNELS_UNSUPPORTED */
 	_("Channel SQLINEs are not supported by your IRCd, so you can't use them."),
 	/* OPER_SQLINE_EXISTS */
@@ -2184,7 +2184,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* OPER_SQLINE_CLEAR */
 	_("The SQLINE list has been cleared."),
 	/* OPER_SZLINE_SYNTAX */
-	_("SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list} [reason]]"),
+	_("SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {\037nick\037 | mask | entry-list} [reason]]"),
 	/* OPER_SZLINE_EXISTS */
 	_("%s already exists on the SZLINE list."),
 	/* OPER_SZLINE_ONLY_IPS */
@@ -4534,7 +4534,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"types, will instruct all servers to add a ban (K-line) for\n"
 	"the mask which the user matched.\n"
 	" \n"
-	"AKILL ADD adds the given user@host/ip mask to the AKILL\n"
+	"AKILL ADD adds the given nick or user@host/ip mask to the AKILL\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
 	"(days), h (hours), or m (minutes).  Combinations (such as \n"
@@ -4623,7 +4623,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"prevent the use of matching channels (on IRCds that \n"
 	"support it).\n"
 	" \n"
-	"SQLINE ADD adds the given mask to the SQLINE\n"
+	"SQLINE ADD adds the given (nick's) mask to the SQLINE\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
 	"(days), h (hours), or m (minutes).  Combinations (such as \n"
@@ -4665,7 +4665,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"connect, Services will not allow it to pursue his IRC\n"
 	"session (and this, whether the IP has a PTR RR or not).\n"
 	" \n"
-	"SZLINE ADD adds the given IP mask to the SZLINE\n"
+	"SZLINE ADD adds the given (nick's) IP mask to the SZLINE\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
 	"(days), h (hours), or m (minutes).  Combinations (such as \n"

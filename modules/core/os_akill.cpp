@@ -170,6 +170,22 @@ class CommandOSAKill : public Command
 			reason += " " + params[3];
 		if (!mask.empty() && !reason.empty())
 		{
+			User *user = finduser(mask);
+			if (user)
+				mask = "*@" + user->host;
+			unsigned int affected = 0;
+			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+				if (Anope::Match((*it)->GetIdent() + "@" + (*it)->host, mask))
+					++affected;
+			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
+
+			if (percent > 95)
+			{
+				u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+				Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
+				return MOD_CONT;
+			}
+
 			XLine *x = SGLine->Add(OperServ, u, mask, expires, reason);
 
 			if (!x)
@@ -207,7 +223,7 @@ class CommandOSAKill : public Command
 					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
 				}
 
-				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s)", u->nick.c_str(), mask.c_str(), reason.c_str(), buf.c_str());
+				ircdproto->SendGlobops(OperServ, "%s added an AKILL for %s (%s) (%s) [affects %i user(s) (%.2f%%)]", u->nick.c_str(), mask.c_str(), reason.c_str(), buf.c_str(), affected, percent);
 			}
 
 			if (readonly)

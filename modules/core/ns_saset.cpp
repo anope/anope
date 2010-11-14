@@ -60,7 +60,7 @@ class CommandNSSASet : public Command
 					Log(LOG_ADMIN, u, this) << params[1] << " " << cmdparams;
 				else
 					Log(LOG_ADMIN, u, this) << params[1] << " for " << params[0];
-				mod_run_cmd(NickServ, u, c, params[1], cmdparams);
+				mod_run_cmd(NickServ, u, c, params[1], cmdparams, false);
 			}
 			else
 				u->SendMessage(NickServ, NICK_SASET_UNKNOWN_OPTION, cmd.c_str());

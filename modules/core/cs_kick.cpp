@@ -16,7 +16,7 @@
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick(const Anope::string &cname) : Command(cname, 2, 3)
+	CommandCSKick() : Command("KICK", 2, 3)
 	{
 	}
 
@@ -82,16 +82,15 @@ class CommandCSKick : public Command
 
 class CSKick : public Module
 {
-	CommandCSKick commandcskick, commandcsk;
+	CommandCSKick commandcskick;
 
  public:
-	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandcskick("KICK"), commandcsk("K")
+	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(ChanServ, &commandcskick);
-		this->AddCommand(ChanServ, &commandcsk);
 	}
 };
 

@@ -320,37 +320,40 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config->BSFantasyCharacter[0] && !was_action)
 	{
 		spacesepstream sep(buf);
-		Anope::string token;
+		Anope::string command;
 
-		if (sep.GetToken(token) && token[0] == Config->BSFantasyCharacter[0])
+		if (sep.GetToken(command) && command[0] == Config->BSFantasyCharacter[0])
 		{
 			/* Strip off the fantasy character */
-			token.erase(token.begin());
+			command.erase(command.begin());
 
 			if (check_access(u, ci, CA_FANTASIA))
 			{
-				Command *command = FindCommand(ChanServ, token);
+				Anope::string message = sep.GetRemaining();
 
-				/* Command exists and can not be called by fantasy */
-				if (command && !command->HasFlag(CFLAG_DISABLE_FANTASY))
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, ci->bi, command, message, true));
+				if (MOD_RESULT == EVENT_STOP)
+					return;
+
+				Command *cmd = FindCommand(ChanServ, command);
+
+				/* Command exists and can be called by fantasy */
+				if (cmd && !cmd->HasFlag(CFLAG_DISABLE_FANTASY))
 				{
-					Anope::string bbuf = token;
-
 					/* Some commands don't need the channel name added.. eg !help */
-					if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
-						bbuf += " " + ci->name;
+					if (!cmd->HasFlag(CFLAG_STRIP_CHANNEL))
+						message = ci->name + " " + message;
+					message = command + " " + message;
 
-					if (!sep.StreamEnd())
-						bbuf += " " + sep.GetRemaining();
-
-					mod_run_cmd(ChanServ, u, bbuf);
+					mod_run_cmd(ChanServ, u, message, true);
 				}
 
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(token, u, ci, sep.GetRemaining()));
+				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, sep.GetRemaining()));
 			}
 			else
 			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(token, u, ci, sep.GetRemaining()));
+				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, ci, sep.GetRemaining()));
 			}
 		}
 	}

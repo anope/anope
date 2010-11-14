@@ -175,20 +175,20 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 				}
 			}
 			if (bi == NickServ || bi == MemoServ || bi == BotServ)
-				mod_run_cmd(bi, u, message);
+				mod_run_cmd(bi, u, message, false);
 			else if (bi == ChanServ)
 			{
 				if (!is_oper(u) && Config->CSOpersOnly)
 					u->SendMessage(ChanServ, ACCESS_DENIED);
 				else
-					mod_run_cmd(bi, u, message);
+					mod_run_cmd(bi, u, message, false);
 			}
 			else if (bi == HostServ)
 			{
 				if (!ircd->vhost)
 					u->SendMessage(HostServ, SERVICE_OFFLINE, Config->s_HostServ.c_str());
 				else
-					mod_run_cmd(bi, u, message);
+					mod_run_cmd(bi, u, message, false);
 			}
 			else if (bi == OperServ)
 			{
@@ -201,7 +201,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 				else
 				{
 					Log(OperServ) << u->nick << ": " <<  message;
-					mod_run_cmd(bi, u, message);
+					mod_run_cmd(bi, u, message, false);
 				}
 			}
 		}

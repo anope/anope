@@ -49,7 +49,7 @@ class CommandCSSet : public Command
 			Anope::string cmdparams = ci->name;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
-			mod_run_cmd(ChanServ, u, c, params[1], cmdparams);
+			mod_run_cmd(ChanServ, u, c, params[1], cmdparams, false);
 		}
 		else
 		{

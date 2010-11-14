@@ -365,10 +365,10 @@ class CoreExport Module : public Extensible
 	 * @param bi The bot the command is being run from
 	 * @param command The command
 	 * @param message The parameters used for the command
-	 * @param c The command class (if it exists)
+	 * @param fantasy true if this is a fantasy command
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, const Anope::string &command, const Anope::string &message, Command *c) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, bool fantasy) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param u The user executing the command

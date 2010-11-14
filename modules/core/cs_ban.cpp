@@ -16,7 +16,7 @@
 class CommandCSBan : public Command
 {
  public:
-	CommandCSBan(const Anope::string &cname) : Command(cname, 2, 3)
+	CommandCSBan(const Anope::string &cname) : Command("BAN", 2, 3)
 	{
 	}
 
@@ -96,16 +96,15 @@ class CommandCSBan : public Command
 
 class CSBan : public Module
 {
-	CommandCSBan commandcsban, commandcskb;
+	CommandCSBan commandcsban;
 
  public:
-	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandcsban("BAN"), commandcskb("KB")
+	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandcsban("BAN")
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(ChanServ, &commandcsban);
-		this->AddCommand(ChanServ, &commandcskb);
 	}
 };
 

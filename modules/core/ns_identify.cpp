@@ -16,7 +16,7 @@
 class CommandNSIdentify : public Command
 {
  public:
-	CommandNSIdentify(const Anope::string &cname) : Command(cname, 1, 2)
+	CommandNSIdentify() : Command("IDENTIFY", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
@@ -109,23 +109,21 @@ class CommandNSIdentify : public Command
 
 	void OnServHelp(User *u)
 	{
-		if (this->name.equals_ci("IDENTIFY"))
-			u->SendMessage(NickServ, NICK_HELP_CMD_IDENTIFY);
+		u->SendMessage(NickServ, NICK_HELP_CMD_IDENTIFY);
 	}
 };
 
 class NSIdentify : public Module
 {
-	CommandNSIdentify commandnsidentify, commandnsid;
+	CommandNSIdentify commandnsidentify;
 
  public:
-	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandnsidentify("IDENTIFY"), commandnsid("ID")
+	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
 		this->AddCommand(NickServ, &commandnsidentify);
-		this->AddCommand(NickServ, &commandnsid);
 	}
 };
 

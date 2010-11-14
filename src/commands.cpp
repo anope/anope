@@ -26,25 +26,31 @@ Command *FindCommand(BotInfo *bi, const Anope::string &name)
 	return NULL;
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &message)
-{
-	spacesepstream sep(message);
-	Anope::string cmd;
-
-	if (sep.GetToken(cmd))
-		mod_run_cmd(bi, u, FindCommand(bi, cmd), cmd, sep.GetRemaining());
-}
-
-void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message)
+void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, bool fantasy)
 {
 	if (!bi || !u)
 		return;
+	
+	spacesepstream sep(fullmessage);
+	Anope::string command, message;
 
-	CommandReturn ret = MOD_CONT;
-
+	if (!sep.GetToken(command))
+		return;
+	message = sep.GetRemaining();
+	
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, message, c));
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, message, fantasy));
 	if (MOD_RESULT == EVENT_STOP)
+		return;
+	
+	Command *c = FindCommand(bi, command);
+
+	mod_run_cmd(bi, u, c, command, message, fantasy);
+}
+
+void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, bool fantasy)
+{
+	if (!bi || !u)
 		return;
 
 	if (!c)
@@ -88,6 +94,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		return;
 	}
 
+	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name, params));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
@@ -134,7 +141,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		return;
 	}
 
-	ret = c->Execute(u, params);
+	CommandReturn ret = c->Execute(u, params);
 
 	if (ret == MOD_CONT)
 	{

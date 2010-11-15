@@ -566,7 +566,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u && HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
+		if (!u || HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
 	else if (cm->Type == MODE_LIST)
@@ -607,7 +607,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	else if (cm->Type == MODE_STATUS)
 	{
 		User *u = finduser(param);
-		if (u && !HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
+		if (!u || !HasUserStatus(u, debug_cast<ChannelModeStatus *>(cm)))
 			return;
 	}
 	else if (cm->Type == MODE_LIST)

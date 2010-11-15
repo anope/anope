@@ -1322,6 +1322,16 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("All users have been kicked from channel %s."),
 	/* CHAN_CLEARED_INVITES */
 	_("All invites on channel %s have been removed."),
+	/* CHAN_CLONED */
+	_("All settings from \002%s\002 have been transferred to \002%s\002"),
+	/* CHAN_CLONED_ACCESS */
+	_("All access entries from \002%s\002 have been transferred to \002%s\002"),
+	/* CHAN_CLONED_AKICK */
+	_("All akick entries from \002%s\002 have been transferred to \002%s\002"),
+	/* CHAN_CLONED_BADWORDS */
+	_("All badword entries from \002%s\002 have been transferred to \002%s\002"),
+	/* CHAN_CLONE_SYNTAX */
+	_("CLONE \037channel\037 \037target\037"),
 	/* CHAN_GETKEY_SYNTAX */
 	_("GETKEY channel"),
 	/* CHAN_GETKEY_NOKEY */
@@ -3354,6 +3364,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    PROTECT    Protects a selected nick on a channel"),
 	/* CHAN_HELP_CMD_DEOP */
 	_("    DEOP       Deops a selected nick on a channel"),
+	/* CHAN_HELP_CMD_CLONE */
+	_("    CLONE      Copy all settings from one channel to another"),
 	/* CHAN_HELP */
 	_("%S allows you to register and control various\n"
 	"aspects of channels.  %S can often prevent\n"
@@ -4131,6 +4143,13 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Syntax: GETKEY channel\n"
 	" \n"
 	"Returns the key of the given channel."),
+	/* CHAN_HELP_CLONE */
+	_("Syntax: \002CLONE \037channel\037 \037target\037 [all | access | akick | badwords]\002\n"
+	" \n"
+	"Copies all settings, access, akicks, etc from channel to the\n"
+	"target channel. If access, akick, or badwords is specified then only\n"
+	"the respective settings are transferred. You must have founder level\n"
+	"access to \037channel\037 and \037target\037."),
 	/* CHAN_SERVADMIN_HELP */
 	_(" \n"
 	"Services Operators can also drop any channel without needing\n"

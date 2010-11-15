@@ -52,13 +52,58 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 	this->memos.memomax = Config->MSMaxMemos;
 	this->last_used = this->time_registered = Anope::CurTime;
 
-	this->ttb = new int16[2 * TTB_SIZE];
+	this->ttb = new int16[TTB_SIZE];
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = 0;
 
 	reset_levels(this);
 
 	RegisteredChannelList[this->name] = this;
+}
+
+/** Copy constructor
+ * @param ci The ChannelInfo to copy settings to
+ */
+ChannelInfo::ChannelInfo(ChannelInfo *ci)
+{
+	*this = *ci;
+
+	if (this->founder)
+		++this->founder->channelcount;
+
+	this->access.clear();
+	this->akick.clear();
+	this->badwords.clear();
+
+	if (this->bi)
+		++this->bi->chancount;
+
+	this->ttb = new int16[TTB_SIZE];
+	for (int i = 0; i < TTB_SIZE; ++i)
+		this->ttb[i] = ci->ttb[i];
+
+	this->levels = new int16[CA_SIZE];
+	for (int i = 0; i < CA_SIZE; ++i)
+		this->levels[i] = ci->levels[i];
+
+	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+	{
+		ChanAccess *access = ci->GetAccess(i);
+		this->AddAccess(access->nc, access->level, access->creator, access->last_seen);
+	}
+	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+	{
+		AutoKick *akick = ci->GetAkick(i);
+		if (akick->HasFlag(AK_ISNICK))
+			this->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+		else
+			this->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+	}
+	for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
+	{
+		BadWord *bw = ci->GetBadWord(i);
+		this->AddBadWord(bw->word, bw->type);
+	}
 }
 
 /** Default destructor, cleans up the channel complete and removes it from the internal list

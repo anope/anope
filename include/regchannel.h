@@ -78,6 +78,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	ChannelInfo(const Anope::string &chname);
 
+	/** Copy constructor
+	 * @param ci The ChannelInfo to copy settings to
+	 */
+	ChannelInfo(ChannelInfo *ci);
+
 	/** Default destructor
 	 */
 	~ChannelInfo();

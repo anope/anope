@@ -18,15 +18,12 @@ class CommandNSDrop : public Command
  public:
 	CommandNSDrop() : Command("DROP", 0, 1)
 	{
+		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
 	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
 	{
 		Anope::string nick = !params.empty() ? params[0] : "";
-		NickAlias *na;
-		NickRequest *nr = NULL;
-		int is_mine; /* Does the nick being dropped belong to the user that is dropping? */
-		Anope::string my_nick;
 
 		if (readonly)
 		{
@@ -34,27 +31,47 @@ class CommandNSDrop : public Command
 			return MOD_CONT;
 		}
 
-		if (!(na = findnick(!nick.empty() ? nick : u->nick)))
+		NickAlias *na = findnick((u->Account() && !nick.empty() ? nick : u->nick));
+		if (!na)
 		{
-			if (!nick.empty())
+			NickRequest *nr = findrequestnick(u->Account() && !nick.empty() ? nick : u->nick);
+			if (nr && u->Account() && u->Account()->IsServicesOper())
 			{
-				if ((nr = findrequestnick(nick)) && u->Account()->IsServicesOper())
+				if (Config->WallDrop)
+					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
+
+				Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
+				delete nr;
+				u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
+			}
+			else if (nr && !nick.empty())
+			{
+				int res = enc_check_password(nick, nr->password);
+				if (res)
 				{
-					if (Config->WallDrop)
-						ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-					Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
+					Log(LOG_COMMAND, u, this) << "to drop nick request " << nr->nick;
+					u->SendMessage(NickServ, NICK_X_DROPPED, nr->nick.c_str());
 					delete nr;
-					u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
 				}
+				else if (bad_password(u))
+					return MOD_STOP;
 				else
-					u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+					u->SendMessage(NickServ, PASSWORD_INCORRECT);
 			}
 			else
 				u->SendMessage(NickServ, NICK_NOT_REGISTERED);
+
 			return MOD_CONT;
 		}
 
-		is_mine = u->Account() && u->Account() == na->nc;
+		if (!u->Account())
+		{
+			u->SendMessage(NickServ, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			return MOD_CONT;
+		}
+
+		bool is_mine = u->Account() == na->nc;
+		Anope::string my_nick;
 		if (is_mine && nick.empty())
 			my_nick = na->nick;
 

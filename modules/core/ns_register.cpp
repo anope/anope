@@ -279,7 +279,7 @@ class CommandNSRegister : public CommandNSConfirm
 			{
 				if (SendRegmail(u, nr))
 				{
-					u->SendMessage(NickServ, NICK_ENTER_REG_CODE, email.c_str(), Config->s_NickServ.c_str());
+					u->SendMessage(NickServ, NICK_ENTER_REG_CODE, email.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 					Log(LOG_COMMAND, u, this) << "send registration verification code to " << nr->email;
 				}
 				else

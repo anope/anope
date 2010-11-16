@@ -674,7 +674,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_IS_PREREG */
 	_("This nick is awaiting an e-mail verification code before completing registration."),
 	/* NICK_ENTER_REG_CODE */
-	_("A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration"),
+	_("A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration.\n"
+	  "If you need to cancel your registration, use \"%R%s drop <password>\"."),
 	/* NICK_GETPASS_PASSCODE_IS */
 	_("Passcode for %s is %s."),
 	/* NICK_FORCE_REG */
@@ -2780,13 +2781,17 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"anymore. Note, however, that you won't be asked to reidentify\n"
 	"yourself."),
 	/* NICK_HELP_DROP */
-	_("Syntax: DROP [nickname]\n"
+	_("Syntax: DROP [nickname | \037password\037]\n"
 	" \n"
 	"Drops your nickname from the %S database.  A nick\n"
 	"that has been dropped is free for anyone to re-register.\n"
 	" \n"
 	"You may drop a nick within your group by passing it\n"
 	"as the nick parameter.\n"
+	" \n"
+	"If you have a nickname registration pending but can not confirm\n"
+	"it for any reason, you can cancel your registration by passing\n"
+	"your password as the \002password\002 parameter.\n"
 	" \n"
 	"In order to use this command, you must first identify\n"
 	"with your password (%R%S HELP IDENTIFY for more\n"

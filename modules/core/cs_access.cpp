@@ -270,12 +270,12 @@ class CommandCSAccess : public Command
 
 			if (i == end)
 				u->SendMessage(ChanServ, CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
-			else if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			else if (nc != u->Account() && check_access(u, ci, CA_NOJOIN) && check_access(u, ci, CA_AUTODEOP) && get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				u->SendMessage(ChanServ, ACCESS_DENIED);
 			else
 			{
 				u->SendMessage(ChanServ, CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
-				bool override = !check_access(u, ci, CA_ACCESS_CHANGE);
+				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && nc != u->Account();
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << " (group: " << access->nc->display << ") from level " << access->level;
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
@@ -402,13 +402,28 @@ class CommandCSAccess : public Command
 
 		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
 		bool is_clear = cmd.equals_ci("CLEAR");
+		bool is_del = cmd.equals_ci("DEL");
+
+		bool has_access = false;
+		if (is_list && check_access(u, ci, CA_ACCESS_LIST))
+			has_access = true;
+		else if (check_access(u, ci, CA_ACCESS_CHANGE))
+			has_access = true;
+		else if (is_del)
+		{
+			NickAlias *na = findnick(nick);
+			if (na && na->nc == u->Account())
+				has_access = true;
+		}
 
 		/* If LIST, we don't *require* any parameters, but we can take any.
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
 			this->OnSyntaxError(u, cmd);
-		/* We still allow LIST in xOP mode, but not others */
+		else if (!has_access)
+			u->SendMessage(ChanServ, ACCESS_DENIED);
+		/* We still allow LIST and CLEAR in xOP mode, but not others */
 		else if (ci->HasFlag(CI_XOP) && !is_list && !is_clear)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
@@ -416,9 +431,7 @@ class CommandCSAccess : public Command
 			else
 				u->SendMessage(ChanServ, CHAN_ACCESS_XOP, Config->s_ChanServ.c_str());
 		}
-		else if ((is_list && !check_access(u, ci, CA_ACCESS_LIST) && !u->Account()->HasCommand("chanserv/access/list")) || (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE) && !u->Account()->HasPriv("chanserv/access/modify")))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
-		else if (readonly && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL") || cmd.equals_ci("CLEAR")))
+		else if (readonly && !is_list)
 			u->SendMessage(ChanServ, CHAN_ACCESS_DISABLED);
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(u, ci, params);

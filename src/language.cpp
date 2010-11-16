@@ -3865,6 +3865,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"The ACCESS DEL command removes the given nick from the\n"
 	"access list.  If a list of entry numbers is given, those\n"
 	"entries are deleted.  (See the example for LIST below.)\n"
+	"You may remove yourself from an access list, even if you\n"
+	"do not have access to modify that list otherwise.\n"
 	" \n"
 	"The ACCESS LIST command displays the access list.  If\n"
 	"a wildcard mask is given, only those entries matching the\n"

@@ -305,9 +305,20 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
+		NickAlias *na = NULL;
+		if (!isdigit(nick[0]))
+		{
+			na = findnick(nick);
+			if (!na)
+			{
+				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, nick.c_str());
+				return MOD_CONT;
+			}
+		}
+
 		short ulev = get_access(u, ci);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if ((!na || na->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return MOD_CONT;
@@ -322,12 +333,6 @@ class XOPBase : public Command
 		}
 		else
 		{
-			NickAlias *na = findnick(nick);
-			if (!na)
-			{
-				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, nick.c_str());
-				return MOD_CONT;
-			}
 			NickCore *nc = na->nc;
 			unsigned i, end;
 			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
@@ -344,7 +349,7 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 
-			if (ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				u->SendMessage(ChanServ, ACCESS_DENIED);
 			else
 			{

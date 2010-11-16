@@ -6,12 +6,13 @@ Legend:
 1.9.4
 -----
 [x] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
+[x] Allow users to delete their own access
+[x] ChanServ CLONE command
+[x] XMLRPC to execute commands and get data from Anope
 
 Future
 ------
-[?] Remote identification
 [+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
-[ ] XMLRPC to execute commands and get data from Anope
 [ ] NS IDENTIFY changes
   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
@@ -19,7 +20,7 @@ Future
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
 [ ] Allow channel founders to change the fantasy trigger for their channel.
 [ ] CIDR Akills, session exceptions, etc
-[ ] Language charset stuff, including collation (1.9.1? phoenix?)
+[?] Language charset stuff, including collation (1.9.1? phoenix?)
 [ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] Useful/common "third party" modules to core distro
@@ -31,7 +32,7 @@ Future
   [x] Setter
   [x] Time added
   [+] Time modified (can they be modified?)
-  [ ] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
+  [x] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
   [x] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)

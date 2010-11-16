@@ -586,9 +586,7 @@ struct ChanAccess
 enum AutoKickFlag
 {
 	/* Is by nick core, not mask */
-	AK_ISNICK,
-	/* This entry is stuck */
-	AK_STUCK
+	AK_ISNICK
 };
 
 /* AutoKick data. */

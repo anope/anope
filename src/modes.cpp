@@ -350,10 +350,6 @@ void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
 
 		Log(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
 	}
-
-	AutoKick *akick;
-	if (chan->ci && (akick = is_stuck(chan->ci, mask)))
-		stick_mask(chan->ci, akick);
 }
 
 /** Add an except to the channel

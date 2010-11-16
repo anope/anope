@@ -184,8 +184,6 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 				this->WallOSGlobal = true;
 			else if (notice.equals_ci("osmode"))
 				this->WallOSMode = true;
-			else if (notice.equals_ci("osclearmodes"))
-				this->WallOSClearmodes = true;
 			else if (notice.equals_ci("oskick"))
 				this->WallOSKick = true;
 			else if (notice.equals_ci("osakill"))

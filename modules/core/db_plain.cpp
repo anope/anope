@@ -710,7 +710,7 @@ class DBPlain : public Module
 		}
 		else if (key.equals_ci("AKICK"))
 		{
-			bool Stuck = params[0].equals_ci("STUCK");
+			// 0 is the old stuck
 			bool Nick = params[1].equals_ci("NICK");
 			NickCore *nc = NULL;
 			if (Nick)
@@ -728,8 +728,6 @@ class DBPlain : public Module
 				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			else
 				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
-			if (Stuck)
-				ak->SetFlag(AK_STUCK);
 			if (Nick)
 				ak->SetFlag(AK_ISNICK);
 
@@ -968,7 +966,7 @@ class DBPlain : public Module
 				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
-				db << "MD AKICK " << (ci->GetAkick(k)->HasFlag(AK_STUCK) ? "STUCK " : "UNSTUCK ") << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
+				db << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
 					(ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
 				if (!ci->GetAkick(k)->reason.empty())
 					db << ci->GetAkick(k)->reason;

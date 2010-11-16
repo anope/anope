@@ -117,7 +117,7 @@ class AkickViewCallback : public AkickListCallback
 		else
 			timebuf = GetString(u, UNKNOWN);
 
-		u->SendMessage(ChanServ, akick->HasFlag(AK_STUCK) ? CHAN_AKICK_VIEW_FORMAT_STUCK : CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u, UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u, NO_REASON).c_str());
+		u->SendMessage(ChanServ, CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u, UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u, NO_REASON).c_str());
 
 		if (akick->last_used)
 			u->SendMessage(ChanServ, CHAN_AKICK_LAST_USED, do_strftime(akick->last_used).c_str());
@@ -268,89 +268,6 @@ class CommandCSAKick : public Command
 		u->SendMessage(ChanServ, CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
 
 		this->DoEnforce(u, ci);
-	}
-
-	void DoStick(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
-	{
-		NickAlias *na;
-		NickCore *nc;
-		Anope::string mask = params[2];
-		unsigned i, end;
-		AutoKick *akick;
-
-		if (!ci->GetAkickCount())
-		{
-			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-			return;
-		}
-
-		na = findnick(mask);
-		nc = na ? na->nc : NULL;
-
-		for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
-		{
-			akick = ci->GetAkick(i);
-
-			if (akick->HasFlag(AK_ISNICK))
-				continue;
-			if (mask.equals_ci(akick->mask))
-				break;
-		}
-
-		if (i == end)
-		{
-			u->SendMessage(ChanServ, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
-			return;
-		}
-
-		bool override = !check_access(u, ci, CA_AKICK);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "STICK " << akick->mask;
-
-		akick->SetFlag(AK_STUCK);
-		u->SendMessage(ChanServ, CHAN_AKICK_STUCK, akick->mask.c_str(), ci->name.c_str());
-
-		if (ci->c)
-			stick_mask(ci, akick);
-	}
-
-	void DoUnStick(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
-	{
-		NickAlias *na;
-		NickCore *nc;
-		AutoKick *akick;
-		unsigned i, end;
-		Anope::string mask = params[2];
-
-		if (!ci->GetAkickCount())
-		{
-			u->SendMessage(ChanServ, CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
-			return;
-		}
-
-		na = findnick(mask);
-		nc = na ? na->nc : NULL;
-
-		for (i = 0, end = ci->GetAkickCount(); i < end; ++i)
-		{
-			akick = ci->GetAkick(i);
-
-			if (akick->HasFlag(AK_ISNICK))
-				continue;
-			if (mask.equals_ci(akick->mask))
-				break;
-		}
-
-		if (i == end)
-		{
-			u->SendMessage(ChanServ, CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
-			return;
-		}
-
-		bool override = !check_access(u, ci, CA_AKICK);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "UNSTICK " << akick->mask;
-
-		akick->UnsetFlag(AK_STUCK);
-		u->SendMessage(ChanServ, CHAN_AKICK_UNSTUCK, akick->mask.c_str(), ci->name.c_str());
 	}
 
 	void DoDel(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -542,7 +459,7 @@ class CommandCSAKick : public Command
 
 		ChannelInfo *ci = cs_findchan(chan);
 
-		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("STICK") || cmd.equals_ci("UNSTICK") || cmd.equals_ci("DEL")))
+		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(u, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
 			u->SendMessage(ChanServ, ACCESS_DENIED);
@@ -550,10 +467,6 @@ class CommandCSAKick : public Command
 			u->SendMessage(ChanServ, CHAN_AKICK_DISABLED);
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(u, ci, params);
-		else if (cmd.equals_ci("STICK"))
-			this->DoStick(u, ci, params);
-		else if (cmd.equals_ci("UNSTICK"))
-			this->DoUnStick(u, ci, params);
 		else if (cmd.equals_ci("DEL"))
 			this->DoDel(u, ci, params);
 		else if (cmd.equals_ci("LIST"))

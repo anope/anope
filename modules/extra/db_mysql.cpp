@@ -752,21 +752,16 @@ class DBMySQL : public Module
 			NickCore *nc = NULL;
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string flag, mask;
-			bool stuck = false;
 			while (sep.GetToken(flag))
 			{
 				if (flag.equals_cs("ISNICK"))
 					nc = findcore(r.Get(i, "mask"));
-				else if (flag.equals_cs("STUCK"))
-					stuck = true;
 
 				AutoKick *ak;
 				if (nc)
 					ak = ci->AddAkick(r.Get(i, "creator"), nc, r.Get(i, "reason"), atol(r.Get(i, "created").c_str()), atol(r.Get(i, "last_used").c_str()));
 				else
 					ak = ci->AddAkick(r.Get(i, "creator"), r.Get(i, "mask"), r.Get(i, "reason"), atol(r.Get(i, "created").c_str()), atol(r.Get(i, "last_used").c_str()));
-				if (stuck)
-					ak->SetFlag(AK_STUCK);
 				if (nc)
 					ak->SetFlag(AK_ISNICK);
 			}
@@ -1268,7 +1263,7 @@ class DBMySQL : public Module
 	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
 	{
 		this->RunQuery("INSERT INTO `anope_cs_akick` (channel, flags, mask, reason, creator, created, last_used) VALUES('" + this->Escape(ci->name) + "', '" +
-			(ak->HasFlag(AK_ISNICK) ? "ISNICK " : "") + (ak->HasFlag(AK_STUCK) ? "STUCK " : "") + "', '" +
+			(ak->HasFlag(AK_ISNICK) ? "ISNICK" : "") + "', '" +
 			this->Escape(ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask) + "', '" + this->Escape(ak->reason) + "', '" +
 			this->Escape(ak->creator) + "', " + stringify(ak->addtime) + ", " + stringify(ak->last_used) + ")");
 	}

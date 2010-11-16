@@ -115,9 +115,6 @@ E bool IsFounder(User *user, ChannelInfo *ci);
 E int get_access(User *user, ChannelInfo *ci);
 E void update_cs_lastseen(User *user, ChannelInfo *ci);
 E int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
-E AutoKick *is_stuck(ChannelInfo *ci, const Anope::string &mask);
-E void stick_mask(ChannelInfo *ci, AutoKick *akick);
-E void stick_all(ChannelInfo *ci);
 
 E int levelinfo_maxwidth;
 E Anope::string get_mlock_modes(ChannelInfo *ci, int complete);

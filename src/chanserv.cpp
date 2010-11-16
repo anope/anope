@@ -325,8 +325,6 @@ void check_modes(Channel *c)
 				c->RemoveMode(NULL, cm);
 		}
 	}
-
-	stick_all(ci);
 }
 
 /*************************************************************************/
@@ -750,85 +748,6 @@ Anope::string get_xop_level(int level)
 		return "QOP";
 	else
 		return "Founder";
-}
-
-/*************************************************************************/
-/*********************** ChanServ command routines ***********************/
-/*************************************************************************/
-
-/* Is the mask stuck? */
-
-AutoKick *is_stuck(ChannelInfo *ci, const Anope::string &mask)
-{
-	if (!ci)
-		return NULL;
-
-	for (unsigned i = 0, akicks = ci->GetAkickCount(); i < akicks; ++i)
-	{
-		AutoKick *akick = ci->GetAkick(i);
-
-		if (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
-			continue;
-
-		if (Anope::Match(akick->mask, mask))
-			return akick;
-
-		if (ircd->reversekickcheck)
-			if (Anope::Match(mask, akick->mask))
-				return akick;
-	}
-
-	return NULL;
-}
-
-/* Ban the stuck mask in a safe manner. */
-
-void stick_mask(ChannelInfo *ci, AutoKick *akick)
-{
-	Entry *ban;
-
-	if (!ci)
-		return;
-
-	if (ci->c->bans && ci->c->bans->entries)
-	{
-		for (ban = ci->c->bans->entries; ban; ban = ban->next)
-		{
-			/* If akick is already covered by a wider ban.
-			   Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
-			if (entry_match_mask(ban, akick->mask, 0))
-				return;
-
-			if (ircd->reversekickcheck)
-			{
-				/* If akick is wider than a ban already in place.
-				   Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
-				if (Anope::Match(ban->mask, akick->mask))
-					return;
-			}
-		}
-	}
-
-	/* Falling there means set the ban */
-	ci->c->SetMode(NULL, CMODE_BAN, akick->mask);
-}
-
-/* Ban the stuck mask in a safe manner. */
-
-void stick_all(ChannelInfo *ci)
-{
-	if (!ci)
-		return;
-
-	for (unsigned i = 0, akicks = ci->GetAkickCount(); i < akicks; ++i)
-	{
-		AutoKick *akick = ci->GetAkick(i);
-
-		if (akick->HasFlag(AK_ISNICK) || !akick->HasFlag(AK_STUCK))
-			continue;
-
-		ci->c->SetMode(NULL, CMODE_BAN, akick->mask);
-	}
 }
 
 ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)

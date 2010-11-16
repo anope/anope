@@ -36,6 +36,13 @@ class CommandCSSASet : public Command
 			return MOD_CONT;
 		}
 
+		// XXX Remove after 1.9.4 release
+		if (params[1].equals_ci("MLOCK"))
+		{
+			u->SendMessage(ChanServ, CHAN_SET_MLOCK_DEPRECATED);
+			return MOD_CONT;
+		}
+
 		Command *c = this->FindCommand(params[1]);
 
 		if (c)

@@ -717,8 +717,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Allowed to use AKICK command"),
 	/* CHAN_LEVEL_SET */
 	_("Allowed to use SET command (not FOUNDER/PASSWORD)"),
-	/* CHAN_LEVEL_CLEAR */
-	_("Allowed to use CLEAR command"),
+	/* CHAN_LEVEL_CLEARUSERS */
+	_("Allowed to use CLEARUSERS command"),
 	/* CHAN_LEVEL_UNBAN */
 	_("Allowed to use UNBAN command"),
 	/* CHAN_LEVEL_OPDEOP */
@@ -867,16 +867,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s is not a valid ban type."),
 	/* CHAN_SET_BANTYPE_CHANGED */
 	_("Ban type for channel %s is now #%d."),
-	/* CHAN_SET_MLOCK_UNKNOWN_CHAR */
-	_("Unknown mode character %c ignored."),
-	/* CHAN_SET_MLOCK_IMPOSSIBLE_CHAR */
-	_("Mode %c ignored because you can't lock it."),
-	/* CHAN_SET_MLOCK_L_REQUIRED */
-	_("You must lock mode +l as well to lock mode +L."),
-	/* CHAN_SET_MLOCK_K_REQUIRED */
-	_("You must lock mode +i as well to lock mode +K."),
-	/* CHAN_MLOCK_CHANGED */
-	_("Mode lock on channel %s changed to %s."),
+	/* CHAN_SET_MLOCK_DEPRECATED */
+	_("MLOCK is deprecated. Use \002%R%s HELP MODE\002 instead."),
 	/* CHAN_SET_KEEPTOPIC_SYNTAX */
 	_("SET channel KEEPTOPIC {ON | OFF}"),
 	/* CHAN_SET_KEEPTOPIC_ON */
@@ -1168,7 +1160,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("  %3d  %4d  %s\n"
 	"    by %s, last seen %s"),
 	/* CHAN_AKICK_SYNTAX */
-	_("AKICK channel {ADD | STICK | UNSTICK | DEL | LIST | VIEW | ENFORCE | CLEAR} [nick-or-usermask] [reason]"),
+	_("AKICK channel {ADD | DEL | LIST | VIEW | ENFORCE | CLEAR} [nick-or-usermask] [reason]"),
 	/* CHAN_AKICK_DISABLED */
 	_("Sorry, channel autokick list modification is temporarily disabled."),
 	/* CHAN_AKICK_ALREADY_EXISTS */
@@ -1181,10 +1173,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s not found on %s autokick list."),
 	/* CHAN_AKICK_NO_MATCH */
 	_("No matching entries on %s autokick list."),
-	/* CHAN_AKICK_STUCK */
-	_("%s is now always active on channel %s."),
-	/* CHAN_AKICK_UNSTUCK */
-	_("%s is not always active anymore on channel %s."),
 	/* CHAN_AKICK_DELETED */
 	_("%s deleted from %s autokick list."),
 	/* CHAN_AKICK_DELETED_ONE */
@@ -1199,9 +1187,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("  %3d %s (%s)"),
 	/* CHAN_AKICK_VIEW_FORMAT */
 	_("%3d %s (by %s on %s)\n"
-	"    %s"),
-	/* CHAN_AKICK_VIEW_FORMAT_STUCK */
-	_("%3d %s (stuck) (by %s on %s)\n"
 	"    %s"),
 	/* CHAN_AKICK_LAST_USED */
 	_("    Last used %s"),
@@ -1309,20 +1294,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s has been unbanned from %s."),
 	/* CHAN_TOPIC_SYNTAX */
 	_("TOPIC channel [topic]"),
-	/* CHAN_CLEAR_SYNTAX */
-	_("CLEAR channel what"),
-	/* CHAN_CLEARED_BANS */
-	_("All bans on channel %s have been removed."),
-	/* CHAN_CLEARED_EXCEPTS */
-	_("All excepts on channel %s have been removed."),
-	/* CHAN_CLEARED_MODES */
-	_("All modes on channel %s have been reset."),
-	/* CHAN_CLEARED_OPS */
-	_("Mode +o has been cleared from channel %s."),
-	/* CHAN_CLEARED_USERS */
-	_("All users have been kicked from channel %s."),
-	/* CHAN_CLEARED_INVITES */
-	_("All invites on channel %s have been removed."),
+	/* CHAN_CLEARUSERS */
+	_("CLEARUSERS \037channel\037"),
 	/* CHAN_CLONED */
 	_("All settings from \002%s\002 have been transferred to \002%s\002"),
 	/* CHAN_CLONED_ACCESS */
@@ -2092,12 +2065,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Operflags %s have been added for %s."),
 	/* OPER_OLINE_IRCOP */
 	_("You are now an IRC Operator."),
-	/* OPER_CLEARMODES_SYNTAX */
-	_("CLEARMODES channel [ALL]"),
-	/* OPER_CLEARMODES_DONE */
-	_("Binary modes and bans cleared from channel %s."),
-	/* OPER_CLEARMODES_ALL_DONE */
-	_("All modes cleared from channel %s."),
 	/* OPER_KICK_SYNTAX */
 	_("KICK channel user reason"),
 	/* OPER_SVSNICK_SYNTAX */
@@ -3329,8 +3296,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    DROP       Cancel the registration of a channel"),
 	/* CHAN_HELP_CMD_BAN */
 	_("    BAN        Bans a selected nick on a channel"),
-	/* CHAN_HELP_CMD_CLEAR */
-	_("    CLEAR      Tells ChanServ to clear certain settings on a channel"),
+	/* CHAN_HELP_CMD_CLEARUSERS */
+	_("    CLEARUSERS Tells ChanServ to clear (kick) all users on a channel"),
 	/* CHAN_HELP_CMD_DEVOICE */
 	_("    DEVOICE    Devoices a selected nick on a channel"),
 	/* CHAN_HELP_CMD_GETKEY */
@@ -3434,8 +3401,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"                     enter the channel"),
 	/* CHAN_HELP_CMD_SET_BANTYPE */
 	_("    BANTYPE       Set how Services make bans on the channel"),
-	/* CHAN_HELP_CMD_SET_MLOCK */
-	_("    MLOCK         Lock channel modes on or off"),
 	/* CHAN_HELP_CMD_SET_KEEPTOPIC */
 	_("    KEEPTOPIC     Retain topic when channel is not in use"),
 	/* CHAN_HELP_CMD_SET_OPNOTICE */
@@ -3521,39 +3486,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"When topic lock is set, %S will not allow the\n"
 	"channel topic to be changed except via the TOPIC\n"
 	"command."),
-	/* CHAN_HELP_SET_MLOCK */
-	_("Syntax: %s channel MLOCK modes\n"
-	" \n"
-	"Sets the mode-lock parameter for the channel. %S\n"
-	"allows you to define certain channel modes to be always\n"
-	"on, off or free to be either on or off.\n"
-	" \n"
-	"The modes parameter is constructed exactly the same way \n"
-	"as a /MODE command; that is, modes followed by a + are \n"
-	"locked on, and modes followed by a - are locked off. Note,\n"
-	"however, that unlike the /MODE command, each use of\n"
-	"SET MLOCK will remove all modes previously locked before\n"
-	"setting the new!\n"
-	" \n"
-	"Warning:  If you set a mode-locked key, as in the second\n"
-	"example below, you should also set the RESTRICTED option for\n"
-	"the channel (see HELP SET RESTRICTED), or anyone entering\n"
-	"the channel when it is empty will be able to see the key!\n"
-	" \n"
-	"Examples:\n"
-	" \n"
-	"    SET #channel MLOCK +nt-iklps\n"
-	"        Forces modes n and t on, and modes i, k, l, p, and\n"
-	"        s off.  Mode m is left free to be either on or off.\n"
-	" \n"
-	"    SET #channel MLOCK +knst-ilmp my-key\n"
-	"        Forces modes k, n, s, and t on, and modes i, l, m,\n"
-	"        and p off.  Also forces the channel key to be\n"
-	"        \"my-key\".\n"
-	" \n"
-	"    SET #channel MLOCK +\n"
-	"        Removes the mode lock; all channel modes are free\n"
-	"        to be either on or off."),
 	/* CHAN_HELP_SET_PEACE */
 	_("Syntax: %s channel PEACE {ON | OFF}\n"
 	" \n"
@@ -3908,8 +3840,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"information."),
 	/* CHAN_HELP_AKICK */
 	_("Syntax: AKICK channel ADD {nick | mask} [reason]\n"
-	"        AKICK channel STICK mask\n"
-	"        AKICK channel UNSTICK mask\n"
 	"        AKICK channel DEL {nick | mask | entry-num | list}\n"
 	"        AKICK channel LIST [mask | entry-num | list]\n"
 	"        AKICK channel VIEW [mask | entry-num | list]\n"
@@ -3929,15 +3859,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"When akicking a registered nick the nickserv account\n"
 	"will be added to the akick list instead of the mask.\n"
 	"All users within that nickgroup will then be akicked.\n"
-	" \n"
-	"The AKICK STICK command permanently bans the given mask \n"
-	"on the channel. If someone tries to remove the ban, %S\n"
-	"will automatically set it again. You can't use it for\n"
-	"registered nicks.\n"
-	" \n"
-	"The AKICK UNSTICK command cancels the effect of the\n"
-	"AKICK STICK command, so you'll be able to unset the\n"
-	"ban again on the channel.\n"
 	" \n"
 	"The AKICK DEL command removes the given nick or mask\n"
 	"from the AutoKick list.  It does not, however, remove any\n"
@@ -4123,26 +4044,10 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"By default, limited to those with founder access on the\n"
 	"channel."),
-	/* CHAN_HELP_CLEAR */
-	_("Syntax: CLEAR channel what\n"
+	/* CHAN_HELP_CLEARUSERS */
+	_("Syntax: CLEARUSERS channel\n"
 	" \n"
-	"Tells %S to clear certain settings on a channel.  what\n"
-	"can be any of the following:\n"
-	" \n"
-	"     MODES    Resets all modes on the channel (i.e. clears\n"
-	"                  modes i,k,l,m,n,p,s,t).\n"
-	"     BANS     Clears all bans on the channel.\n"
-	"     EXCEPTS  Clears all excepts on the channel.\n"
-	"     INVITES  Clears all invites on the channel.\n"
-	"     OPS      Removes channel-operator status (mode +o) from\n"
-	"                  all channel operators. If supported, removes\n"
-	"                  channel-admin (mode +a) and channel-owner (mode +q)\n"
-	"                  as well.\n"
-	"     HOPS     Removes channel-halfoperator status (mode +h) from\n"
-	"                  all channel halfoperators, if supported.\n"
-	"     VOICES   Removes \"voice\" status (mode +v) from anyone\n"
-	"                  with that mode set.\n"
-	"     USERS    Removes (kicks) all users from the channel.\n"
+	"Tells %S to clear (kick) all users certain settings on a channel."
 	" \n"
 	"By default, limited to those with founder access on the\n"
 	"channel."),
@@ -4398,8 +4303,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    MODE        Change a channel's modes"),
 	/* OPER_HELP_CMD_KICK */
 	_("    KICK        Kick a user from a channel"),
-	/* OPER_HELP_CMD_CLEARMODES */
-	_("    CLEARMODES  Clear modes of a channel"),
 	/* OPER_HELP_CMD_AKILL */
 	_("    AKILL       Manipulate the AKILL list"),
 	/* OPER_HELP_CMD_SNLINE */
@@ -4528,12 +4431,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Allows Services Opers to give Operflags to any user.\n"
 	"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
 	"remove all flags simply type a \"-\" instead of any flags."),
-	/* OPER_HELP_CLEARMODES */
-	_("Syntax: CLEARMODES channel [ALL]\n"
-	" \n"
-	"Clears all binary modes (i,k,l,m,n,p,s,t) and bans from a\n"
-	"channel.  If ALL is given, also clears all ops and\n"
-	"voices (+o and +v modes) from the channel."),
 	/* OPER_HELP_KICK */
 	_("Syntax: KICK channel user reason\n"
 	" \n"

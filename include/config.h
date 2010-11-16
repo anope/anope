@@ -711,8 +711,6 @@ class CoreExport ServerConfig
 	bool WallOSGlobal;
 	/* Send a WALLOPS/GLOBOPS when someone uses the MODE command */
 	bool WallOSMode;
-	/* Send a WALLOPS/GLOBOPS when someone uses the CLEARMODES command */
-	bool WallOSClearmodes;
 	/* Send a WALLOPS/GLOBOPS when someone uses the KICK command */
 	bool WallOSKick;
 	/* Send a WALLOPS/GLOBOPS when someone uses the AKILL command */

@@ -82,7 +82,7 @@ class AccessViewCallback : public AccessListCallback
 	static void DoList(User *u, ChannelInfo *ci, unsigned Number, ChanAccess *access)
 	{
 		Anope::string timebuf;
-		if (ci->c && u->Account() && nc_on_chan(ci->c, u->Account()))
+		if (ci->c && nc_on_chan(ci->c, access->nc))
 			timebuf = "Now";
 		else if (access->last_seen == 0)
 			timebuf = "Never";

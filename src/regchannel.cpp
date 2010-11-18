@@ -432,7 +432,7 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const Anope::strin
 		throw CoreException("Was told to mlock a mode negatively with a param?");
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnMLock, OnMLock(Name, status, param));
+	FOREACH_RESULT(I_OnMLock, OnMLock(this, Name, status, param));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
@@ -462,7 +462,7 @@ bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const Anope::strin
 bool ChannelInfo::RemoveMLock(ChannelModeName Name)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(Name));
+	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, Name));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 

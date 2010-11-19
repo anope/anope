@@ -1190,7 +1190,7 @@ bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::stri
 	{
 		Anope::string s;
 		/* There's a CIDR mask here! */
-		cidr = convertTo<uint16>(s.substr(1), s, false);
+		cidr = convertTo<uint16>(cidr_str.substr(1), s, false);
 		/* Bail out if the CIDR is invalid or the string isn't done yet */
 		if (cidr > 32 || !s.empty())
 			return false;

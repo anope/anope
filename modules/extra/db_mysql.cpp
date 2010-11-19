@@ -1005,9 +1005,9 @@ class DBMySQL : public Module
 				}
 				else if (params[1].equals_ci("MLOCK"))
 				{
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_on` = '" + GetMLockOn(ci) + "' WHERE `name` = " + this->Escape(ci->name) + "'");
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_off` = '" + GetMLockOff(ci) + "' WHERE `name` = " + this->Escape(ci->name) + "'");
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_params` = '" + GetMLockParams(ci) + "' WHERE `name` = " + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_on` = '" + GetMLockOn(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_off` = '" + GetMLockOff(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_params` = '" + GetMLockParams(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
 				else if (params[1].equals_ci("BANTYPE"))
 				{
@@ -1015,7 +1015,7 @@ class DBMySQL : public Module
 				}
 				else if (params[1].equals_ci("KEEPTOPIC") || params[1].equals_ci("TOPICLOCK") || params[1].equals_ci("PRIVATE") || params[1].equals_ci("SECUREOPS") || params[1].equals_ci("SECUREFOUNDER") || params[1].equals_ci("RESTRICTED") || params[1].equals_ci("SECURE") || params[1].equals_ci("SIGNKICK") || params[1].equals_ci("OPNOTICE") || params[1].equals_ci("XOP") || params[1].equals_ci("PEACE") || params[1].equals_ci("PERSIST") || params[1].equals_ci("NOEXPIRE"))
 				{
-					SQL->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + BuildFlagsList(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + BuildFlagsList(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
 			}
 		}

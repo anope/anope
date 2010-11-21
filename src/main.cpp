@@ -172,7 +172,7 @@ void do_restart_services()
 	if (quitmsg.empty())
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
 		BotInfo *bi = *it;
 
@@ -214,7 +214,7 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = *it;
 
@@ -495,7 +495,7 @@ int main(int ac, char **av, char **envp)
 				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
 				/* Clear all of our users, but not our bots */
-				for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
+				for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 				{
 					User *u = *it;
 					++it;

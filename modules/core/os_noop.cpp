@@ -38,7 +38,7 @@ class CommandOSNOOP : public Command
 			u->SendMessage(OperServ, OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
-			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
 				User *u2 = *it;
 				++it;

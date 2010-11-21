@@ -850,7 +850,7 @@ struct Exception
 
 /*************************************************************************/
 
-extern CoreExport patricia_tree<Session> SessionList;
+extern CoreExport patricia_tree<Session *> SessionList;
 
 struct Session
 {

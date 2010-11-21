@@ -8,9 +8,9 @@ template<typename Data> struct patricia_elem
 {
 	unsigned int bit;
 	patricia_elem<Data> *up, *one, *zero;
-	typename std::list<Data *>::iterator node;
+	typename std::list<Data>::iterator node;
 	Anope::string key;
-	Data *data;
+	Data data;
 };
 
 template<typename Data, typename Compare = std::equal_to<Anope::string> >
@@ -19,7 +19,7 @@ class patricia_tree
 	Compare comp;
 
 	patricia_elem<Data> *root;
-	std::list<Data *> list;
+	std::list<Data> list;
 
  public:
 
@@ -34,8 +34,8 @@ class patricia_tree
 			this->erase(this->root->key);
 	}
 
-	typedef typename std::list<Data *>::iterator iterator;
-	typedef typename std::list<Data *>::const_iterator const_iterator;
+	typedef typename std::list<Data>::iterator iterator;
+	typedef typename std::list<Data>::const_iterator const_iterator;
 
 	inline iterator begin() { return this->list.begin(); }
 	inline iterator end() { return this->list.end(); }
@@ -43,13 +43,13 @@ class patricia_tree
 	inline const const_iterator begin() const { return this->list.begin(); }
 	inline const const_iterator end() const { return this->list.end(); }
 
-	inline Data *front() { return this->list.front(); }
-	inline Data *back() { return this->list.back(); }
+	inline Data front() { return this->list.front(); }
+	inline Data back() { return this->list.back(); }
 
 	inline size_t size() const { return this->list.size(); }
 	inline bool empty() const { return this->list.empty(); }
 
-	Data *find(const Anope::string &key)
+	Data find(const Anope::string &key)
 	{
 		size_t keylen = key.length();
 		patricia_elem<Data> *prev = NULL, *cur = this->root;
@@ -72,7 +72,7 @@ class patricia_tree
 		return NULL;
 	}
 
-	void insert(const Anope::string &key, Data *data)
+	void insert(const Anope::string &key, Data data)
 	{
 		if (key.empty() || data == NULL)
 			throw CoreExport;
@@ -144,7 +144,7 @@ class patricia_tree
 		newelem->node = this->list.begin();
 	}
 
-	Data *erase(const Anope::string &key)
+	Data erase(const Anope::string &key)
 	{
 		size_t keylen = key.length();
 		patricia_elem<Data> *prev = NULL, *cur = this->root;
@@ -200,7 +200,7 @@ class patricia_tree
 
 		this->list.erase(cur->node);
 
-		Data *data = cur->data;
+		Data data = cur->data;
 		delete cur;
 
 		return data;

@@ -12,8 +12,8 @@
 #include "services.h"
 #include "modules.h"
 
-patricia_tree<User, std::equal_to<ci::string> > UserListByNick;
-patricia_tree<User> UserListByUID;
+patricia_tree<User *, std::equal_to<ci::string> > UserListByNick;
+patricia_tree<User *> UserListByUID;
 
 int32 opcnt = 0;
 uint32 usercnt = 0, maxusercnt = 0;
@@ -682,7 +682,7 @@ void get_user_stats(long &count, long &mem)
 {
 	count = mem = 0;
 
-	for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
 		User *user = *it;
 

@@ -134,7 +134,7 @@ class CommandOSSession : public Command
 			u->SendMessage(OperServ, OPER_SESSION_LIST_HEADER, mincount);
 			u->SendMessage(OperServ, OPER_SESSION_LIST_COLHEAD);
 
-			for (patricia_tree<Session>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
+			for (patricia_tree<Session *>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 			{
 				Session *session = *it;
 

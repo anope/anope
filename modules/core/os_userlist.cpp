@@ -50,7 +50,7 @@ class CommandOSUserList : public Command
 		{
 			u->SendMessage(OperServ, OPER_USERLIST_HEADER);
 
-			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
 				User *u2 = *it;
 

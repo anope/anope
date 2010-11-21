@@ -36,7 +36,7 @@ void InitLogChannels(ServerConfig *config)
 				c->SetFlag(CH_LOGCHAN);
 				c->SetFlag(CH_PERSIST);
 
-				for (patricia_tree<BotInfo>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+				for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 				{
 					BotInfo *bi = *it;
 

@@ -582,7 +582,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	{
 		Anope::string rreason = "G-Lined: " + reason;
 
-		for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
+		for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 		{
 			User *user = *it;
 			++it;
@@ -683,7 +683,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		}
 		else
 		{
-			for (patricia_tree<User>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
+			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
 			{
 				User *user = *it;
 				++it;

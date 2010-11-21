@@ -35,17 +35,12 @@
  * or a range thereof. The first exception that the host matches is the one
  * used.
  *
- * "Session Limiting" is likely to slow down services when there are frequent
- * client connects and disconnects. The size of the exception list can also
- * play a large role in this performance decrease. It is therefore recommened
- * that you keep the number of exceptions to a minimum. 
- *
  * -TheShadow (02 April 1999)
  */
 
 /*************************************************************************/
 
-patricia_tree<Session> SessionList;
+patricia_tree<Session *> SessionList;
 
 std::vector<Exception *> exceptions;
 
@@ -58,7 +53,7 @@ void get_session_stats(long &count, long &mem)
 	count = SessionList.size();
 	mem = sizeof(Session) * SessionList.size();
 
-	for (patricia_tree<Session>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
+	for (patricia_tree<Session *>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 	{
 		Session *session = *it;
 

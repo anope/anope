@@ -33,7 +33,7 @@ class CommandOSStaff : public Command
 			if (na)
 			{
 				/* We have to loop all users as some may be logged into an account but not a nick */
-				for (patricia_tree<User>::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
+				for (patricia_tree<User *>::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
 				{
 					User *u2 = *uit;
 

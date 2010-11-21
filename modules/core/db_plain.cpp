@@ -254,7 +254,6 @@ ChannelLevel ChannelLevels[] = {
 	{"SET", CA_SET},
 	{"UNBAN", CA_UNBAN},
 	{"AUTOOP", CA_AUTOOP},
-	{"AUTODEOP", CA_AUTODEOP},
 	{"AUTOVOICE", CA_AUTOVOICE},
 	{"OPDEOP", CA_OPDEOP},
 	{"ACCESS_LIST", CA_ACCESS_LIST},

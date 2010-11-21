@@ -629,7 +629,6 @@ enum ChannelAccess
 	CA_SET,			/* but not FOUNDER or PASSWORD */
 	CA_UNBAN,
 	CA_AUTOOP,
-	CA_AUTODEOP,	/* Maximum, not minimum */
 	CA_AUTOVOICE,
 	CA_OPDEOP,		/* ChanServ commands OP and DEOP */
 	CA_ACCESS_LIST,

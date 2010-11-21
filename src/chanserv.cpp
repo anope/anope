@@ -19,7 +19,6 @@ registered_channel_map RegisteredChannelList;
 static int def_levels[][2] = {
 	{ CA_AUTOOP,		5 },
 	{ CA_AUTOVOICE,		3 },
-	{ CA_AUTODEOP,		-1 },
 	{ CA_NOJOIN,		-2 },
 	{ CA_INVITE,		5 },
 	{ CA_AKICK,			10 },
@@ -61,7 +60,6 @@ static int def_levels[][2] = {
 };
 
 LevelInfo levelinfo[] = {
-	{ CA_AUTODEOP,		"AUTODEOP",		CHAN_LEVEL_AUTODEOP },
 	{ CA_AUTOHALFOP,	"AUTOHALFOP",	CHAN_LEVEL_AUTOHALFOP },
 	{ CA_AUTOOP,		"AUTOOP",		CHAN_LEVEL_AUTOOP },
 	{ CA_AUTOPROTECT,	"AUTOPROTECT",	CHAN_LEVEL_AUTOPROTECT },
@@ -310,12 +308,6 @@ int check_valid_admin(User *user, Channel *chan, int servermode)
 		return 0;
 	}
 
-	if (check_access(user, chan->ci, CA_AUTODEOP))
-	{
-		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
-		return 0;
-	}
-
 	return 1;
 }
 
@@ -349,20 +341,6 @@ int check_valid_op(User *user, Channel *chan, int servermode)
 			chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		chan->RemoveMode(NULL, CMODE_OP, user->nick);
 		if (halfop && !check_access(user, chan->ci, CA_AUTOHALFOP))
-			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
-
-		return 0;
-	}
-
-	if (check_access(user, chan->ci, CA_AUTODEOP))
-	{
-		chan->RemoveMode(NULL, CMODE_OP, user->nick);
-
-		if (owner)
-			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);
-		if (protect)
-			chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
-		if (halfop)
 			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 
 		return 0;
@@ -508,19 +486,15 @@ int check_access(User *user, ChannelInfo *ci, int what)
 
 	/* Superadmin always wins. Always. */
 	if (user->isSuperAdmin)
-		return what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1;
+		return what == CA_NOJOIN ? 0 : 1;
 	/* If the access of the level we are checking is disabled, they *always* get denied */
 	if (limit == ACCESS_INVALID)
 		return 0;
 	/* If the level of the user is >= the level for "founder" of this channel and "founder" isn't disabled, they can do anything */
 	if (ci->levels[CA_FOUNDER] != ACCESS_INVALID && level >= ci->levels[CA_FOUNDER])
-		return what == CA_AUTODEOP || what == CA_NOJOIN ? 0 : 1;
+		return what == CA_NOJOIN ? 0 : 1;
 
-	/* Hacks to make flags work */
-	if (what == CA_AUTODEOP && ci->HasFlag(CI_SECUREOPS) && !level)
-		return 1;
-
-	if (what == CA_AUTODEOP || what == CA_NOJOIN)
+	if (what == CA_NOJOIN)
 		return level <= ci->levels[what];
 	else
 		return level >= ci->levels[what];

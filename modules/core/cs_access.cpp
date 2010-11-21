@@ -270,7 +270,7 @@ class CommandCSAccess : public Command
 
 			if (i == end)
 				u->SendMessage(ChanServ, CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
-			else if (nc != u->Account() && check_access(u, ci, CA_NOJOIN) && check_access(u, ci, CA_AUTODEOP) && get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			else if (nc != u->Account() && check_access(u, ci, CA_NOJOIN) && get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				u->SendMessage(ChanServ, ACCESS_DENIED);
 			else
 			{
@@ -556,10 +556,7 @@ class CommandCSLevels : public Command
 			{
 				j = levelinfo[i].what;
 
-				if (j == CA_AUTOOP || j == CA_AUTODEOP || j == CA_AUTOVOICE || j == CA_NOJOIN)
-					u->SendMessage(ChanServ, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
-				else
-					u->SendMessage(ChanServ, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
+				u->SendMessage(ChanServ, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
 			}
 			else if (j == ACCESS_FOUNDER)
 				u->SendMessage(ChanServ, CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name.c_str());

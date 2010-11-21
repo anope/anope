@@ -707,8 +707,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Automatic mode +h"),
 	/* CHAN_LEVEL_AUTOPROTECT */
 	_("Automatic mode +a"),
-	/* CHAN_LEVEL_AUTODEOP */
-	_("Channel operator status disallowed"),
 	/* CHAN_LEVEL_NOJOIN */
 	_("Not allowed to join channel"),
 	/* CHAN_LEVEL_INVITE */
@@ -3929,7 +3927,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"set, see HELP LEVELS DESC."),
 	/* CHAN_HELP_LEVELS_DESC */
 	_("The following feature/function names are understood.  Note\n"
-	"that the levels for AUTODEOP and NOJOIN are maximum levels,\n"
+	"that the leves for NOJOIN is the maximum level,\n"
 	"while all others are minimum levels."),
 	/* CHAN_HELP_LEVELS_DESC_FORMAT */
 	_("    %-*s  %s"),

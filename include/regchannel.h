@@ -62,15 +62,26 @@ enum ChannelInfoFlag
 	CI_END
 };
 
+struct ModeLock
+{
+	bool set;
+	ChannelModeName name;
+	Anope::string param;
+	Anope::string setter;
+	time_t created;
+
+	ModeLock(bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime) : set(s), name(n), param(p), setter(se), created(c) { }
+};
+
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
-	std::map<ChannelModeName, Anope::string> Params;	/* Map of parameters by mode name for mlock */
+	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
+ private:
 	std::vector<ChanAccess *> access;					/* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
-	Flags<ChannelModeName, CMODE_END * 2> mlock_on;			/* Modes mlocked on */
-	Flags<ChannelModeName, CMODE_END * 2> mlock_off;		/* Modes mlocked off */
+	ModeList mode_locks;
 
  public:
  	/** Default constructor
@@ -241,51 +252,51 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	void LoadMLock();
 
 	/** Check if a mode is mlocked
-	 * @param Name The mode
+	 * @param mode The mode
+	 * @param An optional param
 	 * @param status True to check mlock on, false for mlock off
 	 * @return true on success, false on fail
 	 */
-	bool HasMLock(ChannelModeName Name, bool status) const;
+	bool HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const;
 
 	/** Set a mlock
-	 * @param Name The mode
+	 * @param mode The mode
 	 * @param status True for mlock on, false for mlock off
 	 * @param param An optional param arg for + mlocked modes
+	 * @param setter Who is setting the mlock
+	 * @param created When the mlock was created
 	 * @return true on success, false on failure (module blocking)
 	 */
-	bool SetMLock(ChannelModeName Name, bool status, const Anope::string &param = "");
+	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", const Anope::string &setter = "", time_t created = Anope::CurTime);
 
 	/** Remove a mlock
-	 * @param Name The mode
-	 * @return true on success, false on failure (module blcoking)
+	 * @param mode The mode
+	 * @param param The param of the mode, required if it is a list or status mode
+	 * @return true on success, false on failure
 	 */
-	bool RemoveMLock(ChannelModeName Name);
+	bool RemoveMLock(ChannelMode *mode, const Anope::string &param = "");
 
 	/** Clear all mlocks on the channel
 	 */
 	void ClearMLock();
 
-	/** Get the number of mlocked modes for this channel
-	 * @param status true for mlock on, false for mlock off
-	 * @return The number of mlocked modes
+	/** Get all of the mlocks for this channel
+	 * @return The mlocks
 	 */
-	size_t GetMLockCount(bool status) const;
+	const std::multimap<ChannelModeName, ModeLock> &GetMLock() const;
 
-	/** Get a param from the channel
-	 * @param Name The mode
-	 * @param Target a string to put the param into
-	 * @return true on success
+	/** Get a list of modes on a channel
+	 * @param Name The mode name to get a list of
+	 * @return a pair of iterators for the beginning and end of the list
 	 */
-	bool GetParam(ChannelModeName Name, Anope::string &Target) const;
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
 
-	/** Check if a mode is set and has a param
-	 * @param Name The mode
+	/** Get details for a specific mlock
+	 * @param name The mode name
+ 	 * @param An optional param to match with
+	 * @return The MLock, if any
 	 */
-	bool HasParam(ChannelModeName Name) const;
-
-	/** Clear all the params from the channel
-	 */
-	void ClearParams();
+	ModeLock *GetMLock(ChannelModeName name, const Anope::string &param = "");
 
 	/** Check whether a user is permitted to be on this channel
 	 * @param u The user

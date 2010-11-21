@@ -66,7 +66,8 @@ class CommandCSInfo : public Command
 		u->SendMessage(ChanServ, CHAN_INFO_TIME_REGGED, do_strftime(ci->time_registered).c_str());
 		u->SendMessage(ChanServ, CHAN_INFO_LAST_USED, do_strftime(ci->last_used).c_str());
 
-		if (!ci->last_topic.empty() && (show_all || (!ci->HasMLock(CMODE_SECRET, true) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
+		ModeLock *secret = ci->GetMLock(CMODE_SECRET);
+		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
 		{
 			u->SendMessage(ChanServ, CHAN_INFO_LAST_TOPIC, ci->last_topic.c_str());
 			u->SendMessage(ChanServ, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter.c_str());

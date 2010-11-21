@@ -769,6 +769,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Allowed to use BAN command"),
 	/* CHAN_LEVEL_TOPIC */
 	_("Allowed to use TOPIC command"),
+	/* CHAN_LEVEL_MODE */
+	_("Allowed to use MODE command"),
 	/* CHAN_LEVEL_INFO */
 	_("Allowed to use INFO command with ALL option"),
 	/* CHAN_LEVEL_AUTOOWNER */
@@ -1294,8 +1296,10 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s has been unbanned from %s."),
 	/* CHAN_TOPIC_SYNTAX */
 	_("TOPIC channel [topic]"),
-	/* CHAN_CLEARUSERS */
+	/* CHAN_CLEARUSERS_SYNTAX */
 	_("CLEARUSERS \037channel\037"),
+	/* CHAN_CLEARED_USERS */
+	_("All users have been kicked from \2%s\2."),
 	/* CHAN_CLONED */
 	_("All settings from \002%s\002 have been transferred to \002%s\002"),
 	/* CHAN_CLONED_ACCESS */
@@ -1366,6 +1370,24 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("KICK #channel nick [reason]"),
 	/* CHAN_BAN_SYNTAX */
 	_("BAN #channel nick [reason]"),
+	/* CHAN_MODE_SYNTAX */
+	_("MODE \037channel\037 {LOCK|SET} [\037modes\037 | {ADD|DEL|LIST} [\037what\037]]"),
+	/* CHAN_MODE_LOCK_UNKNOWN */
+	_("Unknown mode character %c ignored."),
+	/* CHAN_MODE_LOCK_MISSING_PARAM */
+	_("Missing parameter for mode %c."),
+	/* CHAN_MODE_LOCK_NONE */
+	_("Channel %s has no mode locks."),
+	/* CHAN_MODE_LOCK_HEADER */
+	_("Mode locks for %s:"),
+	/* CHAN_MODE_LOCKED */
+	_("%c%c%s locked on %s"),
+	/* CHAN_MODE_NOT_LOCKED */
+	_("%c is not locked on %s."),
+	/* CHAN_MODE_UNLOCKED */
+	_("%c%c%s has been unlocked from %s."),
+	/* CHAN_MODE_LIST_FMT */
+	_("%c%c%s, by %s on %s"),
 	/* MEMO_HAVE_NEW_MEMO */
 	_("You have 1 new memo."),
 	/* MEMO_HAVE_NEW_MEMOS */
@@ -3338,6 +3360,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    DEOP       Deops a selected nick on a channel"),
 	/* CHAN_HELP_CMD_CLONE */
 	_("    CLONE      Copy all settings from one channel to another"),
+	/* CHAN_HELP_CMD_MODE */
+	_("    MODE       Control modes and mode locks on a channel"),
 	/* CHAN_HELP */
 	_("%S allows you to register and control various\n"
 	"aspects of channels.  %S can often prevent\n"
@@ -4062,6 +4086,26 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"target channel. If access, akick, or badwords is specified then only\n"
 	"the respective settings are transferred. You must have founder level\n"
 	"access to \037channel\037 and \037target\037."),
+	/* CHAN_HELP_MODE */
+	_("Syntax: \002MODE \037channel\037 LOCK {ADD|DEL|LIST} [\037what\037]\002\n"
+	"        \002MODE \037channel\037 SET \037modes\037\002\n"
+	" \n"
+	"Mainly controls mode locks and mode access (which is different from channel access)\n"
+	"on a channel.\n"
+	" \n"
+	"The \002MODE LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
+	"If a mode is locked on or off, services will not allow that mode to be changed.\n"
+	"Example:\n"
+	"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
+	" \n"
+	"The \002MODE SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
+	"be given as parameters for list and status modes.\n"
+	"Example:\n"
+	"     \002MODE #channel SET +v *\002\n"
+	"       Sets voice status to all users in the channel.\n"
+	" \n"
+	"     \002MODE #channel SET -b ~c:*\n"
+	"       Clears all extended bans that start with ~c:"),
 	/* CHAN_SERVADMIN_HELP */
 	_(" \n"
 	"Services Operators can also drop any channel without needing\n"

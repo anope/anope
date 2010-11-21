@@ -44,7 +44,7 @@ class CommandCSSet : public Command
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			u->SendMessage(ChanServ, CHAN_SET_MLOCK_DEPRECATED);
+			u->SendMessage(ChanServ, CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
 			return MOD_CONT;
 		}
 

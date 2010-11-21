@@ -106,18 +106,10 @@ How To Add IRCd Support
 
     23) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    24) Channel CIDR: Set to 1 if channel bans, excepts and invites
-                      support CIDR masks. Expected syntax: *!*@ip/mask.
-                      When set to 1, anope will only parse strict CIDR masks.
-                      IRCd's that try to correct invalid CIDR's (like nefarious)
-                      will need a custom implementation in the core.
-                      Contact the anope Dev Team if this is the case.
-                      Set to 0 if CIDR's are not supported by your IRCd.
-
-    25) Global TLD Prefix: Prefix used to send global messages, should probably
+    24) Global TLD Prefix: Prefix used to send global messages, should probably
                            be "$"
 
-    26) Max Modes: The max number of mode changes we can send in one line
+    25) Max Modes: The max number of mode changes we can send in one line
 
 3) Modes 
 

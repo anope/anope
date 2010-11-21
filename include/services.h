@@ -453,9 +453,6 @@ struct IRCDVar
 	int svsmode_ucmode;				/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	int ts6;						/* ircd is TS6 */
-	int cidrchanbei;				/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
-									 * 0 for no support, 1 for strict cidr support, anything else
-									 * for ircd specific support (nefarious only cares about first /mask) */
 	const char *globaltldprefix;	/* TLD prefix used for Global */
 	unsigned maxmodes;				/* Max modes to send per line */
 };
@@ -636,7 +633,6 @@ enum ChannelAccess
 	CA_AUTOVOICE,
 	CA_OPDEOP,		/* ChanServ commands OP and DEOP */
 	CA_ACCESS_LIST,
-	CA_CLEAR,
 	CA_NOJOIN,		/* Maximum */
 	CA_ACCESS_CHANGE,
 	CA_MEMO,
@@ -662,6 +658,7 @@ enum ChannelAccess
 	CA_BANME,
 	CA_BAN,
 	CA_TOPIC,
+	CA_MODE,
 	CA_INFO,
 	CA_AUTOOWNER,
 	CA_OWNER,
@@ -756,7 +753,7 @@ struct LevelInfo
 enum EntryType
 {
 	ENTRYTYPE_NONE,
-	ENTRYTYPE_CIDR4,
+	ENTRYTYPE_CIDR,
 	ENTRYTYPE_NICK_WILD,
 	ENTRYTYPE_NICK,
 	ENTRYTYPE_USER_WILD,
@@ -767,17 +764,27 @@ enum EntryType
 
 class Entry : public Flags<EntryType>
 {
- public:
-	Entry *next, *prev;
-	uint32 cidr_ip;		/* IP mask for CIDR matching */
-	uint32 cidr_mask;	/* Netmask for CIDR matching */
-	Anope::string nick, user, host, mask;
-};
+	Anope::string mask;
 
-struct EList
-{
-	Entry *entries;
-	int32 count;
+ public:
+	unsigned char cidr_len;
+	Anope::string nick, user, host;
+
+	/** Constructor
+	 * @param _host A full nick!ident@host/cidr mask
+	 */
+	Entry(const Anope::string &_host);
+
+	/** Get the banned mask for this entry
+	 * @return The mask
+	 */
+	const Anope::string GetMask();
+
+	/** Check if this entry matches a user
+	 * @param u The user
+	 * @return true on match
+	 */
+	bool Matches(User *u) const;
 };
 
 /*************************************************************************/

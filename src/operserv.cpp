@@ -428,7 +428,18 @@ XLine *XLineManager::Check(User *u)
 		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent(), x->GetUser()))
 			continue;
 
-		if (x->GetHost().empty() || (u->ip() && Anope::Match(u->ip.addr(), x->GetHost())) || Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost, x->GetHost())) || (!u->vhost.empty() && Anope::Match(u->vhost, x->GetHost())))
+		if (u->ip() && !x->GetHost().empty())
+		{
+			try
+			{
+				cidr cidr_ip(x->GetHost());
+				if (cidr_ip.match(u->ip))
+					return x;
+			}
+			catch (const SocketException &) { }
+		}
+
+		if (x->GetHost().empty() || (Anope::Match(u->host, x->GetHost()) || (!u->chost.empty() && Anope::Match(u->chost, x->GetHost())) || (!u->vhost.empty() && Anope::Match(u->vhost, x->GetHost()))))
 		{
 			OnMatch(u, x);
 			return x;

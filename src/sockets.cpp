@@ -171,6 +171,80 @@ void sockaddrs::ntop(int type, const void *src)
 	throw CoreException("Invalid socket type");
 }
 
+cidr::cidr(const Anope::string &ip)
+{
+	if (ip.find_first_not_of("01234567890:./") != Anope::string::npos)
+		throw SocketException("Invalid IP");
+
+	bool ipv6 = ip.find(':') != Anope::string::npos;
+	size_t sl = ip.find_last_of('/');
+	if (sl == Anope::string::npos)
+	{
+		this->cidr_ip = ip;
+		this->cidr_len = ipv6 ? 128 : 32;
+		this->addr.pton(ipv6 ? AF_INET6 : AF_INET, ip);
+	}
+	else
+	{
+		Anope::string real_ip = ip.substr(0, sl);
+		Anope::string cidr_range = ip.substr(sl + 1);
+		if (!cidr_range.is_pos_number_only())
+			throw SocketException("Invalid CIDR range");
+
+		this->cidr_ip = real_ip;
+		this->cidr_len = convertTo<unsigned int>(cidr_range);
+		this->addr.pton(ipv6 ? AF_INET6 : AF_INET, real_ip);
+	}
+}
+
+cidr::cidr(const Anope::string &ip, unsigned char len)
+{
+	bool ipv6 = ip.find(':') != Anope::string::npos;
+	this->addr.pton(ipv6 ? AF_INET6 : AF_INET, ip);
+	this->cidr_ip = ip;
+	this->cidr_len = len;
+}
+
+Anope::string cidr::mask() const
+{
+	return this->cidr_ip + "/" + this->cidr_len;
+}
+
+bool cidr::match(sockaddrs &other)
+{
+	if (this->addr.sa.sa_family != other.sa.sa_family)
+		return false;
+
+	unsigned char *ip, *their_ip, byte;
+
+	switch (this->addr.sa.sa_family)
+	{
+		case AF_INET:
+			ip = reinterpret_cast<unsigned char *>(&this->addr.sa4.sin_addr);
+			byte = this->cidr_len / 8;
+			their_ip = reinterpret_cast<unsigned char *>(&other.sa4.sin_addr);
+			break;
+		case AF_INET6:
+			ip = reinterpret_cast<unsigned char *>(&this->addr.sa6.sin6_addr);
+			byte = this->cidr_len / 8;
+			their_ip = reinterpret_cast<unsigned char *>(&other.sa6.sin6_addr);
+			break;
+		default:
+			throw SocketException("Invalid address type");
+	}
+	
+	if (memcmp(ip, their_ip, byte))
+		return false;
+
+	ip += byte;
+	their_ip += byte;
+	byte = this->cidr_len % 8;
+	if ((*ip & byte) != (*their_ip & byte))
+		return false;
+	
+	return true;
+}
+
 /** Default constructor
  */
 SocketEngineBase::SocketEngineBase()

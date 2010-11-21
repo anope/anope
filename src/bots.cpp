@@ -141,28 +141,24 @@ void BotInfo::Join(Channel *c, bool update_ts)
 {
 	if (Config->BSSmartJoin)
 	{
+		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList(CMODE_BAN);
+
 		/* We check for bans */
-		if (c->bans && c->bans->count)
+		for (; bans.first != bans.second; ++bans.first)
 		{
-			Entry *ban, *next;
-
-			for (ban = c->bans->entries; ban; ban = next)
-			{
-				next = ban->next;
-
-				if (entry_match(ban, this->nick, this->GetIdent(), this->host, 0))
-					c->RemoveMode(NULL, CMODE_BAN, ban->mask);
-			}
-
-			Anope::string Limit;
-			unsigned limit = 0;
-			if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_pos_number_only())
-				limit = convertTo<unsigned>(Limit);
-
-			/* Should we be invited? */
-			if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
-				ircdproto->SendNoticeChanops(this, c, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
+			Entry ban(bans.first->second);
+			if (ban.Matches(this))
+				c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
 		}
+
+		Anope::string Limit;
+		unsigned limit = 0;
+		if (c->GetParam(CMODE_LIMIT, Limit) && Limit.is_pos_number_only())
+			limit = convertTo<unsigned>(Limit);
+
+		/* Should we be invited? */
+		if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
+			ircdproto->SendNoticeChanops(this, c, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
 
 		ModeManager::ProcessModes();
 	}

@@ -27,53 +27,42 @@ std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
 
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
-/* Default mlocked modes on */
-Flags<ChannelModeName, CMODE_END * 2> DefMLockOn;
-/* Default mlocked modes off */
-Flags<ChannelModeName, CMODE_END * 2> DefMLockOff;
-/* Map for default mlocked mode parameters */
-std::map<ChannelModeName, Anope::string> DefMLockParams;
+/* Default mlocked modes */
+std::multimap<ChannelModeName, ModeLock> def_mode_locks;
 
 /** Parse the mode string from the config file and set the default mlocked modes
  */
 void SetDefaultMLock(ServerConfig *config)
 {
-	DefMLockOn.ClearFlags();
-	DefMLockOff.ClearFlags();
-	DefMLockParams.clear();
-	Flags<ChannelModeName, CMODE_END * 2> *ptr = NULL;
+	def_mode_locks.clear();
 
-	Anope::string modes, param;
+	Anope::string modes;
 	spacesepstream sep(config->MLock);
 	sep.GetToken(modes);
 
+	int adding = -1;
 	for (unsigned i = 0, end_mode = modes.length(); i < end_mode; ++i)
 	{
 		if (modes[i] == '+')
-			ptr = &DefMLockOn;
+			adding = 1;
 		else if (modes[i] == '-')
-			ptr = &DefMLockOff;
-		else
+			adding = 0;
+		else if (adding != -1)
 		{
-			if (!ptr)
-				continue;
-
 			ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 
-			if (cm && (cm->Type == MODE_REGULAR || cm->Type == MODE_PARAM))
+			if (cm && cm->Type != MODE_STATUS)
 			{
-				ptr->SetFlag(cm->Name);
-
-				if (ptr == &DefMLockOn && cm->Type == MODE_PARAM)
+				Anope::string param;
+				if (adding == 1 && cm->Type != MODE_REGULAR && !sep.GetToken(param)) // MODE_LIST OR MODE_PARAM
 				{
-					if (sep.GetToken(param))
-						DefMLockParams.insert(std::make_pair(cm->Name, param));
-					else
-					{
-						Log() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
-						ptr->UnsetFlag(cm->Name);
-					}
+					Log() << "Warning: Got default mlock mode " << cm->ModeChar << " with no param?";
+					continue;
 				}
+
+				if (cm->Type != MODE_LIST) // Only MODE_LIST can have duplicates
+					def_mode_locks.erase(cm->Name);
+				def_mode_locks.insert(std::make_pair(cm->Name, ModeLock(adding == 1, cm->Name, param)));
 			}
 		}
 	}
@@ -298,36 +287,20 @@ bool ChannelModeRegistered::CanSet(User *u) const
  * @param chan The channel
  * @param mask The ban
  */
-void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
+void ChannelModeBan::OnAdd(Channel *chan, const Anope::string &mask)
 {
 	/* check for NULL values otherwise we will segfault */
 	if (!chan || mask.empty())
-	{
-		Log() << "add_ban called with NULL values";
 		return;
-	}
 
-	/* Check if the list already exists, if not create it.
-	 * Create a new ban and add it to the list.. ~ Viper */
-	if (!chan->bans)
-		chan->bans = list_create();
-
-	Entry *ban = entry_add(chan->bans, mask);
-	if (!ban)
-		throw CoreException("Creating new ban entry failed");
-
-	/* Check whether it matches a botserv bot after adding internally
-	 * and parsing it through cidr support. ~ Viper */
+	/* Check whether it matches a botserv bot */
 	if (!Config->s_BotServ.empty() && Config->BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
 	{
 		BotInfo *bi = chan->ci->bi;
 
-		if (entry_match(ban, bi->nick, bi->GetIdent(), bi->host, 0))
-		{
-			ircdproto->SendMode(bi, chan, "-b %s", mask.c_str());
-			entry_delete(chan->bans, ban);
-			return;
-		}
+		Entry ban(mask);
+		if (ban.Matches(bi))
+			chan->RemoveMode(NULL, CMODE_BAN, mask);
 	}
 
 	Log(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
@@ -337,41 +310,22 @@ void ChannelModeBan::AddMask(Channel *chan, const Anope::string &mask)
  * @param chan The channel
  * @param mask The ban
  */
-void ChannelModeBan::DelMask(Channel *chan, const Anope::string &mask)
+void ChannelModeBan::OnDel(Channel *chan, const Anope::string &mask)
 {
-	/* Sanity check as it seems some IRCD will just send -b without a mask */
-	if (mask.empty() || !chan->bans || !chan->bans->count)
+	if (!chan || mask.empty())
 		return;
 
-	Entry *ban = elist_find_mask(chan->bans, mask);
-	if (ban)
-	{
-		entry_delete(chan->bans, ban);
-
-		Log(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
-	}
+	Log(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
 }
 
 /** Add an except to the channel
  * @param chan The channel
  * @param mask The except
  */
-void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
+void ChannelModeExcept::OnAdd(Channel *chan, const Anope::string &mask)
 {
 	if (!chan || mask.empty())
-	{
-		Log() << "add_exception called with NULL values";
 		return;
-	}
-
-	/* Check if the list already exists, if not create it.
-	 * Create a new exception and add it to the list.. ~ Viper */
-	if (!chan->excepts)
-		chan->excepts = list_create();
-
-	Entry *exception = entry_add(chan->excepts, mask);
-	if (!exception)
-		throw CoreException("Creating new exception entry failed");
 
 	Log(LOG_DEBUG) << "Added except " << mask << " to channel " << chan->name;
 }
@@ -380,40 +334,22 @@ void ChannelModeExcept::AddMask(Channel *chan, const Anope::string &mask)
  * @param chan The channel
  * @param mask The except
  */
-void ChannelModeExcept::DelMask(Channel *chan, const Anope::string &mask)
+void ChannelModeExcept::OnDel(Channel *chan, const Anope::string &mask)
 {
-	/* Sanity check as it seems some IRCD will just send -e without a mask */
-	if (mask.empty() || !chan->excepts || !chan->excepts->count)
+	if (!chan || mask.empty())
 		return;
 
-	Entry *exception = elist_find_mask(chan->excepts, mask);
-	if (exception)
-	{
-		entry_delete(chan->excepts, exception);
-		Log(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
-	}
+	Log(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
 }
 
 /** Add an invex to the channel
  * @param chan The channel
  * @param mask The invex
  */
-void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
+void ChannelModeInvex::OnAdd(Channel *chan, const Anope::string &mask)
 {
 	if (!chan || mask.empty())
-	{
-		Log() << "add_invite called with NULL values";
 		return;
-	}
-
-	/* Check if the list already exists, if not create it.
-	 * Create a new invite and add it to the list.. ~ Viper */
-	if (!chan->invites)
-		chan->invites = list_create();
-
-	Entry *invite = entry_add(chan->invites, mask);
-	if (!invite)
-		throw CoreException("Creating new invex entry failed");
 
 	Log(LOG_DEBUG) << "Added invite " << mask << " to channel " << chan->name;
 
@@ -423,18 +359,12 @@ void ChannelModeInvex::AddMask(Channel *chan, const Anope::string &mask)
  * @param chan The channel
  * @param mask The index
  */
-void ChannelModeInvex::DelMask(Channel *chan, const Anope::string &mask)
+void ChannelModeInvex::OnDel(Channel *chan, const Anope::string &mask)
 {
-	/* Sanity check as it seems some IRCD will just send -I without a mask */
-	if (mask.empty() || !chan->invites || !chan->invites->count)
+	if (!chan || mask.empty())
 		return;
 
-	Entry *invite = elist_find_mask(chan->invites, mask);
-	if (invite)
-	{
-		entry_delete(chan->invites, invite);
-		Log(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
-	}
+	Log(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
 }
 
 void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)

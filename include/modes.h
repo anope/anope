@@ -185,17 +185,17 @@ class CoreExport ChannelModeList : public ChannelMode
 	 */
 	virtual bool IsValid(const Anope::string &mask) const { return true; }
 
-	/** Add the mask to the channel, this should be overridden
+	/** Called when a mask is added to a channel
 	 * @param chan The channel
 	 * @param mask The mask
 	 */
-	virtual void AddMask(Channel *chan, const Anope::string &mask) { }
+	virtual void OnAdd(Channel *chan, const Anope::string &mask) { }
 
-	/** Delete the mask from the channel, this should be overridden
+	/** Called when a mask is removed from a channel
 	 * @param chan The channel
 	 * @param mask The mask
 	 */
-	virtual void DelMask(Channel *chan, const Anope::string &mask) { }
+	virtual void OnDel(Channel *chan, const Anope::string &mask) { }
 
 };
 
@@ -254,9 +254,9 @@ class CoreExport ChannelModeBan : public ChannelModeList
  public:
 	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, "CMODE_BAN", modeChar) { }
 
-	void AddMask(Channel *chan, const Anope::string &mask);
+	void OnAdd(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const Anope::string &mask);
+	void OnDel(Channel *chan, const Anope::string &mask);
 };
 
 /** Channel mode +e
@@ -266,9 +266,9 @@ class CoreExport ChannelModeExcept : public ChannelModeList
  public:
 	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, "CMODE_EXCEPT", modeChar) { }
 
-	void AddMask(Channel *chan, const Anope::string &mask);
+	void OnAdd(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const Anope::string &mask);
+	void OnDel(Channel *chan, const Anope::string &mask);
 };
 
 /** Channel mode +I
@@ -278,9 +278,9 @@ class CoreExport ChannelModeInvex : public ChannelModeList
  public:
 	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
 
-	void AddMask(Channel *chan, const Anope::string &mask);
+	void OnAdd(Channel *chan, const Anope::string &mask);
 
-	void DelMask(Channel *chan, const Anope::string &mask);
+	void OnDel(Channel *chan, const Anope::string &mask);
 };
 
 

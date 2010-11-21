@@ -37,7 +37,6 @@ IRCDVar myIrcd[] = {
 	 1,						/* Can remove User Channel Modes with SVSMODE */
 	 0,						/* Sglines are not enforced until user reconnects */
 	 0,						/* ts6 */
-	 0,						/* CIDR channelbans */
 	 "$",					/* TLD Prefix for Global */
 	 12,					/* Max number of modes we can send per line */
 	 }
@@ -986,36 +985,30 @@ bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &
 		c->SetModesInternal(NULL, modes);
 	}
 
+	ChannelMode *ban = ModeManager::FindChannelModeByName(CMODE_BAN),
+		*except = ModeManager::FindChannelModeByName(CMODE_EXCEPT),
+		*invex = ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE);
 	spacesepstream sep(params[params.size() - 1]);
 	Anope::string buf;
 	while (sep.GetToken(buf))
 	{
 		/* Ban */
-		if (keep_their_modes && buf[0] == '&')
+		if (keep_their_modes && ban && buf[0] == '&')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
-
-			if (cml->IsValid(buf))
-				cml->AddMask(c, buf);
+			c->SetModeInternal(ban, buf);
 		}
 		/* Except */
-		else if (keep_their_modes && buf[0] == '"')
+		else if (keep_their_modes && except && buf[0] == '"')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
-
-			if (cml->IsValid(buf))
-				cml->AddMask(c, buf);
+			c->SetModeInternal(except, buf);
 		}
 		/* Invex */
-		else if (keep_their_modes && buf[0] == '\'')
+		else if (keep_their_modes && invex && buf[0] == '\'')
 		{
 			buf.erase(buf.begin());
-			ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
-
-			if (cml->IsValid(buf))
-				cml->AddMask(c, buf);
+			c->SetModeInternal(invex, buf);
 		}
 		else
 		{

@@ -63,12 +63,16 @@ class CommandCSForbid : public Command
 		ci->forbidby = u->nick;
 		ci->forbidreason = reason;
 
-		if ((c = findchan(ci->name)))
+		if ((c = ci->c))
 		{
 			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */
-			c->ClearExcepts();
-			c->ClearInvites();
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = c->GetModeList(CMODE_EXCEPT);
+			for (; modes.first != modes.second; ++modes.first)
+				c->RemoveMode(NULL, CMODE_EXCEPT, modes.first->second);
+			modes = c->GetModeList(CMODE_INVITEOVERRIDE);
+			for (; modes.first != modes.second; ++modes.first)
+				c->RemoveMode(NULL, CMODE_INVITEOVERRIDE, modes.first->second);
 
 			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{

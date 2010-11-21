@@ -61,7 +61,7 @@ class CommandCSSetPersist : public Command
 					if (ci->c && !ci->c->HasMode(CMODE_PERM))
 						ci->c->SetMode(NULL, cm);
 					/* Add it to the channels mlock */
-					ci->SetMLock(CMODE_PERM, true);
+					ci->SetMLock(cm, true);
 				}
 			}
 
@@ -81,7 +81,7 @@ class CommandCSSetPersist : public Command
 					if (ci->c && ci->c->HasMode(CMODE_PERM))
 						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
-					ci->RemoveMLock(CMODE_PERM);
+					ci->RemoveMLock(cm);
 				}
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot

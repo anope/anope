@@ -37,7 +37,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* Can remove User Channel Modes with SVSMODE */
 	 0,					/* Sglines are not enforced until user reconnects */
 	 0,					/* ts6 */
-	 0,					/* CIDR channelbans */
 	 "$",				/* TLD Prefix for Global */
 	 6,					/* Max number of modes we can send per line */
 	 }

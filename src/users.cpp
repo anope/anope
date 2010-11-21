@@ -165,6 +165,11 @@ Anope::string User::GetMask() const
 	return this->nick + "!" + this->ident + "@" + this->host;
 }
 
+Anope::string User::GetDisplayedMask() const
+{
+	return this->nick + "!" + this->GetVIdent() + "@" + this->GetDisplayedHost();
+}
+
 void User::SetRealname(const Anope::string &srealname)
 {
 	if (srealname.empty())
@@ -921,7 +926,16 @@ bool is_excepted(ChannelInfo *ci, User *user)
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return false;
 
-	return elist_match_user(ci->c->excepts, user);
+
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
+	for (; modes.first != modes.second; ++modes.first)
+	{
+		Entry e(modes.first->second);
+		if (e.Matches(user))
+			return true;
+	}
+
+	return false;
 }
 
 /*************************************************************************/
@@ -932,7 +946,14 @@ bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
 	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
 		return false;
 
-	return elist_match_mask(ci->c->excepts, mask, 0);
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
+	for (; modes.first != modes.second; ++modes.first)
+	{
+		if (Anope::Match(modes.first->second, mask))
+			return true;
+	}
+
+	return false;
 }
 
 /*************************************************************************/

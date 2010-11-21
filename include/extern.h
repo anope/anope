@@ -75,18 +75,6 @@ E void MassChannelModes(BotInfo *bi, const Anope::string &modes);
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
-E Entry *entry_create(const Anope::string &mask);
-E Entry *entry_add(EList *list, const Anope::string &mask);
-E void entry_delete(EList *list, Entry *e);
-E EList *list_create();
-E int entry_match(Entry *e, const Anope::string &nick, const Anope::string &user, const Anope::string &host, uint32 ip);
-E int entry_match_mask(Entry *e, const Anope::string &mask, uint32 ip);
-E Entry *elist_match(EList *list, const Anope::string &nick, const Anope::string &user, const Anope::string &host, uint32 ip);
-E Entry *elist_match_mask(EList *list, const Anope::string &mask, uint32 ip);
-E Entry *elist_match_user(EList *list, User *u);
-E Entry *elist_find_mask(EList *list, const Anope::string &mask);
-E long get_memuse(EList *list);
-
 inline BotInfo *whosends(ChannelInfo *ci)
 {
 	if (!ci || !ci->bi || !ci->c || !ci->botflags.HasFlag(BS_SYMBIOSIS) || !ci->c->FindUser(ci->bi))
@@ -272,9 +260,7 @@ E bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::st
 /**** modes.cpp ****/
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
-E Flags<ChannelModeName, CMODE_END * 2> DefMLockOn;
-E Flags<ChannelModeName, CMODE_END * 2> DefMLockOff;
-E std::map<ChannelModeName, Anope::string> DefMLockParams;
+E std::multimap<ChannelModeName, ModeLock> def_mode_locks;
 E void SetDefaultMLock(ServerConfig *config);
 
 /**** nickserv.c ****/

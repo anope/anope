@@ -71,28 +71,29 @@ void kill_user(const Anope::string &source, const Anope::string &user, const Ano
  */
 void common_unban(ChannelInfo *ci, const Anope::string &nick)
 {
-	//uint32 ip = 0;
-	User *u;
-	Entry *ban, *next;
-
 	if (!ci || !ci->c || nick.empty())
 		return;
 
-	if (!(u = finduser(nick)))
+	User *u = finduser(nick);
+	if (!u)
 		return;
 
-	if (!ci->c->bans || !ci->c->bans->count)
+	if (!ci->c->HasMode(CMODE_BAN))
 		return;
 
 	if (ircd->svsmode_unban)
 		ircdproto->SendBanDel(ci->c, nick);
 	else
-		for (ban = ci->c->bans->entries; ban; ban = next)
+	{
+		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = ci->c->GetModeList(CMODE_BAN);
+		for (; bans.first != bans.second;)
 		{
-			next = ban->next;
-			if (entry_match(ban, u->nick, u->GetIdent(), u->host, /*ip XXX */ 0) || entry_match(ban, u->nick, u->GetIdent(), u->GetDisplayedHost(), /*ip XXX */0))
-				ci->c->RemoveMode(NULL, CMODE_BAN, ban->mask);
+			Entry ban(bans.first->second);
+			++bans.first;
+			if (ban.Matches(u))
+				ci->c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
 		}
+	}
 }
 
 /*************************************************************************/

@@ -831,6 +831,74 @@ char *str_signed(unsigned char *str)
 	return nstr;
 }
 
+bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
+{
+	size_t s = 0, m = 0, str_len = str.length(), mask_len = mask.length();
+
+	while (s < str_len && m < mask_len && mask[m] != '*')
+	{
+		char string = str[s], wild = mask[m];
+		if (case_sensitive)
+		{
+			if (wild != string && wild != '?')
+				return false;
+		}
+		else
+		{
+			if (tolower(wild) != tolower(string) && wild != '?')
+				return false;
+		}
+
+		++m;
+		++s;
+	}
+
+	size_t sp = Anope::string::npos, mp = Anope::string::npos;
+	while (s < str_len)
+	{
+		char string = str[s], wild = mask[m];
+		if (wild == '*')
+		{
+			if (++m == mask_len)
+				return 1;
+
+			mp = m;
+			sp = s + 1;
+		}
+		else if (case_sensitive)
+		{
+			if (wild == string || wild == '?')
+			{
+				++m;
+				++s;
+			}
+			else
+			{
+				m = mp;
+				s = sp++;
+			}
+		}
+		else
+		{
+			if (tolower(wild) == tolower(string) || wild == '?')
+			{
+				++m;
+				++s;
+			}
+			else
+			{
+				m = mp;
+				s = sp++;
+			}
+		}
+	}
+
+	if (mask[m] == '*')
+		++m;
+
+	return m == mask_len;
+}
+
 /*
 * strlcat and strlcpy were ripped from openssh 2.5.1p2
 * They had the following Copyright info:
@@ -1107,11 +1175,7 @@ uint16 netmask_to_cidr(uint32 mask)
  */
 bool str_is_wildcard(const Anope::string &str)
 {
-	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
-		if (*c == '*' || *c == '?')
-			return true;
-
-	return false;
+	return str.find_first_of("*?") != Anope::string::npos;
 }
 
 /**
@@ -1121,11 +1185,7 @@ bool str_is_wildcard(const Anope::string &str)
  */
 bool str_is_pure_wildcard(const Anope::string &str)
 {
-	for (Anope::string::const_iterator c = str.begin(), c_end = str.end(); c != c_end; ++c)
-		if (*c != '*')
-			return false;
-
-	return true;
+	return str.find_first_not_of('*') == Anope::string::npos;
 }
 
 /*************************************************************************/

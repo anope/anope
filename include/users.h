@@ -139,6 +139,10 @@ class CoreExport User : public Extensible
 	 */
 	Anope::string GetMask() const;
 
+	/** Get the full display mask (nick!vident@vhost/chost)
+	 */
+	Anope::string GetDisplayedMask() const;
+
 	/** Updates the realname of the user record.
 	 */
 	void SetRealname(const Anope::string &realname);

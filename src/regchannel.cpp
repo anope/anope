@@ -33,9 +33,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 
 	this->name = chname;
 
-	this->mlock_on = DefMLockOn;
-	this->mlock_off = DefMLockOff;
-	this->Params = DefMLockParams;
+	this->mode_locks = def_mode_locks;
 
 	size_t t;
 	/* Set default channel flags */
@@ -392,7 +390,9 @@ void ChannelInfo::LoadMLock()
 	std::vector<Anope::string> modenames_on, modenames_off;
 
 	// Force +r
-	this->SetMLock(CMODE_REGISTERED, true);
+	ChannelMode *chm = ModeManager::FindChannelModeByName(CMODE_REGISTERED);
+	if (chm)
+		this->SetMLock(chm, true);
 	this->GetExtRegular("db_mlock_modes_on", modenames_on);
 	this->GetExtRegular("db_mlock_modes_off", modenames_off);
 
@@ -405,7 +405,7 @@ void ChannelInfo::LoadMLock()
 			if (m && m->NameAsString.equals_cs(*it))
 			{
 				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm->Name, true);
+				this->SetMLock(cm, true);
 			}
 		}
 		for (std::vector<Anope::string>::iterator it = modenames_off.begin(), it_end = modenames_off.end(); it != it_end; ++it)
@@ -415,7 +415,7 @@ void ChannelInfo::LoadMLock()
 			if (m && m->NameAsString.equals_cs(*it))
 			{
 				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm->Name, false);
+				this->SetMLock(cm, false);
 			}
 		}
 	}
@@ -429,15 +429,28 @@ void ChannelInfo::LoadMLock()
 			if (m && m->Class == MC_CHANNEL)
 			{
 				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm->Name, true, it->second);
+				this->SetMLock(cm, true, it->second);
 			}
 		}
 	
+	}
+	if (this->GetExtRegular("db_mlp_off", params))
+	{
+		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
+		{
+			Mode *m = ModeManager::FindModeByName(it->first);
+			if (m && m->Class == MC_CHANNEL)
+			{
+				ChannelMode *cm = debug_cast<ChannelMode *>(m);
+				this->SetMLock(cm, false, it->second);
+			}
+		}
 	}
 
 	this->Shrink("db_mlock_modes_on");
 	this->Shrink("db_mlock_modes_off");
 	this->Shrink("db_mlp");
+	this->Shrink("db_mlp_off");
 
 	/* Create perm channel */
 	if (this->HasFlag(CI_PERSIST) && !this->c)
@@ -453,132 +466,135 @@ void ChannelInfo::LoadMLock()
 }
 
 /** Check if a mode is mlocked
- * @param Name The mode
+ * @param mode The mode
  * @param status True to check mlock on, false for mlock off
  * @return true on success, false on fail
  */
-bool ChannelInfo::HasMLock(ChannelModeName Name, bool status) const
+bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
 {
-	if (status)
-		return this->mlock_on.HasFlag(Name);
-	else
-		return this->mlock_off.HasFlag(Name);
+	std::map<ChannelModeName, ModeLock>::const_iterator it = this->mode_locks.find(mode->Name);
+
+	if (it != this->mode_locks.end())
+	{
+		if (mode->Type != MODE_REGULAR)
+		{
+			std::map<ChannelModeName, ModeLock>::const_iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			for (; it != it_end; ++it)
+			{
+				const ModeLock &ml = it->second;
+				if (ml.param == param)
+					return true;
+			}
+		}
+		else
+			return it->second.set == status;
+	}
+	return false;
 }
 
 /** Set a mlock
- * @param Name The mode
+ * @param mode The mode
  * @param status True for mlock on, false for mlock off
  * @param param The param to use for this mode, if required
  * @return true on success, false on failure (module blocking)
  */
-bool ChannelInfo::SetMLock(ChannelModeName Name, bool status, const Anope::string &param)
+bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &param, const Anope::string &setter, time_t created)
 {
-	if (!status && !param.empty())
-		throw CoreException("Was told to mlock a mode negatively with a param?");
+	std::pair<ChannelModeName, ModeLock> ml = std::make_pair(mode->Name, ModeLock(status, mode->Name, param, setter, created));
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnMLock, OnMLock(this, Name, status, param));
+	FOREACH_RESULT(I_OnMLock, OnMLock(this, &ml.second));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
-	/* First, remove this everywhere */
-	this->mlock_on.UnsetFlag(Name);
-	this->mlock_off.UnsetFlag(Name);
-
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
-	if (it != Params.end())
-		Params.erase(it);
-
-	if (status)
-		this->mlock_on.SetFlag(Name);
-	else
-		this->mlock_off.SetFlag(Name);
-
-	if (status && !param.empty())
-		this->Params.insert(std::make_pair(Name, param));
+	/* First, remove this */
+	this->RemoveMLock(mode, param);
+	
+	this->mode_locks.insert(ml);
 
 	return true;
 }
 
 /** Remove a mlock
- * @param Name The mode
- * @return true on success, false on failure (module blocking)
+ * @param mode The mode
+ * @param param The param of the mode, required if it is a list or status mode
+ * @return true on success, false on failure
  */
-bool ChannelInfo::RemoveMLock(ChannelModeName Name)
+bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 {
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, Name));
+	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, mode, param));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
-	this->mlock_on.UnsetFlag(Name);
-	this->mlock_off.UnsetFlag(Name);
+	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
+		return this->mode_locks.erase(mode->Name) > 0;
+	else
+	{
+		// For list or status modes, we must check the parameter
+		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name), it_end = this->mode_locks.upper_bound(mode->Name);
+		for (; it != it_end; ++it)
+		{
+			const ModeLock &ml = it->second;
+			if (ml.param == param)
+			{
+				this->mode_locks.erase(it);
+				return true;
+			}
+		}
 
-	std::map<ChannelModeName, Anope::string>::iterator it = Params.find(Name);
-	if (it != Params.end())
-		this->Params.erase(it);
-
-	return true;
+		return false;
+	}
 }
 
 /** Clear all mlocks on the channel
  */
 void ChannelInfo::ClearMLock()
 {
-	this->mlock_on.ClearFlags();
-	this->mlock_off.ClearFlags();
+	this->mode_locks.clear();
 }
 
-/** Get the number of mlocked modes for this channel
- * @param status true for mlock on, false for mlock off
- * @return The number of mlocked modes
+/** Get all of the mlocks for this channel
+ * @return The mlocks
  */
-size_t ChannelInfo::GetMLockCount(bool status) const
+const std::multimap<ChannelModeName, ModeLock> &ChannelInfo::GetMLock() const
 {
-	if (status)
-		return this->mlock_on.FlagCount();
-	else
-		return this->mlock_off.FlagCount();
+	return this->mode_locks;
 }
 
-/** Get a param from the channel
- * @param Name The mode
- * @param Target a string to put the param into
- * @return true on success
+/** Get a list of modes on a channel
+ * @param Name The mode name to get a list of
+ * @return a pair of iterators for the beginning and end of the list
  */
-bool ChannelInfo::GetParam(ChannelModeName Name, Anope::string &Target) const
+std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> ChannelInfo::GetModeList(ChannelModeName Name)
 {
-	std::map<ChannelModeName, Anope::string>::const_iterator it = this->Params.find(Name);
+	return std::make_pair(this->mode_locks.find(Name), this->mode_locks.upper_bound(Name));
+}
 
-	Target.clear();
-
-	if (it != this->Params.end())
+/** Get details for a specific mlock
+ * @param name The mode name
+ * @param param An optional param to match with
+ * @return The MLock, if any
+ */
+ModeLock *ChannelInfo::GetMLock(ChannelModeName name, const Anope::string &param)
+{
+	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(name);
+	if (it != this->mode_locks.end())
 	{
-		Target = it->second;
-		return true;
+		if (param.empty())
+			return &it->second;
+		else
+		{
+			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(name);
+			for (; it != it_end; ++it)
+			{
+				if (Anope::Match(param, it->second.param))
+					return &it->second;
+			}
+		}
 	}
 
-	return false;
-}
-
-/** Check if a mode is set and has a param
- * @param Name The mode
- */
-bool ChannelInfo::HasParam(ChannelModeName Name) const
-{
-	std::map<ChannelModeName, Anope::string>::const_iterator it = this->Params.find(Name);
-
-	if (it != this->Params.end())
-		return true;
-
-	return false;
-}
-
-/** Clear all the params from the channel
- */
-void ChannelInfo::ClearParams()
-{
-	Params.clear();
+	return NULL;
 }
 
 /** Check whether a user is permitted to be on this channel

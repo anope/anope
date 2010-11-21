@@ -28,15 +28,9 @@ class CommandCSClearUsers : public Command
 		ChannelInfo *ci = c ? c->ci : NULL;
 		Anope::string modebuf;
 
-		ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
-		ChannelMode *admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
-		ChannelMode *op = ModeManager::FindChannelModeByName(CMODE_OP);
-		ChannelMode *halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
-		ChannelMode *voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
-
 		if (!c)
 			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!check_access(u, ci, CA_CLEAR))
+		else if (!check_access(u, ci, CA_FOUNDER))
 			u->SendMessage(ChanServ, ACCESS_DENIED);
 		
 		Anope::string buf = "CLEAR USERS command from " + u->nick + " (" + u->Account()->display + ")";
@@ -55,18 +49,18 @@ class CommandCSClearUsers : public Command
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CLEAR);
+		u->SendMessage(ChanServ, CHAN_HELP_CLEARUSERS);
 		return true;
 	}
 
 	void OnSyntaxError(User *u, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "CLEAR", CHAN_CLEAR_SYNTAX);
+		SyntaxError(ChanServ, u, "CLEAR", CHAN_CLEARUSERS_SYNTAX);
 	}
 
 	void OnServHelp(User *u)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_CLEAR);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_CLEARUSERS);
 	}
 };
 

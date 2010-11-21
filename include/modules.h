@@ -991,20 +991,18 @@ class CoreExport Module : public Extensible
 	virtual void OnUserModeAdd(UserMode *um) { }
 
 	/** Called when a mode is about to be mlocked
-	 * @param ci The channel
-	 * @param Name The mode being mlocked
-	 * @param status true if its being mlocked +, false for -
-	 * @param param The param, if there is one and if status is true
+	 * @param ci The channel the mode is being locked on
+	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnMLock(ChannelInfo *ci, ChannelModeName Name, bool status, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is about to be unlocked
-	 * @param ci The channel
-	 * @param Name The mode being mlocked
+	 * @param ci The channel the mode is being unlocked from
+	 * @param mode The mode being unlocked
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnUnMLock(ChannelInfo *ci, ChannelModeName Name) { return EVENT_CONTINUE; }
+	virtual EventReturn OnUnMLock(ChannelInfo *ci, ChannelMode *mode, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called after a module is loaded
 	 * @param u The user loading the module, can be NULL

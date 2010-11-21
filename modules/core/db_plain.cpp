@@ -258,7 +258,6 @@ ChannelLevel ChannelLevels[] = {
 	{"AUTOVOICE", CA_AUTOVOICE},
 	{"OPDEOP", CA_OPDEOP},
 	{"ACCESS_LIST", CA_ACCESS_LIST},
-	{"CLEAR", CA_CLEAR},
 	{"NOJOIN", CA_NOJOIN},
 	{"ACCESS_CHANGE", CA_ACCESS_CHANGE},
 	{"MEMO", CA_MEMO},
@@ -749,6 +748,16 @@ class DBPlain : public Module
 			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
 			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
 		}
+		else if (key.equals_ci("MLP_OFF"))
+		{
+			std::vector<std::pair<Anope::string, Anope::string> > mlp;
+			ci->GetExtRegular("db_mlp_off", mlp);
+
+			mlp.push_back(std::make_pair(params[0], params[1]));
+
+			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
+			ci->Extend("db_mlp_off", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
+		}
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
@@ -972,30 +981,29 @@ class DBPlain : public Module
 					db << ci->GetAkick(k)->reason;
 				db << endl;
 			}
-			if (ci->GetMLockCount(true))
+			db << "MD MLOCK_ON";
 			{
-				db << "MD MLOCK_ON";
-
 				Anope::string oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_on", oldmodes))
-				{
 					db << " " << oldmodes;
-				}
 				else
 				{
-					for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
-						ChannelMode *cm = it->second;
-						if (ci->HasMLock(cm->Name, true))
+						const ModeLock &ml = it->second;
+						if (ml.set)
+						{
+							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+							if (!cm || cm->Type != MODE_REGULAR)
+								continue;
 							db << " " << cm->NameAsString;
+						}
 					}
 				}
-				db << endl;
 			}
-			if (ci->GetMLockCount(false))
+			db << endl;
+			db << "MD MLOCK_OFF";
 			{
-				db << "MD MLOCK_OFF";
-
 				Anope::string oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_off", oldmodes))
 				{
@@ -1003,32 +1011,41 @@ class DBPlain : public Module
 				}
 				else
 				{
-					for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
-						ChannelMode *cm = it->second;
-						if (ci->HasMLock(cm->Name, false))
+						const ModeLock &ml = it->second;
+						if (!ml.set)
+						{
+							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+							if (!cm || cm->Type != MODE_REGULAR)
+								continue;
 							db << " " << cm->NameAsString;
+						}
 					}
 				}
-				db << endl;
 			}
-			std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
-			if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
+			db << endl;
 			{
-				for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
+				std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
+				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
 				{
-					db << "MD MLP " << it->first << " " << it->second << endl;
+					for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
+					{
+						db << "MD MLP " << it->first << " " << it->second << endl;
+					}
 				}
-			}
-			else
-			{
-				for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+				else
 				{
-					ChannelMode *cm = it->second;
-					Anope::string Param;
+					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+					{
+						const ModeLock &ml = it->second;
+						ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+						if (!cm)
+							continue;
 
-					if (ci->GetParam(cm->Name, Param))
-						db << "MD MLP " << cm->NameAsString << " " << Param << endl;
+						if (!ml.param.empty())
+							db << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString << " " << ml.param << endl;
+					}
 				}
 			}
 			MemoInfo *memos = &ci->memos;

@@ -24,7 +24,6 @@ static int def_levels[][2] = {
 	{ CA_INVITE,		5 },
 	{ CA_AKICK,			10 },
 	{ CA_SET,			ACCESS_QOP },
-	{ CA_CLEAR,			ACCESS_FOUNDER },
 	{ CA_UNBAN,			5 },
 	{ CA_OPDEOP,		5 },
 	{ CA_ACCESS_LIST,	1 },
@@ -52,6 +51,7 @@ static int def_levels[][2] = {
 	{ CA_BANME,			5 },
 	{ CA_BAN,			5 },
 	{ CA_TOPIC,			ACCESS_FOUNDER },
+	{ CA_MODE,			ACCESS_FOUNDER },
 	{ CA_INFO,			ACCESS_QOP },
 	{ CA_AUTOOWNER,		ACCESS_QOP },
 	{ CA_OWNER,			ACCESS_FOUNDER },
@@ -74,7 +74,6 @@ LevelInfo levelinfo[] = {
 	{ CA_SET,			"SET",			CHAN_LEVEL_SET },
 	{ CA_BAN,			"BAN",			CHAN_LEVEL_BAN },
 	{ CA_BANME,			"BANME",			CHAN_LEVEL_BANME },
-	{ CA_CLEAR,			"CLEAR",			CHAN_LEVEL_CLEAR },
 	{ CA_GETKEY,		"GETKEY",		CHAN_LEVEL_GETKEY },
 	{ CA_HALFOP,		"HALFOP",		CHAN_LEVEL_HALFOP },
 	{ CA_HALFOPME,		"HALFOPME",		CHAN_LEVEL_HALFOPME },
@@ -87,6 +86,7 @@ LevelInfo levelinfo[] = {
 	{ CA_PROTECT,		"PROTECT",		CHAN_LEVEL_PROTECT },
 	{ CA_PROTECTME,		"PROTECTME",		CHAN_LEVEL_PROTECTME },
 	{ CA_TOPIC,			"TOPIC",			CHAN_LEVEL_TOPIC },
+	{ CA_MODE,			"MODE",				CHAN_LEVEL_MODE },
 	{ CA_UNBAN,			"UNBAN",			CHAN_LEVEL_UNBAN },
 	{ CA_VOICE,			"VOICE",			CHAN_LEVEL_VOICE },
 	{ CA_VOICEME,		"VOICEME",		CHAN_LEVEL_VOICEME },
@@ -111,59 +111,30 @@ int levelinfo_maxwidth = 0;
 
 Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 {
-	ChannelMode *cm;
-	ChannelModeParam *cmp;
-	std::map<char, ChannelMode *>::iterator it, it_end;
-	Anope::string res, param;
+	Anope::string pos = "+", neg = "-", params;
 
-	if (ci->GetMLockCount(true) || ci->GetMLockCount(false))
+	for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 	{
-		if (ci->GetMLockCount(true))
-		{
-			res += '+';
+		const ModeLock &ml = it->second;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+		if (!cm)
+			continue;
 
-			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-			{
-				cm = it->second;
+		if (ml.set)
+			pos += cm->ModeChar;
+		else
+			neg += cm->ModeChar;
 
-				if (ci->HasMLock(cm->Name, true))
-					res += it->first;
-			}
-		}
-
-		if (ci->GetMLockCount(false))
-		{
-			res += '-';
-
-			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-			{
-				cm = it->second;
-
-				if (ci->HasMLock(cm->Name, false))
-					res += it->first;
-			}
-		}
-
-		if (ci->GetMLockCount(true) && complete)
-		{
-			for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-			{
-				cm = it->second;
-
-				if (cm->Type == MODE_PARAM)
-				{
-					cmp = debug_cast<ChannelModeParam *>(cm);
-
-					ci->GetParam(cmp->Name, param);
-
-					if (!param.empty())
-						res += " " + param;
-				}
-			}
-		}
+		if (complete && !ml.param.empty() && (cm->Type == MODE_PARAM || cm->Type == MODE_LIST))
+			params += " " + ml.param;
 	}
 
-	return res;
+	if (pos.length() == 1)
+		pos.clear();
+	if (neg.length() == 1)
+		neg.clear();
+
+	return pos + neg + params;
 }
 
 /*************************************************************************/
@@ -173,7 +144,7 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 void get_chanserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
-	Anope::string param;
+	ModeLock *ml;
 
 	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
@@ -186,14 +157,17 @@ void get_chanserv_stats(long *nrec, long *memuse)
 		mem += ci->GetAccessCount() * sizeof(ChanAccess);
 		mem += ci->GetAkickCount() * sizeof(AutoKick);
 
-		if (ci->GetParam(CMODE_KEY, param))
-			mem += param.length() + 1;
+		ml = ci->GetMLock(CMODE_KEY);
+		if (ml && !ml->param.empty())
+			mem += ml->param.length() + 1;
 
-		if (ci->GetParam(CMODE_FLOOD, param))
-			mem += param.length() + 1;
+		ml = ci->GetMLock(CMODE_FLOOD);
+		if (ml && !ml->param.empty())
+			mem += ml->param.length() + 1;
 
-		if (ci->GetParam(CMODE_REDIRECT, param))
-			mem += param.length() + 1;
+		ml = ci->GetMLock(CMODE_REDIRECT);
+		if (ml && !ml->param.empty())
+			mem += ml->param.length() + 1;
 
 		if (!ci->last_topic.empty())
 			mem += ci->last_topic.length() + 1;
@@ -237,11 +211,6 @@ void cs_init()
 
 void check_modes(Channel *c)
 {
-	ChannelInfo *ci;
-	ChannelMode *cm;
-	std::map<char, ChannelMode *>::iterator it, it_end;
-	Anope::string param, ciparam;
-
 	if (!c)
 	{
 		Log() << "check_modes called with NULL values";
@@ -268,61 +237,52 @@ void check_modes(Channel *c)
 	c->chanserv_modecount++;
 
 	/* Check if the channel is registered; if not remove mode -r */
-	if (!(ci = c->ci))
+	ChannelInfo *ci = c->ci;
+	if (!ci)
 	{
 		if (c->HasMode(CMODE_REGISTERED))
 			c->RemoveMode(NULL, CMODE_REGISTERED);
 		return;
 	}
 
-	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 	{
-		cm = it->second;
+		const ModeLock &ml = it->second;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+		if (!cm)
+			continue;
 
-		/* If this channel does not have the mode and the mode is mlocked */
-		if (cm->Type == MODE_REGULAR && !c->HasMode(cm->Name) && ci->HasMLock(cm->Name, true))
+		if (cm->Type == MODE_REGULAR)
 		{
-			/* Add the eventual parameter and modify the Channel structure */
-			if (cm->Type == MODE_PARAM)
-			{
-				if (ci->GetParam(cm->Name, ciparam))
-					c->SetMode(NULL, cm, ciparam);
-			}
-			else
+			if (!c->HasMode(cm->Name) && ml.set)
 				c->SetMode(NULL, cm);
+			else if (c->HasMode(cm->Name) && !ml.set)
+				c->RemoveMode(NULL, cm);
 		}
-		/* If this is a param mode and its mlocked, check to ensure it is set and set to the correct value */
-		else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
+		else if (cm->Type == MODE_PARAM)
 		{
+			Anope::string param;
 			c->GetParam(cm->Name, param);
-			ci->GetParam(cm->Name, ciparam);
 
 			/* If the channel doesnt have the mode, or it does and it isn't set correctly */
-			if (!c->HasMode(cm->Name) || (!param.empty() && !ciparam.empty() && !param.equals_cs(ciparam)))
-				c->SetMode(NULL, cm, ciparam);
-		}
-	}
-
-	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-	{
-		cm = it->second;
-
-		/* If the channel has the mode */
-		if (c->HasMode(cm->Name) && ci->HasMLock(cm->Name, false))
-		{
-			/* Add the eventual parameter */
-			if (cm->Type == MODE_PARAM)
+			if (ml.set)
 			{
-				ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
-
-				if (!cmp->MinusNoArg)
-				{
-					if (c->GetParam(cmp->Name, param))
-						c->RemoveMode(NULL, cm, param);
-				}
+				if (!c->HasMode(cm->Name) || (!param.empty() && !ml.param.empty() && !param.equals_cs(ml.param)))
+					c->SetMode(NULL, cm, ml.param);
 			}
 			else
-				c->RemoveMode(NULL, cm);
+			{
+				if (c->HasMode(cm->Name))
+					c->RemoveMode(NULL, cm);
+			}
+
+		}
+		else if (cm->Type == MODE_LIST) // XXX we still need better list code...
+		{
+			if (ml.set)
+				c->SetMode(NULL, cm, ml.param);
+			else
+				c->RemoveMode(NULL, cm, ml.param);
 		}
 	}
 }

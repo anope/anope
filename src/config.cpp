@@ -167,7 +167,7 @@ ServerConfig::ServerConfig() : errstr(""), config_data()
 		}
 	}
 
-	this->WallOper = this->WallBadOS = this->WallOSGlobal = this->WallOSMode = this->WallOSClearmodes = this->WallOSKick = this->WallOSAkill = this->WallOSSNLine = this->WallOSSQLine =
+	this->WallOper = this->WallBadOS = this->WallOSGlobal = this->WallOSMode = this->WallOSKick = this->WallOSAkill = this->WallOSSNLine = this->WallOSSQLine =
 		this->WallOSSZLine = this->WallOSNoOp = this->WallOSJupe = this->WallAkillExpire = this->WallSNLineExpire = this->WallSQLineExpire = this->WallSZLineExpire = this->WallExceptionExpire =
 		this->WallGetpass = this->WallSetpass = this->WallForbid = this->WallDrop = false;
 	if (!OSNotifications.empty())

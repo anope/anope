@@ -174,27 +174,23 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 		if (c)
 		{
-			request->reply("bancount", stringify((c && c->bans ? c->bans->count : 0)));
-			if (c->bans && c->bans->count)
-			{
-				int i = 0;
-				for (Entry *entry = c->bans->entries; entry; entry = entry->next, ++i)
-					request->reply("ban" + stringify(i), iface->Sanitize(entry->mask));
-			}
-			request->reply("exceptcount", stringify((c && c->excepts ? c->excepts->count : 0)));
-			if (c->excepts && c->excepts->count)
-			{
-				int i = 0;
-				for (Entry *entry = c->excepts->entries; entry; entry = entry->next, ++i)
-					request->reply("except" + stringify(i), iface->Sanitize(entry->mask));
-			}
-			request->reply("invitecount", stringify((c && c->invites ? c->invites->count : 0)));
-			if (c->invites && c->invites->count)
-			{
-				int i = 0;
-				for (Entry *entry = c->invites->entries; entry; entry = entry->next, ++i)
-					request->reply("invite" + stringify(i), iface->Sanitize(entry->mask));
-			}
+			request->reply("bancount", stringify(c->HasMode(CMODE_BAN)));
+			int count = 0;
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = c->GetModeList(CMODE_BAN);
+			for (; its.first != its.second; ++its.first)
+				request->reply("ban" + stringify(++count), iface->Sanitize(its.first->second));
+
+			request->reply("exceptcount", stringify(c->HasMode(CMODE_EXCEPT)));
+			count = 0;
+			its = c->GetModeList(CMODE_EXCEPT);
+			for (; its.first != its.second; ++its.first)
+				request->reply("except" + stringify(++count), iface->Sanitize(its.first->second));
+
+			request->reply("invitecount", stringify(c->HasMode(CMODE_INVITEOVERRIDE)));
+			count = 0;
+			its = c->GetModeList(CMODE_INVITEOVERRIDE);
+			for (; its.first != its.second; ++its.first)
+				request->reply("invite" + stringify(++count), iface->Sanitize(its.first->second));
 
 			Anope::string users;
 			for (CUserList::const_iterator it = c->users.begin(); it != c->users.end(); ++it)

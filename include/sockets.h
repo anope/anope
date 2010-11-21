@@ -80,6 +80,18 @@ union CoreExport sockaddrs
 	void ntop(int type, const void *src);
 };
 
+class CoreExport cidr
+{
+	sockaddrs addr;
+	Anope::string cidr_ip;
+	unsigned char cidr_len;
+ public:
+ 	cidr(const Anope::string &ip);
+	cidr(const Anope::string &ip, unsigned char len);
+	Anope::string mask() const;
+	bool match(sockaddrs &other);
+};
+
 class SocketException : public CoreException
 {
  public:

@@ -28,7 +28,6 @@ Channel::Channel(const Anope::string &nname, time_t ts)
 	ChannelList[this->name] = this;
 
 	this->creation_time = ts;
-	this->bans = this->excepts = this->invites = NULL;
 	this->server_modetime = this->chanserv_modetime = 0;
 	this->server_modecount = this->chanserv_modecount = this->bouncy_modes = this->topic_time = 0;
 
@@ -57,27 +56,12 @@ Channel::~Channel()
 	if (this->ci)
 		this->ci->c = NULL;
 
-	if (this->bans && this->bans->count)
-		while (this->bans->entries)
-			entry_delete(this->bans, this->bans->entries);
-
-	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && this->excepts && this->excepts->count)
-		while (this->excepts->entries)
-			entry_delete(this->excepts, this->excepts->entries);
-
-	if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE) && this->invites && this->invites->count)
-		while (this->invites->entries)
-			entry_delete(this->invites, this->invites->entries);
-
 	ChannelList.erase(this->name);
 }
 
 void Channel::Reset()
 {
-	this->ClearModes(NULL, false);
-	this->ClearBans(NULL, false);
-	this->ClearExcepts(NULL, false);
-	this->ClearInvites(NULL, false);
+	this->modes.clear();
 
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 	{
@@ -294,11 +278,27 @@ bool Channel::HasUserStatus(User *u, ChannelModeName Name) const
 /**
  * See if a channel has a mode
  * @param Name The mode name
- * @return true or false
+ * @param param The optional mode param
+ * @return The number of modes set
  */
-bool Channel::HasMode(ChannelModeName Name) const
+size_t Channel::HasMode(ChannelModeName Name, const Anope::string &param)
 {
-	return modes.HasFlag(Name);
+	if (param.empty())
+		return modes.count(Name);
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(Name);
+	for (; its.first != its.second; ++its.first)
+		if (its.first->second == param)
+			return 1;
+	return 0;
+}
+
+/** Get a list of modes on a channel
+ * @param Name A mode name to get the list of
+ * @return a pair of iterators for the beginning and end of the list
+ */
+std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(ChannelModeName Name)
+{
+	return std::make_pair(this->modes.find(Name), this->modes.upper_bound(Name));
 }
 
 /** Set a mode internally on a channel, this is not sent out to the IRCd
@@ -346,36 +346,21 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 			chan_set_correct_modes(u, this, 0);
 		return;
 	}
-	/* Setting b/e/I etc */
-	else if (cm->Type == MODE_LIST)
-	{
-		if (param.empty())
-		{
-			Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
-			return;
-		}
 
-		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
-		cml->AddMask(this, param);
+	if (cm->Type != MODE_LIST)
+		this->modes.erase(cm->Name);
+	this->modes.insert(std::make_pair(cm->Name, param));
+
+	if (param.empty() && cm->Type != MODE_REGULAR)
+	{
+		Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " for " << this->name << " with a paramater, but its not a param mode";
 		return;
 	}
 
-	modes.SetFlag(cm->Name);
-
-	if (!param.empty())
+	if (cm->Type == MODE_LIST)
 	{
-		if (cm->Type != MODE_PARAM)
-		{
-			Log() << "Channel::SetModeInternal() mode " << cm->ModeChar << " for " << this->name << " with a paramater, but its not a param mode";
-			return;
-		}
-
-		/* They could be resetting the mode to change its params */
-		std::map<ChannelModeName, Anope::string>::iterator it = Params.find(cm->Name);
-		if (it != Params.end())
-			Params.erase(it);
-
-		Params.insert(std::make_pair(cm->Name, param));
+		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
+		cml->OnAdd(this, param);
 	}
 
 	/* Channel mode +P or so was set, mark this channel as persistant */
@@ -398,33 +383,34 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	if (!ci)
 		return;
 
-	/* If this channel has this mode locked negative */
-	if (ci->HasMLock(cm->Name, false))
+	ModeLock *ml = ci->GetMLock(cm->Name, param);
+	if (ml)
 	{
-		/* Remove the mode */
-		if (cm->Type == MODE_PARAM)
+		if (ml->set && cm->Type == MODE_PARAM)
 		{
 			Anope::string cparam;
-			GetParam(cm->Name, cparam);
-			RemoveMode(NULL, cm, cparam);
-		}
-		else if (cm->Type == MODE_REGULAR)
-			RemoveMode(NULL, cm);
-	}
-	/* If this is a param mode and its mlocked +, check to ensure someone didn't reset it with the wrong param */
-	else if (cm->Type == MODE_PARAM && ci->HasMLock(cm->Name, true))
-	{
-		ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
-		Anope::string cparam, ciparam;
-		/* Get the param currently set on this channel */
-		GetParam(cmp->Name, cparam);
-		/* Get the param set in mlock */
-		ci->GetParam(cmp->Name, ciparam);
+			this->GetParam(cm->Name, cparam);
 
-		/* We have the wrong param set */
-		if (cparam.empty() || ciparam.empty() || !cparam.equals_cs(ciparam))
-			/* Reset the mode with the correct param */
-			SetMode(NULL, cm, ciparam);
+			/* We have the wrong param set */
+			if (cparam.empty() || ml->param.empty() || !cparam.equals_cs(ml->param))
+				/* Reset the mode with the correct param */
+				this->SetMode(NULL, cm, ml->param);
+		}
+		else if (!ml->set)
+		{
+			if (cm->Type == MODE_REGULAR)
+				this->RemoveMode(NULL, cm);
+			else if (cm->Type == MODE_PARAM)
+			{
+				Anope::string cparam;
+				this->GetParam(cm->Name, cparam);
+				this->RemoveMode(NULL, cm, cparam);
+			}
+			else if (cm->Type == MODE_LIST)
+			{
+				this->RemoveMode(NULL, cm, param);
+			}
+		}
 	}
 }
 
@@ -475,29 +461,29 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 				this->SetMode(bi, cm, bi->nick);
 		}
 
+		/* Enforce secureops, etc */
+		if (EnforceMLock)
+			chan_set_correct_modes(u, this, 1);
 		return;
 	}
-	/* Setting b/e/I etc */
-	else if (cm->Type == MODE_LIST)
-	{
-		if (param.empty())
-		{
-			Log() << "Channel::RemoveModeInternal() mode " << cm->ModeChar << " with no parameter for channel " << this->name;
-			return;
-		}
 
+	if (cm->Type == MODE_LIST && !param.empty())
+	{
+		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> its = this->GetModeList(cm->Name);
+		for (; its.first != its.second; ++its.first)
+			if (Anope::Match(param, its.first->second))
+			{
+				this->modes.erase(its.first);
+				break;
+			}
+	}
+	else
+		this->modes.erase(cm->Name);
+	
+	if (cm->Type == MODE_LIST)
+	{
 		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
-		cml->DelMask(this, param);
-		return;
-	}
-
-	modes.UnsetFlag(cm->Name);
-
-	if (cm->Type == MODE_PARAM)
-	{
-		std::map<ChannelModeName, Anope::string>::iterator it = Params.find(cm->Name);
-		if (it != Params.end())
-			Params.erase(it);
+		cml->OnDel(this, param);
 	}
 
 	if (cm->Name == CMODE_PERM)
@@ -525,22 +511,14 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
 
+	ModeLock *ml = ci->GetMLock(cm->Name, param);
 	/* This channel has this the mode locked on */
-	if (ci->HasMLock(cm->Name, true))
+	if (ml && ml->set)
 	{
 		if (cm->Type == MODE_REGULAR)
-		{
-			/* Set the mode */
-			SetMode(NULL, cm);
-		}
-		/* This is a param mode */
-		else if (cm->Type == MODE_PARAM)
-		{
-			Anope::string cparam;
-			/* Get the param stored in mlock for this mode */
-			if (ci->GetParam(cm->Name, cparam))
-				SetMode(NULL, cm, cparam);
-		}
+			this->SetMode(NULL, cm);
+		else if (cm->Type == MODE_PARAM || cm->Type == MODE_LIST)
+			this->SetMode(NULL, cm, ml->param);
 	}
 }
 
@@ -557,8 +535,12 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	/* Don't set modes already set */
 	if (cm->Type == MODE_REGULAR && HasMode(cm->Name))
 		return;
-	else if (cm->Type == MODE_PARAM && HasMode(cm->Name))
+	else if (cm->Type == MODE_PARAM)
 	{
+		ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
+		if (!cmp->IsValid(param))
+			return;
+
 		Anope::string cparam;
 		if (GetParam(cm->Name, cparam) && cparam.equals_cs(param))
 			return;
@@ -571,7 +553,9 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	}
 	else if (cm->Type == MODE_LIST)
 	{
-		// XXX this needs rewritten
+		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
+		if (this->HasMode(cm->Name, param) || !cml->IsValid(param))
+			return;
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
@@ -612,20 +596,22 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	}
 	else if (cm->Type == MODE_LIST)
 	{
-		// XXX this needs to be rewritten sometime
+		if (!this->HasMode(cm->Name, param))
+			return;
 	}
 
-	/* If this mode needs no param when being unset, empty the param */
-	bool SendParam = true;
+	/* Get the param to send, if we need it */
+	Anope::string realparam = param;
 	if (cm->Type == MODE_PARAM)
 	{
+		realparam.clear();
 		ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
-		if (cmp->MinusNoArg)
-			SendParam = false;
+		if (!cmp->MinusNoArg)
+			this->GetParam(cmp->Name, realparam);
 	}
 
-	ModeManager::StackerAdd(bi, this, cm, false, param);
-	RemoveModeInternal(cm, SendParam ? param : "", EnforceMLock);
+	ModeManager::StackerAdd(bi, this, cm, false, realparam);
+	RemoveModeInternal(cm, realparam, EnforceMLock);
 }
 
 /**
@@ -647,11 +633,11 @@ void Channel::RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string 
  */
 bool Channel::GetParam(ChannelModeName Name, Anope::string &Target) const
 {
-	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
+	std::multimap<ChannelModeName, Anope::string>::const_iterator it = this->modes.find(Name);
 
 	Target.clear();
 
-	if (it != Params.end())
+	if (it != this->modes.end())
 	{
 		Target = it->second;
 		return true;
@@ -660,120 +646,7 @@ bool Channel::GetParam(ChannelModeName Name, Anope::string &Target) const
 	return false;
 }
 
-/** Check if a mode is set and has a param
- * @param Name The mode
- */
-bool Channel::HasParam(ChannelModeName Name) const
-{
-	std::map<ChannelModeName, Anope::string>::const_iterator it = Params.find(Name);
-
-	if (it != Params.end())
-		return true;
-
-	return false;
-}
-
 /*************************************************************************/
-
-/** Clear all the modes from the channel
- * @param bi The client setting the modes
- * @param internal Only remove the modes internally
- */
-void Channel::ClearModes(BotInfo *bi, bool internal)
-{
-	for (size_t n = CMODE_BEGIN + 1; n != CMODE_END; ++n)
-	{
-		ChannelMode *cm = ModeManager::FindChannelModeByName(static_cast<ChannelModeName>(n));
-
-		if (cm && this->HasMode(cm->Name))
-		{
-			if (cm->Type == MODE_REGULAR)
-			{
-				if (!internal)
-					this->RemoveMode(NULL, cm);
-				else
-					this->RemoveModeInternal(cm);
-			}
-			else if (cm->Type == MODE_PARAM)
-			{
-				Anope::string param;
-				this->GetParam(cm->Name, param);
-				if (!internal)
-					this->RemoveMode(NULL, cm, param);
-				else
-					this->RemoveModeInternal(cm, param);
-			}
-		}
-	}
-
-	modes.ClearFlags();
-}
-
-/** Clear all the bans from the channel
- * @param bi The client setting the modes
- * @param internal Only remove the modes internally
- */
-void Channel::ClearBans(BotInfo *bi, bool internal)
-{
-	Entry *entry, *nexte;
-
-	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_BAN));
-
-	if (cml && this->bans && this->bans->count)
-		for (entry = this->bans->entries; entry; entry = nexte)
-		{
-			nexte = entry->next;
-
-			if (!internal)
-				this->RemoveMode(bi, cml, entry->mask);
-			else
-				this->RemoveModeInternal(cml, entry->mask);
-		}
-}
-
-/** Clear all the excepts from the channel
- * @param bi The client setting the modes
- * @param internal Only remove the modes internally
- */
-void Channel::ClearExcepts(BotInfo *bi, bool internal)
-{
-	Entry *entry, *nexte;
-
-	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_EXCEPT));
-
-	if (cml && this->excepts && this->excepts->count)
-		for (entry = this->excepts->entries; entry; entry = nexte)
-		{
-			nexte = entry->next;
-
-			if (!internal)
-				this->RemoveMode(bi, cml, entry->mask);
-			else
-				this->RemoveModeInternal(cml, entry->mask);
-		}
-}
-
-/** Clear all the invites from the channel
- * @param bi The client setting the modes
- * @param internal Only remove the modes internally
- */
-void Channel::ClearInvites(BotInfo *bi, bool internal)
-{
-	Entry *entry, *nexte;
-
-	ChannelModeList *cml = debug_cast<ChannelModeList *>(ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE));
-
-	if (cml && this->invites && this->invites->count)
-		for (entry = this->invites->entries; entry; entry = nexte)
-		{
-			nexte = entry->next;
-
-			if (!internal)
-				this->RemoveMode(bi, cml, entry->mask);
-			else
-				this->RemoveModeInternal(cml, entry->mask);
-		}
-}
 
 /** Set a string of modes on the channel
  * @param bi The client setting the modes
@@ -980,45 +853,26 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 
 Anope::string Channel::GetModes(bool complete, bool plus)
 {
-	Anope::string res;
+	Anope::string res, params;
 
-	if (this->HasModes())
+	for (std::multimap<ChannelModeName, Anope::string>::const_iterator it = this->modes.begin(), it_end = this->modes.end(); it != it_end; ++it)
 	{
-		Anope::string params;
-		for (std::map<Anope::string, Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+		ChannelMode *cm = ModeManager::FindChannelModeByName(it->first);
+		if (!cm || cm->Type == MODE_LIST)
+			continue;
+
+		res += cm->ModeChar;
+
+		if (complete && !it->second.empty())
 		{
-			if (it->second->Class != MC_CHANNEL)
-				continue;
+			ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
 
-			ChannelMode *cm = debug_cast<ChannelMode *>(it->second);
-
-			if (this->HasMode(cm->Name))
-			{
-				res += cm->ModeChar;
-
-				if (complete)
-				{
-					if (cm->Type == MODE_PARAM)
-					{
-						ChannelModeParam *cmp = debug_cast<ChannelModeParam *>(cm);
-
-						if (plus || !cmp->MinusNoArg)
-						{
-							Anope::string param;
-							this->GetParam(cmp->Name, param);
-
-							if (!param.empty())
-								params += " " + param;
-						}
-					}
-				}
-			}
+			if (plus || !cmp->MinusNoArg)
+				params += " " + it->second;
 		}
-
-		res += params;
 	}
 
-	return res;
+	return res + params;
 }
 
 void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string &newtopic, time_t ts)
@@ -1083,17 +937,6 @@ void get_channel_stats(long *nrec, long *memuse)
 		mem += sizeof(*chan);
 		if (!chan->topic.empty())
 			mem += chan->topic.length() + 1;
-		if (chan->GetParam(CMODE_KEY, buf))
-			mem += buf.length() + 1;
-		if (chan->GetParam(CMODE_FLOOD, buf))
-			mem += buf.length() + 1;
-		if (chan->GetParam(CMODE_REDIRECT, buf))
-			mem += buf.length() + 1;
-		mem += get_memuse(chan->bans);
-		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-			mem += get_memuse(chan->excepts);
-		if (ModeManager::FindChannelModeByName(CMODE_INVITEOVERRIDE))
-			mem += get_memuse(chan->invites);
 		for (CUserList::iterator it = chan->users.begin(), it_end = chan->users.end(); it != it_end; ++it)
 		{
 			mem += sizeof(*it);
@@ -1355,6 +1198,26 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 		if (halfop && c->HasUserStatus(user, CMODE_HALFOP) && !check_access(user, ci, CA_AUTOHALFOP) && !check_access(user, ci, CA_HALFOPME))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 	}
+
+	// Check mlock
+	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+	{
+		const ModeLock &ml = it->second;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+		if (!cm || cm->Type != MODE_STATUS)
+			continue;
+
+		if (Anope::Match(user->nick, ml.param) || Anope::Match(user->GetDisplayedMask(), ml.param))
+		{
+			if ((ml.set && !c->HasUserStatus(user, ml.name)) || (!ml.set && c->HasUserStatus(user, ml.name)))
+			{
+				if (ml.set && give_modes)
+					c->SetMode(NULL, cm, user->nick, false);
+				else if (!ml.set && !give_modes)
+					c->RemoveMode(NULL, cm, user->nick, false);
+			}
+		}
+	}
 }
 
 /*************************************************************************/
@@ -1376,382 +1239,137 @@ void MassChannelModes(BotInfo *bi, const Anope::string &modes)
 	}
 }
 
-/*************************************************************************/
-
-/**
- * This handles creating a new Entry.
- * This function destroys and free's the given mask as a side effect.
- * @param mask Host/IP/CIDR mask to convert to an entry
- * @return Entry struct for the given mask, NULL if creation failed
+/** Constructor
+ * @param _host A full nick!ident@host/cidr mask
  */
-Entry *entry_create(const Anope::string &mask)
+Entry::Entry(const Anope::string &_host)
 {
-	Entry *entry;
-	Anope::string cidrhost;
-	uint32 ip, cidr;
+	this->SetFlag(ENTRYTYPE_NONE);
+	this->cidr_len = 0;
+	this->mask = _host;
 
-	entry = new Entry;
-	entry->SetFlag(ENTRYTYPE_NONE);
-	entry->prev = NULL;
-	entry->next = NULL;
-	entry->mask = mask;
-
-	Anope::string newmask = mask, host, nick, user;
-
-	size_t at = newmask.find('@');
+	Anope::string _nick, _user, _realhost;
+	size_t at = _host.find('@');
 	if (at != Anope::string::npos)
 	{
-		host = newmask.substr(at + 1);
-		newmask = newmask.substr(0, at);
-		/* If the user is purely a wildcard, ignore it */
-		if (!str_is_pure_wildcard(newmask))
+		_realhost = _host.substr(at + 1);
+		Anope::string _nickident = _host.substr(0, at);
+
+		size_t ex = _nickident.find('!');
+		if (ex != Anope::string::npos)
 		{
-			/* There might be a nick too  */
-			//user = strchr(mask, '!');
-			size_t ex = newmask.find('!');
-			if (ex != Anope::string::npos)
+			_user = _nickident.substr(ex + 1);
+			_nick = _nickident.substr(0, ex);
+		}
+		else
+			_user = _nickident;
+	}
+	else
+		_realhost = _host;
+	
+	if (!_nick.empty() && !str_is_pure_wildcard(_nick))
+	{
+		this->nick = _nick;
+		if (str_is_wildcard(_nick))
+			this->SetFlag(ENTRYTYPE_NICK_WILD);
+		else
+			this->SetFlag(ENTRYTYPE_NICK);
+	}
+
+	if (!_user.empty() && !str_is_pure_wildcard(_user))
+	{
+		this->user = _user;
+		if (str_is_wildcard(_user))
+			this->SetFlag(ENTRYTYPE_USER_WILD);
+		else
+			this->SetFlag(ENTRYTYPE_USER);
+	}
+
+	if (!_realhost.empty() && !str_is_pure_wildcard(_realhost))
+	{
+		size_t sl = _realhost.find_last_of('/');
+		if (sl != Anope::string::npos)
+		{
+			try
 			{
-				user = newmask.substr(ex + 1);
-				newmask = newmask.substr(0, ex);
-				/* If the nick is purely a wildcard, ignore it */
-				if (!str_is_pure_wildcard(newmask))
-					nick = newmask;
+				sockaddrs addr;
+				bool ipv6 = _realhost.substr(0, sl).find(':') != Anope::string::npos;
+				addr.pton(ipv6 ? AF_INET6 : AF_INET, _realhost.substr(0, sl));
+				/* If we got here, _realhost is a valid IP */
+
+				Anope::string cidr_range = _realhost.substr(sl + 1);
+				if (cidr_range.is_pos_number_only())
+				{
+					_realhost = _realhost.substr(0, sl);
+					this->cidr_len = convertTo<unsigned int>(cidr_range);
+					this->SetFlag(ENTRYTYPE_CIDR);
+					Log(LOG_DEBUG) << "Ban " << _realhost << " has cidr " << static_cast<unsigned int>(this->cidr_len);
+				}
 			}
+			catch (const SocketException &) { }
+		}
+
+		this->host = _realhost;
+
+		if (!this->HasFlag(ENTRYTYPE_CIDR))
+		{
+			if (str_is_wildcard(_realhost))
+				this->SetFlag(ENTRYTYPE_HOST_WILD);
 			else
-				user = newmask;
+				this->SetFlag(ENTRYTYPE_HOST);
 		}
 	}
-	else
-		/* It is possibly an extended ban/invite mask, but we do
-		 * not support these at this point.. ~ Viper */
-		/* If there's no user in the mask, assume a pure wildcard */
-		host = newmask;
+}
 
-	if (!nick.empty())
+/** Get the banned mask for this entry
+ * @return The mask
+ */
+const Anope::string Entry::GetMask()
+{
+	return this->mask;
+}
+
+/** Check if this entry matches a user
+ * @param u The user
+ * @return true on match
+ */
+bool Entry::Matches(User *u) const
+{
+	if (!this->FlagCount())
+		return 0;
+	
+	Anope::string _nick = u->nick;
+	Anope::string _user = u->GetVIdent();
+	Anope::string _host = u->GetDisplayedHost();
+
+	if (this->HasFlag(ENTRYTYPE_CIDR))
 	{
-		entry->nick = nick;
-		/* Check if we have a wildcard user */
-		if (str_is_wildcard(nick))
-			entry->SetFlag(ENTRYTYPE_NICK_WILD);
-		else
-			entry->SetFlag(ENTRYTYPE_NICK);
-	}
-
-	if (!user.empty())
-	{
-		entry->user = user;
-		/* Check if we have a wildcard user */
-		if (str_is_wildcard(user))
-			entry->SetFlag(ENTRYTYPE_USER_WILD);
-		else
-			entry->SetFlag(ENTRYTYPE_USER);
-	}
-
-	/* Only check the host if it's not a pure wildcard */
-	if (!host.empty() && !str_is_pure_wildcard(host))
-	{
-		if (ircd->cidrchanbei && str_is_cidr(host, ip, cidr, cidrhost))
+		try
 		{
-			entry->cidr_ip = ip;
-			entry->cidr_mask = cidr;
-			entry->SetFlag(ENTRYTYPE_CIDR4);
-			host = cidrhost;
+			cidr cidr_mask(this->host, this->cidr_len);
+			if (!u->ip() || !cidr_mask.match(u->ip))
+			{
+				return false;
+			}
 		}
-		else if (ircd->cidrchanbei && host.find('/') != Anope::string::npos)
+		catch (const SocketException &)
 		{
-			/* Most IRCd's don't enforce sane bans therefore it is not
-			 * so unlikely we will encounter this.
-			 * Currently we only support strict CIDR without taking into
-			 * account quirks of every single ircd (nef) that ignore everything
-			 * after the first /cidr. To add this, sanitaze before sending to
-			 * str_is_cidr() as this expects a standard cidr.
-			 * Add it to the internal list (so it is included in for example clear)
-			 * but do not use if during matching.. ~ Viper */
-			entry->ClearFlags();
-			entry->SetFlag(ENTRYTYPE_NONE);
-		}
-		else
-		{
-			entry->host = host;
-			if (str_is_wildcard(host))
-				entry->SetFlag(ENTRYTYPE_HOST_WILD);
-			else
-				entry->SetFlag(ENTRYTYPE_HOST);
+			return false;
 		}
 	}
+	if (this->HasFlag(ENTRYTYPE_NICK) && (_nick.empty() || !this->nick.equals_ci(_nick)))
+		return false;
+	if (this->HasFlag(ENTRYTYPE_USER) && (_user.empty() || !this->user.equals_ci(_user)))
+		return false;
+	if (this->HasFlag(ENTRYTYPE_HOST) && (_host.empty() || !this->host.equals_ci(_host)))
+		return false;
+	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(_nick, this->nick))
+		return false;
+	if (this->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(_user, this->user))
+		return false;
+	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(_host, this->host))
+		return false;
 
-	return entry;
+	return true;
 }
 
-/**
- * Create an entry and add it at the beginning of given list.
- * @param list The List the mask should be added to
- * @param mask The mask to parse and add to the list
- * @return Pointer to newly added entry. NULL if it fails.
- */
-Entry *entry_add(EList *list, const Anope::string &mask)
-{
-	Entry *e;
-
-	e = entry_create(mask);
-
-	if (!e)
-		return NULL;
-
-	e->next = list->entries;
-	e->prev = NULL;
-
-	if (list->entries)
-		list->entries->prev = e;
-	list->entries = e;
-	++list->count;
-
-	return e;
-}
-
-/**
- * Delete the given entry from a given list.
- * @param list Linked list from which entry needs to be removed.
- * @param e The entry to be deleted, must be member of list.
- */
-void entry_delete(EList *list, Entry *e)
-{
-	if (!list || !e)
-		return;
-
-	if (e->next)
-		e->next->prev = e->prev;
-	if (e->prev)
-		e->prev->next = e->next;
-
-	if (list->entries == e)
-		list->entries = e->next;
-
-	delete e;
-
-	--list->count;
-}
-
-/**
- * Create and initialize a new entrylist
- * @return Pointer to the created EList object
- **/
-EList *list_create()
-{
-	EList *list;
-
-	list = new EList;
-	list->entries = NULL;
-	list->count = 0;
-
-	return list;
-}
-
-/**
- * Match the given Entry to the given user/host and optional IP addy
- * @param e Entry struct to match against
- * @param nick Nick to match against
- * @param user User to match against
- * @param host Host to match against
- * @param ip IP to match against, set to 0 to not match this
- * @return 1 for a match, 0 for no match
- */
-int entry_match(Entry *e, const Anope::string &nick, const Anope::string &user, const Anope::string &host, uint32 ip)
-{
-	/* If we don't get an entry, or it s an invalid one, no match ~ Viper */
-	if (!e || !e->FlagCount())
-		return 0;
-
-	if (ircd->cidrchanbei && e->HasFlag(ENTRYTYPE_CIDR4) && (!ip || (ip && (ip & e->cidr_mask) != e->cidr_ip)))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_NICK) && (nick.empty() || !e->nick.equals_ci(nick)))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_USER) && (user.empty() || !e->user.equals_ci(user)))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_HOST) && (host.empty() || !e->host.equals_ci(host)))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(nick, e->nick))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(user, e->user))
-		return 0;
-	if (e->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(host, e->host))
-		return 0;
-
-	return 1;
-}
-
-/**
- * Match the given Entry to the given hostmask and optional IP addy.
- * @param e Entry struct to match against
- * @param mask Hostmask to match against
- * @param ip IP to match against, set to 0 to not match this
- * @return 1 for a match, 0 for no match
- */
-int entry_match_mask(Entry *e, const Anope::string &mask, uint32 ip)
-{
-	int res;
-
-	Anope::string hostmask = mask, host, user, nick;
-
-	size_t at = hostmask.find('@');
-	if (at != Anope::string::npos)
-	{
-		host = hostmask.substr(at + 1);
-		hostmask = hostmask.substr(0, at);
-		size_t ex = hostmask.find('!');
-		if (ex != Anope::string::npos)
-		{
-			user = hostmask.substr(ex + 1);
-			nick = hostmask.substr(0, ex);
-		}
-		else
-			user = hostmask;
-	}
-	else
-		host = hostmask;
-
-	res = entry_match(e, nick, user, host, ip);
-
-	return res;
-}
-
-/**
- * Match a nick, user, host, and ip to a list entry
- * @param e List that should be matched against
- * @param nick The nick to match
- * @param user The user to match
- * @param host The host to match
- * @param ip The ip to match
- * @return Returns the first matching entry, if none, NULL is returned.
- */
-Entry *elist_match(EList *list, const Anope::string &nick, const Anope::string &user, const Anope::string &host, uint32 ip)
-{
-	Entry *e;
-
-	if (!list || !list->entries)
-		return NULL;
-
-	for (e = list->entries; e; e = e->next)
-		if (entry_match(e, nick, user, host, ip))
-			return e;
-
-	/* We matched none */
-	return NULL;
-}
-
-/**
- * Match a mask and ip to a list.
- * @param list EntryList that should be matched against
- * @param mask The nick!user@host mask to match
- * @param ip The ip to match
- * @return Returns the first matching entry, if none, NULL is returned.
- */
-Entry *elist_match_mask(EList *list, const Anope::string &mask, uint32 ip)
-{
-	Entry *res;
-
-	if (!list || !list->entries || mask.empty())
-		return NULL;
-
-	Anope::string hostmask = mask, host, user, nick;
-
-	size_t at = hostmask.find('@');
-	if (at != Anope::string::npos)
-	{
-		host = hostmask.substr(at + 1);
-		hostmask = hostmask.substr(0, at);
-		size_t ex = hostmask.find('!');
-		if (ex != Anope::string::npos)
-		{
-			user = hostmask.substr(ex + 1);
-			nick = hostmask.substr(0, ex);
-		}
-		else
-			user = hostmask;
-	}
-	else
-		host = hostmask;
-
-	res = elist_match(list, nick, user, host, ip);
-
-	return res;
-}
-
-/**
- * Check if a user matches an entry on a list.
- * @param list EntryList that should be matched against
- * @param user The user to match against the entries
- * @return Returns the first matching entry, if none, NULL is returned.
- */
-Entry *elist_match_user(EList *list, User *u)
-{
-	Entry *res;
-	//uint32 ip = 0;
-
-	if (!list || !list->entries || !u)
-		return NULL;
-
-	/* Match what we ve got against the lists.. */
-	res = elist_match(list, u->nick, u->GetIdent(), u->host, /*ip XXX*/0);
-	if (!res)
-		res = elist_match(list, u->nick, u->GetIdent(), u->GetDisplayedHost(), /*ip XXX*/0);
-	if (!res && !u->GetCloakedHost().empty() && !u->GetCloakedHost().equals_cs(u->GetDisplayedHost()))
-		res = elist_match(list, u->nick, u->GetIdent(), u->GetCloakedHost(), /*ip XXX*/ 0);
-
-	return res;
-}
-
-/**
- * Find a entry identical to the given mask..
- * @param list EntryList that should be matched against
- * @param mask The *!*@* mask to match
- * @return Returns the first matching entry, if none, NULL is returned.
- */
-Entry *elist_find_mask(EList *list, const Anope::string &mask)
-{
-	Entry *e;
-
-	if (!list || !list->entries || mask.empty())
-		return NULL;
-
-	for (e = list->entries; e; e = e->next)
-		if (e->mask.equals_ci(mask))
-			return e;
-
-	return NULL;
-}
-
-/**
- * Gets the total memory use of an entrylit.
- * @param list The list we should estimate the mem use of.
- * @return Returns the memory useage of the given list.
- */
-long get_memuse(EList *list)
-{
-	Entry *e;
-	long mem = 0;
-
-	if (!list)
-		return 0;
-
-	mem += sizeof(EList *);
-	mem += sizeof(Entry *) * list->count;
-	if (list->entries)
-	{
-		for (e = list->entries; e; e = e->next)
-		{
-			if (!e->nick.empty())
-				mem += e->nick.length() + 1;
-			if (!e->user.empty())
-				mem += e->user.length() + 1;
-			if (!e->host.empty())
-				mem += e->host.length() + 1;
-			if (!e->mask.empty())
-				mem += e->mask.length() + 1;
-		}
-	}
-
-	return mem;
-}
-
-/*************************************************************************/

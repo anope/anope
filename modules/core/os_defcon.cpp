@@ -207,7 +207,7 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, bool fantasy)
 	{
-		if (!is_oper(u) && CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY))
+		if (!is_oper(u) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
 				u->SendMessage(bi, OPER_DEFCON_DENIED);

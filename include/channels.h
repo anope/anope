@@ -64,13 +64,12 @@ enum ChannelFlags
 
 class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 {
+ public:
+	typedef std::multimap<ChannelModeName, Anope::string> ModeList;
  private:
 	/** A map of channel modes with their parameters set on this channel
 	 */
-	std::map<ChannelModeName, Anope::string> Params;
-
-	/* Modes set on the channel */
-	Flags<ChannelModeName, CMODE_END * 2> modes;
+	ModeList modes;
 	
  public:
 	/** Default constructor
@@ -86,10 +85,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	Anope::string name;		/* Channel name */
 	ChannelInfo *ci;		/* Corresponding ChannelInfo */
 	time_t creation_time;	/* When channel was created */
-
-	EList *bans;
-	EList *excepts;
-	EList *invites;
 
 	/* List of users in the channel */
 	CUserList users;
@@ -146,16 +141,18 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	bool HasUserStatus(User *u, ChannelModeName Name) const;
 
-	/** See if the channel has any modes at all
-	 * @return true or false
-	 */
-	inline bool HasModes() const { return modes.FlagCount(); }
-
 	/** See if a channel has a mode
 	 * @param Name The mode name
-	 * @return true or false
+	 * @return The number of modes set
+ 	 * @param param The optional mode param
 	 */
-	bool HasMode(ChannelModeName Name) const;
+	size_t HasMode(ChannelModeName Name, const Anope::string &param = "");
+
+	/** Get a list of modes on a channel
+	 * @param Name A mode name to get the list of
+	 * @return a pair of iterators for the beginning and end of the list
+	 */
+	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
 
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
 	 * @param cm The mode
@@ -205,41 +202,12 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
 	 */
 	void RemoveMode(BotInfo *bi, ChannelModeName Name, const Anope::string &param = "", bool EnforceMLock = true);
 
-	/** Clear all the modes from the channel
-	 * @param bi The client unsetting the modes
-	 * @param internal Only remove the modes internally
-	 */
-	void ClearModes(BotInfo *bi = NULL, bool internal = false);
-
-	/** Clear all the bans from the channel
-	 * @param bi The client unsetting the modes
-	 * @param internal Only remove the modes internally
-	 */
-	void ClearBans(BotInfo *bi = NULL, bool internal = false);
-
-	/** Clear all the excepts from the channel
-	 * @param bi The client unsetting the modes
-	 * @param internal Only remove the modes internally
-	 */
-	void ClearExcepts(BotInfo *bi = NULL, bool internal = false);
-
-	/** Clear all the invites from the channel
-	 * @param bi The client unsetting the modes
-	 * @param internal Only remove the modes internally
-	 */
-	void ClearInvites(BotInfo *bi = NULL, bool internal = false);
-
 	/** Get a param from the channel
 	 * @param Name The mode
 	 * @param Target a string to put the param into
 	 * @return true on success
 	 */
 	bool GetParam(ChannelModeName Name, Anope::string &Target) const;
-
-	/** Check if a mode is set and has a param
-	 * @param Name The mode
-	 */
-	bool HasParam(ChannelModeName Name) const;
 
 	/** Set a string of modes on the channel
 	 * @param bi The client setting the modes

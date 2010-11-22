@@ -17,7 +17,6 @@
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */
 	 "+Soiq",				/* Modes used by pseudoclients */
-	 5,						/* Chan Max Symbols */
 	 1,						/* SVSNICK */
 	 1,						/* Vhost */
 	 1,						/* Supports SNlines */
@@ -27,7 +26,6 @@ IRCDVar myIrcd[] = {
 	 0,						/* Chan SQlines */
 	 0,						/* Quit on Kill */
 	 1,						/* SVSMODE unban */
-	 1,						/* Reverse */
 	 1,						/* vidents */
 	 1,						/* svshold */
 	 1,						/* time stamp on mode */

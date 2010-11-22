@@ -18,7 +18,6 @@
 IRCDVar myIrcd[] = {
 	{"InspIRCd 1.1",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
-	 5,					/* Chan Max Symbols */
 	 1,					/* SVSNICK */
 	 1,					/* Vhost */
 	 1,					/* Supports SNlines */
@@ -28,7 +27,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* Chan SQlines */
 	 0,					/* Quit on Kill */
 	 0,					/* SVSMODE unban */
-	 1,					/* Reverse */
 	 1,					/* vidents */
 	 1,					/* svshold */
 	 0,					/* time stamp on mode */

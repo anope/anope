@@ -173,9 +173,9 @@ void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PING %s", who.c_str());
+		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PING %s", who.c_str());
 	else
-		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PING %s %s", servname.c_str(), who.c_str());
+		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PING %s %s", servname.c_str(), who.c_str());
 }
 
 /**
@@ -187,9 +187,9 @@ void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who
 void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PONG %s", who.c_str());
+		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PONG %s", who.c_str());
 	else
-		send_cmd(ircd->ts6 ? TS6SID : Config->ServerName, "PONG %s %s", servname.c_str(), who.c_str());
+		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PONG %s %s", servname.c_str(), who.c_str());
 }
 
 void IRCDProto::SendJoin(BotInfo *bi, const ChannelContainer *cc)

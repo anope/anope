@@ -17,7 +17,6 @@
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x",	/* ircd name */
 	"+",					/* Modes used by pseudoclients */
-	 2,					/* Chan Max Symbols */
 	 1,					/* SVSNICK */
 	 0,					/* Vhost */
 	 1,					/* Supports SNlines */
@@ -27,7 +26,6 @@ IRCDVar myIrcd[] = {
 	 1,					/* Chan SQlines */
 	 1,					/* Quit on Kill */
 	 1,					/* SVSMODE unban */
-	 0,					/* Reverse */
 	 0,					/* vidents */
 	 1,					/* svshold */
 	 1,					/* time stamp on mode */

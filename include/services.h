@@ -433,7 +433,6 @@ struct IRCDVar
 {
 	const char *name;				/* Name of the IRCd command */
 	const char *pseudoclient_mode;	/* Mode used by BotServ Bots */
-	int max_symbols;				/* Chan Max Symbols */
 	int svsnick;					/* Supports SVSNICK */
 	int vhost;						/* Supports vhost */
 	int snline;						/* Supports SNline */
@@ -443,7 +442,6 @@ struct IRCDVar
 	int chansqline;					/* Supports Channel Sqlines */
 	int quitonkill;					/* IRCD sends QUIT when kill */
 	int svsmode_unban;				/* svsmode can be used to unban */
-	int reversekickcheck;			/* Can reverse ban check */
 	int vident;						/* Supports vidents */
 	int svshold;					/* Supports svshold */
 	int tsonmode;					/* Timestamp on mode changes */

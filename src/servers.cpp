@@ -12,8 +12,6 @@
 #include "services.h"
 #include "modules.h"
 
-Anope::string TS6SID;
-
 /* Anope */
 Server *Me = NULL;
 
@@ -422,7 +420,7 @@ static char ts6_new_uid[10];
 
 static void ts6_uid_increment(unsigned slot)
 {
-	if (slot != TS6SID.length())
+	if (slot != Config->Numeric.length())
 	{
 		if (ts6_new_uid[slot] == 'Z')
 			ts6_new_uid[slot] = '0';
@@ -456,7 +454,7 @@ const char *ts6_uid_retrieve()
 
 	if (!ts6_uid_initted)
 	{
-		snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID.c_str());
+		snprintf(ts6_new_uid, 10, "%sAAAAAA", Config->Numeric.c_str());
 		ts6_uid_initted = true;
 	}
 
@@ -522,7 +520,7 @@ const char *ts6_sid_retrieve()
 	if (!ts6_sid_initted)
 	{
 		// Initialize ts6_new_sid with the services server SID
-		snprintf(ts6_new_sid, 4, "%s", TS6SID.c_str());
+		snprintf(ts6_new_sid, 4, "%s", Config->Numeric.c_str());
 		ts6_sid_initted = true;
 	}
 

@@ -1,4 +1,4 @@
-/* Ratbox IRCD functions
+/* Plexus 3+ IRCD functions
  *
  * (C) 2003-2010 Anope Team
  * Contact us at team@anope.org
@@ -15,21 +15,21 @@
 static Anope::string TS6UPLINK;
 
 IRCDVar myIrcd[] = {
-	{"Ratbox 2.0+",	/* ircd name */
-	 "+oi",			/* Modes used by pseudoclients */
-	 0,				/* SVSNICK */
-	 0,				/* Vhost */
+	{"hybrid-7.2.3+plexus-3.0.1",	/* ircd name */
+	 "+oi",				/* Modes used by pseudoclients */
+	 1,				/* SVSNICK */
+	 1,				/* Vhost */
 	 1,				/* Supports SNlines */
 	 1,				/* Supports SQlines */
 	 0,				/* Supports SZlines */
-	 1,				/* Join 2 Message */
+	 0,				/* Join 2 Message */
 	 1,				/* Chan SQlines */
 	 0,				/* Quit on Kill */
 	 0,				/* SVSMODE unban */
 	 0,				/* vidents */
-	 0,				/* svshold */
-	 0,				/* time stamp on mode */
-	 0,				/* UMODE */
+	 1,				/* svshold */
+	 1,				/* time stamp on mode */
+	 1,				/* UMODE */
 	 0,				/* O:LINE */
 	 0,				/* No Knock requires +i */
 	 0,				/* Can remove User Channel Modes with SVSMODE */
@@ -50,41 +50,38 @@ IRCDVar myIrcd[] = {
  *	  parv[3] = server is standalone or connected to non-TS only
  *	  parv[4] = server's idea of UTC time
  */
-void ratbox_cmd_svinfo()
+static inline void plexus_cmd_svinfo()
 {
-	send_cmd("", "SVINFO 6 3 0 :%ld", static_cast<long>(Anope::CurTime));
+	send_cmd("", "SVINFO 6 5 0 :%ld", static_cast<long>(Anope::CurTime));
 }
 
-void ratbox_cmd_svsinfo()
+/* CAPAB
+ * QS     - Can handle quit storm removal
+ * EX     - Can do channel +e exemptions
+ * CHW    - Can do channel wall @#
+ * LL     - Can do lazy links
+ * IE     - Can do invite exceptions
+ * EOB    - Can do EOB message
+ * KLN    - Can do KLINE message
+ * GLN    - Can do GLINE message
+ * HUB    - This server is a HUB
+ * AOPS   - Can do anon ops (+a)
+ * UID    - Can do UIDs
+ * ZIP    - Can do ZIPlinks
+ * ENC    - Can do ENCrypted links
+ * KNOCK  - Supports KNOCK
+ * TBURST - Supports TBURST
+ * PARA   - Supports invite broadcasting for +p
+ * ENCAP  - Supports encapsulization of protocol messages
+ * SVS    - Supports services protocol extensions
+ */
+static inline void plexus_cmd_capab()
 {
-}
-
-/* CAPAB */
-/*
-  QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions
-  CHW    - Can do channel wall @#
-  LL     - Can do lazy links
-  IE     - Can do invite exceptions
-  EOB    - Can do EOB message
-  KLN    - Can do KLINE message
-  GLN    - Can do GLINE message
-  HUB    - This server is a HUB
-  UID    - Can do UIDs
-  ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links
-  KNOCK  -  supports KNOCK
-  TBURST - supports TBURST
-  PARA   - supports invite broadcasting for +p
-  ENCAP  - ?
-*/
-void ratbox_cmd_capab()
-{
-	send_cmd("", "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP");
+	send_cmd("", "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
 }
 
 /* PASS */
-void ratbox_cmd_pass(const Anope::string &pass)
+void plexus_cmd_pass(const Anope::string &pass)
 {
 	send_cmd("", "PASS %s TS 6 :%s", pass.c_str(), Config->Numeric.c_str());
 }
@@ -129,12 +126,12 @@ class RatboxProto : public IRCDProto
 
 	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
 	{
-		send_cmd("", "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel.c_str(), user->GetUID().c_str());
+		send_cmd(Config->Numeric, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel.c_str(), user->GetUID().c_str());
 	}
 
 	void SendJoin(const BotInfo *user, const ChannelContainer *cc)
 	{
-		send_cmd("", "SJOIN %ld %s +%s :%s%s", static_cast<long>(cc->chan->creation_time), cc->chan->name.c_str(), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildModePrefixList().c_str(), user->GetUID().c_str());
+		send_cmd(Config->Numeric, "SJOIN %ld %s +%s :%s%s", static_cast<long>(cc->chan->creation_time), cc->chan->name.c_str(), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildModePrefixList().c_str(), user->GetUID().c_str());
 	}
 
 	void SendAkill(const XLine *x)
@@ -153,25 +150,29 @@ class RatboxProto : public IRCDProto
 		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
-	/* SERVER name hop descript */
 	void SendServer(const Server *server)
 	{
 		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
 	}
 
+	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
+	{
+		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->nick, static_cast<long>(u->timestamp), newnick, static_cast<long>(when));
+	}
+
 	void SendConnect()
 	{
-		ratbox_cmd_pass(uplink_server->password);
-		ratbox_cmd_capab();
+		plexus_cmd_pass(uplink_server->password);
+		plexus_cmd_capab();
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
-		ratbox_cmd_svinfo();
+		plexus_cmd_svinfo();
 	}
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
 		EnforceQlinedNick(u->nick, "");
-		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->realname.c_str());
+		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 255.255.255.255 %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
@@ -198,9 +199,7 @@ class RatboxProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "SVSMODE %s %s", u->nick.c_str(), buf.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->Numeric, "ENCAP * SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
@@ -244,20 +243,7 @@ class RatboxProto : public IRCDProto
 
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
-		bool needjoin = c->FindUser(bi) != NULL;
-		if (needjoin)
-		{
-			ChannelStatus status;
-			status.SetFlag(CMODE_OP);
-			ChannelContainer cc(c);
-			cc.Status = &status;
-			ircdproto->SendJoin(bi, &cc);
-		}
-		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
-		if (needjoin)
-		{
-			ircdproto->SendPart(bi, c, NULL);
-		}
+		send_cmd(bi->GetUID(), "ENCAP * TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
 	}
 
 	void SetAutoIdentificationToken(User *u)
@@ -375,17 +361,6 @@ bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &
 }
 
 /*
-   Non TS6
-
-   params[0] = nick
-   params[1] = hop
-   params[2] = ts
-   params[3] = modes
-   params[4] = user
-   params[5] = host
-   params[6] = server
-   params[7] = info
-
    TS6
    params[0] = nick
    params[1] = hop
@@ -395,21 +370,22 @@ bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &
    params[5] = host
    params[6] = IP
    params[7] = UID
-   params[8] = info
+   params[8] = services stamp
+   params[9] = realhost
+   params[10] = info
 
 */
 bool event_nick(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params.size() == 9)
+	if (params.size() == 11)
 	{
-		Server *s = Server::Find(source);
 		/* Source is always the server */
-		User *user = do_nick("", params[0], params[4], params[5], s->GetName(), params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
+		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], params[5], params[7], params[3]);
 		if (user)
 		{
 			NickAlias *na = findnick(user->nick);
 			Anope::string svidbuf;
-			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[2])
+			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[8])
 			{
 				user->Login(na->nc);
 			}
@@ -520,7 +496,6 @@ bool event_motd(const Anope::string &source, const std::vector<Anope::string> &p
 
 bool event_privmsg(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	// XXX: this is really the same as charybdis
 	if (params.size() > 1)
 		m_privmsg(source, params[0], params[1]);
 	return true;
@@ -555,7 +530,7 @@ bool event_server(const Anope::string &source, const std::vector<Anope::string> 
 
 bool event_sid(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
+	/* :42X SID trystan.nomadirc.net 2 43X :ircd-plexus test server */
 	Server *s = Server::Find(source);
 
 	do_server(s->GetName(), params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[3], params[2]);
@@ -597,8 +572,13 @@ bool event_mode(const Anope::string &source, const std::vector<Anope::string> &p
 
 bool event_tmode(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params[1][0] == '#' || params[1][0] == '&')
-		do_cmode(source, params[0], params[1], params[2]);
+	if (params[1][0] == '#')
+	{
+		Anope::string modes = params[2];
+		for (unsigned i = 3; i < params.size(); ++i)
+			modes += " " + params[i];
+		do_cmode(source, params[1], modes, params[0]);
+	}
 	return true;
 }
 
@@ -657,35 +637,58 @@ static void AddModes()
 	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
 	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
 	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+	ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'D'));
+	ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, "UMODE_SOFTCALLERID", 'G'));
+	ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'M'));
+	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
+	ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'S'));
+	ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, "UMODE_WEBIRC", 'W'));
+	ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
+	ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
+	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
+	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
 
 	/* b/e/I */
 	ModeManager::AddChannelMode(new ChannelModeBan('b'));
 	ModeManager::AddChannelMode(new ChannelModeExcept('e'));
 	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+	
+	/* l/k */
+	ModeManager::AddChannelMode(new ChannelModeKey('k'));
+	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
 
 	/* v/h/o/a/q */
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
 	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
 
 	/* Add channel modes */
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, "CMODE_BANDWIDTH", 'B'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'N'));
+	ModeManager::AddChannelMode(new ChannelModeOper('O'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'S'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-	ModeManager::AddChannelMode(new ChannelModeKey('k'));
-	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
 	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'z'));
 }
 
-class ProtoRatbox : public Module
+class ProtoPlexus : public Module
 {
 	Message message_436, message_away, message_join, message_kick, message_kill, message_mode, message_tmode, message_motd,
 		message_nick, message_bmask, message_uid, message_part, message_pass, message_ping, message_privmsg, message_quit,
 		message_server, message_squit, message_topic, message_tb, message_whois, message_capab, message_sjoin, message_error,
 		message_sid;
  public:
-	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_436("436", event_436), message_away("AWAY", event_away), message_join("JOIN", event_join),
 		message_kick("KICK", event_kick), message_kill("KILL", event_kill), message_mode("MODE", event_mode),
 		message_tmode("TMODE", event_tmode), message_motd("MOTD", event_motd), message_nick("NICK", event_nick),
@@ -701,8 +704,8 @@ class ProtoRatbox : public Module
 
 		pmodule_ircd_var(myIrcd);
 
-		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK, CAPAB_TSMODE };
-		for (unsigned i = 0; i < 6; ++i)
+		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK };
+		for (unsigned i = 0; i < 5; ++i)
 			Capab.SetFlag(c[i]);
 
 		AddModes();
@@ -711,4 +714,4 @@ class ProtoRatbox : public Module
 	}
 };
 
-MODULE_INIT(ProtoRatbox)
+MODULE_INIT(ProtoPlexus)

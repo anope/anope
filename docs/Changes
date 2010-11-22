@@ -4,6 +4,7 @@ A Automatically set channel founder to the user with the highest access if there
 A /chanserv clone command to copy settings from one channel to another.
 A Ability for users to delete their own access in channels
 A Ability for users with registrations pending to drop their registrations with /nickserv drop
+A Added support for Plexus 3
 F Changed the GHOST command to not allow ghosting unidentified users if the RECOVER command exists
 
 Anope Version 1.9.3

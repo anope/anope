@@ -185,8 +185,7 @@ Table of Contents
 
         * HostServ, a neat service that allows users to show custom vHosts
           (virtual hosts) instead of their real IP address; this only works
-          on daemons supporting ip cloaking, such as UnrealIRCd, UltimateIRCd
-          and ViagraIRCd.
+          on daemons supporting ip cloaking, such as UnrealIRCd.
 
     Anope currently works with:
 
@@ -194,6 +193,7 @@ Table of Contents
         * InspIRCd 1.1, 1.2, or 2.0
         * Ratbox 2.0.6 or later
         * UnrealIRCd 3.2 or later
+        * Plexus 3 or later
 
     Anope could also work with some of the daemons derived by the ones listed
     above, but there's no support for them if they work or don't work.

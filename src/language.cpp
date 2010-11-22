@@ -114,7 +114,12 @@ const Anope::string GetString(const char *domain, Anope::string language, const 
 #else
 const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string)
 {
-	return string;
+	Anope::string translated = string;
+	if (Config->UseStrictPrivMsg)
+		translated = translated.replace_all_cs("%R", "/");
+	else
+		translated = translated.replace_all_cs("%R", "/msg ");
+	return translated;
 }
 #endif
 

@@ -315,8 +315,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("GROUP target password"),
 	/* NICK_GROUP_DISABLED */
 	_("Sorry, nickname grouping is temporarily disabled."),
-	/* NICK_GROUP_FAILED */
-	_("Sorry, grouping failed."),
 	/* NICK_GROUP_PLEASE_WAIT */
 	_("Please wait %d seconds before using the GROUP command again."),
 	/* NICK_GROUP_CHANGE_DISABLED */
@@ -666,8 +664,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("FORBID nickname reason"),
 	/* NICK_FORBID_SUCCEEDED */
 	_("Nick %s is now forbidden."),
-	/* NICK_FORBID_FAILED */
-	_("Couldn't forbid nick %s!"),
 	/* NICK_REQUESTED */
 	_("This nick has already been requested, please check your e-mail address for the pass code"),
 	/* NICK_REG_RESENT */
@@ -1323,8 +1319,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("FORBID channel reason"),
 	/* CHAN_FORBID_SUCCEEDED */
 	_("Channel %s is now forbidden."),
-	/* CHAN_FORBID_FAILED */
-	_("Couldn't forbid channel %s!"),
 	/* CHAN_FORBID_REASON */
 	_("This channel has been forbidden."),
 	/* CHAN_SUSPEND_SYNTAX */
@@ -1333,8 +1327,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("SUSPEND channel reason"),
 	/* CHAN_SUSPEND_SUCCEEDED */
 	_("Channel %s is now suspended."),
-	/* CHAN_SUSPEND_FAILED */
-	_("Couldn't suspended channel %s!"),
 	/* CHAN_SUSPEND_REASON */
 	_("This channel has been suspended."),
 	/* CHAN_UNSUSPEND_SYNTAX */

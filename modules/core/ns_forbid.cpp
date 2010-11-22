@@ -52,41 +52,33 @@ class CommandNSForbid : public Command
 		NickCore *nc = new NickCore(nick);
 		nc->SetFlag(NI_FORBIDDEN);
 		na = new NickAlias(nick, nc);
-		if (na)
+		na->SetFlag(NS_FORBIDDEN);
+		na->last_usermask = u->nick;
+		if (!reason.empty())
+			na->last_realname = reason;
+
+		User *curr = finduser(na->nick);
+
+		if (curr)
 		{
-			na->SetFlag(NS_FORBIDDEN);
-			na->last_usermask = u->nick;
-			if (!reason.empty())
-				na->last_realname = reason;
-
-			User *curr = finduser(na->nick);
-
-			if (curr)
-			{
-				curr->SendMessage(NickServ, FORCENICKCHANGE_NOW);
-				curr->Collide(na);
-			}
-
-			if (ircd->sqline)
-			{
-				XLine x(na->nick, !reason.empty() ? reason : "Forbidden");
-				ircdproto->SendSQLine(&x);
-			}
-
-			if (Config->WallForbid)
-				ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick.c_str());
-
-			Log(LOG_ADMIN, u, this) << "to forbid nick " << nick;
-			u->SendMessage(NickServ, NICK_FORBID_SUCCEEDED, nick.c_str());
-
-			FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
+			curr->SendMessage(NickServ, FORCENICKCHANGE_NOW);
+			curr->Collide(na);
 		}
-		else
+
+		if (ircd->sqline)
 		{
-			// XXX cant happen ?
-			//Alog() << Config->s_NickServ << ": Valid FORBID for " << nick << " by " << u->nick << " failed";
-			u->SendMessage(NickServ, NICK_FORBID_FAILED, nick.c_str());
+			XLine x(na->nick, !reason.empty() ? reason : "Forbidden");
+			ircdproto->SendSQLine(&x);
 		}
+
+		if (Config->WallForbid)
+			ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick.c_str());
+
+		Log(LOG_ADMIN, u, this) << "to forbid nick " << nick;
+		u->SendMessage(NickServ, NICK_FORBID_SUCCEEDED, nick.c_str());
+
+		FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
+
 		return MOD_CONT;
 	}
 

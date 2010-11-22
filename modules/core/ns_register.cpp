@@ -21,15 +21,6 @@ class CommandNSConfirm : public Command
 	CommandReturn ActuallyConfirmNick(User *u, NickRequest *nr, bool force)
 	{
 		NickAlias *na = new NickAlias(nr->nick, new NickCore(nr->nick));
-
-		if (!na)
-		{
-			// XXX
-			//Alog() << Config->s_NickServ << ": makenick(" << u->nick << ") failed";
-			u->SendMessage(NickServ, NICK_REGISTRATION_FAILED);
-			return MOD_CONT;
-		}
-
 		Anope::string tmp_pass;
 
 		na->nc->pass = nr->password;
@@ -251,8 +242,7 @@ class CommandNSRegister : public CommandNSConfirm
 			/* i.e. there's already such a nick regged */
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				 // XXX
-				//Alog() << Config->s_NickServ << ": " << u->GetIdent() << "@" << u->host << " tried to register FORBIDden nick " << u->nick;
+				Log(NickServ) << u->GetMask() << " tried to register FORBIDden nick " << u->nick;
 				u->SendMessage(NickServ, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			}
 			else

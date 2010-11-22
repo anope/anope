@@ -51,40 +51,32 @@ class CommandCSSuspend : public Command
 		if (readonly)
 			u->SendMessage(ChanServ, READ_ONLY_MODE);
 
-		if (ci)
-		{
-			ci->SetFlag(CI_SUSPENDED);
-			ci->forbidby = u->nick;
-			if (!reason.empty())
-				ci->forbidreason = reason;
+		ci->SetFlag(CI_SUSPENDED);
+		ci->forbidby = u->nick;
+		if (!reason.empty())
+			ci->forbidreason = reason;
 
-			if ((c = findchan(ci->name)))
+		if ((c = findchan(ci->name)))
+		{
+			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{
-				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
-				{
-					UserContainer *uc = *it++;
+				UserContainer *uc = *it++;
 
-					if (is_oper(uc->user))
-						continue;
+				if (is_oper(uc->user))
+					continue;
 
-					c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), CHAN_SUSPEND_REASON).c_str());
-				}
+				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), CHAN_SUSPEND_REASON).c_str());
 			}
-
-			if (Config->WallForbid)
-				ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
-
-			Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
-			u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
-
-			FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 		}
-		else
-		{
-			// cant happen?
-			//Alog() << Config->s_ChanServ << ": Valid SUSPEND for " << ci->name << " by " << u->GetMask() << " failed";
-			u->SendMessage(ChanServ, CHAN_SUSPEND_FAILED, chan.c_str());
-		}
+
+		if (Config->WallForbid)
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+
+		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
+		u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
+
+		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
+
 		return MOD_CONT;
 	}
 
@@ -133,27 +125,19 @@ class CommandCSUnSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (ci)
-		{
-			Log(LOG_ADMIN, u, this, ci) << " was suspended for: " << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
+		Log(LOG_ADMIN, u, this, ci) << " was suspended for: " << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
 
-			ci->UnsetFlag(CI_SUSPENDED);
-			ci->forbidreason.clear();
-			ci->forbidby.clear();
+		ci->UnsetFlag(CI_SUSPENDED);
+		ci->forbidreason.clear();
+		ci->forbidby.clear();
 
-			if (Config->WallForbid)
-				ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
+		if (Config->WallForbid)
+			ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-			u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
+		u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
 
-			FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
-		}
-		else
-		{
-			// cant happen ?
-			//Alog() << Config->s_ChanServ << ": Valid UNSUSPEND for " << chan << " by " << u->nick << " failed";
-			u->SendMessage(ChanServ, CHAN_UNSUSPEND_FAILED, chan.c_str());
-		}
+		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
+
 		return MOD_CONT;
 	}
 

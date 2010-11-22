@@ -51,14 +51,6 @@ class CommandCSForbid : public Command
 			delete ci;
 
 		ci = new ChannelInfo(chan);
-		if (!ci)
-		{
-			 // this cant happen?
-			//Alog() << Config->s_ChanServ << ": Valid FORBID for " << ci->name << " by " << u->nick << " failed";
-			u->SendMessage(ChanServ, CHAN_FORBID_FAILED, chan.c_str());
-			return MOD_CONT;
-		}
-
 		ci->SetFlag(CI_FORBIDDEN);
 		ci->forbidby = u->nick;
 		ci->forbidreason = reason;

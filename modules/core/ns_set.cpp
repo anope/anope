@@ -180,8 +180,7 @@ class CommandNSSetPassword : public Command
 
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
-			 // XXX ?
-			//Alog() << Config->s_NickServ << ": Failed to encrypt password for " << u->Account()->display << " (set)";
+			Log(NickServ) << "Failed to encrypt password for " << u->Account()->display << " (set)";
 			u->SendMessage(NickServ, NICK_SASET_PASSWORD_FAILED);
 			return MOD_CONT;
 		}

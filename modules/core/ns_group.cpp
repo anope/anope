@@ -61,7 +61,7 @@ class CommandNSGroup : public Command
 			u->SendMessage(NickServ, NICK_GROUP_PLEASE_WAIT, (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
 		{
-			//Alog() << Config->s_NickServ << ": " << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
+			Log(NickServ) << NickServ << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
 			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
@@ -110,31 +110,22 @@ class CommandNSGroup : public Command
 
 				na = new NickAlias(u->nick, target->nc);
 
-				if (na)
-				{
-					Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-					na->last_usermask = last_usermask;
-					na->last_realname = u->realname;
-					na->time_registered = na->last_seen = Anope::CurTime;
+				Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+				na->last_usermask = last_usermask;
+				na->last_realname = u->realname;
+				na->time_registered = na->last_seen = Anope::CurTime;
 
-					u->Login(na->nc);
-					FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
-					ircdproto->SetAutoIdentificationToken(u);
-					u->SetMode(NickServ, UMODE_REGISTERED);
+				u->Login(na->nc);
+				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+				ircdproto->SetAutoIdentificationToken(u);
+				u->SetMode(NickServ, UMODE_REGISTERED);
 
-					Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
-					u->SendMessage(NickServ, NICK_GROUP_JOINED, target->nick.c_str());
+				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
+				u->SendMessage(NickServ, NICK_GROUP_JOINED, target->nick.c_str());
 
-					u->lastnickreg = Anope::CurTime;
+				u->lastnickreg = Anope::CurTime;
 
-					check_memos(u);
-				}
-				else
-				{
-					// XXX not possible?
-					//Alog() << Config->s_NickServ << ": makealias(" << u->nick << ") failed";
-					u->SendMessage(NickServ, NICK_GROUP_FAILED);
-				}
+				check_memos(u);
 			}
 		}
 		return MOD_CONT;

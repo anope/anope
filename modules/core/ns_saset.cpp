@@ -199,8 +199,7 @@ class CommandNSSASetPassword : public Command
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
-			// XXX 
-			//Alog() << Config->s_NickServ << ": Failed to encrypt password for " << nc->display << " (saset)";
+			Log(NickServ) << "Failed to encrypt password for " << nc->display << " (saset)";
 			u->SendMessage(NickServ, NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
 			return MOD_CONT;
 		}

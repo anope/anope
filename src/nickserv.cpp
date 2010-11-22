@@ -257,13 +257,34 @@ void expire_nicks()
 			continue;
 		}
 
-		if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire && !na->HasFlag(NS_FORBIDDEN) && !na->HasFlag(NS_NO_EXPIRE) && !na->nc->HasFlag(NI_SUSPENDED))
+		bool expire = false;
+		if (na->nc->HasFlag(NI_SUSPENDED))
+		{
+			if (Config->NSSuspendExpire && Anope::CurTime - na->last_seen >= Config->NSSuspendExpire)
+				expire = true;
+		}
+		else if (na->HasFlag(NS_FORBIDDEN))
+		{
+			if (Config->NSForbidExpire && Anope::CurTime - na->last_seen >= Config->NSForbidExpire)
+				expire = true;
+		}
+		else if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire)
+			expire = true;
+		if (na->HasFlag(NS_NO_EXPIRE))
+			expire = false;
+		
+		if (expire)
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
 			if (MOD_RESULT == EVENT_STOP)
 				continue;
-			Log(LOG_NORMAL, "expire") << "Expiring nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
+			Anope::string extra;
+			if (na->HasFlag(NS_FORBIDDEN))
+				extra = "forbidden ";
+			else if (na->nc->HasFlag(NI_SUSPENDED))
+				extra = "suspended ";
+			Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 			FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));
 			delete na;
 		}

@@ -247,7 +247,7 @@ class CommandOSAKill : public Command
 
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_AKILL_LIST_EMPTY);
+			u->SendMessage(OperServ, OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -282,7 +282,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_AKILL_LIST_EMPTY);
+			u->SendMessage(OperServ, OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -326,7 +326,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_AKILL_LIST_EMPTY);
+			u->SendMessage(OperServ, OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 

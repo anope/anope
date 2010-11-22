@@ -593,8 +593,12 @@ class CoreExport ServerConfig
 	time_t NSRegDelay;
 	/* Time before the registering mail will be resent */
 	time_t NSResendDelay;
-	/* How long before nicks expir */
+	/* How long before nicks expire */
 	time_t NSExpire;
+	/* How long before suspended nicks expire */
+	time_t NSSuspendExpire;
+	/* How long before forbidden nicks expire */
+	time_t NSForbidExpire;
 	/* Time before NickRequests expire */
 	time_t NSRExpire;
 	/* Force email when registering */
@@ -630,6 +634,10 @@ class CoreExport ServerConfig
 	unsigned CSMaxReg;
 	/* Time before a channel expires */
 	time_t CSExpire;
+	/* How long before suspended channels expire */
+	time_t CSSuspendExpire;
+	/* How long before forbidden channels expire */
+	time_t CSForbidExpire;
 	/* Default ban type to use for channels */
 	int CSDefBantype;
 	/* Max number of entries allowed on channel access lists */

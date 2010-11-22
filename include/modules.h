@@ -498,10 +498,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnPreChanExpire(ChannelInfo *ci) { return EVENT_CONTINUE; }
 
-	/** Called when a channel expires
-	 * @param chname The channel name
+	/** Called before a channel expires
+	 * @param ci The channel
 	 */
-	virtual void OnChanExpire(const Anope::string &chname) { }
+	virtual void OnChanExpire(ChannelInfo *ci) { }
 
 	/** Called before Anope connects to its uplink
 	 * @param u The uplink we're going to connect to

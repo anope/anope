@@ -363,17 +363,39 @@ void expire_chans()
 		ChannelInfo *ci = it->second;
 		++it;
 
-		if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire && !ci->HasFlag(CI_FORBIDDEN) && !ci->HasFlag(CI_NO_EXPIRE) && !ci->HasFlag(CI_SUSPENDED))
+		bool expire = false;
+		if (ci->HasFlag(CI_SUSPENDED))
+		{
+			if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
+				expire = true;
+		}
+		else if (ci->HasFlag(CI_FORBIDDEN))
+		{
+			if (Config->CSForbidExpire && Anope::CurTime - ci->last_used >= Config->CSForbidExpire)
+				expire = true;
+		}
+		else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
+			expire = true;
+
+		if (ci->HasFlag(CI_NO_EXPIRE))
+			expire = true;
+
+		if (expire)
 		{
 			EventReturn MOD_RESULT;
 			FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
 			if (MOD_RESULT == EVENT_STOP)
 				continue;
 
-			Anope::string chname = ci->name;
-			Log(LOG_NORMAL, "chanserv/expire") << "Expiring channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << " )";
+			Anope::string extra;
+			if (ci->HasFlag(CI_FORBIDDEN))
+				extra = "forbidden ";
+			else if (ci->HasFlag(CI_SUSPENDED))
+				extra = "suspended ";
+
+			Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";
+			FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
 			delete ci;
-			FOREACH_MOD(I_OnChanExpire, OnChanExpire(chname));
 		}
 	}
 }

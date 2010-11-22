@@ -134,6 +134,7 @@ void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageStr
 }
 
 const char *const language_strings[LANG_STRING_COUNT] = {
+	/* LANGUAGE_NAME */
 	_("English"),
 	/* COMMAND_REQUIRES_PERM */
 	_("Access to this command requires the permission %s to be present in your opertype."),
@@ -143,6 +144,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("You cannot use this command."),
 	/* COMMAND_CAN_USE */
 	_("You can use this command."),
+	/* COMMAND_DEPRECATED */
+	_("This command is deprecated, use \"%R%s MODE\" instead."),
 	/* USER_RECORD_NOT_FOUND */
 	_("Internal error - unable to process request."),
 	/* UNKNOWN_COMMAND */
@@ -2113,7 +2116,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Deleted 1 entry from the AKILL list."),
 	/* OPER_AKILL_DELETED_SEVERAL */
 	_("Deleted %d entries from the AKILL list."),
-	/* OPER_AKILL_LIST_EMPTY */
+	/* OPER_LIST_EMPTY */
 	_("AKILL list is empty."),
 	/* OPER_AKILL_LIST_HEADER */
 	_("Current AKILL list:\n"

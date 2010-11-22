@@ -129,7 +129,7 @@ void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageStr
 }
 
 Anope::string language_strings[LANG_STRING_COUNT] = {
-	/* LANG_NAME */
+	/* LANGUAGE_NAME */
 	_("English"),
 	/* COMMAND_REQUIRES_PERM */
 	_("Access to this command requires the permission %s to be present in your opertype."),
@@ -2077,7 +2077,7 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	_("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list} [reason]]"),
 	/* OPER_AKILL_EXISTS */
 	_("%s already exists on the AKILL list."),
-	/* OPER_AKILL_ALREADY_COVERED */
+	/* OPER_ALREADY_COVERED */
 	_("%s is already covered by %s."),
 	/* OPER_AKILL_NO_NICK */
 	_("Reminder: AKILL masks cannot contain nicknames; make sure you have not included a nick portion in your mask."),
@@ -2100,7 +2100,7 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* OPER_AKILL_LIST_HEADER */
 	_("Current AKILL list:\n"
 	"  Num   Mask                              Reason"),
-	/* OPER_AKILL_LIST_FORMAT */
+	/* OPER_LIST_FORMAT */
 	_("  %3d   %-32s  %s"),
 	/* OPER_AKILL_VIEW_HEADER */
 	_("Current AKILL list:"),

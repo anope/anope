@@ -16,7 +16,7 @@
 
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */
-	 "+Soi",				/* Modes used by pseudoclients */
+	 "+Soiq",				/* Modes used by pseudoclients */
 	 5,						/* Chan Max Symbols */
 	 1,						/* SVSNICK */
 	 1,						/* Vhost */

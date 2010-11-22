@@ -94,7 +94,7 @@ void ratbox_cmd_pass(const Anope::string &pass)
 
 class RatboxProto : public IRCDProto
 {
-	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
+	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
 		if (source)
 			send_cmd(source->GetUID(), "OPERWALL :%s", buf.c_str());

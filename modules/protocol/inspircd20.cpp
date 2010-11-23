@@ -1185,9 +1185,6 @@ class ProtoInspIRCd : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		if (!Config->Numeric.empty())
-			Config->Numeric = Config->Numeric;
-
 		pmodule_ircd_var(myIrcd);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT };

@@ -157,7 +157,7 @@ class RatboxProto : public IRCDProto
 
 	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 	{
-		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->nick, static_cast<long>(u->timestamp), newnick, static_cast<long>(when));
+		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->nick.c_str(), static_cast<long>(u->timestamp), newnick.c_str(), static_cast<long>(when));
 	}
 
 	void SendConnect()

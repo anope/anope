@@ -134,10 +134,6 @@ void Channel::JoinUser(User *user)
 			else
 				user->SendMessage(MemoServ, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 		}
-		/* Added channelname to entrymsg - 30.03.2004, Certus */
-		/* Also, don't send the entrymsg when bursting -GD */
-		if (this->ci && !this->ci->entry_message.empty() && user->server->IsSynced())
-			user->SendMessage(whosends(this->ci)->nick, "[%s] %s", this->name.c_str(), this->ci->entry_message.c_str());
 	}
 
 	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)

@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS `anope_cs_info` (
   `mlock_off` text NOT NULL,
   `mlock_params` text NOT NULL,
   `mlock_params_off` text NOT NULL,
-  `entry_message` text NOT NULL,
   `memomax` smallint(5) unsigned NOT NULL DEFAULT '0',
   `botnick` varchar(255) NOT NULL DEFAULT '',
   `botflags` text NOT NULL,

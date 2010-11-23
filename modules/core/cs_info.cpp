@@ -73,9 +73,6 @@ class CommandCSInfo : public Command
 			u->SendMessage(ChanServ, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter.c_str());
 		}
 
-		if (!ci->entry_message.empty() && show_all)
-			u->SendMessage(ChanServ, CHAN_INFO_ENTRYMSG, ci->entry_message.c_str());
-
 		if (show_all)
 		{
 			u->SendMessage(ChanServ, CHAN_INFO_BANTYPE, ci->bantype);

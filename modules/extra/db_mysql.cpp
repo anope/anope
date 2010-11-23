@@ -615,7 +615,6 @@ class DBMySQL : public Module
 				ci->forbidby = r.Get(i, "forbidby");
 				ci->forbidreason = r.Get(i, "forbidreason");
 				ci->bantype = r.Get(i, "bantype").is_number_only() ? convertTo<int>(r.Get(i, "bantype")) : 2;
-				ci->entry_message = r.Get(i, "entry_message");
 				ci->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int>(r.Get(i, "memomax")) : 20;
 				ci->capsmin = r.Get(i, "capsmin").is_number_only() ? convertTo<int>(r.Get(i, "capsmin")) : 0;
 				ci->capspercent = r.Get(i, "capspercent").is_number_only() ? convertTo<int>(r.Get(i, "capspercent")) : 0;
@@ -1033,10 +1032,6 @@ class DBMySQL : public Module
 				{
 					this->RunQuery("UPDATE `anope_cs_info` SET `descr` = '" + this->Escape(ci->desc) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
-				else if (params[1].equals_ci("ENTRYMSG"))
-				{
-					this->RunQuery("UPDATE `anope_cs_info` SET `entry_message` = '" + this->Escape(ci->entry_message) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
-				}
 				else if (params[1].equals_ci("MLOCK"))
 				{
 					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_on` = '" + GetMLockOn(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
@@ -1261,16 +1256,16 @@ class DBMySQL : public Module
 	void OnChanRegistered(ChannelInfo *ci)
 	{
 		Anope::string flags = BuildFlagsList(ci), mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci, true), mlockparams_off = GetMLockParams(ci, false);
-		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, mlock_params_off, entry_message, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, mlock_params_off, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
 			this->Escape(ci->name) + "', '" + this->Escape(ci->founder ? ci->founder->display : "") + "', '" +
 			this->Escape(ci->successor ? ci->successor->display : "") + "', '" + this->Escape(ci->desc) + "', " +
 			stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + this->Escape(ci->last_topic) + "', '" +
 			this->Escape(ci->last_topic_setter) + "', " + stringify(ci->last_topic_time) + ", '" + flags + "', '" + 
 			this->Escape(ci->forbidby) + "', '" + this->Escape(ci->forbidreason) + "', " +  stringify(ci->bantype) + ", '" +
-			mlockon + "', '" + mlockoff + "', '" + mlockparams + "', '" + mlockparams_off + "', '" + this->Escape(ci->entry_message) + "', " +
+			mlockon + "', '" + mlockoff + "', '" + mlockparams + "', '" + mlockparams_off + "', " +
 			stringify(ci->memos.memomax) + ", '" + this->Escape(ci->bi ? ci->bi->nick : "") + "', '" + GetBotFlags(ci->botflags) +
 			"', " + stringify(ci->capsmin) + ", " + stringify(ci->capspercent) + ", " + stringify(ci->floodlines) + ", " + stringify(ci->floodsecs) + ", " + stringify(ci->repeattimes) + ") " +
-			"ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), mlock_on=VALUES(mlock_on), mlock_off=VALUES(mlock_off), mlock_params=VALUES(mlock_params), entry_message=VALUES(entry_message), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
+			"ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), mlock_on=VALUES(mlock_on), mlock_off=VALUES(mlock_off), mlock_params=VALUES(mlock_params), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
 	}
 
 	void OnChanSuspend(ChannelInfo *ci)

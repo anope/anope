@@ -858,10 +858,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s cannot be the successor on channel %s because he is its founder."),
 	/* CHAN_DESC_CHANGED */
 	_("Description of %s changed to %s."),
-	/* CHAN_ENTRY_MSG_CHANGED */
-	_("Entry message for %s changed."),
-	/* CHAN_ENTRY_MSG_UNSET */
-	_("Entry message for %s unset."),
 	/* CHAN_SET_BANTYPE_INVALID */
 	_("%s is not a valid ban type."),
 	/* CHAN_SET_BANTYPE_CHANGED */
@@ -1235,8 +1231,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("      Successor: %s"),
 	/* CHAN_INFO_DESCRIPTION */
 	_("    Description: %s"),
-	/* CHAN_INFO_ENTRYMSG */
-	_("  Entry message: %s"),
 	/* CHAN_INFO_TIME_REGGED */
 	_("     Registered: %s"),
 	/* CHAN_INFO_LAST_USED */
@@ -1381,6 +1375,27 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%c%c%s has been unlocked from %s."),
 	/* CHAN_MODE_LIST_FMT */
 	_("%c%c%s, by %s on %s"),
+	/* CHAN_ENTRYMSG_LIST_HEADER */
+	_("Entry message list for \2%s\2:"),
+	/* CHAN_ENTRYMSG_LIST_ENTRY */
+	_("%3d    %s\n"
+	"  Added by %s on %s"),
+	/* CHAN_ENTRYMSG_LIST_END */
+	_("End of entry message list."),
+	/* CHAN_ENTRYMSG_LIST_EMPTY */
+	_("Entry message list for \2%s\2 is empty."),
+	/* CHAN_ENTRYMSG_LIST_FULL */
+	_("The entry message list for \2%s\2 is full."),
+	/* CHAN_ENTRYMSG_ADDED */
+	_("Entry message added to \2%s\2"),
+	/* CHAN_ENTRYMSG_DELETED */
+	_("Entry message \2%i\2 for \2%s\2 deleted."),
+	/* CHAN_ENTRYMSG_NOT_FOUND */
+	_("Entry message \2%s\2 not found on channel \2%s\2."),
+	/* CHAN_ENTRYMSG_CLEARED */
+	_("Entry messages for \2%s\2 have been cleared."),
+	/* CHAN_ENTRYMSG_SYNTAX */
+	_("ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"),
 	/* MEMO_HAVE_NEW_MEMO */
 	_("You have 1 new memo."),
 	/* MEMO_HAVE_NEW_MEMOS */
@@ -3355,6 +3370,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    CLONE      Copy all settings from one channel to another"),
 	/* CHAN_HELP_CMD_MODE */
 	_("    MODE       Control modes and mode locks on a channel"),
+	/* CHAN_HELP_CMD_ENTRYMSG */
+	_("    ENTRYMSG   Manage the channel's entrymsgs"),
 	/* CHAN_HELP */
 	_("%S allows you to register and control various\n"
 	"aspects of channels.  %S can often prevent\n"
@@ -3413,9 +3430,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    SUCCESSOR     Set the successor for a channel"),
 	/* CHAN_HELP_CMD_SET_DESC */
 	_("    DESC          Set the channel description"),
-	/* CHAN_HELP_CMD_SET_ENTRYMSG */
-	_("    ENTRYMSG      Set a message to be sent to users when they\n"
-	"                     enter the channel"),
 	/* CHAN_HELP_CMD_SET_BANTYPE */
 	_("    BANTYPE       Set how Services make bans on the channel"),
 	/* CHAN_HELP_CMD_SET_KEEPTOPIC */
@@ -3470,12 +3484,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Sets the description for the channel, which shows up with\n"
 	"the LIST and INFO commands."),
-	/* CHAN_HELP_SET_ENTRYMSG */
-	_("Syntax: %s channel ENTRYMSG [message]\n"
-	" \n"
-	"Sets the message which will be sent via /notice to users\n"
-	"when they enter the channel.  If no parameter is given,\n"
-	"causes no message to be sent upon entering the channel."),
 	/* CHAN_HELP_SET_BANTYPE */
 	_("Syntax: %s channel BANTYPE bantype\n"
 	" \n"
@@ -4099,6 +4107,10 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"     \002MODE #channel SET -b ~c:*\n"
 	"       Clears all extended bans that start with ~c:"),
+	/* CHAN_HELP_ENTRYMSG */
+	_("Syntax: \002ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]\002\n"
+	" \n"
+	"Controls what messages will be sent to users when they join the channel."),
 	/* CHAN_SERVADMIN_HELP */
 	_(" \n"
 	"Services Operators can also drop any channel without needing\n"

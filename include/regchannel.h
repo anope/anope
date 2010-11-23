@@ -116,8 +116,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16 bantype;
 	int16 *levels; /* Access levels for commands */
 
-	Anope::string entry_message; /* Notice sent on entering channel */
-
 	MemoInfo memos;
 
 	Channel *c; /* Pointer to channel record (if channel is currently in use) */

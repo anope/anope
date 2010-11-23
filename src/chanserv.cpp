@@ -169,8 +169,6 @@ void get_chanserv_stats(long *nrec, long *memuse)
 
 		if (!ci->last_topic.empty())
 			mem += ci->last_topic.length() + 1;
-		if (!ci->entry_message.empty())
-			mem += ci->entry_message.length() + 1;
 		if (!ci->forbidby.empty())
 			mem += ci->forbidby.length() + 1;
 		if (!ci->forbidreason.empty())

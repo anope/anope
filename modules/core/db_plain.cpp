@@ -776,8 +776,6 @@ class DBPlain : public Module
 		}
 		else if (key.equals_ci("MIG"))
 			ci->memos.ignores.push_back(params[0].ci_str());
-		else if (key.equals_ci("ENTRYMSG"))
-			ci->entry_message = params[0];
 		else if (key.equals_ci("BI"))
 		{
 			if (params[0].equals_ci("NAME"))
@@ -1061,8 +1059,6 @@ class DBPlain : public Module
 			}
 			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
 				db << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
-			if (!ci->entry_message.empty())
-				db << "MD ENTRYMSG :" << ci->entry_message << endl;
 			if (ci->bi)
 				db << "MD BI NAME " << ci->bi->nick << endl;
 			if (ci->botflags.FlagCount())

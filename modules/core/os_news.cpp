@@ -95,7 +95,7 @@ static void DisplayNews(User *u, NewsType Type)
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			u->SendMessage(Global ? Global : NickServ, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
+			u->SendMessage(OperServ, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 
@@ -114,7 +114,7 @@ static void DisplayNews(User *u, NewsType Type)
 	}
 }
 
-static int add_newsitem(User *u, const Anope::string &text, NewsType type)
+static int add_newsitem(CommandSource &source, const Anope::string &text, NewsType type)
 {
 	int num = 0;
 
@@ -130,7 +130,7 @@ static int add_newsitem(User *u, const Anope::string &text, NewsType type)
 	news->num = num + 1;
 	news->Text = text;
 	news->time = Anope::CurTime;
-	news->who = u->nick;
+	news->who = source.u->nick;
 
 	News.push_back(news);
 
@@ -166,7 +166,7 @@ static LanguageString *findmsgs(NewsType type, Anope::string &type_name)
 class NewsBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u, NewsType type, LanguageString *msgs)
+	CommandReturn DoList(CommandSource &source, NewsType type, LanguageString *msgs)
 	{
 		int count = 0;
 
@@ -174,54 +174,54 @@ class NewsBase : public Command
 			if (News[i]->type == type)
 			{
 				if (!count)
-					u->SendMessage(OperServ, msgs[MSG_LIST_HEADER]);
-				u->SendMessage(OperServ, NEWS_LIST_ENTRY, News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
+					source.Reply(msgs[MSG_LIST_HEADER]);
+				source.Reply(NEWS_LIST_ENTRY, News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		if (!count)
-			u->SendMessage(OperServ, msgs[MSG_LIST_NONE]);
+			source.Reply(msgs[MSG_LIST_NONE]);
 		else
-			u->SendMessage(OperServ, END_OF_ANY_LIST, "News");
+			source.Reply(END_OF_ANY_LIST, "News");
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
 	{
-		Anope::string text = params.size() > 1 ? params[1] : "";
+		const Anope::string text = params.size() > 1 ? params[1] : "";
 		int n;
 
 		if (text.empty())
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source.u, "ADD");
 		else
 		{
 			if (readonly)
 			{
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 				return MOD_CONT;
 			}
-			n = add_newsitem(u, text, type);
+			n = add_newsitem(source, text, type);
 			if (n < 0)
-				u->SendMessage(OperServ, NEWS_ADD_FULL);
+				source.Reply(NEWS_ADD_FULL);
 			else
-				u->SendMessage(OperServ, msgs[MSG_ADDED], n);
+				source.Reply(msgs[MSG_ADDED], n);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
 	{
-		Anope::string text = params.size() > 1 ? params[1] : "";
+		const Anope::string &text = params.size() > 1 ? params[1] : "";
 		unsigned num;
 
 		if (text.empty())
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source.u, "DEL");
 		else
 		{
 			if (readonly)
 			{
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			if (!text.equals_ci("ALL"))
@@ -229,29 +229,29 @@ class NewsBase : public Command
 				num = text.is_pos_number_only() ? convertTo<unsigned>(text) : 0;
 				if (num > 0 && del_newsitem(num, type))
 				{
-					u->SendMessage(OperServ, msgs[MSG_DELETED], num);
+					source.Reply(msgs[MSG_DELETED], num);
 					for (unsigned i = 0, end = News.size(); i < end; ++i)
 						if (News[i]->type == type && News[i]->num > num)
 							--News[i]->num;
 				}
 				else
-					u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], num);
+					source.Reply(msgs[MSG_DEL_NOT_FOUND], num);
 			}
 			else
 			{
 				if (del_newsitem(0, type))
-					u->SendMessage(OperServ, msgs[MSG_DELETED_ALL]);
+					source.Reply(msgs[MSG_DELETED_ALL]);
 				else
-					u->SendMessage(OperServ, msgs[MSG_DEL_NONE]);
+					source.Reply(msgs[MSG_DEL_NONE]);
 			}
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoNews(User *u, const std::vector<Anope::string> &params, NewsType type)
+	CommandReturn DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType type)
 	{
-		Anope::string cmd = params[0];
+		const Anope::string &cmd = params[0];
 		Anope::string type_name;
 
 		LanguageString *msgs = findmsgs(type, type_name);
@@ -259,13 +259,13 @@ class NewsBase : public Command
 			throw CoreException("news: Invalid type to do_news()");
 
 		if (cmd.equals_ci("LIST"))
-			return this->DoList(u, type, msgs);
+			return this->DoList(source, type, msgs);
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params, type, msgs);
+			return this->DoAdd(source, params, type, msgs);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params, type, msgs);
+			return this->DoDel(source, params, type, msgs);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source.u, "");
 
 		return MOD_CONT;
 	}
@@ -278,7 +278,7 @@ class NewsBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, const std::vector<Anope::string> &params) = 0;
+	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
 	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
 
@@ -292,9 +292,9 @@ class CommandOSLogonNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoNews(u, params, NEWS_LOGON);
+		return this->DoNews(source, params, NEWS_LOGON);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -321,9 +321,9 @@ class CommandOSOperNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoNews(u, params, NEWS_OPER);
+		return this->DoNews(source, params, NEWS_OPER);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -350,9 +350,9 @@ class CommandOSRandomNews : public NewsBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoNews(u, params, NEWS_RANDOM);
+		return this->DoNews(source, params, NEWS_RANDOM);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)

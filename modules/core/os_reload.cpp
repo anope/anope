@@ -20,8 +20,10 @@ class CommandOSReload : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		try
 		{
 			ServerConfig *newconfig = new ServerConfig();

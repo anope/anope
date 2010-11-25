@@ -15,8 +15,10 @@
 
 class CommandCSMode : public Command
 {
-	void DoLock(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoLock(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
@@ -44,18 +46,18 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm || !cm->CanSet(u))
 						{
-							u->SendMessage(ChanServ, CHAN_MODE_LOCK_UNKNOWN, modes[i]);
+							source.Reply(CHAN_MODE_LOCK_UNKNOWN, modes[i]);
 							break;
 						}
 						Anope::string mode_param;
 						if (((cm->Type == MODE_STATUS || cm->Type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->Type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
-							u->SendMessage(ChanServ, CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
+							source.Reply(CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
 						else
 						{
 							ci->SetMLock(cm, adding, mode_param, u->nick); 
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
-							u->SendMessage(ChanServ, CHAN_MODE_LOCKED, adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+							source.Reply(CHAN_MODE_LOCKED, adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
 						}
 				}
 			}
@@ -87,22 +89,22 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm || !cm->CanSet(u))
 						{
-							u->SendMessage(ChanServ, CHAN_MODE_LOCK_UNKNOWN, modes[i]);
+							source.Reply(CHAN_MODE_LOCK_UNKNOWN, modes[i]);
 							break;
 						}
 						Anope::string mode_param;
 						if (!cm->Type == MODE_REGULAR && !sep.GetToken(mode_param))
-							u->SendMessage(ChanServ, CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
+							source.Reply(CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
 						else
 						{
 							if (ci->RemoveMLock(cm, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
-								u->SendMessage(ChanServ, CHAN_MODE_UNLOCKED, adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+								source.Reply(CHAN_MODE_UNLOCKED, adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
 							}
 							else
-								u->SendMessage(ChanServ, CHAN_MODE_NOT_LOCKED, cm->ModeChar, ci->name.c_str());
+								source.Reply(CHAN_MODE_NOT_LOCKED, cm->ModeChar, ci->name.c_str());
 						}
 				}
 			}
@@ -112,11 +114,11 @@ class CommandCSMode : public Command
 			const std::multimap<ChannelModeName, ModeLock> &mlocks = ci->GetMLock();
 			if (mlocks.empty())
 			{
-				u->SendMessage(ChanServ, CHAN_MODE_LOCK_NONE, ci->name.c_str());
+				source.Reply(CHAN_MODE_LOCK_NONE, ci->name.c_str());
 			}
 			else
 			{
-				u->SendMessage(ChanServ, CHAN_MODE_LOCK_HEADER, ci->name.c_str());
+				source.Reply(CHAN_MODE_LOCK_HEADER, ci->name.c_str());
 				for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
 					const ModeLock &ml = it->second;
@@ -130,7 +132,7 @@ class CommandCSMode : public Command
 					Anope::string setter = ml.setter;
 					if (setter.empty())
 						setter = ci->founder ? ci->founder->display : "Unknown";
-					u->SendMessage(ChanServ, CHAN_MODE_LIST_FMT, ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), setter.c_str(), do_strftime(ml.created).c_str());
+					source.Reply(CHAN_MODE_LIST_FMT, ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), setter.c_str(), do_strftime(ml.created).c_str());
 				}
 			}
 		}
@@ -138,8 +140,11 @@ class CommandCSMode : public Command
 			this->OnSyntaxError(u, subcommand);
 	}
 	
-	void DoSet(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void DoSet(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
@@ -252,20 +257,21 @@ class CommandCSMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &subcommand = params[1];
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (!ci || !ci->c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!check_access(u, ci, CA_MODE) && !u->Account()->HasCommand("chanserv/mode"))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
-			this->DoLock(u, ci, params);
+			this->DoLock(source, params);
 		else if (subcommand.equals_ci("SET"))
-			this->DoSet(u, ci, params);
+			this->DoSet(source, params);
 		else
 			this->OnSyntaxError(u, "");
 

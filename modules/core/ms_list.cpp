@@ -15,12 +15,12 @@
 
 class MemoListCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	ChannelInfo *ci;
 	const MemoInfo *mi;
 	bool SentHeader;
  public:
-	MemoListCallback(User *_u, ChannelInfo *_ci, const MemoInfo *_mi, const Anope::string &list) : NumberList(list, false), u(_u), ci(_ci), mi(_mi), SentHeader(false)
+	MemoListCallback(CommandSource &_source, ChannelInfo *_ci, const MemoInfo *_mi, const Anope::string &list) : NumberList(list, false), source(_source), ci(_ci), mi(_mi), SentHeader(false)
 	{
 	}
 
@@ -33,20 +33,20 @@ class MemoListCallback : public NumberList
 		{
 			SentHeader = true;
 			if (ci)
-				u->SendMessage(MemoServ, MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+				source.Reply(MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 			else
-				u->SendMessage(MemoServ, MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
+				source.Reply(MEMO_LIST_MEMOS, source.u->nick.c_str(), Config->s_MemoServ.c_str());
 
-			u->SendMessage(MemoServ, MEMO_LIST_HEADER);
+			source.Reply(MEMO_LIST_HEADER);
 		}
 
-		DoList(u, ci, mi, Number - 1);
+		DoList(source, mi, Number - 1);
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, const MemoInfo *mi, unsigned index)
+	static void DoList(CommandSource &source, const MemoInfo *mi, unsigned index)
 	{
 		Memo *m = mi->memos[index];
-		u->SendMessage(MemoServ, MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
+		source.Reply(MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
 	}
 };
 
@@ -57,8 +57,10 @@ class CommandMSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		Anope::string param = !params.empty() ? params[0] : "", chan;
 		ChannelInfo *ci = NULL;
 		const MemoInfo *mi;
@@ -71,12 +73,12 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				u->SendMessage(MemoServ, CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				u->SendMessage(MemoServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -88,15 +90,15 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				u->SendMessage(MemoServ, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				u->SendMessage(MemoServ, MEMO_HAVE_NO_MEMOS);
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
 			if (!param.empty() && isdigit(param[0]))
 			{
-				MemoListCallback list(u, ci, mi, param);
+				MemoListCallback list(source, ci, mi, param);
 				list.Process();
 			}
 			else
@@ -109,9 +111,9 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							u->SendMessage(MemoServ, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
-							u->SendMessage(MemoServ, MEMO_HAVE_NO_NEW_MEMOS);
+							source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
 						return MOD_CONT;
 					}
 				}
@@ -127,13 +129,13 @@ class CommandMSList : public Command
 					{
 						SentHeader = true;
 						if (ci)
-							u->SendMessage(MemoServ, !param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+							source.Reply(!param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 						else
-							u->SendMessage(MemoServ, !param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
-						u->SendMessage(MemoServ, MEMO_LIST_HEADER);
+							source.Reply(!param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
+						source.Reply(MEMO_LIST_HEADER);
 					}
 
-					MemoListCallback::DoList(u, ci, mi, i);
+					MemoListCallback::DoList(source, mi, i);
 				}
 			}
 		}

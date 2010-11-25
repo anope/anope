@@ -15,10 +15,10 @@
 
 class MemoListCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	MemoInfo *mi;
  public:
-	MemoListCallback(User *_u, MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), u(_u), mi(_mi)
+	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi)
 	{
 	}
 
@@ -27,11 +27,12 @@ class MemoListCallback : public NumberList
 		if (!Number || Number > mi->memos.size())
 			return;
 
-		MemoListCallback::DoRead(u, mi, NULL, Number - 1);
+		MemoListCallback::DoRead(source, mi, NULL, Number - 1);
 	}
 
-	static void DoRead(User *u, MemoInfo *mi, ChannelInfo *ci, unsigned index)
+	static void DoRead(CommandSource &source, MemoInfo *mi, ChannelInfo *ci, unsigned index)
 	{
+		User *u = source.u;
 		Memo *m = mi->memos[index];
 		if (ci)
 			u->SendMessage(MemoServ, MEMO_CHAN_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
@@ -53,8 +54,10 @@ class CommandMSRead : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
@@ -67,12 +70,12 @@ class CommandMSRead : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				u->SendMessage(MemoServ, CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				u->SendMessage(MemoServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -85,9 +88,9 @@ class CommandMSRead : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				u->SendMessage(MemoServ, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				u->SendMessage(MemoServ, MEMO_HAVE_NO_MEMOS);
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else {
 			int i, end;
@@ -98,25 +101,25 @@ class CommandMSRead : public Command
 				for (i = 0, end = mi->memos.size(); i < end; ++i)
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 					{
-						MemoListCallback::DoRead(u, mi, ci, i);
+						MemoListCallback::DoRead(source, mi, ci, i);
 						++readcount;
 					}
 				if (!readcount)
 				{
 					if (!chan.empty())
-						u->SendMessage(MemoServ, MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+						source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
-						u->SendMessage(MemoServ, MEMO_HAVE_NO_NEW_MEMOS);
+						source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
 			else if (numstr.equals_ci("LAST"))
 			{
 				for (i = 0, end = mi->memos.size() - 1; i < end; ++i);
-				MemoListCallback::DoRead(u, mi, ci, i);
+				MemoListCallback::DoRead(source, mi, ci, i);
 			}
 			else /* number[s] */
 			{
-				MemoListCallback list(u, mi, numstr);
+				MemoListCallback list(source, mi, numstr);
 				list.Process();
 			}
 		}

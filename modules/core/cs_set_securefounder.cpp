@@ -20,27 +20,28 @@ class CommandCSSetSecureFounder : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetSecureFounder");
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREFOUNDER);
-			u->SendMessage(ChanServ, CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREFOUNDER);
-			u->SendMessage(ChanServ, CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREFOUNDER");

@@ -15,11 +15,11 @@
 
 class MemoDelCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	ChannelInfo *ci;
 	MemoInfo *mi;
  public:
-	MemoDelCallback(User *_u, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), mi(_mi)
+	MemoDelCallback(CommandSource &_source, ChannelInfo *_ci, MemoInfo *_mi, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), mi(_mi)
 	{
 	}
 
@@ -31,10 +31,10 @@ class MemoDelCallback : public NumberList
 		if (ci)
 			FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[Number - 1]));
 		else
-			FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[Number - 1]));
+			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.u->Account(), mi, mi->memos[Number - 1]));
 
 		mi->Del(Number - 1);
-		u->SendMessage(MemoServ, MEMO_DELETED_ONE, Number);
+		source.Reply(MEMO_DELETED_ONE, Number);
 	}
 };
 
@@ -45,12 +45,13 @@ class CommandMSDel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
 		Anope::string numstr = !params.empty() ? params[0] : "", chan;
-		unsigned i, end;
 
 		if (!numstr.empty() && numstr[0] == '#')
 		{
@@ -59,17 +60,17 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				u->SendMessage(MemoServ, CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
 			{
-				u->SendMessage(MemoServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				u->SendMessage(MemoServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -81,15 +82,15 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				u->SendMessage(MemoServ, MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				u->SendMessage(MemoServ, MEMO_HAVE_NO_MEMOS);
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
 			if (isdigit(numstr[0]))
 			{
-				MemoDelCallback list(u, ci, mi, numstr);
+				MemoDelCallback list(source, ci, mi, numstr);
 				list.Process();
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -100,7 +101,7 @@ class CommandMSDel : public Command
 				else
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[mi->memos.size() - 1]));
 				mi->Del(mi->memos[mi->memos.size() - 1]);
-				u->SendMessage(MemoServ, MEMO_DELETED_ONE, mi->memos.size() + 1);
+				source.Reply(MEMO_DELETED_ONE, mi->memos.size() + 1);
 			}
 			else
 			{
@@ -109,13 +110,13 @@ class CommandMSDel : public Command
 				else
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, NULL));
 				/* Delete all memos. */
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
+				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
 					delete mi->memos[i];
 				mi->memos.clear();
 				if (!chan.empty())
-					u->SendMessage(MemoServ, MEMO_CHAN_DELETED_ALL, chan.c_str());
+					source.Reply(MEMO_CHAN_DELETED_ALL, chan.c_str());
 				else
-					u->SendMessage(MemoServ, MEMO_DELETED_ALL);
+					source.Reply(MEMO_DELETED_ALL);
 			}
 		}
 		return MOD_CONT;

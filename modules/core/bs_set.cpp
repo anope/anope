@@ -21,47 +21,45 @@ class CommandBSSet : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string option = params[1];
-		Anope::string value = params[2];
+		const Anope::string &chan = params[0];
+		const Anope::string &option = params[1];
+		const Anope::string &value = params[2];
+
+		User *u = source.u;
 		ChannelInfo *ci;
 
 		if (readonly)
-		{
-			u->SendMessage(BotServ, BOT_SET_DISABLED);
-			return MOD_CONT;
-		}
-
-		if (u->Account()->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
+			source.Reply(BOT_SET_DISABLED);
+		else if (u->Account()->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
 		{
 			BotInfo *bi;
 
 			if (!(bi = findbot(chan)))
 			{
-				u->SendMessage(BotServ, BOT_DOES_NOT_EXIST, chan.c_str());
+				source.Reply(BOT_DOES_NOT_EXIST, chan.c_str());
 				return MOD_CONT;
 			}
 
 			if (value.equals_ci("ON"))
 			{
 				bi->SetFlag(BI_PRIVATE);
-				u->SendMessage(BotServ, BOT_SET_PRIVATE_ON, bi->nick.c_str());
+				source.Reply(BOT_SET_PRIVATE_ON, bi->nick.c_str());
 			}
 			else if (value.equals_ci("OFF"))
 			{
 				bi->UnsetFlag(BI_PRIVATE);
-				u->SendMessage(BotServ, BOT_SET_PRIVATE_OFF, bi->nick.c_str());
+				source.Reply(BOT_SET_PRIVATE_OFF, bi->nick.c_str());
 			}
 			else
 				SyntaxError(BotServ, u, "SET PRIVATE", BOT_SET_PRIVATE_SYNTAX);
 			return MOD_CONT;
 		}
 		else if (!(ci = cs_findchan(chan)))
-			u->SendMessage(BotServ, CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -72,12 +70,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_DONTKICKOPS);
-					u->SendMessage(BotServ, BOT_SET_DONTKICKOPS_ON, ci->name.c_str());
+					source.Reply(BOT_SET_DONTKICKOPS_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_DONTKICKOPS);
-					u->SendMessage(BotServ, BOT_SET_DONTKICKOPS_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_DONTKICKOPS_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET DONTKICKOPS", BOT_SET_DONTKICKOPS_SYNTAX);
@@ -87,12 +85,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_DONTKICKVOICES);
-					u->SendMessage(BotServ, BOT_SET_DONTKICKVOICES_ON, ci->name.c_str());
+					source.Reply(BOT_SET_DONTKICKVOICES_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_DONTKICKVOICES);
-					u->SendMessage(BotServ, BOT_SET_DONTKICKVOICES_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_DONTKICKVOICES_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET DONTKICKVOICES", BOT_SET_DONTKICKVOICES_SYNTAX);
@@ -102,12 +100,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_FANTASY);
-					u->SendMessage(BotServ, BOT_SET_FANTASY_ON, ci->name.c_str());
+					source.Reply(BOT_SET_FANTASY_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_FANTASY);
-					u->SendMessage(BotServ, BOT_SET_FANTASY_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_FANTASY_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET FANTASY", BOT_SET_FANTASY_SYNTAX);
@@ -117,12 +115,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_GREET);
-					u->SendMessage(BotServ, BOT_SET_GREET_ON, ci->name.c_str());
+					source.Reply(BOT_SET_GREET_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_GREET);
-					u->SendMessage(BotServ, BOT_SET_GREET_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_GREET_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET GREET", BOT_SET_GREET_SYNTAX);
@@ -134,12 +132,12 @@ class CommandBSSet : public Command
 					ci->botflags.SetFlag(BS_NOBOT);
 					if (ci->bi)
 						ci->bi->UnAssign(u, ci);
-					u->SendMessage(BotServ, BOT_SET_NOBOT_ON, ci->name.c_str());
+					source.Reply(BOT_SET_NOBOT_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_NOBOT);
-					u->SendMessage(BotServ, BOT_SET_NOBOT_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_NOBOT_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET NOBOT", BOT_SET_NOBOT_SYNTAX);
@@ -149,19 +147,20 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_SYMBIOSIS);
-					u->SendMessage(BotServ, BOT_SET_SYMBIOSIS_ON, ci->name.c_str());
+					source.Reply(BOT_SET_SYMBIOSIS_ON, ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_SYMBIOSIS);
-					u->SendMessage(BotServ, BOT_SET_SYMBIOSIS_OFF, ci->name.c_str());
+					source.Reply(BOT_SET_SYMBIOSIS_OFF, ci->name.c_str());
 				}
 				else
 					SyntaxError(BotServ, u, "SET SYMBIOSIS", BOT_SET_SYMBIOSIS_SYNTAX);
 			}
 			else
-				u->SendMessage(BotServ, BOT_SET_UNKNOWN, option.c_str());
+				source.Reply(BOT_SET_UNKNOWN, option.c_str());
 		}
+
 		return MOD_CONT;
 	}
 

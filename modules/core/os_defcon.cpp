@@ -59,14 +59,15 @@ class CommandOSDefcon : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string lvl = params[0];
+		User *u = source.u;
+		const Anope::string &lvl = params[0];
 		int newLevel = 0;
 
 		if (lvl.empty())
 		{
-			u->SendMessage(OperServ, OPER_DEFCON_CHANGED, Config->DefConLevel);
+			source.Reply(OPER_DEFCON_CHANGED, Config->DefConLevel);
 			defcon_sendlvls(u);
 			return MOD_CONT;
 		}
@@ -210,7 +211,7 @@ class OSDefcon : public Module
 		if (!is_oper(u) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-				u->SendMessage(bi, OPER_DEFCON_DENIED);
+				u->SendMessage(OperServ, OPER_DEFCON_DENIED);
 
 			return EVENT_STOP;
 		}
@@ -226,7 +227,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_NICKS))
 				{
-					u->SendMessage(NickServ, OPER_DEFCON_DENIED);
+					u->SendMessage(service, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -237,7 +238,7 @@ class OSDefcon : public Module
 			{
 				if (!params.empty() && params[0].equals_ci("MLOCK") && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					u->SendMessage(ChanServ, OPER_DEFCON_DENIED);
+					u->SendMessage(service, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -245,7 +246,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
 				{
-					u->SendMessage(ChanServ, OPER_DEFCON_DENIED);
+					u->SendMessage(service, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -256,7 +257,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
 				{
-					u->SendMessage(MemoServ, OPER_DEFCON_DENIED);
+					u->SendMessage(service, OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}

@@ -380,12 +380,11 @@ class CoreExport Module : public Extensible
 	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
-	 * @param u The user executing the command
-	 * @param service The service the command is associated with
+	 * @param source The source of the command
 	 * @param command The command the user executed
 	 * @param params The parameters the user sent
 	 */
-	virtual void OnPostCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params) { }
+	virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { }
 
 	/** Called after the core has finished loading the databases, but before
 	 * we connect to the server

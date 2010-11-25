@@ -9,6 +9,7 @@ Legend:
 [x] Allow users to delete their own access
 [x] ChanServ CLONE command
 [x] XMLRPC to execute commands and get data from Anope
+[+] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 
 Future
 ------
@@ -21,7 +22,6 @@ Future
 [ ] Allow channel founders to change the fantasy trigger for their channel.
 [ ] CIDR Akills, session exceptions, etc
 [?] Language charset stuff, including collation (1.9.1? phoenix?)
-[ ] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN

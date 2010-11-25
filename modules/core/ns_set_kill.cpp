@@ -20,8 +20,9 @@ class CommandNSSetKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetKill");
@@ -35,14 +36,14 @@ class CommandNSSetKill : public Command
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			u->SendMessage(NickServ, NICK_SASET_KILL_ON, nc->display.c_str());
+			source.Reply(NICK_SASET_KILL_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("QUICK"))
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->SetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			u->SendMessage(NickServ, NICK_SASET_KILL_QUICK, nc->display.c_str());
+			source.Reply(NICK_SASET_KILL_QUICK, nc->display.c_str());
 		}
 		else if (param.equals_ci("IMMED"))
 		{
@@ -51,17 +52,17 @@ class CommandNSSetKill : public Command
 				nc->SetFlag(NI_KILLPROTECT);
 				nc->SetFlag(NI_KILL_IMMED);
 				nc->UnsetFlag(NI_KILL_QUICK);
-				u->SendMessage(NickServ, NICK_SASET_KILL_IMMED, nc->display.c_str());
+				source.Reply(NICK_SASET_KILL_IMMED, nc->display.c_str());
 			}
 			else
-				u->SendMessage(NickServ, NICK_SET_KILL_IMMED_DISABLED);
+				source.Reply(NICK_SET_KILL_IMMED_DISABLED);
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			u->SendMessage(NickServ, NICK_SASET_KILL_OFF, nc->display.c_str());
+			source.Reply(NICK_SASET_KILL_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "KILL");

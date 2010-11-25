@@ -20,15 +20,16 @@ class CommandHSOn : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			if (!na->hostinfo.GetIdent().empty())
-				u->SendMessage(HostServ, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				u->SendMessage(HostServ, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+				source.Reply(HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
 			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->hostinfo.GetIdent().empty() ? na->hostinfo.GetIdent() + "@" : "") << na->hostinfo.GetHost();
 			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
@@ -41,7 +42,7 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			u->SendMessage(HostServ, HOST_NOT_ASSIGNED);
+			source.Reply(HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}

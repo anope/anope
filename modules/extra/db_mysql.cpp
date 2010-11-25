@@ -311,7 +311,7 @@ class CommandSQLSync : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params);
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params);
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
 	{
@@ -979,14 +979,18 @@ class DBMySQL : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
+	void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+		BotInfo *service = command->service;
+		ChannelInfo *ci = source.ci;
+
 		if (service == NickServ)
 		{
-			if (u->Account() && ((command.equals_ci("SET") && !params.empty()) || (command.equals_ci("SASET") && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
+			if (u->Account() && ((command->name.equals_ci("SET") && !params.empty()) || (command->name.equals_ci("SASET") && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
-				Anope::string cmd = (command == "SET" ? params[0] : params[1]);
-				NickCore *nc = (command == "SET" ? u->Account() : findcore(params[0]));
+				Anope::string cmd = (command->name.equals_ci("SET") ? params[0] : params[1]);
+				NickCore *nc = (command->name.equals_ci("SET") ? u->Account() : findcore(params[0]));
 				if (!nc)
 					return;
 				if (cmd.equals_ci("PASSWORD") && params.size() > 1)
@@ -1013,9 +1017,8 @@ class DBMySQL : public Module
 		}
 		else if (service == ChanServ)
 		{
-			if (command.equals_ci("SET") && u->Account() && params.size() > 1)
+			if (command->name.equals_ci("SET") && u->Account() && params.size() > 1)
 			{
-				ChannelInfo *ci = cs_findchan(params[0]);
 				if (!ci)
 					return;
 				if (!u->Account()->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
@@ -1051,9 +1054,8 @@ class DBMySQL : public Module
 		}
 		else if (service == BotServ)
 		{
-			if (command.equals_ci("KICK") && params.size() > 2)
+			if (command->name.equals_ci("KICK") && params.size() > 2)
 			{
-				ChannelInfo *ci = cs_findchan(params[0]);
 				if (!ci)
 					return;
 				if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
@@ -1083,9 +1085,8 @@ class DBMySQL : public Module
 					}
 				}
 			}
-			else if (command.equals_ci("SET") && params.size() > 2)
+			else if (command->name.equals_ci("SET") && params.size() > 2)
 			{
-				ChannelInfo *ci = cs_findchan(params[0]);
 				if (ci && !check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
 					return;
 				BotInfo *bi = NULL;
@@ -1105,11 +1106,11 @@ class DBMySQL : public Module
 		}
 		else if (service == MemoServ)
 		{
-			if (command.equals_ci("IGNORE") && params.size() > 0)
+			if (command->name.equals_ci("IGNORE") && params.size() > 0)
 			{
 				Anope::string target = params[0];
 				NickCore *nc = NULL;
-				ChannelInfo *ci = NULL;
+				ci = NULL;
 				if (target[0] != '#')
 				{
 					target = u->nick;
@@ -1609,8 +1610,9 @@ static void SaveDatabases()
 		me->OnExceptionAdd(NULL, exceptions[i]);
 }
 
-CommandReturn CommandSQLSync::Execute(User *u, const std::vector<Anope::string> &params)
+CommandReturn CommandSQLSync::Execute(CommandSource &source, const std::vector<Anope::string> &params)
 {
+	User *u = source.u;
 	SaveDatabases();
 	u->SendMessage(OperServ, OPER_SYNC_UPDATED);
 	return MOD_CONT;

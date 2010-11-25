@@ -13,33 +13,53 @@
 
 #include "module.h"
 
-static int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, User *u);
 
 class CommandOSModInfo : public Command
 {
+	int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, CommandSource &source)
+	{
+		if (!bi)
+			return 0;
+
+		int display = 0;
+
+		for (CommandMap::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
+		{
+			Command *c = it->second;
+
+			if (c->module && c->module->name.equals_ci(mod_name) && c->service)
+			{
+				source.Reply(OPER_MODULE_CMD_LIST, c->service->nick.c_str(), c->name.c_str());
+				++display;
+			}
+		}
+
+		return display;
+	}
+
  public:
 	CommandOSModInfo() : Command("MODINFO", 1, 1)
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string file = params[0];
+		const Anope::string &file = params[0];
 
 		Module *m = FindModule(file);
 		if (m)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
+			source.Reply(OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
 
-			showModuleCmdLoaded(HostServ, m->name, u);
-			showModuleCmdLoaded(OperServ, m->name, u);
-			showModuleCmdLoaded(NickServ, m->name, u);
-			showModuleCmdLoaded(ChanServ, m->name, u);
-			showModuleCmdLoaded(BotServ, m->name, u);
-			showModuleCmdLoaded(MemoServ, m->name, u);
+			showModuleCmdLoaded(HostServ, m->name, source);
+			showModuleCmdLoaded(OperServ, m->name, source);
+			showModuleCmdLoaded(NickServ, m->name, source);
+			showModuleCmdLoaded(ChanServ, m->name, source);
+			showModuleCmdLoaded(BotServ, m->name, source);
+			showModuleCmdLoaded(MemoServ, m->name, source);
 		}
 		else
-			u->SendMessage(OperServ, OPER_MODULE_NO_INFO, file.c_str());
+			source.Reply(OPER_MODULE_NO_INFO, file.c_str());
 
 		return MOD_CONT;
 	}
@@ -74,25 +94,5 @@ class OSModInfo : public Module
 		this->AddCommand(OperServ, &commandosmodinfo);
 	}
 };
-
-static int showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, User *u)
-{
-	if (!bi)
-		return 0;
-
-	int display = 0;
-
-	for (CommandMap::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
-	{
-		Command *c = it->second;
-
-		if (c->module && c->module->name.equals_ci(mod_name) && c->service)
-		{
-			u->SendMessage(OperServ, OPER_MODULE_CMD_LIST, c->service->nick.c_str(), c->name.c_str());
-			++display;
-		}
-	}
-	return display;
-}
 
 MODULE_INIT(OSModInfo)

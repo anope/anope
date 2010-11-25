@@ -21,32 +21,33 @@ class CommandCSRegister : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string desc = params[1];
-		Channel *c = findchan(chan);
-		ChannelInfo *ci;
-		ChannelMode *cm;
+		const Anope::string &chan = params[0];
+		const Anope::string &desc = params[1];
+
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, CHAN_REGISTER_DISABLED);
+			source.Reply(CHAN_REGISTER_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (chan[0] == '&')
-			u->SendMessage(ChanServ, CHAN_REGISTER_NOT_LOCAL);
+			source.Reply(CHAN_REGISTER_NOT_LOCAL);
 		else if (chan[0] != '#')
-			u->SendMessage(ChanServ, CHAN_SYMBOL_REQUIRED);
+			source.Reply(CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			u->SendMessage(ChanServ, CHAN_X_INVALID, chan.c_str());
+			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else if ((ci = cs_findchan(chan)))
-			u->SendMessage(ChanServ, CHAN_ALREADY_REGISTERED, chan.c_str());
+			source.Reply(CHAN_ALREADY_REGISTERED, chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
-			u->SendMessage(ChanServ, CHAN_MUST_BE_CHANOP);
+			source.Reply(CHAN_MUST_BE_CHANOP);
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
-			u->SendMessage(ChanServ, u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);
@@ -65,13 +66,14 @@ class CommandCSRegister : public Command
 			ci->bi = NULL;
 			++ci->founder->channelcount;
 			Log(LOG_COMMAND, u, this, ci);
-			u->SendMessage(ChanServ, CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
+			source.Reply(CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
 
 			/* Implement new mode lock */
 			if (c)
 			{
 				check_modes(c);
 
+				ChannelMode *cm;
 				if (u->FindChannel(c) != NULL)
 				{
 					/* On most ircds you do not receive the admin/owner mode till its registered */

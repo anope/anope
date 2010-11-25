@@ -16,21 +16,21 @@
 
 class SNLineDelCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	unsigned Deleted;
  public:
-	SNLineDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	SNLineDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
 	{
 	}
 
 	~SNLineDelCallback()
 	{
 		if (!Deleted)
-			u->SendMessage(OperServ, OPER_SNLINE_NO_MATCH);
+			source.Reply(OPER_SNLINE_NO_MATCH);
 		else if (Deleted == 1)
-			u->SendMessage(OperServ, OPER_SNLINE_DELETED_ONE);
+			source.Reply(OPER_SNLINE_DELETED_ONE);
 		else
-			u->SendMessage(OperServ, OPER_SNLINE_DELETED_SEVERAL, Deleted);
+			source.Reply(OPER_SNLINE_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -44,10 +44,10 @@ class SNLineDelCallback : public NumberList
 			return;
 
 		++Deleted;
-		DoDel(u, x);
+		DoDel(source, x);
 	}
 
-	static void DoDel(User *u, XLine *x)
+	static void DoDel(CommandSource &source, XLine *x)
 	{
 		SNLine->DelXLine(x);
 	}
@@ -56,17 +56,17 @@ class SNLineDelCallback : public NumberList
 class SNLineListCallback : public NumberList
 {
  protected:
-	User *u;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	SNLineListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	SNLineListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
 	{
 	}
 
 	~SNLineListCallback()
 	{
 		if (!SentHeader)
-			u->SendMessage(OperServ, OPER_SNLINE_NO_MATCH);
+			source.Reply(OPER_SNLINE_NO_MATCH);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -82,22 +82,22 @@ class SNLineListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_SNLINE_LIST_HEADER);
+			source.Reply(OPER_SNLINE_LIST_HEADER);
 		}
 
-		DoList(u, x, Number - 1);
+		DoList(source, x, Number - 1);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		u->SendMessage(OperServ, OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
 class SNLineViewCallback : public SNLineListCallback
 {
  public:
-	SNLineViewCallback(User *_u, const Anope::string &numlist) : SNLineListCallback(_u, numlist)
+	SNLineViewCallback(CommandSource &_source, const Anope::string &numlist) : SNLineListCallback(_source, numlist)
 	{
 	}
 
@@ -114,24 +114,25 @@ class SNLineViewCallback : public SNLineListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_SNLINE_VIEW_HEADER);
+			source.Reply(OPER_SNLINE_VIEW_HEADER);
 		}
 
-		DoList(u, x, Number - 1);
+		DoList(source, x, Number - 1);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
-		u->SendMessage(OperServ, OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
+		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
+		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSSNLine : public Command
 {
  private:
-	CommandReturn OnAdd(User *u, const std::vector<Anope::string> &params)
+	CommandReturn OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		unsigned last_param = 2;
 		Anope::string param, expiry;
 		time_t expires;
@@ -153,7 +154,7 @@ class CommandOSSNLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
+			source.Reply(BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -196,7 +197,7 @@ class CommandOSSNLine : public Command
 
 			if (percent > 95)
 			{
-				u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to SNLine " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -206,7 +207,7 @@ class CommandOSSNLine : public Command
 			if (!x)
 				return MOD_CONT;
 
-			u->SendMessage(OperServ, OPER_SNLINE_ADDED, mask.c_str());
+			source.Reply(OPER_SNLINE_ADDED, mask.c_str());
 
 			if (Config->WallOSSNLine)
 			{
@@ -242,7 +243,7 @@ class CommandOSSNLine : public Command
 			}
 
 			if (readonly)
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 
 		}
 		else
@@ -251,15 +252,17 @@ class CommandOSSNLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn OnDel(User *u, const std::vector<Anope::string> &params)
+	CommandReturn OnDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		if (SNLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SNLINE_LIST_EMPTY);
+			source.Reply(OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
@@ -269,7 +272,7 @@ class CommandOSSNLine : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineDelCallback list(u, mask);
+			SNLineDelCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -278,35 +281,35 @@ class CommandOSSNLine : public Command
 
 			if (!x)
 			{
-				u->SendMessage(OperServ, OPER_SNLINE_NOT_FOUND, mask.c_str());
+				source.Reply(OPER_SNLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SNLINE));
 
-			SNLineDelCallback::DoDel(u, x);
-			u->SendMessage(OperServ, OPER_SNLINE_DELETED, mask.c_str());
+			SNLineDelCallback::DoDel(source, x);
+			source.Reply(OPER_SNLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			u->SendMessage(OperServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn OnList(User *u, const std::vector<Anope::string> &params)
+	CommandReturn OnList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SNLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SNLINE_LIST_EMPTY);
+			source.Reply(OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineListCallback list(u, mask);
+			SNLineListCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -322,35 +325,35 @@ class CommandOSSNLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_SNLINE_LIST_HEADER);
+						source.Reply(OPER_SNLINE_LIST_HEADER);
 					}
 
-					SNLineListCallback::DoList(u, x, i);
+					SNLineListCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_SNLINE_NO_MATCH);
+				source.Reply(OPER_SNLINE_NO_MATCH);
 			else
-				u->SendMessage(OperServ, END_OF_ANY_LIST, "SNLine");
+				source.Reply(END_OF_ANY_LIST, "SNLine");
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn OnView(User *u, const std::vector<Anope::string> &params)
+	CommandReturn OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SNLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SNLINE_LIST_EMPTY);
+			source.Reply(OPER_SNLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SNLineViewCallback list(u, mask);
+			SNLineViewCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -366,25 +369,26 @@ class CommandOSSNLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_SNLINE_VIEW_HEADER);
+						source.Reply(OPER_SNLINE_VIEW_HEADER);
 					}
 
-					SNLineViewCallback::DoList(u, x, i);
+					SNLineViewCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_SNLINE_NO_MATCH);
+				source.Reply(OPER_SNLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn OnClear(User *u)
+	CommandReturn OnClear(CommandSource &source)
 	{
+		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SNLINE));
 		SNLine->Clear();
-		u->SendMessage(OperServ, OPER_SNLINE_CLEAR);
+		source.Reply(OPER_SNLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -393,22 +397,24 @@ class CommandOSSNLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
-			return this->OnAdd(u, params);
+			return this->OnAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			return this->OnDel(u, params);
+			return this->OnDel(source, params);
 		else if (cmd.equals_ci("LIST"))
-			return this->OnList(u, params);
+			return this->OnList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->OnView(u, params);
+			return this->OnView(source, params);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->OnClear(u);
+			return this->OnClear(source);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 

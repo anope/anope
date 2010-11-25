@@ -20,8 +20,9 @@ class CommandOSChanKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string expiry, channel;
 		time_t expires;
 		unsigned last_param = 1;
@@ -40,7 +41,7 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
+			source.Reply(BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -79,7 +80,7 @@ class CommandOSChanKill : public Command
 					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel.c_str(), realreason.c_str());
 			}
 			else
-				u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, channel.c_str());
+				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
 		}
 		return MOD_CONT;
 	}

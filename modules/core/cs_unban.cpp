@@ -20,39 +20,40 @@ class CommandCSUnban : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Channel *c;
-		User *u2;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 
-		if (!(c = findchan(chan)))
+		if (!c)
 		{
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 			return MOD_CONT;
 		}
 
-		if (!check_access(u, c->ci, CA_UNBAN))
+		if (!check_access(u, ci, CA_UNBAN))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
-		u2 = u;
+		User *u2 = u;
 		if (params.size() > 1)
 			u2 = finduser(params[1]);
 
 		if (!u2)
 		{
-			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, params[1].c_str());
+			source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
 			return MOD_CONT;
 		}
 
-		common_unban(c->ci, u2->nick);
+		common_unban(ci, u2->nick);
 		if (u2 == u)
-			u->SendMessage(ChanServ, CHAN_UNBANNED, c->name.c_str());
+			source.Reply(CHAN_UNBANNED, c->name.c_str());
 		else
-			u->SendMessage(ChanServ, CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
+			source.Reply(CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
+
 		return MOD_CONT;
 	}
 

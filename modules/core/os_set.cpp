@@ -16,27 +16,28 @@
 class CommandOSSet : public Command
 {
  private:
-	CommandReturn DoList(User *u)
+	CommandReturn DoList(CommandSource &source)
 	{
-		Log(LOG_ADMIN, u, this);
+		Log(LOG_ADMIN, source.u, this);
 
 		LanguageString index;
 
 		index = allow_ignore ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		u->SendMessage(OperServ, index, "IGNORE");
+		source.Reply(index, "IGNORE");
 		index = readonly ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		u->SendMessage(OperServ, index, "READONLY");
+		source.Reply(index, "READONLY");
 		index = debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		u->SendMessage(OperServ, index, "DEBUG");
+		source.Reply(index, "DEBUG");
 		index = noexpire ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		u->SendMessage(OperServ, index, "NOEXPIRE");
+		source.Reply(index, "NOEXPIRE");
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetIgnore(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoSetIgnore(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string setting = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
 		{
@@ -46,25 +47,26 @@ class CommandOSSet : public Command
 
 		if (setting.equals_ci("ON"))
 		{
-			Log(LOG_ADMIN, u, this) << "IGNORE ON";
+			Log(LOG_ADMIN, u, this) << "ON";
 			allow_ignore = 1;
-			u->SendMessage(OperServ, OPER_SET_IGNORE_ON);
+			source.Reply(OPER_SET_IGNORE_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
-			Log(LOG_ADMIN, u, this) << "IGNORE OFF";
+			Log(LOG_ADMIN, u, this) << "OFF";
 			allow_ignore = 0;
-			u->SendMessage(OperServ, OPER_SET_IGNORE_OFF);
+			source.Reply(OPER_SET_IGNORE_OFF);
 		}
 		else
-			u->SendMessage(OperServ, OPER_SET_IGNORE_ERROR);
+			source.Reply(OPER_SET_IGNORE_ERROR);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetReadOnly(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string setting = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
 		{
@@ -76,23 +78,24 @@ class CommandOSSet : public Command
 		{
 			readonly = true;
 			Log(LOG_ADMIN, u, this) << "READONLY ON";
-			u->SendMessage(OperServ, OPER_SET_READONLY_ON);
+			source.Reply(OPER_SET_READONLY_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			readonly = false;
 			Log(LOG_ADMIN, u, this) << "READONLY OFF";
-			u->SendMessage(OperServ, OPER_SET_READONLY_OFF);
+			source.Reply(OPER_SET_READONLY_OFF);
 		}
 		else
-			u->SendMessage(OperServ, OPER_SET_READONLY_ERROR);
+			source.Reply(OPER_SET_READONLY_ERROR);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetSuperAdmin(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string setting = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
 		{
@@ -106,30 +109,31 @@ class CommandOSSet : public Command
 		 * Rob
 		 **/
 		if (!Config->SuperAdmin)
-			u->SendMessage(OperServ, OPER_SUPER_ADMIN_NOT_ENABLED);
+			source.Reply(OPER_SUPER_ADMIN_NOT_ENABLED);
 		else if (setting.equals_ci("ON"))
 		{
 			u->isSuperAdmin = 1;
-			u->SendMessage(OperServ, OPER_SUPER_ADMIN_ON);
+			source.Reply(OPER_SUPER_ADMIN_ON);
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
 			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_ON).c_str(), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			u->isSuperAdmin = 0;
-			u->SendMessage(OperServ, OPER_SUPER_ADMIN_OFF);
+			source.Reply(OPER_SUPER_ADMIN_OFF);
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
 			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_OFF).c_str(), u->nick.c_str());
 		}
 		else
-			u->SendMessage(OperServ, OPER_SUPER_ADMIN_SYNTAX);
+			source.Reply(OPER_SUPER_ADMIN_SYNTAX);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetDebug(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string setting = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
 		{
@@ -141,29 +145,30 @@ class CommandOSSet : public Command
 		{
 			debug = 1;
 			Log(LOG_ADMIN, u, this) << "DEBUG ON";
-			u->SendMessage(OperServ, OPER_SET_DEBUG_ON);
+			source.Reply(OPER_SET_DEBUG_ON);
 		}
 		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
 		{
 			Log(LOG_ADMIN, u, this) << "DEBUG OFF";
 			debug = 0;
-			u->SendMessage(OperServ, OPER_SET_DEBUG_OFF);
+			source.Reply(OPER_SET_DEBUG_OFF);
 		}
 		else if (setting.is_number_only() && convertTo<int>(setting) > 0)
 		{
 			debug = convertTo<int>(setting);
 			Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
-			u->SendMessage(OperServ, OPER_SET_DEBUG_LEVEL, debug);
+			source.Reply(OPER_SET_DEBUG_LEVEL, debug);
 		}
 		else
-			u->SendMessage(OperServ, OPER_SET_DEBUG_ERROR);
+			source.Reply(OPER_SET_DEBUG_ERROR);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoSetNoExpire(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string setting = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &setting = params.size() > 1 ? params[1] : "";
 
 		if (setting.empty())
 		{
@@ -175,16 +180,16 @@ class CommandOSSet : public Command
 		{
 			noexpire = true;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE ON";
-			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_ON);
+			source.Reply(OPER_SET_NOEXPIRE_ON);
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			noexpire = false;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE OFF";
-			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_OFF);
+			source.Reply(OPER_SET_NOEXPIRE_OFF);
 		}
 		else
-			u->SendMessage(OperServ, OPER_SET_NOEXPIRE_ERROR);
+			source.Reply(OPER_SET_NOEXPIRE_ERROR);
 
 		return MOD_CONT;
 	}
@@ -193,24 +198,25 @@ class CommandOSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string option = params[0];
+		const Anope::string &option = params[0];
 
 		if (option.equals_ci("LIST"))
-			return this->DoList(u);
+			return this->DoList(source);
 		else if (option.equals_ci("IGNORE"))
-			return this->DoSetIgnore(u, params);
+			return this->DoSetIgnore(source, params);
 		else if (option.equals_ci("READONLY"))
-			return this->DoSetReadOnly(u, params);
+			return this->DoSetReadOnly(source, params);
 		else if (option.equals_ci("SUPERADMIN"))
-			return this->DoSetSuperAdmin(u, params);
+			return this->DoSetSuperAdmin(source, params);
 		else if (option.equals_ci("DEBUG"))
-			return this->DoSetDebug(u, params);
+			return this->DoSetDebug(source, params);
 		else if (option.equals_ci("NOEXPIRE"))
-			return this->DoSetNoExpire(u, params);
+			return this->DoSetNoExpire(source, params);
 		else
-			u->SendMessage(OperServ, OPER_SET_UNKNOWN_OPTION, option.c_str());
+			source.Reply(OPER_SET_UNKNOWN_OPTION, option.c_str());
+
 		return MOD_CONT;
 	}
 
@@ -222,12 +228,10 @@ class CommandOSSet : public Command
 			u->SendMessage(OperServ, OPER_HELP_SET_LIST);
 		else if (subcommand.equals_ci("READONLY"))
 			u->SendMessage(OperServ, OPER_HELP_SET_READONLY);
-		else if (subcommand.equals_ci("DEBUG"))
-			u->SendMessage(OperServ, OPER_HELP_SET_DEBUG);
 		else if (subcommand.equals_ci("NOEXPIRE"))
 			u->SendMessage(OperServ, OPER_HELP_SET_NOEXPIRE);
 		else if (subcommand.equals_ci("IGNORE"))
-			u->SendMessage(OperServ, OPER_HELP_SET_IGNORE);
+			u->SendMessage(OperServ,OPER_HELP_SET_IGNORE);
 		else if (subcommand.equals_ci("SUPERADMIN"))
 			u->SendMessage(OperServ, OPER_HELP_SET_SUPERADMIN);
 		else

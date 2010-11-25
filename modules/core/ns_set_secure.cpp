@@ -20,8 +20,9 @@ class CommandNSSetSecure : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetSecure");
@@ -32,12 +33,12 @@ class CommandNSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_SECURE);
-			u->SendMessage(NickServ, NICK_SASET_SECURE_ON, nc->display.c_str());
+			source.Reply(NICK_SASET_SECURE_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_SECURE);
-			u->SendMessage(NickServ, NICK_SASET_SECURE_OFF, nc->display.c_str());
+			source.Reply(NICK_SASET_SECURE_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECURE");

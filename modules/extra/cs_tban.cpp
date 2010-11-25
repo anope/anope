@@ -58,23 +58,25 @@ class CommandCSTBan : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mask;
-		Channel *c;
-		User *u2 = NULL;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 
-		Anope::string chan = params[0];
-		Anope::string nick = params[1];
-		Anope::string time = params[2];
+		const Anope::string &chan = params[0];
+		const Anope::string &nick = params[1];
+		const Anope::string &time = params[2];
 
-		if (!(c = findchan(chan)))
+		User *u2;
+		if (!c)
 			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!(u2 = finduser(nick)))
 			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, nick.c_str());
 		else
 			if (CanBanUser(c, u, u2))
 			{
+				Anope::string mask;
 				get_idealban(c->ci, u2, mask);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				new TempBan(dotime(time), c, mask);

@@ -20,10 +20,11 @@ class CommandOSUserList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string pattern = !params.empty() ? params[0] : "";
-		Anope::string opt = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &pattern = !params.empty() ? params[0] : "";
+		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		Channel *c;
 		std::list<UserModeName> Modes;
 
@@ -32,7 +33,7 @@ class CommandOSUserList : public Command
 
 		if (!pattern.empty() && (c = findchan(pattern)))
 		{
-			u->SendMessage(OperServ, OPER_USERLIST_HEADER_CHAN, pattern.c_str());
+			source.Reply(OPER_USERLIST_HEADER_CHAN, pattern.c_str());
 
 			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
@@ -43,12 +44,12 @@ class CommandOSUserList : public Command
 						if (!uc->user->HasMode(*it))
 							continue;
 
-				u->SendMessage(OperServ, OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
+				source.Reply(OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
 		}
 		else
 		{
-			u->SendMessage(OperServ, OPER_USERLIST_HEADER);
+			source.Reply(OPER_USERLIST_HEADER);
 
 			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
@@ -64,7 +65,7 @@ class CommandOSUserList : public Command
 							if (!u2->HasMode(*mit))
 								continue;
 				}
-				u->SendMessage(OperServ, OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+				source.Reply(OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 			}
 		}
 

@@ -22,9 +22,9 @@ class CommandCSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(ChanServ, u, params[0]);
+		mod_help_cmd(ChanServ, source.u, params[0]);
 
 		return MOD_CONT;
 	}

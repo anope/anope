@@ -24,9 +24,10 @@ class CommandNSGetEMail : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string email = params[0];
+		User *u = source.u;
+		const Anope::string &email = params[0];
 		int j = 0;
 
 		Log(LOG_ADMIN, u, this) << "on " << email;
@@ -38,13 +39,13 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				u->SendMessage(NickServ, NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
+				source.Reply(NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			u->SendMessage(NickServ, NICK_GETEMAIL_NOT_USED, email.c_str());
+			source.Reply(NICK_GETEMAIL_NOT_USED, email.c_str());
 			return MOD_CONT;
 		}
 

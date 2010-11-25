@@ -20,10 +20,11 @@ class CommandMSSend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string text = params[1];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		const Anope::string &text = params[1];
 		memo_send(u, nick, text, 0);
 		return MOD_CONT;
 	}

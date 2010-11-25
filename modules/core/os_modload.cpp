@@ -20,14 +20,15 @@ class CommandOSModLoad : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mname = params[0];
+		User *u = source.u;
+		const Anope::string &mname = params[0];
 
 		Module *m = FindModule(mname);
 		if (m)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_ALREADY_LOADED, mname.c_str());
+			source.Reply(OPER_MODULE_ALREADY_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
 
@@ -35,7 +36,7 @@ class CommandOSModLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), mname.c_str());
-			u->SendMessage(OperServ, OPER_MODULE_LOADED, mname.c_str());
+			source.Reply(OPER_MODULE_LOADED, mname.c_str());
 
 			/* If a user is loading this module, then the core databases have already been loaded
 			 * so trigger the event manually
@@ -45,7 +46,7 @@ class CommandOSModLoad : public Command
 				m->OnPostLoadDatabases();
 		}
 		else
-			u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
+			source.Reply(OPER_MODULE_LOAD_FAIL, mname.c_str());
 
 		return MOD_CONT;
 	}

@@ -68,8 +68,9 @@ class CommandCSOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
 		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
@@ -99,8 +100,9 @@ class CommandCSDeOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
 		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
@@ -130,8 +132,9 @@ class CommandCSVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
@@ -161,8 +164,9 @@ class CommandCSDeVoice : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
@@ -192,14 +196,13 @@ class CommandCSHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
-		{
 			return MOD_CONT;
-		}
 
 		return do_util(u, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
 	}
@@ -228,8 +231,9 @@ class CommandCSDeHalfOp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
@@ -262,8 +266,9 @@ class CommandCSProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
@@ -296,8 +301,9 @@ class CommandCSDeProtect : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
@@ -330,8 +336,9 @@ class CommandCSOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
@@ -364,8 +371,9 @@ class CommandCSDeOwner : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)

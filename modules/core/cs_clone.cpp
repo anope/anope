@@ -20,33 +20,35 @@ public:
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &channel = params[0];
 		const Anope::string &target = params[1];
 		Anope::string what = params.size() > 2 ? params[2] : "";
 
-		ChannelInfo *ci = cs_findchan(channel);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (!check_access(u, ci, CA_SET))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		ChannelInfo *target_ci = cs_findchan(target);
 		if (!target_ci)
 		{
-			u->SendMessage(ChanServ, CHAN_X_NOT_REGISTERED, target.c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
 			return MOD_CONT;
 		}
 		if (!IsFounder(u, ci) || !IsFounder(u, target_ci))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			u->SendMessage(ChanServ, u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 			return MOD_CONT;
 		}
 
@@ -98,7 +100,7 @@ public:
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 
-			u->SendMessage(ChanServ, CHAN_CLONED, channel.c_str(), target.c_str());
+			source.Reply(CHAN_CLONED, channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
@@ -109,7 +111,7 @@ public:
 				target_ci->AddAccess(access->nc, access->level, access->creator, access->last_seen);
 			}
 
-			u->SendMessage(ChanServ, CHAN_CLONED_ACCESS, channel.c_str(), target.c_str());
+			source.Reply(CHAN_CLONED_ACCESS, channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -123,7 +125,7 @@ public:
 					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 			}
 
-			u->SendMessage(ChanServ, CHAN_CLONED_AKICK, channel.c_str(), target.c_str());
+			source.Reply(CHAN_CLONED_AKICK, channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
@@ -134,7 +136,7 @@ public:
 				target_ci->AddBadWord(bw->word, bw->type);
 			}
 
-			u->SendMessage(ChanServ, CHAN_CLONED_BADWORDS, channel.c_str(), target.c_str());
+			source.Reply(CHAN_CLONED_BADWORDS, channel.c_str(), target.c_str());
 		}
 		else
 		{

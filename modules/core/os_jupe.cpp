@@ -20,16 +20,17 @@ class CommandOSJupe : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string jserver = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &jserver = params[0];
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 		Server *server = Server::Find(jserver);
 
 		if (!isValidHost(jserver, 3))
-			u->SendMessage(OperServ, OPER_JUPE_HOST_ERROR);
+			source.Reply(OPER_JUPE_HOST_ERROR);
 		else if (server && (server == Me || server == Me->GetLinks().front()))
-			u->SendMessage(OperServ, OPER_JUPE_INVALID_SERVER);
+			source.Reply(OPER_JUPE_INVALID_SERVER);
 		else
 		{
 			Anope::string rbuf = "Juped by " + u->nick + (!reason.empty() ? ": " + reason : "");

@@ -20,24 +20,26 @@ class CommandHSDel : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na;
-		Anope::string nick = params[0];
-		if ((na = findnick(nick)))
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		NickAlias *na = findnick(nick);
+		if (na)
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();
-			u->SendMessage(HostServ, HOST_DEL, nick.c_str());
+			source.Reply(HOST_DEL, nick.c_str());
 		}
 		else
-			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
+			source.Reply(HOST_NOREG, nick.c_str());
+
 		return MOD_CONT;
 	}
 

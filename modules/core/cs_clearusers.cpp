@@ -20,20 +20,22 @@ class CommandCSClearUsers : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string what = params[1];
-		Channel *c = findchan(chan);
-		ChannelInfo *ci = c ? c->ci : NULL;
+		const Anope::string &chan = params[0];
+
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
+
 		Anope::string modebuf;
 
 		if (!c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_FOUNDER))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		
-		Anope::string buf = "CLEAR USERS command from " + u->nick + " (" + u->Account()->display + ")";
+		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{

@@ -20,27 +20,28 @@ class CommandBSUnassign : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		ChannelInfo *ci = cs_findchan(chan);
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (readonly)
-			u->SendMessage(BotServ, BOT_ASSIGN_READONLY);
+			source.Reply(BOT_ASSIGN_READONLY);
 		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (!ci->bi)
-			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
+			source.Reply(BOT_NOT_ASSIGNED);
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
-			u->SendMessage(BotServ, BOT_UNASSIGN_PERSISTANT_CHAN);
+			source.Reply(BOT_UNASSIGN_PERSISTANT_CHAN);
 		else
 		{
 			bool override = !check_access(u, ci, CA_ASSIGN);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
 
 			ci->bi->UnAssign(u, ci);
-			u->SendMessage(BotServ, BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
+			source.Reply(BOT_UNASSIGN_UNASSIGNED, ci->name.c_str());
 		}
 		return MOD_CONT;
 	}

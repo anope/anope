@@ -22,8 +22,10 @@ public:
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		Anope::string pattern = params[0];
 		unsigned nchans;
 		char buf[BUFSIZE];
@@ -33,7 +35,7 @@ public:
 
 		if (Config->CSListOpersOnly && !is_oper(u))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -42,28 +44,28 @@ public:
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
 			if (tmp.empty())
 			{
-				u->SendMessage(ChanServ, LIST_INCORRECT_RANGE);
-				u->SendMessage(ChanServ, CS_LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				u->SendMessage(ChanServ, LIST_INCORRECT_RANGE);
-				u->SendMessage(ChanServ, CS_LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (tmp.empty())
 			{
-				u->SendMessage(ChanServ, LIST_INCORRECT_RANGE);
-				u->SendMessage(ChanServ, CS_LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				u->SendMessage(ChanServ, LIST_INCORRECT_RANGE);
-				u->SendMessage(ChanServ, CS_LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(CS_LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -119,7 +121,7 @@ public:
 					else
 						snprintf(buf, sizeof(buf), "%-20s  %s", ci->name.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 
-					u->SendMessage(Config->s_ChanServ, "  %c%s", noexpire_char, buf);
+					source.Reply("  %c%s", noexpire_char, buf);
 				}
 				++count;
 			}

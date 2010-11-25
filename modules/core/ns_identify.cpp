@@ -21,9 +21,11 @@ class CommandNSIdentify : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params.size() == 2 ? params[0] : u->nick;
+		User *u = source.u;
+
+		const Anope::string &nick = params.size() == 2 ? params[0] : u->nick;
 		Anope::string pass = params[params.size() - 1];
 
 		NickAlias *na = findnick(nick), *this_na = findnick(u->nick);
@@ -31,32 +33,32 @@ class CommandNSIdentify : public Command
 		{
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
-				u->SendMessage(NickServ, NICK_IS_PREREG);
+				source.Reply(NICK_IS_PREREG);
 			else
-				u->SendMessage(NickServ, NICK_NOT_REGISTERED);
+				source.Reply(NICK_NOT_REGISTERED);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
 		 * identified as
 		 */
 		else if (u->Account() && u->Account() == na->nc)
-			u->SendMessage(NickServ, NICK_ALREADY_IDENTIFIED);
+			source.Reply(NICK_ALREADY_IDENTIFIED);
 		else
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (!res)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
-				u->SendMessage(NickServ, PASSWORD_INCORRECT);
+				source.Reply(PASSWORD_INCORRECT);
 				if (bad_password(u))
 					return MOD_STOP;
 			}
 			else if (res == -1)
-				u->SendMessage(NickServ, NICK_IDENTIFY_FAILED);
+				source.Reply(NICK_IDENTIFY_FAILED);
 			else
 			{
 				if (u->IsIdentified())
@@ -77,7 +79,7 @@ class CommandNSIdentify : public Command
 				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 				Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display;
-				u->SendMessage(NickServ, NICK_IDENTIFY_SUCCEEDED);
+				source.Reply(NICK_IDENTIFY_SUCCEEDED);
 				if (ircd->vhost)
 					do_on_id(u);
 				if (Config->NSModeOnID)
@@ -85,8 +87,8 @@ class CommandNSIdentify : public Command
 
 				if (Config->NSForceEmail && u->Account() && u->Account()->email.empty())
 				{
-					u->SendMessage(NickServ, NICK_IDENTIFY_EMAIL_REQUIRED);
-					u->SendMessage(NickServ, NICK_IDENTIFY_EMAIL_HOWTO);
+					source.Reply(NICK_IDENTIFY_EMAIL_REQUIRED);
+					source.Reply(NICK_IDENTIFY_EMAIL_HOWTO);
 				}
 
 				if (u->IsIdentified())

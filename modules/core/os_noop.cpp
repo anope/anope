@@ -20,10 +20,11 @@ class CommandOSNOOP : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
-		Anope::string server = params[1];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
+		const Anope::string &server = params[1];
 
 		if (cmd.equals_ci("SET"))
 		{
@@ -35,7 +36,7 @@ class CommandOSNOOP : public Command
 			reason = "NOOP command used by " + u->nick;
 			if (Config->WallOSNoOp)
 				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server.c_str());
-			u->SendMessage(OperServ, OPER_NOOP_SET, server.c_str());
+			source.Reply(OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
 			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
@@ -50,7 +51,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("REVOKE"))
 		{
 			ircdproto->SendSVSNOOP(server, 0);
-			u->SendMessage(OperServ, OPER_NOOP_REVOKE, server.c_str());
+			source.Reply(OPER_NOOP_REVOKE, server.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "");

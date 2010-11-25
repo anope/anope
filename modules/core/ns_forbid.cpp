@@ -20,11 +20,11 @@ class CommandNSForbid : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na;
-		Anope::string nick = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		/* Assumes that permission checking has already been done. */
 		if (Config->ForceForbidReason && reason.empty())
@@ -34,17 +34,19 @@ class CommandNSForbid : public Command
 		}
 
 		if (readonly)
-			u->SendMessage(NickServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 		if (!ircdproto->IsNickValid(nick))
 		{
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 			return MOD_CONT;
 		}
-		if ((na = findnick(nick)))
+
+		NickAlias *na = findnick(nick);
+		if (na)
 		{
 			if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 			{
-				u->SendMessage(NickServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			delete na;

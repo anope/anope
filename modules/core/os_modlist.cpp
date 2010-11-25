@@ -20,8 +20,11 @@ class CommandOSModList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+		const Anope::string &param = !params.empty() ? params[0] : "";
+
 		int count = 0;
 		int showCore = 0;
 		int showThird = 1;
@@ -31,8 +34,6 @@ class CommandOSModList : public Command
 		int showQA = 1;
 		int showDB = 1;
 		int showSocketEngine = 1;
-
-		Anope::string param = !params.empty() ? params[0] : "";
 
 		char core[] = "Core";
 		char third[] = "3rd";
@@ -140,56 +141,56 @@ class CommandOSModList : public Command
 				case CORE:
 					if (showCore)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), core);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), core);
 						++count;
 					}
 					break;
 				case THIRD:
 					if (showThird)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), third);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), third);
 						++count;
 					}
 					break;
 				case PROTOCOL:
 					if (showProto)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), proto);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), proto);
 						++count;
 					}
 					break;
 				case SUPPORTED:
 					if (showSupported)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), supported);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), supported);
 						++count;
 					}
 					break;
 				case QATESTED:
 					if (showQA)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), qa);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), qa);
 						++count;
 					}
 					break;
 				case ENCRYPTION:
 					if (showEnc)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), enc);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), enc);
 						++count;
 					}
 					break;
 				case DATABASE:
 					if (showDB)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), db);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), db);
 						++count;
 					}
 					break;
 				case SOCKETENGINE:
 					if (showSocketEngine)
 					{
-						u->SendMessage(OperServ, OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), socketengine);
+						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), socketengine);
 						++count;
 					}
 					break;
@@ -198,9 +199,9 @@ class CommandOSModList : public Command
 			}
 		}
 		if (!count)
-			u->SendMessage(OperServ, OPER_MODULE_NO_LIST);
+			source.Reply(OPER_MODULE_NO_LIST);
 		else
-			u->SendMessage(OperServ, OPER_MODULE_LIST_FOOTER, count);
+			source.Reply(OPER_MODULE_LIST_FOOTER, count);
 
 		return MOD_CONT;
 	}

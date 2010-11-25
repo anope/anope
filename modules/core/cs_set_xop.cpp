@@ -21,15 +21,17 @@ class CommandCSSetXOP : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (!FindModule("cs_xop"))
 		{
-			u->SendMessage(ChanServ, CHAN_XOP_NOT_AVAILABLE, "XOP");
+			source.Reply(CHAN_XOP_NOT_AVAILABLE, "XOP");
 			return MOD_CONT;
 		}
 
-		ChannelInfo *ci = cs_findchan(params[0]);
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetXOP");
 
@@ -65,14 +67,14 @@ class CommandCSSetXOP : public Command
 			}
 
 			Log(LOG_COMMAND, u, this, ci) << "to enable XOP";
-			u->SendMessage(ChanServ, CHAN_SET_XOP_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_XOP_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
 			Log(LOG_COMMAND, u, this, ci) << "to disable XOP";
-			u->SendMessage(ChanServ, CHAN_SET_XOP_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "XOP");

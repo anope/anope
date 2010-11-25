@@ -20,25 +20,28 @@ class CommandOSKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0], nick = params[1], s = params[2];
+		User *u = source.u;
+		const Anope::string &chan = params[0];
+		const Anope::string &nick = params[1];
+		const Anope::string &s = params[2];
 		Channel *c;
 		User *u2;
 
 		if (!(c = findchan(chan)))
 		{
-			u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			u->SendMessage(OperServ, OPER_BOUNCY_MODES_U_LINE);
+			source.Reply(OPER_BOUNCY_MODES_U_LINE);
 			return MOD_CONT;
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 			return MOD_CONT;
 		}
 

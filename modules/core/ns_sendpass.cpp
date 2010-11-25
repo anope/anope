@@ -23,17 +23,18 @@ class CommandNSSendPass : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;
@@ -42,11 +43,11 @@ class CommandNSSendPass : public Command
 				if (SendPassMail(u, na, tmp_pass))
 				{
 					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
-					u->SendMessage(NickServ, NICK_SENDPASS_OK, nick.c_str());
+					source.Reply(NICK_SENDPASS_OK, nick.c_str());
 				}
 			}
 			else
-				u->SendMessage(NickServ, NICK_SENDPASS_UNAVAILABLE);
+				source.Reply(NICK_SENDPASS_UNAVAILABLE);
 		}
 
 		return MOD_CONT;

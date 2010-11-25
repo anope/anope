@@ -21,23 +21,25 @@ class CommandNSRecover : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		User *u = source.u;
+
+		const Anope::string &nick = params[0];
 		Anope::string pass = params.size() > 1 ? params[1] : "";
+
 		NickAlias *na;
 		User *u2;
-
 		if (!(u2 = finduser(nick)))
-			u->SendMessage(NickServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!(na = findnick(u2->nick)))
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
-			u->SendMessage(NickServ, NICK_NO_RECOVER_SELF);
+			source.Reply(NICK_NO_RECOVER_SELF);
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
@@ -50,11 +52,11 @@ class CommandNSRecover : public Command
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				u->SendMessage(NickServ, NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
-				u->SendMessage(NickServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
@@ -73,10 +75,10 @@ class CommandNSRecover : public Command
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				u->SendMessage(NickServ, NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
-				u->SendMessage(NickServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}

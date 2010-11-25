@@ -20,15 +20,16 @@ class CommandHSDelAll : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		NickAlias *na;
-		if ((na = findnick(nick)))
+		const Anope::string &nick = params[0];
+		User *u = source.u;
+		NickAlias *na = findnick(nick);
+		if (na)
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
@@ -39,10 +40,11 @@ class CommandHSDelAll : public Command
 				na->hostinfo.RemoveVhost();
 			}
 			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
-			u->SendMessage(HostServ, HOST_DELALL, nc->display.c_str());
+			source.Reply(HOST_DELALL, nc->display.c_str());
 		}
 		else
-			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
+			source.Reply(HOST_NOREG, nick.c_str());
+
 		return MOD_CONT;
 	}
 

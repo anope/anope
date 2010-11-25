@@ -20,23 +20,23 @@ class CommandCSGetKey : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		ChannelInfo *ci;
-		Anope::string key;
+		const Anope::string &chan = params[0];
 
-		ci = cs_findchan(chan);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
+		Anope::string key;
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
-			u->SendMessage(ChanServ, CHAN_GETKEY_NOKEY, chan.c_str());
+			source.Reply(CHAN_GETKEY_NOKEY, chan.c_str());
 			return MOD_CONT;
 		}
 

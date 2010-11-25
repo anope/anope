@@ -20,9 +20,9 @@ class CommandOSHelp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(OperServ, u, params[0]);
+		mod_help_cmd(OperServ, source.u, params[0]);
 		return MOD_CONT;
 	}
 

@@ -20,15 +20,17 @@ class CommandOSMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0], modes = params[1];
+		User *u = source.u;
+		const Anope::string &chan = params[0];
+		const Anope::string &modes = params[1];
 		Channel *c;
 
 		if (!(c = findchan(chan)))
-			u->SendMessage(OperServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (c->bouncy_modes)
-			u->SendMessage(OperServ, OPER_BOUNCY_MODES_U_LINE);
+			source.Reply(OPER_BOUNCY_MODES_U_LINE);
 		else
 		{
 			c->SetModes(OperServ, false, modes.c_str());

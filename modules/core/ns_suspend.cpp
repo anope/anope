@@ -20,34 +20,35 @@ class CommandNSSuspend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na;
-		User *u2;
-		Anope::string nick = params[0];
-		Anope::string reason = params[1];
+		User *u = source.u;
+
+		const Anope::string &nick = params[0];
+		const Anope::string &reason = params[1];
 
 		if (readonly)
 		{
-			u->SendMessage(NickServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
-		if (!(na = findnick(nick)))
+		NickAlias *na = findnick(nick);
+		if (!na)
 		{
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -65,7 +66,8 @@ class CommandNSSuspend : public Command
 			{
 				na2->last_quit = reason;
 
-				if ((u2 = finduser(na2->nick)))
+				User *u2 = finduser(na2->nick);
+				if (u2)
 				{
 					u2->Logout();
 					u2->Collide(na2);
@@ -108,32 +110,33 @@ class CommandNSUnSuspend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na;
-		Anope::string nick = params[0];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
 
 		if (readonly)
 		{
-			u->SendMessage(NickServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
-		if (!(na = findnick(nick)))
+		NickAlias *na = findnick(nick);
+		if (!na)
 		{
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

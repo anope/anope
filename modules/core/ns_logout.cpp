@@ -20,18 +20,20 @@ class CommandNSLogout : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = !params.empty() ? params[0] : "";
-		Anope::string param = params.size() > 1 ? params[1] : "";
-		User *u2;
+		User *u = source.u;
 
+		const Anope::string &nick = !params.empty() ? params[0] : "";
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
+
+		User *u2;
 		if (!u->Account()->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(u, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			u->SendMessage(NickServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_LOGOUT_SERVICESADMIN, nick.c_str());
+			source.Reply(NICK_LOGOUT_SERVICESADMIN, nick.c_str());
 		else
 		{
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
@@ -42,9 +44,9 @@ class CommandNSLogout : public Command
 
 			/* Remove founder status from this user in all channels */
 			if (!nick.empty())
-				u->SendMessage(NickServ, NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
+				source.Reply(NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
 			else
-				u->SendMessage(NickServ, NICK_LOGOUT_SUCCEEDED);
+				source.Reply(NICK_LOGOUT_SUCCEEDED);
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
 			u2->RemoveMode(NickServ, UMODE_REGISTERED);

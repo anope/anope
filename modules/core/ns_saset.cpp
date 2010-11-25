@@ -28,24 +28,25 @@ class CommandNSSASet : public Command
 		this->subcommands.clear();
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string cmd = params[1];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		const Anope::string &cmd = params[1];
 
 		if (readonly)
 		{
-			u->SendMessage(NickServ, NICK_SET_DISABLED);
+			source.Reply(NICK_SET_DISABLED);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
-			u->SendMessage(NickServ, NICK_SASET_BAD_NICK, nick.c_str());
+			source.Reply(NICK_SASET_BAD_NICK, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else
 		{
 			Command *c = this->FindCommand(params[1]);
@@ -63,7 +64,7 @@ class CommandNSSASet : public Command
 				mod_run_cmd(NickServ, u, c, params[1], cmdparams, false);
 			}
 			else
-				u->SendMessage(NickServ, NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
+				source.Reply(NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
 		}
 
 		return MOD_CONT;
@@ -128,8 +129,9 @@ class CommandNSSASetDisplay : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *setter_na = findnick(params[0]);
 		if (!setter_na)
 			throw CoreException("NULL na in CommandNSSASetDisplay");
@@ -138,7 +140,7 @@ class CommandNSSASetDisplay : public Command
 		NickAlias *na = findnick(params[1]);
 		if (!na || na->nc != nc)
 		{
-			u->SendMessage(NickServ, NICK_SASET_DISPLAY_INVALID, nc->display.c_str());
+			source.Reply(NICK_SASET_DISPLAY_INVALID, nc->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -172,8 +174,9 @@ class CommandNSSASetPassword : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *setter_na = findnick(params[0]);
 		if (!setter_na)
 			throw CoreException("NULL na in CommandNSSASetPassword");
@@ -183,32 +186,32 @@ class CommandNSSASetPassword : public Command
 
 		if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))
 		{
-			u->SendMessage(NickServ, MORE_OBSCURE_PASSWORD);
+			source.Reply(MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
 		else if (len > Config->PassLen)
 		{
-			u->SendMessage(NickServ, PASSWORD_TOO_LONG);
+			source.Reply(PASSWORD_TOO_LONG);
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
 			Log(NickServ) << "Failed to encrypt password for " << nc->display << " (saset)";
-			u->SendMessage(NickServ, NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
+			source.Reply(NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(nc->pass, tmp_pass) == 1)
-			u->SendMessage(NickServ, NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
+			source.Reply(NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
 		else
-			u->SendMessage(NickServ, NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
+			source.Reply(NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
 
 		if (Config->WallSetpass)
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display.c_str());

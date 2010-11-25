@@ -37,137 +37,139 @@ static int stats_count_servers(Server *s)
 class CommandOSStats : public Command
 {
  private:
-	CommandReturn DoStatsAkill(User *u)
+	CommandReturn DoStatsAkill(CommandSource &source)
 	{
 		int timeout;
 		/* AKILLs */
-		u->SendMessage(OperServ, OPER_STATS_AKILL_COUNT, SGLine->GetCount());
+		source.Reply(OPER_STATS_AKILL_COUNT, SGLine->GetCount());
 		timeout = Config->AutokillExpiry + 59;
 		if (timeout >= 172800)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
 		else if (timeout >= 86400)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_DAY);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_DAY);
 		else if (timeout >= 7200)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_HOURS, timeout / 3600);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_HOURS, timeout / 3600);
 		else if (timeout >= 3600)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_HOUR);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_HOUR);
 		else if (timeout >= 120)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_MINS, timeout / 60);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_MINS, timeout / 60);
 		else if (timeout >= 60)
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_MIN);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_MIN);
 		else
-			u->SendMessage(OperServ, OPER_STATS_AKILL_EXPIRE_NONE);
+			source.Reply(OPER_STATS_AKILL_EXPIRE_NONE);
 		if (ircd->snline)
 		{
 			/* SNLINEs */
-			u->SendMessage(OperServ, OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
+			source.Reply(OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
 			timeout = Config->SNLineExpiry + 59;
 			if (timeout >= 172800)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_DAY);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_HOUR);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_MIN);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_MIN);
 			else
-				u->SendMessage(OperServ, OPER_STATS_SNLINE_EXPIRE_NONE);
+				source.Reply(OPER_STATS_SNLINE_EXPIRE_NONE);
 		}
 		if (ircd->sqline)
 		{
 			/* SQLINEs */
-			u->SendMessage(OperServ, OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
+			source.Reply(OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
 			timeout = Config->SQLineExpiry + 59;
 			if (timeout >= 172800)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_DAY);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_HOUR);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_MIN);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_MIN);
 			else
-				u->SendMessage(OperServ, OPER_STATS_SQLINE_EXPIRE_NONE);
+				source.Reply(OPER_STATS_SQLINE_EXPIRE_NONE);
 		}
 		if (ircd->szline)
 		{
 			/* SZLINEs */
-			u->SendMessage(OperServ, OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
+			source.Reply(OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
 			timeout = Config->SZLineExpiry + 59;
 			if (timeout >= 172800)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
 			else if (timeout >= 86400)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_DAY);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_DAY);
 			else if (timeout >= 7200)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_HOURS, timeout / 3600);
 			else if (timeout >= 3600)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_HOUR);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_HOUR);
 			else if (timeout >= 120)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_MINS, timeout / 60);
 			else if (timeout >= 60)
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_MIN);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_MIN);
 			else
-				u->SendMessage(OperServ, OPER_STATS_SZLINE_EXPIRE_NONE);
+				source.Reply(OPER_STATS_SZLINE_EXPIRE_NONE);
 		}
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsReset(User *u)
+	CommandReturn DoStatsReset(CommandSource &source)
 	{
+		User *u = source.u;
 		maxusercnt = usercnt;
 		u->SendMessage(OperServ, OPER_STATS_RESET);
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsUptime(User *u)
+	CommandReturn DoStatsUptime(CommandSource &source)
 	{
+		User *u = source.u;
 		time_t uptime = Anope::CurTime - start_time;
 		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
 		u->SendMessage(OperServ, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
 		u->SendMessage(OperServ, OPER_STATS_MAX_USERS, maxusercnt, do_strftime(maxusertime).c_str());
 		if (days > 1)
-			u->SendMessage(OperServ, OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
+			source.Reply(OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
 		else if (days == 1)
-			u->SendMessage(OperServ, OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
+			source.Reply(OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
 		else
 		{
 			if (hours > 1)
 			{
 				if (mins != 1)
-					u->SendMessage(OperServ, OPER_STATS_UPTIME_HMS, hours, mins);
+					source.Reply(OPER_STATS_UPTIME_HMS, hours, mins);
 				else
-					u->SendMessage(OperServ, OPER_STATS_UPTIME_H1MS, hours, mins, secs);
+					source.Reply(OPER_STATS_UPTIME_H1MS, hours, mins, secs);
 			}
 			else if (hours == 1)
 			{
 				if (mins != 1)
-					u->SendMessage(OperServ, OPER_STATS_UPTIME_1HMS, hours, mins, secs);
+					source.Reply(OPER_STATS_UPTIME_1HMS, hours, mins, secs);
 				else
-					u->SendMessage(OperServ, OPER_STATS_UPTIME_1H1MS, hours, mins, secs);
+					source.Reply(OPER_STATS_UPTIME_1H1MS, hours, mins, secs);
 			}
 			else
 			{
 				if (mins != 1)
 				{
 					if (secs != 1)
-						u->SendMessage(OperServ, OPER_STATS_UPTIME_MS, mins, secs);
+						source.Reply(OPER_STATS_UPTIME_MS, mins, secs);
 					else
-						u->SendMessage(OperServ, OPER_STATS_UPTIME_M1S, mins, secs);
+						source.Reply(OPER_STATS_UPTIME_M1S, mins, secs);
 				}
 				else
 				{
 					if (secs != 1)
-						u->SendMessage(OperServ, OPER_STATS_UPTIME_1MS, mins, secs);
+						source.Reply(OPER_STATS_UPTIME_1MS, mins, secs);
 					else
-						u->SendMessage(OperServ, OPER_STATS_UPTIME_1M1S, mins, secs);
+						source.Reply(OPER_STATS_UPTIME_1M1S, mins, secs);
 				}
 			}
 		}
@@ -175,7 +177,7 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsUplink(User *u)
+	CommandReturn DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
 
@@ -186,43 +188,43 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		u->SendMessage(OperServ, OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
-		u->SendMessage(OperServ, OPER_STATS_UPLINK_CAPAB, buf.c_str());
-		u->SendMessage(OperServ, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
+		source.Reply(OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
+		source.Reply(OPER_STATS_UPLINK_CAPAB, buf.c_str());
+		source.Reply(OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
 		return MOD_CONT;
 	}
 
-	CommandReturn DoStatsMemory(User *u)
+	CommandReturn DoStatsMemory(CommandSource &source)
 	{
 		long count, mem;
 
-		u->SendMessage(OperServ, OPER_STATS_BYTES_READ, TotalRead / 1024);
-		u->SendMessage(OperServ, OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
+		source.Reply(OPER_STATS_BYTES_READ, TotalRead / 1024);
+		source.Reply(OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
 
 		get_user_stats(count, mem);
-		u->SendMessage(OperServ, OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
 		get_channel_stats(&count, &mem);
-		u->SendMessage(OperServ, OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
 		get_core_stats(count, mem);
-		u->SendMessage(OperServ, OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
 		get_aliases_stats(count, mem);
-		u->SendMessage(OperServ, OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
 		get_chanserv_stats(&count, &mem);
-		u->SendMessage(OperServ, OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
 		if (!Config->s_BotServ.empty())
 		{
 			get_botserv_stats(&count, &mem);
-			u->SendMessage(OperServ, OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
+			source.Reply(OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
 		}
 		if (!Config->s_HostServ.empty())
 		{
 			get_hostserv_stats(&count, &mem);
-			u->SendMessage(OperServ, OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
+			source.Reply(OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
 		}
 		get_operserv_stats(&count, &mem);
-		u->SendMessage(OperServ, OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
 		get_session_stats(count, mem);
-		u->SendMessage(OperServ, OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
+		source.Reply(OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
 
 		return MOD_CONT;
 	}
@@ -231,28 +233,28 @@ class CommandOSStats : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string extra = !params.empty() ? params[0] : "";
+		const Anope::string &extra = !params.empty() ? params[0] : "";
 
 		if (!extra.empty() && !extra.equals_ci("ALL"))
 		{
 			if (extra.equals_ci("AKILL"))
-				return this->DoStatsAkill(u);
+				return this->DoStatsAkill(source);
 			else if (extra.equals_ci("RESET"))
-				return this->DoStatsReset(u);
+				return this->DoStatsReset(source);
 			else if (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK"))
-				u->SendMessage(OperServ, OPER_STATS_UNKNOWN_OPTION, extra.c_str());
+				source.Reply(OPER_STATS_UNKNOWN_OPTION, extra.c_str());
 		}
 
 		if (extra.empty() || (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK")))
-			this->DoStatsUptime(u);
+			this->DoStatsUptime(source);
 
 		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("UPLINK")))
-			this->DoStatsUplink(u);
+			this->DoStatsUplink(source);
 
 		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("MEMORY")))
-			this->DoStatsMemory(u);
+			this->DoStatsMemory(source);
 
 		return MOD_CONT;
 	}

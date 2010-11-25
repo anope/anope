@@ -111,22 +111,21 @@ LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 
 class XOPListCallback : public NumberList
 {
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	int level;
 	LanguageString *messages;
 	bool SentHeader;
  public:
-	XOPListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist, int _level, LanguageString *_messages) : NumberList(numlist, false), u(_u), ci(_ci), level(_level), messages(_messages), SentHeader(false)
+	XOPListCallback(CommandSource &_source, const Anope::string &numlist, int _level, LanguageString *_messages) : NumberList(numlist, false), source(_source), level(_level), messages(_messages), SentHeader(false)
 	{
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetAccessCount())
+		if (!Number || Number > source.ci->GetAccessCount())
 			return;
 
-		ChanAccess *access = ci->GetAccess(Number - 1);
+		ChanAccess *access = source.ci->GetAccess(Number - 1);
 
 		if (level != access->level)
 			return;
@@ -134,53 +133,52 @@ class XOPListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(ChanServ, messages[XOP_LIST_HEADER], ci->name.c_str());
+			source.Reply(messages[XOP_LIST_HEADER], source.ci->name.c_str());
 		}
 
-		DoList(u, ci, access, Number - 1, level, messages);
+		DoList(source, access, Number - 1, level, messages);
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, ChanAccess *access, unsigned index, int level, LanguageString *messages)
+	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level, LanguageString *messages)
 	{
-		u->SendMessage(ChanServ, CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
+		source.Reply(CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
 	}
 };
 
 class XOPDelCallback : public NumberList
 {
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	Command *c;
 	LanguageString *messages;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool override;
  public:
-	XOPDelCallback(User *_u, Command *_c, ChannelInfo *_ci, LanguageString *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), messages(_messages), Deleted(0), override(_override)
+	XOPDelCallback(CommandSource &_source, Command *_c, LanguageString *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), messages(_messages), Deleted(0), override(_override)
 	{
 	}
 
 	~XOPDelCallback()
 	{
 		if (!Deleted)
-			 u->SendMessage(ChanServ, messages[XOP_NO_MATCH], ci->name.c_str());
+			 source.Reply(messages[XOP_NO_MATCH], source.ci->name.c_str());
 		else
 		{
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "deleted access of users " << Nicks;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
-				u->SendMessage(ChanServ, messages[XOP_DELETED_ONE], ci->name.c_str());
+				source.Reply(messages[XOP_DELETED_ONE], source.ci->name.c_str());
 			else
-				u->SendMessage(ChanServ, messages[XOP_DELETED_SEVERAL], Deleted, ci->name.c_str());
+				source.Reply(messages[XOP_DELETED_SEVERAL], Deleted, source.ci->name.c_str());
 		}
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetAccessCount())
+		if (!Number || Number > source.ci->GetAccessCount())
 			return;
 
-		ChanAccess *access = ci->GetAccess(Number - 1);
+		ChanAccess *access = source.ci->GetAccess(Number - 1);
 
 		++Deleted;
 		if (!Nicks.empty())
@@ -188,18 +186,21 @@ class XOPDelCallback : public NumberList
 		else
 			Nicks = access->nc->display;
 
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access->nc));
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(source.ci, source.u, access->nc));
 
-		ci->EraseAccess(Number - 1);
+		source.ci->EraseAccess(Number - 1);
 	}
 };
 
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
-		Anope::string nick = params.size() > 2 ? params[2] : "";
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
 		int change = 0;
 
@@ -211,7 +212,7 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
+			source.Reply(messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
@@ -219,19 +220,19 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			u->SendMessage(ChanServ, messages[XOP_NICKS_ONLY]);
+			source.Reply(messages[XOP_NICKS_ONLY]);
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			u->SendMessage(ChanServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -244,7 +245,7 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				u->SendMessage(ChanServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			++change;
@@ -252,7 +253,7 @@ class XOPBase : public Command
 
 		if (!change && ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			u->SendMessage(ChanServ, CHAN_XOP_REACHED_LIMIT, Config->CSAccessMax);
+			source.Reply(CHAN_XOP_REACHED_LIMIT, Config->CSAccessMax);
 			return MOD_CONT;
 		}
 
@@ -271,20 +272,23 @@ class XOPBase : public Command
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
-			u->SendMessage(ChanServ, messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
+			source.Reply(messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
-			u->SendMessage(ChanServ, messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
+			source.Reply(messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
-		Anope::string nick = params.size() > 2 ? params[2] : "";
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 		ChanAccess *access;
 
 		if (nick.empty())
@@ -295,13 +299,13 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
+			source.Reply(messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -311,7 +315,7 @@ class XOPBase : public Command
 			na = findnick(nick);
 			if (!na)
 			{
-				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 		}
@@ -320,7 +324,7 @@ class XOPBase : public Command
 
 		if ((!na || na->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -328,7 +332,7 @@ class XOPBase : public Command
 		if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			bool override = level >= ulev || ulev < ACCESS_AOP;
-			XOPDelCallback list(u, this, ci, messages, override, nick);
+			XOPDelCallback list(source, this, messages, override, nick);
 			list.Process();
 		}
 		else
@@ -345,18 +349,18 @@ class XOPBase : public Command
 
 			if (i == end)
 			{
-				u->SendMessage(ChanServ, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
+				source.Reply(messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 
 			if (nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				u->SendMessage(ChanServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 			else
 			{
 				bool override = ulev <= access->level;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->nc->display;
 
-				u->SendMessage(ChanServ, messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
+				source.Reply(messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
 
@@ -367,13 +371,16 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
-		Anope::string nick = params.size() > 2 ? params[2] : "";
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -382,13 +389,13 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPListCallback list(u, ci, nick, level, messages);
+			XOPListCallback list(source, nick, level, messages);
 			list.Process();
 		}
 		else
@@ -407,36 +414,39 @@ class XOPBase : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					u->SendMessage(ChanServ, messages[XOP_LIST_HEADER], ci->name.c_str());
+					source.Reply(messages[XOP_LIST_HEADER], ci->name.c_str());
 				}
 
-				XOPListCallback::DoList(u, ci, access, i + 1, level, messages);
+				XOPListCallback::DoList(source, access, i + 1, level, messages);
 			}
 
 			if (!SentHeader)
-				u->SendMessage(ChanServ, messages[XOP_NO_MATCH], ci->name.c_str());
+				source.Reply(messages[XOP_NO_MATCH], ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, ChannelInfo *ci, int level, LanguageString *messages)
+	CommandReturn DoClear(CommandSource &source, int level, LanguageString *messages)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, messages[XOP_DISABLED]);
+			source.Reply(messages[XOP_DISABLED]);
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			u->SendMessage(ChanServ, messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -457,25 +467,26 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
  protected:
-	CommandReturn DoXop(User *u, const std::vector<Anope::string> &params, int level, LanguageString *messages)
+	CommandReturn DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
-		Anope::string chan = params[0];
-		Anope::string cmd = params[1];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
-		ChannelInfo *ci = cs_findchan(chan);
+		const Anope::string &cmd = params[1];
 
 		if (!ci->HasFlag(CI_XOP))
-			u->SendMessage(ChanServ, CHAN_XOP_ACCESS, Config->s_ChanServ.c_str());
+			source.Reply(CHAN_XOP_ACCESS, Config->s_ChanServ.c_str());
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params, ci, level, messages);
+			return this->DoAdd(source, params, level, messages);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params, ci, level, messages);
+			return this->DoDel(source, params, level, messages);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, params, ci, level, messages);
+			return this->DoList(source, params, level, messages);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(u, ci, level, messages);
+			return this->DoClear(source, level, messages);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
  public:
@@ -487,7 +498,7 @@ class XOPBase : public Command
 	{
 	}
 
-	virtual CommandReturn Execute(User *u, const std::vector<Anope::string> &params) = 0;
+	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
 	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
 
@@ -503,9 +514,9 @@ class CommandCSQOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(u, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
+		return this->DoXop(source, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -532,9 +543,9 @@ class CommandCSAOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(u, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
+		return this->DoXop(source, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -561,9 +572,9 @@ class CommandCSHOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(u, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
+		return this->DoXop(source, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -590,9 +601,9 @@ class CommandCSSOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(u, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
+		return this->DoXop(source, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -619,9 +630,9 @@ class CommandCSVOP : public XOPBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(u, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
+		return this->DoXop(source, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)

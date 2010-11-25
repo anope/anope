@@ -20,13 +20,13 @@ class CommandCSSuspend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
-		ChannelInfo *ci = cs_findchan(chan);
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
-		Channel *c;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 
 		/* Assumes that permission checking has already been done. */
 		if (Config->ForceForbidReason && reason.empty())
@@ -35,28 +35,22 @@ class CommandCSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (chan[0] != '#')
-		{
-			u->SendMessage(ChanServ, CHAN_UNSUSPEND_ERROR);
-			return MOD_CONT;
-		}
-
 		/* You should not SUSPEND a FORBIDEN channel */
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
-			u->SendMessage(ChanServ, CHAN_MAY_NOT_BE_REGISTERED, chan.c_str());
+			source.Reply(CHAN_MAY_NOT_BE_REGISTERED, ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			u->SendMessage(ChanServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		ci->SetFlag(CI_SUSPENDED);
 		ci->forbidby = u->nick;
 		if (!reason.empty())
 			ci->forbidreason = reason;
 
-		if ((c = findchan(ci->name)))
+		if (c)
 		{
 			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 			{
@@ -73,7 +67,7 @@ class CommandCSSuspend : public Command
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
-		u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, chan.c_str());
+		u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 
@@ -105,23 +99,18 @@ class CommandCSUnSuspend : public Command
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		ChannelInfo *ci = cs_findchan(chan);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
-		if (chan[0] != '#')
-		{
-			u->SendMessage(ChanServ, CHAN_UNSUSPEND_ERROR);
-			return MOD_CONT;
-		}
 		if (readonly)
-			u->SendMessage(ChanServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasFlag(CI_SUSPENDED))
 		{
-			u->SendMessage(ChanServ, CHAN_UNSUSPEND_FAILED, chan.c_str());
+			source.Reply(CHAN_UNSUSPEND_FAILED, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -134,7 +123,7 @@ class CommandCSUnSuspend : public Command
 		if (Config->WallForbid)
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-		u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, chan.c_str());
+		u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 

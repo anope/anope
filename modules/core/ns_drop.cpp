@@ -21,13 +21,14 @@ class CommandNSDrop : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
 
 		if (readonly)
 		{
-			u->SendMessage(NickServ, NICK_DROP_DISABLED);
+			source.Reply(NICK_DROP_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -42,7 +43,7 @@ class CommandNSDrop : public Command
 
 				Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
 				delete nr;
-				u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
+				source.Reply(NICK_X_DROPPED, nick.c_str());
 			}
 			else if (nr && !nick.empty())
 			{
@@ -50,23 +51,23 @@ class CommandNSDrop : public Command
 				if (res)
 				{
 					Log(LOG_COMMAND, u, this) << "to drop nick request " << nr->nick;
-					u->SendMessage(NickServ, NICK_X_DROPPED, nr->nick.c_str());
+					source.Reply(NICK_X_DROPPED, nr->nick.c_str());
 					delete nr;
 				}
 				else if (bad_password(u))
 					return MOD_STOP;
 				else
-					u->SendMessage(NickServ, PASSWORD_INCORRECT);
+					source.Reply(PASSWORD_INCORRECT);
 			}
 			else
-				u->SendMessage(NickServ, NICK_NOT_REGISTERED);
+				source.Reply(NICK_NOT_REGISTERED);
 
 			return MOD_CONT;
 		}
 
 		if (!u->Account())
 		{
-			u->SendMessage(NickServ, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -76,13 +77,13 @@ class CommandNSDrop : public Command
 			my_nick = na->nick;
 
 		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			if (readonly)
-				u->SendMessage(NickServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 
 			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
 			{
@@ -99,14 +100,14 @@ class CommandNSDrop : public Command
 			{
 				if (Config->WallDrop)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-				u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
+				source.Reply(NICK_X_DROPPED, nick.c_str());
 			}
 			else
 			{
 				if (!nick.empty())
-					u->SendMessage(NickServ, NICK_X_DROPPED, nick.c_str());
+					source.Reply(NICK_X_DROPPED, nick.c_str());
 				else
-					u->SendMessage(NickServ, NICK_DROPPED);
+					source.Reply(NICK_DROPPED);
 			}
 		}
 

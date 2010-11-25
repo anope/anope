@@ -19,9 +19,10 @@ class CommandCSSetRestricted : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetRestricted");
 
@@ -30,14 +31,14 @@ class CommandCSSetRestricted : public Command
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
-			u->SendMessage(ChanServ, CHAN_SET_RESTRICTED_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_RESTRICTED_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
-			u->SendMessage(ChanServ, CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "RESTRICTED");

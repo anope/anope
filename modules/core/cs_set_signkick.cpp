@@ -20,9 +20,10 @@ class CommandCSSetSignKick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetSignKick");
 
@@ -30,19 +31,19 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			u->SendMessage(ChanServ, CHAN_SET_SIGNKICK_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_SIGNKICK_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
 			ci->SetFlag(CI_SIGNKICK_LEVEL);
 			ci->UnsetFlag(CI_SIGNKICK);
-			u->SendMessage(ChanServ, CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
+			source.Reply(CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			u->SendMessage(ChanServ, CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SIGNKICK");

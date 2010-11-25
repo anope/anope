@@ -20,9 +20,10 @@ class CommandNSGetPass : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
 		NickAlias *na;
 		NickRequest *nr = NULL;
@@ -34,15 +35,15 @@ class CommandNSGetPass : public Command
 				Log(LOG_ADMIN, u, this) << "for " << nr->nick;
 				if (Config->WallGetpass)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
-				u->SendMessage(NickServ, NICK_GETPASS_PASSCODE_IS, nick.c_str(), nr->passcode.c_str());
+				source.Reply(NICK_GETPASS_PASSCODE_IS, nick.c_str(), nr->passcode.c_str());
 			}
 			else
-				u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
@@ -50,10 +51,10 @@ class CommandNSGetPass : public Command
 				Log(LOG_ADMIN, u, this) << "for " << nick;
 				if (Config->WallGetpass)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
-				u->SendMessage(NickServ, NICK_GETPASS_PASSWORD_IS, nick.c_str(), tmp_pass.c_str());
+				source.Reply(NICK_GETPASS_PASSWORD_IS, nick.c_str(), tmp_pass.c_str());
 			}
 			else
-				u->SendMessage(NickServ, NICK_GETPASS_UNAVAILABLE);
+				source.Reply(NICK_GETPASS_UNAVAILABLE);
 		}
 		return MOD_CONT;
 	}

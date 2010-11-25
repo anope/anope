@@ -20,10 +20,11 @@ class CommandOSUMode : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string modes = params[1];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		const Anope::string &modes = params[1];
 
 		User *u2;
 
@@ -37,12 +38,12 @@ class CommandOSUMode : public Command
 			return MOD_CONT;
 		}
 		if (!(u2 = finduser(nick)))
-			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else
 		{
 			u2->SetModes(OperServ, "%s", modes.c_str());
 
-			u->SendMessage(OperServ, OPER_UMODE_SUCCESS, nick.c_str());
+			source.Reply(OPER_UMODE_SUCCESS, nick.c_str());
 			u2->SendMessage(OperServ, OPER_UMODE_CHANGED, u->nick.c_str());
 
 			if (Config->WallOSMode)

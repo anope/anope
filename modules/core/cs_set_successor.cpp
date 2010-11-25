@@ -20,15 +20,16 @@ class CommandCSSetSuccessor : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetSuccessor");
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -40,17 +41,17 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, params[1].c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
 				return MOD_CONT;
 			}
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				u->SendMessage(ChanServ, NICK_X_FORBIDDEN, na->nick.c_str());
+				source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 				return MOD_CONT;
 			}
 			if (na->nc == ci->founder)
 			{
-				u->SendMessage(ChanServ, CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
+				source.Reply(CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			nc = na->nc;
@@ -63,9 +64,9 @@ class CommandCSSetSuccessor : public Command
 		ci->successor = nc;
 
 		if (nc)
-			u->SendMessage(ChanServ, CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
+			source.Reply(CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
 		else
-			u->SendMessage(ChanServ, CHAN_SUCCESSOR_UNSET, ci->name.c_str());
+			source.Reply(CHAN_SUCCESSOR_UNSET, ci->name.c_str());
 
 		return MOD_CONT;
 	}

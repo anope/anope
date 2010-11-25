@@ -21,29 +21,30 @@ class CommandNSStatus : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u2;
-		Anope::string nick = !params.empty() ? params[0] : u->nick;
+		User *u = source.u;
+		const Anope::string &nick = !params.empty() ? params[0] : u->nick;
 		NickAlias *na = findnick(nick);
 		spacesepstream sep(nick);
 		Anope::string nickbuf;
 
 		while (sep.GetToken(nickbuf))
 		{
-			if (!(u2 = finduser(nickbuf))) /* Nick is not online */
-				u->SendMessage(NickServ, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
+			User *u2 = finduser(nickbuf);
+			if (!u2) /* Nick is not online */
+				source.Reply(NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
 			else if (u2->IsIdentified() && na && na->nc == u2->Account()) /* Nick is identified */
-				u->SendMessage(NickServ, NICK_STATUS_REPLY, nickbuf.c_str(), 3, u2->Account()->display.c_str());
+				source.Reply(NICK_STATUS_REPLY, nickbuf.c_str(), 3, u2->Account()->display.c_str());
 			else if (u2->IsRecognized()) /* Nick is recognised, but NOT identified */
-				u->SendMessage(NickServ, NICK_STATUS_REPLY, nickbuf.c_str(), 2, u2->Account() ? u2->Account()->display.c_str() : "");
+				source.Reply(NICK_STATUS_REPLY, nickbuf.c_str(), 2, u2->Account() ? u2->Account()->display.c_str() : "");
 			else if (!na) /* Nick is online, but NOT a registered */
-				u->SendMessage(NickServ, NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
+				source.Reply(NICK_STATUS_REPLY, nickbuf.c_str(), 0, "");
 			else
 				/* Nick is not identified for the nick, but they could be logged into an account,
 				 * so we tell the user about it
 				 */
-				u->SendMessage(NickServ, NICK_STATUS_REPLY, nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
+				source.Reply(NICK_STATUS_REPLY, nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
 		}
 		return MOD_CONT;
 	}

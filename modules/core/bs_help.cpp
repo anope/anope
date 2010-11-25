@@ -22,8 +22,9 @@ class CommandBSHelp : public Command
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		mod_help_cmd(findbot(Config->s_BotServ), u, params[0]);
 		return MOD_CONT;
 	}

@@ -20,8 +20,10 @@ class CommandMSIgnore : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		Anope::string channel = params[0];
 		Anope::string command = (params.size() > 1 ? params[1] : "");
 		Anope::string param = (params.size() > 2 ? params[2] : "");
@@ -38,21 +40,21 @@ class CommandMSIgnore : public Command
 		if (!mi)
 		{
 			if (isforbid)
-				u->SendMessage(MemoServ, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, channel.c_str());
+				source.Reply(ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, channel.c_str());
 			else
-				u->SendMessage(MemoServ, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, channel.c_str());
+				source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, channel.c_str());
 		}
 		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
-			u->SendMessage(MemoServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
 				mi->ignores.push_back(param.ci_str());
-				u->SendMessage(MemoServ, MEMO_IGNORE_ADD, param.c_str());
+				source.Reply(MEMO_IGNORE_ADD, param.c_str());
 			}
 			else
-				u->SendMessage(MemoServ, MEMO_IGNORE_ALREADY_IGNORED, param.c_str());
+				source.Reply(MEMO_IGNORE_ALREADY_IGNORED, param.c_str());
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
@@ -61,20 +63,20 @@ class CommandMSIgnore : public Command
 			if (it != mi->ignores.end())
 			{
 				mi->ignores.erase(it);
-				u->SendMessage(MemoServ, MEMO_IGNORE_DEL, param.c_str());
+				source.Reply(MEMO_IGNORE_DEL, param.c_str());
 			}
 			else
-				u->SendMessage(MemoServ, MEMO_IGNORE_NOT_IGNORED, param.c_str());
+				source.Reply(MEMO_IGNORE_NOT_IGNORED, param.c_str());
 		}
 		else if (command.equals_ci("LIST"))
 		{
 			if (mi->ignores.empty())
-				u->SendMessage(MemoServ, MEMO_IGNORE_LIST_EMPTY);
+				source.Reply(MEMO_IGNORE_LIST_EMPTY);
 			else
 			{
-				u->SendMessage(MemoServ, MEMO_IGNORE_LIST_HEADER);
+				source.Reply(MEMO_IGNORE_LIST_HEADER);
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
-					u->SendMessage(Config->s_MemoServ, "    %s", mi->ignores[i].c_str());
+					source.Reply("    %s", mi->ignores[i].c_str());
 			}
 		}
 		else

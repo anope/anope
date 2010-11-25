@@ -16,11 +16,12 @@
 class CommandOSIgnore : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string time = params.size() > 1 ? params[1] : "";
-		Anope::string nick = params.size() > 2 ? params[2] : "";
-		time_t t;
+		const Anope::string &time = params.size() > 1 ? params[1] : "";
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
+
+		User *u = source.u;
 
 		if (time.empty() || nick.empty())
 		{
@@ -29,45 +30,48 @@ class CommandOSIgnore : public Command
 		}
 		else
 		{
-			t = dotime(time);
+			time_t t = dotime(time);
 
 			if (t <= -1)
 			{
-				u->SendMessage(OperServ, OPER_IGNORE_VALID_TIME);
+				source.Reply(OPER_IGNORE_VALID_TIME);
 				return MOD_CONT;
 			}
 			else if (!t)
 			{
 				add_ignore(nick, t);
-				u->SendMessage(OperServ, OPER_IGNORE_PERM_DONE, nick.c_str());
+				source.Reply(OPER_IGNORE_PERM_DONE, nick.c_str());
 			}
 			else
 			{
 				add_ignore(nick, t);
-				u->SendMessage(OperServ, OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
+				source.Reply(OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
 			}
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u)
+	CommandReturn DoList(CommandSource &source)
 	{
 		if (ignore.empty())
 		{
-			u->SendMessage(OperServ, OPER_IGNORE_LIST_EMPTY);
+			source.Reply(OPER_IGNORE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
+		User *u = source.u;
+
 		u->SendMessage(OperServ, OPER_IGNORE_LIST);
 		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
-			u->SendMessage(Config->s_OperServ, "%s", (*ign)->mask.c_str());
+			source.Reply("%s", (*ign)->mask.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
 			this->OnSyntaxError(u, "DEL");
@@ -75,17 +79,18 @@ class CommandOSIgnore : public Command
 		{
 			if (delete_ignore(nick))
 			{
-				u->SendMessage(OperServ, OPER_IGNORE_DEL_DONE, nick.c_str());
+				source.Reply(OPER_IGNORE_DEL_DONE, nick.c_str());
 				return MOD_CONT;
 			}
-			u->SendMessage(OperServ, OPER_IGNORE_LIST_NOMATCH, nick.c_str());
+			source.Reply(OPER_IGNORE_LIST_NOMATCH, nick.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u)
+	CommandReturn DoClear(CommandSource &source)
 	{
+		User *u = source.u;
 		clear_ignores();
 		u->SendMessage(OperServ, OPER_IGNORE_LIST_CLEARED);
 
@@ -96,18 +101,19 @@ class CommandOSIgnore : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params);
+			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u);
+			return this->DoList(source);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params);
+			return this->DoDel(source, params);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(u);
+			return this->DoClear(source);
 		else
 			this->OnSyntaxError(u, "");
 

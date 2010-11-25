@@ -20,8 +20,9 @@ class CommandOSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		u->SendMessage(OperServ, OPER_STAFF_LIST_HEADER);
 
 		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
@@ -41,13 +42,13 @@ class CommandOSStaff : public Command
 					{
 						found = 1;
 						if (na->nick.equals_ci(u2->nick))
-							u->SendMessage(OperServ, OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
+							source.Reply(OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
 						else
-							u->SendMessage(OperServ, OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
+							source.Reply(OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
 					}
 				}
 				if (!found)
-					u->SendMessage(OperServ, OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
+					source.Reply(OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
 			}
 		}
 

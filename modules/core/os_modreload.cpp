@@ -20,26 +20,27 @@ class CommandOSModReLoad : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mname = params[0];
+		User *u = source.u;
+		const Anope::string &mname = params[0];
 
 		Module *m = FindModule(mname);
 		if (!m)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_ISNT_LOADED, mname.c_str());
+			source.Reply(OPER_MODULE_ISNT_LOADED, mname.c_str());
 			return MOD_CONT;
 		}
 
 		if (!m->handle)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			source.Reply(OPER_MODULE_REMOVE_FAIL, m->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (m->GetPermanent())
 		{
-			u->SendMessage(OperServ, OPER_MODULE_NO_UNLOAD);
+			source.Reply(OPER_MODULE_NO_UNLOAD);
 			return MOD_CONT;
 		}
 
@@ -49,7 +50,7 @@ class CommandOSModReLoad : public Command
 
 		if (status != MOD_ERR_OK)
 		{
-			u->SendMessage(OperServ, OPER_MODULE_REMOVE_FAIL, mname.c_str());
+			source.Reply(OPER_MODULE_REMOVE_FAIL, mname.c_str());
 			return MOD_CONT;
 		}
 
@@ -57,7 +58,7 @@ class CommandOSModReLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			ircdproto->SendGlobops(OperServ, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
-			u->SendMessage(OperServ, OPER_MODULE_RELOADED, mname.c_str());
+			source.Reply(OPER_MODULE_RELOADED, mname.c_str());
 
 			/* If a user is loading this module, then the core databases have already been loaded
 			 * so trigger the event manually
@@ -71,7 +72,7 @@ class CommandOSModReLoad : public Command
 			if (fatal)
 				throw FatalException("Unable to reload module " + mname);
 			else
-				u->SendMessage(OperServ, OPER_MODULE_LOAD_FAIL, mname.c_str());
+				source.Reply(OPER_MODULE_LOAD_FAIL, mname.c_str());
 		}
 
 		return MOD_CONT;

@@ -94,9 +94,11 @@ class CommandEntryMessage : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (ci && (IsFounder(u, ci) || u->Account()->HasCommand("chanserv/entrymsg")))
 		{
 			bool success = true;

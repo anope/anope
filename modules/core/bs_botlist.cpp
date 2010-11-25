@@ -20,13 +20,14 @@ class CommandBSBotList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		unsigned count = 0;
 
 		if (BotListByNick.empty())
 		{
-			u->SendMessage(BotServ, BOT_BOTLIST_EMPTY);
+			source.Reply(BOT_BOTLIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -37,15 +38,15 @@ class CommandBSBotList : public Command
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
 				if (!count)
-					u->SendMessage(BotServ, BOT_BOTLIST_HEADER);
+					source.Reply(BOT_BOTLIST_HEADER);
 				++count;
-				u->SendMessage(Config->s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
+				source.Reply("   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 			}
 		}
 
 		if (u->Account()->HasCommand("botserv/botlist") && count < BotListByNick.size())
 		{
-			u->SendMessage(BotServ, BOT_BOTLIST_PRIVATE_HEADER);
+			source.Reply(BOT_BOTLIST_PRIVATE_HEADER);
 
 			for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
@@ -53,16 +54,16 @@ class CommandBSBotList : public Command
 
 				if (bi->HasFlag(BI_PRIVATE))
 				{
-					u->SendMessage(Config->s_BotServ, "   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
+					source.Reply("   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 					++count;
 				}
 			}
 		}
 
 		if (!count)
-			u->SendMessage(BotServ, BOT_BOTLIST_EMPTY);
+			source.Reply(BOT_BOTLIST_EMPTY);
 		else
-			u->SendMessage(BotServ, BOT_BOTLIST_FOOTER, count);
+			source.Reply(BOT_BOTLIST_FOOTER, count);
 
 		return MOD_CONT;
 	}

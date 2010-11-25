@@ -20,13 +20,14 @@ class CommandMSStaff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string text = params[0];
+		User *u = source.u;
+		const Anope::string &text = params[0];
 
 		if (readonly)
 		{
-			u->SendMessage(MemoServ, MEMO_SEND_DISABLED);
+			source.Reply(MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 

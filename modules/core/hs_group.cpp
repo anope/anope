@@ -20,19 +20,20 @@ class CommandHSGroup : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			HostServSyncVhosts(na);
 			if (!na->hostinfo.GetIdent().empty())
-				u->SendMessage(HostServ, HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				u->SendMessage(HostServ, HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
-			u->SendMessage(HostServ, HOST_NOT_ASSIGNED);
+			source.Reply(HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}

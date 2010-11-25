@@ -20,8 +20,9 @@ class CommandNSSASetNoexpire : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSASsetNoexpire");
@@ -31,12 +32,12 @@ class CommandNSSASetNoexpire : public Command
 		if (param.equals_ci("ON"))
 		{
 			na->SetFlag(NS_NO_EXPIRE);
-			u->SendMessage(NickServ, NICK_SASET_NOEXPIRE_ON, na->nick.c_str());
+			source.Reply(NICK_SASET_NOEXPIRE_ON, na->nick.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			na->UnsetFlag(NS_NO_EXPIRE);
-			u->SendMessage(NickServ, NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
+			source.Reply(NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "NOEXPIRE");

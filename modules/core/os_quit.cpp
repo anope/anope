@@ -21,8 +21,9 @@ class CommandOSQuit : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		quitmsg = "QUIT command received from " + u->nick;
 
 		if (Config->GlobalOnCycle)

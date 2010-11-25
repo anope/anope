@@ -20,8 +20,9 @@ class CommandNSSetHide : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetHide");
@@ -66,12 +67,12 @@ class CommandNSSetHide : public Command
 		if (arg.equals_ci("ON"))
 		{
 			nc->SetFlag(flag);
-			u->SendMessage(NickServ, onmsg, nc->display.c_str(), Config->s_NickServ.c_str());
+			source.Reply(onmsg, nc->display.c_str(), Config->s_NickServ.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(flag);
-			u->SendMessage(NickServ, offmsg, nc->display.c_str(), Config->s_NickServ.c_str());
+			source.Reply(offmsg, nc->display.c_str(), Config->s_NickServ.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "HIDE");

@@ -28,23 +28,25 @@ class CommandCSSet : public Command
 		this->subcommands.clear();
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, CHAN_SET_DISABLED);
+			source.Reply(CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
 		if (!check_access(u, cs_findchan(params[0]), CA_SET))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			u->SendMessage(ChanServ, CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
+			source.Reply(CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -52,7 +54,7 @@ class CommandCSSet : public Command
 
 		if (c)
 		{
-			ChannelInfo *ci = cs_findchan(params[0]);
+			ChannelInfo *ci = source.ci;
 			Anope::string cmdparams = ci->name;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
@@ -60,8 +62,8 @@ class CommandCSSet : public Command
 		}
 		else
 		{
-			u->SendMessage(ChanServ, NICK_SET_UNKNOWN_OPTION, params[1].c_str());
-			u->SendMessage(ChanServ, MORE_INFO, Config->s_ChanServ.c_str(), "SET");
+			source.Reply(NICK_SET_UNKNOWN_OPTION, params[1].c_str());
+			source.Reply(MORE_INFO, Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;

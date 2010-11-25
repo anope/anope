@@ -43,6 +43,25 @@ enum CommandFlag
 	CFLAG_DISABLE_FANTASY
 };
 
+/* The source for a command */
+struct CommandSource
+{
+	/* User executing the command */
+	User *u;
+	/* Channel (if applicable) */
+	ChannelInfo *ci;
+	/* The service this command is on */
+	BotInfo *owner;
+	/* The service the reply should come from, *not* necessarily the service the command is on */
+	BotInfo *service;
+	/* Whether or not this was a fantasy command */
+	bool fantasy;
+
+	void Reply(LanguageString message, ...);
+	void Reply(const char *message, ...);
+	void Reply(const Anope::string &message);
+};
+
 /** Every services command is a class, inheriting from Command.
  */
 class CoreExport Command : public Flags<CommandFlag>
@@ -73,9 +92,10 @@ class CoreExport Command : public Flags<CommandFlag>
 	virtual ~Command();
 
 	/** Execute this command.
-	 * @param u The user executing the command.
+	 * @param source The source
+	 * @param params Command parameters
 	 */
-	virtual CommandReturn Execute(User *u, const std::vector<Anope::string> &);
+	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
 	/** Called when HELP is requsted for the client this command is on.
 	 * @param u The user requesting help

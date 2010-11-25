@@ -21,39 +21,41 @@ class CommandNSGhost : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		const Anope::string &nick = params[0];
 		Anope::string pass = params.size() > 1 ? params[1] : "";
+
+		User *u = source.u;
 		User *user = finduser(nick);
 		NickAlias *na = findnick(nick);
 
 		if (!user)
-			u->SendMessage(NickServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!na)
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
-			u->SendMessage(NickServ, NICK_NO_GHOST_SELF);
+			source.Reply(NICK_NO_GHOST_SELF);
 		else if ((u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))) ||
 				(!pass.empty() && enc_check_password(pass, na->nc->pass) == 1))
 		{
 			if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
-				u->SendMessage(NickServ, NICK_GHOST_UNIDENTIFIED);
+				source.Reply(NICK_GHOST_UNIDENTIFIED);
 			else
 			{
 				Log(LOG_COMMAND, u, this) << "for " << nick;
 				Anope::string buf = "GHOST command used by " + u->nick;
 				kill_user(Config->s_NickServ, nick, buf);
-				u->SendMessage(NickServ, NICK_GHOST_KILLED, nick.c_str());
+				source.Reply(NICK_GHOST_KILLED, nick.c_str());
 			}
 		}
 		else
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			if (!pass.empty())
 			{
 				Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;

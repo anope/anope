@@ -49,12 +49,12 @@ class CommandHSRequest : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = u->nick;
+		User *u = source.u;
+
 		Anope::string rawhostmask = params[0];
 		Anope::string hostmask;
-		NickAlias *na;
 
 		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (!vIdent.empty())
@@ -97,22 +97,17 @@ class CommandHSRequest : public Command
 			return MOD_CONT;
 		}
 
-		if ((na = findnick(nick)))
+		if (HSRequestMemoOper && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 		{
-			if (HSRequestMemoOper && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
-			{
-				me->SendMessage(HostServ, u, _("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
-				u->lastmemosend = Anope::CurTime;
-				return MOD_CONT;
-			}
-			my_add_host_request(nick, vIdent, hostmask, u->nick, Anope::CurTime);
-
-			me->SendMessage(HostServ, u, _("Your vHost has been requested"));
-			req_send_memos(u, vIdent, hostmask);
-			Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
+			me->SendMessage(HostServ, u, _("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
+			u->lastmemosend = Anope::CurTime;
+			return MOD_CONT;
 		}
-		else
-			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
+		my_add_host_request(u->nick, vIdent, hostmask, u->nick, Anope::CurTime);
+
+		me->SendMessage(HostServ, u, _("Your vHost has been requested"));
+		req_send_memos(u, vIdent, hostmask);
+		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
 		return MOD_CONT;
 	}
@@ -145,12 +140,14 @@ class CommandHSActivate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		NickAlias *na;
+		User *u = source.u;
 
-		if ((na = findnick(nick)))
+		const Anope::string &nick = params[0];
+
+		NickAlias *na = findnick(nick);
+		if (na)
 		{
 			RequestMap::iterator it = Requests.find(na->nick);
 			if (it != Requests.end())
@@ -205,10 +202,12 @@ class CommandHSReject : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+
+		const Anope::string &nick = params[0];
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		RequestMap::iterator it = Requests.find(nick);
 		if (it != Requests.end())
@@ -297,9 +296,9 @@ class CommandHSWaiting : public HSListBase
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoList(u);
+		return this->DoList(source.u);
 	}
 
 	bool OnHelp(User *u, const Anope::string &subcommand)
@@ -351,7 +350,7 @@ class HSRequest : public Module
 
 	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
 	{
-		if (!Config->s_HostServ.empty() && service == findbot(Config->s_HostServ))
+		if (service == HostServ)
 		{
 			if (command.equals_ci("LIST"))
 			{
@@ -361,12 +360,20 @@ class HSRequest : public Module
 				{
 					std::vector<Anope::string> emptyParams;
 					Command *c = FindCommand(HostServ, "WAITING");
-					c->Execute(u, emptyParams);
+					if (!c)
+						throw CoreException("No waiting command?");
+					CommandSource source;
+					source.u = u;
+					source.ci = NULL;
+					source.owner = service;
+					source.service = service;
+					source.fantasy = false;
+					c->Execute(source, emptyParams);
 					return EVENT_STOP;
 				}
 			}
 		}
-		else if (service == findbot(Config->s_NickServ))
+		else if (service == NickServ)
 		{
 			if (command.equals_ci("DROP"))
 			{

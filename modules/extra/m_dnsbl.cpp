@@ -7,6 +7,12 @@
 
 #include "module.h"
 
+struct FakeAkill : public Command
+{
+	FakeAkill() : Command("AKILL", 0, 0) { this->service = OperServ; }
+	CommandReturn Execute(CommandSource &, const std::vector<Anope::string> &) { return MOD_CONT; }
+} fake_akill;
+
 struct Blacklist
 {
 	Anope::string name;
@@ -56,9 +62,7 @@ class DNSBLResolver : public DNSRequest
 		XLine *x = NULL;
 		if (this->add_to_akill && SGLine && (x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason)))
 		{
-			static Command command_akill("AKILL", 0);
-			command_akill.service = OperServ;
-			Log(LOG_COMMAND, OperServ, &command_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
+			Log(LOG_COMMAND, OperServ, &fake_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
 				ircdproto->SendAkill(x);

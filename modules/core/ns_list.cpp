@@ -21,7 +21,7 @@ class CommandNSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		/* SADMINS can search for nicks based on their NS_FORBIDDEN and NS_NO_EXPIRE
 		 * status. The keywords FORBIDDEN and NOEXPIRE represent these two states
@@ -36,6 +36,8 @@ class CommandNSList : public Command
 		 *
 		 * UPDATE: SUSPENDED keyword is now accepted as well.
 		 */
+		User *u = source.u;
+
 		Anope::string pattern = params[0];
 		const NickCore *mync;
 		unsigned nnicks;
@@ -49,7 +51,7 @@ class CommandNSList : public Command
 
 		if (Config->NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -58,24 +60,24 @@ class CommandNSList : public Command
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
 			if (tmp.empty())
 			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (tmp.empty())
 			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -142,7 +144,7 @@ class CommandNSList : public Command
 							snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick.c_str());
 						else
 							snprintf(buf, sizeof(buf), "%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
-						u->SendMessage(Config->s_NickServ, "   %c%s", noexpire_char, buf);
+						source.Reply("   %c%s", noexpire_char, buf);
 					}
 					++count;
 				}
@@ -161,7 +163,7 @@ class CommandNSList : public Command
 				if ((nr->nick.equals_ci(pattern) || Anope::Match(buf, pattern)) && ++nnicks <= Config->NSListMax)
 				{
 					snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick.c_str());
-					u->SendMessage(Config->s_NickServ, "   %c%s", noexpire_char, buf);
+					source.Reply("   %c%s", noexpire_char, buf);
 				}
 			}
 		}

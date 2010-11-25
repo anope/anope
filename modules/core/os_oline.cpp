@@ -20,27 +20,28 @@ class CommandOSOLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string flag = params[1];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
+		const Anope::string &flag = params[1];
 		User *u2 = NULL;
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
 			u2->SetMode(OperServ, UMODE_OPER);
 			u2->SendMessage(OperServ, OPER_OLINE_IRCOP);
-			u->SendMessage(OperServ, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			source.Reply(OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
-			u->SendMessage(OperServ, OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			source.Reply(OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else

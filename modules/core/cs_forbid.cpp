@@ -21,13 +21,13 @@ class CommandCSForbid : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci;
-		Anope::string chan = params[0];
-		Anope::string reason = params.size() > 1 ? params[1] : "";
+		const Anope::string &chan = params[0];
+		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
-		Channel *c;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (Config->ForceForbidReason && reason.empty())
 		{
@@ -37,13 +37,13 @@ class CommandCSForbid : public Command
 
 		if (chan[0] != '#')
 		{
-			u->SendMessage(ChanServ, CHAN_SYMBOL_REQUIRED);
+			source.Reply(CHAN_SYMBOL_REQUIRED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
@@ -55,7 +55,8 @@ class CommandCSForbid : public Command
 		ci->forbidby = u->nick;
 		ci->forbidreason = reason;
 
-		if ((c = ci->c))
+		Channel *c = ci->c;
+		if (c)
 		{
 			/* Before banning everyone, it might be prudent to clear +e and +I lists..
 			 * to prevent ppl from rejoining.. ~ Viper */

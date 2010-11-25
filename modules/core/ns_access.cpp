@@ -16,37 +16,39 @@
 class CommandNSAccess : public Command
 {
  private:
-	CommandReturn DoServAdminList(User *u, const std::vector<Anope::string> &params, NickCore *nc)
+	CommandReturn DoServAdminList(CommandSource &source, const std::vector<Anope::string> &params, NickCore *nc)
 	{
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 		unsigned i, end;
 
 		if (nc->access.empty())
 		{
-			u->SendMessage(NickServ, NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
+			source.Reply(NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, nc->display.c_str());
+			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
-		u->SendMessage(NickServ, NICK_ACCESS_LIST_X, params[1].c_str());
+		source.Reply(NICK_ACCESS_LIST_X, params[1].c_str());
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
 			if (!mask.empty() && !Anope::Match(access, mask))
 				continue;
-			u->SendMessage(Config->s_NickServ, "    %s", access.c_str());
+			source.Reply("    %s", access.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, NickCore *nc, const Anope::string &mask)
+	CommandReturn DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
+		User *u = source.u;
+
 		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "ADD");
@@ -55,24 +57,26 @@ class CommandNSAccess : public Command
 
 		if (nc->access.size() >= Config->NSAccessMax)
 		{
-			u->SendMessage(NickServ, NICK_ACCESS_REACHED_LIMIT, Config->NSAccessMax);
+			source.Reply(NICK_ACCESS_REACHED_LIMIT, Config->NSAccessMax);
 			return MOD_CONT;
 		}
 
 		if (nc->FindAccess(mask))
 		{
-			u->SendMessage(NickServ, NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
+			source.Reply(NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
 			return MOD_CONT;
 		}
 
 		nc->AddAccess(mask);
-		u->SendMessage(NickServ, NICK_ACCESS_ADDED, mask.c_str());
+		source.Reply(NICK_ACCESS_ADDED, mask.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, NickCore *nc, const Anope::string &mask)
+	CommandReturn DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
+		User *u = source.u;
+
 		if (mask.empty())
 		{
 			this->OnSyntaxError(u, "DEL");
@@ -81,33 +85,34 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			u->SendMessage(NickServ, NICK_ACCESS_NOT_FOUND, mask.c_str());
+			source.Reply(NICK_ACCESS_NOT_FOUND, mask.c_str());
 			return MOD_CONT;
 		}
 
-		u->SendMessage(NickServ, NICK_ACCESS_DELETED, mask.c_str());
+		source.Reply(NICK_ACCESS_DELETED, mask.c_str());
 		nc->EraseAccess(mask);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, NickCore *nc, const Anope::string &mask)
+	CommandReturn DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
+		User *u = source.u;
 		unsigned i, end;
 
 		if (nc->access.empty())
 		{
-			u->SendMessage(NickServ, NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
+			source.Reply(NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
 			return MOD_CONT;
 		}
 
-		u->SendMessage(NickServ, NICK_ACCESS_LIST);
+		source.Reply(NICK_ACCESS_LIST);
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
 			if (!mask.empty() && !Anope::Match(access, mask))
 				continue;
-			u->SendMessage(Config->s_NickServ, "    %s", access.c_str());
+			source.Reply("    %s", access.c_str());
 		}
 
 		return MOD_CONT;
@@ -117,34 +122,32 @@ class CommandNSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
-		Anope::string mask = params.size() > 1 ? params[1] : "";
-		NickAlias *na;
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
+		NickAlias *na;
 		if (cmd.equals_ci("LIST") && u->Account()->IsServicesOper() && !mask.empty() && (na = findnick(params[1])))
-			return this->DoServAdminList(u, params, na->nc);
+			return this->DoServAdminList(source, params, na->nc);
 
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
-			u->SendMessage(NickServ, BAD_USERHOST_MASK);
-			u->SendMessage(NickServ, MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
+			source.Reply(BAD_USERHOST_MASK);
+			source.Reply(MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
 		}
-		/*
-		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick);
-			*/
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->Account()->display.c_str());
+			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, u->Account(), mask);
+			return this->DoAdd(source, u->Account(), mask);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, u->Account(), mask);
+			return this->DoDel(source, u->Account(), mask);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, u->Account(), mask);
+			return this->DoList(source, u->Account(), mask);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 

@@ -20,18 +20,18 @@ class CommandCSTopic : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string topic = params.size() > 1 ? params[1] : "";
+		const Anope::string &topic = params.size() > 1 ? params[1] : "";
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		Channel *c = ci->c;
 
 		if (!c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);

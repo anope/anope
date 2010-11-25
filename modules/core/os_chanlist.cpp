@@ -20,10 +20,11 @@ class CommandOSChanList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string pattern = !params.empty() ? params[0] : "";
-		Anope::string opt = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &pattern = !params.empty() ? params[0] : "";
+		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		std::list<ChannelModeName> Modes;
 		User *u2;
 
@@ -35,7 +36,7 @@ class CommandOSChanList : public Command
 
 		if (!pattern.empty() && (u2 = finduser(pattern)))
 		{
-			u->SendMessage(OperServ, OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
+			source.Reply(OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
 
 			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
@@ -46,12 +47,12 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				u->SendMessage(OperServ, OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
+				source.Reply(OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
 			}
 		}
 		else
 		{
-			u->SendMessage(OperServ, OPER_CHANLIST_HEADER);
+			source.Reply(OPER_CHANLIST_HEADER);
 
 			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
@@ -64,7 +65,7 @@ class CommandOSChanList : public Command
 						if (!c->HasMode(*it))
 							continue;
 
-				u->SendMessage(OperServ, OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
+				source.Reply(OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
 			}
 		}
 

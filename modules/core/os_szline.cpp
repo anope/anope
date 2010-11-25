@@ -15,21 +15,21 @@
 
 class SZLineDelCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	unsigned Deleted;
  public:
-	SZLineDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	SZLineDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
 	{
 	}
 
 	~SZLineDelCallback()
 	{
 		if (!Deleted)
-			u->SendMessage(OperServ, OPER_SZLINE_NO_MATCH);
+			source.Reply(OPER_SZLINE_NO_MATCH);
 		else if (Deleted == 1)
-			u->SendMessage(OperServ, OPER_SZLINE_DELETED_ONE);
+			source.Reply(OPER_SZLINE_DELETED_ONE);
 		else
-			u->SendMessage(OperServ, OPER_SZLINE_DELETED_SEVERAL, Deleted);
+			source.Reply(OPER_SZLINE_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -43,10 +43,10 @@ class SZLineDelCallback : public NumberList
 			return;
 
 		++Deleted;
-		DoDel(u, x);
+		DoDel(source, x);
 	}
 
-	static void DoDel(User *u, XLine *x)
+	static void DoDel(CommandSource &source, XLine *x)
 	{
 		SZLine->DelXLine(x);
 	}
@@ -55,17 +55,17 @@ class SZLineDelCallback : public NumberList
 class SZLineListCallback : public NumberList
 {
  protected:
-	User *u;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	SZLineListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	SZLineListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
 	{
 	}
 
 	~SZLineListCallback()
 	{
 		if (!SentHeader)
-			u->SendMessage(OperServ, OPER_SZLINE_NO_MATCH);
+			source.Reply(OPER_SZLINE_NO_MATCH);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -81,22 +81,22 @@ class SZLineListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_SZLINE_LIST_HEADER);
+			source.Reply(OPER_SZLINE_LIST_HEADER);
 		}
 
-		DoList(u, x, Number - 1);
+		DoList(source, x, Number - 1);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		u->SendMessage(OperServ, OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
 class SZLineViewCallback : public SZLineListCallback
 {
  public:
-	SZLineViewCallback(User *_u, const Anope::string &numlist) : SZLineListCallback(_u, numlist)
+	SZLineViewCallback(CommandSource &_source, const Anope::string &numlist) : SZLineListCallback(_source, numlist)
 	{
 	}
 
@@ -113,24 +113,25 @@ class SZLineViewCallback : public SZLineListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_SZLINE_VIEW_HEADER);
+			source.Reply(OPER_SZLINE_VIEW_HEADER);
 		}
 
-		DoList(u, x, Number - 1);
+		DoList(source, x, Number - 1);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		Anope::string expirebuf = expire_left(u->Account(), x->Expires);
-		u->SendMessage(OperServ, OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
+		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
+		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSSZLine : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		unsigned last_param = 2;
 		Anope::string expiry, mask;
 		time_t expires;
@@ -152,7 +153,7 @@ class CommandOSSZLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
+			source.Reply(BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -180,7 +181,7 @@ class CommandOSSZLine : public Command
 
 			if (percent > 95)
 			{
-				u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to SZLine " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -190,7 +191,7 @@ class CommandOSSZLine : public Command
 			if (!x)
 				return MOD_CONT;
 
-			u->SendMessage(OperServ, OPER_SZLINE_ADDED, mask.c_str());
+			source.Reply(OPER_SZLINE_ADDED, mask.c_str());
 
 			if (Config->WallOSSZLine)
 			{
@@ -226,7 +227,7 @@ class CommandOSSZLine : public Command
 			}
 
 			if (readonly)
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 
 		}
 		else
@@ -235,11 +236,13 @@ class CommandOSSZLine : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		if (SZLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SZLINE_LIST_EMPTY);
+			source.Reply(OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -253,7 +256,7 @@ class CommandOSSZLine : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineDelCallback list(u, mask);
+			SZLineDelCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -262,27 +265,27 @@ class CommandOSSZLine : public Command
 
 			if (!x)
 			{
-				u->SendMessage(OperServ, OPER_SZLINE_NOT_FOUND, mask.c_str());
+				source.Reply(OPER_SZLINE_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SZLINE));
 
-			SZLineDelCallback::DoDel(u, x);
-			u->SendMessage(OperServ, OPER_SZLINE_DELETED, mask.c_str());
+			SZLineDelCallback::DoDel(source, x);
+			source.Reply(OPER_SZLINE_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			u->SendMessage(OperServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SZLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SZLINE_LIST_EMPTY);
+			source.Reply(OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -290,7 +293,7 @@ class CommandOSSZLine : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineListCallback list(u, mask);
+			SZLineListCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -306,25 +309,25 @@ class CommandOSSZLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_SZLINE_LIST_HEADER);
+						source.Reply(OPER_SZLINE_LIST_HEADER);
 					}
 
-					SZLineListCallback::DoList(u, x, i);
+					SZLineListCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_SZLINE_NO_MATCH);
+				source.Reply(OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SZLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_SZLINE_LIST_EMPTY);
+			source.Reply(OPER_SZLINE_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
@@ -332,7 +335,7 @@ class CommandOSSZLine : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SZLineViewCallback list(u, mask);
+			SZLineViewCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -348,22 +351,23 @@ class CommandOSSZLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_SZLINE_VIEW_HEADER);
+						source.Reply(OPER_SZLINE_VIEW_HEADER);
 					}
 
-					SZLineViewCallback::DoList(u, x, i);
+					SZLineViewCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_SZLINE_NO_MATCH);
+				source.Reply(OPER_SZLINE_NO_MATCH);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u)
+	CommandReturn DoClear(CommandSource &source)
 	{
+		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SZLINE));
 		SZLine->Clear();
 		u->SendMessage(OperServ, OPER_SZLINE_CLEAR);
@@ -375,22 +379,24 @@ class CommandOSSZLine : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params);
+			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params);
+			return this->DoDel(source, params);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, params);
+			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->DoView(u, params);
+			return this->DoView(source, params);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(u);
+			return this->DoClear(source);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 

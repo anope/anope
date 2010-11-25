@@ -34,20 +34,22 @@ class CommandCSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
+		const Anope::string &chan = params[0];
+
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex");
 		bool show_all = false;
-
-		ChannelInfo *ci = cs_findchan(chan);
 
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
 			if (is_oper(u) && !ci->forbidby.empty())
-				u->SendMessage(ChanServ, CHAN_X_FORBIDDEN_OPER, chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u, NO_REASON).c_str());
+				source.Reply(CHAN_X_FORBIDDEN_OPER, chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u, NO_REASON).c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_X_FORBIDDEN, chan.c_str());
+				source.Reply(CHAN_X_FORBIDDEN, chan.c_str());
 
 			return MOD_CONT;
 		}
@@ -60,7 +62,7 @@ class CommandCSInfo : public Command
 		u->SendMessage(ChanServ, CHAN_INFO_NO_FOUNDER, ci->founder->display.c_str());
 
 		if (show_all && ci->successor)
-			u->SendMessage(ChanServ, CHAN_INFO_NO_SUCCESSOR, ci->successor->display.c_str());
+			source.Reply(CHAN_INFO_NO_SUCCESSOR, ci->successor->display.c_str());
 
 		u->SendMessage(ChanServ, CHAN_INFO_DESCRIPTION, ci->desc.c_str());
 		u->SendMessage(ChanServ, CHAN_INFO_TIME_REGGED, do_strftime(ci->time_registered).c_str());
@@ -69,13 +71,13 @@ class CommandCSInfo : public Command
 		ModeLock *secret = ci->GetMLock(CMODE_SECRET);
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
 		{
-			u->SendMessage(ChanServ, CHAN_INFO_LAST_TOPIC, ci->last_topic.c_str());
-			u->SendMessage(ChanServ, CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter.c_str());
+			source.Reply(CHAN_INFO_LAST_TOPIC, ci->last_topic.c_str());
+			source.Reply(CHAN_INFO_TOPIC_SET_BY, ci->last_topic_setter.c_str());
 		}
 
 		if (show_all)
 		{
-			u->SendMessage(ChanServ, CHAN_INFO_BANTYPE, ci->bantype);
+			source.Reply(CHAN_INFO_BANTYPE, ci->bantype);
 			Anope::string optbuf;
 
 			CheckOptStr(optbuf, CI_KEEPTOPIC, GetString(u, CHAN_INFO_OPT_KEEPTOPIC), ci, u->Account());
@@ -94,17 +96,17 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_XOP, GetString(u, CHAN_INFO_OPT_XOP), ci, u->Account());
 			CheckOptStr(optbuf, CI_PERSIST, GetString(u, CHAN_INFO_OPT_PERSIST), ci, u->Account());
 
-			u->SendMessage(ChanServ, NICK_INFO_OPTIONS, optbuf.empty() ? GetString(u, NICK_INFO_OPT_NONE).c_str() : optbuf.c_str());
-			u->SendMessage(ChanServ, CHAN_INFO_MODE_LOCK, get_mlock_modes(ci, 1).c_str());
+			source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? GetString(u, NICK_INFO_OPT_NONE).c_str() : optbuf.c_str());
+			source.Reply(CHAN_INFO_MODE_LOCK, get_mlock_modes(ci, 1).c_str());
 
 			// XXX: we could just as easily (and tidily) merge this in with the flags display above.
 			if (ci->HasFlag(CI_NO_EXPIRE))
-				u->SendMessage(ChanServ, CHAN_INFO_NO_EXPIRE);
+				source.Reply(CHAN_INFO_NO_EXPIRE);
 			else
-				u->SendMessage(ChanServ, CHAN_INFO_EXPIRE, do_strftime(ci->last_used + Config->CSExpire).c_str());
+				source.Reply(CHAN_INFO_EXPIRE, do_strftime(ci->last_used + Config->CSExpire).c_str());
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
-			u->SendMessage(ChanServ, CHAN_X_SUSPENDED, ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u, NO_REASON).c_str());
+			source.Reply(CHAN_X_SUSPENDED, ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u, NO_REASON).c_str());
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(u, ci, show_all));
 

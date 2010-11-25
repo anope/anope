@@ -20,9 +20,10 @@ class CommandCSSetPersist : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetPersist");
 
@@ -65,7 +66,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			u->SendMessage(ChanServ, CHAN_SET_PERSIST_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_PERSIST_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -92,7 +93,7 @@ class CommandCSSetPersist : public Command
 					ChanServ->UnAssign(NULL, ci);
 			}
 
-			u->SendMessage(ChanServ, CHAN_SET_PERSIST_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_PERSIST_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "PERSIST");

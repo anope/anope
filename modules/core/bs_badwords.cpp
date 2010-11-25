@@ -15,88 +15,87 @@
 
 class BadwordsListCallback : public NumberList
 {
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	BadwordsListCallback(User *_u, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, false), u(_u), ci(_ci), SentHeader(false)
+	BadwordsListCallback(CommandSource &_source, const Anope::string &list) : NumberList(list, false), source(_source), SentHeader(false)
 	{
 	}
 
 	~BadwordsListCallback()
 	{
 		if (!SentHeader)
-			u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_NO_MATCH, source.ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetBadWordCount())
+		if (!Number || Number > source.ci->GetBadWordCount())
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(BotServ, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_LIST_HEADER, source.ci->name.c_str());
 		}
 
-		DoList(u, ci, Number - 1, ci->GetBadWord(Number - 1));
+		DoList(source, Number - 1, source.ci->GetBadWord(Number - 1));
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, unsigned Number, BadWord *bw)
+	static void DoList(CommandSource &source, unsigned Number, BadWord *bw)
 	{
-		u->SendMessage(BotServ, BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
+		source.Reply(BOT_BADWORDS_LIST_FORMAT, Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
 	}
 };
 
 class BadwordsDelCallback : public NumberList
 {
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	Command *c;
 	unsigned Deleted;
 	bool override;
  public:
-	BadwordsDelCallback(User *_u, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), u(_u), ci(_ci), c(_c), Deleted(0), override(false)
+	BadwordsDelCallback(CommandSource &_source, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), c(_c), Deleted(0), override(false)
 	{
-		if (!check_access(u, ci, CA_BADWORDS) && u->Account()->HasPriv("botserv/administration"))
+		if (!check_access(source.u, source.ci, CA_BADWORDS) && source.u->Account()->HasPriv("botserv/administration"))
 			this->override = true;
 	}
 
 	~BadwordsDelCallback()
 	{
 		if (!Deleted)
-			u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_NO_MATCH, source.ci->name.c_str());
 		else if (Deleted == 1)
-			u->SendMessage(BotServ, BOT_BADWORDS_DELETED_ONE, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_DELETED_ONE, source.ci->name.c_str());
 		else
-			u->SendMessage(BotServ, BOT_BADWORDS_DELETED_SEVERAL, Deleted, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_DELETED_SEVERAL, Deleted, source.ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetBadWordCount())
+		if (!Number || Number > source.ci->GetBadWordCount())
 			return;
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL " << ci->GetBadWord(Number -1 )->word;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "DEL " << source.ci->GetBadWord(Number - 1)->word;
 		++Deleted;
-		ci->EraseBadWord(Number - 1);
+		source.ci->EraseBadWord(Number - 1);
 	}
 };
 
 class CommandBSBadwords : public Command
 {
  private:
-	CommandReturn DoList(User *u, ChannelInfo *ci, const Anope::string &word)
+	CommandReturn DoList(CommandSource &source, const Anope::string &word)
 	{
-		bool override = !check_access(u, ci, CA_BADWORDS);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
+		ChannelInfo *ci = source.ci;
+		bool override = !check_access(source.u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "LIST";
 
 		if (!ci->GetBadWordCount())
-			u->SendMessage(BotServ, BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(BOT_BADWORDS_LIST_EMPTY, ci->name.c_str());
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsListCallback list(u, ci, word);
+			BadwordsListCallback list(source, word);
 			list.Process();
 		}
 		else
@@ -113,21 +112,22 @@ class CommandBSBadwords : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					u->SendMessage(BotServ, BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
+					source.Reply(BOT_BADWORDS_LIST_HEADER, ci->name.c_str());
 				}
 
-				BadwordsListCallback::DoList(u, ci, i, bw);
+				BadwordsListCallback::DoList(source, i, bw);
 			}
 
 			if (!SentHeader)
-				u->SendMessage(BotServ, BOT_BADWORDS_NO_MATCH, ci->name.c_str());
+				source.Reply(BOT_BADWORDS_NO_MATCH, ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(User *u, ChannelInfo *ci, const Anope::string &word)
+	CommandReturn DoAdd(CommandSource &source, const Anope::string &word)
 	{
+		ChannelInfo *ci = source.ci;
 		size_t pos = word.rfind(' ');
 		BadWordType type = BW_ANY;
 		Anope::string realword = word;
@@ -149,7 +149,7 @@ class CommandBSBadwords : public Command
 
 		if (ci->GetBadWordCount() >= Config->BSBadWordsMax)
 		{
-			u->SendMessage(BotServ, BOT_BADWORDS_REACHED_LIMIT, Config->BSBadWordsMax);
+			source.Reply(BOT_BADWORDS_REACHED_LIMIT, Config->BSBadWordsMax);
 			return MOD_CONT;
 		}
 
@@ -159,26 +159,27 @@ class CommandBSBadwords : public Command
 
 			if (!bw->word.empty() && ((Config->BSCaseSensitive && realword.equals_cs(bw->word)) || (!Config->BSCaseSensitive && realword.equals_ci(bw->word))))
 			{
-				u->SendMessage(BotServ, BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
+				source.Reply(BOT_BADWORDS_ALREADY_EXISTS, bw->word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 		}
 
-		bool override = !check_access(u, ci, CA_BADWORDS);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << realword;
+		bool override = !check_access(source.u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "ADD " << realword;
 		ci->AddBadWord(realword, type);
 
-		u->SendMessage(BotServ, BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
+		source.Reply(BOT_BADWORDS_ADDED, realword.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDelete(User *u, ChannelInfo *ci, const Anope::string &word)
+	CommandReturn DoDelete(CommandSource &source, const Anope::string &word)
 	{
+		ChannelInfo *ci = source.ci;
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (!word.empty() && isdigit(word[0]) && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsDelCallback list(u, ci, this, word);
+			BadwordsDelCallback list(source, this, word);
 			list.Process();
 		}
 		else
@@ -196,27 +197,28 @@ class CommandBSBadwords : public Command
 
 			if (i == end)
 			{
-				u->SendMessage(BotServ, BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
+				source.Reply(BOT_BADWORDS_NOT_FOUND, word.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 
-			bool override = !check_access(u, ci, CA_BADWORDS);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << badword->word;
+			bool override = !check_access(source.u, ci, CA_BADWORDS);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "DEL " << badword->word;
 			ci->EraseBadWord(i);
 
-			u->SendMessage(BotServ, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
+			source.Reply(BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, ChannelInfo *ci)
+	CommandReturn DoClear(CommandSource &source)
 	{
-		bool override = !check_access(u, ci, CA_BADWORDS);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+		ChannelInfo *ci = source.ci;
+		bool override = !check_access(source.u, ci, CA_BADWORDS);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "CLEAR";
 
 		ci->ClearBadWords();
-		u->SendMessage(BotServ, BOT_BADWORDS_CLEAR);
+		source.Reply(BOT_BADWORDS_CLEAR);
 		return MOD_CONT;
 	}
  public:
@@ -224,12 +226,12 @@ class CommandBSBadwords : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string cmd = params[1];
-		Anope::string word = params.size() > 2 ? params[2] : "";
-		ChannelInfo *ci;
+		const Anope::string &cmd = params[1];
+		const Anope::string &word = params.size() > 2 ? params[2] : "";
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		bool need_args = cmd.equals_ci("LIST") || cmd.equals_ci("CLEAR");
 
 		if (!need_args && word.empty())
@@ -238,28 +240,26 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		ci = cs_findchan(chan);
-
 		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->Account()->HasPriv("botserv/administration")))
 		{
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			u->SendMessage(BotServ, BOT_BADWORDS_DISABLED);
+			source.Reply(BOT_BADWORDS_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, ci, word);
+			return this->DoAdd(source, word);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDelete(u, ci, word);
+			return this->DoDelete(source, word);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, ci, word);
+			return this->DoList(source, word);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(u, ci);
+			return this->DoClear(source);
 		else
 			this->OnSyntaxError(u, "");
 

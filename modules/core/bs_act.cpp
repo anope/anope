@@ -20,26 +20,27 @@ class CommandBSAct : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		Anope::string message = params[1];
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
+			source.Reply(BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			u->SendMessage(BotServ, BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 

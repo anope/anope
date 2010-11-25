@@ -20,42 +20,41 @@ class CommandBSAssign : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string nick = params[1];
-		BotInfo *bi;
-		ChannelInfo *ci;
+		const Anope::string &chan = params[0];
+		const Anope::string &nick = params[1];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
-			u->SendMessage(BotServ, BOT_ASSIGN_READONLY);
+			source.Reply(BOT_ASSIGN_READONLY);
 			return MOD_CONT;
 		}
 
-		if (!(bi = findbot(nick)))
+		BotInfo *bi = findbot(nick);
+		if (!bi)
 		{
-			u->SendMessage(BotServ, BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
-
-		ci = cs_findchan(chan);
 
 		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->Account()->HasPriv("botserv/administration")))
 		{
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (bi->HasFlag(BI_PRIVATE) && !u->Account()->HasCommand("botserv/assign/private"))
 		{
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (ci->bi && nick.equals_ci(ci->bi->nick))
 		{
-			u->SendMessage(BotServ, BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan.c_str());
+			source.Reply(BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan.c_str());
 			return MOD_CONT;
 		}
 

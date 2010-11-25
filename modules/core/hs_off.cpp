@@ -20,17 +20,18 @@ class CommandHSOff : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 
 		if (!na || !na->hostinfo.HasVhost())
-			u->SendMessage(HostServ, HOST_NOT_ASSIGNED);
+			source.Reply(HOST_NOT_ASSIGNED);
 		else
 		{
 			ircdproto->SendVhostDel(u);
 			Log(LOG_COMMAND, u, this) << "to disable their vhost";
-			u->SendMessage(HostServ, HOST_OFF);
+			source.Reply(HOST_OFF);
 		}
 
 		return MOD_CONT;

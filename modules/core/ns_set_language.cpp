@@ -20,8 +20,9 @@ class CommandNSSetLanguage : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetLanguage");
@@ -55,7 +56,7 @@ class CommandNSSetLanguage : public Command
 			const Anope::string &langname = GetString(languages[j], LANGUAGE_NAME);
 			if (langname == "English")
 				continue;
-			u->SendMessage(Config->s_NickServ, "         %s (%s)", languages[j].c_str(), langname.c_str());
+			u->SendMessage("         %s (%s)", languages[j].c_str(), langname.c_str());
 		}
 
 		return true;

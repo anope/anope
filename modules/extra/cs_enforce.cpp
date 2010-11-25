@@ -125,18 +125,16 @@ class CommandCSEnforce : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string what = params.size() > 1 ? params[1] : "";
-		Channel *c = findchan(chan);
-		ChannelInfo *ci;
+		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
-		if (c)
-			ci = c->ci;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 
 		if (!c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!check_access(u, ci, CA_AKICK))
 			u->SendMessage(ChanServ, ACCESS_DENIED);
 		else

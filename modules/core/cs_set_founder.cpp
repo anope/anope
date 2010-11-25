@@ -20,15 +20,16 @@ class CommandCSSetFounder : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetFounder");
 
 		if (this->permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -37,19 +38,19 @@ class CommandCSSetFounder : public Command
 
 		if (!na)
 		{
-			u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, params[1].c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			u->SendMessage(ChanServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		nc = na->nc;
 		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			u->SendMessage(ChanServ, CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
+			source.Reply(CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
 			return MOD_CONT;
 		}
 

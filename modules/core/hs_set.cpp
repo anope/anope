@@ -20,14 +20,13 @@ class CommandHSSet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
+
 		Anope::string nick = params[0];
 		Anope::string rawhostmask = params[1];
 		Anope::string hostmask;
-
-		NickAlias *na;
-		int32 tmp_time;
 
 		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (!vIdent.empty())
@@ -35,12 +34,12 @@ class CommandHSSet : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (rawhostmask.empty())
 			{
-				u->SendMessage(HostServ, HOST_SET_SYNTAX, Config->s_HostServ.c_str());
+				source.Reply(HOST_SET_SYNTAX, Config->s_HostServ.c_str());
 				return MOD_CONT;
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				u->SendMessage(HostServ, HOST_SET_IDENTTOOLONG, Config->UserLen);
+				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return MOD_CONT;
 			}
 			else
@@ -48,13 +47,13 @@ class CommandHSSet : public Command
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						u->SendMessage(HostServ, HOST_SET_IDENT_ERROR);
+						source.Reply(HOST_SET_IDENT_ERROR);
 						return MOD_CONT;
 					}
 			}
 			if (!ircd->vident)
 			{
-				u->SendMessage(HostServ, HOST_NO_VIDENT);
+				source.Reply(HOST_NO_VIDENT);
 				return MOD_CONT;
 			}
 		}
@@ -62,23 +61,22 @@ class CommandHSSet : public Command
 			hostmask = rawhostmask;
 		else
 		{
-			u->SendMessage(HostServ, HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			u->SendMessage(HostServ, HOST_SET_ERROR);
+			source.Reply(HOST_SET_ERROR);
 			return MOD_CONT;
 		}
 
-		tmp_time = Anope::CurTime;
-
+		NickAlias *na = findnick(nick);
 		if ((na = findnick(nick)))
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				u->SendMessage(HostServ, NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -87,12 +85,12 @@ class CommandHSSet : public Command
 			na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 			if (!vIdent.empty())
-				u->SendMessage(HostServ, HOST_IDENT_SET, nick.c_str(), vIdent.c_str(), hostmask.c_str());
+				source.Reply(HOST_IDENT_SET, nick.c_str(), vIdent.c_str(), hostmask.c_str());
 			else
-				u->SendMessage(HostServ, HOST_SET, nick.c_str(), hostmask.c_str());
+				source.Reply(HOST_SET, nick.c_str(), hostmask.c_str());
 		}
 		else
-			u->SendMessage(HostServ, HOST_NOREG, nick.c_str());
+			source.Reply(HOST_NOREG, nick.c_str());
 		return MOD_CONT;
 	}
 

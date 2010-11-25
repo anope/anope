@@ -20,39 +20,35 @@ class CommandCSBan : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string target = params[1];
-		Anope::string reason = params.size() > 2 ? params[2] : "Requested";
+		const Anope::string &chan = params[0];
+		const Anope::string &target = params[1];
+		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
 
-		Channel *c = findchan(chan);
-		ChannelInfo *ci;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		Channel *c = ci->c;
 		User *u2;
 
-		int is_same;
-
-		is_same = target.equals_ci(u->nick);
-
-		if (c)
-			ci = c->ci;
+		bool is_same = target.equals_ci(u->nick);
 
 		if (!c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
-			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, target.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		/*
 		 * Dont ban/kick the user on channels where he is excepted
 		 * to prevent services <-> server wars.
 		 */
 		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2))
-			u->SendMessage(ChanServ, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+			source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 		else if (u2->IsProtected())
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			Anope::string mask;
@@ -89,8 +85,7 @@ class CommandCSBan : public Command
 
 	void OnServHelp(User *u)
 	{
-		if (this->name.equals_ci("BAN"))
-			u->SendMessage(ChanServ, CHAN_HELP_CMD_BAN);
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_BAN);
 	}
 };
 

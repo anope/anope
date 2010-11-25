@@ -20,21 +20,22 @@ class CommandCSSetSecureOps : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetSecureIos");
 
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREOPS);
-			u->SendMessage(ChanServ, CHAN_SET_SECUREOPS_ON, ci->name.c_str());
+			source.Reply(CHAN_SET_SECUREOPS_ON, ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREOPS);
-			u->SendMessage(ChanServ, CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
+			source.Reply(CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "SECUREOPS");

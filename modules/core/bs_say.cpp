@@ -20,30 +20,28 @@ class CommandBSSay : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci;
+		const Anope::string &text = params[1];
 
-		Anope::string chan = params[0];
-		Anope::string text = params[1];
-
-		ci = cs_findchan(chan);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			u->SendMessage(BotServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			u->SendMessage(BotServ, BOT_NOT_ASSIGNED);
+			source.Reply(BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			u->SendMessage(BotServ, BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 

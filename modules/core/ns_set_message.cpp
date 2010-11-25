@@ -20,8 +20,9 @@ class CommandNSSetMessage : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetMessage");
@@ -29,21 +30,21 @@ class CommandNSSetMessage : public Command
 
 		if (!Config->UsePrivmsg)
 		{
-			u->SendMessage(NickServ, NICK_SET_OPTION_DISABLED, "MSG");
+			source.Reply(NICK_SET_OPTION_DISABLED, "MSG");
 			return MOD_CONT;
 		}
 
-		Anope::string param = params.size() > 1 ? params[1] : "";
+		const Anope::string &param = params.size() > 1 ? params[1] : "";
 
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_MSG);
-			u->SendMessage(NickServ, NICK_SASET_MSG_ON, nc->display.c_str());
+			source.Reply(NICK_SASET_MSG_ON, nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_MSG);
-			u->SendMessage(NickServ, NICK_SASET_MSG_OFF, nc->display.c_str());
+			source.Reply(NICK_SASET_MSG_OFF, nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(u, "MSG");

@@ -16,21 +16,22 @@
 class ExceptionDelCallback : public NumberList
 {
  protected:
+	CommandSource &source;
 	User *u;
 	unsigned Deleted;
  public:
-	ExceptionDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
 	{
 	}
 
 	~ExceptionDelCallback()
 	{
 		if (!Deleted)
-			u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
+			source.Reply(OPER_EXCEPTION_NO_MATCH);
 		else if (Deleted == 1)
-			u->SendMessage(OperServ, OPER_EXCEPTION_DELETED_ONE);
+			source.Reply(OPER_EXCEPTION_DELETED_ONE);
 		else
-			u->SendMessage(OperServ, OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
+			source.Reply(OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -55,10 +56,10 @@ class ExceptionDelCallback : public NumberList
 class ExceptionListCallback : public NumberList
 {
  protected:
-	User *u;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	ExceptionListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	ExceptionListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
 	{
 	}
 
@@ -70,11 +71,11 @@ class ExceptionListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
-			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_COLHEAD);
+			source.Reply(OPER_EXCEPTION_LIST_HEADER);
+			source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
 		}
 
-		DoList(u, Number - 1);
+		DoList(source.u, Number - 1);
 	}
 
 	static void DoList(User *u, unsigned index)
@@ -89,7 +90,7 @@ class ExceptionListCallback : public NumberList
 class ExceptionViewCallback : public ExceptionListCallback
 {
  public:
-	ExceptionViewCallback(User *_u, const Anope::string &numlist) : ExceptionListCallback(_u, numlist)
+	ExceptionViewCallback(CommandSource &_source, const Anope::string &numlist) : ExceptionListCallback(_source, numlist)
 	{
 	}
 
@@ -101,10 +102,10 @@ class ExceptionViewCallback : public ExceptionListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
+			source.Reply(OPER_EXCEPTION_LIST_HEADER);
 		}
 
-		DoList(u, Number - 1);
+		DoList(source.u, Number - 1);
 	}
 
 	static void DoList(User *u, unsigned index)
@@ -121,42 +122,42 @@ class ExceptionViewCallback : public ExceptionListCallback
 class CommandOSSession : public Command
 {
  private:
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 
 		unsigned mincount = param.is_pos_number_only() ? convertTo<unsigned>(param) : 0;
 
 		if (mincount <= 1)
-			u->SendMessage(OperServ, OPER_SESSION_INVALID_THRESHOLD);
+			source.Reply(OPER_SESSION_INVALID_THRESHOLD);
 		else
 		{
-			u->SendMessage(OperServ, OPER_SESSION_LIST_HEADER, mincount);
-			u->SendMessage(OperServ, OPER_SESSION_LIST_COLHEAD);
+			source.Reply(OPER_SESSION_LIST_HEADER, mincount);
+			source.Reply(OPER_SESSION_LIST_COLHEAD);
 
 			for (patricia_tree<Session *>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 			{
 				Session *session = *it;
 
 				if (session->count >= mincount)
-					u->SendMessage(OperServ, OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
+					source.Reply(OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
 			}
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 		Session *session = findsession(param);
 
 		if (!session)
-			u->SendMessage(OperServ, OPER_SESSION_NOT_FOUND, param.c_str());
+			source.Reply(OPER_SESSION_NOT_FOUND, param.c_str());
 		else
 		{
 			Exception *exception = find_host_exception(param);
-			u->SendMessage(OperServ, OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
+			source.Reply(OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
 		}
 
 		return MOD_CONT;
@@ -166,22 +167,24 @@ class CommandOSSession : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
 		{
-			u->SendMessage(OperServ, OPER_EXCEPTION_DISABLED);
+			source.Reply(OPER_EXCEPTION_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (cmd.equals_ci("LIST"))
-			return this->DoList(u, params);
+			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->DoView(u, params);
+			return this->DoView(source, params);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 
@@ -205,8 +208,9 @@ class CommandOSSession : public Command
 class CommandOSException : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string mask, expiry, limitstr;
 		unsigned last_param = 3;
 		int x;
@@ -239,7 +243,7 @@ class CommandOSException : public Command
 		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
-			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
+			source.Reply(BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -249,32 +253,33 @@ class CommandOSException : public Command
 
 		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
 		{
-			u->SendMessage(OperServ, OPER_EXCEPTION_INVALID_LIMIT, Config->MaxSessionLimit);
+			source.Reply(OPER_EXCEPTION_INVALID_LIMIT, Config->MaxSessionLimit);
 			return MOD_CONT;
 		}
 		else
 		{
 			if (mask.find('!') == Anope::string::npos || mask.find('@') == Anope::string::npos)
 			{
-				u->SendMessage(OperServ, OPER_EXCEPTION_INVALID_HOSTMASK);
+				source.Reply(OPER_EXCEPTION_INVALID_HOSTMASK);
 				return MOD_CONT;
 			}
 
 			x = exception_add(u, mask, limit, reason, u->nick, expires);
 
 			if (x == 1)
-				u->SendMessage(OperServ, OPER_EXCEPTION_ADDED, mask.c_str(), limit);
+				source.Reply(OPER_EXCEPTION_ADDED, mask.c_str(), limit);
 
 			if (readonly)
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
@@ -284,7 +289,7 @@ class CommandOSException : public Command
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionDelCallback list(u, mask);
+			ExceptionDelCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -294,23 +299,25 @@ class CommandOSException : public Command
 				if (mask.equals_ci(exceptions[i]->mask))
 				{
 					ExceptionDelCallback::DoDel(u, i);
-					u->SendMessage(OperServ, OPER_EXCEPTION_DELETED, mask.c_str());
+					source.Reply(OPER_EXCEPTION_DELETED, mask.c_str());
 					break;
 				}
 			if (i == end)
-				u->SendMessage(OperServ, OPER_EXCEPTION_NOT_FOUND, mask.c_str());
+				source.Reply(OPER_EXCEPTION_NOT_FOUND, mask.c_str());
 		}
 
 		if (readonly)
-			u->SendMessage(OperServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoMove(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoMove(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string n1str = params.size() > 1 ? params[1] : ""; /* From position */
-		Anope::string n2str = params.size() > 2 ? params[2] : ""; /* To position */
+		User *u = source.u;
+
+		const Anope::string &n1str = params.size() > 1 ? params[1] : ""; /* From position */
+		const Anope::string &n2str = params.size() > 2 ? params[2] : ""; /* To position */
 		int n1, n2;
 
 		if (n2str.empty())
@@ -328,10 +335,10 @@ class CommandOSException : public Command
 			exceptions[n1] = exceptions[n2];
 			exceptions[n2] = temp;
 
-			u->SendMessage(OperServ, OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
+			source.Reply(OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "MOVE");
@@ -339,14 +346,15 @@ class CommandOSException : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionListCallback list(u, mask);
+			ExceptionListCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -359,28 +367,29 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
-						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_COLHEAD);
+						source.Reply(OPER_EXCEPTION_LIST_HEADER);
+						source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
 					}
 
 					ExceptionListCallback::DoList(u, i);
 				}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
+				source.Reply(OPER_EXCEPTION_NO_MATCH);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionViewCallback list(u, mask);
+			ExceptionViewCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -393,14 +402,14 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_EXCEPTION_LIST_HEADER);
+						source.Reply(OPER_EXCEPTION_LIST_HEADER);
 					}
 
 					ExceptionViewCallback::DoList(u, i);
 				}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_EXCEPTION_NO_MATCH);
+				source.Reply(OPER_EXCEPTION_NO_MATCH);
 		}
 
 		return MOD_CONT;
@@ -410,28 +419,30 @@ class CommandOSException : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
 		{
-			u->SendMessage(OperServ, OPER_EXCEPTION_DISABLED);
+			source.Reply(OPER_EXCEPTION_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params);
+			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params);
+			return this->DoDel(source, params);
 		else if (cmd.equals_ci("MOVE"))
-			return this->DoMove(u, params);
+			return this->DoMove(source, params);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, params);
+			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->DoView(u, params);
+			return this->DoView(source, params);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 

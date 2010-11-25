@@ -15,21 +15,21 @@
 
 class AkillDelCallback : public NumberList
 {
-	User *u;
+	CommandSource &source;
 	unsigned Deleted;
  public:
-	AkillDelCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, true), u(_u), Deleted(0)
+	AkillDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
 	{
 	}
 
 	~AkillDelCallback()
 	{
 		if (!Deleted)
-			u->SendMessage(OperServ, OPER_AKILL_NO_MATCH);
+			source.Reply(OPER_AKILL_NO_MATCH);
 		else if (Deleted == 1)
-			u->SendMessage(OperServ, OPER_AKILL_DELETED_ONE);
+			source.Reply(OPER_AKILL_DELETED_ONE);
 		else
-			u->SendMessage(OperServ, OPER_AKILL_DELETED_SEVERAL, Deleted);
+			source.Reply(OPER_AKILL_DELETED_SEVERAL, Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -43,10 +43,10 @@ class AkillDelCallback : public NumberList
 			return;
 
 		++Deleted;
-		DoDel(u, x);
+		DoDel(source, x);
 	}
 
-	static void DoDel(User *u, XLine *x)
+	static void DoDel(CommandSource &source, XLine *x)
 	{
 		SGLine->DelXLine(x);
 	}
@@ -55,19 +55,19 @@ class AkillDelCallback : public NumberList
 class AkillListCallback : public NumberList
 {
  protected:
-	User *u;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	AkillListCallback(User *_u, const Anope::string &numlist) : NumberList(numlist, false), u(_u), SentHeader(false)
+	AkillListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
 	{
 	}
 
 	~AkillListCallback()
 	{
 		if (!SentHeader)
-			u->SendMessage(OperServ, OPER_AKILL_NO_MATCH);
+			source.Reply(OPER_AKILL_NO_MATCH);
 		else
-			u->SendMessage(OperServ, END_OF_ANY_LIST, "Akill");
+			source.Reply(END_OF_ANY_LIST, "Akill");
 	}
 
 	void HandleNumber(unsigned Number)
@@ -83,22 +83,22 @@ class AkillListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_AKILL_LIST_HEADER);
+			source.Reply(OPER_AKILL_LIST_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(source, x, Number);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		u->SendMessage(OperServ, OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
 class AkillViewCallback : public AkillListCallback
 {
  public:
-	AkillViewCallback(User *_u, const Anope::string &numlist) : AkillListCallback(_u, numlist)
+	AkillViewCallback(CommandSource &_source, const Anope::string &numlist) : AkillListCallback(_source, numlist)
 	{
 	}
 
@@ -115,23 +115,24 @@ class AkillViewCallback : public AkillListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(OperServ, OPER_AKILL_VIEW_HEADER);
+			source.Reply(OPER_AKILL_VIEW_HEADER);
 		}
 
-		DoList(u, x, Number);
+		DoList(source, x, Number);
 	}
 
-	static void DoList(User *u, XLine *x, unsigned Number)
+	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		u->SendMessage(OperServ, OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(u->Account(), x->Expires).c_str(), x->Reason.c_str());
+		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSAKill : public Command
 {
  private:
-	CommandReturn DoAdd(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		unsigned last_param = 2;
 		Anope::string expiry, mask;
 		time_t expires;
@@ -153,7 +154,7 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			u->SendMessage(OperServ, BAD_EXPIRY_TIME);
+			source.Reply(BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -181,7 +182,7 @@ class CommandOSAKill : public Command
 
 			if (percent > 95)
 			{
-				u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -191,7 +192,7 @@ class CommandOSAKill : public Command
 			if (!x)
 				return MOD_CONT;
 
-			u->SendMessage(OperServ, OPER_AKILL_ADDED, mask.c_str());
+			source.Reply(OPER_AKILL_ADDED, mask.c_str());
 
 			if (Config->WallOSAkill)
 			{
@@ -227,7 +228,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (readonly)
-				u->SendMessage(OperServ, READ_ONLY_MODE);
+				source.Reply(READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(u, "ADD");
@@ -235,9 +236,10 @@ class CommandOSAKill : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		User *u = source.u;
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
@@ -247,13 +249,13 @@ class CommandOSAKill : public Command
 
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_LIST_EMPTY);
+			source.Reply(OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillDelCallback list(u, mask);
+			AkillDelCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -262,35 +264,35 @@ class CommandOSAKill : public Command
 
 			if (!x)
 			{
-				u->SendMessage(OperServ, OPER_AKILL_NOT_FOUND, mask.c_str());
+				source.Reply(OPER_AKILL_NOT_FOUND, mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, x));
 
-			AkillDelCallback::DoDel(u, x);
-			u->SendMessage(OperServ, OPER_AKILL_DELETED, mask.c_str());
+			AkillDelCallback::DoDel(source, x);
+			source.Reply(OPER_AKILL_DELETED, mask.c_str());
 		}
 
 		if (readonly)
-			u->SendMessage(OperServ, READ_ONLY_MODE);
+			source.Reply(READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_LIST_EMPTY);
+			source.Reply(OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillListCallback list(u, mask);
+			AkillListCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -306,35 +308,35 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_AKILL_LIST_HEADER);
+						source.Reply(OPER_AKILL_LIST_HEADER);
 					}
 
-					AkillListCallback::DoList(u, x, i);
+					AkillListCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_AKILL_NO_MATCH);
+				source.Reply(OPER_AKILL_NO_MATCH);
 			else
-				u->SendMessage(OperServ, END_OF_ANY_LIST, "Akill");
+				source.Reply(END_OF_ANY_LIST, "Akill");
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, const std::vector<Anope::string> &params)
+	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (SGLine->GetList().empty())
 		{
-			u->SendMessage(OperServ, OPER_LIST_EMPTY);
+			source.Reply(OPER_LIST_EMPTY);
 			return MOD_CONT;
 		}
 
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkillViewCallback list(u, mask);
+			AkillViewCallback list(source, mask);
 			list.Process();
 		}
 		else
@@ -350,22 +352,23 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						u->SendMessage(OperServ, OPER_AKILL_VIEW_HEADER);
+						source.Reply(OPER_AKILL_VIEW_HEADER);
 					}
 
-					AkillViewCallback::DoList(u, x, i);
+					AkillViewCallback::DoList(source, x, i);
 				}
 			}
 
 			if (!SentHeader)
-				u->SendMessage(OperServ, OPER_AKILL_NO_MATCH);
+				source.Reply(OPER_AKILL_NO_MATCH);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u)
+	CommandReturn DoClear(CommandSource &source)
 	{
+		User *u = source.u;
 		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
 		SGLine->Clear();
 		u->SendMessage(OperServ, OPER_AKILL_CLEAR);
@@ -377,22 +380,24 @@ class CommandOSAKill : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string cmd = params[0];
+		User *u = source.u;
+		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
-			return this->DoAdd(u, params);
+			return this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(u, params);
+			return this->DoDel(source, params);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(u, params);
+			return this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			return this->DoView(u, params);
+			return this->DoView(source, params);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(u);
+			return this->DoClear(source);
 		else
 			this->OnSyntaxError(u, "");
+
 		return MOD_CONT;
 	}
 

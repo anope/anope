@@ -20,9 +20,11 @@ class CommandHSList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string key = !params.empty() ? params[0] : "";
+		User *u = source.u;
+
+		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
 		unsigned display_counter = 0;
 
@@ -35,14 +37,14 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				u->SendMessage(HostServ, LIST_INCORRECT_RANGE);
+				source.Reply(LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					u->SendMessage(HostServ, LIST_INCORRECT_RANGE);
+					source.Reply(LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 				from = convertTo<int>(key.substr(1, tmp - 1));
@@ -63,9 +65,9 @@ class CommandHSList : public Command
 				{
 					++display_counter;
 					if (!na->hostinfo.GetIdent().empty())
-						u->SendMessage(HostServ, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						u->SendMessage(HostServ, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			else
@@ -78,21 +80,21 @@ class CommandHSList : public Command
 				{
 					++display_counter;
 					if (!na->hostinfo.GetIdent().empty())
-						u->SendMessage(HostServ, HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						u->SendMessage(HostServ, HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			++counter;
 		}
 		if (!key.empty())
-			u->SendMessage(HostServ, HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
+			source.Reply(HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
 		else
 		{
 			if (from)
-				u->SendMessage(HostServ, HOST_LIST_RANGE_FOOTER, from, to);
+				source.Reply(HOST_LIST_RANGE_FOOTER, from, to);
 			else
-				u->SendMessage(HostServ, HOST_LIST_FOOTER, display_counter);
+				source.Reply(HOST_LIST_FOOTER, display_counter);
 		}
 		return MOD_CONT;
 	}

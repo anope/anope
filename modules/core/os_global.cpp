@@ -20,9 +20,10 @@ class CommandOSGlobal : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string msg = params[0];
+		User *u = source.u;
+		const Anope::string &msg = params[0];
 
 		if (Config->WallOSGlobal)
 			ircdproto->SendGlobops(OperServ, "\2%s\2 just used GLOBAL command.", u->nick.c_str());

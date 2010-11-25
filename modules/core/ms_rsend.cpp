@@ -20,16 +20,18 @@ class CommandMSRSend : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
-		Anope::string text = params[1];
+		User *u = source.u;
+
+		const Anope::string &nick = params[0];
+		const Anope::string &text = params[1];
 		NickAlias *na = NULL;
 
 		/* prevent user from rsend to themselves */
 		if ((na = findnick(nick)) && na->nc == u->Account())
 		{
-			u->SendMessage(MemoServ, MEMO_NO_RSEND_SELF);
+			source.Reply(MEMO_NO_RSEND_SELF);
 			return MOD_CONT;
 		}
 
@@ -39,7 +41,7 @@ class CommandMSRSend : public Command
 			if (u->Account()->IsServicesOper())
 				memo_send(u, nick, text, 3);
 			else
-				u->SendMessage(MemoServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 		}
 		else if (Config->MSMemoReceipt == 2)
 			/* Everybody can use rsend */
@@ -48,7 +50,7 @@ class CommandMSRSend : public Command
 		{
 			/* rsend has been disabled */
 			Log() << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
-			u->SendMessage(MemoServ, MEMO_RSEND_DISABLED);
+			source.Reply(MEMO_RSEND_DISABLED);
 		}
 
 		return MOD_CONT;

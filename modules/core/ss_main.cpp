@@ -20,8 +20,9 @@ class CommandSSHelp : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ircdproto->SendMessage(statserv, u->nick, "This is a test of the emergency StatServ system.");
 		return MOD_CONT;
 	}

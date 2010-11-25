@@ -99,11 +99,12 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 
+	ChannelInfo *ci = NULL;
 	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
 	{
 		if (ircdproto->IsChannelValid(params[0]))
 		{
-			ChannelInfo *ci = cs_findchan(params[0]);
+			ci = cs_findchan(params[0]);
 			if (ci)
 			{
 				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
@@ -141,11 +142,18 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		return;
 	}
 
-	CommandReturn ret = c->Execute(u, params);
+	CommandSource source;
+	source.u = u;
+	source.ci = ci;
+	source.owner = bi;
+	source.service = fantasy && ci ? ci->bi : c->service;
+	source.fantasy = fantasy;
+
+	CommandReturn ret = c->Execute(source, params);
 
 	if (ret == MOD_CONT)
 	{
-		FOREACH_MOD(I_OnPostCommand, OnPostCommand(u, c->service, c->name, params));
+		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 	}
 }
 

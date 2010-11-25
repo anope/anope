@@ -20,7 +20,7 @@ class CommandNSSetGreet : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
 		if (!na)
@@ -32,12 +32,12 @@ class CommandNSSetGreet : public Command
 		if (!param.empty())
 		{
 			nc->greet = param;
-			u->SendMessage(NickServ, NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
+			source.Reply(NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
 			nc->greet.clear();
-			u->SendMessage(NickServ, NICK_SASET_GREET_UNSET, nc->display.c_str());
+			source.Reply(NICK_SASET_GREET_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;

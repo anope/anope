@@ -20,8 +20,9 @@ class CommandOSRestart : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		quitmsg = "RESTART command received from " + u->nick;
 
 		if (Config->GlobalOnCycle)

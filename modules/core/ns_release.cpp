@@ -21,31 +21,32 @@ class CommandNSRelease : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
 		Anope::string pass = params.size() > 1 ? params[1] : "";
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))
-			u->SendMessage(NickServ, NICK_RELEASE_NOT_HELD, nick.c_str());
+			source.Reply(NICK_RELEASE_NOT_HELD, nick.c_str());
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
-				u->SendMessage(NickServ, NICK_RELEASED);
+				source.Reply(NICK_RELEASED);
 			}
 			else
 			{
-				u->SendMessage(NickServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
@@ -59,10 +60,10 @@ class CommandNSRelease : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				na->Release();
-				u->SendMessage(NickServ, NICK_RELEASED);
+				source.Reply(NICK_RELEASED);
 			}
 			else
-				u->SendMessage(NickServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}

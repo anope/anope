@@ -21,71 +21,71 @@ class CommandNSGroup : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		NickAlias *na, *target;
-		Anope::string nick = params[0];
+		User *u = source.u;
+
+		const Anope::string &nick = params[0];
 		Anope::string pass = params[1];
-		std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
 		if (Config->NSEmailReg && findrequestnick(u->nick))
 		{
-			u->SendMessage(NickServ, NICK_REQUESTED);
+			source.Reply(NICK_REQUESTED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			u->SendMessage(NickServ, NICK_GROUP_DISABLED);
+			source.Reply(NICK_GROUP_DISABLED);
 			return MOD_CONT;
 		}
 
 		if (!ircdproto->IsNickValid(u->nick))
 		{
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, u->nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, u->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->RestrictOperNicks)
-			for (it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 				if (!is_oper(u) && u->nick.find_ci(it->first) != Anope::string::npos)
 				{
-					u->SendMessage(NickServ, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+					source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;
 				}
 
-		na = findnick(u->nick);
+		NickAlias *target, *na = findnick(u->nick);
 		if (!(target = findnick(nick)))
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
-			u->SendMessage(NickServ, NICK_GROUP_PLEASE_WAIT, (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
+			source.Reply(NICK_GROUP_PLEASE_WAIT, (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
 		{
 			Log(NickServ) << NickServ << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
 			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
-			u->SendMessage(NickServ, NICK_X_SUSPENDED, target->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(NickServ, NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 		else if (na && target->nc == na->nc)
-			u->SendMessage(NickServ, NICK_GROUP_SAME, target->nick.c_str());
+			source.Reply(NICK_GROUP_SAME, target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			u->SendMessage(NickServ, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
-			u->SendMessage(NickServ, NICK_GROUP_CHANGE_DISABLED, Config->s_NickServ.c_str());
+			source.Reply(NICK_GROUP_CHANGE_DISABLED, Config->s_NickServ.c_str());
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
-			u->SendMessage(NickServ, NICK_GROUP_TOO_MANY, target->nick.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+			source.Reply(NICK_GROUP_TOO_MANY, target->nick.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		else
 		{
 			int res = enc_check_password(pass, target->nc->pass);
 			if (res == -1)
 			{
 				Log(LOG_COMMAND, u, this) << "failed group for " << na->nick << " (invalid password)";
-				u->SendMessage(NickServ, PASSWORD_INCORRECT);
+				source.Reply(PASSWORD_INCORRECT);
 				if (bad_password(u))
 					return MOD_STOP;
 			}
@@ -103,7 +103,7 @@ class CommandNSGroup : public Command
 
 					if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
 					{
-						u->SendMessage(NickServ, NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+						source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 						return MOD_CONT;
 					}
 				}
@@ -121,7 +121,7 @@ class CommandNSGroup : public Command
 				u->SetMode(NickServ, UMODE_REGISTERED);
 
 				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
-				u->SendMessage(NickServ, NICK_GROUP_JOINED, target->nick.c_str());
+				source.Reply(NICK_GROUP_JOINED, target->nick.c_str());
 
 				u->lastnickreg = Anope::CurTime;
 
@@ -155,17 +155,18 @@ class CommandNSUngroup : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
 		NickAlias *na = findnick(!nick.empty() ? nick : u->nick);
 
 		if (u->Account()->aliases.size() == 1)
-			u->SendMessage(NickServ, NICK_UNGROUP_ONE_NICK);
+			source.Reply(NICK_UNGROUP_ONE_NICK);
 		else if (!na)
-			u->SendMessage(NickServ, NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
 		else if (na->nc != u->Account())
-			u->SendMessage(NickServ, NICK_UNGROUP_NOT_IN_GROUP, na->nick.c_str());
+			source.Reply(NICK_UNGROUP_NOT_IN_GROUP, na->nick.c_str());
 		else
 		{
 			NickCore *oldcore = na->nc;
@@ -187,7 +188,7 @@ class CommandNSUngroup : public Command
 				na->nc->greet = oldcore->greet;
 			na->nc->language = oldcore->language;
 
-			u->SendMessage(NickServ, NICK_UNGROUP_SUCCESSFUL, na->nick.c_str(), oldcore->display.c_str());
+			source.Reply(NICK_UNGROUP_SUCCESSFUL, na->nick.c_str(), oldcore->display.c_str());
 
 			User *user = finduser(na->nick);
 			if (user)
@@ -217,26 +218,27 @@ class CommandNSGList : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
 
 		const NickCore *nc = u->Account();
 
 		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->Account()->IsServicesOper()))
-			u->SendMessage(NickServ, ACCESS_DENIED, Config->s_NickServ.c_str());
+			source.Reply(ACCESS_DENIED, Config->s_NickServ.c_str());
 		else if (!nick.empty() && (!findnick(nick) || !(nc = findnick(nick)->nc)))
-			u->SendMessage(NickServ, nick.empty() ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(nick.empty() ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nick.c_str());
 		else
 		{
-			u->SendMessage(NickServ, !nick.empty() ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display.c_str());
+			source.Reply(!nick.empty() ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER, nc->display.c_str());
 			for (std::list<NickAlias *>::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				NickAlias *na2 = *it;
 
-				u->SendMessage(NickServ, na2->HasFlag(NS_NO_EXPIRE) ? NICK_GLIST_REPLY_NOEXPIRE : NICK_GLIST_REPLY, na2->nick.c_str(), do_strftime(na2->last_seen + Config->NSExpire).c_str());
+				source.Reply(na2->HasFlag(NS_NO_EXPIRE) ? NICK_GLIST_REPLY_NOEXPIRE : NICK_GLIST_REPLY, na2->nick.c_str(), do_strftime(na2->last_seen + Config->NSExpire).c_str());
 			}
-			u->SendMessage(NickServ, NICK_GLIST_FOOTER, nc->aliases.size());
+			source.Reply(NICK_GLIST_FOOTER, nc->aliases.size());
 		}
 		return MOD_CONT;
 	}

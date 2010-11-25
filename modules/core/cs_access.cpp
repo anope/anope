@@ -16,71 +16,72 @@
 class AccessListCallback : public NumberList
 {
  protected:
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	bool SentHeader;
  public:
-	AccessListCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), u(_u), ci(_ci), SentHeader(false)
+	AccessListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
 	{
 	}
 
 	~AccessListCallback()
 	{
 		if (SentHeader)
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_FOOTER, source.ci->name.c_str());
 		else
-			u->SendMessage(ChanServ, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_NO_MATCH, source.ci->name.c_str());
 	}
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetAccessCount())
+		if (!Number || Number > source.ci->GetAccessCount())
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
 		}
 
-		DoList(u, ci, Number - 1, ci->GetAccess(Number - 1));
+		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, unsigned Number, ChanAccess *access)
+	static void DoList(CommandSource &source, unsigned Number, ChanAccess *access)
 	{
-		if (ci->HasFlag(CI_XOP))
+		if (source.ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str());
+			source.Reply(CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str());
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str());
+			source.Reply(CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str());
 	}
 };
 
 class AccessViewCallback : public AccessListCallback
 {
  public:
-	AccessViewCallback(User *_u, ChannelInfo *_ci, const Anope::string &numlist) : AccessListCallback(_u, _ci, numlist)
+	AccessViewCallback(CommandSource &_source, const Anope::string &numlist) : AccessListCallback(_source, numlist)
 	{
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetAccessCount())
+		if (!Number || Number > source.ci->GetAccessCount())
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
 		}
 
-		DoList(u, ci, Number - 1, ci->GetAccess(Number - 1));
+		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
 	}
 
-	static void DoList(User *u, ChannelInfo *ci, unsigned Number, ChanAccess *access)
+	static void DoList(CommandSource &source, unsigned Number, ChanAccess *access)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 		Anope::string timebuf;
 		if (ci->c && nc_on_chan(ci->c, access->nc))
 			timebuf = "Now";
@@ -92,50 +93,52 @@ class AccessViewCallback : public AccessListCallback
 		if (ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			u->SendMessage(ChanServ, CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
 	}
 };
 
 class AccessDelCallback : public NumberList
 {
-	User *u;
-	ChannelInfo *ci;
+	CommandSource &source;
 	Command *c;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool Denied;
 	bool override;
  public:
-	AccessDelCallback(User *_u, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), u(_u), ci(_ci), c(_c), Deleted(0), Denied(false)
+	AccessDelCallback(CommandSource &_source, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), Deleted(0), Denied(false)
 	{
-		if (!check_access(u, ci, CA_ACCESS_CHANGE) && u->Account()->HasPriv("chanserv/access/modify"))
+		if (!check_access(source.u, source.ci, CA_ACCESS_CHANGE) && source.u->Account()->HasPriv("chanserv/access/modify"))
 			this->override = true;
 	}
 
 	~AccessDelCallback()
 	{
 		if (Denied && !Deleted)
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (!Deleted)
-			u->SendMessage(ChanServ, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_NO_MATCH, source.ci->name.c_str());
 		else
 		{
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
 
 			if (Deleted == 1)
-				u->SendMessage(ChanServ, CHAN_ACCESS_DELETED_ONE, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_DELETED_ONE, source.ci->name.c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_ACCESS_DELETED_SEVERAL, Deleted, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_DELETED_SEVERAL, Deleted, source.ci->name.c_str());
 		}
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > ci->GetAccessCount())
+		if (!Number || Number > source.ci->GetAccessCount())
 			return;
+
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
 
@@ -159,26 +162,29 @@ class AccessDelCallback : public NumberList
 
 class CommandCSAccess : public Command
 {
-	CommandReturn DoAdd(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[2];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params[2];
 		int level = params[3].is_number_only() ? convertTo<int>(params[3]) : ACCESS_INVALID;
 		int ulev = get_access(u, ci);
 
 		if (level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!level)
 		{
-			u->SendMessage(ChanServ, CHAN_ACCESS_LEVEL_NONZERO);
+			source.Reply(CHAN_ACCESS_LEVEL_NONZERO);
 			return MOD_CONT;
 		}
 		else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
 		{
-			u->SendMessage(ChanServ, CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 			return MOD_CONT;
 		}
 
@@ -187,12 +193,12 @@ class CommandCSAccess : public Command
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			u->SendMessage(ChanServ, CHAN_ACCESS_NICKS_ONLY);
+			source.Reply(CHAN_ACCESS_NICKS_ONLY);
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			u->SendMessage(ChanServ, NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -203,12 +209,12 @@ class CommandCSAccess : public Command
 			/* Don't allow lowering from a level >= ulev */
 			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				u->SendMessage(ChanServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			if (access->level == level)
 			{
-				u->SendMessage(ChanServ, CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display.c_str(), ci->name.c_str(), level);
+				source.Reply(CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display.c_str(), ci->name.c_str(), level);
 				return MOD_CONT;
 			}
 			access->level = level;
@@ -216,13 +222,13 @@ class CommandCSAccess : public Command
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
-			u->SendMessage(ChanServ, CHAN_ACCESS_LEVEL_CHANGED, nc->display.c_str(), ci->name.c_str(), level);
+			source.Reply(CHAN_ACCESS_LEVEL_CHANGED, nc->display.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
 
 		if (ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			u->SendMessage(ChanServ, CHAN_ACCESS_REACHED_LIMIT, Config->CSAccessMax);
+			source.Reply(CHAN_ACCESS_REACHED_LIMIT, Config->CSAccessMax);
 			return MOD_CONT;
 		}
 
@@ -236,15 +242,18 @@ class CommandCSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[2];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params[2];
 
 		if (!ci->GetAccessCount())
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessDelCallback list(u, ci, this, nick);
+			AccessDelCallback list(source, this, nick);
 			list.Process();
 		}
 		else
@@ -252,7 +261,7 @@ class CommandCSAccess : public Command
 			NickAlias *na = findnick(nick);
 			if (!na)
 			{
-				u->SendMessage(ChanServ, NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -269,12 +278,12 @@ class CommandCSAccess : public Command
 			}
 
 			if (i == end)
-				u->SendMessage(ChanServ, CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
+				source.Reply(CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
 			else if (nc != u->Account() && check_access(u, ci, CA_NOJOIN) && get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				u->SendMessage(ChanServ, ACCESS_DENIED);
+				source.Reply(ACCESS_DENIED);
 			else
 			{
-				u->SendMessage(ChanServ, CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
+				source.Reply(CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
 				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && nc != u->Account();
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << " (group: " << access->nc->display << ") from level " << access->level;
 
@@ -287,15 +296,17 @@ class CommandCSAccess : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params.size() > 2 ? params[2] : "";
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessListCallback list(u, ci, nick);
+			AccessListCallback list(source, nick);
 			list.Process();
 		}
 		else
@@ -312,30 +323,32 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					u->SendMessage(ChanServ, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
 				}
 
-				AccessListCallback::DoList(u, ci, i, access);
+				AccessListCallback::DoList(source, i, access);
 			}
 
 			if (SentHeader)
-				u->SendMessage(ChanServ, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_NO_MATCH, ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoView(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params.size() > 2 ? params[2] : "";
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			u->SendMessage(ChanServ, CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessViewCallback list(u, ci, nick);
+			AccessViewCallback list(source, nick);
 			list.Process();
 		}
 		else
@@ -352,32 +365,35 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					u->SendMessage(ChanServ, CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
 				}
 
-				AccessViewCallback::DoList(u, ci, i, access);
+				AccessViewCallback::DoList(source, i, access);
 			}
 
 			if (SentHeader)
-				u->SendMessage(ChanServ, CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+				source.Reply(CHAN_ACCESS_NO_MATCH, ci->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(User *u, ChannelInfo *ci)
+	CommandReturn DoClear(CommandSource &source)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			ci->ClearAccess();
 
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-			u->SendMessage(ChanServ, CHAN_ACCESS_CLEAR, ci->name.c_str());
+			source.Reply(CHAN_ACCESS_CLEAR, ci->name.c_str());
 
 			bool override = !IsFounder(u, ci);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
@@ -391,14 +407,14 @@ class CommandCSAccess : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string cmd = params[1];
-		Anope::string nick = params.size() > 2 ? params[2] : "";
-		Anope::string s = params.size() > 3 ? params[3] : "";
+		const Anope::string &cmd = params[1];
+		const Anope::string &nick = params.size() > 2 ? params[2] : "";
+		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = cs_findchan(chan);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		bool is_list = cmd.equals_ci("LIST") || cmd.equals_ci("VIEW");
 		bool is_clear = cmd.equals_ci("CLEAR");
@@ -422,27 +438,27 @@ class CommandCSAccess : public Command
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
 			this->OnSyntaxError(u, cmd);
 		else if (!has_access)
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		/* We still allow LIST and CLEAR in xOP mode, but not others */
 		else if (ci->HasFlag(CI_XOP) && !is_list && !is_clear)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-				u->SendMessage(ChanServ, CHAN_ACCESS_XOP_HOP, Config->s_ChanServ.c_str());
+				source.Reply(CHAN_ACCESS_XOP_HOP, Config->s_ChanServ.c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_ACCESS_XOP, Config->s_ChanServ.c_str());
+				source.Reply(CHAN_ACCESS_XOP, Config->s_ChanServ.c_str());
 		}
 		else if (readonly && !is_list)
-			u->SendMessage(ChanServ, CHAN_ACCESS_DISABLED);
+			source.Reply(CHAN_ACCESS_DISABLED);
 		else if (cmd.equals_ci("ADD"))
-			this->DoAdd(u, ci, params);
+			this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
-			this->DoDel(u, ci, params);
+			this->DoDel(source, params);
 		else if (cmd.equals_ci("LIST"))
-			this->DoList(u, ci, params);
+			this->DoList(source, params);
 		else if (cmd.equals_ci("VIEW"))
-			this->DoView(u, ci, params);
+			this->DoView(source, params);
 		else if (cmd.equals_ci("CLEAR"))
-			this->DoClear(u, ci);
+			this->DoClear(source);
 		else
 			this->OnSyntaxError(u, "");
 
@@ -464,10 +480,13 @@ class CommandCSAccess : public Command
 
 class CommandCSLevels : public Command
 {
-	CommandReturn DoSet(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoSet(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string what = params[2];
-		Anope::string lev = params[3];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &what = params[2];
+		const Anope::string &lev = params[3];
 
 		Anope::string error;
 		int level = (lev.is_number_only() ? convertTo<int>(lev, error, false) : 0);
@@ -483,7 +502,7 @@ class CommandCSLevels : public Command
 		if (!error.empty())
 			this->OnSyntaxError(u, "SET");
 		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
-			u->SendMessage(ChanServ, CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
@@ -497,22 +516,25 @@ class CommandCSLevels : public Command
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << levelinfo[i].name << " to " << level;
 
 					if (level == ACCESS_FOUNDER)
-						u->SendMessage(ChanServ, CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name.c_str(), ci->name.c_str());
+						source.Reply(CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name.c_str(), ci->name.c_str());
 					else
-						u->SendMessage(ChanServ, CHAN_LEVELS_CHANGED, levelinfo[i].name.c_str(), ci->name.c_str(), level);
+						source.Reply(CHAN_LEVELS_CHANGED, levelinfo[i].name.c_str(), ci->name.c_str(), level);
 					return MOD_CONT;
 				}
 			}
 
-			u->SendMessage(ChanServ, CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+			source.Reply(CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDisable(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	CommandReturn DoDisable(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string what = params[2];
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
+		const Anope::string &what = params[2];
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
 		if (what.equals_ci("FOUNDER"))
@@ -526,19 +548,21 @@ class CommandCSLevels : public Command
 					bool override = !check_access(u, ci, CA_FOUNDER);
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << levelinfo[i].name;
 
-					u->SendMessage(ChanServ, CHAN_LEVELS_DISABLED, levelinfo[i].name.c_str(), ci->name.c_str());
+					source.Reply(CHAN_LEVELS_DISABLED, levelinfo[i].name.c_str(), ci->name.c_str());
 					return MOD_CONT;
 				}
 			}
 
-		u->SendMessage(ChanServ, CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+		source.Reply(CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(User *u, ChannelInfo *ci)
+	CommandReturn DoList(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_LEVELS_LIST_HEADER, ci->name.c_str());
+		ChannelInfo *ci = source.ci;
+
+		source.Reply(CHAN_LEVELS_LIST_HEADER, ci->name.c_str());
 
 		if (!levelinfo_maxwidth)
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
@@ -556,19 +580,22 @@ class CommandCSLevels : public Command
 			{
 				j = levelinfo[i].what;
 
-				u->SendMessage(ChanServ, CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
+				source.Reply(CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
 			}
 			else if (j == ACCESS_FOUNDER)
-				u->SendMessage(ChanServ, CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name.c_str());
+				source.Reply(CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name.c_str());
 			else
-				u->SendMessage(ChanServ, CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name.c_str(), j);
+				source.Reply(CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name.c_str(), j);
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoReset(User *u, ChannelInfo *ci)
+	CommandReturn DoReset(CommandSource &source)
 	{
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+
 		reset_levels(ci);
 		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
 
@@ -584,14 +611,14 @@ class CommandCSLevels : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		Anope::string cmd = params[1];
-		Anope::string what = params.size() > 2 ? params[2] : "";
-		Anope::string s = params.size() > 3 ? params[3] : "";
+		const Anope::string &cmd = params[1];
+		const Anope::string &what = params.size() > 2 ? params[2] : "";
+		const Anope::string &s = params.size() > 3 ? params[3] : "";
 
-		ChannelInfo *ci = cs_findchan(chan);
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		/* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
 		 * one; else, we want none.
@@ -599,17 +626,17 @@ class CommandCSLevels : public Command
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(u, cmd);
 		else if (ci->HasFlag(CI_XOP))
-			u->SendMessage(ChanServ, CHAN_LEVELS_XOP);
+			source.Reply(CHAN_LEVELS_XOP);
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else if (cmd.equals_ci("SET"))
-			this->DoSet(u, ci, params);
+			this->DoSet(source, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))
-			this->DoDisable(u, ci, params);
+			this->DoDisable(source, params);
 		else if (cmd.equals_ci("LIST"))
-			this->DoList(u, ci);
+			this->DoList(source);
 		else if (cmd.equals_ci("RESET"))
-			this->DoReset(u, ci);
+			this->DoReset(source);
 		else
 			this->OnSyntaxError(u, "");
 

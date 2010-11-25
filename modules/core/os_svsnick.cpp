@@ -20,9 +20,10 @@ class CommandOSSVSNick : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string nick = params[0];
+		User *u = source.u;
+		const Anope::string &nick = params[0];
 		Anope::string newnick = params[1];
 		User *u2;
 
@@ -31,33 +32,33 @@ class CommandOSSVSNick : public Command
 		/* Truncate long nicknames to NICKMAX-2 characters */
 		if (newnick.length() > Config->NickLen)
 		{
-			u->SendMessage(OperServ, NICK_X_TRUNCATED, newnick.c_str(), Config->NickLen, newnick.c_str());
+			source.Reply(NICK_X_TRUNCATED, newnick.c_str(), Config->NickLen, newnick.c_str());
 			newnick = params[1].substr(0, Config->NickLen);
 		}
 
 		/* Check for valid characters */
 		if (newnick[0] == '-' || isdigit(newnick[0]))
 		{
-			u->SendMessage(OperServ, NICK_X_ILLEGAL, newnick.c_str());
+			source.Reply(NICK_X_ILLEGAL, newnick.c_str());
 			return MOD_CONT;
 		}
 		for (unsigned i = 0, end = newnick.length(); i < end; ++i)
 			if (!isvalidnick(newnick[i]))
 			{
-				u->SendMessage(OperServ, NICK_X_ILLEGAL, newnick.c_str());
+				source.Reply(NICK_X_ILLEGAL, newnick.c_str());
 				return MOD_CONT;
 			}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
-			u->SendMessage(OperServ, NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (finduser(newnick))
-			u->SendMessage(OperServ, NICK_X_IN_USE, newnick.c_str());
+			source.Reply(NICK_X_IN_USE, newnick.c_str());
 		else if ((na = findnick(newnick)) && na->HasFlag(NS_FORBIDDEN))
-			u->SendMessage(OperServ, NICK_X_FORBIDDEN, newnick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{
-			u->SendMessage(OperServ, OPER_SVSNICK_NEWNICK, nick.c_str(), newnick.c_str());
+			source.Reply(OPER_SVSNICK_NEWNICK, nick.c_str(), newnick.c_str());
 			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}

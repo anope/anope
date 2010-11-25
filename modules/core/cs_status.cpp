@@ -20,27 +20,17 @@ class CommandCSStatus : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci;
-		User *u2;
-		Anope::string chan = params[0];
-		Anope::string nick = params[1];
-		Anope::string temp;
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
+		const Anope::string &nick = params[1];
 
-		if (!(ci = cs_findchan(chan)))
-		{
-			temp = chan;
-			chan = nick;
-			nick = temp;
-			ci = cs_findchan(chan);
-		}
-		if (!ci)
-			u->SendMessage(ChanServ, CHAN_STATUS_NOT_REGGED, temp.c_str());
-		else if ((u2 = finduser(nick)))
-			u->SendMessage(ChanServ, CHAN_STATUS_INFO, chan.c_str(), nick.c_str(), get_access(u2, ci));
+		User *u2 = finduser(nick);
+		if (u2)
+			source.Reply(CHAN_STATUS_INFO, ci->name.c_str(), u2->nick.c_str(), get_access(u2, ci));
 		else /* !u2 */
-			u->SendMessage(ChanServ, CHAN_STATUS_NOTONLINE, nick.c_str());
+			source.Reply(CHAN_STATUS_NOTONLINE, nick.c_str());
 		return MOD_CONT;
 	}
 

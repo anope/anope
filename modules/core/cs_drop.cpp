@@ -22,14 +22,16 @@ class CommandCSDrop : public Command
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string chan = params[0];
-		ChannelInfo *ci;
+		const Anope::string &chan = params[0];
+
+		User *u = source.u;
+		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
-			u->SendMessage(ChanServ, CHAN_DROP_DISABLED); // XXX: READ_ONLY_MODE?
+			source.Reply(CHAN_DROP_DISABLED); // XXX: READ_ONLY_MODE?
 			return MOD_CONT;
 		}
 
@@ -37,19 +39,19 @@ class CommandCSDrop : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			u->SendMessage(ChanServ, CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			u->SendMessage(ChanServ, CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 

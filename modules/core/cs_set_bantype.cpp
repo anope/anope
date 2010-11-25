@@ -20,9 +20,9 @@ class CommandCSSetBanType : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetBanType");
 
@@ -31,11 +31,11 @@ class CommandCSSetBanType : public Command
 		int16 bantype = convertTo<int16>(params[1], end, false);
 
 		if (!end.empty() || bantype < 0 || bantype > 3)
-			u->SendMessage(ChanServ, CHAN_SET_BANTYPE_INVALID, params[1].c_str());
+			source.Reply(CHAN_SET_BANTYPE_INVALID, params[1].c_str());
 		else
 		{
 			ci->bantype = bantype;
-			u->SendMessage(ChanServ, CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(), ci->bantype);
+			source.Reply(CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(), ci->bantype);
 		}
 
 		return MOD_CONT;

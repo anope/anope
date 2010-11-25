@@ -20,8 +20,9 @@ class CommandOSUpdate : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		u->SendMessage(OperServ, OPER_UPDATING);
 		save_data = true;
 		return MOD_CONT;

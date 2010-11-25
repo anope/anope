@@ -20,8 +20,9 @@ class CommandNSSetEmail : public Command
 	{
 	}
 
-	CommandReturn Execute(User *u, const std::vector<Anope::string> &params)
+	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetEmail");
@@ -31,29 +32,29 @@ class CommandNSSetEmail : public Command
 
 		if (param.empty() && Config->NSForceEmail)
 		{
-			u->SendMessage(NickServ, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
+			source.Reply(NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
 			return MOD_CONT;
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			u->SendMessage(NickServ, ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			u->SendMessage(NickServ, MAIL_X_INVALID, param.c_str());
+			source.Reply(MAIL_X_INVALID, param.c_str());
 			return MOD_CONT;
 		}
 
 		if (!param.empty())
 		{
 			nc->email = param;
-			u->SendMessage(NickServ, NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
+			source.Reply(NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
 		}
 		else
 		{
 			nc->email.clear();
-			u->SendMessage(NickServ, NICK_SASET_EMAIL_UNSET, nc->display.c_str());
+			source.Reply(NICK_SASET_EMAIL_UNSET, nc->display.c_str());
 		}
 
 		return MOD_CONT;

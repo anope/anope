@@ -157,6 +157,39 @@ class CommandBSSet : public Command
 				else
 					SyntaxError(BotServ, u, "SET SYMBIOSIS", BOT_SET_SYMBIOSIS_SYNTAX);
 			}
+			else if (option.equals_ci("MSG"))
+			{
+				if (value.equals_ci("OFF"))
+				{
+					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
+					source.Reply(BOT_SET_MSG_OFF, ci->name.c_str());
+				}
+				else if (value.equals_ci("PRIVMSG"))
+				{
+					ci->botflags.SetFlag(BS_MSG_PRIVMSG);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
+					source.Reply(BOT_SET_MSG_PRIVMSG, ci->name.c_str());
+				}
+				else if (value.equals_ci("NOTICE"))
+				{
+					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
+					ci->botflags.SetFlag(BS_MSG_NOTICE);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
+					source.Reply(BOT_SET_MSG_NOTICE, ci->name.c_str());
+				}
+				else if (value.equals_ci("NOTICEOPS"))
+				{
+					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
+					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
+					ci->botflags.SetFlag(BS_MSG_NOTICEOPS);
+					source.Reply(BOT_SET_MSG_NOTICEOPS, ci->name.c_str());
+				}
+				else
+					SyntaxError(BotServ, u, "SET MSG", BOT_SET_MSG_SYNTAX);
+			}
 			else
 				source.Reply(BOT_SET_UNKNOWN, option.c_str());
 		}
@@ -186,6 +219,8 @@ class CommandBSSet : public Command
 			u->SendMessage(BotServ, BOT_SERVADMIN_HELP_SET_NOBOT);
 		else if (subcommand.equals_ci("PRIVATE"))
 			u->SendMessage(BotServ, BOT_SERVADMIN_HELP_SET_PRIVATE);
+		else if (subcommand.equals_ci("MSG"))
+			u->SendMessage(BotServ, BOT_HELP_SET_MSG);
 		else
 			return false;
 

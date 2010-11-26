@@ -162,6 +162,12 @@ class CommandBSInfo : public Command
 			}
 			else
 				source.Reply(BOT_INFO_CHAN_KICK_ITALICS, GetString(u, BOT_INFO_INACTIVE).c_str());
+			if (ci->botflags.HasFlag(BS_MSG_PRIVMSG))
+				source.Reply(BOT_INFO_CHAN_MSG, "PRIVMSG");
+			else if (ci->botflags.HasFlag(BS_MSG_NOTICE))
+				source.Reply(BOT_INFO_CHAN_MSG, "NOTICE");
+			else if (ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
+				source.Reply(BOT_INFO_CHAN_MSG, "NOTICEOPS");
 			
 			end = buf;
 			*end = 0;

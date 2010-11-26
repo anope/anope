@@ -1763,6 +1763,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("     Italics kicker : %s"),
 	/* BOT_INFO_CHAN_KICK_ITALICS_BAN */
 	_("     Italics kicker : %s (%d kick(s) to ban)"),
+	/* BOT_INFO_CHAN_MSG */
+	_("      Fantasy reply : %s"),
 	/* BOT_INFO_ACTIVE */
 	_("enabled"),
 	/* BOT_INFO_INACTIVE */
@@ -1832,6 +1834,16 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Symbiosis mode is now ON on channel %s."),
 	/* BOT_SET_SYMBIOSIS_OFF */
 	_("Symbiosis mode is now OFF on channel %s."),
+	/* BOT_SET_MSG_SYNTAX */
+	_("SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|NOTICEOPS\037}"),
+	/* BOT_SET_MSG_OFF */
+	_("Fantasy replies will no longer be sent to %s."),
+	/* BOT_SET_MSG_PRIVMSG */
+	_("Fantasy replies will be sent via PRIVMSG to %s."),
+	/* BOT_SET_MSG_NOTICE */
+	_("Fantasy replies will be sent via NOTICE to %s."),
+	/* BOT_SET_MSG_NOTICEOPS */
+	_("Fantasy replies will be sent via NOTICE to channel ops on %s."),
 	/* BOT_KICK_SYNTAX */
 	_("KICK channel option {ON|OFF} [settings]"),
 	/* BOT_KICK_DISABLED */
@@ -4879,6 +4891,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"    GREET            Enable greet messages\n"
 	"    FANTASY          Enable fantaisist commands\n"
 	"    SYMBIOSIS        Allow the bot to act as a real bot\n"
+	"    MSG              Configure how fantasy commands should be replied to\n"
 	" \n"
 	"Type %R%S HELP SET option for more information\n"
 	"on a specific option.\n"
@@ -4925,6 +4938,15 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"When it is enabled, the bot will do everything\n"
 	"normally done by %s on channels, such as MODEs,\n"
 	"KICKs, and even the entry message."),
+	/* BOT_HELP_SET_MSG */
+	_("Syntax: \002SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|NOTICEOPS\037}\002\n"
+	" \n"
+	"Configures how fantasy commands should be returned to the channel. Off disables\n"
+	"fantasy from replying to the channel. Privmsg, notice, and noticeops message the\n"
+	"channel, notice the channel, and notice the channel ops respectively.\n"
+	" \n"
+	"Note that replies over one line will not use this setting to prevent spam, and will\n"
+	"go directly to the user who executed it."),
 	/* BOT_HELP_KICK */
 	_("Syntax: KICK channel option parameters\n"
 	" \n"

@@ -73,6 +73,9 @@ BotFlagInfo BotFlags[] = {
 	{"KICK_FLOOD", BS_KICK_FLOOD},
 	{"KICK_REPEAT", BS_KICK_REPEAT},
 	{"KICK_ITALICS", BS_KICK_ITALICS},
+	{"MSG_PRIVMSG", BS_MSG_PRIVMSG},
+	{"MSG_NOTICE", BS_MSG_NOTICE},
+	{"MSG_NOTICEOPS", BS_MSG_NOTICEOPS},
 	{"", static_cast<BotServFlag>(-1)}
 };
 

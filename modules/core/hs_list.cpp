@@ -22,8 +22,6 @@ class CommandHSList : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
 		unsigned display_counter = 0;

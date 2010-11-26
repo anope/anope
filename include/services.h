@@ -698,6 +698,12 @@ enum BotServFlag
 	BS_KICK_REPEAT,
 	/* BotServ kicks for italics */
 	BS_KICK_ITALICS,
+	/* Send fantasy replies back to the channel via PRIVMSG */
+	BS_MSG_PRIVMSG,
+	/* Send fantasy replies back to the channel via NOTICE */
+	BS_MSG_NOTICE,
+	/* Send fantasy replies back to the channel via NOTICE to ops */
+	BS_MSG_NOTICEOPS,
 	BS_END
 };
 

@@ -57,9 +57,12 @@ struct CommandSource
 	/* Whether or not this was a fantasy command */
 	bool fantasy;
 
+	std::list<Anope::string> reply;
+
+	~CommandSource();
+
 	void Reply(LanguageString message, ...);
 	void Reply(const char *message, ...);
-	void Reply(const Anope::string &message);
 };
 
 /** Every services command is a class, inheriting from Command.

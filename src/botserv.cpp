@@ -80,7 +80,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	{
 		Anope::string ctcp = buf;
 		ctcp.erase(ctcp.begin());
-		ctcp.erase(ctcp.end() - 1);
+		ctcp.erase(ctcp.length() - 1);
 		ircdproto->SendCTCP(ci->bi, u->nick, "%s", ctcp.c_str());
 	}
 
@@ -93,7 +93,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	if (!realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[buf.length() - 1] == '\1')
 	{
 		realbuf.erase(0, 8);
-		realbuf.erase(realbuf.end());
+		realbuf.erase(realbuf.length() - 1);
 		was_action = true;
 	}
 

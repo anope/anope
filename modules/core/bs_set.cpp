@@ -53,7 +53,7 @@ class CommandBSSet : public Command
 				source.Reply(BOT_SET_PRIVATE_OFF, bi->nick.c_str());
 			}
 			else
-				SyntaxError(BotServ, u, "SET PRIVATE", BOT_SET_PRIVATE_SYNTAX);
+				SyntaxError(source, "SET PRIVATE", BOT_SET_PRIVATE_SYNTAX);
 			return MOD_CONT;
 		}
 		else if (!(ci = cs_findchan(chan)))
@@ -78,7 +78,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_DONTKICKOPS_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET DONTKICKOPS", BOT_SET_DONTKICKOPS_SYNTAX);
+					SyntaxError(source, "SET DONTKICKOPS", BOT_SET_DONTKICKOPS_SYNTAX);
 			}
 			else if (option.equals_ci("DONTKICKVOICES"))
 			{
@@ -93,7 +93,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_DONTKICKVOICES_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET DONTKICKVOICES", BOT_SET_DONTKICKVOICES_SYNTAX);
+					SyntaxError(source, "SET DONTKICKVOICES", BOT_SET_DONTKICKVOICES_SYNTAX);
 			}
 			else if (option.equals_ci("FANTASY"))
 			{
@@ -108,7 +108,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_FANTASY_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET FANTASY", BOT_SET_FANTASY_SYNTAX);
+					SyntaxError(source, "SET FANTASY", BOT_SET_FANTASY_SYNTAX);
 			}
 			else if (option.equals_ci("GREET"))
 			{
@@ -123,7 +123,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_GREET_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET GREET", BOT_SET_GREET_SYNTAX);
+					SyntaxError(source, "SET GREET", BOT_SET_GREET_SYNTAX);
 			}
 			else if (u->Account()->HasCommand("botserv/set/nobot") && option.equals_ci("NOBOT"))
 			{
@@ -140,7 +140,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_NOBOT_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET NOBOT", BOT_SET_NOBOT_SYNTAX);
+					SyntaxError(source, "SET NOBOT", BOT_SET_NOBOT_SYNTAX);
 			}
 			else if (option.equals_ci("SYMBIOSIS"))
 			{
@@ -155,7 +155,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_SYMBIOSIS_OFF, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET SYMBIOSIS", BOT_SET_SYMBIOSIS_SYNTAX);
+					SyntaxError(source, "SET SYMBIOSIS", BOT_SET_SYMBIOSIS_SYNTAX);
 			}
 			else if (option.equals_ci("MSG"))
 			{
@@ -188,7 +188,7 @@ class CommandBSSet : public Command
 					source.Reply(BOT_SET_MSG_NOTICEOPS, ci->name.c_str());
 				}
 				else
-					SyntaxError(BotServ, u, "SET MSG", BOT_SET_MSG_SYNTAX);
+					SyntaxError(source, "SET MSG", BOT_SET_MSG_SYNTAX);
 			}
 			else
 				source.Reply(BOT_SET_UNKNOWN, option.c_str());
@@ -197,44 +197,45 @@ class CommandBSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			u->SendMessage(BotServ, BOT_HELP_SET);
+			source.Reply(BOT_HELP_SET);
+			User *u = source.u;
 			if (u->Account() && u->Account()->IsServicesOper())
-				u->SendMessage(BotServ, BOT_SERVADMIN_HELP_SET);
+				source.Reply(BOT_SERVADMIN_HELP_SET);
 		}
 		else if (subcommand.equals_ci("DONTKICKOPS"))
-			u->SendMessage(BotServ, BOT_HELP_SET_DONTKICKOPS);
+			source.Reply(BOT_HELP_SET_DONTKICKOPS);
 		else if (subcommand.equals_ci("DONTKICKVOICES"))
-			u->SendMessage(BotServ, BOT_HELP_SET_DONTKICKVOICES);
+			source.Reply(BOT_HELP_SET_DONTKICKVOICES);
 		else if (subcommand.equals_ci("FANTASY"))
-			u->SendMessage(BotServ, BOT_HELP_SET_FANTASY);
+			source.Reply(BOT_HELP_SET_FANTASY);
 		else if (subcommand.equals_ci("GREET"))
-			u->SendMessage(BotServ, BOT_HELP_SET_GREET);
+			source.Reply(BOT_HELP_SET_GREET);
 		else if (subcommand.equals_ci("SYMBIOSIS"))
-			u->SendMessage(BotServ, BOT_HELP_SET_SYMBIOSIS, Config->s_ChanServ.c_str());
+			source.Reply(BOT_HELP_SET_SYMBIOSIS, Config->s_ChanServ.c_str());
 		else if (subcommand.equals_ci("NOBOT"))
-			u->SendMessage(BotServ, BOT_SERVADMIN_HELP_SET_NOBOT);
+			source.Reply(BOT_SERVADMIN_HELP_SET_NOBOT);
 		else if (subcommand.equals_ci("PRIVATE"))
-			u->SendMessage(BotServ, BOT_SERVADMIN_HELP_SET_PRIVATE);
+			source.Reply(BOT_SERVADMIN_HELP_SET_PRIVATE);
 		else if (subcommand.equals_ci("MSG"))
-			u->SendMessage(BotServ, BOT_HELP_SET_MSG);
+			source.Reply(BOT_HELP_SET_MSG);
 		else
 			return false;
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "SET", BOT_SET_SYNTAX);
+		SyntaxError(source, "SET", BOT_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_SET);
+		source.Reply(BOT_HELP_CMD_SET);
 	}
 };
 

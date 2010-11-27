@@ -31,7 +31,7 @@ class CommandCSSuspend : public Command
 		/* Assumes that permission checking has already been done. */
 		if (Config->ForceForbidReason && reason.empty())
 		{
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 			return MOD_CONT;
 		}
 
@@ -67,27 +67,27 @@ class CommandCSSuspend : public Command
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
-		u->SendMessage(ChanServ, CHAN_SUSPEND_SUCCEEDED, ci->name.c_str());
+		source.Reply(CHAN_SUSPEND_SUCCEEDED, ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_SUSPEND);
+		source.Reply(CHAN_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "SUSPEND", Config->ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
+		SyntaxError(source, "SUSPEND", Config->ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SUSPEND);
+		source.Reply(CHAN_HELP_CMD_SUSPEND);
 	}
 };
 
@@ -123,27 +123,27 @@ class CommandCSUnSuspend : public Command
 		if (Config->WallForbid)
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-		u->SendMessage(ChanServ, CHAN_UNSUSPEND_SUCCEEDED, ci->name.c_str());
+		source.Reply(CHAN_UNSUSPEND_SUCCEEDED, ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_UNSUSPEND);
+		source.Reply(CHAN_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
+		SyntaxError(source, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_UNSUSPEND);
+		source.Reply(CHAN_HELP_CMD_UNSUSPEND);
 	}
 };
 

@@ -22,8 +22,7 @@ class CommandOSStaff : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-		u->SendMessage(OperServ, OPER_STAFF_LIST_HEADER);
+		source.Reply(OPER_STAFF_LIST_HEADER);
 
 		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 		{
@@ -52,19 +51,19 @@ class CommandOSStaff : public Command
 			}
 		}
 
-		u->SendMessage(OperServ, END_OF_ANY_LIST, "Staff");
+		source.Reply(END_OF_ANY_LIST, "Staff");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_STAFF);
+		source.Reply(OPER_HELP_STAFF);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_STAFF);
+		source.Reply(OPER_HELP_CMD_STAFF);
 	}
 };
 

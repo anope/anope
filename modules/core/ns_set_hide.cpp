@@ -22,7 +22,6 @@ class CommandNSSetHide : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetHide");
@@ -60,7 +59,7 @@ class CommandNSSetHide : public Command
 		}
 		else
 		{
-			this->OnSyntaxError(u, "HIDE");
+			this->OnSyntaxError(source, "HIDE");
 			return MOD_CONT;
 		}
 
@@ -75,25 +74,25 @@ class CommandNSSetHide : public Command
 			source.Reply(offmsg, nc->display.c_str(), Config->s_NickServ.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "HIDE");
+			this->OnSyntaxError(source, "HIDE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_HIDE);
+		source.Reply(NICK_HELP_SET_HIDE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SET HIDE", NICK_SET_HIDE_SYNTAX);
+		SyntaxError(source, "SET HIDE", NICK_SET_HIDE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_HIDE);
+		source.Reply(NICK_HELP_CMD_SET_HIDE);
 	}
 };
 
@@ -104,20 +103,20 @@ class CommandNSSASetHide : public CommandNSSetHide
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_HIDE);
+		source.Reply(NICK_HELP_SASET_HIDE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
+		SyntaxError(source, "SASET HIDE", NICK_SASET_HIDE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_HIDE);
+		source.Reply(NICK_HELP_CMD_SET_HIDE);
 	}
 };
 

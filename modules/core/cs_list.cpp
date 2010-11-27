@@ -91,7 +91,7 @@ public:
 
 		Anope::string spattern = "#" + pattern;
 
-		u->SendMessage(ChanServ, NICK_LIST_HEADER, pattern.c_str());
+		source.Reply(NICK_LIST_HEADER, pattern.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -127,24 +127,24 @@ public:
 			}
 		}
 
-		u->SendMessage(ChanServ, CHAN_LIST_END, nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
+		source.Reply(CHAN_LIST_END, nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_LIST);
+		source.Reply(CHAN_HELP_LIST);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "LIST", NICK_LIST_SYNTAX);
+		SyntaxError(source, "LIST", NICK_LIST_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_LIST);
+		source.Reply(CHAN_HELP_CMD_LIST);
 	}
 };
 

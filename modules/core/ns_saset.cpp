@@ -70,14 +70,14 @@ class CommandNSSASet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			u->SendMessage(NickServ, NICK_HELP_SASET_HEAD);
+			source.Reply(NICK_HELP_SASET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-				it->second->OnServHelp(u);
-			u->SendMessage(NickServ, NICK_HELP_SASET_TAIL);
+				it->second->OnServHelp(source);
+			source.Reply(NICK_HELP_SASET_TAIL);
 			return true;
 		}
 		else
@@ -85,20 +85,20 @@ class CommandNSSASet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-				return c->OnHelp(u, subcommand);
+				return c->OnHelp(source, subcommand);
 		}
 
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET);
+		source.Reply(NICK_HELP_CMD_SASET);
 	}
 
 	bool AddSubcommand(Command *c)
@@ -131,7 +131,6 @@ class CommandNSSASetDisplay : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *setter_na = findnick(params[0]);
 		if (!setter_na)
 			throw CoreException("NULL na in CommandNSSASetDisplay");
@@ -145,25 +144,25 @@ class CommandNSSASetDisplay : public Command
 		}
 
 		change_core_display(nc, params[1]);
-		u->SendMessage(NickServ, NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
+		source.Reply(NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_DISPLAY);
+		source.Reply(NICK_HELP_SASET_DISPLAY);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_DISPLAY);
+		source.Reply(NICK_HELP_CMD_SASET_DISPLAY);
 	}
 };
 
@@ -219,20 +218,20 @@ class CommandNSSASetPassword : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_PASSWORD);
+		source.Reply(NICK_HELP_SASET_PASSWORD);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_PASSWORD);
+		source.Reply(NICK_HELP_CMD_SASET_PASSWORD);
 	}
 };
 

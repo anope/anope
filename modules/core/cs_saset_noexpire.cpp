@@ -22,7 +22,6 @@ class CommandCSSASetNoexpire : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSASetNoexpire");
@@ -38,25 +37,25 @@ class CommandCSSASetNoexpire : public Command
 			source.Reply(CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "NOEXPIRE");
+			this->OnSyntaxError(source, "NOEXPIRE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+		source.Reply(CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
+		SyntaxError(source, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_NOEXPIRE);
+		source.Reply(CHAN_HELP_CMD_SET_NOEXPIRE);
 	}
 };
 

@@ -22,21 +22,20 @@ class CommandOSUpdate : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-		u->SendMessage(OperServ, OPER_UPDATING);
+		source.Reply(OPER_UPDATING);
 		save_data = true;
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_UPDATE);
+		source.Reply(OPER_HELP_UPDATE);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_UPDATE);
+		source.Reply(OPER_HELP_CMD_UPDATE);
 	}
 };
 

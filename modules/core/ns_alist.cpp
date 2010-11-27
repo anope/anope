@@ -119,19 +119,20 @@ class CommandNSAList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_ALIST);
+			source.Reply(NICK_SERVADMIN_HELP_ALIST);
 		else
-			u->SendMessage(NickServ, NICK_HELP_ALIST);
+			source.Reply(NICK_HELP_ALIST);
 
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_ALIST);
+		source.Reply(NICK_HELP_CMD_ALIST);
 	}
 };
 

@@ -39,13 +39,13 @@ class CommandMSRSend : public Command
 		{
 			/* Services opers and above can use rsend */
 			if (u->Account()->IsServicesOper())
-				memo_send(u, nick, text, 3);
+				memo_send(source, nick, text, 3);
 			else
 				source.Reply(ACCESS_DENIED);
 		}
 		else if (Config->MSMemoReceipt == 2)
 			/* Everybody can use rsend */
-			memo_send(u, nick, text, 3);
+			memo_send(source, nick, text, 3);
 		else
 		{
 			/* rsend has been disabled */
@@ -56,20 +56,20 @@ class CommandMSRSend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_RSEND);
+		source.Reply(MEMO_HELP_RSEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+		SyntaxError(source, "RSEND", MEMO_RSEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_RSEND);
+		source.Reply(MEMO_HELP_CMD_RSEND);
 	}
 };
 

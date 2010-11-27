@@ -145,7 +145,7 @@ MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid)
 
 /**
  * Split from do_send, this way we can easily send a memo from any point
- * @param u User Struct
+ * @param source Where replies should go
  * @param name Target of the memo
  * @param text Memo Text
  * @param z type see info
@@ -155,71 +155,73 @@ MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid)
  *    3 - reply to user and request read receipt
  * @return void
  */
-void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z)
+void memo_send(CommandSource &source, const Anope::string &name, const Anope::string &text, int z)
 {
 	if (Config->s_MemoServ.empty())
 		return;
 
+	User *u = source.u;
+
 	bool ischan, isforbid;
 	MemoInfo *mi;
-	Anope::string source = u->Account()->display;
-	int is_servoper = u->Account() && u->Account()->IsServicesOper();
+	Anope::string sender = u && u->Account() ? u->Account()->display : "";
+	int is_servoper = u && u->Account() && u->Account()->IsServicesOper();
 
 	if (readonly)
 		u->SendMessage(MemoServ, MEMO_SEND_DISABLED);
 	else if (text.empty())
 	{
 		if (!z)
-			SyntaxError(MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+			SyntaxError(source, "SEND", MEMO_SEND_SYNTAX);
 
 		if (z == 3)
-			SyntaxError(MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+			SyntaxError(source, "RSEND", MEMO_RSEND_SYNTAX);
 	}
 	else if (!u->IsIdentified() && !u->IsRecognized())
 	{
 		if (!z || z == 3)
-			u->SendMessage(MemoServ, NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 	}
 	else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 	{
 		if (!z || z == 3)
 		{
 			if (isforbid)
-				u->SendMessage(MemoServ, ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
+				source.Reply(ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
 			else
-				u->SendMessage(MemoServ, ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
+				source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
 		}
 	}
 	else if (z != 2 && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 	{
 		u->lastmemosend = Anope::CurTime;
 		if (!z)
-			u->SendMessage(MemoServ, MEMO_SEND_PLEASE_WAIT, Config->MSSendDelay);
+			source.Reply(MEMO_SEND_PLEASE_WAIT, Config->MSSendDelay);
 
 		if (z == 3)
-			u->SendMessage(MemoServ, MEMO_RSEND_PLEASE_WAIT, Config->MSSendDelay);
+			source.Reply(MEMO_RSEND_PLEASE_WAIT, Config->MSSendDelay);
 	}
 	else if (!mi->memomax && !is_servoper)
 	{
 		if (!z || z == 3)
-			u->SendMessage(MemoServ, MEMO_X_GETS_NO_MEMOS, name.c_str());
+			source.Reply(MEMO_X_GETS_NO_MEMOS, name.c_str());
 	}
 	else if (mi->memomax > 0 && mi->memos.size() >= mi->memomax && !is_servoper)
 	{
 		if (!z || z == 3)
-			u->SendMessage(MemoServ, MEMO_X_HAS_TOO_MANY_MEMOS, name.c_str());
+			source.Reply(MEMO_X_HAS_TOO_MANY_MEMOS, name.c_str());
 	}
 	else
 	{
 		if (!z || z == 3)
-			u->SendMessage(MemoServ, MEMO_SENT, name.c_str());
+			source.Reply(MEMO_SENT, name.c_str());
 		if ((!u->Account() || !u->Account()->IsServicesOper()) && mi->HasIgnore(u))
 			return;
 
 		u->lastmemosend = Anope::CurTime;
 		Memo *m = new Memo();
 		mi->memos.push_back(m);
-		m->sender = source;
+		m->sender = sender;
 		m->time = Anope::CurTime;
 		m->text = text;
 		m->SetFlag(MF_UNREAD);
@@ -244,13 +246,13 @@ void memo_send(User *u, const Anope::string &name, const Anope::string &text, in
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+							source.Reply(MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						u->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						source.Reply(MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
@@ -333,7 +335,7 @@ static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 
 /* Send receipt notification to sender. */
 
-void rsend_notify(User *u, Memo *m, const Anope::string &chan)
+void rsend_notify(CommandSource &source, Memo *m, const Anope::string &chan)
 {
 	/* Only send receipt if memos are allowed */
 	if (!readonly)
@@ -359,11 +361,11 @@ void rsend_notify(User *u, Memo *m, const Anope::string &chan)
 			snprintf(text, sizeof(text), "%s", GetString(na->nc, MEMO_RSEND_NICK_MEMO_TEXT).c_str());
 
 		/* Send notification */
-		memo_send(u, m->sender, text, 2);
+		memo_send(source, m->sender, text, 2);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
-		u->SendMessage(MemoServ, MEMO_RSEND_USER_NOTIFICATION, nc->display.c_str());
+		source.Reply(MEMO_RSEND_USER_NOTIFICATION, nc->display.c_str());
 	}
 
 	/* Remove receipt flag from the original memo */

@@ -22,7 +22,6 @@ class CommandCSStatus : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		const Anope::string &nick = params[1];
 
@@ -34,20 +33,20 @@ class CommandCSStatus : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_STATUS);
+		source.Reply(CHAN_SERVADMIN_HELP_STATUS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "STATUS", CHAN_STATUS_SYNTAX);
+		SyntaxError(source, "STATUS", CHAN_STATUS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_STATUS);
+		source.Reply(CHAN_HELP_CMD_STATUS);
 	}
 };
 

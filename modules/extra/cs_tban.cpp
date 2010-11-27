@@ -80,30 +80,30 @@ class CommandCSTBan : public Command
 				get_idealban(c->ci, u2, mask);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				new TempBan(dotime(time), c, mask);
-				me->SendMessage(ChanServ, u, _("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
+				me->SendMessage(source, _("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
 			}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		this->OnSyntaxError(u, "");
-		me->SendMessage(ChanServ, u, " ");
-		me->SendMessage(ChanServ, u, _("Bans the given user from a channel for a specified length of\n"
+		this->OnSyntaxError(source, "");
+		me->SendMessage(source, " ");
+		me->SendMessage(source, _("Bans the given user from a channel for a specified length of\n"
 			"time. If the ban is removed before by hand, it will NOT be replaced."));
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(ChanServ, u, _("Syntax: TBAN channel nick time"));
+		me->SendMessage(source, _("Syntax: TBAN channel nick time"));
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		me->SendMessage(ChanServ, u, _("    TBAN       Bans the user for a given length of time"));
+		me->SendMessage(source, _("    TBAN       Bans the user for a given length of time"));
 	}
 };
 

@@ -22,27 +22,26 @@ class CommandMSSend : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
-		memo_send(u, nick, text, 0);
+		memo_send(source, nick, text, 0);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_SEND);
+		source.Reply(MEMO_HELP_SEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+		SyntaxError(source, "SEND", MEMO_SEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_SEND);
+		source.Reply(MEMO_HELP_CMD_SEND);
 	}
 };
 

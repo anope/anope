@@ -80,25 +80,25 @@ class CommandMSIgnore : public Command
 			}
 		}
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_IGNORE);
+		source.Reply(MEMO_HELP_IGNORE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "IGNORE", MEMO_IGNORE_SYNTAX);
+		SyntaxError(source, "IGNORE", MEMO_IGNORE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_IGNORE);
+		source.Reply(MEMO_HELP_CMD_IGNORE);
 	}
 };
 

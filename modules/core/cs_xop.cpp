@@ -206,7 +206,7 @@ class XOPBase : public Command
 
 		if (nick.empty())
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 
@@ -293,7 +293,7 @@ class XOPBase : public Command
 
 		if (nick.empty())
 		{
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
 		}
 
@@ -462,14 +462,13 @@ class XOPBase : public Command
 
 		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-		u->SendMessage(ChanServ, messages[XOP_CLEAR], ci->name.c_str());
+		source.Reply(messages[XOP_CLEAR], ci->name.c_str());
 
 		return MOD_CONT;
 	}
  protected:
 	CommandReturn DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
 		const Anope::string &cmd = params[1];
@@ -485,7 +484,7 @@ class XOPBase : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source, level, messages);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
@@ -500,11 +499,11 @@ class XOPBase : public Command
 
 	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u, const Anope::string &subcommand) = 0;
+	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) = 0;
 
-	virtual void OnServHelp(User *u) = 0;
+	virtual void OnServHelp(CommandSource &source) = 0;
 };
 
 class CommandCSQOP : public XOPBase
@@ -519,20 +518,20 @@ class CommandCSQOP : public XOPBase
 		return this->DoXop(source, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_QOP);
+		source.Reply(CHAN_HELP_QOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "QOP", CHAN_QOP_SYNTAX);
+		SyntaxError(source, "QOP", CHAN_QOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_QOP);
+		source.Reply(CHAN_HELP_CMD_QOP);
 	}
 };
 
@@ -548,20 +547,20 @@ class CommandCSAOP : public XOPBase
 		return this->DoXop(source, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_AOP);
+		source.Reply(CHAN_HELP_AOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "AOP", CHAN_AOP_SYNTAX);
+		SyntaxError(source, "AOP", CHAN_AOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_AOP);
+		source.Reply(CHAN_HELP_CMD_AOP);
 	}
 };
 
@@ -577,20 +576,20 @@ class CommandCSHOP : public XOPBase
 		return this->DoXop(source, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_HOP);
+		source.Reply(CHAN_HELP_HOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "HOP", CHAN_HOP_SYNTAX);
+		SyntaxError(source, "HOP", CHAN_HOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_HOP);
+		source.Reply(CHAN_HELP_CMD_HOP);
 	}
 };
 
@@ -606,20 +605,20 @@ class CommandCSSOP : public XOPBase
 		return this->DoXop(source, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SOP);
+		source.Reply(CHAN_HELP_SOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "SOP", CHAN_SOP_SYNTAX);
+		SyntaxError(source, "SOP", CHAN_SOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SOP);
+		source.Reply(CHAN_HELP_CMD_SOP);
 	}
 };
 
@@ -635,20 +634,20 @@ class CommandCSVOP : public XOPBase
 		return this->DoXop(source, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_VOP);
+		source.Reply(CHAN_HELP_VOP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "VOP", CHAN_VOP_SYNTAX);
+		SyntaxError(source, "VOP", CHAN_VOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_VOP);
+		source.Reply(CHAN_HELP_CMD_VOP);
 	}
 };
 

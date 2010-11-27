@@ -43,15 +43,15 @@ class CommandNSSetGreet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_GREET);
+		source.Reply(NICK_HELP_SET_GREET);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_GREET);
+		source.Reply(NICK_HELP_CMD_SET_GREET);
 	}
 };
 
@@ -62,15 +62,15 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_GREET);
+		source.Reply(NICK_HELP_SASET_GREET);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_GREET);
+		source.Reply(NICK_HELP_CMD_SASET_GREET);
 	}
 };
 

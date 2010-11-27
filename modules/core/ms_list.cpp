@@ -86,7 +86,7 @@ class CommandMSList : public Command
 		else
 			mi = &u->Account()->memos;
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
-			this->OnSyntaxError(u, param);
+			this->OnSyntaxError(source, param);
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
@@ -142,20 +142,20 @@ class CommandMSList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_LIST);
+		source.Reply(MEMO_HELP_LIST);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "LIST", MEMO_LIST_SYNTAX);
+		SyntaxError(source, "LIST", MEMO_LIST_SYNTAX);
 	}
 
-	void OnServCommand(User *u)
+	void OnServCommand(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_LIST);
+		source.Reply(MEMO_HELP_CMD_LIST);
 	}
 };
 

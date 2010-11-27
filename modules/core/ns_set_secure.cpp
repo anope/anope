@@ -22,7 +22,6 @@ class CommandNSSetSecure : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetSecure");
@@ -41,25 +40,25 @@ class CommandNSSetSecure : public Command
 			source.Reply(NICK_SASET_SECURE_OFF, nc->display.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "SECURE");
+			this->OnSyntaxError(source, "SECURE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_SECURE);
+		source.Reply(NICK_HELP_SET_SECURE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SET SECURE", NICK_SET_SECURE_SYNTAX);
+		SyntaxError(source, "SET SECURE", NICK_SET_SECURE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_SECURE);
+		source.Reply(NICK_HELP_CMD_SET_SECURE);
 	}
 };
 
@@ -70,20 +69,20 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_SECURE);
+		source.Reply(NICK_HELP_SASET_SECURE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
+		SyntaxError(source, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_SECURE);
+		source.Reply(NICK_HELP_CMD_SET_SECURE);
 	}
 };
 

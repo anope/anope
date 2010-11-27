@@ -123,14 +123,14 @@ const Anope::string GetString(const char *domain, Anope::string language, const 
 }
 #endif
 
-void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message)
+void SyntaxError(CommandSource &source, const Anope::string &command, LanguageString message)
 {
-	if (!bi || !u || command.empty())
+	if (command.empty())
 		return;
 
-	Anope::string str = GetString(u, message);
-	u->SendMessage(bi, SYNTAX_ERROR, str.c_str());
-	u->SendMessage(bi, MORE_INFO, bi->nick.c_str(), command.c_str());
+	Anope::string str = GetString(source.u, message);
+	source.Reply(SYNTAX_ERROR, str.c_str());
+	source.Reply(MORE_INFO, source.owner->nick.c_str(), command.c_str());
 }
 
 const char *const language_strings[LANG_STRING_COUNT] = {

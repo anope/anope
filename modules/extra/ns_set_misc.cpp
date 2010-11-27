@@ -43,14 +43,14 @@ class CommandNSSetMisc : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(Config->s_NickServ, "    %-10s    %s", this->name.c_str(), this->Desc.c_str());
+		source.Reply("    %-10s    %s", this->name.c_str(), this->Desc.c_str());
 	}
 };
 
@@ -61,9 +61,9 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 	{
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
 	}
 };
 

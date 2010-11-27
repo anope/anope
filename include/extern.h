@@ -146,7 +146,7 @@ E const Anope::string GetString(NickCore *nc, LanguageString string);
 E const Anope::string GetString(User *u, LanguageString string);
 E const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string);
 E const char *const language_strings[LANG_STRING_COUNT];
-E void SyntaxError(BotInfo *bi, User *u, const Anope::string &command, LanguageString message);
+E void SyntaxError(CommandSource &source, const Anope::string &command, LanguageString message);
 
 /*** logger.cpp ***/
 E void InitLogChannels(ServerConfig *);
@@ -189,10 +189,10 @@ class CoreExport UplinkSocket : public ConnectionSocket
 /**** memoserv.c ****/
 
 E void ms_init();
-E void rsend_notify(User *u, Memo *m, const Anope::string &chan);
+E void rsend_notify(CommandSource &source, Memo *m, const Anope::string &chan);
 E void check_memos(User *u);
 E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
-E void memo_send(User *u, const Anope::string &name, const Anope::string &text, int z);
+E void memo_send(CommandSource &source, const Anope::string &name, const Anope::string &text, int z);
 
 /**** messages.c ****/
 

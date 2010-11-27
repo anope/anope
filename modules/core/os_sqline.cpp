@@ -161,7 +161,7 @@ class CommandOSSQLine : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 
@@ -230,7 +230,7 @@ class CommandOSSQLine : public Command
 
 		}
 		else
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 
 		return MOD_CONT;
 	}
@@ -249,7 +249,7 @@ class CommandOSSQLine : public Command
 
 		if (mask.empty())
 		{
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
 		}
 
@@ -371,7 +371,7 @@ class CommandOSSQLine : public Command
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
 		SGLine->Clear();
-		u->SendMessage(OperServ, OPER_SQLINE_CLEAR);
+		source.Reply(OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -382,7 +382,6 @@ class CommandOSSQLine : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
@@ -396,24 +395,24 @@ class CommandOSSQLine : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_SQLINE);
+		source.Reply(OPER_HELP_SQLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "SQLINE", OPER_SQLINE_SYNTAX);
+		SyntaxError(source, "SQLINE", OPER_SQLINE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_SQLINE);
+		source.Reply(OPER_HELP_CMD_SQLINE);
 	}
 };
 

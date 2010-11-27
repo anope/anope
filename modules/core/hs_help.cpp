@@ -23,16 +23,17 @@ class CommandHSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(HostServ, source.u, params[0]);
+		mod_help_cmd(HostServ, source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(HostServ, OPER_HELP, Config->s_HostServ.c_str());
+		User *u = source.u;
+		source.Reply(OPER_HELP, Config->s_HostServ.c_str());
 		for (CommandMap::const_iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
-				it->second->OnServHelp(u);
+				it->second->OnServHelp(source);
 	}
 };
 

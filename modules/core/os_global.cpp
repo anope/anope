@@ -31,20 +31,20 @@ class CommandOSGlobal : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_GLOBAL, Config->s_GlobalNoticer.c_str());
+		source.Reply(OPER_HELP_GLOBAL, Config->s_GlobalNoticer.c_str());
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
+		SyntaxError(source, "GLOBAL", OPER_GLOBAL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_GLOBAL);
+		source.Reply(OPER_HELP_CMD_GLOBAL);
 	}
 };
 

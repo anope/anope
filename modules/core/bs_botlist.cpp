@@ -68,15 +68,15 @@ class CommandBSBotList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_HELP_BOTLIST);
+		source.Reply(BOT_HELP_BOTLIST);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_BOTLIST);
+		source.Reply(BOT_HELP_CMD_BOTLIST);
 	}
 };
 

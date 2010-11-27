@@ -57,20 +57,20 @@ class CommandBSAct : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "ACT", BOT_ACT_SYNTAX);
+		SyntaxError(source, "ACT", BOT_ACT_SYNTAX);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_HELP_ACT);
+		source.Reply(BOT_HELP_ACT);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_ACT);
+		source.Reply(BOT_HELP_CMD_ACT);
 	}
 };
 

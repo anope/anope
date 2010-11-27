@@ -109,7 +109,7 @@ class CommandEntryMessage : public Command
 			else if (params.size() < 3)
 			{
 				success = false;
-				this->OnSyntaxError(u, "");
+				this->OnSyntaxError(source, "");
 			}
 			else if (params[1].equals_ci("ADD"))
 				this->DoAdd(u, ci, params[2]);
@@ -118,7 +118,7 @@ class CommandEntryMessage : public Command
 			else
 			{
 				success = false;
-				this->OnSyntaxError(u, "");
+				this->OnSyntaxError(source, "");
 			}
 			if (success)
 				Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << params[1];
@@ -131,20 +131,20 @@ class CommandEntryMessage : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "ENTRYMSG", CHAN_ENTRYMSG_SYNTAX);
+		SyntaxError(source, "ENTRYMSG", CHAN_ENTRYMSG_SYNTAX);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_ENTRYMSG);
+		source.Reply(CHAN_HELP_ENTRYMSG);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_ENTRYMSG);
+		source.Reply(CHAN_HELP_CMD_ENTRYMSG);
 	}
 };
 
@@ -174,7 +174,7 @@ class CSEntryMessage : public Module
 
 			if (c->ci->GetExtRegular("cs_entrymsg", messages))
 				for (unsigned i = 0; i < messages.size(); ++i)
-					this->SendMessage(whosends(c->ci), u, "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
+					u->SendMessage(whosends(c->ci)->nick, "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
 		}
 	}
 		

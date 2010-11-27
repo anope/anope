@@ -34,9 +34,9 @@ class CommandBSKick : public Command
 		if (readonly)
 			source.Reply(BOT_KICK_DISABLED);
 		else if (chan.empty() || option.empty() || value.empty())
-			SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
+			SyntaxError(source, "KICK", BOT_KICK_SYNTAX);
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
-			SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
+			SyntaxError(source, "KICK", BOT_KICK_SYNTAX);
 		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else if (!ci->bi)
@@ -371,42 +371,42 @@ class CommandBSKick : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			u->SendMessage(BotServ, BOT_HELP_KICK);
+			source.Reply(BOT_HELP_KICK);
 		else if (subcommand.equals_ci("BADWORDS"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_BADWORDS);
+			source.Reply(BOT_HELP_KICK_BADWORDS);
 		else if (subcommand.equals_ci("BOLDS"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_BOLDS);
+			source.Reply(BOT_HELP_KICK_BOLDS);
 		else if (subcommand.equals_ci("CAPS"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_CAPS);
+			source.Reply(BOT_HELP_KICK_CAPS);
 		else if (subcommand.equals_ci("COLORS"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_COLORS);
+			source.Reply(BOT_HELP_KICK_COLORS);
 		else if (subcommand.equals_ci("FLOOD"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_FLOOD);
+			source.Reply(BOT_HELP_KICK_FLOOD);
 		else if (subcommand.equals_ci("REPEAT"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_REPEAT);
+			source.Reply(BOT_HELP_KICK_REPEAT);
 		else if (subcommand.equals_ci("REVERSES"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_REVERSES);
+			source.Reply(BOT_HELP_KICK_REVERSES);
 		else if (subcommand.equals_ci("UNDERLINES"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_UNDERLINES);
+			source.Reply(BOT_HELP_KICK_UNDERLINES);
 		else if (subcommand.equals_ci("ITALICS"))
-			u->SendMessage(BotServ, BOT_HELP_KICK_ITALICS);
+			source.Reply(BOT_HELP_KICK_ITALICS);
 		else
 			return false;
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "KICK", BOT_KICK_SYNTAX);
+		SyntaxError(source, "KICK", BOT_KICK_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_KICK);
+		source.Reply(BOT_HELP_CMD_KICK);
 	}
 };
 

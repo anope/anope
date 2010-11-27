@@ -71,31 +71,32 @@ class CommandCSDrop : public Command
 
 		delete ci;
 
-		u->SendMessage(ChanServ, CHAN_DROPPED, chan.c_str());
+		source.Reply(CHAN_DROPPED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_DROP);
+			source.Reply(CHAN_SERVADMIN_HELP_DROP);
 		else
-			u->SendMessage(ChanServ, CHAN_HELP_DROP);
+			source.Reply(CHAN_HELP_DROP);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "DROP", CHAN_DROP_SYNTAX);
+		SyntaxError(source, "DROP", CHAN_DROP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_DROP);
+		source.Reply(CHAN_HELP_CMD_DROP);
 	}
 };
 

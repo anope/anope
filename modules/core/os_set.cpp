@@ -41,7 +41,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u, "IGNORE");
+			this->OnSyntaxError(source, "IGNORE");
 			return MOD_CONT;
 		}
 
@@ -70,7 +70,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u, "READONLY");
+			this->OnSyntaxError(source, "READONLY");
 			return MOD_CONT;
 		}
 
@@ -99,7 +99,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u, "SUPERADMIN");
+			this->OnSyntaxError(source, "SUPERADMIN");
 			return MOD_CONT;
 		}
 
@@ -137,7 +137,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u, "DEBUG");
+			this->OnSyntaxError(source, "DEBUG");
 			return MOD_CONT;
 		}
 
@@ -172,7 +172,7 @@ class CommandOSSet : public Command
 
 		if (setting.empty())
 		{
-			this->OnSyntaxError(u, "NOEXPIRE");
+			this->OnSyntaxError(source, "NOEXPIRE");
 			return MOD_CONT;
 		}
 
@@ -220,34 +220,34 @@ class CommandOSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			u->SendMessage(OperServ, OPER_HELP_SET);
+			source.Reply(OPER_HELP_SET);
 		else if (subcommand.equals_ci("LIST"))
-			u->SendMessage(OperServ, OPER_HELP_SET_LIST);
+			source.Reply(OPER_HELP_SET_LIST);
 		else if (subcommand.equals_ci("READONLY"))
-			u->SendMessage(OperServ, OPER_HELP_SET_READONLY);
+			source.Reply(OPER_HELP_SET_READONLY);
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			u->SendMessage(OperServ, OPER_HELP_SET_NOEXPIRE);
+			source.Reply(OPER_HELP_SET_NOEXPIRE);
 		else if (subcommand.equals_ci("IGNORE"))
-			u->SendMessage(OperServ,OPER_HELP_SET_IGNORE);
+			source.Reply(OPER_HELP_SET_IGNORE);
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			u->SendMessage(OperServ, OPER_HELP_SET_SUPERADMIN);
+			source.Reply(OPER_HELP_SET_SUPERADMIN);
 		else
 			return false;
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "SET", OPER_SET_SYNTAX);
+		SyntaxError(source, "SET", OPER_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_SET);
+		source.Reply(OPER_HELP_CMD_SET);
 	}
 };
 

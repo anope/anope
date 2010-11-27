@@ -119,7 +119,7 @@ class CommandBSBot : public Command
 
 		if (oldnick.empty() || nick.empty())
 		{
-			this->OnSyntaxError(source.u, "CHANGE");
+			this->OnSyntaxError(source, "CHANGE");
 			return MOD_CONT;
 		}
 
@@ -276,7 +276,7 @@ class CommandBSBot : public Command
 
 		if (nick.empty())
 		{
-			this->OnSyntaxError(source.u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
 		}
 
@@ -332,7 +332,7 @@ class CommandBSBot : public Command
 
 			if (params.size() < 5)
 			{
-				this->OnSyntaxError(u, "ADD");
+				this->OnSyntaxError(source, "ADD");
 				return MOD_CONT;
 			}
 
@@ -355,7 +355,7 @@ class CommandBSBot : public Command
 
 			if (params.size() < 3)
 			{
-				this->OnSyntaxError(u, "CHANGE");
+				this->OnSyntaxError(source, "CHANGE");
 				return MOD_CONT;
 			}
 
@@ -372,32 +372,32 @@ class CommandBSBot : public Command
 
 			if (params.size() < 1)
 			{
-				this->OnSyntaxError(u, "DEL");
+				this->OnSyntaxError(source, "DEL");
 				return MOD_CONT;
 			}
 
 			return this->DoDel(source, params);
 		}
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_SERVADMIN_HELP_BOT);
+		source.Reply(BOT_SERVADMIN_HELP_BOT);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "BOT", BOT_BOT_SYNTAX);
+		SyntaxError(source, "BOT", BOT_BOT_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_BOT);
+		source.Reply(BOT_HELP_CMD_BOT);
 	}
 };
 

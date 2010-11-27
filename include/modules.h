@@ -284,11 +284,10 @@ class CoreExport Module : public Extensible
 	Version GetVersion() const;
 
 	/** Send a message to a user in their language, if a translation is available
-	 * @param from Client to send the message from
-	 * @param to User to send the message to
+	 * @param source The source of the message
 	 * @param fmt The message
 	 */
-	void SendMessage(BotInfo *from, User *to, const char *fmt, ...);
+	void SendMessage(CommandSource &source, const char *fmt, ...);
 
 	/**
 	 * Add a module provided command to the given service.
@@ -365,19 +364,18 @@ class CoreExport Module : public Extensible
 	 * @param bi The bot the command is being run from
 	 * @param command The command
 	 * @param message The parameters used for the command
-	 * @param fantasy true if this is a fantasy command
+	 * @param ci If a tanasy command, the channel the comman was used on
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, bool fantasy) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, ChannelInfo *ci) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
-	 * @param u The user executing the command
-	 * @param service The service the command is associated with
+	 * @param source The source of the command
 	 * @param command The command the user is executing
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param source The source of the command

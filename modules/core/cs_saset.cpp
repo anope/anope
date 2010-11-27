@@ -65,14 +65,14 @@ class CommandCSSASet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			u->SendMessage(ChanServ, CHAN_HELP_SASET_HEAD);
+			source.Reply(CHAN_HELP_SASET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-				it->second->OnServHelp(u);
-			u->SendMessage(ChanServ, CHAN_HELP_SASET_TAIL);
+				it->second->OnServHelp(source);
+			source.Reply(CHAN_HELP_SASET_TAIL);
 			return true;
 		}
 		else
@@ -80,20 +80,20 @@ class CommandCSSASet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-				return c->OnHelp(u, subcommand);
+				return c->OnHelp(source, subcommand);
 		}
 
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SASET);
+		source.Reply(CHAN_HELP_CMD_SASET);
 	}
 
 	bool AddSubcommand(Command *c)

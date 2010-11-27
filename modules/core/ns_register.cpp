@@ -92,7 +92,7 @@ class CommandNSConfirm : public Command
 		{
 			if (passcode.empty())
 			{
-				this->OnSyntaxError(u, "");
+				this->OnSyntaxError(source, "");
 				return MOD_CONT;
 			}
 
@@ -142,22 +142,23 @@ class CommandNSConfirm : public Command
 		return this->DoConfirm(source, params);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CONFIRM);
+		User *u = source.u;
+		source.Reply(NICK_HELP_CONFIRM);
 		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
-			u->SendMessage(NickServ, NICK_HELP_CONFIRM_OPER);
+			source.Reply(NICK_HELP_CONFIRM_OPER);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_CONFIRM_INVALID);
+		source.Reply(NICK_CONFIRM_INVALID);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_CONFIRM);
+		source.Reply(NICK_HELP_CMD_CONFIRM);
 	}
 };
 
@@ -237,7 +238,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 
 		if (Config->NSForceEmail && email.empty())
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(NICK_REG_PLEASE_WAIT, (u->lastnickreg + Config->NSRegDelay) - Anope::CurTime);
 		else if ((na = findnick(u->nick)))
@@ -293,23 +294,23 @@ class CommandNSRegister : public CommandNSConfirm
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_REGISTER);
+		source.Reply(NICK_HELP_REGISTER);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (Config->NSForceEmail)
-			SyntaxError(NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX_EMAIL);
+			SyntaxError(source, "REGISTER", NICK_REGISTER_SYNTAX_EMAIL);
 		else
-			SyntaxError(NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX);
+			SyntaxError(source, "REGISTER", NICK_REGISTER_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_REGISTER);
+		source.Reply(NICK_HELP_CMD_REGISTER);
 	}
 };
 
@@ -350,15 +351,15 @@ class CommandNSResend : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_RESEND);
+		source.Reply(NICK_HELP_RESEND);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_RESEND);
+		source.Reply(NICK_HELP_CMD_RESEND);
 	}
 };
 

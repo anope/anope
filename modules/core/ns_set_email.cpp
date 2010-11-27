@@ -60,15 +60,15 @@ class CommandNSSetEmail : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_EMAIL);
+		source.Reply(NICK_HELP_SET_EMAIL);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_EMAIL);
+		source.Reply(NICK_HELP_CMD_SET_EMAIL);
 	}
 };
 
@@ -79,15 +79,15 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_EMAIL);
+		source.Reply(NICK_HELP_SASET_EMAIL);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_EMAIL);
+		source.Reply(NICK_HELP_CMD_SASET_EMAIL);
 	}
 };
 

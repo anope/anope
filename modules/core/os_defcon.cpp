@@ -13,7 +13,7 @@
 
 #include "module.h"
 
-void defcon_sendlvls(User *u);
+void defcon_sendlvls(CommandSource &source);
 void runDefCon();
 void defconParseModeString(const Anope::string &str);
 void resetDefCon(int level);
@@ -68,13 +68,13 @@ class CommandOSDefcon : public Command
 		if (lvl.empty())
 		{
 			source.Reply(OPER_DEFCON_CHANGED, Config->DefConLevel);
-			defcon_sendlvls(u);
+			defcon_sendlvls(source);
 			return MOD_CONT;
 		}
 		newLevel = lvl.is_number_only() ? convertTo<int>(lvl) : 0;
 		if (newLevel < 1 || newLevel > 5)
 		{
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 			return MOD_CONT;
 		}
 		Config->DefConLevel = newLevel;
@@ -90,8 +90,8 @@ class CommandOSDefcon : public Command
 		if (Config->DefConTimeOut)
 			timeout = new DefConTimeout(5);
 
-		u->SendMessage(OperServ, OPER_DEFCON_CHANGED, Config->DefConLevel);
-		defcon_sendlvls(u);
+		source.Reply(OPER_DEFCON_CHANGED, Config->DefConLevel);
+		defcon_sendlvls(source);
 		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
 		ircdproto->SendGlobops(OperServ, GetString(OPER_DEFCON_WALL).c_str(), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
@@ -113,20 +113,20 @@ class CommandOSDefcon : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_DEFCON);
+		source.Reply(OPER_HELP_DEFCON);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "DEFCON", OPER_DEFCON_SYNTAX);
+		SyntaxError(source, "DEFCON", OPER_DEFCON_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_DEFCON);
+		source.Reply(OPER_HELP_CMD_DEFCON);
 	}
 };
 
@@ -206,12 +206,12 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, bool fantasy)
+	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, ChannelInfo *ci)
 	{
 		if (!is_oper(u) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-				u->SendMessage(OperServ, OPER_DEFCON_DENIED);
+				u->SendMessage(bi, OPER_DEFCON_DENIED);
 
 			return EVENT_STOP;
 		}
@@ -219,45 +219,46 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
+		BotInfo *service = source.owner;
 		if (service == NickServ)
 		{
-			if (command.equals_ci("REGISTER") || command.equals_ci("GROUP"))
+			if (command->name.equals_ci("REGISTER") || command->name.equals_ci("GROUP"))
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_NICKS))
 				{
-					u->SendMessage(service, OPER_DEFCON_DENIED);
+					source.Reply(OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
 		}
 		else if (ChanServ && service == ChanServ)
 		{
-			if (command.equals_ci("SET"))
+			if (command->name.equals_ci("SET"))
 			{
 				if (!params.empty() && params[0].equals_ci("MLOCK") && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					u->SendMessage(service, OPER_DEFCON_DENIED);
+					source.Reply(OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
-			else if (command.equals_ci("REGISTER"))
+			else if (command->name.equals_ci("REGISTER"))
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
 				{
-					u->SendMessage(service, OPER_DEFCON_DENIED);
+					source.Reply(OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
 		}
 		else if (MemoServ && service == MemoServ)
 		{
-			if (command.equals_ci("SEND") || command.equals_ci("SENDALL"))
+			if (command->name.equals_ci("SEND") || command->name.equals_ci("SENDALL"))
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
 				{
-					u->SendMessage(service, OPER_DEFCON_DENIED);
+					source.Reply(OPER_DEFCON_DENIED);
 					return EVENT_STOP;
 				}
 			}
@@ -315,28 +316,28 @@ class OSDefcon : public Module
 /**
  * Send a message to the oper about which precautions are "active" for this level
  **/
-void defcon_sendlvls(User *u)
+void defcon_sendlvls(CommandSource &source)
 {
 	if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
+		source.Reply(OPER_HELP_DEFCON_NO_NEW_CHANNELS);
 	if (CheckDefCon(DEFCON_NO_NEW_NICKS))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_NICKS);
+		source.Reply(OPER_HELP_DEFCON_NO_NEW_NICKS);
 	if (CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
+		source.Reply(OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
 	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && !Config->DefConChanModes.empty())
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
+		source.Reply(OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
 	if (CheckDefCon(DEFCON_REDUCE_SESSION))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
+		source.Reply(OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
 	if (CheckDefCon(DEFCON_NO_NEW_CLIENTS))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
+		source.Reply(OPER_HELP_DEFCON_NO_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_OPER_ONLY))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_OPER_ONLY);
+		source.Reply(OPER_HELP_DEFCON_OPER_ONLY);
 	if (CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
+		source.Reply(OPER_HELP_DEFCON_SILENT_OPER_ONLY);
 	if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
+		source.Reply(OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
 	if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
-		u->SendMessage(OperServ, OPER_HELP_DEFCON_NO_NEW_MEMOS);
+		source.Reply(OPER_HELP_DEFCON_NO_NEW_MEMOS);
 }
 
 void runDefCon()

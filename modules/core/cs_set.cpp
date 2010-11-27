@@ -69,14 +69,14 @@ class CommandCSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			u->SendMessage(ChanServ, CHAN_HELP_SET_HEAD);
+			source.Reply(CHAN_HELP_SET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-				it->second->OnServHelp(u);
-			u->SendMessage(ChanServ, CHAN_HELP_SET_TAIL);
+				it->second->OnServHelp(source);
+			source.Reply(CHAN_HELP_SET_TAIL);
 			return true;
 		}
 		else
@@ -84,20 +84,20 @@ class CommandCSSet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-				return c->OnHelp(u, subcommand);
+				return c->OnHelp(source, subcommand);
 		}
 
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET);
+		source.Reply(CHAN_HELP_CMD_SET);
 	}
 
 	bool AddSubcommand(Command *c)

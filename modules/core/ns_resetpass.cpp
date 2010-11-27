@@ -46,20 +46,20 @@ class CommandNSResetPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_RESETPASS);
+		source.Reply(NICK_HELP_RESETPASS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "RESETPASS", NICK_RESETPASS_SYNTAX);
+		SyntaxError(source, "RESETPASS", NICK_RESETPASS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_RESETPASS);
+		source.Reply(NICK_HELP_CMD_RESETPASS);
 	}
 };
 
@@ -81,11 +81,13 @@ class NSResetPass : public Module
 		ModuleManager::Attach(I_OnPreCommand, this);
 	}
 
-	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		if (service == NickServ && command.equals_ci("CONFIRM") && !params.empty())
+		User *u = source.u;
+		BotInfo *service = source.owner;
+		if (service == NickServ && command->name.equals_ci("CONFIRM") && !params.empty())
 		{
-			NickAlias *na = findnick(u->nick);
+			NickAlias *na = findnick(source.u->nick);
 
 			time_t t;
 			Anope::string c;
@@ -95,7 +97,7 @@ class NSResetPass : public Module
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
-					u->SendMessage(service, NICK_CONFIRM_EXPIRED);
+					source.Reply(NICK_CONFIRM_EXPIRED);
 					return EVENT_STOP;
 				}
 
@@ -115,7 +117,7 @@ class NSResetPass : public Module
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
-					u->SendMessage(service, NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
+					source.Reply(NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
 
 					if (ircd->vhost)
 						do_on_id(u);
@@ -126,7 +128,7 @@ class NSResetPass : public Module
 				else
 				{
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
-					u->SendMessage(service, NICK_CONFIRM_INVALID);
+					source.Reply(NICK_CONFIRM_INVALID);
 					bad_password(u);
 				}
 

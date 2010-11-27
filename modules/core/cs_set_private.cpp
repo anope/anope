@@ -22,7 +22,6 @@ class CommandCSSetPrivate : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetPrivate");
@@ -38,25 +37,25 @@ class CommandCSSetPrivate : public Command
 			source.Reply(CHAN_SET_PRIVATE_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "PRIVATE");
+			this->OnSyntaxError(source, "PRIVATE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PRIVATE, "SASET");
+		source.Reply(CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PRIVATE);
+		source.Reply(CHAN_HELP_CMD_SET_PRIVATE);
 	}
 };
 
@@ -67,15 +66,15 @@ class CommandCSSASetPrivate : public CommandCSSetPrivate
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PRIVATE, "SASET");
+		source.Reply(CHAN_HELP_SET_PRIVATE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
 	}
 };
 

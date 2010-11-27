@@ -22,7 +22,6 @@ class CommandNSSASetNoexpire : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSASsetNoexpire");
@@ -40,25 +39,25 @@ class CommandNSSASetNoexpire : public Command
 			source.Reply(NICK_SASET_NOEXPIRE_OFF, na->nick.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "NOEXPIRE");
+			this->OnSyntaxError(source, "NOEXPIRE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_NOEXPIRE);
+		source.Reply(NICK_HELP_SASET_NOEXPIRE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
+		SyntaxError(source, "SASET NOEXPIRE", NICK_SASET_NOEXPIRE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_NOEXPIRE);
+		source.Reply(NICK_HELP_CMD_SASET_NOEXPIRE);
 	}
 };
 

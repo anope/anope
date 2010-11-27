@@ -105,7 +105,7 @@ class CommandNSList : public Command
 
 		mync = u->Account();
 
-		u->SendMessage(NickServ, NICK_LIST_HEADER, pattern.c_str());
+		source.Reply(NICK_LIST_HEADER, pattern.c_str());
 		if (!unconfirmed)
 		{
 			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
@@ -167,31 +167,33 @@ class CommandNSList : public Command
 				}
 			}
 		}
-		u->SendMessage(NickServ, NICK_LIST_RESULTS, nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
+		source.Reply(NICK_LIST_RESULTS, nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_LIST);
+			source.Reply(NICK_SERVADMIN_HELP_LIST);
 		else
-			u->SendMessage(NickServ, NICK_HELP_LIST);
+			source.Reply(NICK_HELP_LIST);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account()->IsServicesOper())
-			SyntaxError(NickServ, u, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
+			SyntaxError(source, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
 		else
-			SyntaxError(NickServ, u, "LIST", NICK_LIST_SYNTAX);
+			SyntaxError(source, "LIST", NICK_LIST_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_LIST);
+		source.Reply(NICK_HELP_CMD_LIST);
 	}
 };
 

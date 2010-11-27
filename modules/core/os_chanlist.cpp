@@ -22,7 +22,6 @@ class CommandOSChanList : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &pattern = !params.empty() ? params[0] : "";
 		const Anope::string &opt = params.size() > 1 ? params[1] : "";
 		std::list<ChannelModeName> Modes;
@@ -69,19 +68,19 @@ class CommandOSChanList : public Command
 			}
 		}
 
-		u->SendMessage(OperServ, OPER_CHANLIST_END);
+		source.Reply(OPER_CHANLIST_END);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CHANLIST);
+		source.Reply(OPER_HELP_CHANLIST);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_CHANLIST);
+		source.Reply(OPER_HELP_CMD_CHANLIST);
 	}
 };
 

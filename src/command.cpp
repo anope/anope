@@ -78,11 +78,11 @@ Command::~Command()
 		this->module->DelCommand(this->service, this);
 }
 
-void Command::OnServHelp(User *u) { }
+void Command::OnServHelp(CommandSource &source) { }
 
-bool Command::OnHelp(User *u, const Anope::string &subcommand) { return false; }
+bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(User *u, const Anope::string &subcommand) { }
+void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand) { }
 
 void Command::SetPermission(const Anope::string &reststr)
 {

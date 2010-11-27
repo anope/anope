@@ -58,15 +58,15 @@ class CommandCSInfo : public Command
 		if (has_auspex || check_access(u, ci, CA_INFO))
 			show_all = true;
 
-		u->SendMessage(ChanServ, CHAN_INFO_HEADER, chan.c_str());
-		u->SendMessage(ChanServ, CHAN_INFO_NO_FOUNDER, ci->founder->display.c_str());
+		source.Reply(CHAN_INFO_HEADER, chan.c_str());
+		source.Reply(CHAN_INFO_NO_FOUNDER, ci->founder->display.c_str());
 
 		if (show_all && ci->successor)
 			source.Reply(CHAN_INFO_NO_SUCCESSOR, ci->successor->display.c_str());
 
-		u->SendMessage(ChanServ, CHAN_INFO_DESCRIPTION, ci->desc.c_str());
-		u->SendMessage(ChanServ, CHAN_INFO_TIME_REGGED, do_strftime(ci->time_registered).c_str());
-		u->SendMessage(ChanServ, CHAN_INFO_LAST_USED, do_strftime(ci->last_used).c_str());
+		source.Reply(CHAN_INFO_DESCRIPTION, ci->desc.c_str());
+		source.Reply(CHAN_INFO_TIME_REGGED, do_strftime(ci->time_registered).c_str());
+		source.Reply(CHAN_INFO_LAST_USED, do_strftime(ci->last_used).c_str());
 
 		ModeLock *secret = ci->GetMLock(CMODE_SECRET);
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
@@ -113,21 +113,21 @@ class CommandCSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_INFO);
+		source.Reply(CHAN_HELP_INFO);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "INFO", CHAN_INFO_SYNTAX);
+		SyntaxError(source, "INFO", CHAN_INFO_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_INFO);
+		source.Reply(CHAN_HELP_CMD_INFO);
 	}
 };
 

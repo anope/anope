@@ -57,20 +57,20 @@ class CommandCSUnban : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_UNBAN);
+		source.Reply(CHAN_HELP_UNBAN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "UNBAN", CHAN_UNBAN_SYNTAX);
+		SyntaxError(source, "UNBAN", CHAN_UNBAN_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_UNBAN);
+		source.Reply(CHAN_HELP_CMD_UNBAN);
 	}
 };
 

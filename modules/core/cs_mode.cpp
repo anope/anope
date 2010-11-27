@@ -137,7 +137,7 @@ class CommandCSMode : public Command
 			}
 		}
 		else
-			this->OnSyntaxError(u, subcommand);
+			this->OnSyntaxError(source, subcommand);
 	}
 	
 	void DoSet(CommandSource &source, const std::vector<Anope::string> &params)
@@ -273,25 +273,25 @@ class CommandCSMode : public Command
 		else if (subcommand.equals_ci("SET"))
 			this->DoSet(source, params);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_MODE);
+		source.Reply(CHAN_HELP_MODE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "MODE", CHAN_MODE_SYNTAX);
+		SyntaxError(source, "MODE", CHAN_MODE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_MODE);
+		source.Reply(CHAN_HELP_CMD_MODE);
 	}
 };
 

@@ -450,7 +450,7 @@ class CommandCSAKick : public Command
 		bool override = !check_access(u, ci, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
 
-		u->SendMessage(ChanServ, CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
+		source.Reply(CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
 	}
 
 	void DoClear(CommandSource &source)
@@ -461,7 +461,7 @@ class CommandCSAKick : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		ci->ClearAkick();
-		u->SendMessage(ChanServ, CHAN_AKICK_CLEAR, ci->name.c_str());
+		source.Reply(CHAN_AKICK_CLEAR, ci->name.c_str());
 	}
 
  public:
@@ -479,7 +479,7 @@ class CommandCSAKick : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
-			this->OnSyntaxError(u, cmd);
+			this->OnSyntaxError(source, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
@@ -497,25 +497,25 @@ class CommandCSAKick : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_AKICK);
+		source.Reply(CHAN_HELP_AKICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);
+		SyntaxError(source, "AKICK", CHAN_AKICK_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_AKICK);
+		source.Reply(CHAN_HELP_CMD_AKICK);
 	}
 };
 

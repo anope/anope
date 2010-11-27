@@ -39,14 +39,14 @@ class CommandCSSetMisc : public Command
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(Config->s_ChanServ, "    %-10s    %s", this->name.c_str(), this->Desc.c_str());
+		source.Reply("    %-10s    %s", this->name.c_str(), this->Desc.c_str());
 	}
 };
 
@@ -57,9 +57,9 @@ class CommandCSSASetMisc : public CommandCSSetMisc
 	{
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

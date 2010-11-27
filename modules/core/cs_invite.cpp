@@ -68,20 +68,20 @@ class CommandCSInvite : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_INVITE);
+		source.Reply(CHAN_HELP_INVITE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "INVITE", CHAN_INVITE_SYNTAX);
+		SyntaxError(source, "INVITE", CHAN_INVITE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_INVITE);
+		source.Reply(CHAN_HELP_CMD_INVITE);
 	}
 };
 

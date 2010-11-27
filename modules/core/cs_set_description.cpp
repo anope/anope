@@ -22,33 +22,32 @@ class CommandCSSetDescription : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetDescription");
 
 		ci->desc = params[1];
 
-		u->SendMessage(ChanServ, CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
+		source.Reply(CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_DESC, "SET");
+		source.Reply(CHAN_HELP_SET_DESC, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_DESC);
+		source.Reply(CHAN_HELP_CMD_SET_DESC);
 	}
 };
 
@@ -59,16 +58,16 @@ class CommandCSSASetDescription : public CommandCSSetDescription
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_DESC, "SASET");
+		source.Reply(CHAN_HELP_SET_DESC, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

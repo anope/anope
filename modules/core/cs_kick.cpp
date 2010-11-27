@@ -58,20 +58,20 @@ class CommandCSKick : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_KICK);
+		source.Reply(CHAN_HELP_KICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "KICK", CHAN_KICK_SYNTAX);
+		SyntaxError(source, "KICK", CHAN_KICK_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_KICK);
+		source.Reply(CHAN_HELP_CMD_KICK);
 	}
 };
 

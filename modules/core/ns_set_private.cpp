@@ -22,7 +22,6 @@ class CommandNSSetPrivate : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetPrivate");
@@ -41,25 +40,25 @@ class CommandNSSetPrivate : public Command
 			source.Reply(NICK_SASET_PRIVATE_OFF, nc->display.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "PRIVATE");
+			this->OnSyntaxError(source, "PRIVATE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_PRIVATE);
+		source.Reply(NICK_HELP_SET_PRIVATE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_PRIVATE);
+		source.Reply(NICK_HELP_CMD_SET_PRIVATE);
 	}
 };
 
@@ -70,20 +69,20 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_PRIVATE);
+		source.Reply(NICK_HELP_SASET_PRIVATE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SASET_PRIVATE);
+		source.Reply(NICK_HELP_CMD_SASET_PRIVATE);
 	}
 };
 

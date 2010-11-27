@@ -23,17 +23,18 @@ class CommandMSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(MemoServ, source.u, params[0]);
+		mod_help_cmd(MemoServ, source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_HEADER);
+		User *u = source.u;
+		source.Reply(MEMO_HELP_HEADER);
 		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
-				it->second->OnServHelp(u);
-		u->SendMessage(MemoServ, MEMO_HELP_FOOTER, Config->s_ChanServ.c_str());
+				it->second->OnServHelp(source);
+		source.Reply(MEMO_HELP_FOOTER, Config->s_ChanServ.c_str());
 	}
 };
 

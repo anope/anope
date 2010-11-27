@@ -122,19 +122,17 @@ class CommandOSStats : public Command
 
 	CommandReturn DoStatsReset(CommandSource &source)
 	{
-		User *u = source.u;
 		maxusercnt = usercnt;
-		u->SendMessage(OperServ, OPER_STATS_RESET);
+		source.Reply(OPER_STATS_RESET);
 		return MOD_CONT;
 	}
 
 	CommandReturn DoStatsUptime(CommandSource &source)
 	{
-		User *u = source.u;
 		time_t uptime = Anope::CurTime - start_time;
 		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
-		u->SendMessage(OperServ, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
-		u->SendMessage(OperServ, OPER_STATS_MAX_USERS, maxusercnt, do_strftime(maxusertime).c_str());
+		source.Reply(OPER_STATS_CURRENT_USERS, usercnt, opcnt);
+		source.Reply(OPER_STATS_MAX_USERS, maxusercnt, do_strftime(maxusertime).c_str());
 		if (days > 1)
 			source.Reply(OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
 		else if (days == 1)
@@ -259,15 +257,15 @@ class CommandOSStats : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_STATS);
+		source.Reply(OPER_HELP_STATS);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_STATS);
+		source.Reply(OPER_HELP_CMD_STATS);
 	}
 };
 

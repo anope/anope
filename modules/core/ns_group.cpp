@@ -131,20 +131,20 @@ class CommandNSGroup : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_GROUP);
+		source.Reply(NICK_HELP_GROUP);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "GROUP", NICK_GROUP_SYNTAX);
+		SyntaxError(source, "GROUP", NICK_GROUP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_GROUP);
+		source.Reply(NICK_HELP_CMD_GROUP);
 	}
 };
 
@@ -199,15 +199,15 @@ class CommandNSUngroup : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_UNGROUP);
+		source.Reply(NICK_HELP_UNGROUP);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_UNGROUP);
+		source.Reply(NICK_HELP_CMD_UNGROUP);
 	}
 };
 
@@ -243,19 +243,20 @@ class CommandNSGList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_GLIST);
+			source.Reply(NICK_SERVADMIN_HELP_GLIST);
 		else
-			u->SendMessage(NickServ, NICK_HELP_GLIST);
+			source.Reply(NICK_HELP_GLIST);
 
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_GLIST);
+		source.Reply(NICK_HELP_CMD_GLIST);
 	}
 };
 

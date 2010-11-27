@@ -97,15 +97,15 @@ class CommandHSList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(HostServ, HOST_HELP_LIST);
+		source.Reply(HOST_HELP_LIST);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(HostServ, HOST_HELP_CMD_LIST);
+		source.Reply(HOST_HELP_CMD_LIST);
 	}
 };
 

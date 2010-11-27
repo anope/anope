@@ -71,21 +71,21 @@ class CommandCSSetSuccessor : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_SUCCESSOR, "SET");
+		source.Reply(CHAN_HELP_SET_SUCCESSOR, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(ChanServ, u, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SUCCESSOR);
+		source.Reply(CHAN_HELP_CMD_SET_SUCCESSOR);
 	}
 };
 
@@ -96,16 +96,16 @@ class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_SUCCESSOR, "SASET");
+		source.Reply(CHAN_HELP_SET_SUCCESSOR, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
 	}
 };
 

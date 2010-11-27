@@ -45,24 +45,24 @@ class CommandOSOLine : public Command
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_OLINE);
+		source.Reply(OPER_HELP_OLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
+		SyntaxError(source, "OLINE", OPER_OLINE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_OLINE);
+		source.Reply(OPER_HELP_CMD_OLINE);
 	}
 };
 

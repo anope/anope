@@ -85,25 +85,25 @@ class CommandCSAppendTopic : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(ChanServ, u, _("Syntax: APPENDTOPIC channel text"));
-		u->SendMessage(Config->s_ChanServ, " ");
-		me->SendMessage(ChanServ, u, _("This command allows users to append text to a currently set\n"
+		me->SendMessage(source, _("Syntax: APPENDTOPIC channel text"));
+		source.Reply(" ");
+		me->SendMessage(source, _("This command allows users to append text to a currently set\n"
 			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
 			"the new, updated topic is locked."));
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(ChanServ, u, _("Syntax: APPENDTOPIC channel text"));
+		me->SendMessage(source, _("Syntax: APPENDTOPIC channel text"));
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		me->SendMessage(ChanServ, u, _("   APPENDTOPIC Add text to a channels topic"));
+		me->SendMessage(source, _("   APPENDTOPIC Add text to a channels topic"));
 	}
 };
 

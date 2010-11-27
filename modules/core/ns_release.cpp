@@ -68,24 +68,25 @@ class CommandNSRelease : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
+		User *u = source.u;
 		Anope::string relstr = duration(u->Account(), Config->NSReleaseTimeout);
 
-		u->SendMessage(NickServ, NICK_HELP_RELEASE, relstr.c_str());
+		source.Reply(NICK_HELP_RELEASE, relstr.c_str());
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "RELEASE", NICK_RELEASE_SYNTAX);
+		SyntaxError(source, "RELEASE", NICK_RELEASE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_RELEASE);
+		source.Reply(NICK_HELP_CMD_RELEASE);
 	}
 };
 

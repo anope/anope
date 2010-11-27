@@ -62,24 +62,24 @@ class CommandBSAssign : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << bi->nick;
 
 		bi->Assign(u, ci);
-		u->SendMessage(BotServ, BOT_ASSIGN_ASSIGNED, bi->nick.c_str(), ci->name.c_str());
+		source.Reply(BOT_ASSIGN_ASSIGNED, bi->nick.c_str(), ci->name.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_HELP_ASSIGN);
+		source.Reply(BOT_HELP_ASSIGN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "ASSIGN", BOT_ASSIGN_SYNTAX);
+		SyntaxError(source, "ASSIGN", BOT_ASSIGN_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_ASSIGN);
+		source.Reply(BOT_HELP_CMD_ASSIGN);
 	}
 };
 

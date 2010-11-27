@@ -53,20 +53,20 @@ class CommandNSSendPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SENDPASS);
+		source.Reply(NICK_HELP_SENDPASS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
+		SyntaxError(source, "SENDPASS", NICK_SENDPASS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SENDPASS);
+		source.Reply(NICK_HELP_CMD_SENDPASS);
 	}
 };
 

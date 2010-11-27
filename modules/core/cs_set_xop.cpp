@@ -77,25 +77,25 @@ class CommandCSSetXOP : public Command
 			source.Reply(CHAN_SET_XOP_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "XOP");
+			this->OnSyntaxError(source, "XOP");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_XOP, "SET");
+		source.Reply(CHAN_HELP_SET_XOP, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
+		SyntaxError(source, "SET XOP", CHAN_SET_XOP_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_XOP);
+		source.Reply(CHAN_HELP_CMD_SET_XOP);
 	}
 };
 
@@ -106,15 +106,15 @@ class CommandCSSASetXOP : public CommandCSSetXOP
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_XOP, "SASET");
+		source.Reply(CHAN_HELP_SET_XOP, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
+		SyntaxError(source, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
 	}
 };
 

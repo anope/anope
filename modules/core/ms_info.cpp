@@ -186,19 +186,20 @@ class CommandMSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(MemoServ, MEMO_SERVADMIN_HELP_INFO);
+			source.Reply(MEMO_SERVADMIN_HELP_INFO);
 		else
-			u->SendMessage(MemoServ, MEMO_HELP_INFO);
+			source.Reply(MEMO_HELP_INFO);
 
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_INFO);
+		source.Reply(MEMO_HELP_CMD_INFO);
 	}
 };
 

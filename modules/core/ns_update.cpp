@@ -35,19 +35,19 @@ class CommandNSUpdate : public Command
 		na->last_seen = Anope::CurTime;
 		if (ircd->vhost)
 			do_on_id(u);
-		u->SendMessage(NickServ, NICK_UPDATE_SUCCESS, Config->s_NickServ.c_str());
+		source.Reply(NICK_UPDATE_SUCCESS, Config->s_NickServ.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_UPDATE);
+		source.Reply(NICK_HELP_UPDATE);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_UPDATE);
+		source.Reply(NICK_HELP_CMD_UPDATE);
 	}
 };
 

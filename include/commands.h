@@ -29,9 +29,9 @@ enum CommandReturn
 };
 
 extern CoreExport Command *FindCommand(BotInfo *bi, const Anope::string &cmd);
-extern CoreExport void mod_help_cmd(BotInfo *bi, User *u, const Anope::string &cmd);
-extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &message, bool fantasy);
-extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, bool fantasy);
+extern CoreExport void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cmd);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &message, ChannelInfo *ci);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, ChannelInfo *ci);
 
 enum CommandFlag
 {
@@ -101,22 +101,22 @@ class CoreExport Command : public Flags<CommandFlag>
 	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
 	/** Called when HELP is requsted for the client this command is on.
-	 * @param u The user requesting help
+	 * @param source The source
 	 */
-	virtual void OnServHelp(User *u);
+	virtual void OnServHelp(CommandSource &source);
 
 	/** Requested when the user is requesting help on this command. Help on this command should be sent to the user.
-	 * @param u The user requesting help
+	 * @param source The source
 	 * @param subcommand The subcommand the user is requesting help on, or an empty string. (e.g. /ns help set foo bar lol gives a subcommand of "FOO BAR LOL")
 	 * @return true if help was provided to the user, false otherwise.
 	 */
-	virtual bool OnHelp(User *u, const Anope::string &subcommand);
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand);
 
 	/** Requested when the user provides bad syntax to this command (not enough params, etc).
-	 * @param u The user executing the command.
+	 * @param source The source
 	 * @param subcommand The subcommand the user tried to use
 	 */
-	virtual void OnSyntaxError(User *u, const Anope::string &subcommand);
+	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
 
 	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
 	 * @param reststr The permission required to successfully execute this command

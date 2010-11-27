@@ -62,7 +62,7 @@ class CommandMSSet : public Command
 			source.Reply(MEMO_SET_NOTIFY_OFF, Config->s_MemoServ.c_str());
 		}
 		else
-			SyntaxError(MemoServ, u, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
+			SyntaxError(source, "SET NOTIFY", MEMO_SET_NOTIFY_SYNTAX);
 
 		return MOD_CONT;
 	}
@@ -116,12 +116,12 @@ class CommandMSSet : public Command
 			}
 			else if (p1.empty())
 			{
-				SyntaxError(MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
+				SyntaxError(source, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
 			if ((!isdigit(p1[0]) && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
-				SyntaxError(MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
+				SyntaxError(source, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
 			if (!chan.empty())
@@ -151,7 +151,7 @@ class CommandMSSet : public Command
 		{
 			if (p1.empty() || !p2.empty() || !isdigit(p1[0]))
 			{
-				SyntaxError(MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
+				SyntaxError(source, "SET LIMIT", MEMO_SET_LIMIT_SYNTAX);
 				return MOD_CONT;
 			}
 			if (!chan.empty() && ci->HasFlag(CI_MEMO_HARDMAX))
@@ -231,18 +231,19 @@ class CommandMSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			u->SendMessage(MemoServ, MEMO_HELP_SET);
+			source.Reply(MEMO_HELP_SET);
 		else if (subcommand.equals_ci("NOTIFY"))
-			u->SendMessage(MemoServ, MEMO_HELP_SET_NOTIFY);
+			source.Reply(MEMO_HELP_SET_NOTIFY);
 		else if (subcommand.equals_ci("LIMIT"))
 		{
+			User *u = source.u;
 			if (u->Account() && u->Account()->IsServicesOper())
-				u->SendMessage(MemoServ, MEMO_SERVADMIN_HELP_SET_LIMIT, Config->MSMaxMemos);
+				source.Reply(MEMO_SERVADMIN_HELP_SET_LIMIT, Config->MSMaxMemos);
 			else
-				u->SendMessage(MemoServ, MEMO_HELP_SET_LIMIT, Config->MSMaxMemos);
+				source.Reply(MEMO_HELP_SET_LIMIT, Config->MSMaxMemos);
 		}
 		else
 			return false;
@@ -250,14 +251,14 @@ class CommandMSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_SET);
+		source.Reply(MEMO_HELP_CMD_SET);
 	}
 };
 

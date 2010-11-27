@@ -26,7 +26,7 @@ Command *FindCommand(BotInfo *bi, const Anope::string &name)
 	return NULL;
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, bool fantasy)
+void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, ChannelInfo *ci)
 {
 	if (!bi || !u)
 		return;
@@ -39,16 +39,16 @@ void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, bool fa
 	message = sep.GetRemaining();
 	
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, message, fantasy));
+	FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, bi, command, message, ci));
 	if (MOD_RESULT == EVENT_STOP)
 		return;
 	
 	Command *c = FindCommand(bi, command);
 
-	mod_run_cmd(bi, u, c, command, message, fantasy);
+	mod_run_cmd(bi, u, c, command, message, ci);
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, bool fantasy)
+void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, ChannelInfo *ci)
 {
 	if (!bi || !u)
 		return;
@@ -88,18 +88,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		params.push_back(endparam);
 	}
 
-	if (params.size() < c->MinParams)
-	{
-		c->OnSyntaxError(u, !params.empty() ? params[params.size() - 1] : "");
-		return;
-	}
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(u, c->service, c->name, params));
-	if (MOD_RESULT == EVENT_STOP)
-		return;
-
-	ChannelInfo *ci = NULL;
+	bool fantasy = ci != NULL;
 	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
 	{
 		if (ircdproto->IsChannelValid(params[0]))
@@ -134,6 +123,24 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		}
 	}
 
+	CommandSource source;
+	source.u = u;
+	source.ci = ci;
+	source.owner = bi;
+	source.service = fantasy && ci ? ci->bi : c->service;
+	source.fantasy = fantasy;
+
+	if (params.size() < c->MinParams)
+	{
+		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
+		return;
+	}
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
+
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
 	{
@@ -141,13 +148,6 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		return;
 	}
-
-	CommandSource source;
-	source.u = u;
-	source.ci = ci;
-	source.owner = bi;
-	source.service = fantasy && ci ? ci->bi : c->service;
-	source.fantasy = fantasy;
 
 	CommandReturn ret = c->Execute(source, params);
 
@@ -159,13 +159,12 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 
 /**
  * Prints the help message for a given command.
- * @param services Services Client
- * @param u User Struct
- * @param Command Hash Table
+ * @param bi Client the command is on
+ * @param u User
+ * @param ci Optional channel the command was executed one (fantasy)
  * @param cmd Command
- * @return void
  */
-void mod_help_cmd(BotInfo *bi, User *u, const Anope::string &cmd)
+void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cmd)
 {
 	if (!bi || !u || cmd.empty())
 		return;
@@ -175,10 +174,16 @@ void mod_help_cmd(BotInfo *bi, User *u, const Anope::string &cmd)
 	tokens.GetToken(token);
 
 	Command *c = FindCommand(bi, token);
-
 	Anope::string subcommand = tokens.StreamEnd() ? "" : tokens.GetRemaining();
 
-	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(u, subcommand))
+	CommandSource source;
+	source.u = u;
+	source.ci = ci;
+	source.owner = bi;
+	source.service = ci ? ci->bi : bi;
+	source.fantasy = ci != NULL;
+
+	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(source, subcommand))
 		u->SendMessage(bi, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{

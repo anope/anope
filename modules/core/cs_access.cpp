@@ -237,7 +237,7 @@ class CommandCSAccess : public Command
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
-		u->SendMessage(ChanServ, CHAN_ACCESS_ADDED, nc->display.c_str(), ci->name.c_str(), level);
+		source.Reply(CHAN_ACCESS_ADDED, nc->display.c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
 	}
@@ -436,7 +436,7 @@ class CommandCSAccess : public Command
 		 * If DEL, we require a nick and no level.
 		 * Else (ADD), we require a level (which implies a nick). */
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
-			this->OnSyntaxError(u, cmd);
+			this->OnSyntaxError(source, cmd);
 		else if (!has_access)
 			source.Reply(ACCESS_DENIED);
 		/* We still allow LIST and CLEAR in xOP mode, but not others */
@@ -460,21 +460,21 @@ class CommandCSAccess : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_ACCESS);
-		u->SendMessage(ChanServ, CHAN_HELP_ACCESS_LEVELS);
+		source.Reply(CHAN_HELP_ACCESS);
+		source.Reply(CHAN_HELP_ACCESS_LEVELS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "ACCESS", CHAN_ACCESS_SYNTAX);
+		SyntaxError(source, "ACCESS", CHAN_ACCESS_SYNTAX);
 	}
 };
 
@@ -500,7 +500,7 @@ class CommandCSLevels : public Command
 		}
 
 		if (!error.empty())
-			this->OnSyntaxError(u, "SET");
+			this->OnSyntaxError(source, "SET");
 		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
 			source.Reply(CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
@@ -602,7 +602,7 @@ class CommandCSLevels : public Command
 		bool override = !check_access(u, ci, CA_FOUNDER);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
 
-		u->SendMessage(ChanServ, CHAN_LEVELS_RESET, ci->name.c_str());
+		source.Reply(CHAN_LEVELS_RESET, ci->name.c_str());
 		return MOD_CONT;
 	}
 
@@ -624,7 +624,7 @@ class CommandCSLevels : public Command
 		 * one; else, we want none.
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
-			this->OnSyntaxError(u, cmd);
+			this->OnSyntaxError(source, cmd);
 		else if (ci->HasFlag(CI_XOP))
 			source.Reply(CHAN_LEVELS_XOP);
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
@@ -638,17 +638,17 @@ class CommandCSLevels : public Command
 		else if (cmd.equals_ci("RESET"))
 			this->DoReset(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.equals_ci("DESC"))
 		{
 			int i;
-			u->SendMessage(ChanServ, CHAN_HELP_LEVELS_DESC);
+			source.Reply(CHAN_HELP_LEVELS_DESC);
 			if (!levelinfo_maxwidth)
 				for (i = 0; levelinfo[i].what >= 0; ++i)
 				{
@@ -657,22 +657,22 @@ class CommandCSLevels : public Command
 						levelinfo_maxwidth = len;
 				}
 			for (i = 0; levelinfo[i].what >= 0; ++i)
-				u->SendMessage(ChanServ, CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), GetString(u, levelinfo[i].desc).c_str());
+				source.Reply(CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), GetString(source.u, levelinfo[i].desc).c_str());
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_HELP_LEVELS);
+			source.Reply(CHAN_HELP_LEVELS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
+		SyntaxError(source, "LEVELS", CHAN_LEVELS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_ACCESS);
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_LEVELS);
+		source.Reply(CHAN_HELP_CMD_ACCESS);
+		source.Reply(CHAN_HELP_CMD_LEVELS);
 	}
 };
 

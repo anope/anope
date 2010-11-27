@@ -32,15 +32,15 @@ class CommandOSQuit : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_QUIT);
+		source.Reply(OPER_HELP_QUIT);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_QUIT);
+		source.Reply(OPER_HELP_CMD_QUIT);
 	}
 };
 

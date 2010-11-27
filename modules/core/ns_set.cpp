@@ -64,14 +64,14 @@ class CommandNSSet : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			u->SendMessage(NickServ, NICK_HELP_SET_HEAD);
+			source.Reply(NICK_HELP_SET_HEAD);
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
-				it->second->OnServHelp(u);
-			u->SendMessage(NickServ, NICK_HELP_SET_TAIL);
+				it->second->OnServHelp(source);
+			source.Reply(NICK_HELP_SET_TAIL);
 			return true;
 		}
 		else
@@ -79,20 +79,20 @@ class CommandNSSet : public Command
 			Command *c = this->FindCommand(subcommand);
 
 			if (c)
-				return c->OnHelp(u, subcommand);
+				return c->OnHelp(source, subcommand);
 		}
 
 		return false;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET);
+		source.Reply(NICK_HELP_CMD_SET);
 	}
 
 	bool AddSubcommand(Command *c)
@@ -135,25 +135,25 @@ class CommandNSSetDisplay : public Command
 		}
 
 		change_core_display(u->Account(), params[1]);
-		u->SendMessage(NickServ, NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
+		source.Reply(NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_DISPLAY);
+		source.Reply(NICK_HELP_SET_DISPLAY);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_DISPLAY);
+		source.Reply(NICK_HELP_CMD_SET_DISPLAY);
 	}
 };
 
@@ -198,21 +198,21 @@ class CommandNSSetPassword : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_PASSWORD);
+		source.Reply(NICK_HELP_SET_PASSWORD);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(NickServ, u, "SET", NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_PASSWORD);
+		source.Reply(NICK_HELP_CMD_SET_PASSWORD);
 	}
 };
 

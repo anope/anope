@@ -54,20 +54,20 @@ class CommandMSCancel : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CANCEL);
+		source.Reply(MEMO_HELP_CANCEL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
+		SyntaxError(source, "CANCEL", MEMO_CANCEL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_CANCEL);
+		source.Reply(MEMO_HELP_CMD_CANCEL);
 	}
 };
 

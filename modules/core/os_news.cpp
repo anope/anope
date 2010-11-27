@@ -192,7 +192,7 @@ class NewsBase : public Command
 		int n;
 
 		if (text.empty())
-			this->OnSyntaxError(source.u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 		else
 		{
 			if (readonly)
@@ -216,7 +216,7 @@ class NewsBase : public Command
 		unsigned num;
 
 		if (text.empty())
-			this->OnSyntaxError(source.u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 		else
 		{
 			if (readonly)
@@ -265,7 +265,7 @@ class NewsBase : public Command
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, params, type, msgs);
 		else
-			this->OnSyntaxError(source.u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
@@ -280,9 +280,9 @@ class NewsBase : public Command
 
 	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
-	virtual bool OnHelp(User *u, const Anope::string &subcommand) = 0;
+	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
 
-	virtual void OnSyntaxError(User *u, const Anope::string &subcommand) = 0;
+	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) = 0;
 };
 
 class CommandOSLogonNews : public NewsBase
@@ -297,20 +297,20 @@ class CommandOSLogonNews : public NewsBase
 		return this->DoNews(source, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, NEWS_HELP_LOGON, Config->NewsCount);
+		source.Reply(NEWS_HELP_LOGON, Config->NewsCount);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "LOGONNEWS", NEWS_LOGON_SYNTAX);
+		SyntaxError(source, "LOGONNEWS", NEWS_LOGON_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_LOGONNEWS);
+		source.Reply(OPER_HELP_CMD_LOGONNEWS);
 	}
 };
 
@@ -326,20 +326,20 @@ class CommandOSOperNews : public NewsBase
 		return this->DoNews(source, params, NEWS_OPER);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, NEWS_HELP_OPER, Config->NewsCount);
+		source.Reply(NEWS_HELP_OPER, Config->NewsCount);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "OPERNEWS", NEWS_OPER_SYNTAX);
+		SyntaxError(source, "OPERNEWS", NEWS_OPER_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_OPERNEWS);
+		source.Reply(OPER_HELP_CMD_OPERNEWS);
 	}
 };
 
@@ -355,20 +355,20 @@ class CommandOSRandomNews : public NewsBase
 		return this->DoNews(source, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, NEWS_HELP_RANDOM);
+		source.Reply(NEWS_HELP_RANDOM);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
+		SyntaxError(source, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_RANDOMNEWS);
+		source.Reply(OPER_HELP_CMD_RANDOMNEWS);
 	}
 };
 

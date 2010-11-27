@@ -44,25 +44,25 @@ class CommandCSClearUsers : public Command
 			c->Kick(NULL, uc->user, "%s", buf.c_str());
 		}
 
-		u->SendMessage(ChanServ, CHAN_CLEARED_USERS, chan.c_str());
+		source.Reply(CHAN_CLEARED_USERS, chan.c_str());
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CLEARUSERS);
+		source.Reply(CHAN_HELP_CLEARUSERS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "CLEAR", CHAN_CLEARUSERS_SYNTAX);
+		SyntaxError(source, "CLEAR", CHAN_CLEARUSERS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_CLEARUSERS);
+		source.Reply(CHAN_HELP_CMD_CLEARUSERS);
 	}
 };
 

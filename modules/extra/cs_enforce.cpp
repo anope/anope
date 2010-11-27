@@ -142,40 +142,40 @@ class CommandCSEnforce : public Command
 			if (what.empty() || what.equals_ci("SET"))
 			{
 				this->DoSet(c);
-				me->SendMessage(ChanServ, u, _("Enforced %s"), !what.empty() ? what.c_str() : "SET");
+				me->SendMessage(source, _("Enforced %s"), !what.empty() ? what.c_str() : "SET");
 			}
 			else if (what.equals_ci("MODES"))
 			{
 				this->DoModes(c);
-				me->SendMessage(ChanServ, u, _("Enforced %s"), what.c_str());
+				me->SendMessage(source, _("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("SECUREOPS"))
 			{
 				this->DoSecureOps(c);
-				me->SendMessage(ChanServ, u, _("Enforced %s"), what.c_str());
+				me->SendMessage(source, _("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("RESTRICTED"))
 			{
 				this->DoRestricted(c);
-				me->SendMessage(ChanServ, u, _("Enforced %s"), what.c_str());
+				me->SendMessage(source, _("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("+R"))
 			{
 				this->DoCModeR(c);
-				me->SendMessage(ChanServ, u, _("Enforced %s"), what.c_str());
+				me->SendMessage(source, _("Enforced %s"), what.c_str());
 			}
 			else
-				this->OnSyntaxError(u, "");
+				this->OnSyntaxError(source, "");
 		}
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(ChanServ, u, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
-		me->SendMessage(ChanServ, u, " ");
-		me->SendMessage(ChanServ, u, _("Enforce various channel modes and set options. The \037channel\037\n"
+		me->SendMessage(source, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
+		me->SendMessage(source, " ");
+		me->SendMessage(source, _("Enforce various channel modes and set options. The \037channel\037\n"
 			"option indicates what channel to enforce the modes and options\n"
 			"on. The \037what\037 option indicates what modes and options to\n"
 			"enforce, and can be any of SET, SECUREOPS, RESTRICTED, MODES,\n"
@@ -186,14 +186,14 @@ class CommandCSEnforce : public Command
 			"SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
 			"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
 			"if it's not enabled."));
-		me->SendMessage(ChanServ, u, " ");
+		me->SendMessage(source, " ");
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			me->SendMessage(ChanServ, u, _("If \037what\037 is MODES, it will enforce channelmode +R if it is\n"
+			me->SendMessage(source, _("If \037what\037 is MODES, it will enforce channelmode +R if it is\n"
 				"set. If +R is specified for \037what\037, the +R channelmode will\n"
 				"also be enforced, but even if it is not set. If it is not set,\n"
 				"users will be banned to ensure they don't just rejoin."));
 		else
-			me->SendMessage(ChanServ, u, _("If \037what\037 is MODES, nothing will be enforced, since it would\n"
+			me->SendMessage(source, _("If \037what\037 is MODES, nothing will be enforced, since it would\n"
 				"enforce modes that the current ircd does not support. If +R is\n"
 				"specified for \037what\037, an equalivant of channelmode +R on\n"
 				"other ircds will be enforced. All users that are in the channel\n"
@@ -203,14 +203,14 @@ class CommandCSEnforce : public Command
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(ChanServ, u, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
+		me->SendMessage(source, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		me->SendMessage(ChanServ, u, _("    ENFORCE    Enforce various channel modes and set options"));
+		me->SendMessage(source, _("    ENFORCE    Enforce various channel modes and set options"));
 	}
 };
 

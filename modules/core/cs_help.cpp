@@ -24,21 +24,22 @@ class CommandCSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(ChanServ, source.u, params[0]);
+		mod_help_cmd(ChanServ, source.u, NULL, params[0]);
 
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP);
+		User *u = source.u;
+		source.Reply(CHAN_HELP);
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
-				it->second->OnServHelp(u);
+				it->second->OnServHelp(source);
 		if (Config->CSExpire >= 86400)
-			u->SendMessage(ChanServ, CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
+			source.Reply(CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP);
+			source.Reply(CHAN_SERVADMIN_HELP);
 	}
 };
 

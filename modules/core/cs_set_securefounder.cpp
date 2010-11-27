@@ -44,25 +44,25 @@ class CommandCSSetSecureFounder : public Command
 			source.Reply(CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "SECUREFOUNDER");
+			this->OnSyntaxError(source, "SECUREFOUNDER");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREFOUNDER, "SET");
+		source.Reply(CHAN_HELP_SET_SECUREFOUNDER, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(source, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_SECUREFOUNDER);
+		source.Reply(CHAN_HELP_CMD_SET_SECUREFOUNDER);
 	}
 };
 
@@ -73,15 +73,15 @@ class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_SECUREFOUNDER, "SASET");
+		source.Reply(CHAN_HELP_SET_SECUREFOUNDER, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET SECUREFOUNDER", CHAN_SASET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(source, "SASET SECUREFOUNDER", CHAN_SASET_SECUREFOUNDER_SYNTAX);
 	}
 };
 

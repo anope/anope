@@ -38,15 +38,15 @@ class CommandHSGroup : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(HostServ, HOST_HELP_GROUP);
+		source.Reply(HOST_HELP_GROUP);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(HostServ, HOST_HELP_CMD_GROUP);
+		source.Reply(HOST_HELP_CMD_GROUP);
 	}
 };
 

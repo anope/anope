@@ -56,8 +56,9 @@ class ModuleAlias : public Module
 		}
 	}
 
-	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, bool fantasy)
+	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, ChannelInfo *ci)
 	{
+		bool fantasy = ci != NULL;
 		std::map<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command);
 		if (it != aliases.end())
 		{

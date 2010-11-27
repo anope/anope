@@ -21,11 +21,9 @@ class CommandOSIgnore : public Command
 		const Anope::string &time = params.size() > 1 ? params[1] : "";
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
-		User *u = source.u;
-
 		if (time.empty() || nick.empty())
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 		else
@@ -60,9 +58,7 @@ class CommandOSIgnore : public Command
 			return MOD_CONT;
 		}
 
-		User *u = source.u;
-
-		u->SendMessage(OperServ, OPER_IGNORE_LIST);
+		source.Reply(OPER_IGNORE_LIST);
 		for (std::list<IgnoreData *>::iterator ign = ignore.begin(), ign_end = ignore.end(); ign != ign_end; ++ign)
 			source.Reply("%s", (*ign)->mask.c_str());
 
@@ -71,10 +67,9 @@ class CommandOSIgnore : public Command
 
 	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 		else
 		{
 			if (delete_ignore(nick))
@@ -90,9 +85,8 @@ class CommandOSIgnore : public Command
 
 	CommandReturn DoClear(CommandSource &source)
 	{
-		User *u = source.u;
 		clear_ignores();
-		u->SendMessage(OperServ, OPER_IGNORE_LIST_CLEARED);
+		source.Reply(OPER_IGNORE_LIST_CLEARED);
 
 		return MOD_CONT;
 	}
@@ -103,7 +97,6 @@ class CommandOSIgnore : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
@@ -115,25 +108,25 @@ class CommandOSIgnore : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_IGNORE);
+		source.Reply(OPER_HELP_IGNORE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "IGNORE", OPER_IGNORE_SYNTAX);
+		SyntaxError(source, "IGNORE", OPER_IGNORE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_IGNORE);
+		source.Reply(OPER_HELP_CMD_IGNORE);
 	}
 };
 

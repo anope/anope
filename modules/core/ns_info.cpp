@@ -146,21 +146,21 @@ class CommandNSInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP_INFO);
+		source.Reply(NICK_HELP_INFO);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "INFO", NICK_INFO_SYNTAX);
+		SyntaxError(source, "INFO", NICK_INFO_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_INFO);
+		source.Reply(NICK_HELP_CMD_INFO);
 	}
 };
 

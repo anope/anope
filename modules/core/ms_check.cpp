@@ -66,20 +66,20 @@ class CommandMSCheck : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CHECK);
+		source.Reply(MEMO_HELP_CHECK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+		SyntaxError(source, "CHECK", MEMO_CHECK_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_CHECK);
+		source.Reply(MEMO_HELP_CMD_CHECK);
 	}
 };
 

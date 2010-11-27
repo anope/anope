@@ -161,7 +161,7 @@ class CommandOSSZLine : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 
@@ -231,7 +231,7 @@ class CommandOSSZLine : public Command
 
 		}
 		else
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 
 		return MOD_CONT;
 	}
@@ -250,7 +250,7 @@ class CommandOSSZLine : public Command
 
 		if (mask.empty())
 		{
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
 		}
 
@@ -370,7 +370,7 @@ class CommandOSSZLine : public Command
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SZLINE));
 		SZLine->Clear();
-		u->SendMessage(OperServ, OPER_SZLINE_CLEAR);
+		source.Reply(OPER_SZLINE_CLEAR);
 
 		return MOD_CONT;
 	}
@@ -381,7 +381,6 @@ class CommandOSSZLine : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 
 		if (cmd.equals_ci("ADD"))
@@ -395,25 +394,25 @@ class CommandOSSZLine : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_SZLINE);
+		source.Reply(OPER_HELP_SZLINE);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
+		SyntaxError(source, "SZLINE", OPER_SZLINE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_SZLINE);
+		source.Reply(OPER_HELP_CMD_SZLINE);
 	}
 };
 

@@ -22,7 +22,6 @@ class CommandCSSetPersist : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetPersist");
@@ -96,25 +95,25 @@ class CommandCSSetPersist : public Command
 			source.Reply(CHAN_SET_PERSIST_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "PERSIST");
+			this->OnSyntaxError(source, "PERSIST");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PERSIST, "SET");
+		source.Reply(CHAN_HELP_SET_PERSIST, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+		SyntaxError(source, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PERSIST);
+		source.Reply(CHAN_HELP_CMD_SET_PERSIST);
 	}
 };
 
@@ -125,15 +124,15 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PERSIST, "SASET");
+		source.Reply(CHAN_HELP_SET_PERSIST, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
+		SyntaxError(source, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
 	}
 };
 

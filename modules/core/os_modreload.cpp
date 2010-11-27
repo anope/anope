@@ -78,20 +78,20 @@ class CommandOSModReLoad : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_MODRELOAD);
+		source.Reply(OPER_HELP_MODRELOAD);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "MODLOAD", OPER_MODULE_RELOAD_SYNTAX);
+		SyntaxError(source, "MODLOAD", OPER_MODULE_RELOAD_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_MODRELOAD);
+		source.Reply(OPER_HELP_CMD_MODRELOAD);
 	}
 };
 

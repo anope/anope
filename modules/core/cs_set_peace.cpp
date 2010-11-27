@@ -22,7 +22,6 @@ class CommandCSSetPeace : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetPeace");
@@ -38,25 +37,25 @@ class CommandCSSetPeace : public Command
 			source.Reply(CHAN_SET_PEACE_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "PEACE");
+			this->OnSyntaxError(source, "PEACE");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PEACE, "SET");
+		source.Reply(CHAN_HELP_SET_PEACE, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
+		SyntaxError(source, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_PEACE, "SET");
+		source.Reply(CHAN_HELP_CMD_SET_PEACE, "SET");
 	}
 };
 
@@ -67,15 +66,15 @@ class CommandCSSASetPeace : public CommandCSSetPeace
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_PEACE, "SASET");
+		source.Reply(CHAN_HELP_SET_PEACE, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
+		SyntaxError(source, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
 	}
 };
 

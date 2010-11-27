@@ -316,15 +316,15 @@ class CommandSQLSync : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params);
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_SYNC);
+		source.Reply(OPER_HELP_SYNC);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_SQLSYNC);
+		source.Reply(OPER_HELP_CMD_SQLSYNC);
 	}
 };
 

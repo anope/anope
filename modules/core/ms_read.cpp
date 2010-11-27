@@ -32,18 +32,17 @@ class MemoListCallback : public NumberList
 
 	static void DoRead(CommandSource &source, MemoInfo *mi, ChannelInfo *ci, unsigned index)
 	{
-		User *u = source.u;
 		Memo *m = mi->memos[index];
 		if (ci)
-			u->SendMessage(MemoServ, MEMO_CHAN_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(MEMO_CHAN_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
-			u->SendMessage(MemoServ, MEMO_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), index + 1);
-		u->SendMessage(MemoServ, MEMO_TEXT, m->text.c_str());
+			source.Reply(MEMO_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), index + 1);
+		source.Reply(MEMO_TEXT, m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
 		/* Check if a receipt notification was requested */
 		if (m->HasFlag(MF_RECEIPT))
-			rsend_notify(u, m, ci ? ci->name : "");
+			rsend_notify(source, m, ci ? ci->name : "");
 	}
 };
 
@@ -84,7 +83,7 @@ class CommandMSRead : public Command
 			mi = &u->Account()->memos;
 		num = !numstr.empty() && numstr.is_number_only() ? convertTo<int>(numstr) : -1;
 		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && num <= 0))
-			this->OnSyntaxError(u, numstr);
+			this->OnSyntaxError(source, numstr);
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
@@ -126,20 +125,20 @@ class CommandMSRead : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_READ);
+		source.Reply(MEMO_HELP_READ);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "READ", MEMO_READ_SYNTAX);
+		SyntaxError(source, "READ", MEMO_READ_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_READ);
+		source.Reply(MEMO_HELP_CMD_READ);
 	}
 };
 

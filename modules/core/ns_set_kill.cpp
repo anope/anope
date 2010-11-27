@@ -22,7 +22,6 @@ class CommandNSSetKill : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetKill");
@@ -65,25 +64,25 @@ class CommandNSSetKill : public Command
 			source.Reply(NICK_SASET_KILL_OFF, nc->display.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "KILL");
+			this->OnSyntaxError(source, "KILL");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SET_KILL);
+		source.Reply(NICK_HELP_SET_KILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SET KILL", Config->NSAllowKillImmed ? NICK_SET_KILL_IMMED_SYNTAX : NICK_SET_KILL_SYNTAX);
+		SyntaxError(source, "SET KILL", Config->NSAllowKillImmed ? NICK_SET_KILL_IMMED_SYNTAX : NICK_SET_KILL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_KILL);
+		source.Reply(NICK_HELP_CMD_SET_KILL);
 	}
 };
 
@@ -94,20 +93,20 @@ class CommandNSSASetKill : public CommandNSSetKill
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(NickServ, NICK_HELP_SASET_KILL);
+		source.Reply(NICK_HELP_SASET_KILL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(NickServ, u, "SASET KILL", Config->NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
+		SyntaxError(source, "SASET KILL", Config->NSAllowKillImmed ? NICK_SASET_KILL_IMMED_SYNTAX : NICK_SASET_KILL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SET_KILL);
+		source.Reply(NICK_HELP_CMD_SET_KILL);
 	}
 };
 

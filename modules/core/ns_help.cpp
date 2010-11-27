@@ -23,21 +23,22 @@ class CommandNSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(NickServ, source.u, params[0]);
+		mod_help_cmd(NickServ, source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_HELP);
+		User *u = source.u;
+		source.Reply(NICK_HELP);
 		for (CommandMap::const_iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
-				it->second->OnServHelp(u);
+				it->second->OnServHelp(source);
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_SERVADMIN_HELP);
+			source.Reply(NICK_SERVADMIN_HELP);
 		if (Config->NSExpire >= 86400)
-			u->SendMessage(NickServ, NICK_HELP_EXPIRES, Config->NSExpire / 86400);
-		u->SendMessage(NickServ, NICK_HELP_FOOTER);
+			source.Reply(NICK_HELP_EXPIRES, Config->NSExpire / 86400);
+		source.Reply(NICK_HELP_FOOTER);
 	}
 };
 

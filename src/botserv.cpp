@@ -332,7 +332,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 				Anope::string message = sep.GetRemaining();
 
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, ci->bi, command, message, true));
+				FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, ci->bi, command, message, ci));
 				if (MOD_RESULT == EVENT_STOP)
 					return;
 
@@ -346,7 +346,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 						message = ci->name + " " + message;
 					message = command + " " + message;
 
-					mod_run_cmd(ChanServ, u, message, true);
+					mod_run_cmd(ChanServ, u, message, ci);
 				}
 
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, sep.GetRemaining()));

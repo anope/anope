@@ -17,7 +17,6 @@ class ExceptionDelCallback : public NumberList
 {
  protected:
 	CommandSource &source;
-	User *u;
 	unsigned Deleted;
  public:
 	ExceptionDelCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, true), source(_source), Deleted(0)
@@ -41,12 +40,12 @@ class ExceptionDelCallback : public NumberList
 
 		++Deleted;
 
-		DoDel(u, Number - 1);
+		DoDel(source, Number - 1);
 	}
 
-	static void DoDel(User *u, unsigned index)
+	static void DoDel(CommandSource &source, unsigned index)
 	{
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(u, exceptions[index]));
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, exceptions[index]));
 
 		delete exceptions[index];
 		exceptions.erase(exceptions.begin() + index);
@@ -75,15 +74,15 @@ class ExceptionListCallback : public NumberList
 			source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
 		}
 
-		DoList(source.u, Number - 1);
+		DoList(source, Number - 1);
 	}
 
-	static void DoList(User *u, unsigned index)
+	static void DoList(CommandSource &source, unsigned index)
 	{
 		if (index >= exceptions.size())
 			return;
 
-		u->SendMessage(OperServ, OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
+		source.Reply(OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
 	}
 };
 
@@ -105,17 +104,17 @@ class ExceptionViewCallback : public ExceptionListCallback
 			source.Reply(OPER_EXCEPTION_LIST_HEADER);
 		}
 
-		DoList(source.u, Number - 1);
+		DoList(source, Number - 1);
 	}
 
-	static void DoList(User *u, unsigned index)
+	static void DoList(CommandSource &source, unsigned index)
 	{
 		if (index >= exceptions.size())
 			return;
 
-		Anope::string expirebuf = expire_left(u->Account(), exceptions[index]->expires);
+		Anope::string expirebuf = expire_left(source.u->Account(), exceptions[index]->expires);
 
-		u->SendMessage(OperServ, OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
+		source.Reply(OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
 	}
 };
 
@@ -169,7 +168,6 @@ class CommandOSSession : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
@@ -183,25 +181,25 @@ class CommandOSSession : public Command
 		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(source, params);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_SESSION);
+		source.Reply(OPER_HELP_SESSION);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "SESSION", OPER_SESSION_LIST_SYNTAX);
+		SyntaxError(source, "SESSION", OPER_SESSION_LIST_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_SESSION);
+		source.Reply(OPER_HELP_CMD_SESSION);
 	}
 };
 
@@ -227,7 +225,7 @@ class CommandOSException : public Command
 
 		if (params.size() <= last_param)
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 
@@ -236,7 +234,7 @@ class CommandOSException : public Command
 			reason += " " + params[4];
 		if (reason.empty())
 		{
-			this->OnSyntaxError(u, "ADD");
+			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
 		}
 
@@ -278,12 +276,11 @@ class CommandOSException : public Command
 
 	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
-			this->OnSyntaxError(u, "DEL");
+			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
 		}
 
@@ -298,7 +295,7 @@ class CommandOSException : public Command
 			for (; i < end; ++i)
 				if (mask.equals_ci(exceptions[i]->mask))
 				{
-					ExceptionDelCallback::DoDel(u, i);
+					ExceptionDelCallback::DoDel(source, i);
 					source.Reply(OPER_EXCEPTION_DELETED, mask.c_str());
 					break;
 				}
@@ -314,15 +311,13 @@ class CommandOSException : public Command
 
 	CommandReturn DoMove(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		const Anope::string &n1str = params.size() > 1 ? params[1] : ""; /* From position */
 		const Anope::string &n2str = params.size() > 2 ? params[2] : ""; /* To position */
 		int n1, n2;
 
 		if (n2str.empty())
 		{
-			this->OnSyntaxError(u, "MOVE");
+			this->OnSyntaxError(source, "MOVE");
 			return MOD_CONT;
 		}
 
@@ -341,14 +336,13 @@ class CommandOSException : public Command
 				source.Reply(READ_ONLY_MODE);
 		}
 		else
-			this->OnSyntaxError(u, "MOVE");
+			this->OnSyntaxError(source, "MOVE");
 
 		return MOD_CONT;
 	}
 
 	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
@@ -371,7 +365,7 @@ class CommandOSException : public Command
 						source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
 					}
 
-					ExceptionListCallback::DoList(u, i);
+					ExceptionListCallback::DoList(source, i);
 				}
 
 			if (!SentHeader)
@@ -383,7 +377,6 @@ class CommandOSException : public Command
 
 	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
@@ -405,7 +398,7 @@ class CommandOSException : public Command
 						source.Reply(OPER_EXCEPTION_LIST_HEADER);
 					}
 
-					ExceptionViewCallback::DoList(u, i);
+					ExceptionViewCallback::DoList(source, i);
 				}
 
 			if (!SentHeader)
@@ -421,7 +414,6 @@ class CommandOSException : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
@@ -441,25 +433,25 @@ class CommandOSException : public Command
 		else if (cmd.equals_ci("VIEW"))
 			return this->DoView(source, params);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_EXCEPTION);
+		source.Reply(OPER_HELP_EXCEPTION);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
+		SyntaxError(source, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_EXCEPTION);
+		source.Reply(OPER_HELP_CMD_EXCEPTION);
 	}
 };
 

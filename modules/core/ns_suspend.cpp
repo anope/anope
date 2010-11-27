@@ -79,27 +79,27 @@ class CommandNSSuspend : public Command
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << ")";
-		u->SendMessage(NickServ, NICK_SUSPEND_SUCCEEDED, nick.c_str());
+		source.Reply(NICK_SUSPEND_SUCCEEDED, nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_SERVADMIN_HELP_SUSPEND);
+		source.Reply(NICK_SERVADMIN_HELP_SUSPEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
+		SyntaxError(source, "SUSPEND", NICK_SUSPEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_SUSPEND);
+		source.Reply(NICK_HELP_CMD_SUSPEND);
 	}
 };
 
@@ -146,27 +146,27 @@ class CommandNSUnSuspend : public Command
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "for " << na->nick;
-		u->SendMessage(NickServ, NICK_UNSUSPEND_SUCCEEDED, nick.c_str());
+		source.Reply(NICK_UNSUSPEND_SUCCEEDED, nick.c_str());
 
 		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_SERVADMIN_HELP_UNSUSPEND);
+		source.Reply(NICK_SERVADMIN_HELP_UNSUSPEND);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
+		SyntaxError(source, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_UNSUSPEND);
+		source.Reply(NICK_HELP_CMD_UNSUSPEND);
 	}
 };
 

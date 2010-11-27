@@ -78,7 +78,7 @@ class CommandMSDel : public Command
 		else
 			mi = &u->Account()->memos;
 		if (numstr.empty() || (!isdigit(numstr[0]) && !numstr.equals_ci("ALL") && !numstr.equals_ci("LAST")))
-			this->OnSyntaxError(u, numstr);
+			this->OnSyntaxError(source, numstr);
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
@@ -122,20 +122,20 @@ class CommandMSDel : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_DEL);
+		source.Reply(MEMO_HELP_DEL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "DEL", MEMO_DEL_SYNTAX);
+		SyntaxError(source, "DEL", MEMO_DEL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_DEL);
+		source.Reply(MEMO_HELP_CMD_DEL);
 	}
 };
 

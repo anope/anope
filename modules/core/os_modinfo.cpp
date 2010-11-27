@@ -64,20 +64,20 @@ class CommandOSModInfo : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_MODINFO);
+		source.Reply(OPER_HELP_MODINFO);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "MODINFO", OPER_MODULE_INFO_SYNTAX);
+		SyntaxError(source, "MODINFO", OPER_MODULE_INFO_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_MODINFO);
+		source.Reply(OPER_HELP_CMD_MODINFO);
 	}
 };
 

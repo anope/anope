@@ -22,8 +22,6 @@ class CommandOSReload : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
 		try
 		{
 			ServerConfig *newconfig = new ServerConfig();
@@ -36,19 +34,19 @@ class CommandOSReload : public Command
 			Log() << "Error reloading configuration file: " << ex.GetReason();
 		}
 
-		u->SendMessage(OperServ, OPER_RELOAD);
+		source.Reply(OPER_RELOAD);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_RELOAD);
+		source.Reply(OPER_HELP_RELOAD);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_RELOAD);
+		source.Reply(OPER_HELP_CMD_RELOAD);
 	}
 };
 

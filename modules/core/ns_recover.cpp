@@ -83,24 +83,24 @@ class CommandNSRecover : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = duration(u->Account(), Config->NSReleaseTimeout);
+		Anope::string relstr = duration(source.u->Account(), Config->NSReleaseTimeout);
 
-		u->SendMessage(NickServ, NICK_HELP_RECOVER, relstr.c_str());
+		source.Reply(NICK_HELP_RECOVER, relstr.c_str());
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
+		SyntaxError(source, "RECOVER", NICK_RECOVER_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_RECOVER);
+		source.Reply(NICK_HELP_CMD_RECOVER);
 	}
 };
 

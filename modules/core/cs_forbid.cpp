@@ -31,7 +31,7 @@ class CommandCSForbid : public Command
 
 		if (Config->ForceForbidReason && reason.empty())
 		{
-			SyntaxError(ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX_REASON);
+			SyntaxError(source, "FORBID", CHAN_FORBID_SYNTAX_REASON);
 			return MOD_CONT;
 		}
 
@@ -88,27 +88,27 @@ class CommandCSForbid : public Command
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 		Log(LOG_ADMIN, u, this, ci) << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
 
-		u->SendMessage(ChanServ, CHAN_FORBID_SUCCEEDED, chan.c_str());
+		source.Reply(CHAN_FORBID_SUCCEEDED, chan.c_str());
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(ChanServ, CHAN_SERVADMIN_HELP_FORBID);
+		source.Reply(CHAN_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(ChanServ, u, "FORBID", CHAN_FORBID_SYNTAX);
+		SyntaxError(source, "FORBID", CHAN_FORBID_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_FORBID);
+		source.Reply(CHAN_HELP_CMD_FORBID);
 	}
 };
 

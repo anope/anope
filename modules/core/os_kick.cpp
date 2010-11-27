@@ -51,20 +51,20 @@ class CommandOSKick : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_KICK);
+		source.Reply(OPER_HELP_KICK);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(OperServ, u, "KICK", OPER_KICK_SYNTAX);
+		SyntaxError(source, "KICK", OPER_KICK_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_KICK);
+		source.Reply(OPER_HELP_CMD_KICK);
 	}
 };
 

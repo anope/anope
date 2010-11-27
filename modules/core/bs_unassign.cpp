@@ -46,20 +46,20 @@ class CommandBSUnassign : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_HELP_UNASSIGN);
+		source.Reply(BOT_HELP_UNASSIGN);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
+		SyntaxError(source, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_UNASSIGN);
+		source.Reply(BOT_HELP_CMD_UNASSIGN);
 	}
 };
 

@@ -29,7 +29,7 @@ class CommandNSLogout : public Command
 
 		User *u2;
 		if (!u->Account()->IsServicesOper() && !nick.empty())
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
@@ -60,24 +60,25 @@ class CommandNSLogout : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			u->SendMessage(NickServ, NICK_SERVADMIN_HELP_LOGOUT);
+			source.Reply(NICK_SERVADMIN_HELP_LOGOUT);
 		else
-			u->SendMessage(NickServ, NICK_HELP_LOGOUT);
+			source.Reply(NICK_HELP_LOGOUT);
 
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
+		SyntaxError(source, "LOGOUT", NICK_LOGOUT_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_LOGOUT);
+		source.Reply(NICK_HELP_CMD_LOGOUT);
 	}
 };
 

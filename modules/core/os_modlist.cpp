@@ -22,7 +22,6 @@ class CommandOSModList : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &param = !params.empty() ? params[0] : "";
 
 		int count = 0;
@@ -130,7 +129,7 @@ class CommandOSModList : public Command
 			}
 		}
 
-		u->SendMessage(OperServ, OPER_MODULE_LIST_HEADER);
+		source.Reply(OPER_MODULE_LIST_HEADER);
 
 		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 		{
@@ -206,15 +205,15 @@ class CommandOSModList : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(OperServ, OPER_HELP_MODLIST);
+		source.Reply(OPER_HELP_MODLIST);
 		return true;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(OperServ, OPER_HELP_CMD_MODLIST);
+		source.Reply(OPER_HELP_CMD_MODLIST);
 	}
 };
 

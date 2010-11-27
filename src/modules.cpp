@@ -282,9 +282,9 @@ Version Module::GetVersion() const
 	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
-void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
+void Module::SendMessage(CommandSource &source, const char *fmt, ...)
 {
-	Anope::string language = (to && to->Account() ? to->Account()->language : "");
+	Anope::string language = (source.u && source.u->Account() ? source.u->Account()->language : "");
 	
 	Anope::string message = GetString(this->name.c_str(), language, fmt);
 
@@ -298,7 +298,7 @@ void Module::SendMessage(BotInfo *from, User *to, const char *fmt, ...)
 	Anope::string token;
 
 	while (sep.GetToken(token))
-		to->SendMessage(from->nick, token);
+		source.Reply(token.c_str());
 }
 
 Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)

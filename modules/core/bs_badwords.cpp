@@ -236,7 +236,7 @@ class CommandBSBadwords : public Command
 
 		if (!need_args && word.empty())
 		{
-			this->OnSyntaxError(u, cmd);
+			this->OnSyntaxError(source, cmd);
 			return MOD_CONT;
 		}
 
@@ -261,25 +261,25 @@ class CommandBSBadwords : public Command
 		else if (cmd.equals_ci("CLEAR"))
 			return this->DoClear(source);
 		else
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(BotServ, BOT_HELP_BADWORDS);
+		source.Reply(BOT_HELP_BADWORDS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(BotServ, u, "BADWORDS", BOT_BADWORDS_SYNTAX);
+		SyntaxError(source, "BADWORDS", BOT_BADWORDS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(BotServ, BOT_HELP_CMD_BADWORDS);
+		source.Reply(BOT_HELP_CMD_BADWORDS);
 	}
 };
 

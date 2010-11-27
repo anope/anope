@@ -48,20 +48,20 @@ class CommandHSDelAll : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(HostServ, HOST_HELP_DELALL);
+		source.Reply(HOST_HELP_DELALL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(HostServ, u, "DELALL", HOST_DELALL_SYNTAX);
+		SyntaxError(source, "DELALL", HOST_DELALL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(HostServ, HOST_HELP_CMD_DELALL);
+		source.Reply(HOST_HELP_CMD_DELALL);
 	}
 };
 

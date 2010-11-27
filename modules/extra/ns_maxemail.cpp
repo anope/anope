@@ -19,18 +19,18 @@ class NSMaxEmail : public Module
 {
 	int NSEmailMax;
 
-	bool CheckLimitReached(const Anope::string &email, User *u)
+	bool CheckLimitReached(CommandSource &source, const Anope::string &email)
 	{
 		if (this->NSEmailMax < 1 || email.empty())
 			return false;
 
-		if (this->CountEmail(email, u) < this->NSEmailMax)
+		if (this->CountEmail(email, source.u) < this->NSEmailMax)
 			return false;
 
 		if (this->NSEmailMax == 1)
-			this->SendMessage(NickServ, u, _("The given email address has reached it's usage limit of 1 user."));
+			this->SendMessage(source, _("The given email address has reached it's usage limit of 1 user."));
 		else
-			this->SendMessage(NickServ, u, _("The given email address has reached it's usage limit of %d users."), this->NSEmailMax);
+			this->SendMessage(source, _("The given email address has reached it's usage limit of %d users."), this->NSEmailMax);
 
 		return true;
 	}
@@ -72,21 +72,22 @@ class NSMaxEmail : public Module
 		Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
 	}
 
-	EventReturn OnPreCommand(User *u, BotInfo *service, const Anope::string &command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		if (service == findbot(Config->s_NickServ))
+		BotInfo *service = source.owner;
+		if (service == NickServ)
 		{
-			if (command.equals_ci("REGISTER"))
+			if (command->name.equals_ci("REGISTER"))
 			{
-				if (CheckLimitReached(params.size() > 1 ? params[1] : "", u))
+				if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
 					return EVENT_STOP;
 			}
-			else if (command.equals_ci("SET"))
+			else if (command->name.equals_ci("SET"))
 			{
 				Anope::string set = params[0];
 				Anope::string email = params.size() > 1 ? params[1] : "";
 
-				if (set.equals_ci("email") && CheckLimitReached(email, u))
+				if (set.equals_ci("email") && this->CheckLimitReached(source, email))
 					return EVENT_STOP;
 			}
 		}

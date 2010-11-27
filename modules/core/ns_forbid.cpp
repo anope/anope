@@ -29,7 +29,7 @@ class CommandNSForbid : public Command
 		/* Assumes that permission checking has already been done. */
 		if (Config->ForceForbidReason && reason.empty())
 		{
-			this->OnSyntaxError(u, "");
+			this->OnSyntaxError(source, "");
 			return MOD_CONT;
 		}
 
@@ -77,27 +77,27 @@ class CommandNSForbid : public Command
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "to forbid nick " << nick;
-		u->SendMessage(NickServ, NICK_FORBID_SUCCEEDED, nick.c_str());
+		source.Reply(NICK_FORBID_SUCCEEDED, nick.c_str());
 
 		FOREACH_MOD(I_OnNickForbidden, OnNickForbidden(na));
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_SERVADMIN_HELP_FORBID);
+		source.Reply(NICK_SERVADMIN_HELP_FORBID);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "FORBID", Config->ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
+		SyntaxError(source, "FORBID", Config->ForceForbidReason ? NICK_FORBID_SYNTAX_REASON : NICK_FORBID_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_FORBID);
+		source.Reply(NICK_HELP_CMD_FORBID);
 	}
 };
 

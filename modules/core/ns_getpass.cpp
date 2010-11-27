@@ -59,20 +59,20 @@ class CommandNSGetPass : public Command
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(NickServ, NICK_SERVADMIN_HELP_GETPASS);
+		source.Reply(NICK_SERVADMIN_HELP_GETPASS);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
+		SyntaxError(source, "GETPASS", NICK_GETPASS_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(NickServ, NICK_HELP_CMD_GETPASS);
+		source.Reply(NICK_HELP_CMD_GETPASS);
 	}
 };
 

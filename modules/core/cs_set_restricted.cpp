@@ -21,7 +21,6 @@ class CommandCSSetRestricted : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetRestricted");
@@ -41,25 +40,25 @@ class CommandCSSetRestricted : public Command
 			source.Reply(CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "RESTRICTED");
+			this->OnSyntaxError(source, "RESTRICTED");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_RESTRICTED, "SET");
+		source.Reply(CHAN_HELP_SET_RESTRICTED, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
+		SyntaxError(source, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_RESTRICTED);
+		source.Reply(CHAN_HELP_CMD_SET_RESTRICTED);
 	}
 };
 
@@ -70,15 +69,15 @@ class CommandCSSASetRestricted : public CommandCSSetRestricted
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_RESTRICTED, "SASET");
+		source.Reply(CHAN_HELP_SET_RESTRICTED, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
+		SyntaxError(source, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
 	}
 };
 

@@ -38,27 +38,27 @@ class CommandMSSendAll : public Command
 			NickCore *nc = it->second;
 
 			if ((na && na->nc == nc) || !nc->display.equals_ci(u->nick))
-				memo_send(u, nc->display, text, 1);
+				memo_send(source, nc->display, text, 1);
 		}
 
-		u->SendMessage(MemoServ, MEMO_MASS_SENT);
+		source.Reply(MEMO_MASS_SENT);
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_SENDALL);
+		source.Reply(MEMO_HELP_SENDALL);
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(MemoServ, u, "SENDALL", MEMO_SENDALL_SYNTAX);
+		SyntaxError(source, "SENDALL", MEMO_SENDALL_SYNTAX);
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(MemoServ, MEMO_HELP_CMD_SENDALL);
+		source.Reply(MEMO_HELP_CMD_SENDALL);
 	}
 };
 

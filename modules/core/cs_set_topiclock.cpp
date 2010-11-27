@@ -22,7 +22,6 @@ class CommandCSSetTopicLock : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetTopicLock");
@@ -38,25 +37,25 @@ class CommandCSSetTopicLock : public Command
 			source.Reply(CHAN_SET_TOPICLOCK_OFF, ci->name.c_str());
 		}
 		else
-			this->OnSyntaxError(u, "TOPICLOCK");
+			this->OnSyntaxError(source, "TOPICLOCK");
 
 		return MOD_CONT;
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_TOPICLOCK, "SET");
+		source.Reply(CHAN_HELP_SET_TOPICLOCK, "SET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SET", CHAN_SET_TOPICLOCK_SYNTAX);;
+		SyntaxError(source, "SET", CHAN_SET_TOPICLOCK_SYNTAX);;
 	}
 
-	void OnServHelp(User *u)
+	void OnServHelp(CommandSource &source)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_CMD_SET_TOPICLOCK);
+		source.Reply(CHAN_HELP_CMD_SET_TOPICLOCK);
 	}
 };
 
@@ -67,15 +66,15 @@ class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 	{
 	}
 
-	bool OnHelp(User *u, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		u->SendMessage(ChanServ, CHAN_HELP_SET_TOPICLOCK, "SASET");
+		source.Reply(CHAN_HELP_SET_TOPICLOCK, "SASET");
 		return true;
 	}
 
-	void OnSyntaxError(User *u, const Anope::string &)
+	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(ChanServ, u, "SASET", CHAN_SASET_TOPICLOCK_SYNTAX);
+		SyntaxError(source, "SASET", CHAN_SASET_TOPICLOCK_SYNTAX);
 	}
 };
 

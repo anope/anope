@@ -69,7 +69,7 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	{
 	}
 
-	bool Help(User *u, const Anope::string &)
+	bool OnHelp(User *u, const Anope::string &)
 	{
 		u->SendMessage(NickServ, NICK_HELP_SASET_AUTOOP);
 		return true;

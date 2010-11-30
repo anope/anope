@@ -131,7 +131,7 @@ class CommandNSSetDisplay : public Command
 			return MOD_CONT;
 		}
 
-		change_core_display(u->Account(), params[0]);
+		change_core_display(u->Account(), params[1]);
 		u->SendMessage(NickServ, NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
 		return MOD_CONT;
 	}

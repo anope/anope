@@ -227,7 +227,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		access = ci->GetAccess(mask);
+		access = ci->GetAccess(mask, 0, false);
 		if (access)
 		{
 			/**
@@ -307,7 +307,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		access = ci->GetAccess(mask);
+		access = ci->GetAccess(mask, 0, false);
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)

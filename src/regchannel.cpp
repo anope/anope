@@ -278,14 +278,15 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
  *
  * @param u The mask to find within the access list vector
  * @param level Optional channel access level to compare the access entries to
+ * @param wildcard True to match using wildcards
  * @return A ChanAccess struct corresponding to the mask, or NULL if not found
  *
  * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
  */
-ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level)
+ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level, bool wildcard)
 {
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (Anope::Match(this->access[i]->mask, mask))
+		if (wildcard ? Anope::Match(this->access[i]->mask, mask) : this->access[i]->mask.equals_ci(mask))
 			return this->access[i];
 	return NULL;
 }

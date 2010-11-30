@@ -175,11 +175,12 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 *
 	 * @param u The mask to find within the access list vector
 	 * @param level Optional channel access level to compare the access entries to
+	 * @param wildcard True to match using wildcards
 	 * @return A ChanAccess struct corresponding to the mask, or NULL if not found
 	 *
 	 * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
 	 */
-	ChanAccess *GetAccess(const Anope::string &mask, int16 level = 0);
+	ChanAccess *GetAccess(const Anope::string &mask, int16 level = 0, bool wildcard = true);
 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size

@@ -202,7 +202,7 @@ class CommandCSAccess : public Command
 			return MOD_CONT;
 		}
 
-		ChanAccess *access = ci->GetAccess(mask);
+		ChanAccess *access = ci->GetAccess(mask, 0, false);
 		if (access)
 		{
 			/* Don't allow lowering from a level >= u_level */
@@ -220,7 +220,7 @@ class CommandCSAccess : public Command
 
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (level: " << level << ") as level " << u_level;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
 			source.Reply(CHAN_ACCESS_LEVEL_CHANGED, access->mask.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
@@ -257,7 +257,7 @@ class CommandCSAccess : public Command
 		}
 		else
 		{
-			ChanAccess *access = ci->GetAccess(mask);
+			ChanAccess *access = ci->GetAccess(mask, 0, false);
 			ChanAccess *u_access = ci->GetAccess(u);
 			int16 u_level = u_access ? u_access->level : 0;
 			if (!access)

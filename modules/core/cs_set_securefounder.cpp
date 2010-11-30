@@ -98,11 +98,11 @@ class CSSetSecureFounder : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetsecurefounder);
+			c->AddSubcommand(this, &commandcssetsecurefounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetsecurefounder);
+			c->AddSubcommand(this, &commandcssasetsecurefounder);
 	}
 
 	~CSSetSecureFounder()

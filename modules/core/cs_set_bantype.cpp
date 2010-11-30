@@ -92,11 +92,11 @@ class CSSetBanType : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetbantype);
+			c->AddSubcommand(this, &commandcssetbantype);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetbantype);
+			c->AddSubcommand(this, &commandcssasetbantype);
 	}
 
 	~CSSetBanType()

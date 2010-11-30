@@ -158,9 +158,9 @@ class CSSetMisc : public Module
 			}
 
 			if (set)
-				set->AddSubcommand(new CommandCSSetMisc(cname, desc));
+				set->AddSubcommand(this, new CommandCSSetMisc(cname, desc));
 			if (saset)
-				saset->AddSubcommand(new CommandCSSASetMisc(cname, desc));
+				saset->AddSubcommand(this, new CommandCSSASetMisc(cname, desc));
 		}
 	}
 

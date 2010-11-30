@@ -123,11 +123,11 @@ class NSSetKill : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetkill);
+			c->AddSubcommand(this, &commandnssetkill);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetkill);
+			c->AddSubcommand(this, &commandnssasetkill);
 	}
 
 	~NSSetKill()

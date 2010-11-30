@@ -91,11 +91,11 @@ class CSSetOpNotice : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetopnotice);
+			c->AddSubcommand(this, &commandcssetopnotice);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetopnotice);
+			c->AddSubcommand(this, &commandcssasetopnotice);
 	}
 
 	~CSSetOpNotice()

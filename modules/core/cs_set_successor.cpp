@@ -122,11 +122,11 @@ class CSSetSuccessor : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetsuccessor);
+			c->AddSubcommand(this, &commandcssetsuccessor);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetsuccessor);
+			c->AddSubcommand(this, &commandcssasetsuccessor);
 	}
 
 	~CSSetSuccessor()

@@ -99,11 +99,11 @@ class NSSetAutoOp : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetautoop);
+			c->AddSubcommand(this, &commandnssetautoop);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetautoop);
+			c->AddSubcommand(this, &commandnssasetautoop);
 	}
 
 	~NSSetAutoOp()

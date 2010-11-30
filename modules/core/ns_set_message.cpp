@@ -105,11 +105,11 @@ class NSSetMessage : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetmessage);
+			c->AddSubcommand(this, &commandnssetmessage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetmessage);
+			c->AddSubcommand(this, &commandnssasetmessage);
 	}
 
 	~NSSetMessage()

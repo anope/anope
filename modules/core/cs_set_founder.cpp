@@ -120,11 +120,11 @@ class CSSetFounder : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetfounder);
+			c->AddSubcommand(this, &commandcssetfounder);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetfounder);
+			c->AddSubcommand(this, &commandcssasetfounder);
 	}
 
 	~CSSetFounder()

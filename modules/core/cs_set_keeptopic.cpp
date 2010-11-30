@@ -91,11 +91,11 @@ class CSSetKeepTopic : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetkeeptopic);
+			c->AddSubcommand(this, &commandcssetkeeptopic);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetkeeptopic);
+			c->AddSubcommand(this, &commandcssasetkeeptopic);
 	}
 
 	~CSSetKeepTopic()

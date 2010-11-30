@@ -95,8 +95,10 @@ class CommandNSSet : public Command
 		source.Reply(NICK_HELP_CMD_SET);
 	}
 
-	bool AddSubcommand(Command *c)
+	bool AddSubcommand(Module *creator, Command *c)
 	{
+		c->module = creator;
+		c->service = this->service;
 		return this->subcommands.insert(std::make_pair(c->name, c)).second;
 	}
 
@@ -230,8 +232,8 @@ class NSSet : public Module
 
 		this->AddCommand(NickServ, &commandnsset);
 
-		commandnsset.AddSubcommand(&commandnssetdisplay);
-		commandnsset.AddSubcommand(&commandnssetpassword);
+		commandnsset.AddSubcommand(this, &commandnssetdisplay);
+		commandnsset.AddSubcommand(this, &commandnssetpassword);
 	}
 };
 

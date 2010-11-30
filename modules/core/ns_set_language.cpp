@@ -109,11 +109,11 @@ class NSSetLanguage : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetlanguage);
+			c->AddSubcommand(this, &commandnssetlanguage);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetlanguage);
+			c->AddSubcommand(this, &commandnssasetlanguage);
 	}
 
 	~NSSetLanguage()

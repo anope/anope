@@ -99,11 +99,11 @@ class NSSetPrivate : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetprivate);
+			c->AddSubcommand(this, &commandnssetprivate);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetprivate);
+			c->AddSubcommand(this, &commandnssasetprivate);
 	}
 
 	~NSSetPrivate()

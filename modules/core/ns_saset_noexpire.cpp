@@ -73,7 +73,7 @@ class NSSASetNoexpire : public Module
 
 		Command *c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetnoexpire);
+			c->AddSubcommand(this, &commandnssasetnoexpire);
 	}
 
 	~NSSASetNoexpire()

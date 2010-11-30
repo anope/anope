@@ -94,11 +94,11 @@ class CSSetRestricted : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetrestricted);
+			c->AddSubcommand(this, &commandcssetrestricted);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetrestricted);
+			c->AddSubcommand(this, &commandcssasetrestricted);
 	}
 
 	~CSSetRestricted()

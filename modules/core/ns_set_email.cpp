@@ -104,11 +104,11 @@ class NSSetEmail : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetemail);
+			c->AddSubcommand(this, &commandnssetemail);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetemail);
+			c->AddSubcommand(this, &commandnssasetemail);
 	}
 
 	~NSSetEmail()

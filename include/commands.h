@@ -124,9 +124,10 @@ class CoreExport Command : public Flags<CommandFlag>
 	void SetPermission(const Anope::string &reststr);
 
 	/** Add a subcommand to this command
+	 * @param creator The creator of the subcommand
 	 * @param c The command
 	 */
-	virtual bool AddSubcommand(Command *c);
+	virtual bool AddSubcommand(Module *creator, Command *c);
 
 	/** Delete a subcommand from this command
 	 * @param c The command

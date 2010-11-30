@@ -71,7 +71,7 @@ class CSSetNoexpire : public Module
 
 		Command *c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetnoexpire);
+			c->AddSubcommand(this, &commandcssasetnoexpire);
 	}
 
 	~CSSetNoexpire()

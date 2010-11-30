@@ -99,11 +99,11 @@ class CSSetSignKick : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetsignkick);
+			c->AddSubcommand(this, &commandcssetsignkick);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetsignkick);
+			c->AddSubcommand(this, &commandcssasetsignkick);
 	}
 
 	~CSSetSignKick()

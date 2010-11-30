@@ -84,11 +84,11 @@ class CSSetDescription : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetdescription);
+			c->AddSubcommand(this, &commandcssetdescription);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetdescription);
+			c->AddSubcommand(this, &commandcssasetdescription);
 	}
 
 	~CSSetDescription()

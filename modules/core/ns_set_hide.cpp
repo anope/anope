@@ -133,11 +133,11 @@ class NSSetHide : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssethide);
+			c->AddSubcommand(this, &commandnssethide);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasethide);
+			c->AddSubcommand(this, &commandnssasethide);
 	}
 
 	~NSSetHide()

@@ -87,11 +87,11 @@ class NSSetGreet : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetgreet);
+			c->AddSubcommand(this, &commandnssetgreet);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetgreet);
+			c->AddSubcommand(this, &commandnssasetgreet);
 	}
 
 	~NSSetGreet()

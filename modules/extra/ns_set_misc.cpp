@@ -161,9 +161,9 @@ class NSSetMisc : public Module
 			}
 
 			if (set)
-				set->AddSubcommand(new CommandNSSetMisc(cname, desc));
+				set->AddSubcommand(this, new CommandNSSetMisc(cname, desc));
 			if (saset)
-				saset->AddSubcommand(new CommandNSSASetMisc(cname, desc));
+				saset->AddSubcommand(this, new CommandNSSASetMisc(cname, desc));
 		}
 	}
 

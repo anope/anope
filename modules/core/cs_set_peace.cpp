@@ -91,11 +91,11 @@ class CSSetPeace : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetpeace);
+			c->AddSubcommand(this, &commandcssetpeace);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetpeace);
+			c->AddSubcommand(this, &commandcssasetpeace);
 	}
 
 	~CSSetPeace()

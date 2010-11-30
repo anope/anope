@@ -91,11 +91,11 @@ class CSSetSecure : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetsecure);
+			c->AddSubcommand(this, &commandcssetsecure);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetsecure);
+			c->AddSubcommand(this, &commandcssasetsecure);
 	}
 
 	~CSSetSecure()

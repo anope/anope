@@ -131,11 +131,11 @@ class CSSetXOP : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetxop);
+			c->AddSubcommand(this, &commandcssetxop);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetxop);
+			c->AddSubcommand(this, &commandcssasetxop);
 	}
 
 	~CSSetXOP()

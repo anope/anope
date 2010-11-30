@@ -91,11 +91,11 @@ class CSSetTopicLock : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssettopiclock);
+			c->AddSubcommand(this, &commandcssettopiclock);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasettopiclock);
+			c->AddSubcommand(this, &commandcssasettopiclock);
 	}
 
 	~CSSetTopicLock()

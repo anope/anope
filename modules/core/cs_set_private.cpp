@@ -91,11 +91,11 @@ class CSSetPrivate : public Module
 
 		Command *c = FindCommand(ChanServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandcssetprivate);
+			c->AddSubcommand(this, &commandcssetprivate);
 
 		c = FindCommand(ChanServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandcssasetprivate);
+			c->AddSubcommand(this, &commandcssasetprivate);
 	}
 
 	~CSSetPrivate()

@@ -89,7 +89,7 @@ void Command::SetPermission(const Anope::string &reststr)
 	this->permission = reststr;
 }
 
-bool Command::AddSubcommand(Command *c)
+bool Command::AddSubcommand(Module *creator, Command *c)
 {
 	return false;
 }

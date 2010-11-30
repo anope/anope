@@ -99,11 +99,11 @@ class NSSetSecure : public Module
 
 		Command *c = FindCommand(NickServ, "SET");
 		if (c)
-			c->AddSubcommand(&commandnssetsecure);
+			c->AddSubcommand(this, &commandnssetsecure);
 
 		c = FindCommand(NickServ, "SASET");
 		if (c)
-			c->AddSubcommand(&commandnssasetsecure);
+			c->AddSubcommand(this, &commandnssasetsecure);
 	}
 
 	~NSSetSecure()

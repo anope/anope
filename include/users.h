@@ -8,7 +8,7 @@
 #ifndef USERS_H
 #define USERS_H
 
-extern CoreExport patricia_tree<User *, std::equal_to<ci::string> > UserListByNick;
+extern CoreExport patricia_tree<User *, ci::ci_char_traits> UserListByNick;
 extern CoreExport patricia_tree<User *> UserListByUID;
 
 class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>

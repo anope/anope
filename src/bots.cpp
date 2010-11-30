@@ -9,7 +9,7 @@
 #include "modules.h"
 #include "commands.h"
 
-patricia_tree<BotInfo *, std::equal_to<ci::string> > BotListByNick;
+patricia_tree<BotInfo *, ci::ci_char_traits> BotListByNick;
 patricia_tree<BotInfo *> BotListByUID;
 
 BotInfo *BotServ = NULL;

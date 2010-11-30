@@ -13,10 +13,10 @@ template<typename Data> struct patricia_elem
 	Data data;
 };
 
-template<typename Data, typename Compare = std::equal_to<Anope::string> >
+template<typename Data, typename char_traits = std::std_char_traits>
 class patricia_tree
 {
-	Compare comp;
+	typedef std::basic_string<char, char_traits, std::allocator<char> > String;
 
 	patricia_elem<Data> *root;
 	std::list<Data> list;
@@ -49,8 +49,12 @@ class patricia_tree
 	inline size_t size() const { return this->list.size(); }
 	inline bool empty() const { return this->list.empty(); }
 
-	Data find(const Anope::string &key)
+	Data find(const Anope::string &ukey)
 	{
+		Anope::string key;
+		for (size_t i = 0, j = ukey.length(); i < j; ++i)
+			key.push_back(char_traits::chartolower(ukey[i]));
+
 		size_t keylen = key.length();
 		patricia_elem<Data> *prev = NULL, *cur = this->root;
 		bool bitval;
@@ -66,16 +70,17 @@ class patricia_tree
 			cur = bitval ? cur->one : cur->zero;
 		}
 
-		if (cur && comp(cur->key, key))
+		if (cur && String(cur->key.c_str()).compare(key.c_str()) == 0)
 			return cur->data;
 
 		return NULL;
 	}
 
-	void insert(const Anope::string &key, Data data)
+	void insert(const Anope::string &ukey, Data data)
 	{
-		if (key.empty() || data == NULL)
-			throw CoreExport;
+		Anope::string key;
+		for (size_t i = 0, j = ukey.length(); i < j; ++i)
+			key.push_back(char_traits::chartolower(ukey[i]));
 
 		size_t keylen = key.length();
 		patricia_elem<Data> *prev = NULL, *cur = this->root;
@@ -92,7 +97,7 @@ class patricia_tree
 			cur = bitval ? cur->one : cur->zero;
 		}
 
-		if (cur && comp(cur->key, key))
+		if (cur && String(cur->key.c_str()).compare(key.c_str()) == 0)
 			return;
 
 		patricia_elem<Data> *newelem = new patricia_elem<Data>();
@@ -144,8 +149,12 @@ class patricia_tree
 		newelem->node = this->list.begin();
 	}
 
-	Data erase(const Anope::string &key)
+	Data erase(const Anope::string &ukey)
 	{
+		Anope::string key;
+		for (size_t i = 0, j = ukey.length(); i < j; ++i)
+			key.push_back(char_traits::chartolower(ukey[i]));
+
 		size_t keylen = key.length();
 		patricia_elem<Data> *prev = NULL, *cur = this->root;
 		bool bitval;
@@ -161,7 +170,7 @@ class patricia_tree
 			cur = bitval ? cur->one : cur->zero;
 		}
 
-		if (!cur || comp(cur->key, key) == false)
+		if (!cur || String(cur->key.c_str()).compare(key.c_str()))
 			return NULL;
 
 		patricia_elem<Data> *other = (bitval ? prev->zero : prev->one);

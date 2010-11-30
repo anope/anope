@@ -12,7 +12,7 @@
 
 class BotInfo;
 
-extern CoreExport patricia_tree<BotInfo *, std::equal_to<ci::string> > BotListByNick;
+extern CoreExport patricia_tree<BotInfo *, ci::ci_char_traits> BotListByNick;
 extern CoreExport patricia_tree<BotInfo *> BotListByUID;
 
 /** Flags settable on a bot

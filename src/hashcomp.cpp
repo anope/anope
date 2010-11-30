@@ -87,6 +87,11 @@ const char *irc::irc_char_traits::find(const char *s1, int n, char c)
 	return n >= 0 ? s1 : NULL;
 }
 
+const char irc::irc_char_traits::chartolower(char c1)
+{
+	return rfc_case_insensitive_map[static_cast<unsigned char>(c1)];
+}
+
 /* VS 2008 specific function */
 bool irc::hash::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
@@ -153,6 +158,11 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
 	return n >= 0 ? s1 : NULL;
 }
 
+const char ci::ci_char_traits::chartolower(char c1)
+{
+	return ascii_case_insensitive_map[static_cast<unsigned char>(c1)];
+}
+
 /* VS 2008 specific function */
 bool ci::hash::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
@@ -176,6 +186,11 @@ size_t ci::hash::operator()(const ci::string &s) const
 size_t ci::hash::operator()(const Anope::string &s) const
 {
 	return operator()(s.ci_str());
+}
+
+const char std::std_char_traits::chartolower(char c1)
+{
+	return c1;
 }
 
 /** Compare two Anope::strings as ci::strings

@@ -154,6 +154,11 @@ namespace Anope
 		inline size_type length() const { return this->_string.length(); }
 
 		/**
+		 * Add a char to the end of the string.
+		 */
+		inline void push_back(char c) { return this->_string.push_back(c); }
+
+		/**
 		 * Resizes the string content to n characters.
 		 */
 		inline void resize(size_type n) { return this->_string.resize(n); }

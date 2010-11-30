@@ -12,7 +12,7 @@
 #include "services.h"
 #include "modules.h"
 
-patricia_tree<User *, std::equal_to<ci::string> > UserListByNick;
+patricia_tree<User *, ci::ci_char_traits> UserListByNick;
 patricia_tree<User *> UserListByUID;
 
 int32 opcnt = 0;

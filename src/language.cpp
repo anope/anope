@@ -1330,7 +1330,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_PROTECT_SYNTAX */
 	_("PROTECT #channel [nick]"),
 	/* CHAN_OWNER_SYNTAX */
-	_("OWNER #channel"),
+	_("OWNER #channel [\037nick\037]"),
 	/* CHAN_DEOP_SYNTAX */
 	_("DEOP #channel [nick]"),
 	/* CHAN_DEHALFOP_SYNTAX */
@@ -1340,7 +1340,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_DEPROTECT_SYNTAX */
 	_("DEROTECT #channel [nick]"),
 	/* CHAN_DEOWNER_SYNTAX */
-	_("DEOWNER #channel"),
+	_("DEOWNER #channel [\037nick\037]"),
 	/* CHAN_KICK_SYNTAX */
 	_("KICK #channel nick [reason]"),
 	/* CHAN_BAN_SYNTAX */
@@ -4020,15 +4020,17 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"By default, limited to the founder, or to SOPs or those with \n"
 	"level 10 and above on the channel for self deprotecting."),
 	/* CHAN_HELP_OWNER */
-	_("Syntax: OWNER #channel\n"
+	_("Syntax: OWNER #channel [\037nick\037]\n"
 	" \n"
-	"Gives you owner status on channel.\n"
+	"Gives the selected nick owner status on channel. If nick is not\n"
+	"given, it will give you owner.\n"
 	" \n"
 	"Limited to those with founder access on the channel."),
 	/* CHAN_HELP_DEOWNER */
-	_("Syntax: DEOWNER #channel\n"
+	_("Syntax: DEOWNER #channel [\037nick\037]\n"
 	" \n"
-	"Removes your owner status on channel.\n"
+	"Removes owner status from the selected nick on channel. If nick\n"
+	"is not given, it will deowner you.\n"
 	" \n"
 	"Limited to those with founder access on the channel."),
 	/* CHAN_HELP_INVITE */

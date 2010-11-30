@@ -132,14 +132,15 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 
 	/** Add an entry to the channel access list
 	 *
-	 * @param nc The NickCore of the user that the access entry should be tied to
+	 * @param mask The mask of the access entry
 	 * @param level The channel access level the user has on the channel
 	 * @param creator The user who added the access
 	 * @param last_seen When the user was last seen within the channel
+	 * @return The new access class
 	 *
 	 * Creates a new access list entry and inserts it into the access list.
 	 */
-	void AddAccess(NickCore *nc, int16 level, const Anope::string &creator, int32 last_seen = 0);
+	ChanAccess *AddAccess(const Anope::string &mask, int16 level, const Anope::string &creator, int32 last_seen = 0);
 
 	/** Get an entry from the channel access list by index
 	 *
@@ -150,15 +151,35 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	ChanAccess *GetAccess(unsigned index);
 
+	/** Get an entry from the channel access list by User
+	 *
+	 * @param u The User to find within the access list vector
+	 * @param level Optional channel access level to compare the access entries to
+	 * @return A ChanAccess struct corresponding to the User, or NULL if not found
+	 *
+	 * Retrieves an entry from the access list that matches the given User, optionally also matching a certain level.
+	 */
+	ChanAccess *GetAccess(User *u, int16 level = 0);
+
 	/** Get an entry from the channel access list by NickCore
 	 *
-	 * @param nc The NickCore to find within the access list vector
+	 * @param u The NickCore to find within the access list vector
 	 * @param level Optional channel access level to compare the access entries to
 	 * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
 	 *
 	 * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
 	 */
-	ChanAccess *GetAccess(const NickCore *nc, int16 level = 0);
+	ChanAccess *GetAccess(NickCore *nc, int16 level = 0);
+	
+	/** Get an entry from the channel access list by mask
+	 *
+	 * @param u The mask to find within the access list vector
+	 * @param level Optional channel access level to compare the access entries to
+	 * @return A ChanAccess struct corresponding to the mask, or NULL if not found
+	 *
+	 * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
+	 */
+	ChanAccess *GetAccess(const Anope::string &mask, int16 level = 0);
 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size
@@ -172,6 +193,14 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * Clears the memory used by the given access entry and removes it from the vector.
 	 */
 	void EraseAccess(unsigned index);
+
+	/** Erase an entry from the channel access list
+	 *
+	 * @param access The access to remove
+	 *
+	 * Clears the memory used by the given access entry and removes it from the vector.
+	 */
+	void EraseAccess(ChanAccess *access);
 
 	/** Clear the entire channel access list
 	 *

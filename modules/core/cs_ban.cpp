@@ -29,17 +29,19 @@ class CommandCSBan : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		Channel *c = ci->c;
-		User *u2;
-
 		bool is_same = target.equals_ci(u->nick);
+		User *u2 = is_same ? u : finduser(target);
+
+		ChanAccess *u_access = ci->GetAccess(u), *u2_access = ci->GetAccess(u2);
+		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (is_same ? !(u2 = u) : !(u2 = finduser(target)))
+		else if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
 			source.Reply(ACCESS_DENIED);
-		else if (!is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
+		else if (!is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
 			source.Reply(ACCESS_DENIED);
 		/*
 		 * Dont ban/kick the user on channels where he is excepted

@@ -723,25 +723,23 @@ class CoreExport Module : public Extensible
 	/** Called when access is deleted from a channel
 	 * @param ci The channel
 	 * @param u The user who removed the access
-	 * @param nc The user who was deleted
+	 * @param access The access entry being removed
 	 */
-	virtual void OnAccessDel(ChannelInfo *ci, User *u, NickCore *nc) { }
+	virtual void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access) { }
 
 	/** Called when access is changed
 	 * @param ci The channel
 	 * @param u The user who changed the access
-	 * @param nc The nick whos access was changed
-	 * @param level The level of the new access
+	 * @param u access The access changed
 	 */
-	virtual void OnAccessChange(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
+	virtual void OnAccessChange(ChannelInfo *ci, User *u, ChanAccess *access) { }
 
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param u The user who added the access
-	 * @para nc The nick who was added to access
-	 * @param level The level they were added at
+	 * @param access The access changed
 	 */
-	virtual void OnAccessAdd(ChannelInfo *ci, User *u, NickCore *nc, int level) { }
+	virtual void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access) { }
 
 	/** Called when the access list is cleared
 	 * @param ci The channel

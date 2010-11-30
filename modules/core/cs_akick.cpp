@@ -202,7 +202,9 @@ class CommandCSAKick : public Command
 		* or whether the mask matches a user with higher/equal access - Viper */
 		if (ci->HasFlag(CI_PEACE) && nc)
 		{
-			if (nc == ci->founder || get_access_level(ci, nc) >= get_access(u, ci))
+			ChanAccess *nc_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
+			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
+			if (nc == ci->founder || nc_level >= u_level)
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -216,7 +218,9 @@ class CommandCSAKick : public Command
 			{
 				User *u2 = *it;
 
-				if ((check_access(u2, ci, CA_FOUNDER) || get_access(u2, ci) >= get_access(u, ci)) && match_usermask(mask, u2))
+				ChanAccess *u2_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
+				int16 u2_level = u2_access ? u2_access->level : 0, u_level = u_access ? u_access->level : 0;
+				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && match_usermask(mask, u2))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -232,7 +236,9 @@ class CommandCSAKick : public Command
 				if (na2->HasFlag(NS_FORBIDDEN))
 					continue;
 
-				if (na2->nc && (na2->nc == ci->founder || get_access_level(ci, na2->nc) >= get_access(u, ci)))
+				ChanAccess *na2_access = ci->GetAccess(na2->nc), *u_access = ci->GetAccess(u);
+				int16 na2_level = na2_access ? na2_access->level : 0, u_level = u_access ? u_access->level : 0;
+				if (na2->nc && (na2->nc == ci->founder || na2_level >= u_level))
 				{
 					Anope::string buf = na2->nick + "!" + na2->last_usermask;
 					if (Anope::Match(buf, mask))

@@ -30,18 +30,20 @@ static CommandReturn do_util(CommandSource &source, Command *com, ChannelMode *c
 	User *u = source.u;
 	Channel *c = findchan(chan);
 	ChannelInfo *ci = c ? c->ci : NULL;
-	User *u2;
-
 	Anope::string realnick = (!nick.empty() ? nick : u->nick);
 	bool is_same = u->nick.equals_ci(realnick);
+	User *u2 = is_same ? u : finduser(realnick);
+
+	ChanAccess *u_access = ci->GetAccess(u), *u2_access = ci->GetAccess(u2);
+	uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 	if (!c)
 		source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-	else if (is_same ? !(u2 = u) : !(u2 = finduser(realnick)))
+	else if (!u2)
 		source.Reply(NICK_X_NOT_IN_USE, realnick.c_str());
 	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
 		source.Reply(ACCESS_DENIED);
-	else if (!set && !is_same && (ci->HasFlag(CI_PEACE)) && (get_access(u2, ci) >= get_access(u, ci)))
+	else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
 		source.Reply(ACCESS_DENIED);
 	else if (!set && u2->IsProtected() && !is_same)
 		source.Reply(ACCESS_DENIED);

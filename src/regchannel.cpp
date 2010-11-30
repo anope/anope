@@ -12,6 +12,9 @@
 #include "services.h"
 #include "modules.h"
 
+// Awesome channel access hack for superadmin and founder
+static ChanAccess dummy_access;
+
 /** Default constructor
  * @param chname The channel name
  */
@@ -87,7 +90,7 @@ ChannelInfo::ChannelInfo(ChannelInfo *ci)
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 	{
 		ChanAccess *access = ci->GetAccess(i);
-		this->AddAccess(access->nc, access->level, access->creator, access->last_seen);
+		this->AddAccess(access->mask, access->level, access->creator, access->last_seen);
 	}
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
@@ -145,18 +148,20 @@ ChannelInfo::~ChannelInfo()
 
 /** Add an entry to the channel access list
  *
- * @param nc The NickCore of the user that the access entry should be tied to
+ * @param mask The mask of the access entry
  * @param level The channel access level the user has on the channel
  * @param creator The user who added the access
  * @param last_seen When the user was last seen within the channel
+ * @return The new access class
  *
  * Creates a new access list entry and inserts it into the access list.
  */
 
-void ChannelInfo::AddAccess(NickCore *nc, int16 level, const Anope::string &creator, int32 last_seen)
+ChanAccess *ChannelInfo::AddAccess(const Anope::string &mask, int16 level, const Anope::string &creator, int32 last_seen)
 {
 	ChanAccess *new_access = new ChanAccess();
-	new_access->nc = nc;
+	new_access->mask = mask;
+	new_access->nc = findcore(mask);
 	new_access->level = level;
 	new_access->last_seen = last_seen;
 	if (!creator.empty())
@@ -165,6 +170,8 @@ void ChannelInfo::AddAccess(NickCore *nc, int16 level, const Anope::string &crea
 		new_access->creator = "Unknown";
 
 	this->access.push_back(new_access);
+
+	return new_access;
 }
 
 /** Get an entry from the channel access list by index
@@ -184,22 +191,102 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
 
 /** Get an entry from the channel access list by NickCore
  *
- * @param nc The NickCore to find within the access list vector
+ * @param u The User to find within the access list vector
  * @param level Optional channel access level to compare the access entries to
  * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
  *
  * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
  */
 
-ChanAccess *ChannelInfo::GetAccess(const NickCore *nc, int16 level)
+ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 {
-	if (this->access.empty())
+	if (!u)
 		return NULL;
 
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i]->nc == nc && (level ? this->access[i]->level == level : true))
-			return this->access[i];
+	if (u->isSuperAdmin || IsFounder(u, this))
+	{
+		dummy_access.level = u->isSuperAdmin ? ACCESS_SUPERADMIN : ACCESS_FOUNDER;
+		dummy_access.mask = u->nick + "!*@*";
+		dummy_access.nc = NULL;
+		dummy_access.last_seen = Anope::CurTime;
+		return &dummy_access;
+	}
+	
+	if (this->access.empty())
+		return NULL;
+	
+	NickAlias *na = NULL;
+	if (!u->IsIdentified())
+		na = findnick(u->nick);
 
+	ChanAccess *highest = NULL;
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+	{
+		ChanAccess *access = this->access[i];
+
+		if (level && level != access->level)
+			continue;
+		/* Access entry is a mask and we match it */
+		if (!access->nc && (Anope::Match(u->nick, access->mask) || Anope::Match(u->GetDisplayedMask(), access->mask)))
+			;
+		/* Access entry is a nick core and we are identified for that account */
+		else if (access->nc && u->IsIdentified() && u->Account() == access->nc) 
+			;
+		/* User is not identified but on a registered nick, and is recognized, and is on an insecure channel */
+		else if (na && u->IsRecognized() && !this->HasFlag(CI_SECURE))
+			;
+		else
+			continue;
+
+		/* Use the highest level access available */
+		if (!highest || access->level > highest->level)
+			highest = access;
+	}
+
+	return highest;
+}
+
+/** Get an entry from the channel access list by NickCore
+ *
+ * @param u The NickCore to find within the access list vector
+ * @param level Optional channel access level to compare the access entries to
+ * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
+ *
+ * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
+ */
+ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
+{
+	if (nc == this->founder)
+	{
+		dummy_access.level = ACCESS_FOUNDER;
+		dummy_access.mask = nc->display;
+		dummy_access.nc = nc;
+		dummy_access.last_seen = Anope::CurTime;
+		return &dummy_access;
+	}
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+	{
+		if (level && this->access[i]->level != level)
+			continue;
+		if (this->access[i]->nc && this->access[i]->nc == nc)
+			return this->access[i];
+	}
+	return NULL;
+}
+
+/** Get an entry from the channel access list by mask
+ *
+ * @param u The mask to find within the access list vector
+ * @param level Optional channel access level to compare the access entries to
+ * @return A ChanAccess struct corresponding to the mask, or NULL if not found
+ *
+ * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
+ */
+ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level)
+{
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (Anope::Match(this->access[i]->mask, mask))
+			return this->access[i];
 	return NULL;
 }
 
@@ -226,14 +313,33 @@ void ChannelInfo::EraseAccess(unsigned index)
 	this->access.erase(this->access.begin() + index);
 }
 
+/** Erase an entry from the channel access list
+ *
+ * @param access The access to remove
+ *
+ * Clears the memory used by the given access entry and removes it from the vector.
+ */
+void ChannelInfo::EraseAccess(ChanAccess *access)
+{
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+	{
+		if (this->access[i] == access)
+		{
+			this->access.erase(this->access.begin() + i);
+			break;
+		}
+	}
+}
+
 /** Clear the entire channel access list
  *
  * Clears the entire access list by deleting every item and then clearing the vector.
  */
 void ChannelInfo::ClearAccess()
 {
-	while (!this->access.empty())
-		EraseAccess(0);
+	for (unsigned i = this->access.size(); i > 0; --i)
+		delete this->access[i - 1];
+	this->access.clear();
 }
 
 /** Add an akick entry to the channel by NickCore

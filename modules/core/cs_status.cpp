@@ -26,8 +26,9 @@ class CommandCSStatus : public Command
 		const Anope::string &nick = params[1];
 
 		User *u2 = finduser(nick);
+		ChanAccess *u2_access = ci->GetAccess(u2);
 		if (u2)
-			source.Reply(CHAN_STATUS_INFO, ci->name.c_str(), u2->nick.c_str(), get_access(u2, ci));
+			source.Reply(CHAN_STATUS_INFO, ci->name.c_str(), u2->nick.c_str(), u2_access ? u2_access->level : 0);
 		else /* !u2 */
 			source.Reply(CHAN_STATUS_NOTONLINE, nick.c_str());
 		return MOD_CONT;

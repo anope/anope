@@ -47,7 +47,6 @@ class CommandNSAccess : public Command
 
 	CommandReturn DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
-		User *u = source.u;
 
 		if (mask.empty())
 		{
@@ -75,8 +74,6 @@ class CommandNSAccess : public Command
 
 	CommandReturn DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
-		User *u = source.u;
-
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");

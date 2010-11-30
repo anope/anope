@@ -26,7 +26,6 @@ enum
 enum
 {
 	XOP_DISABLED,
-	XOP_NICKS_ONLY,
 	XOP_ADDED,
 	XOP_MOVED,
 	XOP_NO_SUCH_ENTRY,
@@ -43,7 +42,6 @@ enum
 
 LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	{CHAN_AOP_DISABLED,
-	 CHAN_AOP_NICKS_ONLY,
 	 CHAN_AOP_ADDED,
 	 CHAN_AOP_MOVED,
 	 CHAN_AOP_NO_SUCH_ENTRY,
@@ -56,7 +54,6 @@ LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_AOP_LIST_HEADER,
 	 CHAN_AOP_CLEAR},
 	{CHAN_SOP_DISABLED,
-	 CHAN_SOP_NICKS_ONLY,
 	 CHAN_SOP_ADDED,
 	 CHAN_SOP_MOVED,
 	 CHAN_SOP_NO_SUCH_ENTRY,
@@ -69,7 +66,6 @@ LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_SOP_LIST_HEADER,
 	 CHAN_SOP_CLEAR},
 	{CHAN_VOP_DISABLED,
-	 CHAN_VOP_NICKS_ONLY,
 	 CHAN_VOP_ADDED,
 	 CHAN_VOP_MOVED,
 	 CHAN_VOP_NO_SUCH_ENTRY,
@@ -82,7 +78,6 @@ LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_VOP_LIST_HEADER,
 	 CHAN_VOP_CLEAR},
 	{CHAN_HOP_DISABLED,
-	 CHAN_HOP_NICKS_ONLY,
 	 CHAN_HOP_ADDED,
 	 CHAN_HOP_MOVED,
 	 CHAN_HOP_NO_SUCH_ENTRY,
@@ -95,7 +90,6 @@ LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
 	 CHAN_HOP_LIST_HEADER,
 	 CHAN_HOP_CLEAR},
 	 {CHAN_QOP_DISABLED,
-	 CHAN_QOP_NICKS_ONLY,
 	 CHAN_QOP_ADDED,
 	 CHAN_QOP_MOVED,
 	 CHAN_QOP_NO_SUCH_ENTRY,
@@ -141,7 +135,7 @@ class XOPListCallback : public NumberList
 
 	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level, LanguageString *messages)
 	{
-		source.Reply(CHAN_XOP_LIST_FORMAT, index, access->nc->display.c_str());
+		source.Reply(CHAN_XOP_LIST_FORMAT, index, access->mask.c_str());
 	}
 };
 
@@ -182,11 +176,11 @@ class XOPDelCallback : public NumberList
 
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + access->nc->display;
+			Nicks += ", " + access->mask;
 		else
-			Nicks = access->nc->display;
+			Nicks = access->mask;
 
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(source.ci, source.u, access->nc));
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(source.ci, source.u, access));
 
 		source.ci->EraseAccess(Number - 1);
 	}
@@ -200,11 +194,10 @@ class XOPBase : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		const Anope::string &nick = params.size() > 2 ? params[2] : "";
-		ChanAccess *access;
+		Anope::string mask = params.size() > 2 ? params[2] : "";
 		int change = 0;
 
-		if (nick.empty())
+		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
 			return MOD_CONT;
@@ -216,7 +209,8 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		short ulev = get_access(u, ci);
+		ChanAccess *access = ci->GetAccess(u);
+		uint16 ulev = access ? access->level : 0;
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
@@ -224,20 +218,16 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		NickAlias *na = findnick(nick);
-		if (!na)
-		{
-			source.Reply(messages[XOP_NICKS_ONLY]);
-			return MOD_CONT;
-		}
-		else if (na->HasFlag(NS_FORBIDDEN))
+		NickAlias *na = findnick(mask);
+		if (!na && mask.find_first_of("!@*") == Anope::string::npos)
+			mask += "!*@*";
+		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
 			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
-		NickCore *nc = na->nc;
-		access = ci->GetAccess(nc);
+		access = ci->GetAccess(mask);
 		if (access)
 		{
 			/**
@@ -258,7 +248,7 @@ class XOPBase : public Command
 		}
 
 		if (!change)
-			ci->AddAccess(nc, level, u->nick);
+			access = ci->AddAccess(mask, level, u->nick);
 		else
 		{
 			access->level = level;
@@ -267,17 +257,17 @@ class XOPBase : public Command
 		}
 
 		bool override = (level >= ulev || ulev < ACCESS_AOP || (access && access->level > ulev));
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") as level " << level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " as level " << level;
 
 		if (!change)
 		{
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
-			source.Reply(messages[XOP_ADDED], nc->display.c_str(), ci->name.c_str());
+			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
+			source.Reply(messages[XOP_ADDED], access->mask.c_str(), ci->name.c_str());
 		}
 		else
 		{
-			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
-			source.Reply(messages[XOP_MOVED], nc->display.c_str(), ci->name.c_str());
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
+			source.Reply(messages[XOP_MOVED], access->mask.c_str(), ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -288,10 +278,9 @@ class XOPBase : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		const Anope::string &nick = params.size() > 2 ? params[2] : "";
-		ChanAccess *access;
+		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
-		if (nick.empty())
+		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
 			return MOD_CONT;
@@ -309,62 +298,43 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		NickAlias *na = NULL;
-		if (!isdigit(nick[0]))
-		{
-			na = findnick(nick);
-			if (!na)
-			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-				return MOD_CONT;
-			}
-		}
+		ChanAccess *access = ci->GetAccess(u);
+		uint16 ulev = access ? access->level : 0;
 
-		short ulev = get_access(u, ci);
-
-		if ((!na || na->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
+		access = ci->GetAccess(mask);
+
 		/* Special case: is it a number/list?  Only do search if it isn't. */
-		if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
+		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			bool override = level >= ulev || ulev < ACCESS_AOP;
-			XOPDelCallback list(source, this, messages, override, nick);
+			XOPDelCallback list(source, this, messages, override, mask);
 			list.Process();
+		}
+		else if (!access)
+		{
+			source.Reply(messages[XOP_NOT_FOUND], mask.c_str(), ci->name.c_str());
+			return MOD_CONT;
 		}
 		else
 		{
-			NickCore *nc = na->nc;
-			unsigned i, end;
-			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
-			{
-				access = ci->GetAccess(nc, level);
-
-				if (access->nc == nc)
-					break;
-			}
-
-			if (i == end)
-			{
-				source.Reply(messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
-				return MOD_CONT;
-			}
-
-			if (nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (access->nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				source.Reply(ACCESS_DENIED);
 			else
 			{
 				bool override = ulev <= access->level;
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->nc->display;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
 
-				source.Reply(messages[XOP_DELETED], access->nc->display.c_str(), ci->name.c_str());
+				source.Reply(messages[XOP_DELETED], access->mask.c_str(), ci->name.c_str());
 
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
-				ci->EraseAccess(i);
+				ci->EraseAccess(access);
 			}
 		}
 
@@ -378,13 +348,16 @@ class XOPBase : public Command
 
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
-		if (!get_access(u, ci) && !u->Account()->HasCommand("chanserv/access/list"))
+		ChanAccess *access = ci->GetAccess(u);
+		uint16 ulev = access ? access->level : 0;
+
+		if (!ulev && !u->Account()->HasCommand("chanserv/access/list"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
-		bool override = !get_access(u, ci);
+		bool override = !ulev;
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		if (!ci->GetAccessCount())
@@ -404,11 +377,11 @@ class XOPBase : public Command
 
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				ChanAccess *access = ci->GetAccess(i);
+				access = ci->GetAccess(i);
 
 				if (access->level != level)
 					continue;
-				else if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+				else if (!nick.empty() && !Anope::Match(access->mask, nick))
 					continue;
 
 				if (!SentHeader)
@@ -489,7 +462,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
  public:
-	XOPBase(const Anope::string &command) : Command(command, 2, 3)
+	XOPBase(const Anope::string &command) : Command(command, 2, 4)
 	{
 	}
 

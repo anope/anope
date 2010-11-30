@@ -84,7 +84,6 @@ class CommandNSAList : public Command
 			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
-			int level;
 			int chan_count = 0;
 			int match_count = 0;
 
@@ -94,23 +93,24 @@ class CommandNSAList : public Command
 			{
 				ChannelInfo *ci = it->second;
 
-				if ((level = get_access_level(ci, na)))
+				ChanAccess *access = ci->GetAccess(na->nc);
+				if (access)
 				{
 					++chan_count;
 
-					if (min_level > level)
+					if (min_level > access->level)
 						continue;
 
 					++match_count;
 
-					if (ci->HasFlag(CI_XOP) || level == ACCESS_FOUNDER)
+					if (ci->HasFlag(CI_XOP) || access->level == ACCESS_FOUNDER)
 					{
-						Anope::string xop = get_xop_level(level);
+						Anope::string xop = get_xop_level(access->level);
 
 						source.Reply(NICK_ALIST_XOP_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), xop.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 					}
 					else
-						source.Reply(NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), level, !ci->desc.empty() ? ci->desc.c_str() : "");
+						source.Reply(NICK_ALIST_ACCESS_FORMAT, match_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), access->level, !ci->desc.empty() ? ci->desc.c_str() : "");
 				}
 			}
 

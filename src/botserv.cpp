@@ -511,7 +511,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 	Anope::string mask;
 	User *u = finduser(nick);
 
-	if (!u)
+	if (!u || !ci)
 		return;
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
@@ -520,7 +520,9 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 		return;
 	}
 
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
+	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
+	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
 		return;
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u) == 1)
@@ -548,7 +550,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, c
 {
 	User *u = finduser(nick);
 
-	if (!u || !ci->c->FindUser(u))
+	if (!u || !ci || !ci->c || !ci->c->FindUser(u))
 		return;
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
@@ -557,7 +559,9 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, c
 		return;
 	}
 
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
+	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
+	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
 		return;
 
 	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
@@ -577,7 +581,7 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, c
 
 	u = finduser(nick);
 
-	if (!u || !ci->c->FindUser(u))
+	if (!u || !ci || !ci->c || !ci->c->FindUser(u))
 		return;
 
 	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(Anope::CurTime));
@@ -588,7 +592,9 @@ void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, c
 		return;
 	}
 
-	if (mode[0] == '-' && ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && get_access(u, ci) >= get_access(requester, ci))
+	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
+	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
+	if (mode[0] == '-' && ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
 		return;
 
 	ci->c->SetModes(NULL, "%s %s", mode.c_str(), nick.c_str());

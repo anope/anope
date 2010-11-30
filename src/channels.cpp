@@ -459,7 +459,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 
 		/* Enforce secureops, etc */
 		if (EnforceMLock)
-			chan_set_correct_modes(u, this, 1);
+			chan_set_correct_modes(u, this, 0);
 		return;
 	}
 
@@ -1207,9 +1207,9 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 		{
 			if ((ml.set && !c->HasUserStatus(user, ml.name)) || (!ml.set && c->HasUserStatus(user, ml.name)))
 			{
-				if (ml.set && give_modes)
+				if (ml.set)
 					c->SetMode(NULL, cm, user->nick, false);
-				else if (!ml.set && !give_modes)
+				else if (!ml.set)
 					c->RemoveMode(NULL, cm, user->nick, false);
 			}
 		}

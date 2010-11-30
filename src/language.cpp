@@ -958,8 +958,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("QOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"),
 	/* CHAN_QOP_DISABLED */
 	_("Sorry, channel QOP list modification is temporarily disabled."),
-	/* CHAN_QOP_NICKS_ONLY */
-	_("Channel QOP lists may only contain registered nicknames."),
 	/* CHAN_QOP_ADDED */
 	_("%s added to %s QOP list."),
 	/* CHAN_QOP_MOVED */
@@ -987,8 +985,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("AOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"),
 	/* CHAN_AOP_DISABLED */
 	_("Sorry, channel AOP list modification is temporarily disabled."),
-	/* CHAN_AOP_NICKS_ONLY */
-	_("Channel AOP lists may only contain registered nicknames."),
 	/* CHAN_AOP_ADDED */
 	_("%s added to %s AOP list."),
 	/* CHAN_AOP_MOVED */
@@ -1016,8 +1012,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("HOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"),
 	/* CHAN_HOP_DISABLED */
 	_("Sorry, channel HOP list modification is temporarily disabled."),
-	/* CHAN_HOP_NICKS_ONLY */
-	_("Channel HOP lists may only contain registered nicknames."),
 	/* CHAN_HOP_ADDED */
 	_("%s added to %s HOP list."),
 	/* CHAN_HOP_MOVED */
@@ -1045,8 +1039,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("SOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"),
 	/* CHAN_SOP_DISABLED */
 	_("Sorry, channel SOP list modification is temporarily disabled."),
-	/* CHAN_SOP_NICKS_ONLY */
-	_("Channel SOP lists may only contain registered nicknames."),
 	/* CHAN_SOP_ADDED */
 	_("%s added to %s SOP list."),
 	/* CHAN_SOP_MOVED */
@@ -1074,8 +1066,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("VOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"),
 	/* CHAN_VOP_DISABLED */
 	_("Sorry, channel VOP list modification is temporarily disabled."),
-	/* CHAN_VOP_NICKS_ONLY */
-	_("Channel VOP lists may only contain registered nicknames."),
 	/* CHAN_VOP_ADDED */
 	_("%s added to %s VOP list."),
 	/* CHAN_VOP_MOVED */
@@ -1100,7 +1090,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_VOP_CLEAR */
 	_("Channel %s VOP list has been cleared."),
 	/* CHAN_ACCESS_SYNTAX */
-	_("ACCESS channel {ADD|DEL|LIST|VIEW|CLEAR} [nick [level] | entry-list]"),
+	_("ACCESS channel {ADD|DEL|LIST|VIEW|CLEAR} [mask [level] | entry-list]"),
 	/* CHAN_ACCESS_XOP */
 	_("You can't use this command. \n"
 	"Use the AOP, SOP and VOP commands instead.\n"
@@ -1115,8 +1105,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Access level must be non-zero."),
 	/* CHAN_ACCESS_LEVEL_RANGE */
 	_("Access level must be between %d and %d inclusive."),
-	/* CHAN_ACCESS_NICKS_ONLY */
-	_("Channel access lists may only contain registered nicknames."),
 	/* CHAN_ACCESS_REACHED_LIMIT */
 	_("Sorry, you can only have %d access entries on a channel."),
 	/* CHAN_ACCESS_LEVEL_UNCHANGED */
@@ -1139,7 +1127,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("%s access list is empty."),
 	/* CHAN_ACCESS_LIST_HEADER */
 	_("Access list for %s:\n"
-	"  Num   Lev  Nick"),
+	"  Num   Lev  Mask"),
 	/* CHAN_ACCESS_LIST_FOOTER */
 	_("End of access list."),
 	/* CHAN_ACCESS_LIST_XOP_FORMAT */
@@ -3625,8 +3613,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"channel whenever the OP or DEOP commands are used for a user\n"
 	"in the channel."),
 	/* CHAN_HELP_QOP */
-	_("Syntax: QOP channel ADD nick\n"
-	"        QOP channel DEL {nick | entry-num | list}\n"
+	_("Syntax: QOP channel ADD mask\n"
+	"        QOP channel DEL {mask | entry-num | list}\n"
 	"        QOP channel LIST [mask | list]\n"
 	"        QOP channel CLEAR\n"
 	" \n"
@@ -3662,8 +3650,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"and %R%S HELP SET XOP to know how to toggle between \n"
 	"the access list and xOP list systems."),
 	/* CHAN_HELP_AOP */
-	_("Syntax: AOP channel ADD nick\n"
-	"        AOP channel DEL {nick | entry-num | list}\n"
+	_("Syntax: AOP channel ADD mask\n"
+	"        AOP channel DEL {mask | entry-num | list}\n"
 	"        AOP channel LIST [mask | list]\n"
 	"        AOP channel CLEAR\n"
 	" \n"
@@ -3701,8 +3689,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"and %R%S HELP SET XOP to know how to toggle between \n"
 	"the access list and xOP list systems."),
 	/* CHAN_HELP_HOP */
-	_("Syntax: HOP channel ADD nick\n"
-	"        HOP channel DEL {nick | entry-num | list}\n"
+	_("Syntax: HOP channel ADD mask\n"
+	"        HOP channel DEL {mask | entry-num | list}\n"
 	"        HOP channel LIST [mask | list]\n"
 	"        HOP channel CLEAR\n"
 	" \n"
@@ -3738,8 +3726,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"and %R%S HELP SET XOP to know how to toggle between \n"
 	"the access list and xOP list systems."),
 	/* CHAN_HELP_SOP */
-	_("Syntax: SOP channel ADD nick\n"
-	"        SOP channel DEL {nick | entry-num | list}\n"
+	_("Syntax: SOP channel ADD mask\n"
+	"        SOP channel DEL {mask | entry-num | list}\n"
 	"        SOP channel LIST [mask | list]\n"
 	"        SOP channel CLEAR\n"
 	" \n"
@@ -3776,8 +3764,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"and %R%S HELP SET XOP to know how to toggle between \n"
 	"the access list and xOP list systems."),
 	/* CHAN_HELP_VOP */
-	_("Syntax: VOP channel ADD nick\n"
-	"        VOP channel DEL {nick | entry-num | list}\n"
+	_("Syntax: VOP channel ADD mask\n"
+	"        VOP channel DEL {mask | entry-num | list}\n"
 	"        VOP channel LIST [mask | list]\n"
 	"        VOP channel CLEAR\n"
 	" \n"
@@ -3813,8 +3801,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"and %R%S HELP SET XOP to know how to toggle between \n"
 	"the access list and xOP list systems."),
 	/* CHAN_HELP_ACCESS */
-	_("Syntax: ACCESS channel ADD nick level\n"
-	"        ACCESS channel DEL {nick | entry-num | list}\n"
+	_("Syntax: ACCESS channel ADD mask level\n"
+	"        ACCESS channel DEL {mask | entry-num | list}\n"
 	"        ACCESS channel LIST [mask | list]\n"
 	"        ACCESS channel VIEW [mask | list]\n"
 	"        ACCESS channel CLEAR\n"
@@ -3827,14 +3815,16 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"specific information.  Any nick not on the access list has\n"
 	"a user level of 0.\n"
 	" \n"
-	"The ACCESS ADD command adds the given nickname to the\n"
-	"access list with the given user level; if the nick is\n"
+	"The ACCESS ADD command adds the given mask to the\n"
+	"access list with the given user level; if the mask is\n"
 	"already present on the list, its access level is changed to\n"
 	"the level specified in the command.  The level specified\n"
 	"must be less than that of the user giving the command, and\n"
-	"if the nick is already on the access list, the current\n"
+	"if the mask is already on the access list, the current\n"
 	"access level of that nick must be less than the access level\n"
-	"of the user giving the command.\n"
+	"of the user giving the command. When a user joins the channel\n"
+	"the access they receive is from the highest level entry in the\n"
+	"access list.\n"
 	" \n"
 	"The ACCESS DEL command removes the given nick from the\n"
 	"access list.  If a list of entry numbers is given, those\n"

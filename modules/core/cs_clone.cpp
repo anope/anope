@@ -108,7 +108,7 @@ public:
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
-				target_ci->AddAccess(access->nc, access->level, access->creator, access->last_seen);
+				target_ci->AddAccess(access->mask, access->level, access->creator, access->last_seen);
 			}
 
 			source.Reply(CHAN_CLONED_ACCESS, channel.c_str(), target.c_str());

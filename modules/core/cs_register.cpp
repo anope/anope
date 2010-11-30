@@ -28,7 +28,7 @@ class CommandCSRegister : public Command
 
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
+		Channel *c = findchan(chan);
 
 		if (readonly)
 		{
@@ -42,7 +42,7 @@ class CommandCSRegister : public Command
 			source.Reply(CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
 			source.Reply(CHAN_X_INVALID, chan.c_str());
-		else if ((ci = cs_findchan(chan)))
+		else if (ci)
 			source.Reply(CHAN_ALREADY_REGISTERED, chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			source.Reply(CHAN_MUST_BE_CHANOP);

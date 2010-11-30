@@ -401,19 +401,15 @@ void expire_chans()
 /*************************************************************************/
 
 // XXX this is slightly inefficient
-void cs_remove_nick(const NickCore *nc)
+void cs_remove_nick(NickCore *nc)
 {
 	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;
 
-		for (unsigned j = ci->GetAccessCount(); j > 0; --j)
-		{
-			ChanAccess *ca = ci->GetAccess(j - 1);
-
-			if (ca->nc == nc)
-				ci->EraseAccess(j - 1);
-		}
+		ChanAccess *access = ci->GetAccess(nc);
+		if (access)
+			ci->EraseAccess(access);
 
 		for (unsigned j = ci->GetAkickCount(); j > 0; --j)
 		{
@@ -497,7 +493,8 @@ int check_access(User *user, ChannelInfo *ci, int what)
 	if (!user || !ci)
 		return 0;
 
-	level = get_access(user, ci);
+	ChanAccess *u_access = ci->GetAccess(user);
+	level = u_access ? u_access->level : 0;
 	limit = ci->levels[what];
 
 	/* Resetting the last used time */
@@ -564,45 +561,6 @@ bool IsFounder(User *user, ChannelInfo *ci)
 	return false;
 }
 
-/** Return the access level for the user on the channel.
- * If the channel doesn't exist, the user isn't on the access list, or the
- * channel is CI_SECURE and the user isn't identified, return 0
- * @param user The user
- * @param ci The cahnnel
- * @return The level, or 0
- */
-int get_access(User *user, ChannelInfo *ci)
-{
-	ChanAccess *access = NULL;
-
-	if (!ci || !user)
-		return 0;
-
-	/* SuperAdmin always has highest level */
-	if (user->isSuperAdmin)
-		return ACCESS_SUPERADMIN;
-
-	if (IsFounder(user, ci))
-		return ACCESS_FOUNDER;
-
-	if (user->IsIdentified())
-	{
-		access = ci->GetAccess(user->Account());
-		if (access)
-			return access->level;
-	}
-	else
-	{
-		NickAlias *na = findnick(user->nick);
-		if (na)
-			access = ci->GetAccess(na->nc);
-		if (access && user->IsRecognized() && !ci->HasFlag(CI_SECURE))
-			return access->level;
-	}
-
-	return 0;
-}
-
 /*************************************************************************/
 
 void update_cs_lastseen(User *user, ChannelInfo *ci)
@@ -613,7 +571,7 @@ void update_cs_lastseen(User *user, ChannelInfo *ci)
 		return;
 
 	if (IsFounder(user, ci) || user->IsIdentified() || (user->IsRecognized() && !ci->HasFlag(CI_SECURE)))
-		if ((access = ci->GetAccess(user->Account())))
+		if ((access = ci->GetAccess(user)))
 			access->last_seen = Anope::CurTime;
 }
 
@@ -657,30 +615,6 @@ int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret)
 }
 
 /*************************************************************************/
-
-int get_access_level(ChannelInfo *ci, NickCore *nc)
-{
-	if (!ci || !nc)
-		return 0;
-
-	if (nc == ci->founder)
-		return ACCESS_FOUNDER;
-
-	ChanAccess *access = ci->GetAccess(nc);
-
-	if (!access)
-		return 0;
-	else
-		return access->level;
-}
-
-int get_access_level(ChannelInfo *ci, NickAlias *na)
-{
-	if (!na)
-		return 0;
-
-	return get_access_level(ci, na->nc);
-}
 
 Anope::string get_xop_level(int level)
 {

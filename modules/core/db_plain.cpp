@@ -697,17 +697,9 @@ class DBPlain : public Module
 		}
 		else if (key.equals_ci("ACCESS"))
 		{
-			NickCore *nc = findcore(params[0]);
-			if (!nc)
-			{
-				std::stringstream reason;
-				reason << "Access entry for nonexistant core " << params[0] << " on " << ci->name;
-				throw DatabaseException(reason.str());
-			}
-
 			int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
 			time_t last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
-			ci->AddAccess(nc, level, params[3], last_seen);
+			ci->AddAccess(params[0], level, params[3], last_seen);
 		}
 		else if (key.equals_ci("AKICK"))
 		{
@@ -972,7 +964,7 @@ class DBPlain : public Module
 					db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			}
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
-				db << "MD ACCESS " << ci->GetAccess(k)->nc->display << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+				db << "MD ACCESS " << ci->GetAccess(k)->mask << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
 				db << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<

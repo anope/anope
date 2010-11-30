@@ -22,7 +22,6 @@ class CommandMSStaff : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		const Anope::string &text = params[0];
 
 		if (readonly)

@@ -63,8 +63,6 @@ E Channel *findchan(const Anope::string &chan);
 
 E User *nc_on_chan(Channel *c, const NickCore *nc);
 
-E int get_access_level(ChannelInfo *ci, NickAlias *na);
-E int get_access_level(ChannelInfo *ci, NickCore *nc);
 E Anope::string get_xop_level(int level);
 
 E void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
@@ -91,7 +89,7 @@ E void get_chanserv_stats(long *nrec, long *memuse);
 E void reset_levels(ChannelInfo *ci);
 E void cs_init();
 E void expire_chans();
-E void cs_remove_nick(const NickCore *nc);
+E void cs_remove_nick(NickCore *nc);
 
 E void check_modes(Channel *c);
 E int check_valid_admin(User *user, Channel *chan, int servermode);
@@ -100,7 +98,6 @@ E int check_valid_op(User *user, Channel *chan, int servermode);
 E ChannelInfo *cs_findchan(const Anope::string &chan);
 E int check_access(User *user, ChannelInfo *ci, int what);
 E bool IsFounder(User *user, ChannelInfo *ci);
-E int get_access(User *user, ChannelInfo *ci);
 E void update_cs_lastseen(User *user, ChannelInfo *ci);
 E int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
 

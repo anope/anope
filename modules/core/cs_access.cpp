@@ -50,10 +50,10 @@ class AccessListCallback : public NumberList
 		if (source.ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str());
+			source.Reply(CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str());
 		}
 		else
-			source.Reply(CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str());
+			source.Reply(CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->mask.c_str());
 	}
 };
 
@@ -93,10 +93,10 @@ class AccessViewCallback : public AccessListCallback
 		if (ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 		}
 		else
-			source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->nc->display.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 	}
 };
 
@@ -142,7 +142,9 @@ class AccessDelCallback : public NumberList
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
 
-		if (get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+		ChanAccess *u_access = ci->GetAccess(u);
+		int16 u_level = u_access ? u_access->level : 0;
+		if (u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			Denied = true;
 			return;
@@ -150,11 +152,11 @@ class AccessDelCallback : public NumberList
 
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + access->nc->display;
+			Nicks += ", " + access->mask;
 		else
-			Nicks = access->nc->display;
+			Nicks = access->mask;
 
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access->nc));
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
 		ci->EraseAccess(Number - 1);
 	}
@@ -167,11 +169,12 @@ class CommandCSAccess : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		const Anope::string &nick = params[2];
+		Anope::string mask = params[2];
 		int level = params[3].is_number_only() ? convertTo<int>(params[3]) : ACCESS_INVALID;
-		int ulev = get_access(u, ci);
 
-		if (level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
+		ChanAccess *u_access = ci->GetAccess(u);
+		int16 u_level = u_access ? u_access->level : 0;
+		if (level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return MOD_CONT;
@@ -188,41 +191,37 @@ class CommandCSAccess : public Command
 			return MOD_CONT;
 		}
 
-		bool override = !check_access(u, ci, CA_ACCESS_CHANGE) || level >= ulev;
+		bool override = !check_access(u, ci, CA_ACCESS_CHANGE) || level >= u_level;
 
-		NickAlias *na = findnick(nick);
-		if (!na)
+		NickAlias *na = findnick(mask);
+		if (!na && mask.find_first_of("!@*") == Anope::string::npos)
+			mask += "!*@*";
+		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(CHAN_ACCESS_NICKS_ONLY);
-			return MOD_CONT;
-		}
-		else if (na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(NICK_X_FORBIDDEN, mask.c_str());
 			return MOD_CONT;
 		}
 
-		NickCore *nc = na->nc;
-		ChanAccess *access = ci->GetAccess(nc);
+		ChanAccess *access = ci->GetAccess(mask);
 		if (access)
 		{
-			/* Don't allow lowering from a level >= ulev */
-			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
+			/* Don't allow lowering from a level >= u_level */
+			if (access->level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			if (access->level == level)
 			{
-				source.Reply(CHAN_ACCESS_LEVEL_UNCHANGED, access->nc->display.c_str(), ci->name.c_str(), level);
+				source.Reply(CHAN_ACCESS_LEVEL_UNCHANGED, access->mask.c_str(), ci->name.c_str(), level);
 				return MOD_CONT;
 			}
 			access->level = level;
 
-			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, na->nc, level));
+			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
 
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
-			source.Reply(CHAN_ACCESS_LEVEL_CHANGED, nc->display.c_str(), ci->name.c_str(), level);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (level: " << level << ") as level " << u_level;
+			source.Reply(CHAN_ACCESS_LEVEL_CHANGED, access->mask.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
 
@@ -232,12 +231,12 @@ class CommandCSAccess : public Command
 			return MOD_CONT;
 		}
 
-		ci->AddAccess(nc, level, u->nick);
+		access = ci->AddAccess(mask, level, u->nick);
 
-		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, nc, level));
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << na->nick << " (group: " << nc->display << ") (level: " << level << ") as level " << ulev;
-		source.Reply(CHAN_ACCESS_ADDED, nc->display.c_str(), ci->name.c_str(), level);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
+		source.Reply(CHAN_ACCESS_ADDED, access->mask.c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
 	}
@@ -247,49 +246,33 @@ class CommandCSAccess : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		const Anope::string &nick = params[2];
+		const Anope::string &mask = params[2];
 
 		if (!ci->GetAccessCount())
 			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
-		else if (isdigit(nick[0]) && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
+		else if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessDelCallback list(source, this, nick);
+			AccessDelCallback list(source, this, mask);
 			list.Process();
 		}
 		else
 		{
-			NickAlias *na = findnick(nick);
-			if (!na)
-			{
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-				return MOD_CONT;
-			}
-
-			NickCore *nc = na->nc;
-
-			unsigned i, end;
-			ChanAccess *access = NULL;
-			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
-			{
-				access = ci->GetAccess(i);
-
-				if (access->nc == nc)
-					break;
-			}
-
-			if (i == end)
-				source.Reply(CHAN_ACCESS_NOT_FOUND, nick.c_str(), ci->name.c_str());
-			else if (nc != u->Account() && check_access(u, ci, CA_NOJOIN) && get_access(u, ci) <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			ChanAccess *access = ci->GetAccess(mask);
+			ChanAccess *u_access = ci->GetAccess(u);
+			int16 u_level = u_access ? u_access->level : 0;
+			if (!access)
+				source.Reply(CHAN_ACCESS_NOT_FOUND, mask.c_str(), ci->name.c_str());
+			else if (access->nc != u->Account() && check_access(u, ci, CA_NOJOIN) && u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
 				source.Reply(ACCESS_DENIED);
 			else
 			{
-				source.Reply(CHAN_ACCESS_DELETED, access->nc->display.c_str(), ci->name.c_str());
-				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && nc != u->Account();
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << na->nick << " (group: " << access->nc->display << ") from level " << access->level;
+				source.Reply(CHAN_ACCESS_DELETED, access->mask.c_str(), ci->name.c_str());
+				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && access->nc != u->Account();
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask << " from level " << access->level;
 
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, na->nc));
+				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
-				ci->EraseAccess(i);
+				ci->EraseAccess(access);
 			}
 		}
 
@@ -317,7 +300,7 @@ class CommandCSAccess : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+				if (!nick.empty() && !Anope::Match(access->mask, nick))
 					continue;
 
 				if (!SentHeader)
@@ -359,7 +342,7 @@ class CommandCSAccess : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && access->nc && !Anope::Match(access->nc->display, nick))
+				if (!nick.empty() && !Anope::Match(access->mask, nick))
 					continue;
 
 				if (!SentHeader)

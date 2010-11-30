@@ -571,7 +571,8 @@ enum AccessLevel
 struct ChanAccess
 {
 	int16 level;
-	NickCore *nc; /* Guaranteed to be non-NULL if in use, NULL if not */
+	Anope::string mask;	/* Mask of the access entry */
+	NickCore *nc;		/* NC of the entry, if the entry is a valid nickcore */
 	time_t last_seen;
 	Anope::string creator;
 };

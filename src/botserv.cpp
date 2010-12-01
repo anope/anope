@@ -387,8 +387,12 @@ static BanData *get_ban_data(Channel *c, User *u)
 		return NULL;
 
 	Anope::string mask = u->GetIdent() + "@" + u->GetDisplayedHost();
-	for (std::list<BanData *>::iterator it = c->bd.begin(), it_end = c->bd.end(); it != it_end; ++it)
+	/* XXX This should really be on some sort of timer/garbage collector, and use std::map */
+	for (std::list<BanData *>::iterator it = c->bd.begin(), it_end = c->bd.end(), it_next; it != it_end; it = it_next)
 	{
+		it_next = it;
+		++it_next;
+
 		if (Anope::CurTime - (*it)->last_use > Config->BSKeepData)
 		{
 			delete *it;

@@ -587,8 +587,8 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 			User *user = *it;
 			++it;
 
-			if (!is_oper(user) && Anope::Match(user->realname, x->Mask))
-				kill_user(Config->ServerName, user->nick, rreason);
+			if (!user->HasMode(UMODE_OPER) && Anope::Match(user->realname, x->Mask))
+				kill_user(Config->ServerName, user, rreason);
 		}
 	}
 
@@ -605,7 +605,7 @@ void SNLineManager::OnMatch(User *u, XLine *x)
 	ircdproto->SendSGLine(x);
 
 	Anope::string reason = "G-Lined: " + x->Reason;
-	kill_user(Config->s_OperServ, u->nick, reason);
+	kill_user(Config->s_OperServ, u, reason);
 }
 
 void SNLineManager::OnExpire(XLine *x)
@@ -675,7 +675,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 					UserContainer *uc = *it;
 					++it;
 
-					if (is_oper(uc->user))
+					if (uc->user->HasMode(UMODE_OPER))
 						continue;
 					c->Kick(NULL, uc->user, "%s", reason.c_str());
 				}
@@ -688,8 +688,8 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				User *user = *it;
 				++it;
 
-				if (!is_oper(user) && Anope::Match(user->nick, x->Mask))
-					kill_user(Config->ServerName, user->nick, rreason);
+				if (!user->HasMode(UMODE_OPER) && Anope::Match(user->nick, x->Mask))
+					kill_user(Config->ServerName, user, rreason);
 			}
 		}
 	}
@@ -709,7 +709,7 @@ void SQLineManager::OnMatch(User *u, XLine *x)
 	ircdproto->SendSQLine(x);
 
 	Anope::string reason = "Q-Lined: " + x->Reason;
-	kill_user(Config->s_OperServ, u->nick, reason);
+	kill_user(Config->s_OperServ, u, reason);
 }
 
 void SQLineManager::OnExpire(XLine *x)

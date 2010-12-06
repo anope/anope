@@ -46,7 +46,7 @@ class CommandCSInfo : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
-			if (is_oper(u) && !ci->forbidby.empty())
+			if (u->HasMode(UMODE_OPER) && !ci->forbidby.empty())
 				source.Reply(CHAN_X_FORBIDDEN_OPER, chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u, NO_REASON).c_str());
 			else
 				source.Reply(CHAN_X_FORBIDDEN, chan.c_str());

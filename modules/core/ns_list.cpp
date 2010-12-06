@@ -49,7 +49,7 @@ class CommandNSList : public Command
 
 		suspended = nsnoexpire = forbidden = unconfirmed = false;
 
-		if (Config->NSListOpersOnly && !is_oper(u)) /* reverse the help logic */
+		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
 			source.Reply(ACCESS_DENIED);
 			return MOD_STOP;

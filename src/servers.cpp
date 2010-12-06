@@ -349,67 +349,6 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 
 /*************************************************************************/
 
-/**
- * Handle removing the server from the Server struct
- * @param source Name of the server sending the squit
- * @param server Name of the server leaving
- * @return void
- */
-void do_squit(const Anope::string &source, const Anope::string &server)
-{
-	Server *s = Server::Find(server);
-
-	if (!s)
-	{
-		Log() << "SQUIT for nonexistent server " << server;
-		return;
-	}
-
-	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
-
-	Anope::string buf;
-	/* If this is a juped server, send a nice global to inform the online
-	 * opers that we received it.
-	 */
-	if (s->HasFlag(SERVER_JUPED))
-	{
-		buf = "Received SQUIT for juped server " + s->GetName();
-		ircdproto->SendGlobops(OperServ, "%s", buf.c_str());
-	}
-
-	buf = s->GetName() + " " + s->GetUplink()->GetName();
-
-	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
-	{
-		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
-		/* need to fix */
-		ircdproto->SendSquit(s->GetName(), buf);
-	}
-
-	s->Delete(buf);
-}
-
-/*************************************************************************/
-
-/** Handle parsing the CAPAB/PROTOCTL messages
- */
-void CapabParse(const std::vector<Anope::string> &params)
-{
-	for (unsigned i = 0; i < params.size(); ++i)
-	{
-		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-		{
-			if (Capab_Info[j].Token.equals_ci(params[i]))
-			{
-				Capab.SetFlag(Capab_Info[j].Flag);
-				break;
-			}
-		}
-	}
-}
-
-/*************************************************************************/
-
 /* TS6 UID generator common code.
  *
  * Derived from atheme-services, uid.c (hg 2954:116d46894b4c).

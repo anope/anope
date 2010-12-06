@@ -30,7 +30,7 @@ bool bad_password(User *u)
 	u->invalid_pw_time = Anope::CurTime;
 	if (u->invalid_pw_count >= Config->BadPassLimit)
 	{
-		kill_user("", u->nick, "Too many invalid passwords");
+		kill_user("", u, "Too many invalid passwords");
 		return true;
 	}
 
@@ -41,48 +41,41 @@ bool bad_password(User *u)
 
 /**
  * Remove a user from the IRC network.
- * @param source is the nick which should generate the kill, or NULL for a server-generated kill.
+ * @param source is the nick which should generate the kill, or empty for a server-generated kill.
  * @param user to remove
  * @param reason for the kill
  * @return void
  */
-void kill_user(const Anope::string &source, const Anope::string &user, const Anope::string &reason)
+void kill_user(const Anope::string &source, User *user, const Anope::string &reason)
 {
-	if (user.empty())
+	if (!user)
 		return;
 
 	Anope::string real_source = source.empty() ? Config->ServerName : source;
 
 	Anope::string buf = real_source + " (" + reason + ")";
 
-	ircdproto->SendSVSKill(findbot(source), finduser(user), "%s", buf.c_str());
+	ircdproto->SendSVSKill(findbot(source), user, "%s", buf.c_str());
 
-	if (!ircd->quitonkill && finduser(user))
+	if (!ircd->quitonkill)
 		do_kill(user, buf);
 }
 
 /*************************************************************************/
 
 /**
- * Unban the nick from a channel
+ * Unban the user from a channel
  * @param ci channel info for the channel
- * @param nick to remove the ban for
+ * @param u The user to unban
  * @return void
  */
-void common_unban(ChannelInfo *ci, const Anope::string &nick)
+void common_unban(ChannelInfo *ci, User *u)
 {
-	if (!ci || !ci->c || nick.empty())
-		return;
-
-	User *u = finduser(nick);
-	if (!u)
-		return;
-
-	if (!ci->c->HasMode(CMODE_BAN))
+	if (!u || !ci || !ci->c || !ci->c->HasMode(CMODE_BAN))
 		return;
 
 	if (ircd->svsmode_unban)
-		ircdproto->SendBanDel(ci->c, nick);
+		ircdproto->SendBanDel(ci->c, u->nick);
 	else
 	{
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = ci->c->GetModeList(CMODE_BAN);

@@ -66,7 +66,7 @@ class ModuleAlias : public Module
 
 			if (fantasy != alias.fantasy)
 				return EVENT_CONTINUE;
-			else if (!is_oper(u) && alias.operonly)
+			else if (!u->HasMode(UMODE_OPER) && alias.operonly)
 				return EVENT_CONTINUE;
 			else if (!fantasy && !bi->nick.equals_ci(alias.client))
 				return EVENT_CONTINUE;

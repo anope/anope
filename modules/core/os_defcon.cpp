@@ -164,7 +164,7 @@ class OSDefcon : public Module
 			}
 
 			if (CheckDefCon(DEFCON_NO_NEW_CLIENTS) || CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-				kill_user(Config->s_OperServ, u->nick, Config->DefConAkillReason);
+				kill_user(Config->s_OperServ, u, Config->DefConAkillReason);
 
 			return EVENT_STOP;
 		}
@@ -208,7 +208,7 @@ class OSDefcon : public Module
 
 	EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, ChannelInfo *ci)
 	{
-		if (!is_oper(u) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
+		if (!u->HasMode(UMODE_OPER) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
 				u->SendMessage(bi, OPER_DEFCON_DENIED);
@@ -281,7 +281,7 @@ class OSDefcon : public Module
 				if (!Config->SessionLimitDetailsLoc.empty())
 					ircdproto->SendMessage(OperServ, u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				kill_user(Config->s_OperServ, u->nick, "Session limit exceeded");
+				kill_user(Config->s_OperServ, u, "Session limit exceeded");
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{

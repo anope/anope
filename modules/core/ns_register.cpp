@@ -196,7 +196,7 @@ class CommandNSRegister : public CommandNSConfirm
 			return MOD_CONT;
 		}
 
-		if (!is_oper(u) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
+		if (!u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
 		{
 			source.Reply(NICK_REG_DELAY, Config->NickRegDelay);
 			return MOD_CONT;
@@ -230,7 +230,7 @@ class CommandNSRegister : public CommandNSConfirm
 			{
 				Anope::string nick = it->first;
 
-				if (u->nick.find_ci(nick) != Anope::string::npos && !is_oper(u))
+				if (u->nick.find_ci(nick) != Anope::string::npos && !u->HasMode(UMODE_OPER))
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;

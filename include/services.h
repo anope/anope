@@ -897,6 +897,7 @@ enum DefconLevel
  * Forward declaration reqired, because the base IRCDProto class uses some crap from in here.
  */
 class IRCDProto;
+class IRCdMessage;
 struct Uplink;
 class ServerConfig;
 
@@ -997,6 +998,30 @@ class CoreExport IRCDProto
 	 * @param u The user
 	 */
 	virtual void SetAutoIdentificationToken(User *u) { }
+};
+
+class CoreExport IRCdMessage
+{
+ public:
+	virtual bool On436(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnAway(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnJoin(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnKick(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnKill(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnMode(const Anope::string &, const std::vector<Anope::string> &) = 0;
+	virtual bool OnUID(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnNick(const Anope::string &, const std::vector<Anope::string> &) = 0;
+	virtual bool OnPart(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnPing(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnPrivmsg(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnQuit(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnServer(const Anope::string &, const std::vector<Anope::string> &) = 0;
+	virtual bool OnSQuit(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnTopic(const Anope::string &, const std::vector<Anope::string> &) = 0;
+	virtual bool OnWhois(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnCapab(const Anope::string &, const std::vector<Anope::string> &);
+	virtual bool OnSJoin(const Anope::string &, const std::vector<Anope::string> &) = 0;
+	virtual bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 };
 
 /*************************************************************************/

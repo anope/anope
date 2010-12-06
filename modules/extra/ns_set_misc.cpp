@@ -176,7 +176,7 @@ class NSSetMisc : public Module
 
 			Anope::string value;
 			if (na->nc->GetExtRegular("nickserv:" + it->first, value))
-				u->SendMessage(Config->s_NickServ, "      %s: %s", it->first.c_str(), value.c_str());
+				u->SendMessage(NickServ, "      %s: %s", it->first.c_str(), value.c_str());
 		}
 	}
 

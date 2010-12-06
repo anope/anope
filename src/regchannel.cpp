@@ -729,7 +729,7 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 
 	Anope::string mask, reason;
-	if (!is_oper(user) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
+	if (!user->HasMode(UMODE_OPER) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
 		get_idealban(this, user, mask);
 		reason = this->forbidreason.empty() ? GetString(user, CHAN_MAY_NOT_BE_USED) : this->forbidreason;

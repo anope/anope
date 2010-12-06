@@ -187,7 +187,7 @@ void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cm
 		u->SendMessage(bi, NO_HELP_AVAILABLE, cmd.c_str());
 	else
 	{
-		u->SendMessage(bi->nick, " ");
+		u->SendMessage(bi, " ");
 
 		/* Inform the user what permission is required to use the command */
 		if (!c->permission.empty())

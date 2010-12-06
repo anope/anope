@@ -271,136 +271,31 @@ class RatboxProto : public IRCDProto
 		u->Account()->Shrink("authenticationtoken");
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
 	}
-} ircd_proto;
+};
 
-bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &params)
+class RatboxIRCdMessage : public IRCdMessage
 {
-	Channel *c = findchan(params[1]);
-	time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-	bool keep_their_modes = true;
-
-	if (!c)
+ public:
+	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		c = new Channel(params[1], ts);
-		c->SetFlag(CH_SYNCING);
-	}
-	/* Our creation time is newer than what the server gave us */
-	else if (c->creation_time > ts)
-	{
-		c->creation_time = ts;
-		c->Reset();
+		if (params.size() < 2)
+			return true;
 
-		/* Reset mlock */
-		check_modes(c);
-	}
-	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-	else if (ts > c->creation_time)
-		keep_their_modes = false;
-
-	/* If we need to keep their modes, and this SJOIN string contains modes */
-	if (keep_their_modes && params.size() >= 3)
-	{
-		Anope::string modes;
-		for (unsigned i = 2; i < params.size() - 1; ++i)
-			modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
-		/* Set the modes internally */
-		c->SetModesInternal(NULL, modes);
-	}
-
-	spacesepstream sep(params[params.size() - 1]);
-	Anope::string buf;
-	while (sep.GetToken(buf))
-	{
-		std::list<ChannelMode *> Status;
-		char ch;
-
-		/* Get prefixes from the nick */
-		while ((ch = ModeManager::GetStatusChar(buf[0])))
+		if (params[0][0] == '#' || params[0][0] == '&')
+			do_cmode(source, params[0], params[2], params[1]);
+		else
 		{
-			buf.erase(buf.begin());
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-			if (!cm)
-			{
-				Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
-				continue;
-			}
-
-			if (keep_their_modes)
-				Status.push_back(cm);
+			User *u = finduser(source);
+			User *u2 = finduser(params[0]);
+			if (!u || !u2)
+				return true;
+			do_umode(u->nick, u2->nick, params[1]);
 		}
 
-		User *u = finduser(buf);
-		if (!u)
-		{
-			Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
-			continue;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-		/* Add the user to the channel */
-		c->JoinUser(u);
-
-		/* Update their status internally on the channel
-		 * This will enforce secureops etc on the user
-		 */
-		for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-			c->SetModeInternal(*it, buf);
-
-		/* Now set whatever modes this user is allowed to have on the channel */
-		chan_set_correct_modes(u, c, 1);
-
-		/* Check to see if modules want the user to join, if they do
-		 * check to see if they are allowed to join (CheckKick will kick/ban them)
-		 * Don't trigger OnJoinChannel event then as the user will be destroyed
-		 */
-		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-			continue;
-
-		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+		return true;
 	}
 
-	/* Channel is done syncing */
-	if (c->HasFlag(CH_SYNCING))
-	{
-		/* Unset the syncing flag */
-		c->UnsetFlag(CH_SYNCING);
-		c->Sync();
-	}
-
-	return true;
-}
-
-/*
-   Non TS6
-
-   params[0] = nick
-   params[1] = hop
-   params[2] = ts
-   params[3] = modes
-   params[4] = user
-   params[5] = host
-   params[6] = server
-   params[7] = info
-
-   TS6
-   params[0] = nick
-   params[1] = hop
-   params[2] = ts
-   params[3] = modes
-   params[4] = user
-   params[5] = host
-   params[6] = IP
-   params[7] = UID
-   params[8] = info
-
-*/
-bool event_nick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() == 9)
+	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
 		Server *s = Server::Find(source);
 		/* Source is always the server */
@@ -416,31 +311,158 @@ bool event_nick(const Anope::string &source, const std::vector<Anope::string> &p
 			else
 				validate_user(user);
 		}
-	}
-	else if (params.size() == 2)
-		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
-	return true;
-}
 
-bool event_topic(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	Channel *c = findchan(params[0]);
-	if (!c)
-	{
-		Log() << "TOPIC for nonexistant channel " << params[0];
 		return true;
 	}
 
-	if (params.size() == 4)
+	/*
+	  params[0] = nick
+	  params[1] = hop
+	  params[2] = ts
+	  params[3] = modes
+	  params[4] = user
+	  params[5] = host
+	  params[6] = IP
+	  params[7] = UID
+	  params[8] = info
+	*/
+	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
+
+		return true;
 	}
-	else
+
+	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		c->ChangeTopicInternal(source, (params.size() > 1 ? params[1] : ""));
+		if (params[1].equals_cs("1"))
+			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], TS6UPLINK);
+		else
+			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		return true;
 	}
-	return true;
-}
+
+	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[0]);
+		if (!c)
+		{
+			Log() << "TOPIC for nonexistant channel " << params[0];
+			return true;
+		}
+
+		if (params.size() == 4)
+		{
+			c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+		}
+		else
+		{
+			c->ChangeTopicInternal(source, (params.size() > 1 ? params[1] : ""));
+		}
+		return true;
+	}
+
+	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[1]);
+		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+		bool keep_their_modes = true;
+
+		if (!c)
+		{
+			c = new Channel(params[1], ts);
+			c->SetFlag(CH_SYNCING);
+		}
+		/* Our creation time is newer than what the server gave us */
+		else if (c->creation_time > ts)
+		{
+			c->creation_time = ts;
+			c->Reset();
+
+			/* Reset mlock */
+			check_modes(c);
+		}
+		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+		else if (ts > c->creation_time)
+			keep_their_modes = false;
+
+		/* If we need to keep their modes, and this SJOIN string contains modes */
+		if (keep_their_modes && params.size() >= 3)
+		{
+			Anope::string modes;
+			for (unsigned i = 2; i < params.size() - 1; ++i)
+				modes += " " + params[i];
+			if (!modes.empty())
+				modes.erase(modes.begin());
+			/* Set the modes internally */
+			c->SetModesInternal(NULL, modes);
+		}
+
+		spacesepstream sep(params[params.size() - 1]);
+		Anope::string buf;
+		while (sep.GetToken(buf))
+		{
+			std::list<ChannelMode *> Status;
+			char ch;
+
+			/* Get prefixes from the nick */
+			while ((ch = ModeManager::GetStatusChar(buf[0])))
+			{
+				buf.erase(buf.begin());
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+				if (!cm)
+				{
+					Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
+					continue;
+				}
+
+				if (keep_their_modes)
+					Status.push_back(cm);
+			}
+	
+			User *u = finduser(buf);
+			if (!u)
+			{
+				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
+				continue;
+			}
+
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+			/* Add the user to the channel */
+			c->JoinUser(u);
+
+			/* Update their status internally on the channel
+			 * This will enforce secureops etc on the user
+			 */
+			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
+				c->SetModeInternal(*it, buf);
+
+			/* Now set whatever modes this user is allowed to have on the channel */
+			chan_set_correct_modes(u, c, 1);
+
+			/* Check to see if modules want the user to join, if they do
+			 * check to see if they are allowed to join (CheckKick will kick/ban them)
+			 * Don't trigger OnJoinChannel event then as the user will be destroyed
+			 */
+			if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+				continue;
+
+			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+		}
+
+		/* Channel is done syncing */
+		if (c->HasFlag(CH_SYNCING))
+		{
+			/* Unset the syncing flag */
+			c->UnsetFlag(CH_SYNCING);
+			c->Sync();
+		}
+
+		return true;
+	}
+};
 
 bool event_tburst(const Anope::string &source, const std::vector<Anope::string> &params)
 {
@@ -462,94 +484,10 @@ bool event_tburst(const Anope::string &source, const std::vector<Anope::string> 
 	return true;
 }
 
-bool event_436(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 1)
-		return true;
-
-	m_nickcoll(params[0]);
-	return true;
-}
-
-bool event_ping(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 1)
-		return true;
-	ircdproto->SendPong(params.size() > 1 ? params[1] : Config->ServerName, params[0]);
-	return true;
-}
-
-bool event_away(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(source);
-	m_away(u ? u->nick : source, !params.empty() ? params[0] : "");
-	return true;
-}
-
-bool event_kill(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		m_kill(params[0], params[1]);
-	return true;
-}
-
 bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (params.size() > 2)
 		do_kick(source, params[0], params[1], params[2]);
-	return true;
-}
-
-bool event_join(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() != 1)
-		event_sjoin(source, params);
-	else
-		do_join(source, params[0], params[1]);
-	return true;
-}
-
-bool event_motd(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (source.empty())
-		return true;
-
-	m_motd(source);
-	return true;
-}
-
-bool event_privmsg(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	// XXX: this is really the same as charybdis
-	if (params.size() > 1)
-		m_privmsg(source, params[0], params[1]);
-	return true;
-}
-
-bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_part(source, params[0], params.size() > 1 ? params[1] : "");
-
-	return true;
-}
-
-bool event_whois(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!source.empty() && !params.empty())
-	{
-		m_whois(source, params[0]);
-	}
-	return true;
-}
-
-/* EVENT: SERVER */
-bool event_server(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params[1].equals_cs("1"))
-		do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], TS6UPLINK);
-	else
-		do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
 	return true;
 }
 
@@ -562,50 +500,10 @@ bool event_sid(const Anope::string &source, const std::vector<Anope::string> &pa
 	return true;
 }
 
-bool event_squit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_squit(source, params[0]);
-	return true;
-}
-
-bool event_quit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *u = finduser(source);
-
-	do_quit(u ? u->nick : source, !params.empty() ? params[0] : "");
-	return true;
-}
-
-bool event_mode(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 2)
-		return true;
-
-	if (params[0][0] == '#' || params[0][0] == '&')
-		do_cmode(source, params[0], params[2], params[1]);
-	else
-	{
-		User *u = finduser(source);
-		User *u2 = finduser(params[0]);
-		if (!u || !u2)
-			return true;
-		do_umode(u->nick, u2->nick, params[1]);
-	}
-	return true;
-}
-
 bool event_tmode(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (params[1][0] == '#' || params[1][0] == '&')
 		do_cmode(source, params[0], params[1], params[2]);
-	return true;
-}
-
-/* Event: PROTOCTL */
-bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	CapabParse(params);
 	return true;
 }
 
@@ -642,13 +540,6 @@ bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-bool event_error(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		Log(LOG_DEBUG) << params[0];
-	return true;
-}
-
 static void AddModes()
 {
 	/* Add user modes */
@@ -680,26 +571,18 @@ static void AddModes()
 
 class ProtoRatbox : public Module
 {
-	Message message_436, message_away, message_join, message_kick, message_kill, message_mode, message_tmode, message_motd,
-		message_nick, message_bmask, message_uid, message_part, message_pass, message_ping, message_privmsg, message_quit,
-		message_server, message_squit, message_topic, message_tb, message_whois, message_capab, message_sjoin, message_error,
-		message_sid;
+	Message message_kick, message_tmode, message_bmask, message_pass, message_tb, message_sid;
+	
+	RatboxProto ircd_proto;
+	RatboxIRCdMessage ircd_message;
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
-		message_436("436", event_436), message_away("AWAY", event_away), message_join("JOIN", event_join),
-		message_kick("KICK", event_kick), message_kill("KILL", event_kill), message_mode("MODE", event_mode),
-		message_tmode("TMODE", event_tmode), message_motd("MOTD", event_motd), message_nick("NICK", event_nick),
-		message_bmask("BMASK", event_bmask), message_uid("UID", event_nick), message_part("PART", event_part),
-		message_pass("PASS", event_pass), message_ping("PING", event_ping), message_privmsg("PRIVMSG", event_privmsg),
-		message_quit("QUIT", event_quit), message_server("SERVER", event_server), message_squit("SQUIT", event_squit),
-		message_topic("TOPIC", event_topic), message_tb("TB", event_tburst), message_whois("WHOIS", event_whois),
-		message_capab("CAPAB", event_capab), message_sjoin("SJOIN", event_sjoin), message_error("ERROR", event_error),
-		message_sid("SID", event_sid)
+		message_kick("KICK", event_kick), message_tmode("TMODE", event_tmode),
+		message_bmask("BMASK", event_bmask), message_pass("PASS", event_pass),
+		message_tb("TB", event_tburst), message_sid("SID", event_sid)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
-
-		pmodule_ircd_var(myIrcd);
 
 		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK, CAPAB_TSMODE };
 		for (unsigned i = 0; i < 6; ++i)
@@ -707,7 +590,9 @@ class ProtoRatbox : public Module
 
 		AddModes();
 
-		pmodule_ircd_proto(&ircd_proto);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_proto(&this->ircd_proto);
+		pmodule_ircd_message(&this->ircd_message);
 	}
 };
 

@@ -70,7 +70,7 @@ class CommandOSChanKill : public Command
 				{
 					UserContainer *uc = *it++;
 
-					if (is_oper(uc->user))
+					if (uc->user->HasMode(UMODE_OPER))
 						continue;
 
 					SGLine->Add(OperServ, u, "*@" + uc->user->host, expires, realreason);

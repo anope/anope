@@ -57,7 +57,7 @@ class CommandNSInfo : public Command
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			if (is_oper(u) && !na->last_usermask.empty())
+			if (u->HasMode(UMODE_OPER) && !na->last_usermask.empty())
 				source.Reply(NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : GetString(u, NO_REASON).c_str());
 			else
 				source.Reply(NICK_X_FORBIDDEN, nick.c_str());

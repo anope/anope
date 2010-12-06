@@ -56,7 +56,7 @@ class CommandCSSuspend : public Command
 			{
 				UserContainer *uc = *it++;
 
-				if (is_oper(uc->user))
+				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
 				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), CHAN_SUSPEND_REASON).c_str());

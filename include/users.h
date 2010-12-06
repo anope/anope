@@ -149,12 +149,12 @@ class CoreExport User : public Extensible
 
 	/**
 	 * Send a message (notice or privmsg, depending on settings) to a user
-	 * @param source Sender nick
+	 * @param source Sender
 	 * @param fmt Format of the Message
 	 * @param ... any number of parameters
 	 */
-	void SendMessage(const Anope::string &source, const char *fmt, ...);
-	virtual void SendMessage(const Anope::string &source, const Anope::string &msg);
+	void SendMessage(BotInfo *source, const char *fmt, ...);
+	virtual void SendMessage(BotInfo *source, const Anope::string &msg);
 
 	/** Send a language string message to a user
 	 * @param source Sender

@@ -33,7 +33,7 @@ public:
 		int count = 0, from = 0, to = 0;
 		bool forbidden = false, suspended = false, channoexpire = false;
 
-		if (Config->CSListOpersOnly && !is_oper(u))
+		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
 			source.Reply(ACCESS_DENIED);
 			return MOD_STOP;

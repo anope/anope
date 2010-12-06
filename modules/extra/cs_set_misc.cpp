@@ -173,7 +173,7 @@ class CSSetMisc : public Module
 
 			Anope::string value;
 			if (ci->GetExtRegular("chanserv:" + it->first, value))
-				u->SendMessage(Config->s_ChanServ, "      %s: %s", it->first.c_str(), value.c_str());
+				u->SendMessage(ChanServ, "      %s: %s", it->first.c_str(), value.c_str());
 		}
 	}
 

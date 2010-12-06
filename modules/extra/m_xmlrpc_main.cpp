@@ -13,7 +13,7 @@ class XMLRPCUser : public User
 		this->server = Me;
 	}
 
-	void SendMessage(const Anope::string &source, const Anope::string &msg)
+	void SendMessage(BotInfo *, const Anope::string &msg)
 	{
 		this->out += msg + "\n";
 	}

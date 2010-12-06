@@ -504,13 +504,14 @@ static void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
 
 /*************************************************************************/
 
-/* Makes a simple ban and kicks the target */
-
-void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason)
+/* Makes a simple ban and kicks the target
+ * @param requester The user requesting the kickban
+ * @param ci The channel
+ * @param u The user being kicked
+ * @param reason The reason
+ */
+void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string &reason)
 {
-	Anope::string mask;
-	User *u = finduser(nick);
-
 	if (!u || !ci)
 		return;
 
@@ -522,7 +523,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 
 	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
 	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(u->nick) && u_level >= req_level)
 		return;
 
 	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u) == 1)
@@ -531,6 +532,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 		return;
 	}
 
+	Anope::string mask;
 	get_idealban(ci, u, mask);
 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
@@ -544,12 +546,14 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, co
 
 /*************************************************************************/
 
-/* Makes a kick with a "dynamic" reason ;) */
-
-void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason)
+/* Makes a kick with a "dynamic" reason ;)
+ * @param requester The user requesting the kick
+ * @param ci The channel
+ * @param u The user being kicked
+ * @param reason The reason for the kick
+ */
+void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string &reason)
 {
-	User *u = finduser(nick);
-
 	if (!u || !ci || !ci->c || !ci->c->FindUser(u))
 		return;
 
@@ -561,7 +565,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, c
 
 	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
 	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
+	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(u->nick) && u_level >= req_level)
 		return;
 
 	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
@@ -572,35 +576,6 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, c
 
 /*************************************************************************/
 
-/* Makes a mode operation on a channel for a nick */
-
-void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, const Anope::string &nick)
-{
-	char buf[BUFSIZE] = "";
-	User *u;
-
-	u = finduser(nick);
-
-	if (!u || !ci || !ci->c || !ci->c->FindUser(u))
-		return;
-
-	snprintf(buf, BUFSIZE - 1, "%ld", static_cast<long>(Anope::CurTime));
-
-	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && mode[0] == '-' && requester != u)
-	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
-		return;
-	}
-
-	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
-	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
-	if (mode[0] == '-' && ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(nick) && u_level >= req_level)
-		return;
-
-	ci->c->SetModes(NULL, "%s %s", mode.c_str(), nick.c_str());
-}
-
-/*************************************************************************/
 /**
  * Normalize buffer stripping control characters and colors
  * @param A string to be parsed for control and color codes

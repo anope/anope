@@ -48,7 +48,7 @@ class CommandNSGroup : public Command
 
 		if (Config->RestrictOperNicks)
 			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
-				if (!is_oper(u) && u->nick.find_ci(it->first) != Anope::string::npos)
+				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(it->first) != Anope::string::npos)
 				{
 					source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 					return MOD_CONT;

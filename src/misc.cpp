@@ -70,68 +70,6 @@ int tolower(char c)
 /*************************************************************************/
 
 /**
- * strscpy:  Copy at most len-1 characters from a string to a buffer, and
- *           add a null terminator after the last character copied.
- * @param d Buffer to copy into
- * @param s Data to copy int
- * @param len Length of data
- * @return updated buffer
- */
-char *strscpy(char *d, const char *s, size_t len)
-{
-	char *d_orig = d;
-
-	if (!len)
-		return d;
-	while (--len && (*d++ = *s++));
-	*d = '\0';
-	return d_orig;
-}
-
-/*************************************************************************/
-
-/**
- * strnrepl:  Replace occurrences of `old' with `new' in string `s'.  Stop
- *            replacing if a replacement would cause the string to exceed
- *            `size' bytes (including the null terminator).  Return the
- *            string.
- * @param s String
- * @param size size of s
- * @param old character to replace
- * @param newstr character to replace with
- * @return updated s
- */
-char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
-{
-	char *ptr = s;
-	int32 left = strlen(s);
-	int32 avail = size - (left + 1);
-	int32 oldlen = strlen(old);
-	int32 newlen = strlen(newstr);
-	int32 diff = newlen - oldlen;
-
-	while (left >= oldlen)
-	{
-		if (strncmp(ptr, old, oldlen))
-		{
-			--left;
-			++ptr;
-			continue;
-		}
-		if (diff > avail)
-			break;
-		if (diff)
-			memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
-		strncpy(ptr, newstr, newlen);
-		ptr += newlen;
-		left -= oldlen;
-	}
-	return s;
-}
-
-/*************************************************************************/
-
-/**
  * merge_args:  Take an argument count and argument vector and merge them
  *              into a single string in which each argument is separated by
  *              a space.
@@ -576,7 +514,7 @@ void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
 	if (u2)
 	{
 		Log(LOG_NORMAL, "xline") << "Killed Q-lined nick: " << u2->GetMask();
-		kill_user(killer, u2->nick, "This nick is reserved for Services. Please use a non Q-Lined nick.");
+		kill_user(killer, u2, "This nick is reserved for Services. Please use a non Q-Lined nick.");
 	}
 }
 

@@ -16,7 +16,7 @@ CommandSource::~CommandSource()
 
 		// Send to the user if the reply is more than one line
 		if (!this->fantasy || !this->ci || this->reply.size() > 1)
-			u->SendMessage(this->service->nick, message);
+			u->SendMessage(this->service, message);
 		else if (this->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
 			ircdproto->SendPrivmsg(this->service, this->ci->name, message.c_str());
 		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICE))
@@ -24,7 +24,7 @@ CommandSource::~CommandSource()
 		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
 			ircdproto->SendNoticeChanops(this->service, this->ci->c, message.c_str());
 		else
-			u->SendMessage(this->service->nick, message);
+			u->SendMessage(this->service, message);
 	}
 }
 
@@ -60,7 +60,7 @@ void CommandSource::Reply(const char *message, ...)
 		va_start(args, message);
 		vsnprintf(buf, BUFSIZE - 1, message, args);
 
-		this->reply.push_back(message);
+		this->reply.push_back(buf);
 
 		va_end(args);
 	}

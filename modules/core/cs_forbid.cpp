@@ -71,7 +71,7 @@ class CommandCSForbid : public Command
 			{
 				UserContainer *uc = *it++;
 
-				if (is_oper(uc->user))
+				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
 				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user, CHAN_FORBID_REASON).c_str());

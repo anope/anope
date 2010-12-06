@@ -1,4 +1,24 @@
 #include "services.h"
+#include "modules.h"
+
+IRCDProto *ircdproto;
+IRCDVar *ircd;
+IRCdMessage *ircdmessage;
+
+void pmodule_ircd_proto(IRCDProto *proto)
+{
+	ircdproto = proto;
+}
+
+void pmodule_ircd_var(IRCDVar *ircdvar)
+{
+	ircd = ircdvar;
+}
+
+void pmodule_ircd_message(IRCdMessage *message)
+{
+	ircdmessage = message;
+}
 
 void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
@@ -269,3 +289,312 @@ bool IRCDProto::IsChannelValid(const Anope::string &chan)
 
 	return true;
 }
+
+bool IRCdMessage::On436(const Anope::string &, const std::vector<Anope::string> &params)
+{
+	if (!params.empty())
+		introduce_user(params[0]);
+	return true;
+}
+
+bool IRCdMessage::OnAway(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	User *u = finduser(source);
+	if (u && params.empty()) /* un-away */
+		check_memos(u);
+	return true;
+}
+
+bool IRCdMessage::OnJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (!params.empty())
+		do_join(source, params[0], params.size() > 1 ? params[1] : "");
+	return true;
+}
+
+bool IRCdMessage::OnKick(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (params.size() > 2)
+		do_kick(source, params[0], params[1], params[2]);
+	return true;
+}
+
+/** Called on KILL
+ * @params[0] The nick
+ * @params[1] The reason
+ */
+bool IRCdMessage::OnKill(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	User *u = finduser(params[0]);
+	BotInfo *bi;
+
+	if (!u)
+		return true;
+
+	/* Recover if someone kills us. */
+	if (!Config->s_BotServ.empty() && u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
+	{
+		introduce_user(bi->nick);
+		bi->RejoinAll();
+	}
+	else
+		do_kill(u, params[1]);
+	
+	
+	return true;
+}
+
+bool IRCdMessage::OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	return true;
+}
+
+bool IRCdMessage::OnPart(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (!params.empty())
+		do_part(source, params[0], params.size() > 1 ? params[1] : "");
+	return true;
+}
+
+bool IRCdMessage::OnPing(const Anope::string &, const std::vector<Anope::string> &params)
+{
+	if (!params.empty())
+		ircdproto->SendPong(params.size() > 1 ? params[1] : Config->ServerName, params[0]);
+	return true;
+}
+
+bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	const Anope::string &receiver = params.size() > 0 ? params[0] : "";
+	const Anope::string &message = params.size() > 1 ? params[1] : "";
+
+	/* Messages from servers can happen on some IRCds, check for . */
+	if (source.empty() || receiver.empty() || message.empty() || source.find('.') != Anope::string::npos)
+		return true;
+
+	User *u = finduser(source);
+
+	if (!u)
+	{
+		Log() << message << ": user record for " << source << " not found";
+
+		BotInfo *bi = findbot(receiver);
+		if (bi)
+			ircdproto->SendMessage(bi, source, "%s", GetString(USER_RECORD_NOT_FOUND).c_str());
+
+		return MOD_CONT;
+	}
+
+	if (receiver[0] == '#' && !Config->s_BotServ.empty())
+	{
+		ChannelInfo *ci = cs_findchan(receiver);
+		/* Some paranoia checks */
+		if (ci && !ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi)
+			botchanmsgs(u, ci, message);
+	}
+	else
+	{
+		/* Check if we should ignore.  Operators always get through. */
+		if (allow_ignore && !u->HasMode(UMODE_OPER))
+		{
+			if (get_ignore(source))
+			{
+				Anope::string target = myStrGetToken(message, ' ', 0);
+				BotInfo *bi = findbot(target);
+				if (bi)
+					Log(bi) << "Ignored message from " << source << " using command " << target;
+				return MOD_CONT;
+			}
+		}
+
+		/* If a server is specified (nick@server format), make sure it matches
+		 * us, and strip it off. */
+		Anope::string botname = receiver;
+		size_t s = receiver.find('@');
+		if (s != Anope::string::npos)
+		{
+			Anope::string servername(receiver.begin() + s + 1, receiver.end());
+			botname = botname.substr(0, s);
+			if (!servername.equals_ci(Config->ServerName))
+				return MOD_CONT;
+		}
+		else if (Config->UseStrictPrivMsg)
+		{
+			BotInfo *bi = findbot(receiver);
+			if (!bi)
+				return MOD_CONT;
+			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
+			u->SendMessage(bi, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
+			return MOD_CONT;
+		}
+
+		BotInfo *bi = findbot(botname);
+
+		if (bi)
+		{
+			if (message[0] == '\1' && message[message.length() - 1] == '\1')
+			{
+				if (message.substr(0, 6).equals_ci("\1PING "))
+				{
+					Anope::string buf = message;
+					buf.erase(buf.begin());
+					buf.erase(buf.end() - 1);
+					ircdproto->SendCTCP(bi, u->nick, "%s", buf.c_str());
+				}
+				else if (message.substr(0, 9).equals_ci("\1VERSION\1"))
+				{
+					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
+				}
+			}
+			else if (bi == ChanServ)
+			{
+				if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
+					u->SendMessage(ChanServ, ACCESS_DENIED);
+				else
+					mod_run_cmd(bi, u, message, false);
+			}
+			else if (bi == HostServ)
+			{
+				if (!ircd->vhost)
+					u->SendMessage(HostServ, SERVICE_OFFLINE, Config->s_HostServ.c_str());
+				else
+					mod_run_cmd(bi, u, message, false);
+			}
+			else if (bi == OperServ)
+			{
+				if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
+				{
+					u->SendMessage(OperServ, ACCESS_DENIED);
+					if (Config->WallBadOS)
+						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
+				}
+				else
+				{
+					Log(OperServ) << u->nick << ": " <<  message;
+					mod_run_cmd(bi, u, message, false);
+				}
+			}
+			else
+				mod_run_cmd(bi, u, message, false);
+		}
+	}
+
+	return true;
+}
+
+bool IRCdMessage::OnQuit(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	const Anope::string &reason = !params.empty() ? params[0] : "";
+	User *user = finduser(source);
+	if (!user)
+	{
+		Log() << "user: QUIT from nonexistent user " << source << " (" << reason << ")";
+		return true;
+	}
+
+	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
+
+	NickAlias *na = findnick(user->nick);
+	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+	{
+		na->last_seen = Anope::CurTime;
+		na->last_quit = reason;
+	}
+	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
+	delete user;
+
+	return true;
+}
+
+bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	const Anope::string &server = source;
+
+	Server *s = Server::Find(server);
+
+	if (!s)
+	{
+		Log() << "SQUIT for nonexistent server " << server;
+		return true;
+	}
+
+	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
+
+	Anope::string buf;
+	/* If this is a juped server, send a nice global to inform the online
+	 * opers that we received it.
+	 */
+	if (s->HasFlag(SERVER_JUPED))
+	{
+		buf = "Received SQUIT for juped server " + s->GetName();
+		ircdproto->SendGlobops(OperServ, "%s", buf.c_str());
+	}
+
+	buf = s->GetName() + " " + s->GetUplink()->GetName();
+
+	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
+	{
+		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
+		/* need to fix */
+		ircdproto->SendSquit(s->GetName(), buf);
+	}
+
+	s->Delete(buf);
+
+	return true;
+}
+
+bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	const Anope::string &who = params[0];
+
+	if (!source.empty() && !who.empty())
+	{
+		User *u;
+		BotInfo *bi = findbot(who);
+		if (bi)
+		{
+			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
+			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
+		}
+		else if (!ircd->svshold && (u = finduser(who)) && u->server == Me)
+		{
+			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", u->nick.c_str());
+		}
+		else
+			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such service.", who.c_str());
+	}
+
+	return true;
+}
+
+bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string> &params)
+{
+	for (unsigned i = 0; i < params.size(); ++i)
+	{
+		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
+		{
+			if (Capab_Info[j].Token.equals_ci(params[i]))
+			{
+				Capab.SetFlag(Capab_Info[j].Flag);
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
+bool IRCdMessage::OnError(const Anope::string &, const std::vector<Anope::string> &params)
+{
+	if (!params.empty())
+		Log(LOG_DEBUG) << params[0];
+	
+	return true;
+}
+

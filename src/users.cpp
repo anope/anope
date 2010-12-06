@@ -198,14 +198,14 @@ User::~User()
 
 	--usercnt;
 
-	if (is_oper(this))
+	if (this->HasMode(UMODE_OPER))
 		--opcnt;
 
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
 
 	if (Config->LimitSessions && !this->server->IsULined())
-		del_session(this->host);
+		del_session(this);
 
 	UserListByNick.erase(this->nick);
 	if (!this->uid.empty())
@@ -218,7 +218,7 @@ User::~User()
 	Log(LOG_DEBUG_2) << "User::~User() done";
 }
 
-void User::SendMessage(const Anope::string &source, const char *fmt, ...)
+void User::SendMessage(BotInfo *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -234,7 +234,7 @@ void User::SendMessage(const Anope::string &source, const char *fmt, ...)
 	}
 }
 
-void User::SendMessage(const Anope::string &source, const Anope::string &msg)
+void User::SendMessage(BotInfo *source, const Anope::string &msg)
 {
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
@@ -242,9 +242,9 @@ void User::SendMessage(const Anope::string &source, const Anope::string &msg)
 	* - The user is registered and has set /ns set msg on
 	*/
 	if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-		ircdproto->SendPrivmsg(findbot(source), this->nick, "%s", msg.c_str());
+		ircdproto->SendPrivmsg(source, this->nick, "%s", msg.c_str());
 	else
-		ircdproto->SendNotice(findbot(source), this->nick, "%s", msg.c_str());
+		ircdproto->SendNotice(source, this->nick, "%s", msg.c_str());
 }
 
 void User::SendMessage(BotInfo *source, LanguageString message, ...)
@@ -272,7 +272,7 @@ void User::SendMessage(BotInfo *source, LanguageString message, ...)
 	Anope::string line;
 
 	while (sep.GetToken(line))
-		this->SendMessage(source->nick, line.empty() ? " " : line);
+		this->SendMessage(source, line.empty() ? " " : line);
 }
 
 /** Collides a nick.
@@ -349,7 +349,7 @@ void User::Collide(NickAlias *na)
 		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 	}
 	else
-		kill_user(Config->s_NickServ, this->nick, "Services nickname-enforcer kill");
+		kill_user(Config->s_NickServ, this, "Services nickname-enforcer kill");
 }
 
 /** Login the user to a NickCore
@@ -757,7 +757,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		if (user && MOD_RESULT != EVENT_STOP)
 		{
 			if (Config->LimitSessions && !serv->IsULined())
-				add_session(nick, host, user->ip() ? user->ip.addr() : "");
+				add_session(*user);
 
 			if (!user)
 				return NULL;
@@ -828,7 +828,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 			if (ircd->sqline)
 			{
-				if (!is_oper(user) && SQLine->Check(user))
+				if (user->HasMode(UMODE_OPER) && SQLine->Check(user))
 					return NULL;
 			}
 		}
@@ -855,47 +855,13 @@ void do_umode(const Anope::string &, const Anope::string &user, const Anope::str
 
 /*************************************************************************/
 
-/** Handle a QUIT command.
- * @param source User quitting
- * @param reason Quit reason
- */
-void do_quit(const Anope::string &source, const Anope::string &reason)
-{
-	User *user = finduser(source);
-	if (!user)
-	{
-		Log() << "user: QUIT from nonexistent user " << source << " (" << reason << ")";
-		return;
-	}
-
-	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
-
-	NickAlias *na = findnick(user->nick);
-	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
-	{
-		na->last_seen = Anope::CurTime;
-		na->last_quit = reason;
-	}
-	FOREACH_MOD(I_OnUserQuit, OnUserQuit(user, reason));
-	delete user;
-}
-
-/*************************************************************************/
 
 /* Handle a KILL command.
- *  av[0] = nick being killed
- *  av[1] = reason
+ * @param user the user being killed
+ * @param msg why
  */
-
-void do_kill(const Anope::string &nick, const Anope::string &msg)
+void do_kill(User *user, const Anope::string &msg)
 {
-	User *user = finduser(nick);
-	if (!user)
-	{
-		Log() << "KILL of nonexistent nick: " <<  nick;
-		return;
-	}
-
 	Log(user, "killed") << "was killed (Reason: " << msg << ")";
 
 	NickAlias *na = findnick(user->nick);
@@ -905,16 +871,6 @@ void do_kill(const Anope::string &nick, const Anope::string &msg)
 		na->last_quit = msg;
 	}
 	delete user;
-}
-
-/*************************************************************************/
-/*************************************************************************/
-
-/* Is the given nick an oper? */
-
-bool is_oper(User *user)
-{
-	return user && user->HasMode(UMODE_OPER);
 }
 
 /*************************************************************************/

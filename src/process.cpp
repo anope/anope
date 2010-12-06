@@ -101,7 +101,7 @@ IgnoreData *get_ignore(const Anope::string &nick)
 	if (u)
 	{
 		/* Opers are not ignored, even if a matching entry may be present. */
-		if (is_oper(u))
+		if (u->HasMode(UMODE_OPER))
 			return NULL;
 		for (; ign != ign_end; ++ign)
 			if (match_usermask((*ign)->mask, u))

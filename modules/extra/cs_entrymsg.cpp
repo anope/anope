@@ -174,7 +174,7 @@ class CSEntryMessage : public Module
 
 			if (c->ci->GetExtRegular("cs_entrymsg", messages))
 				for (unsigned i = 0; i < messages.size(); ++i)
-					u->SendMessage(whosends(c->ci)->nick, "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
+					u->SendMessage(whosends(c->ci), "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
 		}
 	}
 		

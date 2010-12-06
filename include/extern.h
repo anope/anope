@@ -23,12 +23,13 @@ E void ModuleRunTimeDirCleanUp();
 
 E IRCDVar *ircd;
 E IRCDProto *ircdproto;
+E IRCdMessage *ircdmessage;
 
 /**** actions.c ****/
 
-E void kill_user(const Anope::string &source, const Anope::string &user, const Anope::string &reason);
+E void kill_user(const Anope::string &source, User *user, const Anope::string &reason);
 E bool bad_password(User *u);
-E void common_unban(ChannelInfo *ci, const Anope::string &nick);
+E void common_unban(ChannelInfo *ci, User *u);
 
 E BotInfo *BotServ;
 E BotInfo *ChanServ;
@@ -53,7 +54,6 @@ E Anope::string normalizeBuffer(const Anope::string &);
 
 E void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 E void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
-E void bot_raw_mode(User *requester, ChannelInfo *ci, const Anope::string &mode, const Anope::string &nick);
 
 /**** channels.c ****/
 
@@ -133,6 +133,7 @@ E Uplink *uplink_server;
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar *ircdvar);
+E void pmodule_ircd_message(IRCdMessage *message);
 
 /**** language.cpp ****/
 E std::vector<Anope::string> languages;
@@ -191,32 +192,45 @@ E void check_memos(User *u);
 E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
 E void memo_send(CommandSource &source, const Anope::string &name, const Anope::string &text, int z);
 
-/**** messages.c ****/
+/**** messages.cpp ****/
 
-E int m_nickcoll(const Anope::string &user);
-E int m_away(const Anope::string &source, const Anope::string &msg);
-E int m_kill(const Anope::string &nick, const Anope::string &msg);
-E int m_motd(const Anope::string &source);
-E int m_privmsg(const Anope::string &source, const Anope::string &receiver, const Anope::string &message);
-E bool m_stats(const Anope::string &source, const std::vector<Anope::string> &);
-E int m_whois(const Anope::string &source, const Anope::string &who);
-E bool m_time(const Anope::string &source, const std::vector<Anope::string> &);
-E bool m_version(const Anope::string &source, const std::vector<Anope::string> &);
 E void init_core_messages();
+
+E bool OnStats(const Anope::string &source, const std::vector<Anope::string> &);
+E bool OnTime(const Anope::string &source, const std::vector<Anope::string> &);
+E bool OnVersion(const Anope::string &source, const std::vector<Anope::string> &);
+
+E bool On436(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnAway(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnJoin(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnKick(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnKill(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnMode(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnNick(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnUID(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnPart(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnPing(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnPrivmsg(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnQuit(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnServer(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnSQuit(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnTopic(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnWhois(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnCapab(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnSJoin(const Anope::string &, const std::vector<Anope::string> &);
+E bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 
 /**** misc.c ****/
 
 E bool IsFile(const Anope::string &filename);
 E int toupper(char);
 E int tolower(char);
-E char *strscpy(char *d, const char *s, size_t len);
 #ifndef HAVE_STRLCPY
 E size_t strlcpy(char *, const char *, size_t);
 #endif
 #ifndef HAVE_STRLCAT
 E size_t strlcat(char *, const char *, size_t);
 #endif
-E char *strnrepl(char *s, int32 size, const char *old, const char *nstr);
 E const char *merge_args(int argc, char **argv);
 E const char *merge_args(int argc, const char **argv);
 
@@ -302,8 +316,8 @@ E std::vector<Exception *> exceptions;
 E void get_session_stats(long &count, long &mem);
 E void get_exception_stats(long &count, long &mem);
 
-E void add_session(const Anope::string &nick, const Anope::string &host, const Anope::string &hostip);
-E void del_session(const Anope::string &host);
+E void add_session(User *u);
+E void del_session(User *u);
 
 E void expire_exceptions();
 
@@ -333,10 +347,7 @@ E User *finduser(const Anope::string &nick);
 E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
 
 E void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes);
-E void do_quit(const Anope::string &source, const Anope::string &reason);
-E void do_kill(const Anope::string &source, const Anope::string &reason);
-
-E bool is_oper(User *user);
+E void do_kill(User *user, const Anope::string &reason);
 
 E bool is_excepted(ChannelInfo *ci, User *user);
 E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);

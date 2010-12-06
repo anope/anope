@@ -256,7 +256,7 @@ bool ChannelModeKey::IsValid(const Anope::string &value) const
  */
 bool ChannelModeAdmin::CanSet(User *u) const
 {
-	if (u && is_oper(u))
+	if (u && u->HasMode(UMODE_OPER))
 		return true;
 
 	return false;
@@ -268,7 +268,7 @@ bool ChannelModeAdmin::CanSet(User *u) const
  */
 bool ChannelModeOper::CanSet(User *u) const
 {
-	if (u && is_oper(u))
+	if (u && u->HasMode(UMODE_OPER))
 		return true;
 
 	return false;

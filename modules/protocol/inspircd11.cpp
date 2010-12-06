@@ -13,7 +13,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "hashcomp.h"
 
 IRCDVar myIrcd[] = {
 	{"InspIRCd 1.1",	/* ircd name */
@@ -291,7 +290,395 @@ class InspIRCdProto : public IRCDProto
 		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
 	}
 
-} ircd_proto;
+};
+
+class InspircdIRCdMessage : public IRCdMessage
+{
+ public:
+	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() < 2)
+			return true;
+
+		if (params[0][0] == '#' || params[0][0] == '&')
+			do_cmode(source, params[0], params[1], params[2]);
+		else
+		{
+			/* InspIRCd lets opers change another
+			   users modes
+			 */
+			do_umode(source, params[0], params[1]);
+		}
+
+		return true;
+	}
+
+	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() == 8)
+		{
+			time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+
+			User *user = do_nick("", params[1], params[4], params[2], source, params[7], ts, params[6], params[3], "", params[5]);
+			if (user)
+			{
+				user->SetCloakedHost(params[3]);
+
+				NickAlias *na = findnick(user->nick);
+				Anope::string svidbuf;
+				if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[0])
+				{
+					user->Login(na->nc);
+					user->SetMode(NickServ, UMODE_REGISTERED);
+				}
+				else
+					validate_user(user);
+			}
+		}
+		else if (params.size() == 1)
+			do_nick(source, params[0], "", "", "", "", 0, "", "", "", "");
+		return true;
+	}
+
+	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		return true;
+	}
+
+	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[0]);
+
+		if (!c)
+		{
+			Log() << "TOPIC " << (params.size() > 1 ? params[1] : "") << " for nonexistent channel " << params[0];
+			return true;
+		}
+
+		c->ChangeTopicInternal(source, (params.size() > 1 ? params[1] : ""), Anope::CurTime);
+
+		return true;
+	}
+
+	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params[0].equals_cs("START"))
+		{
+			/* reset CAPAB */
+			has_servicesmod = false;
+			has_globopsmod = false;
+			has_svsholdmod = false;
+			has_chghostmod = false;
+			has_chgidentmod = false;
+			has_hidechansmod = false;
+		}
+		else if (params[0].equals_cs("MODULES"))
+		{
+			if (params[1].find("m_globops.so") != Anope::string::npos)
+				has_globopsmod = true;
+			if (params[1].find("m_services.so") != Anope::string::npos)
+			has_servicesmod = true;
+			if (params[1].find("m_svshold.so") != Anope::string::npos)
+				has_svsholdmod = true;
+			if (params[1].find("m_chghost.so") != Anope::string::npos)
+				has_chghostmod = true;
+			if (params[1].find("m_chgident.so") != Anope::string::npos)
+				has_chgidentmod = true;
+			if (params[1].find("m_hidechans.so") != Anope::string::npos)
+				has_hidechansmod = true;
+		}
+		else if (params[0].equals_cs("CAPABILITIES"))
+		{
+			spacesepstream ssep(params[1]);
+			Anope::string capab;
+			while (ssep.GetToken(capab))
+			{
+				if (capab.find("CHANMODES") != Anope::string::npos)
+				{
+					Anope::string modes(capab.begin() + 10, capab.end());
+					commasepstream sep(modes);
+					Anope::string modebuf;
+
+					sep.GetToken(modebuf);
+					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+					{
+						switch (modebuf[t])
+						{
+							case 'b':
+								ModeManager::AddChannelMode(new ChannelModeBan('b'));
+								continue;
+							case 'e':
+								ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+								continue;
+							case 'I':
+								ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+								continue;
+							default:
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
+						}
+					}
+
+					sep.GetToken(modebuf);
+					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+					{
+						switch (modebuf[t])
+						{
+							case 'k':
+								ModeManager::AddChannelMode(new ChannelModeKey('k'));
+								continue;
+							default:
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
+						}
+					}
+
+					sep.GetToken(modebuf);
+					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+					{
+						switch (modebuf[t])
+						{
+							case 'f':
+								ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+								continue;
+							case 'l':
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l', true));
+								continue;
+							case 'L':
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L', true));
+								continue;
+							default:
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
+						}
+					}
+
+					sep.GetToken(modebuf);
+					for (size_t t = 0, end = modebuf.length(); t < end; ++t)
+					{
+						switch (modebuf[t])
+						{
+							case 'i':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+								continue;
+							case 'm':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+								continue;
+							case 'n':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+								continue;
+							case 'p':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
+								continue;
+							case 's':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+								continue;
+							case 't':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+								continue;
+							case 'r':
+								ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+								continue;
+							case 'c':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
+								continue;
+							case 'u':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, "CMODE_AUDITORIUM", 'u'));
+								continue;
+							case 'z':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
+								continue;
+							case 'A':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, "CMODE_ALLINVITE", 'A'));
+								continue;
+							case 'C':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, "CMODE_NOCTCP", 'C'));
+								continue;
+							case 'G':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, "CMODE_FILTER", 'G'));
+								continue;
+							case 'K':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, "CMODE_NOKNOCK", 'K'));
+								continue;
+							case 'N':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, "CMODE_NONICK", 'N'));
+								continue;
+							case 'O':
+								ModeManager::AddChannelMode(new ChannelModeOper('O'));
+								continue;
+							case 'Q':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, "CMODE_NOKICK", 'Q'));
+								continue;
+							case 'R':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+								continue;
+							case 'S':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, "CMODE_STRIPCOLOR", 'S'));
+								continue;
+							case 'V':
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, "CMODE_NOINVITE", 'V'));
+								continue;
+							default:
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
+						}
+					}
+				}
+				else if (capab.find("PREIX=(") != Anope::string::npos)
+				{
+					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
+					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
+
+					for (size_t t = 0, end = modes.length(); t < end; ++t)
+					{
+						switch (modes[t])
+						{
+							case 'q':
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
+								continue;
+							case 'a':
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
+								continue;
+							case 'o':
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+								continue;
+							case 'h':
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
+								continue;
+							case 'v':
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+								continue;
+						}
+					}
+				}
+				else if (capab.find("MAXMODES=") != Anope::string::npos)
+				{
+					Anope::string maxmodes(capab.begin() + 9, capab.end());
+					ircd->maxmodes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
+				}
+			}
+		}
+		else if (params[0].equals_cs("END"))
+		{
+			if (!has_globopsmod)
+			{
+				send_cmd("", "ERROR :m_globops is not loaded. This is required by Anope");
+				quitmsg = "ERROR: Remote server does not have the m_globops module loaded, and this is required.";
+				quitting = true;
+				return MOD_STOP;
+			}
+			if (!has_servicesmod)
+			{
+				send_cmd("", "ERROR :m_services is not loaded. This is required by Anope");
+				quitmsg = "ERROR: Remote server does not have the m_services module loaded, and this is required.";
+				quitting = true;
+				return MOD_STOP;
+			}
+			if (!has_hidechansmod)
+			{
+				send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
+				quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
+				quitting = true;
+				return MOD_STOP;
+			}
+			if (!has_svsholdmod)
+				ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+			if (!has_chghostmod)
+				ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+			if (!has_chgidentmod)
+				ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+			ircd->svshold = has_svsholdmod;
+		}
+
+		IRCdMessage::OnCapab(source, params);
+	}
+
+	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[0]);
+		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
+		bool keep_their_modes = true;
+
+		if (!c)
+		{
+			c = new Channel(params[0], ts);
+			c->SetFlag(CH_SYNCING);
+		}
+		/* Our creation time is newer than what the server gave us */
+		else if (c->creation_time > ts)
+		{
+			c->creation_time = ts;
+			c->Reset();
+
+			/* Reset mlock */
+			check_modes(c);
+		}
+		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+		else if (ts > c->creation_time)
+			keep_their_modes = false;
+
+		spacesepstream sep(params[params.size() - 1]);
+		Anope::string buf;
+		while (sep.GetToken(buf))
+		{
+			std::list<ChannelMode *> Status;
+			char ch;
+
+			/* Loop through prefixes */
+			while ((ch = ModeManager::GetStatusChar(buf[0])))
+			{
+				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+
+				if (!cm)
+				{
+					Log() << "Received unknown mode prefix " << buf[0] << " in FJOIN string";
+					buf.erase(buf.begin());
+					continue;
+				}
+
+				buf.erase(buf.begin());
+				if (keep_their_modes)
+					Status.push_back(cm);
+			}
+
+			User *u = finduser(buf);
+			if (!u)
+			{
+				Log(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
+				continue;
+			}
+
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+			/* Add the user to the channel */
+			c->JoinUser(u);
+
+			/* Update their status internally on the channel
+			 * This will enforce secureops etc on the user
+			 */
+			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
+				c->SetModeInternal(*it, buf);
+
+			/* Now set whatever modes this user is allowed to have on the channel */
+			chan_set_correct_modes(u, c, 1);
+
+			/* Check to see if modules want the user to join, if they do
+			 * check to see if they are allowed to join (CheckKick will kick/ban them)
+			 * Don't trigger OnJoinChannel event then as the user will be destroyed
+			 */
+			if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+				continue;
+
+			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+		}
+
+		/* Channel is done syncing */
+		if (c->HasFlag(CH_SYNCING))
+		{
+			/* Unset the syncing flag */
+			c->UnsetFlag(CH_SYNCING);
+			c->Sync();
+		}
+	}
+};
 
 bool event_ftopic(const Anope::string &source, const std::vector<Anope::string> &params)
 {
@@ -311,34 +698,17 @@ bool event_ftopic(const Anope::string &source, const std::vector<Anope::string> 
 	return true;
 }
 
-bool event_mode(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 2)
-		return true;
-
-	if (params[0][0] == '#' || params[0][0] == '&')
-		do_cmode(source, params[0], params[1], params[2]);
-	else
-	{
-		/* InspIRCd lets opers change another
-		   users modes
-		 */
-		do_umode(source, params[0], params[1]);
-	}
-	return true;
-}
-
 bool event_opertype(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	/* opertype is equivalent to mode +o because servers
 	   dont do this directly */
 	User *u = finduser(source);
-	if (u && !is_oper(u))
+	if (u && !u->HasMode(UMODE_OPER))
 	{
 		std::vector<Anope::string> newparams;
 		newparams.push_back(source);
 		newparams.push_back("+o");
-		return event_mode(source, newparams);
+		return ircdmessage->OnMode(source, newparams);
 	}
 	else
 		return true;
@@ -380,144 +750,7 @@ bool event_fmode(const Anope::string &source, const std::vector<Anope::string> &
 		}
 	}
 
-	return event_mode(source, newparams);
-}
-
-bool event_fjoin(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	Channel *c = findchan(params[0]);
-	time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
-	bool keep_their_modes = true;
-
-	if (!c)
-	{
-		c = new Channel(params[0], ts);
-		c->SetFlag(CH_SYNCING);
-	}
-	/* Our creation time is newer than what the server gave us */
-	else if (c->creation_time > ts)
-	{
-		c->creation_time = ts;
-		c->Reset();
-
-		/* Reset mlock */
-		check_modes(c);
-	}
-	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-	else if (ts > c->creation_time)
-		keep_their_modes = false;
-
-	spacesepstream sep(params[params.size() - 1]);
-	Anope::string buf;
-	while (sep.GetToken(buf))
-	{
-		std::list<ChannelMode *> Status;
-		char ch;
-
-		/* Loop through prefixes */
-		while ((ch = ModeManager::GetStatusChar(buf[0])))
-		{
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-
-			if (!cm)
-			{
-				Log() << "Received unknown mode prefix " << buf[0] << " in FJOIN string";
-				buf.erase(buf.begin());
-				continue;
-			}
-
-			buf.erase(buf.begin());
-			if (keep_their_modes)
-				Status.push_back(cm);
-		}
-
-		User *u = finduser(buf);
-		if (!u)
-		{
-			Log(LOG_DEBUG) << "FJOIN for nonexistant user " << buf << " on " << c->name;
-			continue;
-		}
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-		/* Add the user to the channel */
-		c->JoinUser(u);
-
-		/* Update their status internally on the channel
-		 * This will enforce secureops etc on the user
-		 */
-		for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-			c->SetModeInternal(*it, buf);
-
-		/* Now set whatever modes this user is allowed to have on the channel */
-		chan_set_correct_modes(u, c, 1);
-
-		/* Check to see if modules want the user to join, if they do
-		 * check to see if they are allowed to join (CheckKick will kick/ban them)
-		 * Don't trigger OnJoinChannel event then as the user will be destroyed
-		 */
-		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-			continue;
-
-		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
-	}
-
-	/* Channel is done syncing */
-	if (c->HasFlag(CH_SYNCING))
-	{
-		/* Unset the syncing flag */
-		c->UnsetFlag(CH_SYNCING);
-		c->Sync();
-	}
-
-	return true;
-}
-
-/* Events */
-bool event_ping(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		ircdproto->SendPong(Config->ServerName, params[0]);
-	return true;
-}
-
-bool event_436(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		m_nickcoll(params[0]);
-	return true;
-}
-
-bool event_away(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!source.empty())
-		m_away(source, !params.empty() ? params[0] : "");
-	return true;
-}
-
-/* Taken from hybrid.c, topic syntax is identical */
-
-bool event_topic(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	Channel *c = findchan(params[0]);
-
-	if (!c)
-	{
-		Log() << "TOPIC " << (params.size() > 1 ? params[1] : "") << " for nonexistent channel " << params[0];
-		return true;
-	}
-
-	c->ChangeTopicInternal(source, (params.size() > 1 ? params[1] : ""), Anope::CurTime);
-
-	return true;
-}
-
-bool event_squit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_squit(source, params[0]);
-	return true;
+	return ircdmessage->OnMode(source, newparams);
 }
 
 bool event_rsquit(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -525,49 +758,15 @@ bool event_rsquit(const Anope::string &source, const std::vector<Anope::string> 
 	if (params.empty() || params.size() > 3)
 		return true;
 
+	std::vector<Anope::string> p;
 	/* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
 	if (params.size() > 1 && Config->ServerName.equals_cs(params[0]))
-		do_squit(source, params[1]);
+		p.push_back(params[1]);
 	else
-		do_squit(source, params[0]);
+		p.push_back(params[0]);
 
-	return true;
-}
+	ircdmessage->OnSQuit(source, p);
 
-bool event_quit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_quit(source, params[0]);
-	return true;
-}
-
-bool event_kill(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		m_kill(params[0], params[1]);
-	return true;
-}
-
-bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 2)
-		do_kick(source, params[0], params[1], params[2]);
-	return true;
-}
-
-bool event_join(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		do_join(source, params[0], params[1]);
-	return true;
-}
-
-bool event_motd(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (source.empty())
-		return true;
-
-	m_motd(source);
 	return true;
 }
 
@@ -652,34 +851,6 @@ bool event_sethost(const Anope::string &source, const std::vector<Anope::string>
 }
 
 
-bool event_nick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() == 8)
-	{
-		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-
-		User *user = do_nick("", params[1], params[4], params[2], source, params[7], ts, params[6], params[3], "", params[5]);
-		if (user)
-		{
-			user->SetCloakedHost(params[3]);
-
-			NickAlias *na = findnick(user->nick);
-			Anope::string svidbuf;
-			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[0])
-			{
-				user->Login(na->nc);
-				user->SetMode(NickServ, UMODE_REGISTERED);
-			}
-			else
-				validate_user(user);
-		}
-	}
-	else if (params.size() == 1)
-		do_nick(source, params[0], "", "", "", "", 0, "", "", "", "");
-	return true;
-}
-
-
 bool event_chghost(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (params.empty())
@@ -693,264 +864,6 @@ bool event_chghost(const Anope::string &source, const std::vector<Anope::string>
 	}
 
 	u->SetDisplayedHost(params[0]);
-	return true;
-}
-
-/* EVENT: SERVER */
-bool event_server(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
-	return true;
-}
-
-bool event_privmsg(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		m_privmsg(source, params[0], params[1]);
-	return true;
-}
-
-bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_part(source, params[0], params.size() > 1 ? params[1] : "");
-	return true;
-}
-
-bool event_whois(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!source.empty() && !params.empty())
-		m_whois(source, params[0]);
-	return true;
-}
-
-bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params[0].equals_cs("START"))
-	{
-		/* reset CAPAB */
-		has_servicesmod = false;
-		has_globopsmod = false;
-		has_svsholdmod = false;
-		has_chghostmod = false;
-		has_chgidentmod = false;
-		has_hidechansmod = false;
-	}
-	else if (params[0].equals_cs("MODULES"))
-	{
-		if (params[1].find("m_globops.so") != Anope::string::npos)
-			has_globopsmod = true;
-		if (params[1].find("m_services.so") != Anope::string::npos)
-			has_servicesmod = true;
-		if (params[1].find("m_svshold.so") != Anope::string::npos)
-			has_svsholdmod = true;
-		if (params[1].find("m_chghost.so") != Anope::string::npos)
-			has_chghostmod = true;
-		if (params[1].find("m_chgident.so") != Anope::string::npos)
-			has_chgidentmod = true;
-		if (params[1].find("m_hidechans.so") != Anope::string::npos)
-			has_hidechansmod = true;
-	}
-	else if (params[0].equals_cs("CAPABILITIES"))
-	{
-		spacesepstream ssep(params[1]);
-		Anope::string capab;
-		while (ssep.GetToken(capab))
-		{
-			if (capab.find("CHANMODES") != Anope::string::npos)
-			{
-				Anope::string modes(capab.begin() + 10, capab.end());
-				commasepstream sep(modes);
-				Anope::string modebuf;
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'b':
-							ModeManager::AddChannelMode(new ChannelModeBan('b'));
-							continue;
-						case 'e':
-							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-							continue;
-						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeInvex('I'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'k':
-							ModeManager::AddChannelMode(new ChannelModeKey('k'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'f':
-							ModeManager::AddChannelMode(new ChannelModeFlood('f'));
-							continue;
-						case 'l':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l', true));
-							continue;
-						case 'L':
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L', true));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
-					}
-				}
-
-				sep.GetToken(modebuf);
-				for (size_t t = 0, end = modebuf.length(); t < end; ++t)
-				{
-					switch (modebuf[t])
-					{
-						case 'i':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-							continue;
-						case 'm':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-							continue;
-						case 'n':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-							continue;
-						case 'p':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-							continue;
-						case 's':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-							continue;
-						case 't':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-							continue;
-						case 'r':
-							ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
-							continue;
-						case 'c':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
-							continue;
-						case 'u':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_AUDITORIUM, "CMODE_AUDITORIUM", 'u'));
-							continue;
-						case 'z':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
-							continue;
-						case 'A':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_ALLINVITE, "CMODE_ALLINVITE", 'A'));
-							continue;
-						case 'C':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, "CMODE_NOCTCP", 'C'));
-							continue;
-						case 'G':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, "CMODE_FILTER", 'G'));
-							continue;
-						case 'K':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKNOCK, "CMODE_NOKNOCK", 'K'));
-							continue;
-						case 'N':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NONICK, "CMODE_NONICK", 'N'));
-							continue;
-						case 'O':
-							ModeManager::AddChannelMode(new ChannelModeOper('O'));
-							continue;
-						case 'Q':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOKICK, "CMODE_NOKICK", 'Q'));
-							continue;
-						case 'R':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
-							continue;
-						case 'S':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_STRIPCOLOR, "CMODE_STRIPCOLOR", 'S'));
-							continue;
-						case 'V':
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, "CMODE_NOINVITE", 'V'));
-							continue;
-						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
-					}
-				}
-			}
-			else if (capab.find("PREIX=(") != Anope::string::npos)
-			{
-				Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
-				Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
-
-				for (size_t t = 0, end = modes.length(); t < end; ++t)
-				{
-					switch (modes[t])
-					{
-						case 'q':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
-							continue;
-						case 'a':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
-							continue;
-						case 'o':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-							continue;
-						case 'h':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
-							continue;
-						case 'v':
-							ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-							continue;
-					}
-				}
-			}
-			else if (capab.find("MAXMODES=") != Anope::string::npos)
-			{
-				Anope::string maxmodes(capab.begin() + 9, capab.end());
-				ircd->maxmodes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
-			}
-		}
-	}
-	else if (params[0].equals_cs("END"))
-	{
-		if (!has_globopsmod)
-		{
-			send_cmd("", "ERROR :m_globops is not loaded. This is required by Anope");
-			quitmsg = "ERROR: Remote server does not have the m_globops module loaded, and this is required.";
-			quitting = true;
-			return MOD_STOP;
-		}
-		if (!has_servicesmod)
-		{
-			send_cmd("", "ERROR :m_services is not loaded. This is required by Anope");
-			quitmsg = "ERROR: Remote server does not have the m_services module loaded, and this is required.";
-			quitting = true;
-			return MOD_STOP;
-		}
-		if (!has_hidechansmod)
-		{
-			send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
-			quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
-			quitting = true;
-			return MOD_STOP;
-		}
-		if (!has_svsholdmod)
-			ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
-		if (!has_chghostmod)
-			ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
-		if (!has_chgidentmod)
-			ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
-		ircd->svshold = has_svsholdmod;
-	}
-
-	CapabParse(params);
 	return true;
 }
 
@@ -982,29 +895,24 @@ static void AddModes()
 
 class ProtoInspIRCd : public Module
 {
-	Message message_endburst, message_436, message_away, message_join, message_kick, message_kill, message_mode, message_motd,
-		message_nick, message_capab, message_part, message_ping, message_privmsg, message_quit, message_server, message_squit,
-		message_rsquit, message_topic, message_whois, message_svsmode, message_chghost, message_chgident, message_chgname,
-		message_sethost, message_setident, message_setname, message_fjoin, message_fmode, message_ftopic, message_opertype,
+	Message message_endburst, message_rsquit, message_svsmode, message_chghost, message_chgident, message_chgname,
+		message_sethost, message_setident, message_setname, message_fmode, message_ftopic, message_opertype,
 		message_idle;
+
+	InspIRCdProto ircd_proto;
+	InspircdIRCdMessage ircd_message;
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
-		message_endburst("ENDBURST", event_endburst), message_436("436", event_436), message_away("AWAY", event_away),
-		message_join("JOIN", event_join), message_kick("KICK", event_kick), message_kill("KILL", event_kill),
-		message_mode("MODE", event_mode), message_motd("MOTD", event_motd), message_nick("NICK", event_nick),
-		message_capab("CAPAB", event_capab), message_part("PART", event_part), message_ping("PING", event_ping),
-		message_privmsg("PRIVMSG", event_privmsg), message_quit("QUIT", event_quit), message_server("SERVER", event_server),
-		message_squit("SQUIT", event_squit), message_rsquit("RSQUIT", event_rsquit), message_topic("TOPIC", event_topic),
-		message_whois("WHOIS", event_whois), message_svsmode("SVSMODE", event_mode), message_chghost("CHGHOST", event_chghost),
+		message_endburst("ENDBURST", event_endburst), message_rsquit("RSQUIT", event_rsquit),
+		message_svsmode("SVSMODE", OnMode), message_chghost("CHGHOST", event_chghost),
 		message_chgident("CHGIDENT", event_chgident), message_chgname("CHGNAME", event_chgname),
 		message_sethost("SETHOST", event_sethost), message_setident("SETIDENT", event_setident),
-		message_setname("SETNAME", event_setname), message_fjoin("FJOIN", event_fjoin), message_fmode("FMODE", event_fmode),
-		message_ftopic("FTOPIC", event_ftopic), message_opertype("OPERTYPE", event_opertype), message_idle("IDLE", event_idle)
+		message_setname("SETNAME", event_setname), message_fmode("FMODE", event_fmode),
+		message_ftopic("FTOPIC", event_ftopic), message_opertype("OPERTYPE", event_opertype),
+		message_idle("IDLE", event_idle)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
-
-		pmodule_ircd_var(myIrcd);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT };
 		for (unsigned i = 0; i < 5; ++i)
@@ -1012,7 +920,9 @@ class ProtoInspIRCd : public Module
 
 		AddModes();
 
-		pmodule_ircd_proto(&ircd_proto);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_proto(&this->ircd_proto);
+		pmodule_ircd_message(&this->ircd_message);
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

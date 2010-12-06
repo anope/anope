@@ -287,366 +287,263 @@ class BahamutIRCdProto : public IRCDProto
 		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
 
-} ircd_proto;
+};
 
-/* EVENT: SJOIN */
-bool event_sjoin(const Anope::string &source, const std::vector<Anope::string> &params)
+class BahamutIRCdMessage : public IRCdMessage
 {
-	Channel *c = findchan(params[1]);
-	time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-	bool keep_their_modes = false;
-
-	if (!c)
+ public:
+	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		c = new Channel(params[1], ts);
-		c->SetFlag(CH_SYNCING);
-	}
-	/* Our creation time is newer than what the server gave us */
-	else if (c->creation_time > ts)
-	{
-		c->creation_time = ts;
-		c->Reset();
+		if (params.size() < 3)
+			return true;
 
-		/* Reset mlock */
-		check_modes(c);
-	}
-	/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
-	else if (ts > c->creation_time)
-		keep_their_modes = false;
-
-	/* If we need to keep their modes, and this SJOIN string contains modes */
-	if (keep_their_modes && params.size() >= 4)
-	{
-		/* Set the modes internally */
-		Anope::string modes;
-		for (unsigned i = 2; i < params.size(); ++i)
-			modes += " " + params[i];
-		if (!modes.empty())
-			modes.erase(modes.begin());
-		c->SetModesInternal(NULL, modes);
-	}
-
-	/* For a reason unknown to me, bahamut will send a SJOIN from the user joining a channel
-	 * if the channel already existed
-	 */
-	if (!c->HasFlag(CH_SYNCING) && params.size() == 2)
-	{
-		User *u = finduser(source);
-		if (!u)
-			Log(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
+		if (params[0][0] == '#' || params[0][0] == '&')
+			do_cmode(source, params[0], params[2], params[1]);
 		else
+			do_umode(source, params[0], params[1]);
+
+		return true;
+	}
+
+	/*
+	 ** NICK - new
+	 **	  source  = NULL
+	 **	  parv[0] = nickname
+	 **	  parv[1] = hopcount
+	 **	  parv[2] = timestamp
+	 **	  parv[3] = modes
+	 **	  parv[4] = username
+	 **	  parv[5] = hostname
+	 **	  parv[6] = server
+	 **	  parv[7] = servicestamp
+	 **	  parv[8] = IP
+	 **	  parv[9] = info
+	 ** NICK - change
+	 **	  source  = oldnick
+	 **	  parv[0] = new nickname
+	 **	  parv[1] = hopcount
+	 */
+	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() != 2)
 		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-			/* Add the user to the channel */
-			c->JoinUser(u);
-
-			/* Now set whatever modes this user is allowed to have on the channel */
-			chan_set_correct_modes(u, c, 1);
-
-			/* Check to see if modules want the user to join, if they do
-			 * check to see if they are allowed to join (CheckKick will kick/ban them)
-			 * Don't trigger OnJoinChannel event then as the user will be destroyed
-			 */
-			if (MOD_RESULT == EVENT_STOP && (!c->ci || !c->ci->CheckKick(u)))
+			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[8], "", "", params[3]);
+			if (user)
 			{
-				FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+				NickAlias *na;
+				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
+				{
+					user->Login(na->nc);
+					user->SetMode(NickServ, UMODE_REGISTERED);
+				}
+				else
+					validate_user(user);
 			}
 		}
-	}
-	else
-	{
-		spacesepstream sep(params[params.size() - 1]);
-		Anope::string buf;
-		while (sep.GetToken(buf))
-		{
-			std::list<ChannelMode *> Status;
-			char ch;
+		else
+			do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
 
-			/* Get prefixes from the nick */
-			while ((ch = ModeManager::GetStatusChar(buf[0])))
+		return true;
+	}
+
+	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		return true;
+	}
+
+	bool OnTopic(const Anope::string &, const std::vector<Anope::string> &params)
+	{
+		if (params.size() < 4)
+			return true;
+
+		Channel *c = findchan(params[0]);
+		if (!c)
+		{
+			Log() << "TOPIC for nonexistant channel " << params[0];
+			return true;
+		}
+
+		c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
+
+		return true;
+	}
+
+	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[1]);
+		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+		bool keep_their_modes = false;
+
+		if (!c)
+		{
+			c = new Channel(params[1], ts);
+			c->SetFlag(CH_SYNCING);
+		}
+		/* Our creation time is newer than what the server gave us */
+		else if (c->creation_time > ts)
+		{
+			c->creation_time = ts;
+			c->Reset();
+
+			/* Reset mlock */
+			check_modes(c);
+		}
+		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
+		else if (ts > c->creation_time)
+			keep_their_modes = false;
+
+		/* If we need to keep their modes, and this SJOIN string contains modes */
+		if (keep_their_modes && params.size() >= 4)
+		{
+			/* Set the modes internally */
+			Anope::string modes;
+			for (unsigned i = 2; i < params.size(); ++i)
+				modes += " " + params[i];
+			if (!modes.empty())
+				modes.erase(modes.begin());
+			c->SetModesInternal(NULL, modes);
+		}
+
+		/* For some reason, bahamut will send a SJOIN from the user joining a channel
+		 * if the channel already existed
+		 */
+		if (!c->HasFlag(CH_SYNCING) && params.size() == 2)
+		{
+			User *u = finduser(source);
+			if (!u)
+				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << source << " on " << c->name;
+			else
 			{
-				buf.erase(buf.begin());
-				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
-				if (!cm)
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+				/* Add the user to the channel */
+				c->JoinUser(u);
+
+				/* Now set whatever modes this user is allowed to have on the channel */
+				chan_set_correct_modes(u, c, 1);
+
+				/* Check to see if modules want the user to join, if they do
+				 * check to see if they are allowed to join (CheckKick will kick/ban them)
+				 * Don't trigger OnJoinChannel event then as the user will be destroyed
+				 */
+				if (MOD_RESULT == EVENT_STOP && (!c->ci || !c->ci->CheckKick(u)))
 				{
-					Log() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
+					FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+				}
+			}
+		}
+		else
+		{
+			spacesepstream sep(params[params.size() - 1]);
+			Anope::string buf;
+			while (sep.GetToken(buf))
+			{
+				std::list<ChannelMode *> Status;
+				char ch;
+
+				/* Get prefixes from the nick */
+				while ((ch = ModeManager::GetStatusChar(buf[0])))
+				{
+					buf.erase(buf.begin());
+					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+					if (!cm)
+					{
+						Log() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
+						continue;
+					}
+
+					if (keep_their_modes)
+						Status.push_back(cm);
+				}
+
+				User *u = finduser(buf);
+				if (!u)
+				{
+					Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
 					continue;
 				}
 
-				if (keep_their_modes)
-					Status.push_back(cm);
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+				/* Add the user to the channel */
+				c->JoinUser(u);
+
+				/* Update their status internally on the channel
+				 * This will enforce secureops etc on the user
+				 */
+				for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
+					c->SetModeInternal(*it, buf);
+
+				/* Now set whatever modes this user is allowed to have on the channel */
+				chan_set_correct_modes(u, c, 1);
+
+				/* Check to see if modules want the user to join, if they do
+				 * check to see if they are allowed to join (CheckKick will kick/ban them)
+				 * Don't trigger OnJoinChannel event then as the user will be destroyed
+				 */
+				if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+					continue;
+
+				FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 			}
-
-			User *u = finduser(buf);
-			if (!u)
-			{
-				Log(LOG_DEBUG) << "SJOIN for nonexistant user " << buf << " on " << c->name;
-				continue;
-			}
-
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
-
-			/* Add the user to the channel */
-			c->JoinUser(u);
-
-			/* Update their status internally on the channel
-			 * This will enforce secureops etc on the user
-			 */
-			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-				c->SetModeInternal(*it, buf);
-
-			/* Now set whatever modes this user is allowed to have on the channel */
-			chan_set_correct_modes(u, c, 1);
-
-			/* Check to see if modules want the user to join, if they do
-			 * check to see if they are allowed to join (CheckKick will kick/ban them)
-			 * Don't trigger OnJoinChannel event then as the user will be destroyed
-			 */
-			if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
-				continue;
-
-			FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
 		}
-	}
 
-	/* Channel is done syncing */
-	if (c->HasFlag(CH_SYNCING))
-	{
-		/* Unset the syncing flag */
-		c->UnsetFlag(CH_SYNCING);
-		c->Sync();
-	}
-
-	return true;
-}
-
-/*
-** NICK - new
-**	  source  = NULL
-**	parv[0] = nickname
-**	  parv[1] = hopcount
-**	  parv[2] = timestamp
-**	  parv[3] = modes
-**	  parv[4] = username
-**	  parv[5] = hostname
-**	  parv[6] = server
-**	parv[7] = servicestamp
-**	  parv[8] = IP
-**	parv[9] = info
-** NICK - change
-**	  source  = oldnick
-**	parv[0] = new nickname
-**	  parv[1] = hopcount
-*/
-bool event_nick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	User *user;
-
-	if (params.size() != 2)
-	{
-		user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[8], "", "", params[3]);
-		if (user)
+		/* Channel is done syncing */
+		if (c->HasFlag(CH_SYNCING))
 		{
-			NickAlias *na;
-			if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
-			{
-				user->Login(na->nc);
-				user->SetMode(NickServ, UMODE_REGISTERED);
-			}
-			else
-				validate_user(user);
+			/* Unset the syncing flag */
+			c->UnsetFlag(CH_SYNCING);
+			c->Sync();
 		}
-	}
-	else
-		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
-	return true;
-}
 
-/* EVENT : CAPAB */
-bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
+		return true;
+	}
+};
+
+static bool event_xs(BotInfo *bi, const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	CapabParse(params);
+	if (!params.empty() && bi)
+	{
+		std::vector<Anope::string> p;
+		p.push_back(bi->nick);
+		p.push_back(params[0]);
+		return ircdmessage->OnPrivmsg(source, p);
+	}
+
 	return true;
 }
 
 /* EVENT : OS */
 bool event_os(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty())
-		m_privmsg(source, Config->s_OperServ, params[0]);
-	return true;
+	return event_xs(OperServ, source, params);
 }
 
 /* EVENT : NS */
 bool event_ns(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty())
-		m_privmsg(source, Config->s_NickServ, params[0]);
-	return true;
+	return event_xs(NickServ, source, params);
 }
 
 /* EVENT : MS */
 bool event_ms(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty())
-		m_privmsg(source, Config->s_MemoServ, params[0]);
-	return true;
+	return event_xs(MemoServ, source, params);
 }
 
 /* EVENT : HS */
 bool event_hs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty())
-		m_privmsg(source, Config->s_HostServ, params[0]);
-	return true;
+	return event_xs(HostServ, source, params);
 }
 
 /* EVENT : CS */
 bool event_cs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty())
-		m_privmsg(source, Config->s_ChanServ, params[0]);
-	return true;
-}
-
-bool event_436(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		m_nickcoll(params[0]);
-	return true;
-}
-
-/* EVENT : SERVER */
-bool event_server(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
-	return true;
-}
-
-/* EVENT : PRIVMSG */
-bool event_privmsg(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		m_privmsg(source, params[0], params[1]);
-	return true;
-}
-
-bool event_part(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty())
-		do_part(source, params[0], params.size() > 1 ? params[1] : "");
-	return true;
-}
-
-bool event_whois(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!source.empty() && params.size() > 0)
-		m_whois(source, params[0]);
-	return true;
-}
-
-bool event_topic(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 4)
-		return true;
-
-	Channel *c = findchan(params[0]);
-	if (!c)
-	{
-		Log() << "TOPIC for nonexistant channel " << params[0];
-		return true;
-	}
-
-	c->ChangeTopicInternal(params[1], params[3], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime);
-
-	return true;
-}
-
-bool event_squit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 0)
-		do_squit(source, params[0]);
-	return true;
-}
-
-bool event_quit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 0)
-		do_quit(source, params[0]);
-	return true;
-}
-
-/* EVENT: MODE */
-bool event_mode(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 3)
-		return true;
-
-	if (params[0][0] == '#' || params[0][0] == '&')
-		do_cmode(source, params[0], params[2], params[1]);
-	else
-		do_umode(source, params[0], params[1]);
-	return true;
-}
-
-/* EVENT: KILL */
-bool event_kill(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 1)
-		m_kill(params[0], params[1]);
-	return true;
-}
-
-/* EVENT: KICK */
-bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 2)
-		do_kick(source, params[0], params[1], params[2]);
-	return true;
-}
-
-/* EVENT: JOIN */
-bool event_join(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() >= 2)
-		do_join(source, params[0], params[1]);
-	return true;
-}
-
-/* EVENT: MOTD */
-bool event_motd(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (source.empty())
-		return true;
-
-	m_motd(source);
-	return true;
-}
-
-bool event_away(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (source.empty())
-		return true;
-	m_away(source, !params.empty() ? params[0] : "");
-	return true;
-}
-
-bool event_ping(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 1)
-		return true;
-	ircdproto->SendPong(params.size() > 1 ? params[1] : Config->ServerName, params[0]);
-	return true;
-}
-
-bool event_error(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() > 0)
-		Log(LOG_DEBUG) << params[0];
-	return true;
+	return event_xs(ChanServ, source, params);
 }
 
 bool event_burst(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -719,26 +616,19 @@ static void AddModes()
 
 class ProtoBahamut : public Module
 {
-	Message message_436, message_away, message_join, message_kick, message_kill, message_mode, message_motd, message_nick,
-		message_part, message_ping, message_privmsg, message_quit, message_server, message_squit, message_topic, message_whois,
-		message_svsmode, message_capab, message_cs, message_hs, message_ms, message_ns, message_os, message_sjoin, message_error,
-		message_burst;
+	Message message_svsmode, message_cs, message_hs, message_ms, message_ns, message_os, message_burst;
+	
+	BahamutIRCdProto ircd_proto;
+	BahamutIRCdMessage ircd_message;
+
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
-		message_436("436", event_436), message_away("AWAY", event_away), message_join("JOIN", event_join),
-		message_kick("KICK", event_kick), message_kill("KILL", event_kill), message_mode("MODE", event_mode),
-		message_motd("MOTD", event_motd), message_nick("NICK", event_nick), message_part("PART", event_part),
-		message_ping("PING", event_ping), message_privmsg("PRIVMSG", event_privmsg), message_quit("QUIT", event_quit),
-		message_server("SERVER", event_server), message_squit("SQUIT", event_squit), message_topic("TOPIC", event_topic),
-		message_whois("WHOIS", event_whois), message_svsmode("SVSMODE", event_mode), message_capab("CAPAB", event_capab),
-		message_cs("CS", event_cs), message_hs("HS", event_hs), message_ms("MS", event_ms), message_ns("NS", event_ns),
-		message_os("OS", event_os), message_sjoin("SJOIN", event_sjoin), message_error("ERROR", event_error),
+		message_svsmode("SVSMODE", OnMode), message_cs("CS", event_cs), message_hs("HS", event_hs),
+		message_ms("MS", event_ms), message_ns("NS", event_ns), message_os("OS", event_os),
 		message_burst("BURST", event_burst)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
-
-		pmodule_ircd_var(myIrcd);
 
 		CapabType c[] = { CAPAB_NOQUIT, CAPAB_TSMODE, CAPAB_UNCONNECT, CAPAB_BURST, CAPAB_DKEY, CAPAB_DOZIP };
 		for (unsigned i = 0; i < 6; ++i)
@@ -746,7 +636,9 @@ class ProtoBahamut : public Module
 
 		AddModes();
 
-		pmodule_ircd_proto(&ircd_proto);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_proto(&this->ircd_proto);
+		pmodule_ircd_message(&this->ircd_message);
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

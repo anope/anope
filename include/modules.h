@@ -367,7 +367,7 @@ class CoreExport Module : public Extensible
 	 * @param ci If a tanasy command, the channel the comman was used on
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommandRun(User *u, BotInfo *bi, Anope::string &command, Anope::string &message, ChannelInfo *ci) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci) { return EVENT_CONTINUE; }
 
 	/** Called before a command is due to be executed.
 	 * @param source The source of the command

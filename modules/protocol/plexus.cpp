@@ -554,6 +554,46 @@ bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
+bool event_encap(const Anope::string &sourcd, const std::vector<Anope::string> &params)
+{
+	if (params.size() < 4)
+		return true;
+/*
+ * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
+ * params[0] = *
+ * params[1] = SU
+ * params[2] = nickname
+ * params[3] = account
+ */
+	if (params[1].equals_cs("SU"))
+	{
+		User *u = finduser(params[2]);
+		NickCore *nc = findcore(params[3]);
+		if (u && nc)
+		{
+			u->Login(nc);
+		}
+	}
+/*
+ * Received: :dev.anope.de ENCAP * CERTFP DukePyrolator :3F122A9CC7811DBAD3566BF2CEC3009007C0868F
+ * params[0] = *
+ * params[1] = CERTFP
+ * params[2] = nickname
+ * params[3] = fingerprint
+ */
+	if (params[1].equals_cs("CERTFP"))
+	{
+		User *u = finduser(params[2]);
+		if (u)
+		{
+			u->fingerprint = params[3];
+			FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+		}
+	}
+	return true;
+}
+
+
 static void AddModes()
 {
 	/* Add user modes */
@@ -617,7 +657,7 @@ class ProtoPlexus : public Module
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_tmode("TMODE", event_tmode), message_bmask("BMASK", event_bmask),
 		message_pass("PASS", event_pass), message_tb("TB", event_tburst),
-		message_sid("SID", event_sid)
+		message_sid("SID", event_sid), message_encap("ENCAP", event_encap);
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);

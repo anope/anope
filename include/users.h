@@ -48,6 +48,7 @@ class CoreExport User : public Extensible
 	Anope::string vhost;		/* User's virtual hostname */
 	Anope::string chost;		/* User's cloaked hostname */
 	Anope::string realname;		/* Realname */
+	Anope::string fingerprint;	/* SSL Fingerprint */
 	sockaddrs ip;			/* User's IP */
 	Server *server;			/* Server user is connected to */
 	time_t timestamp;		/* Timestamp of the nick */

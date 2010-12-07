@@ -317,6 +317,13 @@ bool event_chghost(const Anope::string &source, const std::vector<Anope::string>
 	return true;
 }
 
+
+/*
+ *   source     = numeric of the sending server
+ *   params[0]  = uuid
+ *   params[1]  = metadata name
+ *   params[2]  = data
+ */
 bool event_metadata(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (params.size() < 3)
@@ -331,6 +338,25 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		}
 	}
 
+/*
+ *   possible incoming ssl_cert messages:
+ *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+ *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+ */
+	if (params[1].equals_cs("ssl_cert"))
+	{
+		User *u = finduser(params[0]);
+		if (!u)
+			return true;
+	 	std::string data = params[2].c_str();
+		size_t pos1 = data.find(' ') + 1;
+		size_t pos2 = data.find(' ', pos1);
+		if ((pos2 - pos1) == 32) // fingerprints should always be 32 bytes in size
+		{
+			u->fingerprint = data.substr(pos1, pos2 - pos1);
+			FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));
+		}
+	}
 	return true;
 }
 

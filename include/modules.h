@@ -907,6 +907,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickInfo(User *u, NickAlias *na, bool ShowHidden) { }
 
+	/** Called when we get informed about a users SSL fingerprint
+	 *  when we call this, the fingerprint should already be stored in the user struct
+	 * @param u pointer to the user
+	 */
+	virtual void OnFingerprint(User *u) { }
+
 	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
 	 */
@@ -1032,7 +1038,7 @@ enum Implementation
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
-		I_OnNickInfo,
+		I_OnNickInfo, I_OnFingerprint,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,

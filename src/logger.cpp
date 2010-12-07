@@ -196,6 +196,8 @@ Log::~Log()
 {
 	if (nofork && debug && this->Type >= LOG_NORMAL && this->Type <= LOG_DEBUG + debug - 1)
 		std::cout << GetTimeStamp() << " Debug: " << this->buf.str() << std::endl;
+	else if (nofork && this->Type <= LOG_TERMINAL)
+		std::cout << GetTimeStamp() << " " << this->buf.str() << std::endl;
 	else if (this->Type == LOG_TERMINAL)
 		std::cout << this->buf.str() << std::endl;
 	for (unsigned i = 0; Config && i < Config->LogInfos.size(); ++i)

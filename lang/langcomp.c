@@ -77,10 +77,12 @@ int read_index_file()
 	numstrings++;
     if (!(stringnames = calloc(sizeof(char *), numstrings))) {
 	perror("calloc(stringnames)");
+	fclose(f);
 	return -1;
     }
     if (!(strings = calloc(sizeof(char *), numstrings))) {
 	perror("calloc(strings)");
+	fclose(f);
 	return -1;
     }
     fseek(f, 0, SEEK_SET);
@@ -90,6 +92,7 @@ int read_index_file()
 	    buf[strlen(buf)-1] = '\0';
 	if (!(stringnames[i++] = anopeStrDup(buf))) {
 	    perror("strdup()");
+	    fclose(f);
 	    return -1;
 	}
     }
@@ -201,6 +204,7 @@ int main(int ac, char **av)
     }
     if (!(out = fopen(outfile, "wb"))) {
 	perror(outfile);
+	fclose(in);
 	return 1;
     }
 

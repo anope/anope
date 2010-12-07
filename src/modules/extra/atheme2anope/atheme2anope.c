@@ -232,7 +232,7 @@ void WriteNick(char *line)
 				}
 			}
 		}
-		else if (!strcmp(tok, "SO"))
+		else if (na && !strcmp(tok, "SO"))
 		{
 			tok = strtok(NULL, " ");
 			na->nc->flags |= NI_SERVICES_OPER;

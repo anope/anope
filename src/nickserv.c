@@ -1384,7 +1384,7 @@ void insert_core(NickCore * nc)
 /*************************************************************************/
 void insert_requestnick(NickRequest * nr)
 {
-    int index = HASH(nr->nick);
+    int index;
     if (!nr) {
         if (debug) {
             alog("debug: insert_requestnick called with NULL values");
@@ -1392,6 +1392,7 @@ void insert_requestnick(NickRequest * nr)
         return;
     }
 
+    index = HASH(nr->nick);
 
     nr->prev = NULL;
     nr->next = nrlists[index];

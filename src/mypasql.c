@@ -86,15 +86,16 @@ int __stdcall mysql_LoadFromFile(char *file)
             add_line(&query, line);
             if (mysql_real_query(mysql, query, strlen(query))) {
                 free(query);
+                fclose(fd);
                 return 0;
             }
             free(query);
             query = NULL;
         }
-
         else
             add_line(&query, line);
     }
+    fclose(fd);
     return 1;
 }
 

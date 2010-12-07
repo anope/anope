@@ -926,7 +926,9 @@ int read_config(int reload)
                 perror("Can't open " SERVICES_CONF);
             else
                 alog("Can't open %s", SERVICES_CONF);
+#ifndef NOT_MAIN
         }
+#endif
         return 0;
     }
     while (fgets(buf, sizeof(buf), config)) {
@@ -1246,7 +1248,7 @@ int read_config(int reload)
             if (s) {
                 RootNumber++;
                 ServicesRoots =
-                    realloc(ServicesRoots, sizeof(char *) * RootNumber);
+                    srealloc(ServicesRoots, sizeof(char *) * RootNumber);
                 ServicesRoots[RootNumber - 1] = sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));
@@ -1266,7 +1268,7 @@ int read_config(int reload)
         do {
             if (s) {
                 NumUlines++;
-                Ulines = realloc(Ulines, sizeof(char *) * NumUlines);
+                Ulines = srealloc(Ulines, sizeof(char *) * NumUlines);
                 Ulines[NumUlines - 1] = sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));

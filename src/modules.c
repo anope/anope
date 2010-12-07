@@ -537,7 +537,7 @@ int moduleCopyFile(char *name, char *output)
     int ch;
     FILE *source, *target;
 	int srcfp;
-    char input[4096];
+    char input[4096] = "";
     int len;
 
     strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
@@ -562,6 +562,7 @@ int moduleCopyFile(char *name, char *output)
 	 */
 #ifndef _WIN32
     if ((source = fopen(input, "r")) == NULL) {
+        close(srcfp);
 #else
     if ((source = fopen(input, "rb")) == NULL) {
 #endif
@@ -572,6 +573,7 @@ int moduleCopyFile(char *name, char *output)
 #else
     if ((target = fopen(output, "wb")) == NULL) {
 #endif
+        fclose(source);
         return MOD_ERR_FILE_IO;
     }
     while ((ch = fgetc(source)) != EOF) {

@@ -127,6 +127,7 @@ int mLoadData(void)
                 free(name);
             }
         }
+        fclose(in);
     }
     return ret;
 }

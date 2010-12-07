@@ -161,6 +161,8 @@ void write_version(FILE * fd)
     char buf[1024];
     short until_eof = 0;
 
+    if (!fdin)
+        return;
     while (fgets(buf, 1023, fdin)) {
         strip(buf);
 
@@ -173,7 +175,7 @@ void write_version(FILE * fd)
         if (!strcmp(buf, "cat >version.h <<EOF"))
             until_eof = 1;
     }
-
+    fclose(fdin);
 }
 
 void parse_line(FILE * fd, char *line)

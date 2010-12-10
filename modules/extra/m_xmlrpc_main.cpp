@@ -1,6 +1,7 @@
 #include "module.h"
 #include "xmlrpc.h"
 
+// XXX We no longer need this, we need to modify CommandSource to allow commands to go back here
 class XMLRPCUser : public User
 {
 	Anope::string out;
@@ -56,6 +57,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			this->DoChannel(iface, source, request);
 		else if (request->name == "user")
 			this->DoUser(iface, source, request);
+		else if (request->name == "opers")
+			this->DoOperType(iface, source, request);
 	}
 
 	void DoCommand(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
@@ -108,9 +111,15 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			XMLRPCListenSocket *ls = static_cast<XMLRPCListenSocket *>(source->LS);
 
 			if (ls->username.empty() && ls->password.empty())
+			{
 				request->reply("result", "Logged in");
+				source->logged_in = true;
+			}
 			else if (request->data.size() > 1 && request->data[0] == ls->username && request->data[1] == ls->password)
+			{
 				request->reply("result", "Logged in");
+				source->logged_in = true;
+			}
 			else
 				request->reply("error", "Invalid credentials");
 		}
@@ -237,7 +246,11 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			request->reply("timestamp", stringify(u->timestamp));
 			request->reply("signon", stringify(u->my_signon));
 			if (u->Account())
+			{
 				request->reply("account", iface->Sanitize(u->Account()->display));
+				if (u->Account()->ot)
+					request->reply("opertype", iface->Sanitize(u->Account()->ot->GetName()));
+			}
 
 			Anope::string channels;
 			for (UChannelList::const_iterator it = u->chans.begin(); it != u->chans.end(); ++it)
@@ -250,6 +263,19 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				channels.erase(channels.length() - 1);
 				request->reply("channels", channels);
 			}
+		}
+	}
+
+	void DoOperType(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	{
+		for (std::list<OperType *>::const_iterator it = Config->MyOperTypes.begin(), it_end = Config->MyOperTypes.end(); it != it_end; ++it)
+		{
+			Anope::string perms;
+			for (std::list<Anope::string>::const_iterator it2 = (*it)->GetPrivs().begin(), it2_end = (*it)->GetPrivs().end(); it2 != it2_end; ++it2)
+				perms += " " + *it2;
+			for (std::list<Anope::string>::const_iterator it2 = (*it)->GetCommands().begin(), it2_end = (*it)->GetCommands().end(); it2 != it2_end; ++it2)
+				perms += " " + *it2;
+			request->reply((*it)->GetName(), perms);
 		}
 	}
 };

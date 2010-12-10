@@ -71,6 +71,16 @@ class CoreExport OperType
 	 * @param ot The opertype to inherit from
 	 */
 	void Inherits(OperType *ot);
+
+	/** Gets the icommands for this opertype
+	 * @return A list of commands
+	 */
+	const std::list<Anope::string> &GetCommands() const;
+
+	/** Gets the privileges for this opertype
+	 * @return A list of privileges
+	 */
+	const std::list<Anope::string> &GetPrivs() const;
 };
 
 #endif // OPERTYPE_H

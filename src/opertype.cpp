@@ -66,3 +66,14 @@ void OperType::Inherits(OperType *ot)
 {
 	this->inheritances.insert(ot);
 }
+
+const std::list<Anope::string> &OperType::GetCommands() const
+{
+	return this->commands;
+}
+
+const std::list<Anope::string> &OperType::GetPrivs() const
+{
+	return this->privs;
+}
+

@@ -30,9 +30,7 @@ class AnopeXMLRPC
 		if ($Username && $Pass)
 		{
 			/* Login to XMLRPC, if required */
-			$query = array("login", array($Username, $Pass));
-			$xmlquery = xmlrpc_encode_request($query);
-			socket_write($this->Socket, $xmlquery);
+			$this->RunXMLRPC("login", array($Username, $Pass));
 		}
 	}
 
@@ -48,7 +46,7 @@ class AnopeXMLRPC
 	 * Note that $params["id"] is reserved for query ID, you may set it to something if you wish.
 	 * If you do, the same ID will be passed back with the reply from Anope.
 	 */
-	private function RunXMLRPC($name, $params)
+	function RunXMLRPC($name, $params)
 	{
 		$xmlquery = xmlrpc_encode_request($name, $params);
 		socket_write($this->Socket, $xmlquery);
@@ -97,14 +95,14 @@ class AnopeXMLRPC
 	 */
 	function DoChannel($Channel)
 	{
-		return $this->RunXMLRPC("channel");
+		return $this->RunXMLRPC("channel", NULL);
 	}
 
 	/* Like DoChannel(), but different.
 	 */
 	function DoUser($User)
 	{
-		return $this->RunXMLRPC("channel", array($User));
+		return $this->RunXMLRPC("user", array($User));
 	}
 }
 

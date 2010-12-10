@@ -18,6 +18,7 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 
 		if (message.find("</methodCall>") != Anope::string::npos)
 		{
+			Log(LOG_DEBUG) << "m_xmlrpc: Processing message";
 			this->HandleMessage();
 			this->query.clear();
 		}
@@ -254,6 +255,7 @@ void MyXMLRPCClientSocket::HandleMessage()
 
 	while (this->GetData(name, data))
 	{
+		Log(LOG_DEBUG) << "m_xmlrpc: Tag name: " << name << ", data: " << data;
 		if (name == "methodName")
 			request.name = data;
 		else if (name == "name" && data == "id")

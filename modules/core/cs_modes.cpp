@@ -13,61 +13,82 @@
 
 #include "module.h"
 
-/** do_util: not a command, but does the job of others
- * @param source The source of the command
- * @param com The command calling this function
- * @param cm A channel mode class
- * @param chan The channel its being set on
- * @param nick The nick the modes being set on
- * @param set Is the mode being set or removed
- * @param level The acecss level required to set this mode on someone else
- * @param levelself The access level required to set this mode on yourself
- * @param name The name, eg "OP" or "HALFOP"
- * @param notice Flag required on a channel to send a notice
- */
-static CommandReturn do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, const Anope::string &name, ChannelInfoFlag notice)
+
+class CommandModeBase : public Command
 {
-	User *u = source.u;
-	Channel *c = findchan(chan);
-	ChannelInfo *ci = c ? c->ci : NULL;
-	Anope::string realnick = (!nick.empty() ? nick : u->nick);
-	bool is_same = u->nick.equals_ci(realnick);
-	User *u2 = is_same ? u : finduser(realnick);
-
-	ChanAccess *u_access = ci->GetAccess(u), *u2_access = ci->GetAccess(u2);
-	uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
-
-	if (!c)
-		source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-	else if (!u2)
-		source.Reply(NICK_X_NOT_IN_USE, realnick.c_str());
-	else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
-		source.Reply(ACCESS_DENIED);
-	else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
-		source.Reply(ACCESS_DENIED);
-	else if (!set && u2->IsProtected() && !is_same)
-		source.Reply(ACCESS_DENIED);
-	else if (!c->FindUser(u2))
-		source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
-	else
+ protected:
+	/** do_util: not a command, but does the job of others
+	 * @param source The source of the command
+	 * @param com The command calling this function
+	 * @param cm A channel mode class
+	 * @param chan The channel its being set on
+	 * @param nick The nick the modes being set on
+	 * @param set Is the mode being set or removed
+	 * @param level The acecss level required to set this mode on someone else
+	 * @param levelself The access level required to set this mode on yourself
+	 * @param notice Flag required on a channel to send a notice
+	 */
+	CommandReturn do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
 	{
-		if (set)
-			c->SetMode(NULL, cm, u2->nick);
-		else
-			c->RemoveMode(NULL, cm, u2->nick);
+		User *u = source.u;
 
-		Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
-		if (notice && ci->HasFlag(notice))
-			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s", name.c_str(), u2->nick.c_str(), u->nick.c_str());
+		if (chan.empty())
+			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+				do_mode(source, com, cm, (*it)->chan->name, u->nick, set, level, levelself, notice);
+		else
+			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself, notice);
+
+		return MOD_CONT;
 	}
 
-	return MOD_CONT;
-}
+	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
+	{
+		User *u = source.u;
+		User *u2 = finduser(nick);
+		Channel *c = findchan(chan);
+		ChannelInfo *ci = c ? c->ci : NULL;
 
-class CommandCSOp : public Command
+		bool is_same = u == u2;
+
+		ChanAccess *u_access = ci ? ci->GetAccess(u) : NULL, *u2_access = ci && u2 ? ci->GetAccess(u2) : NULL;
+		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
+
+		if (!c)
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+		else if (!ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+		else if (!u2)
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+		else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
+			source.Reply(ACCESS_DENIED);
+		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
+			source.Reply(ACCESS_DENIED);
+		else if (!set && u2->IsProtected() && !is_same)
+			source.Reply(ACCESS_DENIED);
+		else if (!c->FindUser(u2))
+			source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
+		else
+		{
+			if (set)
+				c->SetMode(NULL, cm, u2->nick);
+			else
+				c->RemoveMode(NULL, cm, u2->nick);
+
+			Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
+			if (notice && ci->HasFlag(notice))
+				ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s", com->name.c_str(), u2->nick.c_str(), u->nick.c_str());
+		}
+	}
+
+
+ public:
+	CommandModeBase(const Anope::string &cname) : Command(cname, 0, 2) { }
+};
+
+class CommandCSOp : public CommandModeBase
 {
  public:
-	CommandCSOp() : Command("OP", 1, 2)
+	CommandCSOp() : CommandModeBase("OP")
 	{
 	}
 
@@ -75,7 +96,7 @@ class CommandCSOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, "OP", CI_OPNOTICE);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, CI_OPNOTICE);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -95,10 +116,10 @@ class CommandCSOp : public Command
 	}
 };
 
-class CommandCSDeOp : public Command
+class CommandCSDeOp : public CommandModeBase
 {
  public:
-	CommandCSDeOp() : Command("DEOP", 1, 2)
+	CommandCSDeOp() : CommandModeBase("DEOP")
 	{
 	}
 
@@ -106,7 +127,7 @@ class CommandCSDeOp : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, "DEOP", CI_OPNOTICE);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, CI_OPNOTICE);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -126,10 +147,10 @@ class CommandCSDeOp : public Command
 	}
 };
 
-class CommandCSVoice : public Command
+class CommandCSVoice : public CommandModeBase
 {
  public:
-	CommandCSVoice() : Command("VOICE", 1, 2)
+	CommandCSVoice() : CommandModeBase("VOICE")
 	{
 	}
 
@@ -137,7 +158,7 @@ class CommandCSVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, "VOICE", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -157,10 +178,10 @@ class CommandCSVoice : public Command
 	}
 };
 
-class CommandCSDeVoice : public Command
+class CommandCSDeVoice : public CommandModeBase
 {
  public:
-	CommandCSDeVoice() : Command("DEVOICE", 1, 2)
+	CommandCSDeVoice() : CommandModeBase("DEVOICE")
 	{
 	}
 
@@ -168,7 +189,7 @@ class CommandCSDeVoice : public Command
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, "DEVOICE", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -188,10 +209,10 @@ class CommandCSDeVoice : public Command
 	}
 };
 
-class CommandCSHalfOp : public Command
+class CommandCSHalfOp : public CommandModeBase
 {
  public:
-	CommandCSHalfOp() : Command("HALFOP", 1, 2)
+	CommandCSHalfOp() : CommandModeBase("HALFOP")
 	{
 	}
 
@@ -202,7 +223,7 @@ class CommandCSHalfOp : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, "HALFOP", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -222,10 +243,10 @@ class CommandCSHalfOp : public Command
 	}
 };
 
-class CommandCSDeHalfOp : public Command
+class CommandCSDeHalfOp : public CommandModeBase
 {
  public:
-	CommandCSDeHalfOp() : Command("DEHALFOP", 1, 2)
+	CommandCSDeHalfOp() : CommandModeBase("DEHALFOP")
 	{
 	}
 
@@ -236,7 +257,7 @@ class CommandCSDeHalfOp : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, "DEHALFOP", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -256,10 +277,10 @@ class CommandCSDeHalfOp : public Command
 	}
 };
 
-class CommandCSProtect : public Command
+class CommandCSProtect : public CommandModeBase
 {
  public:
-	CommandCSProtect() : Command("PROTECT", 1, 2)
+	CommandCSProtect() : CommandModeBase("PROTECT")
 	{
 	}
 
@@ -270,7 +291,7 @@ class CommandCSProtect : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, "PROTECT", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -290,10 +311,10 @@ class CommandCSProtect : public Command
 	}
 };
 
-class CommandCSDeProtect : public Command
+class CommandCSDeProtect : public CommandModeBase
 {
  public:
-	CommandCSDeProtect() : Command("DEPROTECT", 1, 2)
+	CommandCSDeProtect() : CommandModeBase("DEPROTECT")
 	{
 	}
 
@@ -304,7 +325,7 @@ class CommandCSDeProtect : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, "DEPROTECT", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -324,10 +345,10 @@ class CommandCSDeProtect : public Command
 	}
 };
 
-class CommandCSOwner : public Command
+class CommandCSOwner : public CommandModeBase
 {
  public:
-	CommandCSOwner() : Command("OWNER", 1, 2)
+	CommandCSOwner() : CommandModeBase("OWNER")
 	{
 	}
 
@@ -338,7 +359,7 @@ class CommandCSOwner : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, "OWNER", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -358,10 +379,10 @@ class CommandCSOwner : public Command
 	}
 };
 
-class CommandCSDeOwner : public Command
+class CommandCSDeOwner : public CommandModeBase
 {
  public:
-	CommandCSDeOwner() : Command("DEOWNER", 1, 2)
+	CommandCSDeOwner() : CommandModeBase("DEOWNER")
 	{
 	}
 
@@ -372,7 +393,7 @@ class CommandCSDeOwner : public Command
 		if (!cm)
 			return MOD_CONT;
 
-		return do_util(source, this, cm, params[0], params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, "DEOWNER", CI_BEGIN);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

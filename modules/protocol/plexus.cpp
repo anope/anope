@@ -557,7 +557,7 @@ bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-bool event_encap(const Anope::string &sourcd, const std::vector<Anope::string> &params)
+bool event_encap(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (params.size() < 4)
 		return true;
@@ -596,6 +596,13 @@ bool event_encap(const Anope::string &sourcd, const std::vector<Anope::string> &
 	return true;
 }
 
+bool event_eob(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	Server *s = Server::Find(source);
+	if (s)
+		s->Sync(true);
+	return true;
+}
 
 static void AddModes()
 {
@@ -652,7 +659,8 @@ static void AddModes()
 class ProtoPlexus : public Module
 {
 	Message message_tmode, message_bmask, message_pass,
-		message_tb, message_sid, message_encap;
+		message_tb, message_sid, message_encap,
+		message_eob;
 
 	PlexusProto ircd_proto;
 	PlexusIRCdMessage ircd_message;
@@ -660,7 +668,8 @@ class ProtoPlexus : public Module
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_tmode("TMODE", event_tmode), message_bmask("BMASK", event_bmask),
 		message_pass("PASS", event_pass), message_tb("TB", event_tburst),
-		message_sid("SID", event_sid), message_encap("ENCAP", event_encap)
+		message_sid("SID", event_sid), message_encap("ENCAP", event_encap),
+		message_eob("EOB", event_eob)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);

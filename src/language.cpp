@@ -1322,25 +1322,25 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_EXCEPTED */
 	_("%s matches an except on %s and cannot be banned until the except have been removed."),
 	/* CHAN_OP_SYNTAX */
-	_("OP #channel [nick]"),
+	_("OP [#channel] [nick]"),
 	/* CHAN_HALFOP_SYNTAX */
-	_("HALFOP #channel [nick]"),
+	_("HALFOP [#channel] [nick]"),
 	/* CHAN_VOICE_SYNTAX */
-	_("VOICE #channel [nick]"),
+	_("VOICE [#channel] [nick]"),
 	/* CHAN_PROTECT_SYNTAX */
-	_("PROTECT #channel [nick]"),
+	_("PROTECT [#channel] [nick]"),
 	/* CHAN_OWNER_SYNTAX */
-	_("OWNER #channel [\037nick\037]"),
+	_("OWNER [#channel] [\037nick\037]\002"),
 	/* CHAN_DEOP_SYNTAX */
-	_("DEOP #channel [nick]"),
+	_("DEOP [#channel] [nick]"),
 	/* CHAN_DEHALFOP_SYNTAX */
-	_("DEHALFOP #channel [nick]"),
+	_("DEHALFOP [#channel] [nick]"),
 	/* CHAN_DEVOICE_SYNTAX */
-	_("DEVOICE #channel [nick]"),
+	_("DEVOICE [#channel] [nick]"),
 	/* CHAN_DEPROTECT_SYNTAX */
-	_("DEROTECT #channel [nick]"),
+	_("DEROTECT [#channel] [nick]"),
 	/* CHAN_DEOWNER_SYNTAX */
-	_("DEOWNER #channel [\037nick\037]"),
+	_("DEOWNER [#channel] [\037nick\037]"),
 	/* CHAN_KICK_SYNTAX */
 	_("KICK #channel nick [reason]"),
 	/* CHAN_BAN_SYNTAX */
@@ -3952,85 +3952,95 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Note that a preceding '#' specifies a range, channel names\n"
 	"are to be written without '#'."),
 	/* CHAN_HELP_OP */
-	_("Syntax: OP #channel [nick]\n"
+	_("Syntax: OP [#channel] [nick]\n"
 	" \n"
 	"Ops a selected nick on a channel. If nick is not given,\n"
-	"it will op you.\n"
+	"it will op you. If channel is not given, it will op you\n"
+	"on every channel.\n"
 	" \n"
 	"By default, limited to AOPs or those with level 5 access \n"
 	"and above on the channel."),
 	/* CHAN_HELP_DEOP */
-	_("Syntax: DEOP #channel [nick]\n"
+	_("Syntax: DEOP [#channel] [nick]\n"
 	" \n"
 	"Deops a selected nick on a channel. If nick is not given,\n"
-	"it will deop you.\n"
+	"it will deop you. If channel is not given, it will deop\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to AOPs or those with level 5 access \n"
 	"and above on the channel."),
 	/* CHAN_HELP_VOICE */
-	_("Syntax: VOICE #channel [nick]\n"
+	_("Syntax: VOICE [#channel] [nick]\n"
 	" \n"
 	"Voices a selected nick on a channel. If nick is not given,\n"
-	"it will voice you.\n"
+	"it will voice you. If channel is not given, it will voice you\n"
+	"on every channel.\n"
 	" \n"
 	"By default, limited to AOPs or those with level 5 access \n"
 	"and above on the channel, or to VOPs or those with level 3 \n"
 	"and above for self voicing."),
 	/* CHAN_HELP_DEVOICE */
-	_("Syntax: DEVOICE #channel [nick]\n"
+	_("Syntax: DEVOICE [#channel] [nick]\n"
 	" \n"
 	"Devoices a selected nick on a channel. If nick is not given,\n"
-	"it will devoice you.\n"
+	"it will devoice you. If channel is not given, it will devoice\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to AOPs or those with level 5 access \n"
 	"and above on the channel, or to VOPs or those with level 3 \n"
 	"and above for self devoicing."),
 	/* CHAN_HELP_HALFOP */
-	_("Syntax: HALFOP #channel [nick]\n"
+	_("Syntax: HALFOP [#channel] [nick]\n"
 	" \n"
 	"Halfops a selected nick on a channel. If nick is not given,\n"
-	"it will halfop you.\n"
+	"it will halfop you. If channel is not given, it will halfop\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to AOPs and those with level 5 access \n"
 	"and above on the channel, or to HOPs or those with level 4 \n"
 	"and above for self halfopping."),
 	/* CHAN_HELP_DEHALFOP */
-	_("Syntax: DEHALFOP #channel [nick]\n"
+	_("Syntax: DEHALFOP [#channel] [nick]\n"
 	" \n"
 	"Dehalfops a selected nick on a channel. If nick is not given,\n"
-	"it will dehalfop you.\n"
+	"it will dehalfop you. If channel is not given, it will dehalfop\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to AOPs and those with level 5 access \n"
 	"and above on the channel, or to HOPs or those with level 4 \n"
 	"and above for self dehalfopping."),
 	/* CHAN_HELP_PROTECT */
-	_("Syntax: PROTECT #channel [nick]\n"
+	_("Syntax: PROTECT [#channel] [nick]\n"
 	" \n"
 	"Protects a selected nick on a channel. If nick is not given,\n"
-	"it will protect you.\n"
+	"it will protect you. If channel is not given, it will protect\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to the founder, or to SOPs or those with \n"
 	"level 10 and above on the channel for self protecting."),
 	/* CHAN_HELP_DEPROTECT */
-	_("Syntax: DEPROTECT #channel [nick]\n"
+	_("Syntax: DEPROTECT [#channel] [nick]\n"
 	" \n"
 	"Deprotects a selected nick on a channel. If nick is not given,\n"
-	"it will deprotect you.\n"
+	"it will deprotect you. If channel is not given, it will deprotect\n"
+	"you on every channel.\n"
 	" \n"
 	"By default, limited to the founder, or to SOPs or those with \n"
 	"level 10 and above on the channel for self deprotecting."),
 	/* CHAN_HELP_OWNER */
-	_("Syntax: OWNER #channel [\037nick\037]\n"
+	_("Syntax: OWNER [#channel] [\037nick\037]\n"
 	" \n"
 	"Gives the selected nick owner status on channel. If nick is not\n"
-	"given, it will give you owner.\n"
+	"given, it will give you owner. If channel is not given, it will\n"
+	"give you owner on every channel.\n"
 	" \n"
 	"Limited to those with founder access on the channel."),
 	/* CHAN_HELP_DEOWNER */
-	_("Syntax: DEOWNER #channel [\037nick\037]\n"
+	_("Syntax: DEOWNER [#channel] [\037nick\037]\n"
 	" \n"
 	"Removes owner status from the selected nick on channel. If nick\n"
-	"is not given, it will deowner you.\n"
+	"is not given, it will deowner you. If channel is not given, it will\n"
+	"deowner you on every channel.\n"
 	" \n"
 	"Limited to those with founder access on the channel."),
 	/* CHAN_HELP_INVITE */

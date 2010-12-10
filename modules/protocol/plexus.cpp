@@ -152,12 +152,15 @@ class PlexusProto : public IRCDProto
 
 	void SendServer(const Server *server)
 	{
-		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+		if (server == Me)
+			send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+		else
+			send_cmd(Config->Numeric, "SID %s %d %s :%s", server->GetName().c_str(), 2, server->GetSID().c_str(), server->GetDescription().c_str());
 	}
 
 	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 	{
-		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->nick.c_str(), static_cast<long>(u->timestamp), newnick.c_str(), static_cast<long>(when));
+		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->GetUID().c_str(), static_cast<long>(u->timestamp), newnick.c_str(), static_cast<long>(when));
 	}
 
 	void SendConnect()
@@ -199,7 +202,7 @@ class PlexusProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "ENCAP * SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->Numeric, "ENCAP * SVSMODE %s %ld %s", u->GetUID().c_str(), static_cast<long>(u->timestamp), buf.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)

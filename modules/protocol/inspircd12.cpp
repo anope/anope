@@ -52,9 +52,6 @@ static bool has_servicesmod = false;
 static bool has_svsholdmod = false;
 static bool has_hidechansmod = false;
 
-/* Previously introduced user during burst */
-static User *prev_u_intro = NULL;
-
 /* CHGHOST */
 void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 {
@@ -250,40 +247,15 @@ bool event_sethost(const Anope::string &source, const std::vector<Anope::string>
 
 bool event_uid(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *user;
 	Server *s = Server::Find(source);
 	time_t ts = convertTo<time_t>(params[1]);
-
-	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
-	 * If not, validate the user.  ~ Viper*/
-	user = prev_u_intro;
-	prev_u_intro = NULL;
-	if (user && !user->server->IsSynced())
-	{
-		NickAlias *na = findnick(user->nick);
-
-		if (!na || na->nc != user->Account())
-		{
-			validate_user(user);
-			if (user->HasMode(UMODE_REGISTERED))
-				user->RemoveMode(NickServ, UMODE_REGISTERED);
-		}
-		else
-			/* Set them +r (to negate a possible -r on the stack) */
-			user->SetMode(NickServ, UMODE_REGISTERED);
-	}
 
 	Anope::string modes = params[8];
 	for (unsigned i = 9; i < params.size() - 1; ++i)
 		modes += " " + params[i];
-	user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
-	if (user)
-	{
-		if (!user->server->IsSynced())
-			prev_u_intro = user;
-		else
-			validate_user(user);
-	}
+	User *user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
+	if (user && user->server->IsSynced())
+		validate_user(user);
 
 	return true;
 }
@@ -316,10 +288,13 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 	if (params[1].equals_cs("accountname"))
 	{
 		User *u = finduser(params[0]);
+		NickAlias *user_na = u ? findnick(u->nick) : NULL;
 		NickCore *nc = findcore(params[2]);
 		if (u && nc)
 		{
 			u->Login(nc);
+			if (user_na && user_na->nc == nc)
+				u->SetMode(NickServ, UMODE_REGISTERED);
 		}
 	}
 
@@ -347,28 +322,16 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 
 bool event_endburst(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *u = prev_u_intro;
 	Server *s = Server::Find(source);
 
 	if (!s)
 		throw CoreException("Got ENDBURST without a source");
 
-	/* Check if the previously introduced user was Id'd for the nickgroup of the nick he s currently using.
-	 * If not, validate the user. ~ Viper*/
-	prev_u_intro = NULL;
-	if (u && !u->server->IsSynced())
+	for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
-		NickAlias *na = findnick(u->nick);
-
-		if (!na || na->nc != u->Account())
-		{
+		User *u = *it;
+		if (u->server == s && !u->IsIdentified())
 			validate_user(u);
-			if (u->HasMode(UMODE_REGISTERED))
-				u->RemoveMode(NickServ, UMODE_REGISTERED);
-		}
-		else
-			/* Set them +r (to negate a possible -r on the stack) */
-			u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
 	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
@@ -380,6 +343,21 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 class Inspircd12IRCdMessage : public InspircdIRCdMessage
 {
  public:
+	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Server *s = Server::Find(source);
+		time_t ts = convertTo<time_t>(params[1]);
+
+		Anope::string modes = params[8];
+		for (unsigned i = 9; i < params.size() - 1; ++i)
+			modes += " " + params[i];
+		User *user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
+		if (user && user->server->IsSynced())
+			validate_user(user);
+
+		return true;
+	}
+
 	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
 		if (params[0].equals_cs("START"))
@@ -726,8 +704,7 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 
 class ProtoInspIRCd : public Module
 {
-	Message message_endburst,
-		message_uid, message_time,
+	Message message_endburst, message_time,
 		message_rsquit, message_svsmode, message_fhost,
 		message_chgident, message_fname, message_sethost, message_setident, message_setname, message_fjoin, message_fmode,
 		message_ftopic, message_opertype, message_idle, message_metadata;
@@ -737,7 +714,7 @@ class ProtoInspIRCd : public Module
 
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
-		message_endburst("ENDBURST", event_endburst), message_uid("UID", event_uid),
+		message_endburst("ENDBURST", event_endburst),
 		message_time("TIME", event_time), message_rsquit("RSQUIT", event_rsquit),
 		message_svsmode("SVSMODE", OnMode), message_fhost("FHOST", event_chghost),
 		message_chgident("CHGIDENT", event_chgident), message_fname("FNAME", event_chgname),

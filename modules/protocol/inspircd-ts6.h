@@ -271,6 +271,8 @@ class InspircdIRCdMessage : public IRCdMessage
 		return true;
 	}
 
+	virtual bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params) = 0;
+
 	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
 		do_nick(source, params[0], "", "", "", "", 0, "", "", "", "");

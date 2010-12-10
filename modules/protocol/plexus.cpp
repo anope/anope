@@ -248,18 +248,6 @@ class PlexusProto : public IRCDProto
 	{
 		send_cmd(bi->GetUID(), "ENCAP * TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
 	}
-
-	void SetAutoIdentificationToken(User *u)
-	{
-
-		if (!u->Account())
-			return;
-
-		Anope::string svidbuf = stringify(u->timestamp);
-
-		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
-	}
 };
 
 class PlexusIRCdMessage : public IRCdMessage
@@ -302,17 +290,8 @@ class PlexusIRCdMessage : public IRCdMessage
 	{
 		/* Source is always the server */
 		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], params[5], params[7], params[3]);
-		if (user)
-		{
-			NickAlias *na = findnick(user->nick);
-			Anope::string svidbuf;
-			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[8])
-			{
-				user->Login(na->nc);
-			}
-			else
-				validate_user(user);
-		}
+		if (user && user->server->IsSynced())
+			validate_user(user);
 
 		return true;
 	}
@@ -571,10 +550,13 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 	if (params[1].equals_cs("SU"))
 	{
 		User *u = finduser(params[2]);
+		NickAlias *user_na = findnick(params[2]);
 		NickCore *nc = findcore(params[3]);
 		if (u && nc)
 		{
 			u->Login(nc);
+			if (user_na && user_na->nc == nc)
+				u->SetMode(NickServ, UMODE_REGISTERED);
 		}
 	}
 /*
@@ -600,7 +582,16 @@ bool event_eob(const Anope::string &source, const std::vector<Anope::string> &pa
 {
 	Server *s = Server::Find(source);
 	if (s)
+	{
 		s->Sync(true);
+		for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+		{
+			User *u = *it;
+			if (u->server == s && !u->IsIdentified())
+				validate_user(u);
+		}
+	}
+
 	return true;
 }
 

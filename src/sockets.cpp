@@ -509,15 +509,12 @@ bool BufferedSocket::ProcessRead()
  */
 bool BufferedSocket::ProcessWrite()
 {
-	if (WriteBuffer.empty())
-	{
+	if (this->WriteBuffer.empty())
 		return true;
-	}
-	if (this->IO->Send(this, WriteBuffer) == -1)
-	{
+	int count = this->IO->Send(this, this->WriteBuffer);
+	if (count == -1)
 		return false;
-	}
-	WriteBuffer.clear();
+	this->WriteBuffer = this->WriteBuffer.substr(count);
 	SocketEngine->ClearWritable(this);
 
 	return true;

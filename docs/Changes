@@ -13,10 +13,10 @@ A Added m_dnsbl and an asynchronous DNS system
 A Added a new language system that uses gettext
 A Added m_mysql which uses threads to execute queries
 A Added many subcommand modules for some commands, eg ns_set_autoop, ns_set_email, etc
-A Added a new logging system that is a bit more flexable
+A Added a new logging system that is a bit more flexible
 A Added cs_set_misc and ns_set_misc to add miscellaneous set commands
 A Added os_modreload, which allows reloading some modules not normally unloable, like the protocol module
-A Added FOUNDER access levels
+A Added FOUNDER access level
 A Made OperServ, Global, MemoServ, and ChanServ optional
 F Shutting down if a config reload fails
 F Autoid to live through restarts on Unreal

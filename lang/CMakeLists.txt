@@ -17,9 +17,12 @@ if(GETTEXT_FOUND)
     # Get the .mo file name
     string(REGEX REPLACE "\\.po$" ".mo" LANG_MO ${LANG_PO})
     # Add the .mo file to a list for use later with add_custom_target
-    append_to_list(LANG_SRCS_MO ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO})
+    set(LANG_SRCS_MO ${LANG_SRCS_MO} ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO})
     # Run msgfmt on the language file, depends on the .po file
-    add_custom_command(OUTPUT ${LANG_MO} COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_PO} -o ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO} MAIN_DEPENDENCY ${LANG_PO})
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO}
+      COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -c ${CMAKE_CURRENT_SOURCE_DIR}/${LANG_PO} -o ${CMAKE_CURRENT_BINARY_DIR}/${LANG_MO}
+      MAIN_DEPENDENCY ${LANG_PO}
+    )
     # Add to cpack ignored files if not on Windows.
     file(RELATIVE_PATH LANG_RELATIVE ${Anope_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${LANG_LANG})
     if(NOT WIN32)

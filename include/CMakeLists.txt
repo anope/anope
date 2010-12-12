@@ -12,6 +12,9 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h
 # Add version to list of files for CPack to ignore
 get_filename_component(version_BINARY ${version_BINARY} NAME)
 add_to_cpack_ignored_files("${version_BINARY}$" TRUE)
+if(NOT WIN32)
+  add_to_cpack_ignored_files("version.h$" TRUE)
+endif(NOT WIN32)
 
 # Add a custom target to the above file
 add_custom_target(headers DEPENDS version ${CMAKE_CURRENT_BINARY_DIR}/version.h)

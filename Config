@@ -166,8 +166,13 @@ if [ ! "$NO_INTRO" ] ; then
 	. $SOURCE_DIR/src/version.sh
 	if [ -d .git ] ; then
 		VERSION=`git describe --tags`
-		echo "#define VERSION_BUILD	`echo "$VERSION" | cut -d'-' -f2`" > include/version.h
-		echo "#define VERSION_EXTRA	\"-`echo "$VERSION" | cut -d'-' -f3`$VERSION_EXTRA\"" >> include/version.h
+		VERSION_BUILD=`echo "$VERSION" | cut -d'-' -f2`
+		VERSION_EXTRA=`echo "$VERSION" | cut -d'-' -f3`
+		if [ "$VERSION_BUILD" == "$VERSION_EXTRA" ] ; then
+			VERSION_EXTRA=""
+		fi
+		echo "#define VERSION_BUILD	$VERSION_BUILD" > include/version.h
+		echo "#define VERSION_EXTRA	\"$VERSION_EXTRA\"" >> include/version.h
 	fi
 	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
 	echo ""

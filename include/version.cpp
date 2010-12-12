@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
 	fd.open(argv[2], std::ios::in);
 
 	std::string version_build = "#define VERSION_BUILD	1";
-	std::string version_extra;
 	std::string build = "#define BUILD	1";
 	if (fd.is_open())
 	{
@@ -61,12 +60,6 @@ int main(int argc, char *argv[])
 		{
 			if (!filebuf.find("#define VERSION_BUILD"))
 				version_build = filebuf;
-			else if (!filebuf.find("#define VERSION_EXTRA"))
-			{
-				size_t q = filebuf.find('"');
-
-				version_extra = filebuf.substr(q + 1, filebuf.length() - q - 2);
-			}
 			else if (!filebuf.find("#define BUILD"))
 			{
 				size_t tab = filebuf.find('	');
@@ -96,12 +89,7 @@ int main(int argc, char *argv[])
 	for (std::list<std::pair<std::string, std::string> >::iterator it = versions.begin(), it_end = versions.end(); it != it_end; ++it)
 	{
 		if (it->first == "EXTRA")
-		{
-			if (!version_extra.empty())
-				fd << "#define VERSION_EXTRA \"" << version_extra << "\"" << std::endl;
-			else
-				fd << "#define VERSION_EXTRA \"" << it->second << "\"" << std::endl;
-		}
+			fd << "#define VERSION_EXTRA \"" << it->second << "\"" << std::endl;
 		else
 			fd << "#define VERSION_" << it->first << " " << it->second << std::endl;
 	}

@@ -1,3 +1,27 @@
+Revision af8cf44 - Sun, 12 Dec 2010 17:58:09 -0500 - Made version.cpp ok with an empty VERSION_EXTRA
+Revision be4ec3c - Sun, 12 Dec 2010 16:54:46 -0500 - Updated docs/WIN32.txt with instructions on how to get the libraries to build with gettext, ssl, and mysql
+Revision 587e5d9 - Thu, 9 Dec 2010 19:58:41 -0500 - Fixed build on cmake 2.4.x
+Revision 35f0381 - Wed, 1 Dec 2010 15:50:56 -0500 - Fixed clearing entries from the bandata cache
+Revision 14e396b - Mon, 29 Nov 2010 19:20:26 -0500 - Fixed /ns set display
+Revision ba01e7a - Sat, 27 Nov 2010 00:07:48 -0600 - Fixed /ns help saset autoop reply
+Revision 52d9ed4 - Thu, 25 Nov 2010 22:59:39 -0600 - Fixed handling pings and ctcps to channels
+Revision 8f82582 - Mon, 22 Nov 2010 13:10:14 -0600 - Fixed sending operwalls on ratbox
+Revision d1ba920 - Sun, 21 Nov 2010 20:36:46 -0600 - Fixed replacing %R with /msg on non gettext builds
+Revision 56b269e - Sun, 21 Nov 2010 20:05:48 -0600 - Merge branch '1.9' of git.sigterm.info:gitroot/anope/anope into 1.9
+Revision 7e03427 - Sun, 21 Nov 2010 20:05:37 -0600 - Fixed some language string names
+Revision 72ab27a - Sun, 21 Nov 2010 18:55:52 -0500 - Introduce our clients with umode +q on Unreal so they can't be kicked
+Revision 3445f4d - Fri, 19 Nov 2010 14:16:42 -0500 - Fixed parsing cidr masks
+Revision aab915f - Thu, 18 Nov 2010 21:34:38 -0500 - Fixed some mysql queries
+Revision 2765214 - Wed, 17 Nov 2010 19:59:23 -0500 - Fixed the mlock events to be useful and fixed /cs access view's last used time
+Revision 4f8dfc2 - Sun, 14 Nov 2010 17:34:17 -0500 - Delete users and channels from the modestacker when they are destructed
+Revision 4415a77 - Sun, 14 Nov 2010 12:44:34 -0500 - Fixed ban and kick from showing up twice in /cs help
+Revision 8662b09 - Thu, 11 Nov 2010 19:49:00 -0500 - Removed an unused variable
+Revision 12c5314 - Thu, 11 Nov 2010 19:34:23 -0500 - Fixed possible unsafe iteration when purging dns cache, and fixed the dns cache to not expire all of the records for specific hosts if the records have different TTLs (cherry picked from commit 736df4bd98b952aad459fdf7914735e88f97c4b2)
+Revision 0d2db1f - Tue, 9 Nov 2010 15:04:28 -0500 - Fixed DNS caching and made DNS cache empty results (cherry picked from commit 438ae629e51b519d0d5f70531d0262be1b9fe2bc)
+Revision fe6d791 - Tue, 9 Nov 2010 03:20:50 -0500 - Fixed a crash in the DNS engine when using cached results
+Revision dc12525 - Sun, 7 Nov 2010 20:55:30 -0500 - Removed two primary keys on some metadata tables, they should not have them
+Revision 721ef7d - Sun, 7 Nov 2010 18:06:02 -0500 - Fixed the OnPostCommand event overload in db_mysql
+Revision 5209e73 - Sat, 6 Nov 2010 04:24:46 -0400 - Updated version.log
 Revision 07e2ec0 - Sat, 6 Nov 2010 04:24:27 -0400 - Regenerated lang files
 Revision f5d2057 - Fri, 5 Nov 2010 03:34:44 -0400 - Fixed /ms sendall syntax error message
 Revision cbd0f52 - Thu, 4 Nov 2010 00:36:53 -0400 - Made Base not virtual, prevents us from having to dynamic cast in the mode stacker on release builds

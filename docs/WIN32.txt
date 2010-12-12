@@ -103,10 +103,10 @@ Anope for Windows
 
        Building Anope with gettext requires libintl, libiconv, libgcc and
        libmingex. We have precompiled these libraries for you that you may
-       use if you want, they are avaiable at http://someurlwhichidonthaveXXX.
+       use if you want. They are avaiable at http://anope.org/downloads/anope-extra.zip
        The OpenSSL and MySQL header files and libraries are also included in
-       this package. Once downloaded and extracted, you should pass the include,
-       bin, and lib paths to cmake as seen above.
+       this package. Once downloaded and extracted, you should run install.bat
+       then give Config the path to the new 'installed' directory.
 
     5) You are now ready to compile. If you said you wanted to use NMake in step 4,
        at the prompt type:

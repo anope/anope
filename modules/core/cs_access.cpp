@@ -80,7 +80,6 @@ class AccessViewCallback : public AccessListCallback
 
 	static void DoList(CommandSource &source, unsigned Number, ChanAccess *access)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		Anope::string timebuf;
 		if (ci->c && nc_on_chan(ci->c, access->nc))

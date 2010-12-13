@@ -289,7 +289,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
  *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
  *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
  */
-	if (params[1].equals_cs("ssl_cert"))
+	else if (params[1].equals_cs("ssl_cert"))
 	{
 		User *u = finduser(params[0]);
 		if (!u)

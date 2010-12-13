@@ -547,7 +547,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
  * params[2] = nickname
  * params[3] = account
  */
-	if (params[1].equals_cs("SU"))
+	else if (params[1].equals_cs("SU"))
 	{
 		User *u = finduser(params[2]);
 		NickAlias *user_na = findnick(params[2]);
@@ -566,7 +566,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
  * params[2] = nickname
  * params[3] = fingerprint
  */
-	if (params[1].equals_cs("CERTFP"))
+	else if (params[1].equals_cs("CERTFP"))
 	{
 		User *u = finduser(params[2]);
 		if (u)

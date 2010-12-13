@@ -25,7 +25,6 @@ IRCDVar myIrcd[] = {
 	 0,				/* Join 2 Message */
 	 1,				/* Chan SQlines */
 	 0,				/* Quit on Kill */
-	 0,				/* SVSMODE unban */
 	 0,				/* vidents */
 	 1,				/* svshold */
 	 1,				/* time stamp on mode */

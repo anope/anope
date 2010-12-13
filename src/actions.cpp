@@ -67,25 +67,21 @@ void kill_user(const Anope::string &source, User *user, const Anope::string &rea
  * Unban the user from a channel
  * @param ci channel info for the channel
  * @param u The user to unban
+ * @param full True to match against the users real host and IP
  * @return void
  */
-void common_unban(ChannelInfo *ci, User *u)
+void common_unban(ChannelInfo *ci, User *u, bool full)
 {
 	if (!u || !ci || !ci->c || !ci->c->HasMode(CMODE_BAN))
 		return;
 
-	if (ircd->svsmode_unban)
-		ircdproto->SendBanDel(ci->c, u->nick);
-	else
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = ci->c->GetModeList(CMODE_BAN);
+	for (; bans.first != bans.second;)
 	{
-		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = ci->c->GetModeList(CMODE_BAN);
-		for (; bans.first != bans.second;)
-		{
-			Entry ban(bans.first->second);
-			++bans.first;
-			if (ban.Matches(u))
-				ci->c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
-		}
+		Entry ban(bans.first->second);
+		++bans.first;
+		if (ban.Matches(u, full))
+			ci->c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
 	}
 }
 

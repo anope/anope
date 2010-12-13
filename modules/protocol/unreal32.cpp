@@ -25,7 +25,6 @@ IRCDVar myIrcd[] = {
 	 0,						/* Join 2 Message */
 	 0,						/* Chan SQlines */
 	 0,						/* Quit on Kill */
-	 1,						/* SVSMODE unban */
 	 1,						/* vidents */
 	 1,						/* svshold */
 	 1,						/* time stamp on mode */
@@ -299,12 +298,6 @@ class UnrealIRCdProto : public IRCDProto
 		Anope::string edited_reason = x->Reason;
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
 		send_cmd("", "BR + %s :%s", edited_reason.c_str(), x->Mask.c_str());
-	}
-
-	/* SVSMODE -b */
-	void SendBanDel(const Channel *c, const Anope::string &nick)
-	{
-		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */

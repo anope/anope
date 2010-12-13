@@ -48,7 +48,7 @@ class CommandCSUnban : public Command
 			return MOD_CONT;
 		}
 
-		common_unban(ci, u2);
+		common_unban(ci, u2, u == u2);
 		if (u2 == u)
 			source.Reply(CHAN_UNBANNED, c->name.c_str());
 		else

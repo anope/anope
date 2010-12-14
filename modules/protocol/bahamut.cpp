@@ -25,7 +25,6 @@ IRCDVar myIrcd[] = {
 	 0,					/* Join 2 Message */
 	 1,					/* Chan SQlines */
 	 1,					/* Quit on Kill */
-	 1,					/* SVSMODE unban */
 	 0,					/* vidents */
 	 1,					/* svshold */
 	 1,					/* time stamp on mode */
@@ -101,12 +100,6 @@ class BahamutIRCdProto : public IRCDProto
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
 		send_cmd(Config->ServerName, "SVSHOLD %s 0", nick.c_str());
-	}
-
-	/* SVSMODE -b */
-	void SendBanDel(const Channel *c, const Anope::string &nick)
-	{
-		SendSVSModeChan(c, "-b", nick);
 	}
 
 	/* SVSMODE channel modes */

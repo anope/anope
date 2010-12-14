@@ -4856,7 +4856,9 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"%S HELP command."),
 	/* BOT_HELP_FOOTER */
 	_("Bot will join a channel whenever there is at least\n"
-	"%d user(s) on it."),
+	"%d user(s) on it. Additionally, all %s commands\n"
+	"can be used if fantasy is enabled by prefixing the command\n"
+	"name with a %c."),
 	/* BOT_HELP_BOTLIST */
 	_("Syntax: BOTLIST\n"
 	" \n"

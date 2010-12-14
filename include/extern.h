@@ -29,7 +29,7 @@ E IRCdMessage *ircdmessage;
 
 E void kill_user(const Anope::string &source, User *user, const Anope::string &reason);
 E bool bad_password(User *u);
-E void common_unban(ChannelInfo *ci, User *u);
+E void common_unban(ChannelInfo *ci, User *u, bool full = false);
 
 E BotInfo *BotServ;
 E BotInfo *ChanServ;

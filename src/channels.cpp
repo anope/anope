@@ -294,7 +294,10 @@ size_t Channel::HasMode(ChannelModeName Name, const Anope::string &param)
  */
 std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::GetModeList(ChannelModeName Name)
 {
-	return std::make_pair(this->modes.find(Name), this->modes.upper_bound(Name));
+	Channel::ModeList::iterator it = this->modes.find(Name), it_end = it;
+	if (it != this->modes.end())
+		it_end = this->modes.upper_bound(Name);
+	return std::make_pair(it, it_end);
 }
 
 /** Set a mode internally on a channel, this is not sent out to the IRCd
@@ -1327,17 +1330,14 @@ const Anope::string Entry::GetMask()
 
 /** Check if this entry matches a user
  * @param u The user
+ * @param full True to match against a users real host and IP
  * @return true on match
  */
-bool Entry::Matches(User *u) const
+bool Entry::Matches(User *u, bool full) const
 {
 	if (!this->FlagCount())
-		return 0;
+		return false;
 	
-	Anope::string _nick = u->nick;
-	Anope::string _user = u->GetVIdent();
-	Anope::string _host = u->GetDisplayedHost();
-
 	if (this->HasFlag(ENTRYTYPE_CIDR))
 	{
 		try
@@ -1347,23 +1347,34 @@ bool Entry::Matches(User *u) const
 			{
 				return false;
 			}
+			/* If we're not matching fully and their displayed host isnt their IP */
+			else if (!full && u->ip.addr() != u->GetDisplayedHost())
+			{
+				return false;
+			}
 		}
 		catch (const SocketException &)
 		{
 			return false;
 		}
 	}
-	if (this->HasFlag(ENTRYTYPE_NICK) && (_nick.empty() || !this->nick.equals_ci(_nick)))
+	if (this->HasFlag(ENTRYTYPE_NICK) && !this->nick.equals_ci(u->nick))
 		return false;
-	if (this->HasFlag(ENTRYTYPE_USER) && (_user.empty() || !this->user.equals_ci(_user)))
+	if (this->HasFlag(ENTRYTYPE_USER) && !this->user.equals_ci(u->GetVIdent()) && (!full ||
+		!this->user.equals_ci(u->GetIdent())))
 		return false;
-	if (this->HasFlag(ENTRYTYPE_HOST) && (_host.empty() || !this->host.equals_ci(_host)))
+	if (this->HasFlag(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
+		(!this->host.equals_ci(u->host) && !this->host.equals_ci(u->chost) && !this->host.equals_ci(u->vhost) &&
+		(!u->ip() || !this->host.equals_ci(u->ip.addr())))))
 		return false;
-	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(_nick, this->nick))
+	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
 		return false;
-	if (this->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(_user, this->user))
+	if (this->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(u->GetVIdent(), this->user) && (!full ||
+		!Anope::Match(u->GetIdent(), this->user)))
 		return false;
-	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(_host, this->host))
+	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
+		(!Anope::Match(u->host, this->host) && !Anope::Match(u->chost, this->host) &&
+		!Anope::Match(u->vhost, this->host) && (!u->ip() || !Anope::Match(u->ip.addr(), this->host)))))
 		return false;
 
 	return true;

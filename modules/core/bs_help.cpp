@@ -36,7 +36,7 @@ class CommandBSHelp : public Command
 		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(source);
-		source.Reply(BOT_HELP_FOOTER, Config->BSMinUsers);
+		source.Reply(BOT_HELP_FOOTER, Config->BSMinUsers, Config->s_ChanServ.c_str(), Config->BSFantasyCharacter[0]);
 	}
 };
 

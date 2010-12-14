@@ -441,7 +441,6 @@ struct IRCDVar
 	int join2msg;					/* Join 2 Message */
 	int chansqline;					/* Supports Channel Sqlines */
 	int quitonkill;					/* IRCD sends QUIT when kill */
-	int svsmode_unban;				/* svsmode can be used to unban */
 	int vident;						/* Supports vidents */
 	int svshold;					/* Supports svshold */
 	int tsonmode;					/* Timestamp on mode changes */
@@ -786,9 +785,10 @@ class Entry : public Flags<EntryType>
 
 	/** Check if this entry matches a user
 	 * @param u The user
+	 * @param full True to match against a users real host and IP
 	 * @return true on match
 	 */
-	bool Matches(User *u) const;
+	bool Matches(User *u, bool full = false) const;
 };
 
 /*************************************************************************/
@@ -968,7 +968,6 @@ class CoreExport IRCDProto
 	virtual void SendSZLineDel(const XLine *) { }
 	virtual void SendSZLine(const XLine *) { }
 	virtual void SendSGLine(const XLine *) { }
-	virtual void SendBanDel(const Channel *, const Anope::string &) { }
 	virtual void SendSVSModeChan(const Channel *, const Anope::string &, const Anope::string &) { }
 	virtual void SendUnregisteredNick(const User *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);

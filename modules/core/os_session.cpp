@@ -254,7 +254,7 @@ class CommandOSException : public Command
 		}
 		else
 		{
-			if (mask.find('!') == Anope::string::npos || mask.find('@') == Anope::string::npos)
+			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 			{
 				u->SendMessage(OperServ, OPER_EXCEPTION_INVALID_HOSTMASK);
 				return MOD_CONT;

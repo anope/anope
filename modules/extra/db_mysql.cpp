@@ -881,15 +881,15 @@ class DBMySQL : public Module
 			Anope::string by = r.Get(i, "xby");
 			Anope::string reason = r.Get(i, "reason");
 			time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : Anope::CurTime;
-			time_t expires = r.Get(i, "expires").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : Anope::CurTime;
+			time_t expires = r.Get(i, "expire").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expire")) : Anope::CurTime;
 
 			XLine *x = NULL;
 			if (SNLine && r.Get(i, "type").equals_cs("SNLINE"))
-				SNLine->Add(NULL, NULL, mask, expires, reason);
+				x = SNLine->Add(NULL, NULL, mask, expires, reason);
 			else if (SQLine && r.Get(i, "type").equals_cs("SQLINE"))
-				SQLine->Add(NULL, NULL, mask, expires, reason);
+				x = SQLine->Add(NULL, NULL, mask, expires, reason);
 			else if (SZLine && r.Get(i, "type").equals_cs("SZLINE"))
-				SZLine->Add(NULL, NULL, mask, expires, reason);
+				x = SZLine->Add(NULL, NULL, mask, expires, reason);
 			if (x)
 			{
 				x->By = by;
@@ -1361,7 +1361,7 @@ class DBMySQL : public Module
 
 	EventReturn OnAddXLine(User *, XLine *x, XLineType Type)
 	{
-		this->RunQuery(Anope::string("INSERT INTO `anope_os_sxlines` (type, mask, xby, reason, seton, expire) VALUES('") +
+		this->RunQuery(Anope::string("INSERT INTO `anope_os_xlines` (type, mask, xby, reason, seton, expire) VALUES('") +
 			(Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) + "', '" +
 			this->Escape(x->Mask) + "', '" + this->Escape(x->By) + "', '" + this->Escape(x->Reason) + "', " +
 			stringify(x->Created) + ", " + stringify(x->Expires) + ")");

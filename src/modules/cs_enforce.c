@@ -221,7 +221,7 @@ int my_cs_enforce(User * u)
         what = myStrGetToken(cur_buffer, ' ', 1);
         if (!what || (stricmp(what, "SET") == 0)) {
             do_enforce_set(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE, what ? what : "SET");
         } else if (stricmp(what, "MODES") == 0) {
             do_enforce_modes(c);
             moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);

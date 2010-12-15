@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3047"
+VERSION_BUILD="3048"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3048 - Bug #1213 - Fixed /cs enforce #channel to say SET was enforced not (null)
 #Revision 3047 - Fixed some warnings found by cppcheck
 #Revision 3046 - Fixed bug #1202 - Made Anope aware of plexus3's channel mode +z
 #Revision 3045 - Fixed some improper english in the HOST_GROUP language strings

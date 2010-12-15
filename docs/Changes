@@ -8,6 +8,7 @@ A Added support for Plexus 3
 A Readded in support for /cs op/deop/etc to op/deop you in all channels
 F Changed the GHOST command to not allow ghosting unidentified users if the RECOVER command exists
 F Some failed logic in /operserv exception that prevents proper exceptions from being added
+F Fixed the anope_os_sxlines MySQL table and code to work after restarting
 
 Anope Version 1.9.3
 --------------------

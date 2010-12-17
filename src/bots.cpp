@@ -75,6 +75,24 @@ BotInfo::~BotInfo()
 	BotListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID.erase(this->uid);
+	
+	if (this->HasFlag(BI_CORE))
+	{
+		if (this == ChanServ)
+			ChanServ = NULL;
+		else if (this == BotServ)
+			BotServ = NULL;
+		else if (this == HostServ)
+			HostServ = NULL;
+		else if (this == OperServ)
+			OperServ = NULL;
+		else if (this == MemoServ)
+			MemoServ = NULL;
+		else if (this == NickServ)
+			NickServ = NULL;
+		else if (this == Global)
+			Global = NULL;
+	}
 }
 
 

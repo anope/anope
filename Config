@@ -168,11 +168,11 @@ if [ ! "$NO_INTRO" ] ; then
 		VERSION=`git describe --tags`
 		VERSION_BUILD=`echo "$VERSION" | cut -d'-' -f2`
 		VERSION_EXTRA=`echo "$VERSION" | cut -d'-' -f3`
-		if [ "$VERSION_BUILD" == "$VERSION_EXTRA" ] ; then
-			VERSION_EXTRA=""
+		# Only do this if we are not on a tag, src/version.sh will be all we need then.
+		if [ "$VERSION_BUILD" != "$VERSION_EXTRA" ] ; then
+			echo "#define VERSION_BUILD	$VERSION_BUILD" > include/version.h
+			echo "#define VERSION_EXTRA	\"$VERSION_EXTRA\"" >> include/version.h
 		fi
-		echo "#define VERSION_BUILD	$VERSION_BUILD" > include/version.h
-		echo "#define VERSION_EXTRA	\"$VERSION_EXTRA\"" >> include/version.h
 	fi
 	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER
 	echo ""

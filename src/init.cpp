@@ -23,8 +23,28 @@ void introduce_user(const Anope::string &user)
 		throw FatalException("introduce_user loop detected");
 	lasttime = now;
 
-	if (user.empty())
-		ircdproto->SendBOB();
+	if (!user.empty())
+	{
+		User *u = finduser(user);
+		if (u)
+		{
+			ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+
+			BotInfo *bi = findbot(u->nick);
+			if (bi)
+			{
+				XLine x(bi->nick, "Reserved for services");
+				ircdproto->SendSQLine(&x);
+
+				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+					ircdproto->SendJoin(bi, *cit);
+			}
+		}
+
+		return;
+	}
+
+	ircdproto->SendBOB();
 	
 	for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
 	{
@@ -41,7 +61,7 @@ void introduce_user(const Anope::string &user)
 	{
 		User *u = it->second;
 
-		if (user.empty() || u->nick.equals_ci(user))
+		if (u->nick.equals_ci(user))
 		{
 			ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
 
@@ -52,19 +72,17 @@ void introduce_user(const Anope::string &user)
 				ircdproto->SendSQLine(&x);
 
 				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-				{
 					ircdproto->SendJoin(bi, *cit);
-				}
 			}
 		}
 	}
 
-	if (user.empty())
-	{
-		/* Load MLock from the database now that we know what modes exist */
-		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
-			it->second->LoadMLock();
-	}
+	/* Load MLock from the database now that we know what modes exist */
+	for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		it->second->LoadMLock();
+	
+	/* Add our SXLines */
+	XLineManager::Burst();
 }
 
 /*************************************************************************/

@@ -61,19 +61,16 @@ void introduce_user(const Anope::string &user)
 	{
 		User *u = it->second;
 
-		if (u->nick.equals_ci(user))
+		ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+
+		BotInfo *bi = findbot(u->nick);
+		if (bi)
 		{
-			ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+			XLine x(bi->nick, "Reserved for services");
+			ircdproto->SendSQLine(&x);
 
-			BotInfo *bi = findbot(u->nick);
-			if (bi)
-			{
-				XLine x(bi->nick, "Reserved for services");
-				ircdproto->SendSQLine(&x);
-
-				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-					ircdproto->SendJoin(bi, *cit);
-			}
+			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
+				ircdproto->SendJoin(bi, *cit);
 		}
 	}
 

@@ -608,3 +608,36 @@ void DNSRequestTimeout::Tick(time_t)
 	delete this->request;
 }
 
+DNSRecord DNSManager::BlockingQuery(const Anope::string &mask, QueryType qt)
+{
+	DNSRecord result(mask);
+	addrinfo *addrresult, hints;
+
+	result.result = mask;
+	result.type = qt;
+
+	int type = AF_UNSPEC;
+	if (qt == DNS_QUERY_A)
+		type = AF_INET;
+	else if (qt == DNS_QUERY_AAAA)
+		type = AF_INET6;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = type;
+
+	if (getaddrinfo(mask.c_str(), NULL, &hints, &addrresult) == 0)
+	{
+		sockaddrs addr;
+		memcpy(&addr, addrresult->ai_addr, addrresult->ai_addrlen);
+		try
+		{
+			result.result = addr.addr();
+		}
+		catch (const SocketException &) { }
+
+		freeaddrinfo(addrresult);
+	}
+
+	return result;
+}
+

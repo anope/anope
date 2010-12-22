@@ -352,7 +352,6 @@ E void do_kill(User *user, const Anope::string &reason);
 E bool is_excepted(ChannelInfo *ci, User *user);
 E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
 
-E bool match_usermask(const Anope::string &mask, User *user);
 E Anope::string create_mask(User *u);
 
 /******************************************************************************/

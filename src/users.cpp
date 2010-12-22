@@ -914,36 +914,6 @@ bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
 
 /*************************************************************************/
 
-/* Does the user's usermask match the given mask (either nick!user@host or
- * just user@host)?
- */
-
-bool match_usermask(const Anope::string &mask, User *user)
-{
-	if (mask.empty())
-		return false;
-
-	Anope::string mask2 = mask, nick, username, host;
-	size_t ex = mask2.find('!');
-	if (ex != Anope::string::npos)
-	{
-		nick = mask2.substr(0, ex);
-		mask2 = mask2.substr(ex + 1);
-	}
-	size_t at = mask2.find('@');
-	if (at != Anope::string::npos)
-	{
-		username = mask2.substr(0, at);
-		host = mask2.substr(at + 1);
-	}
-	if (username.empty() || host.empty())
-		return 0;
-
-	return (nick.empty() ? true : Anope::Match(user->nick, nick)) && Anope::Match(user->GetIdent(), username) && (Anope::Match(user->host, host) || Anope::Match(user->GetDisplayedHost(), host));
-}
-
-/*************************************************************************/
-
 /* Given a user, return a mask that will most likely match any address the
  * user will have from that location.  For IP addresses, wildcards the
  * appropriate subnet mask (e.g. 35.1.1.1 -> 35.*; 128.2.1.1 -> 128.2.*);

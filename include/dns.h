@@ -174,6 +174,12 @@ class DNSManager : public Timer
 	void Tick(time_t now);
 
 	void Cleanup(Module *mod);
+
+	/** Does a BLOCKING DNS query and returns the first IP.
+	 * Only use this if you know what you are doing. Unless you specifically
+	 * need a blocking query use the DNSRequest system
+	 */
+	static DNSRecord BlockingQuery(const Anope::string &mask, QueryType qt);
 };
 
 /** A DNS timeout, one is made for every DNS request to detect timeouts

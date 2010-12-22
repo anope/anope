@@ -365,10 +365,12 @@ static bool Connect()
 			return true;
 		}
 
+		DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
+
 		try
 		{
 			new UplinkSocket(uplink_server->ipv6);
-			UplinkSock->Connect(uplink_server->host, uplink_server->port, Config->LocalHost);
+			UplinkSock->Connect(req.result, uplink_server->port, Config->LocalHost);
 		}
 		catch (const SocketException &ex)
 		{

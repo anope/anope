@@ -351,7 +351,7 @@ class CommandOSSQLine : public Command
 	CommandReturn DoClear(User *u)
 	{
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
-		SGLine->Clear();
+		SQLine->Clear();
 		u->SendMessage(OperServ, OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;

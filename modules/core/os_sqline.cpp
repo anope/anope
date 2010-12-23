@@ -370,7 +370,7 @@ class CommandOSSQLine : public Command
 	{
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
-		SGLine->Clear();
+		SQLine->Clear();
 		source.Reply(OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;

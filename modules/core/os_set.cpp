@@ -22,43 +22,12 @@ class CommandOSSet : public Command
 
 		LanguageString index;
 
-		index = allow_ignore ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		source.Reply(index, "IGNORE");
 		index = readonly ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		source.Reply(index, "READONLY");
 		index = debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		source.Reply(index, "DEBUG");
 		index = noexpire ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
 		source.Reply(index, "NOEXPIRE");
-
-		return MOD_CONT;
-	}
-
-	CommandReturn DoSetIgnore(CommandSource &source, const std::vector<Anope::string> &params)
-	{
-		User *u = source.u;
-		const Anope::string &setting = params.size() > 1 ? params[1] : "";
-
-		if (setting.empty())
-		{
-			this->OnSyntaxError(source, "IGNORE");
-			return MOD_CONT;
-		}
-
-		if (setting.equals_ci("ON"))
-		{
-			Log(LOG_ADMIN, u, this) << "ON";
-			allow_ignore = 1;
-			source.Reply(OPER_SET_IGNORE_ON);
-		}
-		else if (setting.equals_ci("OFF"))
-		{
-			Log(LOG_ADMIN, u, this) << "OFF";
-			allow_ignore = 0;
-			source.Reply(OPER_SET_IGNORE_OFF);
-		}
-		else
-			source.Reply(OPER_SET_IGNORE_ERROR);
 
 		return MOD_CONT;
 	}
@@ -204,8 +173,6 @@ class CommandOSSet : public Command
 
 		if (option.equals_ci("LIST"))
 			return this->DoList(source);
-		else if (option.equals_ci("IGNORE"))
-			return this->DoSetIgnore(source, params);
 		else if (option.equals_ci("READONLY"))
 			return this->DoSetReadOnly(source, params);
 		else if (option.equals_ci("SUPERADMIN"))
@@ -230,8 +197,6 @@ class CommandOSSet : public Command
 			source.Reply(OPER_HELP_SET_READONLY);
 		else if (subcommand.equals_ci("NOEXPIRE"))
 			source.Reply(OPER_HELP_SET_NOEXPIRE);
-		else if (subcommand.equals_ci("IGNORE"))
-			source.Reply(OPER_HELP_SET_IGNORE);
 		else if (subcommand.equals_ci("SUPERADMIN"))
 			source.Reply(OPER_HELP_SET_SUPERADMIN);
 		else

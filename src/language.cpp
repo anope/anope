@@ -2220,12 +2220,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("The SZLINE list has been cleared."),
 	/* OPER_SET_SYNTAX */
 	_("SET option setting"),
-	/* OPER_SET_IGNORE_ON */
-	_("Ignore code will be used."),
-	/* OPER_SET_IGNORE_OFF */
-	_("Ignore code will not be used."),
-	/* OPER_SET_IGNORE_ERROR */
-	_("Setting for IGNORE must be ON or OFF."),
 	/* OPER_SET_READONLY_ON */
 	_("Services are now in read-only mode."),
 	/* OPER_SET_READONLY_OFF */
@@ -2269,7 +2263,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* OPER_RELOAD */
 	_("Services' configuration file has been reloaded."),
 	/* OPER_IGNORE_SYNTAX */
-	_("IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]"),
+	_("IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick] [reason]"),
 	/* OPER_IGNORE_VALID_TIME */
 	_("You have to enter a valid number as time."),
 	/* OPER_IGNORE_TIME_DONE */
@@ -2279,7 +2273,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* OPER_IGNORE_DEL_DONE */
 	_("%s will no longer be ignored."),
 	/* OPER_IGNORE_LIST */
-	_("Services ignore list:"),
+	_("Services ignore list:\n"
+	"  Mask        Creator      Reason      Expires"),
 	/* OPER_IGNORE_LIST_NOMATCH */
 	_("Nick %s not found on ignore list."),
 	/* OPER_IGNORE_LIST_EMPTY */
@@ -4462,7 +4457,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"The ALL displays the user and uptime statistics, and\n"
 	"everything you'd see with MEMORY and UPLINK options."),
 	/* OPER_HELP_IGNORE */
-	_("Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]\n"
+	_("Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick] [reason]\n"
 	" \n"
 	"Allows Services Operators to make Services ignore a nick or mask\n"
 	"for a certain time or until the next restart. The default\n"
@@ -4689,7 +4684,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"    DEBUG      Activate or deactivate debug mode\n"
 	"    NOEXPIRE   Activate or deactivate no expire mode\n"
 	"    SUPERADMIN Activate or deactivate super-admin mode\n"
-	"    IGNORE     Activate or deactivate ignore mode\n"
 	"    LIST       List the options"),
 	/* OPER_HELP_SET_READONLY */
 	_("Syntax: SET READONLY {ON | OFF}\n"
@@ -4728,10 +4722,6 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"ability to be \"founder\" on all channel's etc...\n"
 	"This option is not persistent, and should only be used when\n"
 	"needed, and set back to OFF when no longer needed."),
-	/* OPER_HELP_SET_IGNORE */
-	_("Syntax: SET IGNORE {ON | OFF}\n"
-	"Setting this will toggle Anope's usage of the IGNORE system \n"
-	"on or off."),
 	/* OPER_HELP_SET_LIST */
 	_("Syntax: SET LIST\n"
 	"Display the various %S settings"),

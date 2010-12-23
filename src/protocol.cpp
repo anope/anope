@@ -382,7 +382,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 		if (bi)
 			ircdproto->SendMessage(bi, source, "%s", GetString(USER_RECORD_NOT_FOUND).c_str());
 
-		return MOD_CONT;
+		return true;
 	}
 
 	if (receiver[0] == '#' && !Config->s_BotServ.empty())
@@ -394,19 +394,6 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 	}
 	else
 	{
-		/* Check if we should ignore.  Operators always get through. */
-		if (allow_ignore && !u->HasMode(UMODE_OPER))
-		{
-			if (get_ignore(source))
-			{
-				Anope::string target = myStrGetToken(message, ' ', 0);
-				BotInfo *bi = findbot(target);
-				if (bi)
-					Log(bi) << "Ignored message from " << source << " using command " << target;
-				return MOD_CONT;
-			}
-		}
-
 		/* If a server is specified (nick@server format), make sure it matches
 		 * us, and strip it off. */
 		Anope::string botname = receiver;
@@ -416,22 +403,27 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			Anope::string servername(receiver.begin() + s + 1, receiver.end());
 			botname = botname.substr(0, s);
 			if (!servername.equals_ci(Config->ServerName))
-				return MOD_CONT;
+				return true;
 		}
 		else if (Config->UseStrictPrivMsg)
 		{
 			BotInfo *bi = findbot(receiver);
 			if (!bi)
-				return MOD_CONT;
+				return true;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
 			u->SendMessage(bi, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
-			return MOD_CONT;
+			return true;
 		}
 
 		BotInfo *bi = findbot(botname);
 
 		if (bi)
 		{
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnBotPrivmsg, OnBotPrivmsg(u, bi, message));
+			if (MOD_RESULT == EVENT_STOP)
+				return true;
+
 			if (message[0] == '\1' && message[message.length() - 1] == '\1')
 			{
 				if (message.substr(0, 6).equals_ci("\1PING "))

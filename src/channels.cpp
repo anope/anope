@@ -125,15 +125,12 @@ void Channel::JoinUser(User *user)
 		update_ts = true;
 	}
 
-	if (!get_ignore(user->nick))
+	if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
 	{
-		if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
-		{
-			if (this->ci->memos.memos.size() == 1)
-				user->SendMessage(MemoServ, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
-			else
-				user->SendMessage(MemoServ, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
-		}
+		if (this->ci->memos.memos.size() == 1)
+			user->SendMessage(MemoServ, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+		else
+			user->SendMessage(MemoServ, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
 	}
 
 	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)
@@ -1168,7 +1165,7 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 
 	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
-	if (give_modes && !get_ignore(user->nick) && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
+	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{
 		if (owner && check_access(user, ci, CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);

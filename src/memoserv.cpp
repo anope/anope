@@ -239,7 +239,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 
 			if (Config->MSNotifyAll)
 			{
-				if (nc->HasFlag(NI_MEMO_RECEIVE) && !get_ignore(name))
+				if (nc->HasFlag(NI_MEMO_RECEIVE))
 				{
 					for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 					{
@@ -274,7 +274,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 
 					if (check_access(cu->user, c->ci, CA_MEMO))
 					{
-						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE) && !get_ignore(cu->user->nick))
+						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
 							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
 					}
 				}

@@ -293,14 +293,6 @@ E bool is_on_access(const User *u, const NickCore *nc);
 
 /**** process.c ****/
 
-E int allow_ignore;
-E std::list<IgnoreData *> ignore;
-
-E void add_ignore(const Anope::string &nick, time_t delta);
-E IgnoreData *get_ignore(const Anope::string &nick);
-E int delete_ignore(const Anope::string &nick);
-E int clear_ignores();
-
 E void process(const Anope::string &buf);
 
 /**** send.c ****/

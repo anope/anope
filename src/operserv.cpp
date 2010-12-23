@@ -297,6 +297,8 @@ bool XLineManager::DelXLine(XLine *x)
 
 	if (it != this->XLines.end())
 	{
+		this->Del(x);
+
 		delete x;
 		this->XLines.erase(it);
 
@@ -427,7 +429,8 @@ XLine *XLineManager::Check(User *u)
 
 		if (x->Expires && x->Expires < Anope::CurTime)
 		{
-			OnExpire(x);
+			this->OnExpire(x);
+			this->Del(x);
 			delete x;
 			this->XLines.erase(XLines.begin() + i - 1);
 			continue;

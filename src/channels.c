@@ -2386,11 +2386,12 @@ Entry *elist_match_mask(EList * list, char *mask, uint32 ip)
  * Check if a user matches an entry on a list.
  * @param list EntryList that should be matched against
  * @param user The user to match against the entries
+ * @param full true to match against real host and real IP
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_user(EList * list, User * u)
+static Entry *_elist_match_user(EList * list, User * u, boolean full)
 {
-    Entry *res;
+    Entry *res = NULL;
     char *host;
     uint32 ip = 0;
 
@@ -2413,16 +2414,27 @@ Entry *elist_match_user(EList * list, User * u)
         ip = str_is_ip(host);
 
     /* Match what we ve got against the lists.. */
-    res = elist_match(list, u->nick, u->username, u->host, ip);
+    if (full)
+        res = elist_match(list, u->nick, u->username, u->host, ip);
     if (!res)
-        res = elist_match(list, u->nick, u->username, u->vhost, ip);
+        res = elist_match(list, u->nick, u->username, u->vhost, 0);
     if (!res)
-        res = elist_match(list, u->nick, u->username, u->chost, ip);
+        res = elist_match(list, u->nick, u->username, u->chost, 0);
 
     if (host)
         free(host);
 
     return res;
+}
+
+Entry *elist_match_user(EList *list, User *u)
+{
+	return _elist_match_user(list, u, false);
+}
+
+Entry *elist_match_user_full(EList *list, User *u, boolean full)
+{
+	return _elist_match_user(list, u, full);
 }
 
 /**

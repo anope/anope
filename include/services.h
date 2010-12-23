@@ -324,7 +324,12 @@ struct ircdvars_ {
 	int admin;				/* Has Admin 			*/
 	int chansqline;				/* Supports Channel Sqlines	*/
 	int quitonkill;				/* IRCD sends QUIT when kill	*/
-	int svsmode_unban;			/* svsmode can be used to unban	*/
+	int svsmode_unban;			/* svsmode can be used to unban
+						 * Note the core no longer uses
+						 * this because it can lead to
+						 * users gaining other users IPs.
+						 * It is kept for API compatability.
+						 */
 	int protect;				/* Has protect modes		*/
 	int reversekickcheck;			/* Can reverse ban check	*/
 	int chanreg;				/* channel mode +r for register	*/

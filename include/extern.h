@@ -56,6 +56,7 @@ E void kill_user(char *source, char *user, char *reason);
 E void bad_password(User * u);
 E void sqline(char *mask, char *reason);
 E void common_unban(ChannelInfo * ci, char *nick);
+E void common_unban_full(ChannelInfo * ci, char *nick, boolean full);
 E void common_svsmode(User * u, char *modes, char *arg);
 
 /**** botserv.c ****/
@@ -154,6 +155,7 @@ E int entry_match_mask(Entry *e, char *mask, uint32 ip);
 E Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip);
 E Entry *elist_match_mask(EList *list, char *mask, uint32 ip);
 E Entry *elist_match_user(EList *list, User *u);
+E Entry *elist_match_user_full(EList *list, User *u, boolean full);
 E Entry *elist_find_mask(EList *list, char *mask);
 E long get_memuse(EList *list);
 
@@ -1175,6 +1177,7 @@ E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, char *mask);
 
 E int match_usermask(const char *mask, User * user);
+E int match_usermask_full(const char *mask, User * user, boolean full);
 E int match_userip(const char *mask, User * user, char *host);
 E void split_usermask(const char *mask, char **nick, char **user,
                       char **host);

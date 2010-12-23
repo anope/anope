@@ -125,9 +125,10 @@ void sqline(char *mask, char *reason)
  * Unban the nick from a channel
  * @param ci channel info for the channel
  * @param nick to remove the ban for
+ * @param full True to match against realhost
  * @return void
  */
-void common_unban(ChannelInfo * ci, char *nick)
+static void _common_unban(ChannelInfo * ci, char *nick, boolean full)
 {
     char *av[4];
     char *host = NULL;
@@ -162,50 +163,57 @@ void common_unban(ChannelInfo * ci, char *nick)
     if (host)
         ip = str_is_ip(host);
 
-    if (ircd->svsmode_unban) {
-        anope_cmd_unban(ci->name, nick);
+    if (ircdcap->tsmode) {
+        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+        av[0] = ci->name;
+        av[1] = buf;
+        av[2] = sstrdup("-b");
+        ac = 4;
     } else {
-        if (ircdcap->tsmode) {
-            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-            av[0] = ci->name;
-            av[1] = buf;
-            av[2] = sstrdup("-b");
-            ac = 4;
-        } else {
-            av[0] = ci->name;
-            av[1] = sstrdup("-b");
-            ac = 3;
-        }
-
-        for (ban = ci->c->bans->entries; ban; ban = next) {
-            next = ban->next;
-            if (entry_match(ban, u->nick, u->username, u->host, ip) ||
-                entry_match(ban, u->nick, u->username, u->vhost, ip) ||
-                entry_match(ban, u->nick, u->username, u->chost, ip)) {
-                anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
-                if (ircdcap->tsmode)
-                    av[3] = sstrdup(ban->mask);
-                else
-                    av[2] = sstrdup(ban->mask);
-
-                do_cmode(whosends(ci), ac, av);
-
-		if (ircdcap->tsmode)
-			free(av[3]);
-		else
-			free(av[2]);
-            }
-        }
-
-        if (ircdcap->tsmode)
-            free(av[2]);
-        else
-            free(av[1]);
+        av[0] = ci->name;
+        av[1] = sstrdup("-b");
+        ac = 3;
     }
+
+    for (ban = ci->c->bans->entries; ban; ban = next) {
+        next = ban->next;
+        if ((full && entry_match(ban, u->nick, u->username, u->host, ip)) ||
+            entry_match(ban, u->nick, u->username, u->vhost, 0) ||
+            entry_match(ban, u->nick, u->username, u->chost, 0)) {
+            anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
+            if (ircdcap->tsmode)
+                av[3] = sstrdup(ban->mask);
+            else
+                av[2] = sstrdup(ban->mask);
+
+            do_cmode(whosends(ci), ac, av);
+
+            if (ircdcap->tsmode)
+                free(av[3]);
+            else
+                free(av[2]);
+        }
+    }
+
+    if (ircdcap->tsmode)
+        free(av[2]);
+    else
+        free(av[1]);
+
     /* host_resolve() sstrdup us this info so we gotta free it */
     if (host) {
         free(host);
     }
+}
+
+void common_unban(ChannelInfo * ci, char *nick)
+{
+	_common_unban(ci, nick, false);
+}
+
+void common_unban_full(ChannelInfo * ci, char *nick, boolean full)
+{
+	_common_unban(ci, nick, full);
 }
 
 /*************************************************************************/

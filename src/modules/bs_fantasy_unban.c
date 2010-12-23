@@ -69,7 +69,7 @@ int do_fantasy(int argc, char **argv)
         if (argc >= 4)
             target = myStrGetToken(argv[3], ' ', 0);
         if (!target)
-            common_unban(ci, u->nick);
+            common_unban_full(ci, u->nick, true);
         else
             common_unban(ci, target);
 

@@ -979,7 +979,7 @@ int is_excepted_mask(ChannelInfo * ci, char *mask)
  * just user@host)?
  */
 
-int match_usermask(const char *mask, User * user)
+static int _match_usermask(const char *mask, User * user, boolean full)
 {
     char *mask2;
     char *nick, *username, *host;
@@ -1007,12 +1007,12 @@ int match_usermask(const char *mask, User * user)
     if (nick) {
         result = match_wild_nocase(nick, user->nick)
             && match_wild_nocase(username, user->username)
-            && (match_wild_nocase(host, user->host)
+            && ((full && match_wild_nocase(host, user->host))
                 || match_wild_nocase(host, user->vhost)
                 || match_wild_nocase(host, user->chost));
     } else {
         result = match_wild_nocase(username, user->username)
-            && (match_wild_nocase(host, user->host)
+            && ((full && match_wild_nocase(host, user->host))
                 || match_wild_nocase(host, user->vhost)
                 || match_wild_nocase(host, user->chost));
     }
@@ -1021,6 +1021,15 @@ int match_usermask(const char *mask, User * user)
     return result;
 }
 
+int match_usermask(const char *mask, User *user)
+{
+	return _match_usermask(mask, user, false);
+}
+
+int match_usermask_full(const char *mask, User *user, boolean full)
+{
+	return _match_usermask(mask, user, full);
+}
 
 /*************************************************************************/
 

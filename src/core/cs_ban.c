@@ -219,7 +219,7 @@ int do_unban(User * u)
     } else if (!check_access(u, ci, CA_UNBAN)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        common_unban(ci, u->nick);
+        common_unban_full(ci, u->nick, true);
         notice_lang(s_ChanServ, u, CHAN_UNBANNED, chan);
     }
     return MOD_CONT;

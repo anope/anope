@@ -515,7 +515,8 @@ bool BufferedSocket::ProcessWrite()
 	if (count == -1)
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
-	SocketEngine->ClearWritable(this);
+	if (this->WriteBuffer.empty())
+		SocketEngine->ClearWritable(this);
 
 	return true;
 }

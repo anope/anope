@@ -104,8 +104,11 @@ IgnoreData *get_ignore(const Anope::string &nick)
 		if (u->HasMode(UMODE_OPER))
 			return NULL;
 		for (; ign != ign_end; ++ign)
-			if (match_usermask((*ign)->mask, u))
+		{
+			Entry ignore_mask((*ign)->mask);
+			if (ignore_mask.Matches(u))
 				break;
+		}
 	}
 	else
 	{

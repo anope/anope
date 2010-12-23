@@ -748,7 +748,15 @@ bool ChannelInfo::CheckKick(User *user)
 		{
 			AutoKick *autokick = this->GetAkick(j);
 
-			if ((autokick->HasFlag(AK_ISNICK) && autokick->nc == nc) || (!autokick->HasFlag(AK_ISNICK) && match_usermask(autokick->mask, user)))
+			if (autokick->HasFlag(AK_ISNICK) && autokick->nc == nc)
+				do_kick = true;
+			else
+			{
+				Entry akick_mask(autokick->mask);
+				if (akick_mask.Matches(user))
+					do_kick = true;
+			}
+			if (do_kick)
 			{
 				Log(LOG_DEBUG_2) << user->nick << " matched akick " << (autokick->HasFlag(AK_ISNICK) ? autokick->nc->display : autokick->mask);
 				autokick->last_used = Anope::CurTime;
@@ -757,7 +765,6 @@ bool ChannelInfo::CheckKick(User *user)
 				else
 					mask = autokick->mask;
 				reason = autokick->reason.empty() ? Config->CSAutokickReason : autokick->reason;
-				do_kick = true;
 				break;
 			}
 		}

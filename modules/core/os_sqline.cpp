@@ -170,12 +170,9 @@ class CommandOSSQLine : public Command
 			reason += " " + params[3];
 		if (!mask.empty() && !reason.empty())
 		{
-			User *user = finduser(mask);
-			if (user)
-				mask = "*@" + user->host;
 			unsigned int affected = 0;
 			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
-				if (Anope::Match((*it)->GetIdent() + "@" + (*it)->host, mask))
+				if (Anope::Match((*it)->nick, mask))
 					++affected;
 			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 
@@ -370,7 +367,7 @@ class CommandOSSQLine : public Command
 	{
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
-		SGLine->Clear();
+		SQLine->Clear();
 		source.Reply(OPER_SQLINE_CLEAR);
 
 		return MOD_CONT;

@@ -142,11 +142,13 @@ class CoreExport XLineManager
 	 */
 	virtual XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
+ private:
 	/** Delete an XLine, eg, remove it from the IRCd.
 	 * @param x The xline
 	 */
 	virtual void Del(XLine *x);
 
+ public:
 	/** Checks if a mask can/should be added to the XLineManager
 	 * @param mask The mask
 	 * @param expires When the mask would expire

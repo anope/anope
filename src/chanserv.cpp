@@ -376,7 +376,7 @@ void expire_chans()
 			expire = true;
 
 		if (ci->HasFlag(CI_NO_EXPIRE))
-			expire = true;
+			expire = false;
 
 		if (expire)
 		{

@@ -44,7 +44,7 @@ class ModuleAlias : public Module
 			Anope::string target_client = config.ReadValue("alias", "target_client", "", i);
 			Anope::string target_command = config.ReadValue("alias", "target_command", "", i);
 			
-			if ((!fantasy &&source_client.empty()) || source_command.empty() || target_client.empty() || target_command.empty())
+			if ((!fantasy && source_client.empty()) || source_command.empty() || target_client.empty() || target_command.empty())
 				continue;
 
 			CommandAlias alias;
@@ -62,12 +62,12 @@ class ModuleAlias : public Module
 	EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci)
 	{
 		bool fantasy = ci != NULL;
-		std::map<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command),
+		std::map<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command), it_end = it;
+		if (it_end != aliases.end())
 			it_end = aliases.upper_bound(command);
 		for (; it != it_end; ++it)
 		{
 			const CommandAlias &alias = it->second;
-
 			
 			if (!fantasy && !bi->nick.equals_ci(alias.source_client))
 				continue;

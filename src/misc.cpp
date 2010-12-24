@@ -201,7 +201,7 @@ time_t dotime(const Anope::string &s)
 	if (s.empty())
 		return -1;
 
-	int amount = 0;
+	int amount;
 	Anope::string end;
 
 	try
@@ -230,7 +230,7 @@ time_t dotime(const Anope::string &s)
 	}
 	catch (const CoreException &) { }
 
-	return amount;
+	return 0;
 }
 
 /*************************************************************************/

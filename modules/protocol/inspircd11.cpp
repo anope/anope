@@ -587,6 +587,8 @@ class InspircdIRCdMessage : public IRCdMessage
 		}
 
 		IRCdMessage::OnCapab(source, params);
+
+		return true;
 	}
 
 	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -676,6 +678,8 @@ class InspircdIRCdMessage : public IRCdMessage
 			c->UnsetFlag(CH_SYNCING);
 			c->Sync();
 		}
+
+		return true;
 	}
 };
 

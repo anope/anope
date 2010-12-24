@@ -312,10 +312,6 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		}
 	}
 
-	/* return if the user is on the ignore list  */
-	if (get_ignore(u->nick))
-		return;
-
 	/* Fantaisist commands */
 	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config->BSFantasyCharacter[0] && !was_action)
 	{

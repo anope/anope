@@ -793,16 +793,6 @@ class Entry : public Flags<EntryType>
 
 /*************************************************************************/
 
-/* Ignorance list data. */
-
-struct IgnoreData
-{
-	Anope::string mask;
-	time_t time; /* When do we stop ignoring them? */
-};
-
-/*************************************************************************/
-
 /* News stuff */
 
 enum NewsType

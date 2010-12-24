@@ -230,7 +230,7 @@ time_t dotime(const Anope::string &s)
 	}
 	catch (const CoreException &) { }
 
-	return -1;
+	return 0;
 }
 
 /*************************************************************************/

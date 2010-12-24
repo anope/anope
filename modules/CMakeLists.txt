@@ -76,9 +76,9 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           endif(WIN32)
           set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${TEMP_LDFLAGS} ${WIN32_NO_LIBS}")
           add_dependencies(${SO} ${PROGRAM_NAME})
-          # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
+          # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
           if(WIN32)
-            target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${WIN32_MEMORY} ${TEMP_DEPENDENCIES})
+            target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY} ${TEMP_DEPENDENCIES})
             set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory
@@ -170,9 +170,9 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           add_library(${SO} MODULE ${MODULES_SUBDIR_SRCS})
           set_target_properties(${SO} PROPERTIES LINKER_LANGUAGE CXX PREFIX "" SUFFIX "" LINK_FLAGS "${SUBDIR_LDFLAGS}")
           add_dependencies(${SO} ${PROGRAM_NAME})
-          # For Windows only, have the module link to the export library of Anope as well as the wsock32 library (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
+          # For Windows only, have the module link to the export library of Anope as well as wsock32 and Ws2_32 libraries (most of the modules probably don't need this, but this is to be on the safe side), also set it's version
           if(WIN32)
-             target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 ${WIN32_MEMORY} ${SUBDIR_EXTRA_DEPENDS})
+             target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY} ${SUBDIR_EXTRA_DEPENDS})
              set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory

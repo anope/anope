@@ -579,13 +579,13 @@ void ChannelInfo::LoadMLock()
  */
 bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool status) const
 {
-	std::map<ChannelModeName, ModeLock>::const_iterator it = this->mode_locks.find(mode->Name);
+	std::multimap<ChannelModeName, ModeLock>::const_iterator it = this->mode_locks.find(mode->Name);
 
 	if (it != this->mode_locks.end())
 	{
 		if (mode->Type != MODE_REGULAR)
 		{
-			std::map<ChannelModeName, ModeLock>::const_iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			std::multimap<ChannelModeName, ModeLock>::const_iterator it_end = this->mode_locks.upper_bound(mode->Name);
 			for (; it != it_end; ++it)
 			{
 				const ModeLock &ml = it->second;

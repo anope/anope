@@ -176,7 +176,7 @@ namespace irc
 
 	/** Used to hash irc::strings for unordered_map
 	 */
-	struct hash
+	struct CoreExport hash
 	{
 		/* VS 2008 specific code */
 		enum { bucket_size = 4, min_buckets = 8 };
@@ -253,7 +253,7 @@ namespace ci
 
 	/** Used to hash ci::strings for unordered_map
 	 */
-	struct hash
+	struct CoreExport hash
 	{
 		/* VS 2008 specific code */
 		enum { bucket_size = 4, min_buckets = 8 };

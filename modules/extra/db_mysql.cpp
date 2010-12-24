@@ -206,7 +206,7 @@ static Anope::string MakeMLock(ChannelInfo *ci, bool status)
 		;
 	else
 	{
-		for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 		{
 			const ModeLock &ml = it->second;
 			if (ml.set == status)
@@ -249,7 +249,7 @@ static Anope::string GetMLockParams(ChannelInfo *ci, bool onoff)
 	}
 	else
 	{
-		for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 		{
 			const ModeLock &ml = it->second;
 

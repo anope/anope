@@ -62,7 +62,7 @@ class ModuleAlias : public Module
 	EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci)
 	{
 		bool fantasy = ci != NULL;
-		std::map<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command), it_end = it;
+		std::multimap<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command), it_end = it;
 		if (it_end != aliases.end())
 			it_end = aliases.upper_bound(command);
 		for (; it != it_end; ++it)

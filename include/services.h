@@ -765,7 +765,7 @@ enum EntryType
 	ENTRYTYPE_HOST
 };
 
-class Entry : public Flags<EntryType>
+class CoreExport Entry : public Flags<EntryType>
 {
 	Anope::string mask;
 

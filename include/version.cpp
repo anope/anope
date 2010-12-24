@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 	for (std::list<std::pair<std::string, std::string> >::iterator it = versions.begin(), it_end = versions.end(); it != it_end; ++it)
 	{
 		if (it->first == "EXTRA")
-			fd << "#define VERSION_EXTRA \"" << (!version_extra.empty() ? version_extra : "") << it->second << "\"" << std::endl;
+			fd << "#define VERSION_EXTRA \"" << (!version_extra.empty() ? version_extra : "") << (version_extra.find(it->second) == std::string::npos ? it->second  : "") << "\"" << std::endl;
 		else
 			fd << "#define VERSION_" << it->first << " " << it->second << std::endl;
 	}

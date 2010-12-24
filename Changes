@@ -2,6 +2,7 @@ Anope Version 1.8 - GIT
 -----------------------
 12/15  F Fixed /cs enforce #channel to say SET was enforced not (null)   [#1213]
 12/23  F Fixed /cs (un)ban and akick from matching users real hosts/IP   [#1079]
+12/12  F Remove vhost requests from nicks that expire                    [  #00]
 
 Anope Version 1.8.5
 -------------------

@@ -115,6 +115,9 @@ int AnopeInit(int argc, char **argv)
     hook = createEventHook(EVENT_NICK_DROPPED, hsreqevt_nick_dropped);
     moduleAddEventHook(hook);
 
+    hook = createEventHook(EVENT_NICK_EXPIRE, hsreqevt_nick_dropped);
+    moduleAddEventHook(hook);
+
     hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
     moduleAddEventHook(hook);
 

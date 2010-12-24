@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3049"
+VERSION_BUILD="3050"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3050 - Remove vhost requests from nicks that expire
 #Revision 3049 - Bug #1079 - Prevent /cs ban, akick, unban, etc, from matching against users real hostname and IPs in an attempt to prevent unauthorized users from gaining other users IPs via brute force attacks.
 #Revision 3048 - Bug #1213 - Fixed /cs enforce #channel to say SET was enforced not (null)
 #Revision 3047 - Fixed some warnings found by cppcheck

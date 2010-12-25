@@ -36,7 +36,7 @@ class CommandCSSetMLock : public Command
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->SetMLock(CMODE_REGISTERED, true);
 
-		Anope::string modes = params[1];
+		Anope::string modes = params.size() > 1 ? params[1] : "";
 		for (Anope::string::const_iterator ch = modes.begin(), end = modes.end(); ch != end; ++ch)
 		{
 			switch (*ch)

@@ -605,7 +605,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 			User *user = *it;
 			++it;
 
-			if (!user->HasMode(UMODE_OPER) && Anope::Match(user->realname, x->Mask))
+			if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
 				kill_user(Config->ServerName, user, rreason);
 		}
 	}
@@ -697,7 +697,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 					UserContainer *uc = *it;
 					++it;
 
-					if (uc->user->HasMode(UMODE_OPER))
+					if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
 						continue;
 					c->Kick(NULL, uc->user, "%s", reason.c_str());
 				}
@@ -710,7 +710,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 				User *user = *it;
 				++it;
 
-				if (!user->HasMode(UMODE_OPER) && Anope::Match(user->nick, x->Mask))
+				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
 					kill_user(Config->ServerName, user, rreason);
 			}
 		}

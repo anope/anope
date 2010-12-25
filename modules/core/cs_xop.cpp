@@ -285,7 +285,6 @@ class XOPBase : public Command
 	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, ChannelInfo *ci, int level, LanguageString *messages)
 	{
 		Anope::string nick = params.size() > 2 ? params[2] : "";
-		ChanAccess *access;
 
 		if (nick.empty())
 		{
@@ -329,16 +328,18 @@ class XOPBase : public Command
 				return MOD_CONT;
 			}
 			NickCore *nc = na->nc;
+
+			ChanAccess *access = NULL;
 			unsigned i, end;
 			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				access = ci->GetAccess(nc, i);
+				access = ci->GetAccess(i);
 
-				if (access->nc == nc)
+				if (access->nc == nc && access->level == level)
 					break;
 			}
 
-			if (i == end || access->level != level)
+			if (i == end)
 			{
 				u->SendMessage(ChanServ, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
 				return MOD_CONT;

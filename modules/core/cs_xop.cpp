@@ -332,13 +332,13 @@ class XOPBase : public Command
 			unsigned i, end;
 			for (i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				access = ci->GetAccess(nc, level);
+				access = ci->GetAccess(nc, i);
 
 				if (access->nc == nc)
 					break;
 			}
 
-			if (i == end)
+			if (i == end || access->level != level)
 			{
 				u->SendMessage(ChanServ, messages[XOP_NOT_FOUND], nick.c_str(), ci->name.c_str());
 				return MOD_CONT;

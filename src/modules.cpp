@@ -173,6 +173,9 @@ int Module::DelCommand(BotInfo *bi, Command *c)
 
 	if (!bi->Commands.erase(c->name))
 		return MOD_ERR_NOEXIST;
+	
+	c->module = NULL;
+	c->service = NULL;
 
 	return MOD_ERR_OK;
 }

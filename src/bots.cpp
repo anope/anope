@@ -72,6 +72,14 @@ BotInfo::~BotInfo()
 			ci->bi = NULL;
 	}
 
+	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+	{
+		Command *c = it->second;
+
+		if (c->module)
+			c->module->DelCommand(this, c);
+	}
+
 	BotListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID.erase(this->uid);

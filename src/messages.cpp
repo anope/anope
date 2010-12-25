@@ -174,9 +174,7 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
 				}
 			}
-			if (bi == NickServ || bi == MemoServ || bi == BotServ)
-				mod_run_cmd(bi, u, message);
-			else if (bi == ChanServ)
+			if (bi == ChanServ)
 			{
 				if (!is_oper(u) && Config->CSOpersOnly)
 					u->SendMessage(ChanServ, ACCESS_DENIED);
@@ -204,6 +202,8 @@ int m_privmsg(const Anope::string &source, const Anope::string &receiver, const 
 					mod_run_cmd(bi, u, message);
 				}
 			}
+			else
+				mod_run_cmd(bi, u, message);
 		}
 	}
 

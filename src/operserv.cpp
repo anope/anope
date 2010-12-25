@@ -324,9 +324,8 @@ XLine *XLineManager::GetEntry(unsigned index)
  */
 void XLineManager::Clear()
 {
-	for (std::vector<XLine *>::iterator it = this->XLines.begin(), it_end = this->XLines.end(); it != it_end; ++it)
-		delete *it;
-	this->XLines.clear();
+	while (!this->XLines.empty())
+		this->DelXLine(this->XLines.front());
 }
 
 /** Add an entry to this XLine Manager

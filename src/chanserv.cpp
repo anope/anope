@@ -111,7 +111,7 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 {
 	Anope::string pos = "+", neg = "-", params;
 
-	for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 	{
 		const ModeLock &ml = it->second;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
@@ -241,7 +241,7 @@ void check_modes(Channel *c)
 		return;
 	}
 
-	for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 	{
 		const ModeLock &ml = it->second;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);

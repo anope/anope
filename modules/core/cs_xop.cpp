@@ -316,7 +316,7 @@ class XOPBase : public Command
 			XOPDelCallback list(source, this, messages, override, mask);
 			list.Process();
 		}
-		else if (!access)
+		else if (!access || access->level != level)
 		{
 			source.Reply(messages[XOP_NOT_FOUND], mask.c_str(), ci->name.c_str());
 			return MOD_CONT;

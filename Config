@@ -171,7 +171,7 @@ if [ ! "$NO_INTRO" ] ; then
 		# Only do this if we are not on a tag, src/version.sh will be all we need then.
 		if [ "$VERSION_BUILD" != "$VERSION_EXTRA" ] ; then
 			echo "#define VERSION_BUILD	$VERSION_BUILD" > include/version.h
-			echo "#define VERSION_EXTRA	\"$VERSION_EXTRA\"" >> include/version.h
+			echo "#define VERSION_EXTRA	\"-$VERSION_EXTRA\"" >> include/version.h
 		fi
 	fi
 	cat $SOURCE_DIR/.BANNER | sed "s/CURVER/$VERSION/" | sed "s@SOURCE_DIR@$SOURCE_DIR@" | $PAGER

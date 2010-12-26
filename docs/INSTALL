@@ -185,16 +185,16 @@ Note: You should also read the README and FAQ files!
     modification.
 
     First rename the example.chk script that is in Anope path (by default,
-    this is ~/services) to services.chk and edit it. You'll need to modify
-    the CONFIGURATION part of the file. Then ensure that the file is marked
-    as executable by typing chmod +x services.chk, and try to launch the
+    this is ~/services/data) to services.chk and edit it. You'll need to 
+    modify the CONFIGURATION part of the file. Then ensure that the file is 
+    marked as executable by typing chmod +x services.chk, and try to launch the
     script to see if it works (Anope must not be running when you do this ;))
 
     When this is done, you'll have to add the crontab entry. Type crontab -e.
     This will open the default text editor with the crontab file. Enter the
     following (with correct path):
 
-        */5 * * * * /home/ircd/services/services.chk >/dev/null 2>&1
+        */5 * * * * /home/ircd/services/data/services.chk >/dev/null 2>&1
 
     The */5 at the beginning means "check every 5 minutes". You may replace
     the 5 with other another number if you want (but less than 60). Consult

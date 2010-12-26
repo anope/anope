@@ -340,7 +340,7 @@ class CoreExport ConnectionSocket : public BufferedSocket
 	void Connect(const Anope::string &TargetHost, int Port, const Anope::string &BindHost = "");
 };
 
-class ClientSocket : public BufferedSocket
+class CoreExport ClientSocket : public BufferedSocket
 {
  public:
 	/* Listen socket this connection came from */

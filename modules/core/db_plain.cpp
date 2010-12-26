@@ -980,7 +980,7 @@ class DBPlain : public Module
 					db << " " << oldmodes;
 				else
 				{
-					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
 						const ModeLock &ml = it->second;
 						if (ml.set)
@@ -1003,7 +1003,7 @@ class DBPlain : public Module
 				}
 				else
 				{
-					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
 						const ModeLock &ml = it->second;
 						if (!ml.set)
@@ -1028,7 +1028,7 @@ class DBPlain : public Module
 				}
 				else
 				{
-					for (std::map<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
 						const ModeLock &ml = it->second;
 						ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);

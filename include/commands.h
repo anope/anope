@@ -44,7 +44,7 @@ enum CommandFlag
 };
 
 /* The source for a command */
-struct CommandSource
+struct CoreExport CommandSource
 {
 	/* User executing the command */
 	User *u;

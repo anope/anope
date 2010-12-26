@@ -10,12 +10,10 @@ class SocketEngineEPoll : public SocketEngineBase
 	long max;
 	int EngineHandle;
 	epoll_event *events;
-	unsigned SocketCount;
 
  public:
 	SocketEngineEPoll()
 	{
-		SocketCount = 0;
 		max = ulimit(4, 0);
 
 		if (max <= 0)
@@ -57,8 +55,6 @@ class SocketEngineEPoll : public SocketEngineBase
 		}
 
 		Sockets.insert(std::make_pair(ev.data.fd, s));
-
-		++SocketCount;
 	}
 
 	void DelSocket(Socket *s)
@@ -76,8 +72,6 @@ class SocketEngineEPoll : public SocketEngineBase
 		}
 
 		Sockets.erase(ev.data.fd);
-
-		--SocketCount;
 	}
 
 	void MarkWritable(Socket *s)

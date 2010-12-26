@@ -32,9 +32,9 @@ NickCore::~NickCore()
 	/* Clean up this nick core from any users online using it
 	 * (ones that /nick but remain unidentified)
 	 */
-	for (std::list<User *>::iterator it = this->Users.begin(), it_end = this->Users.end(); it != it_end; ++it)
+	for (std::list<User *>::iterator it = this->Users.begin(); it != this->Users.end();)
 	{
-		User *user = *it;
+		User *user = *it++;
 		ircdproto->SendAccountLogout(user, user->Account());
 		user->RemoveMode(NickServ, UMODE_REGISTERED);
 		ircdproto->SendUnregisteredNick(user);

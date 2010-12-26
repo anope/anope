@@ -213,7 +213,7 @@ class CommandNSRegister : public CommandNSConfirm
 		/* Guest nick can now have a series of between 1 and 7 digits.
 		 *   --lara
 		 */
-		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
+		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && u->nick.substr(prefixlen).find_first_not_of("1234567890") == Anope::string::npos)
 		{
 			source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
 			return MOD_CONT;

@@ -49,7 +49,7 @@ class MemoListCallback : public NumberList
 class CommandMSRead : public Command
 {
  public:
-	CommandMSRead() : Command("READ", 0, 2)
+	CommandMSRead() : Command("READ", 1, 2)
 	{
 	}
 
@@ -59,8 +59,7 @@ class CommandMSRead : public Command
 
 		MemoInfo *mi;
 		ChannelInfo *ci = NULL;
-		Anope::string numstr = !params.empty() ? params[0] : "", chan;
-		int num;
+		Anope::string numstr = params[0], chan;
 
 		if (!numstr.empty() && numstr[0] == '#')
 		{
@@ -81,8 +80,8 @@ class CommandMSRead : public Command
 		}
 		else
 			mi = &u->Account()->memos;
-		num = !numstr.empty() && numstr.is_number_only() ? convertTo<int>(numstr) : -1;
-		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && num <= 0))
+
+		if (numstr.empty() || (!numstr.equals_ci("LAST") && !numstr.equals_ci("NEW") && !numstr.is_number_only()))
 			this->OnSyntaxError(source, numstr);
 		else if (mi->memos.empty())
 		{
@@ -91,7 +90,8 @@ class CommandMSRead : public Command
 			else
 				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
-		else {
+		else
+		{
 			int i, end;
 
 			if (numstr.equals_ci("NEW"))

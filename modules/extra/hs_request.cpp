@@ -153,6 +153,7 @@ class CommandHSActivate : public Command
 			if (it != Requests.end())
 			{
 				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
+				FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
 				if (HSRequestMemoUser)
 					memo_send(source, na->nick, _("[auto memo] Your requested vHost has been approved."), 2);

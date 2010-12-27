@@ -8,7 +8,7 @@
  * for use in Anope.
  */
 
-#include "anope.h"
+#include "services.h"
 
 /*
  *

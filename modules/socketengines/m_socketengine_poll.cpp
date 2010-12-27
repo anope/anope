@@ -72,7 +72,7 @@ class SocketEnginePoll : public SocketEngineBase
 			return;
 		}
 
-		if (pos->second != SocketCount)
+		if (pos->second != SocketCount - 1)
 		{
 			pollfd *ev = &this->events[pos->second],
 				*last_ev = &this->events[SocketCount - 1];

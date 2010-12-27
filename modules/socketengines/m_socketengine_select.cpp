@@ -73,10 +73,13 @@ class SocketEngineSelect : public SocketEngineBase
 		}
 		else if (sresult)
 		{
-			for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; ++it)
+			int processed = 0;
+			for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end && processed != sresult; ++it)
 			{
 				Socket *s = it->second;
 
+				if (FD_ISSET(s->GetFD(), &efdset) || FD_ISSET(s->GetFD(), &rfdset) || FD_ISSET(s->GetFD(), &wfdset))
+					++processed;
 				if (s->HasFlag(SF_DEAD))
 					continue;
 				if (FD_ISSET(s->GetFD(), &efdset))

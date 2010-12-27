@@ -137,9 +137,13 @@ class SocketEnginePoll : public SocketEngineBase
 			return;
 		}
 
-		for (int i = 0; i < total; ++i)
+		for (int i = 0, processed = 0; i < SocketCount && processed != total; ++i)
 		{
 			pollfd *ev = &this->events[i];
+			
+			if (ev->revents != 0)
+				++processed;
+
 			Socket *s = Sockets[ev->fd];
 
 			if (s->HasFlag(SF_DEAD))

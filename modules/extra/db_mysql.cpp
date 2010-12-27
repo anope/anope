@@ -1314,7 +1314,7 @@ class DBMySQL : public Module
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
 	}
 
-	void OnMemoDel(NickCore *nc, MemoInfo *mi, Memo *m)
+	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
 	{
 		if (m)
 			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "' AND `time` = " + stringify(m->time));

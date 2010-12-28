@@ -106,6 +106,11 @@ class CommandCSRegister : public Command
 	{
 		SyntaxError(source, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
+
+	void OnServHelp(CommandSource &source)
+	{
+		source.Reply(CHAN_HELP_CMD_REGISTER);
+	}
 };
 
 class CSRegister : public Module

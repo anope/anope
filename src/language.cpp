@@ -3291,6 +3291,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_SERVADMIN_HELP_UNSUSPEND */
 	_("Syntax: UNSUSPEND nickname\n"
 	"UNSUSPENDS a nickname from being used."),
+	/* CHAN_HELP_CMD_REGISTER */
+	_("    REGISTER   Register a channel"),
 	/* CHAN_HELP_CMD_FORBID */
 	_("    FORBID     Prevent a channel from being used"),
 	/* CHAN_HELP_CMD_SUSPEND */

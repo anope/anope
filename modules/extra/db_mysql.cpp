@@ -906,6 +906,18 @@ class DBMySQL : public Module
 			}
 		}
 
+		r = SQL->RunQuery("SELECT * FROM `anope_os_exceptions`");
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			Anope::string mask = r.Get(i, "mask");
+			unsigned limit = convertTo<unsigned>(r.Get(i, "slimit"));
+			Anope::string creator = r.Get(i, "who");
+			Anope::string reason = r.Get(i, "reason");
+			time_t expires = convertTo<time_t>(r.Get(i, "expires"));
+
+			exception_add(NULL, mask, limit, reason, creator, expires);
+		}
+
 		r = SQL->RunQuery("SELECT * FROM `anope_extra`");
 		for (int i = 0; i < r.Rows(); ++i)
 		{
@@ -1371,7 +1383,7 @@ class DBMySQL : public Module
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
 	}
 
-	void OnMemoDel(NickCore *nc, MemoInfo *mi, Memo *m)
+	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
 	{
 		if (m)
 			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(nc->display) + "' AND `time` = " + stringify(m->time));

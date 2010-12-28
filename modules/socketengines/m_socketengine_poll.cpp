@@ -72,7 +72,7 @@ class SocketEnginePoll : public SocketEngineBase
 			return;
 		}
 
-		if (pos->second != SocketCount)
+		if (pos->second != SocketCount - 1)
 		{
 			pollfd *ev = &this->events[pos->second],
 				*last_ev = &this->events[SocketCount - 1];
@@ -137,9 +137,13 @@ class SocketEnginePoll : public SocketEngineBase
 			return;
 		}
 
-		for (int i = 0; i < total; ++i)
+		for (int i = 0, processed = 0; i < SocketCount && processed != total; ++i)
 		{
 			pollfd *ev = &this->events[i];
+			
+			if (ev->revents != 0)
+				++processed;
+
 			Socket *s = Sockets[ev->fd];
 
 			if (s->HasFlag(SF_DEAD))

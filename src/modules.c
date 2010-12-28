@@ -2216,7 +2216,7 @@ char *moduleGetData(ModuleData ** md, char *key)
             do_backtrace(0);
     }
 
-    if (debug) {
+    if (debug > 1) {
         alog("debug: moduleGetData %p : key %s", (void *) md, key);
         alog("debug: Current Module %s", mod_name);
     }

@@ -100,6 +100,11 @@ class CommandCSRegister : public Command
 	{
 		SyntaxError(ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
 	}
+
+	void OnServHelp(User *u)
+	{
+		u->SendMessage(ChanServ, CHAN_HELP_CMD_REGISTER);
+	}
 };
 
 class CSRegister : public Module

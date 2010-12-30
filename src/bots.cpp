@@ -64,6 +64,14 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 BotInfo::~BotInfo()
 {
+	// If we're synchronised with the uplink already, send the bot.
+	if (Me && Me->IsSynced())
+	{
+		ircdproto->SendQuit(this, NULL);
+		XLine x(this->nick);
+		ircdproto->SendSQLineDel(&x);
+	}
+
 	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 	{
 		ChannelInfo *ci = it->second;

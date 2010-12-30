@@ -571,11 +571,9 @@ void ChannelInfo::LoadMLock()
 		else
 		{
 			if (!this->bi)
-			{
-				this->bi = whosends(this);
-				++this->bi->chancount;
-			}
-			this->bi->Join(this->c);
+				whosends(this)->Assign(NULL, this);
+			if (this->c->FindUser(this->bi) == NULL)
+				this->bi->Join(this->c);
 		}
 
 		check_modes(this->c);

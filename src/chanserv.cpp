@@ -115,7 +115,7 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 	{
 		const ModeLock &ml = it->second;
 		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-		if (!cm)
+		if (!cm || cm->Type == MODE_LIST || cm->Type == MODE_STATUS)
 			continue;
 
 		if (ml.set)
@@ -123,7 +123,7 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 		else
 			neg += cm->ModeChar;
 
-		if (complete && !ml.param.empty() && (cm->Type == MODE_PARAM || cm->Type == MODE_LIST))
+		if (complete && !ml.param.empty() && cm->Type == MODE_PARAM)
 			params += " " + ml.param;
 	}
 

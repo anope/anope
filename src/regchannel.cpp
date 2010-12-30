@@ -567,6 +567,7 @@ void ChannelInfo::LoadMLock()
 		{
 			/* At this point, CMODE_PERM *must* be locked on the channel, so this is fine */
 			ircdproto->SendChannel(this->c, get_mlock_modes(this, true));
+			this->c->SetModesInternal(NULL, get_mlock_modes(this, true));
 		}
 		else
 		{
@@ -577,7 +578,7 @@ void ChannelInfo::LoadMLock()
 		}
 
 		check_modes(this->c);
-		this->CheckTopic();
+		this->RestoreTopic();
 	}
 }
 

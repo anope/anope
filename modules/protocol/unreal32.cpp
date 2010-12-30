@@ -375,6 +375,24 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		ircdproto->SendMode(NickServ, u, "+d 1");
 	}
+
+	void SendChannel(Channel *c, const Anope::string &modes)
+	{
+		/* Unreal does not support updating a channels TS without actually joining a user,
+		 * so we will join and part us now
+		 */
+		BotInfo *bi = whosends(c->ci);
+		if (c->FindUser(bi) == NULL)
+		{
+			bi->Join(c, true);
+			bi->Part(c);
+		}
+		else
+		{
+			bi->Part(c);
+			bi->Join(c, true);
+		}
+	}
 };
 
 class Unreal32IRCdMessage : public IRCdMessage
@@ -695,9 +713,6 @@ class Unreal32IRCdMessage : public IRCdMessage
 		{
 			c->creation_time = ts;
 			c->Reset();
-
-			/* Reset mlock */
-			check_modes(c);
 		}
 		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 		else if (ts > c->creation_time)
@@ -977,7 +992,7 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 		if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
 			return true;
 	}
-	catch (const CoreException &) { } // convertTo fail
+	catch (const ConvertException &) { }
 	
 	/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 	size_t end_bracket = value.find(']', 1);

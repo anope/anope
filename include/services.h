@@ -357,12 +357,20 @@ template<typename T, size_t Size = 32> class Flags
 
 /*************************************************************************/
 
+class ConvertException : public CoreException
+{
+ public:
+	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
+
+	virtual ~ConvertException() throw() { }
+};
+
 template<typename T> inline Anope::string stringify(const T &x)
 {
 	std::ostringstream stream;
 
 	if (!(stream << x))
-		throw CoreException("Stringify fail");
+		throw ConvertException("Stringify fail");
 
 	return stream.str();
 }
@@ -374,11 +382,11 @@ template<typename T> inline void convert(const Anope::string &s, T &x, Anope::st
 	char c;
 	bool res = i >> x;
 	if (!res)
-		throw CoreException("Convert fail");
+		throw ConvertException("Convert fail");
 	if (failIfLeftoverChars)
 	{
 		if (i.get(c))
-			throw CoreException("Convert fail");
+			throw ConvertException("Convert fail");
 	}
 	else
 	{
@@ -987,6 +995,11 @@ class CoreExport IRCDProto
 	 * @param u The user
 	 */
 	virtual void SetAutoIdentificationToken(User *u) { }
+
+	/** Send a channel creation message to the uplink.
+	 * On most TS6 IRCds this is a SJOIN with no nick
+	 */
+	virtual void SendChannel(Channel *c, const Anope::string &modes) { }
 };
 
 class CoreExport IRCdMessage

@@ -57,7 +57,6 @@ class SSMain : public Module
 			for (CommandMap::iterator it = statserv->Commands.begin(), it_end = statserv->Commands.end(); it != it_end; ++it)
 				this->DelCommand(statserv, it->second);
 
-			ircdproto->SendQuit(statserv, "Quit due to module unload.");
 			delete statserv;
 		}
 	}

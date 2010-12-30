@@ -563,10 +563,19 @@ void ChannelInfo::LoadMLock()
 	if (this->HasFlag(CI_PERSIST) && !this->c)
 	{
 		this->c = new Channel(this->name, this->time_registered);
-		if (!this->bi && ChanServ && ModeManager::FindChannelModeByName(CMODE_PERM) == NULL)
-			ChanServ->Assign(NULL, this);
-		else if (this->bi)
-			this->bi->Join(c);
+		if (ModeManager::FindChannelModeByName(CMODE_PERM) != NULL)
+		{
+			/* At this point, CMODE_PERM *must* be locked on the channel, so this is fine */
+			ircdproto->SendChannel(this->c, get_mlock_modes(this, true));
+		}
+		else
+		{
+			if (!this->bi)
+				whosends(this)->Assign(NULL, this);
+			if (this->c->FindUser(this->bi) == NULL)
+				this->bi->Join(this->c);
+		}
+
 		check_modes(this->c);
 		this->CheckTopic();
 	}

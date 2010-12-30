@@ -68,7 +68,7 @@ NickServRelease::~NickServRelease()
 {
 	NickServReleases.erase(this->nick);
 
-	ircdproto->SendQuit(debug_cast<User *>(this), NULL);
+	ircdproto->SendQuit(this, NULL);
 }
 
 void NickServRelease::Tick(time_t)

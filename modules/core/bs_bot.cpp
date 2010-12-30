@@ -294,10 +294,6 @@ class CommandBSBot : public Command
 
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
 
-		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", source.u->nick.c_str());
-		XLine x(bi->nick);
-		ircdproto->SendSQLineDel(&x);
-
 		Log(LOG_ADMIN, source.u, this) << "DEL " << bi->nick;
 
 		source.Reply(BOT_BOT_DELETED, nick.c_str());

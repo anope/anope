@@ -232,6 +232,11 @@ class RatboxProto : public IRCDProto
 		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
 	}
 
+	void SendChannel(Channel *c, const Anope::string &modes)
+	{
+		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+	}
+
 	bool IsNickValid(const Anope::string &nick)
 	{
 		/* TS6 Save extension -Certus */
@@ -377,9 +382,6 @@ class RatboxIRCdMessage : public IRCdMessage
 		{
 			c->creation_time = ts;
 			c->Reset();
-
-			/* Reset mlock */
-			check_modes(c);
 		}
 		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 		else if (ts > c->creation_time)

@@ -977,7 +977,7 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 		if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
 			return true;
 	}
-	catch (const CoreException &) { } // convertTo fail
+	catch (const ConvertException &) { }
 	
 	/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
 	size_t end_bracket = value.find(']', 1);

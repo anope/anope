@@ -228,7 +228,7 @@ time_t dotime(const Anope::string &s)
 			}
 		}
 	}
-	catch (const CoreException &) { }
+	catch (const ConvertException &) { }
 
 	return 0;
 }

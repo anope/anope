@@ -400,8 +400,13 @@ void ChannelInfo::LoadMLock()
 		this->c = new Channel(this->name, this->time_registered);
 		if (!this->bi && ChanServ && ModeManager::FindChannelModeByName(CMODE_PERM) == NULL)
 			ChanServ->Assign(NULL, this);
-		else if (this->bi)
-			this->bi->Join(c);
+		else
+		{
+			if (!this->bi)
+				whosends(this)->Assign(NULL, this);
+			if (this->c->FindUser(this->bi) == NULL)
+				this->bi->Join(this->c);
+		}
 		check_modes(this->c);
 		this->CheckTopic();
 	}

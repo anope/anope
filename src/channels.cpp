@@ -87,6 +87,9 @@ void Channel::Reset()
 	check_modes(this);
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		chan_set_correct_modes((*it)->user, this, 1);
+	
+	if (this->ci)
+		this->ci->RestoreTopic();
 }
 
 void Channel::Sync()
@@ -117,12 +120,12 @@ void Channel::JoinUser(User *user)
 	uc->Status = Status;
 	this->users.push_back(uc);
 
-	bool update_ts = false;
 	if (this->ci && this->ci->HasFlag(CI_PERSIST) && this->creation_time > this->ci->time_registered)
 	{
 		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
 		this->creation_time = this->ci->time_registered;
-		update_ts = true;
+		ircdproto->SendChannel(this, "");
+		this->Reset();
 	}
 
 	if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
@@ -142,7 +145,7 @@ void Channel::JoinUser(User *user)
 		 * legit users - Rob
 		 **/
 		if (this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
-			this->ci->bi->Join(this, update_ts);
+			this->ci->bi->Join(this, false);
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
@@ -151,17 +154,6 @@ void Channel::JoinUser(User *user)
 		{
 			ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
 			this->ci->bi->lastmsg = Anope::CurTime;
-		}
-	}
-
-	/* Update the TS, unless I'm joining a bot already */
-	if (update_ts && user->server != Me)
-	{
-		/* Send the updated TS */
-		if (!this->FindUser(whosends(this->ci)))
-		{
-			whosends(this->ci)->Join(this, update_ts);
-			whosends(this->ci)->Part(this);
 		}
 	}
 }

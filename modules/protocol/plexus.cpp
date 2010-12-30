@@ -247,6 +247,11 @@ class PlexusProto : public IRCDProto
 	{
 		send_cmd(bi->GetUID(), "ENCAP * TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
 	}
+
+	void SendChannel(Channel *c, const Anope::string &modes)
+	{
+		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+	}
 };
 
 class PlexusIRCdMessage : public IRCdMessage
@@ -357,9 +362,6 @@ class PlexusIRCdMessage : public IRCdMessage
 		{
 			c->creation_time = ts;
 			c->Reset();
-
-			/* Reset mlock */
-			check_modes(c);
 		}
 		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 		else if (ts > c->creation_time)

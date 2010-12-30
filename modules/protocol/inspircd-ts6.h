@@ -230,6 +230,11 @@ class InspIRCdTS6Proto : public IRCDProto
 		send_cmd(Config->Numeric, "METADATA %s accountname :", u->GetUID().c_str());
 	}
 
+	void SendChannel(Channel *c, const Anope::string &modes)
+	{
+		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), modes.c_str());
+	}
+
 	bool IsNickValid(const Anope::string &nick)
 	{
 		/* InspIRCd, like TS6, uses UIDs on collision, so... */

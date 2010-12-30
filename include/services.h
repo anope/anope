@@ -995,6 +995,11 @@ class CoreExport IRCDProto
 	 * @param u The user
 	 */
 	virtual void SetAutoIdentificationToken(User *u) { }
+
+	/** Send a channel creation message to the uplink.
+	 * On most TS6 IRCds this is a SJOIN with no nick
+	 */
+	virtual void SendChannel(Channel *c, const Anope::string &modes) { }
 };
 
 class CoreExport IRCdMessage

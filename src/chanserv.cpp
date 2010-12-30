@@ -273,7 +273,7 @@ void check_modes(Channel *c)
 			}
 
 		}
-		else if (cm->Type == MODE_LIST) // XXX we still need better list code...
+		else if (cm->Type == MODE_LIST)
 		{
 			if (ml.set)
 				c->SetMode(NULL, cm, ml.param);

@@ -408,7 +408,7 @@ void ChannelInfo::LoadMLock()
 				this->bi->Join(this->c);
 		}
 		check_modes(this->c);
-		this->CheckTopic();
+		this->RestoreTopic();
 	}
 }
 

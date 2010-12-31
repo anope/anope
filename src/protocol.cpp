@@ -500,7 +500,7 @@ bool IRCdMessage::OnQuit(const Anope::string &source, const std::vector<Anope::s
 
 bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	const Anope::string &server = source;
+	const Anope::string &server = params[0];
 
 	Server *s = Server::Find(server);
 

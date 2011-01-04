@@ -931,7 +931,6 @@ class CoreExport IRCDProto
 	virtual void SendAkill(const XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;
 	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
-	virtual void SendSVSMode(const User *, int, const char **) = 0;
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
 	virtual void SendClientIntroduction(const User *u, const Anope::string &) = 0;
@@ -966,7 +965,6 @@ class CoreExport IRCDProto
 	virtual void SendSZLineDel(const XLine *) { }
 	virtual void SendSZLine(const XLine *) { }
 	virtual void SendSGLine(const XLine *) { }
-	virtual void SendSVSModeChan(const Channel *, const Anope::string &, const Anope::string &) { }
 	virtual void SendUnregisteredNick(const User *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }

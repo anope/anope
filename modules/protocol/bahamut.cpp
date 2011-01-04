@@ -102,15 +102,6 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd(Config->ServerName, "SVSHOLD %s 0", nick.c_str());
 	}
 
-	/* SVSMODE channel modes */
-	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
-	{
-		if (!nick.empty())
-			send_cmd(Config->ServerName, "SVSMODE %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
-		else
-			send_cmd(Config->ServerName, "SVSMODE %s %s", c->name.c_str(), mode.c_str());
-	}
-
 	/* SQLINE */
 	void SendSQLine(const XLine *x)
 	{
@@ -205,18 +196,6 @@ class BahamutIRCdProto : public IRCDProto
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
 		send_cmd(source ? source->nick : "", "SVSKILL %s :%s", user->nick.c_str(), buf.c_str());
-	}
-
-	/* SVSMODE */
-	/* parv[0] - sender
-	 * parv[1] - nick
-	 * parv[2] - TS (or mode, depending on svs version)
-	 * parv[3] - mode (or services id if old svs version)
-	 * parv[4] - optional arguement (services id)
-	 */
-	void SendSVSMode(const User *u, int ac, const char **av)
-	{
-		this->SendModeInternal(NULL, u, merge_args(ac, av));
 	}
 
 	void SendBOB()

@@ -144,11 +144,6 @@ class PlexusProto : public IRCDProto
 		send_cmd(source ? source->GetUID() : Config->Numeric, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendSVSMode(const User *u, int ac, const char **av)
-	{
-		this->SendModeInternal(NULL, u, merge_args(ac, av));
-	}
-
 	void SendServer(const Server *server)
 	{
 		if (server == Me)

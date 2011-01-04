@@ -65,11 +65,6 @@ class InspIRCdTS6Proto : public IRCDProto
 		send_cmd(source ? source->GetUID() : Config->Numeric, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendSVSMode(const User *u, int ac, const char **av)
-	{
-		this->SendModeInternal(NULL, u, merge_args(ac, av));
-	}
-
 	void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf)
 	{
 		send_cmd(Config->Numeric, "PUSH %s ::%s %03d %s %s", dest.c_str(), source.c_str(), numeric, dest.c_str(), buf.c_str());

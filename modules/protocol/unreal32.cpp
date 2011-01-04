@@ -127,23 +127,6 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(source ? source->nick : Config->ServerName, "h %s :%s", user->nick.c_str(), buf.c_str());
 	}
 
-	/*
-	 * m_svsmode() added by taz
-	 * parv[0] - sender
-	 * parv[1] - username to change mode for
-	 * parv[2] - modes to change
-	 * parv[3] - Service Stamp (if mode == d)
-	 */
-	void SendSVSMode(const User *u, int ac, const char **av)
-	{
-		if (ac >= 1)
-		{
-			if (!u || !av[0])
-				return;
-			this->SendModeInternal(NULL, u, merge_args(ac, av));
-		}
-	}
-
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (buf.empty())
@@ -298,16 +281,6 @@ class UnrealIRCdProto : public IRCDProto
 		Anope::string edited_reason = x->Reason;
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
 		send_cmd("", "BR + %s :%s", edited_reason.c_str(), x->Mask.c_str());
-	}
-
-	/* SVSMODE channel modes */
-
-	void SendSVSModeChan(const Channel *c, const Anope::string &mode, const Anope::string &nick)
-	{
-		if (!nick.empty())
-			send_cmd(Config->ServerName, "n %s %s %s", c->name.c_str(), mode.c_str(), nick.c_str());
-		else
-			send_cmd(Config->ServerName, "n %s %s", c->name.c_str(), mode.c_str());
 	}
 
 	/* svsjoin

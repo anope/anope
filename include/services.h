@@ -968,7 +968,6 @@ class CoreExport IRCDProto
 	virtual void SendUnregisteredNick(const User *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
-	virtual void SendSVSPart(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendBOB() { }
 	virtual void SendEOB() { }

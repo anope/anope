@@ -300,16 +300,6 @@ class UnrealIRCdProto : public IRCDProto
 			send_cmd(source, "BX %s :%s", nick.c_str(), chan.c_str());
 	}
 
-	/* svspart
-		parv[0] - sender
-		parv[1] - nick to make part
-		parv[2] - channel(s) to part
-	*/
-	void SendSVSPart(const Anope::string &source, const Anope::string &nick, const Anope::string &chan)
-	{
-		send_cmd(source, "BT %s :%s", nick.c_str(), chan.c_str());
-	}
-
 	void SendSWhois(const Anope::string &source, const Anope::string &who, const Anope::string &mask)
 	{
 		send_cmd(source, "BA %s :%s", who.c_str(), mask.c_str());

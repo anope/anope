@@ -183,13 +183,6 @@ class InspIRCdTS6Proto : public IRCDProto
 		send_cmd(bi->GetUID(), "SVSJOIN %s %s", u->GetUID().c_str(), chan.c_str());
 	}
 
-	void SendSVSPart(const Anope::string &source, const Anope::string &nick, const Anope::string &chan)
-	{
-		User *u = finduser(nick);
-		BotInfo *bi = findbot(source);
-		send_cmd(bi->GetUID(), "SVSPART %s %s", u->GetUID().c_str(), chan.c_str());
-	}
-
 	void SendSWhois(const Anope::string &, const Anope::string &who, const Anope::string &mask)
 	{
 		User *u = finduser(who);

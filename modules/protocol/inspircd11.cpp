@@ -258,11 +258,6 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(source, "SVSJOIN %s %s", nick.c_str(), chan.c_str());
 	}
 
-	void SendSVSPart(const Anope::string &source, const Anope::string &nick, const Anope::string &chan)
-	{
-		send_cmd(source, "SVSPART %s %s", nick.c_str(), chan.c_str());
-	}
-
 	void SendBOB()
 	{
 		send_cmd("", "BURST %ld", static_cast<long>(Anope::CurTime));

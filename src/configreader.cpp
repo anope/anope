@@ -1,6 +1,6 @@
 /* Configuration file handling.
  *
- * (C) 2003-2010 Anope Team
+ * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.
@@ -14,7 +14,7 @@
  *       | Inspire Internet Relay Chat Daemon |
  *       +------------------------------------+
  *
- *  InspIRCd: (C) 2002-2010 InspIRCd Development Team
+ *  InspIRCd: (C) 2002-2011 InspIRCd Development Team
  * See: http://www.inspircd.org/wiki/index.php/Credits
  *
  * This program is free but copyrighted software; see

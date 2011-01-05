@@ -1,7 +1,7 @@
 /* Mode support
  *
- * Copyright (C) 2008-2010 Adam <Adam@anope.org>
- * Copyright (C) 2008-2010 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2011 Adam <Adam@anope.org>
+ * Copyright (C) 2008-2011 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  */

@@ -1,7 +1,7 @@
 /*
- *   Copyright (C) 2003-2010 Anope Team <team@anope.org>
+ *   Copyright (C) 2003-2011 Anope Team <team@anope.org>
  *   Copyright (C) 2005-2006 Florian Schulze <certus@anope.org>
- *   Copyright (C) 2008-2010 Robin Burchell <w00t@inspircd.org>
+ *   Copyright (C) 2008-2011 Robin Burchell <w00t@inspircd.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License (see it online

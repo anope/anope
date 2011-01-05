@@ -1,8 +1,8 @@
 # Russian translations for cs_tban
 # ?????????? ???????? ??? ?????? cs_tban
-# Copyright (C) 2010 Anope Team
+# Copyright (C) 2011 Anope Team
 # This file is distributed under the same license as the Anope IRC Services
-# Adam <adam@anope.org>, 2010.
+# Adam <adam@anope.org>, 2011.
 #
 msgid ""
 msgstr ""

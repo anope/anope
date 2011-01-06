@@ -1,8 +1,8 @@
 /* inspircd 2.0 + functions
  *
  * (C) 2009  Jan Milants <Viper@Anope.org>
- * (C) 2010 Adam <Adam@anope.org>
- * (C) 2003-2010 Anope Team
+ * (C) 2011 Adam <Adam@anope.org>
+ * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

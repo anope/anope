@@ -1,6 +1,6 @@
 /* Module for encryption using MD5.
  *
- * (C) 2003-2010 Anope Team
+ * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
  *
  * This program is free but copyrighted software; see the file COPYING for

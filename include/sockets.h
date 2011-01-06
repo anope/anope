@@ -1,9 +1,9 @@
 /*
  *
- * (C) 2004-2010 Anope Team
+ * (C) 2004-2011 Anope Team
  * Contact us at team@anope.org
  *
- * Please read COPYING and README for furhter details.
+ * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 

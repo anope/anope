@@ -73,6 +73,15 @@ void Mutex::Unlock()
 	LeaveCriticalSection(&mutex);
 }
 
+/** Attempt to lock the mutex, will return true on success and false on fail
+ * Does not block
+ * @return true or false
+ */
+bool Mutex::TryLock()
+{
+	return TryEnterCriticalSection(&mutex);
+}
+
 /** Constructor
  */
 Condition::Condition() : Mutex()

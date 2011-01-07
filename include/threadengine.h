@@ -99,6 +99,12 @@ class CoreExport Mutex
 	/** Unlock the mutex, it must be locked first
 	 */
 	void Unlock();
+
+	/** Attempt to lock the mutex, will return true on success and false on fail
+	 * Does not block
+	 * @return true or false
+	 */
+	bool TryLock();
 };
 
 class CoreExport Condition : public Mutex

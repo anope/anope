@@ -494,6 +494,8 @@ void ChannelInfo::ClearBadWords()
  */
 void ChannelInfo::LoadMLock()
 {
+	this->ClearMLock();
+
 	std::vector<Anope::string> modenames_on, modenames_off;
 
 	// Force +r

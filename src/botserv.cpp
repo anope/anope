@@ -359,10 +359,15 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 
 BotInfo *findbot(const Anope::string &nick)
 {
+	BotInfo *bi;
 	if (isdigit(nick[0]) && ircd->ts6)
-		return BotListByUID.find(nick);
-
-	return BotListByNick.find(nick);
+		bi = BotListByUID.find(nick);
+	else
+		bi = BotListByNick.find(nick);
+	
+	FOREACH_MOD(I_OnFindBot, OnFindBot(nick));
+	
+	return bi;
 }
 
 /*************************************************************************/

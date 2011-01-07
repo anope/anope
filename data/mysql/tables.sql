@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `anope_ns_core` (
   `email` text NOT NULL,
   `greet` text NOT NULL,
   `flags` text NOT NULL,
-  `language` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `language` varchar(5) NOT NULL DEFAULT '',
   `channelcount` smallint(5) unsigned NOT NULL DEFAULT '0',
   `memomax` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`display`)

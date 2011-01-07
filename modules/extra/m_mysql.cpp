@@ -10,7 +10,7 @@
  * This module spawns a single thread that is used to execute blocking MySQL queries.
  * When a module requests a query to be executed it is added to a list for the thread
  * (which never stops looping and sleeing) to pick up and execute, the result of which
- * is inserted in to another queue to be picked up my the main thread. The main thread
+ * is inserted in to another queue to be picked up by the main thread. The main thread
  * uses Pipe to become notified through the socket engine when there are results waiting
  * to be sent back to the modules requesting the query
  */
@@ -309,15 +309,19 @@ void MySQLService::Run(SQLInterface *i, const Anope::string &query)
 
 SQLResult MySQLService::RunQuery(const Anope::string &query)
 {
+	this->Lock.Lock();
 	if (this->CheckConnection() && !mysql_real_query(this->sql, query.c_str(), query.length()))
 	{
 		MYSQL_RES *res = mysql_use_result(this->sql);
 
+		this->Lock.Unlock();
 		return MySQLResult(query, res);
 	}
 	else
 	{
-		return MySQLResult(query, mysql_error(this->sql));
+		Anope::string error = mysql_error(this->sql);
+		this->Lock.Unlock();
+		return MySQLResult(query, error);
 	}
 }
 
@@ -370,9 +374,7 @@ void DispatcherThread::Run()
 			QueryRequest &r = me->QueryRequests.front();
 			this->Unlock();
 
-			r.service->Lock.Lock();
 			SQLResult sresult = r.service->RunQuery(r.query);
-			r.service->Lock.Unlock();
 
 			this->Lock();
 			if (!me->QueryRequests.empty() && me->QueryRequests.front().query == r.query)
@@ -402,7 +404,7 @@ void MySQLPipe::OnNotify()
 		const QueryResult &qr = *it;
 
 		if (!qr.sqlinterface)
-			throw SQLException("NULL qr.interface in MySQLPipe::OnNotify() ?");
+			throw SQLException("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
 
 		if (qr.result.GetError().empty())
 			qr.sqlinterface->OnResult(qr.result);

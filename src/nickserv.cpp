@@ -319,10 +319,12 @@ NickRequest *findrequestnick(const Anope::string &nick)
 
 NickAlias *findnick(const Anope::string &nick)
 {
-	nickalias_map::const_iterator it = NickAliasList.find(nick);
+	FOREACH_MOD(I_OnFindNick, OnFindNick(nick));
 
+	nickalias_map::const_iterator it = NickAliasList.find(nick);
 	if (it != NickAliasList.end())
 		return it->second;
+
 	return NULL;
 }
 
@@ -330,10 +332,12 @@ NickAlias *findnick(const Anope::string &nick)
 
 NickCore *findcore(const Anope::string &nick)
 {
-	nickcore_map::const_iterator it = NickCoreList.find(nick);
+	FOREACH_MOD(I_OnFindCore, OnFindCore(nick));
 
+	nickcore_map::const_iterator it = NickCoreList.find(nick);
 	if (it != NickCoreList.end())
 		return it->second;
+
 	return NULL;
 }
 

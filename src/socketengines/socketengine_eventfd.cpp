@@ -53,7 +53,12 @@ bool Pipe::Read(const Anope::string &)
 
 void Pipe::Notify()
 {
-	this->Write("*");
+	/* Note we send this immediatly. If use use Socket::Write and if this functions is called
+	 * from a thread, only epoll is able to pick up the change to this sockets want flags immediately
+	 * Other engines time out then pick up and write the change then read it back, which
+	 * is too slow for most things.
+	 */
+	this->IO->Send(this, "");
 }
 
 void Pipe::OnNotify()

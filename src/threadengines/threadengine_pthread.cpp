@@ -79,6 +79,15 @@ void Mutex::Unlock()
 	pthread_mutex_unlock(&mutex);
 }
 
+/** Attempt to lock the mutex, will return true on success and false on fail
+ * Does not block
+ * @return true or false
+ */
+bool Mutex::TryLock()
+{
+	return pthread_mutex_trylock(&mutex) == 0;
+}
+
 /** Constructor
  */
 Condition::Condition() : Mutex()

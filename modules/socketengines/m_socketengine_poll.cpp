@@ -162,7 +162,7 @@ class SocketEnginePoll : public SocketEngineBase
 				s->SetFlag(SF_DEAD);
 		}
 
-		for (int i = 0; i < total; ++i)
+		for (int i = 0; i < SocketCount; ++i)
 		{
 			pollfd *ev = &this->events[i];
 			Socket *s = Sockets[ev->fd];

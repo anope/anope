@@ -110,6 +110,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	Anope::string last_topic_setter;	/* Setter */
 	time_t last_topic_time;			/* Time */
 
+	// These two should be using extensible
 	Anope::string forbidby;
 	Anope::string forbidreason;
 

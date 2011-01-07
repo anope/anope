@@ -447,6 +447,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnBadWordDel(ChannelInfo *ci, BadWord *bw) { }
 
+	/** Called in findbot()
+	 * @param nick The nick being looked up
+	 */
+	virtual void OnFindBot(const Anope::string &nick) { }
+
 	/** Called before a bot kicks a user
 	 * @param bi The bot sending the kick
 	 * @param c The channel the user is being kicked on
@@ -816,6 +821,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanInfo(User *u, ChannelInfo *ci, bool ShowHidden) { }
 
+	/** Called on cs_findchan()
+	 * @param chname The name being looked up
+	 */
+	virtual void OnFindChan(const Anope::string &chname) { }
+
 	/** Called when a nick is dropped
 	 * @param nick The nick
 	 */
@@ -906,6 +916,18 @@ class CoreExport Module : public Extensible
 	 * @param ShowHidden true if we should show the user everything
 	 */
 	virtual void OnNickInfo(User *u, NickAlias *na, bool ShowHidden) { }
+
+	/** Called in findnick()
+	 * Useful to modify the na returned by findnick()
+	 * @param nick The nick being looked up
+	 */
+	virtual void OnFindNick(const Anope::string &nick) { }
+
+	/** Called in findcore()
+	 * Useful to modify the nc returned by findcore()
+	 * @param nick The nick being looked up
+	 */
+	virtual void OnFindCore(const Anope::string &nick) { }
 
 	/** Called when we get informed about a users SSL fingerprint
 	 *  when we call this, the fingerprint should already be stored in the user struct
@@ -1046,17 +1068,17 @@ enum Implementation
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
-		I_OnNickInfo, I_OnFingerprint,
+		I_OnNickInfo, I_OnFindNick, I_OnFindCore,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
-		I_OnChanInfo,
+		I_OnChanInfo, I_OnFindChan,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,
-		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel,
+		I_OnUserKicked, I_OnBotFantasy, I_OnBotNoFantasyAccess, I_OnBotBan, I_OnBadWordAdd, I_OnBadWordDel, I_OnFindBot,
 
 		/* HostServ */
 		I_OnSetVhost, I_OnDeleteVhost,
@@ -1066,7 +1088,7 @@ enum Implementation
 
 		/* Users */
 		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
-		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel,
+		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnFingerprint,
 
 		/* OperServ */
 		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,

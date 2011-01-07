@@ -375,12 +375,12 @@ void Init(int ac, char **av)
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config->EncModuleList);
 
-	/* Add Database Modules */
-	ModuleManager::LoadModuleList(Config->DBModuleList);
-
 	/* Load the socket engine */
 	if (ModuleManager::LoadModule(Config->SocketEngine, NULL) || !SocketEngine)
 		throw FatalException("Unable to load socket engine " + Config->SocketEngine);
+
+	/* Add Database Modules */
+	ModuleManager::LoadModuleList(Config->DBModuleList);
 
 	try
 	{

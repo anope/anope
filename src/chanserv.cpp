@@ -471,10 +471,12 @@ void cs_remove_nick(NickCore *nc)
 
 ChannelInfo *cs_findchan(const Anope::string &chan)
 {
-	registered_channel_map::const_iterator it = RegisteredChannelList.find(chan);
+	FOREACH_MOD(I_OnFindChan, OnFindChan(chan));
 
+	registered_channel_map::const_iterator it = RegisteredChannelList.find(chan);
 	if (it != RegisteredChannelList.end())
 		return it->second;
+
 	return NULL;
 }
 

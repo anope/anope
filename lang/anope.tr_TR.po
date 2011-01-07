@@ -6846,7 +6846,7 @@ msgid ""
 msgstr ""
 "Syntax: DEFCON [1|2|3|4|5]\n"
 "The defcon system can be used to implement a pre-defined\n"
-"set of restrictions to services useful during an attemtped\n"
+"set of restrictions to services useful during an attempted\n"
 "attack on the network."
 
 #: language.cpp:4011

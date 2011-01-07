@@ -1,6 +1,6 @@
 /* os_info.c - Adds oper information lines to nicks/channels
  *
- * (C) 2003-2010 Anope Team
+ * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
  *
  * Based on the original module by Rob <rob@anope.org>

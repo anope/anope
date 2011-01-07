@@ -3,7 +3,7 @@
  * (C) 2003-2011 Anope Team
  * Contact us at info@unreal.org
  *
- * Please read COPYING and README for furhter details.
+ * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 

@@ -3,7 +3,7 @@
 # (C) 2003-2011 Anope Team
 # Contact us at team@anope.org
 #
-# Please read COPYING and README for furhter details.
+# Please read COPYING and README for further details.
 #
 # Based on the original code of Epona by Lara.
 # Based on the original code of Services by Andy Church.
@@ -3279,7 +3279,7 @@ OPER_HELP_DEFCON
 	Syntax: DEFCON [1|2|3|4|5]
 
 	The defcon system can be used to implement a pre-defined
-	set of restrictions to services useful during an attemtped
+	set of restrictions to services useful during an attempted
 	attack on the network.
 
 OPER_HELP_DEFCON_NO_NEW_CHANNELS

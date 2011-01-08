@@ -243,7 +243,7 @@ class RatboxProto : public IRCDProto
 
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
-		bool needjoin = c->FindUser(bi) != NULL;
+		bool needjoin = c->FindUser(bi) == NULL;
 		if (needjoin)
 		{
 			ChannelStatus status;

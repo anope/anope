@@ -116,9 +116,10 @@ class SocketEngineEPoll : public SocketEngineBase
 		Anope::CurTime = time(NULL);
 
 		/* EINTR can be given if the read timeout expires */
-		if (total == -1 && errno != EINTR)
+		if (total == -1)
 		{
-			Log() << "SockEngine::Process(): error: " << Anope::LastError();
+			if (errno != EINTR)
+				Log() << "SockEngine::Process(): error: " << Anope::LastError();
 			return;
 		}
 

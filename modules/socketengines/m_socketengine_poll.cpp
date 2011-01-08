@@ -131,9 +131,11 @@ class SocketEnginePoll : public SocketEngineBase
 		int total = poll(this->events, this->SocketCount, Config->ReadTimeout * 1000);
 		Anope::CurTime = time(NULL);
 
+		/* EINTR can be given if the read timeout expires */
 		if (total == -1)
 		{
-			Log() << "SockEngine::Process(): error: " << Anope::LastError();
+			if (errno != EINTR)
+				Log() << "SockEngine::Process(): error: " << Anope::LastError();
 			return;
 		}
 

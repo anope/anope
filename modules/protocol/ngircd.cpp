@@ -1,0 +1,514 @@
+/* ngIRCd IRCD functions
+ *
+ * (C) 2003-2010 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for furhter details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+#include "services.h"
+#include "modules.h"
+
+IRCDVar myIrcd[] = {
+	{"ngIRCd",	/* ircd name */
+	 "+oi",		/* Modes used by pseudoclients */
+	 0,		/* SVSNICK */
+	 0,		/* Vhost */
+	 0,		/* Supports SNlines */
+	 1,		/* Supports SQlines */
+	 0,		/* Supports SZlines */
+	 0,		/* Join 2 Message */
+	 0,		/* Chan SQlines */
+	 1,		/* Quit on Kill */
+	 0,		/* vidents */
+	 0,		/* svshold */
+	 0,		/* time stamp on mode */
+	 0,		/* UMODE */
+	 0,		/* O:LINE */
+	 0,		/* No Knock requires +i */
+	 0,		/* Can remove User Channel Modes with SVSMODE */
+	 0,		/* Sglines are not enforced until user reconnects */
+	 0,		/* ts6 */
+	 "$",		/* TLD Prefix for Global */
+	 20,		/* Max number of modes we can send per line */
+	 }
+	,
+	{NULL}
+};
+
+/* PASS */
+void ngircd_cmd_pass(const Anope::string &pass)
+{
+	send_cmd("", "PASS %s 0210-IRC+ ngircd|17~9:CLHSo P", pass.c_str());
+}
+
+class ngIRCdProto : public IRCDProto
+{
+	/* ngIRCd does not use the following functions, but we need the
+	 * empty functions in this class or the file will not compile 
+	 */
+	void SendAkill(const XLine *x) { }
+	void SendAkillDel(const XLine*) { }
+	void SendSQLine(const XLine*) { }
+	void SendSQLineDel(const XLine*) { }
+	void SendSGLine(const XLine *x) { }
+	void SendSGLineDel(const XLine *x) { }
+
+	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
+	{
+		if (source)
+			send_cmd(source->nick, "WALLOPS :%s", buf.c_str());
+		else
+			send_cmd(Config->ServerName, "WALLOPS :%s", buf.c_str());
+	}
+
+	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	{
+		send_cmd(user->nick, "JOIN %s", channel.c_str());
+	}
+
+	void SendJoin(const BotInfo *user, const ChannelContainer *cc)
+	{
+		send_cmd(user->nick, "JOIN %s", cc->chan->name.c_str());
+	}
+
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
+	{
+		send_cmd(source ? source->nick : Config->ServerName, "KILL %s :%s", user->nick.c_str(), buf.c_str());
+	}
+
+	/* SERVER name hop descript */
+	void SendServer(const Server *server)
+	{
+		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+	}
+
+	void SendConnect()
+	{
+		ngircd_cmd_pass(uplink_server->password);
+		/* Make myself known to myself in the serverlist */
+		SendServer(Me);
+		/* finish the enhanced server handshake and register the connection */
+		send_cmd(Config->ServerName, "376 * :End of MOTD command");
+	}
+
+	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
+	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	{
+		EnforceQlinedNick(u->nick, "");
+		send_cmd(Config->ServerName, "NICK %s 1 %s %s 1 %s :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), modes.c_str(), u->realname.c_str());
+	}
+
+	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
+	{
+		if (!buf.empty())
+			send_cmd(bi->nick, "PART %s :%s", chan->name.c_str(), buf.c_str());
+		else
+			send_cmd(bi->nick, "PART %s", chan->name.c_str());
+	}
+
+	void SendNumericInternal(const Anope::string &, int numeric, const Anope::string &dest, const Anope::string &buf)
+	{
+		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
+		send_cmd(Config->ServerName, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
+	}
+
+	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
+	{
+		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", dest->name.c_str(), buf.c_str());
+	}
+
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
+	{
+		if (buf.empty())
+			return;
+		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
+	}
+
+	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
+	{
+		if (!buf.empty())
+			send_cmd(bi->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
+		else
+			send_cmd(bi->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
+	}
+
+	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
+	{
+		send_cmd(source ? source->nick : Config->s_ChanServ, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
+	}
+
+	/* INVITE */
+	void SendInvite(BotInfo *source, const Anope::string &chan, const Anope::string &nick)
+	{
+		send_cmd(source->nick, "INVITE %s %s", nick.c_str(), chan.c_str());
+	}
+
+	void SendChannel(Channel *c, const Anope::string &modes)
+	{
+		send_cmd(Config->ServerName, "CHANINFO %s %s", c->name.c_str(), modes.c_str());
+	}
+
+	bool IsNickValid(const Anope::string &nick)
+	{
+		/* TS6 Save extension -Certus */
+		if (isdigit(nick[0]))
+			return false;
+		return true;
+	}
+
+	void SendTopic(BotInfo *bi, Channel *c)
+	{
+		bool needjoin = c->FindUser(bi) == NULL;
+		if (needjoin)
+		{
+			ChannelStatus status;
+			status.SetFlag(CMODE_OP);
+			ChannelContainer cc(c);
+			cc.Status = &status;
+			ircdproto->SendJoin(bi, &cc);
+		}
+		send_cmd(bi->nick, "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
+		if (needjoin)
+		{
+			ircdproto->SendPart(bi, c, NULL);
+		}
+	}
+
+};
+
+class ngIRCdIRCdMessage : public IRCdMessage
+{
+ public:
+	/* ngIRCd uses NJOIN instead of SJOIN, but we still need an 
+	 * empty function in this class or the file will not compile 
+	 */
+	bool OnSJoin(const Anope::string&, const std::vector<Anope::string>&) { return true; }
+
+	/*
+	 * Received: :dev.anope.de MODE #anope +b *!*@*aol*
+	 */
+	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() < 2)
+			return true;
+
+		Anope::string modes = params[1];
+		for (unsigned i = 2; i < params.size(); ++i)
+			modes += " " + params[i];
+
+		if (params[0][0] == '#' || params[0][0] == '&')
+			do_cmode(source, params[0], modes, "");
+		else
+			do_umode(source, params[0], params[1]);
+
+		return true;
+	}
+
+	/*
+	  Received: :DukeP_ NICK :test2
+	  Received: :dev.anope.de NICK DukeP_ 1 ~DukePyro ip-2-201-236-154.web.vodafone.de 1 + :DukePyrolator
+	  source = nickname on nickchange, servername on newuser
+	  params[0] = nick
+	  params[1] = <unknown>
+	  params[2] = username
+	  params[3] = host
+	  params[4] = <unknown>
+	  params[5] = modes
+	  params[6] = info
+	*/
+	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() == 1)
+		{
+			// we have a nickchange
+			do_nick(source, params[0], "", "", "", "", Anope::CurTime, "", "", "", "");
+		}
+		else if (params.size() == 7)
+		{
+			// a new user is connecting to the network
+			User *user = do_nick("", params[0], params[2], params[3], source, params[6], Anope::CurTime, "", "", "", params[5]);
+			if (user)
+				validate_user(user);
+		}
+		else
+		{
+			Log() << "Received NICK with invalid number of parameters. source = " << source << "param[0] = " << params[0] << "params.size() = " << params.size();
+		}
+		return true;
+	}
+
+	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		do_server(Me->IsSynced() ? source : "", params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		return true;
+	}
+
+	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		Channel *c = findchan(params[0]);
+		if (!c)
+		{
+			Log() << "TOPIC for nonexistant channel " << params[0];
+			return true;
+		}
+
+		c->ChangeTopicInternal(source, params[1]);
+		return true;
+	}
+
+	/*
+	 * <@po||ux> DukeP: RFC 2813, 4.2.1: the JOIN command on server-server links
+	 * separates the modes ("o") with ASCII 7, not space. And you can't see ASCII 7.
+	 *
+	 * if a user joins a new channel, the ircd sends <channelname>\7<umode>
+	 */
+	bool OnJoin (const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty())
+		{
+			Anope::string channel, mode;
+			size_t pos;
+			pos = params[0].find('\7');
+			if (pos != Anope::string::npos)
+			{
+				channel = params[0].substr(0, pos);
+				mode += '+' + params[0].substr(pos, params[0].length()) + " " + source;
+				do_join(source, channel, "");
+				do_cmode(source, channel, mode, "");
+			}
+			else
+			{
+				do_join(source, params[0], "");
+			}
+		}
+		return true;
+	}
+};
+
+/*
+ * CHANINFO <chan> +<modes>
+ * CHANINFO <chan> +<modes> :<topic>
+ * CHANINFO <chan> +<modes> <key> <limit> :<topic>
+ */
+bool event_chaninfo(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+
+	Channel *c = findchan(params[0]);
+	Anope::string modes;
+
+	if (!c)
+		c = new Channel(params[0]);
+
+	modes = params[1];
+
+	if (params.size() == 3)
+	{
+		c->ChangeTopicInternal(source, params[2], Anope::CurTime);
+	} 
+	else if (params.size() == 5)
+	{
+		for (size_t i = 0, end = params[1].length(); i < end; ++i)
+		{
+			switch(params[1][i])
+			{
+				case 'k':
+					modes += " " + params[2];
+					continue;
+				case 'l':
+					modes += " " + params[3];
+					continue;
+			}
+		}
+		c->ChangeTopicInternal(source, params[4], Anope::CurTime);
+	}
+
+	c->SetModesInternal(NULL, modes);
+
+	return true;
+}
+
+/*
+ * Received: :dev.anope.de NJOIN #test :DukeP2,@DukeP
+ */
+bool event_njoin(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	Channel *c = findchan(params[0]);
+	commasepstream sep(params[1]);
+	Anope::string buf;
+
+	if (!c)
+	{
+		c = new Channel(params[0], Anope::CurTime);
+		c->SetFlag(CH_SYNCING);
+	}
+	
+	while (sep.GetToken(buf))
+	{
+		std::list<ChannelMode *> Status;
+		char ch;
+
+		/* Get prefixes from the nick */
+		while ((ch = ModeManager::GetStatusChar(buf[0])))
+		{
+			buf.erase(buf.begin());
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
+			if (!cm)
+			{
+				Log() << "Received unknown mode prefix " << ch << " in NJOIN string.";
+				continue;
+			}
+			Status.push_back(cm);
+		}
+		User *u = finduser(buf);
+		if (!u)
+		{
+			Log(LOG_DEBUG) << "NJOIN for nonexistant user " << buf << " on " << c->name;
+			continue;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreJoinChannel, OnPreJoinChannel(u, c));
+
+		/* Add the user to the Channel */
+		c->JoinUser(u);
+
+		/* Update their status internally on the channel
+		 * This will enforce secureops etc on the user
+		 */
+		for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
+			c->SetModeInternal(*it, buf);
+		/* Now set whatever modes this user is allowed to have on the channel */
+		chan_set_correct_modes(u, c, 1);
+
+		/* Check to see if modules want the user to join, if they do
+		 * check to see if they are allowed to join (CheckKick will kick/ban them)
+		 * Don't trigger OnJoinChannel event then as the user will be destroyed
+		 */
+		if (MOD_RESULT != EVENT_STOP && c->ci && c->ci->CheckKick(u))
+			continue;
+
+		FOREACH_MOD(I_OnJoinChannel, OnJoinChannel(u, c));
+	} /* while */
+
+	if (c->HasFlag(CH_SYNCING))
+	{
+		c->UnsetFlag(CH_SYNCING);
+		c->Sync();
+	}
+
+	return true;
+}
+
+bool event_kick(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (params.size() > 2)
+		do_kick(source, params[0], params[1], params[2]);
+	return true;
+}
+
+bool event_pass(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	return true;
+}
+
+bool event_005(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	size_t pos;
+	Anope::string name, data;
+	for (unsigned i = 0, end = params.size(); i < end; ++i)
+	{
+		pos = params[i].find('=');
+		if (pos != Anope::string::npos)
+		{
+			name = params[i].substr(0, pos);
+			data = params[i].substr(pos+1, params[i].length());
+			if (name == "NICKLEN")
+			{
+				unsigned newlen = convertTo<unsigned>(data);
+				if (Config->NickLen != newlen)
+				{
+					Log() << "Config->NickLen changed from " << Config->NickLen << " to " << newlen;
+					Config->NickLen = newlen;
+				}
+			}
+		}
+	}
+	return true;
+}
+
+bool event_442(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	return true;
+}
+
+bool event_376(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	return true;
+}
+
+
+static void AddModes()
+{
+	/* Add user modes */
+	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+	ModeManager::AddUserMode(new UserMode(UMODE_RESTRICTED, "UMODE_RESTRICTED", 'r'));
+	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+
+// channel modes: biIklmnoPstvz
+	/* b/e/I */
+	ModeManager::AddChannelMode(new ChannelModeBan('b'));
+	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+
+	/* v/h/o/a/q */
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+
+	/* Add channel modes */
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+	ModeManager::AddChannelMode(new ChannelModeKey('k'));
+	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'P'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+	ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
+
+	return;
+}
+
+
+
+class ProtongIRCd : public Module
+{
+	Message message_kick, message_pass, message_njoin, message_chaninfo, message_005, 
+		message_442, message_376;
+	
+	ngIRCdProto ircd_proto;
+	ngIRCdIRCdMessage ircd_message;
+ public:
+	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+		message_kick("KICK", event_kick), message_pass("PASS", event_pass),
+		message_njoin("NJOIN", event_njoin), message_chaninfo("CHANINFO", event_chaninfo),
+		message_005("005", event_005), message_442("442", event_442), message_376("376", event_376)
+	{
+		this->SetAuthor("Anope");
+		this->SetType(PROTOCOL);
+
+		AddModes();
+
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_proto(&this->ircd_proto);
+		pmodule_ircd_message(&this->ircd_message);
+	}
+};
+
+MODULE_INIT(ProtongIRCd)

@@ -18,7 +18,7 @@ static ChanAccess dummy_access;
 /** Default constructor
  * @param chname The channel name
  */
-ChannelInfo::ChannelInfo(const Anope::string &chname)
+ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
@@ -65,7 +65,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname)
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(ChannelInfo *ci)
+ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
 {
 	*this = *ci;
 

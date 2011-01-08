@@ -22,7 +22,7 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid)
+User::User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid) : modes(UserModeNameStrings)
 {
 	if (snick.empty() || sident.empty() || shost.empty())
 		throw CoreException("Bad args passed to User::User");

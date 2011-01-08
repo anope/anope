@@ -41,6 +41,10 @@ enum NickNameFlag
 	NS_END
 };
 
+const Anope::string NickNameFlagStrings[] = {
+	"NS_BEGIN", "NS_FORBIDDEN", "NS_NO_EXPIRE", "NS_HELD", "NS_COLLIDED", "NS_END", ""
+};
+
 /** Flags set on NickCores
  */
 enum NickCoreFlag
@@ -83,6 +87,12 @@ enum NickCoreFlag
 	NI_FORBIDDEN,
 
 	NI_END
+};
+
+const Anope::string NickCoreFlagStrings[] = {
+	"NI_BEGIN", "NI_KILLPROTECT", "NI_SECURE", "NI_MSG", "NI_MEMO_HARDMAX", "NI_MEMO_SIGNON", "NI_MEMO_RECEIVE",
+	"NI_PRIVATE", "NI_HIDE_EMAIL", "NI_HIDE_MASK", "NI_HIDE_QUIT", "NI_KILL_QUICK", "NI_KILL_IMMED",
+	"NI_MEMO_MAIL", "NI_HIDE_STATUS", "NI_SUSPENDED", "NI_AUTOOP", "NI_FORBIDDEN", ""
 };
 
 class CoreExport NickRequest : public Extensible

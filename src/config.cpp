@@ -40,7 +40,7 @@ static Anope::string NSDefaults;
 
 /*************************************************************************/
 
-ServerConfig::ServerConfig() : errstr(""), config_data()
+ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFlagStrings), CSDefFlags(ChannelInfoFlagStrings), BSDefFlags(BotServFlagStrings)
 {
 	this->Read();
 

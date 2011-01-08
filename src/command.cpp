@@ -66,7 +66,7 @@ void CommandSource::Reply(const char *message, ...)
 	}
 }
 
-Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
 {
 	this->module = NULL;
 	this->service = NULL;

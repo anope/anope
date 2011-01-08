@@ -306,8 +306,11 @@ template<typename T, size_t Size = 32> class Flags
 {
  protected:
 	std::bitset<Size> Flag_Values;
+	const Anope::string *Flag_Strings;
 
  public:
+ 	Flags(const Anope::string *flag_strings) : Flag_Strings(flag_strings) { }
+
 	/** Add a flag to this item
 	 * @param Value The flag
 	 */
@@ -346,6 +349,23 @@ template<typename T, size_t Size = 32> class Flags
 	void ClearFlags()
 	{
 		Flag_Values.reset();
+	}
+
+	std::vector<Anope::string> ToString()
+	{
+		std::vector<Anope::string> ret;
+		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+			if (this->HasFlag(static_cast<T>(i)))
+				ret.push_back(this->Flag_Strings[i]);
+		return ret;
+	}
+
+	void FromString(const std::vector<Anope::string> &strings)
+	{
+		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+			for (unsigned j = 0; j < strings.size(); ++j)
+				if (this->Flag_Strings[i] == strings[j])
+					this->SetFlag(static_cast<T>(i));
 	}
 };
 
@@ -470,10 +490,14 @@ enum MemoFlag
 {
 	/* Memo is unread */
 	MF_UNREAD,
-	/* SEnder requests a receipt */
+	/* Sender requests a receipt */
 	MF_RECEIPT,
 	/* Memo is a notification of receipt */
 	MF_NOTIFYS
+};
+
+const Anope::string MemoFlagStrings[] = {
+	"MF_UNREAD", "MF_RECEIPT", "MF_NOTIFYS", ""
 };
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
@@ -481,6 +505,7 @@ enum MemoFlag
 class Memo : public Flags<MemoFlag>
 {
  public:
+	Memo();
 	time_t time;	/* When it was sent */
 	Anope::string sender;
 	Anope::string text;
@@ -592,10 +617,13 @@ enum AutoKickFlag
 	AK_ISNICK
 };
 
+const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
+
 /* AutoKick data. */
 class AutoKick : public Flags<AutoKickFlag>
 {
  public:
+ 	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
 	/* Only one of these can be in use */
 	Anope::string mask;
 	NickCore *nc;
@@ -713,6 +741,12 @@ enum BotServFlag
 	/* Send fantasy replies back to the channel via NOTICE to ops */
 	BS_MSG_NOTICEOPS,
 	BS_END
+};
+
+const Anope::string BotServFlagStrings[] = {
+	"BS_BEGIN", "BS_DONTKICKOPS", "BS_DONTKICKVOICES", "BS_FANTASY", "BS_SYMBIOSIS", "BS_GREET", "BS_NOBOT",
+	"BS_KICK_BOLDs", "BS_KICK_COLORS", "BS_KICK_REVERSES", "BS_KICK_UNDERLINES", "BS_KICK_BADWORDS", "BS_KICK_CAPS",
+	"BS_KICK_FLOOD", "BS_KICK_REPEAT", "BS_KICK_ITALICS", "BS_MSG_PRIVMSG", "BS_MSG_NOTICE", "BS_MSG_NOTICEOPS", ""
 };
 
 /* Indices for TTB (Times To Ban) */

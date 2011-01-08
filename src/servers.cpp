@@ -45,7 +45,8 @@ CapabInfo Capab_Info[] = {
 	{"", CAPAB_END}
 };
 
-Flags<CapabType, CAPAB_END> Capab;
+static const Anope::string CapabFlags = "";
+Flags<CapabType, CAPAB_END> Capab(&CapabFlags);
 
 /** Constructor
  * @param uplink The uplink this server is from, is only NULL when creating Me
@@ -55,7 +56,7 @@ Flags<CapabType, CAPAB_END> Capab;
  * @param sid Server sid/numeric
  * @param flag An optional server flag
  */
-Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag) : Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
+Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const Anope::string &description, const Anope::string &sid, ServerFlag flag) : Flags<ServerFlag>(ServerFlagStrings), Name(name), Hops(hops), Description(description), SID(sid), UplinkServer(uplink)
 {
 	this->SetFlag(SERVER_SYNCING);
 	this->SetFlag(flag);

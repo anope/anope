@@ -14,6 +14,7 @@ extern CoreExport patricia_tree<User *> UserListByUID;
 class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {
  public:
+	ChannelStatus();
 	Anope::string BuildCharPrefixList() const;
 	Anope::string BuildModePrefixList() const;
 };

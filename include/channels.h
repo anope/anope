@@ -52,7 +52,7 @@ struct UserContainer
 
 typedef std::list<UserContainer *> CUserList;
 
-enum ChannelFlags
+enum ChannelFlag
 {
 	/* Channel still exists when emptied */
 	CH_PERSIST,
@@ -62,7 +62,7 @@ enum ChannelFlags
 	CH_LOGCHAN
 };
 
-class CoreExport Channel : public Extensible, public Flags<ChannelFlags>
+class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 {
  public:
 	typedef std::multimap<ChannelModeName, Anope::string> ModeList;

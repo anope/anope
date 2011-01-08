@@ -43,6 +43,16 @@ enum CommandFlag
 	CFLAG_DISABLE_FANTASY
 };
 
+const Anope::string CommandFlagStrings[] = {
+	"CFLAG_ALLOW_UNREGISTERED",
+	"CFLAG_ALLOW_FORBIDDEN",
+	"CFLAG_ALLOW_SUSPENDED",
+	"CFLAG_ALLOW_UNREGISTEREDCHANNEL",
+	"CFLAG_STRIP_CHANNEL",
+	"CFLAG_DISABLE_FANTASY",
+	""
+};
+
 /* The source for a command */
 struct CoreExport CommandSource
 {

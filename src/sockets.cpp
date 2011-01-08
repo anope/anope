@@ -337,7 +337,7 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 
 /** Empty constructor, used for things such as the pipe socket
  */
-Socket::Socket()
+Socket::Socket() : Flags<SocketFlag, 2>(SocketFlagStrings)
 {
 	this->Type = SOCKTYPE_BASE;
 	this->IO = &normalSocketIO;
@@ -348,7 +348,7 @@ Socket::Socket()
  * @param ipv6 IPv6?
  * @param type The socket type, defaults to SOCK_STREAM
  */
-Socket::Socket(int sock, bool ipv6, int type)
+Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag, 2>(SocketFlagStrings)
 {
 	this->Type = SOCKTYPE_BASE;
 	this->IO = &normalSocketIO;

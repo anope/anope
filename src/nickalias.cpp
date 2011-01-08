@@ -24,7 +24,7 @@ NickRequest::~NickRequest()
  * @param nick The nick
  * @param nickcore The nickcofe for this nick
  */
-NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore)
+NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<NickNameFlag, NS_END>(NickNameFlagStrings)
 {
 	if (nickname.empty())
 		throw CoreException("Empty nick passed to NickAlias constructor");

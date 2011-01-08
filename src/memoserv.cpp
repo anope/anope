@@ -14,6 +14,8 @@
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m);
 
+Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
+
 /**
  * MemoServ initialization.
  * @return void

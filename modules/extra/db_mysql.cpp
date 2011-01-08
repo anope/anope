@@ -1,123 +1,18 @@
 #include "module.h"
 #include "sql.h"
 
-struct NickAliasFlagInfo
+static Anope::string ToString(const std::vector<Anope::string> &strings)
 {
-	Anope::string Name;
-	NickNameFlag Flag;
-};
+	Anope::string ret;
 
-NickAliasFlagInfo NickAliasFlags[] = {
-	{"FORBIDDEN", NS_FORBIDDEN},
-	{"NOEXPIRE", NS_NO_EXPIRE},
-	{"", static_cast<NickNameFlag>(-1)}
-};
-
-struct NickCoreFlagInfo
-{
-	Anope::string Name;
-	NickCoreFlag Flag;
-};
-
-NickCoreFlagInfo NickCoreFlags[] = {
-	{"KILLPROTECT", NI_KILLPROTECT},
-	{"SECURE", NI_SECURE},
-	{"MSG", NI_MSG},
-	{"MEMO_HARDMAX", NI_MEMO_HARDMAX},
-	{"MEMO_SIGNON", NI_MEMO_SIGNON},
-	{"MEMO_RECEIVE", NI_MEMO_RECEIVE},
-	{"PRIVATE", NI_PRIVATE},
-	{"HIDE_EMAIL", NI_HIDE_EMAIL},
-	{"HIDE_MASK", NI_HIDE_MASK},
-	{"HIDE_QUIT", NI_HIDE_QUIT},
-	{"KILL_QUICK", NI_KILL_QUICK},
-	{"KILL_IMMED", NI_KILL_IMMED},
-	{"MEMO_MAIL", NI_MEMO_MAIL},
-	{"HIDE_STATUS", NI_HIDE_STATUS},
-	{"SUSPENDED", NI_SUSPENDED},
-	{"AUTOOP", NI_AUTOOP},
-	{"FORBIDDEN", NI_FORBIDDEN},
-	{"", static_cast<NickCoreFlag>(-1)}
-};
-
-struct BotServFlagInfo
-{
-	Anope::string Name;
-	BotFlag Flag;
-};
-
-BotServFlagInfo BotServFlags[] = {
-	{"PRIVATE", BI_PRIVATE},
-	{"", static_cast<BotFlag>(-1)}
-};
-
-struct BotFlagInfo
-{
-	Anope::string Name;
-	BotServFlag Flag;
-};
-
-BotFlagInfo BotFlags[] = {
-	{"DONTKICKOPS", BS_DONTKICKOPS},
-	{"DONTKICKVOICES", BS_DONTKICKVOICES},
-	{"FANTASY", BS_FANTASY},
-	{"SYMBIOSIS", BS_SYMBIOSIS},
-	{"GREET", BS_GREET},
-	{"NOBOT", BS_NOBOT},
-	{"KICK_BOLDS", BS_KICK_BOLDS},
-	{"KICK_COLORS", BS_KICK_COLORS},
-	{"KICK_REVERSES", BS_KICK_REVERSES},
-	{"KICK_UNDERLINES", BS_KICK_UNDERLINES},
-	{"KICK_BADWORDS", BS_KICK_BADWORDS},
-	{"KICK_CAPS", BS_KICK_CAPS},
-	{"KICK_FLOOD", BS_KICK_FLOOD},
-	{"KICK_REPEAT", BS_KICK_REPEAT},
-	{"KICK_ITALICS", BS_KICK_ITALICS},
-	{"MSG_PRIVMSG", BS_MSG_PRIVMSG},
-	{"MSG_NOTICE", BS_MSG_NOTICE},
-	{"MSG_NOTICEOPS", BS_MSG_NOTICEOPS},
-	{"", static_cast<BotServFlag>(-1)}
-};
-
-struct ChannelFlagInfo
-{
-	Anope::string Name;
-	ChannelInfoFlag Flag;
-};
-
-ChannelFlagInfo ChannelFlags[] = {
-	{"KEEPTOPIC", CI_KEEPTOPIC},
-	{"SECUREOPS", CI_SECUREOPS},
-	{"PRIVATE", CI_PRIVATE},
-	{"TOPICLOCK", CI_TOPICLOCK},
-	{"RESTRICTED", CI_RESTRICTED},
-	{"PEACE", CI_PEACE},
-	{"SECURE", CI_SECURE},
-	{"FORBIDDEN", CI_FORBIDDEN},
-	{"NO_EXPIRE", CI_NO_EXPIRE},
-	{"MEMO_HARDMAX", CI_MEMO_HARDMAX},
-	{"OPNOTICE", CI_OPNOTICE},
-	{"SECUREFOUNDER", CI_SECUREFOUNDER},
-	{"SIGNKICK", CI_SIGNKICK},
-	{"SIGNKICK_LEVEL", CI_SIGNKICK_LEVEL},
-	{"XOP", CI_XOP},
-	{"SUSPENDED", CI_SUSPENDED},
-	{"PERSIST", CI_PERSIST},
-	{"", static_cast<ChannelInfoFlag>(-1)}
-};
-
-struct MemoFlagInfo
-{
-	Anope::string Name;
-	MemoFlag Flag;
-};
-
-MemoFlagInfo MemoFlags[] = {
-	{"UNREAD", MF_UNREAD},
-	{"RECEIPT", MF_RECEIPT},
-	{"NOTIFYS", MF_NOTIFYS},
-	{"", static_cast<MemoFlag>(-1)}
-};
+	for (unsigned i = 0; i < strings.size(); ++i)
+		ret += " " + strings[i];
+	
+	if (!ret.empty())
+		ret.erase(ret.begin());
+	
+	return ret;
+}
 
 static std::vector<Anope::string> MakeVector(const Anope::string &buf)
 {
@@ -140,62 +35,6 @@ static std::vector<Anope::string> MakeVector(const Anope::string &buf)
 	}
 
 	return params;
-}
-
-static Anope::string BuildFlagsList(ChannelInfo *ci)
-{
-	Anope::string ret;
-
-	for (int i = 0; ChannelFlags[i].Flag != -1; ++i)
-		if (ci->HasFlag(ChannelFlags[i].Flag))
-			ret += " " + ChannelFlags[i].Name;
-
-	if (!ret.empty())
-		ret.erase(ret.begin());
-
-	return ret;
-}
-
-static Anope::string BuildFlagsList(NickAlias *na)
-{
-	Anope::string ret;
-
-	for (int i = 0; NickAliasFlags[i].Flag != -1; ++i)
-		if (na->HasFlag(NickAliasFlags[i].Flag))
-			ret += " " + NickAliasFlags[i].Name;
-
-	if (!ret.empty())
-		ret.erase(ret.begin());
-
-	return ret;
-}
-
-static Anope::string BuildFlagsList(NickCore *nc)
-{
-	Anope::string ret;
-
-	for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
-		if (nc->HasFlag(NickCoreFlags[i].Flag))
-			ret += " " + NickCoreFlags[i].Name;
-
-	if (!ret.empty())
-		ret.erase(ret.begin());
-
-	return ret;
-}
-
-static Anope::string BuildFlagsList(Memo *m)
-{
-	Anope::string ret;
-
-	for (int i = 0; MemoFlags[i].Flag != -1; ++i)
-		if (m->HasFlag(MemoFlags[i].Flag))
-			ret += " " + MemoFlags[i].Name;
-
-	if (!ret.empty())
-		ret.erase(ret.begin());
-
-	return ret;
 }
 
 static Anope::string MakeMLock(ChannelInfo *ci, bool status)
@@ -266,34 +105,6 @@ static Anope::string GetMLockParams(ChannelInfo *ci, bool onoff)
 		ret.erase(ret.begin());
 
 	return ret;
-}
-
-static Anope::string GetBotFlags(Flags<BotServFlag>& Flags)
-{
-	Anope::string buf;
-
-	for (int i = 0; BotFlags[i].Flag != -1; ++i)
-		if (Flags.HasFlag(BotFlags[i].Flag))
-			buf += " " + BotFlags[i].Name;
-
-	if (!buf.empty())
-		buf.erase(buf.begin());
-
-	return buf;
-}
-
-static Anope::string GetBotServFlags(BotInfo *bi)
-{
-	Anope::string buf;
-
-	for (int i = 0; BotServFlags[i].Flag != -1; ++i)
-		if (bi->HasFlag(BotServFlags[i].Flag))
-			buf += " " + BotServFlags[i].Name;
-
-	if (!buf.empty())
-		buf.erase(buf.begin());;
-
-	return buf;
 }
 
 static NickAlias *CurNick = NULL;
@@ -446,17 +257,10 @@ class DBMySQL : public Module
 
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string buf;
+			std::vector<Anope::string> flags;
 			while (sep.GetToken(buf))
-			{
-				for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
-				{
-					if (NickCoreFlags[j].Name == buf)
-					{
-						nc->SetFlag(NickCoreFlags[j].Flag);
-						break;
-					}
-				}
-			}
+				flags.push_back(buf);
+			nc->FromString(flags);
 
 			nc->language = r.Get(i, "language");
 			nc->channelcount = r.Get(i, "channelcount").is_number_only() ? convertTo<int>(r.Get(i, "channelcount")) : 0;
@@ -510,17 +314,11 @@ class DBMySQL : public Module
 
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string buf;
+			std::vector<Anope::string> flags;
 			while (sep.GetToken(buf))
-			{
-				for (int j = 0; NickAliasFlags[j].Flag != -1; ++j)
-				{
-					if (NickAliasFlags[j].Name == buf)
-					{
-						na->SetFlag(NickAliasFlags[j].Flag);
-						break;
-					}
-				}
-			}
+				flags.push_back(buf);
+
+			na->FromString(flags);
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_ns_alias_metadata`");
@@ -563,17 +361,11 @@ class DBMySQL : public Module
 
 			spacesepstream sep(r.Get(i, "flags"));
 			Anope::string buf;
+			std::vector<Anope::string> flags;
 			while (sep.GetToken(buf))
-			{
-				for (int j = 0; BotServFlags[j].Flag != -1; ++j)
-				{
-					if (buf == BotServFlags[j].Name)
-					{
-						bi->SetFlag(BotServFlags[j].Flag);
-						break;
-					}
-				}
-			}
+				flags.push_back(buf);
+
+			bi->FromString(flags);
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_bs_info_metadata`");
@@ -629,17 +421,11 @@ class DBMySQL : public Module
 				{
 					spacesepstream sep(r.Get(i, "botflags"));
 					Anope::string buf;
+					std::vector<Anope::string> flags;
 					while (sep.GetToken(buf))
-					{
-						for (int j = 0; BotFlags[j].Flag != -1; ++j)
-						{
-							if (buf == BotFlags[j].Name)
-							{
-								ci->botflags.SetFlag(BotFlags[j].Flag);
-								break;
-							}
-						}
-					}
+						flags.push_back(buf);
+
+					ci->botflags.FromString(flags);
 				}
 
 				if (!r.Get(i, "mlock_on").empty())
@@ -691,18 +477,11 @@ class DBMySQL : public Module
 				{
 					spacesepstream sep(r.Get(i, "flags"));
 					Anope::string buf;
-
+					std::vector<Anope::string> flags;
 					while (sep.GetToken(buf))
-					{
-						for (int j = 0; ChannelFlags[j].Flag != -1; ++j)
-						{
-							if (buf == ChannelFlags[j].Name)
-							{
-								ci->SetFlag(ChannelFlags[j].Flag);
-								break;
-							}
-						}
-					}
+						flags.push_back(buf);
+
+					ci->FromString(flags);
 				}
 			}
 		}
@@ -847,17 +626,11 @@ class DBMySQL : public Module
 				{
 					spacesepstream sep(r.Get(i, "flags"));
 					Anope::string buf;
+					std::vector<Anope::string> flags;
 					while (sep.GetToken(buf))
-					{
-						for (unsigned j = 0; MemoFlags[j].Flag != -1; ++j)
-						{
-							if (MemoFlags[j].Name == buf)
-							{
-								m->SetFlag(MemoFlags[j].Flag);
-								break;
-							}
-						}
-					}
+						flags.push_back(buf);
+
+					m->FromString(flags);
 				}
 			}
 		}
@@ -978,7 +751,7 @@ class DBMySQL : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
 
 			/* This is for the core bots, bots added by users are already handled by an event */
-			this->RunQuery("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + GetBotServFlags(CurBot) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
+			this->RunQuery("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" + this->Escape(CurBot->nick) + "', '" + this->Escape(CurBot->GetIdent()) + "', '" + this->Escape(CurBot->host) + "', '" + this->Escape(CurBot->realname) + "', '" + ToString(CurBot->ToString()) + "', " + stringify(CurBot->created) + ", " + stringify(CurBot->chancount) + ") ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
 		}
 
 		this->RunQuery("TRUNCATE TABLE `anope_extra`");
@@ -1019,7 +792,7 @@ class DBMySQL : public Module
 				}
 				else if (cmd.equals_ci("KILL") || cmd.equals_ci("SECURE") || cmd.equals_ci("PRIVATE") || cmd.equals_ci("MSG") || cmd.equals_ci("HIDE") || cmd.equals_ci("AUTOOP"))
 				{
-					this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + BuildFlagsList(nc) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
+					this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + ToString(CurBot->ToString()) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
 				}
 			}
 		}
@@ -1056,7 +829,7 @@ class DBMySQL : public Module
 				}
 				else if (params[1].equals_ci("KEEPTOPIC") || params[1].equals_ci("TOPICLOCK") || params[1].equals_ci("PRIVATE") || params[1].equals_ci("SECUREOPS") || params[1].equals_ci("SECUREFOUNDER") || params[1].equals_ci("RESTRICTED") || params[1].equals_ci("SECURE") || params[1].equals_ci("SIGNKICK") || params[1].equals_ci("OPNOTICE") || params[1].equals_ci("XOP") || params[1].equals_ci("PEACE") || params[1].equals_ci("PERSIST") || params[1].equals_ci("NOEXPIRE"))
 				{
-					this->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + BuildFlagsList(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + ToString(ci->ToString()) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
 			}
 		}
@@ -1076,7 +849,7 @@ class DBMySQL : public Module
 						{
 							this->RunQuery("INSERT INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES('" + this->Escape(ci->name) + "', " + stringify(i) + ", " + stringify(ci->ttb[i]) + ") ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)");
 						}
-						this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + GetBotFlags(ci->botflags) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+						this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + ToString(ci->botflags.ToString()) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 
 						if (params[1].equals_ci("CAPS"))
 						{
@@ -1102,13 +875,13 @@ class DBMySQL : public Module
 					bi = findbot(params[0]);
 				if (bi && params[1].equals_ci("PRIVATE") && u->Account()->HasPriv("botserv/set/private"))
 				{
-					this->RunQuery("UPDATE `anope_bs_core` SET `flags` = '" + GetBotServFlags(bi) + "' WHERE `nick` = '" + this->Escape(bi->nick) + "'");
+					this->RunQuery("UPDATE `anope_bs_core` SET `flags` = '" + ToString(bi->ToString()) + "' WHERE `nick` = '" + this->Escape(bi->nick) + "'");
 				}
 				else if (!ci)
 					return;
 				else if (params[1].equals_ci("DONTKICKOPS") || params[1].equals_ci("DONTKICKVOICES") || params[1].equals_ci("FANTASY") || params[1].equals_ci("GREET") || params[1].equals_ci("SYMBIOSIS") || params[1].equals_ci("NOBOT"))
 				{
-					this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + GetBotFlags(ci->botflags) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+					this->RunQuery("UPDATE `anope_cs_info` SET `botflags` = '" + ToString(ci->botflags.ToString()) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
 			}
 		}
@@ -1166,7 +939,7 @@ class DBMySQL : public Module
 
 	void OnNickForbidden(NickAlias *na)
 	{
-		this->RunQuery("UPDATE `anope_ns_alias` SET `flags` = '" + BuildFlagsList(na) + "' WHERE `nick` = '" + this->Escape(na->nick) + "'");
+		this->RunQuery("UPDATE `anope_ns_alias` SET `flags` = '" + ToString(na->ToString()) + "' WHERE `nick` = '" + this->Escape(na->nick) + "'");
 	}
 
 	void OnNickGroup(User *u, NickAlias *)
@@ -1189,7 +962,7 @@ class DBMySQL : public Module
 		this->RunQuery("INSERT INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, time_registered, last_seen, flags, display) VALUES('" +
 			this->Escape(na->nick) + "', '" + this->Escape(na->last_quit) + "', '" +
 			this->Escape(na->last_realname) + "', '" + this->Escape(na->last_usermask) + "', " + stringify(na->time_registered) + ", " + stringify(na->last_seen) +
-			", '" + BuildFlagsList(na) + "', '" + this->Escape(na->nc->display) + "') " + "ON DUPLICATE KEY UPDATE last_quit=VALUES(last_quit), "
+			", '" + ToString(na->ToString()) + "', '" + this->Escape(na->nc->display) + "') " + "ON DUPLICATE KEY UPDATE last_quit=VALUES(last_quit), "
 			"last_realname=VALUES(last_realname), last_usermask=VALUES(last_usermask), time_registered=VALUES(time_registered), last_seen=VALUES(last_seen), "
 			"flags=VALUES(flags), display=VALUES(display)");
 	}
@@ -1199,7 +972,7 @@ class DBMySQL : public Module
 		this->RunQuery("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES('" +
 			this->Escape(nc->display) + "', '" + this->Escape(nc->pass) + "', '" +
 			this->Escape(nc->email) + "', '" + this->Escape(nc->greet) + "', '" +
-			BuildFlagsList(nc) + "', " + stringify(nc->language) + ", " + stringify(nc->channelcount) + ", " +
+			ToString(nc->ToString()) + "', " + stringify(nc->language) + ", " + stringify(nc->channelcount) + ", " +
 			stringify(nc->memos.memomax) + ") " +
 			"ON DUPLICATE KEY UPDATE pass=VALUES(pass), email=VALUES(email), greet=VALUES(greet), flags=VALUES(flags), language=VALUES(language), " +
 			"channelcount=VALUES(channelcount), memomax=VALUES(memomax)");
@@ -1218,7 +991,7 @@ class DBMySQL : public Module
 
 	void OnNickSuspend(NickAlias *na)
 	{
-		this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + BuildFlagsList(na->nc) + "' WHERE `display` = '" + this->Escape(na->nc->display) + "'");
+		this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + ToString(na->nc->ToString()) + "' WHERE `display` = '" + this->Escape(na->nc->display) + "'");
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access)
@@ -1253,7 +1026,7 @@ class DBMySQL : public Module
 	void OnChanForbidden(ChannelInfo *ci)
 	{
 		this->RunQuery("INSERT INTO `anope_cs_info` (name, time_registered, last_used, flags, forbidby, forbidreason) VALUES ('" +
-			this->Escape(ci->name) + "', " + stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + BuildFlagsList(ci) + "', '" +  this->Escape(ci->forbidby) + "', '"
+			this->Escape(ci->name) + "', " + stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + ToString(ci->ToString()) + "', '" +  this->Escape(ci->forbidby) + "', '"
 			+ this->Escape(ci->forbidreason) + "')");
 	}
 
@@ -1264,22 +1037,22 @@ class DBMySQL : public Module
 
 	void OnChanRegistered(ChannelInfo *ci)
 	{
-		Anope::string flags = BuildFlagsList(ci), mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci, true), mlockparams_off = GetMLockParams(ci, false);
+		Anope::string mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci, true), mlockparams_off = GetMLockParams(ci, false);
 		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, mlock_params_off, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
 			this->Escape(ci->name) + "', '" + this->Escape(ci->founder ? ci->founder->display : "") + "', '" +
 			this->Escape(ci->successor ? ci->successor->display : "") + "', '" + this->Escape(ci->desc) + "', " +
 			stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + this->Escape(ci->last_topic) + "', '" +
-			this->Escape(ci->last_topic_setter) + "', " + stringify(ci->last_topic_time) + ", '" + flags + "', '" + 
+			this->Escape(ci->last_topic_setter) + "', " + stringify(ci->last_topic_time) + ", '" + ToString(ci->ToString()) + "', '" + 
 			this->Escape(ci->forbidby) + "', '" + this->Escape(ci->forbidreason) + "', " +  stringify(ci->bantype) + ", '" +
 			mlockon + "', '" + mlockoff + "', '" + mlockparams + "', '" + mlockparams_off + "', " +
-			stringify(ci->memos.memomax) + ", '" + this->Escape(ci->bi ? ci->bi->nick : "") + "', '" + GetBotFlags(ci->botflags) +
+			stringify(ci->memos.memomax) + ", '" + this->Escape(ci->bi ? ci->bi->nick : "") + "', '" + ToString(ci->botflags.ToString()) +
 			"', " + stringify(ci->capsmin) + ", " + stringify(ci->capspercent) + ", " + stringify(ci->floodlines) + ", " + stringify(ci->floodsecs) + ", " + stringify(ci->repeattimes) + ") " +
 			"ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), mlock_on=VALUES(mlock_on), mlock_off=VALUES(mlock_off), mlock_params=VALUES(mlock_params), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
 	}
 
 	void OnChanSuspend(ChannelInfo *ci)
 	{
-		this->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + BuildFlagsList(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
+		this->RunQuery("UPDATE `anope_cs_info` SET `flags` = '" + ToString(ci->ToString()) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 		this->RunQuery("UPDATE `anope_cs_info` SET `forbidby` = '" + this->Escape(ci->forbidby) + " WHERE `name` = '" + this->Escape(ci->name) + "'");
 		this->RunQuery("UPDATE `anope_cs_info` SET `forbidreason` = '" + this->Escape(ci->forbidreason) + " WHERE `name` = '" + this->Escape(ci->name) + "'");
 	}
@@ -1301,7 +1074,7 @@ class DBMySQL : public Module
 	{
 		this->RunQuery("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES('" +
 			this->Escape(bi->nick) + "', '" + this->Escape(bi->GetIdent()) + "', '" + this->Escape(bi->host) + "', '" +
-			this->Escape(bi->realname) + "', '" + GetBotServFlags(bi) + "', " + stringify(bi->created) + ", " + stringify(bi->chancount) + ") " +
+			this->Escape(bi->realname) + "', '" + ToString(bi->ToString()) + "', " + stringify(bi->created) + ", " + stringify(bi->chancount) + ") " +
 			"ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
 	}
 
@@ -1372,14 +1145,14 @@ class DBMySQL : public Module
 	void OnMemoSend(User *, NickCore *nc, Memo *m)
 	{
 		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(nc->display) + "', '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
+			this->Escape(nc->display) + "', '" + ToString(m->ToString()) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'NICK')");
 	}
 
 	void OnMemoSend(User *, ChannelInfo *ci, Memo *m)
 	{
 		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(ci->name) + "', '" + BuildFlagsList(m) + "', " + stringify(m->time) + ", '" +
+			this->Escape(ci->name) + "', '" + ToString(m->ToString()) + "', " + stringify(m->time) + ", '" +
 			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
 	}
 

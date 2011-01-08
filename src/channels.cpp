@@ -14,11 +14,13 @@
 
 channel_map ChannelList;
 
+static const Anope::string ChannelFlagString[] = { "CH_PERSIST", "CH_SYNCING", "CH_LOGCHAN", "" };
+
 /** Default constructor
  * @param name The channel name
  * @param ts The time the channel was created
  */
-Channel::Channel(const Anope::string &nname, time_t ts)
+Channel::Channel(const Anope::string &nname, time_t ts) : Flags<ChannelFlag, 3>(ChannelFlagString)
 {
 	if (nname.empty())
 		throw CoreException("A channel without a name ?");
@@ -1227,10 +1229,12 @@ void MassChannelModes(BotInfo *bi, const Anope::string &modes)
 	}
 }
 
+static const Anope::string EntryFlagString[] = { "ENTRYTYPE_NONE", "ENTRYTYPE_CIDR", "ENTRYTYPE_NICK_WILD", "ENTRYTYPE_NICK", "ENTRYTYPE_USER_WILD", "ENTRYTYPE_USER", "ENTRYTYPE_HOST_WILD", "ENTRYTYPE_HOST", "" };
+
 /** Constructor
  * @param _host A full nick!ident@host/cidr mask
  */
-Entry::Entry(const Anope::string &_host)
+Entry::Entry(const Anope::string &_host) : Flags<EntryType>(EntryFlagString)
 {
 	this->SetFlag(ENTRYTYPE_NONE);
 	this->cidr_len = 0;

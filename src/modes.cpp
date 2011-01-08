@@ -101,6 +101,10 @@ void SetDefaultMLock(ServerConfig *config)
 	}
 }
 
+ChannelStatus::ChannelStatus() : Flags<ChannelModeName, CMODE_END * 2>(ChannelModeNameStrings)
+{
+}
+
 Anope::string ChannelStatus::BuildCharPrefixList() const
 {
 	Anope::string ret;

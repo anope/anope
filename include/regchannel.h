@@ -62,6 +62,12 @@ enum ChannelInfoFlag
 	CI_END
 };
 
+const Anope::string ChannelInfoFlagStrings[] = {
+	"CI_BEGIN", "CI_INHABIT", "CI_KEEPTOPIC", "CI_SECUREOPS", "CI_PRIVATE", "CI_TOPICLOCK", "CI_RESTRICTED",
+	"CI_PEACE", "CI_SECURE", "CI_FORBIDDEN", "CI_NO_EXPIRE", "CI_MEMO_HARDMAX", "CI_OPNOTICE", "CI_SECUREFOUNDER",
+	"CI_SIGNKICK", "CI_SIGNKICK_LEVEL", "CI_XOP", "CI_SUSPENDED", "CI_PERSIST", ""
+};
+
 struct ModeLock
 {
 	bool set;

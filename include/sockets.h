@@ -121,6 +121,8 @@ enum SocketFlag
 	SF_WRITABLE
 };
 
+static const Anope::string SocketFlagStrings[] = { "SF_DEAD", "SF_WRITABLE", "" };
+
 class Socket;
 class ClientSocket;
 class ListenSocket;

@@ -70,6 +70,8 @@ enum ServerFlag
 	SERVER_JUPED
 };
 
+const Anope::string ServerFlagStrings[] = { "SERVER_NONE", "SERVER_SYNCING", "SERVER_JUPED", "" };
+
 /** Class representing a server
  */
 class CoreExport Server : public Flags<ServerFlag>

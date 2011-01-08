@@ -17,9 +17,9 @@ std::vector<NewsItem *> News;
 std::vector<std::bitset<32> > DefCon;
 bool DefConModesSet = false;
 /* Defcon modes mlocked on */
-Flags<ChannelModeName, CMODE_END * 2> DefConModesOn;
+Flags<ChannelModeName, CMODE_END * 2> DefConModesOn(ChannelModeNameStrings);
 /* Defcon modes mlocked off */
-Flags<ChannelModeName, CMODE_END * 2> DefConModesOff;
+Flags<ChannelModeName, CMODE_END * 2> DefConModesOff(ChannelModeNameStrings);
 /* Map of Modesa and Params for DefCon */
 std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 

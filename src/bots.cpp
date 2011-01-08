@@ -20,7 +20,9 @@ BotInfo *MemoServ = NULL;
 BotInfo *NickServ = NULL;
 BotInfo *OperServ = NULL;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, nuser, nhost, ts6_uid_retrieve())
+static const Anope::string BotFlagString[] = { "1", "BI_CORE", "BI_PRIVATE", "" };
+
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString)
 {
 	this->realname = nreal;
 	this->server = Me;

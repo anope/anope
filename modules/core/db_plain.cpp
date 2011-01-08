@@ -203,49 +203,10 @@ static void ReadDatabase(Module *m = NULL)
 	db.close();
 }
 
-struct ChannelFlagInfo
-{
-	Anope::string Name;
-	ChannelInfoFlag Flag;
-};
-
 struct ChannelLevel
 {
 	Anope::string Name;
 	int Level;
-};
-
-struct BotFlagInfo
-{
-	Anope::string Name;
-	BotServFlag Flag;
-};
-
-struct NickCoreFlagInfo
-{
-	Anope::string Name;
-	NickCoreFlag Flag;
-};
-
-ChannelFlagInfo ChannelInfoFlags[] = {
-	{"KEEPTOPIC", CI_KEEPTOPIC},
-	{"SECUREOPS", CI_SECUREOPS},
-	{"PRIVATE", CI_PRIVATE},
-	{"TOPICLOCK", CI_TOPICLOCK},
-	{"RESTRICTED", CI_RESTRICTED},
-	{"PEACE", CI_PEACE},
-	{"SECURE", CI_SECURE},
-	{"FORBIDDEN", CI_FORBIDDEN},
-	{"NO_EXPIRE", CI_NO_EXPIRE},
-	{"MEMO_HARDMAX", CI_MEMO_HARDMAX},
-	{"OPNOTICE", CI_OPNOTICE},
-	{"SECUREFOUNDER", CI_SECUREFOUNDER},
-	{"SIGNKICK", CI_SIGNKICK},
-	{"SIGNKICK_LEVEL", CI_SIGNKICK_LEVEL},
-	{"XOP", CI_XOP},
-	{"SUSPENDED", CI_SUSPENDED},
-	{"PERSIST", CI_PERSIST},
-	{"", static_cast<ChannelInfoFlag>(-1)}
 };
 
 ChannelLevel ChannelLevels[] = {
@@ -289,48 +250,18 @@ ChannelLevel ChannelLevels[] = {
 	{"", -1}
 };
 
-BotFlagInfo BotFlags[] = {
-	{"DONTKICKOPS", BS_DONTKICKOPS},
-	{"DONTKICKVOICES", BS_DONTKICKVOICES},
-	{"FANTASY", BS_FANTASY},
-	{"SYMBIOSIS", BS_SYMBIOSIS},
-	{"GREET", BS_GREET},
-	{"NOBOT", BS_NOBOT},
-	{"KICK_BOLDS", BS_KICK_BOLDS},
-	{"KICK_COLORS", BS_KICK_COLORS},
-	{"KICK_REVERSES", BS_KICK_REVERSES},
-	{"KICK_UNDERLINES", BS_KICK_UNDERLINES},
-	{"KICK_BADWORDS", BS_KICK_BADWORDS},
-	{"KICK_CAPS", BS_KICK_CAPS},
-	{"KICK_FLOOD", BS_KICK_FLOOD},
-	{"KICK_REPEAT", BS_KICK_REPEAT},
-	{"KICK_ITALICS", BS_KICK_ITALICS},
-	{"MSG_PRIVMSG", BS_MSG_PRIVMSG},
-	{"MSG_NOTICE", BS_MSG_NOTICE},
-	{"MSG_NOTICEOPS", BS_MSG_NOTICEOPS},
-	{"", static_cast<BotServFlag>(-1)}
-};
+static Anope::string ToString(const std::vector<Anope::string> &strings)
+{
+	Anope::string ret;
 
-NickCoreFlagInfo NickCoreFlags[] = {
-	{"KILLPROTECT", NI_KILLPROTECT},
-	{"SECURE", NI_SECURE},
-	{"MSG", NI_MSG},
-	{"MEMO_HARDMAX", NI_MEMO_HARDMAX},
-	{"MEMO_SIGNON", NI_MEMO_SIGNON},
-	{"MEMO_RECEIVE", NI_MEMO_RECEIVE},
-	{"PRIVATE", NI_PRIVATE},
-	{"HIDE_EMAIL", NI_HIDE_EMAIL},
-	{"HIDE_MASK", NI_HIDE_MASK},
-	{"HIDE_QUIT", NI_HIDE_QUIT},
-	{"KILL_QUICK", NI_KILL_QUICK},
-	{"KILL_IMMED", NI_KILL_IMMED},
-	{"MEMO_MAIL", NI_MEMO_MAIL},
-	{"HIDE_STATUS", NI_HIDE_STATUS},
-	{"SUSPENDED", NI_SUSPENDED},
-	{"AUTOOP", NI_AUTOOP},
-	{"FORBIDDEN", NI_FORBIDDEN},
-	{"", static_cast<NickCoreFlag>(-1)}
-};
+	for (unsigned i = 0; i < strings.size(); ++i)
+		ret += " " + strings[i];
+	
+	if (!ret.empty())
+		ret.erase(ret.begin());
+	
+	return ret;
+}
 
 static void LoadNickCore(const std::vector<Anope::string> &params)
 {
@@ -587,12 +518,7 @@ class DBPlain : public Module
 		else if (key.equals_ci("ACCESS"))
 			nc->AddAccess(params[0]);
 		else if (key.equals_ci("FLAGS"))
-		{
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-				for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
-					if (params[j].equals_ci(NickCoreFlags[i].Name))
-						nc->SetFlag(NickCoreFlags[i].Flag);
-		}
+			nc->FromString(params);
 		else if (key.equals_ci("MI"))
 		{
 			Memo *m = new Memo;
@@ -676,12 +602,7 @@ class DBPlain : public Module
 						ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 		}
 		else if (key.equals_ci("FLAGS"))
-		{
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-				for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
-					if (params[j].equals_ci(ChannelInfoFlags[i].Name))
-						ci->SetFlag(ChannelInfoFlags[i].Flag);
-		}
+			ci->FromString(params);
 		else if (key.equals_ci("DESC"))
 			ci->desc = params[0];
 		else if (key.equals_ci("TOPIC"))
@@ -776,12 +697,7 @@ class DBPlain : public Module
 			if (params[0].equals_ci("NAME"))
 				ci->bi = findbot(params[1]);
 			else if (params[0].equals_ci("FLAGS"))
-			{
-				for (unsigned j = 1, end = params.size(); j < end; ++j)
-					for (int i = 0; BotFlags[i].Flag != -1; ++i)
-						if (params[j].equals_ci(BotFlags[i].Name))
-							ci->botflags.SetFlag(BotFlags[i].Flag);
-			}
+				ci->FromString(params);
 			else if (params[0].equals_ci("TTB"))
 			{
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)
@@ -880,13 +796,7 @@ class DBPlain : public Module
 					db << "MD ACCESS " << *it << endl;
 			}
 			if (nc->FlagCount())
-			{
-				db << "MD FLAGS";
-				for (int j = 0; NickCoreFlags[j].Flag != -1; ++j)
-					if (nc->HasFlag(NickCoreFlags[j].Flag))
-						db << " " << NickCoreFlags[j].Name;
-				db << endl;
-			}
+				db << "MD FLAGS " << ToString(nc->ToString()) << endl;
 			MemoInfo *mi = &nc->memos;
 			for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
 			{
@@ -915,8 +825,8 @@ class DBPlain : public Module
 				db << "MD LAST_REALNAME :" << na->last_realname << endl;
 			if (!na->last_quit.empty())
 				db << "MD LAST_QUIT :" << na->last_quit << endl;
-			if (na->HasFlag(NS_FORBIDDEN) || na->HasFlag(NS_NO_EXPIRE))
-				db << "MD FLAGS" << (na->HasFlag(NS_FORBIDDEN) ? " FORBIDDEN" : "") << (na->HasFlag(NS_NO_EXPIRE) ? " NOEXPIRE " : "") << endl;
+			if (na->FlagCount())
+				db << "MD FLAGS " << ToString(na->ToString()) << endl;
 			if (na->hostinfo.HasVhost())
 				db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
 
@@ -928,10 +838,8 @@ class DBPlain : public Module
 			BotInfo *bi = *it;
 
 			db << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
-			if (bi->HasFlag(BI_PRIVATE))
-			{
-				db << "MD FLAGS PRIVATE" << endl;
-			}
+			if (bi->FlagCount())
+				db << "MD FLAGS " << ToString(bi->ToString()) << endl;
 		}
 
 		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
@@ -954,15 +862,9 @@ class DBPlain : public Module
 				db << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
 			db << endl;
 			if (ci->FlagCount())
-			{
-				db << "MD FLAGS";
-				for (int j = 0; ChannelInfoFlags[j].Flag != -1; ++j)
-					if (ci->HasFlag(ChannelInfoFlags[j].Flag))
-						db << " " << ChannelInfoFlags[j].Name;
-				db << endl;
-				if (ci->HasFlag(CI_FORBIDDEN))
-					db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
-			}
+				db << "MD FLAGS " << ToString(ci->ToString()) << endl;
+			if (ci->HasFlag(CI_FORBIDDEN))
+				db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
 				db << "MD ACCESS " << ci->GetAccess(k)->mask << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
@@ -1057,13 +959,7 @@ class DBPlain : public Module
 			if (ci->bi)
 				db << "MD BI NAME " << ci->bi->nick << endl;
 			if (ci->botflags.FlagCount())
-			{
-				db << "MD BI FLAGS";
-				for (int j = 0; BotFlags[j].Flag != -1; ++j)
-					if (ci->botflags.HasFlag(BotFlags[j].Flag))
-						db << " " << BotFlags[j].Name;
-				db << endl;
-			}
+				db << "MD BI FLAGS " << ToString(ci->botflags.ToString()) << endl;
 			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << endl;
 			if (ci->capsmin)
 				db << "MD BI CAPSMIN " << ci->capsmin << endl;

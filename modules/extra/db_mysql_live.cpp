@@ -185,7 +185,8 @@ class MySQLLiveModule : public Module, public Pipe
 			ci->successor = findcore(res.Get(0, "successor"));
 			ci->desc = res.Get(0, "descr");
 			ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-			// XXX flags, we need ChannelInfo::ProcessFlags or similar?
+			ci->ClearFlags();
+			ci->FromString(BuildStringVector(res.Get(0, "flags")));
 			ci->forbidby = res.Get(0, "forbidby");
 			ci->forbidreason = res.Get(0, "forbidreason");
 			ci->bantype = convertTo<int>(res.Get(0, "bantype"));
@@ -274,7 +275,8 @@ class MySQLLiveModule : public Module, public Pipe
 			na->last_usermask = res.Get(0, "last_usermask");
 			na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 			na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
-			// XXX flags
+			na->ClearFlags();
+			na->FromString(BuildStringVector(res.Get(0, "flags")));
 
 			if (na->nc != nc)
 			{
@@ -312,7 +314,8 @@ class MySQLLiveModule : public Module, public Pipe
 			nc->pass = res.Get(0, "pass");
 			nc->email = res.Get(0, "email");
 			nc->greet = res.Get(0, "greet");
-			// flags
+			nc->ClearFlags();
+			nc->FromString(BuildStringVector(res.Get(0, "flags")));
 			nc->language = res.Get(0, "language");
 		}
 		catch (const SQLException &) { }

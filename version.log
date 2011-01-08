@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3053"
+VERSION_BUILD="3054"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3054 - Enable NICKIP for InspIRCd 1.2+
 #Revision 3053 - Some more copyright/typo fixes, spotted by chaz :P
 #Revision 3052 - Updated Copyright to 2011
 #Revision 3051 - Made the moduleGetData debug messages for level 2+

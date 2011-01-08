@@ -3,17 +3,24 @@
 
 class CommandMutex;
 static std::list<CommandMutex *> commands;
+
+/* Current command being processed by the core */
 static CommandMutex *current_command = NULL;
+/* Mutex held by the core when it is processing. Used by threads to halt the core */
+static Mutex main_mutex;
 
 class CommandMutex : public Thread
 {
  public:
+	// Mutex used by this command to allow the core to drop and pick up processing of it at will
 	Mutex mutex;
+	// Set to true when this thread is processing data that is not thread safe (eg, the command)
+	bool processing;
 	Command *command;
 	CommandSource source;
 	std::vector<Anope::string> params;
 
-	CommandMutex() : Thread()
+	CommandMutex() : Thread(), processing(true)
 	{
 		commands.push_back(this);
 		current_command = this;
@@ -48,7 +55,7 @@ class CommandMutex : public Thread
 			}
 		}
 
-		this->mutex.Unlock();
+		main_mutex.Unlock();
 	}
 };
 
@@ -91,7 +98,7 @@ class MySQLLiveModule : public Module, public Pipe
 			// Give processing to the command thread
 			Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << source.u->nick;
 			threadEngine.Start(cm);
-			cm->mutex.Lock();
+			main_mutex.Lock();
 		}
 		catch (const CoreException &ex)
 		{
@@ -111,7 +118,7 @@ class MySQLLiveModule : public Module, public Pipe
 			CommandMutex *cm  = *it;
 
 			// Thread engine will pick this up later
-			if (cm->GetExitState())
+			if (cm->GetExitState() || !cm->processing)
 				continue;
 
 			Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << cm->source.u->nick;
@@ -120,7 +127,7 @@ class MySQLLiveModule : public Module, public Pipe
 			// Unlock to give processing back to the command thread
 			cm->mutex.Unlock();
 			// Relock to regain processing once the command thread hangs for any reason
-			cm->mutex.Lock();
+			main_mutex.Lock();
 
 			current_command = NULL;
 		}
@@ -135,9 +142,11 @@ class MySQLLiveModule : public Module, public Pipe
 		CommandMutex *cm = current_command;
 
 		// Give it back to the core
-		cm->mutex.Unlock();
+		cm->processing = false;
+		main_mutex.Unlock();
 		SQLResult res = this->RunQuery("SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'");
 		// And take it back...
+		cm->processing = true;
 		this->Notify();
 		cm->mutex.Lock();
 
@@ -170,8 +179,10 @@ class MySQLLiveModule : public Module, public Pipe
 
 		CommandMutex *cm = current_command;
 
-		cm->mutex.Unlock();
+		cm->processing = false;
+		main_mutex.Unlock();
 		SQLResult res = this->RunQuery("SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'");
+		cm->processing = true;
 		this->Notify();
 		cm->mutex.Lock();
 
@@ -254,8 +265,10 @@ class MySQLLiveModule : public Module, public Pipe
 
 		CommandMutex *cm = current_command;
 
-		cm->mutex.Unlock();
+		cm->processing = false;
+		main_mutex.Unlock();
 		SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'");
+		cm->processing = true;
 		this->Notify();
 		cm->mutex.Lock();
 
@@ -299,8 +312,10 @@ class MySQLLiveModule : public Module, public Pipe
 
 		CommandMutex *cm = current_command;
 
-		cm->mutex.Unlock();
+		cm->processing = false;
+		main_mutex.Unlock();
 		SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_core` WHERE `name` = '" + this->Escape(nick) + "'");
+		cm->processing = true;
 		this->Notify();
 		cm->mutex.Lock();
 

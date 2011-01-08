@@ -42,7 +42,7 @@ enum NickNameFlag
 };
 
 const Anope::string NickNameFlagStrings[] = {
-	"NS_BEGIN", "NS_FORBIDDEN", "NS_NO_EXPIRE", "NS_HELD", "NS_COLLIDED", "NS_END", ""
+	"NS_BEGIN", "NS_FORBIDDEN", "NS_NO_EXPIRE", "NS_HELD", "NS_COLLIDED", ""
 };
 
 /** Flags set on NickCores

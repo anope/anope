@@ -215,6 +215,8 @@ class SNLineManager : public XLineManager
 	void OnExpire(XLine *x);
 
 	void Send(XLine *x);
+
+	XLine *Check(User *u);
 };
 
 class SQLineManager : public XLineManager

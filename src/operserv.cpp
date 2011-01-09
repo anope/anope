@@ -364,9 +364,9 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
 	ret.first = 0;
 	ret.second = NULL;
 
-	for (unsigned i = 0, end = this->GetCount(); i < end; ++i)
+	for (unsigned i = this->GetCount(); i > 0; --i)
 	{
-		XLine *x = this->GetEntry(i);
+		XLine *x = this->GetEntry(i - 1);
 		ret.second = x;
 
 		if (x->Mask.equals_ci(mask))
@@ -392,7 +392,6 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
 		else if (Anope::Match(x->Mask, mask) && (!expires || x->Expires <= expires))
 		{
 			this->DelXLine(x);
-			--i;
 		}
 	}
 
@@ -634,6 +633,31 @@ void SNLineManager::OnExpire(XLine *x)
 void SNLineManager::Send(XLine *x)
 {
 	ircdproto->SendSGLine(x);
+}
+
+XLine *SNLineManager::Check(User *u)
+{
+	for (unsigned i = this->XLines.size(); i > 0; --i)
+	{
+		XLine *x = this->XLines[i - 1];
+
+		if (x->Expires && x->Expires < Anope::CurTime)
+		{
+			this->OnExpire(x);
+			this->Del(x);
+			delete x;
+			this->XLines.erase(XLines.begin() + i - 1);
+			continue;
+		}
+
+		if (Anope::Match(u->realname, x->Mask))
+		{
+			this->OnMatch(u, x);
+			return x;
+		}
+	}
+
+	return NULL;
 }
 
 XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)

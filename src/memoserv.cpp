@@ -248,13 +248,13 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							source.Reply(MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+							user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						source.Reply(MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						u->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */

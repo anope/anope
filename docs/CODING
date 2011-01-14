@@ -1,170 +1,239 @@
 Orginally pulled from: http://www.inspircd.org/wiki/Coding_Guidelines
-Yes, I'm aware the formatting of this document is ugly. It'll be fixed when someone cares. Read the wiki page if you want pretty for now.
 
 ---
 
-
 InspIRCd Coding Guidelines
 
-The following are a set of guidelines for writing patches to InspIRCd, or for creating modules for distribution with the official package. These 
-guidelines were written a time after InspIRCd development started, and so not all code yet follows these. This will be rectified with time.
+The following are a set of guidelines for writing patches to InspIRCd, or for
+creating modules for distribution with the official package. These guidelines
+were written a time after InspIRCd development started, and so not all code
+yet follows these. This will be rectified with time.
 
 
 1. Comments
-	Multi Line
-	Multiple line comments should follow the C-style comment, for example:
-	 /*
-	 * This is a multiple line comment, huzzah..
-	 */
 
-	Single Line
-	Single line comments should also be in the C style, for example:
-	 /* This is a boring one-line comment */
+   * Multi Line
+     Multiple line comments should follow the C-style comment, for example:
+       /*
+        * This is a multiple line comment, huzzah..
+        */
 
-	Doxygen commenting
-	If you wish your comment to show in doxygen, the comment should be directly above the item you are documenting (a class, function, enum, etc) 
-	and the first line should be "/**". For example:
-	 /** This is a doxygen multiline comment.
-	 * Description of thingymebob here.
-	 */
-	The first line after the "**" is used as the short description of the item (up to the full stop) and everything afterwards as the detailed 
-	description.
+   * Single Line
+     Single line comments should also be in the C style, for example:
+       /* This is a boring one-line comment */
 
-	Indentation
-	Tabs. Tabs. ONLY TABS. Use a single tab for each level of indentation, for example:
-	int main()
-	{
-	<tab>if (condition)
-	<tab>{
-	<tab><tab>code
-	<tab>}
-	}
+   * Doxygen commenting
+     If you wish your comment to show in doxygen, the comment should be directly
+     above the item you are documenting (a class, function, enum, etc) and the
+     first line should be "/**". For example:
+       /** This is a doxygen multiline comment.
+	*  Description of thingymebob here.
+	*/
+
+     The first line after the "**" is used as the short description of the item
+     (up to the full stop) and everything afterwards as the detailed description.
 
 
-	Separation
-	Always put a space in between a keyword like if/while and the condition, for example:
-	 if (foo == bar)
-	NOT
-	 if(foo == bar)
+2. Indentation
 
-	Braces
-	Always put braces opening and closing blocks on separate lines, see the identation example. For example, place braces like this:
-	if (apples == "green")
-	{
-		cout << "Apples are green" << endl;
-	}
+   Tabs. Tabs. ONLY TABS. Use a single tab for each level of indentation,
+   for example:
+     int main()
+     {
+     <tab>if (condition)
+     <tab>{
+     <tab><tab>code
+     <tab>}
+     }
 
-	and not:
-	 if (apples == "green") {
-		cout << "Apples are green" << endl;
-	}
-	The one exception to this is if you are declaring a class method which is only one line long, in that case the following is acceptable in most cases:
-	class foo : public bar
-	{
-	        foo() { }
-	        getrandomfoo() { return rand(); }
-	};
 
-	Templates
-	Where possible, use templates rather than #defines. Avoid use of RTTI.
-	Structs
-	Structs should be declared in the following fashion:
-	struct BodyPartBasket
-	{
-	        int arms;
-	        int legs;
-	        int scrotalsacs;
-	};
-	and not like this:
-	 typedef struct
-	{
-	        int arms;
-	        int legs;
-	        int scrotalsacs;
-	} BodyPartBasket;
-	The second way is not required in C++ to be able to do this:
-	 BodyPartBasket mybasket;
-	Plus, placing the name at the bottom of the declaration makes readability more difficult (as you have to scroll down to the bottom of the 
-	struct to find its name).
-	(where possible, call them classes rather than structs.)
+3. Separation
 
-	Variable naming
-	Class and struct names should be in camel case with a leading capital letter, for example "MyBagOfBones" and not "my_bag_of_bones" or 
-	"mybagofbones". Variable names can be in either camel case with a leading capital letter or alternatively all lower case, so long as the same 
-	naming convention is adhered to throughout the class. No classes or variables should be named in capitals unless this makes sense for the 
-	name (for example "class DNS"). Constants and enum values should always be completely in CAPITALS and underscores may be used, for example:
-	enum DecayState
-	{
-	        DECAYED_MOULDY  = 0,
-	        DECAYED_SMELLY  = 1,
-	        DECAYED_MAGGOTS = 2
-	};
-	All value names in an enum should be started with the same text which should be related in some way to the enum's use. For example "DNS_CNAME, 
-	DNS_A, DNS_AAAA".
+   Always put a space in between a keyword like if/while and the condition,
+   for example:
+     if (foo == bar)
+    NOT
+     if(foo == bar)
 
-	Use of references
-	Wherever possible, when dealing with any complex class, pass a const reference rather than a copy of the class. For example:
-	MyThingy::MyThingy(const std::string &thingyvalue)
-	{
-	}
-	Of course, if you intended to change the string you can just omit the 'const'.
 
-	Use of char pointers
-	Whenever you use char pointers (char*, char**) try to use const equivalents. This is much safer and avoids ugly and dangerous casts. For example:
-	MyThingy::Thingify(const char* const* wotsits)
-	{
-	}
-	If it is possible without performance loss, consider avoiding char pointers altogether and using std::string instead.
+4. Braces
 
-	Use of STL
-	For more information on use of STL in InspIRCd, please see the separate STL FAQ.
+   Always put braces opening and closing blocks on separate lines, see the
+   identation example. For example, place braces like this:
+     if (apples == "green")
+     {
+         cout << "Apples are green" << endl;
+     }
 
-	Making copies of data
-	Never ever make a copy of a piece of data unless it is absolutely necessary. For example, don't use strlcpy() to make a copy of the const char* string 
-	returned by std::string::c_str(), if the change can be done to the std::string itself. The same goes for unnecessary variable assignments, especially 
-	those which assign large classes.
+   and not:
+     if (apples == "green") {
+         cout << "Apples are green" << endl;
+     }
 
-	namespace std
-	Avoid the following:
-	 using namespace std;
-	It might take a bit more typing, but things work better if you don't set (then later assume) the namespace -- specify it explicitly when you want to 
-	use it.
+   The one exception to this is if you are declaring a class method which is
+   only one line long, in that case the following is acceptable in most cases:
+     class foo : public bar
+     {
+         foo() { }
+	 getrandomfoo() { return rand(); }
+     };
 
-	Linefeeds
-	Unix linefeeds only please. We do not like to see our screens covered in ^M. :-)
 
-	Portability
-	Always make sure your code is portable to all supported operating systems, remember of course that as of 1.1.8 this includes windows. Don't write code 
-	that only works on windows, or only works on Linux. Test your code on all platforms or ask for help from other developers who have the platforms you 
-	want to test on.
+5. Templates
 
-	new() and delete(), malloc() and free()
-	Apart from the fact that using malloc() and free() is bad practice in C++ code, you must never use malloc() or free() in InspIRCd, within its modules 
-	or within the core. This is because if you use malloc() or free() in windows, the memory is claimed from the program's local heap. In windows, each 
-	shared object (module, dll) has its own heap, which is protected from other dlls and executables. To get around this issue and allow more posix-like 
-	memory access from other dlls in the program (other modules), InspIRCd overrides the operators new and delete to ensure that memory allocated by them 
-	comes from the windows global heap. If you use malloc() and free() for this, the ircd will segfault when another module tries to access the memory you 
-	have allocated!
+   Where possible, use templates rather than #defines. Avoid use of RTTI.
 
-	strdup()
-	As with malloc(), above, strdup() should be avoided. Where strdup() is absolutely necessary, use strnewdup() which is our strdup() implementation that 
-	calls operator new instead of using malloc(). char arrays allocated by strnewdup() should be deleted with operator delete[].
 
-	CoreExport and DllImport
-	Prefix all types you want to import or export to other modules with CoreExport and DllImport macros. These do nothing in POSIX operating systems, 
-	however in windows these are expanded to the instructions __declspec(dllimport) and __declspec(dllexport) respectively depending on where they are 
-	used and how.
+6. Structs
 
-	External Dependencies
-	If a module is compiled as standard, or the code is part of the core, you must not use any dependencies that are not available as standard on all 
-	supported operating systems beyond libstdc++, libc, and whatever else is currently required to build the core. Modules which use nonstandard 
-	dependencies belong in the modules/extra directory.
+   Structs should be declared in the following fashion:
+     struct BodyPartBasket
+     {
+         int arms;
+	 int legs;
+	 int scrotalsacs;
+     };
+   and not like this:
+     typedef struct
+     {
+         int arms;
+	 int legs;
+	 int scrotalsacs;
+     } BodyPartBasket;
 
-	Profiling and Performance
-	It is one thing to assume that code performs bad, it is another thing to prove that it actually is. A lot of experienced programmers talk about 
-	'premature optimisation', and here is what it means: if you have a piece of code called once on startup that takes 10 seconds instead of one second to 
-	run, and a piece of code that takes 0.05 seconds to run when it should take 0.01, and it is called once per second, the second piece of code is the 
-	priority.
-	In other words, make sure that what you think is slow, and a performance problem in Insp actually is.
-	To do this, use the callgrind tool from Valgrind (valgrind --tool=cachegrind bin/inspircd -nofork -debug), and kcachegrind (or similar) to view the 
-	output files.
+    The second way is not required in C++ to be able to do this:
+      BodyPartBasket mybasket;
+
+    Plus, placing the name at the bottom of the declaration makes readability
+    more difficult (as you have to scroll down to the bottom of the struct to
+    find its name). (where possible, call them classes rather than structs.)
+
+
+7. Variable naming
+
+   Class and struct names should be in camel case with a leading capital letter,
+   for example "MyBagOfBones" and not "my_bag_of_bones" or "mybagofbones".
+   Variable names can be in either camel case with a leading capital letter or
+   alternatively all lower case, so long as the same naming convention is
+   adhered to throughout the class. No classes or variables should be named in
+   capitals unless this makes sense for the name (for example "class DNS").
+   Constants and enum values should always be completely in CAPITALS and
+   underscores may be used, for example:
+     enum DecayState
+     {
+         DECAYED_MOULDY  = 0,
+	 DECAYED_SMELLY  = 1,
+	 DECAYED_MAGGOTS = 2
+     };
+   All value names in an enum should be started with the same text which should
+   be related in some way to the enum's use. For example "DNS_CNAME, DNS_A,
+   DNS_AAAA".
+
+
+8. Use of references
+
+   Wherever possible, when dealing with any complex class, pass a const reference
+   rather than a copy of the class. For example:
+     MyThingy::MyThingy(const std::string &thingyvalue)
+     {
+     }
+   Of course, if you intended to change the string you can just omit the 'const'.
+
+
+9. Use of char pointers
+
+   Whenever you use char pointers (char*, char**) try to use const equivalents.
+   This is much safer and avoids ugly and dangerous casts. For example:
+     MyThingy::Thingify(const char* const* wotsits)
+     {
+     }
+   If it is possible without performance loss, consider avoiding char pointers
+   altogether and using std::string instead.
+
+
+10. Use of STL
+
+    For more information on use of STL in InspIRCd, please see the separate
+    STL FAQ.
+
+
+11. Making copies of data
+
+   Never ever make a copy of a piece of data unless it is absolutely necessary.
+   For example, don't use strlcpy() to make a copy of the const char* string
+   returned by std::string::c_str(), if the change can be done to the std::string
+   itself. The same goes for unnecessary variable assignments, especially those
+   which assign large classes.
+
+
+12. namespace std
+
+   Avoid the following:
+     using namespace std;
+   It might take a bit more typing, but things work better if you don't set
+   (then later assume) the namespace -- specify it explicitly when you want to
+   use it.
+
+
+13. Linefeeds
+
+   Unix linefeeds only please. We do not like to see our screens covered in ^M.
+
+
+14. Portability
+
+   Always make sure your code is portable to all supported operating systems,
+   remember of course that as of 1.1.8 this includes windows. Don't write code
+   that only works on windows, or only works on Linux. Test your code on all
+   platforms or ask for help from other developers who have the platforms you
+   want to test on.
+
+   * new() and delete(), malloc() and free()
+     Apart from the fact that using malloc() and free() is bad practice in C++
+     code, you must never use malloc() or free() in InspIRCd, within its modules
+     or within the core. This is because if you use malloc() or free() in windows,
+     the memory is claimed from the program's local heap.
+     In windows, each shared object (module, dll) has its own heap, which is
+     protected from other dlls and executables. To get around this issue and
+     allow more posix-like memory access from other dlls in the program (other
+     modules), InspIRCd overrides the operators new and delete to ensure that
+     memory allocated by them comes from the windows global heap. If you use
+     malloc() and free() for this, the ircd will segfault when another module
+     tries to access the memory you have allocated!
+
+   * strdup()
+     As with malloc(), above, strdup() should be avoided. Where strdup() is
+     absolutely necessary, use strnewdup() which is our strdup() implementation
+     that calls operator new instead of using malloc().
+     char arrays allocated by strnewdup() should be deleted with operator delete[].
+
+   * CoreExport and DllImport
+     Prefix all types you want to import or export to other modules with CoreExport
+     and DllImport macros. These do nothing in POSIX operating systems, however
+     in windows these are expanded to the instructions __declspec(dllimport) and
+     __declspec(dllexport) respectively depending on where they are used and how.
+
+
+15. External Dependencies
+
+   If a module is compiled as standard, or the code is part of the core, you must
+   not use any dependencies that are not available as standard on all supported
+   operating systems beyond libstdc++, libc, and whatever else is currently
+   required to build the core. Modules which use nonstandard dependencies belong
+   in the modules/extra directory.
+
+
+16. Profiling and Performance
+
+   It is one thing to assume that code performs bad, it is another thing to prove
+   that it actually is. A lot of experienced programmers talk about 'premature
+   optimisation', and here is what it means: if you have a piece of code called
+   once on startup that takes 10 seconds instead of one second to run, and a
+   piece of code that takes 0.05 seconds to run when it should take 0.01, and
+   it is called once per second, the second piece of code is the priority.
+
+   In other words, make sure that what you think is slow, and a performance
+   problem in Insp actually is.
+   To do this, use the callgrind tool from Valgrind (valgrind --tool=cachegrind
+   bin/inspircd -nofork -debug), and kcachegrind (or similar) to view the output
+   files.

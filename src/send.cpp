@@ -33,9 +33,9 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
 	if (!UplinkSock)
 	{
 		if (!source.empty())
-			Log(LOG_DEBUG) << "Attemtped to send \"" << source << " " << buf << "\" with UplinkSock NULL";
+			Log(LOG_DEBUG) << "Attempted to send \"" << source << " " << buf << "\" with UplinkSock NULL";
 		else
-			Log(LOG_DEBUG) << "Attemtped to send \"" << buf << "\" with UplinkSock NULL";
+			Log(LOG_DEBUG) << "Attempted to send \"" << buf << "\" with UplinkSock NULL";
 		return;
 	}
 

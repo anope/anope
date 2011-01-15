@@ -499,6 +499,14 @@ int check_access(User *user, ChannelInfo *ci, int what)
 	level = u_access ? u_access->level : 0;
 	limit = ci->levels[what];
 
+	// Set should never be disabled, if it is it is db-converter screwup
+	// This all needs rewritten anyway...
+	if (what == CA_SET && limit == ACCESS_INVALID)
+	{
+		ci->levels[what] = ACCESS_FOUNDER;
+		limit = ACCESS_FOUNDER;
+	}
+
 	/* Resetting the last used time */
 	if (level > 0)
 		ci->last_used = Anope::CurTime;

@@ -734,6 +734,8 @@ enum BotServFlag
 	BS_KICK_REPEAT,
 	/* BotServ kicks for italics */
 	BS_KICK_ITALICS,
+	/* BotServ kicks for amsgs */
+	BS_KICK_AMSGS,
 	/* Send fantasy replies back to the channel via PRIVMSG */
 	BS_MSG_PRIVMSG,
 	/* Send fantasy replies back to the channel via NOTICE */
@@ -746,7 +748,8 @@ enum BotServFlag
 const Anope::string BotServFlagStrings[] = {
 	"BS_BEGIN", "BS_DONTKICKOPS", "BS_DONTKICKVOICES", "BS_FANTASY", "BS_SYMBIOSIS", "BS_GREET", "BS_NOBOT",
 	"BS_KICK_BOLDs", "BS_KICK_COLORS", "BS_KICK_REVERSES", "BS_KICK_UNDERLINES", "BS_KICK_BADWORDS", "BS_KICK_CAPS",
-	"BS_KICK_FLOOD", "BS_KICK_REPEAT", "BS_KICK_ITALICS", "BS_MSG_PRIVMSG", "BS_MSG_NOTICE", "BS_MSG_NOTICEOPS", ""
+	"BS_KICK_FLOOD", "BS_KICK_REPEAT", "BS_KICK_ITALICS", "BS_KICK_AMSGS", "BS_MSG_PRIVMSG", "BS_MSG_NOTICE",
+	"BS_MSG_NOTICEOPS", ""
 };
 
 /* Indices for TTB (Times To Ban) */
@@ -761,6 +764,7 @@ enum
 	TTB_FLOOD,
 	TTB_REPEAT,
 	TTB_ITALICS,
+	TTB_AMSGS,
 	TTB_SIZE
 };
 

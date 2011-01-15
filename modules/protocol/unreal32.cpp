@@ -1043,7 +1043,7 @@ class ProtoUnreal : public Module
 		message_mode("G", OnMode),
 		message_nick("&", OnNick), message_part("D", OnPart),
 		message_ping("8", OnPing), message_pong("PONG", event_pong),
-		message_pong2("9", event_pong), message_privmsg("!", OnPrivmsg),
+		message_pong2("9", event_pong), message_privmsg("!", ::OnPrivmsg),
 		message_quit(",", OnQuit),
 		message_server("'", OnServer), message_squit("-", OnSQuit),
 		message_topic(")", OnTopic), message_svsmode("SVSMODE", OnMode),

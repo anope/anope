@@ -365,6 +365,36 @@ class CommandBSKick : public Command
 					source.Reply(BOT_KICK_ITALICS_OFF);
 				}
 			}
+			else if (option.equals_ci("AMSGS"))
+			{
+				if (value.equals_ci("ON"))
+				{
+					if (!ttb.empty())
+					{
+						Anope::string error;
+						ci->ttb[TTB_AMSGS] = convertTo<int16>(ttb, error, false);
+						if (!error.empty() || ci->ttb[TTB_AMSGS] < 0)
+						{
+							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
+							ci->ttb[TTB_AMSGS] = 0;
+							source.Reply(BOT_KICK_AMSGS_ON_BAN, ci->ttb[TTB_AMSGS]);
+							return MOD_CONT;
+						}
+					}
+					else
+						ci->ttb[TTB_AMSGS] = 0;
+					ci->botflags.SetFlag(BS_KICK_AMSGS);
+					if (ci->ttb[TTB_AMSGS])
+						source.Reply(BOT_KICK_AMSGS_ON_BAN, ci->ttb[TTB_AMSGS]);
+					else
+						source.Reply(BOT_KICK_AMSGS_ON);
+				}
+				else
+				{
+					ci->botflags.UnsetFlag(BS_KICK_AMSGS);
+					source.Reply(BOT_KICK_AMSGS_OFF);
+				}
+			}
 			else
 				source.Reply(BOT_KICK_UNKNOWN, option.c_str());
 		}
@@ -393,6 +423,8 @@ class CommandBSKick : public Command
 			source.Reply(BOT_HELP_KICK_UNDERLINES);
 		else if (subcommand.equals_ci("ITALICS"))
 			source.Reply(BOT_HELP_KICK_ITALICS);
+		else if (subcommand.equals_ci("AMSGS"))
+			source.Reply(BOT_HELP_KICK_AMSGS);
 		else
 			return false;
 
@@ -421,6 +453,40 @@ class BSKick : public Module
 		this->SetType(CORE);
 
 		this->AddCommand(BotServ, &commandbskick);
+
+		ModuleManager::Attach(I_OnPrivmsg, this);
+	}
+
+	EventReturn OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg, bool &Allow)
+	{
+		Anope::string m, ch;
+		time_t time;
+
+		if (u->GetExtRegular("bs_kick_lastmsg", m) && u->GetExtRegular("bs_kick_lasttime", time) && u->GetExtRegular("bs_kick_lastchan", ch))
+		{
+			if (time == Anope::CurTime && m == msg && ch != ci->name)
+			{
+				for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
+				{
+					Channel *c = (*it)->chan;
+					++it;
+
+					if (c->ci != NULL)
+					{
+						check_ban(c->ci, u, TTB_AMSGS);
+						bot_kick(c->ci, u, BOT_REASON_AMSGS);
+					}
+				}
+
+				return EVENT_CONTINUE;
+			}
+		}
+		
+		u->Extend("bs_kick_lastmsg", new ExtensibleItemRegular<Anope::string>(msg));
+		u->Extend("bs_kick_lasttime", new ExtensibleItemRegular<time_t>(Anope::CurTime));
+		u->Extend("bs_kick_lastchan", new ExtensibleItemRegular<Anope::string>(ci->name));
+
+		return EVENT_CONTINUE;
 	}
 };
 

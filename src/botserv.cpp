@@ -16,9 +16,6 @@
 
 static UserData *get_user_data(Channel *c, User *u);
 
-static void check_ban(ChannelInfo *ci, User *u, int ttbtype);
-static void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...);
-
 E void moduleAddBotServCmds();
 
 /*************************************************************************/
@@ -116,6 +113,11 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		Allow = true;
 	else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && ci->c->HasUserStatus(u, CMODE_VOICE))
 		Allow = true;
+	
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnPrivmsg, OnPrivmsg(u, ci, realbuf, Allow));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
 
 	if (!check_access(u, ci, CA_NOKICK) && Allow)
 	{
@@ -452,7 +454,7 @@ static UserData *get_user_data(Channel *c, User *u)
  * @param u The user
  * @param ttbtype The type of bot kicker the user should be checked against
  */
-static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
+void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 {
 	BanData *bd = get_ban_data(ci->c, u);
 
@@ -485,7 +487,7 @@ static void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 
 /* This makes a bot kick an user. Works somewhat like notice_lang in fact ;) */
 
-static void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
+void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
 {
 	va_list args;
 	char buf[1024];

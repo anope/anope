@@ -85,30 +85,33 @@ class MySQLLiveModule : public Module, public Pipe
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		CommandMutex *cm = new CommandMutex();
-		try
+		if (this->SQL)
 		{
-			cm->mutex.Lock();
-			cm->command = command;
-			cm->source = source;
-			cm->params = params;
+			CommandMutex *cm = new CommandMutex();
+			try
+			{
+				cm->mutex.Lock();
+				cm->command = command;
+				cm->source = source;
+				cm->params = params;
 
-			commands.push_back(cm);
+				commands.push_back(cm);
 
-			// Give processing to the command thread
-			Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << source.u->nick;
-			threadEngine.Start(cm);
-			main_mutex.Lock();
+				// Give processing to the command thread
+				Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << source.u->nick;
+				threadEngine.Start(cm);
+				main_mutex.Lock();
+
+				return EVENT_STOP;
+			}
+			catch (const CoreException &ex)
+			{
+				delete cm;
+				Log() << "db_mysql_live: Unable to thread for command: " << ex.GetReason();
+			}
 		}
-		catch (const CoreException &ex)
-		{
-			delete cm;
-			Log() << "db_mysql_live: Unable to thread for command: " << ex.GetReason();
 
-			return EVENT_CONTINUE;
-		}
-
-		return EVENT_STOP;
+		return EVENT_CONTINUE;
 	}
 
 	void OnNotify()

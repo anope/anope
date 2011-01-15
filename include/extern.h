@@ -52,6 +52,8 @@ E BotInfo *findbot(const Anope::string &nick);
  */
 E Anope::string normalizeBuffer(const Anope::string &);
 
+E void check_ban(ChannelInfo *ci, User *u, int ttbtype);
+E void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...);
 E void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 E void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 

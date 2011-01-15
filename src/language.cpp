@@ -1648,6 +1648,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Don't use underlines on this channel!"),
 	/* BOT_REASON_ITALIC */
 	_("Don't use italics on this channel!"),
+	/* BOT_REASON_AMSGS */
+	_("Don't use AMSGs!"),
 	/* BOT_BOT_SYNTAX */
 	_("BOT ADD nick user host real\n"
 	"BOT CHANGE oldnick newnick [user [host [real]]]\n"
@@ -1910,6 +1912,13 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"%d kicks for the same user."),
 	/* BOT_KICK_ITALICS_OFF */
 	_("Bot won't kick italics anymore."),
+	/* BOT_KICK_AMSGS_ON */
+	_("Bot will now kick for \002amsgs\002"),
+	/* BOT_KICK_AMSGS_ON_BAN */
+	_("Bot will not kick for \002amsgs\002, and will place a ban after\n"
+	"%d kicks for the same user."),
+	/* BOT_KICK_AMSGS_OFF */
+	_("Bot won't kick for \002amsgs\002 anymore."),
 	/* BOT_BADWORDS_SYNTAX */
 	_("BADWORDS channel {ADD|DEL|LIST|CLEAR} [word | entry-list] [SINGLE|START|END]"),
 	/* BOT_BADWORDS_DISABLED */
@@ -4948,6 +4957,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Configures bot kickers.  option can be one of:\n"
 	" \n"
+	"    AMSGS         Sets if the bot kicks for amsgs\n"
 	"    BOLDS         Sets if the bot kicks bolds\n"
 	"    BADWORDS      Sets if the bot kicks bad words\n"
 	"    CAPS          Sets if the bot kicks caps\n"
@@ -5039,6 +5049,14 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Sets the italics kicker on or off. When enabled, this\n"
 	"option tells the bot to kick users who use italics.\n"
 	"ttb is the number of times a user can be kicked\n"
+	"before it get banned. Don't give ttb to disable\n"
+	"the ban system once activated."),
+	/* BOT_HELP_KICK_AMSGS */
+	_("Syntax: \002KICK \037channel\037 AMSGS {\037ON|OFF\037} [\037ttb\037]\002\n"
+	"Sets the amsg kicker on or off. When enabled, the bot will\n"
+	"kick users who send the same message to multiple channels\n"
+	"where BotServ bots are.\n"
+	"Ttb is the number of times a user can be kicked\n"
 	"before it get banned. Don't give ttb to disable\n"
 	"the ban system once activated."),
 	/* BOT_HELP_BADWORDS */

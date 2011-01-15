@@ -720,6 +720,8 @@ class DBPlain : public Module
 						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("ITALICS"))
 						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					else if (params[j].equals_ci("AMSGS"))
+						ci->ttb[9] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 				}
 			}
 			else if (params[0].equals_ci("CAPSMIN"))
@@ -960,7 +962,7 @@ class DBPlain : public Module
 				db << "MD BI NAME " << ci->bi->nick << endl;
 			if (ci->botflags.FlagCount())
 				db << "MD BI FLAGS " << ToString(ci->botflags.ToString()) << endl;
-			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << endl;
+			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << " AMSGS " << ci->ttb[9] << endl;
 			if (ci->capsmin)
 				db << "MD BI CAPSMIN " << ci->capsmin << endl;
 			if (ci->capspercent)

@@ -50,7 +50,7 @@ class CommandNSConfirm : public Command
 		if (!force)
 		{
 			u->Login(na->nc);
-			Log(LOG_COMMAND, u, this) << "to register " << u->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
+			Log(LOG_COMMAND, u, this) << "to register " << nr->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
 			if (Config->NSAddAccessOnReg)
 				source.Reply(NICK_REGISTERED, u->nick.c_str(), na->nc->GetAccess(0).c_str());
 			else
@@ -67,7 +67,7 @@ class CommandNSConfirm : public Command
 		}
 		else
 		{
-			Log(LOG_COMMAND, u, this) << "to confirm " << u->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
+			Log(LOG_COMMAND, u, this) << "to confirm " << nr->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
 			source.Reply(NICK_FORCE_REG, nr->nick.c_str());
 			User *user = finduser(nr->nick);
 			/* Delrequest must be called before validate_user */

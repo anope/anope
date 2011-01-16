@@ -697,7 +697,7 @@ class DBPlain : public Module
 			if (params[0].equals_ci("NAME"))
 				ci->bi = findbot(params[1]);
 			else if (params[0].equals_ci("FLAGS"))
-				ci->FromString(params);
+				ci->botflags.FromString(params);
 			else if (params[0].equals_ci("TTB"))
 			{
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)

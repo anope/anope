@@ -29,6 +29,8 @@ enum BotFlag
 	BI_END
 };
 
+static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "" };
+
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 {
  public:

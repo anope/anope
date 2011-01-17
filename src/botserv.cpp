@@ -329,7 +329,6 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			{
 				Anope::string message = sep.GetRemaining();
 
-				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, ci->bi, command, message, ci));
 				if (MOD_RESULT == EVENT_STOP)
 					return;
@@ -529,7 +528,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(u->nick) && u_level >= req_level)
 		return;
 
-	if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u) == 1)
+	if (matches_list(ci->c, u, CMODE_EXCEPT))
 	{
 		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, BOT_EXCEPT).c_str());
 		return;

@@ -749,7 +749,7 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 	}
 
-	if (!do_kick && ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(this, user) == 1)
+	if (!do_kick && matches_list(this->c, user, CMODE_EXCEPT))
 		return false;
 
 	const NickCore *nc = user->Account() || user->IsRecognized() ? user->Account() : NULL;

@@ -343,7 +343,7 @@ E User *do_nick(const Anope::string &source, const Anope::string &nick, const An
 E void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes);
 E void do_kill(User *user, const Anope::string &reason);
 
-E bool is_excepted(ChannelInfo *ci, User *user);
+E bool matches_list(Channel *c, User *user, ChannelModeName mode);
 E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
 
 E Anope::string create_mask(User *u);

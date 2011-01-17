@@ -876,14 +876,13 @@ void do_kill(User *user, const Anope::string &msg)
 /*************************************************************************/
 /*************************************************************************/
 
-/* Is the given user ban-excepted? */
-bool is_excepted(ChannelInfo *ci, User *user)
+bool matches_list(Channel *c, User *user, ChannelModeName mode)
 {
-	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
+	if (!c || !c->HasMode(mode))
 		return false;
 
 
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
+	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = c->GetModeList(mode);
 	for (; modes.first != modes.second; ++modes.first)
 	{
 		Entry e(modes.first->second);

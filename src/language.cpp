@@ -505,6 +505,21 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Your access list is empty."),
 	/* NICK_ACCESS_LIST_X_EMPTY */
 	_("Access list for %s is empty."),
+	/* NICK_AJOIN_SYNTAX */
+	_("AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]"),
+	/* NICK_AJOIN_LIST_EMPTY */
+	_("Your auto join list is empty."),
+	/* NICK_AJOIN_LIST_HEAD */
+	_("Your auto join list:\n"
+	"  Num   Channel      Key"),
+	/* NICK_AJOIN_LIST_FULL */
+	_("Your auto join list is full."),
+	/* NICK_AJOIN_ADDED */
+	_("Added %s to your auto join list."),
+	/* NICK_AJOIN_NOTFOUND */
+	_("%s was not found on your auto join list."),
+	/* NICK_AJOIN_DELETED */
+	_("%s was removed from your auto join list."),
 	/* NICK_STATUS_REPLY */
 	_("STATUS %s %d %s"),
 	/* NICK_INFO_SYNTAX */
@@ -2671,6 +2686,8 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    SUSPEND    Suspend a given nick"),
 	/* NICK_HELP_CMD_UNSUSPEND */
 	_("    UNSUSPEND  Unsuspend a given nick"),
+	/* NICK_HELP_CMD_AJOIN */
+	_("   AJOIN      Manage your auto join list"),
 	/* NICK_HELP */
 	_("%S allows you to \"register\" a nickname and\n"
 	"prevent others from using it. The following\n"
@@ -3203,6 +3220,11 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"This command will re-send the auth code (also called passcode)\n"
 	"to the e-mail address of the user whom is performing it."),
+	/* NICK_HELP_AJOIN */
+	_("Syntax: \002AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]\002\n"
+	" \n"
+	"This command manages your auto join list. When you identify\n"
+	"you will automatically join the channels on your auto join list"),
 	/* NICK_SERVADMIN_HELP */
 	_(" \n"
 	"Services Operators can also drop any nickname without needing\n"

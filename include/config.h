@@ -627,6 +627,8 @@ class CoreExport ServerConfig
 	bool NSModeOnID;
 	/* Add the users hostnask their access list when they register */
 	bool NSAddAccessOnReg;
+	/* Maximum number of channels on AJoin */
+	unsigned AJoinMax;
 
 	/* Default flags for newly registered channels */
 	Flags<ChannelInfoFlag, CI_END> CSDefFlags;

@@ -41,7 +41,7 @@ static bool CanBanUser(Channel *c, User *u, User *u2)
 	bool ok = false;
 	if (!check_access(u, ci, CA_BAN))
 		u->SendMessage(ChanServ, ACCESS_DENIED);
-	else if (is_excepted(ci, u2))
+	else if (matches_list(c, u2, CMODE_EXCEPT))
 		u->SendMessage(ChanServ, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 	else if (u2->IsProtected())
 		u->SendMessage(ChanServ, ACCESS_DENIED);

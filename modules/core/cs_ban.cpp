@@ -47,7 +47,7 @@ class CommandCSBan : public Command
 		 * Dont ban/kick the user on channels where he is excepted
 		 * to prevent services <-> server wars.
 		 */
-		else if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted(ci, u2))
+		else if (matches_list(ci->c, u2, CMODE_EXCEPT))
 			source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 		else if (u2->IsProtected())
 			source.Reply(ACCESS_DENIED);

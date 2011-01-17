@@ -28,7 +28,7 @@ template<typename T> class ExtensibleItemRegular : public ExtensibleItemBase
  public:
 	ExtensibleItemRegular(T item) : Item(item) { }
 	virtual ~ExtensibleItemRegular() { }
-	T GetItem() const { return Item; }
+	T &GetItem() { return Item; }
 };
 
 /** Class used to represent an extensible item that holds a pointer
@@ -41,7 +41,7 @@ template<typename T> class ExtensibleItemPointer : public ExtensibleItemBase
  public:
 	ExtensibleItemPointer(T *item) : Item(item) { }
 	virtual ~ExtensibleItemPointer() { delete Item; }
-	T *GetItem() const { return Item; }
+	T *GetItem() { return Item; }
 };
 
 /** Class used to represent an extensible item that holds a pointer to an arrray
@@ -54,7 +54,7 @@ template<typename T> class ExtensibleItemPointerArray : public ExtensibleItemBas
  public:
 	ExtensibleItemPointerArray(T *item) : Item(item) { }
 	virtual ~ExtensibleItemPointerArray() { delete [] Item; }
-	T *GetItem() const { return Item; }
+	T *GetItem() { return Item; }
 };
 
 class CoreExport Extensible : public Base
@@ -108,7 +108,7 @@ class CoreExport Extensible : public Base
 	 */
 	void Extend(const Anope::string &key)
 	{
-		this->Extend(key, new ExtensibleItemRegular<char *>(NULL));
+		this->Extend(key, new ExtensibleItemPointer<char *>(NULL));
 	}
 
 	/** Shrink an Extensible class.

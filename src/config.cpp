@@ -1115,6 +1115,7 @@ void ServerConfig::Read()
 		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&this->NSStrictPrivileges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "modeonid", "no", new ValueContainerBool(&this->NSModeOnID), DT_BOOLEAN, NoValidation},
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&this->NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
+		{"nickserv", "ajoinmax", "10", new ValueContainerUInt(&this->AJoinMax), DT_UINTEGER, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&this->UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerString(&this->SendMailPath), DT_STRING, ValidateMail},
 		{"mail", "sendfrom", "", new ValueContainerString(&this->SendFrom), DT_STRING, ValidateMail},

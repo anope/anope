@@ -26,7 +26,7 @@ class CommandNSAJoin : public Command
 		{
 			source.Reply(NICK_AJOIN_LIST_HEAD);
 			for (unsigned i = 0; i < channels.size(); ++i)
-				source.Reply(" %3d %-23s %s", i + 1, channels[i].first.c_str(), channels[i].second.c_str());
+				source.Reply(" %3d    %-12s %s", i + 1, channels[i].first.c_str(), channels[i].second.c_str());
 		}
 	}
 
@@ -215,7 +215,7 @@ class NSAJoin : public Module
 		if (key == "NS_AJOIN")
 		{
 			std::vector<std::pair<Anope::string, Anope::string> > channels;
-			bool valid = nc->GetExtRegular("ns_ajoin_channels", channels);
+			nc->GetExtRegular("ns_ajoin_channels", channels);
 
 			for (unsigned i = 0; i < params.size(); ++i)
 			{

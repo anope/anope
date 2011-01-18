@@ -63,6 +63,8 @@ class CommandNSAJoin : public Command
 		else
 		{
 			channels.erase(channels.begin() + i);
+			source.u->Account()->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
+				std::pair<Anope::string, Anope::string> > >(channels));
 			source.Reply(NICK_AJOIN_DELETED, params[1].c_str());
 		}
 	}
@@ -220,11 +222,11 @@ class NSAJoin : public Module
 			for (unsigned i = 0; i < params.size(); ++i)
 			{
 				Anope::string chan, chankey;
-				commasepstream sep(params[0]);
+				commasepstream sep(params[i]);
 				sep.GetToken(chan);
 				sep.GetToken(chankey);
 
-				  channels.push_back(std::make_pair(chan, chankey));
+				channels.push_back(std::make_pair(chan, chankey));
 			}
 
 			nc->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<

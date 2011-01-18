@@ -12,8 +12,8 @@
 
 #include "module.h"
 
-std::fstream db;
 Anope::string DatabaseFile;
+std::stringstream db_buffer;
 
 /** Enum used for what METADATA type we are reading
  */
@@ -41,7 +41,7 @@ static void ReadDatabase(Module *m = NULL)
 	EventReturn MOD_RESULT;
 	MDType Type = MD_NONE;
 
-	db.clear();
+	std::fstream db;
 	db.open(DatabaseFile.c_str(), std::ios_base::in);
 
 	if (!db.is_open())
@@ -391,7 +391,7 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 
 void Write(const Anope::string &buf)
 {
-	db << buf << endl;
+	db_buffer << buf << endl;
 }
 
 void WriteMetadata(const Anope::string &key, const Anope::string &data)
@@ -756,22 +756,13 @@ class DBPlain : public Module
 	{
 		BackupDatabase();
 
-		db.clear();
-		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
-
-		if (!db.is_open())
-		{
-			ircdproto->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
-			return EVENT_CONTINUE;
-		}
-
-		db << "VER 2" << endl;
+		db_buffer << "VER 2" << endl;
 
 		for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
 		{
 			NickRequest *nr = it->second;
 
-			db << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
+			db_buffer << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
 		}
@@ -780,39 +771,39 @@ class DBPlain : public Module
 		{
 			NickCore *nc = nit->second;
 
-			db << "NC " << nc->display << " " << nc->pass << endl;
+			db_buffer << "NC " << nc->display << " " << nc->pass << endl;
 
-			db << "MD MEMOMAX " << nc->memos.memomax << endl;
-			db << "MD CHANCOUNT " << nc->channelcount << endl;
+			db_buffer << "MD MEMOMAX " << nc->memos.memomax << endl;
+			db_buffer << "MD CHANCOUNT " << nc->channelcount << endl;
 
 			if (!nc->language.empty())
-				db << "MD LANGUAGE " << nc->language << endl;
+				db_buffer << "MD LANGUAGE " << nc->language << endl;
 			if (!nc->email.empty())
-				db << "MD EMAIL " << nc->email << endl;
+				db_buffer << "MD EMAIL " << nc->email << endl;
 			if (!nc->greet.empty())
-				db << "MD GREET :" << nc->greet << endl;
+				db_buffer << "MD GREET :" << nc->greet << endl;
 
 			if (!nc->access.empty())
 			{
 				for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
-					db << "MD ACCESS " << *it << endl;
+					db_buffer << "MD ACCESS " << *it << endl;
 			}
 			if (nc->FlagCount())
-				db << "MD FLAGS " << ToString(nc->ToString()) << endl;
+				db_buffer << "MD FLAGS " << ToString(nc->ToString()) << endl;
 			MemoInfo *mi = &nc->memos;
 			for (unsigned k = 0, end = mi->memos.size(); k < end; ++k)
 			{
-				db << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
+				db_buffer << "MD MI " << mi->memos[k]->time << " " << mi->memos[k]->sender;
 				if (mi->memos[k]->HasFlag(MF_UNREAD))
-					db << " UNREAD";
+					db_buffer << " UNREAD";
 				if (mi->memos[k]->HasFlag(MF_RECEIPT))
-					db << " RECEIPT";
+					db_buffer << " RECEIPT";
 				if (mi->memos[k]->HasFlag(MF_NOTIFYS))
-					db << " NOTIFYS";
-				db << " :" << mi->memos[k]->text << endl;
+					db_buffer << " NOTIFYS";
+				db_buffer << " :" << mi->memos[k]->text << endl;
 			}
 			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
-				db << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
+				db_buffer << "MD MIG " << Anope::string(mi->ignores[k]) << endl;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nc));
 		}
 
@@ -820,17 +811,17 @@ class DBPlain : public Module
 		{
 			NickAlias *na = it->second;
 
-			db << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
+			db_buffer << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
 			if (!na->last_usermask.empty())
-				db << "MD LAST_USERMASK " << na->last_usermask << endl;
+				db_buffer << "MD LAST_USERMASK " << na->last_usermask << endl;
 			if (!na->last_realname.empty())
-				db << "MD LAST_REALNAME :" << na->last_realname << endl;
+				db_buffer << "MD LAST_REALNAME :" << na->last_realname << endl;
 			if (!na->last_quit.empty())
-				db << "MD LAST_QUIT :" << na->last_quit << endl;
+				db_buffer << "MD LAST_QUIT :" << na->last_quit << endl;
 			if (na->FlagCount())
-				db << "MD FLAGS " << ToString(na->ToString()) << endl;
+				db_buffer << "MD FLAGS " << ToString(na->ToString()) << endl;
 			if (na->hostinfo.HasVhost())
-				db << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
+				db_buffer << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}
@@ -839,49 +830,49 @@ class DBPlain : public Module
 		{
 			BotInfo *bi = *it;
 
-			db << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
+			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
 			if (bi->FlagCount())
-				db << "MD FLAGS " << ToString(bi->ToString()) << endl;
+				db_buffer << "MD FLAGS " << ToString(bi->ToString()) << endl;
 		}
 
 		for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
 		{
 			ChannelInfo *ci = cit->second;
 
-			db << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
-			db << "MD BANTYPE " << ci->bantype << endl;
-			db << "MD MEMOMAX " << ci->memos.memomax << endl;
+			db_buffer << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
+			db_buffer << "MD BANTYPE " << ci->bantype << endl;
+			db_buffer << "MD MEMOMAX " << ci->memos.memomax << endl;
 			if (ci->founder)
-				db << "MD FOUNDER " << ci->founder->display << endl;
+				db_buffer << "MD FOUNDER " << ci->founder->display << endl;
 			if (ci->successor)
-				db << "MD SUCCESSOR " << ci->successor->display << endl;
+				db_buffer << "MD SUCCESSOR " << ci->successor->display << endl;
 			if (!ci->desc.empty())
-				db << "MD DESC :" << ci->desc << endl;
+				db_buffer << "MD DESC :" << ci->desc << endl;
 			if (!ci->last_topic.empty())
-				db << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
-			db << "MD LEVELS";
+				db_buffer << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
+			db_buffer << "MD LEVELS";
 			for (int j = 0; ChannelLevels[j].Level != -1; ++j)
-				db << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
-			db << endl;
+				db_buffer << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
+			db_buffer << endl;
 			if (ci->FlagCount())
-				db << "MD FLAGS " << ToString(ci->ToString()) << endl;
+				db_buffer << "MD FLAGS " << ToString(ci->ToString()) << endl;
 			if (ci->HasFlag(CI_FORBIDDEN))
-				db << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
+				db_buffer << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
-				db << "MD ACCESS " << ci->GetAccess(k)->mask << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+				db_buffer << "MD ACCESS " << ci->GetAccess(k)->mask << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
-				db << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
+				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<
 					(ci->GetAkick(k)->HasFlag(AK_ISNICK) ? ci->GetAkick(k)->nc->display : ci->GetAkick(k)->mask) << " " << ci->GetAkick(k)->creator << " " << ci->GetAkick(k)->addtime << " " << ci->last_used << " :";
 				if (!ci->GetAkick(k)->reason.empty())
-					db << ci->GetAkick(k)->reason;
-				db << endl;
+					db_buffer << ci->GetAkick(k)->reason;
+				db_buffer << endl;
 			}
-			db << "MD MLOCK_ON";
+			db_buffer << "MD MLOCK_ON";
 			{
 				Anope::string oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_on", oldmodes))
-					db << " " << oldmodes;
+					db_buffer << " " << oldmodes;
 				else
 				{
 					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
@@ -892,18 +883,18 @@ class DBPlain : public Module
 							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 							if (!cm || cm->Type != MODE_REGULAR)
 								continue;
-							db << " " << cm->NameAsString;
+							db_buffer << " " << cm->NameAsString;
 						}
 					}
 				}
 			}
-			db << endl;
-			db << "MD MLOCK_OFF";
+			db_buffer << endl;
+			db_buffer << "MD MLOCK_OFF";
 			{
 				Anope::string oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_off", oldmodes))
 				{
-					db << " " << oldmodes;
+					db_buffer << " " << oldmodes;
 				}
 				else
 				{
@@ -915,19 +906,19 @@ class DBPlain : public Module
 							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 							if (!cm || cm->Type != MODE_REGULAR)
 								continue;
-							db << " " << cm->NameAsString;
+							db_buffer << " " << cm->NameAsString;
 						}
 					}
 				}
 			}
-			db << endl;
+			db_buffer << endl;
 			{
 				std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
 				{
 					for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
 					{
-						db << "MD MLP " << it->first << " " << it->second << endl;
+						db_buffer << "MD MLP " << it->first << " " << it->second << endl;
 					}
 				}
 				else
@@ -940,83 +931,95 @@ class DBPlain : public Module
 							continue;
 
 						if (!ml.param.empty())
-							db << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString << " " << ml.param << endl;
+							db_buffer << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString << " " << ml.param << endl;
 					}
 				}
 			}
 			MemoInfo *memos = &ci->memos;
 			for (unsigned k = 0, end = memos->memos.size(); k < end; ++k)
 			{
-				db << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
+				db_buffer << "MD MI " << memos->memos[k]->time << " " << memos->memos[k]->sender;
 				if (memos->memos[k]->HasFlag(MF_UNREAD))
-					db << " UNREAD";
+					db_buffer << " UNREAD";
 				if (memos->memos[k]->HasFlag(MF_RECEIPT))
-					db << " RECEIPT";
+					db_buffer << " RECEIPT";
 				if (memos->memos[k]->HasFlag(MF_NOTIFYS))
-					db << " NOTIFYS";
-				db << " :" << memos->memos[k]->text << endl;
+					db_buffer << " NOTIFYS";
+				db_buffer << " :" << memos->memos[k]->text << endl;
 			}
 			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
-				db << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
+				db_buffer << "MD MIG " << Anope::string(memos->ignores[k]) << endl;
 			if (ci->bi)
-				db << "MD BI NAME " << ci->bi->nick << endl;
+				db_buffer << "MD BI NAME " << ci->bi->nick << endl;
 			if (ci->botflags.FlagCount())
-				db << "MD BI FLAGS " << ToString(ci->botflags.ToString()) << endl;
-			db << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << " AMSGS " << ci->ttb[9] << endl;
+				db_buffer << "MD BI FLAGS " << ToString(ci->botflags.ToString()) << endl;
+			db_buffer << "MD BI TTB BOLDS " << ci->ttb[0] << " COLORS " << ci->ttb[1] << " REVERSES " << ci->ttb[2] << " UNDERLINES " << ci->ttb[3] << " BADWORDS " << ci->ttb[4] << " CAPS " << ci->ttb[5] << " FLOOD " << ci->ttb[6] << " REPEAT " << ci->ttb[7] << " ITALICS " << ci->ttb[8] << " AMSGS " << ci->ttb[9] << endl;
 			if (ci->capsmin)
-				db << "MD BI CAPSMIN " << ci->capsmin << endl;
+				db_buffer << "MD BI CAPSMIN " << ci->capsmin << endl;
 			if (ci->capspercent)
-				db << "MD BI CAPSPERCENT " << ci->capspercent << endl;
+				db_buffer << "MD BI CAPSPERCENT " << ci->capspercent << endl;
 			if (ci->floodlines)
-				db << "MD BI FLOODLINES " << ci->floodlines << endl;
+				db_buffer << "MD BI FLOODLINES " << ci->floodlines << endl;
 			if (ci->floodsecs)
-				db << "MD BI FLOODSECS " << ci->floodsecs << endl;
+				db_buffer << "MD BI FLOODSECS " << ci->floodsecs << endl;
 			if (ci->repeattimes)
-				db << "MD BI REPEATTIMES " << ci->repeattimes << endl;
+				db_buffer << "MD BI REPEATTIMES " << ci->repeattimes << endl;
 			for (unsigned k = 0, end = ci->GetBadWordCount(); k < end; ++k)
-				db << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") <<
+				db_buffer << "MD BI BADWORD " << (ci->GetBadWord(k)->type == BW_ANY ? "ANY " : "") << (ci->GetBadWord(k)->type == BW_SINGLE ? "SINGLE " : "") << (ci->GetBadWord(k)->type == BW_START ? "START " : "") <<
 					(ci->GetBadWord(k)->type == BW_END ? "END " : "") << ":" << ci->GetBadWord(k)->word << endl;
 
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, ci));
 		}
 
-		db << "OS STATS " << maxusercnt << " " << maxusertime << endl;
+		db_buffer << "OS STATS " << maxusercnt << " " << maxusertime << endl;
 
 		if (SGLine)
 			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SGLine->GetEntry(i);
-				db << "OS AKILL " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+				db_buffer << "OS AKILL " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
 		if (SNLine)
 			for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SNLine->GetEntry(i);
-				db << "OS SNLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+				db_buffer << "OS SNLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
 		if (SQLine)
 			for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SQLine->GetEntry(i);
-				db << "OS SQLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+				db_buffer << "OS SQLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
 		if (SZLine)
 			for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
 			{
 				XLine *x = SZLine->GetEntry(i);
-				db << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+				db_buffer << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
 		for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
 		{
 			Exception *e = *it;
-			db << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
+			db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
 		}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
+
+		std::fstream db;
+		db.open(DatabaseFile.c_str(), std::ios_base::out | std::ios_base::trunc);
+
+		if (!db.is_open())
+		{
+			ircdproto->SendGlobops(NULL, "Unable to open %s for writing!", DatabaseFile.c_str());
+			return EVENT_CONTINUE;
+		}
+
+		db << db_buffer.str();
+		db_buffer.clear();
 
 		db.close();
 

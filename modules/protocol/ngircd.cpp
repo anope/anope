@@ -42,7 +42,7 @@ IRCDVar myIrcd[] = {
 /* PASS */
 void ngircd_cmd_pass(const Anope::string &pass)
 {
-	send_cmd("", "PASS %s 0210-IRC+ ngircd|17~9:CLHSo P", pass.c_str());
+	send_cmd("", "PASS %s 0210-IRC+ Anope|17~9:CLHSo P", pass.c_str());
 }
 
 class ngIRCdProto : public IRCDProto
@@ -162,20 +162,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
-		bool needjoin = c->FindUser(bi) == NULL;
-		if (needjoin)
-		{
-			ChannelStatus status;
-			status.SetFlag(CMODE_OP);
-			ChannelContainer cc(c);
-			cc.Status = &status;
-			ircdproto->SendJoin(bi, &cc);
-		}
 		send_cmd(bi->nick, "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
-		if (needjoin)
-		{
-			ircdproto->SendPart(bi, c, NULL);
-		}
 	}
 
 };
@@ -243,7 +230,10 @@ class ngIRCdIRCdMessage : public IRCdMessage
 
 	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		do_server(Me->IsSynced() ? source : "", params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		if (params.size() == 3)
+			do_server("", params[0], 0, params[2], params[1]);
+		else
+			do_server(source, params[0], params[1].is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[3], params[2]);
 		return true;
 	}
 

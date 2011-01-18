@@ -859,19 +859,14 @@ int main(int argc, char *argv[])
 				process_mlock_modes(fs, ci->mlock_off, ircd);
 				fs << std::endl;
 			}
-			if (ci->mlock_limit || (ci->mlock_key && *ci->mlock_key) || (ci->mlock_flood && *ci->mlock_flood) || (ci->mlock_redirect && *ci->mlock_redirect))
-			{
-				fs << "MD MLP";
-				if (ci->mlock_limit)
-					fs << " CMODE_LIMIT " << ci->mlock_limit;
-				if (ci->mlock_key && *ci->mlock_key)
-					fs << " CMODE_KEY " << ci->mlock_key;
-				if (ci->mlock_flood && *ci->mlock_flood)
-					fs << " CMODE_FLOOD " << ci->mlock_flood;
-				if (ci->mlock_redirect && *ci->mlock_redirect)
-					fs << " CMODE_REDIRECT " << ci->mlock_redirect;
-				fs << std::endl;
-			}
+			if (ci->mlock_limit)
+				fs << "MD MLP CMODE_LIMIT " << ci->mlock_limit << std::endl;
+			if (ci->mlock_key && *ci->mlock_key)
+				fs << "MD MLP CMODE_KEY " << ci->mlock_key << std::endl;
+			if (ci->mlock_flood && *ci->mlock_flood)
+				fs << "MD MLP CMODE_FLOOD " << ci->mlock_flood << std::endl;
+			if (ci->mlock_redirect && *ci->mlock_redirect)
+				fs << "MD MLP CMODE_REDIRECT " << ci->mlock_redirect << std::endl;
 			if (ci->memos.memocount)
 			{
 				Memo *memos = ci->memos.memos;

@@ -1768,6 +1768,10 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("     Italics kicker : %s"),
 	/* BOT_INFO_CHAN_KICK_ITALICS_BAN */
 	_("     Italics kicker : %s (%d kick(s) to ban)"),
+	/* BOT_INFO_CHAN_KICK_AMSGS */
+	_("     AMSG kicker    : %s"),
+	/* BOT_INFO_CHAN_KICK_AMSGS_BAN */
+	_("     AMSG kicker    : %s (%d kick(s) to ban)"),
 	/* BOT_INFO_CHAN_MSG */
 	_("      Fantasy reply : %s"),
 	/* BOT_INFO_ACTIVE */

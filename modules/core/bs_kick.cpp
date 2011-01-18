@@ -471,7 +471,7 @@ class BSKick : public Module
 					Channel *c = (*it)->chan;
 					++it;
 
-					if (c->ci != NULL)
+					if (c->ci != NULL && c->ci->botflags.HasFlag(BS_KICK_AMSGS))
 					{
 						check_ban(c->ci, u, TTB_AMSGS);
 						bot_kick(c->ci, u, BOT_REASON_AMSGS);

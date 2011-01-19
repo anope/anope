@@ -10,7 +10,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
    	   'RUNGROUP=${RUNGROUP}' 
 
 .c.o:
-	$(CC) $(CFLAGS) -I../include/ -c $<
+	$(CC) $(CFLAGS) -I../include/ $< -o $*
 
 all: ${OBJS}
 
@@ -26,7 +26,7 @@ clean:
 
 spotless: clean
 
-install: anopesmtp db-merger epona2anope
+install:
 	test -d ${BINDEST} || mkdir ${BINDEST}
 	test -d $(BINDEST)/tools || mkdir $(BINDEST)/tools
 	$(INSTALL) anopesmtp $(BINDEST)/tools/anopesmtp

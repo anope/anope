@@ -1084,6 +1084,7 @@ void ServerConfig::Read()
 		{"options", "newscount", "3", new ValueContainerUInt(&this->NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerString(&UlineServers), DT_STRING, NoValidation},
 		{"options", "mlock", "+nrt", new ValueContainerString(&this->MLock), DT_STRING, NoValidation},
+		{"options", "nomlock", "", new ValueContainerString(&this->NoMLock), DT_STRING, NoValidation},
 		{"options", "botmodes", "", new ValueContainerString(&this->BotModes), DT_STRING, NoValidation},
 		{"options", "maxretries", "10", new ValueContainerUInt(&this->MaxRetries), DT_UINTEGER, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&this->RetryWait), DT_INTEGER, ValidateNotZero},

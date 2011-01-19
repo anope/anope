@@ -192,6 +192,17 @@ ChannelMode::~ChannelMode()
 {
 }
 
+/** Can a user set this mode, used for mlock
+ * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
+ * @param u The user, or NULL
+ */
+bool ChannelMode::CanSet(User *u) const
+{
+	if (Config->NoMLock.find(this->ModeChar) != Anope::string::npos)
+		return false;
+	return true;
+}
+
 /** Default constructor
  * @param mName The mode name
  * @param mNameAsString The mode name as a string

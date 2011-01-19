@@ -544,6 +544,8 @@ class CoreExport ServerConfig
 	unsigned NewsCount;
 	/* Default mlock modes */
 	Anope::string MLock;
+	/* Unmlockable modes */
+	Anope::string NoMLock;
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
 	/* THe actual modes */

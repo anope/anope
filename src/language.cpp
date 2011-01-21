@@ -171,11 +171,11 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* PASSWORD_INCORRECT */
 	_("Password incorrect."),
 	/* INVALID_TARGET */
-	_("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."),
+	_("\"/msg %s\" is no longer supported. Use \"/msg %s@%s\" or \"/%s\" instead."),
 	/* ACCESS_DENIED */
 	_("Access denied."),
 	/* MORE_OBSCURE_PASSWORD */
-	_("Please try again with a more obscure password.  Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters."),
+	_("Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters."),
 	/* PASSWORD_TOO_LONG */
 	_("Your password is too long. Please try again with a shorter password."),
 	/* NICK_NOT_REGISTERED */
@@ -2452,7 +2452,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Allows Services Operators to manipulate the list of hosts that\n"
 	"have specific session limits - allowing certain machines, \n"
 	"such as shell servers, to carry more than the default number\n"
-	"of clients at a time. Once a host reaches it's session limit,\n"
+	"of clients at a time. Once a host reaches its session limit,\n"
 	"all clients attempting to connect from that host will be\n"
 	"killed. Before the user is killed, they are notified, via a\n"
 	"/NOTICE from %S, of a source of help regarding session\n"
@@ -2474,7 +2474,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"exceptions; if the optional mask is given, the list is limited\n"
 	"to those exceptions matching the mask. The difference is that\n"
 	"EXCEPTION VIEW is more verbose, displaying the name of the\n"
-	"person who added the exception, it's session limit, reason, \n"
+	"person who added the exception, its session limit, reason, \n"
 	"host mask and the expiry date and time.\n"
 	" \n"
 	"Note that a connecting client will \"use\" the first exception\n"
@@ -2691,7 +2691,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_HELP_CMD_UNSUSPEND */
 	_("    UNSUSPEND  Unsuspend a given nick"),
 	/* NICK_HELP_CMD_AJOIN */
-	_("   AJOIN      Manage your auto join list"),
+	_("    AJOIN      Manage your auto join list"),
 	/* NICK_HELP */
 	_("%S allows you to \"register\" a nickname and\n"
 	"prevent others from using it. The following\n"
@@ -2704,7 +2704,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"NOTICE: This service is intended to provide a way for\n"
 	"IRC users to ensure their identity is not compromised.\n"
 	"It is NOT intended to facilitate \"stealing\" of\n"
-	"nicknames or other malicious actions.  Abuse of %S\n"
+	"nicknames or other malicious actions. Abuse of %S\n"
 	"will result in, at minimum, loss of the abused\n"
 	"nickname(s)."),
 	/* NICK_HELP_EXPIRES */
@@ -2714,20 +2714,20 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_HELP_REGISTER */
 	_("Syntax: REGISTER password [email]\n"
 	" \n"
-	"Registers your nickname in the %S database.  Once\n"
+	"Registers your nickname in the %S database. Once\n"
 	"your nick is registered, you can use the SET and ACCESS\n"
 	"commands to configure your nick's settings as you like\n"
-	"them.  Make sure you remember the password you use when\n"
+	"them. Make sure you remember the password you use when\n"
 	"registering - you'll need it to make changes to your nick\n"
-	"later.  (Note that case matters!  ANOPE, Anope, and \n"
+	"later. (Note that case matters! ANOPE, Anope, and \n"
 	"anope are all different passwords!)\n"
 	" \n"
 	"Guidelines on choosing passwords:\n"
 	" \n"
-	"Passwords should not be easily guessable.  For example,\n"
-	"using your real name as a password is a bad idea.  Using\n"
+	"Passwords should not be easily guessable. For example,\n"
+	"using your real name as a password is a bad idea. Using\n"
 	"your nickname as a password is a much worse idea ;) and,\n"
-	"in fact, %S will not allow it.  Also, short\n"
+	"in fact, %S will not allow it. Also, short\n"
 	"passwords are vulnerable to trial-and-error searches, so\n"
 	"you should choose a password at least 5 characters long.\n"
 	"Finally, the space character cannot be used in passwords.\n"
@@ -2919,16 +2919,16 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"to change nicks instead of the usual 60.  If you select\n"
 	"IMMED, user's nick will be changed immediately without being\n"
 	"warned first or given a chance to change their nick; please\n"
-	"do not use this option unless necessary.  Also, your\n"
+	"do not use this option unless necessary. Also, your\n"
 	"network's administrators may have disabled this option."),
 	/* NICK_HELP_SET_SECURE */
 	_("Syntax: SET SECURE {ON | OFF}\n"
 	" \n"
 	"Turns %S's security features on or off for your\n"
-	"nick.  With SECURE set, you must enter your password\n"
+	"nick. With SECURE set, you must enter your password\n"
 	"before you will be recognized as the owner of the nick,\n"
 	"regardless of whether your address is on the access\n"
-	"list.  However, if you are on the access list, %S\n"
+	"list. However, if you are on the access list, %S\n"
 	"will not auto-kill you regardless of the setting of the\n"
 	"KILL option."),
 	/* NICK_HELP_SET_PRIVATE */
@@ -2963,7 +2963,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_HELP_SASET_HEAD */
 	_("Syntax: SASET nickname option parameters.\n"
 	" \n"
-	"Sets various nickname options.  option can be one of:"),
+	"Sets various nickname options. option can be one of:"),
 	/* NICK_HELP_CMD_SASET_DISPLAY */
 	_("    DISPLAY    Set the display of the group in Services"),
 	/* NICK_HELP_CMD_SASET_PASSWORD */
@@ -2994,7 +2994,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* NICK_HELP_SASET_PASSWORD */
 	_("Syntax: SASET nickname PASSWORD new-password\n"
 	" \n"
-	"Changes the password used to identify as the nick's	owner."),
+	"Changes the password used to identify as the nick's owner."),
 	/* NICK_HELP_SASET_EMAIL */
 	_("Syntax: SASET nickname EMAIL address\n"
 	" \n"
@@ -3010,25 +3010,25 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}\n"
 	" \n"
 	"Turns the automatic protection option for the nick\n"
-	"on or off.  With protection on, if another user\n"
+	"on or off. With protection on, if another user\n"
 	"tries to take the nick, they will be given one minute to\n"
 	"change to another nick, after which %S will forcibly change\n"
 	"their nick.\n"
 	" \n"
 	"If you select QUICK, the user will be given only 20 seconds\n"
-	"to change nicks instead of the usual 60.  If you select\n"
+	"to change nicks instead of the usual 60. If you select\n"
 	"IMMED, user's nick will be changed immediately without being\n"
 	"warned first or given a chance to change their nick; please\n"
-	"do not use this option unless necessary.  Also, your\n"
+	"do not use this option unless necessary. Also, your\n"
 	"network's administrators may have disabled this option."),
 	/* NICK_HELP_SASET_SECURE */
 	_("Syntax: SASET nickname SECURE {ON | OFF}\n"
 	" \n"
 	"Turns %S's security features on or off for your\n"
-	"nick.  With SECURE set, you must enter your password\n"
+	"nick. With SECURE set, you must enter your password\n"
 	"before you will be recognized as the owner of the nick,\n"
 	"regardless of whether your address is on the access\n"
-	"list.  However, if you are on the access list, %S\n"
+	"list. However, if you are on the access list, %S\n"
 	"will not auto-kill you regardless of the setting of the\n"
 	"KILL option."),
 	/* NICK_HELP_SASET_PRIVATE */
@@ -3101,7 +3101,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Instructs %S to remove any hold on your nickname\n"
 	"caused by automatic kill protection or use of the RECOVER\n"
-	"command.  This holds lasts for %s;\n"
+	"command. This holds lasts for %s;\n"
 	"this command gets rid of them sooner.\n"
 	" \n"
 	"In order to use the RELEASE command for a nick, your\n"
@@ -3115,7 +3115,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Terminates a \"ghost\" IRC session using your nick.  A\n"
 	"\"ghost\" session is one which is not actually connected,\n"
 	"but which the IRC server believes is still online for one\n"
-	"reason or another.  Typically, this happens if your\n"
+	"reason or another. Typically, this happens if your\n"
 	"computer crashes or your Internet or modem connection\n"
 	"goes down while you're on IRC.\n"
 	" \n"
@@ -3175,7 +3175,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Syntax: STATUS nickname...\n"
 	" \n"
 	"Returns whether the user using the given nickname is\n"
-	"recognized as the owner of the nickname.  The response has\n"
+	"recognized as the owner of the nickname. The response has\n"
 	"this format:\n"
 	" \n"
 	"    nickname status-code account\n"
@@ -3406,11 +3406,11 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("    ENTRYMSG   Manage the channel's entrymsgs"),
 	/* CHAN_HELP */
 	_("%S allows you to register and control various\n"
-	"aspects of channels.  %S can often prevent\n"
+	"aspects of channels. %S can often prevent\n"
 	"malicious users from \"taking over\" channels by limiting\n"
-	"who is allowed channel operator privileges.  Available\n"
+	"who is allowed channel operator privileges. Available\n"
 	"commands are listed below; to use them, type\n"
-	"%R%S command.  For more information on a\n"
+	"%R%S command. For more information on a\n"
 	"specific command, type %R%S HELP command."),
 	/* CHAN_HELP_EXPIRES */
 	_("Note that any channel which is not used for %d days\n"
@@ -3426,7 +3426,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"general description of the channel's purpose.\n"
 	" \n"
 	"When you register a channel, you are recorded as the\n"
-	"\"founder\" of the channel.  The channel founder is allowed\n"
+	"\"founder\" of the channel. The channel founder is allowed\n"
 	"to change all of the channel settings for the channel;\n"
 	"%S will also automatically give the founder\n"
 	"channel-operator privileges when s/he enters the channel.\n"
@@ -3499,12 +3499,12 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* CHAN_HELP_SET_FOUNDER */
 	_("Syntax: %s channel FOUNDER nick\n"
 	" \n"
-	"Changes the founder of a channel.  The new nickname must\n"
+	"Changes the founder of a channel. The new nickname must\n"
 	"be a registered one."),
 	/* CHAN_HELP_SET_SUCCESSOR */
 	_("Syntax: %s channel SUCCESSOR nick\n"
 	" \n"
-	"Changes the successor of a channel.  If the founder's\n"
+	"Changes the successor of a channel. If the founder's\n"
 	"nickname expires or is dropped while the channel is still\n"
 	"registered, the successor will become the new founder of the\n"
 	"channel.  However, if the successor already has too many\n"
@@ -3560,7 +3560,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Syntax: %s channel RESTRICTED {ON | OFF}\n"
 	" \n"
 	"Enables or disables the restricted access option for a\n"
-	"channel.  When restricted access is set, users not on the access list will\n"
+	"channel. When restricted access is set, users not on the access list will\n"
 	"instead be kicked and banned from the channel."),
 	/* CHAN_HELP_SET_SECURE */
 	_("Syntax: %s channel SECURE {ON | OFF}\n"
@@ -3939,31 +3939,31 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"akick list."),
 	/* CHAN_HELP_LEVELS */
 	_("Syntax: LEVELS channel SET type level\n"
-	"        LEVELS channel {DIS | DISABLE} type\n"
-	"        LEVELS channel LIST\n"
-	"        LEVELS channel RESET\n"
+	"          LEVELS channel {DIS | DISABLE} type\n"
+	"          LEVELS channel LIST\n"
+	"          LEVELS channel RESET\n"
 	" \n"
 	"The LEVELS command allows fine control over the meaning of\n"
 	"the numeric access levels used for channels.  With this\n"
 	"command, you can define the access level required for most\n"
-	"of %S's functions.  (The SET FOUNDER and this command\n"
+	"of %S's functions. (The SET FOUNDER and this command\n"
 	"are always restricted to the channel founder.)\n"
 	" \n"
 	"LEVELS SET allows the access level for a function or group of\n"
-	"functions to be changed.  LEVELS DISABLE (or DIS for short)\n"
+	"functions to be changed. LEVELS DISABLE (or DIS for short)\n"
 	"disables an automatic feature or disallows access to a\n"
 	"function by anyone, INCLUDING the founder (although, the founder\n"
 	"can always reenable it).\n"
 	" \n"
 	"LEVELS LIST shows the current levels for each function or\n"
-	"group of functions.  LEVELS RESET resets the levels to the\n"
+	"group of functions. LEVELS RESET resets the levels to the\n"
 	"default levels of a newly-created channel (see\n"
 	"HELP ACCESS LEVELS).\n"
 	" \n"
 	"For a list of the features and functions whose levels can be\n"
 	"set, see HELP LEVELS DESC."),
 	/* CHAN_HELP_LEVELS_DESC */
-	_("The following feature/function names are understood.  Note\n"
+	_("The following feature/function names are understood. Note\n"
 	"that the leves for NOJOIN is the maximum level,\n"
 	"while all others are minimum levels."),
 	/* CHAN_HELP_LEVELS_DESC_FORMAT */
@@ -4230,7 +4230,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* MEMO_HELP_HEADER */
 	_("%S is a utility allowing IRC users to send short\n"
 	"messages to other IRC users, whether they are online at\n"
-	"the time or not, or to channels(*).  Both the sender's\n"
+	"the time or not, or to channels(*). Both the sender's\n"
 	"nickname and the target nickname or channel must be\n"
 	"registered in order to send a memo.\n"
 	"%S's commands include:"),
@@ -4238,14 +4238,14 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	_("Type %R%S HELP command for help on any of the\n"
 	"above commands.\n"
 	"(*) By default, any user with at least level 10 access on a\n"
-	"    channel can read that channel's memos.  This can be\n"
+	"    channel can read that channel's memos. This can be\n"
 	"    changed with the %s LEVELS command."),
 	/* MEMO_HELP_SEND */
 	_("Syntax: SEND {nick | channel} memo-text\n"
 	" \n"
 	"Sends the named nick or channel a memo containing\n"
-	"memo-text.  When sending to a nickname, the recipient will\n"
-	"receive a notice that he/she has a new memo.  The target\n"
+	"memo-text. When sending to a nickname, the recipient will\n"
+	"receive a notice that he/she has a new memo. The target\n"
 	"nickname/channel must be registered."),
 	/* MEMO_HELP_CANCEL */
 	_("Syntax: CANCEL {nick | channel}\n"
@@ -4255,19 +4255,19 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* MEMO_HELP_LIST */
 	_("Syntax: LIST [channel] [list | NEW]\n"
 	" \n"
-	"Lists any memos you currently have.  With NEW, lists only\n"
-	"new (unread) memos.  Unread memos are marked with a \"*\"\n"
-	"to the left of the memo number.  You can also specify a list\n"
+	"Lists any memos you currently have. With NEW, lists only\n"
+	"new (unread) memos. Unread memos are marked with a \"*\"\n"
+	"to the left of the memo number. You can also specify a list\n"
 	"of numbers, as in the example below:\n"
 	"   LIST 2-5,7-9\n"
 	"      Lists memos numbered 2 through 5 and 7 through 9."),
 	/* MEMO_HELP_READ */
 	_("Syntax: READ [channel] {num | list | LAST | NEW}\n"
 	" \n"
-	"Sends you the text of the memos specified.  If LAST is\n"
-	"given, sends you the memo you most recently received.  If\n"
+	"Sends you the text of the memos specified. If LAST is\n"
+	"given, sends you the memo you most recently received. If\n"
 	"NEW is given, sends you all of your new memos.  Otherwise,\n"
-	"sends you memo number num.  You can also give a list of\n"
+	"sends you memo number num. You can also give a list of\n"
 	"numbers, as in this example:\n"
 	" \n"
 	"   READ 2-5,7-9\n"
@@ -4275,7 +4275,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	/* MEMO_HELP_DEL */
 	_("Syntax: DEL [channel] {num | list | LAST | ALL}\n"
 	" \n"
-	"Deletes the specified memo or memos.  You can supply\n"
+	"Deletes the specified memo or memos. You can supply\n"
 	"multiple memo numbers or ranges of numbers instead of a\n"
 	"single number, as in the second example below.\n"
 	" \n"
@@ -4294,9 +4294,9 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Sets various memo options.  option can be one of:\n"
 	" \n"
 	"    NOTIFY      Changes when you will be notified about\n"
-	"                    new memos (only for nicknames)\n"
+	"                   new memos (only for nicknames)\n"
 	"    LIMIT       Sets the maximum number of memos you can\n"
-	"                    receive\n"
+	"                   receive\n"
 	" \n"
 	"Type %R%S HELP SET option for more information\n"
 	"on a specific option."),
@@ -4373,7 +4373,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Sends the named nick or channel a memo containing\n"
 	"memo-text.  When sending to a nickname, the recipient will\n"
-	"receive a notice that he/she has a new memo.  The target\n"
+	"receive a notice that he/she has a new memo. The target\n"
 	"nickname/channel must be registered.\n"
 	"Once the memo is read by its recipient, an automatic notification\n"
 	"memo will be sent to the sender informing him/her that the memo\n"
@@ -4531,7 +4531,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Allows staff to kick a user from any channel.\n"
 	"Parameters are the same as for the standard /KICK\n"
-	"command.  The kick message will have the nickname of the\n"
+	"command. The kick message will have the nickname of the\n"
 	"IRCop sending the KICK command prepended; for example:\n"
 	" \n"
 	"*** SpamMan has been kicked off channel #my_channel by %S (Alcan (Flood))"),
@@ -4546,7 +4546,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"        AKILL VIEW [mask | list]\n"
 	"        AKILL CLEAR\n"
 	" \n"
-	"Allows Services operators to manipulate the AKILL list.  If\n"
+	"Allows Services operators to manipulate the AKILL list. If\n"
 	"a user matching an AKILL mask attempts to connect, Services\n"
 	"will issue a KILL for that user and, on supported server\n"
 	"types, will instruct all servers to add a ban (K-line) for\n"
@@ -4555,12 +4555,12 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"AKILL ADD adds the given nick or user@host/ip mask to the AKILL\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
-	"(days), h (hours), or m (minutes).  Combinations (such as \n"
+	"(days), h (hours), or m (minutes). Combinations (such as \n"
 	"1h30m) are not permitted.  If a unit specifier is not \n"
 	"included, the default is days (so +30 by itself means 30 \n"
-	"days).  To add an AKILL which does not expire, use +0.  If the\n"
+	"days). To add an AKILL which does not expire, use +0. If the\n"
 	"usermask to be added starts with a +, an expiry time must\n"
-	"be given, even if it is the same as the default.  The\n"
+	"be given, even if it is the same as the default. The\n"
 	"current AKILL default expiry time can be found with the\n"
 	"STATS AKILL command.\n"
 	" \n"
@@ -4644,23 +4644,23 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"SQLINE ADD adds the given (nick's) mask to the SQLINE\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
-	"(days), h (hours), or m (minutes).  Combinations (such as \n"
-	"1h30m) are not permitted.  If a unit specifier is not \n"
+	"(days), h (hours), or m (minutes). Combinations (such as \n"
+	"1h30m) are not permitted. If a unit specifier is not \n"
 	"included, the default is days (so +30 by itself means 30 \n"
-	"days).  To add an SQLINE which does not expire, use +0.  \n"
+	"days). To add an SQLINE which does not expire, use +0.  \n"
 	"If the mask to be added starts with a +, an expiry time \n"
 	"must be given, even if it is the same as the default. The\n"
 	"current SQLINE default expiry time can be found with the\n"
 	"STATS AKILL command.\n"
 	" \n"
 	"The SQLINE DEL command removes the given mask from the\n"
-	"SQLINE list if it is present.  If a list of entry numbers is \n"
-	"given, those entries are deleted.  (See the example for LIST \n"
+	"SQLINE list if it is present. If a list of entry numbers is \n"
+	"given, those entries are deleted. (See the example for LIST \n"
 	"below.)\n"
 	" \n"
-	"The SQLINE LIST command displays the SQLINE list.  \n"
+	"The SQLINE LIST command displays the SQLINE list.\n"
 	"If a wildcard mask is given, only those entries matching the\n"
-	"mask are displayed.  If a list of entry numbers is given,\n"
+	"mask are displayed. If a list of entry numbers is given,\n"
 	"only those entries are shown; for example:\n"
 	"   SQLINE LIST 2-5,7-9\n"
 	"      Lists SQLINE entries numbered 2 through 5 and 7 \n"
@@ -4686,23 +4686,23 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"SZLINE ADD adds the given (nick's) IP mask to the SZLINE\n"
 	"list for the given reason (which must be given).\n"
 	"expiry is specified as an integer followed by one of d \n"
-	"(days), h (hours), or m (minutes).  Combinations (such as \n"
-	"1h30m) are not permitted.  If a unit specifier is not \n"
+	"(days), h (hours), or m (minutes). Combinations (such as \n"
+	"1h30m) are not permitted. If a unit specifier is not \n"
 	"included, the default is days (so +30 by itself means 30 \n"
 	"days).  To add an SZLINE which does not expire, use +0.  If the\n"
 	"realname mask to be added starts with a +, an expiry time must\n"
-	"be given, even if it is the same as the default.  The\n"
+	"be given, even if it is the same as the default. The\n"
 	"current SZLINE default expiry time can be found with the\n"
 	"STATS AKILL command.\n"
 	" \n"
 	"The SZLINE DEL command removes the given mask from the\n"
-	"SZLINE list if it is present.  If a list of entry numbers is \n"
-	"given, those entries are deleted.  (See the example for LIST \n"
+	"SZLINE list if it is present. If a list of entry numbers is \n"
+	"given, those entries are deleted. (See the example for LIST \n"
 	"below.)\n"
 	" \n"
-	"The SZLINE LIST command displays the SZLINE list.  \n"
+	"The SZLINE LIST command displays the SZLINE list.\n"
 	"If a wildcard mask is given, only those entries matching the\n"
-	"mask are displayed.  If a list of entry numbers is given,\n"
+	"mask are displayed. If a list of entry numbers is given,\n"
 	"only those entries are shown; for example:\n"
 	"   SZLINE LIST 2-5,7-9\n"
 	"      Lists SZLINE entries numbered 2 through 5 and 7 \n"
@@ -4741,14 +4741,14 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	" \n"
 	"Sets debug mode on or off.  In debug mode, all data sent to\n"
 	"and from Services as well as a number of other debugging\n"
-	"messages are written to the log file.  If num is\n"
+	"messages are written to the log file. If num is\n"
 	"given, debug mode is activated, with the debugging level set\n"
 	"to num.\n"
 	"This option is equivalent to the command-line option\n"
 	"-debug."),
 	/* OPER_HELP_SET_NOEXPIRE */
 	_("Syntax: SET NOEXPIRE {ON | OFF}\n"
-	"Sets no expire mode on or off.  In no expire mode, nicks,\n"
+	"Sets no expire mode on or off. In no expire mode, nicks,\n"
 	"channels, akills and exceptions won't expire until the\n"
 	"option is unset.\n"
 	"This option is equivalent to the command-line option\n"
@@ -4764,7 +4764,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Display the various %S settings"),
 	/* OPER_HELP_NOOP */
 	_("Syntax: NOOP SET server\n"
-	"        NOOP REVOKE server\n"
+	"          NOOP REVOKE server\n"
 	"NOOP SET remove all O:lines of the given\n"
 	"server and kill all IRCops currently on it to\n"
 	"prevent them from rehashing the server (because this\n"
@@ -4779,7 +4779,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"Tells Services to jupiter a server -- that is, to create\n"
 	"a fake \"server\" connected to Services which prevents\n"
 	"the real server of that name from connecting.  The jupe\n"
-	"may be removed using a standard SQUIT.  If a reason is\n"
+	"may be removed using a standard SQUIT. If a reason is\n"
 	"given, it is placed in the server information field;\n"
 	"otherwise, the server information field will contain the\n"
 	"text \"Juped by <nick>\", showing the nickname of the\n"
@@ -5248,7 +5248,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"well as vhosts."),
 	/* HOST_HELP_DELALL */
 	_("Syntax: DELALL <nick>.\n"
-	"Deletes the vhost for all nick's in the same group as\n"
+	"Deletes the vhost for all nicks in the same group as\n"
 	"that of the given nick."),
 	/* HOST_HELP_SETALL */
 	_("Syntax: SETALL <nick> <hostmask>.\n"
@@ -5256,7 +5256,7 @@ const char *const language_strings[LANG_STRING_COUNT] = {
 	"of the given nick.  If your IRCD supports vIdents, then\n"
 	"using SETALL <nick> <ident>@<hostmask> will set idents\n"
 	"for users as well as vhosts.\n"
-	"* NOTE, this will not update the vhost for any nick's\n"
+	"* NOTE, this will not update the vhost for any nicks\n"
 	"added to the group after this command was used."),
 	/* HOST_HELP_OFF */
 	_("Syntax: OFF\n"

@@ -28,9 +28,9 @@ class NSMaxEmail : public Module
 			return false;
 
 		if (this->NSEmailMax == 1)
-			this->SendMessage(source, _("The given email address has reached it's usage limit of 1 user."));
+			this->SendMessage(source, _("The given email address has reached its usage limit of 1 user."));
 		else
-			this->SendMessage(source, _("The given email address has reached it's usage limit of %d users."), this->NSEmailMax);
+			this->SendMessage(source, _("The given email address has reached its usage limit of %d users."), this->NSEmailMax);
 
 		return true;
 	}

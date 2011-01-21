@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 	std::ofstream fs;
 	std::string hashm, ircd;
 
-	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.2+ database converter"C_NONE"\n\n");
+	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.3+ database converter"C_NONE"\n\n");
 
 	while (hashm != "md5" && hashm != "sha1" && hashm != "oldmd5" && hashm != "plain")
 	{
@@ -189,8 +189,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	// VERSHUN ONE
-	fs << "VER 1" << std::endl;
+	fs << "VER 2" << std::endl;
 
 	/* Section I: Nicks */
 	/* Ia: First database */
@@ -355,7 +354,7 @@ int main(int argc, char *argv[])
 		char **access;
 		Memo *memos;
 		int j, len;
-		char cpass[5000]; // if it's ever this long, I will commit suicide
+		std::string cpass;
 		for (nc = nclists[i]; nc; nc = nc->next)
 		{
 			if (nc->aliascount < 1)
@@ -382,12 +381,17 @@ int main(int argc, char *argv[])
 			else
 				len = 32;
 
-			b64_encode(nc->pass, len, cpass, 5000);
+			if (hashm == "plain")
+				b64_encode(nc->pass, cpass);
+			else
+				cpass = Hex(nc->pass);
 
-			fs << "NC " << nc->display << " " << hashm << ":" << cpass;
-			fs << " " << GetLanguageID(nc->language) << " " << nc->memos.memomax << " " << nc->channelcount << std::endl;
+			fs << "NC " << nc->display << " " << hashm << ":" << cpass << std::endl;
+			fs << "MD LANGUAGE " << GetLanguageID(nc->language) << std::endl;
+			fs << "MD MEMOMAX " << nc->memos.memomax << std::endl;
+			fs << "MD CHANCOUNT " << nc->channelcount << std::endl;
 
-			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
+			std::cout << "Wrote account for " << nc->display << " passlen " << cpass.length() << std::endl;
 			if (nc->email)
 				fs << "MD EMAIL " << nc->email << std::endl;
 			if (nc->greet)
@@ -784,12 +788,13 @@ int main(int argc, char *argv[])
 		{
 			int j;
 
-			fs << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used;
-			fs << " " << ci->bantype << " " << ci->memos.memomax << std::endl;
+			fs << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << std::endl;
 			if (ci->founder)
 				fs << "MD FOUNDER " << ci->founder << std::endl;
 			if (ci->successor)
 				fs << "MD SUCCESSOR " << ci->successor << std::endl;
+			fs << "MD BANTYPE " << ci->bantype << std::endl;
+			fs << "MD MEMOMAX " << ci->memos.memomax << std::endl;
 			fs << "MD LEVELS";
 			for (j = 0; j < 36; ++j)
 			{

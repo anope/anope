@@ -239,7 +239,7 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 HostCore *head = NULL;
 
-int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
+void b64_encode(const std::string &src, std::string &target);
 
 /* Memo Flags */
 #define MF_UNREAD	0x0001 /* Memo has not yet been read */
@@ -380,48 +380,48 @@ const std::string GetLanguageID(int id)
 	switch (id)
 	{
 		case LANG_EN_US:
-			return "en";
+			return "en_US";
 			break;
 		case LANG_JA_JIS:
 		case LANG_JA_EUC:
 		case LANG_JA_SJIS: // these seem to be unused
-			return "en";
+			return "en_US";
 			break;
 		case LANG_ES:
-			return "es";
+			return "es_ES";
 			break;
 		case LANG_PT:
-			return "pt";
+			return "pt_PT";
 			break;
 		case LANG_FR:
-			return "fr";
+			return "fr_FR";
 			break;
 		case LANG_TR:
-			return "tr";
+			return "tr_TR";
 			break;
 		case LANG_IT:
-			return "it";
+			return "it_IT";
 			break;
 		case LANG_DE:
-			return "de";
+			return "de_DE";
 			break;
 		case LANG_CAT:
-			return "ca"; // yes, iso639 defines catalan as CA
+			return "ca_ES"; // yes, iso639 defines catalan as CA
 			break;
 		case LANG_GR:
-			return "gr";
+			return "el_GR";
 			break;
 		case LANG_NL:
-			return "nl";
+			return "nl_NL";
 			break;
 		case LANG_RU:
-			return "ru";
+			return "ru_RU";
 			break;
 		case LANG_HUN:
-			return "hu";
+			return "hu_HU";
 			break;
 		case LANG_PL:
-			return "pl";
+			return "pl_PL";
 			break;
 		default:
 			abort();
@@ -779,6 +779,21 @@ long base64dec(char *b64)
 		return 0;
 }
 
+std::string Hex(const std::string &data)
+{
+	const char hextable[] = "0123456789abcdef";
+
+	size_t l = data.length();
+	std::string rv;
+	for (size_t i = 0; i < l; ++i)
+	{
+		unsigned char c = data[i];
+		rv += hextable[c >> 4];
+		rv += hextable[c & 0xF];
+	}
+	return rv;
+}
+
 static const char Base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';
 
@@ -845,192 +860,42 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
+void b64_encode(const std::string &src, std::string &target)
 {
-	size_t datalength = 0;
+	size_t src_pos = 0, src_len = src.length();
 	unsigned char input[3];
-	unsigned char output[4];
-	size_t i;
 
-	while (srclength > 2)
+	target.clear();
+
+	while (src_len - src_pos > 2)
 	{
-		input[0] = *src++;
-		input[1] = *src++;
-		input[2] = *src++;
-		srclength -= 3;
+		input[0] = src[src_pos++];
+		input[1] = src[src_pos++];
+		input[2] = src[src_pos++];
 
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-		output[3] = input[2] & 0x3f;
-
-		if (datalength + 4 > targsize)
-			return -1;
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		target[datalength++] = Base64[output[2]];
-		target[datalength++] = Base64[output[3]];
+		target += Base64[input[0] >> 2];
+		target += Base64[((input[0] & 0x03) << 4) + (input[1] >> 4)];
+		target += Base64[((input[1] & 0x0f) << 2) + (input[2] >> 6)];
+		target += Base64[input[2] & 0x3f];
 	}
 
-	/* Now we worry about padding. */
-	if (srclength)
+	/* Now we worry about padding */
+	if (src_pos != src_len)
 	{
-		/* Get what's left. */
-		input[0] = input[1] = input[2] = '\0';
-		for (i = 0; i < srclength; ++i)
-			input[i] = *src++;
+		input[0] = input[1] = input[2] = 0;
+		for (size_t i = 0; i < src_len - src_pos; ++i)
+			input[i] = src[src_pos + i];
 
-		output[0] = input[0] >> 2;
-		output[1] = ((input[0] & 0x03) << 4) + (input[1] >> 4);
-		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
-
-		if (datalength + 4 > targsize)
-			return -1;
-		target[datalength++] = Base64[output[0]];
-		target[datalength++] = Base64[output[1]];
-		if (srclength == 1)
-			target[datalength++] = Pad64;
+		target += Base64[input[0] >> 2];
+		target += Base64[((input[0] & 0x03) << 4) + (input[1] >> 4)];
+		if (src_pos == src_len - 1)
+			target += Pad64;
 		else
-			target[datalength++] = Base64[output[2]];
-		target[datalength++] = Pad64;
+			target += Base64[((input[1] & 0x0f) << 2) + (input[2] >> 6)];
+		target += Pad64;
 	}
-	if (datalength >= targsize)
-		return -1;
-	target[datalength] = '\0';  /* Returned value doesn't count \0. */
-	return datalength;
 }
 
-/* skips all whitespace anywhere.
-   converts characters, four at a time, starting at (or after)
-   src from base - 64 numbers into three 8 bit bytes in the target area.
-   it returns the number of data bytes stored at the target, or -1 on error.
- */
-
-int b64_decode(const char *src, char *target, size_t targsize)
-{
-	int tarindex, state, ch;
-	const char *pos;
-
-	state = 0;
-	tarindex = 0;
-
-	while ((ch = *src++))
-	{
-		if (isspace(ch)) /* Skip whitespace anywhere. */
-			continue;
-
-		if (ch == Pad64)
-			break;
-
-		pos = strchr(Base64, ch);
-		if (!pos) /* A non-base64 character. */
-			return -1;
-
-		switch (state)
-		{
-			case 0:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) >= targsize)
-						return -1;
-					target[tarindex] = (pos - Base64) << 2;
-				}
-				state = 1;
-				break;
-			case 1:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) + 1 >= targsize)
-						return -1;
-					target[tarindex] |= (pos - Base64) >> 4;
-					target[tarindex + 1] = ((pos - Base64) & 0x0f) << 4;
-				}
-				++tarindex;
-				state = 2;
-				break;
-			case 2:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) + 1 >= targsize)
-						return -1;
-					target[tarindex] |= (pos - Base64) >> 2;
-					target[tarindex + 1] = ((pos - Base64) & 0x03) << 6;
-				}
-				++tarindex;
-				state = 3;
-				break;
-			case 3:
-				if (target)
-				{
-					if (static_cast<size_t>(tarindex) >= targsize)
-						return (-1);
-					target[tarindex] |= pos - Base64;
-				}
-				++tarindex;
-				state = 0;
-				break;
-			default:
-				abort();
-		}
-	}
-
-	/*
-	 * We are done decoding Base-64 chars.  Let's see if we ended
-	 * on a byte boundary, and/or with erroneous trailing characters.
-	 */
-
-	if (ch == Pad64) /* We got a pad char. */
-	{
-		ch = *src++; /* Skip it, get next. */
-		switch (state)
-		{
-			case 0: /* Invalid = in first position */
-			case 1: /* Invalid = in second position */
-				return (-1);
-
-			case 2: /* Valid, means one byte of info */
-				/* Skip any number of spaces. */
-				for (; ch != '\0'; ch = *src++)
-					if (!isspace(ch))
-						break;
-				/* Make sure there is another trailing = sign. */
-				if (ch != Pad64)
-					return -1;
-				ch = *src++; /* Skip the = */
-				/* Fall through to "single trailing =" case. */
-				/* FALLTHROUGH */
-
-			case 3: /* Valid, means two bytes of info */
-				/*
-				 * We know this char is an =.  Is there anything but
-				 * whitespace after it?
-				 */
-				for (; ch != '\0'; ch = *src++)
-					if (!isspace(ch))
-						return (-1);
-
-				/*
-				 * Now make sure for cases 2 and 3 that the "extra"
-				 * bits that slopped past the last full byte were
-				 * zeros.  If we don't check them, they become a
-				 * subliminal channel.
-				 */
-				if (target && target[tarindex])
-					return -1;
-		}
-	}
-	else
-	{
-		/*
-		 * We ended by seeing the end of the string.  Make sure we
-		 * have no partial bytes lying around.
-		 */
-		if (state)
-			return -1;
-	}
-
-	return tarindex;
-}
 
 /* ':' and '#' and '&' and '+' and '@' must never be in this table. */
 /* these tables must NEVER CHANGE! >) */

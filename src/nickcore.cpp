@@ -10,7 +10,7 @@ NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_EN
 		throw CoreException("Empty display passed to NickCore constructor");
 
 	this->ot = NULL;
-	this->language = this->channelcount = 0;
+	this->channelcount = 0;
 	this->lastmail = 0;
 
 	this->display = coredisplay;

@@ -72,11 +72,11 @@ int do_moo(int argc, char **argv) {
     if(argc>=3) { /* We need at least 3 arguments */
 	if(stricmp(argv[0],"moo")==0) { /* is it meant for us? */
             if((ci = cs_findchan(argv[2]))) { /* channel should always exist */
-                anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION moo's at %s %c",1,argv[1],1);
-	        return MOD_STOP; /* We've dealt with it, dont let others */
+                anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION moos at %s %c",1,argv[1],1);
+	        return MOD_STOP; /* We've dealt with it, don't let others */
             }
 	} 
     }
-    return MOD_CONT; /* guess it wasnt for us, pass it on */
+    return MOD_CONT; /* guess it wasn't for us, pass it on */
 }
 

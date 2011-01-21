@@ -447,7 +447,7 @@ int anope_event_newmask(char *source, int ac, char **av)
          */
         u->mode &= ~UMODE_NM;
         if (debug)
-            alog("debug: Ignoring NEWMASK because it's send because of SVSMODE +r");
+            alog("debug: Ignoring NEWMASK because it's sent because of SVSMODE +r");
         return MOD_CONT;
     }
 

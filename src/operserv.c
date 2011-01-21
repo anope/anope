@@ -1627,7 +1627,7 @@ void runDefCon(void)
     if (checkDefCon(DEFCON_FORCE_CHAN_MODES)) {
         if (DefConChanModes && !DefConModesSet) {
             if (DefConChanModes[0] == '+' || DefConChanModes[0] == '-') {
-                alog("DEFCON: setting %s on all chan's", DefConChanModes);
+                alog("DEFCON: setting %s on all channels", DefConChanModes);
                 DefConModesSet = 1;
                 do_mass_mode(DefConChanModes);
             }
@@ -1637,7 +1637,7 @@ void runDefCon(void)
             if (DefConChanModes[0] == '+' || DefConChanModes[0] == '-') {
                 DefConModesSet = 0;
                 if ((newmodes = defconReverseModes(DefConChanModes))) {
-                    alog("DEFCON: setting %s on all chan's", newmodes);
+                    alog("DEFCON: setting %s on all channels", newmodes);
                     do_mass_mode(newmodes);
                     free(newmodes);
                 }

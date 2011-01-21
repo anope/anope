@@ -177,9 +177,9 @@ void my_add_languages(void)
 {
     char *langtable_en_us[] = {
         /* LNG_NSEMAILMAX_REACHED */
-        "The given email address has reached it's usage limit of %d users.",
+        "The given email address has reached its usage limit of %d users.",
         /* LNG_NSEMAILMAX_REACHED_ONE */
-        "The given email address has reached it's usage limit of 1 user."
+        "The given email address has reached its usage limit of 1 user."
     };
 
     char *langtable_nl[] = {

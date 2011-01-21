@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3056"
+VERSION_BUILD="3057"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3057 - Bug #1233 - Fixed some misuse of apostrophes - patch by binki
 #Revision 3056 - Bug #1227 - Fixed 'make install' recompiling src/tools
 #Revision 3055 - Do not allow services opers to send one person more than 32767 memos
 #Revision 3054 - Enable NICKIP for InspIRCd 1.2+

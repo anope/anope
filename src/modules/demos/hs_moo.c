@@ -80,7 +80,7 @@ void AnopeFini(void)
 /***************************************************************************************************************************************/
 
 void myHostServHelp(User *u) {
-	notice(s_HostServ,u->nick, "    MOO         Moo's at the user!");		/* this will appear in the help list */
+	notice(s_HostServ,u->nick, "    MOO         Moos at the user!");		/* this will appear in the help list */
 }
 
 int myHostServMooHelp(User *u) {

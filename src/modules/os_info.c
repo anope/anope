@@ -545,12 +545,12 @@ void m_AddLanguages(void)
         /* OINFO_HELP */
         "Syntax: OINFO [ADD|DEL] nick <info>\n"
             "Add or Delete Oper information for the given nick\n"
-            "This will show up when any oper /ns info nick's the user.\n"
+            "This will show up when any oper uses /ns info nick on the user.\n"
             "and can be used for 'tagging' users etc....",
         /* OCINFO_HELP */
         "Syntax: OINFO [ADD|DEL] chan <info>\n"
             "Add or Delete Oper information for the given channel\n"
-            "This will show up when any oper /cs info's the channel.\n"
+            "This will show up when any oper uses /cs info on the channel.\n"
             "and can be used for 'tagging' channels etc....",
         /* OINFO_HELP_CMD */
         "    OINFO         Add / Del an OperInfo line to a nick",

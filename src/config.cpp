@@ -353,14 +353,18 @@ ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFla
 
 		while (f.is_open() && getline(f, server.str()))
 		{
-			if (server.find("nameserver ") == 0)
+			if (server.find("nameserver") == 0)
 			{
-				if (server.substr(11).is_pos_number_only())
+				size_t ip = server.find_first_of("123456789");
+				if (ip != Anope::string::npos)
 				{
-					this->NameServer = server.substr(11);
-					Log(LOG_DEBUG) << "Nameserver set to " << this->NameServer;
-					success = true;
-					break;
+					if (server.substr(ip).is_pos_number_only())
+					{
+						this->NameServer = server.substr(ip);
+						Log(LOG_DEBUG) << "Nameserver set to " << this->NameServer;
+						success = true;
+						break;
+					}
 				}
 			}
 		}

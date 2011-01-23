@@ -1019,7 +1019,7 @@ class DBPlain : public Module
 		}
 
 		db << db_buffer.str();
-		db_buffer.clear();
+		db_buffer.str("");
 
 		db.close();
 

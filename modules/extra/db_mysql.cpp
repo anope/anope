@@ -1221,7 +1221,7 @@ class DBMySQL : public Module
 
 	void OnDeleteVhost(NickAlias *na)
 	{
-		this->RunQuery("DELETE FROM `anope_hs_core` WHERE `nick` = '" + na->nick + "'");
+		this->RunQuery("DELETE FROM `anope_hs_core` WHERE `nick` = '" + this->Escape(na->nick) + "'");
 	}
 
 	void OnSetVhost(NickAlias *na)
@@ -1343,7 +1343,7 @@ static void SaveDatabases()
 		{
 			ChanAccess *access = ci->GetAccess(j);
 
-			me->RunQuery(Anope::string("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES('") + access->level + "', " + me->Escape(access->mask) + ", " + me->Escape(ci->name) + ", " + access->last_seen + ", " + me->Escape(access->creator) + ") ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+			me->RunQuery(Anope::string("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES(") + stringify(access->level) + ", '" + me->Escape(access->mask) + "', '" + me->Escape(ci->name) + "', " + stringify(access->last_seen) + ", '" + me->Escape(access->creator) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 		}
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)
@@ -1355,7 +1355,7 @@ static void SaveDatabases()
 
 		for (int k = 0; k < CA_SIZE; ++k)
 		{
-			me->RunQuery("INSERT INTO `anope_cs_levels` (channel, position, level) VALUES(" + me->Escape(ci->name) + ", '" + stringify(k) + "', '" + stringify(ci->levels[k]) + "') ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)");
+			me->RunQuery("INSERT INTO `anope_cs_levels` (channel, position, level) VALUES('" + me->Escape(ci->name) + "', " + stringify(k) + ", " + stringify(ci->levels[k]) + ") ON DUPLICATE KEY UPDATE position=VALUES(position), level=VALUES(level)");
 		}
 
 		for (unsigned j = 0, end = ci->memos.memos.size(); j < end; ++j)

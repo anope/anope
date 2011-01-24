@@ -269,7 +269,7 @@ static void LoadNickCore(const std::vector<Anope::string> &params)
 	/* Clear default flags */
 	nc->ClearFlags();
 
-	nc->pass = params[1];
+	nc->pass = params.size() > 1 ? params[1] : "";
 
 	Log(LOG_DEBUG_2) << "[db_plain]: Loaded NickCore " << nc->display;
 }

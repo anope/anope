@@ -52,12 +52,13 @@ class DNSBLResolver : public DNSRequest
 		user->Extend("m_dnsbl_akilled");
 
 		Anope::string reason = this->blacklist.reason;
-		reason = reason.replace_all_ci("%n", user->nick);
-		reason = reason.replace_all_ci("%u", user->GetIdent());
-		reason = reason.replace_all_ci("%g", user->realname);
-		reason = reason.replace_all_ci("%h", user->host);
-		reason = reason.replace_all_ci("%i", user->ip.addr());
-		reason = reason.replace_all_ci("%r", record_reason);
+		reason = reason.replace_all_cs("%n", user->nick);
+		reason = reason.replace_all_cs("%u", user->GetIdent());
+		reason = reason.replace_all_cs("%g", user->realname);
+		reason = reason.replace_all_cs("%h", user->host);
+		reason = reason.replace_all_cs("%i", user->ip.addr());
+		reason = reason.replace_all_cs("%r", record_reason);
+		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
 		XLine *x = NULL;
 		if (this->add_to_akill && SGLine && (x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason)))

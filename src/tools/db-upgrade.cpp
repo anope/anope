@@ -191,6 +191,8 @@ int main(int argc, char *argv[])
 		if (line.substr(0, 2) == "NC")
 		{
 			std::vector<std::string> parts = BuildStringVector(line);
+			if (parts.size() < 3)
+				continue;
 			std::string password = parts[2];
 			size_t colon = password.find(':');
 			if (colon != std::string::npos && password.substr(0, colon) != "plain")

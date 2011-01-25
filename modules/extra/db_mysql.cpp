@@ -1142,7 +1142,7 @@ class DBMySQL : public Module
 		this->RunQuery("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES('" +
 			this->Escape(nc->display) + "', '" + this->Escape(nc->pass) + "', '" +
 			this->Escape(nc->email) + "', '" + this->Escape(nc->greet) + "', '" +
-			BuildFlagsList(nc) + "', " + stringify(nc->language) + ", " + stringify(nc->channelcount) + ", " +
+			BuildFlagsList(nc) + "', '" + this->Escape(nc->language) + "', " + stringify(nc->channelcount) + ", " +
 			stringify(nc->memos.memomax) + ") " +
 			"ON DUPLICATE KEY UPDATE pass=VALUES(pass), email=VALUES(email), greet=VALUES(greet), flags=VALUES(flags), language=VALUES(language), " +
 			"channelcount=VALUES(channelcount), memomax=VALUES(memomax)");

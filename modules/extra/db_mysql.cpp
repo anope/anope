@@ -972,7 +972,7 @@ class DBMySQL : public Module
 		this->RunQuery("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES('" +
 			this->Escape(nc->display) + "', '" + this->Escape(nc->pass) + "', '" +
 			this->Escape(nc->email) + "', '" + this->Escape(nc->greet) + "', '" +
-			ToString(nc->ToString()) + "', " + stringify(nc->language) + ", " + stringify(nc->channelcount) + ", " +
+			ToString(nc->ToString()) + "', '" + this->Escape(nc->language) + "', " + stringify(nc->channelcount) + ", " +
 			stringify(nc->memos.memomax) + ") " +
 			"ON DUPLICATE KEY UPDATE pass=VALUES(pass), email=VALUES(email), greet=VALUES(greet), flags=VALUES(flags), language=VALUES(language), " +
 			"channelcount=VALUES(channelcount), memomax=VALUES(memomax)");
@@ -1283,21 +1283,22 @@ static void WriteBotMetadata(const Anope::string &key, const Anope::string &data
 
 static void SaveDatabases()
 {
-	me->RunQuery("TRUNCATE TABLE `anope_ns_alias`");
-
-	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
-	{
-		me->InsertAlias(it->second);
-		if (it->second->hostinfo.HasVhost())
-			me->OnSetVhost(it->second);
-	}
-
 	me->RunQuery("TRUNCATE TABLE `anope_ns_core`");
 	me->RunQuery("TRUNCATE TABLE `anope_ms_info`");
+	me->RunQuery("TRUNCATE TABLE `anope_ns_alias`");
 
 	for (nickcore_map::const_iterator nit = NickCoreList.begin(), nit_end = NickCoreList.end(); nit != nit_end; ++nit)
 	{
 		NickCore *nc = nit->second;
+
+		me->InsertCore(nc);
+
+		for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
+		{
+			me->InsertAlias(*it);
+			if ((*it)->hostinfo.HasVhost())
+				me->OnSetVhost(*it);
+		}
 
 		for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 		{
@@ -1310,10 +1311,7 @@ static void SaveDatabases()
 
 			me->OnMemoSend(NULL, nc, m);
 		}
-
-		me->InsertCore(nc);
 	}
-
 
 	me->RunQuery("TRUNCATE TABLE `anope_bs_core`");
 

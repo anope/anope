@@ -2044,6 +2044,8 @@ int anope_event_capab(char *source, int ac, char **av)
 
 			if (!strcasecmp(name, "hidechans"))
 				has_hidechansmod = 1;
+			else if (!strcasecmp(name, "servprotect"))
+				has_servprotectmod = 1;
 		}
 	} else if (strcasecmp(av[0], "CAPABILITIES") == 0) {
 		char **argv;

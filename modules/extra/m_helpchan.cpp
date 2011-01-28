@@ -29,7 +29,7 @@ class HelpChannel : public Module
 		{
 			User *u = finduser(param);
 
-			if (u)
+			if (u && check_access(u, c->ci, CA_OPDEOPME))
 				u->SetMode(OperServ, UMODE_HELPOP);
 		}
 

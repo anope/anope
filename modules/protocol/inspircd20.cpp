@@ -521,7 +521,10 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("regdeaf"))
 					um = new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", modechar[0]);
 				else if (modename.equals_cs("servprotect"))
+				{
 					um = new UserMode(UMODE_PROTECTED, "UMODE_PROTECTED", modechar[0]);
+					ircd->pseudoclient_mode = "+Ik";
+				}
 				else if (modename.equals_cs("showwhois"))
 					um = new UserMode(UMODE_WHOIS, "UMODE_WHOIS", modechar[0]);
 				else if (modename.equals_cs("snomask"))
@@ -563,8 +566,6 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					has_chghostmod = true;
 				else if (module.equals_cs("m_chgident.so"))
 					has_chgidentmod = true;
-				else if (module.equals_cs("m_servprotect.so"))
-					ircd->pseudoclient_mode = "+Ik";
 			}
 		}
 		else if (params[0].equals_cs("CAPABILITIES"))

@@ -27,6 +27,8 @@ Anope Mutli Language Support
     If you have finished a language file translation and you want others to use it, please send it to team@anope.org
     (don't forget to mention clearly your (nick)name, your e-mail and the language name). You'll of course get full credit for it.
 
+    NOTE: There is no guarantee we will use your work so please do not be offended if we say no thanks.
+
 3) Using langages with modules
 
     Module authors can easially add the ability to have their modules translated by adding _() around the strings they

@@ -34,7 +34,7 @@ void get_botserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 
-	for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
 	{
 		BotInfo *bi = *it;
 

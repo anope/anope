@@ -85,10 +85,11 @@ Server::~Server()
 
 	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
 	{
-		for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
+		patricia_tree<User *, ci::ci_char_traits>::iterator uit(UserListByNick);
+		for (bool next = uit.next(); next;)
 		{
-			User *u = *it;
-			++it;
+			User *u = *uit;
+			next = uit.next();
 
 			if (u->server == this)
 			{

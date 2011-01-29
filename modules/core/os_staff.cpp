@@ -26,27 +26,22 @@ class CommandOSStaff : public Command
 
 		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 		{
-			int found = 0;
 			Anope::string nick = it->first, type = it->second;
 
 			NickAlias *na = findnick(nick);
 			if (na)
 			{
-				/* We have to loop all users as some may be logged into an account but not a nick */
-				for (patricia_tree<User *>::const_iterator uit = UserListByNick.begin(), uit_end = UserListByNick.end(); uit != uit_end; ++uit)
+				NickCore *nc = na->nc;
+				for (std::list<User *>::iterator uit = nc->Users.begin(); uit != nc->Users.end(); ++uit)
 				{
 					User *u2 = *uit;
 
-					if (u2->Account() && u2->Account() == na->nc)
-					{
-						found = 1;
-						if (na->nick.equals_ci(u2->nick))
-							source.Reply(OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
-						else
-							source.Reply(OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
-					}
+					if (na->nick.equals_ci(u2->nick))
+						source.Reply(OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
+					else
+						source.Reply(OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
 				}
-				if (!found)
+				if (nc->Users.empty())
 					source.Reply(OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
 			}
 		}

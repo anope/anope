@@ -312,7 +312,7 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	if (!s)
 		throw CoreException("Got ENDBURST without a source");
 
-	for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
 	{
 		User *u = *it;
 		if (u->server == s && !u->IsIdentified())

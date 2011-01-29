@@ -682,7 +682,7 @@ void get_user_stats(long &count, long &mem)
 {
 	count = mem = 0;
 
-	for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
 	{
 		User *user = *it;
 

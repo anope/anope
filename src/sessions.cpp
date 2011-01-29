@@ -53,7 +53,7 @@ void get_session_stats(long &count, long &mem)
 	count = SessionList.size();
 	mem = sizeof(Session) * SessionList.size();
 
-	for (patricia_tree<Session *>::const_iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
+	for (patricia_tree<Session *>::iterator it(SessionList); it.next();)
 	{
 		Session *session = *it;
 

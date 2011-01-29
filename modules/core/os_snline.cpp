@@ -190,7 +190,7 @@ class CommandOSSNLine : public Command
 			if (mask[masklen - 1] == ' ')
 				mask.erase(masklen - 1);
 			unsigned int affected = 0;
-			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
 				if (Anope::Match((*it)->realname, mask))
 					++affected;
 			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;

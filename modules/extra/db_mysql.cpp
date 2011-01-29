@@ -745,7 +745,7 @@ class DBMySQL : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, CurChannel));
 		}
 
-		for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
 		{
 			CurBot = *it;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
@@ -1315,7 +1315,7 @@ static void SaveDatabases()
 
 	me->RunQuery("TRUNCATE TABLE `anope_bs_core`");
 
-	for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
 		me->OnBotCreate(*it);
 
 	me->RunQuery("TRUNCATE TABLE `anope_cs_info`");

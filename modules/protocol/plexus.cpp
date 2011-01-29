@@ -580,7 +580,7 @@ bool event_eob(const Anope::string &source, const std::vector<Anope::string> &pa
 	if (s)
 	{
 		s->Sync(true);
-		for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
 		{
 			User *u = *it;
 			if (u->server == s && !u->IsIdentified())

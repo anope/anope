@@ -172,9 +172,11 @@ void do_restart_services()
 	if (quitmsg.empty())
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick);
+	for (bool next = it.next(); next;)
 	{
 		BotInfo *bi = *it;
+		next = it.next();
 
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(bi, "Restarting");
@@ -214,9 +216,11 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		for (patricia_tree<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick);
+		for (bool next = it.next(); next;)
 		{
 			BotInfo *bi = *it;
+			next = it.next();
 
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(bi, "Shutting down");
@@ -228,8 +232,13 @@ static void services_shutdown()
 
 		ircdproto->SendSquit(Config->ServerName, quitmsg);
 
-		while (!UserListByNick.empty())
-			delete UserListByNick.front();
+		patricia_tree<User *, ci::ci_char_traits>::iterator uit(UserListByNick);
+		for (bool next = uit.next(); next;)
+		{
+			User *u = *uit;
+			next = uit.next();
+			delete u;
+		}
 	}
 	SocketEngine->Process();
 	delete UplinkSock;
@@ -497,10 +506,11 @@ int main(int ac, char **av, char **envp)
 				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
 				/* Clear all of our users, but not our bots */
-				for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end;)
+				patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick);
+				for (bool next = it.next(); next;)
 				{
 					User *u = *it;
-					++it;
+					next = it.next();
 
 					if (u->server != Me)
 						delete u;

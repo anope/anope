@@ -39,10 +39,11 @@ class CommandOSNOOP : public Command
 			source.Reply(OPER_NOOP_SET, server.c_str());
 
 			/* Kill all the IRCops of the server */
-			for (patricia_tree<User *>::const_iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick);
+			for (bool next = it.next(); next;)
 			{
 				User *u2 = *it;
-				++it;
+				next = it.next();
 
 				if (u2 && u2->HasMode(UMODE_OPER) && Anope::Match(u2->server->GetName(), server, true))
 					kill_user(Config->s_OperServ, u2, reason);

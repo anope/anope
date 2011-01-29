@@ -8,7 +8,6 @@ template<typename Data> struct patricia_elem
 {
 	unsigned int bit;
 	patricia_elem<Data> *up, *one, *zero;
-	typename std::list<Data>::iterator node;
 	Anope::string key;
 	Data data;
 };
@@ -19,13 +18,13 @@ class patricia_tree
 	typedef std::basic_string<char, char_traits, std::allocator<char> > String;
 
 	patricia_elem<Data> *root;
-	std::list<Data> list;
+	size_t count;
 
  public:
-
 	patricia_tree()
 	{
 		this->root = NULL;
+		this->count = 0;
 	}
 
 	virtual ~patricia_tree()
@@ -34,20 +33,8 @@ class patricia_tree
 			this->erase(this->root->key);
 	}
 
-	typedef typename std::list<Data>::iterator iterator;
-	typedef typename std::list<Data>::const_iterator const_iterator;
-
-	inline iterator begin() { return this->list.begin(); }
-	inline iterator end() { return this->list.end(); }
-
-	inline const const_iterator begin() const { return this->list.begin(); }
-	inline const const_iterator end() const { return this->list.end(); }
-
-	inline Data front() { return this->list.front(); }
-	inline Data back() { return this->list.back(); }
-
-	inline size_t size() const { return this->list.size(); }
-	inline bool empty() const { return this->list.empty(); }
+	inline size_t size() const { return this->count; }
+	inline bool empty() const { return this->count == 0; }
 
 	Data find(const Anope::string &ukey)
 	{
@@ -101,7 +88,6 @@ class patricia_tree
 			return;
 
 		patricia_elem<Data> *newelem = new patricia_elem<Data>();
-		newelem->up = prev;
 		newelem->key = key;
 		newelem->data = data;
 
@@ -111,11 +97,14 @@ class patricia_tree
 			for (newelem->bit = 0; GET_BIT_XOR(key, cur->key, newelem->bit) == 0; ++newelem->bit);
 
 		patricia_elem<Data> *place = prev;
+
 		while (place && newelem->bit < place->bit)
 		{
 			prev = place;
 			place = place->up;
 		}
+
+		newelem->up = place;
 
 		if (GET_BIT(key, newelem->bit))
 		{
@@ -145,8 +134,7 @@ class patricia_tree
 		else
 			this->root = newelem;
 
-		this->list.push_front(data);
-		newelem->node = this->list.begin();
+		++this->count;
 	}
 
 	Data erase(const Anope::string &ukey)
@@ -207,13 +195,74 @@ class patricia_tree
 			prev->bit = cur->bit;
 		}
 
-		this->list.erase(cur->node);
-
 		Data data = cur->data;
 		delete cur;
 
+		--this->count;
+
 		return data;
 	}
+
+	class iterator
+	{
+		enum IterationState
+		{
+			ITERATION_AT_CENTER,
+			ITERATION_FROM_CENTER
+		};
+
+		patricia_elem<Data> *elem;
+		IterationState from;
+
+	 public:
+		iterator(patricia_tree<Data, char_traits> &tree)
+		{
+			this->elem = tree.root;
+			this->from = ITERATION_AT_CENTER;
+		}
+
+		bool next()
+		{
+			if (this->elem == NULL)
+				;
+			else if (this->from == ITERATION_AT_CENTER)
+			{
+				if (this->elem->zero != NULL && this->elem->zero->bit > this->elem->bit)
+				{
+					this->elem = this->elem->zero;
+					return this->next();
+				}
+
+				this->from = ITERATION_FROM_CENTER;
+				return true;
+			}
+			else if (this->from == ITERATION_FROM_CENTER)
+			{
+				if (this->elem->one != NULL && this->elem->one->bit > this->elem->bit)
+				{
+					this->elem = this->elem->one;
+					this->from = ITERATION_AT_CENTER;
+					return this->next();
+				}
+
+				while (this->elem->up != NULL && this->elem->up->one == this->elem)
+					this->elem = this->elem->up;
+
+				if (this->elem->up != NULL)
+				{
+					this->elem = this->elem->up;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		inline Data operator*()
+		{
+			return this->elem->data;
+		}
+	};
 };
 
 

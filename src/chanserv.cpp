@@ -587,7 +587,7 @@ void update_cs_lastseen(User *user, ChannelInfo *ci)
 
 /*************************************************************************/
 
-/* Returns the best ban possible for an user depending of the bantype
+/* Returns the best ban possible for a user depending of the bantype
    value. */
 
 int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret)

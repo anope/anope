@@ -99,7 +99,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 
 	/* Now we can make kicker stuff. We try to order the checks
 	 * from the fastest one to the slowest one, since there's
-	 * no need to process other kickers if an user is kicked before
+	 * no need to process other kickers if a user is kicked before
 	 * the last kicker check.
 	 *
 	 * But FIRST we check whether the user is protected in any
@@ -373,7 +373,7 @@ BotInfo *findbot(const Anope::string &nick)
 
 /*************************************************************************/
 
-/* Returns ban data associated with an user if it exists, allocates it
+/* Returns ban data associated with a user if it exists, allocates it
    otherwise. */
 
 static BanData *get_ban_data(Channel *c, User *u)
@@ -415,7 +415,7 @@ static BanData *get_ban_data(Channel *c, User *u)
 
 /*************************************************************************/
 
-/* Returns BotServ data associated with an user on a given channel.
+/* Returns BotServ data associated with a user on a given channel.
  * Allocates it if necessary.
  */
 
@@ -484,7 +484,7 @@ void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 
 /*************************************************************************/
 
-/* This makes a bot kick an user. Works somewhat like notice_lang in fact ;) */
+/* This makes a bot kick a user. Works somewhat like notice_lang in fact ;) */
 
 void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
 {

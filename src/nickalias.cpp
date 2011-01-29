@@ -66,7 +66,7 @@ NickAlias::~NickAlias()
 {
 	FOREACH_MOD(I_OnDelNick, OnDelNick(this));
 
-	/* Second thing to do: look for an user using the alias
+	/* Second thing to do: look for a user using the alias
 	 * being deleted, and make appropriate changes */
 	User *u = finduser(this->nick);
 	if (u && u->Account())

@@ -162,7 +162,7 @@ Note: You should also read the README and FAQ files!
 4) Starting Anope
 
     Go into the directory where binaries were installed (by default, this is
-    ~/services). Type ./services to launch Anope.
+    ~/services/bin). Type ./services to launch Anope.
 
     If there are syntax errors in the configuration file they will be
     displayed on the screen. Correct them until there are no errors anymore.
@@ -180,9 +180,7 @@ Note: You should also read the README and FAQ files!
 5) Setting up a crontab
 
     A crontab entry will allow you to check periodically whether Anope is
-    still running, and restart it if not. You'll need to have Anope binaries
-    and data installed in the same directory for this to work without
-    modification.
+    still running, and restart it if not.
 
     First rename the example.chk script that is in Anope path (by default,
     this is ~/services/data) to services.chk and edit it. You'll need to 

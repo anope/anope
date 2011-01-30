@@ -4380,7 +4380,7 @@ CHAN_HELP_CMD_HALFOP
 CHAN_HELP_CMD_HOP
 	    HOP        Verwaltet die HOP-Liste von einen Channel
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gibt Dir Founder (Gründer) Staus in einem Channel
+	    OWNER      Gibt Dir Founder (Gründer) Status in einem Channel
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Schützt den angegebenen Nicknamen in einem Channel
 CHAN_HELP_CMD_ADMIN

@@ -461,9 +461,9 @@ class CommandCSAccess : public Command
 				" \n"
 				"Maintains the \002access list\002 for a channel.  The access\n"
 				"list specifies which users are allowed chanop status or\n"
-				"access to %S commands on the channel.  Different\n"
+				"access to %s commands on the channel.  Different\n"
 				"user levels allow for access to different subsets of\n"
-				"privileges; \002%R%S HELP ACCESS LEVELS\002 for more\n"
+				"privileges; \002%R%s HELP ACCESS LEVELS\002 for more\n"
 				"specific information.  Any nick not on the access list has\n"
 				"a user level of 0.\n"
 				" \n"
@@ -496,12 +496,13 @@ class CommandCSAccess : public Command
 				"to \002ACCESS LIST\002 but shows the creator and last used time.\n"
 				" \n"
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
-				"access list."));
+				"access list."),
+				ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		source.Reply(_("\002User access levels\002\n"
 				" \n"
 				"By default, the following access levels are defined:\n"
 				" \n"
-				"   \002Founder\002   Full access to %S functions; automatic\n"
+				"   \002Founder\002   Full access to %s functions; automatic\n"
 				"                     opping upon entering channel.  Note\n"
 				"                     that only one person may have founder\n"
 				"                     status (it cannot be given using the\n"
@@ -514,8 +515,8 @@ class CommandCSAccess : public Command
 				"   \002     <0\002   May not be opped.\n"
 				" \n"
 				"These levels may be changed, or new ones added, using the\n"
-				"\002LEVELS\002 command; type \002%R%S HELP LEVELS\002 for\n"
-				"information."));
+				"\002LEVELS\002 command; type \002%R%s HELP LEVELS\002 for\n"
+				"information."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -717,7 +718,7 @@ class CommandCSLevels : public Command
 					"The \002LEVELS\002 command allows fine control over the meaning of\n"
 					"the numeric access levels used for channels.  With this\n"
 					"command, you can define the access level required for most\n"
-					"of %S's functions. (The \002SET FOUNDER\002 and this command\n"
+					"of %s's functions. (The \002SET FOUNDER\002 and this command\n"
 					"are always restricted to the channel founder.)\n"
 					" \n"
 					"\002LEVELS SET\002 allows the access level for a function or group of\n"
@@ -732,7 +733,7 @@ class CommandCSLevels : public Command
 					"\002HELP ACCESS LEVELS\002).\n"
 					" \n"
 					"For a list of the features and functions whose levels can be\n"
-					"set, see \002HELP LEVELS DESC\002."));
+					"set, see \002HELP LEVELS DESC\002."), ChanServ->nick.c_str());
 		return true;
 	}
 

@@ -114,7 +114,7 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 				"Changes the language Services uses when sending messages to\n"
 				"\037nickname\037 (for example, when responding to a command he sends).\n"
 				"\037language\037 should be chosen from a list of supported languages\n"
-				"that you can get by typing \002%R%S HELP SET LANGUAGE\002."));
+				"that you can get by typing \002%R%s HELP SET LANGUAGE\002."), NickServ->nick.c_str());
 	}
 };
 

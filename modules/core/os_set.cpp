@@ -200,7 +200,7 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		else if (subcommand.equals_ci("LIST"))
 			source.Reply(_("Syntax: \002SET LIST\n"
-					"Display the various %S settings"));
+					"Display the various %s settings"), OperServ->nick.c_str());
 		else if (subcommand.equals_ci("READONLY"))
 			source.Reply(_("Syntax: \002SET READONLY {ON | OFF}\002\n"
 					" \n"

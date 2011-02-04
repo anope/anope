@@ -149,13 +149,14 @@ class CommandNSConfirm : public Command
 				" \n"
 				"This is the second step of nickname registration process.\n"
 				"You must perform this command in order to get your nickname\n"
-				"registered with %S. The passcode (or called auth code also)\n"
+				"registered with %s. The passcode (or called auth code also)\n"
 				"is sent to your e-mail address in the first step of the\n"
 				"registration process. For more information about the first\n"
-				"stage of the registration process, type: \002%R%S HELP REGISTER\002\n"
+				"stage of the registration process, type: \002%R%s HELP REGISTER\002\n"
 				" \n"
 				"This is also used after the RESETPASS command has been used to\n"
-				"force identify you to your nick so you may change your password."));
+				"force identify you to your nick so you may change your password."),
+				NickServ->nick.c_str());
 		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
 			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
 				"replace \037passcode\037 with a users nick to force validate them."));
@@ -312,7 +313,7 @@ class CommandNSRegister : public CommandNSConfirm
 	{
 		source.Reply(_("Syntax: \002REGISTER \037password\037 \037[email]\037\002\n"
 				" \n"
-				"Registers your nickname in the %S database. Once\n"
+				"Registers your nickname in the %s database. Once\n"
 				"your nick is registered, you can use the \002SET\002 and \002ACCESS\002\n"
 				"commands to configure your nick's settings as you like\n"
 				"them. Make sure you remember the password you use when\n"
@@ -325,7 +326,7 @@ class CommandNSRegister : public CommandNSConfirm
 				"Passwords should not be easily guessable. For example,\n"
 				"using your real name as a password is a bad idea. Using\n"
 				"your nickname as a password is a much worse idea ;) and,\n"
-				"in fact, %S will not allow it. Also, short\n"
+				"in fact, %s will not allow it. Also, short\n"
 				"passwords are vulnerable to trial-and-error searches, so\n"
 				"you should choose a password at least 5 characters long.\n"
 				"Finally, the space character cannot be used in passwords.\n"
@@ -340,7 +341,8 @@ class CommandNSRegister : public CommandNSConfirm
 				"that will allow you to register other nicks later sharing\n"
 				"the same configuration, the same set of memos and the\n"
 				"same channel privileges. For more information on this\n"
-				"feature, type \002%R%S HELP GROUP\002."));
+				"feature, type \002%R%s HELP GROUP\002."),
+				NickServ->nick.c_str(), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

@@ -84,12 +84,12 @@ class CommandNSSetHide : public Command
 		source.Reply(_("Syntax: \002SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}\002\n"
 				" \n"
 				"Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %S \002INFO\002 on your\n"
+				"being displayed when someone does a %s \002INFO\002 on your\n"
 				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."));
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
 		return true;
 	}
 
@@ -116,12 +116,12 @@ class CommandNSSASetHide : public CommandNSSetHide
 		source.Reply(_("Syntax: \002SASET \037nickname\037 HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}\002\n"
 				" \n"
 				"Allows you to prevent certain pieces of information from\n"
-				"being displayed when someone does a %S \002INFO\002 on the\n"
+				"being displayed when someone does a %s \002INFO\002 on the\n"
 				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."));
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
 		return true;
 	}
 

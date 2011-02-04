@@ -46,11 +46,11 @@ class CommandCSSetSecure : public Command
 	{
 		source.Reply(_("Syntax: \002%s \037channel\037 SECURE {ON | OFF}\002\n"
 			" \n"
-			"Enables or disables %S's security features for a\n"
+			"Enables or disables %s's security features for a\n"
 			"channel. When \002SECURE\002 is set, only users who have\n"
 			"registered their nicknames with %s and IDENTIFY'd\n"
 			"with their password will be given access to the channel\n"
-			"as controlled by the access list."), this->name.c_str(), Config->s_NickServ.c_str());
+			"as controlled by the access list."), this->name.c_str(), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 
@@ -61,7 +61,7 @@ class CommandCSSetSecure : public Command
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(_("    SECURE        Activate %S security features"));
+		source.Reply(_("    SECURE        Activate %s security features"), ChanServ->nick.c_str());
 	}
 };
 

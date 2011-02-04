@@ -74,11 +74,11 @@ class CommandNSSet : public Command
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
 			source.Reply(_("In order to use this command, you must first identify\n"
-					"with your password (\002%R%S HELP IDENTIFY\002 for more\n"
+					"with your password (\002%R%s HELP IDENTIFY\002 for more\n"
 					"information).\n"
 					" \n"
-					"Type \002%R%S HELP SET \037option\037\002 for more information\n"
-					"on a specific option."));
+					"Type \002%R%s HELP SET \037option\037\002 for more information\n"
+					"on a specific option."), NickServ->nick.c_str(), NickServ->nick.c_str());
 			return true;
 		}
 		else

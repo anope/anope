@@ -49,13 +49,13 @@ class CommandNSSetSecure : public Command
 	{
 		source.Reply(_("Syntax: \002SET SECURE {ON | OFF}\002\n"
 				" \n"
-				"Turns %S's security features on or off for your\n"
+				"Turns %s's security features on or off for your\n"
 				"nick. With \002SECURE\002 set, you must enter your password\n"
 				"before you will be recognized as the owner of the nick,\n"
 				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %S\n"
+				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."));
+				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 
@@ -81,13 +81,13 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 	{
 		source.Reply(_("Syntax: \002SASET \037nickname\037 SECURE {ON | OFF}\002\n"
 				" \n"
-				"Turns %S's security features on or off for your\n"
+				"Turns %s's security features on or off for your\n"
 				"nick. With \002SECURE\002 set, you must enter your password\n"
 				"before you will be recognized as the owner of the nick,\n"
 				"regardless of whether your address is on the access\n"
-				"list. However, if you are on the access list, %S\n"
+				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."));
+				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

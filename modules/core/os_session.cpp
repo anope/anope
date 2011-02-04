@@ -465,7 +465,7 @@ class CommandOSException : public Command
 				"of clients at a time. Once a host reaches its session limit,\n"
 				"all clients attempting to connect from that host will be\n"
 				"killed. Before the user is killed, they are notified, via a\n"
-				"/NOTICE from %S, of a source of help regarding session\n"
+				"/NOTICE from %s, of a source of help regarding session\n"
 				"limiting. The content of this notice is a config setting.\n"
 				" \n"
 				"\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
@@ -489,7 +489,8 @@ class CommandOSException : public Command
 				" \n"
 				"Note that a connecting client will \"use\" the first exception\n"
 				"their host matches. Large exception lists and widely matching\n"
-				"exception masks are likely to degrade services' performance."));
+				"exception masks are likely to degrade services' performance."),
+				OperServ->nick.c_str());
 		return true;
 	}
 

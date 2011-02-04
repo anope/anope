@@ -49,7 +49,7 @@ class CommandCSSetPeace : public Command
 				"Enables or disables the \002peace\002 option for a channel.\n"
 				"When \002peace\002 is set, a user won't be able to kick,\n"
 				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %S commands."), this->name.c_str());
+				"a level superior or equal to his via %s commands."), this->name.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

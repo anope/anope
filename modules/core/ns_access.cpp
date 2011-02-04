@@ -156,9 +156,9 @@ class CommandNSAccess : public Command
 					" \n"
 					"Modifies or displays the access list for your nick.  This\n"
 					"is the list of addresses which will be automatically\n"
-					"recognized by %S as allowed to use the nick.  If\n"
+					"recognized by %s as allowed to use the nick.  If\n"
 					"you want to use the nick from a different address, you\n"
-					"need to send an \002IDENTIFY\002 command to make %S\n"
+					"need to send an \002IDENTIFY\002 command to make %s\n"
 					"recognize you.\n"
 					" \n"
 					"Examples:\n"
@@ -171,7 +171,7 @@ class CommandNSAccess : public Command
 					"        Reverses the previous command.\n"
 					" \n"
 					"    \002ACCESS LIST\002\n"
-					"        Displays the current access list."));
+					"        Displays the current access list."), ChanServ->nick.c_str());
 		return true;
 	}
 

@@ -121,16 +121,16 @@ class CommandNSDrop : public Command
 			source.Reply(_("Syntax: \002DROP [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, drops your nickname from the\n"
-					"%S database.\n"
+					"%s database.\n"
 					" \n"
 					"With a parameter, drops the named nick from the database.\n"
 					"You may drop any nick within your group without any \n"
 					"special privileges. Dropping any nick is limited to \n"
-					"\002Services Operators\002."));
+					"\002Services Operators\002."), NickServ->nick.c_str());
 		else
 			source.Reply(_("Syntax: \002DROP [\037nickname\037 | \037password\037]\002\n"
 					" \n"
-					"Drops your nickname from the %S database.  A nick\n"
+					"Drops your nickname from the %s database.  A nick\n"
 					"that has been dropped is free for anyone to re-register.\n"
 					" \n"
 					"You may drop a nick within your group by passing it\n"
@@ -141,8 +141,8 @@ class CommandNSDrop : public Command
 					"your password as the \002password\002 parameter.\n"
 					" \n"
 					"In order to use this command, you must first identify\n"
-					"with your password (\002%R%S HELP IDENTIFY\002 for more\n"
-					"information)."));
+					"with your password (\002%R%s HELP IDENTIFY\002 for more\n"
+					"information)."), NickServ->nick.c_str(), NickServ->nick.c_str());
 
 		return true;
 	}

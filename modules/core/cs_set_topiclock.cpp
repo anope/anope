@@ -44,12 +44,12 @@ class CommandCSSetTopicLock : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET \037%s\037 TOPICLOCK {ON | OFF}\002\n"
+		source.Reply(_("Syntax: \002%s \037channel\037 TOPICLOCK {ON | OFF}\002\n"
 				" \n"
 				"Enables or disables the \002topic lock\002 option for a channel.\n"
-				"When \002topic lock\002 is set, %S will not allow the\n"
+				"When \002topic lock\002 is set, %s will not allow the\n"
 				"channel topic to be changed except via the \002TOPIC\002\n"
-				"command."), this->name.c_str());
+				"command."), this->name.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

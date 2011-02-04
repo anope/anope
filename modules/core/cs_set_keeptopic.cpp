@@ -48,9 +48,9 @@ class CommandCSSetKeepTopic : public Command
 				" \n"
 				"Enables or disables the \002topic retention\002 option for a	\n"
 				"channel. When \002topic retention\002 is set, the topic for the\n"
-				"channel will be remembered by %S even after the\n"
+				"channel will be remembered by %s even after the\n"
 				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), this->name.c_str());
+				"next time the channel is created."), this->name.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

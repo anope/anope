@@ -81,8 +81,8 @@ class CommandCSSet : public Command
 					"Available options:"));
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
-			source.Reply(_("Type \002%R%S HELP SET \037option\037\002 for more information on a\n"
-					"particular option."));
+			source.Reply(_("Type \002%R%s HELP SET \037option\037\002 for more information on a\n"
+					"particular option."), ChanServ->nick.c_str());
 			return true;
 		}
 		else

@@ -279,7 +279,7 @@ class CommandBSBadwords : public Command
 				"Maintains the \002bad words list\002 for a channel. The bad\n"
 				"words list determines which words are to be kicked\n"
 				"when the bad words kicker is enabled. For more information,\n"
-				"type \002%R%S HELP KICK BADWORDS\002.\n"
+				"type \002%R%s HELP KICK BADWORDS\002.\n"
 				" \n"
 				"The \002BADWORDS ADD\002 command adds the given word to the\n"
 				"badword list. If SINGLE is specified, a kick will be\n"
@@ -303,7 +303,7 @@ class CommandBSBadwords : public Command
 				"      7 through 9.\n"
 				" \n"
 				"The \002BADWORDS CLEAR\002 command clears all entries of the\n"
-				"bad words list."));
+				"bad words list."), BotServ->nick.c_str());
 		return true;
 	}
 

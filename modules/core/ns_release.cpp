@@ -76,7 +76,7 @@ class CommandNSRelease : public Command
 
 		source.Reply(_("Syntax: \002RELEASE \037nickname\037 [\037password\037]\002\n"
 				" \n"
-				"Instructs %S to remove any hold on your nickname\n"
+				"Instructs %s to remove any hold on your nickname\n"
 				"caused by automatic kill protection or use of the \002RECOVER\002\n"
 				"command. This holds lasts for %s;\n"
 				"This command gets rid of them sooner.\n"
@@ -85,7 +85,7 @@ class CommandNSRelease : public Command
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."));
+				"the nickname."), NickServ->nick.c_str());
 
 
 		return true;

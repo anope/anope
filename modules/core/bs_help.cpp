@@ -32,13 +32,14 @@ class CommandBSHelp : public Command
 	{
 		// Abuse syntax error to display general list help.
 		User *u = source.u;
-		source.Reply(_("\002%S\002 allows you to have a bot on your own channel.\n"
+		source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
 				"It has been created for users that can't host or\n"
 				"configure a bot, or for use on networks that don't\n"
 				"allow user bots. Available commands are listed \n"
-				"below; to use them, type \002%R%S \037command\037\002.  For \n"
+				"below; to use them, type \002%R%s \037command\037\002.  For \n"
 				"more information on a specific command, type \002%R\n"
-				"%S HELP \037command\037\002."));
+				"%s HELP \037command\037\002."),
+				BotServ->nick.c_str(), BotServ->nick.c_str(), BotServ->nick.c_str());
 		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(source);

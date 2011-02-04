@@ -49,11 +49,12 @@ class CommandNSSetPrivate : public Command
 	{
 		source.Reply(_("Syntax: \002SET PRIVATE {ON | OFF}\002\n"
 				" \n"
-				"Turns %S's privacy option on or off for your nick.\n"
+				"Turns %s's privacy option on or off for your nick.\n"
 				"With \002PRIVATE\002 set, your nickname will not appear in\n"
-				"nickname lists generated with %S's \002LIST\002 command.\n"
+				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows your nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"));
+				"information on it using the \002INFO\002 command.)"),
+				NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 
@@ -64,7 +65,7 @@ class CommandNSSetPrivate : public Command
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(_("    PRIVATE    Prevent the nickname from appearing in a \002%R%S LIST\002"));
+		source.Reply(_("    PRIVATE    Prevent the nickname from appearing in a \002%R%s LIST\002"), ChanServ->nick.c_str());
 	}
 };
 
@@ -79,11 +80,12 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 	{
 		source.Reply(_("Syntax: \002SASET \037nickname\037 PRIVATE {ON | OFF}\002\n"
 				" \n"
-				"Turns %S's privacy option on or off for the nick.\n"
+				"Turns %s's privacy option on or off for the nick.\n"
 				"With \002PRIVATE\002 set, the nickname will not appear in\n"
-				"nickname lists generated with %S's \002LIST\002 command.\n"
+				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows the nickname can still get\n"
-				"information on it using the \002INFO\002 command.)"));
+				"information on it using the \002INFO\002 command.)"),
+				NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

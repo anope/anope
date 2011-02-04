@@ -57,12 +57,13 @@ class CommandCSSetSignKick : public Command
 				" \n"
 				"Enables or disables signed kicks for a\n"
 				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"%S KICK command will have the nick that used the\n"
+				"%s KICK command will have the nick that used the\n"
 				"command in their reason.\n"
 				" \n"
 				"If you use \002LEVEL\002, those who have a level that is superior \n"
 				"or equal to the SIGNKICK level on the channel won't have their \n"
-				"kicks signed. See \002%R%S HELP LEVELS\002 for more information."), this->name.c_str());
+				"kicks signed. See \002%R%s HELP LEVELS\002 for more information."), this->name.c_str(),
+				ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

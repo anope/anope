@@ -53,10 +53,10 @@ class CommandCSClearUsers : public Command
 	{
 		source.Reply(_("Syntax: \002CLEARUSERS \037channel\037\002\n"
 				" \n"
-				"Tells %S to clear (kick) all users certain settings on a channel."
+				"Tells %s to clear (kick) all users certain settings on a channel."
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."));
+				"channel."), ChanServ->nick.c_str());
 		return true;
 	}
 

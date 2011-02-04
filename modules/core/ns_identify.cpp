@@ -90,9 +90,9 @@ class CommandNSIdentify : public Command
 					source.Reply(_("You must now supply an e-mail for your nick.\n"
 						"This e-mail will allow you to retrieve your password in\n"
 						"case you forget it."));
-					source.Reply(_("Type \002%R%S SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
+					source.Reply(_("Type \002%R%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
 						"Your privacy is respected; this e-mail won't be given to\n"
-					"any third-party person."));
+					"any third-party person."), NickServ->nick.c_str());
 				}
 
 				if (u->IsIdentified())
@@ -106,11 +106,11 @@ class CommandNSIdentify : public Command
 	{
 		source.Reply(_("Syntax: \002IDENTIFY [account] \037password\037\002\n"
 				" \n"
-				"Tells %S that you are really the owner of this\n"
+				"Tells %s that you are really the owner of this\n"
 				"nick.  Many commands require you to authenticate yourself\n"
 				"with this command before you use them.  The password\n"
 				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."));
+				"command."), NickServ->nick.c_str());
 		return true;
 	}
 

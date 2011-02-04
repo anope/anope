@@ -447,9 +447,10 @@ class CommandCSQOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."));
+				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), ChanServ->nick.c_str(),
+				ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -513,9 +514,9 @@ class CommandCSAOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."));
+				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 	/* CHAN_HELP_HOP */
 		return true;
 	}
@@ -578,9 +579,9 @@ class CommandCSHOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."));
+				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -643,9 +644,9 @@ class CommandCSSOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."));
+				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -707,9 +708,9 @@ class CommandCSVOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."));
+				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

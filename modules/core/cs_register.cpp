@@ -100,7 +100,7 @@ class CommandCSRegister : public Command
 	{
 		source.Reply(_("Syntax: \002REGISTER \037channel\037 \037description\037\002\n"
 			" \n"
-			"Registers a channel in the %S database.  In order\n"
+			"Registers a channel in the %s database.  In order\n"
 			"to use this command, you must first be a channel operator\n"
 			"on the channel you're trying to register.\n"
 			"The description, which \002must\002 be included, is a\n"
@@ -109,15 +109,16 @@ class CommandCSRegister : public Command
 			"When you register a channel, you are recorded as the\n"
 			"\"founder\" of the channel. The channel founder is allowed\n"
 			"to change all of the channel settings for the channel;\n"
-			"%S will also automatically give the founder\n"
+			"%s will also automatically give the founder\n"
 			"channel-operator privileges when s/he enters the channel.\n"
-			"See the \002ACCESS\002 command (\002%R%S HELP ACCESS\002) for\n"
+			"See the \002ACCESS\002 command (\002%R%s HELP ACCESS\002) for\n"
 			"information on giving a subset of these privileges to\n"
 			"other channel users.\n"
 			" \n"
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
-			"\002%R%s HELP\002 for information on how to do so."));
+			"\002%R%s HELP\002 for information on how to do so."),
+			ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

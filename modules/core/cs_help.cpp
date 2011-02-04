@@ -32,13 +32,15 @@ class CommandCSHelp : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		source.Reply(_("\002%S\002 allows you to register and control various\n"
-				"aspects of channels. %S can often prevent\n"
+		source.Reply(_("\002%s\002 allows you to register and control various\n"
+				"aspects of channels. %s can often prevent\n"
 				"malicious users from \"taking over\" channels by limiting\n"
 				"who is allowed channel operator privileges. Available\n"
 				"commands are listed below; to use them, type\n"
-				"\002%R%S \037command\037\002. For more information on a\n"
-				"specific command, type \002%R%S HELP \037command\037\002."));
+				"\002%R%s \037command\037\002. For more information on a\n"
+				"specific command, type \002%R%s HELP \037command\037\002."),
+				ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(),
+				ChanServ->nick.c_str());
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(source);

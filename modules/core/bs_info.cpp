@@ -222,11 +222,11 @@ class CommandBSInfo : public Command
 	{
 		source.Reply(_("Syntax: \002INFO {\037chan\037 | \037nick\037}\002\n"
 				" \n"
-				"Allows you to see %S information about a channel or a bot.\n"
+				"Allows you to see %s information about a channel or a bot.\n"
 				"If the parameter is a channel, then you'll get information\n"
 				"such as enabled kickers. If the parameter is a nick,\n"
 				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."));
+				"time or number of channels it is on."), NickServ->nick.c_str());
 		return true;
 	}
 

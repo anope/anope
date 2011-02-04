@@ -47,9 +47,9 @@ class CommandCSSetOpNotice : public Command
 		source.Reply(_("Syntax: \002%s \037channel\037 OPNOTICE {ON | OFF}\002\n"
 				" \n"
 				"Enables or disables the \002op-notice\002 option for a channel.\n"
-				"When \002op-notice\002 is set, %S will send a notice to the\n"
+				"When \002op-notice\002 is set, %s will send a notice to the\n"
 				"channel whenever the \002OP\002 or \002DEOP\002 commands are used for a user\n"
-				"in the channel."), this->name.c_str());
+				"in the channel."), this->name.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

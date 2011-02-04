@@ -152,7 +152,7 @@ class CommandNSGroup : public Command
 				"You can use this command even if you have not registered\n"
 				"your nick yet. If your nick is already registered, you'll\n"
 				"need to identify yourself before using this command. Type\n"
-				"\037%R%S HELP IDENTIFY\037 for more information. This\n"
+				"\037%R%s HELP IDENTIFY\037 for more information. This\n"
 				"last may be not possible on your IRC network.\n"
 				" \n"
 				"It is recommended to use this command with a non-registered\n"
@@ -164,7 +164,8 @@ class CommandNSGroup : public Command
 				"You can only be in one group at a time. Group merging is\n"
 				"not possible.\n"
 				" \n"
-				"\037Note\037: all the nicknames of a group have the same password."));
+				"\037Note\037: all the nicknames of a group have the same password."),
+				NickServ->nick.c_str());
 		return true;
 	}
 

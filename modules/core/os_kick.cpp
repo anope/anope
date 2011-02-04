@@ -60,7 +60,7 @@ class CommandOSKick : public Command
 				"command. The kick message will have the nickname of the\n"
 				"IRCop sending the KICK command prepended; for example:\n"
 				" \n"
-				"*** SpamMan has been kicked off channel #my_channel by %S (Alcan (Flood))"));
+				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), OperServ->nick.c_str());
 		return true;
 	}
 

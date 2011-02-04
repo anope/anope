@@ -91,25 +91,26 @@ class CommandNSRecover : public Command
 		source.Reply(_("Syntax: \002RECOVER \037nickname\037 [\037password\037]\002\n"
 				" \n"
 				"Allows you to recover your nickname if someone else has\n"
-				"taken it; this does the same thing that %S does\n"
+				"taken it; this does the same thing that %s does\n"
 				"automatically if someone tries to use a kill-protected\n"
 				"nick.\n"
 				" \n"
-				"When you give this command, %S will bring a fake\n"
+				"When you give this command, %s will bring a fake\n"
 				"user online with the same nickname as the user you're\n"
 				"trying to recover your nick from.  This causes the IRC\n"
 				"servers to disconnect the other user.  This fake user will\n"
 				"remain online for %s to ensure that the other\n"
 				"user does not immediately reconnect; after that time, you\n"
 				"can reclaim your nick.  Alternatively, use the \002RELEASE\002\n"
-				"command (\002%R%S HELP RELEASE\002) to get the nick\n"
+				"command (\002%R%s HELP RELEASE\002) to get the nick\n"
 				"back sooner.\n"
 				" \n"
 				"In order to use the \002RECOVER\002 command for a nick, your\n"
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), relstr.c_str());
+				"the nickname."), NickServ->nick.c_str(), NickServ->nick.c_str(), relstr.c_str(),
+				NickServ->nick.c_str());
 
 		return true;
 	}

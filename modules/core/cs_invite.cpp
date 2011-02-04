@@ -72,10 +72,10 @@ class CommandCSInvite : public Command
 	{
 		source.Reply(_("Syntax: \002INVITE \037channel\037\002\n"
 				" \n"
-				"Tells %S to invite you into the given channel.\n"
+				"Tells %s to invite you into the given channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."));
+				"on the channel."), ChanServ->nick.c_str());
 		return true;
 	}
 

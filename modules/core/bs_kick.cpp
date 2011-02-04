@@ -428,22 +428,22 @@ class CommandBSKick : public Command
 					"    UNDERLINES    Sets if the bot kicks underlines\n"
 					"    ITALICS       Sets if the bot kicks italics\n"
 					" \n"
-					"Type \002%R%S HELP KICK \037option\037\002 for more information\n"
+					"Type \002%R%s HELP KICK \037option\037\002 for more information\n"
 					"on a specific option.\n"
 					" \n"
 					"Note: access to this command is controlled by the\n"
-					"level SET."));
+					"level SET."), ChanServ->nick.c_str());
 		else if (subcommand.equals_ci("BADWORDS"))
 			source.Reply(_("Syntax: \002KICK \037#channel\037 BADWORDS {\037ON|OFF\037} [\037ttb\037]\002\n"
 					"Sets the bad words kicker on or off. When enabled, this\n"
 					"option tells the bot to kick users who say certain words\n"
 					"on the channels.\n"
 					"You can define bad words for your channel using the\n"
-					"\002BADWORDS\002 command. Type \002%R%S HELP BADWORDS\002 for\n"
+					"\002BADWORDS\002 command. Type \002%R%s HELP BADWORDS\002 for\n"
 					"more information.\n"
 					"ttb is the number of times a user can be kicked\n"
 					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."));
+					"the ban system once activated."), ChanServ->nick.c_str());
 		else if (subcommand.equals_ci("BOLDS"))
 			source.Reply(_("Syntax: \002KICK \037channel\037 BOLDS {\037ON|OFF\037} [\037ttb\037]\002\n"
 					"Sets the bolds kicker on or off. When enabled, this\n"

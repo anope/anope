@@ -50,14 +50,14 @@ class CommandCSTopic : public Command
 	{
 		source.Reply(_("Syntax: \002TOPIC \037channel\037 [\037topic\037]\002\n"
 				" \n"
-				"Causes %S to set the channel topic to the one\n"
+				"Causes %s to set the channel topic to the one\n"
 				"specified. If \002topic\002 is not given, then an empty topic\n"
 				"is set. This command is most useful in conjunction\n"
-				"with \002SET TOPICLOCK\002. See \002%R%S HELP SET TOPICLOCK\002\n"
+				"with \002SET TOPICLOCK\002. See \002%R%s HELP SET TOPICLOCK\002\n"
 				"for more information.\n"
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."));
+				"channel."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

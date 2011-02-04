@@ -71,7 +71,7 @@ class CommandMSSet : public Command
 		Anope::string p2 = params.size() > 2 ? params[2] : "";
 		Anope::string p3 = params.size() > 3 ? params[3] : "";
 		Anope::string user, chan;
-		int32 limit;
+		int16 limit;
 		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
 		bool is_servadmin = u->Account()->HasPriv("memoserv/set-limit");
@@ -115,7 +115,7 @@ class CommandMSSet : public Command
 				SyntaxError(MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
 			}
-			if ((!isdigit(p1[0]) && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
+			if ((!p1.is_pos_number_only() && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
 				SyntaxError(MemoServ, u, "SET LIMIT", MEMO_SET_LIMIT_SERVADMIN_SYNTAX);
 				return MOD_CONT;
@@ -134,14 +134,12 @@ class CommandMSSet : public Command
 				else
 					nc->UnsetFlag(NI_MEMO_HARDMAX);
 			}
-			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
-			if (limit < 0 || limit > 32767)
+			limit = -1;
+			try
 			{
-				u->SendMessage(MemoServ, MEMO_SET_LIMIT_OVERFLOW, 32767);
-				limit = 32767;
+				limit = convertTo<int16>(p1);
 			}
-			if (p1.equals_ci("NONE"))
-				limit = -1;
+			catch (const CoreException &) { }
 		}
 		else
 		{
@@ -160,7 +158,12 @@ class CommandMSSet : public Command
 				u->SendMessage(MemoServ, MEMO_SET_YOUR_LIMIT_FORBIDDEN);
 				return MOD_CONT;
 			}
-			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
+			limit = -1;
+			try
+			{
+				limit = convertTo<int16>(p1);
+			}
+			catch (const CoreException &) { }
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
 			if (limit < 0 || (Config->MSMaxMemos > 0 && static_cast<unsigned>(limit) > Config->MSMaxMemos))
@@ -170,11 +173,6 @@ class CommandMSSet : public Command
 				else
 					u->SendMessage(MemoServ, MEMO_SET_YOUR_LIMIT_TOO_HIGH, Config->MSMaxMemos);
 				return MOD_CONT;
-			}
-			else if (limit > 32767)
-			{
-				u->SendMessage(MemoServ, MEMO_SET_LIMIT_OVERFLOW, 32767);
-				limit = 32767;
 			}
 		}
 		mi->memomax = limit;

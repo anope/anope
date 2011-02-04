@@ -573,41 +573,48 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key.equals_ci("LANGUAGE"))
-			nc->language = params[0];
-		else if (key.equals_ci("MEMOMAX"))
-			nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : 1;
-		else if (key.equals_ci("CHANCOUNT"))
-			nc->channelcount = params[0].is_pos_number_only() ? convertTo<uint16>(params[0]) : 0;
-		else if (key.equals_ci("EMAIL"))
-			nc->email = params[0];
-		else if (key.equals_ci("GREET"))
-			nc->greet = params[0];
-		else if (key.equals_ci("ACCESS"))
-			nc->AddAccess(params[0]);
-		else if (key.equals_ci("FLAGS"))
+		try
 		{
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-				for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
-					if (params[j].equals_ci(NickCoreFlags[i].Name))
-						nc->SetFlag(NickCoreFlags[i].Flag);
-		}
-		else if (key.equals_ci("MI"))
-		{
-			Memo *m = new Memo;
-			m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-			m->sender = params[1];
-			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+			if (key.equals_ci("LANGUAGE"))
+				nc->language = params[0];
+			else if (key.equals_ci("MEMOMAX"))
+				nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
+			else if (key.equals_ci("CHANCOUNT"))
+				nc->channelcount = params[0].is_pos_number_only() ? convertTo<uint16>(params[0]) : 0;
+			else if (key.equals_ci("EMAIL"))
+				nc->email = params[0];
+			else if (key.equals_ci("GREET"))
+				nc->greet = params[0];
+			else if (key.equals_ci("ACCESS"))
+				nc->AddAccess(params[0]);
+			else if (key.equals_ci("FLAGS"))
 			{
-				if (params[j].equals_ci("UNREAD"))
-					m->SetFlag(MF_UNREAD);
-				else if (params[j].equals_ci("RECEIPT"))
-					m->SetFlag(MF_RECEIPT);
-				else if (params[j].equals_ci("NOTIFYS"))
-					m->SetFlag(MF_NOTIFYS);
+				for (unsigned j = 0, end = params.size(); j < end; ++j)
+					for (int i = 0; NickCoreFlags[i].Flag != -1; ++i)
+						if (params[j].equals_ci(NickCoreFlags[i].Name))
+							nc->SetFlag(NickCoreFlags[i].Flag);
 			}
-			m->text = params[params.size() - 1];
-			nc->memos.memos.push_back(m);
+			else if (key.equals_ci("MI"))
+			{
+				Memo *m = new Memo;
+				m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+				m->sender = params[1];
+				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+				{
+					if (params[j].equals_ci("UNREAD"))
+						m->SetFlag(MF_UNREAD);
+					else if (params[j].equals_ci("RECEIPT"))
+						m->SetFlag(MF_RECEIPT);
+					else if (params[j].equals_ci("NOTIFYS"))
+						m->SetFlag(MF_NOTIFYS);
+				}
+				m->text = params[params.size() - 1];
+				nc->memos.memos.push_back(m);
+			}
+		}
+		catch (const CoreException &ex)
+		{
+			throw DatabaseException(ex.GetReason());
 		}
 
 		return EVENT_CONTINUE;
@@ -649,183 +656,189 @@ class DBPlain : public Module
 
 	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		if (key.equals_ci("BANTYPE"))
-			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
-		else if (key.equals_ci("MEMOMAX"))
-			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : 1;
-		else if (key.equals_ci("FOUNDER"))
+		try
 		{
-			ci->founder = findcore(params[0]);
-			if (!ci->founder)
+			if (key.equals_ci("BANTYPE"))
+				ci->bantype = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
+			else if (key.equals_ci("MEMOMAX"))
+				ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
+			else if (key.equals_ci("FOUNDER"))
 			{
-				std::stringstream reason;
-				reason << "Deleting founderless channel " << ci->name << " (founder: " << params[0] << ")";
-				throw DatabaseException(reason.str());
-			}
-		}
-		else if (key.equals_ci("SUCCESSOR"))
-			ci->successor = findcore(params[0]);
-		else if (key.equals_ci("LEVELS"))
-		{
-			for (unsigned j = 0, end = params.size(); j < end; j += 2)
-				for (int i = 0; ChannelLevels[i].Level != -1; ++i)
-					if (params[j].equals_ci(ChannelLevels[i].Name))
-						ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-		}
-		else if (key.equals_ci("FLAGS"))
-		{
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-				for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
-					if (params[j].equals_ci(ChannelInfoFlags[i].Name))
-						ci->SetFlag(ChannelInfoFlags[i].Flag);
-		}
-		else if (key.equals_ci("DESC"))
-			ci->desc = params[0];
-		else if (key.equals_ci("TOPIC"))
-		{
-			ci->last_topic_setter = params[0];
-			ci->last_topic_time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
-			ci->last_topic = params[2];
-		}
-		else if (key.equals_ci("FORBID"))
-		{
-			ci->forbidby = params[0];
-			ci->forbidreason = params[1];
-		}
-		else if (key.equals_ci("ACCESS"))
-		{
-			NickCore *nc = findcore(params[0]);
-			if (!nc)
-			{
-				std::stringstream reason;
-				reason << "Access entry for nonexistant core " << params[0] << " on " << ci->name;
-				throw DatabaseException(reason.str());
-			}
-
-			int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
-			time_t last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
-			ci->AddAccess(nc, level, params[3], last_seen);
-		}
-		else if (key.equals_ci("AKICK"))
-		{
-			bool Stuck = params[0].equals_ci("STUCK");
-			bool Nick = params[1].equals_ci("NICK");
-			NickCore *nc = NULL;
-			if (Nick)
-			{
-				nc = findcore(params[2]);
-				if (!nc)
+				ci->founder = findcore(params[0]);
+				if (!ci->founder)
 				{
 					std::stringstream reason;
-					reason << "Akick for nonexistant core " << params[2] << " on " << ci->name;
+					reason << "Deleting founderless channel " << ci->name << " (founder: " << params[0] << ")";
 					throw DatabaseException(reason.str());
 				}
 			}
-			AutoKick *ak;
-			if (Nick)
-				ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
-			else
-				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
-			if (Stuck)
-				ak->SetFlag(AK_STUCK);
-			if (Nick)
-				ak->SetFlag(AK_ISNICK);
-
-		}
-		else if (key.equals_ci("MLOCK_ON") || key.equals_ci("MLOCK_OFF"))
-		{
-			bool Set = key.equals_ci("MLOCK_ON");
-
-			/* For now store mlock in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-			ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(params));
-		}
-		else if (key.equals_ci("MLP"))
-		{
-			std::vector<std::pair<Anope::string, Anope::string> > mlp;
-			ci->GetExtRegular("db_mlp", mlp);
-	
-			mlp.push_back(std::make_pair(params[0], params[1]));
-
-			/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-			ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
-		}
-		else if (key.equals_ci("MI"))
-		{
-			Memo *m = new Memo;
-			m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-			m->sender = params[1];
-			for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+			else if (key.equals_ci("SUCCESSOR"))
+				ci->successor = findcore(params[0]);
+			else if (key.equals_ci("LEVELS"))
 			{
-				if (params[j].equals_ci("UNREAD"))
-					m->SetFlag(MF_UNREAD);
-				else if (params[j].equals_ci("RECEIPT"))
-					m->SetFlag(MF_RECEIPT);
-				else if (params[j].equals_ci("NOTIFYS"))
-					m->SetFlag(MF_NOTIFYS);
+				for (unsigned j = 0, end = params.size(); j < end; j += 2)
+					for (int i = 0; ChannelLevels[i].Level != -1; ++i)
+						if (params[j].equals_ci(ChannelLevels[i].Name))
+							ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 			}
-			m->text = params[params.size() - 1];
-			ci->memos.memos.push_back(m);
-		}
-		else if (key.equals_ci("ENTRYMSG"))
-			ci->entry_message = params[0];
-		else if (key.equals_ci("BI"))
-		{
-			if (params[0].equals_ci("NAME"))
-				ci->bi = findbot(params[1]);
-			else if (params[0].equals_ci("FLAGS"))
+			else if (key.equals_ci("FLAGS"))
 			{
-				for (unsigned j = 1, end = params.size(); j < end; ++j)
-					for (int i = 0; BotFlags[i].Flag != -1; ++i)
-						if (params[j].equals_ci(BotFlags[i].Name))
-							ci->botflags.SetFlag(BotFlags[i].Flag);
+				for (unsigned j = 0, end = params.size(); j < end; ++j)
+					for (int i = 0; ChannelInfoFlags[i].Flag != -1; ++i)
+						if (params[j].equals_ci(ChannelInfoFlags[i].Name))
+							ci->SetFlag(ChannelInfoFlags[i].Flag);
 			}
-			else if (params[0].equals_ci("TTB"))
+			else if (key.equals_ci("DESC"))
+				ci->desc = params[0];
+			else if (key.equals_ci("TOPIC"))
 			{
-				for (unsigned j = 1, end = params.size(); j < end; j += 2)
+				ci->last_topic_setter = params[0];
+				ci->last_topic_time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
+				ci->last_topic = params[2];
+			}
+			else if (key.equals_ci("FORBID"))
+			{
+				ci->forbidby = params[0];
+				ci->forbidreason = params[1];
+			}
+			else if (key.equals_ci("ACCESS"))
+			{
+				NickCore *nc = findcore(params[0]);
+				if (!nc)
 				{
-					if (params[j].equals_ci("BOLDS"))
-						ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("COLORS"))
-						ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("REVERSES"))
-						ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("UNDERLINES"))
-						ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("BADWORDS"))
-						ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("CAPS"))
-						ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("FLOOD"))
-						ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("REPEAT"))
-						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
-					else if (params[j].equals_ci("ITALICS"))
-						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					std::stringstream reason;
+					reason << "Access entry for nonexistant core " << params[0] << " on " << ci->name;
+					throw DatabaseException(reason.str());
+				}
+
+				int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
+				time_t last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
+				ci->AddAccess(nc, level, params[3], last_seen);
+			}
+			else if (key.equals_ci("AKICK"))
+			{
+				bool Stuck = params[0].equals_ci("STUCK");
+				bool Nick = params[1].equals_ci("NICK");
+				NickCore *nc = NULL;
+				if (Nick)
+				{
+					nc = findcore(params[2]);
+					if (!nc)
+					{
+						std::stringstream reason;
+						reason << "Akick for nonexistant core " << params[2] << " on " << ci->name;
+						throw DatabaseException(reason.str());
+					}
+				}
+				AutoKick *ak;
+				if (Nick)
+					ak = ci->AddAkick(params[3], nc, params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
+				else
+					ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
+				if (Stuck)
+					ak->SetFlag(AK_STUCK);
+				if (Nick)
+					ak->SetFlag(AK_ISNICK);
+			}
+			else if (key.equals_ci("MLOCK_ON") || key.equals_ci("MLOCK_OFF"))
+			{
+				bool Set = key.equals_ci("MLOCK_ON");
+
+				/* For now store mlock in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
+				ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(params));
+			}
+			else if (key.equals_ci("MLP"))
+			{
+				std::vector<std::pair<Anope::string, Anope::string> > mlp;
+				ci->GetExtRegular("db_mlp", mlp);
+	
+				mlp.push_back(std::make_pair(params[0], params[1]));
+
+				/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
+				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
+			}
+			else if (key.equals_ci("MI"))
+			{
+				Memo *m = new Memo;
+				m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
+				m->sender = params[1];
+				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+				{
+					if (params[j].equals_ci("UNREAD"))
+						m->SetFlag(MF_UNREAD);
+					else if (params[j].equals_ci("RECEIPT"))
+						m->SetFlag(MF_RECEIPT);
+					else if (params[j].equals_ci("NOTIFYS"))
+						m->SetFlag(MF_NOTIFYS);
+				}
+				m->text = params[params.size() - 1];
+				ci->memos.memos.push_back(m);
+			}
+			else if (key.equals_ci("ENTRYMSG"))
+				ci->entry_message = params[0];
+			else if (key.equals_ci("BI"))
+			{
+				if (params[0].equals_ci("NAME"))
+					ci->bi = findbot(params[1]);
+				else if (params[0].equals_ci("FLAGS"))
+				{
+					for (unsigned j = 1, end = params.size(); j < end; ++j)
+						for (int i = 0; BotFlags[i].Flag != -1; ++i)
+							if (params[j].equals_ci(BotFlags[i].Name))
+								ci->botflags.SetFlag(BotFlags[i].Flag);
+				}
+				else if (params[0].equals_ci("TTB"))
+				{
+					for (unsigned j = 1, end = params.size(); j < end; j += 2)
+					{
+						if (params[j].equals_ci("BOLDS"))
+							ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("COLORS"))
+							ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("REVERSES"))
+							ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("UNDERLINES"))
+							ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("BADWORDS"))
+							ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("CAPS"))
+							ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("FLOOD"))
+							ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("REPEAT"))
+							ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						else if (params[j].equals_ci("ITALICS"))
+							ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+					}
+				}
+				else if (params[0].equals_ci("CAPSMIN"))
+					ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				else if (params[0].equals_ci("CAPSPERCENT"))
+					ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				else if (params[0].equals_ci("FLOODLINES"))
+					ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				else if (params[0].equals_ci("FLOODSECS"))
+					ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				else if (params[0].equals_ci("REPEATTIMES"))
+					ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				else if (params[0].equals_ci("BADWORD"))
+				{
+					BadWordType Type;
+					if (params[1].equals_ci("SINGLE"))
+						Type = BW_SINGLE;
+					else if (params[1].equals_ci("START"))
+						Type = BW_START;
+					else if (params[1].equals_ci("END"))
+						Type = BW_END;
+					else
+						Type = BW_ANY;
+					ci->AddBadWord(params[2], Type);
 				}
 			}
-			else if (params[0].equals_ci("CAPSMIN"))
-				ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
-			else if (params[0].equals_ci("CAPSPERCENT"))
-				ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
-			else if (params[0].equals_ci("FLOODLINES"))
-				ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
-			else if (params[0].equals_ci("FLOODSECS"))
-				ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
-			else if (params[0].equals_ci("REPEATTIMES"))
-				ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
-			else if (params[0].equals_ci("BADWORD"))
-			{
-				BadWordType Type;
-				if (params[1].equals_ci("SINGLE"))
-					Type = BW_SINGLE;
-				else if (params[1].equals_ci("START"))
-					Type = BW_START;
-				else if (params[1].equals_ci("END"))
-					Type = BW_END;
-				else
-					Type = BW_ANY;
-				ci->AddBadWord(params[2], Type);
-			}
+		}
+		catch (const CoreException &ex)
+		{
+			throw DatabaseException(ex.GetReason());
 		}
 
 		return EVENT_CONTINUE;

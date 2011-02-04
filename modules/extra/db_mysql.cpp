@@ -449,7 +449,7 @@ class DBMySQL : public Module
 
 			nc->language = r.Get(i, "language");
 			nc->channelcount = r.Get(i, "channelcount").is_number_only() ? convertTo<int>(r.Get(i, "channelcount")) : 0;
-			nc->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int>(r.Get(i, "memomax")) : 20;
+			nc->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int16>(r.Get(i, "memomax")) : 20;
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_ns_access`");
@@ -608,7 +608,7 @@ class DBMySQL : public Module
 				ci->forbidreason = r.Get(i, "forbidreason");
 				ci->bantype = r.Get(i, "bantype").is_number_only() ? convertTo<int>(r.Get(i, "bantype")) : 2;
 				ci->entry_message = r.Get(i, "entry_message");
-				ci->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int>(r.Get(i, "memomax")) : 20;
+				ci->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int16>(r.Get(i, "memomax")) : 20;
 				ci->capsmin = r.Get(i, "capsmin").is_number_only() ? convertTo<int>(r.Get(i, "capsmin")) : 0;
 				ci->capspercent = r.Get(i, "capspercent").is_number_only() ? convertTo<int>(r.Get(i, "capspercent")) : 0;
 				ci->floodlines = r.Get(i, "floodlines").is_number_only() ? convertTo<int>(r.Get(i, "floodlines")) : 0;

@@ -28,19 +28,19 @@ class CommandBSAct : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(BOT_NOT_ASSIGNED);
+			source.Reply(LanguageString::BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(LanguageString::BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -59,18 +59,21 @@ class CommandBSAct : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "ACT", BOT_ACT_SYNTAX);
+		SyntaxError(source, "ACT", _("ACT \037channel\037 \037text\037"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(BOT_HELP_ACT);
+		source.Reply(_("Syntax: \002ACT \037channel\037 \037text\037\002\n"
+				" \n"
+				"Makes the bot do the equivalent of a \"/me\" command\n"
+				"on the given channel using the given text."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(BOT_HELP_CMD_ACT);
+		source.Reply(_("    ACT            Makes the bot do the equivalent of a \"/me\" command"));
 	}
 };
 

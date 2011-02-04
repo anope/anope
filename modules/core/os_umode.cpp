@@ -38,13 +38,13 @@ class CommandOSUMode : public Command
 			return MOD_CONT;
 		}
 		if (!(u2 = finduser(nick)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else
 		{
 			u2->SetModes(OperServ, "%s", modes.c_str());
 
-			source.Reply(OPER_UMODE_SUCCESS, nick.c_str());
-			u2->SendMessage(OperServ, OPER_UMODE_CHANGED, u->nick.c_str());
+			source.Reply(_("Changed usermodes of \002%s\002."), nick.c_str());
+			u2->SendMessage(OperServ, _("\002%s\002 changed your usermodes."), u->nick.c_str());
 
 			if (Config->WallOSMode)
 				ircdproto->SendGlobops(OperServ, "\2%s\2 used UMODE on %s", u->nick.c_str(), nick.c_str());
@@ -54,18 +54,22 @@ class CommandOSUMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_UMODE);
+		source.Reply(_("Syntax: \002UMODE \037user\037 \037modes\037\002\n"
+				" \n"
+				"Allows Services Opers to set user modes for any user.\n"
+				"Parameters are the same as for the standard /MODE\n"
+				"command."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "UMODE", OPER_UMODE_SYNTAX);
+		SyntaxError(source, "UMODE", _("UMODE \037nick\037 \037modes\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_UMODE);
+		source.Reply(_("    UMODE       Change a user's modes"));
 	}
 };
 

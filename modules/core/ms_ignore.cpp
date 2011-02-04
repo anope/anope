@@ -40,21 +40,21 @@ class CommandMSIgnore : public Command
 		if (!mi)
 		{
 			if (isforbid)
-				source.Reply(ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, channel.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, channel.c_str());
 			else
-				source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, channel.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, channel.c_str());
 		}
 		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
 			{
 				mi->ignores.push_back(param.ci_str());
-				source.Reply(MEMO_IGNORE_ADD, param.c_str());
+				source.Reply(_("\002%s\002 added to your ignore list."), param.c_str());
 			}
 			else
-				source.Reply(MEMO_IGNORE_ALREADY_IGNORED, param.c_str());
+				source.Reply(_("\002%s\002 is already on your ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
@@ -63,18 +63,18 @@ class CommandMSIgnore : public Command
 			if (it != mi->ignores.end())
 			{
 				mi->ignores.erase(it);
-				source.Reply(MEMO_IGNORE_DEL, param.c_str());
+				source.Reply(_("\002%s\002 removed from your ignore list."), param.c_str());
 			}
 			else
-				source.Reply(MEMO_IGNORE_NOT_IGNORED, param.c_str());
+				source.Reply(_("\002%s\002 is not on your ignore list."), param.c_str());
 		}
 		else if (command.equals_ci("LIST"))
 		{
 			if (mi->ignores.empty())
-				source.Reply(MEMO_IGNORE_LIST_EMPTY);
+				source.Reply(_("Your memo ignore list is empty."));
 			else
 			{
-				source.Reply(MEMO_IGNORE_LIST_HEADER);
+				source.Reply(_("Ignore list:"));
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
 					source.Reply("    %s", mi->ignores[i].c_str());
 			}
@@ -87,18 +87,21 @@ class CommandMSIgnore : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_IGNORE);
+		source.Reply(_("Syntax: \002IGNORE [\037channek\037] {\002ADD|DEL|LIST\002} [\037entry\037]\n"
+				" \n"
+				"Allows you to ignore users by nick or host from memoing you. If someone on your\n"
+				"memo ignore list tries to memo you, they will not be told that you have them ignored."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "IGNORE", MEMO_IGNORE_SYNTAX);
+		SyntaxError(source, "IGNORE", _("IGNORE [\037channel\037] {\002ADD|DEL|\002} [\037entry\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_IGNORE);
+		source.Reply(_("    IGNORE Manage your memo ignore list"));
 	}
 };
 

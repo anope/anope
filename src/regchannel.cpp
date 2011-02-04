@@ -744,7 +744,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!user->HasMode(UMODE_OPER) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
 	{
 		get_idealban(this, user, mask);
-		reason = this->forbidreason.empty() ? GetString(user, CHAN_MAY_NOT_BE_USED) : this->forbidreason;
+		reason = this->forbidreason.empty() ? GetString(user->Account(), _("This channel may not be used.")) : this->forbidreason;
 		set_modes = true;
 		do_kick = true;
 	}
@@ -785,7 +785,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!do_kick && check_access(user, this, CA_NOJOIN))
 	{
 		get_idealban(this, user, mask);
-		reason = GetString(user, CHAN_NOT_ALLOWED_TO_JOIN);
+		reason = GetString(user->Account(), LanguageString::CHAN_NOT_ALLOWED_TO_JOIN);
 		do_kick = true;
 	}
 

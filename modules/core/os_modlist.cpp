@@ -129,7 +129,7 @@ class CommandOSModList : public Command
 			}
 		}
 
-		source.Reply(OPER_MODULE_LIST_HEADER);
+		source.Reply(_("Current Module list:"));
 
 		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
 		{
@@ -140,56 +140,56 @@ class CommandOSModList : public Command
 				case CORE:
 					if (showCore)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), core);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), core);
 						++count;
 					}
 					break;
 				case THIRD:
 					if (showThird)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), third);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), third);
 						++count;
 					}
 					break;
 				case PROTOCOL:
 					if (showProto)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), proto);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), proto);
 						++count;
 					}
 					break;
 				case SUPPORTED:
 					if (showSupported)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), supported);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), supported);
 						++count;
 					}
 					break;
 				case QATESTED:
 					if (showQA)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), qa);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), qa);
 						++count;
 					}
 					break;
 				case ENCRYPTION:
 					if (showEnc)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), enc);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), enc);
 						++count;
 					}
 					break;
 				case DATABASE:
 					if (showDB)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), db);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), db);
 						++count;
 					}
 					break;
 				case SOCKETENGINE:
 					if (showSocketEngine)
 					{
-						source.Reply(OPER_MODULE_LIST, m->name.c_str(), m->version.c_str(), socketengine);
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), socketengine);
 						++count;
 					}
 					break;
@@ -198,22 +198,24 @@ class CommandOSModList : public Command
 			}
 		}
 		if (!count)
-			source.Reply(OPER_MODULE_NO_LIST);
+			source.Reply(_("No modules currently loaded"));
 		else
-			source.Reply(OPER_MODULE_LIST_FOOTER, count);
+			source.Reply(_("%d Modules loaded."), count);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODLIST);
+		source.Reply(_("Syntax: \002MODLIST\002 [Core|3rd|protocol|encryption|supported|qatested]\n"
+				" \n"
+				"Lists all currently loaded modules."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODLIST);
+		source.Reply(_("    MODLIST     List loaded modules"));
 	}
 };
 

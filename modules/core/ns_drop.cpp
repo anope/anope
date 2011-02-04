@@ -28,7 +28,7 @@ class CommandNSDrop : public Command
 
 		if (readonly)
 		{
-			source.Reply(NICK_DROP_DISABLED);
+			source.Reply(_("Sorry, nickname de-registration is temporarily disabled."));
 			return MOD_CONT;
 		}
 
@@ -43,7 +43,7 @@ class CommandNSDrop : public Command
 
 				Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
 				delete nr;
-				source.Reply(NICK_X_DROPPED, nick.c_str());
+				source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 			}
 			else if (nr && !nick.empty())
 			{
@@ -51,23 +51,23 @@ class CommandNSDrop : public Command
 				if (res)
 				{
 					Log(LOG_COMMAND, u, this) << "to drop nick request " << nr->nick;
-					source.Reply(NICK_X_DROPPED, nr->nick.c_str());
+					source.Reply(_("Nickname \002%s\002 has been dropped."), nr->nick.c_str());
 					delete nr;
 				}
 				else if (bad_password(u))
 					return MOD_STOP;
 				else
-					source.Reply(PASSWORD_INCORRECT);
+					source.Reply(LanguageString::PASSWORD_INCORRECT);
 			}
 			else
-				source.Reply(NICK_NOT_REGISTERED);
+				source.Reply(LanguageString::NICK_NOT_REGISTERED);
 
 			return MOD_CONT;
 		}
 
 		if (!u->Account())
 		{
-			source.Reply(NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(LanguageString::NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -77,13 +77,13 @@ class CommandNSDrop : public Command
 			my_nick = na->nick;
 
 		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else
 		{
 			if (readonly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 
 			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
 			{
@@ -100,14 +100,14 @@ class CommandNSDrop : public Command
 			{
 				if (Config->WallDrop)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-				source.Reply(NICK_X_DROPPED, nick.c_str());
+				source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 			}
 			else
 			{
 				if (!nick.empty())
-					source.Reply(NICK_X_DROPPED, nick.c_str());
+					source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 				else
-					source.Reply(NICK_DROPPED);
+					source.Reply(_("Your nickname has been dropped."));
 			}
 		}
 
@@ -118,16 +118,38 @@ class CommandNSDrop : public Command
 	{
 		User *u = source.u;
 		if (u->Account() && u->Account()->HasPriv("nickserv/drop"))
-			source.Reply(NICK_SERVADMIN_HELP_DROP);
+			source.Reply(_("Syntax: \002DROP [\037nickname\037]\002\n"
+					" \n"
+					"Without a parameter, drops your nickname from the\n"
+					"%S database.\n"
+					" \n"
+					"With a parameter, drops the named nick from the database.\n"
+					"You may drop any nick within your group without any \n"
+					"special privileges. Dropping any nick is limited to \n"
+					"\002Services Operators\002."));
 		else
-			source.Reply(NICK_HELP_DROP);
+			source.Reply(_("Syntax: \002DROP [\037nickname\037 | \037password\037]\002\n"
+					" \n"
+					"Drops your nickname from the %S database.  A nick\n"
+					"that has been dropped is free for anyone to re-register.\n"
+					" \n"
+					"You may drop a nick within your group by passing it\n"
+					"as the \002nick\002 parameter.\n"
+					" \n"
+					"If you have a nickname registration pending but can not confirm\n"
+					"it for any reason, you can cancel your registration by passing\n"
+					"your password as the \002password\002 parameter.\n"
+					" \n"
+					"In order to use this command, you must first identify\n"
+					"with your password (\002%R%S HELP IDENTIFY\002 for more\n"
+					"information)."));
 
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_DROP);
+		source.Reply(_("    DROP       Cancel the registration of a nickname"));
 	}
 };
 

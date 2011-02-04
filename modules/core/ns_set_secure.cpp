@@ -32,12 +32,12 @@ class CommandNSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_SECURE);
-			source.Reply(NICK_SASET_SECURE_ON, nc->display.c_str());
+			source.Reply(_("Secure option is now \002\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_SECURE);
-			source.Reply(NICK_SASET_SECURE_OFF, nc->display.c_str());
+			source.Reply(_("Secure option is now \002\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
@@ -47,18 +47,26 @@ class CommandNSSetSecure : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_SECURE);
+		source.Reply(_("Syntax: \002SET SECURE {ON | OFF}\002\n"
+				" \n"
+				"Turns %S's security features on or off for your\n"
+				"nick. With \002SECURE\002 set, you must enter your password\n"
+				"before you will be recognized as the owner of the nick,\n"
+				"regardless of whether your address is on the access\n"
+				"list. However, if you are on the access list, %S\n"
+				"will not auto-kill you regardless of the setting of the\n"
+				"\002KILL\002 option."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET SECURE", NICK_SET_SECURE_SYNTAX);
+		SyntaxError(source, "SET SECURE", _("SET SECURE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_SECURE);
+		source.Reply(_("    SECURE     Turn nickname security on or off"));
 	}
 };
 
@@ -71,18 +79,26 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_SECURE);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 SECURE {ON | OFF}\002\n"
+				" \n"
+				"Turns %S's security features on or off for your\n"
+				"nick. With \002SECURE\002 set, you must enter your password\n"
+				"before you will be recognized as the owner of the nick,\n"
+				"regardless of whether your address is on the access\n"
+				"list. However, if you are on the access list, %S\n"
+				"will not auto-kill you regardless of the setting of the\n"
+				"\002KILL\002 option."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
+		SyntaxError(source, "SASET SECURE", _("SASET \037nickname\037 SECURE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_SECURE);
+		source.Reply(_("    SECURE     Turn nickname security on or off"));
 	}
 };
 

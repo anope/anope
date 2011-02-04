@@ -51,7 +51,7 @@ class CommandNSList : public Command
 
 		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
@@ -60,24 +60,24 @@ class CommandNSList : public Command
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
 			if (tmp.empty())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 			if (tmp.empty())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			if (!tmp.is_number_only())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -105,7 +105,7 @@ class CommandNSList : public Command
 
 		mync = u->Account();
 
-		source.Reply(NICK_LIST_HEADER, pattern.c_str());
+		source.Reply(LanguageString::LIST_HEADER, pattern.c_str());
 		if (!unconfirmed)
 		{
 			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
@@ -167,7 +167,7 @@ class CommandNSList : public Command
 				}
 			}
 		}
-		source.Reply(NICK_LIST_RESULTS, nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
+		source.Reply(_("End of list - %d/%d matches shown."), nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
 		return MOD_CONT;
 	}
 
@@ -175,9 +175,49 @@ class CommandNSList : public Command
 	{
 		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			source.Reply(NICK_SERVADMIN_HELP_LIST);
+			source.Reply(_("Syntax: \002LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]\002\n"
+					" \n"
+					"Lists all registered nicknames which match the given\n"
+					"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
+					"option set will only be displayed to Services Operators.  Nicks\n"
+					"with the \002NOEXPIRE\002 option set will have a \002!\002 appended to\n"
+					"the nickname for Services Operators.\n"
+					" \n"
+					"If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
+					"nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the\n"
+					"NOEXPIRE flag set will be displayed. If multiple options are\n"
+					"given, all nicks matching at least one option will be displayed.\n"
+					"These options are limited to \037Services Operators\037.  \n"
+					"Examples:\n"
+					" \n"
+					"    \002LIST *!joeuser@foo.com\002\n"
+					"        Lists all registered nicks owned by joeuser@foo.com.\n"
+					" \n"
+					"    \002LIST *Bot*!*@*\002\n"
+					"        Lists all registered nicks with \002Bot\002 in their\n"
+					"        names (case insensitive).\n"
+					" \n"
+					"    \002LIST * NOEXPIRE\002\n"
+					"        Lists all registered nicks which have been set to\n"));
 		else
-			source.Reply(NICK_HELP_LIST);
+			source.Reply(_("Syntax: \002LIST \037pattern\037\002\n"
+					" \n"
+					"Lists all registered nicknames which match the given\n"
+					"pattern, in \037nick!user@host\037 format.  Nicks with the\n"
+					"\002PRIVATE\002 option set will not be displayed.\n"
+					" \n"
+					"Examples:\n"
+					" \n"
+					"    \002LIST *!joeuser@foo.com\002\n"
+					"        Lists all nicks owned by joeuser@foo.com.\n"
+					" \n"
+					"    \002LIST *Bot*!*@*\002\n"
+					"        Lists all registered nicks with \002Bot\002 in their\n"
+					"        names (case insensitive).\n"
+					" \n"
+					"    \002LIST *!*@*.bar.org\002\n"
+					"        Lists all nicks owned by users in the \002bar.org\002\n"
+					"        domain."));
 
 		return true;
 	}
@@ -186,14 +226,14 @@ class CommandNSList : public Command
 	{
 		User *u = source.u;
 		if (u->Account()->IsServicesOper())
-			SyntaxError(source, "LIST", NICK_LIST_SERVADMIN_SYNTAX);
+			SyntaxError(source, "LIST", _("LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 		else
-			SyntaxError(source, "LIST", NICK_LIST_SYNTAX);
+			SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_LIST);
+		source.Reply(_("    LIST       List all registered nicknames that match a given pattern"));
 	}
 };
 

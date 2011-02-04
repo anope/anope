@@ -28,26 +28,29 @@ class CommandCSSetDescription : public Command
 
 		ci->desc = params[1];
 
-		source.Reply(CHAN_DESC_CHANGED, ci->name.c_str(), ci->desc.c_str());
+		source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_DESC, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 DESC \037description\037\002\n"
+				" \n"
+				"Sets the description for the channel, which shows up with\n"
+				"the \002LIST\002 and \002INFO\002 commands."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_DESC);
+		source.Reply(_("    DESC          Set the channel description"));
 	}
 };
 
@@ -58,16 +61,10 @@ class CommandCSSASetDescription : public CommandCSSetDescription
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_DESC, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 };
 

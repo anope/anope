@@ -31,24 +31,24 @@ public:
 
 		if (!check_access(u, ci, CA_SET))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		ChannelInfo *target_ci = cs_findchan(target);
 		if (!target_ci)
 		{
-			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, target.c_str());
 			return MOD_CONT;
 		}
 		if (!IsFounder(u, ci) || !IsFounder(u, target_ci))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? LanguageString::CHAN_EXCEEDED_CHANNEL_LIMIT : LanguageString::CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 			return MOD_CONT;
 		}
 
@@ -100,7 +100,7 @@ public:
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 
-			source.Reply(CHAN_CLONED, channel.c_str(), target.c_str());
+			source.Reply(_("All settings from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
@@ -111,7 +111,7 @@ public:
 				target_ci->AddAccess(access->mask, access->level, access->creator, access->last_seen);
 			}
 
-			source.Reply(CHAN_CLONED_ACCESS, channel.c_str(), target.c_str());
+			source.Reply(_("All access entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -125,7 +125,7 @@ public:
 					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 			}
 
-			source.Reply(CHAN_CLONED_AKICK, channel.c_str(), target.c_str());
+			source.Reply(_("All akick entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
@@ -136,7 +136,7 @@ public:
 				target_ci->AddBadWord(bw->word, bw->type);
 			}
 
-			source.Reply(CHAN_CLONED_BADWORDS, channel.c_str(), target.c_str());
+			source.Reply(_("All badword entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else
 		{
@@ -151,18 +151,23 @@ public:
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_CLONE);
+		source.Reply(_("Syntax: \002CLONE \037channel\037 \037target\037 [all | access | akick | badwords]\002\n"
+				" \n"
+				"Copies all settings, access, akicks, etc from channel to the\n"
+				"target channel. If access, akick, or badwords is specified then only\n"
+				"the respective settings are transferred. You must have founder level\n"
+				"access to \037channel\037 and \037target\037."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "CLONE", CHAN_CLONE_SYNTAX);
+		SyntaxError(source, "CLONE", _("CLONE \037channel\037 \037target\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_CLONE);
+		source.Reply(_("    CLONE      Copy all settings from one channel to another"));
 	}
 };
 

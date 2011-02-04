@@ -22,7 +22,7 @@ class CommandOSStaff : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		source.Reply(OPER_STAFF_LIST_HEADER);
+		source.Reply(_("On Level Nick"));
 
 		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 		{
@@ -37,28 +37,30 @@ class CommandOSStaff : public Command
 					User *u2 = *uit;
 
 					if (na->nick.equals_ci(u2->nick))
-						source.Reply(OPER_STAFF_FORMAT, '*', type.c_str(), u2->nick.c_str());
+						source.Reply(_(" %c %s  %s"), '*', type.c_str(), u2->nick.c_str());
 					else
-						source.Reply(OPER_STAFF_AFORMAT, '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
+						source.Reply(_(" %c %s  %s [%s]"), '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
 				}
 				if (nc->Users.empty())
-					source.Reply(OPER_STAFF_FORMAT, ' ', type.c_str(), na->nick.c_str());
+					source.Reply(_(" %c %s  %s"), ' ', type.c_str(), na->nick.c_str());
 			}
 		}
 
-		source.Reply(END_OF_ANY_LIST, "Staff");
+		source.Reply(LanguageString::END_OF_ANY_LIST, "Staff");
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_STAFF);
+		source.Reply(_("Syntax: \002STAFF\002\n"
+				"Displays all Services Staff nicks along with level\n"
+				"and on-line status."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_STAFF);
+		source.Reply(_("    STAFF       Display Services staff and online status"));
 	}
 };
 

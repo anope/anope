@@ -30,7 +30,7 @@ class CommandCSInvite : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -38,7 +38,7 @@ class CommandCSInvite : public Command
 
 		if (!check_access(u, ci, CA_INVITE))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -49,7 +49,7 @@ class CommandCSInvite : public Command
 		{
 			if (!(u2 = finduser(params[1])))
 			{
-				source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+				source.Reply(LanguageString::NICK_X_NOT_IN_USE, params[1].c_str());
 				return MOD_CONT;
 			}
 		}
@@ -58,30 +58,35 @@ class CommandCSInvite : public Command
 		Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
 
 		if (c->FindUser(u2))
-			source.Reply(CHAN_INVITE_ALREADY_IN, c->name.c_str());
+			source.Reply(_("You are already in \002%s\002! "), c->name.c_str());
 		else
 		{
 			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
-			source.Reply(CHAN_INVITE_OTHER_SUCCESS, u2->nick.c_str(), c->name.c_str());
-			u2->SendMessage(whosends(ci), CHAN_INVITE_SUCCESS, c->name.c_str());
+			source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
+			u2->SendMessage(whosends(ci), _("You have been invited to \002%s\002."), c->name.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_INVITE);
+		source.Reply(_("Syntax: \002INVITE \037channel\037\002\n"
+				" \n"
+				"Tells %S to invite you into the given channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 and above\n"
+				"on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "INVITE", CHAN_INVITE_SYNTAX);
+		SyntaxError(source, "INVITE", _("INVITE \037channel\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_INVITE);
+		source.Reply(_("    INVITE     Tells ChanServ to invite you into a channel"));
 	}
 };
 

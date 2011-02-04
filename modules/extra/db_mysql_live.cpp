@@ -42,7 +42,7 @@ class CommandMutex : public Thread
 
 		if (!command->permission.empty() && !u->Account()->HasCommand(command->permission))
 		{
-			u->SendMessage(bi, ACCESS_DENIED);
+			u->SendMessage(bi, LanguageString::ACCESS_DENIED);
 			Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		}
 		else

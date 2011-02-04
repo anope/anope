@@ -31,13 +31,13 @@ class CommandMSCheck : public Command
 		NickAlias *na = findnick(recipient);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, recipient.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, recipient.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, recipient.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,33 +53,36 @@ class CommandMSCheck : public Command
 				found = true; /* Yes, we've found the memo */
 
 				if (mi->memos[i]->HasFlag(MF_UNREAD))
-					source.Reply(MEMO_CHECK_NOT_READ, na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has not yet been read."), na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
 				else
-					source.Reply(MEMO_CHECK_READ, na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
+					source.Reply(_("The last memo you sent to %s (sent on %s) has been read."), na->nick.c_str(), do_strftime(mi->memos[i]->time).c_str());
 				break;
 			}
 		}
 
 		if (!found)
-			source.Reply(MEMO_CHECK_NO_MEMO, na->nick.c_str());
+			source.Reply(_("Nick %s doesn't have a memo from you."), na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_CHECK);
+		source.Reply(_("Syntax: \002CHECK \037nick\037\002\n"
+				" \n"
+				"Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
+				"or not. Note that this does only work with nicks, not with chans."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "CHECK", MEMO_CHECK_SYNTAX);
+		SyntaxError(source, "CHECK", _("CHECK \037nickname\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_CHECK);
+		source.Reply(_("    CHECK  Checks if last memo to a nick was read"));
 	}
 };
 

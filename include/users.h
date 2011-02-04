@@ -158,13 +158,6 @@ class CoreExport User : public Extensible
 	void SendMessage(BotInfo *source, const char *fmt, ...);
 	virtual void SendMessage(BotInfo *source, const Anope::string &msg);
 
-	/** Send a language string message to a user
-	 * @param source Sender
-	 * @param message The message num
-	 * @param ... parameters
-	 */
-	void SendMessage(BotInfo *source, LanguageString message, ...);
-
 	/** Collide a nick
 	 * See the comment in users.cpp
 	 * @param na The nick

@@ -22,20 +22,24 @@ class CommandOSUpdate : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		source.Reply(OPER_UPDATING);
+		source.Reply(_("Updating databases."));
 		save_data = true;
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_UPDATE);
+		source.Reply(_("Syntax: \002UPDATE\002\n"
+				" \n"
+				"Causes Services to update all database files as soon as you\n"
+				"send the command."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_UPDATE);
+		source.Reply(_("    UPDATE      Force the Services databases to be\n"
+				"                updated on disk immediately"));
 	}
 };
 

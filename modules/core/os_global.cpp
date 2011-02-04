@@ -33,18 +33,21 @@ class CommandOSGlobal : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_GLOBAL, Config->s_GlobalNoticer.c_str());
+		source.Reply(_("Syntax: \002GLOBAL \037message\037\002\n"
+				" \n"
+				"Allows Administrators to send messages to all users on the \n"
+				"network. The message will be sent from the nick \002%s\002."), Config->s_GlobalNoticer.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "GLOBAL", OPER_GLOBAL_SYNTAX);
+		SyntaxError(source, "GLOBAL", _("GLOBAL \037message\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_GLOBAL);
+		source.Reply(_("    GLOBAL      Send a message to all users"));
 	}
 };
 

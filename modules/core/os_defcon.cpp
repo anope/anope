@@ -33,14 +33,14 @@ class DefConTimeout : public Timer
 			Config->DefConLevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			Log(OperServ, "operserv/defcon") << "Defcon level timeout, returning to level " << level;
-			ircdproto->SendGlobops(OperServ, GetString(OPER_DEFCON_WALL).c_str(), Config->s_OperServ.c_str(), level);
+			ircdproto->SendGlobops(OperServ, GetString(NULL, _("\002%s\002 Changed the DEFCON level to \002%d\002")).c_str(), Config->s_OperServ.c_str(), level);
 
 			if (Config->GlobalOnDefcon)
 			{
 				if (!Config->DefConOffMessage.empty())
 					oper_global("", "%s", Config->DefConOffMessage.c_str());
 				else
-					oper_global("", GetString(DEFCON_GLOBAL).c_str(), Config->DefConLevel);
+					oper_global("", GetString(NULL, _("The Defcon Level is now at Level: \002%d\002")).c_str(), Config->DefConLevel);
 
 				if (Config->GlobalOnDefconMore && Config->DefConOffMessage.empty())
 					oper_global("", "%s", Config->DefconMessage.c_str());
@@ -67,7 +67,7 @@ class CommandOSDefcon : public Command
 
 		if (lvl.empty())
 		{
-			source.Reply(OPER_DEFCON_CHANGED, Config->DefConLevel);
+			source.Reply(_("Services are now at DEFCON \002%d\002"), Config->DefConLevel);
 			defcon_sendlvls(source);
 			return MOD_CONT;
 		}
@@ -90,10 +90,10 @@ class CommandOSDefcon : public Command
 		if (Config->DefConTimeOut)
 			timeout = new DefConTimeout(5);
 
-		source.Reply(OPER_DEFCON_CHANGED, Config->DefConLevel);
+		source.Reply(_("Services are now at DEFCON \002%d\002"), Config->DefConLevel);
 		defcon_sendlvls(source);
 		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
-		ircdproto->SendGlobops(OperServ, GetString(OPER_DEFCON_WALL).c_str(), u->nick.c_str(), newLevel);
+		ircdproto->SendGlobops(OperServ, GetString(NULL, _("\002%s\002 Changed the DEFCON level to \002%d\002")).c_str(), u->nick.c_str(), newLevel);
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (Config->GlobalOnDefcon)
@@ -101,7 +101,7 @@ class CommandOSDefcon : public Command
 			if (Config->DefConLevel == 5 && !Config->DefConOffMessage.empty())
 				oper_global("", "%s", Config->DefConOffMessage.c_str());
 			else
-				oper_global("", GetString(DEFCON_GLOBAL).c_str(), Config->DefConLevel);
+				oper_global("", GetString(NULL, _("The Defcon Level is now at Level: \002%d\002")).c_str(), Config->DefConLevel);
 		}
 		if (Config->GlobalOnDefconMore)
 		{
@@ -115,18 +115,21 @@ class CommandOSDefcon : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_DEFCON);
+		source.Reply(_("Syntax: \002DEFCON\002 [\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]\n"
+				"The defcon system can be used to implement a pre-defined\n"
+				"set of restrictions to services useful during an attempted\n"
+				"attack on the network."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEFCON", OPER_DEFCON_SYNTAX);
+		SyntaxError(source, "DEFCON", _("DEFCON [\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_DEFCON);
+		source.Reply(_("    DEFCON      Manipulate the DefCon system"));
 	}
 };
 
@@ -211,7 +214,7 @@ class OSDefcon : public Module
 		if (!u->HasMode(UMODE_OPER) && (CheckDefCon(DEFCON_OPER_ONLY) || CheckDefCon(DEFCON_SILENT_OPER_ONLY)))
 		{
 			if (!CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-				u->SendMessage(bi, OPER_DEFCON_DENIED);
+				u->SendMessage(bi, _("Services are in Defcon mode, Please try again later."));
 
 			return EVENT_STOP;
 		}
@@ -228,7 +231,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_NICKS))
 				{
-					source.Reply(OPER_DEFCON_DENIED);
+					source.Reply(_("Services are in Defcon mode, Please try again later."));
 					return EVENT_STOP;
 				}
 			}
@@ -239,7 +242,7 @@ class OSDefcon : public Module
 			{
 				if (!params.empty() && params[0].equals_ci("MLOCK") && CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
 				{
-					source.Reply(OPER_DEFCON_DENIED);
+					source.Reply(_("Services are in Defcon mode, Please try again later."));
 					return EVENT_STOP;
 				}
 			}
@@ -247,7 +250,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
 				{
-					source.Reply(OPER_DEFCON_DENIED);
+					source.Reply(_("Services are in Defcon mode, Please try again later."));
 					return EVENT_STOP;
 				}
 			}
@@ -258,7 +261,7 @@ class OSDefcon : public Module
 			{
 				if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
 				{
-					source.Reply(OPER_DEFCON_DENIED);
+					source.Reply(_("Services are in Defcon mode, Please try again later."));
 					return EVENT_STOP;
 				}
 			}
@@ -319,25 +322,25 @@ class OSDefcon : public Module
 void defcon_sendlvls(CommandSource &source)
 {
 	if (CheckDefCon(DEFCON_NO_NEW_CHANNELS))
-		source.Reply(OPER_HELP_DEFCON_NO_NEW_CHANNELS);
+		source.Reply(_("* No new channel registrations"));
 	if (CheckDefCon(DEFCON_NO_NEW_NICKS))
-		source.Reply(OPER_HELP_DEFCON_NO_NEW_NICKS);
+		source.Reply(_("* No new nick registrations"));
 	if (CheckDefCon(DEFCON_NO_MLOCK_CHANGE))
-		source.Reply(OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
+		source.Reply(_("* No MLOCK changes"));
 	if (CheckDefCon(DEFCON_FORCE_CHAN_MODES) && !Config->DefConChanModes.empty())
-		source.Reply(OPER_HELP_DEFCON_FORCE_CHAN_MODES, Config->DefConChanModes.c_str());
+		source.Reply(_("* Force Chan Modes (%s) to be set on all channels"), Config->DefConChanModes.c_str());
 	if (CheckDefCon(DEFCON_REDUCE_SESSION))
-		source.Reply(OPER_HELP_DEFCON_REDUCE_SESSION, Config->DefConSessionLimit);
+		source.Reply(_("* Use the reduced session limit of %d"), Config->DefConSessionLimit);
 	if (CheckDefCon(DEFCON_NO_NEW_CLIENTS))
-		source.Reply(OPER_HELP_DEFCON_NO_NEW_CLIENTS);
+		source.Reply(_("* Kill any NEW clients connecting"));
 	if (CheckDefCon(DEFCON_OPER_ONLY))
-		source.Reply(OPER_HELP_DEFCON_OPER_ONLY);
+		source.Reply(_("* Ignore any non-opers with message"));
 	if (CheckDefCon(DEFCON_SILENT_OPER_ONLY))
-		source.Reply(OPER_HELP_DEFCON_SILENT_OPER_ONLY);
+		source.Reply(_("* Silently ignore non-opers"));
 	if (CheckDefCon(DEFCON_AKILL_NEW_CLIENTS))
-		source.Reply(OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
+		source.Reply(_("* AKILL any new clients connecting"));
 	if (CheckDefCon(DEFCON_NO_NEW_MEMOS))
-		source.Reply(OPER_HELP_DEFCON_NO_NEW_MEMOS);
+		source.Reply(_("* No new memos sent"));
 }
 
 void runDefCon()

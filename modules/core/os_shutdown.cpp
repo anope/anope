@@ -33,13 +33,15 @@ class CommandOSShutdown : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_SHUTDOWN);
+		source.Reply(_("Syntax: \002SHUTDOWN\002\n"
+				" \n"
+				"Causes Services to save all databases and then shut down."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SHUTDOWN);
+		source.Reply(_("    SHUTDOWN    Terminate the Services program with save"));
 	}
 };
 

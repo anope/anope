@@ -27,9 +27,9 @@ class CommandHSOn : public Command
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
 			if (!na->hostinfo.GetIdent().empty())
-				source.Reply(HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(_("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				source.Reply(HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
 			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->hostinfo.GetIdent().empty() ? na->hostinfo.GetIdent() + "@" : "") << na->hostinfo.GetHost();
 			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
 			if (ircd->vhost)
@@ -42,20 +42,23 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			source.Reply(HOST_NOT_ASSIGNED);
+			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_ON);
+		source.Reply(_("Syntax: \002ON\002\n"
+				"Activates the vhost currently assigned to the nick in use.\n"
+				"When you use this command any user who performs a /whois\n"
+				"on you will see the vhost instead of your real IP address."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_ON);
+		source.Reply(_("    ON          Activates your assigned vhost"));
 	}
 };
 

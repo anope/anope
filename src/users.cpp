@@ -247,34 +247,6 @@ void User::SendMessage(BotInfo *source, const Anope::string &msg)
 		ircdproto->SendNotice(source, this->nick, "%s", msg.c_str());
 }
 
-void User::SendMessage(BotInfo *source, LanguageString message, ...)
-{
-	if (!source)
-	{
-		Log(LOG_DEBUG) << "Tried to send message " << message << " with nonexistant source!";
-		return;
-	}
-
-	Anope::string m = GetString(this, message);
-
-	m = m.replace_all_cs("%S", source->nick);
-
-	if (m.length() >= 4096)
-		Log() << "Warning, language string " << message << " is longer than 4096 bytes";
-
-	va_list args;
-	char buf[4096];
-	va_start(args, message);
-	vsnprintf(buf, sizeof(buf) - 1, m.c_str(), args);
-	va_end(args);
-
-	sepstream sep(buf, '\n');
-	Anope::string line;
-
-	while (sep.GetToken(line))
-		this->SendMessage(source, line.empty() ? " " : line);
-}
-
 /** Collides a nick.
  *
  * First, it marks the nick (if the user is on a registered nick, we don't use it without but it could be)
@@ -345,7 +317,7 @@ void User::Collide(NickAlias *na)
 			guestnick = Config->NSGuestNickPrefix + stringify(getrandom16());
 		} while (finduser(guestnick));
 
-		this->SendMessage(NickServ, FORCENICKCHANGE_CHANGING, guestnick.c_str());
+		this->SendMessage(NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 	}
 	else

@@ -125,7 +125,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_BOLDS);
-			bot_kick(ci, u, BOT_REASON_BOLD);
+			bot_kick(ci, u, _("Don't use bolds on this channel!"));
 			return;
 		}
 
@@ -133,7 +133,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find(3) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_COLORS);
-			bot_kick(ci, u, BOT_REASON_COLOR);
+			bot_kick(ci, u, _("Don't use colors on this channel!"));
 			return;
 		}
 
@@ -141,7 +141,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find(22) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_REVERSES);
-			bot_kick(ci, u, BOT_REASON_REVERSE);
+			bot_kick(ci, u, _("Don't use reverses on this channel!"));
 			return;
 		}
 
@@ -149,7 +149,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_ITALICS);
-			bot_kick(ci, u, BOT_REASON_ITALIC);
+			bot_kick(ci, u, _("Don't use italics on this channel!"));
 			return;
 		}
 
@@ -157,7 +157,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
 		{
 			check_ban(ci, u, TTB_UNDERLINES);
-			bot_kick(ci, u, BOT_REASON_UNDERLINE);
+			bot_kick(ci, u, _("Don't use underlines on this channel!"));
 			return;
 		}
 
@@ -182,7 +182,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			if (i && l && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
 			{
 				check_ban(ci, u, TTB_CAPS);
-				bot_kick(ci, u, BOT_REASON_CAPS);
+				bot_kick(ci, u, _("Turn caps lock OFF!"));
 				return;
 			}
 		}
@@ -255,9 +255,9 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 				{
 					check_ban(ci, u, TTB_BADWORDS);
 					if (Config->BSGentleBWReason)
-						bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
+						bot_kick(ci, u, _("Watch your language!"));
 					else
-						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word.c_str());
+						bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());
 
 					return;
 				}
@@ -281,7 +281,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			if (ud->lines >= ci->floodlines)
 			{
 				check_ban(ci, u, TTB_FLOOD);
-				bot_kick(ci, u, BOT_REASON_FLOOD);
+				bot_kick(ci, u, _("Stop flooding!"));
 				return;
 			}
 		}
@@ -308,7 +308,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			if (ud->times >= ci->repeattimes)
 			{
 				check_ban(ci, u, TTB_REPEAT);
-				bot_kick(ci, u, BOT_REASON_REPEAT);
+				bot_kick(ci, u, _("Stop repeating yourself!"));
 				return;
 			}
 		}
@@ -486,7 +486,7 @@ void check_ban(ChannelInfo *ci, User *u, int ttbtype)
 
 /* This makes a bot kick a user. Works somewhat like notice_lang in fact ;) */
 
-void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
+void bot_kick(ChannelInfo *ci, User *u, const char *message, ...)
 {
 	va_list args;
 	char buf[1024];
@@ -494,7 +494,7 @@ void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...)
 	if (!ci || !ci->bi || !ci->c || !u)
 		return;
 
-	Anope::string fmt = GetString(u, message);
+	Anope::string fmt = GetString(u->Account(), message);
 	va_start(args, message);
 	if (fmt.empty())
 		return;
@@ -519,7 +519,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), LanguageString::ACCESS_DENIED).c_str());
 		return;
 	}
 
@@ -530,7 +530,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 
 	if (matches_list(ci->c, u, CMODE_EXCEPT))
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, BOT_EXCEPT).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), _("User matches channel except.")).c_str());
 		return;
 	}
 
@@ -561,7 +561,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester, ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), LanguageString::ACCESS_DENIED).c_str());
 		return;
 	}
 

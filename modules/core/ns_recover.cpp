@@ -31,32 +31,32 @@ class CommandNSRecover : public Command
 		NickAlias *na;
 		User *u2;
 		if (!(u2 = finduser(nick)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!(na = findnick(u2->nick)))
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
-			source.Reply(NICK_NO_RECOVER_SELF);
+			source.Reply(_("You can't recover yourself!"));
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 
 			if (res == 1)
 			{
-				u2->SendMessage(NickServ, FORCENICKCHANGE_NOW);
+				u2->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				source.Reply(NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(LanguageString::NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
@@ -69,16 +69,16 @@ class CommandNSRecover : public Command
 		{
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
-				u2->SendMessage(NickServ, FORCENICKCHANGE_NOW);
+				u2->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				source.Reply(NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(LanguageString::NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
@@ -88,19 +88,40 @@ class CommandNSRecover : public Command
 		/* Convert Config->NSReleaseTimeout seconds to string format */
 		Anope::string relstr = duration(source.u->Account(), Config->NSReleaseTimeout);
 
-		source.Reply(NICK_HELP_RECOVER, relstr.c_str());
+		source.Reply(_("Syntax: \002RECOVER \037nickname\037 [\037password\037]\002\n"
+				" \n"
+				"Allows you to recover your nickname if someone else has\n"
+				"taken it; this does the same thing that %S does\n"
+				"automatically if someone tries to use a kill-protected\n"
+				"nick.\n"
+				" \n"
+				"When you give this command, %S will bring a fake\n"
+				"user online with the same nickname as the user you're\n"
+				"trying to recover your nick from.  This causes the IRC\n"
+				"servers to disconnect the other user.  This fake user will\n"
+				"remain online for %s to ensure that the other\n"
+				"user does not immediately reconnect; after that time, you\n"
+				"can reclaim your nick.  Alternatively, use the \002RELEASE\002\n"
+				"command (\002%R%S HELP RELEASE\002) to get the nick\n"
+				"back sooner.\n"
+				" \n"
+				"In order to use the \002RECOVER\002 command for a nick, your\n"
+				"current address as shown in /WHOIS must be on that nick's\n"
+				"access list, you must be identified and in the group of\n"
+				"that nick, or you must supply the correct password for\n"
+				"the nickname."), relstr.c_str());
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "RECOVER", NICK_RECOVER_SYNTAX);
+		SyntaxError(source, "RECOVER", _("RECOVER \037nickname\037 [\037password\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_RECOVER);
+		source.Reply(_("    RECOVER    Kill another user who has taken your nick"));
 	}
 };
 

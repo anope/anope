@@ -41,81 +41,81 @@ class CommandOSStats : public Command
 	{
 		int timeout;
 		/* AKILLs */
-		source.Reply(OPER_STATS_AKILL_COUNT, SGLine->GetCount());
+		source.Reply(_("Current number of AKILLs: \002%d\002"), SGLine->GetCount());
 		timeout = Config->AutokillExpiry + 59;
 		if (timeout >= 172800)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_DAYS, timeout / 86400);
+			source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
 		else if (timeout >= 86400)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_DAY);
+			source.Reply(_("Default AKILL expiry time: \0021 day\002"));
 		else if (timeout >= 7200)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_HOURS, timeout / 3600);
+			source.Reply(_("Default AKILL expiry time: \002%d hours\002"), timeout / 3600);
 		else if (timeout >= 3600)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_HOUR);
+			source.Reply(_("Default AKILL expiry time: \0021 hour\002"));
 		else if (timeout >= 120)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_MINS, timeout / 60);
+			source.Reply(_("Default AKILL expiry time: \002%d minutes\002"), timeout / 60);
 		else if (timeout >= 60)
-			source.Reply(OPER_STATS_AKILL_EXPIRE_MIN);
+			source.Reply(_("Default AKILL expiry time: \0021 minute\002"));
 		else
-			source.Reply(OPER_STATS_AKILL_EXPIRE_NONE);
+			source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
 		if (ircd->snline)
 		{
 			/* SNLINEs */
-			source.Reply(OPER_STATS_SNLINE_COUNT, SNLine->GetCount());
+			source.Reply(_("Current number of SNLINEs: \002%d\002"), SNLine->GetCount());
 			timeout = Config->SNLineExpiry + 59;
 			if (timeout >= 172800)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_DAY);
+				source.Reply(_("Default SNLINE expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(_("Default SNLINE expiry time: \002%d hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_HOUR);
+				source.Reply(_("Default SNLINE expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(_("Default SNLINE expiry time: \002%d minutes\002"), timeout / 60);
 			else if (timeout >= 60)
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_MIN);
+				source.Reply(_("Default SNLINE expiry time: \0021 minute\002"));
 			else
-				source.Reply(OPER_STATS_SNLINE_EXPIRE_NONE);
+				source.Reply(_("Default SNLINE expiry time: \002No expiration\002"));
 		}
 		if (ircd->sqline)
 		{
 			/* SQLINEs */
-			source.Reply(OPER_STATS_SQLINE_COUNT, SQLine->GetCount());
+			source.Reply(_("Current number of SQLINEs: \002%d\002"), SQLine->GetCount());
 			timeout = Config->SQLineExpiry + 59;
 			if (timeout >= 172800)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_DAY);
+				source.Reply(_("Default SQLINE expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(_("Default SQLINE expiry time: \002%d hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_HOUR);
+				source.Reply(_("Default SQLINE expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(_("Default SQLINE expiry time: \002%d minutes\002"), timeout / 60);
 			else if (timeout >= 60)
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_MIN);
+				source.Reply(_("Default SQLINE expiry time: \0021 minute\002"));
 			else
-				source.Reply(OPER_STATS_SQLINE_EXPIRE_NONE);
+				source.Reply(_("Default SQLINE expiry time: \002No expiration\002"));
 		}
 		if (ircd->szline)
 		{
 			/* SZLINEs */
-			source.Reply(OPER_STATS_SZLINE_COUNT, SZLine->GetCount());
+			source.Reply(_("Current number of SZLINEs: \002%d\002"), SZLine->GetCount());
 			timeout = Config->SZLineExpiry + 59;
 			if (timeout >= 172800)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_DAYS, timeout / 86400);
+				source.Reply(_("Default SZLINE expiry time: \002%d days\002"), timeout / 86400);
 			else if (timeout >= 86400)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_DAY);
+				source.Reply(_("Default SZLINE expiry time: \0021 day\002"));
 			else if (timeout >= 7200)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_HOURS, timeout / 3600);
+				source.Reply(_("Default SZLINE expiry time: \002%d hours\002"), timeout / 3600);
 			else if (timeout >= 3600)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_HOUR);
+				source.Reply(_("Default SZLINE expiry time: \0021 hour\002"));
 			else if (timeout >= 120)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_MINS, timeout / 60);
+				source.Reply(_("Default SZLINE expiry time: \002%d minutes\002"), timeout / 60);
 			else if (timeout >= 60)
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_MIN);
+				source.Reply(_("Default SZLINE expiry time: \0021 minute\002"));
 			else
-				source.Reply(OPER_STATS_SZLINE_EXPIRE_NONE);
+				source.Reply(_("Default SZLINE expiry time: \002No expiration\002"));
 		}
 		return MOD_CONT;
 	}
@@ -123,7 +123,7 @@ class CommandOSStats : public Command
 	CommandReturn DoStatsReset(CommandSource &source)
 	{
 		maxusercnt = usercnt;
-		source.Reply(OPER_STATS_RESET);
+		source.Reply(_("Statistics reset."));
 		return MOD_CONT;
 	}
 
@@ -131,43 +131,43 @@ class CommandOSStats : public Command
 	{
 		time_t uptime = Anope::CurTime - start_time;
 		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
-		source.Reply(OPER_STATS_CURRENT_USERS, usercnt, opcnt);
-		source.Reply(OPER_STATS_MAX_USERS, maxusercnt, do_strftime(maxusertime).c_str());
+		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), usercnt, opcnt);
+		source.Reply(_("Maximum users: \002%d\002 (%s)"), maxusercnt, do_strftime(maxusertime).c_str());
 		if (days > 1)
-			source.Reply(OPER_STATS_UPTIME_DHMS, days, hours, mins, secs);
+			source.Reply(_("Services up \002%d\002 days, \002%02d:%02d\002"), days, hours, mins, secs);
 		else if (days == 1)
-			source.Reply(OPER_STATS_UPTIME_1DHMS, days, hours, mins, secs);
+			source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 day, OPER_STATS_UPTIME_1\002%02d:%02dOPER_STATS_UPTIME_1\002"), days, hours, mins, secs);
 		else
 		{
 			if (hours > 1)
 			{
 				if (mins != 1)
-					source.Reply(OPER_STATS_UPTIME_HMS, hours, mins);
+					source.Reply(_("Services up \002%d\002 hours, \002%d\002 minutes"), hours, mins);
 				else
-					source.Reply(OPER_STATS_UPTIME_H1MS, hours, mins, secs);
+					source.Reply(_("Services up OPER_STATS_UPTIME_H1\002%dOPER_STATS_UPTIME_H1\002 hours, OPER_STATS_UPTIME_H1\002%dOPER_STATS_UPTIME_H1\002 minute"), hours, mins, secs);
 			}
 			else if (hours == 1)
 			{
 				if (mins != 1)
-					source.Reply(OPER_STATS_UPTIME_1HMS, hours, mins, secs);
+					source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 hour, OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 minutes"), hours, mins, secs);
 				else
-					source.Reply(OPER_STATS_UPTIME_1H1MS, hours, mins, secs);
+					source.Reply(_("Services up OPER_STATS_UPTIME_1H1\002%dOPER_STATS_UPTIME_1H1\002 hour, OPER_STATS_UPTIME_1H1\002%dOPER_STATS_UPTIME_1H1\002 minute"), hours, mins, secs);
 			}
 			else
 			{
 				if (mins != 1)
 				{
 					if (secs != 1)
-						source.Reply(OPER_STATS_UPTIME_MS, mins, secs);
+						source.Reply(_("Services up \002%d\002 minutes, \002%d\002 seconds"), mins, secs);
 					else
-						source.Reply(OPER_STATS_UPTIME_M1S, mins, secs);
+						source.Reply(_("Services up OPER_STATS_UPTIME_M1\002%dOPER_STATS_UPTIME_M1\002 minutes, OPER_STATS_UPTIME_M1\002%dOPER_STATS_UPTIME_M1\002 second"), mins, secs);
 				}
 				else
 				{
 					if (secs != 1)
-						source.Reply(OPER_STATS_UPTIME_1MS, mins, secs);
+						source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 minute, OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 seconds"), mins, secs);
 					else
-						source.Reply(OPER_STATS_UPTIME_1M1S, mins, secs);
+						source.Reply(_("Services up OPER_STATS_UPTIME_1M1\002%dOPER_STATS_UPTIME_1M1\002 minute, OPER_STATS_UPTIME_1M1\002%dOPER_STATS_UPTIME_1M1\002 second"), mins, secs);
 				}
 			}
 		}
@@ -186,9 +186,9 @@ class CommandOSStats : public Command
 		if (!buf.empty())
 			buf.erase(buf.begin());
 
-		source.Reply(OPER_STATS_UPLINK_SERVER, Me->GetLinks().front()->GetName().c_str());
-		source.Reply(OPER_STATS_UPLINK_CAPAB, buf.c_str());
-		source.Reply(OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(Me->GetLinks().front()));
+		source.Reply(_("Uplink server: %s"), Me->GetLinks().front()->GetName().c_str());
+		source.Reply(_("Uplink capab: %s"), buf.c_str());
+		source.Reply(_("Servers found: %d"), stats_count_servers(Me->GetLinks().front()));
 		return MOD_CONT;
 	}
 
@@ -196,33 +196,33 @@ class CommandOSStats : public Command
 	{
 		long count, mem;
 
-		source.Reply(OPER_STATS_BYTES_READ, TotalRead / 1024);
-		source.Reply(OPER_STATS_BYTES_WRITTEN, TotalWritten / 1024);
+		source.Reply(_("Bytes read    : %5d kB"), TotalRead / 1024);
+		source.Reply(_("Bytes written : %5d kB"), TotalWritten / 1024);
 
 		get_user_stats(count, mem);
-		source.Reply(OPER_STATS_USER_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("User          : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		get_channel_stats(&count, &mem);
-		source.Reply(OPER_STATS_CHANNEL_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("Channel       : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		get_core_stats(count, mem);
-		source.Reply(OPER_STATS_GROUPS_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("NS Groups     : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		get_aliases_stats(count, mem);
-		source.Reply(OPER_STATS_ALIASES_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("NS Aliases    : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		get_chanserv_stats(&count, &mem);
-		source.Reply(OPER_STATS_CHANSERV_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("ChanServ      : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		if (!Config->s_BotServ.empty())
 		{
 			get_botserv_stats(&count, &mem);
-			source.Reply(OPER_STATS_BOTSERV_MEM, count, (mem + 512) / 1024);
+			source.Reply(_("BotServ       : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		}
 		if (!Config->s_HostServ.empty())
 		{
 			get_hostserv_stats(&count, &mem);
-			source.Reply(OPER_STATS_HOSTSERV_MEM, count, (mem + 512) / 1024);
+			source.Reply(_("HostServ      : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		}
 		get_operserv_stats(&count, &mem);
-		source.Reply(OPER_STATS_OPERSERV_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("OperServ      : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 		get_session_stats(count, mem);
-		source.Reply(OPER_STATS_SESSIONS_MEM, count, (mem + 512) / 1024);
+		source.Reply(_("Sessions      : \002%6d\002 records, \002%5d\002 kB"), count, (mem + 512) / 1024);
 
 		return MOD_CONT;
 	}
@@ -242,7 +242,7 @@ class CommandOSStats : public Command
 			else if (extra.equals_ci("RESET"))
 				return this->DoStatsReset(source);
 			else if (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK"))
-				source.Reply(OPER_STATS_UNKNOWN_OPTION, extra.c_str());
+				source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 		}
 
 		if (extra.empty() || (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK")))
@@ -259,13 +259,34 @@ class CommandOSStats : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_STATS);
+		source.Reply(_("Syntax: \002STATS [AKILL | ALL | RESET | MEMORY | UPLINK]\002\n"
+				" \n"
+				"Without any option, shows the current number of users and\n"
+				"IRCops online (excluding Services), the highest number of\n"
+				"users online since Services was started, and the length of\n"
+				"time Services has been running.\n"
+				" \n"
+				"With the \002AKILL\002 option, displays the current size of the\n"
+				"AKILL list and the current default expiry time.\n"
+				" \n"
+				"The \002RESET\002 option currently resets the maximum user count\n"
+				"to the number of users currently present on the network.\n"
+				" \n"
+				"The \002MEMORY\002 option displays information on the memory\n"
+				"usage of Services. Using this option can freeze Services for\n"
+				"a short period of time on large networks; don't overuse it!\n"
+				" \n"
+				"The \002UPLINK\002 option displays information about the current\n"
+				"server Anope uses as an uplink to the network.\n"
+				" \n"
+				"The \002ALL\002 displays the user and uptime statistics, and\n"
+				"everything you'd see with \002MEMORY\002 and \002UPLINK\002 options."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_STATS);
+		source.Reply(_("    STATS       Show status of Services and network"));
 	}
 };
 

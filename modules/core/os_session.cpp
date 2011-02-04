@@ -26,11 +26,11 @@ class ExceptionDelCallback : public NumberList
 	~ExceptionDelCallback()
 	{
 		if (!Deleted)
-			source.Reply(OPER_EXCEPTION_NO_MATCH);
+			source.Reply(_("No matching entries on session-limit exception list."));
 		else if (Deleted == 1)
-			source.Reply(OPER_EXCEPTION_DELETED_ONE);
+			source.Reply(_("Deleted 1 entry from session-limit exception list."));
 		else
-			source.Reply(OPER_EXCEPTION_DELETED_SEVERAL, Deleted);
+			source.Reply(_("Deleted %d entries from session-limit exception list."), Deleted);
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -70,8 +70,8 @@ class ExceptionListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_EXCEPTION_LIST_HEADER);
-			source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
+			source.Reply(_("Current Session Limit Exception list:"));
+			source.Reply(_("Num  Limit  Host"));
 		}
 
 		DoList(source, Number - 1);
@@ -82,7 +82,7 @@ class ExceptionListCallback : public NumberList
 		if (index >= exceptions.size())
 			return;
 
-		source.Reply(OPER_EXCEPTION_LIST_FORMAT, index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
+		source.Reply(_("%3d  %4d   %s"), index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
 	}
 };
 
@@ -101,7 +101,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_EXCEPTION_LIST_HEADER);
+			source.Reply(_("Current Session Limit Exception list:"));
 		}
 
 		DoList(source, Number - 1);
@@ -114,7 +114,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 		Anope::string expirebuf = expire_left(source.u->Account(), exceptions[index]->expires);
 
-		source.Reply(OPER_EXCEPTION_VIEW_FORMAT, index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
+		source.Reply(_("%3d.  %s  (by %s on %s; %s)\n " "    Limit: %-4d  - %s"), index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
 	}
 };
 
@@ -128,18 +128,18 @@ class CommandOSSession : public Command
 		unsigned mincount = param.is_pos_number_only() ? convertTo<unsigned>(param) : 0;
 
 		if (mincount <= 1)
-			source.Reply(OPER_SESSION_INVALID_THRESHOLD);
+			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
 		else
 		{
-			source.Reply(OPER_SESSION_LIST_HEADER, mincount);
-			source.Reply(OPER_SESSION_LIST_COLHEAD);
+			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
+			source.Reply(_("Sessions  Host"));
 
 			for (patricia_tree<Session *>::iterator it(SessionList); it.next();)
 			{
 				Session *session = *it;
 
 				if (session->count >= mincount)
-					source.Reply(OPER_SESSION_LIST_FORMAT, session->count, session->host.c_str());
+					source.Reply(_("%6d    %s"), session->count, session->host.c_str());
 			}
 		}
 
@@ -152,11 +152,11 @@ class CommandOSSession : public Command
 		Session *session = findsession(param);
 
 		if (!session)
-			source.Reply(OPER_SESSION_NOT_FOUND, param.c_str());
+			source.Reply(_("\002%s\002 not found on session list."), param.c_str());
 		else
 		{
 			Exception *exception = find_host_exception(param);
-			source.Reply(OPER_SESSION_VIEW_FORMAT, param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
 		}
 
 		return MOD_CONT;
@@ -172,7 +172,7 @@ class CommandOSSession : public Command
 
 		if (!Config->LimitSessions)
 		{
-			source.Reply(OPER_EXCEPTION_DISABLED);
+			source.Reply(_("Session limiting is disabled."));
 			return MOD_CONT;
 		}
 
@@ -188,18 +188,31 @@ class CommandOSSession : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_SESSION);
+		source.Reply(_("Syntax: \002SESSION LIST \037threshold\037\002\n"
+				"        \002SESSION VIEW \037host\037\002\n"
+				" \n"
+				"Allows Services Operators to view the session list.\n"
+				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
+				"The threshold must be a number greater than 1. This is to \n"
+				"prevent accidental listing of the large number of single \n"
+				"session hosts.\n"
+				"\002SESSION VIEW\002 displays detailed information about a specific\n"
+				"host - including the current session count and session limit.\n"
+				"The \037host\037 value may not include wildcards.\n"
+				"See the \002EXCEPTION\002 help for more information about session\n"
+				"limiting and how to set session limits specific to certain\n"
+				"hosts and groups thereof."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SESSION", OPER_SESSION_LIST_SYNTAX);
+		SyntaxError(source, "SESSION", _("SESSION LIST \037limit\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SESSION);
+		source.Reply(_("    SESSION     View the list of host sessions"));
 	}
 };
 
@@ -241,7 +254,7 @@ class CommandOSException : public Command
 		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(LanguageString::BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -251,24 +264,24 @@ class CommandOSException : public Command
 
 		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
 		{
-			source.Reply(OPER_EXCEPTION_INVALID_LIMIT, Config->MaxSessionLimit);
+			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), Config->MaxSessionLimit);
 			return MOD_CONT;
 		}
 		else
 		{
 			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 			{
-				source.Reply(OPER_EXCEPTION_INVALID_HOSTMASK);
+				source.Reply(_("Invalid hostmask. Only real hostmasks are valid as exceptions are not matched against nicks or usernames."));
 				return MOD_CONT;
 			}
 
 			x = exception_add(u, mask, limit, reason, u->nick, expires);
 
 			if (x == 1)
-				source.Reply(OPER_EXCEPTION_ADDED, mask.c_str(), limit);
+				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
 
 			if (readonly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 		}
 
 		return MOD_CONT;
@@ -296,15 +309,15 @@ class CommandOSException : public Command
 				if (mask.equals_ci(exceptions[i]->mask))
 				{
 					ExceptionDelCallback::DoDel(source, i);
-					source.Reply(OPER_EXCEPTION_DELETED, mask.c_str());
+					source.Reply(_("\002%s\002 deleted from session-limit exception list."), mask.c_str());
 					break;
 				}
 			if (i == end)
-				source.Reply(OPER_EXCEPTION_NOT_FOUND, mask.c_str());
+				source.Reply(_("\002%s\002 not found on session-limit exception list."), mask.c_str());
 		}
 
 		if (readonly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -330,10 +343,10 @@ class CommandOSException : public Command
 			exceptions[n1] = exceptions[n2];
 			exceptions[n2] = temp;
 
-			source.Reply(OPER_EXCEPTION_MOVED, exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
+			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(source, "MOVE");
@@ -361,15 +374,15 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_EXCEPTION_LIST_HEADER);
-						source.Reply(OPER_EXCEPTION_LIST_COLHEAD);
+						source.Reply(_("Current Session Limit Exception list:"));
+						source.Reply(_("Num  Limit  Host"));
 					}
 
 					ExceptionListCallback::DoList(source, i);
 				}
 
 			if (!SentHeader)
-				source.Reply(OPER_EXCEPTION_NO_MATCH);
+				source.Reply(_("No matching entries on session-limit exception list."));
 		}
 
 		return MOD_CONT;
@@ -395,14 +408,14 @@ class CommandOSException : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_EXCEPTION_LIST_HEADER);
+						source.Reply(_("Current Session Limit Exception list:"));
 					}
 
 					ExceptionViewCallback::DoList(source, i);
 				}
 
 			if (!SentHeader)
-				source.Reply(OPER_EXCEPTION_NO_MATCH);
+				source.Reply(_("No matching entries on session-limit exception list."));
 		}
 
 		return MOD_CONT;
@@ -418,7 +431,7 @@ class CommandOSException : public Command
 
 		if (!Config->LimitSessions)
 		{
-			source.Reply(OPER_EXCEPTION_DISABLED);
+			source.Reply(_("Session limiting is disabled."));
 			return MOD_CONT;
 		}
 
@@ -440,18 +453,54 @@ class CommandOSException : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_EXCEPTION);
+		source.Reply(_("Syntax: \002EXCEPTION ADD [\037+expiry\037] \037mask\037 \037limit\037 \037reason\037\002\n"
+				"        \002EXCEPTION DEL {\037mask\037 | \037list\037}\002\n"
+				"        \002EXCEPTION MOVE \037num\037 \037position\037\002\n"
+				"        \002EXCEPTION LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002EXCEPTION VIEW [\037mask\037 | \037list\037]\002\n"
+				" \n"
+				"Allows Services Operators to manipulate the list of hosts that\n"
+				"have specific session limits - allowing certain machines, \n"
+				"such as shell servers, to carry more than the default number\n"
+				"of clients at a time. Once a host reaches its session limit,\n"
+				"all clients attempting to connect from that host will be\n"
+				"killed. Before the user is killed, they are notified, via a\n"
+				"/NOTICE from %S, of a source of help regarding session\n"
+				"limiting. The content of this notice is a config setting.\n"
+				" \n"
+				"\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
+				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
+				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002,\n"
+				"are allowed because sessions limiting does not take nick or\n"
+				"user names into account. \037limit\037 must be a number greater than\n"
+				"or equal to zero. This determines how many sessions this host\n"
+				"may carry at a time. A value of zero means the host has an\n"
+				"unlimited session limit. See the \002AKILL\002 help for details about\n"
+				"the format of the optional \037expiry\037 parameter.\n"
+				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
+				"\002EXCEPTION MOVE\002 moves exception \037num\037 to \037position\037. The\n"
+				"exceptions inbetween will be shifted up or down to fill the gap.\n"
+				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
+				"exceptions; if the optional mask is given, the list is limited\n"
+				"to those exceptions matching the mask. The difference is that\n"
+				"\002EXCEPTION VIEW\002 is more verbose, displaying the name of the\n"
+				"person who added the exception, its session limit, reason, \n"
+				"host mask and the expiry date and time.\n"
+				" \n"
+				"Note that a connecting client will \"use\" the first exception\n"
+				"their host matches. Large exception lists and widely matching\n"
+				"exception masks are likely to degrade services' performance."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "EXCEPTION", OPER_EXCEPTION_SYNTAX);
+		SyntaxError(source, "EXCEPTION", _("EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [\037params\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_EXCEPTION);
+		source.Reply(_("    EXCEPTION   Modify the session-limit exception list"));
 	}
 };
 

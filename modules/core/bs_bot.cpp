@@ -26,60 +26,60 @@ class CommandBSBot : public Command
 
 		if (findbot(nick))
 		{
-			source.Reply(BOT_BOT_ALREADY_EXISTS, nick.c_str());
+			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (nick.length() > Config->NickLen)
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		if (user.length() > Config->UserLen)
 		{
-			source.Reply(BOT_LONG_IDENT, Config->UserLen);
+			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
 			return MOD_CONT;
 		}
 
 		if (host.length() > Config->HostLen)
 		{
-			source.Reply(BOT_LONG_HOST, Config->HostLen);
+			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
 			return MOD_CONT;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
 			if (!isvalidnick(nick[i]))
 			{
-				source.Reply(BOT_BAD_NICK);
+				source.Reply(_("Bot Nicks may only contain valid nick characters."));
 				return MOD_CONT;
 			}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		/* Check the host is valid re RFC 2812 */
 		if (!isValidHost(host, 3))
 		{
-			source.Reply(BOT_BAD_HOST);
+			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return MOD_CONT;
 		}
 
 		for (unsigned i = 0, end = user.length(); i < end && i < Config->UserLen; ++i)
 			if (!isalnum(user[i]))
 			{
-				source.Reply(BOT_BAD_IDENT, Config->UserLen);
+				source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
 				return MOD_CONT;
 			}
 
@@ -89,20 +89,20 @@ class CommandBSBot : public Command
 		*/
 		if (findnick(nick))
 		{
-			source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_ALREADY_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (!(bi = new BotInfo(nick, user, host, real)))
 		{
 			// XXX this cant happen?
-			source.Reply(BOT_BOT_CREATION_FAILED);
+			source.Reply(_("Sorry, bot creation failed."));
 			return MOD_CONT;
 		}
 
 		Log(LOG_ADMIN, source.u, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
-		source.Reply(BOT_BOT_ADDED, bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
+		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
 		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
 		return MOD_CONT;
@@ -125,37 +125,37 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(oldnick)))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, false))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
 		if (nick.length() > Config->NickLen)
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		if (!user.empty() && user.length() > Config->UserLen)
 		{
-			source.Reply(BOT_LONG_IDENT, Config->UserLen);
+			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
 			return MOD_CONT;
 		}
 
 		if (!host.empty() && host.length() > Config->HostLen)
 		{
-			source.Reply(BOT_LONG_HOST, Config->HostLen);
+			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(nick, false))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
 			return MOD_CONT;
 		}
 
@@ -166,34 +166,34 @@ class CommandBSBot : public Command
 		*/
 		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
 		{
-			source.Reply(BOT_BOT_ANY_CHANGES);
+			source.Reply(_("Old info is equal to the new one."));
 			return MOD_CONT;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
 			if (!isvalidnick(nick[i]))
 			{
-				source.Reply(BOT_BAD_NICK);
+				source.Reply(_("Bot Nicks may only contain valid nick characters."));
 				return MOD_CONT;
 			}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
-			source.Reply(BOT_BAD_NICK);
+			source.Reply(_("Bot Nicks may only contain valid nick characters."));
 			return MOD_CONT;
 		}
 
 		if (!host.empty() && !isValidHost(host, 3))
 		{
-			source.Reply(BOT_BAD_HOST);
+			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return MOD_CONT;
 		}
 
@@ -201,13 +201,13 @@ class CommandBSBot : public Command
 			for (unsigned i = 0, end = user.length(); i < end && i < Config->UserLen; ++i)
 				if (!isalnum(user[i]))
 				{
-					source.Reply(BOT_BAD_IDENT, Config->UserLen);
+					source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
 					return MOD_CONT;
 				}
 
 		if (!nick.equals_ci(bi->nick) && findbot(nick))
 		{
-			source.Reply(BOT_BOT_ALREADY_EXISTS, nick.c_str());
+			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -219,7 +219,7 @@ class CommandBSBot : public Command
 			*/
 			if (findnick(nick))
 			{
-				source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
+				source.Reply(LanguageString::NICK_ALREADY_REGISTERED, nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -262,7 +262,7 @@ class CommandBSBot : public Command
 			bi->RejoinAll();
 		}
 
-		source.Reply(BOT_BOT_CHANGED, oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
+		source.Reply(_("Bot \002%s\002 has been changed to %s!%s@%s (%s)"), oldnick.c_str(), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 		Log(LOG_ADMIN, source.u, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
@@ -282,13 +282,13 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(nick)))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (nickIsServices(nick, false))
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -296,7 +296,7 @@ class CommandBSBot : public Command
 
 		Log(LOG_ADMIN, source.u, this) << "DEL " << bi->nick;
 
-		source.Reply(BOT_BOT_DELETED, nick.c_str());
+		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
 		delete bi;
 		return MOD_CONT;
 	}
@@ -313,7 +313,7 @@ class CommandBSBot : public Command
 
 		if (readonly)
 		{
-			source.Reply(BOT_BOT_READONLY);
+			source.Reply(_("Sorry, bot modification is temporarily disabled."));
 			return MOD_CONT;
 		}
 
@@ -322,7 +322,7 @@ class CommandBSBot : public Command
 			// ADD nick user host real - 5
 			if (!u->Account()->HasCommand("botserv/bot/add"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -345,7 +345,7 @@ class CommandBSBot : public Command
 			// but only oldn and newn are required
 			if (!u->Account()->HasCommand("botserv/bot/change"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -362,7 +362,7 @@ class CommandBSBot : public Command
 			// DEL nick
 			if (!u->Account()->HasCommand("botserv/bot/del"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 
@@ -382,18 +382,38 @@ class CommandBSBot : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(BOT_SERVADMIN_HELP_BOT);
+		source.Reply(_("Syntax: \002BOT ADD \037nick\037 \037user\037 \037host\037 \037real\037\002\n"
+				"        \002BOT CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002\n"
+				"        \002BOT DEL \037nick\037\002\n"
+				" \n"
+				"Allows Services Operators to create, modify, and delete\n"
+				"bots that users will be able to use on their own\n"
+				"channels.\n"
+				" \n"
+				"\002BOT ADD\002 adds a bot with the given nickname, username,\n"
+				"hostname and realname. Since no integrity checks are done \n"
+				"for these settings, be really careful.\n"
+				"\002BOT CHANGE\002 allows to change nickname, username, hostname\n"
+				"or realname of a bot without actually delete it (and all\n"
+				"the data associated with it).\n"
+				"\002BOT DEL\002 removes the given bot from the bot list.  \n"
+				" \n"
+				"\002Note\002: you cannot create a bot that has a nick that is\n"
+				"currently registered. If an unregistered user is currently\n"
+				"using the nick, they will be killed."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "BOT", BOT_BOT_SYNTAX);
+		SyntaxError(source, "BOT", _("BOT ADD \037nick\037 \037user\037 \037host\037 \037real\037\n"
+			"\002BOT CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002\n"
+			"\002BOT DEL \037nick\037\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(BOT_HELP_CMD_BOT);
+		source.Reply(_("    BOT            Maintains network bot list"));
 	}
 };
 

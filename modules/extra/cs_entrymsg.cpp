@@ -33,40 +33,40 @@ unsigned EntryMsg::MaxEntries = 0;
 class CommandEntryMessage : public Command
 {
  private:
-	void DoList(User *u, ChannelInfo *ci)
+	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		std::vector<EntryMsg> messages;
 		if (ci->GetExtRegular("cs_entrymsg", messages))
 		{
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_HEADER, ci->name.c_str());
+			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
 			for (unsigned i = 0; i < messages.size(); ++i)
-				u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_ENTRY, i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_END);
+				source.Reply(LanguageString::CHAN_LIST_ENTRY, i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
+			source.Reply(_("End of entry message list."));
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());
 	}
 		
-	void DoAdd(User *u, ChannelInfo *ci, const Anope::string &message)
+	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
 		std::vector<EntryMsg> messages;
 		ci->GetExtRegular("cs_entrymsg", messages);
 
 		if (EntryMsg::MaxEntries && messages.size() >= EntryMsg::MaxEntries)
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_FULL, ci->name.c_str());
+			source.Reply(_("The entry message list for \2%s\2 is full."), ci->name.c_str());
 		else
 		{
-			messages.push_back(EntryMsg(u->nick, message));
+			messages.push_back(EntryMsg(source.u->nick, message));
 			ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_ADDED, ci->name.c_str());
+			source.Reply(_("Entry message added to \2%s\2"), ci->name.c_str());
 		}
 	}
 
-	void DoDel(User *u, ChannelInfo *ci, const Anope::string &message)
+	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
 		std::vector<EntryMsg> messages;
 		if (!message.is_pos_number_only())
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_NOT_FOUND, message.c_str(), ci->name.c_str());
+			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
 		else if (ci->GetExtRegular("cs_entrymsg", messages))
 		{
 			unsigned i = convertTo<unsigned>(message);
@@ -74,19 +74,19 @@ class CommandEntryMessage : public Command
 			{
 				messages.erase(messages.begin() + i - 1);
 				ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
-				u->SendMessage(ChanServ, CHAN_ENTRYMSG_DELETED, i, ci->name.c_str());
+				source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
 			}
 			else
-				u->SendMessage(ChanServ, CHAN_ENTRYMSG_NOT_FOUND, message.c_str(), ci->name.c_str());
+				source.Reply(_("Entry message \2%s\2 not found on channel \2%s\2."), message.c_str(), ci->name.c_str());
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_ENTRYMSG_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());
 	}
 
-	void DoClear(User *u, ChannelInfo *ci)
+	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
 		ci->Shrink("cs_entrymsg");
-		u->SendMessage(ChanServ, CHAN_ENTRYMSG_CLEARED, ci->name.c_str());
+		source.Reply(_("Entry messages for \2%s\2 have been cleared."), ci->name.c_str());
 	}
 
  public:
@@ -103,18 +103,18 @@ class CommandEntryMessage : public Command
 		{
 			bool success = true;
 			if (params[1].equals_ci("LIST"))
-				this->DoList(u, ci);
+				this->DoList(source, ci);
 			else if (params[1].equals_ci("CLEAR"))
-				this->DoClear(u, ci);
+				this->DoClear(source, ci);
 			else if (params.size() < 3)
 			{
 				success = false;
 				this->OnSyntaxError(source, "");
 			}
 			else if (params[1].equals_ci("ADD"))
-				this->DoAdd(u, ci, params[2]);
+				this->DoAdd(source, ci, params[2]);
 			else if (params[1].equals_ci("DEL"))
-				this->DoDel(u, ci, params[2]);
+				this->DoDel(source, ci, params[2]);
 			else
 			{
 				success = false;
@@ -125,7 +125,7 @@ class CommandEntryMessage : public Command
 		}
 		else
 		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
+			u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
 		}
 
 		return MOD_CONT;
@@ -133,18 +133,20 @@ class CommandEntryMessage : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "ENTRYMSG", CHAN_ENTRYMSG_SYNTAX);
+		SyntaxError(source, "ENTRYMSG", _("ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_ENTRYMSG);
+		source.Reply(_("Syntax: \002ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]\002\n"
+				" \n"
+				"Controls what messages will be sent to users when they join the channel."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_ENTRYMSG);
+		source.Reply(_("    ENTRYMSG   Manage the channel's entrymsgs"));
 	}
 };
 

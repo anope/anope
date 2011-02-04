@@ -60,45 +60,45 @@ static int def_levels[][2] = {
 };
 
 LevelInfo levelinfo[] = {
-	{ CA_AUTOHALFOP,	"AUTOHALFOP",	CHAN_LEVEL_AUTOHALFOP },
-	{ CA_AUTOOP,		"AUTOOP",		CHAN_LEVEL_AUTOOP },
-	{ CA_AUTOPROTECT,	"AUTOPROTECT",	CHAN_LEVEL_AUTOPROTECT },
-	{ CA_AUTOVOICE,		"AUTOVOICE",		CHAN_LEVEL_AUTOVOICE },
-	{ CA_NOJOIN,		"NOJOIN",		CHAN_LEVEL_NOJOIN },
-	{ CA_SIGNKICK,		"SIGNKICK",		CHAN_LEVEL_SIGNKICK },
-	{ CA_ACCESS_LIST,	"ACC-LIST",		CHAN_LEVEL_ACCESS_LIST },
-	{ CA_ACCESS_CHANGE,	"ACC-CHANGE",	CHAN_LEVEL_ACCESS_CHANGE },
-	{ CA_AKICK,			"AKICK",			CHAN_LEVEL_AKICK },
-	{ CA_SET,			"SET",			CHAN_LEVEL_SET },
-	{ CA_BAN,			"BAN",			CHAN_LEVEL_BAN },
-	{ CA_BANME,			"BANME",			CHAN_LEVEL_BANME },
-	{ CA_GETKEY,		"GETKEY",		CHAN_LEVEL_GETKEY },
-	{ CA_HALFOP,		"HALFOP",		CHAN_LEVEL_HALFOP },
-	{ CA_HALFOPME,		"HALFOPME",		CHAN_LEVEL_HALFOPME },
-	{ CA_INFO,			"INFO",			CHAN_LEVEL_INFO },
-	{ CA_KICK,			"KICK",			CHAN_LEVEL_KICK },
-	{ CA_KICKME,		"KICKME",		CHAN_LEVEL_KICKME },
-	{ CA_INVITE,		"INVITE",		CHAN_LEVEL_INVITE },
-	{ CA_OPDEOP,		"OPDEOP",		CHAN_LEVEL_OPDEOP },
-	{ CA_OPDEOPME,		"OPDEOPME",		CHAN_LEVEL_OPDEOPME },
-	{ CA_PROTECT,		"PROTECT",		CHAN_LEVEL_PROTECT },
-	{ CA_PROTECTME,		"PROTECTME",		CHAN_LEVEL_PROTECTME },
-	{ CA_TOPIC,			"TOPIC",			CHAN_LEVEL_TOPIC },
-	{ CA_MODE,			"MODE",				CHAN_LEVEL_MODE },
-	{ CA_UNBAN,			"UNBAN",			CHAN_LEVEL_UNBAN },
-	{ CA_VOICE,			"VOICE",			CHAN_LEVEL_VOICE },
-	{ CA_VOICEME,		"VOICEME",		CHAN_LEVEL_VOICEME },
-	{ CA_MEMO,			"MEMO",			CHAN_LEVEL_MEMO },
-	{ CA_ASSIGN,		"ASSIGN",		CHAN_LEVEL_ASSIGN },
-	{ CA_BADWORDS,		"BADWORDS",		CHAN_LEVEL_BADWORDS },
-	{ CA_FANTASIA,		"FANTASIA",		CHAN_LEVEL_FANTASIA },
-	{ CA_GREET,			"GREET",			CHAN_LEVEL_GREET },
-	{ CA_NOKICK,		"NOKICK",		CHAN_LEVEL_NOKICK },
-	{ CA_SAY,			"SAY",			CHAN_LEVEL_SAY },
-	{ CA_AUTOOWNER,		"AUTOOWNER",		CHAN_LEVEL_AUTOOWNER },
-	{ CA_OWNER,			"OWNER",			CHAN_LEVEL_OWNER },
-	{ CA_OWNERME,		"OWNERME",		CHAN_LEVEL_OWNERME },
-	{ CA_FOUNDER,		"FOUNDER",		CHAN_LEVEL_FOUNDER },
+	{ CA_AUTOHALFOP,	"AUTOHALFOP",		_("Automatic mode +h") },
+	{ CA_AUTOOP,		"AUTOOP",		_("Automatic channel operator status") },
+	{ CA_AUTOPROTECT,	"AUTOPROTECT",		_("Automatic mode +a") },
+	{ CA_AUTOVOICE,		"AUTOVOICE",		_("Automatic mode +v") },
+	{ CA_NOJOIN,		"NOJOIN",		_("Not allowed to join channel") },
+	{ CA_SIGNKICK,		"SIGNKICK",		_("No signed kick when SIGNKICK LEVEL is used") },
+	{ CA_ACCESS_LIST,	"ACC-LIST",		_("Allowed to view the access list") },
+	{ CA_ACCESS_CHANGE,	"ACC-CHANGE",		_("Allowed to modify the access list") },
+	{ CA_AKICK,		"AKICK",		_("Allowed to use AKICK command") },
+	{ CA_SET,		"SET",			_("Allowed to use SET command (not FOUNDER/PASSWORD)"), },
+	{ CA_BAN,		"BAN",			_("Allowed to use BAN command") },
+	{ CA_BANME,		"BANME",		_("Allowed to ban him/herself") },
+	{ CA_GETKEY,		"GETKEY",		_("Allowed to use GETKEY command") },
+	{ CA_HALFOP,		"HALFOP",		_("Allowed to (de)halfop him/herself") },
+	{ CA_HALFOPME,		"HALFOPME",		_("Allowed to (de)halfop him/herself") },
+	{ CA_INFO,		"INFO",			_("Allowed to use INFO command with ALL option") },
+	{ CA_KICK,		"KICK",			_("Allowed to use KICK command") },
+	{ CA_KICKME,		"KICKME",		_("Allowed to kick him/herself") },
+	{ CA_INVITE,		"INVITE",		_("Allowed to use INVITE command") },
+	{ CA_OPDEOP,		"OPDEOP",		_("Allowed to use OP/DEOP commands") },
+	{ CA_OPDEOPME,		"OPDEOPME",		_("Allowed to (de)op him/herself") },
+	{ CA_PROTECT,		"PROTECT",		_("Allowed to use PROTECT/DEPROTECT commands") },
+	{ CA_PROTECTME,		"PROTECTME",		_("Allowed to (de)protect him/herself"), },
+	{ CA_TOPIC,		"TOPIC",		_("Allowed to use TOPIC command") },
+	{ CA_MODE,		"MODE",			_("Allowed to use MODE command") },
+	{ CA_UNBAN,		"UNBAN",		_("Allowed to use UNBAN command") },
+	{ CA_VOICE,		"VOICE",		_("Allowed to use VOICE/DEVOICE commands") },
+	{ CA_VOICEME,		"VOICEME",		_("Allowed to (de)voice him/herself") },
+	{ CA_MEMO,		"MEMO",			_("Allowed to list/read channel memos") },
+	{ CA_ASSIGN,		"ASSIGN",		_("Allowed to assign/unassign a bot") },
+	{ CA_BADWORDS,		"BADWORDS",		_("Allowed to use BADWORDS command") },
+	{ CA_FANTASIA,		"FANTASIA",		_("Allowed to use fantaisist commands") },
+	{ CA_GREET,		"GREET",		_("Greet message displayed") },
+	{ CA_NOKICK,		"NOKICK",		_("Never kicked by the bot's kickers") },
+	{ CA_SAY,		"SAY",			_("Allowed to use SAY and ACT commands") },
+	{ CA_AUTOOWNER,		"AUTOOWNER",		_("Automatic mode +q") },
+	{ CA_OWNER,		"OWNER",		_("Allowed to use OWNER command") },
+	{ CA_OWNERME,		"OWNERME",		_("Allowed to (de)owner him/herself") },
+	{ CA_FOUNDER,		"FOUNDER",		_("Allowed to issue commands restricted to channel founders") },
 	{ -1 }
 };
 int levelinfo_maxwidth = 0;
@@ -301,7 +301,7 @@ int check_valid_admin(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT))
 	{
-		user->SendMessage(ChanServ, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
+		user->SendMessage(ChanServ, _("This channel has been registered with %s."), Config->s_ChanServ.c_str());
 		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 		return 0;
 	}
@@ -331,7 +331,7 @@ int check_valid_op(User *user, Channel *chan, int servermode)
 
 	if (servermode && !check_access(user, chan->ci, CA_AUTOOP))
 	{
-		user->SendMessage(ChanServ, CHAN_IS_REGISTERED, Config->s_ChanServ.c_str());
+		user->SendMessage(ChanServ, _("This channel has been registered with %s."), Config->s_ChanServ.c_str());
 
 		if (owner)
 			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);

@@ -41,7 +41,7 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(LanguageString::BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -80,25 +80,28 @@ class CommandOSChanKill : public Command
 					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel.c_str(), realreason.c_str());
 			}
 			else
-				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
+				source.Reply(LanguageString::CHAN_X_NOT_IN_USE, channel.c_str());
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_CHANKILL);
+		source.Reply(_("Syntax: \002CHANKILL [+\037expiry\037] \037channel\037 \037reason\037\002\n"
+				"Puts an AKILL for every nick on the specified channel. It\n"
+				"uses the entire and complete real ident@host for every nick,\n"
+				"then enforces the AKILL."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "CHANKILL", OPER_CHANKILL_SYNTAX);
+		SyntaxError(source, "CHANKILL", _("CHANKILL [+\037expiry\037] {\037#channel\037} [\037reason\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_CHANKILL);
+		source.Reply(_("    CHANKILL    AKILL all users on a specific channel"));
 	}
 };
 

@@ -20,14 +20,14 @@ class CommandOSSet : public Command
 	{
 		Log(LOG_ADMIN, source.u, this);
 
-		LanguageString index;
+		Anope::string index;
 
-		index = readonly ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		source.Reply(index, "READONLY");
-		index = debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		source.Reply(index, "DEBUG");
-		index = noexpire ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF;
-		source.Reply(index, "NOEXPIRE");
+		index = readonly ? _("%s is enabled") : _("%s is disabled");
+		source.Reply(index.c_str(), "READONLY");
+		index = debug ? _("%s is enabled") : _("%s is disabled");
+		source.Reply(index.c_str(), "DEBUG");
+		index = noexpire ? _("%s is enabled") : _("%s is disabled");
+		source.Reply(index.c_str(), "NOEXPIRE");
 
 		return MOD_CONT;
 	}
@@ -47,16 +47,16 @@ class CommandOSSet : public Command
 		{
 			readonly = true;
 			Log(LOG_ADMIN, u, this) << "READONLY ON";
-			source.Reply(OPER_SET_READONLY_ON);
+			source.Reply(_("Services are now in \002read-only\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			readonly = false;
 			Log(LOG_ADMIN, u, this) << "READONLY OFF";
-			source.Reply(OPER_SET_READONLY_OFF);
+			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
-			source.Reply(OPER_SET_READONLY_ERROR);
+			source.Reply(_("Setting for READONLY must be \002\002 or \002\002."));
 
 		return MOD_CONT;
 	}
@@ -78,23 +78,23 @@ class CommandOSSet : public Command
 		 * Rob
 		 **/
 		if (!Config->SuperAdmin)
-			source.Reply(OPER_SUPER_ADMIN_NOT_ENABLED);
+			source.Reply(_("SuperAdmin setting not enabled in services.conf"));
 		else if (setting.equals_ci("ON"))
 		{
 			u->isSuperAdmin = 1;
-			source.Reply(OPER_SUPER_ADMIN_ON);
+			source.Reply(_("You are now a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
-			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_ON).c_str(), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, GetString(NULL, _("%s is now a Super-Admin")).c_str(), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			u->isSuperAdmin = 0;
-			source.Reply(OPER_SUPER_ADMIN_OFF);
+			source.Reply(_("You are no longer a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
-			ircdproto->SendGlobops(OperServ, GetString(OPER_SUPER_ADMIN_WALL_OFF).c_str(), u->nick.c_str());
+			ircdproto->SendGlobops(OperServ, GetString(NULL, _("%s is no longer a Super-Admin")).c_str(), u->nick.c_str());
 		}
 		else
-			source.Reply(OPER_SUPER_ADMIN_SYNTAX);
+			source.Reply(_("Setting for SuperAdmin must be \002\002 or \002\002 (must be enabled in services.conf)"));
 
 		return MOD_CONT;
 	}
@@ -114,22 +114,22 @@ class CommandOSSet : public Command
 		{
 			debug = 1;
 			Log(LOG_ADMIN, u, this) << "DEBUG ON";
-			source.Reply(OPER_SET_DEBUG_ON);
+			source.Reply(_("Services are now in debug mode."));
 		}
 		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
 		{
 			Log(LOG_ADMIN, u, this) << "DEBUG OFF";
 			debug = 0;
-			source.Reply(OPER_SET_DEBUG_OFF);
+			source.Reply(_("Services are now in non-debug mode."));
 		}
 		else if (setting.is_number_only() && convertTo<int>(setting) > 0)
 		{
 			debug = convertTo<int>(setting);
 			Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
-			source.Reply(OPER_SET_DEBUG_LEVEL, debug);
+			source.Reply(_("Services are now in debug mode (level %d)."), debug);
 		}
 		else
-			source.Reply(OPER_SET_DEBUG_ERROR);
+			source.Reply(_("Setting for DEBUG must be \002\002, \002\002, or a positive number."));
 
 		return MOD_CONT;
 	}
@@ -149,16 +149,16 @@ class CommandOSSet : public Command
 		{
 			noexpire = true;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE ON";
-			source.Reply(OPER_SET_NOEXPIRE_ON);
+			source.Reply(_("Services are now in \002no expire\002 mode."));
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			noexpire = false;
 			Log(LOG_ADMIN, u, this) << "NOEXPIRE OFF";
-			source.Reply(OPER_SET_NOEXPIRE_OFF);
+			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else
-			source.Reply(OPER_SET_NOEXPIRE_ERROR);
+			source.Reply(_("Setting for NOEXPIRE must be \002\002 or \002\002."));
 
 		return MOD_CONT;
 	}
@@ -182,7 +182,7 @@ class CommandOSSet : public Command
 		else if (option.equals_ci("NOEXPIRE"))
 			return this->DoSetNoExpire(source, params);
 		else
-			source.Reply(OPER_SET_UNKNOWN_OPTION, option.c_str());
+			source.Reply(_("Unknown option \002%s\002."), option.c_str());
 
 		return MOD_CONT;
 	}
@@ -190,29 +190,57 @@ class CommandOSSet : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			source.Reply(OPER_HELP_SET);
+			source.Reply(_("Syntax: \002SET \037option\037 \037setting\037\002\n"
+					"Sets various global Services options.  Option names\n"
+					"currently defined are:\n"
+					"    READONLY   Set read-only or read-write mode\n"
+					"    DEBUG      Activate or deactivate debug mode\n"
+					"    NOEXPIRE   Activate or deactivate no expire mode\n"
+					"    SUPERADMIN Activate or deactivate super-admin mode\n"
+					"    LIST       List the options"));
 		else if (subcommand.equals_ci("LIST"))
-			source.Reply(OPER_HELP_SET_LIST);
+			source.Reply(_("Syntax: \002SET LIST\n"
+					"Display the various %S settings"));
 		else if (subcommand.equals_ci("READONLY"))
-			source.Reply(OPER_HELP_SET_READONLY);
+			source.Reply(_("Syntax: \002SET READONLY {ON | OFF}\002\n"
+					" \n"
+					"Sets read-only mode on or off.  In read-only mode, normal\n"
+					"users will not be allowed to modify any Services data,\n"
+					"including channel and nickname access lists, etc.  IRCops\n"
+					"with sufficient Services privileges will be able to modify\n"
+					"Services' AKILL list and drop or forbid nicknames and\n"
+					"channels, but any such changes will not be saved unless\n"
+					"read-only mode is deactivated before Services is terminated\n"
+					"or restarted.\n"
+					" \n"
+					"This option is equivalent to the command-line option\n"
+					"\002-readonly\002."));
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			source.Reply(OPER_HELP_SET_NOEXPIRE);
+			source.Reply(_("Syntax: \002SET NOEXPIRE {ON | OFF}\002\n"
+					"Sets no expire mode on or off. In no expire mode, nicks,\n"
+					"channels, akills and exceptions won't expire until the\n"
+					"option is unset.\n"
+					"This option is equivalent to the command-line option\n"
+					"\002-noexpire\002."));
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			source.Reply(OPER_HELP_SET_SUPERADMIN);
+			source.Reply(_("Syntax: \002SET SUPERADMIN {ON | OFF}\002\n"
+					"Setting this will grant you extra privileges such as the\n"
+					"ability to be \"founder\" on all channel's etc...\n"
+					"This option is \002not\002 persistent, and should only be used when\n"
+					"needed, and set back to OFF when no longer needed."));
 		else
 			return false;
-
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", OPER_SET_SYNTAX);
+		SyntaxError(source, "SET", _("SET \037option\037 \037setting\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SET);
+		source.Reply(_("    SET         Set various global Services options"));
 	}
 };
 

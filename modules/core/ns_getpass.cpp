@@ -35,15 +35,15 @@ class CommandNSGetPass : public Command
 				Log(LOG_ADMIN, u, this) << "for " << nr->nick;
 				if (Config->WallGetpass)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
-				source.Reply(NICK_GETPASS_PASSCODE_IS, nick.c_str(), nr->passcode.c_str());
+				source.Reply(_("Passcode for %s is \002%s\002."), nick.c_str(), nr->passcode.c_str());
 			}
 			else
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
@@ -51,28 +51,33 @@ class CommandNSGetPass : public Command
 				Log(LOG_ADMIN, u, this) << "for " << nick;
 				if (Config->WallGetpass)
 					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
-				source.Reply(NICK_GETPASS_PASSWORD_IS, nick.c_str(), tmp_pass.c_str());
+				source.Reply(_("Password for %s is \002%s\002."), nick.c_str(), tmp_pass.c_str());
 			}
 			else
-				source.Reply(NICK_GETPASS_UNAVAILABLE);
+				source.Reply(_("GETPASS command unavailable because encryption is in use."));
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_SERVADMIN_HELP_GETPASS);
+		source.Reply(_("Syntax: \002GETPASS \037nickname\037\002\n"
+				" \n"
+				"Returns the password for the given nickname.  \002Note\002 that\n"
+				"whenever this command is used, a message including the\n"
+				"person who issued the command and the nickname it was used\n"
+				"on will be logged and sent out as a WALLOPS/GLOBOPS."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "GETPASS", NICK_GETPASS_SYNTAX);
+		SyntaxError(source, "GETPASS", _("GETPASS \037nickname\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_GETPASS);
+		source.Reply(_("    GETPASS    Retrieve the password for a nickname"));
 	}
 };
 

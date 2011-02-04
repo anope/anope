@@ -28,25 +28,29 @@ class CommandHSGroup : public Command
 		{
 			HostServSyncVhosts(na);
 			if (!na->hostinfo.GetIdent().empty())
-				source.Reply(HOST_IDENT_GROUP, u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
-				source.Reply(HOST_GROUP, u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
-			source.Reply(HOST_NOT_ASSIGNED);
+			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_GROUP);
+		source.Reply(_("Syntax: \002GROUP\002\n"
+				" \n"
+				"This command allows users to set the vhost of their\n"
+				"CURRENT nick to be the vhost for all nicks in the same\n"
+				"group."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_GROUP);
+		source.Reply(_("    GROUP       Syncs the vhost for all nicks in a group"));
 	}
 };
 

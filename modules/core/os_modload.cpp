@@ -28,7 +28,7 @@ class CommandOSModLoad : public Command
 		Module *m = FindModule(mname);
 		if (m)
 		{
-			source.Reply(OPER_MODULE_ALREADY_LOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
 			return MOD_CONT;
 		}
 
@@ -36,7 +36,7 @@ class CommandOSModLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			ircdproto->SendGlobops(OperServ, "%s loaded module %s", u->nick.c_str(), mname.c_str());
-			source.Reply(OPER_MODULE_LOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 loaded"), mname.c_str());
 
 			/* If a user is loading this module, then the core databases have already been loaded
 			 * so trigger the event manually
@@ -46,25 +46,28 @@ class CommandOSModLoad : public Command
 				m->OnPostLoadDatabases();
 		}
 		else
-			source.Reply(OPER_MODULE_LOAD_FAIL, mname.c_str());
+			source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODLOAD);
+		source.Reply(_("Syntax: \002MODLOAD\002 \002FileName\002\n"
+				" \n"
+				"This command loads the module named FileName from the modules\n"
+				"directory."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
+		SyntaxError(source, "MODLOAD", _("MODLOAD \037FileName\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODLOAD);
+		source.Reply(_("    MODLOAD     Load a module"));
 	}
 };
 

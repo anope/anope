@@ -21,10 +21,11 @@ class CommandNSAJoin : public Command
 		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
 
 		if (channels.empty())
-			source.Reply(NICK_AJOIN_LIST_EMPTY);
+			source.Reply(_("Your auto join list is empty."));
 		else
 		{
-			source.Reply(NICK_AJOIN_LIST_HEAD);
+			source.Reply(_("Your auto join list:\n"
+					"  Num   Channel      Key"));
 			for (unsigned i = 0; i < channels.size(); ++i)
 				source.Reply(" %3d    %-12s %s", i + 1, channels[i].first.c_str(), channels[i].second.c_str());
 		}
@@ -36,13 +37,13 @@ class CommandNSAJoin : public Command
 		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
 
 		if (channels.size() >= Config->AJoinMax)
-			source.Reply(NICK_AJOIN_LIST_FULL);
+			source.Reply(_("Your auto join list is full."));
 		else if (ircdproto->IsChannelValid(params[1]) == false)
- 			source.Reply(CHAN_X_INVALID, params[1].c_str());
+ 			source.Reply(LanguageString::CHAN_X_INVALID, params[1].c_str());
 		else
 		{
 			channels.push_back(std::make_pair(params[1], params.size() > 2 ? params[2] : ""));
-			source.Reply(NICK_AJOIN_ADDED, params[1].c_str());
+			source.Reply(_("Added %s to your auto join list."), params[1].c_str());
 			source.u->Account()->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
 				std::pair<Anope::string, Anope::string> > >(channels));
 		}
@@ -59,13 +60,13 @@ class CommandNSAJoin : public Command
 				break;
 		
 		if (i == channels.size())
-			source.Reply(NICK_AJOIN_NOTFOUND, params[1].c_str());
+			source.Reply(_("%s was not found on your auto join list."), params[1].c_str());
 		else
 		{
 			channels.erase(channels.begin() + i);
 			source.u->Account()->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
 				std::pair<Anope::string, Anope::string> > >(channels));
-			source.Reply(NICK_AJOIN_DELETED, params[1].c_str());
+			source.Reply(_("%s was removed from your auto join list."), params[1].c_str());
 		}
 	}
 
@@ -92,18 +93,21 @@ class CommandNSAJoin : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_AJOIN);
+		source.Reply(_("Syntax: \002AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]\002\n"
+				" \n"
+				"This command manages your auto join list. When you identify\n"
+				"you will automatically join the channels on your auto join list"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "AJOIN", NICK_AJOIN_SYNTAX);
+		SyntaxError(source, "AJOIN", _("AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_AJOIN);
+		source.Reply(_("    AJOIN      Manage your auto join list"));
 	}
 };
 

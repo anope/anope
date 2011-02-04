@@ -28,28 +28,6 @@ CommandSource::~CommandSource()
 	}
 }
 
-void CommandSource::Reply(LanguageString message, ...)
-{
-	Anope::string m = GetString(this->u, message);
-
-	m = m.replace_all_cs("%S", this->owner->nick);
-
-	if (m.length() >= 4096)
-		Log() << "Warning, language string " << message << " is longer than 4096 bytes";
-
-	va_list args;
-	char buf[4096];
-	va_start(args, message);
-	vsnprintf(buf, sizeof(buf) - 1, m.c_str(), args);
-	va_end(args);
-
-	sepstream sep(buf, '\n');
-	Anope::string line;
-
-	while (sep.GetToken(line))
-		this->Reply(line.empty() ? " " : line.c_str());
-}
-
 void CommandSource::Reply(const char *message, ...)
 {
 	va_list args;
@@ -60,10 +38,18 @@ void CommandSource::Reply(const char *message, ...)
 		va_start(args, message);
 		vsnprintf(buf, BUFSIZE - 1, message, args);
 
-		this->reply.push_back(buf);
+		this->Reply(Anope::string(buf));
 
 		va_end(args);
 	}
+}
+
+void CommandSource::Reply(const Anope::string &message)
+{
+	sepstream sep(message, '\n');
+	Anope::string tok;
+	while (sep.GetToken(tok))
+		this->reply.push_back(tok);
 }
 
 Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)

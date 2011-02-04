@@ -26,9 +26,9 @@ class AccessListCallback : public NumberList
 	~AccessListCallback()
 	{
 		if (SentHeader)
-			source.Reply(CHAN_ACCESS_LIST_FOOTER, source.ci->name.c_str());
+			source.Reply(_("End of access list."), source.ci->name.c_str());
 		else
-			source.Reply(CHAN_ACCESS_NO_MATCH, source.ci->name.c_str());
+			source.Reply(_("No matching entries on %s access list."), source.ci->name.c_str());
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -39,7 +39,7 @@ class AccessListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
@@ -50,10 +50,10 @@ class AccessListCallback : public NumberList
 		if (source.ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(CHAN_ACCESS_LIST_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str());
+			source.Reply(_("  %3d   %s  %s"), Number + 1, xop.c_str(), access->mask.c_str());
 		}
 		else
-			source.Reply(CHAN_ACCESS_LIST_AXS_FORMAT, Number + 1, access->level, access->mask.c_str());
+			source.Reply(_("  %3d  %4d  %s"), Number + 1, access->level, access->mask.c_str());
 	}
 };
 
@@ -72,7 +72,7 @@ class AccessViewCallback : public AccessListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
@@ -92,10 +92,10 @@ class AccessViewCallback : public AccessListCallback
 		if (ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(LanguageString::CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 		}
 		else
-			source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(LanguageString::CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 	}
 };
 
@@ -117,17 +117,17 @@ class AccessDelCallback : public NumberList
 	~AccessDelCallback()
 	{
 		if (Denied && !Deleted)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!Deleted)
-			source.Reply(CHAN_ACCESS_NO_MATCH, source.ci->name.c_str());
+			source.Reply(_("No matching entries on %s access list."), source.ci->name.c_str());
 		else
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
 
 			if (Deleted == 1)
-				source.Reply(CHAN_ACCESS_DELETED_ONE, source.ci->name.c_str());
+				source.Reply(_("Deleted 1 entry from %s access list."), source.ci->name.c_str());
 			else
-				source.Reply(CHAN_ACCESS_DELETED_SEVERAL, Deleted, source.ci->name.c_str());
+				source.Reply(_("Deleted %d entries from %s access list."), Deleted, source.ci->name.c_str());
 		}
 	}
 
@@ -175,18 +175,18 @@ class CommandCSAccess : public Command
 		int16 u_level = u_access ? u_access->level : 0;
 		if (level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!level)
 		{
-			source.Reply(CHAN_ACCESS_LEVEL_NONZERO);
+			source.Reply(_("Access level must be non-zero."));
 			return MOD_CONT;
 		}
 		else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
 		{
-			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(LanguageString::CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 			return MOD_CONT;
 		}
 
@@ -197,7 +197,7 @@ class CommandCSAccess : public Command
 			mask += "!*@*";
 		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, mask.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, mask.c_str());
 			return MOD_CONT;
 		}
 
@@ -207,12 +207,12 @@ class CommandCSAccess : public Command
 			/* Don't allow lowering from a level >= u_level */
 			if (access->level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			if (access->level == level)
 			{
-				source.Reply(CHAN_ACCESS_LEVEL_UNCHANGED, access->mask.c_str(), ci->name.c_str(), level);
+				source.Reply(_("Access level for \002%s\002 on %s unchanged from \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 				return MOD_CONT;
 			}
 			access->level = level;
@@ -220,13 +220,13 @@ class CommandCSAccess : public Command
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
-			source.Reply(CHAN_ACCESS_LEVEL_CHANGED, access->mask.c_str(), ci->name.c_str(), level);
+			source.Reply(_("Access level for \002%s\002 on %s changed to \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
 
 		if (ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			source.Reply(CHAN_ACCESS_REACHED_LIMIT, Config->CSAccessMax);
+			source.Reply(_("Sorry, you can only have %d access entries on a channel."), Config->CSAccessMax);
 			return MOD_CONT;
 		}
 
@@ -235,7 +235,7 @@ class CommandCSAccess : public Command
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
-		source.Reply(CHAN_ACCESS_ADDED, access->mask.c_str(), ci->name.c_str(), level);
+		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
 	}
@@ -248,7 +248,7 @@ class CommandCSAccess : public Command
 		const Anope::string &mask = params[2];
 
 		if (!ci->GetAccessCount())
-			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			AccessDelCallback list(source, this, mask);
@@ -260,12 +260,12 @@ class CommandCSAccess : public Command
 			ChanAccess *u_access = ci->GetAccess(u);
 			int16 u_level = u_access ? u_access->level : 0;
 			if (!access)
-				source.Reply(CHAN_ACCESS_NOT_FOUND, mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
 			else if (access->nc != u->Account() && check_access(u, ci, CA_NOJOIN) && u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 			else
 			{
-				source.Reply(CHAN_ACCESS_DELETED, access->mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
 				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && access->nc != u->Account();
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask << " from level " << access->level;
 
@@ -285,7 +285,7 @@ class CommandCSAccess : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			AccessListCallback list(source, nick);
@@ -305,16 +305,16 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
 				}
 
 				AccessListCallback::DoList(source, i, access);
 			}
 
 			if (SentHeader)
-				source.Reply(CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				source.Reply(_("End of access list."), ci->name.c_str());
 			else
-				source.Reply(CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+				source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -327,7 +327,7 @@ class CommandCSAccess : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			source.Reply(CHAN_ACCESS_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			AccessViewCallback list(source, nick);
@@ -347,16 +347,16 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
 				}
 
 				AccessViewCallback::DoList(source, i, access);
 			}
 
 			if (SentHeader)
-				source.Reply(CHAN_ACCESS_LIST_FOOTER, ci->name.c_str());
+				source.Reply(_("End of access list."), ci->name.c_str());
 			else
-				source.Reply(CHAN_ACCESS_NO_MATCH, ci->name.c_str());
+				source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -368,14 +368,14 @@ class CommandCSAccess : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else
 		{
 			ci->ClearAccess();
 
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-			source.Reply(CHAN_ACCESS_CLEAR, ci->name.c_str());
+			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
 			bool override = !IsFounder(u, ci);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
@@ -420,17 +420,21 @@ class CommandCSAccess : public Command
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
 			this->OnSyntaxError(source, cmd);
 		else if (!has_access)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		/* We still allow LIST and CLEAR in xOP mode, but not others */
 		else if (ci->HasFlag(CI_XOP) && !is_list && !is_clear)
 		{
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-				source.Reply(CHAN_ACCESS_XOP_HOP, Config->s_ChanServ.c_str());
+				source.Reply(_("You can't use this command. \n"
+						"Use the AOP, SOP, HOP and VOP commands instead.\n"
+						"Type \002%R%s HELP \037command\037\002 for more information."), Config->s_ChanServ.c_str());
 			else
-				source.Reply(CHAN_ACCESS_XOP, Config->s_ChanServ.c_str());
+				source.Reply(_("You can't use this command. \n"
+						"Use the AOP, SOP and VOP commands instead.\n"
+						"Type \002%R%s HELP \037command\037\002 for more information."), Config->s_ChanServ.c_str());
 		}
 		else if (readonly && !is_list)
-			source.Reply(CHAN_ACCESS_DISABLED);
+			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
@@ -449,14 +453,75 @@ class CommandCSAccess : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_ACCESS);
-		source.Reply(CHAN_HELP_ACCESS_LEVELS);
+		source.Reply(_("Syntax: \002ACCESS \037channel\037 ADD \037mask\037 \037level\037\002\n"
+				"        \002ACCESS \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002ACCESS \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002ACCESS \037channel\037 VIEW [\037mask\037 | \037list\037]\002\n"
+				"        \002ACCESS \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002access list\002 for a channel.  The access\n"
+				"list specifies which users are allowed chanop status or\n"
+				"access to %S commands on the channel.  Different\n"
+				"user levels allow for access to different subsets of\n"
+				"privileges; \002%R%S HELP ACCESS LEVELS\002 for more\n"
+				"specific information.  Any nick not on the access list has\n"
+				"a user level of 0.\n"
+				" \n"
+				"The \002ACCESS ADD\002 command adds the given mask to the\n"
+				"access list with the given user level; if the mask is\n"
+				"already present on the list, its access level is changed to\n"
+				"the level specified in the command.  The \037level\037 specified\n"
+				"must be less than that of the user giving the command, and\n"
+				"if the \037mask\037 is already on the access list, the current\n"
+				"access level of that nick must be less than the access level\n"
+				"of the user giving the command. When a user joins the channel\n"
+				"the access they receive is from the highest level entry in the\n"
+				"access list.\n"
+				" \n"
+				"The \002ACCESS DEL\002 command removes the given nick from the\n"
+				"access list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				"You may remove yourself from an access list, even if you\n"
+				"do not have access to modify that list otherwise.\n"
+				" \n"
+				"The \002ACCESS LIST\002 command displays the access list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002ACCESS #channel LIST 2-5,7-9\002\n"
+				"      Lists access entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				" \n"
+				"The \002ACCESS VIEW\002 command displays the access list similar\n"
+				"to \002ACCESS LIST\002 but shows the creator and last used time.\n"
+				" \n"
+				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
+				"access list."));
+		source.Reply(_("\002User access levels\002\n"
+				" \n"
+				"By default, the following access levels are defined:\n"
+				" \n"
+				"   \002Founder\002   Full access to %S functions; automatic\n"
+				"                     opping upon entering channel.  Note\n"
+				"                     that only one person may have founder\n"
+				"                     status (it cannot be given using the\n"
+				"                     \002ACCESS\002 command).\n"
+				"   \002     10\002   Access to AKICK command; automatic opping.\n"
+				"   \002      5\002   Automatic opping.\n"
+				"   \002      3\002   Automatic voicing.\n"
+				"   \002      0\002   No special privileges; can be opped by other\n"
+				"                     ops (unless \002secure-ops\002 is set).\n"
+				"   \002     <0\002   May not be opped.\n"
+				" \n"
+				"These levels may be changed, or new ones added, using the\n"
+				"\002LEVELS\002 command; type \002%R%S HELP LEVELS\002 for\n"
+				"information."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "ACCESS", CHAN_ACCESS_SYNTAX);
+		SyntaxError(source, "ACCESS", _("ACCESS \037channel\037 {ADD|DEL|LIST|VIEW|CLEAR} [\037mask\037 [\037level\037] | \037entry-list\037]"));
 	}
 };
 
@@ -484,7 +549,7 @@ class CommandCSLevels : public Command
 		if (!error.empty())
 			this->OnSyntaxError(source, "SET");
 		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
-			source.Reply(CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(_("Level must be between %d and %d inclusive."), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
@@ -498,14 +563,14 @@ class CommandCSLevels : public Command
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << levelinfo[i].name << " to " << level;
 
 					if (level == ACCESS_FOUNDER)
-						source.Reply(CHAN_LEVELS_CHANGED_FOUNDER, levelinfo[i].name.c_str(), ci->name.c_str());
+						source.Reply(_("Level for %s on channel %s changed to founder only."), levelinfo[i].name.c_str(), ci->name.c_str());
 					else
-						source.Reply(CHAN_LEVELS_CHANGED, levelinfo[i].name.c_str(), ci->name.c_str(), level);
+						source.Reply(_("Level for \002%s\002 on channel %s changed to \002%d\002."), levelinfo[i].name.c_str(), ci->name.c_str(), level);
 					return MOD_CONT;
 				}
 			}
 
-			source.Reply(CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+			source.Reply(_("Setting \002%s\002 not known.  Type \002%R%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->s_ChanServ.c_str());
 		}
 
 		return MOD_CONT;
@@ -530,12 +595,12 @@ class CommandCSLevels : public Command
 					bool override = !check_access(u, ci, CA_FOUNDER);
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << levelinfo[i].name;
 
-					source.Reply(CHAN_LEVELS_DISABLED, levelinfo[i].name.c_str(), ci->name.c_str());
+					source.Reply(_("\002%s\002 disabled on channel %s."), levelinfo[i].name.c_str(), ci->name.c_str());
 					return MOD_CONT;
 				}
 			}
 
-		source.Reply(CHAN_LEVELS_UNKNOWN, what.c_str(), Config->s_ChanServ.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%R%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->s_ChanServ.c_str());
 
 		return MOD_CONT;
 	}
@@ -544,7 +609,7 @@ class CommandCSLevels : public Command
 	{
 		ChannelInfo *ci = source.ci;
 
-		source.Reply(CHAN_LEVELS_LIST_HEADER, ci->name.c_str());
+		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
 		if (!levelinfo_maxwidth)
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
@@ -562,12 +627,12 @@ class CommandCSLevels : public Command
 			{
 				j = levelinfo[i].what;
 
-				source.Reply(CHAN_LEVELS_LIST_DISABLED, levelinfo_maxwidth, levelinfo[i].name.c_str());
+				source.Reply(_("    %-*s  (disabled)"), levelinfo_maxwidth, levelinfo[i].name.c_str());
 			}
 			else if (j == ACCESS_FOUNDER)
-				source.Reply(CHAN_LEVELS_LIST_FOUNDER, levelinfo_maxwidth, levelinfo[i].name.c_str());
+				source.Reply(_("    %-*s  (founder only)"), levelinfo_maxwidth, levelinfo[i].name.c_str());
 			else
-				source.Reply(CHAN_LEVELS_LIST_NORMAL, levelinfo_maxwidth, levelinfo[i].name.c_str(), j);
+				source.Reply(_("    %-*s  %d"), levelinfo_maxwidth, levelinfo[i].name.c_str(), j);
 		}
 
 		return MOD_CONT;
@@ -584,7 +649,7 @@ class CommandCSLevels : public Command
 		bool override = !check_access(u, ci, CA_FOUNDER);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
 
-		source.Reply(CHAN_LEVELS_RESET, ci->name.c_str());
+		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
 		return MOD_CONT;
 	}
 
@@ -608,9 +673,9 @@ class CommandCSLevels : public Command
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
 		else if (ci->HasFlag(CI_XOP))
-			source.Reply(CHAN_LEVELS_XOP);
+			source.Reply(_("Levels are not available as xOP is enabled on this channel."));
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))
@@ -630,7 +695,9 @@ class CommandCSLevels : public Command
 		if (subcommand.equals_ci("DESC"))
 		{
 			int i;
-			source.Reply(CHAN_HELP_LEVELS_DESC);
+			source.Reply(_("The following feature/function names are understood. Note\n"
+					"that the leves for NOJOIN is the maximum level,\n"
+					"while all others are minimum levels."));
 			if (!levelinfo_maxwidth)
 				for (i = 0; levelinfo[i].what >= 0; ++i)
 				{
@@ -639,22 +706,45 @@ class CommandCSLevels : public Command
 						levelinfo_maxwidth = len;
 				}
 			for (i = 0; levelinfo[i].what >= 0; ++i)
-				source.Reply(CHAN_HELP_LEVELS_DESC_FORMAT, levelinfo_maxwidth, levelinfo[i].name.c_str(), GetString(source.u, levelinfo[i].desc).c_str());
+				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, levelinfo[i].name.c_str(), GetString(source.u->Account(), levelinfo[i].desc).c_str());
 		}
 		else
-			source.Reply(CHAN_HELP_LEVELS);
+			source.Reply(_("Syntax: \002LEVELS \037channel\037 SET \037type\037 \037level\037\002\n"
+					"        \002LEVELS \037channel\037 {DIS | DISABLE} \037type\037\002\n"
+					"        \002LEVELS \037channel\037 LIST\002\n"
+					"        \002LEVELS \037channel\037 RESET\002\n"
+					" \n"
+					"The \002LEVELS\002 command allows fine control over the meaning of\n"
+					"the numeric access levels used for channels.  With this\n"
+					"command, you can define the access level required for most\n"
+					"of %S's functions. (The \002SET FOUNDER\002 and this command\n"
+					"are always restricted to the channel founder.)\n"
+					" \n"
+					"\002LEVELS SET\002 allows the access level for a function or group of\n"
+					"functions to be changed. \002LEVELS DISABLE\002 (or \002DIS\002 for short)\n"
+					"disables an automatic feature or disallows access to a\n"
+					"function by anyone, INCLUDING the founder (although, the founder\n"
+					"can always reenable it).\n"
+					" \n"
+					"\002LEVELS LIST\002 shows the current levels for each function or\n"
+					"group of functions. \002LEVELS RESET\002 resets the levels to the\n"
+					"default levels of a newly-created channel (see\n"
+					"\002HELP ACCESS LEVELS\002).\n"
+					" \n"
+					"For a list of the features and functions whose levels can be\n"
+					"set, see \002HELP LEVELS DESC\002."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LEVELS", CHAN_LEVELS_SYNTAX);
+		SyntaxError(source, "LEVELS", _("LEVELS \037channel\037 {SET | DIS[ABLE] | LIST | RESET} [\037item\037 [\037level\037]]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_ACCESS);
-		source.Reply(CHAN_HELP_CMD_LEVELS);
+		source.Reply(_("    ACCESS     Modify the list of privileged users"));
+		source.Reply(_("    LEVELS     Redefine the meanings of access levels"));
 	}
 };
 

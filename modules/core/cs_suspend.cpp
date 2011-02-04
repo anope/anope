@@ -38,12 +38,12 @@ class CommandCSSuspend : public Command
 		/* You should not SUSPEND a FORBIDEN channel */
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
-			source.Reply(CHAN_MAY_NOT_BE_REGISTERED, ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 may not be registered."), ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (readonly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 
 		ci->SetFlag(CI_SUSPENDED);
 		ci->forbidby = u->nick;
@@ -59,7 +59,7 @@ class CommandCSSuspend : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), CHAN_SUSPEND_REASON).c_str());
+				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), _("This channel has been suspended.")).c_str());
 			}
 		}
 
@@ -67,7 +67,7 @@ class CommandCSSuspend : public Command
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
-		source.Reply(CHAN_SUSPEND_SUCCEEDED, ci->name.c_str());
+		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 
@@ -76,18 +76,26 @@ class CommandCSSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_SERVADMIN_HELP_SUSPEND);
+		source.Reply(_("Syntax: \002SUSPEND \037channel\037 [\037reason\037]\002\n"
+				" \n"
+				"Disallows anyone from registering or using the given\n"
+				"channel.  May be cancelled by using the UNSUSPEND\n"
+				"command to preserve all previous channel data/settings.\n"
+				" \n"
+				"Reason may be required on certain networks."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SUSPEND", Config->ForceForbidReason ? CHAN_SUSPEND_SYNTAX_REASON : CHAN_SUSPEND_SYNTAX);
+		SyntaxError(source, "SUSPEND", Config->ForceForbidReason ? _("SUSPEND \037channel\037 \037reason\037") : _("SUSPEND \037channel\037 \037freason\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SUSPEND);
+		source.Reply(_("    SUSPEND    Prevent a channel from being used preserving\n"
+			"               	channel data and settings"));
+
 	}
 };
 
@@ -105,12 +113,12 @@ class CommandCSUnSuspend : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (readonly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasFlag(CI_SUSPENDED))
 		{
-			source.Reply(CHAN_UNSUSPEND_FAILED, ci->name.c_str());
+			source.Reply(_("Couldn't release channel \002%s\002!"), ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -123,7 +131,7 @@ class CommandCSUnSuspend : public Command
 		if (Config->WallForbid)
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
-		source.Reply(CHAN_UNSUSPEND_SUCCEEDED, ci->name.c_str());
+		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 
 		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 
@@ -132,18 +140,21 @@ class CommandCSUnSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_SERVADMIN_HELP_UNSUSPEND);
+		source.Reply(_("Syntax: \002UNSUSPEND \037channel\037\002\n"
+				" \n"
+				"Releases a suspended channel. All data and settings\n"
+				"are preserved from before the suspension."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "UNSUSPEND", CHAN_UNSUSPEND_SYNTAX);
+		SyntaxError(source, "UNSUSPEND", _("UNSUSPEND \037channel\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_UNSUSPEND);
+		source.Reply(_("    UNSUSPEND  Releases a suspended channel"));
 	}
 };
 

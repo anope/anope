@@ -29,7 +29,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -41,17 +41,17 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, params[1].c_str());
 				return MOD_CONT;
 			}
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 				return MOD_CONT;
 			}
 			if (na->nc == ci->founder)
 			{
-				source.Reply(CHAN_SUCCESSOR_IS_FOUNDER, na->nick.c_str(), ci->name.c_str());
+				source.Reply(_("%s cannot be the successor on channel %s because he is its founder."), na->nick.c_str(), ci->name.c_str());
 				return MOD_CONT;
 			}
 			nc = na->nc;
@@ -64,28 +64,36 @@ class CommandCSSetSuccessor : public Command
 		ci->successor = nc;
 
 		if (nc)
-			source.Reply(CHAN_SUCCESSOR_CHANGED, ci->name.c_str(), nc->display.c_str());
+			source.Reply(_("Successor for %s changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());
 		else
-			source.Reply(CHAN_SUCCESSOR_UNSET, ci->name.c_str());
+			source.Reply(_("Successor for \002%s\002 unset."), ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_SUCCESSOR, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 SUCCESSOR \037nick\037\002\n"
+				" \n"
+				"Changes the successor of a channel. If the founder's\n"
+				"nickname expires or is dropped while the channel is still\n"
+				"registered, the successor will become the new founder of the\n"
+				"channel.  However, if the successor already has too many\n"
+				"channels registered (%d), the channel will be dropped\n"
+				"instead, just as if no successor had been set.  The new\n"
+				"nickname must be a registered one."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_SUCCESSOR);
+		source.Reply(_("    SUCCESSOR     Set the successor for a channel"));
 	}
 };
 
@@ -96,16 +104,10 @@ class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_SUCCESSOR, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 };
 

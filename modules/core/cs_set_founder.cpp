@@ -29,7 +29,7 @@ class CommandCSSetFounder : public Command
 
 		if (this->permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -38,19 +38,19 @@ class CommandCSSetFounder : public Command
 
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, params[1].c_str());
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		nc = na->nc;
 		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(CHAN_SET_FOUNDER_TOO_MANY_CHANS, na->nick.c_str());
+			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -64,26 +64,29 @@ class CommandCSSetFounder : public Command
 		ci->founder = nc;
 		++nc->channelcount;
 
-		source.Reply(CHAN_FOUNDER_CHANGED, ci->name.c_str(), na->nick.c_str());
+		source.Reply(_("Founder of %s changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_FOUNDER, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 FOUNDER \037nick\037\002\n"
+				" \n"
+				"Changes the founder of a channel. The new nickname must\n"
+				"be a registered one."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_FOUNDER);
+		source.Reply(_("    FOUNDER       Set the founder of a channel"));
 	}
 };
 
@@ -94,16 +97,10 @@ class CommandCSSASetFounder : public CommandCSSetFounder
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_FOUNDER, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 };
 

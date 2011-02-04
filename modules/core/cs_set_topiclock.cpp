@@ -29,12 +29,12 @@ class CommandCSSetTopicLock : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_TOPICLOCK);
-			source.Reply(CHAN_SET_TOPICLOCK_ON, ci->name.c_str());
+			source.Reply(_("Topic lock option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_TOPICLOCK);
-			source.Reply(CHAN_SET_TOPICLOCK_OFF, ci->name.c_str());
+			source.Reply(_("Topic lock option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "TOPICLOCK");
@@ -44,18 +44,23 @@ class CommandCSSetTopicLock : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_TOPICLOCK, "SET");
+		source.Reply(_("Syntax: \002SET \037%s\037 TOPICLOCK {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002topic lock\002 option for a channel.\n"
+				"When \002topic lock\002 is set, %S will not allow the\n"
+				"channel topic to be changed except via the \002TOPIC\002\n"
+				"command."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET", CHAN_SET_TOPICLOCK_SYNTAX);;
+		SyntaxError(source, "SET", _("SET \037channel\037 TOPICLOCK {ON | OFF}"));;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_TOPICLOCK);
+		source.Reply(_("    TOPICLOCK     Topic can only be changed with TOPIC"));
 	}
 };
 
@@ -66,15 +71,9 @@ class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_TOPICLOCK, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET", CHAN_SASET_TOPICLOCK_SYNTAX);
+		SyntaxError(source, "SASET", _("SASET \002channel\002 TOPICLOCK {ON | OFF}"));
 	}
 };
 

@@ -380,7 +380,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 
 		BotInfo *bi = findbot(receiver);
 		if (bi)
-			ircdproto->SendMessage(bi, source, "%s", GetString(USER_RECORD_NOT_FOUND).c_str());
+			ircdproto->SendMessage(bi, source, "%s", "Internal error - unable to process request.");
 
 		return true;
 	}
@@ -411,7 +411,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			if (!bi)
 				return true;
 			Log(LOG_DEBUG) << "Ignored PRIVMSG without @ from " << source;
-			u->SendMessage(bi, INVALID_TARGET, receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
+			u->SendMessage(bi, _("\"/msg %s\" is no longer supported.  Use \"/msg %s@%s\" or \"/%s\" instead."), receiver.c_str(), receiver.c_str(), Config->ServerName.c_str(), receiver.c_str());
 			return true;
 		}
 
@@ -441,14 +441,14 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			else if (bi == ChanServ)
 			{
 				if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
-					u->SendMessage(ChanServ, ACCESS_DENIED);
+					u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
 				else
 					mod_run_cmd(bi, u, message, false);
 			}
 			else if (bi == HostServ)
 			{
 				if (!ircd->vhost)
-					u->SendMessage(HostServ, SERVICE_OFFLINE, Config->s_HostServ.c_str());
+					u->SendMessage(HostServ, _("%s is currently offline."), Config->s_HostServ.c_str());
 				else
 					mod_run_cmd(bi, u, message, false);
 			}
@@ -456,7 +456,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			{
 				if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
 				{
-					u->SendMessage(OperServ, ACCESS_DENIED);
+					u->SendMessage(OperServ, LanguageString::ACCESS_DENIED);
 					if (Config->WallBadOS)
 						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 				}

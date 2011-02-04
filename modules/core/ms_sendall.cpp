@@ -27,7 +27,7 @@ class CommandMSSendAll : public Command
 
 		if (readonly)
 		{
-			source.Reply(MEMO_SEND_DISABLED);
+			source.Reply(LanguageString::MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -41,24 +41,25 @@ class CommandMSSendAll : public Command
 				memo_send(source, nc->display, text, 1);
 		}
 
-		source.Reply(MEMO_MASS_SENT);
+		source.Reply(_("A massmemo has been sent to all registered users."));
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_SENDALL);
+		source.Reply(_("Syntax: \002SENDALL\002 \002memo-text\002\n \n"
+				"Sends all registered users a memo containing \037memo-text\037."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SENDALL", MEMO_SENDALL_SYNTAX);
+		SyntaxError(source, "SENDALL", _("SENDALL \037memo-text\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_SENDALL);
+		source.Reply(_("    SENDALL  Send a memo to all registered users"));
 	}
 };
 

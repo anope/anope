@@ -46,21 +46,21 @@ class CommandNSInfo : public Command
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
 			{
-				source.Reply(NICK_IS_PREREG);
+				source.Reply(LanguageString::NICK_IS_PREREG);
 				if (has_auspex)
-					source.Reply(NICK_INFO_EMAIL, nr->email.c_str());
+					source.Reply(_("   E-mail address: %s"), nr->email.c_str());
 			}
 			else if (nickIsServices(nick, true))
-				source.Reply(NICK_X_IS_SERVICES, nick.c_str());
+				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
 			else
-				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			if (u->HasMode(UMODE_OPER) && !na->last_usermask.empty())
-				source.Reply(NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : GetString(u, NO_REASON).c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
 			else
-				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
 		}
 		else
 		{
@@ -74,71 +74,71 @@ class CommandNSInfo : public Command
 			if (has_auspex || (u->Account() && na->nc == u->Account()))
 				show_hidden = true;
 
-			source.Reply(NICK_INFO_REALNAME, na->nick.c_str(), na->last_realname.c_str());
+			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
-				source.Reply(NICK_INFO_SERVICES_OPERTYPE, na->nick.c_str(), na->nc->ot->GetName().c_str());
+				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->ot->GetName().c_str());
 
 			if (nick_online)
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					source.Reply(NICK_INFO_ADDRESS_ONLINE, na->last_usermask.c_str());
+					source.Reply(_("   Is online from: %s"), na->last_usermask.c_str());
 				else
-					source.Reply(NICK_INFO_ADDRESS_ONLINE_NOHOST, na->nick.c_str());
+					source.Reply(_("%s is currently online."), na->nick.c_str());
 			}
 			else
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					source.Reply(NICK_INFO_ADDRESS, na->last_usermask.c_str());
+					source.Reply(_("Last seen address: %s"), na->last_usermask.c_str());
 			}
 
-			source.Reply(NICK_INFO_TIME_REGGED, do_strftime(na->time_registered).c_str());
+			source.Reply(_("  Time registered: %s"), do_strftime(na->time_registered).c_str());
 
 			if (!nick_online)
 			{
-				source.Reply(NICK_INFO_LAST_SEEN, do_strftime(na->last_seen).c_str());
+				source.Reply(_("   Last seen time: %s"), do_strftime(na->last_seen).c_str());
 			}
 
 			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
-				source.Reply(NICK_INFO_LAST_QUIT, na->last_quit.c_str());
+				source.Reply(_("Last quit message: %s"), na->last_quit.c_str());
 
 			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_EMAIL)))
-				source.Reply(NICK_INFO_EMAIL, na->nc->email.c_str());
+				source.Reply(_("   E-mail address: %s"), na->nc->email.c_str());
 
 			if (show_hidden)
 			{
 				if (!Config->s_HostServ.empty() && ircd->vhost && na->hostinfo.HasVhost())
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
-						source.Reply(NICK_INFO_VHOST2, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+						source.Reply(_("            vhost: %s@%s"), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 					else
-						source.Reply(NICK_INFO_VHOST, na->hostinfo.GetHost().c_str());
+						source.Reply(_("            vhost: %s"), na->hostinfo.GetHost().c_str());
 				}
 				if (!na->nc->greet.empty())
-					source.Reply(NICK_INFO_GREET, na->nc->greet.c_str());
+					source.Reply(_("    Greet message: %s"), na->nc->greet.c_str());
 
 				Anope::string optbuf;
 
-				CheckOptStr(optbuf, NI_KILLPROTECT, GetString(u, NICK_INFO_OPT_KILL).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_SECURE, GetString(u, NICK_INFO_OPT_SECURE).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_PRIVATE, GetString(u, NICK_INFO_OPT_PRIVATE).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_MSG, GetString(u, NICK_INFO_OPT_MSG).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_AUTOOP, GetString(u, NICK_INFO_OPT_AUTOOP).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_KILLPROTECT, GetString(u->Account(), _("Protection")).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_SECURE, GetString(u->Account(), _("Security")).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_PRIVATE, GetString(u->Account(), _("Private")).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_MSG, GetString(u->Account(), _("Message mode")).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_AUTOOP, GetString(u->Account(), _("Auto-op")).c_str(), na->nc);
 
-				source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? GetString(u, NICK_INFO_OPT_NONE).c_str() : optbuf.c_str());
+				source.Reply(LanguageString::NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
 					if (!na->last_quit.empty())
-						source.Reply(NICK_INFO_SUSPENDED, na->last_quit.c_str());
+						source.Reply(_("This nickname is currently suspended, reason: %s"), na->last_quit.c_str());
 					else
-						source.Reply(NICK_INFO_SUSPENDED_NO_REASON);
+						source.Reply(_("This nickname is currently suspended"));
 				}
 
 				if (na->HasFlag(NS_NO_EXPIRE))
-					source.Reply(NICK_INFO_NO_EXPIRE);
+					source.Reply(_("This nickname will not expire."));
 				else
-					source.Reply(NICK_INFO_EXPIRE, do_strftime(na->last_seen + Config->NSExpire).c_str());
+					source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(u, na, show_hidden));
@@ -148,19 +148,23 @@ class CommandNSInfo : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_INFO);
+		source.Reply(_("Syntax: \002INFO \037nickname\037\002\n"
+				" \n"
+				"Displays information about the given nickname, such as\n"
+				"the nick's owner, last seen address and time, and nick\n"
+				"options."));
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "INFO", NICK_INFO_SYNTAX);
+		SyntaxError(source, "INFO", _("INFO \037nick\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_INFO);
+		source.Reply(_("    INFO       Displays information about a given nickname"));
 	}
 };
 

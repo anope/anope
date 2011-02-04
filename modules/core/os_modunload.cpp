@@ -28,19 +28,19 @@ class CommandOSModUnLoad : public Command
 		Module *m = FindModule(mname);
 		if (!m)
 		{
-			source.Reply(OPER_MODULE_ISNT_LOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 isn't loaded."), mname.c_str());
 			return MOD_CONT;
 		}
 		
 		if (!m->handle)
 		{
-			source.Reply(OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
 			return MOD_CONT;
 		}
 	
 		if (m->GetPermanent() || m->type == PROTOCOL)
 		{
-			source.Reply(OPER_MODULE_NO_UNLOAD);
+			source.Reply(_("Unable to remove module \002%s\002"));
 			return MOD_CONT;
 		}
 
@@ -50,29 +50,32 @@ class CommandOSModUnLoad : public Command
 
 		if (status == MOD_ERR_OK)
 		{
-			source.Reply(OPER_MODULE_UNLOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 unloaded"), mname.c_str());
 			ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), mname.c_str());
 		}
 		else
-			source.Reply(OPER_MODULE_REMOVE_FAIL, mname.c_str());
+			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODUNLOAD);
+		source.Reply(_("Syntax: \002MODUNLOAD\002 \002FileName\002\n"
+				" \n"
+				"This command unloads the module named FileName from the modules\n"
+				"directory."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+		SyntaxError(source, "MODUNLOAD", _("MODUNLOAD \037FileName\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODUNLOAD);
+		source.Reply(_("    MODUNLOAD   Un-Load a module"));
 	}
 };
 

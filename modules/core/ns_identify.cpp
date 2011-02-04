@@ -33,32 +33,32 @@ class CommandNSIdentify : public Command
 		{
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
-				source.Reply(NICK_IS_PREREG);
+				source.Reply(LanguageString::NICK_IS_PREREG);
 			else
-				source.Reply(NICK_NOT_REGISTERED);
+				source.Reply(LanguageString::NICK_NOT_REGISTERED);
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
 		 * identified as
 		 */
 		else if (u->Account() && u->Account() == na->nc)
-			source.Reply(NICK_ALREADY_IDENTIFIED);
+			source.Reply(_("You are already identified."));
 		else
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (!res)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
-				source.Reply(PASSWORD_INCORRECT);
+				source.Reply(LanguageString::PASSWORD_INCORRECT);
 				if (bad_password(u))
 					return MOD_STOP;
 			}
 			else if (res == -1)
-				source.Reply(NICK_IDENTIFY_FAILED);
+				source.Reply(_("Sorry, identification failed."));
 			else
 			{
 				if (u->IsIdentified())
@@ -79,7 +79,7 @@ class CommandNSIdentify : public Command
 				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 				Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display;
-				source.Reply(NICK_IDENTIFY_SUCCEEDED);
+				source.Reply(_("Password accepted - you are now recognized."));
 				if (ircd->vhost)
 					do_on_id(u);
 				if (Config->NSModeOnID)
@@ -87,8 +87,12 @@ class CommandNSIdentify : public Command
 
 				if (Config->NSForceEmail && u->Account() && u->Account()->email.empty())
 				{
-					source.Reply(NICK_IDENTIFY_EMAIL_REQUIRED);
-					source.Reply(NICK_IDENTIFY_EMAIL_HOWTO);
+					source.Reply(_("You must now supply an e-mail for your nick.\n"
+						"This e-mail will allow you to retrieve your password in\n"
+						"case you forget it."));
+					source.Reply(_("Type \002%R%S SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
+						"Your privacy is respected; this e-mail won't be given to\n"
+					"any third-party person."));
 				}
 
 				if (u->IsIdentified())
@@ -100,18 +104,24 @@ class CommandNSIdentify : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_IDENTIFY);
+		source.Reply(_("Syntax: \002IDENTIFY [account] \037password\037\002\n"
+				" \n"
+				"Tells %S that you are really the owner of this\n"
+				"nick.  Many commands require you to authenticate yourself\n"
+				"with this command before you use them.  The password\n"
+				"should be the same one you sent with the \002REGISTER\002\n"
+				"command."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
+		SyntaxError(source, "IDENTIFY", _("IDENTIFY [account] \037password\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_IDENTIFY);
+		source.Reply(_("    IDENTIFY   Identify yourself with your password"));
 	}
 };
 

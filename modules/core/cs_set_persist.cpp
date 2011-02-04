@@ -65,7 +65,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			source.Reply(CHAN_SET_PERSIST_ON, ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 is now persistant."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -92,7 +92,7 @@ class CommandCSSetPersist : public Command
 					ChanServ->UnAssign(NULL, ci);
 			}
 
-			source.Reply(CHAN_SET_PERSIST_OFF, ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 is no longer persistant."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PERSIST");
@@ -102,18 +102,37 @@ class CommandCSSetPersist : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_PERSIST, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 PERSIST {ON | OFF}\002\n"
+				"Enables or disables the persistant channel setting.\n"
+				"When persistant is set, the service bot will remain\n"
+				"in the channel when it has emptied of users.\n"
+				" \n"
+				"If your IRCd does not a permanent (persistant) channel\n"
+				"mode you must have a service bot in your channel to\n"
+				"set persist on, and it can not be unassigned while persist\n"
+				"is on.\n"
+				" \n"
+				"If this network does not have BotServ enabled and does\n"
+				"not have a permanent channel mode, ChanServ will\n"
+				"join your channel when you set persist on (and leave when\n"
+				"it has been set off).\n"
+				" \n"
+				"If your IRCd has a permanent (persistant) channel mode\n"
+				"and is is set or unset (for any reason, including MLOCK),\n"
+				"persist is automatically set and unset for the channel aswell.\n"
+				"Additionally, services will set or unset this mode when you\n"
+				"set persist on or off."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET PERSIST", CHAN_SET_PERSIST_SYNTAX);
+		SyntaxError(source, "SET PERSIST", _("SET \037channel\037 PERSIST {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_PERSIST);
+		source.Reply(_("    PERSIST       Set the channel as permanent"));
 	}
 };
 
@@ -124,15 +143,9 @@ class CommandCSSASetPersist : public CommandCSSetPersist
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_PERSIST, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET PERSIST", CHAN_SASET_PERSIST_SYNTAX);
+		SyntaxError(source, "SASET PERSIST", _("SASET \002channel\002 PERSIST {ON | OFF}"));
 	}
 };
 

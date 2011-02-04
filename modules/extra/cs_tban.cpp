@@ -40,11 +40,11 @@ static bool CanBanUser(Channel *c, User *u, User *u2)
 	ChannelInfo *ci = c->ci;
 	bool ok = false;
 	if (!check_access(u, ci, CA_BAN))
-		u->SendMessage(ChanServ, ACCESS_DENIED);
+		u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
 	else if (matches_list(c, u2, CMODE_EXCEPT))
-		u->SendMessage(ChanServ, CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+		u->SendMessage(ChanServ, LanguageString::CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 	else if (u2->IsProtected())
-		u->SendMessage(ChanServ, ACCESS_DENIED);
+		u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
 	else
 		ok = true;
 
@@ -70,9 +70,9 @@ class CommandCSTBan : public Command
 
 		User *u2;
 		if (!c)
-			u->SendMessage(ChanServ, CHAN_X_NOT_IN_USE, chan.c_str());
+			u->SendMessage(ChanServ, LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!(u2 = finduser(nick)))
-			u->SendMessage(ChanServ, NICK_X_NOT_IN_USE, nick.c_str());
+			u->SendMessage(ChanServ, LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else
 			if (CanBanUser(c, u, u2))
 			{

@@ -36,21 +36,21 @@ class CommandCSBan : public Command
 		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!u2)
-			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		/*
 		 * Dont ban/kick the user on channels where he is excepted
 		 * to prevent services <-> server wars.
 		 */
 		else if (matches_list(ci->c, u2, CMODE_EXCEPT))
-			source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+			source.Reply(LanguageString::CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 		else if (u2->IsProtected())
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else
 		{
 			Anope::string mask;
@@ -76,18 +76,23 @@ class CommandCSBan : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_BAN);
+		source.Reply(_("Syntax: \002BAN \037#channel\037 \037nick\037 [\037reason\037]\002\n"
+				" \n"
+				"Bans a selected nick on a channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 access \n"
+				"and above on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "BAN", CHAN_BAN_SYNTAX);
+		SyntaxError(source, "BAN", _("BAN \037#channel\037 \037nick\037 [\037reason\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_BAN);
+		source.Reply(_("    BAN        Bans a selected nick on a channel"));
 	}
 };
 

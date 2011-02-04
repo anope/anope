@@ -35,12 +35,12 @@ class CommandMSInfo : public Command
 			na = findnick(nname);
 			if (!na)
 			{
-				source.Reply(NICK_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nname.c_str());
 				return MOD_CONT;
 			}
 			else if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(NICK_X_FORBIDDEN, nname.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, nname.c_str());
 				return MOD_CONT;
 			}
 			mi = &na->nc->memos;
@@ -50,12 +50,12 @@ class CommandMSInfo : public Command
 		{
 			if (!(ci = cs_findchan(nname)))
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, nname.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -63,7 +63,7 @@ class CommandMSInfo : public Command
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else
@@ -75,13 +75,13 @@ class CommandMSInfo : public Command
 		if (!nname.empty() && (ci || na->nc != u->Account()))
 		{
 			if (mi->memos.empty())
-				source.Reply(MEMO_INFO_X_NO_MEMOS, nname.c_str());
+				source.Reply(_("%s currently has no memos."), nname.c_str());
 			else if (mi->memos.size() == 1)
 			{
 				if (mi->memos[0]->HasFlag(MF_UNREAD))
-					source.Reply(MEMO_INFO_X_MEMO_UNREAD, nname.c_str());
+					source.Reply(_("%s currently has \0021\002 memo, and it has not yet been read."), nname.c_str());
 				else
-					source.Reply(MEMO_INFO_X_MEMO, nname.c_str());
+					source.Reply(_("%s currently has \0021\002 memo."), nname.c_str());
 			}
 			else
 			{
@@ -90,55 +90,55 @@ class CommandMSInfo : public Command
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
 				if (count == mi->memos.size())
-					source.Reply(MEMO_INFO_X_MEMOS_ALL_UNREAD, nname.c_str(), count);
+					source.Reply(_("%s currently has \002%d\002 memos; all of them are unread."), nname.c_str(), count);
 				else if (!count)
-					source.Reply(MEMO_INFO_X_MEMOS, nname.c_str(), mi->memos.size());
+					source.Reply(_("%s currently has \002%d\002 memos."), nname.c_str(), mi->memos.size());
 				else if (count == 1)
-					source.Reply(MEMO_INFO_X_MEMOS_ONE_UNREAD, nname.c_str(), mi->memos.size());
+					source.Reply(_("%s currently has \002%d\002 memos, of which \0021\002 is unread."), nname.c_str(), mi->memos.size());
 				else
-					source.Reply(MEMO_INFO_X_MEMOS_SOME_UNREAD, nname.c_str(), mi->memos.size(), count);
+					source.Reply(_("%s currently has \002%d\002 memos, of which \002%d\002 are unread."), nname.c_str(), mi->memos.size(), count);
 			}
 			if (!mi->memomax)
 			{
 				if (hardmax)
-					source.Reply(MEMO_INFO_X_HARD_LIMIT, nname.c_str(), mi->memomax);
+					source.Reply(_("%s's memo limit is \002%d\002, and may not be changed."), nname.c_str(), mi->memomax);
 				else
-					source.Reply(MEMO_INFO_X_LIMIT, nname.c_str(), mi->memomax);
+					source.Reply(_("%s's memo limit is \002%d\002."), nname.c_str(), mi->memomax);
 			}
 			else if (mi->memomax > 0)
 			{
 				if (hardmax)
-					source.Reply(MEMO_INFO_X_HARD_LIMIT, nname.c_str(), mi->memomax);
+					source.Reply(_("%s's memo limit is \002%d\002, and may not be changed."), nname.c_str(), mi->memomax);
 				else
-					source.Reply(MEMO_INFO_X_LIMIT, nname.c_str(), mi->memomax);
+					source.Reply(_("%s's memo limit is \002%d\002."), nname.c_str(), mi->memomax);
 			}
 			else
-				source.Reply(MEMO_INFO_X_NO_LIMIT, nname.c_str());
+				source.Reply(_("%s has no memo limit."), nname.c_str());
 
 			/* I ripped this code out of ircservices 4.4.5, since I didn't want
 			   to rewrite the whole thing (it pisses me off). */
 			if (na)
 			{
 				if (na->nc->HasFlag(NI_MEMO_RECEIVE) && na->nc->HasFlag(NI_MEMO_SIGNON))
-					source.Reply(MEMO_INFO_X_NOTIFY_ON, nname.c_str());
+					source.Reply(_("%s is notified of new memos at logon and when they arrive."), nname.c_str());
 				else if (na->nc->HasFlag(NI_MEMO_RECEIVE))
-					source.Reply(MEMO_INFO_X_NOTIFY_RECEIVE, nname.c_str());
+					source.Reply(_("%s is notified when new memos arrive."), nname.c_str());
 				else if (na->nc->HasFlag(NI_MEMO_SIGNON))
-					source.Reply(MEMO_INFO_X_NOTIFY_SIGNON, nname.c_str());
+					source.Reply(_("%s is notified of news memos at logon."), nname.c_str());
 				else
-					source.Reply(MEMO_INFO_X_NOTIFY_OFF, nname.c_str());
+					source.Reply(_("%s is not notified of new memos."), nname.c_str());
 			}
 		}
 		else /* !nname || (!ci || na->nc == u->Account()) */
 		{
 			if (mi->memos.empty())
-				source.Reply(MEMO_INFO_NO_MEMOS);
+				source.Reply(_("You currently have no memos."));
 			else if (mi->memos.size() == 1)
 			{
 				if (mi->memos[0]->HasFlag(MF_UNREAD))
-					source.Reply(MEMO_INFO_MEMO_UNREAD);
+					source.Reply(_("You currently have \0021\002 memo, and it has not yet been read."));
 				else
-					source.Reply(MEMO_INFO_MEMO);
+					source.Reply(_("You currently have \0021\002 memo."));
 			}
 			else
 			{
@@ -147,41 +147,41 @@ class CommandMSInfo : public Command
 					if (mi->memos[i]->HasFlag(MF_UNREAD))
 						++count;
 				if (count == mi->memos.size())
-					source.Reply(MEMO_INFO_MEMOS_ALL_UNREAD, count);
+					source.Reply(_("You currently have \002%d\002 memos; all of them are unread."), count);
 				else if (!count)
-					source.Reply(MEMO_INFO_MEMOS, mi->memos.size());
+					source.Reply(_("You currently have \002%d\002 memos."), mi->memos.size());
 				else if (count == 1)
-					source.Reply(MEMO_INFO_MEMOS_ONE_UNREAD, mi->memos.size());
+					source.Reply(_("You currently have \002%d\002 memos, of which \0021\002 is unread."), mi->memos.size());
 				else
-					source.Reply(MEMO_INFO_MEMOS_SOME_UNREAD, mi->memos.size(), count);
+					source.Reply(_("You currently have \002%d\002 memos, of which \002%d\002 are unread."), mi->memos.size(), count);
 			}
 
 			if (!mi->memomax)
 			{
 				if (!u->Account()->IsServicesOper() && hardmax)
-					source.Reply(MEMO_INFO_HARD_LIMIT_ZERO);
+					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos.  You cannot change this limit."));
 				else
-					source.Reply(MEMO_INFO_LIMIT_ZERO);
+					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos."));
 			}
 			else if (mi->memomax > 0)
 			{
 				if (!u->Account()->IsServicesOper() && hardmax)
-					source.Reply(MEMO_INFO_HARD_LIMIT, mi->memomax);
+					source.Reply(_("Your memo limit is \002%d\002, and may not be changed."), mi->memomax);
 				else
-					source.Reply(MEMO_INFO_LIMIT, mi->memomax);
+					source.Reply(_("Your memo limit is \002%d\002."), mi->memomax);
 			}
 			else
-				source.Reply(MEMO_INFO_NO_LIMIT);
+				source.Reply(_("You have no limit on the number of memos you may keep."));
 
 			/* Ripped too. But differently because of a seg fault (loughs) */
 			if (u->Account()->HasFlag(NI_MEMO_RECEIVE) && u->Account()->HasFlag(NI_MEMO_SIGNON))
-				source.Reply(MEMO_INFO_NOTIFY_ON);
+				source.Reply(_("You will be notified of new memos at logon and when they arrive."));
 			else if (u->Account()->HasFlag(NI_MEMO_RECEIVE))
-				source.Reply(MEMO_INFO_NOTIFY_RECEIVE);
+				source.Reply(_("You will be notified when new memos arrive."));
 			else if (u->Account()->HasFlag(NI_MEMO_SIGNON))
-				source.Reply(MEMO_INFO_NOTIFY_SIGNON);
+				source.Reply(_("You will be notified of new memos at logon."));
 			else
-				source.Reply(MEMO_INFO_NOTIFY_OFF);
+				source.Reply(_("You will not be notified of new memos."));
 		}
 		return MOD_CONT;
 	}
@@ -190,16 +190,31 @@ class CommandMSInfo : public Command
 	{
 		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			source.Reply(MEMO_SERVADMIN_HELP_INFO);
+			source.Reply(_("Syntax: \002INFO [\037nick\037 | \037channel\037]\002\n"
+					"Without a parameter, displays information on the number of\n"
+					"memos you have, how many of them are unread, and how many\n"
+					"total memos you can receive.\n"
+					" \n"
+					"With a channel parameter, displays the same information for\n"
+					"the given channel.\n"
+					" \n"
+					"With a nickname parameter, displays the same information\n"
+					"for the given nickname.  This use limited to \002Services\n"
+					"admins\002."));
 		else
-			source.Reply(MEMO_HELP_INFO);
+			source.Reply(_("Syntax: \002INFO [\037channel\037]\002\n"
+					" \n"
+					"Displays information on the number of memos you have, how\n"
+					"many of them are unread, and how many total memos you can\n"
+					"receive.  With a parameter, displays the same information\n"
+					"for the given channel."));
 
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_INFO);
+		source.Reply(_("    INFO   Displays information about your memos"));
 	}
 };
 

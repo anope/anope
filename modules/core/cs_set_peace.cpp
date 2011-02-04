@@ -29,12 +29,12 @@ class CommandCSSetPeace : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PEACE);
-			source.Reply(CHAN_SET_PEACE_ON, ci->name.c_str());
+			source.Reply(_("Peace option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PEACE);
-			source.Reply(CHAN_SET_PEACE_OFF, ci->name.c_str());
+			source.Reply(_("Peace option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PEACE");
@@ -44,18 +44,23 @@ class CommandCSSetPeace : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_PEACE, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 PEACE {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002peace\002 option for a channel.\n"
+				"When \002peace\002 is set, a user won't be able to kick,\n"
+				"ban or remove a channel status of a user that has\n"
+				"a level superior or equal to his via %S commands."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
+		SyntaxError(source, "SET PEACE", _("SET \037channel\037 PEACE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_PEACE, "SET");
+		source.Reply(_("    PEACE         Regulate the use of critical commands"), "SET");
 	}
 };
 
@@ -66,15 +71,9 @@ class CommandCSSASetPeace : public CommandCSSetPeace
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_PEACE, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET PEACE", CHAN_SASET_PEACE_SYNTAX);
+		SyntaxError(source, "SASET PEACE", _("SASET \002channel\002 PEACE {ON | OFF}"));
 	}
 };
 

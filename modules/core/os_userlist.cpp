@@ -32,7 +32,8 @@ class CommandOSUserList : public Command
 
 		if (!pattern.empty() && (c = findchan(pattern)))
 		{
-			source.Reply(OPER_USERLIST_HEADER_CHAN, pattern.c_str());
+			source.Reply(_("\002%s\002 users list:\n"
+					"Nick                 Mask"), pattern.c_str());
 
 			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
@@ -43,12 +44,13 @@ class CommandOSUserList : public Command
 						if (!uc->user->HasMode(*it))
 							continue;
 
-				source.Reply(OPER_USERLIST_RECORD, uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
+				source.Reply(_("%-20s %s@%s"), uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
 			}
 		}
 		else
 		{
-			source.Reply(OPER_USERLIST_HEADER);
+			source.Reply(_("Users list:\n"
+					"Nick                 Mask"));
 
 			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
 			{
@@ -64,23 +66,31 @@ class CommandOSUserList : public Command
 							if (!u2->HasMode(*mit))
 								continue;
 				}
-				source.Reply(OPER_USERLIST_RECORD, u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+				source.Reply(_("%-20s %s@%s"), u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
 			}
 		}
 
-		source.Reply(OPER_USERLIST_END);
+		source.Reply(_("End of users list."));
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_USERLIST);
+		source.Reply(_("Syntax: \002USERLIST [{\037pattern | channel\037} [\037INVISIBLE\037]]\002\n"
+				" \n"
+				"Lists all users currently online on the IRC network, whether their\n"
+				"nick is registered or not.\n"
+				" \n"
+				"If \002pattern\002 is given, lists only users that match it (it must be in\n"
+				"the format nick!user@host). If \002channel\002 is given, lists only users\n"
+				"that are on the given channel. If INVISIBLE is specified, only users\n"
+				"with the +i flag will be listed."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_USERLIST);
+		source.Reply(_("    USERLIST    Lists all user records"));
 	}
 };
 

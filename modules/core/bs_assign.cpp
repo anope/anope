@@ -29,32 +29,32 @@ class CommandBSAssign : public Command
 
 		if (readonly)
 		{
-			source.Reply(BOT_ASSIGN_READONLY);
+			source.Reply(LanguageString::BOT_ASSIGN_READONLY);
 			return MOD_CONT;
 		}
 
 		BotInfo *bi = findbot(nick);
 		if (!bi)
 		{
-			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->Account()->HasPriv("botserv/administration")))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (bi->HasFlag(BI_PRIVATE) && !u->Account()->HasCommand("botserv/assign/private"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (ci->bi && nick.equals_ci(ci->bi->nick))
 		{
-			source.Reply(BOT_ASSIGN_ALREADY, ci->bi->nick.c_str(), chan.c_str());
+			source.Reply(_("Bot \002%s\002 is already assigned to channel \002%s\002."), ci->bi->nick.c_str(), chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -62,24 +62,28 @@ class CommandBSAssign : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << bi->nick;
 
 		bi->Assign(u, ci);
-		source.Reply(BOT_ASSIGN_ASSIGNED, bi->nick.c_str(), ci->name.c_str());
+		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(BOT_HELP_ASSIGN);
+		source.Reply(_("Syntax: \002ASSIGN \037chan\037 \037nick\037\002\n"
+				" \n"
+				"Assigns a bot pointed out by nick to the channel chan. You\n"
+				"can then configure the bot for the channel so it fits\n"
+				"your needs."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "ASSIGN", BOT_ASSIGN_SYNTAX);
+		SyntaxError(source, "ASSIGN", _("ASSIGN \037chan\037 \037nick\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(BOT_HELP_CMD_ASSIGN);
+		source.Reply(_("    ASSIGN         Assigns a bot to a channel"));
 	}
 };
 

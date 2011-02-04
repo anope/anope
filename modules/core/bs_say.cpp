@@ -29,19 +29,19 @@ class CommandBSSay : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(BOT_NOT_ASSIGNED);
+			source.Reply(LanguageString::BOT_NOT_ASSIGNED);
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			source.Reply(BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(LanguageString::BOT_NOT_ON_CHANNEL, ci->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -62,18 +62,20 @@ class CommandBSSay : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(BOT_HELP_SAY);
+		source.Reply(_("Syntax: \002SAY \037channel\037 \037text\037\002\n"
+				" \n"
+				"Makes the bot say the given text on the given channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SAY", BOT_SAY_SYNTAX);
+		SyntaxError(source, "SAY", _("SAY \037channel\037 \037text\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(BOT_HELP_CMD_SAY);
+		source.Reply(_("    SAY            Makes the bot say the given text on the given channel"));
 	}
 };
 

@@ -35,7 +35,8 @@ class CommandOSChanList : public Command
 
 		if (!pattern.empty() && (u2 = finduser(pattern)))
 		{
-			source.Reply(OPER_CHANLIST_HEADER_USER, u2->nick.c_str());
+			source.Reply(_("\002%s\002 channel list:\n"
+					"Name                 Users Modes   Topic"), u2->nick.c_str());
 
 			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
@@ -46,12 +47,13 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				source.Reply(OPER_CHANLIST_RECORD, cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
+				source.Reply(_("%-20s  %4d +%-6s %s"), cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
 			}
 		}
 		else
 		{
-			source.Reply(OPER_CHANLIST_HEADER);
+			source.Reply(_("Channel list:\n"
+					"Name                 Users Modes   Topic"));
 
 			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
@@ -64,23 +66,30 @@ class CommandOSChanList : public Command
 						if (!c->HasMode(*it))
 							continue;
 
-				source.Reply(OPER_CHANLIST_RECORD, c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
+				source.Reply(_("%-20s  %4d +%-6s %s"), c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
 			}
 		}
 
-		source.Reply(OPER_CHANLIST_END);
+		source.Reply(_("End of channel list."));
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_CHANLIST);
+		source.Reply(_("Syntax: \002CHANLIST [{\037pattern\037 | \037nick\037} [\037SECRET\037]]\002\n"
+				" \n"
+				"Lists all channels currently in use on the IRC network, whether they\n"
+				"are registered or not.\n"
+				"If \002pattern\002 is given, lists only channels that match it. If a nickname\n"
+				"is given, lists only the channels the user using it is on. If SECRET is\n"
+				"specified, lists only channels matching \002pattern\002 that have the +s or\n"
+				"+p mode."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_CHANLIST);
+		source.Reply(_("    CHANLIST    Lists all channel records"));
 	}
 };
 

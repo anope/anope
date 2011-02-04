@@ -71,8 +71,8 @@ struct CoreExport CommandSource
 
 	~CommandSource();
 
-	void Reply(LanguageString message, ...);
 	void Reply(const char *message, ...);
+	void Reply(const Anope::string &message);
 };
 
 /** Every services command is a class, inheriting from Command.

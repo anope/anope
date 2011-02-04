@@ -32,14 +32,25 @@ class CommandCSHelp : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		source.Reply(CHAN_HELP);
+		source.Reply(_("\002%S\002 allows you to register and control various\n"
+				"aspects of channels. %S can often prevent\n"
+				"malicious users from \"taking over\" channels by limiting\n"
+				"who is allowed channel operator privileges. Available\n"
+				"commands are listed below; to use them, type\n"
+				"\002%R%S \037command\037\002. For more information on a\n"
+				"specific command, type \002%R%S HELP \037command\037\002."));
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
 				it->second->OnServHelp(source);
 		if (Config->CSExpire >= 86400)
-			source.Reply(CHAN_HELP_EXPIRES, Config->CSExpire / 86400);
+			source.Reply(_("Note that any channel which is not used for %d days\n"
+			"(i.e. which no user on the channel's access list enters\n"
+			"for that period of time) will be automatically dropped."), Config->CSExpire / 86400);
 		if (u->Account() && u->Account()->IsServicesOper())
-			source.Reply(CHAN_SERVADMIN_HELP);
+			source.Reply(_(" \n"
+					"Services Operators can also drop any channel without needing\n"
+					"to identify via password, and may view the access, AKICK,\n"
+					"and level setting lists for any channel."));
 	}
 };
 

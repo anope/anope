@@ -34,14 +34,14 @@ class CommandCSSASet : public Command
 
 		if (readonly)
 		{
-			source.Reply(CHAN_SET_DISABLED);
+			source.Reply(LanguageString::CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
 
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			source.Reply(CHAN_SET_MLOCK_DEPRECATED);
+			source.Reply(LanguageString::CHAN_SET_MLOCK_DEPRECATED);
 			return MOD_CONT;
 		}
 
@@ -58,8 +58,8 @@ class CommandCSSASet : public Command
 		}
 		else
 		{
-			source.Reply(NICK_SET_UNKNOWN_OPTION, params[1].c_str());
-			source.Reply(MORE_INFO, Config->s_ChanServ.c_str(), "SET");
+			source.Reply(_("Unknown SASET option \002%s\002."), params[1].c_str());
+			source.Reply(LanguageString::MORE_INFO, Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -69,10 +69,16 @@ class CommandCSSASet : public Command
 	{
 		if (subcommand.empty())
 		{
-			source.Reply(CHAN_HELP_SASET_HEAD);
+			source.Reply(_("Syntax: SASET \002channel\002 \037option\037 \037parameters\037\n"
+					" \n"
+					"Allows Services Operators to forcefully change settings\n"
+					"on channels.\n"
+					" \n"
+					"Available options:"));
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
-			source.Reply(CHAN_HELP_SASET_TAIL);
+			source.Reply(_("Type \002%R%S HELP SASET \037option\037\002 for more information on a\n"
+				"particular option."));
 			return true;
 		}
 		else
@@ -88,12 +94,12 @@ class CommandCSSASet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SASET);
+		source.Reply(_("    SASET      Forcefully set channel options and information"));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

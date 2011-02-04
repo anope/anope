@@ -23,17 +23,17 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			source.Reply(NICK_ACCESS_LIST_X_EMPTY, nc->display.c_str());
+			source.Reply(_("Access list for \002%s\002 is empty."), nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
-		source.Reply(NICK_ACCESS_LIST_X, params[1].c_str());
+		source.Reply(_("Access list for \002%s\002:"), params[1].c_str());
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
@@ -56,18 +56,18 @@ class CommandNSAccess : public Command
 
 		if (nc->access.size() >= Config->NSAccessMax)
 		{
-			source.Reply(NICK_ACCESS_REACHED_LIMIT, Config->NSAccessMax);
+			source.Reply(_("Sorry, you can only have %d access entries for a nickname."), Config->NSAccessMax);
 			return MOD_CONT;
 		}
 
 		if (nc->FindAccess(mask))
 		{
-			source.Reply(NICK_ACCESS_ALREADY_PRESENT, mask.c_str());
+			source.Reply(_("Mask \002%s\002 already present on your access list."), mask.c_str());
 			return MOD_CONT;
 		}
 
 		nc->AddAccess(mask);
-		source.Reply(NICK_ACCESS_ADDED, mask.c_str());
+		source.Reply(_("\002%s\002 added to your access list."), mask.c_str());
 
 		return MOD_CONT;
 	}
@@ -82,11 +82,11 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			source.Reply(NICK_ACCESS_NOT_FOUND, mask.c_str());
+			source.Reply(_("\002%s\002 not found on your access list."), mask.c_str());
 			return MOD_CONT;
 		}
 
-		source.Reply(NICK_ACCESS_DELETED, mask.c_str());
+		source.Reply(_("\002%s\002 deleted from your access list."), mask.c_str());
 		nc->EraseAccess(mask);
 
 		return MOD_CONT;
@@ -99,11 +99,11 @@ class CommandNSAccess : public Command
 
 		if (nc->access.empty())
 		{
-			source.Reply(NICK_ACCESS_LIST_EMPTY, u->nick.c_str());
+			source.Reply(_("Your access list is empty."), u->nick.c_str());
 			return MOD_CONT;
 		}
 
-		source.Reply(NICK_ACCESS_LIST);
+		source.Reply(_("Access list:"));
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
@@ -131,11 +131,11 @@ class CommandNSAccess : public Command
 
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
-			source.Reply(BAD_USERHOST_MASK);
-			source.Reply(MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
+			source.Reply(LanguageString::BAD_USERHOST_MASK);
+			source.Reply(LanguageString::MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
 		}
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, u->Account(), mask);
 		else if (cmd.equals_ci("DEL"))
@@ -150,18 +150,39 @@ class CommandNSAccess : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_ACCESS);
+		source.Reply(_("Syntax: \002ACCESS ADD \037mask\037\002\n"
+				"        \002ACCESS DEL \037mask\037\002\n"
+					"        \002ACCESS LIST\002\n"
+					" \n"
+					"Modifies or displays the access list for your nick.  This\n"
+					"is the list of addresses which will be automatically\n"
+					"recognized by %S as allowed to use the nick.  If\n"
+					"you want to use the nick from a different address, you\n"
+					"need to send an \002IDENTIFY\002 command to make %S\n"
+					"recognize you.\n"
+					" \n"
+					"Examples:\n"
+					" \n"
+					"    \002ACCESS ADD anyone@*.bepeg.com\002\n"
+					"        Allows access to user \002anyone\002 from any machine in\n"
+					"        the \002bepeg.com\002 domain.\n"
+					" \n"
+					"    \002ACCESS DEL anyone@*.bepeg.com\002\n"
+					"        Reverses the previous command.\n"
+					" \n"
+					"    \002ACCESS LIST\002\n"
+					"        Displays the current access list."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "ACCESS", NICK_ACCESS_SYNTAX);
+		SyntaxError(source, "ACCESS", _("ACCESS {ADD | DEL | LIST} [\037mask\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_ACCESS);
+		source.Reply(_("    ACCESS     Modify the list of authorized addresses"));
 	}
 };
 

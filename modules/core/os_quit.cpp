@@ -34,13 +34,19 @@ class CommandOSQuit : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_QUIT);
+		source.Reply(_("Syntax: \002QUIT\002\n"
+				" \n"
+				"Causes Services to do an immediate shutdown; databases are\n"
+				"\002not\002 saved.  This command should not be used unless\n"
+				"damage to the in-memory copies of the databases is feared\n"
+				"and they should not be saved.  For normal shutdowns, use the\n"
+				"\002SHUTDOWN\002 command."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_QUIT);
+		source.Reply(_("    QUIT        Terminate the Services program with no save"));
 	}
 };
 

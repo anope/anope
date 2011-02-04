@@ -32,12 +32,12 @@ class CommandHSSetAll : public Command
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(HOST_NOREG, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -47,12 +47,12 @@ class CommandHSSetAll : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (rawhostmask.empty())
 			{
-				source.Reply(HOST_SETALL_SYNTAX, Config->s_HostServ.c_str());
+				source.Reply(_("vhost for group \002%s\002 set to \002%s\002."), Config->s_HostServ.c_str());
 				return MOD_CONT;
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
+				source.Reply(LanguageString::HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return MOD_CONT;
 			}
 			else
@@ -60,13 +60,13 @@ class CommandHSSetAll : public Command
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						source.Reply(HOST_SET_IDENT_ERROR);
+						source.Reply(LanguageString::HOST_SET_IDENT_ERROR);
 						return MOD_CONT;
 					}
 			}
 			if (!ircd->vident)
 			{
-				source.Reply(HOST_NO_VIDENT);
+				source.Reply(LanguageString::HOST_NO_VIDENT);
 				return MOD_CONT;
 			}
 		}
@@ -76,13 +76,13 @@ class CommandHSSetAll : public Command
 			hostmask = rawhostmask;
 		else
 		{
-			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(LanguageString::HOST_SET_TOOLONG, Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			source.Reply(HOST_SET_ERROR);
+			source.Reply(LanguageString::HOST_SET_ERROR);
 			return MOD_CONT;
 		}
 
@@ -94,26 +94,32 @@ class CommandHSSetAll : public Command
 		HostServSyncVhosts(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!vIdent.empty())
-			source.Reply(HOST_IDENT_SETALL, nick.c_str(), vIdent.c_str(), hostmask.c_str());
+			source.Reply(_("vhost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), vIdent.c_str(), hostmask.c_str());
 		else
-			source.Reply(HOST_SETALL, nick.c_str(), hostmask.c_str());
+			source.Reply(_("vhost for group \002%s\002 set to \002%s\002."), nick.c_str(), hostmask.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_SETALL);
+		source.Reply(_("Syntax: \002SETALL\002 \002<nick>\002 \002<hostmask>\002.\n"
+				"Sets the vhost for all nicks in the same group as that\n"
+				"of the given nick.  If your IRCD supports vIdents, then\n"
+				"using SETALL <nick> <ident>@<hostmask> will set idents\n"
+				"for users as well as vhosts.\n"
+				"* NOTE, this will not update the vhost for any nicks\n"
+				"added to the group after this command was used."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SETALL", HOST_SETALL_SYNTAX);
+		SyntaxError(source, "SETALL", _("SETALL \002<nick>\002 \002<hostmask>\002."));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_SETALL);
+		source.Reply(_("    SETALL      Set the vhost for all nicks in a group"));
 	}
 };
 

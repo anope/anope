@@ -35,37 +35,27 @@ public:
 
 		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_STOP;
 		}
 
 		if (pattern[0] == '#')
 		{
 			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
-			if (tmp.empty())
+			if (tmp.empty() || !tmp.is_number_only())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(CS_LIST_INCORRECT_RANGE);
-				return MOD_CONT;
-			}
-			if (!tmp.is_number_only())
-			{
-				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(CS_LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+				source.Reply(_("To search for channels starting with #, search for the channel\n"
+					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
 				return MOD_CONT;
 			}
 			from = convertTo<int>(tmp);
 			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
-			if (tmp.empty())
+			if (tmp.empty() || !tmp.is_number_only())
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(CS_LIST_INCORRECT_RANGE);
-				return MOD_CONT;
-			}
-			if (!tmp.is_number_only())
-			{
-				source.Reply(LIST_INCORRECT_RANGE);
-				source.Reply(CS_LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+				source.Reply(_("To search for channels starting with #, search for the channel\n"
+					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
 				return MOD_CONT;
 			}
 			to = convertTo<int>(tmp);
@@ -91,7 +81,7 @@ public:
 
 		Anope::string spattern = "#" + pattern;
 
-		source.Reply(NICK_LIST_HEADER, pattern.c_str());
+		source.Reply(LanguageString::LIST_HEADER, pattern.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -127,24 +117,29 @@ public:
 			}
 		}
 
-		source.Reply(CHAN_LIST_END, nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
+		source.Reply(_("End of list - %d/%d matches shown."), nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_LIST);
+		source.Reply(_("Syntax: \002LIST \037pattern\037\002\n"
+				" \n"
+				"Lists all registered channels matching the given pattern.\n"
+				"(Channels with the \002PRIVATE\002 option set are not listed.)\n"
+				"Note that a preceding '#' specifies a range, channel names\n"
+				"are to be written without '#'."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LIST", NICK_LIST_SYNTAX);
+		SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_LIST);
+		source.Reply(_("    LIST       Lists all registered channels matching the given pattern"));
 	}
 };
 

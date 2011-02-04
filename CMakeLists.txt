@@ -220,7 +220,7 @@ find_package(Gettext)
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 
 # Use the following directories as includes
-include_directories(${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/include ${Anope_BINARY_DIR}/lang)
+include_directories(${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/include ${Anope_BINARY_DIR}/language)
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)
@@ -449,7 +449,7 @@ endif(${Anope_SOURCE_DIR} STREQUAL ${Anope_BINARY_DIR})
 # Go into the following directories and run their CMakeLists.txt as well
 add_subdirectory(data)
 add_subdirectory(docs)
-add_subdirectory(lang)
+add_subdirectory(language)
 add_subdirectory(src)
 add_subdirectory(modules)
 add_subdirectory(include)

@@ -23,94 +23,14 @@ enum
 	XOP_TYPES
 };
 
-enum
-{
-	XOP_DISABLED,
-	XOP_ADDED,
-	XOP_MOVED,
-	XOP_NO_SUCH_ENTRY,
-	XOP_NOT_FOUND,
-	XOP_NO_MATCH,
-	XOP_DELETED,
-	XOP_DELETED_ONE,
-	XOP_DELETED_SEVERAL,
-	XOP_LIST_EMPTY,
-	XOP_LIST_HEADER,
-	XOP_CLEAR,
-	XOP_MESSAGES
-};
-
-LanguageString xop_msgs[XOP_TYPES][XOP_MESSAGES] = {
-	{CHAN_AOP_DISABLED,
-	 CHAN_AOP_ADDED,
-	 CHAN_AOP_MOVED,
-	 CHAN_AOP_NO_SUCH_ENTRY,
-	 CHAN_AOP_NOT_FOUND,
-	 CHAN_AOP_NO_MATCH,
-	 CHAN_AOP_DELETED,
-	 CHAN_AOP_DELETED_ONE,
-	 CHAN_AOP_DELETED_SEVERAL,
-	 CHAN_AOP_LIST_EMPTY,
-	 CHAN_AOP_LIST_HEADER,
-	 CHAN_AOP_CLEAR},
-	{CHAN_SOP_DISABLED,
-	 CHAN_SOP_ADDED,
-	 CHAN_SOP_MOVED,
-	 CHAN_SOP_NO_SUCH_ENTRY,
-	 CHAN_SOP_NOT_FOUND,
-	 CHAN_SOP_NO_MATCH,
-	 CHAN_SOP_DELETED,
-	 CHAN_SOP_DELETED_ONE,
-	 CHAN_SOP_DELETED_SEVERAL,
-	 CHAN_SOP_LIST_EMPTY,
-	 CHAN_SOP_LIST_HEADER,
-	 CHAN_SOP_CLEAR},
-	{CHAN_VOP_DISABLED,
-	 CHAN_VOP_ADDED,
-	 CHAN_VOP_MOVED,
-	 CHAN_VOP_NO_SUCH_ENTRY,
-	 CHAN_VOP_NOT_FOUND,
-	 CHAN_VOP_NO_MATCH,
-	 CHAN_VOP_DELETED,
-	 CHAN_VOP_DELETED_ONE,
-	 CHAN_VOP_DELETED_SEVERAL,
-	 CHAN_VOP_LIST_EMPTY,
-	 CHAN_VOP_LIST_HEADER,
-	 CHAN_VOP_CLEAR},
-	{CHAN_HOP_DISABLED,
-	 CHAN_HOP_ADDED,
-	 CHAN_HOP_MOVED,
-	 CHAN_HOP_NO_SUCH_ENTRY,
-	 CHAN_HOP_NOT_FOUND,
-	 CHAN_HOP_NO_MATCH,
-	 CHAN_HOP_DELETED,
-	 CHAN_HOP_DELETED_ONE,
-	 CHAN_HOP_DELETED_SEVERAL,
-	 CHAN_HOP_LIST_EMPTY,
-	 CHAN_HOP_LIST_HEADER,
-	 CHAN_HOP_CLEAR},
-	 {CHAN_QOP_DISABLED,
-	 CHAN_QOP_ADDED,
-	 CHAN_QOP_MOVED,
-	 CHAN_QOP_NO_SUCH_ENTRY,
-	 CHAN_QOP_NOT_FOUND,
-	 CHAN_QOP_NO_MATCH,
-	 CHAN_QOP_DELETED,
-	 CHAN_QOP_DELETED_ONE,
-	 CHAN_QOP_DELETED_SEVERAL,
-	 CHAN_QOP_LIST_EMPTY,
-	 CHAN_QOP_LIST_HEADER,
-	 CHAN_QOP_CLEAR}
-};
-
 class XOPListCallback : public NumberList
 {
 	CommandSource &source;
 	int level;
-	LanguageString *messages;
+	Command *c;
 	bool SentHeader;
  public:
-	XOPListCallback(CommandSource &_source, const Anope::string &numlist, int _level, LanguageString *_messages) : NumberList(numlist, false), source(_source), level(_level), messages(_messages), SentHeader(false)
+	XOPListCallback(CommandSource &_source, const Anope::string &numlist, int _level, Command *_c) : NumberList(numlist, false), source(_source), level(_level), c(_c), SentHeader(false)
 	{
 	}
 
@@ -127,15 +47,15 @@ class XOPListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(messages[XOP_LIST_HEADER], source.ci->name.c_str());
+			source.Reply(_("%s list for %s:\n  Num  Nick"), this->c->name.c_str(), source.ci->name.c_str());
 		}
 
-		DoList(source, access, Number - 1, level, messages);
+		DoList(source, access, Number - 1, level);
 	}
 
-	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level, LanguageString *messages)
+	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level)
 	{
-		source.Reply(CHAN_XOP_LIST_FORMAT, index, access->mask.c_str());
+		source.Reply(_("  %3d  %s"), index, access->mask.c_str());
 	}
 };
 
@@ -143,27 +63,26 @@ class XOPDelCallback : public NumberList
 {
 	CommandSource &source;
 	Command *c;
-	LanguageString *messages;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool override;
  public:
-	XOPDelCallback(CommandSource &_source, Command *_c, LanguageString *_messages, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), messages(_messages), Deleted(0), override(_override)
+	XOPDelCallback(CommandSource &_source, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), Deleted(0), override(_override)
 	{
 	}
 
 	~XOPDelCallback()
 	{
 		if (!Deleted)
-			 source.Reply(messages[XOP_NO_MATCH], source.ci->name.c_str());
+			 source.Reply(_("No matching entries on %s %s list."), source.ci->name.c_str(), this->c->name.c_str());
 		else
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
-				source.Reply(messages[XOP_DELETED_ONE], source.ci->name.c_str());
+				source.Reply(_("Deleted one entry from %s %s list."), source.ci->name.c_str(), this->c->name.c_str());
 			else
-				source.Reply(messages[XOP_DELETED_SEVERAL], Deleted, source.ci->name.c_str());
+				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, source.ci->name.c_str(), this->c->name.c_str());
 		}
 	}
 
@@ -189,7 +108,7 @@ class XOPDelCallback : public NumberList
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
@@ -205,7 +124,7 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			source.Reply(messages[XOP_DISABLED]);
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -214,7 +133,7 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -223,7 +142,7 @@ class XOPBase : public Command
 			mask += "!*@*";
 		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -235,7 +154,7 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			++change;
@@ -243,7 +162,7 @@ class XOPBase : public Command
 
 		if (!change && ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			source.Reply(CHAN_XOP_REACHED_LIMIT, Config->CSAccessMax);
+			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, this->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -262,18 +181,18 @@ class XOPBase : public Command
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
-			source.Reply(messages[XOP_ADDED], access->mask.c_str(), ci->name.c_str());
+			source.Reply(("\002%s\002 added to %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
-			source.Reply(messages[XOP_MOVED], access->mask.c_str(), ci->name.c_str());
+			source.Reply(_("\002%s\002 moved to %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
@@ -288,13 +207,13 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			source.Reply(messages[XOP_DISABLED]);
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
 			return MOD_CONT;
 		}
 
@@ -303,7 +222,7 @@ class XOPBase : public Command
 
 		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -313,24 +232,24 @@ class XOPBase : public Command
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			bool override = level >= ulev || ulev < ACCESS_AOP;
-			XOPDelCallback list(source, this, messages, override, mask);
+			XOPDelCallback list(source, this, override, mask);
 			list.Process();
 		}
 		else if (!access || access->level != level)
 		{
-			source.Reply(messages[XOP_NOT_FOUND], mask.c_str(), ci->name.c_str());
+			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), this->name.c_str());
 			return MOD_CONT;
 		}
 		else
 		{
 			if (access->nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 			else
 			{
 				bool override = ulev <= access->level;
 				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
 
-				source.Reply(messages[XOP_DELETED], access->mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 deleted from %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
@@ -341,7 +260,7 @@ class XOPBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
+	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
@@ -353,7 +272,7 @@ class XOPBase : public Command
 
 		if (!ulev && !u->Account()->HasCommand("chanserv/access/list"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -362,13 +281,13 @@ class XOPBase : public Command
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPListCallback list(source, nick, level, messages);
+			XOPListCallback list(source, nick, level, this);
 			list.Process();
 		}
 		else
@@ -387,39 +306,39 @@ class XOPBase : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(messages[XOP_LIST_HEADER], ci->name.c_str());
+					source.Reply(_("%s list for %s:\n  Num  Nick"), ci->name.c_str());
 				}
 
-				XOPListCallback::DoList(source, access, i + 1, level, messages);
+				XOPListCallback::DoList(source, access, i + 1, level);
 			}
 
 			if (!SentHeader)
-				source.Reply(messages[XOP_NO_MATCH], ci->name.c_str());
+				source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), this->name.c_str());
 		}
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoClear(CommandSource &source, int level, LanguageString *messages)
+	CommandReturn DoClear(CommandSource &source, int level)
 	{
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
-			source.Reply(messages[XOP_DISABLED]);
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(messages[XOP_LIST_EMPTY], ci->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -435,27 +354,29 @@ class XOPBase : public Command
 
 		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-		source.Reply(messages[XOP_CLEAR], ci->name.c_str());
+		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), this->name.c_str());
 
 		return MOD_CONT;
 	}
+
  protected:
-	CommandReturn DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level, LanguageString *messages)
+	CommandReturn DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level)
 	{
 		ChannelInfo *ci = source.ci;
 
 		const Anope::string &cmd = params[1];
 
 		if (!ci->HasFlag(CI_XOP))
-			source.Reply(CHAN_XOP_ACCESS, Config->s_ChanServ.c_str());
+			source.Reply(_("You can't use this command. Use the ACCESS command instead.\n"
+					"Type \002%R%s HELP ACCESS\002 for more information."), Config->s_ChanServ.c_str());
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, params, level, messages);
+			return this->DoAdd(source, params, level);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, params, level, messages);
+			return this->DoDel(source, params, level);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, params, level, messages);
+			return this->DoList(source, params, level);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(source, level, messages);
+			return this->DoClear(source, level);
 		else
 			this->OnSyntaxError(source, "");
 
@@ -488,23 +409,58 @@ class CommandCSQOP : public XOPBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_QOP, xop_msgs[XOP_QOP]);
+		return this->DoXop(source, params, ACCESS_QOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_QOP);
+		source.Reply(_("Syntax: \002QOP \037channel\037 ADD \037mask\037\002\n"
+				"        \002QOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002QOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002QOP \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002QOP\002 (AutoOwner) \002list\002 for a channel. The QOP \n"
+				"list gives users the right to be auto-owner on your channel,\n"
+				"which gives them almost (or potentially, total) access.\n"
+				" \n"
+				"The \002QOP ADD\002 command adds the given nickname to the\n"
+				"QOP list.\n"
+				" \n"
+				"The \002QOP DEL\002 command removes the given nick from the\n"
+				"QOP list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				" \n"
+				"The \002QOP LIST\002 command displays the QOP list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002QOP #channel LIST 2-5,7-9\002\n"
+				"      Lists QOP entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				"      \n"
+				"The \002QOP CLEAR\002 command clears all entries of the\n"
+				"QOP list.\n"
+				" \n"
+				"The \002QOP\002 commands are limited to\n"
+				"founders (unless SECUREOPS is off). However, any user on the\n"
+				"QOP list may use the \002QOP LIST\002 command.\n"
+				" \n"
+				"This command may have been disabled for your channel, and\n"
+				"in that case you need to use the access list. See \n"
+				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "QOP", CHAN_QOP_SYNTAX);
+		SyntaxError(source, "QOP", _("QOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_QOP);
+		source.Reply(_("    QOP        Modify the list of QOP users"));
 	}
 };
 
@@ -517,23 +473,61 @@ class CommandCSAOP : public XOPBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_AOP, xop_msgs[XOP_AOP]);
+		return this->DoXop(source, params, ACCESS_AOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_AOP);
+		source.Reply(_("Syntax: \002AOP \037channel\037 ADD \037mask\037\002\n"
+				"        \002AOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002AOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002AOP \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002AOP\002 (AutoOP) \002list\002 for a channel. The AOP \n"
+				"list gives users the right to be auto-opped on your channel,\n"
+				"to unban or invite themselves if needed, to have their\n"
+				"greet message showed on join, and so on.\n"
+				" \n"
+				"The \002AOP ADD\002 command adds the given nickname to the\n"
+				"AOP list.\n"
+				" \n"
+				"The \002AOP DEL\002 command removes the given nick from the\n"
+				"AOP list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				" \n"
+				"The \002AOP LIST\002 command displays the AOP list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002AOP #channel LIST 2-5,7-9\002\n"
+				"      Lists AOP entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				"      \n"
+				"The \002AOP CLEAR\002 command clears all entries of the\n"
+				"AOP list.\n"
+				" \n"
+				"The \002AOP ADD\002 and \002AOP DEL\002 commands are limited to\n"
+				"SOPs or above, while the \002AOP CLEAR\002 command can only\n"
+				"be used by the channel founder. However, any user on the\n"
+				"AOP list may use the \002AOP LIST\002 command.\n"
+				" \n"
+				"This command may have been disabled for your channel, and\n"
+				"in that case you need to use the access list. See \n"
+				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."));
+	/* CHAN_HELP_HOP */
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "AOP", CHAN_AOP_SYNTAX);
+		SyntaxError(source, "AOP", _("AOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_AOP);
+		source.Reply(_("    AOP        Modify the list of AOP users"));
 	}
 };
 
@@ -546,23 +540,58 @@ class CommandCSHOP : public XOPBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_HOP, xop_msgs[XOP_HOP]);
+		return this->DoXop(source, params, ACCESS_HOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_HOP);
+		source.Reply(_("Syntax: \002HOP \037channel\037 ADD \037mask\037\002\n"
+				"        \002HOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002HOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002HOP \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002HOP\002 (HalfOP) \002list\002 for a channel. The HOP \n"
+				"list gives users the right to be auto-halfopped on your \n"
+				"channel.\n"
+				" \n"
+				"The \002HOP ADD\002 command adds the given nickname to the\n"
+				"HOP list.\n"
+				" \n"
+				"The \002HOP DEL\002 command removes the given nick from the\n"
+				"HOP list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				" \n"
+				"The \002HOP LIST\002 command displays the HOP list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002HOP #channel LIST 2-5,7-9\002\n"
+				"      Lists HOP entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				"      \n"
+				"The \002HOP CLEAR\002 command clears all entries of the\n"
+				"HOP list.\n"
+				" \n"
+				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are \n"
+				"limited to AOPs or above, while the \002HOP CLEAR\002 command \n"
+				"can only be used by the channel founder.\n"
+				" \n"
+				"This command may have been disabled for your channel, and\n"
+				"in that case you need to use the access list. See \n"
+				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "HOP", CHAN_HOP_SYNTAX);
+		SyntaxError(source, "HOP", _("HOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_HOP);
+		source.Reply(_("    HOP        Maintains the HOP (HalfOP) list for a channel"));
 	}
 };
 
@@ -575,23 +604,59 @@ class CommandCSSOP : public XOPBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_SOP, xop_msgs[XOP_SOP]);
+		return this->DoXop(source, params, ACCESS_SOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_SOP);
+		source.Reply(_("Syntax: \002SOP \037channel\037 ADD \037mask\037\002\n"
+				"        \002SOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002SOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002SOP \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002SOP\002 (SuperOP) \002list\002 for a channel. The SOP \n"
+				"list gives users all rights given by the AOP list, and adds\n"
+				"those needed to use the AutoKick and the BadWords lists, \n"
+				"to send and read channel memos, and so on.\n"
+				" \n"
+				"The \002SOP ADD\002 command adds the given nickname to the\n"
+				"SOP list.\n"
+				" \n"
+				"The \002SOP DEL\002 command removes the given nick from the\n"
+				"SOP list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				" \n"
+				"The \002SOP LIST\002 command displays the SOP list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002SOP #channel LIST 2-5,7-9\002\n"
+				"      Lists AOP entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				"      \n"
+				"The \002SOP CLEAR\002 command clears all entries of the\n"
+				"SOP list.\n"
+				" \n"
+				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are \n"
+				"limited to the channel founder. However, any user on the\n"
+				"AOP list may use the \002SOP LIST\002 command.\n"
+				" \n"
+				"This command may have been disabled for your channel, and\n"
+				"in that case you need to use the access list. See \n"
+				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SOP", CHAN_SOP_SYNTAX);
+		SyntaxError(source, "SOP", _("SOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SOP);
+		source.Reply(_("    SOP        Modify the list of SOP users"));
 	}
 };
 
@@ -604,23 +669,58 @@ class CommandCSVOP : public XOPBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_VOP, xop_msgs[XOP_VOP]);
+		return this->DoXop(source, params, ACCESS_VOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_VOP);
+		source.Reply(_("Syntax: \002VOP \037channel\037 ADD \037mask\037\002\n"
+				"        \002VOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002VOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002VOP \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002VOP\002 (VOicePeople) \002list\002 for a channel.  \n"
+				"The VOP list allows users to be auto-voiced and to voice \n"
+				"themselves if they aren't.\n"
+				" \n"
+				"The \002VOP ADD\002 command adds the given nickname to the\n"
+				"VOP list.\n"
+				" \n"
+				"The \002VOP DEL\002 command removes the given nick from the\n"
+				"VOP list.  If a list of entry numbers is given, those\n"
+				"entries are deleted.  (See the example for LIST below.)\n"
+				" \n"
+				"The \002VOP LIST\002 command displays the VOP list.  If\n"
+				"a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002VOP #channel LIST 2-5,7-9\002\n"
+				"      Lists VOP entries numbered 2 through 5 and\n"
+				"      7 through 9.\n"
+				"      \n"
+				"The \002VOP CLEAR\002 command clears all entries of the\n"
+				"VOP list.\n"
+				" \n"
+				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are \n"
+				"limited to AOPs or above, while the \002VOP CLEAR\002 command \n"
+				"can only be used by the channel founder.\n"
+				" \n"
+				"This command may have been disabled for your channel, and\n"
+				"in that case you need to use the access list. See \n"
+				"\002%R%S HELP ACCESS\002 for information about the access list,\n"
+				"and \002%R%S HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "VOP", CHAN_VOP_SYNTAX);
+		SyntaxError(source, "VOP", _("VOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_VOP);
+		source.Reply(_("    VOP        Maintains the VOP (VOicePeople) list for a channel"));
 	}
 };
 

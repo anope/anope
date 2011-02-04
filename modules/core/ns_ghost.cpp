@@ -31,31 +31,31 @@ class CommandNSGhost : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!user)
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!na)
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
-			source.Reply(NICK_NO_GHOST_SELF);
+			source.Reply(_("You can't ghost yourself!"));
 		else if ((u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))) ||
 				(!pass.empty() && enc_check_password(pass, na->nc->pass) == 1))
 		{
 			if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
-				source.Reply(NICK_GHOST_UNIDENTIFIED);
+				source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
 			else
 			{
 				Log(LOG_COMMAND, u, this) << "for " << nick;
 				Anope::string buf = "GHOST command used by " + u->nick;
 				kill_user(Config->s_NickServ, user, buf);
-				source.Reply(NICK_GHOST_KILLED, nick.c_str());
+				source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
 			}
 		}
 		else
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			if (!pass.empty())
 			{
 				Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
@@ -69,18 +69,31 @@ class CommandNSGhost : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_GHOST);
+		source.Reply(_("Syntax: \002GHOST \037nickname\037 [\037password\037]\002\n"
+				""
+				"itermminates a \"ghost\" IRC session using your nick.  A\n"
+				"ghost\" session is one which is not actually connected,\n"
+				"but which the IRC server believes is still online for one\n"
+				"reason or another. Typically, this happens if your\n"
+				"computer crashes or your Internet or modem connection\n"
+				"goes down while you're on IRC.\n"
+				" \n"
+				"In order to use the \002GHOST\002 command for a nick, your\n"
+				"current address as shown in /WHOIS must be on that nick's\n"
+				"access list, you must be identified and in the group of\n"
+				"that nick, or you must supply the correct password for\n"
+				"the nickname."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "GHOST", NICK_GHOST_SYNTAX);
+		SyntaxError(source, "GHOST", _("GHOST \037nickname\037 [\037password\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_GHOST);
+		source.Reply(_("    GHOST      Disconnects a \"ghost\" IRC session using your nick"));
 	}
 };
 

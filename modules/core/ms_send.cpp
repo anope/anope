@@ -30,18 +30,23 @@ class CommandMSSend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_SEND);
+		source.Reply(_("Syntax: \002SEND {\037nick\037 | \037channel\037} \037memo-text\037\002\n"
+				" \n"
+				"Sends the named \037nick\037 or \037channel\037 a memo containing\n"
+				"\037memo-text\037. When sending to a nickname, the recipient will\n"
+				"receive a notice that he/she has a new memo. The target\n"
+				"nickname/channel must be registered."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SEND", MEMO_SEND_SYNTAX);
+		SyntaxError(source, "SEND", LanguageString::MEMO_SEND_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_SEND);
+		source.Reply(_("    SEND   Send a memo to a nick or channel"));
 	}
 };
 

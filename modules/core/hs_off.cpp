@@ -26,12 +26,12 @@ class CommandHSOff : public Command
 		NickAlias *na = findnick(u->nick);
 
 		if (!na || !na->hostinfo.HasVhost())
-			source.Reply(HOST_NOT_ASSIGNED);
+			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
 		else
 		{
 			ircdproto->SendVhostDel(u);
 			Log(LOG_COMMAND, u, this) << "to disable their vhost";
-			source.Reply(HOST_OFF);
+			source.Reply(_("Your vhost was removed and the normal cloaking restored."));
 		}
 
 		return MOD_CONT;
@@ -39,13 +39,16 @@ class CommandHSOff : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_OFF);
+		source.Reply(_("Syntax: \002OFF\002\n"
+				"Deactivates the vhost currently assigned to the nick in use.\n"
+				"When you use this command any user who performs a /whois\n"
+				"on you will see your real IP address."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_OFF);
+		source.Reply(_("    OFF         Deactivates your assigned vhost"));
 	}
 };
 

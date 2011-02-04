@@ -29,40 +29,45 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
 			u2->SetMode(OperServ, UMODE_OPER);
-			u2->SendMessage(OperServ, OPER_OLINE_IRCOP);
-			source.Reply(OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			u2->SendMessage(OperServ, _("You are now an IRC Operator."));
+			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
-			source.Reply(OPER_OLINE_SUCCESS, flag.c_str(), nick.c_str());
+			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
+
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_OLINE);
+		source.Reply(_("Syntax: \002OLINE \037user\037 \037flags\037\002\n"
+				" \n"
+				"Allows Services Opers to give Operflags to any user.\n"
+				"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
+				"remove all flags simply type a \"-\" instead of any flags."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "OLINE", OPER_OLINE_SYNTAX);
+		SyntaxError(source, "OLINE", _("OLINE \037nick\037 \037flags\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_OLINE);
+		source.Reply(_("    OLINE       Give Operflags to a certain user"));
 	}
 };
 

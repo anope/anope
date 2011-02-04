@@ -26,7 +26,7 @@ class CommandMSStaff : public Command
 
 		if (readonly)
 		{
-			source.Reply(MEMO_SEND_DISABLED);
+			source.Reply(LanguageString::MEMO_SEND_DISABLED);
 			return MOD_CONT;
 		}
 
@@ -43,18 +43,21 @@ class CommandMSStaff : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_STAFF);
+		source.Reply(_("Syntax: \002STAFF\002 \002memo-text\002\n"
+			" \n"
+			"Sends all services staff a memo containing \037memo-text\037."));
+
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "STAFF", MEMO_STAFF_SYNTAX);
+		SyntaxError(source, "STAFF", _("STAFF \037memo-text\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_STAFF);
+		source.Reply(_("    STAFF  Send a memo to all opers/admins"));
 	}
 };
 

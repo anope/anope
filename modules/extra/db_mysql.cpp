@@ -129,13 +129,17 @@ class CommandSQLSync : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_SYNC);
+		source.Reply(_("Syntax: \002SQLSYNC\002\n"
+				" \n"
+				"This command syncs your databases with SQL. You should\n"
+				"only have to execute this command once, when you initially\n"
+				"import your databases into SQL."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SQLSYNC);
+		source.Reply(_("    SQLSYNC     Import your databases to SQL"));
 	}
 };
 
@@ -1393,7 +1397,7 @@ CommandReturn CommandSQLSync::Execute(CommandSource &source, const std::vector<A
 {
 	User *u = source.u;
 	SaveDatabases();
-	u->SendMessage(OperServ, OPER_SYNC_UPDATED);
+	u->SendMessage(OperServ, _("Updating MySQL."));
 	return MOD_CONT;
 }
 

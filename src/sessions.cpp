@@ -257,13 +257,13 @@ int exception_add(User *u, const Anope::string &mask, unsigned limit, const Anop
 			{
 				e->limit = limit;
 				if (u)
-					u->SendMessage(OperServ, OPER_EXCEPTION_CHANGED, mask.c_str(), e->limit);
+					u->SendMessage(OperServ, _("Exception for \002%s\002 has been updated to %d."), mask.c_str(), e->limit);
 				return -2;
 			}
 			else
 			{
 				if (u)
-					u->SendMessage(OperServ, OPER_EXCEPTION_EXISTS, mask.c_str());
+					u->SendMessage(OperServ, _("\002%s\002 already exists on the EXCEPTION list."), mask.c_str());
 				return -1;
 			}
 		}

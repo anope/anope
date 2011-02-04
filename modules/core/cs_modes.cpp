@@ -54,19 +54,19 @@ class CommandModeBase : public Command
 		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!set && u2->IsProtected() && !is_same)
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!c->FindUser(u2))
-			source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		else
 		{
 			if (set)
@@ -101,18 +101,25 @@ class CommandCSOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_OP);
+		source.Reply(_("Syntax: \002OP [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Ops a selected nick on a channel. If nick is not given,\n"
+				"it will op you. If channel is not given, it will op you\n"
+				"on every channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 access \n"
+				"and above on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "OP", CHAN_OP_SYNTAX);
+		SyntaxError(source, "OP", _("OP [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_OP);
+		source.Reply(_("    OP         Gives Op status to a selected nick on a channel"));
 	}
 };
 
@@ -132,18 +139,25 @@ class CommandCSDeOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_DEOP);
+		source.Reply(_("Syntax: \002DEOP [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Deops a selected nick on a channel. If nick is not given,\n"
+				"it will deop you. If channel is not given, it will deop\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 access \n"
+				"and above on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEOP", CHAN_DEOP_SYNTAX);
+		SyntaxError(source, "DEOP", _("DEOP [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DEOP);
+		source.Reply(_("    DEOP       Deops a selected nick on a channel"));
 	}
 };
 
@@ -163,18 +177,26 @@ class CommandCSVoice : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_VOICE);
+		source.Reply(_("Syntax: \002VOICE [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Voices a selected nick on a channel. If nick is not given,\n"
+				"it will voice you. If channel is not given, it will voice you\n"
+				"on every channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 access \n"
+				"and above on the channel, or to VOPs or those with level 3 \n"
+				"and above for self voicing."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "VOICE", CHAN_VOICE_SYNTAX);
+		SyntaxError(source, "VOICE", _("VOICE [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_VOICE);
+		source.Reply(_("    VOICE      Voices a selected nick on a channel"));
 	}
 };
 
@@ -194,18 +216,26 @@ class CommandCSDeVoice : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_DEVOICE);
+		source.Reply(_("Syntax: \002DEVOICE [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Devoices a selected nick on a channel. If nick is not given,\n"
+				"it will devoice you. If channel is not given, it will devoice\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 access \n"
+				"and above on the channel, or to VOPs or those with level 3 \n"
+				"and above for self devoicing."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEVOICE", CHAN_DEVOICE_SYNTAX);
+		SyntaxError(source, "DEVOICE", _("DEVOICE [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DEVOICE);
+		source.Reply(_("    DEVOICE    Devoices a selected nick on a channel"));
 	}
 };
 
@@ -228,18 +258,25 @@ class CommandCSHalfOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_HALFOP);
+		source.Reply(_("Syntax: \002HALFOP [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Halfops a selected nick on a channel. If nick is not given,\n"
+				"it will halfop you. If channel is not given, it will halfop\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to AOPs and those with level 5 access \n"
+				"and above on the channel, or to HOPs or those with level 4 \n"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "HALFOP", CHAN_HALFOP_SYNTAX);
+		SyntaxError(source, "HALFOP", _("HALFOP [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_HALFOP);
+		source.Reply(_("    HALFOP     Halfops a selected nick on a channel"));
 	}
 };
 
@@ -262,18 +299,26 @@ class CommandCSDeHalfOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_DEHALFOP);
+		source.Reply(_("Syntax: \002DEHALFOP [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Dehalfops a selected nick on a channel. If nick is not given,\n"
+				"it will dehalfop you. If channel is not given, it will dehalfop\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to AOPs and those with level 5 access \n"
+				"and above on the channel, or to HOPs or those with level 4 \n"
+				"and above for self dehalfopping."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEHALFOP", CHAN_DEHALFOP_SYNTAX);
+		SyntaxError(source, "DEHALFOP", _("DEHALFOP [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DEHALFOP);
+		source.Reply(_("    DEHALFOP   Dehalfops a selected nick on a channel"));
 	}
 };
 
@@ -296,18 +341,25 @@ class CommandCSProtect : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_PROTECT);
+		source.Reply(_("Syntax: \002PROTECT [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Protects a selected nick on a channel. If nick is not given,\n"
+				"it will protect you. If channel is not given, it will protect\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to the founder, or to SOPs or those with \n"
+				"level 10 and above on the channel for self protecting."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "PROTECT", CHAN_PROTECT_SYNTAX);
+		SyntaxError(source, "PROTECT", _("PROTECT [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_PROTECT);
+		source.Reply(_("    PROTECT    Protects a selected nick on a channel"));
 	}
 };
 
@@ -330,18 +382,24 @@ class CommandCSDeProtect : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_DEPROTECT);
+		source.Reply(_("Syntax: \002DEPROTECT [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Deprotects a selected nick on a channel. If nick is not given,\n"
+				"it will deprotect you. If channel is not given, it will deprotect\n"
+				"you on every channel.\n"
+				" \n"
+				"By default, limited to the founder, or to SOPs or those with \n"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEPROTECT", CHAN_DEPROTECT_SYNTAX);
+		SyntaxError(source, "DEPROTECT", _("DEROTECT [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DEPROTECT);
+		source.Reply(_("    DEPROTECT  Deprotects a selected nick on a channel"));
 	}
 };
 
@@ -364,18 +422,24 @@ class CommandCSOwner : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_OWNER);
+		source.Reply(_("Syntax: \002OWNER [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Gives the selected nick owner status on \002channel\002. If nick is not\n"
+				"given, it will give you owner. If channel is not given, it will\n"
+				"give you owner on every channel.\n"
+				" \n"
+				"Limited to those with founder access on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "OWNER", CHAN_OWNER_SYNTAX);
+		SyntaxError(source, "OWNER", _("OWNER [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_OWNER);
+		source.Reply(_("    OWNER      Gives you owner status on channel"));
 	}
 };
 
@@ -398,18 +462,24 @@ class CommandCSDeOwner : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_DEOWNER);
+		source.Reply(_("Syntax: \002DEOWNER [\037#channel\037] [\037nick\037]\002\n"
+				" \n"
+				"Removes owner status from the selected nick on \002channel\002. If nick\n"
+				"is not given, it will deowner you. If channel is not given, it will\n"
+				"deowner you on every channel.\n"
+				" \n"
+				"Limited to those with founder access on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEOWNER", CHAN_DEOWNER_SYNTAX);
+		SyntaxError(source, "DEOWNER", _("DEOWNER [\037#channel\037] [\037nick\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DEOWNER);
+		source.Reply(_("    DEOWNER    Removes your owner status on a channel"));
 	}
 };
 

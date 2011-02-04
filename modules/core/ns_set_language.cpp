@@ -41,18 +41,28 @@ class CommandNSSetLanguage : public Command
 		}
 
 		nc->language = param != "en" ? param : "";
-		source.Reply(NICK_SET_LANGUAGE_CHANGED);
+		PopLanguage();
+		PushLanguage("anope", nc->language);
+		source.Reply(_("Language changed to \002English\002."));
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_LANGUAGE);
+		source.Reply(_("Syntax: \002SET LANGUAGE \037language\037\002\n"
+				" \n"
+				"Changes the language Services uses when sending messages to\n"
+				"you (for example, when responding to a command you send).\n"
+				"\037language\037 should be chosen from the following list of\n"
+				"supported languages:"));
+
 		source.Reply("         en (English)");
 		for (unsigned j = 0; j < languages.size(); ++j)
 		{
-			const Anope::string &langname = GetString(languages[j], LANGUAGE_NAME);
+			PushLanguage("anope", languages[j]);
+			const Anope::string &langname = _("English");
+			PopLanguage();
 			if (langname == "English")
 				continue;
 			source.Reply("         %s (%s)", languages[j].c_str(), langname.c_str());
@@ -63,12 +73,14 @@ class CommandNSSetLanguage : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET LANGUAGE", NICK_SET_LANGUAGE_SYNTAX);
+		SyntaxError(source, "SET LANGUAGE", _("SET LANGUAGE \037language\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_LANGUAGE);
+		source.Reply(_("    LANGUAGE   Set the language Services will use when\n"
+				"                   sending messages to you"));
+
 	}
 };
 
@@ -81,18 +93,28 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_LANGUAGE);
+		source.Reply(_("Syntax: \002SET LANGUAGE \037language\037\002\n"
+				" \n"
+				"Changes the language Services uses when sending messages to\n"
+				"you (for example, when responding to a command you send).\n"
+				"\037language\037 should be chosen from the following list of\n"
+				"supported languages:"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET LANGUAGE", NICK_SASET_LANGUAGE_SYNTAX);
+		SyntaxError(source, "SASET LANGUAGE", _("SASET \037nickname\037 LANGUAGE \037number\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_LANGUAGE);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 LANGUAGE \037language\037\002\n"
+				" \n"
+				"Changes the language Services uses when sending messages to\n"
+				"\037nickname\037 (for example, when responding to a command he sends).\n"
+				"\037language\037 should be chosen from a list of supported languages\n"
+				"that you can get by typing \002%R%S HELP SET LANGUAGE\002."));
 	}
 };
 

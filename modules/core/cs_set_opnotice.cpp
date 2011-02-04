@@ -29,12 +29,12 @@ class CommandCSSetOpNotice : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_OPNOTICE);
-			source.Reply(CHAN_SET_OPNOTICE_ON, ci->name.c_str());
+			source.Reply(_("Op-notice option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_OPNOTICE);
-			source.Reply(CHAN_SET_OPNOTICE_OFF, ci->name.c_str());
+			source.Reply(_("Op-notice option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "OPNOTICE");
@@ -44,18 +44,23 @@ class CommandCSSetOpNotice : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_OPNOTICE, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 OPNOTICE {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002op-notice\002 option for a channel.\n"
+				"When \002op-notice\002 is set, %S will send a notice to the\n"
+				"channel whenever the \002OP\002 or \002DEOP\002 commands are used for a user\n"
+				"in the channel."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET OPNOTICE", CHAN_SET_OPNOTICE_SYNTAX);
+		SyntaxError(source, "SET OPNOTICE", _("SET \037channel\037 OPNOTICE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_OPNOTICE);
+		source.Reply(_("    OPNOTICE      Send a notice when OP/DEOP commands are used"));
 	}
 };
 
@@ -66,15 +71,9 @@ class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_OPNOTICE, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET OPNOTICE", CHAN_SASET_OPNOTICE_SYNTAX);
+		SyntaxError(source, "SET OPNOTICE", _("SASET \002channel\002 OPNOTICE {ON | OFF}"));
 	}
 };
 

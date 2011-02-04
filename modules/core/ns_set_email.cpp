@@ -32,29 +32,29 @@ class CommandNSSetEmail : public Command
 
 		if (param.empty() && Config->NSForceEmail)
 		{
-			source.Reply(NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
+			source.Reply(_("You cannot unset the e-mail on this network."));
 			return MOD_CONT;
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			source.Reply(MAIL_X_INVALID, param.c_str());
+			source.Reply(LanguageString::MAIL_X_INVALID, param.c_str());
 			return MOD_CONT;
 		}
 
 		if (!param.empty())
 		{
 			nc->email = param;
-			source.Reply(NICK_SASET_EMAIL_CHANGED, nc->display.c_str(), param.c_str());
+			source.Reply(_("E-mail address for \002%s\002 changed to \002%s\002."), nc->display.c_str(), param.c_str());
 		}
 		else
 		{
 			nc->email.clear();
-			source.Reply(NICK_SASET_EMAIL_UNSET, nc->display.c_str());
+			source.Reply(_("E-mail address for \002%s\002 unset."), nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -62,13 +62,17 @@ class CommandNSSetEmail : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_EMAIL);
+		source.Reply(_("Syntax: \002SET EMAIL \037address\037\002\n"
+				" \n"
+				"Associates the given E-mail address with your nickname.\n"
+				"This address will be displayed whenever someone requests\n"
+				"information on the nickname with the \002INFO\002 command."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_EMAIL);
+		source.Reply(_("    EMAIL      Associate an E-mail address with your nickname"));
 	}
 };
 
@@ -81,13 +85,15 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_EMAIL);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 EMAIL \037address\037\002\n"
+				" \n"
+				"Associates the given E-mail address with the nickname."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_EMAIL);
+		source.Reply(_("    EMAIL      Associate an E-mail address with the nickname"));
 	}
 };
 

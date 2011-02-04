@@ -25,11 +25,11 @@ class AkillDelCallback : public NumberList
 	~AkillDelCallback()
 	{
 		if (!Deleted)
-			source.Reply(OPER_AKILL_NO_MATCH);
+			source.Reply(_("No matching entries on the AKILL list."));
 		else if (Deleted == 1)
-			source.Reply(OPER_AKILL_DELETED_ONE);
+			source.Reply(_("Deleted 1 entry from the AKILL list."));
 		else
-			source.Reply(OPER_AKILL_DELETED_SEVERAL, Deleted);
+			source.Reply(_("Deleted %d entries from the AKILL list."), Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -65,9 +65,9 @@ class AkillListCallback : public NumberList
 	~AkillListCallback()
 	{
 		if (!SentHeader)
-			source.Reply(OPER_AKILL_NO_MATCH);
+			source.Reply(_("No matching entries on the AKILL list."));
 		else
-			source.Reply(END_OF_ANY_LIST, "Akill");
+			source.Reply(LanguageString::END_OF_ANY_LIST, "Akill");
 	}
 
 	void HandleNumber(unsigned Number)
@@ -83,7 +83,8 @@ class AkillListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_AKILL_LIST_HEADER);
+			source.Reply(_("Current AKILL list:\n"
+					"  Num   Mask                              Reason"));
 		}
 
 		DoList(source, x, Number);
@@ -91,7 +92,7 @@ class AkillListCallback : public NumberList
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(LanguageString::OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -115,7 +116,7 @@ class AkillViewCallback : public AkillListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_AKILL_VIEW_HEADER);
+			source.Reply(_("Current AKILL list:"));
 		}
 
 		DoList(source, x, Number);
@@ -123,7 +124,7 @@ class AkillViewCallback : public AkillListCallback
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
+		source.Reply(LanguageString::OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
 	}
 };
 
@@ -154,7 +155,7 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(LanguageString::BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -182,7 +183,7 @@ class CommandOSAKill : public Command
 
 			if (percent > 95)
 			{
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -192,7 +193,7 @@ class CommandOSAKill : public Command
 			if (!x)
 				return MOD_CONT;
 
-			source.Reply(OPER_AKILL_ADDED, mask.c_str());
+			source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
 			if (Config->WallOSAkill)
 			{
@@ -228,7 +229,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (readonly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(source, "ADD");
@@ -249,7 +250,7 @@ class CommandOSAKill : public Command
 
 		if (SGLine->GetList().empty())
 		{
-			source.Reply(OPER_LIST_EMPTY);
+			source.Reply(_("AKILL list is empty."));
 			return MOD_CONT;
 		}
 
@@ -264,18 +265,18 @@ class CommandOSAKill : public Command
 
 			if (!x)
 			{
-				source.Reply(OPER_AKILL_NOT_FOUND, mask.c_str());
+				source.Reply(_("\002%s\002 not found on the AKILL list."), mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, x));
 
 			AkillDelCallback::DoDel(source, x);
-			source.Reply(OPER_AKILL_DELETED, mask.c_str());
+			source.Reply(_("\002%s\002 deleted from the AKILL list."), mask.c_str());
 		}
 
 		if (readonly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -284,7 +285,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			source.Reply(OPER_LIST_EMPTY);
+			source.Reply(_("AKILL list is empty."));
 			return MOD_CONT;
 		}
 
@@ -308,7 +309,8 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_AKILL_LIST_HEADER);
+						source.Reply(_("Current AKILL list:\n"
+								"  Num   Mask                              Reason"));
 					}
 
 					AkillListCallback::DoList(source, x, i);
@@ -316,9 +318,9 @@ class CommandOSAKill : public Command
 			}
 
 			if (!SentHeader)
-				source.Reply(OPER_AKILL_NO_MATCH);
+				source.Reply(_("No matching entries on the AKILL list."));
 			else
-				source.Reply(END_OF_ANY_LIST, "Akill");
+				source.Reply(LanguageString::END_OF_ANY_LIST, "Akill");
 		}
 
 		return MOD_CONT;
@@ -328,7 +330,7 @@ class CommandOSAKill : public Command
 	{
 		if (SGLine->GetList().empty())
 		{
-			source.Reply(OPER_LIST_EMPTY);
+			source.Reply(_("AKILL list is empty."));
 			return MOD_CONT;
 		}
 
@@ -352,7 +354,7 @@ class CommandOSAKill : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_AKILL_VIEW_HEADER);
+						source.Reply(_("Current AKILL list:"));
 					}
 
 					AkillViewCallback::DoList(source, x, i);
@@ -360,7 +362,7 @@ class CommandOSAKill : public Command
 			}
 
 			if (!SentHeader)
-				source.Reply(OPER_AKILL_NO_MATCH);
+				source.Reply(_("No matching entries on the AKILL list."));
 		}
 
 		return MOD_CONT;
@@ -371,7 +373,7 @@ class CommandOSAKill : public Command
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
 		SGLine->Clear();
-		source.Reply(OPER_AKILL_CLEAR);
+		source.Reply(_("The AKILL list has been cleared."));
 
 		return MOD_CONT;
 	}
@@ -402,18 +404,59 @@ class CommandOSAKill : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_AKILL);
+		source.Reply(_("Syntax: \002AKILL ADD [+\037expiry\037] \037mask\037 \037reason\037\002\n"
+				"        \002AKILL DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002AKILL LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002AKILL VIEW [\037mask\037 | \037list\037]\002\n"
+				"        \002AKILL CLEAR\002\n"
+				" \n"
+				"Allows Services operators to manipulate the AKILL list. If\n"
+				"a user matching an AKILL mask attempts to connect, Services\n"
+				"will issue a KILL for that user and, on supported server\n"
+				"types, will instruct all servers to add a ban (K-line) for\n"
+				"the mask which the user matched.\n"
+				" \n"
+				"\002AKILL ADD\002 adds the given nick or user@host/ip mask to the AKILL\n"
+				"list for the given reason (which \002must\002 be given).\n"
+				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
+				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
+				"included, the default is days (so \037+30\037 by itself means 30 \n"
+				"days). To add an AKILL which does not expire, use \037+0\037. If the\n"
+				"usermask to be added starts with a \037+\037, an expiry time must\n"
+				"be given, even if it is the same as the default. The\n"
+				"current AKILL default expiry time can be found with the\n"
+				"\002STATS AKILL\002 command.\n"
+				" \n"
+				"The \002AKILL DEL\002 command removes the given mask from the\n"
+				"AKILL list if it is present.  If a list of entry numbers is \n"
+				"given, those entries are deleted.  (See the example for LIST \n"
+				"below.)\n"
+				" \n"
+				"The \002AKILL LIST\002 command displays the AKILL list.  \n"
+				"If a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed.  If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002AKILL LIST 2-5,7-9\002\n"
+				"      Lists AKILL entries numbered 2 through 5 and 7 \n"
+				"      through 9.\n"
+				"      \n"
+				"\002AKILL VIEW\002 is a more verbose version of \002AKILL LIST\002, and \n"
+				"will show who added an AKILL, the date it was added, and when \n"
+				"it expires, as well as the user@host/ip mask and reason.\n"
+				" \n"
+				"\002AKILL CLEAR\002 clears all entries of the AKILL list."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "AKILL", OPER_AKILL_SYNTAX);
+		SyntaxError(source, "AKILL", _("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_AKILL);
+		source.Reply(_("    AKILL       Manipulate the AKILL list"));
 	}
 };
 

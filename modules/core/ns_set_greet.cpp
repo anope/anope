@@ -32,12 +32,12 @@ class CommandNSSetGreet : public Command
 		if (!param.empty())
 		{
 			nc->greet = param;
-			source.Reply(NICK_SASET_GREET_CHANGED, nc->display.c_str(), nc->greet.c_str());
+			source.Reply(_("Greet message for \002%s\002 changed to \002%s\002."), nc->display.c_str(), nc->greet.c_str());
 		}
 		else
 		{
 			nc->greet.clear();
-			source.Reply(NICK_SASET_GREET_UNSET, nc->display.c_str());
+			source.Reply(_("Greet message for \002%s\002 unset."), nc->display.c_str());
 		}
 
 		return MOD_CONT;
@@ -45,13 +45,18 @@ class CommandNSSetGreet : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_GREET);
+		source.Reply(_("Syntax: \002SET GREET \037message\037\002\n"
+				" \n"
+				"Makes the given message the greet of your nickname, that\n"
+				"will be displayed when joining a channel that has GREET\n"
+				"option enabled, provided that you have the necessary \n"
+				"access on it."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_GREET);
+		source.Reply(_("    GREET      Associate a greet message with your nickname"));
 	}
 };
 
@@ -64,13 +69,18 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_GREET);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 GREET \037message\037\002\n"
+				" \n"
+				"Makes the given message the greet of the nickname, that\n"
+				"will be displayed when joining a channel that has GREET\n"
+				"option enabled, provided that the user has the necessary \n"
+				"access on it."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_GREET);
+		source.Reply(_("    GREET      Associate a greet message with the nickname"));
 	}
 };
 

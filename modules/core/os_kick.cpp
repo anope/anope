@@ -31,17 +31,17 @@ class CommandOSKick : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
 		{
-			source.Reply(OPER_BOUNCY_MODES_U_LINE);
+			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			return MOD_CONT;
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -53,18 +53,25 @@ class CommandOSKick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_KICK);
+		source.Reply(_("Syntax: \002KICK \037channel\037 \037user\037 \037reason\037\002\n"
+				" \n"
+				"Allows staff to kick a user from any channel.\n"
+				"Parameters are the same as for the standard /KICK\n"
+				"command. The kick message will have the nickname of the\n"
+				"IRCop sending the KICK command prepended; for example:\n"
+				" \n"
+				"*** SpamMan has been kicked off channel #my_channel by %S (Alcan (Flood))"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "KICK", OPER_KICK_SYNTAX);
+		SyntaxError(source, "KICK", _("KICK \037channel\037 \037user\037 \037reason\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_KICK);
+		source.Reply(_("    KICK        Kick a user from a channel"));
 	}
 };
 

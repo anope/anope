@@ -32,33 +32,33 @@ class CommandOSSVSNick : public Command
 		/* Truncate long nicknames to NICKMAX-2 characters */
 		if (newnick.length() > Config->NickLen)
 		{
-			source.Reply(NICK_X_TRUNCATED, newnick.c_str(), Config->NickLen, newnick.c_str());
+			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), Config->NickLen, newnick.c_str());
 			newnick = params[1].substr(0, Config->NickLen);
 		}
 
 		/* Check for valid characters */
 		if (newnick[0] == '-' || isdigit(newnick[0]))
 		{
-			source.Reply(NICK_X_ILLEGAL, newnick.c_str());
+			source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
 			return MOD_CONT;
 		}
 		for (unsigned i = 0, end = newnick.length(); i < end; ++i)
 			if (!isvalidnick(newnick[i]))
 			{
-				source.Reply(NICK_X_ILLEGAL, newnick.c_str());
+				source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
 				return MOD_CONT;
 			}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (finduser(newnick))
-			source.Reply(NICK_X_IN_USE, newnick.c_str());
+			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
 		else if ((na = findnick(newnick)) && na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, newnick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, newnick.c_str());
 		else
 		{
-			source.Reply(OPER_SVSNICK_NEWNICK, nick.c_str(), newnick.c_str());
+			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
 			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
@@ -67,18 +67,20 @@ class CommandOSSVSNick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_SVSNICK);
+		source.Reply(_("Syntax: \002SVSNICK \037nick\037 \037newnick\037\002\n"
+				" \n"
+				"Forcefully changes a user's nickname from nick to newnick."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SVSNICK", OPER_SVSNICK_SYNTAX);
+		SyntaxError(source, "SVSNICK", _("SVSNICK \037nick\037 \037newnick\037 "));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SVSNICK);
+		source.Reply(_("    SVSNICK     Forcefully change a user's nickname"));
 	}
 };
 

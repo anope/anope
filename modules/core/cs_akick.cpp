@@ -64,7 +64,7 @@ class AkickListCallback : public NumberList
 	~AkickListCallback()
 	{
 		if (!SentHeader)
-			source.Reply(CHAN_AKICK_NO_MATCH, source.ci->name.c_str());
+			source.Reply(_("No matching entries on %s autokick list."), source.ci->name.c_str());
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -75,7 +75,7 @@ class AkickListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(CHAN_AKICK_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(_("Autokick list for %s:"), source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAkick(Number - 1));
@@ -83,7 +83,7 @@ class AkickListCallback : public NumberList
 
 	static void DoList(CommandSource &source, unsigned index, AutoKick *akick)
 	{
-		source.Reply(CHAN_AKICK_LIST_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(source.u, NO_REASON).c_str());
+		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(source.u->Account(), LanguageString::NO_REASON).c_str());
 	}
 };
 
@@ -102,7 +102,7 @@ class AkickViewCallback : public AkickListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(CHAN_AKICK_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(_("Autokick list for %s:"), source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAkick(Number - 1));
@@ -116,12 +116,12 @@ class AkickViewCallback : public AkickListCallback
 		if (akick->addtime)
 			timebuf = do_strftime(akick->addtime);
 		else
-			timebuf = GetString(u, UNKNOWN);
+			timebuf = GetString(u->Account(), LanguageString::UNKNOWN);
 
-		source.Reply(CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u, UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u, NO_REASON).c_str());
+		source.Reply(LanguageString::CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u->Account(), LanguageString::UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
 
 		if (akick->last_used)
-			source.Reply(CHAN_AKICK_LAST_USED, do_strftime(akick->last_used).c_str());
+			source.Reply(_("    Last used %s"), do_strftime(akick->last_used).c_str());
 	}
 };
 
@@ -143,11 +143,11 @@ class AkickDelCallback : public NumberList
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
 
 		if (!Deleted)
-			source.Reply(CHAN_AKICK_NO_MATCH, ci->name.c_str());
+			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 		else if (Deleted == 1)
-			source.Reply(CHAN_AKICK_DELETED_ONE, ci->name.c_str());
+			source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
 		else
-			source.Reply(CHAN_AKICK_DELETED_SEVERAL, Deleted, ci->name.c_str());
+			source.Reply(_("Deleted %d entries from %s autokick list."), Deleted, ci->name.c_str());
 	}
 
 	void HandleNumber(unsigned Number)
@@ -184,7 +184,7 @@ class CommandCSAKick : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(NICK_X_FORBIDDEN, mask.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, mask.c_str());
 				return;
 			}
 
@@ -194,7 +194,7 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask))
 		{
-			source.Reply(CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
+			source.Reply(LanguageString::CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 			return;
 		}
 
@@ -206,7 +206,7 @@ class CommandCSAKick : public Command
 			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
 			if (nc == ci->founder || nc_level >= u_level)
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return;
 			}
 		}
@@ -224,7 +224,7 @@ class CommandCSAKick : public Command
 
 				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && entry_mask.Matches(u2))
 				{
-					source.Reply(ACCESS_DENIED);
+					source.Reply(LanguageString::ACCESS_DENIED);
 					return;
 				}
 			}
@@ -245,7 +245,7 @@ class CommandCSAKick : public Command
 					Anope::string buf = na2->nick + "!" + na2->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
-						source.Reply(ACCESS_DENIED);
+						source.Reply(LanguageString::ACCESS_DENIED);
 						return;
 					}
 				}
@@ -257,14 +257,14 @@ class CommandCSAKick : public Command
 			akick = ci->GetAkick(j);
 			if (akick->HasFlag(AK_ISNICK) ? akick->nc == nc : mask.equals_ci(akick->mask))
 			{
-				source.Reply(CHAN_AKICK_ALREADY_EXISTS, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 already exists on %s autokick list."), akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), ci->name.c_str());
 				return;
 			}
 		}
 
 		if (ci->GetAkickCount() >= Config->CSAutokickMax)
 		{
-			source.Reply(CHAN_AKICK_REACHED_LIMIT, Config->CSAutokickMax);
+			source.Reply(_("Sorry, you can only have %d autokick masks on a channel."), Config->CSAutokickMax);
 			return;
 		}
 
@@ -278,7 +278,7 @@ class CommandCSAKick : public Command
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
 
-		source.Reply(CHAN_AKICK_ADDED, mask.c_str(), ci->name.c_str());
+		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
 		this->DoEnforce(source);
 	}
@@ -294,7 +294,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			source.Reply(CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
 		}
 
@@ -319,7 +319,7 @@ class CommandCSAKick : public Command
 
 			if (i == ci->GetAkickCount())
 			{
-				source.Reply(CHAN_AKICK_NOT_FOUND, mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 not found on %s autokick list."), mask.c_str(), ci->name.c_str());
 				return;
 			}
 
@@ -328,7 +328,7 @@ class CommandCSAKick : public Command
 
 			ci->EraseAkick(i);
 
-			source.Reply(CHAN_AKICK_DELETED, mask.c_str(), ci->name.c_str());
+			source.Reply(_("\002%s\002 deleted from %s autokick list."), mask.c_str(), ci->name.c_str());
 		}
 	}
 
@@ -344,7 +344,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			source.Reply(CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
 		}
 
@@ -372,14 +372,14 @@ class CommandCSAKick : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 				}
 
 				AkickListCallback::DoList(source, i, akick);
 			}
 
 			if (!SentHeader)
-				source.Reply(CHAN_AKICK_NO_MATCH, ci->name.c_str());
+				source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 		}
 	}
 
@@ -395,7 +395,7 @@ class CommandCSAKick : public Command
 
 		if (!ci->GetAkickCount())
 		{
-			source.Reply(CHAN_AKICK_LIST_EMPTY, ci->name.c_str());
+			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
 		}
 
@@ -423,14 +423,14 @@ class CommandCSAKick : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(CHAN_AKICK_LIST_HEADER, ci->name.c_str());
+					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 				}
 
 				AkickViewCallback::DoList(source, i, akick);
 			}
 
 			if (!SentHeader)
-				source.Reply(CHAN_AKICK_NO_MATCH, ci->name.c_str());
+				source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 		}
 	}
 
@@ -443,7 +443,7 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
 			return;
 		}
 
@@ -458,7 +458,7 @@ class CommandCSAKick : public Command
 		bool override = !check_access(u, ci, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
 
-		source.Reply(CHAN_AKICK_ENFORCE_DONE, ci->name.c_str(), count);
+		source.Reply(_("AKICK ENFORCE for \002%s\002 complete; \002%d\002 users were affected."), ci->name.c_str(), count);
 	}
 
 	void DoClear(CommandSource &source)
@@ -469,7 +469,7 @@ class CommandCSAKick : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		ci->ClearAkick();
-		source.Reply(CHAN_AKICK_CLEAR, ci->name.c_str());
+		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());
 	}
 
  public:
@@ -489,9 +489,9 @@ class CommandCSAKick : public Command
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
-			source.Reply(CHAN_AKICK_DISABLED);
+			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
 			this->DoAdd(source, params);
 		else if (cmd.equals_ci("DEL"))
@@ -512,18 +512,56 @@ class CommandCSAKick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_AKICK);
+		source.Reply(_("Syntax: \002AKICK \037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]\002\n"
+				"        \002AKICK \037channel\037 DEL {\037nick\037 | \037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002AKICK \037channel\037 LIST [\037mask\037 | \037entry-num\037 | \037list\037]\002\n"
+				"        \002AKICK \037channel\037 VIEW [\037mask\037 | \037entry-num\037 | \037list\037]\002\n"
+				"        \002AKICK \037channel\037 ENFORCE\002\n"
+				"        \002AKICK \037channel\037 CLEAR\002\n"
+				" \n"
+				"Maintains the \002AutoKick list\002 for a channel.  If a user\n"
+				"on the AutoKick list attempts to join the channel,\n"
+				"%S will ban that user from the channel, then kick\n"
+				"the user.\n"
+				" \n"
+				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
+				"to the AutoKick list.  If a \037reason\037 is given with\n"
+				"the command, that reason will be used when the user is\n"
+				"kicked; if not, the default reason is \"You have been\n"
+				"banned from the channel\".\n"
+				"When akicking a \037registered nick\037 the nickserv account\n"
+				"will be added to the akick list instead of the mask.\n"
+				"All users within that nickgroup will then be akicked.\n"
+				" \n"
+				"The \002AKICK DEL\002 command removes the given nick or mask\n"
+				"from the AutoKick list.  It does not, however, remove any\n"
+				"bans placed by an AutoKick; those must be removed\n"
+				"manually.\n"
+				" \n"
+				"The \002AKICK LIST\002 command displays the AutoKick list, or\n"
+				"optionally only those AutoKick entries which match the\n"
+				"given mask.\n"
+				" \n"
+				"The \002AKICK VIEW\002 command is a more verbose version of\n"
+				"\002AKICK LIST\002 command.\n"
+				" \n"
+				"The \002AKICK ENFORCE\002 command causes %S to enforce the\n"
+				"current AKICK list by removing those users who match an\n"
+				"AKICK mask.\n"
+				" \n"
+				"The \002AKICK CLEAR\002 command clears all entries of the\n"
+				"akick list."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "AKICK", CHAN_AKICK_SYNTAX);
+		SyntaxError(source, "AKICK", _("AKICK \037channel\037 {ADD | DEL | LIST | VIEW | ENFORCE | CLEAR} [\037nick-or-usermask\037] [\037reason\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_AKICK);
+		source.Reply(_("    AKICK      Maintain the AutoKick list"));
 	}
 };
 

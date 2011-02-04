@@ -29,12 +29,12 @@ class CommandCSSetSecureOps : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREOPS);
-			source.Reply(CHAN_SET_SECUREOPS_ON, ci->name.c_str());
+			source.Reply(_("Secure ops option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREOPS);
-			source.Reply(CHAN_SET_SECUREOPS_OFF, ci->name.c_str());
+			source.Reply(_("Secure ops option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREOPS");
@@ -44,18 +44,22 @@ class CommandCSSetSecureOps : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_SECUREOPS, "SET");
+		source.Reply(_("Syntax: \002SET \037%s\037 SECUREOPS {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002secure ops\002 option for a channel.\n"
+				"When \002secure ops\002 is set, users who are not on the userlist\n"
+				"will not be allowed chanop status."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET SECUREOPS", CHAN_SET_SECUREOPS_SYNTAX);
+		SyntaxError(source, "SET SECUREOPS", _("SET \037channel\037 SECUREOPS {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_SECUREOPS);
+		source.Reply(_("    SECUREOPS     Stricter control of chanop status"));
 	}
 };
 
@@ -66,15 +70,9 @@ class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_SECUREOPS, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET SECUREOPS", CHAN_SASET_SECUREOPS_SYNTAX);
+		SyntaxError(source, "SASET SECUREOPS", _("SASET \002channel\002 SECUREOPS {ON | OFF}"));
 	}
 };
 

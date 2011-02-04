@@ -28,7 +28,7 @@ class CommandCSSetXOP : public Command
 
 		if (!FindModule("cs_xop"))
 		{
-			source.Reply(CHAN_XOP_NOT_AVAILABLE, "XOP");
+			source.Reply(_("xOP system is not available."), "XOP");
 			return MOD_CONT;
 		}
 
@@ -67,14 +67,14 @@ class CommandCSSetXOP : public Command
 			}
 
 			Log(LOG_COMMAND, u, this, ci) << "to enable XOP";
-			source.Reply(CHAN_SET_XOP_ON, ci->name.c_str());
+			source.Reply(_("xOP lists system for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
 			Log(LOG_COMMAND, u, this, ci) << "to disable XOP";
-			source.Reply(CHAN_SET_XOP_OFF, ci->name.c_str());
+			source.Reply(_("xOP lists system for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "XOP");
@@ -84,18 +84,37 @@ class CommandCSSetXOP : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_XOP, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 XOP {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the xOP lists system for a channel.\n"
+				"When \002XOP\002 is set, you have to use the \002AOP\002/\002SOP\002/\002VOP\002\n"
+				"commands in order to give channel privileges to\n"
+				"users, else you have to use the \002ACCESS\002 command.\n"
+				" \n"
+				"\002Technical Note\002: when you switch from access list to xOP \n"
+				"lists system, your level definitions and user levels will be\n"
+				"changed, so you won't find the same values if you\n"
+				"switch back to access system! \n"
+				" \n"
+				"You should also check that your users are in the good xOP \n"
+				"list after the switch from access to xOP lists, because the \n"
+				"guess is not always perfect... in fact, it is not recommended \n"
+				"to use the xOP lists if you changed level definitions with \n"
+				"the \002LEVELS\002 command.\n"
+				" \n"
+				"Switching from xOP lists system to access list system\n"
+				"causes no problem though."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET XOP", CHAN_SET_XOP_SYNTAX);
+		SyntaxError(source, "SET XOP", _("SET \037channel\037 XOP {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_XOP);
+		source.Reply(_("    XOP           Toggle the user privilege system"));
 	}
 };
 
@@ -106,15 +125,9 @@ class CommandCSSASetXOP : public CommandCSSetXOP
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_XOP, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET XOP", CHAN_SASET_XOP_SYNTAX);
+		SyntaxError(source, "SASET XOP", _("SASET \002channel\002 XOP {ON | OFF}"));
 	}
 };
 

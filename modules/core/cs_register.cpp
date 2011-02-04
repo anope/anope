@@ -32,22 +32,22 @@ class CommandCSRegister : public Command
 
 		if (readonly)
 		{
-			source.Reply(CHAN_REGISTER_DISABLED);
+			source.Reply(_("Sorry, channel registration is temporarily disabled."));
 			return MOD_CONT;
 		}
 
 		if (chan[0] == '&')
-			source.Reply(CHAN_REGISTER_NOT_LOCAL);
+			source.Reply(_("Local channels cannot be registered."));
 		else if (chan[0] != '#')
-			source.Reply(CHAN_SYMBOL_REQUIRED);
+			source.Reply(LanguageString::CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			source.Reply(CHAN_X_INVALID, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_INVALID, chan.c_str());
 		else if (ci)
-			source.Reply(CHAN_ALREADY_REGISTERED, chan.c_str());
+			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
-			source.Reply(CHAN_MUST_BE_CHANOP);
+			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? LanguageString::CHAN_EXCEEDED_CHANNEL_LIMIT : LanguageString::CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);
@@ -66,7 +66,7 @@ class CommandCSRegister : public Command
 			ci->bi = NULL;
 			++ci->founder->channelcount;
 			Log(LOG_COMMAND, u, this, ci);
-			source.Reply(CHAN_REGISTERED, chan.c_str(), u->nick.c_str());
+			source.Reply(_("Channel \002%s\002 registered under your nickname: %s"), chan.c_str(), u->nick.c_str());
 
 			/* Implement new mode lock */
 			if (c)
@@ -98,18 +98,37 @@ class CommandCSRegister : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_REGISTER, Config->s_ChanServ.c_str());
+		source.Reply(_("Syntax: \002REGISTER \037channel\037 \037description\037\002\n"
+			" \n"
+			"Registers a channel in the %S database.  In order\n"
+			"to use this command, you must first be a channel operator\n"
+			"on the channel you're trying to register.\n"
+			"The description, which \002must\002 be included, is a\n"
+			"general description of the channel's purpose.\n"
+			" \n"
+			"When you register a channel, you are recorded as the\n"
+			"\"founder\" of the channel. The channel founder is allowed\n"
+			"to change all of the channel settings for the channel;\n"
+			"%S will also automatically give the founder\n"
+			"channel-operator privileges when s/he enters the channel.\n"
+			"See the \002ACCESS\002 command (\002%R%S HELP ACCESS\002) for\n"
+			"information on giving a subset of these privileges to\n"
+			"other channel users.\n"
+			" \n"
+			"NOTICE: In order to register a channel, you must have\n"
+			"first registered your nickname.  If you haven't,\n"
+			"\002%R%s HELP\002 for information on how to do so."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "REGISTER", CHAN_REGISTER_SYNTAX);
+		SyntaxError(source, "REGISTER", _("REGISTER \037channel\037 \037description\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_REGISTER);
+		source.Reply(_("    REGISTER   Register a channel"));
 	}
 };
 

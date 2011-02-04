@@ -29,38 +29,40 @@ class CommandCSGetKey : public Command
 
 		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		Anope::string key;
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
-			source.Reply(CHAN_GETKEY_NOKEY, chan.c_str());
+			source.Reply(_("The channel \002%s\002 has no key."), chan.c_str());
 			return MOD_CONT;
 		}
 
 		bool override = !check_access(u, ci, CA_GETKEY);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
-		source.Reply(CHAN_GETKEY_KEY, chan.c_str(), key.c_str());
+		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_GETKEY);
+		source.Reply(_("Syntax: \002GETKEY \037channel\037\002\n"
+				" \n"
+				"Returns the key of the given channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "GETKEY", CHAN_GETKEY_SYNTAX);
+		SyntaxError(source, "GETKEY", _("GETKEY \037channel\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_GETKEY);
+		source.Reply(_("    GETKEY     Returns the key of the given channel"));
 	}
 };
 

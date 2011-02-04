@@ -34,13 +34,16 @@ class CommandOSRestart : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_RESTART);
+		source.Reply(_("Syntax: \002RESTART\002\n"
+				" \n"
+				"Causes Services to save all databases and then restart\n"
+				"(i.e. exit and immediately re-run the executable)."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_RESTART);
+		source.Reply(_("    RESTART     Save databases and restart Services"));
 	}
 };
 

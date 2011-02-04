@@ -57,9 +57,9 @@ void check_memos(User *u)
 	}
 	if (newcnt > 0)
 	{
-		u->SendMessage(MemoServ, newcnt == 1 ? MEMO_HAVE_NEW_MEMO : MEMO_HAVE_NEW_MEMOS, newcnt);
+		u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
 		if (newcnt == 1 && (nc->memos.memos[i - 1]->HasFlag(MF_UNREAD)))
-			u->SendMessage(MemoServ, MEMO_TYPE_READ_LAST, Config->s_MemoServ.c_str());
+			u->SendMessage(MemoServ, _("Type \002%R%s READ LAST\002 to read it."), Config->s_MemoServ.c_str());
 		else if (newcnt == 1)
 		{
 			for (i = 0; i < end; ++i)
@@ -67,17 +67,17 @@ void check_memos(User *u)
 				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
 			}
-			u->SendMessage(MemoServ, MEMO_TYPE_READ_NUM, Config->s_MemoServ.c_str(), i);
+			u->SendMessage(MemoServ, _("Type \002%R%s READ %d\002 to read it."), Config->s_MemoServ.c_str(), i);
 		}
 		else
-			u->SendMessage(MemoServ, MEMO_TYPE_LIST_NEW, Config->s_MemoServ.c_str());
+			u->SendMessage(MemoServ, _("Type \002%R%s LIST NEW\002 to list them."), Config->s_MemoServ.c_str());
 	}
 	if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax)
 	{
 		if (nc->memos.memos.size() > nc->memos.memomax)
-			u->SendMessage(MemoServ, MEMO_OVER_LIMIT, nc->memos.memomax);
+			u->SendMessage(MemoServ, _("Warning: You are over your maximum number of memos (%d).  You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 		else
-			u->SendMessage(MemoServ, MEMO_AT_LIMIT, nc->memos.memomax);
+			u->SendMessage(MemoServ, _("Warning: You have reached your maximum number of memos (%d).  You will be unable to receive any new memos until you delete some of your current ones."), nc->memos.memomax);
 	}
 }
 
@@ -170,53 +170,53 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	int is_servoper = u && u->Account() && u->Account()->IsServicesOper();
 
 	if (readonly)
-		u->SendMessage(MemoServ, MEMO_SEND_DISABLED);
+		u->SendMessage(MemoServ, LanguageString::MEMO_SEND_DISABLED);
 	else if (text.empty())
 	{
 		if (!z)
-			SyntaxError(source, "SEND", MEMO_SEND_SYNTAX);
+			SyntaxError(source, "SEND", LanguageString::MEMO_SEND_SYNTAX);
 
 		if (z == 3)
-			SyntaxError(source, "RSEND", MEMO_RSEND_SYNTAX);
+			SyntaxError(source, "RSEND", _("{\037nick\037 | \037channel\037} \037memo-text\037")); // XXX?
 	}
 	else if (!u->IsIdentified() && !u->IsRecognized())
 	{
 		if (!z || z == 3)
-			source.Reply(NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(LanguageString::NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
 	}
 	else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 	{
 		if (!z || z == 3)
 		{
 			if (isforbid)
-				source.Reply(ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, name.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, name.c_str());
 			else
-				source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, name.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, name.c_str());
 		}
 	}
 	else if (z != 2 && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 	{
 		u->lastmemosend = Anope::CurTime;
 		if (!z)
-			source.Reply(MEMO_SEND_PLEASE_WAIT, Config->MSSendDelay);
+			source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
 
 		if (z == 3)
-			source.Reply(MEMO_RSEND_PLEASE_WAIT, Config->MSSendDelay);
+			source.Reply(_("Please wait %d seconds before using the RSEND command again."), Config->MSSendDelay);
 	}
 	else if (!mi->memomax && !is_servoper)
 	{
 		if (!z || z == 3)
-			source.Reply(MEMO_X_GETS_NO_MEMOS, name.c_str());
+			source.Reply(_("%s cannot receive memos."), name.c_str());
 	}
 	else if (mi->memomax > 0 && mi->memos.size() >= mi->memomax && !is_servoper)
 	{
 		if (!z || z == 3)
-			source.Reply(MEMO_X_HAS_TOO_MANY_MEMOS, name.c_str());
+			source.Reply(_("%s currently has too many memos and cannot receive more."), name.c_str());
 	}
 	else
 	{
 		if (!z || z == 3)
-			source.Reply(MEMO_SENT, name.c_str());
+			source.Reply(_("Memo sent to \002%s\002."), name.c_str());
 		if ((!u->Account() || !u->Account()->IsServicesOper()) && mi->HasIgnore(u))
 			return;
 
@@ -248,13 +248,13 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+							user->SendMessage(MemoServ, LanguageString::MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						u->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						u->SendMessage(MemoServ, LanguageString::MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
@@ -277,7 +277,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 					if (check_access(cu->user, c->ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(MemoServ, LanguageString::MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
 					}
 				}
 			} /* MSNotifyAll */
@@ -328,9 +328,16 @@ static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
 	char message[BUFSIZE];
 
-	snprintf(message, sizeof(message), GetString(nc, NICK_MAIL_TEXT).c_str(), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
+	snprintf(message, sizeof(message), GetString(nc,
+	"Hi %s\n"
+	" \n"
+	"You've just received a new memo from %s. This is memo number %d.\n"
+	" \n"
+	"Memo text:\n"
+	" \n"
+	"%s").c_str(), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
 
-	return Mail(nc, GetString(nc, MEMO_MAIL_SUBJECT), message);
+	return Mail(nc, GetString(nc, _("New memo")), message);
 }
 
 /*************************************************************************/
@@ -358,16 +365,17 @@ void rsend_notify(CommandSource &source, Memo *m, const Anope::string &chan)
 		   nick or channel */
 		char text[256];
 		if (!chan.empty())
-			snprintf(text, sizeof(text), GetString(na->nc, MEMO_RSEND_CHAN_MEMO_TEXT).c_str(), chan.c_str());
+			snprintf(text, sizeof(text), GetString(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")).c_str(), chan.c_str());
 		else
-			snprintf(text, sizeof(text), "%s", GetString(na->nc, MEMO_RSEND_NICK_MEMO_TEXT).c_str());
+			snprintf(text, sizeof(text), "%s", GetString(na->nc, _("\002[auto-memo]\002 The memo you sent has been viewed.")).c_str());
 
 		/* Send notification */
 		memo_send(source, m->sender, text, 2);
 
 		/* Notify recepient of the memo that a notification has
 		   been sent to the sender */
-		source.Reply(MEMO_RSEND_USER_NOTIFICATION, nc->display.c_str());
+		source.Reply(_("A notification memo has been sent to %s informing him/her you have\n"
+				"read his/her memo."), nc->display.c_str());
 	}
 
 	/* Remove receipt flag from the original memo */

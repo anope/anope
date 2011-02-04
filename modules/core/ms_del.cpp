@@ -34,7 +34,7 @@ class MemoDelCallback : public NumberList
 			FOREACH_MOD(I_OnMemoDel, OnMemoDel(source.u->Account(), mi, mi->memos[Number - 1]));
 
 		mi->Del(Number - 1);
-		source.Reply(MEMO_DELETED_ONE, Number);
+		source.Reply(_("Memo %d has been deleted."), Number);
 	}
 };
 
@@ -60,17 +60,17 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
 			{
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -82,9 +82,9 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(LanguageString::MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(LanguageString::MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -101,7 +101,7 @@ class CommandMSDel : public Command
 				else
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[mi->memos.size() - 1]));
 				mi->Del(mi->memos[mi->memos.size() - 1]);
-				source.Reply(MEMO_DELETED_ONE, mi->memos.size() + 1);
+				source.Reply(_("Memo %d has been deleted."), mi->memos.size() + 1);
 			}
 			else
 			{
@@ -114,9 +114,9 @@ class CommandMSDel : public Command
 					delete mi->memos[i];
 				mi->memos.clear();
 				if (!chan.empty())
-					source.Reply(MEMO_CHAN_DELETED_ALL, chan.c_str());
+					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());
 				else
-					source.Reply(MEMO_DELETED_ALL);
+					source.Reply(_("All of your memos have been deleted."));
 			}
 		}
 		return MOD_CONT;
@@ -124,18 +124,33 @@ class CommandMSDel : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_DEL);
+		source.Reply(_("Syntax: \002DEL [\037channel\037] {\037num\037 | \037list\037 | LAST | ALL}\002\n"
+				" \n"
+				"Deletes the specified memo or memos. You can supply\n"
+				"multiple memo numbers or ranges of numbers instead of a\n"
+				"single number, as in the second example below.\n"
+				" \n"
+				"If \002LAST\002 is given, the last memo will be deleted.\n"
+				"If \002ALL\002 is given, deletes all of your memos.\n"
+				" \n"
+				"Examples:\n"
+				" \n"
+				"   \002DEL 1\002\n"
+				"      Deletes your first memo.\n"
+				" \n"
+				"   \002DEL 2-5,7-9\002\n"
+				"      Deletes memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEL", MEMO_DEL_SYNTAX);
+		SyntaxError(source, "DEL", _("DEL [\037channel\037] {\037num\037 | \037list\037 | ALL}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_DEL);
+		source.Reply(_("    DEL    Delete a memo or memos"));
 	}
 };
 

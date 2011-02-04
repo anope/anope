@@ -31,9 +31,9 @@ class CommandCSClearUsers : public Command
 		Anope::string modebuf;
 
 		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!check_access(u, ci, CA_FOUNDER))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		
 		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
 
@@ -44,25 +44,30 @@ class CommandCSClearUsers : public Command
 			c->Kick(NULL, uc->user, "%s", buf.c_str());
 		}
 
-		source.Reply(CHAN_CLEARED_USERS, chan.c_str());
+		source.Reply(_("All users have been kicked from \2%s\2."), chan.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_CLEARUSERS);
+		source.Reply(_("Syntax: \002CLEARUSERS \037channel\037\002\n"
+				" \n"
+				"Tells %S to clear (kick) all users certain settings on a channel."
+				" \n"
+				"By default, limited to those with founder access on the\n"
+				"channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "CLEAR", CHAN_CLEARUSERS_SYNTAX);
+		SyntaxError(source, "CLEAR", _("CLEARUSERS \037channel\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_CLEARUSERS);
+		source.Reply(_("    CLEARUSERS Tells ChanServ to clear (kick) all users on a channel"));
 	}
 };
 

@@ -32,12 +32,12 @@ class CommandNSSetPrivate : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_PRIVATE);
-			source.Reply(NICK_SASET_PRIVATE_ON, nc->display.c_str());
+			source.Reply(_("Private option is now \002\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_PRIVATE);
-			source.Reply(NICK_SASET_PRIVATE_OFF, nc->display.c_str());
+			source.Reply(_("Private option is now \002\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
@@ -47,18 +47,24 @@ class CommandNSSetPrivate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_PRIVATE);
+		source.Reply(_("Syntax: \002SET PRIVATE {ON | OFF}\002\n"
+				" \n"
+				"Turns %S's privacy option on or off for your nick.\n"
+				"With \002PRIVATE\002 set, your nickname will not appear in\n"
+				"nickname lists generated with %S's \002LIST\002 command.\n"
+				"(However, anyone who knows your nickname can still get\n"
+				"information on it using the \002INFO\002 command.)"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET PRIVATE", NICK_SET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SET PRIVATE", _("SET PRIVATE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_PRIVATE);
+		source.Reply(_("    PRIVATE    Prevent the nickname from appearing in a \002%R%S LIST\002"));
 	}
 };
 
@@ -71,18 +77,23 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_PRIVATE);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 PRIVATE {ON | OFF}\002\n"
+				" \n"
+				"Turns %S's privacy option on or off for the nick.\n"
+				"With \002PRIVATE\002 set, the nickname will not appear in\n"
+				"nickname lists generated with %S's \002LIST\002 command.\n"
+				"(However, anyone who knows the nickname can still get\n"
+				"information on it using the \002INFO\002 command.)"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET PRIVATE", NICK_SASET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SASET PRIVATE", _("SASET \037nickname\037 PRIVATE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_PRIVATE);
 	}
 };
 

@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../cs_enforce.cpp:213
+msgid "    ENFORCE    Enforce various channel modes and set options"
+msgstr ""
+
+#: ../cs_enforce.cpp:178
+msgid ""
+"Enforce various channel modes and set options. The channel\n"
+"option indicates what channel to enforce the modes and options\n"
+"on. The what option indicates what modes and options to\n"
+"enforce, and can be any of SET, SECUREOPS, RESTRICTED, MODES,\n"
+"or +R. When left out, it defaults to SET.\n"
+" \n"
+"If what is SET, it will enforce SECUREOPS and RESTRICTED\n"
+"on the users currently in the channel, if they are set. Give\n"
+"SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
+"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
+"if it's not enabled."
+msgstr ""
+
+#: ../cs_enforce.cpp:145 ../cs_enforce.cpp:150 ../cs_enforce.cpp:155
+#: ../cs_enforce.cpp:160 ../cs_enforce.cpp:165
+#, c-format
+msgid "Enforced %s"
+msgstr ""
+
+#: ../cs_enforce.cpp:191
+msgid ""
+"If what is MODES, it will enforce channelmode +R if it is\n"
+"set. If +R is specified for what, the +R channelmode will\n"
+"also be enforced, but even if it is not set. If it is not set,\n"
+"users will be banned to ensure they don't just rejoin."
+msgstr ""
+
+#: ../cs_enforce.cpp:196
+msgid ""
+"If what is MODES, nothing will be enforced, since it would\n"
+"enforce modes that the current ircd does not support. If +R is\n"
+"specified for what, an equalivant of channelmode +R on\n"
+"other ircds will be enforced. All users that are in the channel\n"
+"but have not identified for their nickname will be kicked and\n"
+"banned from the channel."
+msgstr ""
+
+#: ../cs_enforce.cpp:176 ../cs_enforce.cpp:208
+msgid "Syntax: ENFORCE channel [what]"
+msgstr ""

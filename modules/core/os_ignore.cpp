@@ -165,15 +165,15 @@ class CommandOSIgnore : public Command
 
 			if (t <= -1)
 			{
-				source.Reply(OPER_IGNORE_VALID_TIME);
+				source.Reply(_("You have to enter a valid number as time."));
 				return MOD_CONT;
 			}
 
 			ignore_service->AddIgnore(nick, source.u->nick, reason, t);
 			if (!t)
-				source.Reply(OPER_IGNORE_PERM_DONE, nick.c_str());
+				source.Reply(_("\002%s\002 will now permanently be ignored."), nick.c_str());
 			else
-				source.Reply(OPER_IGNORE_TIME_DONE, nick.c_str(), time.c_str());
+				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), time.c_str());
 		}
 
 		return MOD_CONT;
@@ -187,10 +187,11 @@ class CommandOSIgnore : public Command
 
 		const std::list<IgnoreData> &ignores = ignore_service->GetIgnores();
 		if (ignores.empty())
-			source.Reply(OPER_IGNORE_LIST_EMPTY);
+			source.Reply(_("Ignore list is empty."));
 		else
 		{
-			source.Reply(OPER_IGNORE_LIST);
+			source.Reply(_("Services ignore list:\n"
+					"  Mask        Creator      Reason      Expires"));
 			for (std::list<IgnoreData>::const_iterator ign = ignores.begin(), ign_end = ignores.end(); ign != ign_end; ++ign)
 			{
 				const IgnoreData &ignore = *ign;
@@ -212,9 +213,9 @@ class CommandOSIgnore : public Command
 		if (nick.empty())
 			this->OnSyntaxError(source, "DEL");
 		else if (ignore_service->DelIgnore(nick))
-			source.Reply(OPER_IGNORE_DEL_DONE, nick.c_str());
+			source.Reply(_("\002%s\002 will no longer be ignored."), nick.c_str());
 		else
-			source.Reply(OPER_IGNORE_LIST_NOMATCH, nick.c_str());
+			source.Reply(_("Nick \002%s\002 not found on ignore list."), nick.c_str());
 
 		return MOD_CONT;
 	}
@@ -226,7 +227,7 @@ class CommandOSIgnore : public Command
 			return MOD_CONT;
 
 		ignore_service->ClearIgnores();
-		source.Reply(OPER_IGNORE_LIST_CLEARED);
+		source.Reply(_("Ignore list has been cleared."));
 
 		return MOD_CONT;
 	}
@@ -256,18 +257,31 @@ class CommandOSIgnore : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_IGNORE);
+		source.Reply(_("Syntax: \002IGNORE {ADD|DEL|LIST|CLEAR} [\037time\037] [\037nick\037] [\037reason\037]\002\n"
+				" \n"
+				"Allows Services Operators to make Services ignore a nick or mask\n"
+				"for a certain time or until the next restart. The default\n"
+				"time format is seconds. You can specify it by using units.\n"
+				"Valid units are: \037s\037 for seconds, \037m\037 for minutes, \n"
+				"\037h\037 for hours and \037d\037 for days. \n"
+				"Combinations of these units are not permitted.\n"
+				"To make Services permanently ignore the	user, type 0 as time.\n"
+				"When adding a \037mask\037, it should be in the format user@host\n"
+				"or nick!user@host, everything else will be considered a nick.\n"
+				"Wildcards are permitted.\n"
+				" \n"
+				"Ignores will not be enforced on IRC Operators."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "IGNORE", OPER_IGNORE_SYNTAX);
+		SyntaxError(source, "IGNORE", _("IGNORE {ADD|DEL|LIST|CLEAR} [\037time\037] [\037nick\037] [\037reason\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_IGNORE);
+		source.Reply(_("    IGNORE      Modify the Services ignore list"));
 	}
 };
 

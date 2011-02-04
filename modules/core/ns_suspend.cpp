@@ -29,26 +29,26 @@ class CommandNSSuspend : public Command
 
 		if (readonly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -79,7 +79,7 @@ class CommandNSSuspend : public Command
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << ")";
-		source.Reply(NICK_SUSPEND_SUCCEEDED, nick.c_str());
+		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
 
@@ -88,18 +88,19 @@ class CommandNSSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_SERVADMIN_HELP_SUSPEND);
+		source.Reply(_("Syntax: SUSPEND nickname reason\n"
+			"SUSPENDs a nickname from being used."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SUSPEND", NICK_SUSPEND_SYNTAX);
+		SyntaxError(source, "SUSPEND", _("SUSPEND nickname reason"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SUSPEND);
+		source.Reply(_("    SUSPEND    Suspend a given nick"));
 	}
 };
 
@@ -117,26 +118,26 @@ class CommandNSUnSuspend : public Command
 
 		if (readonly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -146,7 +147,7 @@ class CommandNSUnSuspend : public Command
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "for " << na->nick;
-		source.Reply(NICK_UNSUSPEND_SUCCEEDED, nick.c_str());
+		source.Reply(_("Nick %s is now released."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 
@@ -155,18 +156,19 @@ class CommandNSUnSuspend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_SERVADMIN_HELP_UNSUSPEND);
+		source.Reply(_("Syntax: UNSUSPEND nickname\n"
+			"UNSUSPENDS a nickname from being used."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
+		SyntaxError(source, "UNSUSPEND", _("UNSUSPEND nickname"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_UNSUSPEND);
+		source.Reply(_("    UNSUSPEND  Unsuspend a given nick"));
 	}
 };
 

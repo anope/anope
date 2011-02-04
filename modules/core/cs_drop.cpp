@@ -31,7 +31,7 @@ class CommandCSDrop : public Command
 
 		if (readonly)
 		{
-			source.Reply(CHAN_DROP_DISABLED); // XXX: READ_ONLY_MODE?
+			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
 			return MOD_CONT;
 		}
 
@@ -39,19 +39,19 @@ class CommandCSDrop : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_FORBIDDEN, chan.c_str());
 			return MOD_CONT;
 		}
 
 		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -71,7 +71,7 @@ class CommandCSDrop : public Command
 
 		delete ci;
 
-		source.Reply(CHAN_DROPPED, chan.c_str());
+		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
@@ -82,21 +82,27 @@ class CommandCSDrop : public Command
 	{
 		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			source.Reply(CHAN_SERVADMIN_HELP_DROP);
+			source.Reply(_("Syntax: \002DROP \037channel\037\002\n"
+					" \n"
+					"Unregisters the named channel.  Only \002Services Operators\002\n"
+					"can drop a channel for which they have not identified."));
 		else
-			source.Reply(CHAN_HELP_DROP);
+			source.Reply(_("Syntax: \002DROP \037channel\037\002\n"
+					" \n"
+					"Unregisters the named channel.  Can only be used by\n"
+					"\002channel founder\002."));
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DROP", CHAN_DROP_SYNTAX);
+		SyntaxError(source, "DROP", _("DROP \037channel\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_DROP);
+		source.Reply(_("    DROP       Cancel the registration of a channel"));
 	}
 };
 

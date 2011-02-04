@@ -133,9 +133,9 @@ void Channel::JoinUser(User *user)
 	if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
 	{
 		if (this->ci->memos.memos.size() == 1)
-			user->SendMessage(MemoServ, MEMO_X_ONE_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+			user->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), this->ci->memos.memos.size(), this->ci->name.c_str());
 		else
-			user->SendMessage(MemoServ, MEMO_X_MANY_NOTICE, this->ci->memos.memos.size(), this->ci->name.c_str());
+			user->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), this->ci->memos.memos.size(), this->ci->name.c_str());
 	}
 
 	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)

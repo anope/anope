@@ -34,9 +34,9 @@ class CommandMSCancel : public Command
 		if (!(mi = getmemoinfo(nname, ischan, isforbid)))
 		{
 			if (isforbid)
-				source.Reply(ischan ? CHAN_X_FORBIDDEN : NICK_X_FORBIDDEN, nname.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, nname.c_str());
 			else
-				source.Reply(ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, nname.c_str());
 		}
 		else
 		{
@@ -45,29 +45,32 @@ class CommandMSCancel : public Command
 				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]));
 					mi->Del(mi->memos[i]);
-					source.Reply(MEMO_CANCELLED, nname.c_str());
+					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
 					return MOD_CONT;
 				}
 
-			source.Reply(MEMO_CANCEL_NONE);
+			source.Reply(_("No memo was cancelable."));
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_CANCEL);
+		source.Reply(_("Syntax: \002CANCEL {\037nick\037 | \037channel\037}\002\n"
+				" \n"
+				"Cancels the last memo you sent to the given nick or channel,\n"
+				"provided it has not been read at the time you use the command."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "CANCEL", MEMO_CANCEL_SYNTAX);
+		SyntaxError(source, "CANCEL", _("CANCEL {\037nick\037 | \037channel\037}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_CANCEL);
+		source.Reply(_("    CANCEL Cancel last memo you sent"));
 	}
 };
 

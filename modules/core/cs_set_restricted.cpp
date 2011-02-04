@@ -30,14 +30,14 @@ class CommandCSSetRestricted : public Command
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
-			source.Reply(CHAN_SET_RESTRICTED_ON, ci->name.c_str());
+			source.Reply(_("Restricted access option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
-			source.Reply(CHAN_SET_RESTRICTED_OFF, ci->name.c_str());
+			source.Reply(_("Restricted access option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "RESTRICTED");
@@ -47,18 +47,22 @@ class CommandCSSetRestricted : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_RESTRICTED, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 RESTRICTED {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002restricted access\002 option for a\n"
+				"channel. When \002restricted access\002 is set, users not on the access list will\n"
+				"instead be kicked and banned from the channel."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET RESTRICTED", CHAN_SET_RESTRICTED_SYNTAX);
+		SyntaxError(source, "SET RESTRICTED", _("SET \037channel\037 RESTRICTED {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_RESTRICTED);
+		source.Reply(_("    RESTRICTED    Restrict access to the channel"));
 	}
 };
 
@@ -69,15 +73,9 @@ class CommandCSSASetRestricted : public CommandCSSetRestricted
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_RESTRICTED, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET RESTRICTED", CHAN_SASET_RESTRICTED_SYNTAX);
+		SyntaxError(source, "SASET RESTRICTED", _("SASET \002channel\002 RESTRICTED {ON | OFF}"));
 	}
 };
 

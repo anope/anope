@@ -118,10 +118,7 @@ class patricia_tree
 		}
 
 		if (place != prev)
-		{
 			prev->up = newelem;
-			newelem->up = place;
-		}
 
 		if (place)
 		{

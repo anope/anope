@@ -36,17 +36,17 @@ class CommandNSSASet : public Command
 
 		if (readonly)
 		{
-			source.Reply(NICK_SET_DISABLED);
+			source.Reply(LanguageString::NICK_SET_DISABLED);
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
-			source.Reply(NICK_SASET_BAD_NICK, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
 		else
 		{
 			Command *c = this->FindCommand(params[1]);
@@ -64,7 +64,7 @@ class CommandNSSASet : public Command
 				mod_run_cmd(NickServ, u, c, params[1], cmdparams, false);
 			}
 			else
-				source.Reply(NICK_SASET_UNKNOWN_OPTION, cmd.c_str());
+				source.Reply(_("Unknown SASET option \002%s\002."), cmd.c_str());
 		}
 
 		return MOD_CONT;
@@ -74,10 +74,14 @@ class CommandNSSASet : public Command
 	{
 		if (subcommand.empty())
 		{
-			source.Reply(NICK_HELP_SASET_HEAD);
+			source.Reply(_("Syntax: \002SASET \037nickname\037 \037option\037 \037parameters\037\002.\n"
+					" \n"
+					"Sets various nickname options. \037option\037 can be one of:"));
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
-			source.Reply(NICK_HELP_SASET_TAIL);
+			source.Reply(_("Type \002%R%S HELP SASET \037option\037\002 for more information\n"
+					"on a specific option. The options will be set on the given\n"
+					"\037nickname\037."));
 			return true;
 		}
 		else
@@ -93,12 +97,12 @@ class CommandNSSASet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET);
+		source.Reply(_("    SASET      Set SET-options on another nickname"));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)
@@ -141,30 +145,33 @@ class CommandNSSASetDisplay : public Command
 		NickAlias *na = findnick(params[1]);
 		if (!na || na->nc != nc)
 		{
-			source.Reply(NICK_SASET_DISPLAY_INVALID, nc->display.c_str());
+			source.Reply(LanguageString::NICK_SASET_DISPLAY_INVALID, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		change_core_display(nc, params[1]);
-		source.Reply(NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
+		source.Reply(LanguageString::NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_DISPLAY);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 DISPLAY \037new-display\037\002\n"
+				" \n"
+				"Changes the display used to refer to the nickname group in \n"
+				"Services. The new display MUST be a nick of the group."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_DISPLAY);
+		source.Reply(_("    DISPLAY    Set the display of the group in Services"));
 	}
 };
 
@@ -187,32 +194,32 @@ class CommandNSSASetPassword : public Command
 
 		if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))
 		{
-			source.Reply(MORE_OBSCURE_PASSWORD);
+			source.Reply(LanguageString::MORE_OBSCURE_PASSWORD);
 			return MOD_CONT;
 		}
 		else if (len > Config->PassLen)
 		{
-			source.Reply(PASSWORD_TOO_LONG);
+			source.Reply(LanguageString::PASSWORD_TOO_LONG);
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
 			Log(NickServ) << "Failed to encrypt password for " << nc->display << " (saset)";
-			source.Reply(NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
+			source.Reply(LanguageString::NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(nc->pass, tmp_pass) == 1)
-			source.Reply(NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
+			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
 		else
-			source.Reply(NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
+			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
 
 		if (Config->WallSetpass)
 			ircdproto->SendGlobops(NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display.c_str());
@@ -222,18 +229,20 @@ class CommandNSSASetPassword : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_PASSWORD);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 PASSWORD \037new-password\037\002\n"
+				" \n"
+				"Changes the password used to identify as the nick's owner."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET", NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_PASSWORD);
+		source.Reply(_("    PASSWORD   Set the nickname password"));
 	}
 };
 

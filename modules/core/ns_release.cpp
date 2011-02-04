@@ -29,24 +29,24 @@ class CommandNSRelease : public Command
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))
-			source.Reply(NICK_RELEASE_NOT_HELD, nick.c_str());
+			source.Reply(_("Nick \002%s\002 isn't being held."), nick.c_str());
 		else if (!pass.empty())
 		{
 			int res = enc_check_password(pass, na->nc->pass);
 			if (res == 1)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
-				source.Reply(NICK_RELEASED);
+				source.Reply(_("Services' hold on your nick has been released."));
 			}
 			else
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
@@ -60,10 +60,10 @@ class CommandNSRelease : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
 				na->Release();
-				source.Reply(NICK_RELEASED);
+				source.Reply(_("Services' hold on your nick has been released."));
 			}
 			else
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 		}
 		return MOD_CONT;
 	}
@@ -74,19 +74,31 @@ class CommandNSRelease : public Command
 		User *u = source.u;
 		Anope::string relstr = duration(u->Account(), Config->NSReleaseTimeout);
 
-		source.Reply(NICK_HELP_RELEASE, relstr.c_str());
+		source.Reply(_("Syntax: \002RELEASE \037nickname\037 [\037password\037]\002\n"
+				" \n"
+				"Instructs %S to remove any hold on your nickname\n"
+				"caused by automatic kill protection or use of the \002RECOVER\002\n"
+				"command. This holds lasts for %s;\n"
+				"This command gets rid of them sooner.\n"
+				" \n"
+				"In order to use the \002RELEASE\002 command for a nick, your\n"
+				"current address as shown in /WHOIS must be on that nick's\n"
+				"access list, you must be identified and in the group of\n"
+				"that nick, or you must supply the correct password for\n"
+				"the nickname."));
+
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "RELEASE", NICK_RELEASE_SYNTAX);
+		SyntaxError(source, "RELEASE", _("RELEASE \037nickname\037 [\037password\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_RELEASE);
+		source.Reply(_("    RELEASE    Regain custody of your nick after RECOVER"));
 	}
 };
 

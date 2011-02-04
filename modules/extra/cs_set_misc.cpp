@@ -31,17 +31,17 @@ class CommandCSSetMisc : public Command
 		if (params.size() > 1)
 		{
 			ci->Extend("chanserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			u->SendMessage(ChanServ, CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
+			u->SendMessage(ChanServ, LanguageString::CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
-			u->SendMessage(ChanServ, CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
+			u->SendMessage(ChanServ, LanguageString::CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
 
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
@@ -59,7 +59,7 @@ class CommandCSSASetMisc : public CommandCSSetMisc
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 };
 

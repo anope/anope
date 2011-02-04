@@ -29,12 +29,12 @@ class CommandCSSetKeepTopic : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_KEEPTOPIC);
-			source.Reply(CHAN_SET_KEEPTOPIC_ON, ci->name.c_str());
+			source.Reply(_("Topic retention option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_KEEPTOPIC);
-			source.Reply(CHAN_SET_KEEPTOPIC_OFF, ci->name.c_str());
+			source.Reply(_("Topic retention option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "KEEPTOPIC");
@@ -44,18 +44,24 @@ class CommandCSSetKeepTopic : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_KEEPTOPIC, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 KEEPTOPIC {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002topic retention\002 option for a	\n"
+				"channel. When \002topic retention\002 is set, the topic for the\n"
+				"channel will be remembered by %S even after the\n"
+				"last user leaves the channel, and will be restored the\n"
+				"next time the channel is created."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET KEEPTOPIC", CHAN_SET_KEEPTOPIC_SYNTAX);
+		SyntaxError(source, "SET KEEPTOPIC", _("SET \037channel\037 KEEPTOPIC {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_KEEPTOPIC);
+		source.Reply(_("    KEEPTOPIC     Retain topic when channel is not in use"));
 	}
 };
 
@@ -66,15 +72,9 @@ class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_KEEPTOPIC, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET KEEPTOPIC", CHAN_SASET_KEEPTOPIC_SYNTAX);
+		SyntaxError(source, "SET KEEPTOPIC", _("SASET \002channel\002 KEEPTOPIC {ON | OFF}"));
 	}
 };
 

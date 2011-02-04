@@ -481,21 +481,21 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find('!') != Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, OPER_AKILL_NO_NICK);
+			u->SendMessage(bi, _("\002Reminder\002: AKILL masks cannot contain nicknames; make sure you have \002not\002 included a nick portion in your mask."));
 		return NULL;
 	}
 
 	if (mask.find('@') == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, BAD_USERHOST_MASK);
+			u->SendMessage(bi, LanguageString::BAD_USERHOST_MASK);
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -505,11 +505,11 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				u->SendMessage(bi, OPER_AKILL_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 already exists on the AKILL list."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -563,7 +563,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (!mask.empty() && mask.find_first_not_of("*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -573,11 +573,11 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				u->SendMessage(bi, OPER_SNLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 already exists on the SNLINE list."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -666,14 +666,14 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find_first_not_of("*") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(OperServ, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
 	if (mask[0] == '#' && !ircd->chansqline)
 	{
 		if (bi && u)
-			u->SendMessage(OperServ, OPER_SQLINE_CHANNELS_UNSUPPORTED);
+			u->SendMessage(OperServ, _("Channel SQLINEs are not supported by your IRCd, so you can't use them."));
 		return NULL;
 	}
 
@@ -683,11 +683,11 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				u->SendMessage(bi, OPER_SQLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 already exists on the SQLINE list."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;
@@ -792,13 +792,13 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 {
 	if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 	{
-		u->SendMessage(OperServ, OPER_SZLINE_ONLY_IPS);
+		u->SendMessage(OperServ, _("\002Reminder:\002 you can only add IP masks to the SZLINE list."));
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("*?") == Anope::string::npos)
 	{
-		u->SendMessage(OperServ, USERHOST_MASK_TOO_WIDE, mask.c_str());
+		u->SendMessage(OperServ, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 		return NULL;
 	}
 
@@ -808,11 +808,11 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		if (bi && u)
 		{
 			if (canAdd.first == 1)
-				u->SendMessage(bi, OPER_SZLINE_EXISTS, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 already exists on the SZLINE list."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
-				u->SendMessage(bi, OPER_EXPIRY_CHANGED, canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
-				u->SendMessage(bi, OPER_ALREADY_COVERED, mask.c_str(), canAdd.second->Mask.c_str());
+				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
 		}
 
 		return NULL;

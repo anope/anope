@@ -28,19 +28,19 @@ class CommandOSModReLoad : public Command
 		Module *m = FindModule(mname);
 		if (!m)
 		{
-			source.Reply(OPER_MODULE_ISNT_LOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 isn't loaded."), mname.c_str());
 			return MOD_CONT;
 		}
 
 		if (!m->handle)
 		{
-			source.Reply(OPER_MODULE_REMOVE_FAIL, m->name.c_str());
+			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (m->GetPermanent())
 		{
-			source.Reply(OPER_MODULE_NO_UNLOAD);
+			source.Reply(_("Unable to remove module \002%s\002"));
 			return MOD_CONT;
 		}
 
@@ -50,7 +50,7 @@ class CommandOSModReLoad : public Command
 
 		if (status != MOD_ERR_OK)
 		{
-			source.Reply(OPER_MODULE_REMOVE_FAIL, mname.c_str());
+			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());
 			return MOD_CONT;
 		}
 
@@ -58,7 +58,7 @@ class CommandOSModReLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			ircdproto->SendGlobops(OperServ, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
-			source.Reply(OPER_MODULE_RELOADED, mname.c_str());
+			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
 
 			/* If a user is loading this module, then the core databases have already been loaded
 			 * so trigger the event manually
@@ -72,7 +72,7 @@ class CommandOSModReLoad : public Command
 			if (fatal)
 				throw FatalException("Unable to reload module " + mname);
 			else
-				source.Reply(OPER_MODULE_LOAD_FAIL, mname.c_str());
+				source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
 		}
 
 		return MOD_CONT;
@@ -80,18 +80,20 @@ class CommandOSModReLoad : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODRELOAD);
+		source.Reply(_("Syntax: \002MODRELOAD\002 \002FileName\002\n"
+				" \n"
+				"This command reloads the module named FileName."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODLOAD", OPER_MODULE_RELOAD_SYNTAX);
+		SyntaxError(source, "MODLOAD", _("MODRELOAD \037FileName\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODRELOAD);
+		source.Reply(_("    MODRELOAD   Reload a module"));
 	}
 };
 

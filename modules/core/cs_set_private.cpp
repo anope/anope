@@ -29,12 +29,12 @@ class CommandCSSetPrivate : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PRIVATE);
-			source.Reply(CHAN_SET_PRIVATE_ON, ci->name.c_str());
+			source.Reply(_("Private option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PRIVATE);
-			source.Reply(CHAN_SET_PRIVATE_OFF, ci->name.c_str());
+			source.Reply(_("Private option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");
@@ -44,18 +44,22 @@ class CommandCSSetPrivate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_PRIVATE, "SASET");
+		source.Reply(_("Syntax: \002%s \037channel\037 PRIVATE {ON | OFF}\002\n"
+				" \n"
+				"Enables or disables the \002private\002 option for a channel.\n"
+				"When \002private\002 is set, a \002%R%S LIST\002 will not\n"
+				"include the channel in any lists."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET PRIVATE", CHAN_SET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SET PRIVATE", _("SET \037channel\037 PRIVATE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_PRIVATE);
+		source.Reply(_("    PRIVATE       Hide channel from LIST command"));
 	}
 };
 
@@ -66,15 +70,9 @@ class CommandCSSASetPrivate : public CommandCSSetPrivate
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_PRIVATE, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET PRIVATE", CHAN_SASET_PRIVATE_SYNTAX);
+		SyntaxError(source, "SASET PRIVATE", _("SASET \002channel\002 PRIVATE {ON | OFF}"));
 	}
 };
 

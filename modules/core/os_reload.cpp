@@ -34,19 +34,23 @@ class CommandOSReload : public Command
 			Log() << "Error reloading configuration file: " << ex.GetReason();
 		}
 
-		source.Reply(OPER_RELOAD);
+		source.Reply(_("Services' configuration file has been reloaded."));
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_RELOAD);
+		source.Reply(_("Syntax: \002RELOAD\002\n"
+				"Causes Services to reload the configuration file. Note that\n"
+				"some directives still need the restart of the Services to\n"
+				"take effect (such as Services' nicknames, activation of the \n"
+				"session limitation, etc.)"));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_RELOAD);
+		source.Reply(_("    RELOAD      Reload services' configuration file"));
 	}
 };
 

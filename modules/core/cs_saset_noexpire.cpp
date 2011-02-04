@@ -29,12 +29,12 @@ class CommandCSSASetNoexpire : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_NO_EXPIRE);
-			source.Reply(CHAN_SET_NOEXPIRE_ON, ci->name.c_str());
+			source.Reply(_("Channel %s \002will not\002 expire."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_NO_EXPIRE);
-			source.Reply(CHAN_SET_NOEXPIRE_OFF, ci->name.c_str());
+			source.Reply(_("Channel %s \002will\002 expire."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
@@ -44,18 +44,21 @@ class CommandCSSASetNoexpire : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+		source.Reply(_("Syntax: \002SET \037channel\037 NOEXPIRE {ON | OFF}\002\n"
+				" \n"
+				"Sets whether the given channel will expire.  Setting this\n"
+				"to ON prevents the channel from expiring."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET NOEXPIRE", CHAN_SET_NOEXPIRE_SYNTAX);
+		SyntaxError(source, "SET NOEXPIRE", _("SET \037channel\037 NOEXPIRE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_NOEXPIRE);
+		source.Reply(_("    NOEXPIRE      Prevent the channel from expiring"));
 	}
 };
 

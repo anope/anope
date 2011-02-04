@@ -29,19 +29,19 @@ class CommandCSSetSecureFounder : public Command
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECUREFOUNDER);
-			source.Reply(CHAN_SET_SECUREFOUNDER_ON, ci->name.c_str());
+			source.Reply(_("Secure founder option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECUREFOUNDER);
-			source.Reply(CHAN_SET_SECUREFOUNDER_OFF, ci->name.c_str());
+			source.Reply(_("Secure founder option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECUREFOUNDER");
@@ -51,18 +51,24 @@ class CommandCSSetSecureFounder : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_SECUREFOUNDER, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 SECUREFOUNDER {ON | OFF}\002\n"
+			" \n"
+			"Enables or disables the \002secure founder\002 option for a channel.\n"
+			"When \002secure founder\002 is set, only the real founder will be\n"
+			"able to drop the channel, change its password, its founder and its\n"
+			"successor, and not those who have founder level access through\n"
+			"the access/qop command."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET SECUREFOUNDER", CHAN_SET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(source, "SET SECUREFOUNDER", _("SET \037channel\037 SECUREFOUNDER {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_SECUREFOUNDER);
+		source.Reply(_("    SECUREFOUNDER Stricter control of channel founder status"));
 	}
 };
 
@@ -73,15 +79,9 @@ class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_SECUREFOUNDER, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET SECUREFOUNDER", CHAN_SASET_SECUREFOUNDER_SYNTAX);
+		SyntaxError(source, "SASET SECUREFOUNDER", _("SASET \002channel\002 SECUREFOUNDER {ON | OFF}"));
 	}
 };
 

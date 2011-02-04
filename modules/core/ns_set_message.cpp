@@ -29,7 +29,7 @@ class CommandNSSetMessage : public Command
 
 		if (!Config->UsePrivmsg)
 		{
-			source.Reply(NICK_SET_OPTION_DISABLED, "MSG");
+			source.Reply(_("Option \002%s\02 cannot be set on this network."), "MSG");
 			return MOD_CONT;
 		}
 
@@ -38,12 +38,12 @@ class CommandNSSetMessage : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_MSG);
-			source.Reply(NICK_SASET_MSG_ON, nc->display.c_str());
+			source.Reply(_("Services will now reply to \002%s\002 with \002messages\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_MSG);
-			source.Reply(NICK_SASET_MSG_OFF, nc->display.c_str());
+			source.Reply(_("Services will now reply to \002%s\002 with \002notices\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "MSG");
@@ -53,18 +53,22 @@ class CommandNSSetMessage : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_MSG);
+		source.Reply(_("Syntax: \002SET MSG {ON | OFF}\002\n"
+				" \n"
+				"Allows you to choose the way Services are communicating with \n"
+				"you. With \002MSG\002 set, Services will use messages, else they'll \n"
+				"use notices."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET MSG", NICK_SET_MSG_SYNTAX);
+		SyntaxError(source, "SET MSG", _("SET MSG {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_MSG);
+		source.Reply(_("    MSG        Change the communication method of Services"));
 	}
 };
 
@@ -77,18 +81,22 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_MSG);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 MSG {ON | OFF}\002\n"
+				" \n"
+				"Allows you to choose the way Services are communicating with \n"
+				"the given user. With \002MSG\002 set, Services will use messages,\n"
+				"else they'll use notices."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET MSG", NICK_SASET_MSG_SYNTAX);
+		SyntaxError(source, "SASET MSG", _("SASAET \037nickname\037 PRIVATE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_MSG);
+		source.Reply(_("    MSG        Change the communication method of Services"));
 	}
 };
 

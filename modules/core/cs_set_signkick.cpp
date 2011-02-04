@@ -30,19 +30,20 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			source.Reply(CHAN_SET_SIGNKICK_ON, ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
 			ci->SetFlag(CI_SIGNKICK_LEVEL);
 			ci->UnsetFlag(CI_SIGNKICK);
-			source.Reply(CHAN_SET_SIGNKICK_LEVEL, ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002ON\002, but depends of the\n"
+				"level of the user that is using the command."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			source.Reply(CHAN_SET_SIGNKICK_OFF, ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SIGNKICK");
@@ -52,18 +53,27 @@ class CommandCSSetSignKick : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_SIGNKICK, "SET");
+		source.Reply(_("Syntax: \002SET \037%s\037 SIGNKICK {ON | LEVEL | OFF}\002\n"
+				" \n"
+				"Enables or disables signed kicks for a\n"
+				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
+				"%S KICK command will have the nick that used the\n"
+				"command in their reason.\n"
+				" \n"
+				"If you use \002LEVEL\002, those who have a level that is superior \n"
+				"or equal to the SIGNKICK level on the channel won't have their \n"
+				"kicks signed. See \002%R%S HELP LEVELS\002 for more information."), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET SIGNKICK", CHAN_SET_SIGNKICK_SYNTAX);
+		SyntaxError(source, "SET SIGNKICK", _("SET \037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_SIGNKICK);
+		source.Reply(_("    SIGNKICK      Sign kicks that are done with KICK command"));
 	}
 };
 
@@ -74,15 +84,9 @@ class CommandCSSASetSignKick : public CommandCSSetSignKick
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_SIGNKICK, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET SIGNKICK", CHAN_SASET_SIGNKICK_SYNTAX);
+		SyntaxError(source, "SASET SIGNKICK", _("SASET \002channel\002 SIGNKICK {ON | OFF}"));
 	}
 };
 

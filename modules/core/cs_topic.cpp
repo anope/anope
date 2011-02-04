@@ -29,9 +29,9 @@ class CommandCSTopic : public Command
 		Channel *c = ci->c;
 
 		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
@@ -48,18 +48,27 @@ class CommandCSTopic : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_TOPIC);
+		source.Reply(_("Syntax: \002TOPIC \037channel\037 [\037topic\037]\002\n"
+				" \n"
+				"Causes %S to set the channel topic to the one\n"
+				"specified. If \002topic\002 is not given, then an empty topic\n"
+				"is set. This command is most useful in conjunction\n"
+				"with \002SET TOPICLOCK\002. See \002%R%S HELP SET TOPICLOCK\002\n"
+				"for more information.\n"
+				" \n"
+				"By default, limited to those with founder access on the\n"
+				"channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "TOPIC", CHAN_TOPIC_SYNTAX);
+		SyntaxError(source, "TOPIC", _("TOPIC \037channel\037 [\037topic\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_TOPIC);
+		source.Reply(_("    TOPIC      Manipulate the topic of the specified channel"));
 	}
 };
 

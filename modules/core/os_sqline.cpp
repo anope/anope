@@ -25,11 +25,11 @@ class SQLineDelCallback : public NumberList
 	~SQLineDelCallback()
 	{
 		if (!Deleted)
-			source.Reply(OPER_SQLINE_NO_MATCH);
+			source.Reply(_("No matching entries on the SQLINE list."));
 		else if (Deleted == 1)
-			source.Reply(OPER_SQLINE_DELETED_ONE);
+			source.Reply(_("Deleted 1 entry from the SQLINE list."));
 		else
-			source.Reply(OPER_SQLINE_DELETED_SEVERAL, Deleted);
+			source.Reply(_("Deleted %d entries from the SQLINE list."), Deleted);
 	}
 
 	void HandleNumber(unsigned Number)
@@ -65,7 +65,7 @@ class SQLineListCallback : public NumberList
 	~SQLineListCallback()
 	{
 		if (!SentHeader)
-			source.Reply(OPER_SQLINE_NO_MATCH);
+			source.Reply(_("No matching entries on the SQLINE list."));
 	}
 
 	virtual void HandleNumber(unsigned Number)
@@ -81,7 +81,7 @@ class SQLineListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_SQLINE_LIST_HEADER);
+			source.Reply(_("Current SQLINE list:\n  Num   Mask                              Reason"));
 		}
 
 		DoList(source, x, Number - 1);
@@ -89,7 +89,7 @@ class SQLineListCallback : public NumberList
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(LanguageString::OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -113,7 +113,7 @@ class SQLineViewCallback : public SQLineListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(OPER_SQLINE_VIEW_HEADER);
+			source.Reply(_("Current SQLINE list:"));
 		}
 
 		DoList(source, x, Number);
@@ -122,7 +122,7 @@ class SQLineViewCallback : public SQLineListCallback
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
 		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
-		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
+		source.Reply(LanguageString::OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -153,7 +153,7 @@ class CommandOSSQLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(BAD_EXPIRY_TIME);
+			source.Reply(LanguageString::BAD_EXPIRY_TIME);
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -178,7 +178,7 @@ class CommandOSSQLine : public Command
 
 			if (percent > 95)
 			{
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -187,7 +187,7 @@ class CommandOSSQLine : public Command
 			if (!x)
 				return MOD_CONT;
 
-			source.Reply(OPER_SQLINE_ADDED, mask.c_str());
+			source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
 
 			if (Config->WallOSSQLine)
 			{
@@ -223,7 +223,7 @@ class CommandOSSQLine : public Command
 			}
 
 			if (readonly)
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 
 		}
 		else
@@ -238,7 +238,7 @@ class CommandOSSQLine : public Command
 
 		if (SQLine->GetList().empty())
 		{
-			source.Reply(OPER_SQLINE_LIST_EMPTY);
+			source.Reply(_("SQLINE list is empty."));
 			return MOD_CONT;
 		}
 
@@ -261,18 +261,18 @@ class CommandOSSQLine : public Command
 
 			if (!x)
 			{
-				source.Reply(OPER_SQLINE_NOT_FOUND, mask.c_str());
+				source.Reply(_("\002%s\002 not found on the SQLINE list."), mask.c_str());
 				return MOD_CONT;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, X_SQLINE));
 
 			SQLineDelCallback::DoDel(source, x);
-			source.Reply(OPER_SQLINE_DELETED, mask.c_str());
+			source.Reply(_("\002%s\002 deleted from the SQLINE list."), mask.c_str());
 		}
 
 		if (readonly)
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 
 		return MOD_CONT;
 	}
@@ -281,7 +281,7 @@ class CommandOSSQLine : public Command
 	{
 		if (SQLine->GetList().empty())
 		{
-			source.Reply(OPER_SQLINE_LIST_EMPTY);
+			source.Reply(_("SQLINE list is empty."));
 			return MOD_CONT;
 		}
 
@@ -305,7 +305,7 @@ class CommandOSSQLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_SQLINE_LIST_HEADER);
+						source.Reply(_("Current SQLINE list:\n  Num   Mask                              Reason"));
 					}
 
 					SQLineListCallback::DoList(source, x, i);
@@ -313,9 +313,9 @@ class CommandOSSQLine : public Command
 			}
 
 			if (!SentHeader)
-				source.Reply(OPER_SQLINE_NO_MATCH);
+				source.Reply(_("No matching entries on the SQLINE list."));
 			else
-				source.Reply(END_OF_ANY_LIST, "SQLine");
+				source.Reply(LanguageString::END_OF_ANY_LIST, "SQLine");
 		}
 
 		return MOD_CONT;
@@ -325,7 +325,7 @@ class CommandOSSQLine : public Command
 	{
 		if (SQLine->GetList().empty())
 		{
-			source.Reply(OPER_SQLINE_LIST_EMPTY);
+			source.Reply(_("SQLINE list is empty."));
 			return MOD_CONT;
 		}
 
@@ -349,7 +349,7 @@ class CommandOSSQLine : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						source.Reply(OPER_SQLINE_VIEW_HEADER);
+						source.Reply(_("Current SQLINE list:"));
 					}
 
 					SQLineViewCallback::DoList(source, x, i);
@@ -357,7 +357,7 @@ class CommandOSSQLine : public Command
 			}
 
 			if (!SentHeader)
-				source.Reply(OPER_SQLINE_NO_MATCH);
+				source.Reply(_("No matching entries on the SQLINE list."));
 		}
 
 		return MOD_CONT;
@@ -368,7 +368,7 @@ class CommandOSSQLine : public Command
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, X_SQLINE));
 		SQLine->Clear();
-		source.Reply(OPER_SQLINE_CLEAR);
+		source.Reply(_("The SQLINE list has been cleared."));
 
 		return MOD_CONT;
 	}
@@ -398,18 +398,61 @@ class CommandOSSQLine : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_SQLINE);
+		source.Reply(_("Syntax: \002SQLINE ADD [+\037expiry\037] \037mask\037 \037reason\037\002\n"
+				"        \002SQLINE DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
+				"        \002SQLINE LIST [\037mask\037 | \037list\037]\002\n"
+				"        \002SQLINE VIEW [\037mask\037 | \037list\037]\002\n"
+				"        \002SQLINE CLEAR\002\n"
+				" \n"
+				"Allows Services operators to manipulate the SQLINE list.  If\n"
+				"a user with a nick matching an SQLINE mask attempts to \n"
+				"connect, Services will not allow it to pursue his IRC\n"
+				"session.\n"
+				"If the first character of the mask is #, services will \n"
+				"prevent the use of matching channels (on IRCds that \n"
+				"support it).\n"
+				" \n"
+				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
+				"list for the given reason (which \002must\002 be given).\n"
+				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
+				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
+				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
+				"included, the default is days (so \037+30\037 by itself means 30 \n"
+				"days). To add an SQLINE which does not expire, use \037+0\037. \n"
+				"If the mask to be added starts with a \037+\037, an expiry time \n"
+				"must be given, even if it is the same as the default. The\n"
+				"current SQLINE default expiry time can be found with the\n"
+				"\002STATS AKILL\002 command.\n"
+				" \n"
+				"The \002SQLINE DEL\002 command removes the given mask from the\n"
+				"SQLINE list if it is present. If a list of entry numbers is \n"
+				"given, those entries are deleted. (See the example for LIST \n"
+				"below.)\n"
+				" \n"
+				"The \002SQLINE LIST\002 command displays the SQLINE list. \n"
+				"If a wildcard mask is given, only those entries matching the\n"
+				"mask are displayed. If a list of entry numbers is given,\n"
+				"only those entries are shown; for example:\n"
+				"   \002SQLINE LIST 2-5,7-9\002\n"
+				"      Lists SQLINE entries numbered 2 through 5 and 7 \n"
+				"      through 9.\n"
+				" \n"
+				"\002SQLINE VIEW\002 is a more verbose version of \002SQLINE LIST\002, and \n"
+				"will show who added an SQLINE, the date it was added, and when \n"
+				"it expires, as well as the mask and reason.\n"
+				" \n"
+				"\002SQLINE CLEAR\002 clears all entries of the SQLINE list."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SQLINE", OPER_SQLINE_SYNTAX);
+		SyntaxError(source, "SQLINE", _("SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_SQLINE);
+		source.Reply(_("    SQLINE      Manipulate the SQLINE list"));
 	}
 };
 

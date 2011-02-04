@@ -28,13 +28,13 @@ class CommandCSUnban : public Command
 
 		if (!c)
 		{
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
@@ -44,33 +44,39 @@ class CommandCSUnban : public Command
 
 		if (!u2)
 		{
-			source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, params[1].c_str());
 			return MOD_CONT;
 		}
 
 		common_unban(ci, u2, u == u2);
 		if (u2 == u)
-			source.Reply(CHAN_UNBANNED, c->name.c_str());
+			source.Reply(_("You have been unbanned from \002%s\002."), c->name.c_str());
 		else
-			source.Reply(CHAN_UNBANNED_OTHER, u2->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), c->name.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_UNBAN);
+		source.Reply(_("Syntax: \002UNBAN \037channel\037 [\037nick\037]\002\n"
+				" \n"
+				"Tells %S to remove all bans preventing you or the given\n"
+				"user from entering the given channel.  \n"
+				" \n"
+				"By default, limited to AOPs or those with level 5 and above\n"
+				"on the channel."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "UNBAN", CHAN_UNBAN_SYNTAX);
+		SyntaxError(source, "UNBAN", _("UNBAN \037channel\037 [\037nick\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_UNBAN);
+		source.Reply(_("    UNBAN      Remove all bans preventing a user from entering a channel"));
 	}
 };
 

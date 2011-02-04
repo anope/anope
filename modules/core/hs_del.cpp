@@ -29,34 +29,36 @@ class CommandHSDel : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();
-			source.Reply(HOST_DEL, nick.c_str());
+			source.Reply(_("vhost for \002%s\002 removed."), nick.c_str());
 		}
 		else
-			source.Reply(HOST_NOREG, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_DEL);
+		source.Reply(_("Syntax: \002DEL\002 \002<nick>\002\n"
+				"Deletes the vhost assigned to the given nick from the\n"
+				"database."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DEL", HOST_DEL_SYNTAX);
+		SyntaxError(source, "DEL", _("DEL \002<nick>\002."));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_DEL);
+		source.Reply(_("    DEL         Delete the vhost of another user"));
 	}
 };
 

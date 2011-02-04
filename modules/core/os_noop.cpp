@@ -36,7 +36,7 @@ class CommandOSNOOP : public Command
 			reason = "NOOP command used by " + u->nick;
 			if (Config->WallOSNoOp)
 				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server.c_str());
-			source.Reply(OPER_NOOP_SET, server.c_str());
+			source.Reply(_("All O:lines of \002%s\002 have been removed."), server.c_str());
 
 			/* Kill all the IRCops of the server */
 			patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick);
@@ -52,7 +52,7 @@ class CommandOSNOOP : public Command
 		else if (cmd.equals_ci("REVOKE"))
 		{
 			ircdproto->SendSVSNOOP(server, 0);
-			source.Reply(OPER_NOOP_REVOKE, server.c_str());
+			source.Reply(_("All O:lines of \002%s\002 have been reset."), server.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -61,18 +61,29 @@ class CommandOSNOOP : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_NOOP);
+		source.Reply(_("Syntax: \002NOOP SET \037server\037\002\n"
+				"          \002NOOP REVOKE \037server\037\002\n"
+				"\n"
+				"\002NOOP SET\002 remove all O:lines of the given\n"
+				"\002server\002 and kill all IRCops currently on it to\n"
+				"prevent them from rehashing the server (because this\n"
+				"would just cancel the effect).\n"
+				"\002NOOP REVOKE\002 makes all removed O:lines available again\n"
+				"on the given \002server\002.\n"
+				"\002Note:\002 The \002server\002 is not checked at all by the\n"
+				"Services."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "NOOP", OPER_NOOP_SYNTAX);
+		SyntaxError(source, "NOOP", _("NOOP {SET|REVOKE} \037server\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_NOOP);
+		source.Reply(_("    NOOP        Temporarily remove all O:lines of a server \n"
+				"                remotely"));
 	}
 };
 

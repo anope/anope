@@ -29,17 +29,17 @@ class CommandNSResetPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		if (!(na = findnick(params[0])))
-			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, params[0].c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
 			if (SendResetEmail(u, na))
 			{
 				Log(LOG_COMMAND, u, this) << "for " << na->nick << " (group: " << na->nc->display << ")";
-				source.Reply(NICK_RESETPASS_COMPLETE, na->nick.c_str());
+				source.Reply(_("Password reset email for \002%s\002 has been sent."), na->nick.c_str());
 			}
 		}
 
@@ -48,18 +48,20 @@ class CommandNSResetPass : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_RESETPASS);
+		source.Reply(_("Syntax: \002RESETPASS \037nickname\037\002\n"
+				"Sends a code key to the nickname with instructions on how to\n"
+				"reset their password."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "RESETPASS", NICK_RESETPASS_SYNTAX);
+		SyntaxError(source, "RESETPASS", _("RESETPASS \037nickname\037\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_RESETPASS);
+		source.Reply(_("    RESETPASS  Helps you reset lost passwords"));
 	}
 };
 
@@ -97,7 +99,7 @@ class NSResetPass : public Module
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
-					source.Reply(NICK_CONFIRM_EXPIRED);
+					source.Reply(_("Your password reset request has expired."));
 					return EVENT_STOP;
 				}
 
@@ -117,7 +119,7 @@ class NSResetPass : public Module
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
-					source.Reply(NICK_CONFIRM_SUCCESS, Config->s_NickServ.c_str());
+					source.Reply(_("You are now identified for your nick. Change your password using \"%R%s SET PASSWORD \002newpassword\002\" now."), Config->s_NickServ.c_str());
 
 					if (ircd->vhost)
 						do_on_id(u);
@@ -128,7 +130,7 @@ class NSResetPass : public Module
 				else
 				{
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
-					source.Reply(NICK_CONFIRM_INVALID);
+					source.Reply(LanguageString::NICK_CONFIRM_INVALID);
 					bad_password(u);
 				}
 
@@ -144,7 +146,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), GetString(na->nc, NICK_RESETPASS_SUBJECT).c_str(), na->nick.c_str());
+	snprintf(subject, sizeof(subject), GetString(na->nc, _("Reset password request for %s")).c_str(), na->nick.c_str());
 
 	int min = 1, max = 62;
 	int chars[] = {
@@ -160,7 +162,15 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 
-	snprintf(message, sizeof(message), GetString(na->nc, NICK_RESETPASS_MESSAGE).c_str(), na->nick.c_str(), Config->s_NickServ.c_str(), passcode.c_str(), Config->NetworkName.c_str());
+	snprintf(message, sizeof(message), GetString(na->nc, 
+	"Hi,\n"
+	" \n"
+	"You have requested to have the password for %s reset.\n"
+	"To reset your password, type \002%R%s CONFIRM %s\002\n"
+	" \n"
+	"If you don't know why this mail was sent to you, please ignore it silently.\n"
+	" \n"
+	"%s administrators.").c_str(), na->nick.c_str(), Config->s_NickServ.c_str(), passcode.c_str(), Config->NetworkName.c_str());
 
 	na->nc->Shrink("ns_resetpass_code");
 	na->nc->Shrink("ns_resetpass_time");

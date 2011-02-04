@@ -34,19 +34,19 @@ class CommandCSSet : public Command
 
 		if (readonly)
 		{
-			source.Reply(CHAN_SET_DISABLED);
+			source.Reply(LanguageString::CHAN_SET_DISABLED);
 			return MOD_CONT;
 		}
 		if (!check_access(u, cs_findchan(params[0]), CA_SET))
 		{
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 			return MOD_CONT;
 		}
 
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			source.Reply(CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
+			source.Reply(LanguageString::CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -62,8 +62,8 @@ class CommandCSSet : public Command
 		}
 		else
 		{
-			source.Reply(NICK_SET_UNKNOWN_OPTION, params[1].c_str());
-			source.Reply(MORE_INFO, Config->s_ChanServ.c_str(), "SET");
+			source.Reply(LanguageString::NICK_SET_UNKNOWN_OPTION, params[1].c_str());
+			source.Reply(LanguageString::MORE_INFO, Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -73,10 +73,16 @@ class CommandCSSet : public Command
 	{
 		if (subcommand.empty())
 		{
-			source.Reply(CHAN_HELP_SET_HEAD);
+			source.Reply(_("Syntax: \002SET \037channel\037 \037option\037 \037parameters\037\002\n"
+					" \n"
+					"Allows the channel founder to set various channel options\n"
+					"and other information.\n"
+					" \n"
+					"Available options:"));
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
-			source.Reply(CHAN_HELP_SET_TAIL);
+			source.Reply(_("Type \002%R%S HELP SET \037option\037\002 for more information on a\n"
+					"particular option."));
 			return true;
 		}
 		else
@@ -92,12 +98,12 @@ class CommandCSSet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET);
+		source.Reply(_("    SET        Set channel options and information"));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

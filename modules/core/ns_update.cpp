@@ -35,19 +35,22 @@ class CommandNSUpdate : public Command
 		na->last_seen = Anope::CurTime;
 		if (ircd->vhost)
 			do_on_id(u);
-		source.Reply(NICK_UPDATE_SUCCESS, Config->s_NickServ.c_str());
+		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->s_NickServ.c_str());
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_UPDATE);
+		source.Reply(_("Syntax: UPDATE\n"
+				"Updates your current status, i.e. it checks for new memos,\n"
+				"sets needed chanmodes (ModeonID) and updates your vhost and\n"
+				"your userflags (lastseentime, etc)."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_UPDATE);
+		source.Reply(_("    UPDATE     Updates your current status, i.e. it checks for new memos"));
 	}
 };
 

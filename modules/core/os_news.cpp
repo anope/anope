@@ -33,54 +33,54 @@ enum
 
 struct NewsMessages msgarray[] = {
 	{NEWS_LOGON, "LOGON",
-	 {NEWS_LOGON_SYNTAX,
-	  NEWS_LOGON_LIST_HEADER,
-	  NEWS_LOGON_LIST_NONE,
-	  NEWS_LOGON_ADD_SYNTAX,
-	  NEWS_LOGON_ADDED,
-	  NEWS_LOGON_DEL_SYNTAX,
-	  NEWS_LOGON_DEL_NOT_FOUND,
-	  NEWS_LOGON_DELETED,
-	  NEWS_LOGON_DEL_NONE,
-	  NEWS_LOGON_DELETED_ALL}
+	 {_("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("Logon news items:"),
+	  _("There is no logon news."),
+	  _("Syntax: \002LOGONNEWS ADD \037text\037\002"),
+	  _("Added new logon news item (#%d)."),
+	  _("Syntax: \002LOGONNEWS DEL {\037num\037 | ALL}"),
+	  _("Logon news item #%d not found!"),
+	  _("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("No logon news items to delete!"),
+	  _("All logon news items deleted.")}
 	 },
 	{NEWS_OPER, "OPER",
-	 {NEWS_OPER_SYNTAX,
-	  NEWS_OPER_LIST_HEADER,
-	  NEWS_OPER_LIST_NONE,
-	  NEWS_OPER_ADD_SYNTAX,
-	  NEWS_OPER_ADDED,
-	  NEWS_OPER_DEL_SYNTAX,
-	  NEWS_OPER_DEL_NOT_FOUND,
-	  NEWS_OPER_DELETED,
-	  NEWS_OPER_DEL_NONE,
-	  NEWS_OPER_DELETED_ALL}
+	 {_("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("Oper news items:"),
+	  _("There is no oper news."),
+	  _("Syntax: \002OPERNEWS ADD \037text\037\002"),
+	  _("Added new oper news item (#%d)."),
+	  _("Syntax: \002OPERNEWS DEL {\037num\037 | ALL}"),
+	  _("Oper news item #%d not found!"),
+	  _("Oper news item #%d deleted."),
+	  _("No oper news items to delete!"),
+	  _("All oper news items deleted.")}
 	 },
 	{NEWS_RANDOM, "RANDOM",
-	 {NEWS_RANDOM_SYNTAX,
-	  NEWS_RANDOM_LIST_HEADER,
-	  NEWS_RANDOM_LIST_NONE,
-	  NEWS_RANDOM_ADD_SYNTAX,
-	  NEWS_RANDOM_ADDED,
-	  NEWS_RANDOM_DEL_SYNTAX,
-	  NEWS_RANDOM_DEL_NOT_FOUND,
-	  NEWS_RANDOM_DELETED,
-	  NEWS_RANDOM_DEL_NONE,
-	  NEWS_RANDOM_DELETED_ALL}
+	 {_("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("Random news items:"),
+	  _("There is no random news."),
+	  _("Syntax: \002RANDOMNEWS ADD \037text\037\002"),
+	  _("Added new random news item (#%d)."),
+	  _("Syntax: \002RANDOMNEWS DEL {\037num\037 | ALL}"),
+	  _("Random news item #%d not found!"),
+	  _("Random news item #%d deleted."),
+	  _("No random news items to delete!"),
+	  _("All random news items deleted.")}
 	 }
 };
 
 static void DisplayNews(User *u, NewsType Type)
 {
-	LanguageString msg;
 	static unsigned current_news = 0;
+	Anope::string msg;
 
 	if (Type == NEWS_LOGON)
-		msg = NEWS_LOGON_TEXT;
+		msg = _("[\002Logon News\002 - %s] %s");
 	else if (Type == NEWS_OPER)
-		msg = NEWS_OPER_TEXT;
+		msg = _("[\002Oper News\002 - %s] %s");
 	else if (Type == NEWS_RANDOM)
-		msg = NEWS_RANDOM_TEXT;
+		msg = _("[\002Random News\002 - %s] %s");
 	else
 		throw CoreException("news: Invalid type (" + stringify(Type) + ") to display_news()");
 
@@ -95,7 +95,7 @@ static void DisplayNews(User *u, NewsType Type)
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			u->SendMessage(OperServ, msg, do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
+			u->SendMessage(OperServ, msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 
@@ -152,7 +152,7 @@ static int del_newsitem(unsigned num, NewsType type)
 	return count;
 }
 
-static LanguageString *findmsgs(NewsType type, Anope::string &type_name)
+static const char **findmsgs(NewsType type, Anope::string &type_name)
 {
 	for (unsigned i = 0; i < lenof(msgarray); ++i)
 		if (msgarray[i].type == type)
@@ -166,7 +166,7 @@ static LanguageString *findmsgs(NewsType type, Anope::string &type_name)
 class NewsBase : public Command
 {
  protected:
-	CommandReturn DoList(CommandSource &source, NewsType type, LanguageString *msgs)
+	CommandReturn DoList(CommandSource &source, NewsType type, const char **msgs)
 	{
 		int count = 0;
 
@@ -175,18 +175,18 @@ class NewsBase : public Command
 			{
 				if (!count)
 					source.Reply(msgs[MSG_LIST_HEADER]);
-				source.Reply(NEWS_LIST_ENTRY, News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
+				source.Reply(_("%5d (%s by %s)\n""    %s"), News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
 				++count;
 			}
 		if (!count)
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
-			source.Reply(END_OF_ANY_LIST, "News");
+			source.Reply(LanguageString::END_OF_ANY_LIST, "News");
 
 		return MOD_CONT;
 	}
 
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
+	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
 	{
 		const Anope::string text = params.size() > 1 ? params[1] : "";
 		int n;
@@ -197,12 +197,12 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			n = add_newsitem(source, text, type);
 			if (n < 0)
-				source.Reply(NEWS_ADD_FULL);
+				source.Reply(_("News list is full!"));
 			else
 				source.Reply(msgs[MSG_ADDED], n);
 		}
@@ -210,7 +210,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
+	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
 		unsigned num;
@@ -221,7 +221,7 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				source.Reply(READ_ONLY_MODE);
+				source.Reply(LanguageString::READ_ONLY_MODE);
 				return MOD_CONT;
 			}
 			if (!text.equals_ci("ALL"))
@@ -254,7 +254,7 @@ class NewsBase : public Command
 		const Anope::string &cmd = params[0];
 		Anope::string type_name;
 
-		LanguageString *msgs = findmsgs(type, type_name);
+		const char **msgs = findmsgs(type, type_name);
 		if (!msgs)
 			throw CoreException("news: Invalid type to do_news()");
 
@@ -299,18 +299,29 @@ class CommandOSLogonNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NEWS_HELP_LOGON, Config->NewsCount);
+		source.Reply(_("Syntax: \002LOGONNEWS ADD \037text\037\002\n"
+			"        \002LOGONNEWS DEL {\037num\037 | ALL}\002\n"
+			"        \002LOGONNEWS LIST\002\n"
+			" \n"
+			"Edits or displays the list of logon news messages.  When a\n"
+			"user connects to the network, these messages will be sent\n"
+			"to them.  (However, no more than \002%d\002 messages will be\n"
+			"sent in order to avoid flooding the user.  If there are\n"
+			"more news messages, only the most recent will be sent.)\n"
+			"NewsCount can be configured in services.conf.\n"
+			" \n"
+			"LOGONNEWS may only be used by Services Operators."), Config->NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LOGONNEWS", NEWS_LOGON_SYNTAX);
+		SyntaxError(source, "LOGONNEWS", _("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_LOGONNEWS);
+		source.Reply(_("    LOGONNEWS   Define messages to be shown to users at logon"));
 	}
 };
 
@@ -328,18 +339,29 @@ class CommandOSOperNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NEWS_HELP_OPER, Config->NewsCount);
+		source.Reply(_("Syntax: \002OPERNEWS ADD \037text\037\002\n"
+				"        \002OPERNEWS DEL {\037num\037 | ALL}\002\n"
+				"        \002OPERNEWS LIST\002\n"
+				" \n"
+				"Edits or displays the list of oper news messages.  When a\n"
+				"user opers up (with the /OPER command), these messages will\n"
+				"be sent to them.  (However, no more than \002%d\002 messages will\n"
+				"be sent in order to avoid flooding the user.  If there are\n"
+				"more news messages, only the most recent will be sent.)\n"
+				"NewsCount can be configured in services.conf.\n"
+				" \n"
+				"OPERNEWS may only be used by Services Operators."), Config->NewsCount);
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "OPERNEWS", NEWS_OPER_SYNTAX);
+		SyntaxError(source, "OPERNEWS", _("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_OPERNEWS);
+		source.Reply(_("    OPERNEWS    Define messages to be shown to users who oper"));
 	}
 };
 
@@ -357,18 +379,27 @@ class CommandOSRandomNews : public NewsBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NEWS_HELP_RANDOM);
+		source.Reply(_("Syntax: \002RANDOMNEWS ADD \037text\037\002\n"
+				"        \002RANDOMNEWS DEL {\037num\037 | ALL}\002\n"
+				"        \002RANDOMNEWS LIST\002\n"
+				" \n"
+				"Edits or displays the list of random news messages.  When a\n"
+				"user connects to the network, one (and only one) of the\n"
+				"random news will be randomly chosen and sent to them.\n"
+				" \n"
+				"RANDOMNEWS may only be used by Services Operators."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "RANDOMNEWS", NEWS_RANDOM_SYNTAX);
+		SyntaxError(source, "RANDOMNEWS", _("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_RANDOMNEWS);
+		source.Reply(_("    RANDOMNEWS  Define messages to be randomly shown to users \n"
+				"                at logon"));
 	}
 };
 

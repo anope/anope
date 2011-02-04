@@ -31,19 +31,19 @@ class CommandCSForbid : public Command
 
 		if (Config->ForceForbidReason && reason.empty())
 		{
-			SyntaxError(source, "FORBID", CHAN_FORBID_SYNTAX_REASON);
+			SyntaxError(source, "FORBID", _("FORBID \037channel\037 \037reason\037"));
 			return MOD_CONT;
 		}
 
 		if (chan[0] != '#')
 		{
-			source.Reply(CHAN_SYMBOL_REQUIRED);
+			source.Reply(LanguageString::CHAN_SYMBOL_REQUIRED);
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			source.Reply(READ_ONLY_MODE);
+			source.Reply(LanguageString::READ_ONLY_MODE);
 			return MOD_CONT;
 		}
 
@@ -74,7 +74,7 @@ class CommandCSForbid : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user, CHAN_FORBID_REASON).c_str());
+				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), _("This channel has been forbidden.")).c_str());
 			}
 		}
 
@@ -88,7 +88,7 @@ class CommandCSForbid : public Command
 			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 		Log(LOG_ADMIN, u, this, ci) << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
 
-		source.Reply(CHAN_FORBID_SUCCEEDED, chan.c_str());
+		source.Reply(_("Channel \002%s\002 is now forbidden."), chan.c_str());
 
 		FOREACH_MOD(I_OnChanForbidden, OnChanForbidden(ci));
 
@@ -97,18 +97,23 @@ class CommandCSForbid : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_SERVADMIN_HELP_FORBID);
+		source.Reply(_("Syntax: \002FORBID \037channel\037 [\037reason\037]\002\n"
+				" \n"
+				"Disallows anyone from registering or using the given\n"
+				"channel.  May be cancelled by dropping the channel.\n"
+				" \n"
+				"Reason may be required on certain networks."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "FORBID", CHAN_FORBID_SYNTAX);
+		SyntaxError(source, "FORBID", _("FORBID \037channel\037 [\037reason\037]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_FORBID);
+		source.Reply(_("    FORBID     Prevent a channel from being used"));
 	}
 };
 

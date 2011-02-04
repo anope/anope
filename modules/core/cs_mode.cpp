@@ -46,18 +46,18 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm || !cm->CanSet(u))
 						{
-							source.Reply(CHAN_MODE_LOCK_UNKNOWN, modes[i]);
+							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
 						Anope::string mode_param;
 						if (((cm->Type == MODE_STATUS || cm->Type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->Type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
-							source.Reply(CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
+							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
 						else
 						{
 							ci->SetMLock(cm, adding, mode_param, u->nick); 
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
-							source.Reply(CHAN_MODE_LOCKED, adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
 						}
 				}
 			}
@@ -89,22 +89,22 @@ class CommandCSMode : public Command
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
 						if (!cm || !cm->CanSet(u))
 						{
-							source.Reply(CHAN_MODE_LOCK_UNKNOWN, modes[i]);
+							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
 						Anope::string mode_param;
 						if (!cm->Type == MODE_REGULAR && !sep.GetToken(mode_param))
-							source.Reply(CHAN_MODE_LOCK_MISSING_PARAM, cm->ModeChar);
+							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
 						else
 						{
 							if (ci->RemoveMLock(cm, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
-								source.Reply(CHAN_MODE_UNLOCKED, adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
 							}
 							else
-								source.Reply(CHAN_MODE_NOT_LOCKED, cm->ModeChar, ci->name.c_str());
+								source.Reply(_("%c is not locked on %s."), cm->ModeChar, ci->name.c_str());
 						}
 				}
 			}
@@ -114,11 +114,11 @@ class CommandCSMode : public Command
 			const std::multimap<ChannelModeName, ModeLock> &mlocks = ci->GetMLock();
 			if (mlocks.empty())
 			{
-				source.Reply(CHAN_MODE_LOCK_NONE, ci->name.c_str());
+				source.Reply(_("Channel %s has no mode locks."), ci->name.c_str());
 			}
 			else
 			{
-				source.Reply(CHAN_MODE_LOCK_HEADER, ci->name.c_str());
+				source.Reply(_("Mode locks for %s:"), ci->name.c_str());
 				for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
 					const ModeLock &ml = it->second;
@@ -132,7 +132,7 @@ class CommandCSMode : public Command
 					Anope::string setter = ml.setter;
 					if (setter.empty())
 						setter = ci->founder ? ci->founder->display : "Unknown";
-					source.Reply(CHAN_MODE_LIST_FMT, ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), setter.c_str(), do_strftime(ml.created).c_str());
+					source.Reply(_("%c%c%s, by %s on %s"), ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), setter.c_str(), do_strftime(ml.created).c_str());
 				}
 			}
 		}
@@ -265,9 +265,9 @@ class CommandCSMode : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (!ci || !ci->c)
-			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
 		else if (!check_access(u, ci, CA_MODE) && !u->Account()->HasCommand("chanserv/mode"))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, params);
 		else if (subcommand.equals_ci("SET"))
@@ -280,18 +280,36 @@ class CommandCSMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(CHAN_HELP_MODE);
+		source.Reply(_("Syntax: \002MODE \037channel\037 LOCK {ADD|DEL|LIST} [\037what\037]\002\n"
+			"        \002MODE \037channel\037 SET \037modes\037\002\n"
+			" \n"
+			"Mainly controls mode locks and mode access (which is different from channel access)\n"
+			"on a channel.\n"
+			" \n"
+			"The \002MODE LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
+			"If a mode is locked on or off, services will not allow that mode to be changed.\n"
+			"Example:\n"
+			"     \002MODE #channel LOCK ADD +bmnt *!*@*aol*\002\n"
+			" \n"
+			"The \002MODE SET\002 command allows you to set modes through services. Wildcards * and ? may\n"
+			"be given as parameters for list and status modes.\n"
+			"Example:\n"
+			"     \002MODE #channel SET +v *\002\n"
+			"       Sets voice status to all users in the channel.\n"
+			" \n"
+			"     \002MODE #channel SET -b ~c:*\n"
+			"       Clears all extended bans that start with ~c:"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODE", CHAN_MODE_SYNTAX);
+		SyntaxError(source, "MODE", _("MODE \037channel\037 {LOCK|SET} [\037modes\037 | {ADD|DEL|LIST} [\037what\037]]"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_MODE);
+		source.Reply(_("    MODE       Control modes and mode locks on a channel"));
 	}
 };
 

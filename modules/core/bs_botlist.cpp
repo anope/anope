@@ -25,12 +25,6 @@ class CommandBSBotList : public Command
 		User *u = source.u;
 		unsigned count = 0;
 
-		if (BotListByNick.empty())
-		{
-			source.Reply(BOT_BOTLIST_EMPTY);
-			return MOD_CONT;
-		}
-
 		for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
 		{
 			BotInfo *bi = *it;
@@ -38,7 +32,7 @@ class CommandBSBotList : public Command
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
 				if (!count)
-					source.Reply(BOT_BOTLIST_HEADER);
+					source.Reply(_("Bot list:"));
 				++count;
 				source.Reply("   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
 			}
@@ -46,7 +40,7 @@ class CommandBSBotList : public Command
 
 		if (u->Account()->HasCommand("botserv/botlist") && count < BotListByNick.size())
 		{
-			source.Reply(BOT_BOTLIST_PRIVATE_HEADER);
+			source.Reply(_("Bots reserved to IRC operators:"));
 
 			for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
 			{
@@ -61,22 +55,25 @@ class CommandBSBotList : public Command
 		}
 
 		if (!count)
-			source.Reply(BOT_BOTLIST_EMPTY);
+			source.Reply(_("There are no bots available at this time.\n"
+					"Ask a Services Operator to create one!"));
 		else
-			source.Reply(BOT_BOTLIST_FOOTER, count);
+			source.Reply(_("%d bots available."), count);
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(BOT_HELP_BOTLIST);
+		source.Reply(_("Syntax: \002BOTLIST\002\n"
+				" \n"
+				"Lists all available bots on this network."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(BOT_HELP_CMD_BOTLIST);
+		source.Reply(_("    BOTLIST        Lists available bots"));
 	}
 };
 

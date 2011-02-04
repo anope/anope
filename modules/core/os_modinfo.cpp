@@ -29,7 +29,7 @@ class CommandOSModInfo : public Command
 
 			if (c->module && c->module->name.equals_ci(mod_name) && c->service)
 			{
-				source.Reply(OPER_MODULE_CMD_LIST, c->service->nick.c_str(), c->name.c_str());
+				source.Reply(_("Providing command: %\002%s %s\002"), c->service->nick.c_str(), c->name.c_str());
 				++display;
 			}
 		}
@@ -49,7 +49,7 @@ class CommandOSModInfo : public Command
 		Module *m = FindModule(file);
 		if (m)
 		{
-			source.Reply(OPER_MODULE_INFO_LIST, m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
+			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
 
 			showModuleCmdLoaded(HostServ, m->name, source);
 			showModuleCmdLoaded(OperServ, m->name, source);
@@ -59,25 +59,27 @@ class CommandOSModInfo : public Command
 			showModuleCmdLoaded(MemoServ, m->name, source);
 		}
 		else
-			source.Reply(OPER_MODULE_NO_INFO, file.c_str());
+			source.Reply(_("No information about module \002%s\002 is available"), file.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODINFO);
+		source.Reply(_("Syntax: \002MODINFO\002 \002FileName\002\n"
+				" \n"
+				"This command lists information about the specified loaded module"));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODINFO", OPER_MODULE_INFO_SYNTAX);
+		SyntaxError(source, "MODINFO", _("MODINFO \037FileName\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODINFO);
+		source.Reply(_("    MODINFO     Info about a loaded module"));
 	}
 };
 

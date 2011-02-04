@@ -53,7 +53,7 @@ E BotInfo *findbot(const Anope::string &nick);
 E Anope::string normalizeBuffer(const Anope::string &);
 
 E void check_ban(ChannelInfo *ci, User *u, int ttbtype);
-E void bot_kick(ChannelInfo *ci, User *u, LanguageString message, ...);
+E void bot_kick(ChannelInfo *ci, User *u, const char *message, ...);
 E void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 E void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 
@@ -140,13 +140,12 @@ E void pmodule_ircd_message(IRCdMessage *message);
 /**** language.cpp ****/
 E std::vector<Anope::string> languages;
 E void InitLanguages();
-E const Anope::string GetString(const Anope::string &language, LanguageString string);
-E const Anope::string GetString(LanguageString string);
-E const Anope::string GetString(NickCore *nc, LanguageString string);
-E const Anope::string GetString(User *u, LanguageString string);
-E const Anope::string GetString(const char *domain, Anope::string language, const Anope::string &string);
-E const char *const language_strings[LANG_STRING_COUNT];
-E void SyntaxError(CommandSource &source, const Anope::string &command, LanguageString message);
+E const Anope::string GetString(NickCore *nc, const char *string);
+E const Anope::string GetString(const Anope::string &domain, const Anope::string &lang, const char *string);
+E void PushLanguage(const Anope::string &, Anope::string);
+E void PopLanguage();
+E const char *anope_gettext(const char *string);
+E void SyntaxError(CommandSource &source, const Anope::string &command, const Anope::string &message);
 
 /*** logger.cpp ***/
 E void InitLogChannels(ServerConfig *);

@@ -169,8 +169,8 @@ void do_on_id(User *u)
 		u->UpdateHost();
 
 		if (!na->hostinfo.GetIdent().empty())
-			u->SendMessage(HostServ, HOST_IDENT_ACTIVATED, na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 		else
-			u->SendMessage(HostServ, HOST_ACTIVATED, na->hostinfo.GetHost().c_str());
+			u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
 	}
 }

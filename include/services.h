@@ -140,6 +140,13 @@ extern "C" void __pfnBkCheck() {}
 # undef int32
 #endif
 
+#if GETTEXT_FOUND
+# include LIBINTL
+# define _(x) anope_gettext(x)
+#else
+# define _(x) x
+#endif
+
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
  * It defines the class factory and external AnopeInit and AnopeFini functions.
@@ -776,7 +783,6 @@ enum
  * user is kicked.
  */
 
-#include "language.h"
 #include "users.h"
 #include "account.h"
 #include "bots.h"
@@ -792,7 +798,7 @@ struct LevelInfo
 {
 	int what;
 	Anope::string name;
-	LanguageString desc;
+	const char *desc;
 };
 
 #include "channels.h"
@@ -852,7 +858,7 @@ struct NewsMessages
 {
 	NewsType type;
 	Anope::string name;
-	LanguageString msgs[10];
+	const char *msgs[10];
 };
 
 struct NewsItem
@@ -938,6 +944,7 @@ struct Uplink;
 class ServerConfig;
 
 #include "extern.h"
+#include "language.h"
 #include "operserv.h"
 #include "mail.h"
 #include "servers.h"

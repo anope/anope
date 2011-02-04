@@ -35,14 +35,14 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				source.Reply(LIST_INCORRECT_RANGE);
+				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					source.Reply(LIST_INCORRECT_RANGE);
+					source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
 				from = convertTo<int>(key.substr(1, tmp - 1));
@@ -63,9 +63,9 @@ class CommandHSList : public Command
 				{
 					++display_counter;
 					if (!na->hostinfo.GetIdent().empty())
-						source.Reply(HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						source.Reply(HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			else
@@ -78,34 +78,43 @@ class CommandHSList : public Command
 				{
 					++display_counter;
 					if (!na->hostinfo.GetIdent().empty())
-						source.Reply(HOST_IDENT_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 					else
-						source.Reply(HOST_ENTRY, counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
 				}
 			}
 			++counter;
 		}
 		if (!key.empty())
-			source.Reply(HOST_LIST_KEY_FOOTER, key.c_str(), display_counter);
+			source.Reply(_("Displayed records matching key \002%s\002 (Count: \002%d\002)"), key.c_str(), display_counter);
 		else
 		{
 			if (from)
-				source.Reply(HOST_LIST_RANGE_FOOTER, from, to);
+				source.Reply(_("Displayed records from \002%d\002 to \002%d\002"), from, to);
 			else
-				source.Reply(HOST_LIST_FOOTER, display_counter);
+				source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
 		}
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_LIST);
+		source.Reply(_("Syntax: \002LIST\002 \002[<key>|<#X-Y>]\002\n"
+				"This command lists registered vhosts to the operator\n"
+				"if a Key is specified, only entries whos nick or vhost match\n"
+				"the pattern given in <key> are displayed e.g. Rob* for all\n"
+				"entries beginning with \"Rob\"\n"
+				"If a #X-Y style is used, only entries between the range of X\n"
+				"and Y will be displayed, e.g. #1-3 will display the first 3\n"
+				"nick/vhost entries.\n"
+				"The list uses the value of NSListMax as a hard limit for the\n"
+				"number of items to display to a operator at any 1 time."));
 		return true;
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_LIST);
+		source.Reply(_("    LIST        Displays one or more vhost entries."));
 	}
 };
 

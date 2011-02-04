@@ -31,11 +31,11 @@ class CommandCSSetBanType : public Command
 		int16 bantype = convertTo<int16>(params[1], end, false);
 
 		if (!end.empty() || bantype < 0 || bantype > 3)
-			source.Reply(CHAN_SET_BANTYPE_INVALID, params[1].c_str());
+			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
 		else
 		{
 			ci->bantype = bantype;
-			source.Reply(CHAN_SET_BANTYPE_CHANGED, ci->name.c_str(), ci->bantype);
+			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
 		}
 
 		return MOD_CONT;
@@ -43,19 +43,29 @@ class CommandCSSetBanType : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_BANTYPE, "SET");
+		source.Reply(_("Syntax: \002%s \037channel\037 BANTYPE \037bantype\037\002\n"
+				" \n"
+				"Sets the ban type that will be used by services whenever\n"
+				"they need to ban someone from your channel.\n"
+				" \n"
+				"bantype is a number between 0 and 3 that means:\n"
+				" \n"
+				"0: ban in the form *!user@host\n"
+				"1: ban in the form *!*user@host\n"
+				"2: ban in the form *!*@host\n"
+				"3: ban in the form *!*user@*.domain"), this->name.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_BANTYPE);
+		source.Reply(_("    BANTYPE       Set how Services make bans on the channel"));
 	}
 };
 
@@ -66,16 +76,10 @@ class CommandCSSASetBanType : public CommandCSSetBanType
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_BANTYPE, "SASET");
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
 	}
 };
 

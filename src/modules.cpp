@@ -289,19 +289,22 @@ void Module::SendMessage(CommandSource &source, const char *fmt, ...)
 {
 	Anope::string language = (source.u && source.u->Account() ? source.u->Account()->language : "");
 	
-	Anope::string message = GetString(this->name.c_str(), language, fmt);
+	PushLanguage(this->name, language);
+	fmt = anope_gettext(fmt);
 
 	va_list args;
 	char buf[4096];
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf) - 1, message.c_str(), args);
+	vsnprintf(buf, sizeof(buf) - 1, fmt, args);
 	va_end(args);
 
 	sepstream sep(buf, '\n');
 	Anope::string token;
 
 	while (sep.GetToken(token))
-		source.Reply(token.c_str());
+		source.Reply(token);
+	
+	PopLanguage();
 }
 
 Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)

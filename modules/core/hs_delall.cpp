@@ -29,7 +29,7 @@ class CommandHSDelAll : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
@@ -40,28 +40,30 @@ class CommandHSDelAll : public Command
 				na->hostinfo.RemoveVhost();
 			}
 			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
-			source.Reply(HOST_DELALL, nc->display.c_str());
+			source.Reply(_("vhosts for group \002%s\002 have been removed."), nc->display.c_str());
 		}
 		else
-			source.Reply(HOST_NOREG, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(HOST_HELP_DELALL);
+		source.Reply(_("Syntax: \002DELALL\002 \002<nick>\002.\n"
+				"Deletes the vhost for all nicks in the same group as\n"
+				"that of the given nick."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "DELALL", HOST_DELALL_SYNTAX);
+		SyntaxError(source, "DELALL", _("DELALL <nick>\002."));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(HOST_HELP_CMD_DELALL);
+		source.Reply(_("    DELALL      Delete the vhost for all nicks in a group"));
 	}
 };
 

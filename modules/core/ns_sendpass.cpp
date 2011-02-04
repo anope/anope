@@ -30,11 +30,11 @@ class CommandNSSendPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
-			source.Reply(ACCESS_DENIED);
+			source.Reply(LanguageString::ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;
@@ -43,11 +43,11 @@ class CommandNSSendPass : public Command
 				if (SendPassMail(u, na, tmp_pass))
 				{
 					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
-					source.Reply(NICK_SENDPASS_OK, nick.c_str());
+					source.Reply(_("Password of \002%s\002 has been sent."), nick.c_str());
 				}
 			}
 			else
-				source.Reply(NICK_SENDPASS_UNAVAILABLE);
+				source.Reply(_("SENDPASS command unavailable because encryption is in use."));
 		}
 
 		return MOD_CONT;
@@ -55,18 +55,24 @@ class CommandNSSendPass : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_HELP_SENDPASS);
+		source.Reply(_("Syntax: \002SENDPASS \037nickname\037\002\n"
+				" \n"
+				"Send the password of the given nickname to the e-mail address\n"
+				"set in the nickname record. This command is really useful\n"
+				"to deal with lost passwords.\n"
+				" \n"
+				"May be limited to \002IRC operators\002 on certain networks."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SENDPASS", NICK_SENDPASS_SYNTAX);
+		SyntaxError(source, "SENDPASS", _("SENDPASS \037nickname\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SENDPASS);
+		source.Reply(_("    SENDPASS   Forgot your password? Try this"));
 	}
 };
 
@@ -95,8 +101,16 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), GetString(na->nc, NICK_SENDPASS_SUBJECT).c_str(), na->nick.c_str());
-	snprintf(message, sizeof(message), GetString(na->nc, NICK_SENDPASS).c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
+	snprintf(subject, sizeof(subject), GetString(na->nc, "Nickname password (%s)").c_str(), na->nick.c_str());
+	snprintf(message, sizeof(message), GetString(na->nc, 
+	"Hi,\n"
+	" \n"
+	"You have requested to receive the password of nickname %s by e-mail.\n"
+	"The password is %s. For security purposes, you should change it as soon as you receive this mail.\n"
+	" \n"
+	"If you don't know why this mail was sent to you, please ignore it silently.\n"
+	" \n"
+	"%s administrators.").c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
 
 	return Mail(u, na->nc, NickServ, subject, message);
 }

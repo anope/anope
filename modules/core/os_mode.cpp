@@ -28,9 +28,9 @@ class CommandOSMode : public Command
 		Channel *c;
 
 		if (!(c = findchan(chan)))
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (c->bouncy_modes)
-			source.Reply(OPER_BOUNCY_MODES_U_LINE);
+			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 		else
 		{
 			c->SetModes(OperServ, false, modes.c_str());
@@ -43,18 +43,22 @@ class CommandOSMode : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(OPER_HELP_MODE);
+		source.Reply(_("Syntax: \002MODE \037channel\037 \037modes\037\002\n"
+				" \n"
+				"Allows Services operators to set channel modes for any\n"
+				"channel. Parameters are the same as for the standard /MODE\n"
+				"command."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "MODE", OPER_MODE_SYNTAX);
+		SyntaxError(source, "MODE", _("MODE \037channel\037 \037modes\037"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(OPER_HELP_CMD_MODE);
+		source.Reply(_("    MODE        Change a channel's modes"));
 	}
 };
 

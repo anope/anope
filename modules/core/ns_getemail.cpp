@@ -39,13 +39,13 @@ class CommandNSGetEMail : public Command
 			if (!nc->email.empty() && nc->email.equals_ci(email))
 			{
 				++j;
-				source.Reply(NICK_GETEMAIL_EMAILS_ARE, nc->display.c_str(), email.c_str());
+				source.Reply(_("Emails Match \002%s\002 to \002%s\002."), nc->display.c_str(), email.c_str());
 			}
 		}
 
 		if (j <= 0)
 		{
-			source.Reply(NICK_GETEMAIL_NOT_USED, email.c_str());
+			source.Reply(_("No Emails listed for \002%s\002."), email.c_str());
 			return MOD_CONT;
 		}
 
@@ -54,18 +54,22 @@ class CommandNSGetEMail : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(NICK_SERVADMIN_HELP_GETEMAIL);
+		source.Reply(_("Syntax: \002GETEMAIL \037user@emailhost\037\002\n"
+				"Returns the matching nicks that used given email. \002Note\002 that\n"
+				"you can not use wildcards for either user or emailhost. Whenever\n"
+				"this command is used, a message including the person who issued\n"
+				"the command and the email it was used on will be logged."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+		SyntaxError(source, "GETMAIL", _("GETEMAIL \002user@email-host\002 No WildCards!!"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_GETEMAIL);
+		source.Reply(_("    GETEMAIL   Matches and returns all users that registered using given email"));
 	}
 };
 

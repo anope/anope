@@ -32,12 +32,12 @@ class CommandNSSetAutoOp : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_AUTOOP);
-			source.Reply(NICK_SASET_AUTOOP_ON, nc->display.c_str());
+			source.Reply(_("Services will now autoop %s in channels."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_AUTOOP);
-			source.Reply(NICK_SASET_AUTOOP_OFF, nc->display.c_str());
+			source.Reply(_("Services will no longer autoop %s in channels."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "AUTOOP");
@@ -47,18 +47,21 @@ class CommandNSSetAutoOp : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SET_AUTOOP);
+		source.Reply(_("Syntax: \002SET AUTOOP {ON | OFF}\002\n"
+				" \n"
+				"Sets whether you will be opped automatically. Set to ON to \n"
+				"allow ChanServ to op you automatically when entering channels."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);
+		SyntaxError(source, "SET AUTOOP", _("SET AUTOOP {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SET_AUTOOP);
+		source.Reply(_("    AUTOOP     Should services op you automatically.    "));
 	}
 };
 
@@ -71,18 +74,22 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(NICK_HELP_SASET_AUTOOP);
+		source.Reply(_("Syntax: \002SASET \037nickname\037 AUTOOP {ON | OFF}\002\n"
+				" \n"
+				"Sets whether the given nickname will be opped automatically.\n"
+				"Set to \002ON\002 to allow ChanServ to op the given nickname \n"
+				"omatically when joining channels."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
+		SyntaxError(source, "SET AUTOOP", _("SASET \037nickname\037 AUTOOP {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_SASET_AUTOOP);
+		source.Reply(_("    AUTOOP     Turn autoop on or off"));
 	}
 };
 

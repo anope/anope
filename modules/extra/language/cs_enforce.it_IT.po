@@ -1,0 +1,85 @@
+# Italian translations for cs_enforce
+# Traduzioni italiane per il cs_enforce
+# Copyright (C) 2011 Anope Team
+# This file is distributed under the same license as Anope IRC Services
+# Adam <adam@anope.org>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Anope\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"PO-Revision-Date: 2010-09-25 21:55-0400\n"
+"Last-Translator: Adam <adam@anope.org>\n"
+"Language-Team: Italian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../cs_enforce.cpp:213
+msgid "    ENFORCE    Enforce various channel modes and set options"
+msgstr "    ENFORCE    Forza diversi modi di canale ed opzioni SET"
+
+#: ../cs_enforce.cpp:178
+msgid ""
+"Enforce various channel modes and set options. The channel\n"
+"option indicates what channel to enforce the modes and options\n"
+"on. The what option indicates what modes and options to\n"
+"enforce, and can be any of SET, SECUREOPS, RESTRICTED, MODES,\n"
+"or +R. When left out, it defaults to SET.\n"
+" \n"
+"If what is SET, it will enforce SECUREOPS and RESTRICTED\n"
+"on the users currently in the channel, if they are set. Give\n"
+"SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
+"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
+"if it's not enabled."
+msgstr ""
+"Forza diversi modi di canale ed opzioni SET. Il parametro canale\n"
+"indica il canale sul quale forzare i modi e le opzioni. Il parametro\n"
+"cosa indica i modi e le opzioni da forzare, e possono essere\n"
+"qualsiasi delle opzioni SET, SECUREOPS, RESTRICTED, MODES, o +R.\n"
+"Se non specificato, viene sottointeso SET.\n"
+" \n"
+"Se cosa è SET, forzerà SECUREOPS e RESTRICTED sugli utenti\n"
+"attualmente nel canale, se sono impostati. Specifica SECUREOPS per\n"
+"forzare l'opzione SECUREOPS, anche se non è attivata. Specifica\n"
+"RESTRICTED per forzare l'opzione RESTRICTED, anche se non è\n"
+"attivata."
+
+#: ../cs_enforce.cpp:145 ../cs_enforce.cpp:150 ../cs_enforce.cpp:155
+#: ../cs_enforce.cpp:160 ../cs_enforce.cpp:165
+#, c-format
+msgid "Enforced %s"
+msgstr "Forzato %s"
+
+#: ../cs_enforce.cpp:191
+msgid ""
+"If what is MODES, it will enforce channelmode +R if it is\n"
+"set. If +R is specified for what, the +R channelmode will\n"
+"also be enforced, but even if it is not set. If it is not set,\n"
+"users will be banned to ensure they don't just rejoin."
+msgstr ""
+"Se cosa è MODES, forzerà il modo del canale +R se è impostato.\n"
+"Se +R è specificato per cosa, il modo del canale +R verrà\n"
+"forzato, anche se non è impostato. Se non è impostato, gli utenti\n"
+"verranno bannati per assicurare che non rientrino semplicemente."
+
+#: ../cs_enforce.cpp:196
+msgid ""
+"If what is MODES, nothing will be enforced, since it would\n"
+"enforce modes that the current ircd does not support. If +R is\n"
+"specified for what, an equalivant of channelmode +R on\n"
+"other ircds will be enforced. All users that are in the channel\n"
+"but have not identified for their nickname will be kicked and\n"
+"banned from the channel."
+msgstr ""
+"Se cosa è MODES, niente verrà forzato, siccome forzerebbe\n"
+"dei modi che l'ircd in uso non supporterebbe. Se +R è specificato\n"
+"per cosa, un modo equivalente a +R sui altri ircd verrà\n"
+"forzato. Tutti gli utenti presenti nel canale ma non identificati\n"
+"per il loro nickname verranno bannati ed espulsi dal canale."
+
+#: ../cs_enforce.cpp:176 ../cs_enforce.cpp:208
+msgid "Syntax: ENFORCE channel [what]"
+msgstr "Sintassi: ENFORCE canale [cosa]"

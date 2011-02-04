@@ -31,9 +31,9 @@ class CommandNSLogout : public Command
 		if (!u->Account()->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
-			source.Reply(NICK_LOGOUT_SERVICESADMIN, nick.c_str());
+			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else
 		{
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
@@ -44,9 +44,9 @@ class CommandNSLogout : public Command
 
 			/* Remove founder status from this user in all channels */
 			if (!nick.empty())
-				source.Reply(NICK_LOGOUT_X_SUCCEEDED, nick.c_str());
+				source.Reply(_("Nick %s has been logged out."), nick.c_str());
 			else
-				source.Reply(NICK_LOGOUT_SUCCEEDED);
+				source.Reply(_("Your nick has been logged out."));
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
 			u2->RemoveMode(NickServ, UMODE_REGISTERED);
@@ -64,21 +64,35 @@ class CommandNSLogout : public Command
 	{
 		User *u = source.u;
 		if (u->Account() && u->Account()->IsServicesOper())
-			source.Reply(NICK_SERVADMIN_HELP_LOGOUT);
+			source.Reply(_("Syntax: \002LOGOUT [\037nickname\037 [REVALIDATE]]\002\n"
+					" \n"
+					"Without a parameter, reverses the effect of the \002IDENTIFY\002 \n"
+					"command, i.e. make you not recognized as the real owner of the nick\n"
+					"anymore. Note, however, that you won't be asked to reidentify\n"
+					"yourself.\n"
+					" \n"
+					"With a parameter, does the same for the given nick. If you \n"
+					"specify REVALIDATE as well, Services will ask the given nick\n"
+					"to re-identify. This use limited to \002Services Operators\002."));
 		else
-			source.Reply(NICK_HELP_LOGOUT);
+			source.Reply(_("Syntax: \002LOGOUT\002\n"
+					" \n"
+					"This reverses the effect of the \002IDENTIFY\002 command, i.e.\n"
+					"make you not recognized as the real owner of the nick\n"
+					"anymore. Note, however, that you won't be asked to reidentify\n"
+					"yourself."));
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LOGOUT", NICK_LOGOUT_SYNTAX);
+		SyntaxError(source, "LOGOUT", _("LOGOUT"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(NICK_HELP_CMD_LOGOUT);
+		source.Reply(_("    LOGOUT     Reverses the effect of the IDENTIFY command"));
 	}
 };
 

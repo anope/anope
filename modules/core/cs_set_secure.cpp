@@ -29,12 +29,12 @@ class CommandCSSetSecure : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_SECURE);
-			source.Reply(CHAN_SET_SECURE_ON, ci->name.c_str());
+			source.Reply(_("Secure option for %s is now \002\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_SECURE);
-			source.Reply(CHAN_SET_SECURE_OFF, ci->name.c_str());
+			source.Reply(_("Secure option for %s is now \002\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");
@@ -44,18 +44,24 @@ class CommandCSSetSecure : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(CHAN_HELP_SET_SECURE, "SET", Config->s_NickServ.c_str());
+		source.Reply(_("Syntax: \002%s \037channel\037 SECURE {ON | OFF}\002\n"
+			" \n"
+			"Enables or disables %S's security features for a\n"
+			"channel. When \002SECURE\002 is set, only users who have\n"
+			"registered their nicknames with %s and IDENTIFY'd\n"
+			"with their password will be given access to the channel\n"
+			"as controlled by the access list."), this->name.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
+		SyntaxError(source, "SET SECURE", _("SET \037channel\037 SECURE {ON | OFF}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(CHAN_HELP_CMD_SET_SECURE);
+		source.Reply(_("    SECURE        Activate %S security features"));
 	}
 };
 
@@ -66,15 +72,9 @@ class CommandCSSASetSecure : public CommandCSSetSecure
 	{
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		source.Reply(CHAN_HELP_SET_SECURE, "SASET", Config->s_NickServ.c_str());
-		return true;
-	}
-
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET SECURE", CHAN_SASET_SECURE_SYNTAX);
+		SyntaxError(source, "SASET SECURE", _("SASET \002channel\002 SECURE {ON | OFF}"));
 	}
 };
 

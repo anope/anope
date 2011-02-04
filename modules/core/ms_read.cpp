@@ -34,10 +34,10 @@ class MemoListCallback : public NumberList
 	{
 		Memo *m = mi->memos[index];
 		if (ci)
-			source.Reply(MEMO_CHAN_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%R%s DEL %s %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
-			source.Reply(MEMO_HEADER, index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), index + 1);
-		source.Reply(MEMO_TEXT, m->text.c_str());
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%R%s DEL %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->s_MemoServ.c_str(), index + 1);
+		source.Reply("%s", m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
 		/* Check if a receipt notification was requested */
@@ -68,12 +68,12 @@ class CommandMSRead : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -86,9 +86,9 @@ class CommandMSRead : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(LanguageString::MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(LanguageString::MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -106,9 +106,9 @@ class CommandMSRead : public Command
 				if (!readcount)
 				{
 					if (!chan.empty())
-						source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+						source.Reply(LanguageString::MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
-						source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
+						source.Reply(LanguageString::MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -127,18 +127,27 @@ class CommandMSRead : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_READ);
+		source.Reply(_("Syntax: \002READ [\037channel\037] {\037num\037 | \037list\037 | LAST | NEW}\002\n"
+				" \n"
+				"Sends you the text of the memos specified. If LAST is\n"
+				"given, sends you the memo you most recently received. If\n"
+				"NEW is given, sends you all of your new memos.  Otherwise,\n"
+				"sends you memo number \037num\037. You can also give a list of\n"
+				"numbers, as in this example:\n"
+				" \n"
+				"   \002READ 2-5,7-9\002\n"
+				"      Displays memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "READ", MEMO_READ_SYNTAX);
+		SyntaxError(source, "READ", _("READ [\037channel\037] {\037list\037 | LAST | NEW}"));
 	}
 
 	void OnServHelp(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_READ);
+		source.Reply(_("    READ   Read a memo or memos"));
 	}
 };
 

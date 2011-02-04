@@ -33,11 +33,11 @@ class MemoListCallback : public NumberList
 		{
 			SentHeader = true;
 			if (ci)
-				source.Reply(MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+				source.Reply(_("Memos for %s.  To read, type: \002%R%s READ %s \037num\037\002"), ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 			else
-				source.Reply(MEMO_LIST_MEMOS, source.u->nick.c_str(), Config->s_MemoServ.c_str());
+				source.Reply(_("Memos for %s.  To read, type: \002%R%s READ \037num\037\002"), source.u->nick.c_str(), Config->s_MemoServ.c_str());
 
-			source.Reply(MEMO_LIST_HEADER);
+			source.Reply(_(" Num  Sender            Date/Time"));
 		}
 
 		DoList(source, mi, Number - 1);
@@ -46,7 +46,7 @@ class MemoListCallback : public NumberList
 	static void DoList(CommandSource &source, const MemoInfo *mi, unsigned index)
 	{
 		Memo *m = mi->memos[index];
-		source.Reply(MEMO_LIST_FORMAT, (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
+		source.Reply(_("%c%3d  %-16s  %s"), (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
 	}
 };
 
@@ -73,12 +73,12 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(ACCESS_DENIED);
+				source.Reply(LanguageString::ACCESS_DENIED);
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -90,9 +90,9 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(LanguageString::MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(MEMO_HAVE_NO_MEMOS);
+				source.Reply(LanguageString::MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -111,9 +111,9 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							source.Reply(LanguageString::MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
-							source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
+							source.Reply(LanguageString::MEMO_HAVE_NO_NEW_MEMOS);
 						return MOD_CONT;
 					}
 				}
@@ -129,10 +129,10 @@ class CommandMSList : public Command
 					{
 						SentHeader = true;
 						if (ci)
-							source.Reply(!param.empty() ? MEMO_LIST_CHAN_NEW_MEMOS : MEMO_LIST_CHAN_MEMOS, ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%R%s READ %s \037num\037\002") : _("Memos for %s. To read, type: \002%R%s READ %s \037num\037\002"), ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 						else
-							source.Reply(!param.empty() ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS, u->nick.c_str(), Config->s_MemoServ.c_str());
-						source.Reply(MEMO_LIST_HEADER);
+							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%R%s READ \037num\037\002") : _("Memos for %s. To read, type: \002%R%s READ \037num\037\002"), u->nick.c_str(), Config->s_MemoServ.c_str());
+						source.Reply(_(" Num  Sender            Date/Time"));
 					}
 
 					MemoListCallback::DoList(source, mi, i);
@@ -144,18 +144,25 @@ class CommandMSList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(MEMO_HELP_LIST);
+		source.Reply(_("Syntax: \002LIST [\037channel\037] [\037list\037 | NEW]\002\n"
+				" \n"
+				"Lists any memos you currently have.  With \002NEW\002, lists only\n"
+				"new (unread) memos. Unread memos are marked with a \"*\"\n"
+				"to the left of the memo number. You can also specify a list\n"
+				"of numbers, as in the example below:\n"
+				"   \002LIST 2-5,7-9\002\n"
+				"      Lists memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LIST", MEMO_LIST_SYNTAX);
+		SyntaxError(source, "LIST", _("LIST [\037channel\037] [\037list\037 | NEW]"));
 	}
 
 	void OnServCommand(CommandSource &source)
 	{
-		source.Reply(MEMO_HELP_CMD_LIST);
+		source.Reply(_("    LIST   List your memos"));
 	}
 };
 

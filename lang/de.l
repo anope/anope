@@ -12,7 +12,7 @@
 # - Solltest du irgendwelche Rechtschreibfehler oder sonstige
 #   Verbesserungsvorschläge haben, immer her damit!
 #
-# INFO ::: Letzte Änderung:	08.08.2009	-- Han` -- Han@mefalcon.org --
+# INFO ::: Letzte Änderung:	29.01.2011	-- Han` -- Han@mefalcon.org --
 #
 ##########################################################################
 #
@@ -856,7 +856,7 @@ NICK_GLIST_FOOTER
 NICK_GLIST_REPLY
 	   %c%s
 NICK_GLIST_REPLY_ADMIN
-	   %c%s (wird in %s auslaufen)
+	   %c%s (wird am %s auslaufen)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -4344,7 +4344,7 @@ CHAN_HELP_CMD_CLEAR
 	    CLEAR      Entfernt bestimmte Einstellungen des angegebenen Channel
 CHAN_HELP_CMD_DEVOICE
 	    DEVOICE    Enfernt den Voice-Status des angegebenen Nicknamens
-	               in einen Channel
+	               in einem Channel
 CHAN_HELP_CMD_GETKEY
 	    GETKEY     Gibt das Channel-Passwort wieder
 CHAN_HELP_CMD_INFO
@@ -4354,43 +4354,43 @@ CHAN_HELP_CMD_INVITE
 CHAN_HELP_CMD_KICK
 	    KICK       Kickt den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_LIST
-	    LIST       Listet alle registrieten Channels des angegebene Muster
+	    LIST       Listet alle registrierten Channels des angegebene Muster
 CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     Das Befehl wir den angegegenen Nickname abmelden
+	    LOGOUT     Meldet den angegebenen Nicknamen ab
 CHAN_HELP_CMD_OP
-	    OP         Gibt den angegebenen Nicknamen Op-Status in einen Channel
+	    OP         Gibt dem angegebenen Nicknamen Op-Status in einem Channel
 CHAN_HELP_CMD_TOPIC
 	    TOPIC      Ändert den Topic des angegebenen Channels
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Enfernt den oder die ban(s) die dich betreffen aus einen Channel
+	    UNBAN      Enfernt den oder die Bann(s) die Dich betreffen aus einem Channel
 CHAN_HELP_CMD_VOICE
-	    VOICE      Gibt den angegebenen User Voice-Status in einen Channel
+	    VOICE      Gibt dem angegebenen User Voice-Status in einem Channel
 CHAN_HELP_CMD_VOP
-	    VOP        Verwaltet die VOP-Liste von einen Channel
+	    VOP        Verwaltet die VOP-Liste eines Channels
 CHAN_HELP_CMD_DEHALFOP
 	    DEHALFOP   Enfernt den HalfOP-Status des angegebenen Nicknamens
-	               in einen Channel
+	               in einem Channel
 CHAN_HELP_CMD_DEOWNER
-	    DEOWNER    Entfernt dein Founder (Gründer) Status in einen Channel
+	    DEOWNER    Entfernt Deinen Founder (Gründer) Status in einem Channel
 CHAN_HELP_CMD_DEPROTECT
-	    DEPROTECT  Entfernt den schutz des angegebenen Nicknamens 
-	               in einen Channel
+	    DEPROTECT  Entfernt den Schutz des angegebenen Nicknamens 
+	               in einem Channel
 CHAN_HELP_CMD_HALFOP
-	    HALFOP     Gibt den angegebenen User HalfOP-Status in einen Channel
+	    HALFOP     Gibt dem angegebenen User HalfOP-Status in einem Channel
 CHAN_HELP_CMD_HOP
 	    HOP        Verwaltet die HOP-Liste von einen Channel
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gibt dir Founder (Gründer) Staus in einen Channel
+	    OWNER      Gibt Dir Founder (Gründer) Status in einem Channel
 CHAN_HELP_CMD_PROTECT
-	    PROTECT    Schützt den angegebenen Nicknamen in einen Channel
+	    PROTECT    Schützt den angegebenen Nicknamen in einem Channel
 CHAN_HELP_CMD_ADMIN
-	    ADMIN      Schützt den angegebenen Nicknamen in einen Channel
+	    ADMIN      Schützt den angegebenen Nicknamen in einem Channel
 CHAN_HELP_CMD_DEADMIN
 	    DEADMIN    Entfernt den Schutz des angegebenen Nicknamens 
-	               in einen Channel
+	               in einem Channel
 CHAN_HELP_CMD_DEOP
 	    DEOP       Enfernt den OP-Status des angegebenen Nicknamens
-	               in einen Channel
+	               in einem Channel
 
 CHAN_HELP
 	Mit Hilfe von %S kann man Channel registrieren und
@@ -6354,20 +6354,20 @@ BOT_HELP_CMD_BADWORDS
 BOT_HELP_CMD_ACT
 	    ACT           Veranlaßt den Bot ein "/me" Befehl ausführen
 BOT_HELP_CMD_INFO
-	    INFO          Erlaubt dir Informationen über ein BotServ ServicesBot zu sehen
+	    INFO          Erlaubt Dir, Informationen über einen ServicesBot anzuzeigen
 BOT_HELP_CMD_SAY
-	    SAY           Veranlaßt ein Bot ein Text in einen Channel zu sagen
+	    SAY           Veranlaßt den Bot etwas in einem Channel zu sagen
 BOT_HELP_CMD_UNASSIGN
-	    UNASSIGN      Entfernt ein ServicesBot von einen Channel
+	    UNASSIGN      Entfernt ein ServicesBot von einem Channel
 BOT_HELP_CMD_BOT
 	    BOT           Verwaltung von Bots
 
 BOT_HELP
-	%S ist dafür geschaffen, Bots in Channels 
+	%S ist dafür geschaffen, Bots in Channels
 	einzubringen. Geschaffen wurde er für User, die
 	selbst keinen Bot ausfetzen können, oder auch Netzwerke,
-	die Bots verbieten. Mögliche Befehle siehe unten, 
-	die Syntax ist %R%S Befehl.  
+	die Bots verbieten. Mögliche Befehle siehe unten,
+	die Syntax ist %R%S Befehl.
 	
 	Für weitere Hilfe zu einem bestimmten Befehl
 	tippe %R%S HELP Befehl

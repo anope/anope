@@ -4,6 +4,7 @@ Anope Version 1.8 - GIT
 12/23  F Fixed /cs (un)ban and akick from matching users real hosts/IP   [#1079]
 12/12  F Remove vhost requests from nicks that expire                    [  #00]
 1/28   F Fixed not introducing our clients with usermode k on InspIRCd2.0[     ]
+1/29   F Updated german language file.                                   [  #00]
 
 Anope Version 1.8.5
 -------------------

@@ -328,7 +328,7 @@ var buildPackages = [
         if (!findCompiler()) {
                 WScript.Echo("\nERROR: No suitable build tools were found!");
                 WScript.Echo("Please ensure you have downloaded and installed a version of Visual C++ and/or PlatformSDK.\n");
-                WScript.Echo("For more information on the tools needed to build Anope on Windows, see:\nhttp://anope.info/wiki/Windows#Compiling\n");
+                WScript.Echo("For more information on the tools needed to build Anope on Windows, see:\nhttp://wiki.anope.org/index.php/Windows:1.8#Compiling\n");
         }
         else {
                 WScript.Echo("\nBuild tools were found successfully!\n");
@@ -522,8 +522,7 @@ var buildPackages = [
                 if (noPSDK) {
                         WScript.Echo("Some of the build tools were detected on your computer, but the essential PlatformSDK components were missing.");
                         WScript.Echo("You will need to download the PlatformSDK from the URL below, ensuring that the Core Windows files, and Debugging Tools are installed.");
-                        WScript.Echo("For more details on installing the PlatformSDK, visit http://anope.info/wiki/Windows#Compiling\n");
-                        WScript.Echo("PSDK: http://download.microsoft.com/download/a/5/f/a5f0d781-e201-4ab6-8c6a-9bb4efed1e1a/PSDK-x86.exe\n");                        
+                        WScript.Echo("For more details on installing the PlatformSDK, visit http://wiki.anope.org/index.php/Windows:1.8#Compiling\n");
                 }
                 return false;
         }

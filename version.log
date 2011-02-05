@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3058"
+VERSION_BUILD="3059"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3059 - Fixed the wiki URLs in install.js
 #Revision 3058 - Fixed not introducing our clients with usermode +k on InspIRCd 2.0
 #Revision 3057 - Bug #1233 - Fixed some misuse of apostrophes - patch by binki
 #Revision 3056 - Bug #1227 - Fixed 'make install' recompiling src/tools

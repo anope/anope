@@ -162,8 +162,14 @@ class CommandCSAccess : public Command
 	CommandReturn DoAdd(User *u, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		Anope::string nick = params[2];
-		int level = params[3].is_number_only() ? convertTo<int>(params[3]) : ACCESS_INVALID;
 		int ulev = get_access(u, ci);
+
+		int level = ACCESS_INVALID;
+		try
+		{
+			level = convertTo<int>(params[3]);
+		}
+		catch (const CoreException &) { }
 
 		if (level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
@@ -456,20 +462,24 @@ class CommandCSLevels : public Command
 		Anope::string what = params[2];
 		Anope::string lev = params[3];
 
-		Anope::string error;
-		int level = (lev.is_number_only() ? convertTo<int>(lev, error, false) : 0);
-		if (!lev.is_number_only())
-			error = "1";
 
+		int level = 0;
 		if (lev.equals_ci("FOUNDER"))
-		{
 			level = ACCESS_FOUNDER;
-			error.clear();
+		else
+		{
+			try
+			{
+				level = convertTo<int>(lev);
+			}
+			catch (const CoreException &)
+			{
+				this->OnSyntaxError(u, "SET");
+				return MOD_CONT;
+			}
 		}
 
-		if (!error.empty())
-			this->OnSyntaxError(u, "SET");
-		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
+		if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
 			u->SendMessage(ChanServ, CHAN_LEVELS_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{

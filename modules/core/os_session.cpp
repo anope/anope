@@ -125,7 +125,12 @@ class CommandOSSession : public Command
 	{
 		Anope::string param = params[1];
 
-		unsigned mincount = param.is_pos_number_only() ? convertTo<unsigned>(param) : 0;
+		unsigned mincount = 0;
+		try
+		{
+			mincount = convertTo<unsigned>(param);
+		}
+		catch (const CoreException &) { }
 
 		if (mincount <= 1)
 			u->SendMessage(OperServ, OPER_SESSION_INVALID_THRESHOLD);
@@ -245,7 +250,12 @@ class CommandOSException : public Command
 		else if (expires > 0)
 			expires += Anope::CurTime;
 
-		int limit = !limitstr.empty() && limitstr.is_number_only() ? convertTo<int>(limitstr) : -1;
+		int limit = -1;
+		try
+		{
+			limit = convertTo<int>(limitstr);
+		}
+		catch (const CoreException &) { }
 
 		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
 		{
@@ -319,8 +329,13 @@ class CommandOSException : public Command
 			return MOD_CONT;
 		}
 
-		n1 = n1str.is_pos_number_only() ? convertTo<int>(n1str) - 1 : -1;
-		n2 = n2str.is_pos_number_only() ? convertTo<int>(n2str) - 1 : -1;
+		n1 = n2 = -1;
+		try
+		{
+			n1 = convertTo<int>(n1str);
+			n2 = convertTo<int>(n2str);
+		}
+		catch (const CoreException &) { }
 
 		if (n1 >= 0 && n1 < exceptions.size() && n2 >= 0 && n2 < exceptions.size() && n1 != n2)
 		{

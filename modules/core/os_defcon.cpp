@@ -70,7 +70,12 @@ class CommandOSDefcon : public Command
 			defcon_sendlvls(u);
 			return MOD_CONT;
 		}
-		newLevel = lvl.is_number_only() ? convertTo<int>(lvl) : 0;
+
+		try
+		{
+			newLevel = convertTo<int>(lvl);
+		}
+		catch (const CoreException &) { }
 		if (newLevel < 1 || newLevel > 5)
 		{
 			this->OnSyntaxError(u, "");

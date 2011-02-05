@@ -143,16 +143,20 @@ class CommandOSSet : public Command
 			Log(LOG_ADMIN, u, this) << "DEBUG ON";
 			u->SendMessage(OperServ, OPER_SET_DEBUG_ON);
 		}
-		else if (setting.equals_ci("OFF") || (setting[0] == '0' && setting.is_number_only() && !convertTo<int>(setting)))
+		else if (setting.equals_ci("OFF"))
 		{
 			Log(LOG_ADMIN, u, this) << "DEBUG OFF";
 			debug = 0;
 			u->SendMessage(OperServ, OPER_SET_DEBUG_OFF);
 		}
-		else if (setting.is_number_only() && convertTo<int>(setting) > 0)
+		else if (setting.is_number_only())
 		{
-			debug = convertTo<int>(setting);
-			Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
+			try
+			{
+				debug = convertTo<int>(setting);
+				Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
+			}
+			catch (const CoreException &) { }
 			u->SendMessage(OperServ, OPER_SET_DEBUG_LEVEL, debug);
 		}
 		else

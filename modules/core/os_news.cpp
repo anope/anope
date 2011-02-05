@@ -226,16 +226,21 @@ class NewsBase : public Command
 			}
 			if (!text.equals_ci("ALL"))
 			{
-				num = text.is_pos_number_only() ? convertTo<unsigned>(text) : 0;
-				if (num > 0 && del_newsitem(num, type))
+				try
 				{
-					u->SendMessage(OperServ, msgs[MSG_DELETED], num);
-					for (unsigned i = 0, end = News.size(); i < end; ++i)
-						if (News[i]->type == type && News[i]->num > num)
-							--News[i]->num;
+					num = convertTo<unsigned>(text);
+					if (del_newsitem(num, type))
+					{
+						u->SendMessage(OperServ, msgs[MSG_DELETED], num);
+						for (unsigned i = 0, end = News.size(); i < end; ++i)
+							if (News[i]->type == type && News[i]->num > num)
+								--News[i]->num;
+						return MOD_CONT;
+					}
 				}
-				else
-					u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], num);
+				catch (const CoreException &) { }
+
+				u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], num);
 			}
 			else
 			{

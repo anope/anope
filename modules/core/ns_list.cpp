@@ -55,30 +55,20 @@ class CommandNSList : public Command
 
 		if (pattern[0] == '#')
 		{
-			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
-			if (tmp.empty())
+			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */
+					n2 = myStrGetToken(pattern, '-', 1);
+
+			try
+			{
+				from = convertTo<int>(n1);
+				to = convertTo<int>(n2);
+			}
+			catch (const CoreException &)
 			{
 				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
 				return MOD_CONT;
 			}
-			if (!tmp.is_number_only())
-			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
-				return MOD_CONT;
-			}
-			from = convertTo<int>(tmp);
-			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
-			if (tmp.empty())
-			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
-				return MOD_CONT;
-			}
-			if (!tmp.is_number_only())
-			{
-				u->SendMessage(NickServ, LIST_INCORRECT_RANGE);
-				return MOD_CONT;
-			}
-			to = convertTo<int>(tmp);
+
 			pattern = "*";
 		}
 

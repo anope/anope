@@ -75,7 +75,7 @@ class CommandMSSet : public Command
 		Anope::string p2 = params.size() > 2 ? params[2] : "";
 		Anope::string p3 = params.size() > 3 ? params[3] : "";
 		Anope::string user, chan;
-		int32 limit;
+		int16 limit;
 		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
 		bool is_servadmin = u->Account()->HasPriv("memoserv/set-limit");
@@ -114,7 +114,7 @@ class CommandMSSet : public Command
 				p1 = p2;
 				p2 = p3;
 			}
-			else if (p1.empty() || (!isdigit(p1[0]) && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
+			else if (p1.empty() || (!p1.is_pos_number_only() && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
 				SyntaxError(source, "SET LIMIT", _("SET LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]"));
 				return MOD_CONT;
@@ -133,14 +133,12 @@ class CommandMSSet : public Command
 				else
 					nc->UnsetFlag(NI_MEMO_HARDMAX);
 			}
-			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
-			if (limit < 0 || limit > 32767)
+			limit = -1;
+			try
 			{
-				source.Reply(_("Memo limit too large; limiting to %d instead."), 32767);
-				limit = 32767;
+				limit = convertTo<int16>(p1);
 			}
-			if (p1.equals_ci("NONE"))
-				limit = -1;
+			catch (const ConvertException &) { }
 		}
 		else
 		{
@@ -159,7 +157,12 @@ class CommandMSSet : public Command
 				source.Reply(_("You are not permitted to change your memo limit."));
 				return MOD_CONT;
 			}
-			limit = p1.is_pos_number_only() ? convertTo<int32>(p1) : -1;
+			limit = -1;
+			try
+			{
+				limit = convertTo<int16>(p1);
+			}
+			catch (const ConvertException &) { }
 			/* The first character is a digit, but we could still go negative
 			 * from overflow... watch out! */
 			if (limit < 0 || (Config->MSMaxMemos > 0 && static_cast<unsigned>(limit) > Config->MSMaxMemos))
@@ -169,11 +172,6 @@ class CommandMSSet : public Command
 				else
 					source.Reply(_("You cannot set your memo limit higher than %d."), Config->MSMaxMemos);
 				return MOD_CONT;
-			}
-			else if (limit > 32767)
-			{
-				source.Reply(_("Memo limit too large; limiting to %d instead."), 32767);
-				limit = 32767;
 			}
 		}
 		mi->memomax = limit;

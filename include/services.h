@@ -520,7 +520,7 @@ class Memo : public Flags<MemoFlag>
 
 struct CoreExport MemoInfo
 {
-	unsigned memomax;
+	int16 memomax;
 	std::vector<Memo *> memos;
 	std::vector<ci::string> ignores;
 

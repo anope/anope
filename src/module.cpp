@@ -9,7 +9,7 @@
 #include "modules.h"
 
 #ifdef GETTEXT_FOUND
-# include LIBINTL
+# include <libintl.h>
 #endif
 
 Module::Module(const Anope::string &mname, const Anope::string &creator)

@@ -20,7 +20,7 @@ endif(NOT WIN32)
 
 # If we found everything we need set variables correctly for lang/CMakeLists.txt to use
 if(GETTEXT_FOUND)
-  set(LIBINTL_INCLUDE "${GETTEXT_INCLUDE}/libintl.h")
+  include_directories("${GETTEXT_INCLUDE}")
   set(GETTEXT_MSGFMT_EXECUTABLE ${GETTEXT_MSGFMT})
 
   if(WIN32)

@@ -141,7 +141,7 @@ extern "C" void __pfnBkCheck() {}
 #endif
 
 #if GETTEXT_FOUND
-# include LIBINTL
+# include <libintl.h>
 # define _(x) anope_gettext(x)
 #else
 # define _(x) x

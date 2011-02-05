@@ -20,7 +20,6 @@
 #cmakedefine HAVE_EVENTFD 1
 #cmakedefine GETTEXT_FOUND 1
 #cmakedefine RUNGROUP "@RUNGROUP@"
-#define LIBINTL "@LIBINTL_INCLUDE@"
 
 #cmakedefine HAVE_UINT8_T 1
 #cmakedefine HAVE_U_INT8_T 1

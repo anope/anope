@@ -41,24 +41,22 @@ public:
 
 		if (pattern[0] == '#')
 		{
-			Anope::string tmp = myStrGetToken(pattern.substr(1), '-', 0); /* Read FROM out */
-			if (tmp.empty() || !tmp.is_number_only())
+			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */
+					n2 = myStrGetTokenRemainder(pattern, '-', 1);
+
+			try
+			{
+				from = convertTo<int>(n1);
+				to = convertTo<int>(n2);
+			}
+			catch (const ConvertException &)
 			{
 				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 				source.Reply(_("To search for channels starting with #, search for the channel\n"
 					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
 				return MOD_CONT;
 			}
-			from = convertTo<int>(tmp);
-			tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
-			if (tmp.empty() || !tmp.is_number_only())
-			{
-				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
-				source.Reply(_("To search for channels starting with #, search for the channel\n"
-					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
-				return MOD_CONT;
-			}
-			to = convertTo<int>(tmp);
+
 			pattern = "*";
 		}
 

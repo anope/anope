@@ -169,7 +169,13 @@ class CommandCSAccess : public Command
 		ChannelInfo *ci = source.ci;
 
 		Anope::string mask = params[2];
-		int level = params[3].is_number_only() ? convertTo<int>(params[3]) : ACCESS_INVALID;
+		int level = ACCESS_INVALID;
+		
+		try
+		{
+			level = convertTo<int>(params[3]);
+		}
+		catch (const ConvertException &) { }
 
 		ChanAccess *u_access = ci->GetAccess(u);
 		int16 u_level = u_access ? u_access->level : 0;
@@ -536,20 +542,25 @@ class CommandCSLevels : public Command
 		const Anope::string &what = params[2];
 		const Anope::string &lev = params[3];
 
-		Anope::string error;
-		int level = (lev.is_number_only() ? convertTo<int>(lev, error, false) : 0);
-		if (!lev.is_number_only())
-			error = "1";
+		int level;
 
 		if (lev.equals_ci("FOUNDER"))
-		{
 			level = ACCESS_FOUNDER;
-			error.clear();
+		else
+		{
+			level = 1;
+			try
+			{
+				level = convertTo<int>(lev);
+			}
+			catch (const ConvertException &)
+			{
+				this->OnSyntaxError(source, "SET");
+				return MOD_CONT;
+			}
 		}
 
-		if (!error.empty())
-			this->OnSyntaxError(source, "SET");
-		else if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
+		if (level <= ACCESS_INVALID || level > ACCESS_FOUNDER)
 			source.Reply(_("Level must be between %d and %d inclusive."), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{

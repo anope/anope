@@ -69,15 +69,22 @@ class CommandEntryMessage : public Command
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
 		else if (ci->GetExtRegular("cs_entrymsg", messages))
 		{
-			unsigned i = convertTo<unsigned>(message);
-			if (i > 0 && i <= messages.size())
+			try
 			{
-				messages.erase(messages.begin() + i - 1);
-				ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
-				source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
+				unsigned i = convertTo<unsigned>(message);
+				if (i <= messages.size())
+				{
+					messages.erase(messages.begin() + i - 1);
+					ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
+					source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
+				}
+				else
+					throw ConvertException();
 			}
-			else
+			catch (const ConvertException &)
+			{
 				source.Reply(_("Entry message \2%s\2 not found on channel \2%s\2."), message.c_str(), ci->name.c_str());
+			}
 		}
 		else
 			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());

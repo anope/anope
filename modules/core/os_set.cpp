@@ -122,14 +122,19 @@ class CommandOSSet : public Command
 			debug = 0;
 			source.Reply(_("Services are now in non-debug mode."));
 		}
-		else if (setting.is_number_only() && convertTo<int>(setting) > 0)
-		{
-			debug = convertTo<int>(setting);
-			Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
-			source.Reply(_("Services are now in debug mode (level %d)."), debug);
-		}
 		else
-			source.Reply(_("Setting for DEBUG must be \002\002, \002\002, or a positive number."));
+		{
+			try
+			{
+				debug = convertTo<int>(setting);
+				Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
+				source.Reply(_("Services are now in debug mode (level %d)."), debug);
+				return MOD_CONT;
+			}
+			catch (const ConvertException &) { }
+			
+			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
+		}
 
 		return MOD_CONT;
 	}

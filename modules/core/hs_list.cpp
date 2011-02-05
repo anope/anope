@@ -45,8 +45,12 @@ class CommandHSList : public Command
 					source.Reply(LanguageString::LIST_INCORRECT_RANGE);
 					return MOD_CONT;
 				}
-				from = convertTo<int>(key.substr(1, tmp - 1));
-				to = convertTo<int>(key.substr(tmp + 1));
+				try
+				{
+					from = convertTo<int>(key.substr(1, tmp - 1));
+					to = convertTo<int>(key.substr(tmp + 1));
+				}
+				catch (const ConvertException &) { }
 			}
 		}
 

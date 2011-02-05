@@ -26,16 +26,14 @@ class CommandCSSetBanType : public Command
 		if (!ci)
 			throw CoreException("NULL ci in CommandCSSetBanType");
 
-		Anope::string end;
-
-		int16 bantype = convertTo<int16>(params[1], end, false);
-
-		if (!end.empty() || bantype < 0 || bantype > 3)
-			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
-		else
+		try
 		{
-			ci->bantype = bantype;
+			ci->bantype = convertTo<int16>(params[1]);
 			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
+		}
+		catch (const ConvertException &)
+		{
+			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
 		}
 
 		return MOD_CONT;

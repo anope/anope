@@ -52,13 +52,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_BADWORDS] = convertTo<int16>(ttb, error, false);
-						/* Only error if errno returns ERANGE or EINVAL or we are less then 0 - TSL */
-						if (!error.empty() || ci->ttb[TTB_BADWORDS] < 0)
+						try
 						{
-							/* leaving the debug behind since we might want to know what these are */
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BADWORDS];
+							ci->ttb[TTB_BADWORDS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_BADWORDS] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							/* reset the value back to 0 - TSL */
 							ci->ttb[TTB_BADWORDS] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
@@ -67,6 +68,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_BADWORDS] = 0;
+
 					ci->botflags.SetFlag(BS_KICK_BADWORDS);
 					if (ci->ttb[TTB_BADWORDS])
 						source.Reply(_("Bot will now kick \002bad words\002, and will place a ban after \n"
@@ -88,11 +90,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_BOLDS] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_BOLDS] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_BOLDS];
+							ci->ttb[TTB_BOLDS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_BOLDS] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_BOLDS] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -121,11 +126,14 @@ class CommandBSKick : public Command
 
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_CAPS] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_CAPS] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_CAPS];
+							ci->ttb[TTB_CAPS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_CAPS] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_CAPS] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -134,17 +142,21 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_CAPS] = 0;
 
-					if (min.empty())
-						ci->capsmin = 10;
-					else
-						ci->capsmin = min.is_number_only() ? convertTo<int16>(min) : 10;
+					ci->capsmin = 10;
+					try
+					{
+						ci->capsmin = convertTo<int16>(min);
+					}
+					catch (const ConvertException &) { }
 					if (ci->capsmin < 1)
 						ci->capsmin = 10;
 
-					if (percent.empty())
-						ci->capspercent = 25;
-					else
-						ci->capspercent = percent.is_number_only() ? convertTo<int16>(percent) : 25;
+					ci->capspercent = 25;
+					try
+					{
+						ci->capspercent = convertTo<int16>(percent);
+					}
+					catch (const ConvertException &) { }
 					if (ci->capspercent < 1 || ci->capspercent > 100)
 						ci->capspercent = 25;
 
@@ -169,11 +181,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_COLORS] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_COLORS] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_COLORS];
+							ci->ttb[TTB_COLORS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_COLORS] < 1)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_COLORS] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -181,6 +196,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_COLORS] = 0;
+
 					ci->botflags.SetFlag(BS_KICK_COLORS);
 					if (ci->ttb[TTB_COLORS])
 						source.Reply(_("Bot will now kick \002colors\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_COLORS]);
@@ -202,11 +218,14 @@ class CommandBSKick : public Command
 
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_FLOOD] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_FLOOD] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_FLOOD];
+							ci->ttb[TTB_FLOOD] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_FLOOD] < 1)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_FLOOD] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -215,19 +234,25 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_FLOOD] = 0;
 
-					if (lines.empty())
-						ci->floodlines = 6;
-					else
-						ci->floodlines = lines.is_number_only() ? convertTo<int16>(lines) : 6;
+					ci->floodlines = 6;
+					try
+					{
+						ci->floodlines = convertTo<int16>(lines);
+					}
+					catch (const ConvertException &) { }
 					if (ci->floodlines < 2)
 						ci->floodlines = 6;
 
-					if (secs.empty())
+					ci->floodsecs = 10;
+					try
+					{
+						ci->floodsecs = convertTo<int16>(secs);
+					}
+					catch (const ConvertException &) { }
+					if (ci->floodsecs < 1)
 						ci->floodsecs = 10;
-					else
-						ci->floodsecs = secs.is_number_only() ? convertTo<int16>(secs) : 10;
-					if (ci->floodsecs < 1 || ci->floodsecs > Config->BSKeepData)
-						ci->floodsecs = 10;
+					if (ci->floodsecs > Config->BSKeepData)
+						ci->floodsecs = Config->BSKeepData;
 
 					ci->botflags.SetFlag(BS_KICK_FLOOD);
 					if (ci->ttb[TTB_FLOOD])
@@ -249,11 +274,14 @@ class CommandBSKick : public Command
 
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_REPEAT] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REPEAT];
+							ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_REPEAT])
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_REPEAT] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -262,10 +290,12 @@ class CommandBSKick : public Command
 					else
 						ci->ttb[TTB_REPEAT] = 0;
 
-					if (times.empty())
-						ci->repeattimes = 3;
-					else
-						ci->repeattimes = times.is_number_only() ? convertTo<int16>(times) : 3;
+					ci->repeattimes = 3;
+					try
+					{
+						ci->repeattimes = convertTo<int16>(times);
+					}
+					catch (const ConvertException &) { }
 					if (ci->repeattimes < 2)
 						ci->repeattimes = 3;
 
@@ -290,11 +320,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_REVERSES] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_REVERSES] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_REVERSES];
+							ci->ttb[TTB_REVERSES] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_REVERSES] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_REVERSES] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -320,11 +353,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_UNDERLINES] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_UNDERLINES] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_UNDERLINES];
+							ci->ttb[TTB_UNDERLINES] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_REVERSES] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_UNDERLINES] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -332,6 +368,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_UNDERLINES] = 0;
+
 					ci->botflags.SetFlag(BS_KICK_UNDERLINES);
 					if (ci->ttb[TTB_UNDERLINES])
 						source.Reply(_("Bot will now kick \002underlines\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_UNDERLINES]);
@@ -350,11 +387,14 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_ITALICS] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_ITALICS] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
+							ci->ttb[TTB_ITALICS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_ITALICS] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_ITALICS] = 0;
 							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
@@ -362,6 +402,7 @@ class CommandBSKick : public Command
 					}
 					else
 						ci->ttb[TTB_ITALICS] = 0;
+
 					ci->botflags.SetFlag(BS_KICK_ITALICS);
 					if (ci->ttb[TTB_ITALICS])
 						source.Reply(_("Bot will now kick \002italics\002, and will place a ban after\n%d kicks for the same user."), ci->ttb[TTB_ITALICS]);
@@ -380,17 +421,22 @@ class CommandBSKick : public Command
 				{
 					if (!ttb.empty())
 					{
-						Anope::string error;
-						ci->ttb[TTB_AMSGS] = convertTo<int16>(ttb, error, false);
-						if (!error.empty() || ci->ttb[TTB_AMSGS] < 0)
+						try
 						{
-							Log(LOG_DEBUG) << "remainder of ttb " << error << " ttb " << ci->ttb[TTB_ITALICS];
+							ci->ttb[TTB_AMSGS] = convertTo<int16>(ttb);
+							if (ci->ttb[TTB_AMSGS] < 0)
+								throw ConvertException();
+						}
+						catch (const ConvertException &)
+						{
 							ci->ttb[TTB_AMSGS] = 0;
+							source.Reply(_("\002%s\002 cannot be taken as times to ban."), ttb.c_str());
 							return MOD_CONT;
 						}
 					}
 					else
 						ci->ttb[TTB_AMSGS] = 0;
+
 					ci->botflags.SetFlag(BS_KICK_AMSGS);
 					if (ci->ttb[TTB_AMSGS])
 						source.Reply(_("Bot will now kick for \002amsgs\002, and will place a ban after %d\nkicks for the same user."), ci->ttb[TTB_AMSGS]);

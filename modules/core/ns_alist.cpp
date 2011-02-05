@@ -35,7 +35,6 @@ class CommandNSAList : public Command
 		Anope::string nick;
 		NickAlias *na;
 
-		int min_level = 0;
 		int is_servadmin = u->Account()->IsServicesOper();
 		unsigned lev_param = 0;
 
@@ -60,6 +59,7 @@ class CommandNSAList : public Command
 		Anope::string lev = params.size() > lev_param ? params[lev_param] : "";
 
 		/* if a level was given, make sure it's an int for later */
+		int min_level = ACCESS_INVALID;
 		if (!lev.empty())
 		{
 			if (lev.equals_ci("FOUNDER"))
@@ -73,7 +73,13 @@ class CommandNSAList : public Command
 			else if (lev.equals_ci("VOP"))
 				min_level = ACCESS_VOP;
 			else
-				min_level = lev.is_number_only() ? convertTo<int>(lev) : ACCESS_INVALID;
+			{
+				try
+				{
+					min_level = convertTo<int>(lev);
+				}
+				catch (const ConvertException &) { }
+			}
 		}
 
 		if (!na)

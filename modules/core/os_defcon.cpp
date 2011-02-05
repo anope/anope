@@ -63,7 +63,6 @@ class CommandOSDefcon : public Command
 	{
 		User *u = source.u;
 		const Anope::string &lvl = params[0];
-		int newLevel = 0;
 
 		if (lvl.empty())
 		{
@@ -71,12 +70,20 @@ class CommandOSDefcon : public Command
 			defcon_sendlvls(source);
 			return MOD_CONT;
 		}
-		newLevel = lvl.is_number_only() ? convertTo<int>(lvl) : 0;
+
+		int newLevel = 0;
+		try
+		{
+			newLevel = convertTo<int>(lvl);
+		}
+		catch (const ConvertException &) { }
+
 		if (newLevel < 1 || newLevel > 5)
 		{
 			this->OnSyntaxError(source, "");
 			return MOD_CONT;
 		}
+
 		Config->DefConLevel = newLevel;
 
 		FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(newLevel));

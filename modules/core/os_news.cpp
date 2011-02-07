@@ -213,7 +213,6 @@ class NewsBase : public Command
 	CommandReturn DoDel(User *u, const std::vector<Anope::string> &params, NewsType type, LanguageString *msgs)
 	{
 		Anope::string text = params.size() > 1 ? params[1] : "";
-		unsigned num;
 
 		if (text.empty())
 			this->OnSyntaxError(u, "DEL");
@@ -228,7 +227,7 @@ class NewsBase : public Command
 			{
 				try
 				{
-					num = convertTo<unsigned>(text);
+					unsigned num = convertTo<unsigned>(text);
 					if (del_newsitem(num, type))
 					{
 						u->SendMessage(OperServ, msgs[MSG_DELETED], num);
@@ -240,7 +239,7 @@ class NewsBase : public Command
 				}
 				catch (const CoreException &) { }
 
-				u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], num);
+				u->SendMessage(OperServ, msgs[MSG_DEL_NOT_FOUND], text.c_str());
 			}
 			else
 			{

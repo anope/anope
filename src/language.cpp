@@ -2507,7 +2507,7 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* NEWS_LOGON_DEL_SYNTAX */
 	_("Syntax: LOGONNEWS DEL {num | ALL}"),
 	/* NEWS_LOGON_DEL_NOT_FOUND */
-	_("Logon news item #%d not found!"),
+	_("Logon news item #%s not found!"),
 	/* NEWS_LOGON_DELETED */
 	_("Logon news item #%d deleted."),
 	/* NEWS_LOGON_DEL_NONE */
@@ -2527,7 +2527,7 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* NEWS_OPER_DEL_SYNTAX */
 	_("Syntax: OPERNEWS DEL {num | ALL}"),
 	/* NEWS_OPER_DEL_NOT_FOUND */
-	_("Oper news item #%d not found!"),
+	_("Oper news item #%s not found!"),
 	/* NEWS_OPER_DELETED */
 	_("Oper news item #%d deleted."),
 	/* NEWS_OPER_DEL_NONE */
@@ -2547,7 +2547,7 @@ Anope::string language_strings[LANG_STRING_COUNT] = {
 	/* NEWS_RANDOM_DEL_SYNTAX */
 	_("Syntax: RANDOMNEWS DEL {num | ALL}"),
 	/* NEWS_RANDOM_DEL_NOT_FOUND */
-	_("Random news item #%d not found!"),
+	_("Random news item #%s not found!"),
 	/* NEWS_RANDOM_DELETED */
 	_("Random news item #%d deleted."),
 	/* NEWS_RANDOM_DEL_NONE */

@@ -153,6 +153,17 @@ done
 
 ###########################################################################
 
+which cmake > /dev/null
+if [ $? -ne 0 ] ; then
+	clear
+	echo "Anope requires CMake 2.4 or newer to be configured, which can"
+	echo "be downloaded at http://www.cmake.org/. If you have installed"
+	echo "CMake already, ensure it is in your PATH environment variable."
+	exit 0
+fi
+
+###########################################################################
+
 if [ ! "$NO_INTRO" ] ; then
 	case `uname -s` in
 		MINGW*)

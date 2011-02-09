@@ -39,7 +39,7 @@ struct NewsMessages msgarray[] = {
 	  _("Syntax: \002LOGONNEWS ADD \037text\037\002"),
 	  _("Added new logon news item (#%d)."),
 	  _("Syntax: \002LOGONNEWS DEL {\037num\037 | ALL}"),
-	  _("Logon news item #%d not found!"),
+	  _("Logon news item #%s not found!"),
 	  _("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
 	  _("No logon news items to delete!"),
 	  _("All logon news items deleted.")}
@@ -51,7 +51,7 @@ struct NewsMessages msgarray[] = {
 	  _("Syntax: \002OPERNEWS ADD \037text\037\002"),
 	  _("Added new oper news item (#%d)."),
 	  _("Syntax: \002OPERNEWS DEL {\037num\037 | ALL}"),
-	  _("Oper news item #%d not found!"),
+	  _("Oper news item #%s not found!"),
 	  _("Oper news item #%d deleted."),
 	  _("No oper news items to delete!"),
 	  _("All oper news items deleted.")}
@@ -63,7 +63,7 @@ struct NewsMessages msgarray[] = {
 	  _("Syntax: \002RANDOMNEWS ADD \037text\037\002"),
 	  _("Added new random news item (#%d)."),
 	  _("Syntax: \002RANDOMNEWS DEL {\037num\037 | ALL}"),
-	  _("Random news item #%d not found!"),
+	  _("Random news item #%s not found!"),
 	  _("Random news item #%d deleted."),
 	  _("No random news items to delete!"),
 	  _("All random news items deleted.")}
@@ -213,7 +213,6 @@ class NewsBase : public Command
 	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
-		unsigned num;
 
 		if (text.empty())
 			this->OnSyntaxError(source, "DEL");
@@ -240,7 +239,7 @@ class NewsBase : public Command
 				}
 				catch (const ConvertException &) { }
 
-				source.Reply(msgs[MSG_DEL_NOT_FOUND], num);
+				source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
 			}
 			else
 			{

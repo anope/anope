@@ -40,11 +40,6 @@ IRCDVar myIrcd[] = {
 };
 
 /* PASS */
-void ngircd_cmd_pass(const Anope::string &pass)
-{
-	send_cmd("", "PASS %s 0210-IRC+ Anope|17~9:CLHSo P", pass.c_str());
-}
-
 class ngIRCdProto : public IRCDProto
 {
 	/* ngIRCd does not use the following functions, but we need the
@@ -88,7 +83,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		ngircd_cmd_pass(uplink_server->password);
+		send_cmd("", "PASS %s 0210-IRC+ Anope|17~9:CLHSo P", uplink_server->password.c_str());
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
@@ -492,6 +487,8 @@ class ProtongIRCd : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
+		
+		Capab.SetFlag(CAPAB_QS);
 
 		AddModes();
 

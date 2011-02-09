@@ -690,10 +690,12 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 {
 	if (source.empty())
 	{
-		/* This is a new user; create a User structure for it. */
-		Log(LOG_DEBUG) << "new user: " << nick;
-
 		Server *serv = Server::Find(server);
+		if (serv == NULL)
+		{
+			Log() << "User " << nick << " introduced with nonexistant server " << server << "!";
+			return NULL;
+		}
 
 		/* Allocate User structure and fill it in. */
 		dynamic_reference<User> user = new User(nick, username, host, uid);

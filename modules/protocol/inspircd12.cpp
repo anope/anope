@@ -726,10 +726,6 @@ class ProtoInspIRCd : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		CapabType c[] = { CAPAB_NOQUIT, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT };
-		for (unsigned i = 0; i < 5; ++i)
-			Capab.SetFlag(c[i]);
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);

@@ -175,74 +175,19 @@ How To Add IRCd Support
 
 5) CAPAB/PROTOCTL
 
-    Most IRCD send a CAPAB or PROTOCTL line so that they can work out what
-    the other end of the connection is capable of doing. Anope has a function
-    to read these lines and set itself up to to handle these events better.
-    When adding support for your ircd, take the following steps.
+    Most IRCDs send a CAPAB or PROTOCTL line so that they can work out what
+    the other end of the connection is capable of doing. The protocol module should
+    handle all of these without the cores knowledge with the exception of the following:
     
-    1) In the module constructor you must tell Anope what the uplink is capable of that
-       isn't already passed in the CAPAB/PROTOCTL, you do this by something similar to:
-
-       CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_SJB64, CAPAB_NICKCHARS };
-       for (unsigned i = 0; i < 11; ++i)
-           Capab.SetFlag(c[i]);
-
-       Anything else given to Anope in the CAPAB/PROTOCTL message will be handled later by CapabParse.
-
-       The available CAPAB options are:
-
        --------------------------------------------------------------------------
        Define          |  Description
-       ----------------|------------|-----------|--------------------------------
+       ----------------|---------------------------------------------------------
        CAPAB_NOQUIT    |  NOQUIT protocol support
        CAPAB_TSMODE    |  Chanmodes are timestamped
        CAPAB_UNCONNECT |  UNCONNECT protocol support
-       CAPAB_NICKIP    |  IP sent in the NICK line
-       CAPAB_NSJOIN    |  Smart SJOIN support
-       CAPAB_ZIP       |  Support for gzipped links
-       CAPAB_BURST     |  Supports BURST command
-       CAPAB_TS3       |  Support for TS3 protocol
-       CAPAB_TS5       |  Support for TS5 protocol
-       CAPAB_DKEY      |  DH-Key exchange using DKEY
-       CAPAB_DOZIP     |  Link traffic will be gzipped
-       CAPAB_DODKEY    |  Do DKEY with this link
-       CAPAB_QS        |  Supports quit storm removal
-       CAPAB_SCS       |  String Cache System support
-       CAPAB_PT4       |  Support for PT4 protocol
-       CAPAB_UID       |  Support for UIDs
-       CAPAB_KNOCK     |  Supports KNOCK
-       CAPAB_CLIENT    |  Supports CLIENT
-       CAPAB_IPV6      |  Support for IPv6 addresses
-       CAPAB_SSJ5      |  Smart Join protocol 5 support
-       CAPAB_SN2       |  Support for SN2 protocol
-       CAPAB_VHOST     |  Supports VHOST protocol
-       CAPAB_TOKEN     |  Supports s2s tokens
-       CAPAB_SSJ3      |  Smart Join protocol 3 support
-       CAPAB_NICK2     |  Support for extended NICK (v2)
-       CAPAB_UMODE2    |  Supports UMODE2 command
-       CAPAB_VL        |  VLine information in info field
-       CAPAB_TLKEXT    |  Not 8, but 10 params in TKL's
-       CAPAB_CHANMODE  |  Channel modes are passed here
-       CAPAB_SJB64     |  SJOIN timestamps are base64 encoded
-       CAPAB_NICKCHARS |  Character set used by the IRCD for nicks
+       CAPAB_QS        |  Quitstorm - same as NOQUIT
 
-    2) Ensure that the CAPAB/PROTOCTL event his handled correctly. 
-
-        A) In the function module constructor make sure that you have the
-           following two lines:
-
-           Message message_capab("CAPAB", event_capab);	   
-
-        B) Add the function to handle the event
-
-            bool event_capab(const Anope::string &source, const std::vector<Anope::string> &params)
-            {
-                CapabParse(params);
-                return true;
-            }
-
-           This function should call the CapabParse function which parses
-           the received CAPAB/PROTOCTL line.
+   You can override the default OnCapab method in IRCdMessage if required.
 
 6) IRCDProto Class
 

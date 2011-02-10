@@ -574,6 +574,7 @@ bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string
 			if (Capab_Info[j].Token.equals_ci(params[i]))
 			{
 				Capab.SetFlag(Capab_Info[j].Flag);
+				Log(LOG_DEBUG) << "Capab: Enabling " << Capab_Info[j].Token;
 				break;
 			}
 		}

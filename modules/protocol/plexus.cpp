@@ -661,10 +661,6 @@ class ProtoPlexus : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK };
-		for (unsigned i = 0; i < 5; ++i)
-			Capab.SetFlag(c[i]);
-
 		AddModes();
 
 		pmodule_ircd_var(myIrcd);

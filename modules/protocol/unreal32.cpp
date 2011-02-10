@@ -1065,10 +1065,6 @@ class ProtoUnreal : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		CapabType c[] = { CAPAB_NOQUIT, CAPAB_NICKIP, CAPAB_ZIP, CAPAB_TOKEN, CAPAB_SSJ3, CAPAB_NICK2, CAPAB_VL, CAPAB_TLKEXT, CAPAB_CHANMODE, CAPAB_NICKCHARS };
-		for (unsigned i = 0; i < 10; ++i)
-			Capab.SetFlag(c[i]);
-
 		AddModes();
 
 		pmodule_ircd_var(myIrcd);

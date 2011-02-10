@@ -580,10 +580,6 @@ class ProtoRatbox : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		CapabType c[] = { CAPAB_ZIP, CAPAB_TS5, CAPAB_QS, CAPAB_UID, CAPAB_KNOCK, CAPAB_TSMODE };
-		for (unsigned i = 0; i < 6; ++i)
-			Capab.SetFlag(c[i]);
-
 		AddModes();
 
 		pmodule_ircd_var(myIrcd);

@@ -603,10 +603,6 @@ class ProtoBahamut : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		CapabType c[] = { CAPAB_NOQUIT, CAPAB_TSMODE, CAPAB_UNCONNECT, CAPAB_BURST, CAPAB_DKEY, CAPAB_DOZIP };
-		for (unsigned i = 0; i < 6; ++i)
-			Capab.SetFlag(c[i]);
-
 		AddModes();
 
 		pmodule_ircd_var(myIrcd);

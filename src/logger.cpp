@@ -296,7 +296,7 @@ bool LogInfo::HasType(LogType type)
 		case LOG_TERMINAL:
 			return true;
 		case LOG_RAWIO:
-			return this->RawIO;
+			return debug ? true : this->RawIO;
 		case LOG_DEBUG:
 			return debug ? true : this->Debug;
 		// LOG_DEBUG_[234]

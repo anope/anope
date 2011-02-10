@@ -200,17 +200,16 @@ void del_session(User *u)
 
 void expire_exceptions()
 {
-	for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; )
+	for (unsigned i = exceptions.size(); i > 0; --i)
 	{
-		Exception *e = *it;
-		std::vector<Exception *>::iterator curr_it = it++;
+		Exception *e = exceptions[i - 1];
 
 		if (!e->expires || e->expires > Anope::CurTime)
 			continue;
 		if (Config->WallExceptionExpire)
 			ircdproto->SendGlobops(OperServ, "Session limit exception for %s has expired.", e->mask.c_str());
 		delete e;
-		exceptions.erase(curr_it);
+		exceptions.erase(exceptions.begin() + i - 1);
 	}
 }
 

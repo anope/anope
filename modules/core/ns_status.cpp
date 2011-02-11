@@ -19,6 +19,7 @@ class CommandNSStatus : public Command
 	CommandNSStatus() : Command("STATUS", 0, 16)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Returns the owner status of the given nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -72,11 +73,6 @@ class CommandNSStatus : public Command
 				"rest will be ignored. If no nickname is given, your status\n"
 				"will be returned."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    STATUS     Returns the owner status of the given nickname"));
 	}
 };
 

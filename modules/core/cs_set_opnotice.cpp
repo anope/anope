@@ -18,6 +18,7 @@ class CommandCSSetOpNotice : public Command
  public:
 	CommandCSSetOpNotice(const Anope::string &cpermission = "") : Command("OPNOTICE", 2, 2, cpermission)
 	{
+		this->SetDesc("Send a notice when OP/DEOP commands are used");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -56,11 +57,6 @@ class CommandCSSetOpNotice : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET OPNOTICE", _("SET \037channel\037 OPNOTICE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OPNOTICE      Send a notice when OP/DEOP commands are used"));
 	}
 };
 

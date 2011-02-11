@@ -18,6 +18,7 @@ class CommandCSSetSignKick : public Command
  public:
 	CommandCSSetSignKick(const Anope::string &cpermission = "") : Command("SIGNKICK", 2, 2, cpermission)
 	{
+		this->SetDesc("Sign kicks that are done with KICK command");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -70,11 +71,6 @@ class CommandCSSetSignKick : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET SIGNKICK", _("SET \037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SIGNKICK      Sign kicks that are done with KICK command"));
 	}
 };
 

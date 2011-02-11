@@ -18,6 +18,7 @@ class CommandOSShutdown : public Command
  public:
 	CommandOSShutdown() : Command("SHUTDOWN", 0, 0, "operserv/shutdown")
 	{
+		this->SetDesc("Terminate services with save");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -37,11 +38,6 @@ class CommandOSShutdown : public Command
 				" \n"
 				"Causes Services to save all databases and then shut down."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SHUTDOWN    Terminate the Services program with save"));
 	}
 };
 

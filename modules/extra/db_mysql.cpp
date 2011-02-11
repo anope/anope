@@ -123,6 +123,7 @@ class CommandSQLSync : public Command
  public:
 	CommandSQLSync() : Command("SQLSYNC", 0, 0, "operserv/sqlsync")
 	{
+		this->SetDesc("Import your databases to SQL");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params);
@@ -135,11 +136,6 @@ class CommandSQLSync : public Command
 				"only have to execute this command once, when you initially\n"
 				"import your databases into SQL."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SQLSYNC     Import your databases to SQL"));
 	}
 };
 

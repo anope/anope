@@ -79,6 +79,8 @@ struct CoreExport CommandSource
  */
 class CoreExport Command : public Flags<CommandFlag>
 {
+	Anope::string desc;
+
  public:
  	/* Maximum paramaters accepted by this command */
 	size_t MaxParams;
@@ -104,6 +106,10 @@ class CoreExport Command : public Flags<CommandFlag>
 
 	virtual ~Command();
 
+ protected:
+	void SetDesc(const Anope::string &d);
+
+ public:
 	/** Execute this command.
 	 * @param source The source
 	 * @param params Command parameters

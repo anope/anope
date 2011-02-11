@@ -18,6 +18,7 @@ class CommandBSUnassign : public Command
  public:
 	CommandBSUnassign() : Command("UNASSIGN", 1, 1)
 	{
+		this->SetDesc("Unassigns a bot from a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -61,11 +62,6 @@ class CommandBSUnassign : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "UNASSIGN", _("UNASSIGN \037chan\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UNASSIGN       Unassigns a bot from a channel"));
 	}
 };
 

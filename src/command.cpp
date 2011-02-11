@@ -64,7 +64,15 @@ Command::~Command()
 		this->module->DelCommand(this->service, this);
 }
 
-void Command::OnServHelp(CommandSource &source) { }
+void Command::SetDesc(const Anope::string &d)
+{
+	this->desc = d;
+}
+
+void Command::OnServHelp(CommandSource &source)
+{
+	source.Reply("    %-14s %s", this->name.c_str(), _(this->desc.c_str()));
+}
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
 

@@ -19,6 +19,7 @@ class CommandNSList : public Command
  public:
 	CommandNSList() : Command("LIST", 1, 2)
 	{
+		this->SetDesc("List all registered nicknames that match a given pattern");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -219,11 +220,6 @@ class CommandNSList : public Command
 			SyntaxError(source, "LIST", _("LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 		else
 			SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LIST       List all registered nicknames that match a given pattern"));
 	}
 };
 

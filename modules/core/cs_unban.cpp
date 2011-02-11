@@ -18,6 +18,7 @@ class CommandCSUnban : public Command
  public:
 	CommandCSUnban() : Command("UNBAN", 1, 2)
 	{
+		this->SetDesc("Remove all bans preventing a user from entering a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -72,11 +73,6 @@ class CommandCSUnban : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "UNBAN", _("UNBAN \037channel\037 [\037nick\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UNBAN      Remove all bans preventing a user from entering a channel"));
 	}
 };
 

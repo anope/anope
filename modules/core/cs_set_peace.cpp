@@ -18,6 +18,7 @@ class CommandCSSetPeace : public Command
  public:
 	CommandCSSetPeace(const Anope::string &cpermission = "") : Command("PEACE", 2, 2, cpermission)
 	{
+		this->SetDesc("Regulate the use of critical commands");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -56,11 +57,6 @@ class CommandCSSetPeace : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET PEACE", _("SET \037channel\037 PEACE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PEACE         Regulate the use of critical commands"), "SET");
 	}
 };
 

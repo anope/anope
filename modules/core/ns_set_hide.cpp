@@ -18,6 +18,7 @@ class CommandNSSetHide : public Command
  public:
 	CommandNSSetHide(const Anope::string &spermission = "") : Command("HIDE", 2, 3, spermission)
 	{
+		this->SetDesc("Hide certain pieces of nickname information");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -97,11 +98,6 @@ class CommandNSSetHide : public Command
 	{
 		SyntaxError(source, "SET HIDE", _("SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    HIDE       Hide certain pieces of nickname information"));
-	}
 };
 
 class CommandNSSASetHide : public CommandNSSetHide
@@ -128,11 +124,6 @@ class CommandNSSASetHide : public CommandNSSetHide
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET HIDE", _("SASET NICK_SASET_HIDE_SYNTAX37nicknameNICK_SASET_HIDE_SYNTAX37 HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    HIDE       Hide certain pieces of nickname information"));
 	}
 };
 

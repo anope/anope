@@ -18,6 +18,7 @@ class CommandMSInfo : public Command
  public:
 	CommandMSInfo() : Command("INFO", 0, 1)
 	{
+		this->SetDesc("Displays information about your memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -210,11 +211,6 @@ class CommandMSInfo : public Command
 					"for the given channel."));
 
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    INFO   Displays information about your memos"));
 	}
 };
 

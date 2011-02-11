@@ -40,6 +40,7 @@ class CommandOSModInfo : public Command
  public:
 	CommandOSModInfo() : Command("MODINFO", 1, 1)
 	{
+		this->SetDesc("Info about a loaded module");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -75,11 +76,6 @@ class CommandOSModInfo : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODINFO", _("MODINFO \037FileName\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODINFO     Info about a loaded module"));
 	}
 };
 

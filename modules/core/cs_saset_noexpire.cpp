@@ -18,6 +18,7 @@ class CommandCSSASetNoexpire : public Command
  public:
 	CommandCSSASetNoexpire() : Command("NOEXPIRE", 2, 2, "chanserv/saset/noexpire")
 	{
+		this->SetDesc("Prevent the channel from expiring");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -54,11 +55,6 @@ class CommandCSSASetNoexpire : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET NOEXPIRE", _("SET \037channel\037 NOEXPIRE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    NOEXPIRE      Prevent the channel from expiring"));
 	}
 };
 

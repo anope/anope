@@ -18,6 +18,7 @@ class CommandHSGroup : public Command
  public:
 	CommandHSGroup() : Command("GROUP", 0, 0)
 	{
+		this->SetDesc("Syncs the vhost for all nicks in a group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -46,11 +47,6 @@ class CommandHSGroup : public Command
 				"CURRENT nick to be the vhost for all nicks in the same\n"
 				"group."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GROUP       Syncs the vhost for all nicks in a group"));
 	}
 };
 

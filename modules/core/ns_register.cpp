@@ -135,6 +135,7 @@ class CommandNSConfirm : public Command
 	CommandNSConfirm(const Anope::string &cmdn, int min, int max) : Command(cmdn, min, max)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Confirm a nickserv auth code");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -167,11 +168,6 @@ class CommandNSConfirm : public Command
 	{
 		source.Reply(LanguageString::NICK_CONFIRM_INVALID);
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    CONFIRM    Confirm a nickserv auth code"));
-	}
 };
 
 class CommandNSRegister : public CommandNSConfirm
@@ -180,6 +176,7 @@ class CommandNSRegister : public CommandNSConfirm
 	CommandNSRegister() : CommandNSConfirm("REGISTER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Register a nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -353,11 +350,6 @@ class CommandNSRegister : public CommandNSConfirm
 		else
 			SyntaxError(source, "REGISTER", _("\037password\037 [\037email\037]"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    REGISTER   Register a nickname"));
-	}
 };
 
 class CommandNSResend : public Command
@@ -366,6 +358,7 @@ class CommandNSResend : public Command
 	CommandNSResend() : Command("RESEND", 0, 0)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Resend a nickserv auth code");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -404,11 +397,6 @@ class CommandNSResend : public Command
 				"This command will re-send the auth code (also called passcode)\n"
 				"to the e-mail address of the user whom is performing it."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RESEND     Resend a nickserv auth code"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandOSUpdate : public Command
  public:
 	CommandOSUpdate() : Command("UPDATE", 0, 0, "operserv/update")
 	{
+		this->SetDesc("Force the Services databases to be updated immediately");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -34,12 +35,6 @@ class CommandOSUpdate : public Command
 				"Causes Services to update all database files as soon as you\n"
 				"send the command."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UPDATE      Force the Services databases to be\n"
-				"                updated on disk immediately"));
 	}
 };
 

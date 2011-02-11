@@ -18,6 +18,7 @@ class CommandOSJupe : public Command
  public:
 	CommandOSJupe() : Command("JUPE", 1, 2, "operserv/jupe")
 	{
+		this->SetDesc("\"Jupiter\" a server");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -63,11 +64,6 @@ class CommandOSJupe : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "JUPE", _("JUPE \037servername\037 [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    JUPE        \"Jupiter\" a server"));
 	}
 };
 

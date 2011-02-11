@@ -156,7 +156,7 @@ class CoreExport User : public Extensible
 	 * @param ... any number of parameters
 	 */
 	void SendMessage(BotInfo *source, const char *fmt, ...);
-	virtual void SendMessage(BotInfo *source, const Anope::string &msg);
+	virtual void SendMessage(BotInfo *source, Anope::string msg);
 
 	/** Collide a nick
 	 * See the comment in users.cpp

@@ -99,6 +99,7 @@ class CommandEntryMessage : public Command
  public:
 	CommandEntryMessage(const Anope::string &cname) : Command(cname, 2, 3)
 	{
+		this->SetDesc("Manage the channel's entry messages");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -149,11 +150,6 @@ class CommandEntryMessage : public Command
 				" \n"
 				"Controls what messages will be sent to users when they join the channel."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ENTRYMSG   Manage the channel's entrymsgs"));
 	}
 };
 

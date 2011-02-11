@@ -18,6 +18,7 @@ class CommandOSMode : public Command
  public:
 	CommandOSMode() : Command("MODE", 2, 2, "operserv/mode")
 	{
+		this->SetDesc("Change a channel's modes");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -54,11 +55,6 @@ class CommandOSMode : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODE", _("MODE \037channel\037 \037modes\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODE        Change a channel's modes"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandHSDelAll : public Command
  public:
 	CommandHSDelAll() : Command("DELALL", 1, 1, "hostserv/del")
 	{
+		this->SetDesc("Delete the vhost for all nicks in a group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -59,11 +60,6 @@ class CommandHSDelAll : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DELALL", _("DELALL <nick>\002."));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DELALL      Delete the vhost for all nicks in a group"));
 	}
 };
 

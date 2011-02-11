@@ -90,6 +90,7 @@ class CommandCSOp : public CommandModeBase
  public:
 	CommandCSOp() : CommandModeBase("OP")
 	{
+		this->SetDesc("Gives Op status to a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -116,11 +117,6 @@ class CommandCSOp : public CommandModeBase
 	{
 		SyntaxError(source, "OP", _("OP [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OP         Gives Op status to a selected nick on a channel"));
-	}
 };
 
 class CommandCSDeOp : public CommandModeBase
@@ -128,6 +124,7 @@ class CommandCSDeOp : public CommandModeBase
  public:
 	CommandCSDeOp() : CommandModeBase("DEOP")
 	{
+		this->SetDesc("Deops a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -154,11 +151,6 @@ class CommandCSDeOp : public CommandModeBase
 	{
 		SyntaxError(source, "DEOP", _("DEOP [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEOP       Deops a selected nick on a channel"));
-	}
 };
 
 class CommandCSVoice : public CommandModeBase
@@ -166,6 +158,7 @@ class CommandCSVoice : public CommandModeBase
  public:
 	CommandCSVoice() : CommandModeBase("VOICE")
 	{
+		this->SetDesc("Voices a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -193,11 +186,6 @@ class CommandCSVoice : public CommandModeBase
 	{
 		SyntaxError(source, "VOICE", _("VOICE [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    VOICE      Voices a selected nick on a channel"));
-	}
 };
 
 class CommandCSDeVoice : public CommandModeBase
@@ -205,6 +193,7 @@ class CommandCSDeVoice : public CommandModeBase
  public:
 	CommandCSDeVoice() : CommandModeBase("DEVOICE")
 	{
+		this->SetDesc("Devoices a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -232,11 +221,6 @@ class CommandCSDeVoice : public CommandModeBase
 	{
 		SyntaxError(source, "DEVOICE", _("DEVOICE [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEVOICE    Devoices a selected nick on a channel"));
-	}
 };
 
 class CommandCSHalfOp : public CommandModeBase
@@ -244,6 +228,7 @@ class CommandCSHalfOp : public CommandModeBase
  public:
 	CommandCSHalfOp() : CommandModeBase("HALFOP")
 	{
+		this->SetDesc("Halfops a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -273,11 +258,6 @@ class CommandCSHalfOp : public CommandModeBase
 	{
 		SyntaxError(source, "HALFOP", _("HALFOP [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    HALFOP     Halfops a selected nick on a channel"));
-	}
 };
 
 class CommandCSDeHalfOp : public CommandModeBase
@@ -285,6 +265,7 @@ class CommandCSDeHalfOp : public CommandModeBase
  public:
 	CommandCSDeHalfOp() : CommandModeBase("DEHALFOP")
 	{
+		this->SetDesc("Dehalfops a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -315,11 +296,6 @@ class CommandCSDeHalfOp : public CommandModeBase
 	{
 		SyntaxError(source, "DEHALFOP", _("DEHALFOP [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEHALFOP   Dehalfops a selected nick on a channel"));
-	}
 };
 
 class CommandCSProtect : public CommandModeBase
@@ -327,6 +303,7 @@ class CommandCSProtect : public CommandModeBase
  public:
 	CommandCSProtect() : CommandModeBase("PROTECT")
 	{
+		this->SetDesc("Protects a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -356,11 +333,6 @@ class CommandCSProtect : public CommandModeBase
 	{
 		SyntaxError(source, "PROTECT", _("PROTECT [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PROTECT    Protects a selected nick on a channel"));
-	}
 };
 
 class CommandCSDeProtect : public CommandModeBase
@@ -368,6 +340,7 @@ class CommandCSDeProtect : public CommandModeBase
  public:
 	CommandCSDeProtect() : CommandModeBase("DEPROTECT")
 	{
+		this->SetDesc("Deprotects a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -396,11 +369,6 @@ class CommandCSDeProtect : public CommandModeBase
 	{
 		SyntaxError(source, "DEPROTECT", _("DEROTECT [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEPROTECT  Deprotects a selected nick on a channel"));
-	}
 };
 
 class CommandCSOwner : public CommandModeBase
@@ -408,6 +376,7 @@ class CommandCSOwner : public CommandModeBase
  public:
 	CommandCSOwner() : CommandModeBase("OWNER")
 	{
+		this->SetDesc("Gives you owner status on channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -436,11 +405,6 @@ class CommandCSOwner : public CommandModeBase
 	{
 		SyntaxError(source, "OWNER", _("OWNER [\037#channel\037] [\037nick\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OWNER      Gives you owner status on channel"));
-	}
 };
 
 class CommandCSDeOwner : public CommandModeBase
@@ -448,6 +412,7 @@ class CommandCSDeOwner : public CommandModeBase
  public:
 	CommandCSDeOwner() : CommandModeBase("DEOWNER")
 	{
+		this->SetDesc("Removes your owner status on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -475,11 +440,6 @@ class CommandCSDeOwner : public CommandModeBase
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DEOWNER", _("DEOWNER [\037#channel\037] [\037nick\037]\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEOWNER    Removes your owner status on a channel"));
 	}
 };
 

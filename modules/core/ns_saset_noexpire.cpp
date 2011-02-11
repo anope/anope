@@ -18,6 +18,7 @@ class CommandNSSASetNoexpire : public Command
  public:
 	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 2, "nickserv/saset/noexpire")
 	{
+		this->SetDesc("Prevent the nickname from expiring");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -56,11 +57,6 @@ class CommandNSSASetNoexpire : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET NOEXPIRE", _("SASET \037nickname\037 NOEXPIRE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    NOEXPIRE   Prevent the nickname from expiring"));
 	}
 };
 

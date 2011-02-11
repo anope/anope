@@ -18,6 +18,7 @@ class CommandCSSetSecure : public Command
  public:
 	CommandCSSetSecure(const Anope::string &cpermission = "") : Command("SECURE", 2, 2, cpermission)
 	{
+		this->SetDesc("Activate " + ChanServ->nick + "'s security features");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -57,11 +58,6 @@ class CommandCSSetSecure : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET SECURE", _("SET \037channel\037 SECURE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SECURE        Activate %s security features"), ChanServ->nick.c_str());
 	}
 };
 

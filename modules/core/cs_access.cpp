@@ -393,6 +393,7 @@ class CommandCSAccess : public Command
  public:
 	CommandCSAccess() : Command("ACCESS", 2, 4)
 	{
+		this->SetDesc("Modify the list of privileged users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -668,6 +669,7 @@ class CommandCSLevels : public Command
  public:
 	CommandCSLevels() : Command("LEVELS", 2, 4)
 	{
+		this->SetDesc("Redefine the meanings of access levels");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -751,12 +753,6 @@ class CommandCSLevels : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "LEVELS", _("LEVELS \037channel\037 {SET | DIS[ABLE] | LIST | RESET} [\037item\037 [\037level\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ACCESS     Modify the list of privileged users"));
-		source.Reply(_("    LEVELS     Redefine the meanings of access levels"));
 	}
 };
 

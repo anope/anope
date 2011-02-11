@@ -18,6 +18,7 @@ class CommandCSClearUsers : public Command
  public:
 	CommandCSClearUsers() : Command("CLEARUSERS", 1, 1)
 	{
+		this->SetDesc("Tells ChanServ to clear (kick) all users on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -63,11 +64,6 @@ class CommandCSClearUsers : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "CLEAR", _("CLEARUSERS \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    CLEARUSERS Tells ChanServ to clear (kick) all users on a channel"));
 	}
 };
 

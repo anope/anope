@@ -18,6 +18,7 @@ class CommandOSSVSNick : public Command
  public:
 	CommandOSSVSNick() : Command("SVSNICK", 2, 2, "operserv/svsnick")
 	{
+		this->SetDesc("Forcefully change a user's nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -76,11 +77,6 @@ class CommandOSSVSNick : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SVSNICK", _("SVSNICK \037nick\037 \037newnick\037 "));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SVSNICK     Forcefully change a user's nickname"));
 	}
 };
 

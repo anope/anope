@@ -18,6 +18,7 @@ class CommandNSForbid : public Command
  public:
 	CommandNSForbid() : Command("FORBID", 1, 2, "nickserv/forbid")
 	{
+		this->SetDesc("Prevents a nickname from being registered");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -98,11 +99,6 @@ class CommandNSForbid : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "FORBID", Config->ForceForbidReason ? _("FORBID \037nickname\037 \037reason\037") : _("FORBID \037nickname\037 [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    FORBID     Prevents a nickname from being registered"));
 	}
 };
 

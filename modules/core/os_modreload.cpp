@@ -18,6 +18,7 @@ class CommandOSModReLoad : public Command
  public:
 	CommandOSModReLoad() : Command("MODRELOAD", 1, 1, "operserv/modload")
 	{
+		this->SetDesc("Reload a module");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -89,11 +90,6 @@ class CommandOSModReLoad : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODLOAD", _("MODRELOAD \037FileName\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODRELOAD   Reload a module"));
 	}
 };
 

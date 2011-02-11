@@ -18,6 +18,7 @@ class CommandNSSetGreet : public Command
  public:
 	CommandNSSetGreet(const Anope::string &spermission = "") : Command("GREET", 1, 2, spermission)
 	{
+		this->SetDesc("Associate a greet message with your nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -53,11 +54,6 @@ class CommandNSSetGreet : public Command
 				"access on it."));
 		return true;
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GREET      Associate a greet message with your nickname"));
-	}
 };
 
 class CommandNSSASetGreet : public CommandNSSetGreet
@@ -76,11 +72,6 @@ class CommandNSSASetGreet : public CommandNSSetGreet
 				"option enabled, provided that the user has the necessary \n"
 				"access on it."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GREET      Associate a greet message with the nickname"));
 	}
 };
 

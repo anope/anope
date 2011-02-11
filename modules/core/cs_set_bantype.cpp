@@ -18,6 +18,7 @@ class CommandCSSetBanType : public Command
  public:
 	CommandCSSetBanType(const Anope::string &cpermission = "") : Command("BANTYPE", 2, 2, cpermission)
 	{
+		this->SetDesc("Set how Services make bans on the channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -59,11 +60,6 @@ class CommandCSSetBanType : public Command
 	{
 		// XXX
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    BANTYPE       Set how Services make bans on the channel"));
 	}
 };
 

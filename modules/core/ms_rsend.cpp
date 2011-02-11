@@ -18,6 +18,7 @@ class CommandMSRSend : public Command
  public:
 	CommandMSRSend() : Command("RSEND", 2, 2)
 	{
+		this->SetDesc("Sends a memo and requests a read receipt");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -73,11 +74,6 @@ class CommandMSRSend : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "RSEND", _("RSEND {\037nick\037 | \037channel\037} \037memo-text\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RSEND  Sends a memo and requests a read receipt"));
 	}
 };
 

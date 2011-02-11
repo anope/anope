@@ -43,6 +43,7 @@ class CommandBSInfo : public Command
 	CommandBSInfo() : Command("INFO", 1, 1)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
+		this->SetDesc("Allows you to see BotServ information about a channel or a bot");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -233,11 +234,6 @@ class CommandBSInfo : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "INFO", _("INFO {\037chan\037 | \037nick\037}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    INFO           Allows you to see BotServ information about a channel or a bot"));
 	}
 };
 

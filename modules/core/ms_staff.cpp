@@ -18,6 +18,7 @@ class CommandMSStaff : public Command
  public:
 	CommandMSStaff() : Command("STAFF", 1, 1, "memoserv/staff")
 	{
+		this->SetDesc("Send a memo to all opers/admins");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -53,11 +54,6 @@ class CommandMSStaff : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "STAFF", _("STAFF \037memo-text\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    STAFF  Send a memo to all opers/admins"));
 	}
 };
 

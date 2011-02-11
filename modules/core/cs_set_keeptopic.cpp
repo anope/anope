@@ -18,6 +18,7 @@ class CommandCSSetKeepTopic : public Command
  public:
 	CommandCSSetKeepTopic(const Anope::string &cpermission = "") : Command("KEEPTOPIC", 2, 2, cpermission)
 	{
+		this->SetDesc("Retain topic when channel is not in use");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -57,11 +58,6 @@ class CommandCSSetKeepTopic : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET KEEPTOPIC", _("SET \037channel\037 KEEPTOPIC {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    KEEPTOPIC     Retain topic when channel is not in use"));
 	}
 };
 

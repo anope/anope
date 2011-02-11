@@ -18,6 +18,7 @@ class CommandOSUMode : public Command
  public:
 	CommandOSUMode() : Command("UMODE", 2, 2, "operserv/umode")
 	{
+		this->SetDesc("Change a user's modes");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -65,11 +66,6 @@ class CommandOSUMode : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "UMODE", _("UMODE \037nick\037 \037modes\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UMODE       Change a user's modes"));
 	}
 };
 

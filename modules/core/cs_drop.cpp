@@ -20,6 +20,7 @@ class CommandCSDrop : public Command
 	{
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
+		this->SetDesc("Cancel the registration of a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -98,11 +99,6 @@ class CommandCSDrop : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DROP", _("DROP \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DROP       Cancel the registration of a channel"));
 	}
 };
 

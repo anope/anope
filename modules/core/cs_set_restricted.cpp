@@ -17,6 +17,7 @@ class CommandCSSetRestricted : public Command
  public:
 	CommandCSSetRestricted(const Anope::string &cpermission = "") : Command("RESTRICTED", 2, 2, cpermission)
 	{
+		this->SetDesc("Restrict access to the channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -58,11 +59,6 @@ class CommandCSSetRestricted : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET RESTRICTED", _("SET \037channel\037 RESTRICTED {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RESTRICTED    Restrict access to the channel"));
 	}
 };
 

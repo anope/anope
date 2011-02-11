@@ -43,6 +43,7 @@ class CommandMSDel : public Command
  public:
 	CommandMSDel() : Command("DEL", 0, 2)
 	{
+		this->SetDesc("Delete a memo or memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -146,11 +147,6 @@ class CommandMSDel : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DEL", _("DEL [\037channel\037] {\037num\037 | \037list\037 | ALL}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEL    Delete a memo or memos"));
 	}
 };
 

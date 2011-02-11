@@ -18,6 +18,7 @@ class CommandOSModLoad : public Command
  public:
 	CommandOSModLoad() : Command("MODLOAD", 1, 1, "operserv/modload")
 	{
+		this->SetDesc("Load a module");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -63,11 +64,6 @@ class CommandOSModLoad : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODLOAD", _("MODLOAD \037FileName\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODLOAD     Load a module"));
 	}
 };
 

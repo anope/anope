@@ -73,6 +73,7 @@ class CommandNSAJoin : public Command
  public:
 	CommandNSAJoin() : Command("AJOIN", 1, 3)
 	{
+		this->SetDesc("Manage your auto join list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -103,11 +104,6 @@ class CommandNSAJoin : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "AJOIN", _("AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AJOIN      Manage your auto join list"));
 	}
 };
 

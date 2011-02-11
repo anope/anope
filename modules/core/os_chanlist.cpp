@@ -18,6 +18,7 @@ class CommandOSChanList : public Command
  public:
 	CommandOSChanList() : Command("CHANLIST", 0, 2)
 	{
+		this->SetDesc("Lists all channel records");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -85,11 +86,6 @@ class CommandOSChanList : public Command
 				"specified, lists only channels matching \002pattern\002 that have the +s or\n"
 				"+p mode."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    CHANLIST    Lists all channel records"));
 	}
 };
 

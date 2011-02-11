@@ -18,6 +18,7 @@ class CommandBSAct : public Command
  public:
 	CommandBSAct() : Command("ACT", 2, 2)
 	{
+		this->SetDesc("Makes the bot do the equivalent of a \"/me\" command");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -69,11 +70,6 @@ class CommandBSAct : public Command
 				"Makes the bot do the equivalent of a \"/me\" command\n"
 				"on the given channel using the given text."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ACT            Makes the bot do the equivalent of a \"/me\" command"));
 	}
 };
 

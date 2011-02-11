@@ -32,6 +32,7 @@ class CommandCSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
+		this->SetDesc("Lists information about the named registered channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -128,11 +129,6 @@ class CommandCSInfo : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "INFO", _("INFO \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    INFO       Lists information about the named registered channel"));
 	}
 };
 

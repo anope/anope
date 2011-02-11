@@ -16,10 +16,11 @@
 
 class CommandCSList : public Command
 {
-public:
+ public:
 	CommandCSList() : Command("LIST", 1, 2)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
+		this->SetDesc("Lists all registered channels matching the given pattern");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -133,11 +134,6 @@ public:
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LIST       Lists all registered channels matching the given pattern"));
 	}
 };
 

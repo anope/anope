@@ -227,6 +227,7 @@ class CommandBSBadwords : public Command
  public:
 	CommandBSBadwords() : Command("BADWORDS", 2, 3)
 	{
+		this->SetDesc("Maintains bad words list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -310,11 +311,6 @@ class CommandBSBadwords : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "BADWORDS", _("BADWORDS \037channel\037 {ADD|DEL|LIST|CLEAR} [\037word\037 | \037entry-list\037] [SINGLE|START|END]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    BADWORDS       Maintains bad words list"));
 	}
 };
 

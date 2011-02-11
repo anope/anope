@@ -95,14 +95,7 @@ const char *anope_gettext(const char *string)
 	setlocale(LC_ALL, "");
 #endif
 
-	Anope::string translated = translated_string ? translated_string : "";
-
-	if (Config->UseStrictPrivMsg)
-		translated = translated.replace_all_cs("%R", "/");
-	else
-		translated = translated.replace_all_cs("%R", "/msg ");
-	
-	return translated.c_str();
+	return translated_string != NULL ? translated_string : "";
 }
 #else
 void PushLanguage(const Anope::string &, Anope::string)
@@ -115,12 +108,7 @@ void PopLanguage()
 
 const char *anope_gettext(const char *string)
 {
-	Anope::string translated = string ? string : "";
-	if (Config->UseStrictPrivMsg)
-		translated = translated.replace_all_cs("%R", "/");
-	else
-		translated = translated.replace_all_cs("%R", "/msg ");
-	return translated.c_str();
+	return string != NULL ? string : "";
 }
 #endif
 

@@ -18,6 +18,7 @@ class CommandCSSetSuccessor : public Command
  public:
 	CommandCSSetSuccessor(const Anope::string &cpermission = "") : Command("SUCCESSOR", 1, 2, cpermission)
 	{
+		this->SetDesc("Set the successor for a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -89,11 +90,6 @@ class CommandCSSetSuccessor : public Command
 	{
 		// XXX
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SUCCESSOR     Set the successor for a channel"));
 	}
 };
 

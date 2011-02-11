@@ -22,6 +22,7 @@ class CommandNSGetEMail : public Command
  public:
 	CommandNSGetEMail() : Command("GETEMAIL", 1, 1, "nickserv/getemail")
 	{
+		this->SetDesc("Matches and returns all users that registered using given email");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -65,11 +66,6 @@ class CommandNSGetEMail : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "GETMAIL", _("GETEMAIL \002user@email-host\002 No WildCards!!"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GETEMAIL   Matches and returns all users that registered using given email"));
 	}
 };
 

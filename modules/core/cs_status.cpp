@@ -18,6 +18,7 @@ class CommandCSStatus : public Command
  public:
 	CommandCSStatus() : Command("STATUS", 2, 2, "chanserv/status")
 	{
+		this->SetDesc("Returns the current access level of a user on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -52,11 +53,6 @@ class CommandCSStatus : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "STATUS", _("STATUS \037channel\037 \037item\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    STATUS     Returns the current access level of a user               on a channel"));
 	}
 };
 

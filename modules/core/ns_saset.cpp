@@ -21,6 +21,7 @@ class CommandNSSASet : public Command
  public:
 	CommandNSSASet() : Command("SASET", 2, 4)
 	{
+		this->SetDesc("Set SET-options on another nickname");
 	}
 
 	~CommandNSSASet()
@@ -100,11 +101,6 @@ class CommandNSSASet : public Command
 		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
 	}
 
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SASET      Set SET-options on another nickname"));
-	}
-
 	bool AddSubcommand(Module *creator, Command *c)
 	{
 		c->module = creator;
@@ -133,6 +129,7 @@ class CommandNSSASetDisplay : public Command
  public:
 	CommandNSSASetDisplay() : Command("DISPLAY", 2, 2, "nickserv/saset/display")
 	{
+		this->SetDesc("Set the display of the group in Services");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -168,11 +165,6 @@ class CommandNSSASetDisplay : public Command
 		// XXX
 		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DISPLAY    Set the display of the group in Services"));
-	}
 };
 
 class CommandNSSASetPassword : public Command
@@ -180,6 +172,7 @@ class CommandNSSASetPassword : public Command
  public:
 	CommandNSSASetPassword() : Command("PASSWORD", 2, 2, "nickserv/saset/password")
 	{
+		this->SetDesc("Set the nickname password");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -238,11 +231,6 @@ class CommandNSSASetPassword : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PASSWORD   Set the nickname password"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandOSGlobal : public Command
  public:
 	CommandOSGlobal() : Command("GLOBAL", 1, 1, "operserv/global")
 	{
+		this->SetDesc("Send a message to all users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -43,11 +44,6 @@ class CommandOSGlobal : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "GLOBAL", _("GLOBAL \037message\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GLOBAL      Send a message to all users"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandOSReload : public Command
  public:
 	CommandOSReload() : Command("RELOAD", 0, 0, "operserv/reload")
 	{
+		this->SetDesc("Reload services' configuration file");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -46,11 +47,6 @@ class CommandOSReload : public Command
 				"take effect (such as Services' nicknames, activation of the \n"
 				"session limitation, etc.)"));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RELOAD      Reload services' configuration file"));
 	}
 };
 

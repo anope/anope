@@ -18,6 +18,7 @@ class CommandOSKick : public Command
  public:
 	CommandOSKick() : Command("KICK", 3, 3, "operserv/kick")
 	{
+		this->SetDesc("Kick a user from a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -67,11 +68,6 @@ class CommandOSKick : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "KICK", _("KICK \037channel\037 \037user\037 \037reason\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    KICK        Kick a user from a channel"));
 	}
 };
 

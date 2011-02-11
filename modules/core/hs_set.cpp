@@ -18,6 +18,7 @@ class CommandHSSet : public Command
  public:
 	CommandHSSet() : Command("SET", 2, 2, "hostserv/set")
 	{
+		this->SetDesc("Set the vhost of another user");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -108,11 +109,6 @@ class CommandHSSet : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SET", _("SET \002<nick>\002 \002<hostmask>\002."));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SET         Set the vhost of another user"));
 	}
 };
 

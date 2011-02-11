@@ -55,6 +55,7 @@ class CommandMSList : public Command
  public:
 	CommandMSList() : Command("LIST", 0, 2)
 	{
+		this->SetDesc("List your memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -158,11 +159,6 @@ class CommandMSList : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "LIST", _("LIST [\037channel\037] [\037list\037 | NEW]"));
-	}
-
-	void OnServCommand(CommandSource &source)
-	{
-		source.Reply(_("    LIST   List your memos"));
 	}
 };
 

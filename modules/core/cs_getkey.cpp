@@ -18,6 +18,7 @@ class CommandCSGetKey : public Command
  public:
 	CommandCSGetKey() : Command("GETKEY", 1, 1)
 	{
+		this->SetDesc("Returns the key of the given channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -58,11 +59,6 @@ class CommandCSGetKey : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "GETKEY", _("GETKEY \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GETKEY     Returns the key of the given channel"));
 	}
 };
 

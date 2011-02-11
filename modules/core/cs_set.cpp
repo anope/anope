@@ -21,6 +21,7 @@ class CommandCSSet : public Command
  public:
 	CommandCSSet() : Command("SET", 2, 3)
 	{
+		this->SetDesc("Set channel options and information");
 	}
 
 	~CommandCSSet()
@@ -99,11 +100,6 @@ class CommandCSSet : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SET        Set channel options and information"));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

@@ -396,8 +396,6 @@ class XOPBase : public Command
 	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
 
 	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) = 0;
-
-	virtual void OnServHelp(CommandSource &source) = 0;
 };
 
 class CommandCSQOP : public XOPBase
@@ -405,6 +403,7 @@ class CommandCSQOP : public XOPBase
  public:
 	CommandCSQOP() : XOPBase("QOP")
 	{
+		this->SetDesc("Modify the list of QOP users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -458,11 +457,6 @@ class CommandCSQOP : public XOPBase
 	{
 		SyntaxError(source, "QOP", _("QOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    QOP        Modify the list of QOP users"));
-	}
 };
 
 class CommandCSAOP : public XOPBase
@@ -470,6 +464,7 @@ class CommandCSAOP : public XOPBase
  public:
 	CommandCSAOP() : XOPBase("AOP")
 	{
+		this->SetDesc("Modify the list of AOP users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -517,18 +512,12 @@ class CommandCSAOP : public XOPBase
 				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
-	/* CHAN_HELP_HOP */
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "AOP", _("AOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AOP        Modify the list of AOP users"));
 	}
 };
 
@@ -537,6 +526,7 @@ class CommandCSHOP : public XOPBase
  public:
 	CommandCSHOP() : XOPBase("HOP")
 	{
+		this->SetDesc("Maintains the HOP (HalfOP) list for a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -589,11 +579,6 @@ class CommandCSHOP : public XOPBase
 	{
 		SyntaxError(source, "HOP", _("HOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    HOP        Maintains the HOP (HalfOP) list for a channel"));
-	}
 };
 
 class CommandCSSOP : public XOPBase
@@ -601,6 +586,7 @@ class CommandCSSOP : public XOPBase
  public:
 	CommandCSSOP() : XOPBase("SOP")
 	{
+		this->SetDesc("Modify the list of SOP users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -654,11 +640,6 @@ class CommandCSSOP : public XOPBase
 	{
 		SyntaxError(source, "SOP", _("SOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SOP        Modify the list of SOP users"));
-	}
 };
 
 class CommandCSVOP : public XOPBase
@@ -666,6 +647,7 @@ class CommandCSVOP : public XOPBase
  public:
 	CommandCSVOP() : XOPBase("VOP")
 	{
+		this->SetDesc("Maintains the VOP (VOicePeople) list for a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -717,11 +699,6 @@ class CommandCSVOP : public XOPBase
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "VOP", _("VOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    VOP        Maintains the VOP (VOicePeople) list for a channel"));
 	}
 };
 

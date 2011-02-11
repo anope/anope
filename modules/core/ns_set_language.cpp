@@ -18,6 +18,7 @@ class CommandNSSetLanguage : public Command
  public:
 	CommandNSSetLanguage(const Anope::string &spermission = "") : Command("LANGUAGE", 2, 2, spermission)
 	{
+		this->SetDesc("Set the language Services will use when messaging you");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -75,13 +76,6 @@ class CommandNSSetLanguage : public Command
 	{
 		SyntaxError(source, "SET LANGUAGE", _("SET LANGUAGE \037language\037"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LANGUAGE   Set the language Services will use when\n"
-				"                   sending messages to you"));
-
-	}
 };
 
 class CommandNSSASetLanguage : public CommandNSSetLanguage
@@ -105,16 +99,6 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET LANGUAGE", _("SASET \037nickname\037 LANGUAGE \037number\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 LANGUAGE \037language\037\002\n"
-				" \n"
-				"Changes the language Services uses when sending messages to\n"
-				"\037nickname\037 (for example, when responding to a command he sends).\n"
-				"\037language\037 should be chosen from a list of supported languages\n"
-				"that you can get by typing \002%R%s HELP SET LANGUAGE\002."), NickServ->nick.c_str());
 	}
 };
 

@@ -304,6 +304,7 @@ class CommandBSBot : public Command
 	CommandBSBot() : Command("BOT", 1, 6)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
+		this->SetDesc("Maintains network bot list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -409,11 +410,6 @@ class CommandBSBot : public Command
 		SyntaxError(source, "BOT", _("BOT ADD \037nick\037 \037user\037 \037host\037 \037real\037\n"
 			"\002BOT CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002\n"
 			"\002BOT DEL \037nick\037\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    BOT            Maintains network bot list"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandOSOLine : public Command
  public:
 	CommandOSOLine() : Command("OLINE", 2, 2, "operserv/oline")
 	{
+		this->SetDesc("Give Operflags to a certain user");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -63,11 +64,6 @@ class CommandOSOLine : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "OLINE", _("OLINE \037nick\037 \037flags\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OLINE       Give Operflags to a certain user"));
 	}
 };
 

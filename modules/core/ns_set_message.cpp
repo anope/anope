@@ -18,6 +18,7 @@ class CommandNSSetMessage : public Command
  public:
 	CommandNSSetMessage(const Anope::string &spermission = "") : Command("MSG", 2, 2, spermission)
 	{
+		this->SetDesc("Change the communication method of Services");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -65,11 +66,6 @@ class CommandNSSetMessage : public Command
 	{
 		SyntaxError(source, "SET MSG", _("SET MSG {ON | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MSG        Change the communication method of Services"));
-	}
 };
 
 class CommandNSSASetMessage : public CommandNSSetMessage
@@ -92,11 +88,6 @@ class CommandNSSASetMessage : public CommandNSSetMessage
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET MSG", _("SASAET \037nickname\037 PRIVATE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MSG        Change the communication method of Services"));
 	}
 };
 

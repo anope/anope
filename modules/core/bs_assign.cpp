@@ -18,6 +18,7 @@ class CommandBSAssign : public Command
  public:
 	CommandBSAssign() : Command("ASSIGN", 2, 2)
 	{
+		this->SetDesc("Assigns a bot to a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -79,11 +80,6 @@ class CommandBSAssign : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "ASSIGN", _("ASSIGN \037chan\037 \037nick\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ASSIGN         Assigns a bot to a channel"));
 	}
 };
 

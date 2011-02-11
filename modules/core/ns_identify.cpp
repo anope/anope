@@ -19,6 +19,7 @@ class CommandNSIdentify : public Command
 	CommandNSIdentify() : Command("IDENTIFY", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Identify yourself with your password");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -117,11 +118,6 @@ class CommandNSIdentify : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "IDENTIFY", _("IDENTIFY [account] \037password\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    IDENTIFY   Identify yourself with your password"));
 	}
 };
 

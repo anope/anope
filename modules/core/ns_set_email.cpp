@@ -18,6 +18,7 @@ class CommandNSSetEmail : public Command
  public:
 	CommandNSSetEmail(const Anope::string &spermission = "") : Command("EMAIL", 1, 2, spermission)
 	{
+		this->SetDesc("Associate an E-mail address with your nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -69,11 +70,6 @@ class CommandNSSetEmail : public Command
 				"information on the nickname with the \002INFO\002 command."));
 		return true;
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    EMAIL      Associate an E-mail address with your nickname"));
-	}
 };
 
 class CommandNSSASetEmail : public CommandNSSetEmail
@@ -89,11 +85,6 @@ class CommandNSSASetEmail : public CommandNSSetEmail
 				" \n"
 				"Associates the given E-mail address with the nickname."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    EMAIL      Associate an E-mail address with the nickname"));
 	}
 };
 

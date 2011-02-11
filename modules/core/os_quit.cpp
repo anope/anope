@@ -19,6 +19,7 @@ class CommandOSQuit : public Command
  public:
 	CommandOSQuit() : Command("QUIT", 0, 0, "operserv/quit")
 	{
+		this->SetDesc("Terminate the Services program with no save");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -42,11 +43,6 @@ class CommandOSQuit : public Command
 				"and they should not be saved.  For normal shutdowns, use the\n"
 				"\002SHUTDOWN\002 command."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    QUIT        Terminate the Services program with no save"));
 	}
 };
 

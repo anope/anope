@@ -18,6 +18,7 @@ class CommandNSSetAutoOp : public Command
  public:
 	CommandNSSetAutoOp(const Anope::string &spermission = "") : Command("AUTOOP", 1, 2, spermission)
 	{
+		this->SetDesc("Should services op you automatically.");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -58,11 +59,6 @@ class CommandNSSetAutoOp : public Command
 	{
 		SyntaxError(source, "SET AUTOOP", _("SET AUTOOP {ON | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AUTOOP     Should services op you automatically.    "));
-	}
 };
 
 class CommandNSSASetAutoOp : public CommandNSSetAutoOp
@@ -85,11 +81,6 @@ class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET AUTOOP", _("SASET \037nickname\037 AUTOOP {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AUTOOP     Turn autoop on or off"));
 	}
 };
 

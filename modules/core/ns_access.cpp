@@ -117,6 +117,7 @@ class CommandNSAccess : public Command
  public:
 	CommandNSAccess() : Command("ACCESS", 1, 3)
 	{
+		this->SetDesc("Modify the list of authorized addresses");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -178,11 +179,6 @@ class CommandNSAccess : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "ACCESS", _("ACCESS {ADD | DEL | LIST} [\037mask\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ACCESS     Modify the list of authorized addresses"));
 	}
 };
 

@@ -51,6 +51,7 @@ class CommandMSRead : public Command
  public:
 	CommandMSRead() : Command("READ", 1, 2)
 	{
+		this->SetDesc("Read a memo or memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -143,11 +144,6 @@ class CommandMSRead : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "READ", _("READ [\037channel\037] {\037list\037 | LAST | NEW}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    READ   Read a memo or memos"));
 	}
 };
 

@@ -18,6 +18,7 @@ class CommandOSStaff : public Command
  public:
 	CommandOSStaff() : Command("STAFF", 0, 0, "operserv/staff")
 	{
+		this->SetDesc("Display Services staff and online status");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -56,11 +57,6 @@ class CommandOSStaff : public Command
 				"Displays all Services Staff nicks along with level\n"
 				"and on-line status."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    STAFF       Display Services staff and online status"));
 	}
 };
 

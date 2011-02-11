@@ -21,6 +21,7 @@ class CommandNSResetPass : public Command
 	CommandNSResetPass() : Command("RESETPASS", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Helps you reset lost passwords");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -57,11 +58,6 @@ class CommandNSResetPass : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "RESETPASS", _("RESETPASS \037nickname\037\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RESETPASS  Helps you reset lost passwords"));
 	}
 };
 

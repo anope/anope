@@ -18,6 +18,7 @@ class CommandNSSetSecure : public Command
  public:
 	CommandNSSetSecure(const Anope::string &cpermission = "") : Command("SECURE", 2, 2, cpermission)
 	{
+		this->SetDesc("Turn nickname security on or off");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -63,11 +64,6 @@ class CommandNSSetSecure : public Command
 	{
 		SyntaxError(source, "SET SECURE", _("SET SECURE {ON | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SECURE     Turn nickname security on or off"));
-	}
 };
 
 class CommandNSSASetSecure : public CommandNSSetSecure
@@ -94,11 +90,6 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET SECURE", _("SASET \037nickname\037 SECURE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SECURE     Turn nickname security on or off"));
 	}
 };
 

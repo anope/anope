@@ -21,6 +21,7 @@ class CommandNSSendPass : public Command
 	CommandNSSendPass() : Command("SENDPASS", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Forgot your password? Try this");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -68,11 +69,6 @@ class CommandNSSendPass : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SENDPASS", _("SENDPASS \037nickname\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SENDPASS   Forgot your password? Try this"));
 	}
 };
 

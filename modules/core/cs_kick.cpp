@@ -18,6 +18,7 @@ class CommandCSKick : public Command
  public:
 	CommandCSKick() : Command("KICK", 2, 3)
 	{
+		this->SetDesc("Kicks a selected nick from a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -74,11 +75,6 @@ class CommandCSKick : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "KICK", _("KICK \037#channel\037 \037nick\037 [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    KICK       Kicks a selected nick from a channel"));
 	}
 };
 

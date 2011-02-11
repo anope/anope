@@ -19,6 +19,7 @@ class CommandCSSetXOP : public Command
  public:
 	CommandCSSetXOP(const Anope::string &cpermission = "") : Command("XOP", 2, 2, cpermission)
 	{
+		this->SetDesc("Toggle the user privilege system");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -110,11 +111,6 @@ class CommandCSSetXOP : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET XOP", _("SET \037channel\037 XOP {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    XOP           Toggle the user privilege system"));
 	}
 };
 

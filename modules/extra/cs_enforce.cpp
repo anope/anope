@@ -123,6 +123,7 @@ class CommandCSEnforce : public Command
  public:
 	CommandCSEnforce() : Command("ENFORCE", 1, 2)
 	{
+		this->SetDesc("Enforce various channel modes and set options");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -206,11 +207,6 @@ class CommandCSEnforce : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		me->SendMessage(source, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		me->SendMessage(source, _("    ENFORCE    Enforce various channel modes and set options"));
 	}
 };
 

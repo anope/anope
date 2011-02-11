@@ -294,6 +294,7 @@ class CommandOSLogonNews : public NewsBase
  public:
 	CommandOSLogonNews() : NewsBase("LOGONNEWS")
 	{
+		this->SetDesc("Define messages to be shown to users at logon");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -322,11 +323,6 @@ class CommandOSLogonNews : public NewsBase
 	{
 		SyntaxError(source, "LOGONNEWS", _("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LOGONNEWS   Define messages to be shown to users at logon"));
-	}
 };
 
 class CommandOSOperNews : public NewsBase
@@ -334,6 +330,7 @@ class CommandOSOperNews : public NewsBase
  public:
 	CommandOSOperNews() : NewsBase("OPERNEWS")
 	{
+		this->SetDesc("Define messages to be shown to users who oper");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -362,11 +359,6 @@ class CommandOSOperNews : public NewsBase
 	{
 		SyntaxError(source, "OPERNEWS", _("OPERNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OPERNEWS    Define messages to be shown to users who oper"));
-	}
 };
 
 class CommandOSRandomNews : public NewsBase
@@ -374,6 +366,7 @@ class CommandOSRandomNews : public NewsBase
  public:
 	CommandOSRandomNews() : NewsBase("RANDOMNEWS")
 	{
+		this->SetDesc("Define messages to be randomly shown to users at logon");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -398,12 +391,6 @@ class CommandOSRandomNews : public NewsBase
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "RANDOMNEWS", _("RANDOMNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RANDOMNEWS  Define messages to be randomly shown to users \n"
-				"                at logon"));
 	}
 };
 

@@ -380,6 +380,7 @@ class CommandOSAKill : public Command
  public:
 	CommandOSAKill() : Command("AKILL", 1, 4, "operserv/akill")
 	{
+		this->SetDesc("Manipulate the AKILL list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -452,11 +453,6 @@ class CommandOSAKill : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "AKILL", _("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AKILL       Manipulate the AKILL list"));
 	}
 };
 

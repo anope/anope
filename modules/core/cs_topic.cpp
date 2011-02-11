@@ -18,6 +18,7 @@ class CommandCSTopic : public Command
  public:
 	CommandCSTopic() : Command("TOPIC", 1, 2)
 	{
+		this->SetDesc("Manipulate the topic of the specified channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -64,11 +65,6 @@ class CommandCSTopic : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "TOPIC", _("TOPIC \037channel\037 [\037topic\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    TOPIC      Manipulate the topic of the specified channel"));
 	}
 };
 

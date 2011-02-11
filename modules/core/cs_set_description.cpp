@@ -18,6 +18,7 @@ class CommandCSSetDescription : public Command
  public:
 	CommandCSSetDescription(const Anope::string &cpermission = "") : Command("DESC", 2, 2, cpermission)
 	{
+		this->SetDesc("Set the channel description");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -46,11 +47,6 @@ class CommandCSSetDescription : public Command
 	{
 		// XXX
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DESC          Set the channel description"));
 	}
 };
 

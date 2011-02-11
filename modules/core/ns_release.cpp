@@ -19,6 +19,7 @@ class CommandNSRelease : public Command
 	CommandNSRelease() : Command("RELEASE", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Regain custody of your nick after RECOVER");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -94,11 +95,6 @@ class CommandNSRelease : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "RELEASE", _("RELEASE \037nickname\037 [\037password\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RELEASE    Regain custody of your nick after RECOVER"));
 	}
 };
 

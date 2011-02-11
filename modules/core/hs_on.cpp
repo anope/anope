@@ -18,6 +18,7 @@ class CommandHSOn : public Command
  public:
 	CommandHSOn() : Command("ON", 0, 0)
 	{
+		this->SetDesc("Activates your assigned vhost");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -54,11 +55,6 @@ class CommandHSOn : public Command
 				"When you use this command any user who performs a /whois\n"
 				"on you will see the vhost instead of your real IP address."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    ON          Activates your assigned vhost"));
 	}
 };
 

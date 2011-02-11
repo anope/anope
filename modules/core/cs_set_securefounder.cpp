@@ -18,6 +18,7 @@ class CommandCSSetSecureFounder : public Command
  public:
 	CommandCSSetSecureFounder(const Anope::string &cpermission = "") : Command("SECUREFOUNDER", 2, 2, cpermission)
 	{
+		this->SetDesc("Stricter control of channel founder status");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -64,11 +65,6 @@ class CommandCSSetSecureFounder : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET SECUREFOUNDER", _("SET \037channel\037 SECUREFOUNDER {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SECUREFOUNDER Stricter control of channel founder status"));
 	}
 };
 

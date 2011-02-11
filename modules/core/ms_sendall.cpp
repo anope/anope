@@ -18,6 +18,7 @@ class CommandMSSendAll : public Command
  public:
 	CommandMSSendAll() : Command("SENDALL", 1, 1, "memoserv/sendall")
 	{
+		this->SetDesc("Send a memo to all registered users");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -55,11 +56,6 @@ class CommandMSSendAll : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SENDALL", _("SENDALL \037memo-text\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SENDALL  Send a memo to all registered users"));
 	}
 };
 

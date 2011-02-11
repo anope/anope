@@ -19,6 +19,7 @@ class CommandBSSet : public Command
 	CommandBSSet() : Command("SET", 3, 3)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
+		this->SetDesc("Configures bot options");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -294,11 +295,6 @@ class CommandBSSet : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SET", _("SET \037(channel | bot)\037 \037option\037 \037settings\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SET            Configures bot options"));
 	}
 };
 

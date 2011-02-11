@@ -18,6 +18,7 @@ class CommandOSNOOP : public Command
  public:
 	CommandOSNOOP() : Command("NOOP", 2, 2, "operserv/noop")
 	{
+		this->SetDesc("Temporarily remove all O:lines of a server remotely");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -78,12 +79,6 @@ class CommandOSNOOP : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "NOOP", _("NOOP {SET|REVOKE} \037server\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    NOOP        Temporarily remove all O:lines of a server \n"
-				"                remotely"));
 	}
 };
 

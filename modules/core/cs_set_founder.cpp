@@ -18,6 +18,7 @@ class CommandCSSetFounder : public Command
  public:
 	CommandCSSetFounder(const Anope::string &cpermission = "") : Command("FOUNDER", 2, 2, cpermission)
 	{
+		this->SetDesc("Set the founder of a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -82,11 +83,6 @@ class CommandCSSetFounder : public Command
 	{
 		// XXX
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    FOUNDER       Set the founder of a channel"));
 	}
 };
 

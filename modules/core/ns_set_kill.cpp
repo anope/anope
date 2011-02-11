@@ -18,6 +18,7 @@ class CommandNSSetKill : public Command
  public:
 	CommandNSSetKill(const Anope::string &spermission = "") : Command("KILL", 2, 3, spermission)
 	{
+		this->SetDesc("Turn protection on or off");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -92,11 +93,6 @@ class CommandNSSetKill : public Command
 	{
 		SyntaxError(source, "SET KILL", Config->NSAllowKillImmed ? _("SET KILL {ON | QUICK | IMMED | OFF}") : _("SET KILL {ON | QUICK | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    KILL       Turn protection on or off"));
-	}
 };
 
 class CommandNSSASetKill : public CommandNSSetKill
@@ -128,11 +124,6 @@ class CommandNSSASetKill : public CommandNSSetKill
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET KILL", Config->NSAllowKillImmed ? _("SASET \037nickname\037 KILL {ON | QUICK | IMMED | OFF}") : _("SASET \037nickname\037 KILL {ON | QUICK | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    KILL       Turn protection on or off"));
 	}
 };
 

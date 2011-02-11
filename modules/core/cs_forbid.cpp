@@ -19,6 +19,7 @@ class CommandCSForbid : public Command
 	CommandCSForbid() : Command("FORBID", 1, 2, "chanserv/forbid")
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
+		this->SetDesc("Prevent a channel from being used");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -109,11 +110,6 @@ class CommandCSForbid : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "FORBID", _("FORBID \037channel\037 [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    FORBID     Prevent a channel from being used"));
 	}
 };
 

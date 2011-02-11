@@ -18,6 +18,7 @@ class CommandOSRestart : public Command
  public:
 	CommandOSRestart() : Command("RESTART", 0, 0, "operserv/restart")
 	{
+		this->SetDesc("Save databases and restart Services");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -27,7 +28,6 @@ class CommandOSRestart : public Command
 
 		if (Config->GlobalOnCycle)
 			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
-		/*	raise(SIGHUP); */
 		do_restart_services();
 		return MOD_CONT;
 	}
@@ -39,11 +39,6 @@ class CommandOSRestart : public Command
 				"Causes Services to save all databases and then restart\n"
 				"(i.e. exit and immediately re-run the executable)."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RESTART     Save databases and restart Services"));
 	}
 };
 

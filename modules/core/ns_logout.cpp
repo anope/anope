@@ -18,6 +18,7 @@ class CommandNSLogout : public Command
  public:
 	CommandNSLogout() : Command("LOGOUT", 0, 2)
 	{
+		this->SetDesc("Reverses the effect of the IDENTIFY command");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -88,11 +89,6 @@ class CommandNSLogout : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "LOGOUT", _("LOGOUT"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LOGOUT     Reverses the effect of the IDENTIFY command"));
 	}
 };
 

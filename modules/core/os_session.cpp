@@ -169,6 +169,7 @@ class CommandOSSession : public Command
  public:
 	CommandOSSession() : Command("SESSION", 2, 2, "operserv/session")
 	{
+		this->SetDesc("View the list of host sessions");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -213,11 +214,6 @@ class CommandOSSession : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SESSION", _("SESSION LIST \037limit\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SESSION     View the list of host sessions"));
 	}
 };
 
@@ -438,6 +434,7 @@ class CommandOSException : public Command
  public:
 	CommandOSException() : Command("EXCEPTION", 1, 5)
 	{
+		this->SetDesc("Modify the session-limit exception list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -512,11 +509,6 @@ class CommandOSException : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "EXCEPTION", _("EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [\037params\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    EXCEPTION   Modify the session-limit exception list"));
 	}
 };
 

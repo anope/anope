@@ -48,6 +48,7 @@ class CommandCSAppendTopic : public Command
  public:
 	CommandCSAppendTopic() : Command("APPENDTOPIC", 2, 2)
 	{
+		this->SetDesc("Add text to a channels topic");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -99,11 +100,6 @@ class CommandCSAppendTopic : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		me->SendMessage(source, _("Syntax: APPENDTOPIC channel text"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		me->SendMessage(source, _("   APPENDTOPIC Add text to a channels topic"));
 	}
 };
 

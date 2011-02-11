@@ -47,6 +47,7 @@ class CommandHSRequest : public Command
  public:
 	CommandHSRequest() : Command("REQUEST", 1, 1)
 	{
+		this->SetDesc("Request a vHost for your nick");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -126,11 +127,6 @@ class CommandHSRequest : public Command
 	{
 		me->SendMessage(source, _("Syntax: \002REQUEST \037vhost\037\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		me->SendMessage(source, _("    REQUEST     Request a vHost for your nick"));
-	}
 };
 
 class CommandHSActivate : public Command
@@ -138,6 +134,7 @@ class CommandHSActivate : public Command
  public:
 	CommandHSActivate() : Command("ACTIVATE", 1, 1, "hostserv/set")
 	{
+		this->SetDesc("Approve the requested vHost of a user");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -187,13 +184,6 @@ class CommandHSActivate : public Command
 	{
 		me->SendMessage(source, _("Syntax: \002ACTIVATE \037nick\037\002"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		me->SendMessage(source, _("    ACTIVATE    Approve the requested vHost of a user\n"
-			"    REJECT      Reject the requested vHost of a user\n"
-			"    WAITING     Convenience command for LIST +req"));
-	}
 };
 
 class CommandHSReject : public Command
@@ -201,6 +191,7 @@ class CommandHSReject : public Command
  public:
 	CommandHSReject() : Command("REJECT", 1, 2, "hostserv/set")
 	{
+		this->SetDesc("Reject the requested vHost of a user");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -295,6 +286,7 @@ class CommandHSWaiting : public HSListBase
  public:
 	CommandHSWaiting() : HSListBase("WAITING", 0, 0)
 	{
+		this->SetDesc("Convenience command for LIST +req");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,6 +18,7 @@ class CommandHSSetAll : public Command
  public:
 	CommandHSSetAll() : Command("SETALL", 2, 2, "hostserv/set")
 	{
+		this->SetDesc("Set the vhost for all nicks in a group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -115,11 +116,6 @@ class CommandHSSetAll : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SETALL", _("SETALL \002<nick>\002 \002<hostmask>\002."));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SETALL      Set the vhost for all nicks in a group"));
 	}
 };
 

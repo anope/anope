@@ -18,6 +18,7 @@ class CommandCSSetSecureOps : public Command
  public:
 	CommandCSSetSecureOps(const Anope::string &cpermission = "") : Command("SECUREOPS", 2, 2, cpermission)
 	{
+		this->SetDesc("Stricter control of chanop status");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -55,11 +56,6 @@ class CommandCSSetSecureOps : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET SECUREOPS", _("SET \037channel\037 SECUREOPS {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SECUREOPS     Stricter control of chanop status"));
 	}
 };
 

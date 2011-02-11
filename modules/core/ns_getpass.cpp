@@ -18,6 +18,7 @@ class CommandNSGetPass : public Command
  public:
 	CommandNSGetPass() : Command("GETPASS", 1, 1, "nickserv/getpass")
 	{
+		this->SetDesc("Retrieve the password for a nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -73,11 +74,6 @@ class CommandNSGetPass : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "GETPASS", _("GETPASS \037nickname\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GETPASS    Retrieve the password for a nickname"));
 	}
 };
 

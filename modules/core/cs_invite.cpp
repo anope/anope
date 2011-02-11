@@ -18,6 +18,7 @@ class CommandCSInvite : public Command
  public:
 	CommandCSInvite() : Command("INVITE", 1, 3)
 	{
+		this->SetDesc("Tells ChanServ to invite you into a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -82,11 +83,6 @@ class CommandCSInvite : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "INVITE", _("INVITE \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    INVITE     Tells ChanServ to invite you into a channel"));
 	}
 };
 

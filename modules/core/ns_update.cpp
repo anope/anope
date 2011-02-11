@@ -18,6 +18,7 @@ class CommandNSUpdate : public Command
  public:
 	CommandNSUpdate() : Command("UPDATE", 0, 0)
 	{
+		this->SetDesc("Updates your current status, i.e. it checks for new memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -46,11 +47,6 @@ class CommandNSUpdate : public Command
 				"sets needed chanmodes (ModeonID) and updates your vhost and\n"
 				"your userflags (lastseentime, etc)."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UPDATE     Updates your current status, i.e. it checks for new memos"));
 	}
 };
 

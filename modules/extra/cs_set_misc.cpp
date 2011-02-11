@@ -16,8 +16,9 @@ class CommandCSSetMisc : public Command
 {
 	Anope::string Desc;
  public:
-	CommandCSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(desc)
+	CommandCSSetMisc(const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(cdesc)
 	{
+		this->SetDesc(cdesc);
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -43,17 +44,12 @@ class CommandCSSetMisc : public Command
 	{
 		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply("    %-10s    %s", this->name.c_str(), this->Desc.c_str());
-	}
 };
 
 class CommandCSSASetMisc : public CommandCSSetMisc
 {
  public:
-	CommandCSSASetMisc(const Anope::string &cname, const Anope::string &desc) : CommandCSSetMisc(cname, desc, "chanserv/saset/" + cname)
+	CommandCSSASetMisc(const Anope::string &cname, const Anope::string &cdesc) : CommandCSSetMisc(cname, cdesc, "chanserv/saset/" + cname)
 	{
 	}
 

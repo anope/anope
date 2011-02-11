@@ -18,6 +18,7 @@ class CommandBSSay : public Command
  public:
 	CommandBSSay() : Command("SAY", 2, 2)
 	{
+		this->SetDesc("Makes the bot say the given text on the given channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -71,11 +72,6 @@ class CommandBSSay : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SAY", _("SAY \037channel\037 \037text\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SAY            Makes the bot say the given text on the given channel"));
 	}
 };
 

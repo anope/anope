@@ -18,6 +18,7 @@ class CommandHSList : public Command
  public:
 	CommandHSList() : Command("LIST", 0, 1, "hostserv/list")
 	{
+		this->SetDesc("Displays one or more vhost entries.");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -114,11 +115,6 @@ class CommandHSList : public Command
 				"The list uses the value of NSListMax as a hard limit for the\n"
 				"number of items to display to a operator at any 1 time."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    LIST        Displays one or more vhost entries."));
 	}
 };
 

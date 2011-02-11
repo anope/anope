@@ -18,6 +18,7 @@ class CommandNSSetPrivate : public Command
  public:
 	CommandNSSetPrivate(const Anope::string &spermission = "") : Command("PRIVATE", 2, 2, spermission)
 	{
+		this->SetDesc("Prevent the nickname from appearing in a \002%R" + NickServ->nick + " LIST\002");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -62,11 +63,6 @@ class CommandNSSetPrivate : public Command
 	{
 		SyntaxError(source, "SET PRIVATE", _("SET PRIVATE {ON | OFF}"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PRIVATE    Prevent the nickname from appearing in a \002%R%s LIST\002"), ChanServ->nick.c_str());
-	}
 };
 
 class CommandNSSASetPrivate : public CommandNSSetPrivate
@@ -92,10 +88,6 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SASET PRIVATE", _("SASET \037nickname\037 PRIVATE {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
 	}
 };
 

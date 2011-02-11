@@ -21,6 +21,7 @@ class CommandNSSet : public Command
  public:
 	CommandNSSet() : Command("SET", 1, 3)
 	{
+		this->SetDesc("Set options, including kill protection");
 	}
 
 	~CommandNSSet()
@@ -97,11 +98,6 @@ class CommandNSSet : public Command
 		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
 	}
 
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SET        Set options, including kill protection"));
-	}
-
 	bool AddSubcommand(Module *creator, Command *c)
 	{
 		c->module = creator;
@@ -130,6 +126,7 @@ class CommandNSSetDisplay : public Command
  public:
 	CommandNSSetDisplay() : Command("DISPLAY", 1)
 	{
+		this->SetDesc("Set the display of your group in Services");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -162,11 +159,6 @@ class CommandNSSetDisplay : public Command
 		// XXX
 		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DISPLAY    Set the display of your group in Services"));
-	}
 };
 
 class CommandNSSetPassword : public Command
@@ -174,6 +166,7 @@ class CommandNSSetPassword : public Command
  public:
 	CommandNSSetPassword() : Command("PASSWORD", 1)
 	{
+		this->SetDesc("Set your nickname password");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -223,11 +216,6 @@ class CommandNSSetPassword : public Command
 	{
 		// XXX
 		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PASSWORD   Set your nickname password"));
 	}
 };
 

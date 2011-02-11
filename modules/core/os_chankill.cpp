@@ -18,6 +18,7 @@ class CommandOSChanKill : public Command
  public:
 	CommandOSChanKill() : Command("CHANKILL", 2, 3, "operserv/chankill")
 	{
+		this->SetDesc("AKILL all users on a specific channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -97,11 +98,6 @@ class CommandOSChanKill : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "CHANKILL", _("CHANKILL [+\037expiry\037] {\037#channel\037} [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    CHANKILL    AKILL all users on a specific channel"));
 	}
 };
 

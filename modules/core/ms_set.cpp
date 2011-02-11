@@ -201,6 +201,7 @@ class CommandMSSet : public Command
  public:
 	CommandMSSet() : Command("SET", 2, 5)
 	{
+		this->SetDesc("Set options related to memos");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -293,11 +294,6 @@ class CommandMSSet : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SET    Set options related to memos"));
 	}
 };
 

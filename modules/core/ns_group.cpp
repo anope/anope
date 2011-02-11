@@ -19,6 +19,7 @@ class CommandNSGroup : public Command
 	CommandNSGroup() : Command("GROUP", 2, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Join a group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -173,11 +174,6 @@ class CommandNSGroup : public Command
 	{
 		SyntaxError(source, "GROUP", _("\037target\037 \037password\037"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GROUP      Join a group"));
-	}
 };
 
 class CommandNSUngroup : public Command
@@ -185,6 +181,7 @@ class CommandNSUngroup : public Command
  public:
 	CommandNSUngroup() : Command("UNGROUP", 0, 1)
 	{
+		this->SetDesc("Remove a nick from a group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -242,11 +239,6 @@ class CommandNSUngroup : public Command
 				"nick in your group."));
 		return true;
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UNGROUP    Remove a nick from a group"));
-	}
 };
 
 class CommandNSGList : public Command
@@ -254,6 +246,7 @@ class CommandNSGList : public Command
  public:
 	CommandNSGList() : Command("GLIST", 0, 1)
 	{
+		this->SetDesc("Lists all nicknames in your group");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -299,11 +292,6 @@ class CommandNSGList : public Command
 					"Lists all nicks in your group."));
 
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    GLIST      Lists all nicknames in your group"));
 	}
 };
 

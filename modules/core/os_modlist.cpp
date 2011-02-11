@@ -18,6 +18,7 @@ class CommandOSModList : public Command
  public:
 	CommandOSModList() : Command("MODLIST", 0, 1, "operserv/modlist")
 	{
+		this->SetDesc("List loaded modules");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -211,11 +212,6 @@ class CommandOSModList : public Command
 				" \n"
 				"Lists all currently loaded modules."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODLIST     List loaded modules"));
 	}
 };
 

@@ -21,6 +21,7 @@ class CommandCSSASet : public Command
  public:
 	CommandCSSASet() : Command("SASET", 2, 3)
 	{
+		this->SetDesc("Forcefully set channel options and information");
 	}
 
 	~CommandCSSASet()
@@ -95,11 +96,6 @@ class CommandCSSASet : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SASET      Forcefully set channel options and information"));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

@@ -18,6 +18,7 @@ class CommandCSBan : public Command
  public:
 	CommandCSBan(const Anope::string &cname) : Command("BAN", 2, 3)
 	{
+		this->SetDesc("Bans a selected nick on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -88,11 +89,6 @@ class CommandCSBan : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "BAN", _("BAN \037#channel\037 \037nick\037 [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    BAN        Bans a selected nick on a channel"));
 	}
 };
 

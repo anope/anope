@@ -18,6 +18,7 @@ class CommandMSCheck : public Command
  public:
 	CommandMSCheck() : Command("CHECK", 1, 1)
 	{
+		this->SetDesc("Checks if last memo to a nick was read");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -78,11 +79,6 @@ class CommandMSCheck : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "CHECK", _("CHECK \037nickname\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    CHECK  Checks if last memo to a nick was read"));
 	}
 };
 

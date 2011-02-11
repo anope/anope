@@ -18,6 +18,7 @@ class CommandCSSetTopicLock : public Command
  public:
 	CommandCSSetTopicLock(const Anope::string &cpermission = "") : Command("TOPICLOCK", 2, 2, cpermission)
 	{
+		this->SetDesc("Topic can only be changed with TOPIC");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -56,11 +57,6 @@ class CommandCSSetTopicLock : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET", _("SET \037channel\037 TOPICLOCK {ON | OFF}"));;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    TOPICLOCK     Topic can only be changed with TOPIC"));
 	}
 };
 

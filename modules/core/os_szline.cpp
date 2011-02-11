@@ -377,6 +377,7 @@ class CommandOSSZLine : public Command
  public:
 	CommandOSSZLine() : Command("SZLINE", 1, 4, "operserv/szline")
 	{
+		this->SetDesc("Manipulate the SZLINE list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -448,11 +449,6 @@ class CommandOSSZLine : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SZLINE", _("SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SZLINE      Manipulate the SZLINE list"));
 	}
 };
 

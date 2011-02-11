@@ -56,6 +56,7 @@ class CommandCSTBan : public Command
  public:
 	CommandCSTBan() : Command("TBAN", 3, 3)
 	{
+		this->SetDesc("Bans the user for a given length of time");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -99,11 +100,6 @@ class CommandCSTBan : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		me->SendMessage(source, _("Syntax: TBAN channel nick time"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		me->SendMessage(source, _("    TBAN       Bans the user for a given length of time"));
 	}
 };
 

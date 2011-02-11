@@ -475,6 +475,7 @@ class CommandCSAKick : public Command
  public:
 	CommandCSAKick() : Command("AKICK", 2, 4)
 	{
+		this->SetDesc("Maintain the AutoKick list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -557,11 +558,6 @@ class CommandCSAKick : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "AKICK", _("AKICK \037channel\037 {ADD | DEL | LIST | VIEW | ENFORCE | CLEAR} [\037nick-or-usermask\037] [\037reason\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    AKICK      Maintain the AutoKick list"));
 	}
 };
 

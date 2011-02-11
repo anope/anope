@@ -18,6 +18,7 @@ class CommandOSModUnLoad : public Command
  public:
 	CommandOSModUnLoad() : Command("MODUNLOAD", 1, 1, "operserv/modload")
 	{
+		this->SetDesc("Un-Load a module");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -71,11 +72,6 @@ class CommandOSModUnLoad : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODUNLOAD", _("MODUNLOAD \037FileName\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODUNLOAD   Un-Load a module"));
 	}
 };
 

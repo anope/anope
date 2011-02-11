@@ -235,6 +235,7 @@ class CommandOSIgnore : public Command
  public:
 	CommandOSIgnore() : Command("IGNORE", 1, 4, "operserv/ignore")
 	{
+		this->SetDesc("Modify the Services ignore list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -277,11 +278,6 @@ class CommandOSIgnore : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "IGNORE", _("IGNORE {ADD|DEL|LIST|CLEAR} [\037time\037] [\037nick\037] [\037reason\037]\002"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    IGNORE      Modify the Services ignore list"));
 	}
 };
 

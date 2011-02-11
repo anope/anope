@@ -19,12 +19,13 @@ class CommandCSRegister : public Command
 	CommandCSRegister() : Command("REGISTER", 2, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
+		this->SetDesc("Register a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
-		const Anope::string &desc = params[1];
+		const Anope::string &chdesc = params[1];
 
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
@@ -52,7 +53,7 @@ class CommandCSRegister : public Command
 		{
 			ci = new ChannelInfo(chan);
 			ci->founder = u->Account();
-			ci->desc = desc;
+			ci->desc = chdesc;
 
 			if (c && !c->topic.empty())
 			{
@@ -125,11 +126,6 @@ class CommandCSRegister : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "REGISTER", _("REGISTER \037channel\037 \037description\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    REGISTER   Register a channel"));
 	}
 };
 

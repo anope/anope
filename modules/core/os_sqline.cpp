@@ -375,6 +375,7 @@ class CommandOSSQLine : public Command
  public:
 	CommandOSSQLine() : Command("SQLINE", 1, 4, "operserv/sqline")
 	{
+		this->SetDesc("Manipulate the SQLINE list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -448,11 +449,6 @@ class CommandOSSQLine : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SQLINE", _("SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SQLINE      Manipulate the SQLINE list"));
 	}
 };
 

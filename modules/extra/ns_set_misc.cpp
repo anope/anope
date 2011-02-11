@@ -19,8 +19,9 @@ class CommandNSSetMisc : public Command
 	Anope::string Desc;
 
  public:
-	CommandNSSetMisc(const Anope::string &cname, const Anope::string &desc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(desc)
+	CommandNSSetMisc(const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(cdesc)
 	{
+		this->SetDesc(cdesc);
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -47,17 +48,12 @@ class CommandNSSetMisc : public Command
 	{
 		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply("    %-10s    %s", this->name.c_str(), this->Desc.c_str());
-	}
 };
 
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(const Anope::string &cname, const Anope::string &desc) : CommandNSSetMisc(cname, desc, "nickserv/saset/" + cname)
+	CommandNSSASetMisc(const Anope::string &cname, const Anope::string &cdesc) : CommandNSSetMisc(cname, cdesc, "nickserv/saset/" + cname)
 	{
 	}
 
@@ -75,7 +71,7 @@ class NSSetMisc : public Module
 		Anope::string Desc;
 		bool ShowHidden;
 
-		CommandInfo(const Anope::string &name, const Anope::string &desc, bool showhidden) : Name(name), Desc(desc), ShowHidden(showhidden) { }
+		CommandInfo(const Anope::string &name, const Anope::string &cdesc, bool showhidden) : Name(name), Desc(cdesc), ShowHidden(showhidden) { }
 	};
 
 	std::map<Anope::string, CommandInfo *> Commands;

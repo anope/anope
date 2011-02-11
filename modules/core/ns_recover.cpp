@@ -19,6 +19,7 @@ class CommandNSRecover : public Command
 	CommandNSRecover() : Command("RECOVER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Kill another user who has taken your nick");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -118,11 +119,6 @@ class CommandNSRecover : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "RECOVER", _("RECOVER \037nickname\037 [\037password\037]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    RECOVER    Kill another user who has taken your nick"));
 	}
 };
 

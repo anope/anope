@@ -395,6 +395,7 @@ class CommandOSSNLine : public Command
  public:
 	CommandOSSNLine() : Command("SNLINE", 1, 3, "operserv/snline")
 	{
+		this->SetDesc("Manipulate the SNLINE list");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -468,11 +469,6 @@ class CommandOSSNLine : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SNLINE", _("SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037mask\037 | \037entry-list\037}[:\037reason\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SNLINE      Manipulate the SNLINE list"));
 	}
 };
 

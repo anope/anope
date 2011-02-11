@@ -255,6 +255,7 @@ class CommandCSMode : public Command
  public:
 	CommandCSMode() : Command("MODE", 3, 4)
 	{
+		this->SetDesc("Control modes and mode locks on a channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -305,11 +306,6 @@ class CommandCSMode : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "MODE", _("MODE \037channel\037 {LOCK|SET} [\037modes\037 | {ADD|DEL|LIST} [\037what\037]]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    MODE       Control modes and mode locks on a channel"));
 	}
 };
 

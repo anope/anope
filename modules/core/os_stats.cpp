@@ -229,6 +229,7 @@ class CommandOSStats : public Command
  public:
 	CommandOSStats() : Command("STATS", 0, 1, "operserv/stats")
 	{
+		this->SetDesc("Show status of Services and network");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -282,11 +283,6 @@ class CommandOSStats : public Command
 				"The \002ALL\002 displays the user and uptime statistics, and\n"
 				"everything you'd see with \002MEMORY\002 and \002UPLINK\002 options."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    STATS       Show status of Services and network"));
 	}
 };
 

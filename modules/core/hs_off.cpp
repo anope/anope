@@ -18,6 +18,7 @@ class CommandHSOff : public Command
  public:
 	CommandHSOff() : Command("OFF", 0, 0)
 	{
+		this->SetDesc("Deactivates your assigned vhost");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -44,11 +45,6 @@ class CommandHSOff : public Command
 				"When you use this command any user who performs a /whois\n"
 				"on you will see your real IP address."));
 		return true;
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    OFF         Deactivates your assigned vhost"));
 	}
 };
 

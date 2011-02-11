@@ -17,7 +17,8 @@ class CommandCSSuspend : public Command
 {
  public:
 	CommandCSSuspend() : Command("SUSPEND", 1, 2, "chanserv/suspend")
-	{
+	{ 
+		this->SetDesc("Prevent a channel from being used preserving channel data and settings");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -90,13 +91,6 @@ class CommandCSSuspend : public Command
 	{
 		SyntaxError(source, "SUSPEND", Config->ForceForbidReason ? _("SUSPEND \037channel\037 \037reason\037") : _("SUSPEND \037channel\037 \037freason\037"));
 	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SUSPEND    Prevent a channel from being used preserving\n"
-			"               	channel data and settings"));
-
-	}
 };
 
 class CommandCSUnSuspend : public Command
@@ -105,6 +99,7 @@ class CommandCSUnSuspend : public Command
 	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1, "chanserv/suspend")
 	{
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
+		this->SetDesc("Releases a suspended channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -150,11 +145,6 @@ class CommandCSUnSuspend : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "UNSUSPEND", _("UNSUSPEND \037channel\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    UNSUSPEND  Releases a suspended channel"));
 	}
 };
 

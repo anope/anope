@@ -57,6 +57,7 @@ class CommandOSDefcon : public Command
  public:
 	CommandOSDefcon() : Command("DEFCON", 1, 1, "operserv/defcon")
 	{
+		this->SetDesc("Manipulate the DefCon system");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -132,11 +133,6 @@ class CommandOSDefcon : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DEFCON", _("DEFCON [\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEFCON      Manipulate the DefCon system"));
 	}
 };
 

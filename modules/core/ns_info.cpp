@@ -31,6 +31,7 @@ class CommandNSInfo : public Command
 	CommandNSInfo() : Command("INFO", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc("Displays information about a given nickname");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -160,11 +161,6 @@ class CommandNSInfo : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "INFO", _("INFO \037nick\037"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    INFO       Displays information about a given nickname"));
 	}
 };
 

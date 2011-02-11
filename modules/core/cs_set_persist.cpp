@@ -18,6 +18,7 @@ class CommandCSSetPersist : public Command
  public:
 	CommandCSSetPersist(const Anope::string &cpermission = "") : Command("PERSIST", 2, 2, cpermission)
 	{
+		this->SetDesc("Set the channel as permanent");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -128,11 +129,6 @@ class CommandCSSetPersist : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		SyntaxError(source, "SET PERSIST", _("SET \037channel\037 PERSIST {ON | OFF}"));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    PERSIST       Set the channel as permanent"));
 	}
 };
 

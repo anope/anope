@@ -18,6 +18,7 @@ class CommandMSSend : public Command
  public:
 	CommandMSSend() : Command("SEND", 2, 2)
 	{
+		this->SetDesc("Send a memo to a nick or channel");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -42,11 +43,6 @@ class CommandMSSend : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "SEND", LanguageString::MEMO_SEND_SYNTAX);
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    SEND   Send a memo to a nick or channel"));
 	}
 };
 

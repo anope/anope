@@ -18,6 +18,7 @@ class CommandHSDel : public Command
  public:
 	CommandHSDel() : Command("DEL", 1, 1, "hostserv/del")
 	{
+		this->SetDesc("Delete the vhost of another user");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -54,11 +55,6 @@ class CommandHSDel : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		SyntaxError(source, "DEL", _("DEL \002<nick>\002."));
-	}
-
-	void OnServHelp(CommandSource &source)
-	{
-		source.Reply(_("    DEL         Delete the vhost of another user"));
 	}
 };
 

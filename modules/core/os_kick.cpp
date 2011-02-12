@@ -47,8 +47,7 @@ class CommandOSKick : public Command
 		}
 
 		c->Kick(OperServ, u2, "%s (%s)", u->nick.c_str(), s.c_str());
-		if (Config->WallOSKick)
-			ircdproto->SendGlobops(OperServ, "%s used KICK on %s/%s", u->nick.c_str(), u2->nick.c_str(), chan.c_str());
+		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name;
 		return MOD_CONT;
 	}
 

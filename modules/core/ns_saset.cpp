@@ -214,9 +214,6 @@ class CommandNSSASetPassword : public Command
 		else
 			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
 
-		if (Config->WallSetpass)
-			ircdproto->SendGlobops(NickServ, "\2%s\2 used SASET PASSWORD on \2%s\2", u->nick.c_str(), nc->display.c_str());
-
 		return MOD_CONT;
 	}
 

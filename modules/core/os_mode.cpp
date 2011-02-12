@@ -38,8 +38,7 @@ class CommandOSMode : public Command
 			{
 				c->SetModes(OperServ, false, modes.c_str());
 
-				if (Config->WallOSMode)
-					ircdproto->SendGlobops(OperServ, "\2%s\2 used MODE %s on %s", u->nick.c_str(), modes.c_str(), c->name.c_str());
+				Log(LOG_ADMIN, u, this) << modes << " on " << target;
 			}
 		}
 		else
@@ -54,8 +53,7 @@ class CommandOSMode : public Command
 
 				u2->SendMessage(OperServ, _("\002%s\002 changed your usermodes to %s."), u->nick.c_str(), modes.c_str());
 
-				if (Config->WallOSMode)
-					ircdproto->SendGlobops(OperServ, "\2%s\2 used MODE %s %s", u->nick.c_str(), modes.c_str(), u2->nick.c_str());
+				Log(LOG_ADMIN, u, this) << modes << " on " << target;
 			}
 		}
 

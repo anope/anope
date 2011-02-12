@@ -34,8 +34,6 @@ class CommandNSGetPass : public Command
 			if ((nr = findrequestnick(nick)))
 			{
 				Log(LOG_ADMIN, u, this) << "for " << nr->nick;
-				if (Config->WallGetpass)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
 				source.Reply(_("Passcode for %s is \002%s\002."), nick.c_str(), nr->passcode.c_str());
 			}
 			else
@@ -50,8 +48,6 @@ class CommandNSGetPass : public Command
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
 				Log(LOG_ADMIN, u, this) << "for " << nick;
-				if (Config->WallGetpass)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick.c_str(), nick.c_str());
 				source.Reply(_("Password for %s is \002%s\002."), nick.c_str(), tmp_pass.c_str());
 			}
 			else

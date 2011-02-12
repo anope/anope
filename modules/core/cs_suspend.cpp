@@ -64,9 +64,6 @@ class CommandCSSuspend : public Command
 			}
 		}
 
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used SUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
-
 		Log(LOG_ADMIN, u, this, ci) << (!reason.empty() ? reason : "No reason");
 		source.Reply(_("Channel \002%s\002 is now suspended."), ci->name.c_str());
 
@@ -122,9 +119,6 @@ class CommandCSUnSuspend : public Command
 		ci->UnsetFlag(CI_SUSPENDED);
 		ci->forbidreason.clear();
 		ci->forbidby.clear();
-
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used UNSUSPEND on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 

@@ -265,7 +265,9 @@ std::list<Anope::string> &LogInfo::GetList(LogType type)
 	switch (type)
 	{
 		case LOG_ADMIN:
+			return this->Admin;
 		case LOG_OVERRIDE:
+			return this->Override;
 		case LOG_COMMAND:
 			return this->Commands;
 		case LOG_SERVER:
@@ -346,6 +348,13 @@ void LogInfo::ProcessMessage(const Log *l)
 				if (!c || !l->bi)
 					continue;
 				ircdproto->SendPrivmsg(l->bi, c->name, "%s", l->buf.str().c_str());
+			}
+		}
+		else if (target == "globops")
+		{
+			if (UplinkSock && l->bi && l->Type <= LOG_NORMAL && Me && Me->IsSynced())
+			{
+				ircdproto->SendGlobops(l->bi, "%s", l->buf.str().c_str());
 			}
 		}
 		else

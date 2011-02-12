@@ -35,8 +35,7 @@ class CommandOSNOOP : public Command
 			ircdproto->SendSVSNOOP(server, 1);
 
 			reason = "NOOP command used by " + u->nick;
-			if (Config->WallOSNoOp)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick.c_str(), server.c_str());
+			Log(LOG_ADMIN, u, this) << "on " << server;
 			source.Reply(_("All O:lines of \002%s\002 have been removed."), server.c_str());
 
 			/* Kill all the IRCops of the server */

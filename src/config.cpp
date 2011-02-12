@@ -167,9 +167,8 @@ ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFla
 		}
 	}
 
-	this->WallOper = this->WallBadOS = this->WallOSGlobal = this->WallOSMode = this->WallOSKick = this->WallOSAkill = this->WallOSSNLine = this->WallOSSQLine =
-		this->WallOSSZLine = this->WallOSNoOp = this->WallOSJupe = this->WallAkillExpire = this->WallSNLineExpire = this->WallSQLineExpire = this->WallSZLineExpire = this->WallExceptionExpire =
-		this->WallGetpass = this->WallSetpass = this->WallForbid = this->WallDrop = false;
+	this->WallOper = this->WallBadOS = this->WallAkillExpire = this->WallSNLineExpire = this->WallSQLineExpire =
+	this->WallSZLineExpire = this->WallExceptionExpire = false;
 	if (!OSNotifications.empty())
 	{
 		spacesepstream notifications(OSNotifications);
@@ -180,24 +179,6 @@ ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFla
 				this->WallOper = true;
 			else if (notice.equals_ci("bados"))
 				this->WallBadOS = true;
-			else if (notice.equals_ci("osglobal"))
-				this->WallOSGlobal = true;
-			else if (notice.equals_ci("osmode"))
-				this->WallOSMode = true;
-			else if (notice.equals_ci("oskick"))
-				this->WallOSKick = true;
-			else if (notice.equals_ci("osakill"))
-				this->WallOSAkill = true;
-			else if (notice.equals_ci("ossnline"))
-				this->WallOSSNLine = true;
-			else if (notice.equals_ci("ossqline"))
-				this->WallOSSQLine = true;
-			else if (notice.equals_ci("osszline"))
-				this->WallOSSZLine = true;
-			else if (notice.equals_ci("osnoop"))
-				this->WallOSNoOp = true;
-			else if (notice.equals_ci("osjupe"))
-				this->WallOSJupe = true;
 			else if (notice.equals_ci("akillexpire"))
 				this->WallAkillExpire = true;
 			else if (notice.equals_ci("snlineexpire"))
@@ -208,14 +189,6 @@ ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFla
 				this->WallSZLineExpire = true;
 			else if (notice.equals_ci("exceptionexpire"))
 				this->WallExceptionExpire = true;
-			else if (notice.equals_ci("getpass"))
-				this->WallGetpass = true;
-			else if (notice.equals_ci("setpass"))
-				this->WallSetpass = true;
-			else if (notice.equals_ci("forbid"))
-				this->WallForbid = true;
-			else if (notice.equals_ci("drop"))
-				this->WallDrop = true;
 		}
 	}
 

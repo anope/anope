@@ -245,39 +245,34 @@ time_t dotime(const Anope::string &s)
 Anope::string duration(NickCore *nc, time_t seconds)
 {
 	/* We first calculate everything */
-	int days = seconds / 86400;
+	time_t days = seconds / 86400;
 	seconds -= (days * 86400);
-	int hours = seconds / 3600;
+	time_t hours = seconds / 3600;
 	seconds -= (hours * 3600);
-	int minutes = seconds / 60;
+	time_t minutes = seconds / 60;
 
-	char buf[64];
 	Anope::string buffer;
 
 	if (!days && !hours && !minutes)
-	{
-		snprintf(buf, sizeof(buf), GetString(nc, "%d second%s").c_str(), seconds, seconds != 1 ? "s" : "");
-		buffer = buf;
-	}
+		buffer = stringify(seconds) + " second" + (seconds != 1 ? "s" : "");
 	else
 	{
 		bool need_comma = false;
 		if (days)
 		{
-			snprintf(buf, sizeof(buf), GetString(nc, "%d day%s").c_str(), days, days != 1 ? "s" : "");
-			buffer = buf;
+			buffer = stringify(days) + " day" + (days != 1 ? "s" : "");
 			need_comma = true;
 		}
 		if (hours)
 		{
-			snprintf(buf, sizeof(buf), GetString(nc, "%d hour%s").c_str(), hours, hours != 1 ? "s" : "");
-			buffer += Anope::string(need_comma ? ", " : "") + buf;
+			buffer += need_comma ? ", " : "";
+			buffer += stringify(hours) + " hour" + (hours != 1 ? "s" : "");
 			need_comma = true;
 		}
 		if (minutes)
 		{
-			snprintf(buf, sizeof(buf), GetString(nc, "%d minute%s").c_str(), minutes != 1 ? "s" : "");
-			buffer += Anope::string(need_comma ? ", " : "") + buf;
+			buffer += need_comma ? ", " : "";
+			buffer += stringify(minutes) + " minute" + (minutes != 1 ? "s" : "");
 		}
 	}
 

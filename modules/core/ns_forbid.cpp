@@ -74,9 +74,6 @@ class CommandNSForbid : public Command
 			ircdproto->SendSQLine(&x);
 		}
 
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick.c_str(), nick.c_str());
-
 		Log(LOG_ADMIN, u, this) << "to forbid nick " << nick;
 		source.Reply(_("Nick \002%s\002 is now forbidden."), nick.c_str());
 

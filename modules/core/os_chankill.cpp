@@ -77,8 +77,8 @@ class CommandOSChanKill : public Command
 					SGLine->Add(OperServ, u, "*@" + uc->user->host, expires, realreason);
 					SGLine->Check(uc->user);
 				}
-				if (Config->WallOSAkill)
-					ircdproto->SendGlobops(OperServ, "%s used CHANKILL on %s (%s)", u->nick.c_str(), channel.c_str(), realreason.c_str());
+
+				Log(LOG_ADMIN, u, this) << "(" << realreason << ")";
 			}
 			else
 				source.Reply(LanguageString::CHAN_X_NOT_IN_USE, channel.c_str());

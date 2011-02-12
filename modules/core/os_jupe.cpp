@@ -40,8 +40,7 @@ class CommandOSJupe : public Command
 			Server *juped_server = new Server(Me, jserver, 1, rbuf, ircd->ts6 ? ts6_sid_retrieve() : "", SERVER_JUPED);
 			ircdproto->SendServer(juped_server);
 
-			if (Config->WallOSJupe)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick.c_str(), jserver.c_str());
+			Log(LOG_ADMIN, u, this) << "on " << jserver << " (" << rbuf << ")";
 		}
 		return MOD_CONT;
 	}

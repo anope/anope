@@ -76,9 +76,6 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(NickServ, "\2%s\2 used SUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
-
 		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << ")";
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
@@ -139,9 +136,6 @@ class CommandNSUnSuspend : public Command
 		}
 
 		na->nc->UnsetFlag(NI_SUSPENDED);
-
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(NickServ, "\2%s\2 used UNSUSPEND on \2%s\2", u->nick.c_str(), nick.c_str());
 
 		Log(LOG_ADMIN, u, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());

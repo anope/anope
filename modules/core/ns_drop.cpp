@@ -39,9 +39,6 @@ class CommandNSDrop : public Command
 			NickRequest *nr = findrequestnick(u->Account() && !nick.empty() ? nick : u->nick);
 			if (nr && u->Account() && u->Account()->IsServicesOper())
 			{
-				if (Config->WallDrop)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
-
 				Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
 				delete nr;
 				source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
@@ -99,8 +96,6 @@ class CommandNSDrop : public Command
 
 			if (!is_mine)
 			{
-				if (Config->WallDrop)
-					ircdproto->SendGlobops(NickServ, "\2%s\2 used DROP on \2%s\2", u->nick.c_str(), nick.c_str());
 				source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
 			}
 			else

@@ -188,39 +188,7 @@ class CommandOSSQLine : public Command
 				return MOD_CONT;
 
 			source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-
-			if (Config->WallOSSQLine)
-			{
-				Anope::string buf;
-
-				if (!expires)
-					buf = "does not expire";
-				else
-				{
-					time_t wall_expiry = expires - Anope::CurTime;
-					Anope::string s;
-
-					if (wall_expiry >= 86400)
-					{
-						wall_expiry /= 86400;
-						s = "day";
-					}
-					else if (wall_expiry >= 3600)
-					{
-						wall_expiry /= 3600;
-						s = "hour";
-					}
-					else if (wall_expiry >= 60)
-					{
-						wall_expiry /= 60;
-						s = "minute";
-					}
-
-					buf = "expires in " + stringify(wall_expiry) + " " + s + (wall_expiry == 1 ? "" : "s");
-				}
-
-				ircdproto->SendGlobops(OperServ, "%s added an SQLINE for %s (%s) [affects %i user(s) (%.2f%%)]", u->nick.c_str(), mask.c_str(), buf.c_str(), affected, percent);
-			}
+			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << duration(NULL, expires - Anope::CurTime) << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 			if (readonly)
 				source.Reply(LanguageString::READ_ONLY_MODE);

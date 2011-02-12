@@ -85,8 +85,6 @@ class CommandCSForbid : public Command
 			ircdproto->SendSQLine(&x);
 		}
 
-		if (Config->WallForbid)
-			ircdproto->SendGlobops(ChanServ, "\2%s\2 used FORBID on channel \2%s\2", u->nick.c_str(), ci->name.c_str());
 		Log(LOG_ADMIN, u, this, ci) << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
 
 		source.Reply(_("Channel \002%s\002 is now forbidden."), chan.c_str());

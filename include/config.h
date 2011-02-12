@@ -719,24 +719,6 @@ class CoreExport ServerConfig
 	bool WallOper;
 	/* Send a WALLOPS/GLOBOPS when a nonoper tries to use OperServ */
 	bool WallBadOS;
-	/* Send a WALLOPS/GLOBOPS when someone uses the GLOBAL command */
-	bool WallOSGlobal;
-	/* Send a WALLOPS/GLOBOPS when someone uses the MODE command */
-	bool WallOSMode;
-	/* Send a WALLOPS/GLOBOPS when someone uses the KICK command */
-	bool WallOSKick;
-	/* Send a WALLOPS/GLOBOPS when someone uses the AKILL command */
-	bool WallOSAkill;
-	/* Send a WALLOPS/GLOBOPS when someone uses the SNLINE command */
-	bool WallOSSNLine;
-	/* Send a WALLOPS/GLOBOPS when someone uses the SQLINE command */
-	bool WallOSSQLine;
-	/* Send a WALLOPS/GLOBOPS when someone uses the SZLINE command */
-	bool WallOSSZLine;
-	/* Send a WALLOPS/GLOBOPS when someone uses the NOOP command */
-	bool WallOSNoOp;
-	/* Send a WALLOPS/GLOBOPS when when someone uses the JUPE command */
-	bool WallOSJupe;
 	/* Send a WALLOPS/GLOBOPS when an akill expires */
 	bool WallAkillExpire;
 	/* Send a WALLOPS/GLOBOPS when SNLines expire */
@@ -747,14 +729,6 @@ class CoreExport ServerConfig
 	bool WallSZLineExpire;
 	/* Send a WALLOPS/GLOBOPS when exceptions expire */
 	bool WallExceptionExpire;
-	/* Send a WALLOPS/GLOBOPS when DROP is used */
-	bool WallDrop;
-	/* Send a WALLOPS/GLOBOPS when FORBID is used */
-	bool WallForbid;
-	/* Send a WALLOPS/GLOBOPS when GETPASS is used */
-	bool WallGetpass;
-	/* Send a WALLOPS/GLOBOPS when SETPASS is used */
-	bool WallSetpass;
 	/* Add the akillers nick to the akill reason */
 	bool AddAkiller;
 

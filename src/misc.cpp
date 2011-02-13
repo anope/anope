@@ -832,6 +832,24 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
 	return m == mask_len;
 }
 
+/** Returns a sequence of data formatted as the format argument specifies.
+ ** After the format parameter, the function expects at least as many
+ ** additional arguments as specified in format.
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return a Anope::string
+ */
+Anope::string Anope::printf(const char *fmt, ...)
+{
+	va_list args;
+	char buf[1024];
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	va_end(args);
+	return buf;
+}
+
+
 /*
 * strlcat and strlcpy were ripped from openssh 2.5.1p2
 * They had the following Copyright info:

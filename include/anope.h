@@ -329,6 +329,15 @@ namespace Anope
 	extern CoreExport void Unhex(const Anope::string &src, Anope::string &dest);
 	extern CoreExport void Unhex(const Anope::string &src, char *dest);
 
+	/** Returns a sequence of data formatted as the format argument specifies.
+	 ** After the format parameter, the function expects at least as many
+	 ** additional arguments as specified in format.
+	 * @param fmt Format of the Message
+	 * @param ... any number of parameters
+	 * @return a Anope::string
+	 */
+	extern CoreExport string printf(const char *fmt, ...);
+
 	/** Return the last error, uses errno/GetLastError() to determin this
 	 * @return An error message
 	 */

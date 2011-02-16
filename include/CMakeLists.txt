@@ -16,5 +16,26 @@ if(NOT WIN32)
   add_to_cpack_ignored_files("version.h$" TRUE)
 endif(NOT WIN32)
 
+set(PCH_SOURCES_GCH "")
+if(CMAKE_COMPILER_IS_GNUCXX)
+  string(REPLACE " " ";" PCH_CXXFLAGS ${CXXFLAGS})
+
+  set(PCH_SOURCES "module.h;modules.h;services.h")
+  foreach(PCH_SOURCE ${PCH_SOURCES})
+    set(PCH_EXTRAFLAGS "")
+    if(DEBUG_BUILD)
+      set(PCH_EXTRAFLAGS "-g")
+    endif(DEBUG_BUILD)
+    if(PCH_SOURCE STREQUAL "module.h")
+      set(PCH_EXTRAFLAGS ${PCH_EXTRAFLAGS} -fPIC)
+    endif(PCH_SOURCE STREQUAL "module.h")
+
+    set(PCH_SOURCES_GCH "${PCH_SOURCES_GCH};${CMAKE_CURRENT_BINARY_DIR}/${PCH_SOURCE}.gch")
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PCH_SOURCE}.gch
+      COMMAND ${CMAKE_CXX_COMPILER} ARGS ${PCH_CXXFLAGS} ${PCH_EXTRAFLAGS} -I${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${PCH_SOURCE} -o ${CMAKE_CURRENT_BINARY_DIR}/${PCH_SOURCE}.gch VERBATIM
+    )
+  endforeach(PCH_SOURCE ${PCH_SOURCES})
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 # Add a custom target to the above file
-add_custom_target(headers DEPENDS version ${CMAKE_CURRENT_BINARY_DIR}/version.h)
+add_custom_target(headers DEPENDS version ${CMAKE_CURRENT_BINARY_DIR}/version.h ${PCH_SOURCES_GCH})

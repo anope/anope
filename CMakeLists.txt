@@ -220,7 +220,9 @@ find_package(Gettext)
 option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 
 # Use the following directories as includes
-include_directories(${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/include ${Anope_BINARY_DIR}/language)
+# Note that it is important the binary include directory comes before the
+# source include directory so the precompiled headers work correctly.
+include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language)
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)

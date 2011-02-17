@@ -397,7 +397,7 @@ class DBMySQL : public Module
 			I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearAccess,
 			I_OnDelCore, I_OnNickForbidden, I_OnNickGroup, I_OnMakeNickRequest,
 			I_OnDelNickRequest, I_OnNickRegister, I_OnChangeCoreDisplay,
-			I_OnNickSuspended,
+			I_OnNickSuspended, I_OnDelNick,
 			/* ChanServ */
 			I_OnAccessAdd, I_OnAccessDel, I_OnAccessChange, I_OnAccessClear, I_OnLevelChange,
 			I_OnChanForbidden, I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
@@ -414,7 +414,7 @@ class DBMySQL : public Module
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 41);
+		ModuleManager::Attach(i, this, 42);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -1162,6 +1162,11 @@ class DBMySQL : public Module
 	void OnNickSuspend(NickAlias *na)
 	{
 		this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + BuildFlagsList(na->nc) + "' WHERE `display` = '" + this->Escape(na->nc->display) + "'");
+	}
+
+	void OnDelNick(NickAlias *na)
+	{
+		this->RunQuery("DELETE FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(na->nick) + "'");
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, NickCore *nc, int level)

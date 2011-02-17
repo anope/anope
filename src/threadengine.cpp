@@ -20,7 +20,7 @@ void ThreadEngine::Process()
 
 /** Threads constructor
  */
-Thread::Thread() : Exit(false)
+Thread::Thread() : exit(false)
 {
 	threadEngine.threads.push_back(this);
 }
@@ -41,7 +41,7 @@ Thread::~Thread()
  */
 void Thread::SetExitState()
 {
-	Exit = true;
+	exit = true;
 }
 
 /** Returns the exit state of the thread
@@ -49,7 +49,7 @@ void Thread::SetExitState()
  */
 bool Thread::GetExitState() const
 {
-	return Exit;
+	return exit;
 }
 
 /** Called to run the thread, should be overloaded

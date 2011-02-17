@@ -39,6 +39,13 @@ void Thread::Join()
 	pthread_join(Handle, NULL);
 }
 
+/** Exit the thread. Note that the thread still must be joined to free resources!
+ */
+void Thread::Exit()
+{
+	pthread_exit(0);
+}
+
 /** Start a new thread
  * @param thread A pointer to a newley allocated thread
  */

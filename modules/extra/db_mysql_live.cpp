@@ -1,67 +1,11 @@
 #include "module.h"
+#include "async_commands.h"
 #include "sql.h"
 
-class CommandMutex;
-static std::list<CommandMutex *> commands;
-
-/* Current command being processed by the core */
-static CommandMutex *current_command = NULL;
-/* Mutex held by the core when it is processing. Used by threads to halt the core */
-static Mutex main_mutex;
-
-class CommandMutex : public Thread
-{
- public:
-	// Mutex used by this command to allow the core to drop and pick up processing of it at will
-	Mutex mutex;
-	// Set to true when this thread is processing data that is not thread safe (eg, the command)
-	bool processing;
-	Command *command;
-	CommandSource source;
-	std::vector<Anope::string> params;
-
-	CommandMutex() : Thread(), processing(true)
-	{
-		commands.push_back(this);
-		current_command = this;
-	}
-
-	~CommandMutex()
-	{
-		std::list<CommandMutex *>::iterator it = std::find(commands.begin(), commands.end(), this);
-		if (it != commands.end())
-			commands.erase(it);
-		if (this == current_command)
-			current_command = NULL;
-	}
-
-	void Run()
-	{
-		User *u = this->source.u;
-		BotInfo *bi = this->source.owner;
-
-		if (!command->permission.empty() && !u->Account()->HasCommand(command->permission))
-		{
-			u->SendMessage(bi, LanguageString::ACCESS_DENIED);
-			Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
-		}
-		else
-		{
-			CommandReturn ret = command->Execute(source, params);
-
-			if (ret == MOD_CONT)
-			{
-				FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, command, params));
-			}
-		}
-
-		main_mutex.Unlock();
-	}
-};
-
-class MySQLLiveModule : public Module, public Pipe
+class MySQLLiveModule : public Module
 {
 	service_reference<SQLProvider> SQL;
+	service_reference<AsynchCommandsService> ACS;
 
 	SQLResult RunQuery(const Anope::string &query)
 	{
@@ -76,86 +20,41 @@ class MySQLLiveModule : public Module, public Pipe
 		return SQL ? SQL->Escape(query) : query;
 	}
 
+	CommandMutex *CurrentCommand()
+	{
+		if (this->ACS)
+			return this->ACS->CurrentCommand();
+		return NULL;
+	}
+
  public:
-	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), SQL("mysql/main")
+	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
+		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands")
 	{
-		Implementation i[] = { I_OnPreCommand, I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore };
-		ModuleManager::Attach(i, this, 5);
+		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore };
+		ModuleManager::Attach(i, this, 4);
 	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
-	{
-		if (this->SQL)
-		{
-			CommandMutex *cm = new CommandMutex();
-			try
-			{
-				cm->mutex.Lock();
-				cm->command = command;
-				cm->source = source;
-				cm->params = params;
-
-				commands.push_back(cm);
-
-				// Give processing to the command thread
-				Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << source.u->nick;
-				threadEngine.Start(cm);
-				main_mutex.Lock();
-
-				return EVENT_STOP;
-			}
-			catch (const CoreException &ex)
-			{
-				delete cm;
-				Log() << "db_mysql_live: Unable to thread for command: " << ex.GetReason();
-			}
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnNotify()
-	{
-		for (std::list<CommandMutex *>::iterator it = commands.begin(), it_end = commands.end(); it != it_end; ++it)
-		{
-			CommandMutex *cm  = *it;
-
-			// Thread engine will pick this up later
-			if (cm->GetExitState() || !cm->processing)
-				continue;
-
-			Log(LOG_DEBUG_2) << "db_mysql_live: Waiting for command thread " << cm->command->name << " from " << cm->source.u->nick;
-			current_command = cm;
-
-			// Unlock to give processing back to the command thread
-			cm->mutex.Unlock();
-			// Relock to regain processing once the command thread hangs for any reason
-			main_mutex.Lock();
-
-			current_command = NULL;
-		}
-	}
-
 
 	void OnFindBot(const Anope::string &nick)
 	{
-		if (!current_command)
+		static bool lookup = true;
+		if (lookup == false)
+		{
+			lookup = true;
 			return;
-
-		CommandMutex *cm = current_command;
-
-		// Give it back to the core
-		cm->processing = false;
-		main_mutex.Unlock();
-		SQLResult res = this->RunQuery("SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'");
-		// And take it back...
-		cm->processing = true;
-		this->Notify();
-		cm->mutex.Lock();
+		}
 
 		try
 		{
-			current_command = NULL;
+			CommandMutex *current_command = this->CurrentCommand();
+
+			if (current_command)
+				current_command->Unlock();
+			SQLResult res = this->RunQuery("SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'");
+			if (current_command)
+				current_command->Lock();
+
+			lookup = false;
 			BotInfo *bi = findbot(res.Get(0, "nick"));
 			if (!bi)
 				bi = new BotInfo(res.Get(0, "nick"), res.Get(0, "user"), res.Get(0, "host"), res.Get(0, "rname"));
@@ -177,21 +76,24 @@ class MySQLLiveModule : public Module, public Pipe
 
 	void OnFindChan(const Anope::string &chname)
 	{
-		if (!current_command)
+		static bool lookup = true;
+		if (lookup == false)
+		{
+			lookup = true;
 			return;
-
-		CommandMutex *cm = current_command;
-
-		cm->processing = false;
-		main_mutex.Unlock();
-		SQLResult res = this->RunQuery("SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'");
-		cm->processing = true;
-		this->Notify();
-		cm->mutex.Lock();
+		}
 
 		try
 		{
-			current_command = NULL;
+			CommandMutex *current_command = this->CurrentCommand();
+
+			if (current_command)
+				current_command->Unlock();
+			SQLResult res = this->RunQuery("SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'");
+			if (current_command)
+				current_command->Lock();
+
+			lookup = false;
 			ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
 			if (!ci)
 				ci = new ChannelInfo(res.Get(0, "name"));
@@ -263,25 +165,27 @@ class MySQLLiveModule : public Module, public Pipe
 
 	void OnFindNick(const Anope::string &nick)
 	{
-		if (!current_command)
+		static bool lookup = true;
+		if (lookup == false)
+		{
+			lookup = true;
 			return;
-
-		CommandMutex *cm = current_command;
-
-		cm->processing = false;
-		main_mutex.Unlock();
-		SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'");
-		cm->processing = true;
-		this->Notify();
-		cm->mutex.Lock();
+		}
 
 		try
 		{
-			// Make OnFindCore trigger and look up the core too
+			CommandMutex *current_command = this->CurrentCommand();
+
+			if (current_command)
+				current_command->Unlock();
+			SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'");
+			if (current_command)
+				current_command->Lock();
+
 			NickCore *nc = findcore(res.Get(0, "display"));
 			if (!nc)
 				return;
-			current_command = NULL;
+			lookup = false;
 			NickAlias *na = findnick(res.Get(0, "nick"));
 			if (!na)
 				na = new NickAlias(res.Get(0, "nick"), nc);
@@ -310,21 +214,24 @@ class MySQLLiveModule : public Module, public Pipe
 
 	void OnFindCore(const Anope::string &nick)
 	{
-		if (!current_command)
+		static bool lookup = true;
+		if (lookup == false)
+		{
+			lookup = true;
 			return;
-
-		CommandMutex *cm = current_command;
-
-		cm->processing = false;
-		main_mutex.Unlock();
-		SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_core` WHERE `name` = '" + this->Escape(nick) + "'");
-		cm->processing = true;
-		this->Notify();
-		cm->mutex.Lock();
+		}
 
 		try
 		{
-  			current_command = NULL;
+			CommandMutex *current_command = this->CurrentCommand();
+
+			if (current_command)
+				current_command->Unlock();
+			SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_core` WHERE `name` = '" + this->Escape(nick) + "'");
+			if (current_command)
+				current_command->Lock();
+
+			lookup = false;
  			NickCore *nc = findcore(res.Get(0, "display"));
 			if (!nc)
 				nc = new NickCore(res.Get(0, "display"));

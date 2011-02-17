@@ -45,7 +45,7 @@ class CoreExport Thread : public Extensible
 {
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
-	bool Exit;
+	bool exit;
 
  public:
 	/* Handle for this thread */
@@ -66,6 +66,10 @@ class CoreExport Thread : public Extensible
 	/** Sets the exit state as true informing the thread we want it to shut down
 	 */
 	void SetExitState();
+
+	/** Exit the thread. Note that the thread still must be joined to free resources!
+	 */
+	void Exit();
 
 	/** Returns the exit state of the thread
 	 * @return true if we want to exit

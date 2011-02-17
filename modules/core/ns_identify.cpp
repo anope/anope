@@ -77,14 +77,14 @@ class CommandNSIdentify : public Command
 
 				u->UpdateHost();
 
-				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
-
 				Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display;
 				source.Reply(_("Password accepted - you are now recognized."));
 				if (ircd->vhost)
 					do_on_id(u);
 				if (Config->NSModeOnID)
 					do_setmodes(u);
+
+				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 				if (Config->NSForceEmail && u->Account() && u->Account()->email.empty())
 				{

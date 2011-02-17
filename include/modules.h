@@ -827,9 +827,10 @@ class CoreExport Module : public Extensible
 	virtual void OnFindChan(const Anope::string &chname) { }
 
 	/** Called when a nick is dropped
-	 * @param nick The nick
+	 * @param u The user dropping the nick
+	 * @param na The nick
 	 */
-	virtual void OnNickDrop(const Anope::string &nick) { }
+	virtual void OnNickDrop(User *u, NickAlias *na) { }
 
 	/** Called when a nick is forbidden
 	 * @param na The nick alias of the forbidden nick

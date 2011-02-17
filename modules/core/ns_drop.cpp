@@ -89,10 +89,10 @@ class CommandNSDrop : public Command
 				ircdproto->SendSQLineDel(&x);
 			}
 
+			FOREACH_MOD(I_OnNickDrop, OnNickDrop(u, na));
+
 			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
 			delete na;
-
-			FOREACH_MOD(I_OnNickDrop, OnNickDrop(!my_nick.empty() ? my_nick : nick));
 
 			if (!is_mine)
 			{

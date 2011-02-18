@@ -227,20 +227,20 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 		if (level && level != access->level)
 			continue;
 		/* Access entry is a mask and we match it */
-		if (!access->nc && (Anope::Match(u->nick, access->mask) || Anope::Match(u->GetDisplayedMask(), access->mask)))
+		else if (!access->nc && (Anope::Match(u->nick, access->mask) || Anope::Match(u->GetDisplayedMask(), access->mask)))
 			;
 		/* Access entry is a nick core and we are identified for that account */
 		else if (access->nc && u->IsIdentified() && u->Account() == access->nc) 
 			;
-		/* User is not identified but on a registered nick, and is recognized, and is on an insecure channel */
-		else if (na && u->IsRecognized() && !this->HasFlag(CI_SECURE))
-			;
 		else
 			continue;
 
-		/* Use the highest level access available */
-		if (!highest || access->level > highest->level)
-			highest = access;
+		if (u->IsIdentified() || (na && u->IsRecognized() && !this->HasFlag(CI_SECURE)))
+		{
+			/* Use the highest level access available */
+			if (!highest || access->level > highest->level)
+				highest = access;
+		}
 	}
 
 	return highest;

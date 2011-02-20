@@ -1066,6 +1066,11 @@ class CoreExport Module : public Extensible
 	 * @return MOD_STOP to stop processing completely
 	 */
 	virtual EventReturn OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg, bool &Allow) { return EVENT_CONTINUE; }
+
+	/** Called when any object is destroyed
+	 * @param b The object
+	 */
+	virtual void OnObjectDestroy(Base *b) { }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1118,7 +1123,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
-		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg,
+		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnObjectDestroy,
 	I_END
 };
 

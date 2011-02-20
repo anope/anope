@@ -111,6 +111,10 @@ BotInfo::~BotInfo()
 	}
 }
 
+void BotInfo::SetIdent(const Anope::string &sident)
+{
+	this->ident = sident;
+}
 
 void BotInfo::SetNewNick(const Anope::string &newnick)
 {

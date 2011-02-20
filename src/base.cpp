@@ -1,4 +1,5 @@
 #include "services.h"
+#include "modules.h"
 
 Base::Base()
 {
@@ -10,6 +11,8 @@ Base::~Base()
 	{
 		(*it)->Invalidate();
 	}
+
+	FOREACH_MOD(I_OnObjectDestroy, OnObjectDestroy(this));
 }
 
 void Base::AddReference(dynamic_reference_base *r)

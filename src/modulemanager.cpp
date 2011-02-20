@@ -400,7 +400,7 @@ void ModuleManager::UnloadAll()
 			Module *m = *it++;
 
 			if (static_cast<MODType>(i) == m->type)
-				DeleteModule(m);
+				UnloadModule(m, NULL);
 		}
 	}
 }

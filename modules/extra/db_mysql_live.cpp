@@ -2,59 +2,51 @@
 #include "async_commands.h"
 #include "sql.h"
 
-class MySQLLiveModule : public Module
+class SQLCache : public Timer
 {
-	service_reference<SQLProvider> SQL;
-	service_reference<AsynchCommandsService> ACS;
-
-	SQLResult RunQuery(const Anope::string &query)
-	{
-		if (!this->SQL)
-			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
-
-		return SQL->RunQuery(query);
-	}
-
-	const Anope::string Escape(const Anope::string &query)
-	{
-		return SQL ? SQL->Escape(query) : query;
-	}
-
-	CommandMutex *CurrentCommand()
-	{
-		if (this->ACS)
-			return this->ACS->CurrentCommand();
-		return NULL;
-	}
-
+	typedef std::map<Anope::string, time_t, std::less<ci::string> > cache_map;
+	cache_map cache;
  public:
-	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands")
+
+	SQLCache() : Timer(300, Anope::CurTime, true) { }
+
+	bool Check(const Anope::string &item)
 	{
-		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore };
-		ModuleManager::Attach(i, this, 4);
+		cache_map::iterator it = this->cache.find(item);
+		if (it != this->cache.end() && Anope::CurTime - it->second < 5)
+			return true;
+
+		this->cache[item] = Anope::CurTime;
+		return false;
 	}
 
-	void OnFindBot(const Anope::string &nick)
+	void Tick(time_t)
 	{
-		static bool lookup = true;
-		if (lookup == false)
+		for (cache_map::iterator it = this->cache.begin(), next_it; it != this->cache.end(); it = next_it)
 		{
-			lookup = true;
-			return;
-		}
+			next_it = it;
+			++next_it;
 
+			if (Anope::CurTime - it->second > 5)
+				this->cache.erase(it);
+		}
+	}
+};
+
+class BotInfoUpdater : public SQLInterface, public SQLCache
+{
+ public:
+ 	BotInfoUpdater(Module *m) : SQLInterface(m) { }
+
+	void OnResult(const SQLResult &r)
+	{
+		BotInfoUpdater::Process(r);
+	}
+
+	static void Process(const SQLResult &res)
+	{
 		try
 		{
-			CommandMutex *current_command = this->CurrentCommand();
-
-			if (current_command)
-				current_command->Unlock();
-			SQLResult res = this->RunQuery("SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'");
-			if (current_command)
-				current_command->Lock();
-
-			lookup = false;
 			BotInfo *bi = findbot(res.Get(0, "nick"));
 			if (!bi)
 				bi = new BotInfo(res.Get(0, "nick"), res.Get(0, "user"), res.Get(0, "host"), res.Get(0, "rname"));
@@ -70,30 +62,28 @@ class MySQLLiveModule : public Module
 			bi->created = convertTo<time_t>(res.Get(0, "created"));
 			bi->chancount = convertTo<uint32>(res.Get(0, "chancount"));
 		}
-		catch (const SQLException &) { }
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
 		catch (const ConvertException &) { }
 	}
+};
 
-	void OnFindChan(const Anope::string &chname)
+class ChanInfoUpdater : public SQLInterface, public SQLCache
+{
+ public:
+ 	ChanInfoUpdater(Module *m) : SQLInterface(m) { }
+
+	void OnResult(const SQLResult &r)
 	{
-		static bool lookup = true;
-		if (lookup == false)
-		{
-			lookup = true;
-			return;
-		}
+		ChanInfoUpdater::Process(r);
+	}
 
+	static void Process(const SQLResult &res)
+	{
 		try
 		{
-			CommandMutex *current_command = this->CurrentCommand();
-
-			if (current_command)
-				current_command->Unlock();
-			SQLResult res = this->RunQuery("SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'");
-			if (current_command)
-				current_command->Lock();
-
-			lookup = false;
 			ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
 			if (!ci)
 				ci = new ChannelInfo(res.Get(0, "name"));
@@ -159,33 +149,31 @@ class MySQLLiveModule : public Module
 			if (ci->c)
 				check_modes(ci->c);
 		}
-		catch (const SQLException &) { }
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
 		catch (const ConvertException &) { }
 	}
+};
 
-	void OnFindNick(const Anope::string &nick)
+class NickInfoUpdater : public SQLInterface, public SQLCache
+{
+ public:
+ 	NickInfoUpdater(Module *m) : SQLInterface(m) { }
+
+	void OnResult(const SQLResult &r)
 	{
-		static bool lookup = true;
-		if (lookup == false)
-		{
-			lookup = true;
-			return;
-		}
+		NickInfoUpdater::Process(r);
+	}
 
+	static void Process(const SQLResult &res)
+	{
 		try
 		{
-			CommandMutex *current_command = this->CurrentCommand();
-
-			if (current_command)
-				current_command->Unlock();
-			SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'");
-			if (current_command)
-				current_command->Lock();
-
 			NickCore *nc = findcore(res.Get(0, "display"));
 			if (!nc)
 				return;
-			lookup = false;
 			NickAlias *na = findnick(res.Get(0, "nick"));
 			if (!na)
 				na = new NickAlias(res.Get(0, "nick"), nc);
@@ -208,30 +196,28 @@ class MySQLLiveModule : public Module
 				na->nc->aliases.push_back(na);
 			}
 		}
-		catch (const SQLException &) { }
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
 		catch (const ConvertException &) { }
 	}
+};
 
-	void OnFindCore(const Anope::string &nick)
+class NickCoreUpdater : public SQLInterface, public SQLCache
+{
+ public:
+ 	NickCoreUpdater(Module *m) : SQLInterface(m) { }
+
+	void OnResult(const SQLResult &r)
 	{
-		static bool lookup = true;
-		if (lookup == false)
-		{
-			lookup = true;
-			return;
-		}
+		NickCoreUpdater::Process(r);
+	}
 
+	static void Process(const SQLResult &res)
+	{
 		try
 		{
-			CommandMutex *current_command = this->CurrentCommand();
-
-			if (current_command)
-				current_command->Unlock();
-			SQLResult res = this->RunQuery("SELECT * FROM `anope_ns_core` WHERE `name` = '" + this->Escape(nick) + "'");
-			if (current_command)
-				current_command->Lock();
-
-			lookup = false;
  			NickCore *nc = findcore(res.Get(0, "display"));
 			if (!nc)
 				nc = new NickCore(res.Get(0, "display"));
@@ -243,8 +229,201 @@ class MySQLLiveModule : public Module
 			nc->FromString(BuildStringVector(res.Get(0, "flags")));
 			nc->language = res.Get(0, "language");
 		}
-		catch (const SQLException &) { }
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << ex.GetReason();
+		}
 		catch (const ConvertException &) { }
+	}
+};
+
+class MySQLLiveModule : public Module
+{
+	service_reference<SQLProvider> SQL;
+	service_reference<AsynchCommandsService> ACS;
+
+	BotInfoUpdater botinfoupdater;
+	ChanInfoUpdater chaninfoupdater;
+	NickInfoUpdater nickinfoupdater;
+	NickCoreUpdater nickcoreupdater;
+
+	SQLResult RunQuery(const Anope::string &query)
+	{
+		if (!this->SQL)
+			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+
+		SQLResult res = SQL->RunQuery(query);
+		if (!res.GetError().empty())
+			throw SQLException(res.GetError());
+		return res;
+	}
+
+	void RunQuery(SQLInterface *i, const Anope::string &query)
+	{
+		if (!this->SQL)
+			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+
+		return SQL->Run(i, query);
+	}
+
+	const Anope::string Escape(const Anope::string &query)
+	{
+		return SQL ? SQL->Escape(query) : query;
+	}
+
+	CommandMutex *CurrentCommand()
+	{
+		if (this->ACS)
+			return this->ACS->CurrentCommand();
+		return NULL;
+	}
+
+ public:
+	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
+		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands"), botinfoupdater(this),
+		chaninfoupdater(this), nickinfoupdater(this), nickcoreupdater(this)
+	{
+		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnPreShutdown };
+		ModuleManager::Attach(i, this, 5);
+	}
+
+	void OnPreShutdown()
+	{
+		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore };
+		for (size_t j = 0; j < 4; ++j)
+			ModuleManager::Detach(i[j], this);
+	}
+
+	void OnFindBot(const Anope::string &nick)
+	{
+		if (botinfoupdater.Check(nick))
+			return;
+
+		try
+		{
+			Anope::string query = "SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'";
+			CommandMutex *current_command = this->CurrentCommand();
+			if (current_command)
+			{
+				current_command->Unlock();
+				try
+				{
+					SQLResult res = this->RunQuery(query);
+					current_command->Lock();
+					BotInfoUpdater::Process(res);
+				}
+				catch (const SQLException &ex)
+				{
+					current_command->Lock();
+					throw;
+				}
+			}
+			else
+				this->RunQuery(&botinfoupdater, query);
+		}
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << "OnBotChan: " << ex.GetReason();
+		}
+	}
+
+	void OnFindChan(const Anope::string &chname)
+	{
+		if (chaninfoupdater.Check(chname))
+			return;
+
+		try
+		{
+			Anope::string query = "SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'";
+			CommandMutex *current_command = this->CurrentCommand();
+			if (current_command)
+			{
+				current_command->Unlock();
+				try
+				{
+					SQLResult res = this->RunQuery(query);
+					current_command->Lock();
+					ChanInfoUpdater::Process(res);
+				}
+				catch (const SQLException &)
+				{
+					current_command->Lock();
+					throw;
+				}
+			}
+			else
+				this->RunQuery(&chaninfoupdater, query);
+		}
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << "OnFindChan: " << ex.GetReason();
+		}
+	}
+
+	void OnFindNick(const Anope::string &nick)
+	{
+		if (nickinfoupdater.Check(nick))
+			return;
+
+		try
+		{
+			Anope::string query = "SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'";
+			CommandMutex *current_command = this->CurrentCommand();
+			if (current_command)
+			{
+				current_command->Unlock();
+				try
+				{
+					SQLResult res = this->RunQuery(query);
+					current_command->Lock();
+					NickInfoUpdater::Process(res);
+				}
+				catch (const SQLException &)
+				{
+					current_command->Lock();
+					throw;
+				}
+			}
+			else
+				this->RunQuery(&nickinfoupdater, query);
+		}
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << "OnFindNick: " << ex.GetReason();
+		}
+	}
+
+	void OnFindCore(const Anope::string &nick)
+	{
+		if (nickcoreupdater.Check(nick))
+			return;
+
+		try
+		{
+			Anope::string query = "SELECT * FROM `anope_ns_core` WHERE `display` = '" + this->Escape(nick) + "'";
+			CommandMutex *current_command = this->CurrentCommand();
+			if (current_command)
+			{
+				current_command->Unlock();
+				try
+				{
+					SQLResult res = this->RunQuery(query);
+					current_command->Lock();
+					NickCoreUpdater::Process(res);
+				}
+				catch (const SQLException &)
+				{
+					current_command->Lock();
+					throw;
+				}
+			}
+			else
+				this->RunQuery(&nickcoreupdater, query);
+		}
+		catch (const SQLException &ex)
+		{
+			Log(LOG_DEBUG) << "OnFindCore: " << ex.GetReason();
+		}
 	}
 };
 

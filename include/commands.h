@@ -69,15 +69,15 @@ struct CoreExport CommandSource
 
 	std::list<Anope::string> reply;
 
-	~CommandSource();
-
 	void Reply(const char *message, ...);
 	void Reply(const Anope::string &message);
+
+	void DoReply();
 };
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command : public Flags<CommandFlag>
+class CoreExport Command : public Flags<CommandFlag>, public Base
 {
 	Anope::string desc;
 

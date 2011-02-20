@@ -35,6 +35,7 @@ void Thread::Join()
  */
 void Thread::Exit()
 {
+	this->SetExitState();
 	ExitThread(0);
 }
 

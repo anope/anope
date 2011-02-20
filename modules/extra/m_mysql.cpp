@@ -50,15 +50,12 @@ class MySQLResult : public SQLResult
  public:
 	MySQLResult(const Anope::string &q, MYSQL_RES *r) : SQLResult(q), res(r)
 	{
-		if (!res)
-			return;
+		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
-		unsigned num_fields = mysql_num_fields(res);
+		Log(LOG_DEBUG) << "SQL query " << q << " returned " << num_fields << " fields";
 
 		if (!num_fields)
 			return;
-
-		Log(LOG_DEBUG) << "SQL query returned " << num_fields << " fields";
 
 		for (MYSQL_ROW row; (row = mysql_fetch_row(res));)
 		{
@@ -268,6 +265,8 @@ class ModuleSQL : public Module
 		}
 
 		this->DThread->Unlock();
+
+		this->SQLPipe->OnNotify();
 	}
 };
 
@@ -398,8 +397,11 @@ void DispatcherThread::Run()
 void MySQLPipe::OnNotify()
 {
 	me->DThread->Lock();
+	std::deque<QueryResult> finishedRequests = me->FinishedRequests;
+	me->FinishedRequests.clear();
+	me->DThread->Unlock();
 
-	for (std::deque<QueryResult>::const_iterator it = me->FinishedRequests.begin(), it_end = me->FinishedRequests.end(); it != it_end; ++it)
+	for (std::deque<QueryResult>::const_iterator it = finishedRequests.begin(), it_end = finishedRequests.end(); it != it_end; ++it)
 	{
 		const QueryResult &qr = *it;
 
@@ -411,9 +413,6 @@ void MySQLPipe::OnNotify()
 		else
 			qr.sqlinterface->OnError(qr.result);
 	}
-	me->FinishedRequests.clear();
-
-	me->DThread->Unlock();
 }
 
 MODULE_INIT(ModuleSQL)

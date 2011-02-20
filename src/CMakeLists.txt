@@ -1,6 +1,5 @@
 # Find all the *.cpp files within the current source directory, and sort the list
-file(GLOB SRC_SRCS_CPP RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
-set(SRC_SRCS ${SRC_SRCS_C} ${SRC_SRCS_CPP})
+file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 
 # If using Windows, add the windows.cpp, the win32 threading engine, and the socket engine to the list
 if(WIN32)

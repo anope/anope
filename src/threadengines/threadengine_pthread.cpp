@@ -43,6 +43,7 @@ void Thread::Join()
  */
 void Thread::Exit()
 {
+	this->SetExitState();
 	pthread_exit(0);
 }
 

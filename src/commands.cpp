@@ -168,6 +168,8 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 	}
+
+	source.DoReply();
 }
 
 /**

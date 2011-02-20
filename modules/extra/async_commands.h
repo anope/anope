@@ -6,11 +6,11 @@ class CommandMutex : public Thread
 	Mutex mutex;
 	// Set to true when this thread is processing data that is not thread safe (eg, the command)
 	bool processing;
-	Command *command;
 	CommandSource source;
+	Command *command;
 	std::vector<Anope::string> params;
 
-	CommandMutex() : Thread(), processing(true) { }
+	CommandMutex(CommandSource &s, Command *c, const std::vector<Anope::string> &p) : Thread(), processing(true), source(s), command(c), params(p) { }
 
 	~CommandMutex() { }
 

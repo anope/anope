@@ -8,26 +8,6 @@
 #include "services.h"
 #include "modules.h"
 
-CommandSource::~CommandSource()
-{
-	for (std::list<Anope::string>::iterator it = this->reply.begin(), it_end = this->reply.end(); it != it_end; ++it)
-	{
-		const Anope::string &message = *it;
-
-		// Send to the user if the reply is more than one line
-		if (!this->fantasy || !this->ci || this->reply.size() > 1)
-			u->SendMessage(this->service, message);
-		else if (this->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
-			ircdproto->SendPrivmsg(this->service, this->ci->name, message.c_str());
-		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICE))
-			ircdproto->SendNotice(this->service, this->ci->name, message.c_str());
-		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
-			ircdproto->SendNoticeChanops(this->service, this->ci->c, message.c_str());
-		else
-			u->SendMessage(this->service, message);
-	}
-}
-
 void CommandSource::Reply(const char *message, ...)
 {
 	va_list args;
@@ -50,6 +30,26 @@ void CommandSource::Reply(const Anope::string &message)
 	Anope::string tok;
 	while (sep.GetToken(tok))
 		this->reply.push_back(tok);
+}
+
+void CommandSource::DoReply()
+{
+	for (std::list<Anope::string>::iterator it = this->reply.begin(), it_end = this->reply.end(); it != it_end; ++it)
+	{
+		const Anope::string &message = *it;
+
+		// Send to the user if the reply is more than one line
+		if (!this->fantasy || !this->ci || this->reply.size() > 1)
+			u->SendMessage(this->service, message);
+		else if (this->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
+			ircdproto->SendPrivmsg(this->service, this->ci->name, message.c_str());
+		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICE))
+			ircdproto->SendNotice(this->service, this->ci->name, message.c_str());
+		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
+			ircdproto->SendNoticeChanops(this->service, this->ci->c, message.c_str());
+		else
+			u->SendMessage(this->service, message);
+	}
 }
 
 Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)

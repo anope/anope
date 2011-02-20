@@ -914,6 +914,8 @@ class ProtoInspIRCd : public Module
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 
+		Capab.SetFlag(CAPAB_NOQUIT);
+
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 

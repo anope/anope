@@ -694,11 +694,15 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 
 bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
-	Anope::string rest;
-	if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-		return true;
-	else
-		return false;
+	try
+	{
+		Anope::string rest;
+		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+			return true;
+	}
+	catch (const CoreException &) { }
+	
+	return false;
 }
 
 class ProtoInspIRCd : public Module

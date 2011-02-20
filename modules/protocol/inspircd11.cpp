@@ -865,9 +865,13 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 
 bool ChannelModeFlood::IsValid(const Anope::string &value) const
 {
-	Anope::string rest;
-	if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-		return true;
+	try
+	{
+		Anope::string rest;
+		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+			return true;
+	}
+	catch (const ConvertException &) { }
 
 	return false;
 }

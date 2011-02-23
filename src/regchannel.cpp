@@ -598,6 +598,7 @@ bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool s
 		if (mode->Type != MODE_REGULAR)
 		{
 			std::multimap<ChannelModeName, ModeLock>::const_iterator it_end = this->mode_locks.upper_bound(mode->Name);
+
 			for (; it != it_end; ++it)
 			{
 				const ModeLock &ml = it->second;
@@ -651,14 +652,18 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 	else
 	{
 		// For list or status modes, we must check the parameter
-		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name), it_end = this->mode_locks.upper_bound(mode->Name);
-		for (; it != it_end; ++it)
+		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name);
+		if (it != this->mode_locks.end())
 		{
-			const ModeLock &ml = it->second;
-			if (ml.param == param)
+			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			for (; it != it_end; ++it)
 			{
-				this->mode_locks.erase(it);
-				return true;
+				const ModeLock &ml = it->second;
+				if (ml.param == param)
+				{
+					this->mode_locks.erase(it);
+					return true;
+				}
 			}
 		}
 
@@ -687,7 +692,10 @@ const std::multimap<ChannelModeName, ModeLock> &ChannelInfo::GetMLock() const
  */
 std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> ChannelInfo::GetModeList(ChannelModeName Name)
 {
-	return std::make_pair(this->mode_locks.find(Name), this->mode_locks.upper_bound(Name));
+	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(Name), it_end = it;
+	if (it != this->mode_locks.end())
+		it_end = this->mode_locks.upper_bound(Name);
+	return std::make_pair(it, it_end);
 }
 
 /** Get details for a specific mlock

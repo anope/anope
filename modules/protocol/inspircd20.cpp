@@ -391,8 +391,6 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					cm = new ChannelMode(CMODE_ALLINVITE, "CMODE_ALLINVITE", modechar[0]);
 				else if (modename.equals_cs("auditorium"))
 					cm = new ChannelMode(CMODE_AUDITORIUM, "CMODE_AUDITORIUM", modechar[0]);
-				else if (modename.equals_cs("autoop"))
-					continue; // XXX Not currently tracked
 				else if (modename.equals_cs("ban"))
 					cm = new ChannelModeBan(modechar[0]);
 				else if (modename.equals_cs("banexception"))
@@ -407,20 +405,12 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					cm = new ChannelMode(CMODE_FILTER, "CMODE_FILTER", modechar[0]);
 				else if (modename.equals_cs("delayjoin"))
 					cm = new ChannelMode(CMODE_DELAYEDJOIN, "CMODE_DELAYEDJOIN", modechar[0]);
-				else if (modename.equals_cs("delaymsg"))
-					continue;
-				else if (modename.equals_cs("exemptchanops"))
-					continue; // XXX
-				else if (modename.equals_cs("filter"))
-					continue; // XXX
 				else if (modename.equals_cs("flood"))
 					cm = new ChannelModeFlood(modechar[0], true);
 				else if (modename.equals_cs("founder"))
 					cm = new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", modechar[1], modechar[0]);
 				else if (modename.equals_cs("halfop"))
 					cm = new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", modechar[1], modechar[0]);
-				else if (modename.equals_cs("history"))
-					continue; // XXX
 				else if (modename.equals_cs("invex"))
 					cm = new ChannelModeInvex(modechar[0]);
 				else if (modename.equals_cs("inviteonly"))
@@ -435,8 +425,6 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					cm = new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", modechar[0], true);
 				else if (modename.equals_cs("moderated"))
 					cm = new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", modechar[0]);
-				else if (modename.equals_cs("namebase"))
-					continue; // XXX
 				else if (modename.equals_cs("nickflood"))
 					cm = new ChannelModeParam(CMODE_NICKFLOOD, "CMODE_NICKFLOOD", modechar[0], true);
 				else if (modename.equals_cs("noctcp"))
@@ -477,7 +465,8 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					cm = new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", modechar[1], modechar[0]);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
-					cm = new ChannelModeStatus(CMODE_END, "", modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_END, modechar[0], modechar[1], modechar[0]);
+				/* else don't do anything here, we will get it in CAPAB CAPABILITIES */
 
 				if (cm)
 					ModeManager::AddChannelMode(cm);
@@ -585,8 +574,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						// XXX list modes needs a bit of a rewrite
-						ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t], modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -594,7 +582,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t]));
 					}
 
 					sep.GetToken(modebuf);
@@ -602,7 +590,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
+						ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t], true));
 					}
 
 					sep.GetToken(modebuf);
@@ -610,7 +598,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					{
 						if (ModeManager::FindChannelModeByChar(modebuf[t]))
 							continue;
-						ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
+						ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t], modebuf[t]));
 					}
 				}
 				else if (capab.find("USERMODES") != Anope::string::npos)

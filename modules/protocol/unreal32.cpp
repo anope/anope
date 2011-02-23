@@ -538,7 +538,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 							ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t], modebuf[t]));
 					}
 				}
 
@@ -557,7 +557,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t]));
 					}
 				}
 
@@ -573,7 +573,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_JOINFLOOD, "CMODE_JOINFLOOD", 'j', true));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
+							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t], true));
 					}
 				}
 
@@ -649,7 +649,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, "CMODE_FILTER", 'G'));
 							continue;
 						default:
-							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
+							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t], modebuf[t]));
 					}
 				}
 			}

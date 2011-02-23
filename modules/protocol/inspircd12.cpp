@@ -419,9 +419,8 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 							case 'a':
 								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT , "CMODE_PROTECT", 'a', '@'));
 								continue;
-							// XXX mode g
 							default:
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 
@@ -434,7 +433,7 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 								ModeManager::AddChannelMode(new ChannelModeKey('k'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 
@@ -462,7 +461,7 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l', true));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t], true));
 						}
 					}
 
@@ -544,7 +543,7 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 								ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 				}

@@ -404,7 +404,7 @@ class InspircdIRCdMessage : public IRCdMessage
 								ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 
@@ -417,7 +417,7 @@ class InspircdIRCdMessage : public IRCdMessage
 								ModeManager::AddChannelMode(new ChannelModeKey('k'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 
@@ -436,7 +436,7 @@ class InspircdIRCdMessage : public IRCdMessage
 								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, "CMODE_REDIRECT", 'L', true));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, "", modebuf[t], true));
+								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_END, modebuf[t], modebuf[t], true));
 						}
 					}
 
@@ -506,7 +506,7 @@ class InspircdIRCdMessage : public IRCdMessage
 								ModeManager::AddChannelMode(new ChannelMode(CMODE_NOINVITE, "CMODE_NOINVITE", 'V'));
 								continue;
 							default:
-								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, "", modebuf[t]));
+								ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t], modebuf[t]));
 						}
 					}
 				}

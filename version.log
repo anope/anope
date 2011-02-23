@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3060"
+VERSION_BUILD="3061"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3061 - Rejoin our clients if kicked on TS6 IRCDs and made ratbox protocol module use account tracking
 #Revision 3060 - Fixed bug 1248, an error in fr.l - reported by SaKa
 #Revision 3059 - Fixed the wiki URLs in install.js
 #Revision 3058 - Fixed not introducing our clients with usermode +k on InspIRCd 2.0

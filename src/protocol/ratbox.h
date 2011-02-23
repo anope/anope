@@ -117,4 +117,5 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason);
 int ratbox_valid_nick(char *nick);
 void ratbox_cmd_ctcp(char *source, char *dest, char *buf);
 
+int anope_event_encap(char *source, int ac, char **av);
 

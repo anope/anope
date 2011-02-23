@@ -18,25 +18,25 @@
 
 IRCDVar myIrcd[] = {
     {"Ratbox 2.0+",             /* ircd name */
-     "+oi",                     /* nickserv mode */
-     "+oi",                     /* chanserv mode */
-     "+oi",                     /* memoserv mode */
-     "+oi",                     /* hostserv mode */
-     "+oai",                    /* operserv mode */
-     "+oi",                     /* botserv mode  */
-     "+oi",                     /* helpserv mode */
-     "+oi",                     /* Dev/Null mode */
-     "+oi",                     /* Global mode   */
-     "+oi",                     /* nickserv alias mode */
-     "+oi",                     /* chanserv alias mode */
-     "+oi",                     /* memoserv alias mode */
-     "+oi",                     /* hostserv alias mode */
-     "+oai",                    /* operserv alias mode */
-     "+oi",                     /* botserv alias mode  */
-     "+oi",                     /* helpserv alias mode */
-     "+oi",                     /* Dev/Null alias mode */
-     "+oi",                     /* Global alias mode   */
-     "+oi",                     /* Used by BotServ Bots */
+     "+oiS",                     /* nickserv mode */
+     "+oiS",                     /* chanserv mode */
+     "+oiS",                     /* memoserv mode */
+     "+oiS",                     /* hostserv mode */
+     "+oaiS",                    /* operserv mode */
+     "+oiS",                     /* botserv mode  */
+     "+oiS",                     /* helpserv mode */
+     "+oiS",                     /* Dev/Null mode */
+     "+oiS",                     /* Global mode   */
+     "+oiS",                     /* nickserv alias mode */
+     "+oiS",                     /* chanserv alias mode */
+     "+oiS",                     /* memoserv alias mode */
+     "+oiS",                     /* hostserv alias mode */
+     "+oaiS",                    /* operserv alias mode */
+     "+oiS",                     /* botserv alias mode  */
+     "+oiS",                     /* helpserv alias mode */
+     "+oiS",                     /* Dev/Null alias mode */
+     "+oiS",                     /* Global alias mode   */
+     "+oiS",                     /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */
      "-acilmnpst",              /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
@@ -550,6 +550,20 @@ void ratbox_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
 
+int ratbox_login(int argc, char **argv)
+{
+    send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * SU %s :%s", argv[0], argv[0]);
+
+    return MOD_CONT;
+}
+
+int ratbox_logout(int argc, char **argv)
+{
+    send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * SU %s", argv[0]);
+
+    return MOD_CONT;
+}
+
 int anope_event_sjoin(char *source, int ac, char **av)
 {
     do_sjoin(source, ac, av);
@@ -762,7 +776,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);    
+    m = createMessage("ENCAP",     anope_event_encap); addCoreMessage(IRCD,m);    
     m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
 }
 
@@ -1152,6 +1166,36 @@ int anope_event_server(char *source, int ac, char **av)
         do_server(source, av[0], av[1], av[2], NULL);
     }
     return MOD_CONT;
+}
+
+int anope_event_encap(char *source, int ac, char **av)
+{
+	if (ac > 2 && !strcmp(av[1], "LOGIN"))
+	{
+		User *u = NULL;
+		if (UseTS6)
+			u = find_byuid(source);
+		if (!u)
+			u = finduser(source);
+		if (u && u->na && !nick_identified(u) && !strcmp(u->nick, av[2]))
+		{
+			u->na->status |= NS_IDENTIFIED;
+			check_memos(u);
+
+			if (NSNickTracking)
+				nsStartNickTracking(u);
+
+			u->na->last_seen = time(NULL);
+			if (u->na->last_usermask)
+				free(u->na->last_usermask);
+			u->na->last_usermask = smalloc(strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2);
+			sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u), common_get_vhost(u));
+
+			alog("%s: %s!%s@%s automatically identified for nick %s", s_NickServ, u->nick, u->username, u->host, u->nick);
+		}
+	}
+
+	return MOD_CONT;
 }
 
 int anope_event_sid(char *source, int ac, char **av)
@@ -1873,6 +1917,7 @@ void moduleAddAnopeCmds()
  **/
 int AnopeInit(int argc, char **argv)
 {
+    EvtHook *hk;
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -1902,6 +1947,15 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAnopeCmds();
     moduleAddIRCDMsgs();
+
+    hk = createEventHook(EVENT_NICK_IDENTIFY, ratbox_login);
+    moduleAddEventHook(hk);
+
+    hk = createEventHook(EVENT_NICK_REGISTERED, ratbox_login);
+    moduleAddEventHook(hk);
+
+    hk = createEventHook(EVENT_NICK_LOGOUT, ratbox_logout);
+    moduleAddEventHook(hk);
 
     return MOD_CONT;
 }

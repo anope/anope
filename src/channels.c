@@ -640,12 +640,20 @@ void do_kick(const char *source, int ac, char **av)
     User *user;
     char *s, *t;
     struct u_chanlist *c;
+    Uid *uid;
 
     t = av[1];
     while (*(s = t)) {
         t = s + strcspn(s, ",");
         if (*t)
             *t++ = 0;
+
+	if (ircd->ts6 && UseTS6)
+	{
+		uid = find_nickuid(s);
+		if (uid)
+			s = uid->nick;
+	}
 
         /* If it is the bot that is being kicked, we make it rejoin the
          * channel and stop immediately.

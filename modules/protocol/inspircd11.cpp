@@ -529,21 +529,21 @@ class InspircdIRCdMessage : public IRCdMessage
 				send_cmd("", "ERROR :m_globops is not loaded. This is required by Anope");
 				quitmsg = "ERROR: Remote server does not have the m_globops module loaded, and this is required.";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 			if (!has_servicesmod)
 			{
 				send_cmd("", "ERROR :m_services is not loaded. This is required by Anope");
 				quitmsg = "ERROR: Remote server does not have the m_services module loaded, and this is required.";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 			if (!has_hidechansmod)
 			{
 				send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
 				quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 			if (!has_svsholdmod)
 				ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");

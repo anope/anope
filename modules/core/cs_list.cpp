@@ -37,7 +37,7 @@ class CommandCSList : public Command
 		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
 			source.Reply(LanguageString::ACCESS_DENIED);
-			return MOD_STOP;
+			return MOD_CONT;
 		}
 
 		if (pattern[0] == '#')

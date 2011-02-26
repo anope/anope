@@ -26,7 +26,7 @@ Command *FindCommand(BotInfo *bi, const Anope::string &name)
 	return NULL;
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, ChannelInfo *ci)
+void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &fullmessage)
 {
 	if (!bi || !u)
 		return;
@@ -45,10 +45,10 @@ void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &fullmessage, Channel
 	
 	Command *c = FindCommand(bi, command);
 
-	mod_run_cmd(bi, u, c, command, message, ci);
+	mod_run_cmd(bi, u, ci, c, command, message);
 }
 
-void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, ChannelInfo *ci)
+void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope::string &command, const Anope::string &message)
 {
 	if (!bi || !u)
 		return;
@@ -166,12 +166,13 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	}
 
 	CommandReturn ret = c->Execute(source, params);
-	if (ret == MOD_STOP)
-		return;
+	if (ret != MOD_STOP)
+	{
+		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
+		source.DoReply();
+	}
 
-	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
-
-	source.DoReply();
+	PopLanguage();
 }
 
 /**

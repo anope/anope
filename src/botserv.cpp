@@ -343,7 +343,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 						message = ci->name + " " + message;
 					message = command + " " + message;
 
-					mod_run_cmd(ChanServ, u, message, ci);
+					mod_run_cmd(ChanServ, u, ci, message);
 				}
 
 				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, sep.GetRemaining()));

@@ -33,43 +33,6 @@ class SQLCache : public Timer
 	}
 };
 
-class BotInfoUpdater : public SQLInterface, public SQLCache
-{
- public:
- 	BotInfoUpdater(Module *m) : SQLInterface(m) { }
-
-	void OnResult(const SQLResult &r)
-	{
-		BotInfoUpdater::Process(r);
-	}
-
-	static void Process(const SQLResult &res)
-	{
-		try
-		{
-			BotInfo *bi = findbot(res.Get(0, "nick"));
-			if (!bi)
-				bi = new BotInfo(res.Get(0, "nick"), res.Get(0, "user"), res.Get(0, "host"), res.Get(0, "rname"));
-			else
-			{
-				bi->SetIdent(res.Get(0, "user"));
-				bi->host = res.Get(0, "host");
-				bi->realname = res.Get(0, "rname");
-			}
-
-			if (res.Get(0, "flags").equals_cs("PRIVATE"))
-				bi->SetFlag(BI_PRIVATE);
-			bi->created = convertTo<time_t>(res.Get(0, "created"));
-			bi->chancount = convertTo<uint32>(res.Get(0, "chancount"));
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << ex.GetReason();
-		}
-		catch (const ConvertException &) { }
-	}
-};
-
 class ChanInfoUpdater : public SQLInterface, public SQLCache
 {
  public:
@@ -242,7 +205,6 @@ class MySQLLiveModule : public Module
 	service_reference<SQLProvider> SQL;
 	service_reference<AsynchCommandsService> ACS;
 
-	BotInfoUpdater botinfoupdater;
 	ChanInfoUpdater chaninfoupdater;
 	NickInfoUpdater nickinfoupdater;
 	NickCoreUpdater nickcoreupdater;
@@ -280,51 +242,18 @@ class MySQLLiveModule : public Module
 
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands"), botinfoupdater(this),
+		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands"),
 		chaninfoupdater(this), nickinfoupdater(this), nickcoreupdater(this)
 	{
-		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnPreShutdown };
-		ModuleManager::Attach(i, this, 5);
+		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnPreShutdown };
+		ModuleManager::Attach(i, this, 4);
 	}
 
 	void OnPreShutdown()
 	{
-		Implementation i[] = { I_OnFindBot, I_OnFindChan, I_OnFindNick, I_OnFindCore };
-		for (size_t j = 0; j < 4; ++j)
+		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore };
+		for (size_t j = 0; j < 3; ++j)
 			ModuleManager::Detach(i[j], this);
-	}
-
-	void OnFindBot(const Anope::string &nick)
-	{
-		if (botinfoupdater.Check(nick))
-			return;
-
-		try
-		{
-			Anope::string query = "SELECT * FROM `anope_bs_core` WHERE `nick` = '" + this->Escape(nick) + "'";
-			CommandMutex *current_command = this->CurrentCommand();
-			if (current_command)
-			{
-				current_command->Unlock();
-				try
-				{
-					SQLResult res = this->RunQuery(query);
-					current_command->Lock();
-					BotInfoUpdater::Process(res);
-				}
-				catch (const SQLException &ex)
-				{
-					current_command->Lock();
-					throw;
-				}
-			}
-			else
-				this->RunQuery(&botinfoupdater, query);
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << "OnBotChan: " << ex.GetReason();
-		}
 	}
 
 	void OnFindChan(const Anope::string &chname)

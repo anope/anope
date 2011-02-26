@@ -89,7 +89,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				else
 					request->reply("online", "yes");
 
-				mod_run_cmd(bi, *u, command, false);
+				mod_run_cmd(bi, *u, NULL, command);
 
 				if (created && u)
 				{

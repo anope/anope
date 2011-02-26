@@ -360,7 +360,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				send_cmd("", "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START");
 				quitmsg = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 
 			/* reset CAPAB */
@@ -627,14 +627,14 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				send_cmd("", "ERROR :m_services_account.so is not loaded. This is required by Anope");
 				quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 			if (!ModeManager::FindUserModeByName(UMODE_PRIV))
 			{
 				send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
 				quitmsg = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
 				quitting = true;
-				return MOD_STOP;
+				return false;
 			}
 			if (!has_svsholdmod)
 				ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");

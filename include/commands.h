@@ -30,8 +30,8 @@ enum CommandReturn
 
 extern CoreExport Command *FindCommand(BotInfo *bi, const Anope::string &cmd);
 extern CoreExport void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cmd);
-extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, const Anope::string &message, ChannelInfo *ci);
-extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command, const Anope::string &message, ChannelInfo *ci);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &message);
+extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope::string &command, const Anope::string &message);
 
 enum CommandFlag
 {

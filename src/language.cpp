@@ -69,7 +69,7 @@ const char *anope_gettext(const char *string)
 	std::pair<Anope::string, Anope::string> lang_info;
 	if (!language_stack.empty())
 		lang_info = language_stack.top();
-	if (lang_info.first.empty() || lang_info.second.empty())
+	if (*string == 0 || lang_info.first.empty() || lang_info.second.empty())
 		return string;
 
 	++_nl_msg_cat_cntr;

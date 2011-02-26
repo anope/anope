@@ -53,7 +53,7 @@ class CommandNSList : public Command
 		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
 			source.Reply(LanguageString::ACCESS_DENIED);
-			return MOD_STOP;
+			return MOD_CONT;
 		}
 
 		if (pattern[0] == '#')

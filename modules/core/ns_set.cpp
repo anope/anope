@@ -57,7 +57,7 @@ class CommandNSSet : public Command
 				Log(LOG_COMMAND, u, this) << params[0] << " " << cmdparams;
 			else
 				Log(LOG_COMMAND, u, this) << params[0];
-			mod_run_cmd(NickServ, u, c, params[0], cmdparams, false);
+			mod_run_cmd(NickServ, u, NULL, c, params[0], cmdparams);
 		}
 		else
 			source.Reply(LanguageString::NICK_SET_UNKNOWN_OPTION, params[0].c_str());

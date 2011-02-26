@@ -438,14 +438,14 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 				if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
 					u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
 				else
-					mod_run_cmd(bi, u, message, false);
+					mod_run_cmd(bi, u, NULL, message);
 			}
 			else if (bi == HostServ)
 			{
 				if (!ircd->vhost)
 					u->SendMessage(HostServ, _("%s is currently offline."), Config->s_HostServ.c_str());
 				else
-					mod_run_cmd(bi, u, message, false);
+					mod_run_cmd(bi, u, NULL, message);
 			}
 			else if (bi == OperServ)
 			{
@@ -458,11 +458,11 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 				else
 				{
 					Log(OperServ) << u->nick << ": " <<  message;
-					mod_run_cmd(bi, u, message, false);
+					mod_run_cmd(bi, u, NULL, message);
 				}
 			}
 			else
-				mod_run_cmd(bi, u, message, false);
+				mod_run_cmd(bi, u, NULL, message);
 		}
 	}
 

@@ -51,8 +51,6 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 */
 	virtual ~BotInfo();
 
-	void SetIdent(const Anope::string &sident);
-
 	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to
 	 */

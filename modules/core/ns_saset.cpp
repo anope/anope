@@ -62,7 +62,7 @@ class CommandNSSASet : public Command
 					Log(LOG_ADMIN, u, this) << params[1] << " " << cmdparams;
 				else
 					Log(LOG_ADMIN, u, this) << params[1] << " for " << params[0];
-				mod_run_cmd(NickServ, u, c, params[1], cmdparams, false);
+				mod_run_cmd(NickServ, u, NULL, c, params[1], cmdparams);
 			}
 			else
 				source.Reply(_("Unknown SASET option \002%s\002."), cmd.c_str());

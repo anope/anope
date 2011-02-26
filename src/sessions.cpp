@@ -114,7 +114,7 @@ void add_session(const Anope::string &nick, const Anope::string &host, const Ano
 			if (exception)
 			{
 				kill = false;
-				if (session->count >= exception->limit)
+				if (exception->limit && session->count >= exception->limit)
 					kill = true;
 			}
 		}

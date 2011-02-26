@@ -433,6 +433,8 @@ bool event_fjoin(const Anope::string &source, const std::vector<Anope::string> &
 			if (keep_their_modes)
 				Status.push_back(cm);
 		}
+		/* Erase the , */
+		buf.erase(buf.begin());
 
 		User *u = finduser(buf);
 		if (!u)
@@ -887,7 +889,7 @@ bool event_capab(const Anope::string &source, const std::vector<Anope::string> &
 					}
 				}
 			}
-			else if (capab.find("PREIX=(") != Anope::string::npos)
+			else if (capab.find("PREFIX=(") != Anope::string::npos)
 			{
 				Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
 				Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());

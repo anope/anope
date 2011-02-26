@@ -450,7 +450,11 @@ bool event_nick(const Anope::string &source, const std::vector<Anope::string> &p
 
 	if (params.size() != 2)
 	{
-		user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[8], "", "", params[3]);
+		/* Currently bahamut has no ipv6 support */
+		sockaddrs ip;
+		ip.ntop(AF_INET, params[8].c_str());
+
+		user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), "", "", params[3]);
 		if (user)
 		{
 			NickAlias *na;
@@ -585,12 +589,9 @@ bool event_quit(const Anope::string &source, const std::vector<Anope::string> &p
 /* EVENT: MODE */
 bool event_mode(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params.size() < 3)
-		return true;
-
-	if (params[0][0] == '#' || params[0][0] == '&')
+	if (params.size() > 2 && (params[0][0] == '#' || params[0][0] == '&'))
 		do_cmode(source, params[0], params[2], params[1]);
-	else
+	else if (params.size() > 1)
 		do_umode(source, params[0], params[1]);
 	return true;
 }

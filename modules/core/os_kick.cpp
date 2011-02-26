@@ -32,7 +32,7 @@ class CommandOSKick : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
 			return MOD_CONT;
 		}
 		else if (c->bouncy_modes)
@@ -42,7 +42,7 @@ class CommandOSKick : public Command
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 			return MOD_CONT;
 		}
 

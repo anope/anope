@@ -36,12 +36,12 @@ class CommandMSInfo : public Command
 			na = findnick(nname);
 			if (!na)
 			{
-				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(_(NICK_X_NOT_REGISTERED), nname.c_str());
 				return MOD_CONT;
 			}
 			else if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, nname.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), nname.c_str());
 				return MOD_CONT;
 			}
 			mi = &na->nc->memos;
@@ -51,12 +51,12 @@ class CommandMSInfo : public Command
 		{
 			if (!(ci = cs_findchan(nname)))
 			{
-				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(_(CHAN_X_NOT_REGISTERED), nname.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -64,7 +64,7 @@ class CommandMSInfo : public Command
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 		else

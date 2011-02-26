@@ -172,7 +172,7 @@ int validate_user(User *u)
 	NickRequest *nr = findrequestnick(u->nick);
 	if (nr)
 	{
-		u->SendMessage(NickServ, LanguageString::NICK_IS_PREREG);
+		u->SendMessage(NickServ, _(NICK_IS_PREREG));
 		return 0;
 	}
 
@@ -189,7 +189,7 @@ int validate_user(User *u)
 
 	if (na->nc->HasFlag(NI_SUSPENDED))
 	{
-		u->SendMessage(NickServ, LanguageString::NICK_X_SUSPENDED, u->nick.c_str());
+		u->SendMessage(NickServ, _(NICK_X_SUSPENDED), u->nick.c_str());
 		u->Collide(na);
 		return 0;
 	}
@@ -209,16 +209,16 @@ int validate_user(User *u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			u->SendMessage(NickServ, LanguageString::NICK_IS_SECURE, Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, _(NICK_IS_SECURE), Config->s_NickServ.c_str());
 		else
-			u->SendMessage(NickServ, LanguageString::NICK_IS_REGISTERED, Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, _(NICK_IS_REGISTERED), Config->s_NickServ.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 	{
 		if (na->nc->HasFlag(NI_KILL_IMMED))
 		{
-			u->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
+			u->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 			u->Collide(na);
 		}
 		else if (na->nc->HasFlag(NI_KILL_QUICK))

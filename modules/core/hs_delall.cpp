@@ -30,7 +30,7 @@ class CommandHSDelAll : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 				return MOD_CONT;
 			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
@@ -44,7 +44,7 @@ class CommandHSDelAll : public Command
 			source.Reply(_("vhosts for group \002%s\002 have been removed."), nc->display.c_str());
 		}
 		else
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 
 		return MOD_CONT;
 	}

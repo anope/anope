@@ -35,9 +35,9 @@ class CommandMSCancel : public Command
 		if (!(mi = getmemoinfo(nname, ischan, isforbid)))
 		{
 			if (isforbid)
-				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, nname.c_str());
+				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), nname.c_str());
 			else
-				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, nname.c_str());
+				source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		}
 		else
 		{

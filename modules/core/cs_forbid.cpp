@@ -38,13 +38,13 @@ class CommandCSForbid : public Command
 
 		if (chan[0] != '#')
 		{
-			source.Reply(LanguageString::CHAN_SYMBOL_REQUIRED);
+			source.Reply(_(CHAN_SYMBOL_REQUIRED));
 			return MOD_CONT;
 		}
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 			return MOD_CONT;
 		}
 
@@ -75,7 +75,7 @@ class CommandCSForbid : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), _("This channel has been forbidden.")).c_str());
+				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), "This channel has been forbidden.").c_str());
 			}
 		}
 

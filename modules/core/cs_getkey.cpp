@@ -30,7 +30,7 @@ class CommandCSGetKey : public Command
 
 		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 

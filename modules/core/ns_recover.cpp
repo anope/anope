@@ -32,13 +32,13 @@ class CommandNSRecover : public Command
 		NickAlias *na;
 		User *u2;
 		if (!(u2 = finduser(nick)))
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else if (!(na = findnick(u2->nick)))
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't recover yourself!"));
 		else if (!pass.empty())
@@ -47,17 +47,17 @@ class CommandNSRecover : public Command
 
 			if (res == 1)
 			{
-				u2->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
+				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				source.Reply(LanguageString::NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
@@ -70,16 +70,16 @@ class CommandNSRecover : public Command
 		{
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
 			{
-				u2->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
+				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
 
-				source.Reply(LanguageString::NICK_RECOVERED, Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 		}
 		return MOD_CONT;
 	}

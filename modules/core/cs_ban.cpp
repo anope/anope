@@ -37,21 +37,21 @@ class CommandCSBan : public Command
 		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
 		else if (!u2)
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, target.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_BAN) : !check_access(u, ci, CA_BANME))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		/*
 		 * Dont ban/kick the user on channels where he is excepted
 		 * to prevent services <-> server wars.
 		 */
 		else if (matches_list(ci->c, u2, CMODE_EXCEPT))
-			source.Reply(LanguageString::CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+			source.Reply(_(CHAN_EXCEPTED), u2->nick.c_str(), ci->name.c_str());
 		else if (u2->IsProtected())
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			Anope::string mask;

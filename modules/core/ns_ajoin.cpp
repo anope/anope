@@ -39,7 +39,7 @@ class CommandNSAJoin : public Command
 		if (channels.size() >= Config->AJoinMax)
 			source.Reply(_("Your auto join list is full."));
 		else if (ircdproto->IsChannelValid(params[1]) == false)
- 			source.Reply(LanguageString::CHAN_X_INVALID, params[1].c_str());
+ 			source.Reply(_(CHAN_X_INVALID), params[1].c_str());
 		else
 		{
 			channels.push_back(std::make_pair(params[1], params.size() > 2 ? params[2] : ""));

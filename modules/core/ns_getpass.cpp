@@ -37,12 +37,12 @@ class CommandNSGetPass : public Command
 				source.Reply(_("Passcode for %s is \002%s\002."), nick.c_str(), nr->passcode.c_str());
 			}
 			else
-				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)

@@ -47,7 +47,7 @@ class CommandOSStaff : public Command
 			}
 		}
 
-		source.Reply(LanguageString::END_OF_ANY_LIST, "Staff");
+		source.Reply(_(END_OF_ANY_LIST), "Staff");
 		return MOD_CONT;
 	}
 

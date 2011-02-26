@@ -181,7 +181,7 @@ class NewsBase : public Command
 		if (!count)
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
-			source.Reply(LanguageString::END_OF_ANY_LIST, "News");
+			source.Reply(_(END_OF_ANY_LIST), "News");
 
 		return MOD_CONT;
 	}
@@ -197,7 +197,7 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 				return MOD_CONT;
 			}
 			n = add_newsitem(source, text, type);
@@ -220,7 +220,7 @@ class NewsBase : public Command
 		{
 			if (readonly)
 			{
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 				return MOD_CONT;
 			}
 			if (!text.equals_ci("ALL"))

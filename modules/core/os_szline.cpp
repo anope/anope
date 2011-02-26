@@ -89,7 +89,7 @@ class SZLineListCallback : public NumberList
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(LanguageString::OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(_(OPER_LIST_FORMAT), Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -122,7 +122,7 @@ class SZLineViewCallback : public SZLineListCallback
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
 		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
-		source.Reply(LanguageString::OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
+		source.Reply(_(OPER_VIEW_FORMAT), Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -153,7 +153,7 @@ class CommandOSSZLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(LanguageString::BAD_EXPIRY_TIME);
+			source.Reply(_(BAD_EXPIRY_TIME));
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -181,7 +181,7 @@ class CommandOSSZLine : public Command
 
 			if (percent > 95)
 			{
-				source.Reply(LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to SZLine " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -195,7 +195,7 @@ class CommandOSSZLine : public Command
 			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << duration(NULL, expires - Anope::CurTime) << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 			if (readonly)
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 
 		}
 		else
@@ -244,7 +244,7 @@ class CommandOSSZLine : public Command
 		}
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 
 		return MOD_CONT;
 	}

@@ -30,7 +30,7 @@ class CommandCSSetSuccessor : public Command
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -42,12 +42,12 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, params[1].c_str());
+				source.Reply(_(NICK_X_NOT_REGISTERED), params[1].c_str());
 				return MOD_CONT;
 			}
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 				return MOD_CONT;
 			}
 			if (na->nc == ci->founder)
@@ -89,7 +89,7 @@ class CommandCSSetSuccessor : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
 	}
 };
 
@@ -103,7 +103,7 @@ class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 

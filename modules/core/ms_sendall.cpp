@@ -28,7 +28,7 @@ class CommandMSSendAll : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::MEMO_SEND_DISABLED);
+			source.Reply(_(MEMO_SEND_DISABLED));
 			return MOD_CONT;
 		}
 

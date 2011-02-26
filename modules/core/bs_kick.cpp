@@ -39,9 +39,9 @@ class CommandBSKick : public Command
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
 			SyntaxError(source, "KICK", _("KICK \037channel\037 \037option\037 {\037ON|\037} [\037settings\037]"));
 		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
-			source.Reply(LanguageString::BOT_NOT_ASSIGNED);
+			source.Reply(_(BOT_NOT_ASSIGNED));
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -451,7 +451,7 @@ class CommandBSKick : public Command
 				}
 			}
 			else
-				source.Reply(LanguageString::UNKNOWN_OPTION, option.c_str(), this->name.c_str());
+				source.Reply(_(UNKNOWN_OPTION), option.c_str(), this->name.c_str());
 		}
 		return MOD_CONT;
 	}

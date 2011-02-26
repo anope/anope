@@ -170,11 +170,11 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	int is_servoper = u && u->Account() && u->Account()->IsServicesOper();
 
 	if (readonly)
-		u->SendMessage(MemoServ, LanguageString::MEMO_SEND_DISABLED);
+		u->SendMessage(MemoServ, _(MEMO_SEND_DISABLED));
 	else if (text.empty())
 	{
 		if (!z)
-			SyntaxError(source, "SEND", LanguageString::MEMO_SEND_SYNTAX);
+			SyntaxError(source, "SEND", _(MEMO_SEND_SYNTAX));
 
 		if (z == 3)
 			SyntaxError(source, "RSEND", _("{\037nick\037 | \037channel\037} \037memo-text\037")); // XXX?
@@ -182,16 +182,16 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	else if (!u->IsIdentified() && !u->IsRecognized())
 	{
 		if (!z || z == 3)
-			source.Reply(LanguageString::NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
 	}
 	else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 	{
 		if (!z || z == 3)
 		{
 			if (isforbid)
-				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, name.c_str());
+				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), name.c_str());
 			else
-				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, name.c_str());
+				source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), name.c_str());
 		}
 	}
 	else if (z != 2 && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
@@ -248,13 +248,13 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							user->SendMessage(MemoServ, LanguageString::MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+							user->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						u->SendMessage(MemoServ, LanguageString::MEMO_NEW_MEMO_ARRIVED, sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						u->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
@@ -277,7 +277,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 					if (check_access(cu->user, c->ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, LanguageString::MEMO_NEW_X_MEMO_ARRIVED, c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(MemoServ, _(MEMO_NEW_X_MEMO_ARRIVED), c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
 					}
 				}
 			} /* MSNotifyAll */

@@ -84,11 +84,11 @@ class CommandNSAList : public Command
 		}
 
 		if (!na)
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
-			source.Reply(LanguageString::CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(_(CHAN_ACCESS_LEVEL_RANGE), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			int chan_count = 0;

@@ -519,7 +519,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), LanguageString::ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), _(ACCESS_DENIED)).c_str());
 		return;
 	}
 
@@ -561,7 +561,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), LanguageString::ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), _(ACCESS_DENIED)).c_str());
 		return;
 	}
 

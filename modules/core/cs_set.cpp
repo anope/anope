@@ -35,19 +35,19 @@ class CommandCSSet : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::CHAN_SET_DISABLED);
+			source.Reply(_(CHAN_SET_DISABLED));
 			return MOD_CONT;
 		}
 		if (!check_access(u, cs_findchan(params[0]), CA_SET))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			source.Reply(LanguageString::CHAN_SET_MLOCK_DEPRECATED, Config->s_ChanServ.c_str());
+			source.Reply(_(CHAN_SET_MLOCK_DEPRECATED), Config->s_ChanServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -63,8 +63,8 @@ class CommandCSSet : public Command
 		}
 		else
 		{
-			source.Reply(LanguageString::NICK_SET_UNKNOWN_OPTION, params[1].c_str());
-			source.Reply(LanguageString::MORE_INFO, Config->s_ChanServ.c_str(), "SET");
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), params[1].c_str());
+			source.Reply(_(MORE_INFO), Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -99,7 +99,7 @@ class CommandCSSet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

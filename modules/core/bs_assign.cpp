@@ -30,26 +30,26 @@ class CommandBSAssign : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::BOT_ASSIGN_READONLY);
+			source.Reply(_(BOT_ASSIGN_READONLY));
 			return MOD_CONT;
 		}
 
 		BotInfo *bi = findbot(nick);
 		if (!bi)
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->Account()->HasPriv("botserv/administration")))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
 		if (bi->HasFlag(BI_PRIVATE) && !u->Account()->HasCommand("botserv/assign/private"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 

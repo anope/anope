@@ -41,12 +41,12 @@ class CommandMSIgnore : public Command
 		if (!mi)
 		{
 			if (isforbid)
-				source.Reply(ischan ? LanguageString::CHAN_X_FORBIDDEN : LanguageString::NICK_X_FORBIDDEN, channel.c_str());
+				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), channel.c_str());
 			else
-				source.Reply(ischan ? LanguageString::CHAN_X_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, channel.c_str());
+				source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), channel.c_str());
 		}
 		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())

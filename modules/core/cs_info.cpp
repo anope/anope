@@ -48,9 +48,9 @@ class CommandCSInfo : public Command
 		if (ci->HasFlag(CI_FORBIDDEN))
 		{
 			if (u->HasMode(UMODE_OPER) && !ci->forbidby.empty())
-				source.Reply(LanguageString::CHAN_X_FORBIDDEN_OPER, chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
+				source.Reply(_(CHAN_X_FORBIDDEN_OPER), chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : _(NO_REASON));
 			else
-				source.Reply(LanguageString::CHAN_X_FORBIDDEN, chan.c_str());
+				source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
 
 			return MOD_CONT;
 		}
@@ -59,7 +59,7 @@ class CommandCSInfo : public Command
 		if (has_auspex || check_access(u, ci, CA_INFO))
 			show_all = true;
 
-		source.Reply(LanguageString::CHAN_INFO_HEADER, chan.c_str());
+		source.Reply(_(CHAN_INFO_HEADER), chan.c_str());
 		source.Reply(_("        Founder: %s"), ci->founder->display.c_str());
 
 		if (show_all && ci->successor)
@@ -81,35 +81,33 @@ class CommandCSInfo : public Command
 			source.Reply(_("       Ban type: %d"), ci->bantype);
 			Anope::string optbuf;
 
-			CheckOptStr(optbuf, CI_KEEPTOPIC, GetString(u->Account(), _("Topic Retention")), ci, u->Account());
-			CheckOptStr(optbuf, CI_OPNOTICE, GetString(u->Account(), _("OP Notice")), ci, u->Account());
-			CheckOptStr(optbuf, CI_PEACE, GetString(u->Account(), _("Peace")), ci, u->Account());
-			CheckOptStr(optbuf, CI_PRIVATE, GetString(u->Account(), _("Private")), ci, u->Account());
-			CheckOptStr(optbuf, CI_RESTRICTED, GetString(u->Account(), _("Restricted Access")), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECURE, GetString(u->Account(), _("Secure")), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECUREFOUNDER, GetString(u->Account(), _("Secure Founder")), ci, u->Account());
-			CheckOptStr(optbuf, CI_SECUREOPS, GetString(u->Account(), _("Secure Ops")), ci, u->Account());
+			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, u->Account());
+			CheckOptStr(optbuf, CI_OPNOTICE, _("OP Notice"), ci, u->Account());
+			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, u->Account());
+			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, u->Account());
+			CheckOptStr(optbuf, CI_RESTRICTED, _("Restricted Access"), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECURE, _("Secure"), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECUREFOUNDER, _("Secure Founder"), ci, u->Account());
+			CheckOptStr(optbuf, CI_SECUREOPS, _("Secure Ops"), ci, u->Account());
 			if (ci->HasFlag(CI_SIGNKICK))
-				CheckOptStr(optbuf, CI_SIGNKICK, GetString(u->Account(), _("Signed kicks")), ci, u->Account());
+				CheckOptStr(optbuf, CI_SIGNKICK, _("Signed kicks"), ci, u->Account());
 			else
-				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, GetString(u->Account(), _("Signed kicks")), ci, u->Account());
-			CheckOptStr(optbuf, CI_TOPICLOCK, GetString(u->Account(), _("Topic Lock")), ci, u->Account());
-			CheckOptStr(optbuf, CI_XOP, GetString(u->Account(), _("xOP lists system")), ci, u->Account());
-			CheckOptStr(optbuf, CI_PERSIST, GetString(u->Account(), _("Persistant")), ci, u->Account());
+				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, _("Signed kicks"), ci, u->Account());
+			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, u->Account());
+			CheckOptStr(optbuf, CI_XOP, _("xOP lists system"), ci, u->Account());
+			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
+			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 
-			source.Reply(LanguageString::NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
+			source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
 			source.Reply(_("      Mode lock: %s"), get_mlock_modes(ci, 1).c_str());
 
-			// XXX: we could just as easily (and tidily) merge this in with the flags display above.
-			if (ci->HasFlag(CI_NO_EXPIRE))
-				source.Reply(_("This channel will not expire."));
-			else
+			if (!ci->HasFlag(CI_NO_EXPIRE))
 				source.Reply(_("      Expires on: %s"), do_strftime(ci->last_used + Config->CSExpire).c_str());
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
-			source.Reply(_("      Suspended: [%s] %s"), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
+			source.Reply(_("      Suspended: [%s] %s"), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : _(NO_REASON));
 
-		FOREACH_MOD(I_OnChanInfo, OnChanInfo(u, ci, show_all));
+		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, show_all));
 
 		return MOD_CONT;
 	}

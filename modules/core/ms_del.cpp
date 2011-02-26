@@ -61,17 +61,17 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
 				return MOD_CONT;
 			}
 			else if (readonly)
 			{
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -83,9 +83,9 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				source.Reply(LanguageString::MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(_(MEMO_X_HAS_NO_MEMOS), chan.c_str());
 			else
-				source.Reply(LanguageString::MEMO_HAVE_NO_MEMOS);
+				source.Reply(_(MEMO_HAVE_NO_MEMOS));
 		}
 		else
 		{

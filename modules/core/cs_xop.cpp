@@ -133,7 +133,7 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -142,7 +142,7 @@ class XOPBase : public Command
 			mask += "!*@*";
 		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -154,7 +154,7 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			++change;
@@ -222,7 +222,7 @@ class XOPBase : public Command
 
 		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -243,7 +243,7 @@ class XOPBase : public Command
 		else
 		{
 			if (access->nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 			else
 			{
 				bool override = ulev <= access->level;
@@ -272,7 +272,7 @@ class XOPBase : public Command
 
 		if (!ulev && !u->Account()->HasCommand("chanserv/access/list"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -338,7 +338,7 @@ class XOPBase : public Command
 
 		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 

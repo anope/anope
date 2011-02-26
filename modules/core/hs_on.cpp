@@ -43,7 +43,7 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
+			source.Reply(_(HOST_NOT_ASSIGNED));
 
 		return MOD_CONT;
 	}

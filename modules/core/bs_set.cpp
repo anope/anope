@@ -39,7 +39,7 @@ class CommandBSSet : public Command
 
 			if (!(bi = findbot(chan)))
 			{
-				source.Reply(LanguageString::BOT_DOES_NOT_EXIST, chan.c_str());
+				source.Reply(_(BOT_DOES_NOT_EXIST), chan.c_str());
 				return MOD_CONT;
 			}
 
@@ -58,9 +58,9 @@ class CommandBSSet : public Command
 			return MOD_CONT;
 		}
 		else if (!(ci = cs_findchan(chan)))
-			source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
 		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -192,7 +192,7 @@ class CommandBSSet : public Command
 					SyntaxError(source, "SET MSG", _("SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|\037}"));
 			}
 			else
-				source.Reply(LanguageString::UNKNOWN_OPTION, option.c_str(), this->name.c_str());
+				source.Reply(_(UNKNOWN_OPTION), option.c_str(), this->name.c_str());
 		}
 
 		return MOD_CONT;

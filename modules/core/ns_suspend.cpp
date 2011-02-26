@@ -30,26 +30,26 @@ class CommandNSSuspend : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -112,26 +112,26 @@ class CommandNSUnSuspend : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 

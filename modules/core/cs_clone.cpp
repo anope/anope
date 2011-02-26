@@ -32,24 +32,24 @@ public:
 
 		if (!check_access(u, ci, CA_SET))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 		ChannelInfo *target_ci = cs_findchan(target);
 		if (!target_ci)
 		{
-			source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, target.c_str());
+			source.Reply(_(CHAN_X_NOT_REGISTERED), target.c_str());
 			return MOD_CONT;
 		}
 		if (!IsFounder(u, ci) || !IsFounder(u, target_ci))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
 		if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? LanguageString::CHAN_EXCEEDED_CHANNEL_LIMIT : LanguageString::CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? _(CHAN_EXCEEDED_CHANNEL_LIMIT) : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
 			return MOD_CONT;
 		}
 

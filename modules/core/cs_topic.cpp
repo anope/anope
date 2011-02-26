@@ -30,9 +30,9 @@ class CommandCSTopic : public Command
 		Channel *c = ci->c;
 
 		if (!c)
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 		else if (!check_access(u, ci, CA_TOPIC) && !u->Account()->HasCommand("chanserv/topic"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);

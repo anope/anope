@@ -45,7 +45,7 @@ class AsynchCommandMutex : public CommandMutex
 
 		if (!command->permission.empty() && !u->Account()->HasCommand(command->permission))
 		{
-			u->SendMessage(bi, LanguageString::ACCESS_DENIED);
+			u->SendMessage(bi, _(ACCESS_DENIED));
 			Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		}
 		else

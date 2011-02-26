@@ -40,15 +40,15 @@ class CommandCSRegister : public Command
 		if (chan[0] == '&')
 			source.Reply(_("Local channels cannot be registered."));
 		else if (chan[0] != '#')
-			source.Reply(LanguageString::CHAN_SYMBOL_REQUIRED);
+			source.Reply(_(CHAN_SYMBOL_REQUIRED));
 		else if (!ircdproto->IsChannelValid(chan))
-			source.Reply(LanguageString::CHAN_X_INVALID, chan.c_str());
+			source.Reply(_(CHAN_X_INVALID), chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? LanguageString::CHAN_EXCEEDED_CHANNEL_LIMIT : LanguageString::CHAN_REACHED_CHANNEL_LIMIT, Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? _(CHAN_EXCEEDED_CHANNEL_LIMIT) : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);

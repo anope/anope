@@ -52,7 +52,7 @@ class CommandNSList : public Command
 
 		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -68,7 +68,7 @@ class CommandNSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+				source.Reply(_(LIST_INCORRECT_RANGE));
 				return MOD_CONT;
 			}
 
@@ -96,7 +96,7 @@ class CommandNSList : public Command
 
 		mync = u->Account();
 
-		source.Reply(LanguageString::LIST_HEADER, pattern.c_str());
+		source.Reply(_(LIST_HEADER), pattern.c_str());
 		if (!unconfirmed)
 		{
 			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
@@ -219,7 +219,7 @@ class CommandNSList : public Command
 		if (u->Account()->IsServicesOper())
 			SyntaxError(source, "LIST", _("LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 		else
-			SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
+			SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));
 	}
 };
 

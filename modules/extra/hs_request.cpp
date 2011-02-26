@@ -68,19 +68,19 @@ class CommandHSRequest : public Command
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				source.Reply(LanguageString::HOST_SET_IDENTTOOLONG, Config->UserLen);
+				source.Reply(_(HOST_SET_IDENTTOOLONG), Config->UserLen);
 				return MOD_CONT;
 			}
 			else
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						source.Reply(LanguageString::HOST_SET_IDENT_ERROR);
+						source.Reply(_(HOST_SET_IDENT_ERROR));
 						return MOD_CONT;
 					}
 			if (!ircd->vident)
 			{
-				source.Reply(LanguageString::HOST_NO_VIDENT);
+				source.Reply(_(HOST_NO_VIDENT));
 				return MOD_CONT;
 			}
 		}
@@ -88,13 +88,13 @@ class CommandHSRequest : public Command
 			hostmask = rawhostmask;
 		else
 		{
-			source.Reply(LanguageString::HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(_(HOST_SET_TOOLONG), Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			source.Reply(LanguageString::HOST_SET_ERROR);
+			source.Reply(_(HOST_SET_ERROR));
 			return MOD_CONT;
 		}
 
@@ -164,7 +164,7 @@ class CommandHSActivate : public Command
 				me->SendMessage(source, _("No request for nick %s found."), nick.c_str());
 		}
 		else
-			u->SendMessage(HostServ, LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 
 		return MOD_CONT;
 	}
@@ -247,7 +247,7 @@ class CommandHSReject : public Command
 class HSListBase : public Command
 {
  protected:
-	CommandReturn DoList(User *u)
+	CommandReturn DoList(CommandSource &source)
 	{
 		int counter = 1;
 		int from = 0, to = 0;
@@ -260,24 +260,19 @@ class HSListBase : public Command
 			{
 				++display_counter;
 				if (!hr->ident.empty())
-					u->SendMessage(HostServ, _("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->ident.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
+					source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->ident.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
 				else
-					u->SendMessage(HostServ, _("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
+					source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
 			}
 			++counter;
 		}
-		u->SendMessage(HostServ, _("Displayed all records (Count: \002%d\002)"), display_counter);
+		source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
 
 		return MOD_CONT;
 	}
  public:
 	HSListBase(const Anope::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		// no-op
 	}
 };
 
@@ -291,7 +286,7 @@ class CommandHSWaiting : public HSListBase
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoList(source.u);
+		return this->DoList(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

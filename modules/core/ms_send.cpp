@@ -42,7 +42,7 @@ class CommandMSSend : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SEND", LanguageString::MEMO_SEND_SYNTAX);
+		SyntaxError(source, "SEND", _(MEMO_SEND_SYNTAX));
 	}
 };
 

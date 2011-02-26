@@ -30,19 +30,19 @@ class CommandBSSay : public Command
 
 		if (!check_access(u, ci, CA_SAY))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
 		if (!ci->bi)
 		{
-			source.Reply(LanguageString::BOT_NOT_ASSIGNED);
+			source.Reply(_(BOT_NOT_ASSIGNED));
 			return MOD_CONT;
 		}
 
 		if (!ci->c || !ci->c->FindUser(ci->bi))
 		{
-			source.Reply(LanguageString::BOT_NOT_ON_CHANNEL, ci->name.c_str());
+			source.Reply(_(BOT_NOT_ON_CHANNEL), ci->name.c_str());
 			return MOD_CONT;
 		}
 

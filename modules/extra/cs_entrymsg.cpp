@@ -40,7 +40,7 @@ class CommandEntryMessage : public Command
 		{
 			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
 			for (unsigned i = 0; i < messages.size(); ++i)
-				source.Reply(LanguageString::CHAN_LIST_ENTRY, i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
+				source.Reply(_(CHAN_LIST_ENTRY), i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
 			source.Reply(_("End of entry message list."));
 		}
 		else
@@ -133,7 +133,7 @@ class CommandEntryMessage : public Command
 		}
 		else
 		{
-			u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		}
 
 		return MOD_CONT;

@@ -47,21 +47,21 @@ class CommandNSInfo : public Command
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
 			{
-				source.Reply(LanguageString::NICK_IS_PREREG);
+				source.Reply(_(NICK_IS_PREREG));
 				if (has_auspex)
 					source.Reply(_("   E-mail address: %s"), nr->email.c_str());
 			}
 			else if (nickIsServices(nick, true))
 				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
 			else
-				source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
 		{
 			if (u->HasMode(UMODE_OPER) && !na->last_usermask.empty())
-				source.Reply(LanguageString::NICK_X_FORBIDDEN_OPER, nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
+				source.Reply(_(NICK_X_FORBIDDEN_OPER), nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : _(NO_REASON));
 			else
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 		}
 		else
 		{
@@ -126,7 +126,7 @@ class CommandNSInfo : public Command
 				CheckOptStr(optbuf, NI_MSG, GetString(u->Account(), _("Message mode")).c_str(), na->nc);
 				CheckOptStr(optbuf, NI_AUTOOP, GetString(u->Account(), _("Auto-op")).c_str(), na->nc);
 
-				source.Reply(LanguageString::NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
+				source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
@@ -142,7 +142,7 @@ class CommandNSInfo : public Command
 					source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());
 			}
 
-			FOREACH_MOD(I_OnNickInfo, OnNickInfo(u, na, show_hidden));
+			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, show_hidden));
 		}
 		return MOD_CONT;
 	}

@@ -116,7 +116,7 @@ class CommandNSConfirm : public Command
 
 			if (!nr->passcode.equals_cs(passcode))
 			{
-				source.Reply(LanguageString::NICK_CONFIRM_INVALID);
+				source.Reply(_(NICK_CONFIRM_INVALID));
 				return MOD_CONT;
 			}
 		}
@@ -166,7 +166,7 @@ class CommandNSConfirm : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(LanguageString::NICK_CONFIRM_INVALID);
+		source.Reply(_(NICK_CONFIRM_INVALID));
 	}
 };
 
@@ -213,7 +213,7 @@ class CommandNSRegister : public CommandNSConfirm
 
 		if ((anr = findrequestnick(u->nick)))
 		{
-			source.Reply(LanguageString::NICK_REQUESTED);
+			source.Reply(_(NICK_REQUESTED));
 			return MOD_CONT;
 		}
 
@@ -224,13 +224,13 @@ class CommandNSRegister : public CommandNSConfirm
 		 */
 		if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && u->nick.substr(prefixlen).find_first_not_of("1234567890") == Anope::string::npos)
 		{
-			source.Reply(LanguageString::NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+			source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (!ircdproto->IsNickValid(u->nick))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, u->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), u->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -241,7 +241,7 @@ class CommandNSRegister : public CommandNSConfirm
 
 				if (u->nick.find_ci(nick) != Anope::string::npos && !u->HasMode(UMODE_OPER))
 				{
-					source.Reply(LanguageString::NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+					source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 					return MOD_CONT;
 				}
 		}
@@ -256,17 +256,17 @@ class CommandNSRegister : public CommandNSConfirm
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
 				Log(NickServ) << u->GetMask() << " tried to register FORBIDden nick " << u->nick;
-				source.Reply(LanguageString::NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+				source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 			}
 			else
-				source.Reply(LanguageString::NICK_ALREADY_REGISTERED, u->nick.c_str());
+				source.Reply(_(NICK_ALREADY_REGISTERED), u->nick.c_str());
 		}
 		else if (pass.equals_ci(u->nick) || (Config->StrictPasswords && pass.length() < 5))
-			source.Reply(LanguageString::MORE_OBSCURE_PASSWORD);
+			source.Reply(_(MORE_OBSCURE_PASSWORD));
 		else if (pass.length() > Config->PassLen)
-			source.Reply(LanguageString::PASSWORD_TOO_LONG);
+			source.Reply(_(PASSWORD_TOO_LONG));
 		else if (!email.empty() && !MailValidate(email))
-			source.Reply(LanguageString::MAIL_X_INVALID, email.c_str());
+			source.Reply(_(MAIL_X_INVALID), email.c_str());
 		else
 		{
 			for (idx = 0; idx < 9; ++idx)

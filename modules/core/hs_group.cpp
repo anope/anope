@@ -34,7 +34,7 @@ class CommandHSGroup : public Command
 				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
-			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
+			source.Reply(_(HOST_NOT_ASSIGNED));
 
 		return MOD_CONT;
 	}

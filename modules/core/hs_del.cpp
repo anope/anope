@@ -30,7 +30,7 @@ class CommandHSDel : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 				return MOD_CONT;
 			}
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
@@ -39,7 +39,7 @@ class CommandHSDel : public Command
 			source.Reply(_("vhost for \002%s\002 removed."), nick.c_str());
 		}
 		else
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 
 		return MOD_CONT;
 	}

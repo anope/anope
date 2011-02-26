@@ -30,11 +30,11 @@ class CommandNSRelease : public Command
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))
 			source.Reply(_("Nick \002%s\002 isn't being held."), nick.c_str());
 		else if (!pass.empty())
@@ -47,7 +47,7 @@ class CommandNSRelease : public Command
 			}
 			else
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				if (!res)
 				{
 					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
@@ -64,7 +64,7 @@ class CommandNSRelease : public Command
 				source.Reply(_("Services' hold on your nick has been released."));
 			}
 			else
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 		}
 		return MOD_CONT;
 	}

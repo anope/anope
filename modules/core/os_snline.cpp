@@ -90,7 +90,7 @@ class SNLineListCallback : public NumberList
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(LanguageString::OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(_(OPER_LIST_FORMAT), Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -123,7 +123,7 @@ class SNLineViewCallback : public SNLineListCallback
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
 		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
-		source.Reply(LanguageString::OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
+		source.Reply(_(OPER_VIEW_FORMAT), Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -154,7 +154,7 @@ class CommandOSSNLine : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(LanguageString::BAD_EXPIRY_TIME);
+			source.Reply(_(BAD_EXPIRY_TIME));
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -197,7 +197,7 @@ class CommandOSSNLine : public Command
 
 			if (percent > 95)
 			{
-				source.Reply(LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+				source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
 				Log(LOG_ADMIN, u, this) << "tried to SNLine " << percent << "% of the network (" << affected << " users)";
 				return MOD_CONT;
 			}
@@ -211,7 +211,7 @@ class CommandOSSNLine : public Command
 			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << duration(NULL, expires - Anope::CurTime) << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 			if (readonly)
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 
 		}
 		else
@@ -260,7 +260,7 @@ class CommandOSSNLine : public Command
 		}
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 
 		return MOD_CONT;
 	}
@@ -303,7 +303,7 @@ class CommandOSSNLine : public Command
 			if (!SentHeader)
 				source.Reply(_("No matching entries on the SNLINE list."));
 			else
-				source.Reply(LanguageString::END_OF_ANY_LIST, "SNLine");
+				source.Reply(_(END_OF_ANY_LIST), "SNLine");
 		}
 
 		return MOD_CONT;

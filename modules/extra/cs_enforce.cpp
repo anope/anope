@@ -89,7 +89,7 @@ class CommandCSEnforce : public Command
 			if (check_access(uc->user, ci, CA_NOJOIN))
 			{
 				get_idealban(ci, uc->user, mask);
-				Anope::string reason = GetString(uc->user->Account(), LanguageString::CHAN_NOT_ALLOWED_TO_JOIN);
+				Anope::string reason = GetString(uc->user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, uc->user, "%s", reason.c_str());
 			}
@@ -113,8 +113,8 @@ class CommandCSEnforce : public Command
 			if (!uc->user->IsIdentified())
 			{
 				get_idealban(ci, uc->user, mask);
-				Anope::string reason = GetString(uc->user->Account(), LanguageString::CHAN_NOT_ALLOWED_TO_JOIN);
-				if (!c->HasMode(CMODE_REGISTERED))
+				Anope::string reason = GetString(uc->user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
+				if (!c->HasMode(CMODE_REGISTEREDONLY))
 					c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, uc->user, "%s", reason.c_str());
 			}
@@ -135,9 +135,9 @@ class CommandCSEnforce : public Command
 		Channel *c = ci->c;
 
 		if (!c)
-			u->SendMessage(ChanServ, LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 		else if (!check_access(u, ci, CA_AKICK))
-			u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			if (what.empty() || what.equals_ci("SET"))

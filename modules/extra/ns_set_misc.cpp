@@ -26,7 +26,6 @@ class CommandNSSetMisc : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		NickAlias *na = findnick(params[0]);
 		if (!na)
 			throw CoreException("NULL na in CommandNSSetMisc");
@@ -36,17 +35,17 @@ class CommandNSSetMisc : public Command
 		if (params.size() > 1)
 		{
 			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			u->SendMessage(NickServ, LanguageString::CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), params[1].c_str());
+			source.Reply(_(CHAN_SETTING_CHANGED), this->name.c_str(), nc->display.c_str(), params[1].c_str());
 		}
 		else
-			u->SendMessage(NickServ, LanguageString::CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
+			source.Reply(_(CHAN_SETTING_UNSET), this->name.c_str(), nc->display.c_str());
 
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
 	}
 };
 
@@ -59,7 +58,7 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(NICK_SASET_SYNTAX));
 	}
 };
 
@@ -163,7 +162,7 @@ class NSSetMisc : public Module
 		}
 	}
 
-	void OnNickInfo(User *u, NickAlias *na, bool ShowHidden)
+	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)
 	{
 		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
 		{
@@ -172,7 +171,7 @@ class NSSetMisc : public Module
 
 			Anope::string value;
 			if (na->nc->GetExtRegular("nickserv:" + it->first, value))
-				u->SendMessage(NickServ, "      %s: %s", it->first.c_str(), value.c_str());
+				source.Reply("      %s: %s", it->first.c_str(), value.c_str());
 		}
 	}
 

@@ -65,7 +65,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		u->SendMessage(bi, _(LanguageString::NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
+		u->SendMessage(bi, _(_(NICK_IDENTIFY_REQUIRED)), Config->s_NickServ.c_str());
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for unregistered user " << u->GetMask() << " with command " << command;
 		PopLanguage();
 		return;
@@ -102,14 +102,14 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 			{
 				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
 				{
-					u->SendMessage(bi, _(LanguageString::CHAN_X_FORBIDDEN), ci->name.c_str());
+					u->SendMessage(bi, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
 					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
 					PopLanguage();
 					return;
 				}
 				else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 				{
-					u->SendMessage(bi, _(LanguageString::CHAN_X_FORBIDDEN), ci->name.c_str());
+					u->SendMessage(bi, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
 					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
 					PopLanguage();
 					return;
@@ -117,7 +117,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 			}
 			else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
 			{
-				u->SendMessage(bi, _(LanguageString::CHAN_X_NOT_REGISTERED), params[0].c_str());
+				u->SendMessage(bi, _(_(CHAN_X_NOT_REGISTERED)), params[0].c_str());
 				PopLanguage();
 				return;
 			}
@@ -125,7 +125,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 		/* A user not giving a channel name for a param that should be a channel */
 		else
 		{
-			u->SendMessage(bi, LanguageString::CHAN_X_INVALID, params[0].c_str());
+			u->SendMessage(bi, _(CHAN_X_INVALID), params[0].c_str());
 			PopLanguage();
 			return;
 		}
@@ -158,7 +158,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
 	{
-		u->SendMessage(bi, LanguageString::ACCESS_DENIED);
+		u->SendMessage(bi, _(ACCESS_DENIED));
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		source.DoReply();
 		PopLanguage();
@@ -205,7 +205,7 @@ void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cm
 		source.Reply( _("No help available for \002%s\002."), cmd.c_str());
 	else
 	{
-		u->SendMessage(bi, " ");
+		source.Reply(" ");
 
 		/* Inform the user what permission is required to use the command */
 		if (!c->permission.empty())
@@ -221,4 +221,6 @@ void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cm
 		else
 			source.Reply(_("You can use this command."));
 	}
+
+	source.DoReply();
 }

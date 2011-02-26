@@ -74,12 +74,12 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -91,9 +91,9 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				source.Reply(LanguageString::MEMO_X_HAS_NO_MEMOS, chan.c_str());
+				source.Reply(_(MEMO_X_HAS_NO_MEMOS), chan.c_str());
 			else
-				source.Reply(LanguageString::MEMO_HAVE_NO_MEMOS);
+				source.Reply(_(MEMO_HAVE_NO_MEMOS));
 		}
 		else
 		{
@@ -112,9 +112,9 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							source.Reply(LanguageString::MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
+							source.Reply(_(MEMO_X_HAS_NO_NEW_MEMOS), chan.c_str());
 						else
-							source.Reply(LanguageString::MEMO_HAVE_NO_NEW_MEMOS);
+							source.Reply(_(MEMO_HAVE_NO_NEW_MEMOS));
 						return MOD_CONT;
 					}
 				}

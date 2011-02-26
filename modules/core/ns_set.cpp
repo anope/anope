@@ -35,13 +35,13 @@ class CommandNSSet : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::NICK_SET_DISABLED);
+			source.Reply(_(NICK_SET_DISABLED));
 			return MOD_CONT;
 		}
 
 		if (u->Account()->HasFlag(NI_SUSPENDED))
 		{
-			source.Reply(LanguageString::NICK_X_SUSPENDED, u->Account()->display.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -60,7 +60,7 @@ class CommandNSSet : public Command
 			mod_run_cmd(NickServ, u, NULL, c, params[0], cmdparams);
 		}
 		else
-			source.Reply(LanguageString::NICK_SET_UNKNOWN_OPTION, params[0].c_str());
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), params[0].c_str());
 
 		return MOD_CONT;
 	}
@@ -95,7 +95,7 @@ class CommandNSSet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)
@@ -136,12 +136,12 @@ class CommandNSSetDisplay : public Command
 
 		if (!na || na->nc != u->Account())
 		{
-			source.Reply(LanguageString::NICK_SASET_DISPLAY_INVALID, u->Account()->display.c_str());
+			source.Reply(_(NICK_SASET_DISPLAY_INVALID), u->Account()->display.c_str());
 			return MOD_CONT;
 		}
 
 		change_core_display(u->Account(), params[1]);
-		source.Reply(LanguageString::NICK_SET_DISPLAY_CHANGED, u->Account()->display.c_str());
+		source.Reply(_(NICK_SET_DISPLAY_CHANGED), u->Account()->display.c_str());
 		return MOD_CONT;
 	}
 
@@ -157,7 +157,7 @@ class CommandNSSetDisplay : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
 	}
 };
 
@@ -178,27 +178,27 @@ class CommandNSSetPassword : public Command
 
 		if (u->Account()->display.equals_ci(param) || (Config->StrictPasswords && len < 5))
 		{
-			source.Reply(LanguageString::MORE_OBSCURE_PASSWORD);
+			source.Reply(_(MORE_OBSCURE_PASSWORD));
 			return MOD_CONT;
 		}
 		else if (len > Config->PassLen)
 		{
-			source.Reply(LanguageString::PASSWORD_TOO_LONG);
+			source.Reply(_(PASSWORD_TOO_LONG));
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
 			Log(NickServ) << "Failed to encrypt password for " << u->Account()->display << " (set)";
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_FAILED);
+			source.Reply(_(NICK_SASET_PASSWORD_FAILED));
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED_TO, u->Account()->display.c_str(), tmp_pass.c_str());
+			source.Reply(_(NICK_SASET_PASSWORD_CHANGED_TO), u->Account()->display.c_str(), tmp_pass.c_str());
 		else
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED, u->Account()->display.c_str());
+			source.Reply(_(NICK_SASET_PASSWORD_CHANGED), u->Account()->display.c_str());
 
 		return MOD_CONT;
 	}
@@ -215,7 +215,7 @@ class CommandNSSetPassword : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
 	}
 };
 

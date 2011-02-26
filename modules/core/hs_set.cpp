@@ -40,7 +40,7 @@ class CommandHSSet : public Command
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				source.Reply(LanguageString::HOST_SET_IDENTTOOLONG, Config->UserLen);
+				source.Reply(_(HOST_SET_IDENTTOOLONG), Config->UserLen);
 				return MOD_CONT;
 			}
 			else
@@ -48,13 +48,13 @@ class CommandHSSet : public Command
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						source.Reply(LanguageString::HOST_SET_IDENT_ERROR);
+						source.Reply(_(HOST_SET_IDENT_ERROR));
 						return MOD_CONT;
 					}
 			}
 			if (!ircd->vident)
 			{
-				source.Reply(LanguageString::HOST_NO_VIDENT);
+				source.Reply(_(HOST_NO_VIDENT));
 				return MOD_CONT;
 			}
 		}
@@ -62,13 +62,13 @@ class CommandHSSet : public Command
 			hostmask = rawhostmask;
 		else
 		{
-			source.Reply(LanguageString::HOST_SET_TOOLONG, Config->HostLen);
+			source.Reply(_(HOST_SET_TOOLONG), Config->HostLen);
 			return MOD_CONT;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			source.Reply(LanguageString::HOST_SET_ERROR);
+			source.Reply(_(HOST_SET_ERROR));
 			return MOD_CONT;
 		}
 
@@ -77,7 +77,7 @@ class CommandHSSet : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -91,7 +91,7 @@ class CommandHSSet : public Command
 				source.Reply(_("vhost for \002%s\002 set to \002%s\002."), nick.c_str(), hostmask.c_str());
 		}
 		else
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 
 		return MOD_CONT;
 	}

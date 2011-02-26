@@ -37,17 +37,17 @@ class CommandNSSASet : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::NICK_SET_DISABLED);
+			source.Reply(_(NICK_SET_DISABLED));
 			return MOD_CONT;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else
 		{
 			Command *c = this->FindCommand(params[1]);
@@ -98,7 +98,7 @@ class CommandNSSASet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(NICK_SASET_SYNTAX));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)
@@ -142,12 +142,12 @@ class CommandNSSASetDisplay : public Command
 		NickAlias *na = findnick(params[1]);
 		if (!na || na->nc != nc)
 		{
-			source.Reply(LanguageString::NICK_SASET_DISPLAY_INVALID, nc->display.c_str());
+			source.Reply(_(NICK_SASET_DISPLAY_INVALID), nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		change_core_display(nc, params[1]);
-		source.Reply(LanguageString::NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
+		source.Reply(_(NICK_SET_DISPLAY_CHANGED), nc->display.c_str());
 		return MOD_CONT;
 	}
 
@@ -163,7 +163,7 @@ class CommandNSSASetDisplay : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(NICK_SASET_SYNTAX));
 	}
 };
 
@@ -187,32 +187,32 @@ class CommandNSSASetPassword : public Command
 
 		if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 		else if (nc->display.equals_ci(params[1]) || (Config->StrictPasswords && len < 5))
 		{
-			source.Reply(LanguageString::MORE_OBSCURE_PASSWORD);
+			source.Reply(_(MORE_OBSCURE_PASSWORD));
 			return MOD_CONT;
 		}
 		else if (len > Config->PassLen)
 		{
-			source.Reply(LanguageString::PASSWORD_TOO_LONG);
+			source.Reply(_(PASSWORD_TOO_LONG));
 			return MOD_CONT;
 		}
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
 			Log(NickServ) << "Failed to encrypt password for " << nc->display << " (saset)";
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_FAILED, nc->display.c_str());
+			source.Reply(_(NICK_SASET_PASSWORD_FAILED), nc->display.c_str());
 			return MOD_CONT;
 		}
 
 		Anope::string tmp_pass;
 		if (enc_decrypt(nc->pass, tmp_pass) == 1)
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED_TO, nc->display.c_str(), tmp_pass.c_str());
+			source.Reply(_(NICK_SASET_PASSWORD_CHANGED_TO), nc->display.c_str(), tmp_pass.c_str());
 		else
-			source.Reply(LanguageString::NICK_SASET_PASSWORD_CHANGED, nc->display.c_str());
+			source.Reply(_(NICK_SASET_PASSWORD_CHANGED), nc->display.c_str());
 
 		return MOD_CONT;
 	}
@@ -227,7 +227,7 @@ class CommandNSSASetPassword : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
-		SyntaxError(source, "SASET", LanguageString::NICK_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(NICK_SASET_SYNTAX));
 	}
 };
 

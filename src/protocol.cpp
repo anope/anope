@@ -436,7 +436,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			else if (bi == ChanServ)
 			{
 				if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
-					u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+					u->SendMessage(ChanServ, _(ACCESS_DENIED));
 				else
 					mod_run_cmd(bi, u, NULL, message);
 			}
@@ -451,7 +451,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 			{
 				if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
 				{
-					u->SendMessage(OperServ, LanguageString::ACCESS_DENIED);
+					u->SendMessage(OperServ, _(ACCESS_DENIED));
 					if (Config->WallBadOS)
 						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 				}

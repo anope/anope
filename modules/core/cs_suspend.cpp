@@ -44,7 +44,7 @@ class CommandCSSuspend : public Command
 		}
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 
 		ci->SetFlag(CI_SUSPENDED);
 		ci->forbidby = u->nick;
@@ -60,7 +60,7 @@ class CommandCSSuspend : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), _("This channel has been suspended.")).c_str());
+				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), "This channel has been suspended.").c_str());
 			}
 		}
 
@@ -105,7 +105,7 @@ class CommandCSUnSuspend : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasFlag(CI_SUSPENDED))

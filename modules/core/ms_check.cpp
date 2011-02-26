@@ -32,13 +32,13 @@ class CommandMSCheck : public Command
 		NickAlias *na = findnick(recipient);
 		if (!na)
 		{
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, recipient.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), recipient.c_str());
 			return MOD_CONT;
 		}
 
 		if (na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, recipient.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), recipient.c_str());
 			return MOD_CONT;
 		}
 

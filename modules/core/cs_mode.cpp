@@ -266,9 +266,9 @@ class CommandCSMode : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (!ci || !ci->c)
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 		else if (!check_access(u, ci, CA_MODE) && !u->Account()->HasCommand("chanserv/mode"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, params);
 		else if (subcommand.equals_ci("SET"))

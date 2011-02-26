@@ -40,19 +40,19 @@ class CommandCSDrop : public Command
 
 		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(LanguageString::CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
 			return MOD_CONT;
 		}
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(LanguageString::CHAN_X_FORBIDDEN, chan.c_str());
+			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
 			return MOD_CONT;
 		}
 
 		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->Account()->HasCommand("chanserv/drop"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 

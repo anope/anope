@@ -31,7 +31,7 @@ class CommandNSGroup : public Command
 
 		if (Config->NSEmailReg && findrequestnick(u->nick))
 		{
-			source.Reply(LanguageString::NICK_REQUESTED);
+			source.Reply(_(NICK_REQUESTED));
 			return MOD_CONT;
 		}
 
@@ -43,7 +43,7 @@ class CommandNSGroup : public Command
 
 		if (!ircdproto->IsNickValid(u->nick))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, u->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), u->nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -51,31 +51,31 @@ class CommandNSGroup : public Command
 			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(it->first) != Anope::string::npos)
 				{
-					source.Reply(LanguageString::NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+					source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 					return MOD_CONT;
 				}
 
 		NickAlias *target, *na = findnick(u->nick);
 		if (!(target = findnick(nick)))
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
 		{
 			Log(NickServ) << NickServ << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
-			source.Reply(LanguageString::NICK_X_SUSPENDED, u->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
 			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
-			source.Reply(LanguageString::NICK_X_SUSPENDED, target->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), target->nick.c_str());
 		}
 		else if (target->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 		else if (na && target->nc == na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			source.Reply(LanguageString::NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
 			source.Reply(_("Your nick is already registered; type \002%R%s DROP\002 first."), Config->s_NickServ.c_str());
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
@@ -88,7 +88,7 @@ class CommandNSGroup : public Command
 			if (res == -1)
 			{
 				Log(LOG_COMMAND, u, this) << "failed group for " << na->nick << " (invalid password)";
-				source.Reply(LanguageString::PASSWORD_INCORRECT);
+				source.Reply(_(PASSWORD_INCORRECT));
 				if (bad_password(u))
 					return MOD_STOP;
 			}
@@ -106,7 +106,7 @@ class CommandNSGroup : public Command
 
 					if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
 					{
-						source.Reply(LanguageString::NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+						source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 						return MOD_CONT;
 					}
 				}
@@ -193,7 +193,7 @@ class CommandNSUngroup : public Command
 		if (u->Account()->aliases.size() == 1)
 			source.Reply(_("Your nick is not grouped to anything, you can't ungroup it."));
 		else if (!na)
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), !nick.empty() ? nick.c_str() : u->nick.c_str());
 		else if (na->nc != u->Account())
 			source.Reply(_("The nick %s is not in your group."), na->nick.c_str());
 		else
@@ -257,9 +257,9 @@ class CommandNSGList : public Command
 		const NickCore *nc = u->Account();
 
 		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->Account()->IsServicesOper()))
-			source.Reply(LanguageString::ACCESS_DENIED, Config->s_NickServ.c_str());
+			source.Reply(_(ACCESS_DENIED), Config->s_NickServ.c_str());
 		else if (!nick.empty() && (!findnick(nick) || !(nc = findnick(nick)->nc)))
-			source.Reply(nick.empty() ? LanguageString::NICK_NOT_REGISTERED : LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(nick.empty() ? _(NICK_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nick.c_str());
 		else
 		{
 			source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());

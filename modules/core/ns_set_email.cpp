@@ -38,12 +38,12 @@ class CommandNSSetEmail : public Command
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			source.Reply(LanguageString::MAIL_X_INVALID, param.c_str());
+			source.Reply(_(MAIL_X_INVALID), param.c_str());
 			return MOD_CONT;
 		}
 

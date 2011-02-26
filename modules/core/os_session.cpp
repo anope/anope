@@ -255,7 +255,7 @@ class CommandOSException : public Command
 		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
-			source.Reply(LanguageString::BAD_EXPIRY_TIME);
+			source.Reply(_(BAD_EXPIRY_TIME));
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -287,7 +287,7 @@ class CommandOSException : public Command
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
 
 			if (readonly)
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 		}
 
 		return MOD_CONT;
@@ -323,7 +323,7 @@ class CommandOSException : public Command
 		}
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 
 		return MOD_CONT;
 	}
@@ -357,7 +357,7 @@ class CommandOSException : public Command
 			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 		}
 		else
 			this->OnSyntaxError(source, "MOVE");

@@ -55,17 +55,17 @@ class CommandNSDrop : public Command
 				else if (bad_password(u))
 					return MOD_STOP;
 				else
-					source.Reply(LanguageString::PASSWORD_INCORRECT);
+					source.Reply(_(PASSWORD_INCORRECT));
 			}
 			else
-				source.Reply(LanguageString::NICK_NOT_REGISTERED);
+				source.Reply(_(NICK_NOT_REGISTERED));
 
 			return MOD_CONT;
 		}
 
 		if (!u->Account())
 		{
-			source.Reply(LanguageString::NICK_IDENTIFY_REQUIRED, Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -75,13 +75,13 @@ class CommandNSDrop : public Command
 			my_nick = na->nick;
 
 		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			if (readonly)
-				source.Reply(LanguageString::READ_ONLY_MODE);
+				source.Reply(_(READ_ONLY_MODE));
 
 			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
 			{

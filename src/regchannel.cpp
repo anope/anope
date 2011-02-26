@@ -793,7 +793,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!do_kick && check_access(user, this, CA_NOJOIN))
 	{
 		get_idealban(this, user, mask);
-		reason = GetString(user->Account(), LanguageString::CHAN_NOT_ALLOWED_TO_JOIN);
+		reason = GetString(user->Account(), _(CHAN_NOT_ALLOWED_TO_JOIN));
 		do_kick = true;
 	}
 

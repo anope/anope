@@ -35,14 +35,14 @@ class CommandCSSASet : public Command
 
 		if (readonly)
 		{
-			source.Reply(LanguageString::CHAN_SET_DISABLED);
+			source.Reply(_(CHAN_SET_DISABLED));
 			return MOD_CONT;
 		}
 
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			source.Reply(LanguageString::CHAN_SET_MLOCK_DEPRECATED);
+			source.Reply(_(CHAN_SET_MLOCK_DEPRECATED));
 			return MOD_CONT;
 		}
 
@@ -60,7 +60,7 @@ class CommandCSSASet : public Command
 		else
 		{
 			source.Reply(_("Unknown SASET option \002%s\002."), params[1].c_str());
-			source.Reply(LanguageString::MORE_INFO, Config->s_ChanServ.c_str(), "SET");
+			source.Reply(_(MORE_INFO), Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -95,7 +95,7 @@ class CommandCSSASet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 
 	bool AddSubcommand(Module *creator, Command *c)

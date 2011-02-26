@@ -88,12 +88,12 @@ class CommandMSSet : public Command
 			p3 = params.size() > 4 ? params[4] : "";
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(LanguageString::CHAN_X_NOT_REGISTERED, chan.c_str());
+				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
 				return MOD_CONT;
 			}
 			else if (!is_servadmin && !check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			mi = &ci->memos;
@@ -105,7 +105,7 @@ class CommandMSSet : public Command
 				NickAlias *na;
 				if (!(na = findnick(p1)))
 				{
-					source.Reply(LanguageString::NICK_X_NOT_REGISTERED, p1.c_str());
+					source.Reply(_(NICK_X_NOT_REGISTERED), p1.c_str());
 					return MOD_CONT;
 				}
 				user = p1;
@@ -218,8 +218,8 @@ class CommandMSSet : public Command
 			return this->DoLimit(source, params, mi);
 		else
 		{
-			source.Reply(LanguageString::NICK_SET_UNKNOWN_OPTION, cmd.c_str());
-			source.Reply(LanguageString::MORE_INFO, Config->s_MemoServ.c_str(), "SET");
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), cmd.c_str());
+			source.Reply(_(MORE_INFO), Config->s_MemoServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;
@@ -293,7 +293,7 @@ class CommandMSSet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", LanguageString::NICK_SET_SYNTAX);
+		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
 	}
 };
 

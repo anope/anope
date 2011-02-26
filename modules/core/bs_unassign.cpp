@@ -29,11 +29,11 @@ class CommandBSUnassign : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (readonly)
-			source.Reply(LanguageString::BOT_ASSIGN_READONLY);
+			source.Reply(_(BOT_ASSIGN_READONLY));
 		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
-			source.Reply(LanguageString::BOT_NOT_ASSIGNED);
+			source.Reply(_(BOT_NOT_ASSIGNED));
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
 			source.Reply(_("You can not unassign bots while persist is set on the channel."));
 		else

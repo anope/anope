@@ -32,9 +32,9 @@ class CommandCSClearUsers : public Command
 		Anope::string modebuf;
 
 		if (!c)
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
 		else if (!check_access(u, ci, CA_FOUNDER))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		
 		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
 

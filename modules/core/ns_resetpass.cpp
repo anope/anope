@@ -30,11 +30,11 @@ class CommandNSResetPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		if (!(na = findnick(params[0])))
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, params[0].c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), params[0].c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else
 		{
 			if (SendResetEmail(u, na))
@@ -126,7 +126,7 @@ class NSResetPass : public Module
 				else
 				{
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
-					source.Reply(LanguageString::NICK_CONFIRM_INVALID);
+					source.Reply(_(NICK_CONFIRM_INVALID));
 					bad_password(u);
 				}
 

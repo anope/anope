@@ -72,11 +72,11 @@ class CommandBSInfo : public Command
 		{
 			if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("botserv/administration"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 
-			source.Reply(LanguageString::CHAN_INFO_HEADER, ci->name.c_str());
+			source.Reply(_(CHAN_INFO_HEADER), ci->name.c_str());
 			if (ci->bi)
 				source.Reply(_("           Bot nick : %s"), ci->bi->nick.c_str());
 			else
@@ -85,93 +85,93 @@ class CommandBSInfo : public Command
 			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
 			{
 				if (ci->ttb[TTB_BADWORDS])
-					source.Reply(_("   Bad words kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_BADWORDS]);
+					source.Reply(_("   Bad words kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_BADWORDS]);
 				else
-					source.Reply(_("   Bad words kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("   Bad words kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("   Bad words kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("   Bad words kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_BOLDS))
 			{
 				if (ci->ttb[TTB_BOLDS])
-					source.Reply(_("       Bolds kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_BOLDS]);
+					source.Reply(_("       Bolds kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_BOLDS]);
 				else
-					source.Reply(_("       Bolds kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("       Bolds kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("       Bolds kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("       Bolds kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_CAPS))
 			{
 				if (ci->ttb[TTB_CAPS])
-					source.Reply(_("        Caps kicker : %s (%d kick(s) to ban; minimum %d/%d%%)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
+					source.Reply(_("        Caps kicker : %s (%d kick(s) to ban; minimum %d/%d%%)"), _(ENABLED), ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
 				else
-					source.Reply(_("        Caps kicker : %s (minimum %d/%d%%)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->capsmin, ci->capspercent);
+					source.Reply(_("        Caps kicker : %s (minimum %d/%d%%)"), _(ENABLED), ci->capsmin, ci->capspercent);
 			}
 			else
-				source.Reply(_("        Caps kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("        Caps kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_COLORS))
 			{
 				if (ci->ttb[TTB_COLORS])
-					source.Reply(_("      Colors kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_COLORS]);
+					source.Reply(_("      Colors kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_COLORS]);
 				else
-					source.Reply(_("      Colors kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("      Colors kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("      Colors kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("      Colors kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_FLOOD))
 			{
 				if (ci->ttb[TTB_FLOOD])
-					source.Reply(_("       Flood kicker : %s (%d kick(s) to ban; %d lines in %ds)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
+					source.Reply(_("       Flood kicker : %s (%d kick(s) to ban; %d lines in %ds)"), _(ENABLED), ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
 				else
-					source.Reply(_("       Flood kicker : %s (%d lines in %ds)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->floodlines, ci->floodsecs);
+					source.Reply(_("       Flood kicker : %s (%d lines in %ds)"), _(ENABLED), ci->floodlines, ci->floodsecs);
 			}
 			else
-				source.Reply(_("       Flood kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("       Flood kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_REPEAT))
 			{
 				if (ci->ttb[TTB_REPEAT])
-					source.Reply(_("      Repeat kicker : %s (%d kick(s) to ban; %d times)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_REPEAT], ci->repeattimes);
+					source.Reply(_("      Repeat kicker : %s (%d kick(s) to ban; %d times)"), _(ENABLED), ci->ttb[TTB_REPEAT], ci->repeattimes);
 				else
-					source.Reply(_("      Repeat kicker : %s (%d times)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->repeattimes);
+					source.Reply(_("      Repeat kicker : %s (%d times)"), _(ENABLED), ci->repeattimes);
 			}
 			else
-				source.Reply(_("      Repeat kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("      Repeat kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_REVERSES))
 			{
 				if (ci->ttb[TTB_REVERSES])
-					source.Reply(_("    Reverses kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_REVERSES]);
+					source.Reply(_("    Reverses kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_REVERSES]);
 				else
-					source.Reply(_("    Reverses kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("    Reverses kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("    Reverses kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("    Reverses kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_UNDERLINES))
 			{
 				if (ci->ttb[TTB_UNDERLINES])
-					source.Reply(_("  Underlines kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_UNDERLINES]);
+					source.Reply(_("  Underlines kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_UNDERLINES]);
 				else
-					source.Reply(_("  Underlines kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("  Underlines kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("  Underlines kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("  Underlines kicker : %s"), _(DISABLED));
                         if (ci->botflags.HasFlag(BS_KICK_ITALICS))
 			{
 				if (ci->ttb[TTB_ITALICS])
-					source.Reply(_("     Italics kicker : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_ITALICS]);
+					source.Reply(_("     Italics kicker : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_ITALICS]);
 				else
-					source.Reply(_("     Italics kicker : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("     Italics kicker : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("     Italics kicker : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("     Italics kicker : %s"), _(DISABLED));
 			if (ci->botflags.HasFlag(BS_KICK_AMSGS))
 			{
 				if (ci->ttb[TTB_AMSGS])
-					source.Reply(_("     AMSG kicker    : %s (%d kick(s) to ban)"), GetString(u->Account(), LanguageString::ENABLED).c_str(), ci->ttb[TTB_AMSGS]);
+					source.Reply(_("     AMSG kicker    : %s (%d kick(s) to ban)"), _(ENABLED), ci->ttb[TTB_AMSGS]);
 				else
-					source.Reply(_("     AMSG kicker    : %s"), GetString(u->Account(), LanguageString::ENABLED).c_str());
+					source.Reply(_("     AMSG kicker    : %s"), _(ENABLED));
 			}
 			else
-				source.Reply(_("     AMSG kicker    : %s"), GetString(u->Account(), LanguageString::DISABLED).c_str());
+				source.Reply(_("     AMSG kicker    : %s"), _(DISABLED));
 
 			if (ci->botflags.HasFlag(BS_MSG_PRIVMSG))
 				source.Reply(_("      Fantasy reply : %s"), "PRIVMSG");
@@ -184,35 +184,35 @@ class CommandBSInfo : public Command
 			*end = 0;
 			if (ci->botflags.HasFlag(BS_DONTKICKOPS))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s", GetString(u->Account(), _("Ops protection")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s",  _("Ops protection"));
 				need_comma = true;
 			}
 			if (ci->botflags.HasFlag(BS_DONTKICKVOICES))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", GetString(u->Account(), _("Voices protection")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "",  _("Voices protection"));
 				need_comma = true;
 			}
 			if (ci->botflags.HasFlag(BS_FANTASY))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", GetString(u->Account(), _("Fantasy")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("Fantasy"));
 				need_comma = true;
 			}
 			if (ci->botflags.HasFlag(BS_GREET))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", GetString(u->Account(), _("Greet")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("Greet"));
 				need_comma = true;
 			}
 			if (ci->botflags.HasFlag(BS_NOBOT))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", GetString(u->Account(), _("No bot")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("No bot"));
 				need_comma = true;
 			}
 			if (ci->botflags.HasFlag(BS_SYMBIOSIS))
 			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", GetString(u->Account(), _("Symbiosis")).c_str());
+				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("Symbiosis"));
 				need_comma = true;
 			}
-			source.Reply(_("            Options : %s"), *buf ? buf : GetString(u->Account(), _("None")).c_str());
+			source.Reply(_("            Options : %s"), *buf ? buf : _("None"));
 		}
 		else
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());

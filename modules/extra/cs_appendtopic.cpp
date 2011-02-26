@@ -60,9 +60,9 @@ class CommandCSAppendTopic : public Command
 		Channel *c = ci->c;
 
 		if (!c)
-			u->SendMessage(ChanServ, LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 		else if (!check_access(u, ci, CA_TOPIC))
-			u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			Anope::string topic;

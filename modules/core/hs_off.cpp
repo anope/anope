@@ -27,7 +27,7 @@ class CommandHSOff : public Command
 		NickAlias *na = findnick(u->nick);
 
 		if (!na || !na->hostinfo.HasVhost())
-			source.Reply(LanguageString::HOST_NOT_ASSIGNED);
+			source.Reply(_(HOST_NOT_ASSIGNED));
 		else
 		{
 			ircdproto->SendVhostDel(u);

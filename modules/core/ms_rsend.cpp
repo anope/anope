@@ -42,7 +42,7 @@ class CommandMSRSend : public Command
 			if (u->Account()->IsServicesOper())
 				memo_send(source, nick, text, 3);
 			else
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 		}
 		else if (Config->MSMemoReceipt == 2)
 			/* Everybody can use rsend */

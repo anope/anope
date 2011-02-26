@@ -31,7 +31,7 @@ class CommandOSMode : public Command
 		{
 			Channel *c = findchan(target);
 			if (!c)
-				source.Reply(LanguageString::CHAN_X_NOT_IN_USE, target.c_str());
+				source.Reply(_(CHAN_X_NOT_IN_USE), target.c_str());
 			else if (c->bouncy_modes)
 				source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			else
@@ -45,7 +45,7 @@ class CommandOSMode : public Command
 		{
 			User *u2 = finduser(target);
 			if (!u2)
-				source.Reply(LanguageString::NICK_X_NOT_IN_USE, target.c_str());
+				source.Reply(_(NICK_X_NOT_IN_USE), target.c_str());
 			else
 			{
 				u2->SetModes(OperServ, "%s", modes.c_str());

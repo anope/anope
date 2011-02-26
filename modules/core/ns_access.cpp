@@ -29,7 +29,7 @@ class CommandNSAccess : public Command
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			source.Reply(LanguageString::NICK_X_SUSPENDED, nc->display.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), nc->display.c_str());
 			return MOD_CONT;
 		}
 
@@ -132,11 +132,11 @@ class CommandNSAccess : public Command
 
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
-			source.Reply(LanguageString::BAD_USERHOST_MASK);
-			source.Reply(LanguageString::MORE_INFO, Config->s_NickServ.c_str(), "ACCESS");
+			source.Reply(_(BAD_USERHOST_MASK));
+			source.Reply(_(MORE_INFO), Config->s_NickServ.c_str(), "ACCESS");
 		}
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, u->Account()->display.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, u->Account(), mask);
 		else if (cmd.equals_ci("DEL"))

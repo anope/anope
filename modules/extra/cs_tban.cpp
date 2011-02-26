@@ -35,16 +35,17 @@ class TempBan : public CallBack
 	}
 };
 
-static bool CanBanUser(Channel *c, User *u, User *u2)
+static bool CanBanUser(CommandSource &source, Channel *c, User *u2)
 {
+	User *u = source.u;
 	ChannelInfo *ci = c->ci;
 	bool ok = false;
 	if (!check_access(u, ci, CA_BAN))
-		u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+		source.Reply(_(ACCESS_DENIED));
 	else if (matches_list(c, u2, CMODE_EXCEPT))
-		u->SendMessage(ChanServ, LanguageString::CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
+		source.Reply(_(CHAN_EXCEPTED), u2->nick.c_str(), ci->name.c_str());
 	else if (u2->IsProtected())
-		u->SendMessage(ChanServ, LanguageString::ACCESS_DENIED);
+		source.Reply(_(ACCESS_DENIED));
 	else
 		ok = true;
 
@@ -61,7 +62,6 @@ class CommandCSTBan : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 		Channel *c = ci->c;
 
@@ -71,11 +71,11 @@ class CommandCSTBan : public Command
 
 		User *u2;
 		if (!c)
-			u->SendMessage(ChanServ, LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
 		else if (!(u2 = finduser(nick)))
-			u->SendMessage(ChanServ, LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else
-			if (CanBanUser(c, u, u2))
+			if (CanBanUser(source, c, u2))
 			{
 				Anope::string mask;
 				get_idealban(c->ci, u2, mask);

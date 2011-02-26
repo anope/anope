@@ -89,7 +89,7 @@ class CommandBSBot : public Command
 		*/
 		if (findnick(nick))
 		{
-			source.Reply(LanguageString::NICK_ALREADY_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_ALREADY_REGISTERED), nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -125,13 +125,13 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(oldnick)))
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
 			return MOD_CONT;
 		}
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, false))
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
 			return MOD_CONT;
 		}
 
@@ -155,7 +155,7 @@ class CommandBSBot : public Command
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(nick, false))
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, oldnick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
 			return MOD_CONT;
 		}
 
@@ -219,7 +219,7 @@ class CommandBSBot : public Command
 			*/
 			if (findnick(nick))
 			{
-				source.Reply(LanguageString::NICK_ALREADY_REGISTERED, nick.c_str());
+				source.Reply(_(NICK_ALREADY_REGISTERED), nick.c_str());
 				return MOD_CONT;
 			}
 
@@ -282,13 +282,13 @@ class CommandBSBot : public Command
 
 		if (!(bi = findbot(nick)))
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
 			return MOD_CONT;
 		}
 
 		if (nickIsServices(nick, false))
 		{
-			source.Reply(LanguageString::BOT_DOES_NOT_EXIST, nick.c_str());
+			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -323,7 +323,7 @@ class CommandBSBot : public Command
 			// ADD nick user host real - 5
 			if (!u->Account()->HasCommand("botserv/bot/add"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 
@@ -346,7 +346,7 @@ class CommandBSBot : public Command
 			// but only oldn and newn are required
 			if (!u->Account()->HasCommand("botserv/bot/change"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 
@@ -363,7 +363,7 @@ class CommandBSBot : public Command
 			// DEL nick
 			if (!u->Account()->HasCommand("botserv/bot/del"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 

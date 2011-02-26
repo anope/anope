@@ -29,13 +29,13 @@ class CommandCSUnban : public Command
 
 		if (!c)
 		{
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 			return MOD_CONT;
 		}
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -45,7 +45,7 @@ class CommandCSUnban : public Command
 
 		if (!u2)
 		{
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, params[1].c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), params[1].c_str());
 			return MOD_CONT;
 		}
 

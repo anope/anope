@@ -31,7 +31,7 @@ class CommandCSInvite : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, chan.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -39,7 +39,7 @@ class CommandCSInvite : public Command
 
 		if (!check_access(u, ci, CA_INVITE))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -50,7 +50,7 @@ class CommandCSInvite : public Command
 		{
 			if (!(u2 = finduser(params[1])))
 			{
-				source.Reply(LanguageString::NICK_X_NOT_IN_USE, params[1].c_str());
+				source.Reply(_(NICK_X_NOT_IN_USE), params[1].c_str());
 				return MOD_CONT;
 			}
 		}

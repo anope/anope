@@ -42,7 +42,7 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			source.Reply(LanguageString::BAD_EXPIRY_TIME);
+			source.Reply(_(BAD_EXPIRY_TIME));
 			return MOD_CONT;
 		}
 		else if (expires > 0)
@@ -81,7 +81,7 @@ class CommandOSChanKill : public Command
 				Log(LOG_ADMIN, u, this) << "(" << realreason << ")";
 			}
 			else
-				source.Reply(LanguageString::CHAN_X_NOT_IN_USE, channel.c_str());
+				source.Reply(_(CHAN_X_NOT_IN_USE), channel.c_str());
 		}
 		return MOD_CONT;
 	}

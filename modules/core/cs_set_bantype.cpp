@@ -59,7 +59,7 @@ class CommandCSSetBanType : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SET", LanguageString::CHAN_SET_SYNTAX);
+		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
 	}
 };
 
@@ -73,7 +73,7 @@ class CommandCSSASetBanType : public CommandCSSetBanType
 	void OnSyntaxError(CommandSource &source, const Anope::string &)
 	{
 		// XXX
-		SyntaxError(source, "SASET", LanguageString::CHAN_SASET_SYNTAX);
+		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 

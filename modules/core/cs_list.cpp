@@ -36,7 +36,7 @@ class CommandCSList : public Command
 
 		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -52,7 +52,7 @@ class CommandCSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+				source.Reply(_(LIST_INCORRECT_RANGE));
 				source.Reply(_("To search for channels starting with #, search for the channel\n"
 					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
 				return MOD_CONT;
@@ -80,7 +80,7 @@ class CommandCSList : public Command
 
 		Anope::string spattern = "#" + pattern;
 
-		source.Reply(LanguageString::LIST_HEADER, pattern.c_str());
+		source.Reply(_(LIST_HEADER), pattern.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -133,7 +133,7 @@ class CommandCSList : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "LIST", LanguageString::NICK_LIST_SYNTAX);
+		SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));
 	}
 };
 

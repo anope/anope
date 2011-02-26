@@ -30,7 +30,7 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);

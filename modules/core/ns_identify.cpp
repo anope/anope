@@ -34,14 +34,14 @@ class CommandNSIdentify : public Command
 		{
 			NickRequest *nr = findrequestnick(nick);
 			if (nr)
-				source.Reply(LanguageString::NICK_IS_PREREG);
+				source.Reply(_(NICK_IS_PREREG));
 			else
-				source.Reply(LanguageString::NICK_NOT_REGISTERED);
+				source.Reply(_(NICK_NOT_REGISTERED));
 		}
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		/* You can now identify for other nicks without logging out first,
 		 * however you can not identify again for the group you're already
 		 * identified as
@@ -54,7 +54,7 @@ class CommandNSIdentify : public Command
 			if (!res)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
-				source.Reply(LanguageString::PASSWORD_INCORRECT);
+				source.Reply(_(PASSWORD_INCORRECT));
 				if (bad_password(u))
 					return MOD_STOP;
 			}

@@ -31,11 +31,11 @@ class CommandNSSendPass : public Command
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!(na = findnick(nick)))
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;

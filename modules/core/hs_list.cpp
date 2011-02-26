@@ -36,14 +36,14 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+				source.Reply(_(LIST_INCORRECT_RANGE));
 				return MOD_CONT;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					source.Reply(LanguageString::LIST_INCORRECT_RANGE);
+					source.Reply(_(LIST_INCORRECT_RANGE));
 					return MOD_CONT;
 				}
 				try

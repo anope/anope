@@ -815,11 +815,11 @@ class CoreExport Module : public Extensible
 	virtual void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) { }
 
 	/** Called when a user requests info for a channel
-	 * @param u The user requesting info
+	 * @param source The user requesting info
 	 * @param ci The channel the user is requesting info for
 	 * @param ShowHidden true if we should show the user everything
 	 */
-	virtual void OnChanInfo(User *u, ChannelInfo *ci, bool ShowHidden) { }
+	virtual void OnChanInfo(CommandSource &source, ChannelInfo *ci, bool ShowHidden) { }
 
 	/** Called on cs_findchan()
 	 * @param chname The name being looked up
@@ -912,11 +912,11 @@ class CoreExport Module : public Extensible
 	virtual void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) { }
 
 	/** Called when a user requests info for a nick
-	 * @param u The user requesting info
+	 * @param source The user requesting info
 	 * @param na The nick the user is requesting info from
 	 * @param ShowHidden true if we should show the user everything
 	 */
-	virtual void OnNickInfo(User *u, NickAlias *na, bool ShowHidden) { }
+	virtual void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden) { }
 
 	/** Called in findnick()
 	 * Useful to modify the na returned by findnick()

@@ -39,7 +39,7 @@ class AccessListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(_(CHAN_ACCESS_LIST_HEADER), source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
@@ -72,7 +72,7 @@ class AccessViewCallback : public AccessListCallback
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, source.ci->name.c_str());
+			source.Reply(_(CHAN_ACCESS_LIST_HEADER), source.ci->name.c_str());
 		}
 
 		DoList(source, Number - 1, source.ci->GetAccess(Number - 1));
@@ -92,10 +92,10 @@ class AccessViewCallback : public AccessListCallback
 		if (ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(LanguageString::CHAN_ACCESS_VIEW_XOP_FORMAT, Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(_(CHAN_ACCESS_VIEW_XOP_FORMAT), Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 		}
 		else
-			source.Reply(LanguageString::CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(_(CHAN_ACCESS_VIEW_AXS_FORMAT), Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
 	}
 };
 
@@ -117,7 +117,7 @@ class AccessDelCallback : public NumberList
 	~AccessDelCallback()
 	{
 		if (Denied && !Deleted)
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!Deleted)
 			source.Reply(_("No matching entries on %s access list."), source.ci->name.c_str());
 		else
@@ -181,7 +181,7 @@ class CommandCSAccess : public Command
 		int16 u_level = u_access ? u_access->level : 0;
 		if (level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
@@ -192,7 +192,7 @@ class CommandCSAccess : public Command
 		}
 		else if (level <= ACCESS_INVALID || level >= ACCESS_FOUNDER)
 		{
-			source.Reply(LanguageString::CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(_(CHAN_ACCESS_LEVEL_RANGE), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 			return MOD_CONT;
 		}
 
@@ -203,7 +203,7 @@ class CommandCSAccess : public Command
 			mask += "!*@*";
 		else if (na && na->HasFlag(NS_FORBIDDEN))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, mask.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), mask.c_str());
 			return MOD_CONT;
 		}
 
@@ -213,7 +213,7 @@ class CommandCSAccess : public Command
 			/* Don't allow lowering from a level >= u_level */
 			if (access->level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			if (access->level == level)
@@ -268,7 +268,7 @@ class CommandCSAccess : public Command
 			if (!access)
 				source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
 			else if (access->nc != u->Account() && check_access(u, ci, CA_NOJOIN) && u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 			else
 			{
 				source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
@@ -311,7 +311,7 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(_(CHAN_ACCESS_LIST_HEADER), ci->name.c_str());
 				}
 
 				AccessListCallback::DoList(source, i, access);
@@ -353,7 +353,7 @@ class CommandCSAccess : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(LanguageString::CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					source.Reply(_(CHAN_ACCESS_LIST_HEADER), ci->name.c_str());
 				}
 
 				AccessViewCallback::DoList(source, i, access);
@@ -374,7 +374,7 @@ class CommandCSAccess : public Command
 		ChannelInfo *ci = source.ci;
 
 		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else
 		{
 			ci->ClearAccess();
@@ -427,7 +427,7 @@ class CommandCSAccess : public Command
 		if (is_list || is_clear ? 0 : (cmd.equals_ci("DEL") ? (nick.empty() || !s.empty()) : s.empty()))
 			this->OnSyntaxError(source, cmd);
 		else if (!has_access)
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		/* We still allow LIST and CLEAR in xOP mode, but not others */
 		else if (ci->HasFlag(CI_XOP) && !is_list && !is_clear)
 		{
@@ -689,7 +689,7 @@ class CommandCSLevels : public Command
 		else if (ci->HasFlag(CI_XOP))
 			source.Reply(_("Levels are not available as xOP is enabled on this channel."));
 		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, params);
 		else if (cmd.equals_ci("DIS") || cmd.equals_ci("DISABLE"))

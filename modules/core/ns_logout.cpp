@@ -32,7 +32,7 @@ class CommandNSLogout : public Command
 		if (!u->Account()->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
 			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else

@@ -488,14 +488,14 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find('@') == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, LanguageString::BAD_USERHOST_MASK);
+			u->SendMessage(bi, _(BAD_USERHOST_MASK));
 		return NULL;
 	}
 
 	if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
 		return NULL;
 	}
 
@@ -563,7 +563,7 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (!mask.empty() && mask.find_first_not_of("*?") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(bi, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(bi, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
 		return NULL;
 	}
 
@@ -666,7 +666,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	if (mask.find_first_not_of("*") == Anope::string::npos)
 	{
 		if (bi && u)
-			u->SendMessage(OperServ, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+			u->SendMessage(OperServ, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
 		return NULL;
 	}
 
@@ -798,7 +798,7 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 
 	if (mask.find_first_not_of("*?") == Anope::string::npos)
 	{
-		u->SendMessage(OperServ, LanguageString::USERHOST_MASK_TOO_WIDE, mask.c_str());
+		u->SendMessage(OperServ, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
 		return NULL;
 	}
 

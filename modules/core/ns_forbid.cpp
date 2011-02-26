@@ -35,10 +35,10 @@ class CommandNSForbid : public Command
 		}
 
 		if (readonly)
-			source.Reply(LanguageString::READ_ONLY_MODE);
+			source.Reply(_(READ_ONLY_MODE));
 		if (!ircdproto->IsNickValid(nick))
 		{
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 			return MOD_CONT;
 		}
 
@@ -47,7 +47,7 @@ class CommandNSForbid : public Command
 		{
 			if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
 			}
 			delete na;
@@ -64,7 +64,7 @@ class CommandNSForbid : public Command
 
 		if (curr)
 		{
-			curr->SendMessage(NickServ, LanguageString::FORCENICKCHANGE_NOW);
+			curr->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 			curr->Collide(na);
 		}
 

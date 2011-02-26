@@ -32,13 +32,13 @@ class CommandNSGhost : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!user)
-			source.Reply(LanguageString::NICK_X_NOT_IN_USE, nick.c_str());
+			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else if (!na)
-			source.Reply(LanguageString::NICK_X_NOT_REGISTERED, nick.c_str());
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(LanguageString::NICK_X_FORBIDDEN, na->nick.c_str());
+			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(LanguageString::NICK_X_SUSPENDED, na->nick.c_str());
+			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't ghost yourself!"));
 		else if ((u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))) ||
@@ -56,7 +56,7 @@ class CommandNSGhost : public Command
 		}
 		else
 		{
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 			if (!pass.empty())
 			{
 				Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;

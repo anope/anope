@@ -83,7 +83,7 @@ class AkickListCallback : public NumberList
 
 	static void DoList(CommandSource &source, unsigned index, AutoKick *akick)
 	{
-		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(source.u->Account(), LanguageString::NO_REASON).c_str());
+		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
 	}
 };
 
@@ -110,15 +110,14 @@ class AkickViewCallback : public AkickListCallback
 
 	static void DoList(CommandSource &source, unsigned index, AutoKick *akick)
 	{
-		User *u = source.u;
 		Anope::string timebuf;
 
 		if (akick->addtime)
 			timebuf = do_strftime(akick->addtime);
 		else
-			timebuf = GetString(u->Account(), LanguageString::UNKNOWN);
+			timebuf = _(UNKNOWN);
 
-		source.Reply(LanguageString::CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : GetString(u->Account(), LanguageString::UNKNOWN).c_str(), timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : GetString(u->Account(), LanguageString::NO_REASON).c_str());
+		source.Reply(_(CHAN_AKICK_VIEW_FORMAT), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : UNKNOWN, timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
 
 		if (akick->last_used)
 			source.Reply(_("    Last used %s"), do_strftime(akick->last_used).c_str());
@@ -184,7 +183,7 @@ class CommandCSAKick : public Command
 		{
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				source.Reply(LanguageString::NICK_X_FORBIDDEN, mask.c_str());
+				source.Reply(_(NICK_X_FORBIDDEN), mask.c_str());
 				return;
 			}
 
@@ -194,7 +193,7 @@ class CommandCSAKick : public Command
 		/* Check excepts BEFORE we get this far */
 		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask))
 		{
-			source.Reply(LanguageString::CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
+			source.Reply(_(CHAN_EXCEPTED), mask.c_str(), ci->name.c_str());
 			return;
 		}
 
@@ -206,7 +205,7 @@ class CommandCSAKick : public Command
 			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
 			if (nc == ci->founder || nc_level >= u_level)
 			{
-				source.Reply(LanguageString::ACCESS_DENIED);
+				source.Reply(_(ACCESS_DENIED));
 				return;
 			}
 		}
@@ -224,7 +223,7 @@ class CommandCSAKick : public Command
 
 				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && entry_mask.Matches(u2))
 				{
-					source.Reply(LanguageString::ACCESS_DENIED);
+					source.Reply(_(ACCESS_DENIED));
 					return;
 				}
 			}
@@ -245,7 +244,7 @@ class CommandCSAKick : public Command
 					Anope::string buf = na2->nick + "!" + na2->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
-						source.Reply(LanguageString::ACCESS_DENIED);
+						source.Reply(_(ACCESS_DENIED));
 						return;
 					}
 				}
@@ -443,7 +442,7 @@ class CommandCSAKick : public Command
 
 		if (!c)
 		{
-			source.Reply(LanguageString::CHAN_X_NOT_IN_USE, ci->name.c_str());
+			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
 			return;
 		}
 
@@ -490,7 +489,7 @@ class CommandCSAKick : public Command
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
-			source.Reply(LanguageString::ACCESS_DENIED);
+			source.Reply(_(ACCESS_DENIED));
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))

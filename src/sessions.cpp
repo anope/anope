@@ -106,7 +106,7 @@ void add_session(User *u)
 			if (exception)
 			{
 				kill = false;
-				if (session->count >= exception->limit)
+				if (exception->limit && session->count >= exception->limit)
 					kill = true;
 			}
 		}

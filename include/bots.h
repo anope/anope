@@ -77,15 +77,15 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 
 	/** Join this bot to a channel
 	 * @param c The channel
-	 * @param update_ts Assume we're updating the TS for this channel
+	 * @param status The status the bot should have on the channel
 	 */
-	void Join(Channel *c, bool update_ts = false);
+	void Join(Channel *c, ChannelStatus *status = NULL);
 
 	/** Join this bot to a channel
 	 * @param chname The channel name
-	 * @param update_ts Assume we're updating the TS for this channel
+	 * @param status The status the bot should have on the channel
 	 */
-	void Join(const Anope::string &chname, bool update_ts = false);
+	void Join(const Anope::string &chname, ChannelStatus *status = NULL);
 
 	/** Part this bot from a channel
 	 * @param c The channel

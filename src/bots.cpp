@@ -175,7 +175,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 	ci->bi = NULL;
 }
 
-void BotInfo::Join(Channel *c, bool update_ts)
+void BotInfo::Join(Channel *c, ChannelStatus *status)
 {
 	if (Config->BSSmartJoin)
 	{
@@ -202,35 +202,15 @@ void BotInfo::Join(Channel *c, bool update_ts)
 	}
 
 	c->JoinUser(this);
-	ChannelContainer *cc = this->FindChannel(c);
-	for (unsigned i = 0; i < Config->BotModeList.size(); ++i)
-	{
-		if (!update_ts)
-		{
-			c->SetMode(this, Config->BotModeList[i], this->nick, false);
-		}
-		else
-		{
-			cc->Status->SetFlag(Config->BotModeList[i]->Name);
-			c->SetModeInternal(Config->BotModeList[i], this->nick, false);
-		}
-	}
-	if (!update_ts)
-		ircdproto->SendJoin(this, c->name, c->creation_time);
-	/* This is sent later, when we burst to the uplink */
-	else if (Me && Me->IsSynced())
-	{
-		ircdproto->SendJoin(this, cc);
-		
-		c->Reset();
-	}
-	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c->ci, this));
+	ircdproto->SendJoin(this, c, status);
+
+	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c, this));
 }
 
-void BotInfo::Join(const Anope::string &chname, bool update_ts)
+void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
 {
 	Channel *c = findchan(chname);
-	return this->Join(c ? c : new Channel(chname), update_ts);
+	return this->Join(c ? c : new Channel(chname), status);
 }
 
 void BotInfo::Part(Channel *c, const Anope::string &reason)

@@ -16,7 +16,7 @@ static Anope::string TS6UPLINK;
 
 IRCDVar myIrcd[] = {
 	{"Ratbox 2.0+",	/* ircd name */
-	 "+oi",			/* Modes used by pseudoclients */
+	 "+oiS",			/* Modes used by pseudoclients */
 	 0,				/* SVSNICK */
 	 0,				/* Vhost */
 	 1,				/* Supports SNlines */
@@ -79,7 +79,7 @@ void ratbox_cmd_svsinfo()
 */
 void ratbox_cmd_capab()
 {
-	send_cmd("", "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP");
+	send_cmd("", "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP TS6");
 }
 
 /* PASS */
@@ -92,10 +92,7 @@ class RatboxProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		if (source)
-			send_cmd(source->GetUID(), "OPERWALL :%s", buf.c_str());
-		else
-			send_cmd(Config->Numeric, "OPERWALL :%s", buf.c_str());
+		send_cmd(source ? source->GetUID() : Config->Numeric, "OPERWALL :%s", buf.c_str());
 	}
 
 	void SendSQLine(const XLine *x)
@@ -126,14 +123,20 @@ class RatboxProto : public IRCDProto
 		send_cmd(Config->Numeric, "UNRESV * %s", x->Mask.c_str());
 	}
 
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd("", "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel.c_str(), user->GetUID().c_str());
-	}
-
-	void SendJoin(const BotInfo *user, const ChannelContainer *cc)
-	{
-		send_cmd("", "SJOIN %ld %s +%s :%s%s", static_cast<long>(cc->chan->creation_time), cc->chan->name.c_str(), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildModePrefixList().c_str(), user->GetUID().c_str());
+		/* Note that we must send our modes with the SJOIN and
+		 * can not add them to the mode stacker because ratbox
+		 * does not allow *any* client to op itself
+		 */
+		send_cmd("", "SJOIN %ld %s +%s :%s%s", static_cast<long>(c->creation_time), c->name.c_str(), c->GetModes(true, true).c_str(), status != NULL ? status->BuildModePrefixList().c_str() : "", user->GetUID().c_str());
+		/* And update our internal status for this user since this is not going through our mode handling system */
+		if (status != NULL)
+		{
+			UserContainer *uc = c->FindUser(user);
+			if (uc != NULL)
+				*uc->Status = *status;
+		}
 	}
 
 	void SendAkill(const XLine *x)
@@ -176,24 +179,13 @@ class RatboxProto : public IRCDProto
 			send_cmd(bi->GetUID(), "PART %s", chan->name.c_str());
 	}
 
-	void SendNumericInternal(const Anope::string &, int numeric, const Anope::string &dest, const Anope::string &buf)
-	{
-		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
-		send_cmd(Config->Numeric, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
-	}
-
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
-		if (bi)
-			send_cmd(bi->GetUID(), "MODE %s %s", dest->name.c_str(), buf.c_str());
-		else
-			send_cmd(Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->GetUID() : Config->Numeric, "SVSMODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
@@ -227,9 +219,9 @@ class RatboxProto : public IRCDProto
 		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
-		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
 	}
 
 	bool IsNickValid(const Anope::string &nick)
@@ -248,27 +240,11 @@ class RatboxProto : public IRCDProto
 		{
 			ChannelStatus status;
 			status.SetFlag(CMODE_OP);
-			ChannelContainer cc(c);
-			cc.Status = &status;
-			ircdproto->SendJoin(bi, &cc);
+			bi->Join(c, &status);
 		}
 		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
 		if (needjoin)
-		{
-			ircdproto->SendPart(bi, c, NULL);
-		}
-	}
-
-	void SetAutoIdentificationToken(User *u)
-	{
-
-		if (!u->Account())
-			return;
-
-		Anope::string svidbuf = stringify(u->timestamp);
-
-		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
+			bi->Part(c);
 	}
 };
 
@@ -283,33 +259,17 @@ class RatboxIRCdMessage : public IRCdMessage
 		if (params[0][0] == '#' || params[0][0] == '&')
 			do_cmode(source, params[0], params[2], params[1]);
 		else
-		{
-			User *u = finduser(source);
-			User *u2 = finduser(params[0]);
-			if (!u || !u2)
-				return true;
-			do_umode(u->nick, u2->nick, params[1]);
-		}
+			do_umode(params[0], params[1]);
 
 		return true;
 	}
 
 	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		Server *s = Server::Find(source);
 		/* Source is always the server */
-		User *user = do_nick("", params[0], params[4], params[5], s->GetName(), params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
-		if (user)
-		{
-			NickAlias *na = findnick(user->nick);
-			Anope::string svidbuf;
-			if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[2])
-			{
-				user->Login(na->nc);
-			}
-			else
-				validate_user(user);
-		}
+		User *user = do_nick("", params[0], params[4], params[5], source, params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
+		if (user && user->server->IsSynced())
+			validate_user(user);
 
 		return true;
 	}
@@ -338,6 +298,7 @@ class RatboxIRCdMessage : public IRCdMessage
 			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], TS6UPLINK);
 		else
 			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], "");
+		ircdproto->SendPing(Config->ServerName, params[0]);
 		return true;
 	}
 
@@ -490,9 +451,40 @@ bool event_kick(const Anope::string &source, const std::vector<Anope::string> &p
 bool event_sid(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	/* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
-	Server *s = Server::Find(source);
+	do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[3], params[2]);
+	ircdproto->SendPing(Config->ServerName, params[0]);
+	return true;
+}
 
-	do_server(s->GetName(), params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[3], params[2]);
+// Debug: Received: :00BAAAAAB ENCAP * LOGIN Adam
+bool event_encap(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	if (params.size() > 2 && params[1] == "LOGIN")
+	{
+		User *u = finduser(source);
+		NickCore *nc = findcore(params[2]);
+		if (!u || !nc)
+			return true;
+		u->Login(nc);
+	}
+
+	return true;
+}
+
+bool event_pong(const Anope::string &source, const std::vector<Anope::string> &params)
+{
+	Server *s = Server::Find(source);
+	if (s && !s->IsSynced())
+	{
+		s->Sync(false);
+
+		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+		{
+			User *u = *it;
+			if (u->server == s && !u->IsIdentified())
+				validate_user(u);
+		}
+	}
 	return true;
 }
 
@@ -536,55 +528,58 @@ bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-static void AddModes()
-{
-	/* Add user modes */
-	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-
-	/* b/e/I */
-	ModeManager::AddChannelMode(new ChannelModeBan('b'));
-	ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
-
-	/* v/h/o/a/q */
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-
-	/* Add channel modes */
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-	ModeManager::AddChannelMode(new ChannelModeKey('k'));
-	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-}
-
 class ProtoRatbox : public Module
 {
-	Message message_kick, message_tmode, message_bmask, message_pass, message_tb, message_sid;
+	Message message_kick, message_tmode, message_bmask, message_pass, message_tb, message_sid, message_encap,
+		message_pong;
 	
 	RatboxProto ircd_proto;
 	RatboxIRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+
+		/* b/e/I */
+		ModeManager::AddChannelMode(new ChannelModeBan('b'));
+		ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+
+		/* v/h/o/a/q */
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+
+		/* Add channel modes */
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelModeKey('k'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+	}
+
  public:
 	ProtoRatbox(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_kick("KICK", event_kick), message_tmode("TMODE", event_tmode),
 		message_bmask("BMASK", event_bmask), message_pass("PASS", event_pass),
-		message_tb("TB", event_tburst), message_sid("SID", event_sid)
+		message_tb("TB", event_tburst), message_sid("SID", event_sid), message_encap("ENCAP", event_encap),
+		message_pong("PONG", event_pong)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		AddModes();
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
+
+		this->AddModes();
 	}
 };
 

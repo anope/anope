@@ -991,8 +991,7 @@ class CoreExport IRCDProto
 	virtual void SendQuit(const User *u, const char *fmt, ...);
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
-	virtual void SendJoin(const BotInfo *, const Anope::string &, time_t) = 0;
-	virtual void SendJoin(BotInfo *, const ChannelContainer *);
+	virtual void SendJoin(BotInfo *, Channel *, const ChannelStatus *) = 0;
 	virtual void SendSQLineDel(const XLine *x) = 0;
 	virtual void SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
@@ -1041,7 +1040,7 @@ class CoreExport IRCDProto
 	/** Send a channel creation message to the uplink.
 	 * On most TS6 IRCds this is a SJOIN with no nick
 	 */
-	virtual void SendChannel(Channel *c, const Anope::string &modes) { }
+	virtual void SendChannel(Channel *c) { }
 };
 
 class CoreExport IRCdMessage

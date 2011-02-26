@@ -823,7 +823,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 /*************************************************************************/
 
-void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes)
+void do_umode(const Anope::string &user, const Anope::string &modes)
 {
 	User *u = finduser(user);
 	if (!u)

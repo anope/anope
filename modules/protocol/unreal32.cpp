@@ -129,15 +129,11 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(source->nick, "G %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->nick : Config->ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
 	}
 
@@ -173,15 +169,13 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(Config->ServerName, "~ %ld %s :%s", static_cast<long>(chantime), channel.c_str(), user->nick.c_str());
-	}
-
-	void SendJoin(BotInfo *user, const ChannelContainer *cc)
-	{
-		send_cmd(Config->ServerName, "~ %ld %s :%s%s", static_cast<long>(cc->chan->creation_time), cc->chan->name.c_str(), cc->Status->BuildModePrefixList().c_str(), user->nick.c_str());
-		cc->chan->SetModes(user, false, "%s", cc->chan->GetModes(true, true).c_str());
+		send_cmd(Config->ServerName, "~ %ld %s :%s", static_cast<long>(c->creation_time), c->name.c_str(), user->nick.c_str());
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	/* unsqline
@@ -209,16 +203,12 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSO(const Anope::string &source, const Anope::string &nick, const Anope::string &flag)
 	{
-		if (source.empty() || nick.empty() || flag.empty())
-			return;
 		send_cmd(source, "BB %s %s", nick.c_str(), flag.c_str());
 	}
 
 	/* NICK <newnick>  */
 	void SendChangeBotNick(const BotInfo *oldnick, const Anope::string &newnick)
 	{
-		if (!oldnick || newnick.empty())
-			return;
 		send_cmd(oldnick->nick, "& %s %ld", newnick.c_str(), static_cast<long>(Anope::CurTime));
 	}
 
@@ -339,7 +329,7 @@ class UnrealIRCdProto : public IRCDProto
 		ircdproto->SendMode(NickServ, u, "+d 1");
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
 		/* Unreal does not support updating a channels TS without actually joining a user,
 		 * so we will join and part us now
@@ -347,13 +337,13 @@ class UnrealIRCdProto : public IRCDProto
 		BotInfo *bi = whosends(c->ci);
 		if (c->FindUser(bi) == NULL)
 		{
-			bi->Join(c, true);
+			bi->Join(c);
 			bi->Part(c);
 		}
 		else
 		{
 			bi->Part(c);
-			bi->Join(c, true);
+			bi->Join(c);
 		}
 	}
 };
@@ -374,7 +364,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 		if (params[0][0] == '#' || params[0][0] == '&')
 			do_cmode(source, params[0], modes, server_source ? params[params.size() - 1] : "");
 		else
-			do_umode(source, params[0], modes);
+			do_umode(params[0], modes);
 
 		return true;
 	}
@@ -828,7 +818,7 @@ bool event_umode2(const Anope::string &source, const std::vector<Anope::string> 
 	if (params.size() < 1)
 		return true;
 
-	do_umode(source, source, params[0]);
+	do_umode(source, params[0]);
 	return true;
 }
 
@@ -981,43 +971,6 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 	return true;
 }
 
-static void AddModes()
-{
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-	/* Unreal sends +q as * and +a as ~ */
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '~'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '*'));
-
-	/* Add user modes */
-	ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, "UMODE_SERV_ADMIN", 'A'));
-	ModeManager::AddUserMode(new UserMode(UMODE_BOT, "UMODE_BOT", 'B'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CO_ADMIN, "UMODE_CO_ADMIN", 'C'));
-	ModeManager::AddUserMode(new UserMode(UMODE_FILTER, "UMODE_FILTER", 'G'));
-	ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, "UMODE_HIDEOPER", 'H'));
-	ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'N'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
-	ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, "UMODE_PROTECTED", 'S'));
-	ModeManager::AddUserMode(new UserMode(UMODE_NO_CTCP, "UMODE_NO_CTCP", 'T'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WEBTV, "UMODE_WEBTV", 'V'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, "UMODE_WHOIS", 'W'));
-	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-	ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
-	ModeManager::AddUserMode(new UserMode(UMODE_GLOBOPS, "UMODE_GLOBOPS", 'g'));
-	ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
-	ModeManager::AddUserMode(new UserMode(UMODE_GOD, "UMODE_GOD", 'q'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-	ModeManager::AddUserMode(new UserMode(UMODE_VHOST, "UMODE_VHOST", 't'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'z'));
-}
-
 class ProtoUnreal : public Module
 {
 	Message message_away, message_join, message_kick,
@@ -1035,6 +988,44 @@ class ProtoUnreal : public Module
 
 	UnrealIRCdProto ircd_proto;
 	Unreal32IRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+		/* Unreal sends +q as * and +a as ~ */
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '~'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '*'));
+
+		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, "UMODE_SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserMode(UMODE_BOT, "UMODE_BOT", 'B'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CO_ADMIN, "UMODE_CO_ADMIN", 'C'));
+		ModeManager::AddUserMode(new UserMode(UMODE_FILTER, "UMODE_FILTER", 'G'));
+		ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, "UMODE_HIDEOPER", 'H'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'N'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, "UMODE_PROTECTED", 'S'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NO_CTCP, "UMODE_NO_CTCP", 'T'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WEBTV, "UMODE_WEBTV", 'V'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, "UMODE_WHOIS", 'W'));
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
+		ModeManager::AddUserMode(new UserMode(UMODE_GLOBOPS, "UMODE_GLOBOPS", 'g'));
+		ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
+		ModeManager::AddUserMode(new UserMode(UMODE_GOD, "UMODE_GOD", 'q'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_VHOST, "UMODE_VHOST", 't'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'z'));
+	}
+
  public:
 	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_away("6", OnAway),
@@ -1065,11 +1056,11 @@ class ProtoUnreal : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		AddModes();
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
+		
+		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

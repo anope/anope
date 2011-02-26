@@ -126,7 +126,7 @@ void Channel::JoinUser(User *user)
 	{
 		Log(LOG_DEBUG) << "Changing TS of " << this->name << " from " << this->creation_time << " to " << this->ci->time_registered;
 		this->creation_time = this->ci->time_registered;
-		ircdproto->SendChannel(this, "");
+		ircdproto->SendChannel(this);
 		this->Reset();
 	}
 
@@ -147,7 +147,7 @@ void Channel::JoinUser(User *user)
 		 * legit users - Rob
 		 **/
 		if (this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
-			this->ci->bi->Join(this, false);
+			this->ci->bi->Join(this, &Config->BotModeList);
 		/* Only display the greet if the main uplink we're connected
 		 * to has synced, or we'll get greet-floods when the net
 		 * recovers from a netsplit. -GD
@@ -444,16 +444,17 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		if (cc)
 			cc->Status->UnsetFlag(cm->Name);
 
-		/* Reset modes on bots if we're supposed to */
-		if (bi)
-		{
-			if (std::find(Config->BotModeList.begin(), Config->BotModeList.end(), cm) != Config->BotModeList.end())
-				this->SetMode(bi, cm, bi->nick);
-		}
-
-		/* Enforce secureops, etc */
 		if (EnforceMLock)
+		{
+			/* Reset modes on bots if we're supposed to */
+			if (bi)
+			{
+				if (Config->BotModeList.HasFlag(cm->Name))
+					this->SetMode(bi, cm, bi->nick);
+			}
+
 			chan_set_correct_modes(u, this, 0);
+		}
 		return;
 	}
 
@@ -726,7 +727,10 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 					continue;
 				cm = ModeManager::FindChannelModeByChar(m[i]);
 				if (!cm)
+				{
+					Log(LOG_DEBUG) << "Channel::SetModeInternal: Unknown mode char " << m[i];
 					continue;
+				}
 				modestring += cm->ModeChar;
 		}
 

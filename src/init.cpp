@@ -37,7 +37,7 @@ void introduce_user(const Anope::string &user)
 				ircdproto->SendSQLine(&x);
 
 				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-					ircdproto->SendJoin(bi, *cit);
+					ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
 			}
 		}
 
@@ -70,7 +70,7 @@ void introduce_user(const Anope::string &user)
 			ircdproto->SendSQLine(&x);
 
 			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-				ircdproto->SendJoin(bi, *cit);
+				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
 		}
 	}
 

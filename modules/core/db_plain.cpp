@@ -877,9 +877,10 @@ class DBPlain : public Module
 			}
 			db_buffer << "MD MLOCK_ON";
 			{
-				Anope::string oldmodes;
+				std::vector<Anope::string> oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_on", oldmodes))
-					db_buffer << " " << oldmodes;
+					for (unsigned i = 0; i < oldmodes.size(); ++i)
+						db_buffer << " " << oldmodes[i];
 				else
 				{
 					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
@@ -898,11 +899,10 @@ class DBPlain : public Module
 			db_buffer << endl;
 			db_buffer << "MD MLOCK_OFF";
 			{
-				Anope::string oldmodes;
+				std::vector<Anope::string> oldmodes;
 				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_off", oldmodes))
-				{
-					db_buffer << " " << oldmodes;
-				}
+					for (unsigned i = 0; i < oldmodes.size(); ++i)
+						db_buffer << " " << oldmodes[i];
 				else
 				{
 					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)

@@ -549,7 +549,7 @@ class CoreExport ServerConfig
 	/* Default botmodes on channels, defaults to ao */
 	Anope::string BotModes;
 	/* THe actual modes */
-	std::vector<ChannelModeStatus *> BotModeList;
+	ChannelStatus BotModeList;
 	/* How many times to try and reconnect to the uplink before giving up */
 	unsigned MaxRetries;
 	/* How long to wait between connection attempts */

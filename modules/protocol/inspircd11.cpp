@@ -120,15 +120,11 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(source ? source->nick : Config->s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
@@ -148,8 +144,6 @@ class InspIRCdProto : public IRCDProto
 
 	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(Config->ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
@@ -160,22 +154,13 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(user->nick, "JOIN %s %ld", channel.c_str(), static_cast<long>(chantime));
-	}
-
-	void SendJoin(BotInfo *user, const ChannelContainer *cc)
-	{
-		SendJoin(user, cc->chan->name, cc->chan->creation_time);
-		for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-		{
-			if (cc->Status->HasFlag(it->second->Name))
-			{
-				cc->chan->SetMode(user, it->second, user->nick);
-			}
-		}
-		cc->chan->SetModes(user, false, "%s", cc->chan->GetModes(true, true).c_str());
+		send_cmd(user->nick, "JOIN %s %ld", c->name.c_str(), static_cast<long>(c->creation_time));
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	/* UNSQLINE */
@@ -193,8 +178,6 @@ class InspIRCdProto : public IRCDProto
 	/* SQUIT */
 	void SendSquit(const Anope::string &servname, const Anope::string &message)
 	{
-		if (servname.empty() || message.empty())
-			return;
 		send_cmd(Config->ServerName, "SQUIT %s :%s", servname.c_str(), message.c_str());
 	}
 
@@ -292,12 +275,7 @@ class InspircdIRCdMessage : public IRCdMessage
 		if (params[0][0] == '#' || params[0][0] == '&')
 			do_cmode(source, params[0], params[1], params[2]);
 		else
-		{
-			/* InspIRCd lets opers change another
-			   users modes
-			 */
-			do_umode(source, params[0], params[1]);
-		}
+			do_umode(params[0], params[1]);
 
 		return true;
 	}
@@ -510,7 +488,7 @@ class InspircdIRCdMessage : public IRCdMessage
 						}
 					}
 				}
-				else if (capab.find("PREIX=(") != Anope::string::npos)
+				else if (capab.find("PREFIX=(") != Anope::string::npos)
 				{
 					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
 					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
@@ -625,6 +603,8 @@ class InspircdIRCdMessage : public IRCdMessage
 				if (keep_their_modes)
 					Status.push_back(cm);
 			}
+			/* Erase the , */
+			buf.erase(buf.begin());
 
 			User *u = finduser(buf);
 			if (!u)
@@ -876,25 +856,26 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 	return false;
 }
 
-static void AddModes()
-{
-	ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
-	ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
-}
-
 class ProtoInspIRCd : public Module
 {
 	Message message_endburst, message_rsquit, message_svsmode, message_chghost, message_chgident, message_chgname,
 		message_sethost, message_setident, message_setname, message_fmode, message_ftopic, message_opertype,
-		message_idle;
+		message_idle, message_fjoin;
 
 	InspIRCdProto ircd_proto;
 	InspircdIRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode(UMODE_HELPOP, "UMODE_HELPOP", 'h'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+	}
+
  public:
 	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_endburst("ENDBURST", event_endburst), message_rsquit("RSQUIT", event_rsquit),
@@ -903,18 +884,18 @@ class ProtoInspIRCd : public Module
 		message_sethost("SETHOST", event_sethost), message_setident("SETIDENT", event_setident),
 		message_setname("SETNAME", event_setname), message_fmode("FMODE", event_fmode),
 		message_ftopic("FTOPIC", event_ftopic), message_opertype("OPERTYPE", event_opertype),
-		message_idle("IDLE", event_idle)
+		message_idle("IDLE", event_idle), message_fjoin("FJOIN", OnSJoin)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
-
-		AddModes();
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 
 		Capab.SetFlag(CAPAB_NOQUIT);
+
+		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

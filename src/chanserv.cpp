@@ -109,6 +109,9 @@ int levelinfo_maxwidth = 0;
 
 Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 {
+	if (!ci)
+		return "";
+
 	Anope::string pos = "+", neg = "-", params;
 
 	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)

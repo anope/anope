@@ -317,6 +317,8 @@ ServerConfig::ServerConfig() : errstr(""), config_data(), NSDefFlags(NickCoreFla
 	}
 
 	SetDefaultMLock(this);
+	if (ircd)
+		InitLogChannels(this);
 
 	if (IsFile(this->NameServer))
 	{
@@ -950,9 +952,6 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 
 bool DoneLogs(ServerConfig *config, const Anope::string &)
 {
-	if (ircd)
-		InitLogChannels(config);
-
 	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
 
 	return true;

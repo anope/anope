@@ -339,7 +339,7 @@ E User *finduser(const Anope::string &nick);
 
 E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
 
-E void do_umode(const Anope::string &, const Anope::string &user, const Anope::string &modes);
+E void do_umode(const Anope::string &user, const Anope::string &modes);
 E void do_kill(User *user, const Anope::string &reason);
 
 E bool matches_list(Channel *c, User *user, ChannelModeName mode);

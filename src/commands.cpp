@@ -141,6 +141,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	if (params.size() < c->MinParams)
 	{
 		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
+		source.DoReply();
 		PopLanguage();
 		return;
 	}
@@ -149,6 +150,7 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
 	if (MOD_RESULT == EVENT_STOP)
 	{
+		source.DoReply();
 		PopLanguage();
 		return;
 	}
@@ -158,16 +160,16 @@ void mod_run_cmd(BotInfo *bi, User *u, Command *c, const Anope::string &command,
 	{
 		u->SendMessage(bi, LanguageString::ACCESS_DENIED);
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
+		source.DoReply();
 		PopLanguage();
 		return;
 	}
 
 	CommandReturn ret = c->Execute(source, params);
+	if (ret == MOD_STOP)
+		return;
 
-	if (ret == MOD_CONT)
-	{
-		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
-	}
+	FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 
 	source.DoReply();
 }

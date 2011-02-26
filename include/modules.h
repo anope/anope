@@ -423,10 +423,10 @@ class CoreExport Module : public Extensible
 	virtual void OnBotNoFantasyAccess(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params) { }
 
 	/** Called after a bot joins a channel
-	 * @param ci The channael
+	 * @param c The channel
 	 * @param bi The bot
 	 */
-	virtual void OnBotJoin(ChannelInfo *ci, BotInfo *bi) { }
+	virtual void OnBotJoin(Channel *c, BotInfo *bi) { }
 
 	/** Called when a bot places a ban
 	 * @param u User being banned

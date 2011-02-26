@@ -27,12 +27,8 @@ void InitLogChannels(ServerConfig *config)
 			if (target[0] == '#')
 			{
 				Channel *c = findchan(target);
-				bool created = false;
 				if (!c)
-				{
 					c = new Channel(target);
-					created = true;
-				}
 				c->SetFlag(CH_LOGCHAN);
 				c->SetFlag(CH_PERSIST);
 
@@ -41,9 +37,7 @@ void InitLogChannels(ServerConfig *config)
 					BotInfo *bi = *it;
 
 					if (bi->HasFlag(BI_CORE) && !c->FindUser(bi))
-					{
-						bi->Join(c, created);
-					}
+						bi->Join(c, &config->BotModeList);
 				}
 			}
 		}

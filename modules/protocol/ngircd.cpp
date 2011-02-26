@@ -42,9 +42,6 @@ IRCDVar myIrcd[] = {
 /* PASS */
 class ngIRCdProto : public IRCDProto
 {
-	/* ngIRCd does not use the following functions, but we need the
-	 * empty functions in this class or the file will not compile 
-	 */
 	void SendAkill(const XLine *x) { }
 	void SendAkillDel(const XLine*) { }
 	void SendSQLine(const XLine*) { }
@@ -54,20 +51,16 @@ class ngIRCdProto : public IRCDProto
 
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		if (source)
-			send_cmd(source->nick, "WALLOPS :%s", buf.c_str());
-		else
-			send_cmd(Config->ServerName, "WALLOPS :%s", buf.c_str());
+		send_cmd(source ? source->nick : Config->ServerName, "WALLOPS :%s", buf.c_str());
 	}
 
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(user->nick, "JOIN %s", channel.c_str());
-	}
-
-	void SendJoin(const BotInfo *user, const ChannelContainer *cc)
-	{
-		send_cmd(user->nick, "JOIN %s", cc->chan->name.c_str());
+		send_cmd(user->nick, "JOIN %s", c->name.c_str());
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -87,7 +80,7 @@ class ngIRCdProto : public IRCDProto
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */
-		send_cmd(Config->ServerName, "376 * :End of MOTD command");
+		this->SendNumeric(Config->ServerName, 376, "*", ":End of MOTD command");
 	}
 
 	// Received: :dev.anope.de NICK DukeP 1 ~DukePyro p57ABF9C9.dip.t-dialin.net 1 +i :DukePyrolator
@@ -105,12 +98,6 @@ class ngIRCdProto : public IRCDProto
 			send_cmd(bi->nick, "PART %s", chan->name.c_str());
 	}
 
-	void SendNumericInternal(const Anope::string &, int numeric, const Anope::string &dest, const Anope::string &buf)
-	{
-		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
-		send_cmd(Config->ServerName, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
-	}
-
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
 		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", dest->name.c_str(), buf.c_str());
@@ -118,8 +105,6 @@ class ngIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
@@ -142,33 +127,20 @@ class ngIRCdProto : public IRCDProto
 		send_cmd(source->nick, "INVITE %s %s", nick.c_str(), chan.c_str());
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->ServerName, "CHANINFO %s %s", c->name.c_str(), modes.c_str());
+		send_cmd(Config->ServerName, "CHANINFO %s %s", c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
 	}
-
-	bool IsNickValid(const Anope::string &nick)
-	{
-		/* TS6 Save extension -Certus */
-		if (isdigit(nick[0]))
-			return false;
-		return true;
-	}
-
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
 		send_cmd(bi->nick, "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
 	}
-
 };
 
 class ngIRCdIRCdMessage : public IRCdMessage
 {
  public:
-	/* ngIRCd uses NJOIN instead of SJOIN, but we still need an 
-	 * empty function in this class or the file will not compile 
-	 */
-	bool OnSJoin(const Anope::string&, const std::vector<Anope::string>&) { return true; }
+	bool OnSJoin(const Anope::string&, const std::vector<Anope::string>&) { return false; }
 
 	/*
 	 * Received: :dev.anope.de MODE #anope +b *!*@*aol*
@@ -185,7 +157,7 @@ class ngIRCdIRCdMessage : public IRCdMessage
 		if (params[0][0] == '#' || params[0][0] == '&')
 			do_cmode(source, params[0], modes, "");
 		else
-			do_umode(source, params[0], params[1]);
+			do_umode(params[0], params[1]);
 
 		return true;
 	}
@@ -255,20 +227,16 @@ class ngIRCdIRCdMessage : public IRCdMessage
 	{
 		if (!params.empty())
 		{
-			Anope::string channel, mode;
-			size_t pos;
-			pos = params[0].find('\7');
+			size_t pos = params[0].find('\7');
 			if (pos != Anope::string::npos)
 			{
-				channel = params[0].substr(0, pos);
-				mode += '+' + params[0].substr(pos, params[0].length()) + " " + source;
+				Anope::string channel = params[0].substr(0, pos);
+				Anope::string mode = '+' + params[0].substr(pos, params[0].length()) + " " + source;
 				do_join(source, channel, "");
 				do_cmode(source, channel, mode, "");
 			}
 			else
-			{
 				do_join(source, params[0], "");
-			}
 		}
 		return true;
 	}
@@ -283,13 +251,11 @@ bool event_chaninfo(const Anope::string &source, const std::vector<Anope::string
 {
 
 	Channel *c = findchan(params[0]);
-	Anope::string modes;
-
 	if (!c)
 		c = new Channel(params[0]);
 
-	modes = params[1];
-
+	Anope::string modes = params[1];
+	
 	if (params.size() == 3)
 	{
 		c->ChangeTopicInternal(source, params[2], Anope::CurTime);
@@ -436,42 +402,6 @@ bool event_376(const Anope::string &source, const std::vector<Anope::string> &pa
 }
 
 
-static void AddModes()
-{
-	/* Add user modes */
-	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_RESTRICTED, "UMODE_RESTRICTED", 'r'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
-
-// channel modes: biIklmnoPstvz
-	/* b/e/I */
-	ModeManager::AddChannelMode(new ChannelModeBan('b'));
-	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
-
-	/* v/h/o/a/q */
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-
-	/* Add channel modes */
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-	ModeManager::AddChannelMode(new ChannelModeKey('k'));
-	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'P'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
-
-	return;
-}
-
-
-
 class ProtongIRCd : public Module
 {
 	Message message_kick, message_pass, message_njoin, message_chaninfo, message_005, 
@@ -479,6 +409,39 @@ class ProtongIRCd : public Module
 	
 	ngIRCdProto ircd_proto;
 	ngIRCdIRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_RESTRICTED, "UMODE_RESTRICTED", 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+
+		/* b/e/I */
+		ModeManager::AddChannelMode(new ChannelModeBan('b'));
+		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+
+		/* v/h/o/a/q */
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+
+		/* Add channel modes */
+		// channel modes: biIklmnoPstvz
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelModeKey('k'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'P'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'z'));
+	}
+
  public:
 	ProtongIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_kick("KICK", event_kick), message_pass("PASS", event_pass),
@@ -490,11 +453,11 @@ class ProtongIRCd : public Module
 		
 		Capab.SetFlag(CAPAB_QS);
 
-		AddModes();
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
+
+		this->AddModes();
 	}
 };
 

@@ -230,34 +230,6 @@ bool event_sethost(const Anope::string &source, const std::vector<Anope::string>
 	return true;
 }
 
-/*
- * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
- * 0: uid
- * 1: ts
- * 2: nick
- * 3: host
- * 4: dhost
- * 5: ident
- * 6: ip
- * 7: signon
- * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
- * last: realname
- */
-
-bool event_uid(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	Server *s = Server::Find(source);
-	time_t ts = convertTo<time_t>(params[1]);
-
-	Anope::string modes = params[8];
-	for (unsigned i = 9; i < params.size() - 1; ++i)
-		modes += " " + params[i];
-	User *user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
-	if (user && user->server->IsSynced())
-		validate_user(user);
-
-	return true;
-}
 
 bool event_chghost(const Anope::string &source, const std::vector<Anope::string> &params)
 {
@@ -297,11 +269,11 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		}
 	}
 
-/*
- *   possible incoming ssl_cert messages:
- *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
- *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
- */
+	/*
+	 *   possible incoming ssl_cert messages:
+	 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+	 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+	 */
 	else if (params[1].equals_cs("ssl_cert"))
 	{
 		User *u = finduser(params[0]);
@@ -342,15 +314,27 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 class Inspircd12IRCdMessage : public InspircdIRCdMessage
 {
  public:
+	/*
+	 * [Nov 03 22:09:58.176252 2009] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
+	 * 0: uid
+	 * 1: ts
+	 * 2: nick
+	 * 3: host
+	 * 4: dhost
+	 * 5: ident
+	 * 6: ip
+	 * 7: signon
+	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
+	 * last: realname
+	 */
 	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		Server *s = Server::Find(source);
 		time_t ts = convertTo<time_t>(params[1]);
 
 		Anope::string modes = params[8];
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += " " + params[i];
-		User *user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
+		User *user = do_nick("", params[2], params[5], params[3], source, params[params.size() - 1], ts, params[6], params[4], params[0], modes);
 		if (user && user->server->IsSynced())
 			validate_user(user);
 

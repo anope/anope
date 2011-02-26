@@ -75,18 +75,14 @@ class BahamutIRCdProto : public IRCDProto
 {
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		if (Capab.HasFlag(CAPAB_TSMODE))
-			send_cmd(source->nick, "MODE %s 0 %s", dest->name.c_str(), buf.c_str());
+			send_cmd(source->nick, "MODE %s %ld %s", dest->name.c_str(), static_cast<long>(dest->creation_time), buf.c_str());
 		else
 			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->nick : Config->ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
 	}
 
@@ -163,22 +159,13 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* JOIN - SJOIN */
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel.c_str());
-	}
-
-	void SendJoin(BotInfo *user, const ChannelContainer *cc)
-	{
-		SendJoin(user, cc->chan->name, cc->chan->creation_time);
-		for (std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
-		{
-			if (cc->Status->HasFlag(it->second->Name))
-			{
-				cc->chan->SetMode(user, it->second, user->nick);
-			}
-		}
-		cc->chan->SetModes(user, false, "%s", cc->chan->GetModes(true, true).c_str());
+		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(c->creation_time), c->name.c_str());
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	void SendAkill(const XLine *x)
@@ -210,8 +197,6 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
 	}
 
@@ -259,9 +244,9 @@ class BahamutIRCdProto : public IRCDProto
 		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
-		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
 	}
 };
 
@@ -270,13 +255,10 @@ class BahamutIRCdMessage : public IRCdMessage
  public:
 	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		if (params.size() < 3)
-			return true;
-
-		if (params[0][0] == '#' || params[0][0] == '&')
+		if (params.size() > 2 && (params[0][0] == '#' || params[0][0] == '&'))
 			do_cmode(source, params[0], params[2], params[1]);
-		else
-			do_umode(source, params[0], params[1]);
+		else if (params.size() > 1)
+			do_umode(params[0], params[1]);
 
 		return true;
 	}
@@ -303,7 +285,11 @@ class BahamutIRCdMessage : public IRCdMessage
 	{
 		if (params.size() != 2)
 		{
-			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[8], "", "", params[3]);
+			/* Currently bahamut has no ipv6 support */
+			sockaddrs ip;
+			ip.ntop(AF_INET, params[8].c_str());
+
+			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), "", "", params[3]);
 			if (user)
 			{
 				NickAlias *na;
@@ -554,49 +540,49 @@ bool ChannelModeFlood::IsValid(const Anope::string &value) const
 	return false;
 }
 
-static void AddModes()
-{
-	/* Add user modes */
-	ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, "UMODE_SERV_ADMIN", 'A'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
-	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-	ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
-
-	/* b/e/I */
-	ModeManager::AddChannelMode(new ChannelModeBan('b'));
-
-	/* v/h/o/a/q */
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-
-	/* Add channel modes */
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-	ModeManager::AddChannelMode(new ChannelModeFlood('f'));
-	ModeManager::AddChannelMode(new ChannelModeKey('k'));
-	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-	ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
-	ModeManager::AddChannelMode(new ChannelModeOper('O'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
-}
-
 class ProtoBahamut : public Module
 {
 	Message message_svsmode, message_cs, message_hs, message_ms, message_ns, message_os, message_burst;
 	
 	BahamutIRCdProto ircd_proto;
 	BahamutIRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, "UMODE_SERV_ADMIN", 'A'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'd'));
+
+		/* b/e/I */
+		ModeManager::AddChannelMode(new ChannelModeBan('b'));
+
+		/* v/h/o/a/q */
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+
+		/* Add channel modes */
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+		ModeManager::AddChannelMode(new ChannelModeKey('k'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
+		ModeManager::AddChannelMode(new ChannelModeRegistered('r'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
+		ModeManager::AddChannelMode(new ChannelModeOper('O'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+	}
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
@@ -607,11 +593,11 @@ class ProtoBahamut : public Module
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		AddModes();
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
+
+		this->AddModes();
 
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}

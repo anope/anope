@@ -105,8 +105,7 @@ bool event_opertype(const Anope::string &source, const std::vector<Anope::string
 {
 	/* opertype is equivalent to mode +o because servers
 	   dont do this directly */
-	User *u;
-	u = finduser(source);
+	User *u = finduser(source);
 	if (u && !u->HasMode(UMODE_OPER))
 	{
 		std::vector<Anope::string> newparams;
@@ -174,9 +173,8 @@ bool event_rsquit(const Anope::string &source, const std::vector<Anope::string> 
 
 bool event_setname(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(source);
 	if (!u)
 	{
 		Log(LOG_DEBUG) << "SETNAME for nonexistent user " << source;
@@ -189,9 +187,8 @@ bool event_setname(const Anope::string &source, const std::vector<Anope::string>
 
 bool event_chgname(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(source);
 	if (!u)
 	{
 		Log(LOG_DEBUG) << "FNAME for nonexistent user " << source;
@@ -204,9 +201,8 @@ bool event_chgname(const Anope::string &source, const std::vector<Anope::string>
 
 bool event_setident(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(source);
 	if (!u)
 	{
 		Log(LOG_DEBUG) << "SETIDENT for nonexistent user " << source;
@@ -233,9 +229,8 @@ bool event_chgident(const Anope::string &source, const std::vector<Anope::string
 
 bool event_sethost(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	User *u;
+	User *u = finduser(source);
 
-	u = finduser(source);
 	if (!u)
 	{
 		Log(LOG_DEBUG) << "SETHOST for nonexistent user " << source;
@@ -249,6 +244,7 @@ bool event_sethost(const Anope::string &source, const std::vector<Anope::string>
 bool event_chghost(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	User *u = finduser(source);
+
 	if (!u)
 	{
 		Log(LOG_DEBUG) << "FHOST for nonexistent user " << source;
@@ -283,11 +279,11 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		}
 	}
 
-/*
- *   possible incoming ssl_cert messages:
- *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
- *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
- */
+	/*
+	 *   possible incoming ssl_cert messages:
+	 *   Received: :409 METADATA 409AAAAAA ssl_cert :vTrSe c38070ce96e41cc144ed6590a68d45a6 <...> <...>
+	 *   Received: :409 METADATA 409AAAAAC ssl_cert :vTrSE Could not get peer certificate: error:00000000:lib(0):func(0):reason(0)
+	 */
 	else if (params[1].equals_cs("ssl_cert"))
 	{
 		User *u = finduser(params[0]);
@@ -343,13 +339,12 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 	 */
 	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		Server *s = Server::Find(source);
 		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 
 		Anope::string modes = params[8];
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += Anope::string(" ") + params[i];
-		User *user = do_nick("", params[2], params[5], params[3], s->GetName(), params[params.size() - 1], ts, params[6], params[4], params[0], modes);
+		User *user = do_nick("", params[2], params[5], params[3], source, params[params.size() - 1], ts, params[6], params[4], params[0], modes);
 		if (user && user->server->IsSynced())
 			validate_user(user);
 

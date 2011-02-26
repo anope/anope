@@ -568,8 +568,8 @@ void ChannelInfo::LoadMLock()
 		if (ModeManager::FindChannelModeByName(CMODE_PERM) != NULL)
 		{
 			/* At this point, CMODE_PERM *must* be locked on the channel, so this is fine */
-			ircdproto->SendChannel(this->c, get_mlock_modes(this, true));
-			this->c->SetModesInternal(NULL, get_mlock_modes(this, true));
+			ircdproto->SendChannel(this->c);
+			this->c->Reset();
 		}
 		else
 		{
@@ -577,10 +577,10 @@ void ChannelInfo::LoadMLock()
 				whosends(this)->Assign(NULL, this);
 			if (this->c->FindUser(this->bi) == NULL)
 				this->bi->Join(this->c);
-		}
 
-		check_modes(this->c);
-		this->RestoreTopic();
+			check_modes(this->c);
+			this->RestoreTopic();
+		}
 	}
 }
 

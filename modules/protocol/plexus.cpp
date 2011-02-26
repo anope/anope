@@ -89,10 +89,7 @@ class PlexusProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		if (source)
-			send_cmd(source->GetUID(), "OPERWALL :%s", buf.c_str());
-		else
-			send_cmd(Config->Numeric, "OPERWALL :%s", buf.c_str());
+		send_cmd(source ? source->GetUID() : Config->Numeric, "OPERWALL :%s", buf.c_str());
 	}
 
 	void SendSQLine(const XLine *x)
@@ -123,14 +120,13 @@ class PlexusProto : public IRCDProto
 		send_cmd(Config->Numeric, "UNRESV * %s", x->Mask.c_str());
 	}
 
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(Config->Numeric, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel.c_str(), user->GetUID().c_str());
-	}
-
-	void SendJoin(const BotInfo *user, const ChannelContainer *cc)
-	{
-		send_cmd(Config->Numeric, "SJOIN %ld %s +%s :%s%s", static_cast<long>(cc->chan->creation_time), cc->chan->name.c_str(), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildModePrefixList().c_str(), user->GetUID().c_str());
+		send_cmd(Config->Numeric, "SJOIN %ld %s +%s :%s", static_cast<long>(c->creation_time), c->name.c_str(), c->GetModes(true, true).c_str(), user->GetUID().c_str());
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	void SendAkill(const XLine *x)
@@ -180,12 +176,6 @@ class PlexusProto : public IRCDProto
 			send_cmd(bi->GetUID(), "PART %s", chan->name.c_str());
 	}
 
-	void SendNumericInternal(const Anope::string &, int numeric, const Anope::string &dest, const Anope::string &buf)
-	{
-		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
-		send_cmd(Config->Numeric, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
-	}
-
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
 		if (bi)
@@ -229,23 +219,14 @@ class PlexusProto : public IRCDProto
 		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
 	}
 
-	bool IsNickValid(const Anope::string &nick)
-	{
-		/* TS6 Save extension -Certus */
-		if (isdigit(nick[0]))
-			return false;
-
-		return true;
-	}
-
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
 		send_cmd(bi->GetUID(), "ENCAP * TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
 	}
 };
 
@@ -260,13 +241,7 @@ class PlexusIRCdMessage : public IRCdMessage
 		if (params[0][0] == '#' || params[0][0] == '&')
 			do_cmode(source, params[0], params[2], params[1]);
 		else
-		{
-			User *u = finduser(source);
-			User *u2 = finduser(params[0]);
-			if (!u || !u2)
-				return true;
-			do_umode(u->nick, u2->nick, params[1]);
-		}
+			do_umode(params[0], params[1]);
 
 		return true;
 	}
@@ -287,8 +262,11 @@ class PlexusIRCdMessage : public IRCdMessage
 	*/
 	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
-		/* Source is always the server */
-		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], params[5], params[7], params[3]);
+		/* An IP of 0 means the user is spoofed */
+		Anope::string ip = params[6];
+		if (ip == "0")
+			ip.clear();
+		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip, params[5], params[7], params[3]);
 		if (user && user->server->IsSynced())
 			validate_user(user);
 
@@ -442,20 +420,23 @@ class PlexusIRCdMessage : public IRCdMessage
 
 bool event_tburst(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params.size() != 4)
+	// :rizon.server TBURST 1298674830 #lol 1298674833 Adam!Adam@i.has.a.spoof :lol
+	if (params.size() < 4)
 		return true;
 
-	Anope::string setter = myStrGetToken(params[2], '!', 0);
-	time_t topic_time = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-	Channel *c = findchan(params[0]);
+	Channel *c = findchan(params[1]);
 
 	if (!c)
 	{
 		Log() << "TOPIC " << params[3] << " for nonexistent channel " << params[0];
 		return true;
 	}
+	else if (c->creation_time < convertTo<time_t>(params[0]))
+		return true;
 
-	c->ChangeTopicInternal(setter, params.size() > 3 ? params[3] : "", topic_time);
+	Anope::string setter = myStrGetToken(params[3], '!', 0);
+	time_t topic_time = Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : Anope::CurTime;
+	c->ChangeTopicInternal(setter, params.size() > 4 ? params[4] : "", topic_time);
 
 	return true;
 }
@@ -477,13 +458,7 @@ bool event_mode(const Anope::string &source, const std::vector<Anope::string> &p
 	if (params[0][0] == '#' || params[0][0] == '&')
 		do_cmode(source, params[0], params[2], params[1]);
 	else
-	{
-		User *u = finduser(source);
-		User *u2 = finduser(params[0]);
-		if (!u || !u2)
-			return true;
-		do_umode(u->nick, u2->nick, params[1]);
-	}
+		do_umode(params[0], params[1]);
 	return true;
 }
 
@@ -536,13 +511,13 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 {
 	if (params.size() < 4)
 		return true;
-/*
- * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
- * params[0] = *
- * params[1] = SU
- * params[2] = nickname
- * params[3] = account
- */
+	/*
+	 * Received: :dev.anope.de ENCAP * SU DukePyrolator DukePyrolator
+	 * params[0] = *
+	 * params[1] = SU
+	 * params[2] = nickname
+	 * params[3] = account
+	 */
 	else if (params[1].equals_cs("SU"))
 	{
 		User *u = finduser(params[2]);
@@ -555,13 +530,14 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 				u->SetMode(NickServ, UMODE_REGISTERED);
 		}
 	}
-/*
- * Received: :dev.anope.de ENCAP * CERTFP DukePyrolator :3F122A9CC7811DBAD3566BF2CEC3009007C0868F
- * params[0] = *
- * params[1] = CERTFP
- * params[2] = nickname
- * params[3] = fingerprint
- */
+
+	/*
+	 * Received: :dev.anope.de ENCAP * CERTFP DukePyrolator :3F122A9CC7811DBAD3566BF2CEC3009007C0868F
+	 * params[0] = *
+	 * params[1] = CERTFP
+	 * params[2] = nickname
+	 * params[3] = fingerprint
+	 */
 	else if (params[1].equals_cs("CERTFP"))
 	{
 		User *u = finduser(params[2]);
@@ -591,58 +567,6 @@ bool event_eob(const Anope::string &source, const std::vector<Anope::string> &pa
 	return true;
 }
 
-static void AddModes()
-{
-	/* Add user modes */
-	ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-	ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-	ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-	ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'D'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, "UMODE_SOFTCALLERID", 'G'));
-	ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'M'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
-	ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'S'));
-	ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, "UMODE_WEBIRC", 'W'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
-	ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
-	ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
-	ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
-
-	/* b/e/I */
-	ModeManager::AddChannelMode(new ChannelModeBan('b'));
-	ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-	ModeManager::AddChannelMode(new ChannelModeInvex('I'));
-	
-	/* l/k */
-	ModeManager::AddChannelMode(new ChannelModeKey('k'));
-	ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
-
-	/* v/h/o/a/q */
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
-	ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
-
-	/* Add channel modes */
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, "CMODE_BANDWIDTH", 'B'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'N'));
-	ModeManager::AddChannelMode(new ChannelModeOper('O'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'S'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-	ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'z'));
-}
-
 class ProtoPlexus : public Module
 {
 	Message message_tmode, message_bmask, message_pass,
@@ -651,21 +575,75 @@ class ProtoPlexus : public Module
 
 	PlexusProto ircd_proto;
 	PlexusIRCdMessage ircd_message;
+
+	void AddModes()
+	{
+		/* Add user modes */
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'D'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, "UMODE_SOFTCALLERID", 'G'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'M'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'S'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, "UMODE_WEBIRC", 'W'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
+		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+
+		/* b/e/I */
+		ModeManager::AddChannelMode(new ChannelModeBan('b'));
+		ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+	
+		/* l/k */
+		ModeManager::AddChannelMode(new ChannelModeKey('k'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+
+		/* v/h/o/a/q */
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
+
+		/* Add channel modes */
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, "CMODE_BANDWIDTH", 'B'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'N'));
+		ModeManager::AddChannelMode(new ChannelModeOper('O'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'S'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'z'));
+	}
+
  public:
 	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
 		message_tmode("TMODE", event_tmode), message_bmask("BMASK", event_bmask),
-		message_pass("PASS", event_pass), message_tb("TB", event_tburst),
+		message_pass("PASS", event_pass), message_tb("TBURST", event_tburst),
 		message_sid("SID", event_sid), message_encap("ENCAP", event_encap),
 		message_eob("EOB", event_eob)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(PROTOCOL);
 
-		AddModes();
-
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
+
+		this->AddModes();
 	}
 };
 

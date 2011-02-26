@@ -77,8 +77,6 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		if (buf.empty())
-			return;
 		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", u->GetUID().c_str(), buf.c_str());
 	}
 
@@ -107,14 +105,17 @@ class InspIRCdTS6Proto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(const BotInfo *user, const Anope::string &channel, time_t chantime)
+	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(Config->Numeric, "FJOIN %s %ld + :,%s", channel.c_str(), static_cast<long>(chantime), user->GetUID().c_str());
-	}
-
-	void SendJoin(BotInfo *user, const ChannelContainer *cc)
-	{
-		send_cmd(Config->Numeric, "FJOIN %s %ld +%s :%s,%s", cc->chan->name.c_str(), static_cast<long>(cc->chan->creation_time), cc->chan->GetModes(true, true).c_str(), cc->Status->BuildCharPrefixList().c_str(), user->GetUID().c_str());
+		send_cmd(Config->Numeric, "FJOIN %s %ld +%s :,%s", c->name.c_str(), static_cast<long>(c->creation_time), c->GetModes(true, true).c_str(), user->GetUID().c_str());
+		/* Note that we can send this with the FJOIN but choose not to
+		 * because the mode stacker will handle this and probably will
+		 * merge these modes with +nrt and other mlocked modes
+		 */
+		if (status)
+			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
+				if (status->HasFlag(static_cast<ChannelModeName>(i)))
+					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
 	/* UNSQLINE */
@@ -218,9 +219,9 @@ class InspIRCdTS6Proto : public IRCDProto
 		send_cmd(Config->Numeric, "METADATA %s accountname :", u->GetUID().c_str());
 	}
 
-	void SendChannel(Channel *c, const Anope::string &modes)
+	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), modes.c_str());
+		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), get_mlock_modes(c->ci, true).c_str());
 	}
 
 	bool IsNickValid(const Anope::string &nick)
@@ -247,18 +248,15 @@ class InspircdIRCdMessage : public IRCdMessage
 			   as it slightly breaks RFC1459
 			 */
 			User *u = finduser(source);
-			User *u2 = finduser(params[0]);
-
 			// This can happen with server-origin modes.
 			if (!u)
-				u = u2;
-
+				u = finduser(params[0]);
 			// if it's still null, drop it like fire.
 			// most likely situation was that server introduced a nick which we subsequently akilled
-			if (!u || !u2)
+			if (!u)
 				return true;
 
-			do_umode(u->nick, u2->nick, params[1]);
+			do_umode(u->nick, params[1]);
 		}
 
 		return true;

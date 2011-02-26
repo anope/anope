@@ -68,36 +68,13 @@ void SetDefaultMLock(ServerConfig *config)
 	}
 
 	/* Set Bot Modes */
-	config->BotModeList.clear();
+	config->BotModeList.ClearFlags();
 	for (unsigned i = 0; i < config->BotModes.length(); ++i)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByChar(config->BotModes[i]);
 
-		if (cm && cm->Type == MODE_STATUS && std::find(config->BotModeList.begin(), config->BotModeList.end(), cm) == config->BotModeList.end())
-			config->BotModeList.push_back(debug_cast<ChannelModeStatus *>(cm));
-	}
-
-	/* Apply the new modes to channels */
-	for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
-	{
-		BotInfo *bi = *it;
-
-		for (UChannelList::const_iterator cit = bi->chans.begin(); cit != bi->chans.end(); ++cit)
-		{
-			ChannelContainer *cc = *cit;
-
-			if (!cc || !cc->chan)
-				continue;
-
-			for (unsigned i = 0; i < config->BotModeList.size(); ++i)
-			{
-				if (cc->Status->HasFlag(config->BotModeList[i]->Name))
-					continue;
-
-				cc->Status->SetFlag(config->BotModeList[i]->Name);
-				cc->chan->SetModeInternal(config->BotModeList[i], bi->nick, false);
-			}
-		}
+		if (cm && cm->Type == MODE_STATUS)
+			config->BotModeList.SetFlag(cm->Name);
 	}
 }
 

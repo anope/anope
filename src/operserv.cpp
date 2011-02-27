@@ -252,17 +252,6 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 	return ret;
 }
 
-void XLineManager::Burst()
-{
-	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(), it_end = XLineManagers.end(); it != it_end; ++it)
-	{
-		XLineManager *xlm = *it;
-		
-		for (std::vector<XLine *>::const_iterator it2 = xlm->GetList().begin(), it2_end = xlm->GetList().end(); it2 != it2_end; ++it2)
-			xlm->Send(*it2);
-	}
-}
-
 /** Get the number of XLines in this XLineManager
  * @return The number of XLines
  */
@@ -446,7 +435,10 @@ XLine *XLineManager::Check(User *u)
 			{
 				cidr cidr_ip(x->GetHost());
 				if (cidr_ip.match(u->ip))
+				{
+					OnMatch(u, x);
 					return x;
+				}
 			}
 			catch (const SocketException &) { }
 		}
@@ -532,7 +524,7 @@ XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	this->AddXLine(x);
 
 	if (UplinkSock && Config->AkillOnAdd)
-		this->Send(x);
+		this->Send(NULL, x);
 
 	return x;
 }
@@ -544,7 +536,9 @@ void SGLineManager::Del(XLine *x)
 
 void SGLineManager::OnMatch(User *u, XLine *x)
 {
-	ircdproto->SendAkill(x);
+	if (u)
+		kill_user(Config->s_OperServ, u, x->Reason);
+	ircdproto->SendAkill(u, x);
 }
 
 void SGLineManager::OnExpire(XLine *x)
@@ -553,9 +547,9 @@ void SGLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
 }
 
-void SGLineManager::Send(XLine *x)
+void SGLineManager::Send(User *u, XLine *x)
 {
-	ircdproto->SendAkill(x);
+	ircdproto->SendAkill(u, x);
 }
 
 XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
@@ -620,9 +614,12 @@ void SNLineManager::Del(XLine *x)
 
 void SNLineManager::OnMatch(User *u, XLine *x)
 {
-	this->Send(x);
-	Anope::string reason = "G-Lined: " + x->Reason;
-	kill_user(Config->s_OperServ, u, reason);
+	if (u)
+	{
+		Anope::string reason = "G-Lined: " + x->Reason;
+		kill_user(Config->s_OperServ, u, reason);
+	}
+	this->Send(u, x);
 }
 
 void SNLineManager::OnExpire(XLine *x)
@@ -631,9 +628,9 @@ void SNLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
-void SNLineManager::Send(XLine *x)
+void SNLineManager::Send(User *u, XLine *x)
 {
-	ircdproto->SendSGLine(x);
+	ircdproto->SendSGLine(u, x);
 }
 
 XLine *SNLineManager::Check(User *u)
@@ -743,7 +740,7 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	}
 
 	if (UplinkSock)
-		this->Send(x);
+		this->Send(NULL, x);
 
 	return x;
 }
@@ -755,10 +752,13 @@ void SQLineManager::Del(XLine *x)
 
 void SQLineManager::OnMatch(User *u, XLine *x)
 {
-	ircdproto->SendSQLine(x);
+	if (u)
+	{
+		Anope::string reason = "Q-Lined: " + x->Reason;
+		kill_user(Config->s_OperServ, u, reason);
+	}
 
-	Anope::string reason = "Q-Lined: " + x->Reason;
-	kill_user(Config->s_OperServ, u, reason);
+	ircdproto->SendSQLine(u, x);
 }
 
 void SQLineManager::OnExpire(XLine *x)
@@ -767,16 +767,16 @@ void SQLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
-void SQLineManager::Send(XLine *x)
+void SQLineManager::Send(User *u, XLine *x)
 {
-	ircdproto->SendSQLine(x);
+	ircdproto->SendSQLine(u, x);
 }
 
 bool SQLineManager::Check(Channel *c)
 {
 	if (ircd->chansqline && SQLine)
 	{
-		for (std::vector<XLine *>::const_iterator it = SGLine->GetList().begin(), it_end = SGLine->GetList().end(); it != it_end; ++it)
+		for (std::vector<XLine *>::const_iterator it = SQLine->GetList().begin(), it_end = SQLine->GetList().end(); it != it_end; ++it)
 		{
 			XLine *x = *it;
 
@@ -831,7 +831,7 @@ XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	this->AddXLine(x);
 
 	if (UplinkSock)
-		this->Send(x);
+		this->Send(NULL, x);
 
 	return x;
 }
@@ -843,7 +843,13 @@ void SZLineManager::Del(XLine *x)
 
 void SZLineManager::OnMatch(User *u, XLine *x)
 {
-	ircdproto->SendSZLine(x);
+	if (u)
+	{
+		Anope::string reason = "Z-Lined: " + x->Reason;
+		kill_user(Config->s_OperServ, u, reason);
+	}
+
+	ircdproto->SendSZLine(u, x);
 }
 
 void SZLineManager::OnExpire(XLine *x)
@@ -852,8 +858,8 @@ void SZLineManager::OnExpire(XLine *x)
 		ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
-void SZLineManager::Send(XLine *x)
+void SZLineManager::Send(User *u, XLine *x)
 {
-	ircdproto->SendSZLine(x);
+	ircdproto->SendSZLine(u, x);
 }
 

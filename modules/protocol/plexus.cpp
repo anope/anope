@@ -92,7 +92,7 @@ class PlexusProto : public IRCDProto
 		send_cmd(source ? source->GetUID() : Config->Numeric, "OPERWALL :%s", buf.c_str());
 	}
 
-	void SendSQLine(const XLine *x)
+	void SendSQLine(User *, const XLine *x)
 	{
 		send_cmd(Config->Numeric, "RESV * %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
@@ -103,7 +103,7 @@ class PlexusProto : public IRCDProto
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
-	void SendSGLine(const XLine *x)
+	void SendSGLine(User *, const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
@@ -129,7 +129,7 @@ class PlexusProto : public IRCDProto
 					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
-	void SendAkill(const XLine *x)
+	void SendAkill(User *, const XLine *x)
 	{
 		BotInfo *bi = OperServ;
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());

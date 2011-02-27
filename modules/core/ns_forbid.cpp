@@ -71,7 +71,7 @@ class CommandNSForbid : public Command
 		if (ircd->sqline)
 		{
 			XLine x(na->nick, !reason.empty() ? reason : "Forbidden");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendSQLine(NULL, &x);
 		}
 
 		Log(LOG_ADMIN, u, this) << "to forbid nick " << nick;

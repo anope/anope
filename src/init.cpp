@@ -34,7 +34,7 @@ void introduce_user(const Anope::string &user)
 			if (bi)
 			{
 				XLine x(bi->nick, "Reserved for services");
-				ircdproto->SendSQLine(&x);
+				ircdproto->SendSQLine(NULL, &x);
 
 				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
 					ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
@@ -67,7 +67,7 @@ void introduce_user(const Anope::string &user)
 		if (bi)
 		{
 			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendSQLine(NULL, &x);
 
 			for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
 				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
@@ -77,9 +77,6 @@ void introduce_user(const Anope::string &user)
 	/* Load MLock from the database now that we know what modes exist */
 	for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		it->second->LoadMLock();
-	
-	/* Add our SXLines */
-	XLineManager::Burst();
 }
 
 /*************************************************************************/

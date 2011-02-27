@@ -973,7 +973,7 @@ class CoreExport IRCDProto
 	virtual void SendSVSNOOP(const Anope::string &, int) { }
 	virtual void SendTopic(BotInfo *, Channel *) = 0;
 	virtual void SendVhostDel(User *) { }
-	virtual void SendAkill(const XLine *) = 0;
+	virtual void SendAkill(User *, const XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;
 	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
@@ -992,11 +992,11 @@ class CoreExport IRCDProto
 	virtual void SendPing(const Anope::string &servname, const Anope::string &who);
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 	virtual void SendJoin(BotInfo *, Channel *, const ChannelStatus *) = 0;
-	virtual void SendSQLineDel(const XLine *x) = 0;
+	virtual void SendSQLineDel(const XLine *x) { }
 	virtual void SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
 	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);
-	virtual void SendSQLine(const XLine *x) = 0;
+	virtual void SendSQLine(User *, const XLine *x) { }
 	virtual void SendSquit(const Anope::string &servname, const Anope::string &message);
 	virtual void SendSVSO(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick);
@@ -1007,8 +1007,8 @@ class CoreExport IRCDProto
 	virtual void SendSVSHoldDel(const Anope::string &) { }
 	virtual void SendSGLineDel(const XLine *) { }
 	virtual void SendSZLineDel(const XLine *) { }
-	virtual void SendSZLine(const XLine *) { }
-	virtual void SendSGLine(const XLine *) { }
+	virtual void SendSZLine(User *u, const XLine *) { }
+	virtual void SendSGLine(User *, const XLine *) { }
 	virtual void SendUnregisteredNick(const User *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }

@@ -18,7 +18,7 @@ IRCDVar myIrcd[] = {
 	 0,		/* SVSNICK */
 	 0,		/* Vhost */
 	 0,		/* Supports SNlines */
-	 1,		/* Supports SQlines */
+	 0,		/* Supports SQlines */
 	 0,		/* Supports SZlines */
 	 0,		/* Join 2 Message */
 	 0,		/* Chan SQlines */
@@ -42,12 +42,15 @@ IRCDVar myIrcd[] = {
 /* PASS */
 class ngIRCdProto : public IRCDProto
 {
-	void SendAkill(const XLine *x) { }
+	void SendAkill(User *u, const XLine *x)
+	{
+		if (SGLine && u == NULL)
+			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+				if (SGLine->Check(*it) != NULL)
+					break;
+	}
+
 	void SendAkillDel(const XLine*) { }
-	void SendSQLine(const XLine*) { }
-	void SendSQLineDel(const XLine*) { }
-	void SendSGLine(const XLine *x) { }
-	void SendSGLineDel(const XLine *x) { }
 
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{

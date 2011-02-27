@@ -241,7 +241,7 @@ class CommandBSBot : public Command
 		{
 			ircdproto->SendChangeBotNick(bi, nick);
 			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendSQLine(NULL, &x);
 		}
 
 		if (!nick.equals_cs(bi->nick))
@@ -258,7 +258,7 @@ class CommandBSBot : public Command
 		{
 			ircdproto->SendClientIntroduction(bi, ircd->pseudoclient_mode);
 			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendSQLine(NULL, &x);
 			bi->RejoinAll();
 		}
 

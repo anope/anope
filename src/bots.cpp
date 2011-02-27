@@ -55,7 +55,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	{
 		ircdproto->SendClientIntroduction(this, ircd->pseudoclient_mode);
 		XLine x(this->nick, "Reserved for services");
-		ircdproto->SendSQLine(&x);
+		ircdproto->SendSQLine(NULL, &x);
 	}
 
 	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_PROTECTED));

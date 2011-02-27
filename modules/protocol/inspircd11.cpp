@@ -99,7 +99,7 @@ class InspIRCdProto : public IRCDProto
 			inspircd_cmd_chgident(u->nick, u->GetIdent());
 	}
 
-	void SendAkill(const XLine *x)
+	void SendAkill(User *, const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
@@ -170,7 +170,7 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(const XLine *x)
+	void SendSQLine(User *, const XLine *x)
 	{
 		send_cmd(Config->ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
@@ -231,7 +231,7 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(const XLine *x)
+	void SendSZLine(User *, const XLine *x)
 	{
 		send_cmd(Config->ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}

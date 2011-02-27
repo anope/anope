@@ -66,13 +66,13 @@ class DNSBLResolver : public DNSRequest
 			Log(LOG_COMMAND, OperServ, &fake_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
-				ircdproto->SendAkill(x);
+				ircdproto->SendAkill(*user, x);
 		}
 		else
 		{
 			Log(OperServ) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
 			XLine xline(Anope::string("*@") + user->host, OperServ ? OperServ->nick : "OperServ", Anope::CurTime + this->blacklist.bantime, reason);
-			ircdproto->SendAkill(&xline);
+			ircdproto->SendAkill(*user, &xline);
 		}
 	}
 };

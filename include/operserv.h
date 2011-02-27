@@ -97,10 +97,6 @@ class CoreExport XLineManager
 	 */
 	static std::pair<XLineManager *, XLine *> CheckAll(User *u);
 
-	/** Called on burst when all of our XLines should be bursted to the uplink
-	 */
-	static void Burst();
-
 	/** Get the number of XLines in this XLineManager
 	 * @return The number of XLines
 	 */
@@ -184,8 +180,10 @@ class CoreExport XLineManager
 	virtual void OnExpire(XLine *x);
 
 	/** Called to send an XLine to the IRCd
+	 * @param u The user, if we know it
+	 * @param x The xline
 	 */
-	virtual void Send(XLine *x) = 0;
+	virtual void Send(User *u, XLine *x) = 0;
 };
 
 /* This is for AKILLS */
@@ -200,7 +198,7 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(XLine *x);
 	
-	void Send(XLine *x);
+	void Send(User *u, XLine *x);
 };
 
 class SNLineManager : public XLineManager
@@ -214,7 +212,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(XLine *x);
 
-	void Send(XLine *x);
+	void Send(User *u, XLine *x);
 
 	XLine *Check(User *u);
 };
@@ -230,7 +228,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(XLine *x);
 
-	void Send(XLine *x);
+	void Send(User *u, XLine *x);
 
 	static bool Check(Channel *c);
 };
@@ -246,7 +244,7 @@ class SZLineManager : public XLineManager
 
 	void OnExpire(XLine *x);
 
-	void Send(XLine *x);
+	void Send(User *u, XLine *x);
 };
 
 #endif // OPERSERV_H

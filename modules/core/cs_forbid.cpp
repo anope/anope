@@ -82,7 +82,7 @@ class CommandCSForbid : public Command
 		if (ircd->chansqline)
 		{
 			XLine x(chan, "Forbidden");
-			ircdproto->SendSQLine(&x);
+			ircdproto->SendSQLine(NULL, &x);
 		}
 
 		Log(LOG_ADMIN, u, this, ci) << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");

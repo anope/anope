@@ -113,7 +113,7 @@ class UnrealIRCdProto : public IRCDProto
 		ModeManager::ProcessModes();
 	}
 
-	void SendAkill(const XLine *x)
+	void SendAkill(User *, const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
@@ -190,7 +190,7 @@ class UnrealIRCdProto : public IRCDProto
 	** - Unreal will translate this to TKL for us
 	**
 	*/
-	void SendSQLine(const XLine *x)
+	void SendSQLine(User *, const XLine *x)
 	{
 		send_cmd("", "c %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
@@ -257,7 +257,7 @@ class UnrealIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(const XLine *x)
+	void SendSZLine(User *, const XLine *x)
 	{
 		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + 172800), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
@@ -266,7 +266,7 @@ class UnrealIRCdProto : public IRCDProto
 	/*
 	 * SVSNLINE + reason_where_is_space :realname mask with spaces
 	*/
-	void SendSGLine(const XLine *x)
+	void SendSGLine(User *, const XLine *x)
 	{
 		Anope::string edited_reason = x->Reason;
 		edited_reason = edited_reason.replace_all_cs(" ", "_");

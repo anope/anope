@@ -99,7 +99,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SQLINE */
-	void SendSQLine(const XLine *x)
+	void SendSQLine(User *, const XLine *x)
 	{
 		send_cmd("", "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
@@ -120,7 +120,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SZLINE */
-	void SendSZLine(const XLine *x)
+	void SendSZLine(User *, const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
 		send_cmd("", "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
@@ -135,7 +135,7 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SGLINE */
-	void SendSGLine(const XLine *x)
+	void SendSGLine(User *, const XLine *x)
 	{
 		send_cmd("", "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
 	}
@@ -168,7 +168,7 @@ class BahamutIRCdProto : public IRCDProto
 					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
 	}
 
-	void SendAkill(const XLine *x)
+	void SendAkill(User *, const XLine *x)
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;

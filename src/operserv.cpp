@@ -252,17 +252,6 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 	return ret;
 }
 
-void XLineManager::Burst()
-{
-	for (std::list<XLineManager *>::iterator it = XLineManagers.begin(), it_end = XLineManagers.end(); it != it_end; ++it)
-	{
-		XLineManager *xlm = *it;
-		
-		for (std::vector<XLine *>::const_iterator it2 = xlm->GetList().begin(), it2_end = xlm->GetList().end(); it2 != it2_end; ++it2)
-			xlm->Send(*it2);
-	}
-}
-
 /** Get the number of XLines in this XLineManager
  * @return The number of XLines
  */
@@ -763,7 +752,7 @@ bool SQLineManager::Check(Channel *c)
 {
 	if (ircd->chansqline && SQLine)
 	{
-		for (std::vector<XLine *>::const_iterator it = SGLine->GetList().begin(), it_end = SGLine->GetList().end(); it != it_end; ++it)
+		for (std::vector<XLine *>::const_iterator it = SQLine->GetList().begin(), it_end = SQLine->GetList().end(); it != it_end; ++it)
 		{
 			XLine *x = *it;
 

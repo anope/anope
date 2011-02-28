@@ -97,10 +97,6 @@ class CoreExport XLineManager
 	 */
 	static std::pair<XLineManager *, XLine *> CheckAll(User *u);
 
-	/** Called on burst when all of our XLines should be bursted to the uplink
-	 */
-	static void Burst();
-
 	/** Get the number of XLines in this XLineManager
 	 * @return The number of XLines
 	 */

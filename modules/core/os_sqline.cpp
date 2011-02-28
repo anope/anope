@@ -43,7 +43,7 @@ class SQLineDelCallback : public NumberList
 			return;
 
 		++Deleted;
-		DoDel(u, x - 1);
+		DoDel(u, x);
 	}
 
 	static void DoDel(User *u, XLine *x)

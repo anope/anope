@@ -60,7 +60,8 @@ void AnopeFini(void)
  **/
 void myChanServHelp(User * u)
 {
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SENDPASS);
+    if (!RestrictMail || is_services_oper(u))
+        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_SENDPASS);
 }
 
 /**

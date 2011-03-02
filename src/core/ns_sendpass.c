@@ -58,7 +58,8 @@ void AnopeFini(void)
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
+    if (!RestrictMail || is_services_oper(u))
+        notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
 }
 
 /**

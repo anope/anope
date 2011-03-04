@@ -10,10 +10,17 @@ Legend:
 [x] ChanServ CLONE command
 [x] XMLRPC to execute commands and get data from Anope
 [+] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
+[x] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
+[ ] understanding extbans for /cs unban etc.
+[ ] (optional?) A way to confirm email changes by users
+[ ] Auto identify through SSL key
+[ ] Optional os_login system that can also use SSL keys.
+[ ] os_info module to show useful configuration settings to services opers.
+[ ] Remove nick requests. Instead use an unconfirmed nick group which cant recieve umode +r and auto expires after 1d?
+[ ] LDAP
 
 Future
 ------
-[+] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
 [ ] NS IDENTIFY changes
   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
@@ -25,7 +32,7 @@ Future
 [?] a way for a module to queue itself (or even another module) for unloading
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
-  [ ] CS ENTRYMSG
+  [x] CS ENTRYMSG
 [?] Don't allow soper accounts to expire
 [?] Reason for CS SET RESTRICTED
 [x] AKILL/SGLINE/etc..
@@ -36,4 +43,3 @@ Future
   [x] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
-[?] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)

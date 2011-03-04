@@ -88,6 +88,8 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
             DESTINATION data/modules
           )
         endif(HAS_FUNCTION)
+      else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
+        message("  This is not a fatal error - ${SRC} will not be built.")
       endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES)
     endforeach(SRC)
 
@@ -152,7 +154,7 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
         endforeach(SRC)
 
         # Continue if library and function requirements are met
-        if(NOT SKIP AND HAS_FUNCTION)
+        if(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
           # Remove duplicates from the linker flags
           if(SUBDIR_LDFLAGS)
             remove_list_duplicates(SUBDIR_LDFLAGS)
@@ -182,7 +184,9 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           install(TARGETS ${SO}
             DESTINATION data/modules
           )
-        endif(NOT SKIP AND HAS_FUNCTION)
+         else(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
+          message("  This is not a fatal error - ${SUBDIR} will not be built.")
+        endif(NOT SKIP_DEPENDS AND NOT SKIP_LIBRARIES AND HAS_FUNCTION)
       endif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${SUBDIR}")
     endforeach(SUBDIR)
   endif(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_FOLDER}")

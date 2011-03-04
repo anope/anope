@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3062"
+VERSION_BUILD="3063"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3063 - Fixed opping our clients on ratbox when TS6 is not used.
 #Revision 3062 - Do not show SENDPASS in NickServ and ChanServ help to users who can't use it
 #Revision 3061 - Rejoin our clients if kicked on TS6 IRCDs and made ratbox protocol module use account tracking
 #Revision 3060 - Fixed bug 1248, an error in fr.l - reported by SaKa

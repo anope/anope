@@ -1468,7 +1468,8 @@ void ratbox_cmd_bot_chan_mode(char *nick, char *chan)
         ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode,
                          (u ? u->uid : nick));
     } else {
-        anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+        /* Ratbox does not allow *any* client to op itself - use ChanServ */
+        anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->botchanumode, nick);
     }
 }
 

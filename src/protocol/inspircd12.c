@@ -575,11 +575,10 @@ void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void inspircd_cmd_vhost_off(User * u)
 {
-    Uid *ud = find_uid(s_OperServ);
-    send_cmd(ud->uid,  "MODE %s -%s",  u->nick,  myIrcd->vhostchar);
-    inspircd_cmd_chghost(u->nick, u->host);
+    common_svsmode(u, "-x", NULL);
+    common_svsmode(u, "+x", NULL);
 
-    if (has_chgidentmod && u->username && u->vident && strcmp(u->username, u->vident) > 0)
+    if (has_chgidentmod && u->username && u->vident && strcmp(u->username, u->vident) != 0)
     {
         inspircd_cmd_chgident(u->nick, u->username);
     }

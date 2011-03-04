@@ -33,181 +33,146 @@ class SQLCache : public Timer
 	}
 };
 
-class ChanInfoUpdater : public SQLInterface, public SQLCache
+static void ChanInfoUpdate(const SQLResult &res)
 {
- public:
- 	ChanInfoUpdater(Module *m) : SQLInterface(m) { }
-
-	void OnResult(const SQLResult &r)
+	try
 	{
-		ChanInfoUpdater::Process(r);
-	}
+		ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
+		if (!ci)
+			ci = new ChannelInfo(res.Get(0, "name"));
+		ci->founder = findcore(res.Get(0, "founder"));
+		ci->successor = findcore(res.Get(0, "successor"));
+		ci->desc = res.Get(0, "descr");
+		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
+		ci->ClearFlags();
+		ci->FromString(BuildStringVector(res.Get(0, "flags")));
+		ci->forbidby = res.Get(0, "forbidby");
+		ci->forbidreason = res.Get(0, "forbidreason");
+		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
+		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
 
-	static void Process(const SQLResult &res)
+		Anope::string mlock_on = res.Get(0, "mlock_on"),
+				mlock_off = res.Get(0, "mlock_off"),
+				mlock_params = res.Get(0, "mlock_params"),
+				mlock_params_off = res.Get(0, "mlock_params_off");
+
+		Anope::string mode;
+		std::vector<Anope::string> modes;
+
+		spacesepstream sep(mlock_on);
+		while (sep.GetToken(mode))
+			modes.push_back(mode);
+		ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
+
+		modes.clear();
+		sep = mlock_off;
+		while (sep.GetToken(mode))
+			modes.push_back(mode);
+		ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
+
+		modes.clear();
+		sep = mlock_params;
+		while (sep.GetToken(mode))
+			modes.push_back(mode);
+		ci->Extend("mlock_params", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
+
+		modes.clear();
+		sep = mlock_params_off;
+		while (sep.GetToken(mode))
+			modes.push_back(mode);
+		ci->Extend("mlock_params_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
+
+		ci->LoadMLock();
+
+		if (res.Get(0, "botnick").equals_cs(ci->bi ? ci->bi->nick : "") == false)
+		{
+			if (ci->bi)
+				ci->bi->UnAssign(NULL, ci);
+			BotInfo *bi = findbot(res.Get(0, "botnick"));
+			if (bi)
+				bi->Assign(NULL, ci);
+		}
+
+		ci->capsmin = convertTo<int16>(res.Get(0, "capsmin"));
+		ci->capspercent = convertTo<int16>(res.Get(0, "capspercent"));
+		ci->floodlines = convertTo<int16>(res.Get(0, "floodlines"));
+		ci->floodsecs = convertTo<int16>(res.Get(0, "floodsecs"));
+		ci->repeattimes = convertTo<int16>(res.Get(0, "repeattimes"));
+
+		if (ci->c)
+			check_modes(ci->c);
+	}
+	catch (const SQLException &ex)
 	{
-		try
-		{
-			ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
-			if (!ci)
-				ci = new ChannelInfo(res.Get(0, "name"));
-			ci->founder = findcore(res.Get(0, "founder"));
-			ci->successor = findcore(res.Get(0, "successor"));
-			ci->desc = res.Get(0, "descr");
-			ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-			ci->ClearFlags();
-			ci->FromString(BuildStringVector(res.Get(0, "flags")));
-			ci->forbidby = res.Get(0, "forbidby");
-			ci->forbidreason = res.Get(0, "forbidreason");
-			ci->bantype = convertTo<int>(res.Get(0, "bantype"));
-			ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
-
-			Anope::string mlock_on = res.Get(0, "mlock_on"),
-					mlock_off = res.Get(0, "mlock_off"),
-					mlock_params = res.Get(0, "mlock_params"),
-					mlock_params_off = res.Get(0, "mlock_params_off");
-
-			Anope::string mode;
-			std::vector<Anope::string> modes;
-
-			spacesepstream sep(mlock_on);
-			while (sep.GetToken(mode))
-				modes.push_back(mode);
-			ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-			modes.clear();
-			sep = mlock_off;
-			while (sep.GetToken(mode))
-				modes.push_back(mode);
-			ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-			modes.clear();
-			sep = mlock_params;
-			while (sep.GetToken(mode))
-				modes.push_back(mode);
-			ci->Extend("mlock_params", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-			modes.clear();
-			sep = mlock_params_off;
-			while (sep.GetToken(mode))
-				modes.push_back(mode);
-			ci->Extend("mlock_params_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-			ci->LoadMLock();
-
-			if (res.Get(0, "botnick").equals_cs(ci->bi ? ci->bi->nick : "") == false)
-			{
-				if (ci->bi)
-					ci->bi->UnAssign(NULL, ci);
-				BotInfo *bi = findbot(res.Get(0, "botnick"));
-				if (bi)
-					bi->Assign(NULL, ci);
-			}
-
-			ci->capsmin = convertTo<int16>(res.Get(0, "capsmin"));
-			ci->capspercent = convertTo<int16>(res.Get(0, "capspercent"));
-			ci->floodlines = convertTo<int16>(res.Get(0, "floodlines"));
-			ci->floodsecs = convertTo<int16>(res.Get(0, "floodsecs"));
-			ci->repeattimes = convertTo<int16>(res.Get(0, "repeattimes"));
-
-			if (ci->c)
-				check_modes(ci->c);
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << ex.GetReason();
-		}
-		catch (const ConvertException &) { }
+		Log(LOG_DEBUG) << ex.GetReason();
 	}
-};
+	catch (const ConvertException &) { }
+}
 
-class NickInfoUpdater : public SQLInterface, public SQLCache
+static void NickInfoUpdate(const SQLResult &res)
 {
- public:
- 	NickInfoUpdater(Module *m) : SQLInterface(m) { }
-
-	void OnResult(const SQLResult &r)
+	try
 	{
-		NickInfoUpdater::Process(r);
-	}
+		NickCore *nc = findcore(res.Get(0, "display"));
+		if (!nc)
+			return;
+		NickAlias *na = findnick(res.Get(0, "nick"));
+		if (!na)
+			na = new NickAlias(res.Get(0, "nick"), nc);
 
-	static void Process(const SQLResult &res)
+		na->last_quit = res.Get(0, "last_quit");
+		na->last_realname = res.Get(0, "last_realname");
+		na->last_usermask = res.Get(0, "last_usermask");
+		na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
+		na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
+		na->ClearFlags();
+		na->FromString(BuildStringVector(res.Get(0, "flags")));
+
+		if (na->nc != nc)
+		{
+			std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
+			if (it != na->nc->aliases.end())
+				na->nc->aliases.erase(it);
+
+			na->nc = nc;
+			na->nc->aliases.push_back(na);
+		}
+	}
+	catch (const SQLException &ex)
 	{
-		try
-		{
-			NickCore *nc = findcore(res.Get(0, "display"));
-			if (!nc)
-				return;
-			NickAlias *na = findnick(res.Get(0, "nick"));
-			if (!na)
-				na = new NickAlias(res.Get(0, "nick"), nc);
-
-			na->last_quit = res.Get(0, "last_quit");
-			na->last_realname = res.Get(0, "last_realname");
-			na->last_usermask = res.Get(0, "last_usermask");
-			na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-			na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
-			na->ClearFlags();
-			na->FromString(BuildStringVector(res.Get(0, "flags")));
-
-			if (na->nc != nc)
-			{
-				std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
-				if (it != na->nc->aliases.end())
-					na->nc->aliases.erase(it);
-
-				na->nc = nc;
-				na->nc->aliases.push_back(na);
-			}
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << ex.GetReason();
-		}
-		catch (const ConvertException &) { }
+		Log(LOG_DEBUG) << ex.GetReason();
 	}
-};
+	catch (const ConvertException &) { }
+}
 
-class NickCoreUpdater : public SQLInterface, public SQLCache
+static void NickCoreUpdate(const SQLResult &res)
 {
- public:
- 	NickCoreUpdater(Module *m) : SQLInterface(m) { }
-
-	void OnResult(const SQLResult &r)
+	try
 	{
-		NickCoreUpdater::Process(r);
-	}
+		NickCore *nc = findcore(res.Get(0, "display"));
+		if (!nc)
+			nc = new NickCore(res.Get(0, "display"));
 
-	static void Process(const SQLResult &res)
+		nc->pass = res.Get(0, "pass");
+		nc->email = res.Get(0, "email");
+		nc->greet = res.Get(0, "greet");
+		nc->ClearFlags();
+		nc->FromString(BuildStringVector(res.Get(0, "flags")));
+		nc->language = res.Get(0, "language");
+	}
+	catch (const SQLException &ex)
 	{
-		try
-		{
- 			NickCore *nc = findcore(res.Get(0, "display"));
-			if (!nc)
-				nc = new NickCore(res.Get(0, "display"));
-
-			nc->pass = res.Get(0, "pass");
-			nc->email = res.Get(0, "email");
-			nc->greet = res.Get(0, "greet");
-			nc->ClearFlags();
-			nc->FromString(BuildStringVector(res.Get(0, "flags")));
-			nc->language = res.Get(0, "language");
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << ex.GetReason();
-		}
-		catch (const ConvertException &) { }
+		Log(LOG_DEBUG) << ex.GetReason();
 	}
-};
+	catch (const ConvertException &) { }
+}
 
 class MySQLLiveModule : public Module
 {
 	service_reference<SQLProvider> SQL;
 	service_reference<AsynchCommandsService> ACS;
 
-	ChanInfoUpdater chaninfoupdater;
-	NickInfoUpdater nickinfoupdater;
-	NickCoreUpdater nickcoreupdater;
+	SQLCache chan_cache, nick_cache, core_cache;
 
 	SQLResult RunQuery(const Anope::string &query)
 	{
@@ -218,14 +183,6 @@ class MySQLLiveModule : public Module
 		if (!res.GetError().empty())
 			throw SQLException(res.GetError());
 		return res;
-	}
-
-	void RunQuery(SQLInterface *i, const Anope::string &query)
-	{
-		if (!this->SQL)
-			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
-
-		return SQL->Run(i, query);
 	}
 
 	const Anope::string Escape(const Anope::string &query)
@@ -242,8 +199,7 @@ class MySQLLiveModule : public Module
 
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands"),
-		chaninfoupdater(this), nickinfoupdater(this), nickcoreupdater(this)
+		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands")
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnPreShutdown };
 		ModuleManager::Attach(i, this, 4);
@@ -258,7 +214,7 @@ class MySQLLiveModule : public Module
 
 	void OnFindChan(const Anope::string &chname)
 	{
-		if (chaninfoupdater.Check(chname))
+		if (chan_cache.Check(chname))
 			return;
 
 		try
@@ -272,7 +228,7 @@ class MySQLLiveModule : public Module
 				{
 					SQLResult res = this->RunQuery(query);
 					current_command->Lock();
-					ChanInfoUpdater::Process(res);
+					ChanInfoUpdate(res);
 				}
 				catch (const SQLException &)
 				{
@@ -281,7 +237,10 @@ class MySQLLiveModule : public Module
 				}
 			}
 			else
-				this->RunQuery(&chaninfoupdater, query);
+			{
+				SQLResult res = this->RunQuery(query);
+				ChanInfoUpdate(res);
+			}
 		}
 		catch (const SQLException &ex)
 		{
@@ -291,7 +250,7 @@ class MySQLLiveModule : public Module
 
 	void OnFindNick(const Anope::string &nick)
 	{
-		if (nickinfoupdater.Check(nick))
+		if (nick_cache.Check(nick))
 			return;
 
 		try
@@ -305,7 +264,7 @@ class MySQLLiveModule : public Module
 				{
 					SQLResult res = this->RunQuery(query);
 					current_command->Lock();
-					NickInfoUpdater::Process(res);
+					NickInfoUpdate(res);
 				}
 				catch (const SQLException &)
 				{
@@ -314,7 +273,10 @@ class MySQLLiveModule : public Module
 				}
 			}
 			else
-				this->RunQuery(&nickinfoupdater, query);
+			{
+				SQLResult res = this->RunQuery(query);
+				NickInfoUpdate(res);
+			}
 		}
 		catch (const SQLException &ex)
 		{
@@ -324,7 +286,7 @@ class MySQLLiveModule : public Module
 
 	void OnFindCore(const Anope::string &nick)
 	{
-		if (nickcoreupdater.Check(nick))
+		if (core_cache.Check(nick))
 			return;
 
 		try
@@ -338,7 +300,7 @@ class MySQLLiveModule : public Module
 				{
 					SQLResult res = this->RunQuery(query);
 					current_command->Lock();
-					NickCoreUpdater::Process(res);
+					NickCoreUpdate(res);
 				}
 				catch (const SQLException &)
 				{
@@ -347,7 +309,10 @@ class MySQLLiveModule : public Module
 				}
 			}
 			else
-				this->RunQuery(&nickcoreupdater, query);
+			{
+				SQLResult res = this->RunQuery(query);
+				NickCoreUpdate(res);
+			}
 		}
 		catch (const SQLException &ex)
 		{

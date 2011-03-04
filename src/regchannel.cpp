@@ -768,8 +768,11 @@ bool ChannelInfo::CheckKick(User *user)
 		{
 			AutoKick *autokick = this->GetAkick(j);
 
-			if (autokick->HasFlag(AK_ISNICK) && autokick->nc == nc)
-				do_kick = true;
+			if (autokick->HasFlag(AK_ISNICK))
+			{
+				if (autokick->nc == nc)
+					do_kick = true;
+			}
 			else
 			{
 				Entry akick_mask(autokick->mask);

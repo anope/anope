@@ -8,7 +8,7 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3063"
+VERSION_BUILD="3064"
 
 # $Log$ # Changes since 1.8.5 Release
 #Revision 3063 - Fixed opping our clients on ratbox when TS6 is not used.

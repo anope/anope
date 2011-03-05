@@ -217,8 +217,8 @@ class DBMySQL : public Module
 			I_OnSaveDatabase, I_OnPostCommand,
 			/* NickServ */
 			I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearAccess,
-			I_OnDelCore, I_OnNickForbidden, I_OnNickGroup, I_OnMakeNickRequest,
-			I_OnDelNickRequest, I_OnNickRegister, I_OnChangeCoreDisplay,
+			I_OnDelCore, I_OnNickForbidden, I_OnNickGroup,
+			I_OnNickRegister, I_OnChangeCoreDisplay,
 			I_OnNickSuspended, I_OnDelNick,
 			/* ChanServ */
 			I_OnAccessAdd, I_OnAccessDel, I_OnAccessChange, I_OnAccessClear, I_OnLevelChange,
@@ -236,7 +236,7 @@ class DBMySQL : public Module
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 42);
+		ModuleManager::Attach(i, this, 40);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -588,16 +588,6 @@ class DBMySQL : public Module
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, ci->name, Params));
 		}
 
-		r = SQL->RunQuery("SELECT * FROM `anope_ns_request`");
-		for (int i = 0; i < r.Rows(); ++i)
-		{
-			NickRequest *nr = new NickRequest(r.Get(i, "nick"));
-			nr->password = r.Get(i, "passcode");
-			nr->password = r.Get(i, "password");
-			nr->email = r.Get(i, "email");
-			nr->requested = r.Get(i, "requested").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "requested")) : Anope::CurTime;
-		}
-
 		r = SQL->RunQuery("SELECT * FROM `anope_ms_info`");
 		for (int i = 0; i < r.Rows(); ++i)
 		{
@@ -945,16 +935,6 @@ class DBMySQL : public Module
 	void OnNickGroup(User *u, NickAlias *)
 	{
 		OnNickRegister(findnick(u->nick));
-	}
-
-	void OnMakeNickRequest(NickRequest *nr)
-	{
-		this->RunQuery("INSERT INTO `anope_ns_request` (nick, passcode, password, email, requested) VALUES('" + this->Escape(nr->nick) + "', '" + this->Escape(nr->passcode) + "', '" + this->Escape(nr->password) + "', '" + this->Escape(nr->email) + "', " + stringify(nr->requested) + ")");
-	}
-
-	void OnDelNickRequest(NickRequest *nr)
-	{
-		this->RunQuery("DELETE FROM `anope_ns_request` WHERE `nick` = '" + this->Escape(nr->nick) + "'");
 	}
 
 	void InsertAlias(NickAlias *na)
@@ -1368,11 +1348,6 @@ static void SaveDatabases()
 			me->OnMemoSend(NULL, ci, m);
 		}
 	}
-
-	me->RunQuery("TRUNCATE TABLE `anope_ns_request`");
-
-	for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
-		me->OnMakeNickRequest(it->second);
 
 	if (SGLine)
 		for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)

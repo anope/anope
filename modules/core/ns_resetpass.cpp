@@ -31,7 +31,7 @@ class CommandNSResetPass : public Command
 
 		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
 			source.Reply(_(ACCESS_DENIED));
-		if (!(na = findnick(params[0])))
+		else if (!(na = findnick(params[0])))
 			source.Reply(_(NICK_X_NOT_REGISTERED), params[0].c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
 			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
@@ -82,36 +82,40 @@ class NSResetPass : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		BotInfo *service = source.owner;
-		if (service == NickServ && command->name.equals_ci("CONFIRM") && !params.empty())
+		if (command->service == NickServ && command->name.equals_ci("CONFIRM") && params.size() > 1)
 		{
-			NickAlias *na = findnick(source.u->nick);
+			NickAlias *na = findnick(params[0]);
 
 			time_t t;
 			Anope::string c;
 			if (na && na->nc->GetExtRegular("ns_resetpass_code", c) && na->nc->GetExtRegular("ns_resetpass_time", t))
 			{
+				const Anope::string &passcode = params[1];
 				if (t < Anope::CurTime - 3600)
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
 					source.Reply(_("Your password reset request has expired."));
-					return EVENT_STOP;
 				}
-
-				Anope::string passcode = params[0];
-				if (passcode.equals_cs(c))
+				else if (passcode.equals_cs(c))
 				{
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
 
-					u->UpdateHost();
-					na->last_realname = u->realname;
-					na->last_seen = Anope::CurTime;
+					NickAlias *this_na = findnick(u->nick);
+
+					if (this_na && this_na == na)
+					{
+						u->UpdateHost();
+						na->last_realname = u->realname;
+						na->last_seen = Anope::CurTime;
+						u->SetMode(NickServ, UMODE_REGISTERED);
+					}
+
 					u->Login(na->nc);
 					ircdproto->SendAccountLogin(u, u->Account());
 					ircdproto->SetAutoIdentificationToken(u);
-					u->SetMode(NickServ, UMODE_REGISTERED);
+					na->nc->UnsetFlag(NI_UNCONFIRMED);
 					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
@@ -124,11 +128,7 @@ class NSResetPass : public Module
 					check_memos(u);
 				}
 				else
-				{
-					Log(LOG_COMMAND, u, &commandnsresetpass) << "invalid confirm passcode for " << na->nick;
-					source.Reply(_(NICK_CONFIRM_INVALID));
-					bad_password(u);
-				}
+					return EVENT_CONTINUE;
 
 				return EVENT_STOP;
 			}
@@ -140,10 +140,6 @@ class NSResetPass : public Module
 
 static bool SendResetEmail(User *u, NickAlias *na)
 {
-	char subject[BUFSIZE], message[BUFSIZE];
-
-	snprintf(subject, sizeof(subject), GetString(na->nc, _("Reset password request for %s")).c_str(), na->nick.c_str());
-
 	int min = 1, max = 62;
 	int chars[] = {
 		' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -158,18 +154,21 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 
-	snprintf(message, sizeof(message), GetString(na->nc, 
+	Anope::string subject = Anope::printf(GetString(na->nc, "Reset password request for %s"), na->nick.c_str());
+	Anope::string message = Anope::printf(GetString(na->nc,
 	"Hi,\n"
 	" \n"
 	"You have requested to have the password for %s reset.\n"
-	"To reset your password, type \002%R%s CONFIRM %s\002\n"
+	"To reset your password, type %R%s CONFIRM %s %s\n"
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators.").c_str(), na->nick.c_str(), Config->s_NickServ.c_str(), passcode.c_str(), Config->NetworkName.c_str());
+	"%s administrators."), na->nick.c_str(), Config->s_NickServ.c_str(), na->nick.c_str(), passcode.c_str(), Config->NetworkName.c_str());
 
-	na->nc->Shrink("ns_resetpass_code");
-	na->nc->Shrink("ns_resetpass_time");
+	if (Config->UseStrictPrivMsg)
+		message = message.replace_all_cs("%R", "/");
+	else
+		message = message.replace_all_cs("%R", "/msg ");
 
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
 	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));

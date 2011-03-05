@@ -601,10 +601,12 @@ class CoreExport ServerConfig
 	time_t NSSuspendExpire;
 	/* How long before forbidden nicks expire */
 	time_t NSForbidExpire;
-	/* Time before NickRequests expire */
-	time_t NSRExpire;
+	/* Time before unconfirmed nicks expire */
+	time_t NSUnconfirmedExpire;
 	/* Force email when registering */
 	bool NSForceEmail;
+	/* Force users to validate new email addresses */
+	bool NSConfirmEmailChanges;
 	/* Max number of nicks in a group */
 	unsigned NSMaxAliases;
 	/* Max number of allowed strings on the access list */

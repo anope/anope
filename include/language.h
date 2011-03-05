@@ -61,7 +61,6 @@
 #define NICK_RECOVERED			"User claiming your nick has been killed.\n" \
 						"\002%R%s RELEASE %s\002 to get it back before %s timeout."
 #define NICK_REQUESTED			"This nick has already been requested, please check your e-mail address for the pass code"
-#define NICK_IS_PREREG			"This nick is awaiting an e-mail verification code before completing registration."
 #define NICK_CONFIRM_INVALID		"Invalid passcode has been entered, please check the e-mail again, and retry"
 #define CHAN_NOT_ALLOWED_TO_JOIN	"You are not permitted to be on this channel."
 #define CHAN_X_INVALID			"Channel %s is not a valid channel."

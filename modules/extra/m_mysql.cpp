@@ -186,7 +186,7 @@ class ModuleSQL : public Module, public Pipe
 
 			for (i = 0, num = config.Enumerate("mysql"); i < num; ++i)
 			{
-				if (config.ReadValue("mysql", "name", "", i) == cname)
+				if (config.ReadValue("mysql", "name", "main", i) == cname)
 				{
 					break;
 				}

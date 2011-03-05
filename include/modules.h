@@ -561,14 +561,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
-	/** Called when nickrequest metadata is read from the database
-	 * @param nr The nickrequest
-	 * @parm key The metadata key
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickRequest *nr, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
 	/** Called when botinfo metadata is read from the database
 	 * @param bi The botinfo
 	 * @param key The metadata key
@@ -596,12 +588,6 @@ class CoreExport Module : public Extensible
 	 * @param na The nick alias
 	 */
 	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickAlias *na) { }
-
-	/** Called when we are wrting metadata for a nickrequest
-	 * @param WriteMetata A callback function used to insert the metadata
-	 * @param nr The nick request
-	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickRequest *nr) { }
 
 	/** Called when we are writing metadata for a botinfo
 	 * @param WriteMetata A callback function used to insert the metadata
@@ -884,16 +870,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) { }
 
-	/** called from ns_register.c, after the NickRequest have been created
-	 * @param nr pointer to the NickRequest
-	 */
-	virtual void OnMakeNickRequest(NickRequest *nr) { }
-
-	/** called on delnickrequest()
-	 * @param nr pointer to the NickRequest
-	 */
-	virtual void OnDelNickRequest(NickRequest *nr) { }
-
 	/** called from NickCore::ClearAccess()
 	 * @param nc pointer to the NickCore
 	 */
@@ -1082,7 +1058,7 @@ enum Implementation
 		I_OnPreNickExpire, I_OnNickExpire, I_OnNickForbidden, I_OnNickGroup, I_OnNickLogout, I_OnNickIdentify, I_OnNickDrop,
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
-		I_OnDelNickRequest, I_OnMakeNickRequest, I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
+		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 		I_OnNickInfo, I_OnFindNick, I_OnFindCore,
 
 		/* ChanServ */

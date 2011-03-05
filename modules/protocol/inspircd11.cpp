@@ -296,7 +296,8 @@ class InspircdIRCdMessage : public IRCdMessage
 				if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[0])
 				{
 					user->Login(na->nc);
-					user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED))
+						user->SetMode(NickServ, UMODE_REGISTERED);
 				}
 				else
 					validate_user(user);

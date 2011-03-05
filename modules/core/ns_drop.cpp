@@ -36,30 +36,7 @@ class CommandNSDrop : public Command
 		NickAlias *na = findnick((u->Account() && !nick.empty() ? nick : u->nick));
 		if (!na)
 		{
-			NickRequest *nr = findrequestnick(u->Account() && !nick.empty() ? nick : u->nick);
-			if (nr && u->Account() && u->Account()->IsServicesOper())
-			{
-				Log(LOG_ADMIN, u, this) << "to drop nickname " << nr->nick << " (email: " << nr->email << ")";
-				delete nr;
-				source.Reply(_("Nickname \002%s\002 has been dropped."), nick.c_str());
-			}
-			else if (nr && !nick.empty())
-			{
-				int res = enc_check_password(nick, nr->password);
-				if (res)
-				{
-					Log(LOG_COMMAND, u, this) << "to drop nick request " << nr->nick;
-					source.Reply(_("Nickname \002%s\002 has been dropped."), nr->nick.c_str());
-					delete nr;
-				}
-				else if (bad_password(u))
-					return MOD_STOP;
-				else
-					source.Reply(_(PASSWORD_INCORRECT));
-			}
-			else
-				source.Reply(_(NICK_NOT_REGISTERED));
-
+			source.Reply(_(NICK_NOT_REGISTERED));
 			return MOD_CONT;
 		}
 

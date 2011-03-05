@@ -31,13 +31,7 @@ class CommandNSIdentify : public Command
 
 		NickAlias *na = findnick(nick), *this_na = findnick(u->nick);
 		if (!na)
-		{
-			NickRequest *nr = findrequestnick(nick);
-			if (nr)
-				source.Reply(_(NICK_IS_PREREG));
-			else
-				source.Reply(_(NICK_NOT_REGISTERED));
-		}
+			source.Reply(_(NICK_NOT_REGISTERED));
 		else if (na->HasFlag(NS_FORBIDDEN))
 			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
@@ -72,7 +66,7 @@ class CommandNSIdentify : public Command
 				ircdproto->SendAccountLogin(u, u->Account());
 				ircdproto->SetAutoIdentificationToken(u);
 
-				if (this_na && this_na->nc == na->nc)
+				if (this_na && this_na->nc == na->nc && this_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 					u->SetMode(NickServ, UMODE_REGISTERED);
 
 				u->UpdateHost();
@@ -86,7 +80,7 @@ class CommandNSIdentify : public Command
 
 				FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
 
-				if (Config->NSForceEmail && u->Account() && u->Account()->email.empty())
+				if (Config->NSForceEmail && u->Account()->email.empty())
 				{
 					source.Reply(_("You must now supply an e-mail for your nick.\n"
 						"This e-mail will allow you to retrieve your password in\n"
@@ -94,6 +88,14 @@ class CommandNSIdentify : public Command
 					source.Reply(_("Type \002%R%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
 						"Your privacy is respected; this e-mail won't be given to\n"
 					"any third-party person."), NickServ->nick.c_str());
+				}
+
+				if (u->Account()->HasFlag(NI_UNCONFIRMED))
+				{
+					source.Reply(_("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
+					time_t time_registered = Anope::CurTime - na->time_registered;
+					if (Config->NSUnconfirmedExpire > time_registered)
+						source.Reply(_("Your account will expire, if not confirmed, in %s"), duration(u->Account(), Config->NSUnconfirmedExpire - time_registered).c_str());
 				}
 
 				check_memos(u);

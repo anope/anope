@@ -37,27 +37,6 @@ void MailThread::Run()
 	SetExitState();
 }
 
-bool Mail(User *u, NickRequest *nr, BotInfo *service, const Anope::string &subject, const Anope::string &message)
-{
-	if (!u || !nr || !service || subject.empty() || message.empty())
-		return false;
-
-	if (!Config->UseMail)
-		u->SendMessage(service, _("Services have been configured to not send mail."));
-	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
-		u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), Config->MailDelay - Anope::CurTime - u->lastmail);
-	else if (nr->email.empty())
-		u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nr->nick.c_str());
-	else
-	{
-		u->lastmail = nr->lastmail = Anope::CurTime;
-		threadEngine.Start(new MailThread(nr->nick, nr->email, subject, message));
-		return true;
-	}
-
-	return false;
-}
-
 bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject, const Anope::string &message)
 {
 	if (!u || !nc || !service || subject.empty() || message.empty())

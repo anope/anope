@@ -44,14 +44,7 @@ class CommandNSInfo : public Command
 
 		if (!na)
 		{
-			NickRequest *nr = findrequestnick(nick);
-			if (nr)
-			{
-				source.Reply(_(NICK_IS_PREREG));
-				if (has_auspex)
-					source.Reply(_("   E-mail address: %s"), nr->email.c_str());
-			}
-			else if (nickIsServices(nick, true))
+			if (nickIsServices(nick, true))
 				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
 			else
 				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
@@ -120,11 +113,11 @@ class CommandNSInfo : public Command
 
 				Anope::string optbuf;
 
-				CheckOptStr(optbuf, NI_KILLPROTECT, GetString(u->Account(), _("Protection")).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_SECURE, GetString(u->Account(), _("Security")).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_PRIVATE, GetString(u->Account(), _("Private")).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_MSG, GetString(u->Account(), _("Message mode")).c_str(), na->nc);
-				CheckOptStr(optbuf, NI_AUTOOP, GetString(u->Account(), _("Auto-op")).c_str(), na->nc);
+				CheckOptStr(optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
+				CheckOptStr(optbuf, NI_SECURE, _("Security"), na->nc);
+				CheckOptStr(optbuf, NI_PRIVATE, _("Private"), na->nc);
+				CheckOptStr(optbuf, NI_MSG, _("Message mode"), na->nc);
+				CheckOptStr(optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
 
 				source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
 
@@ -136,13 +129,21 @@ class CommandNSInfo : public Command
 						source.Reply(_("This nickname is currently suspended"));
 				}
 
-				if (na->HasFlag(NS_NO_EXPIRE))
-					source.Reply(_("This nickname will not expire."));
+				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				{
+					if (na->HasFlag(NS_NO_EXPIRE))
+						source.Reply(_("This nickname will not expire."));
+					else
+						source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());
+				}
 				else
-					source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());
+					source.Reply(_("Expires on: %s"), do_strftime(na->time_registered + Config->NSUnconfirmedExpire).c_str());
 			}
 
 			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, show_hidden));
+
+			if (na->nc->HasFlag(NI_UNCONFIRMED))
+				source.Reply(_("This nickname is unconfirmed."));
 		}
 		return MOD_CONT;
 	}

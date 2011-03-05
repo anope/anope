@@ -137,7 +137,6 @@ extern void expire_all()
 	Log(LOG_DEBUG) << "Running expire routines";
 	expire_nicks();
 	expire_chans();
-	expire_requests();
 	expire_exceptions();
 
 	FOREACH_MOD(I_OnDatabaseExpire, OnDatabaseExpire());

@@ -32,12 +32,10 @@ class CommandCSRegister : public Command
 		Channel *c = findchan(chan);
 
 		if (readonly)
-		{
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
-			return MOD_CONT;
-		}
-
-		if (chan[0] == '&')
+		else if (u->Account()->HasFlag(NI_UNCONFIRMED))
+			source.Reply(_("You must confirm your account before you can register a channel."));
+		else if (chan[0] == '&')
 			source.Reply(_("Local channels cannot be registered."));
 		else if (chan[0] != '#')
 			source.Reply(_(CHAN_SYMBOL_REQUIRED));

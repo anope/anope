@@ -427,7 +427,8 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+						user->SetMode(NickServ, UMODE_REGISTERED);
 				}
 				else
 					validate_user(user);
@@ -448,7 +449,8 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+						user->SetMode(NickServ, UMODE_REGISTERED);
 				}
 				else
 					validate_user(user);

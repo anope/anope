@@ -291,21 +291,6 @@ CREATE TABLE IF NOT EXISTS `anope_ns_core_metadata` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `anope_ns_request`
---
-
-CREATE TABLE IF NOT EXISTS `anope_ns_request` (
-  `nick` varchar(255) NOT NULL DEFAULT '',
-  `passcode` text NOT NULL,
-  `password` text NOT NULL,
-  `email` text NOT NULL,
-  `requested` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`nick`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `anope_os_akills`
 --
 

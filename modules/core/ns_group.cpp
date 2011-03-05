@@ -29,12 +29,6 @@ class CommandNSGroup : public Command
 		const Anope::string &nick = params[0];
 		Anope::string pass = params[1];
 
-		if (Config->NSEmailReg && findrequestnick(u->nick))
-		{
-			source.Reply(_(NICK_REQUESTED));
-			return MOD_CONT;
-		}
-
 		if (readonly)
 		{
 			source.Reply(_("Sorry, nickname grouping is temporarily disabled."));
@@ -121,7 +115,8 @@ class CommandNSGroup : public Command
 				u->Login(na->nc);
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
 				ircdproto->SetAutoIdentificationToken(u);
-				u->SetMode(NickServ, UMODE_REGISTERED);
+				if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
+					u->SetMode(NickServ, UMODE_REGISTERED);
 
 				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 				source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());

@@ -68,7 +68,7 @@ class IdentifyInterface : public LDAPInterface, public Command
 		ircdproto->SendAccountLogin(u, u->Account());
 		ircdproto->SetAutoIdentificationToken(u);
 
-		if (this_na && this_na->nc == na->nc)
+		if (this_na && this_na->nc == na->nc && this_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 			u->SetMode(NickServ, UMODE_REGISTERED);
 
 		u->UpdateHost();

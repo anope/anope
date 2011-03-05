@@ -5,15 +5,12 @@
 
 class NickAlias;
 class NickCore;
-class NickRequest;
 
 typedef unordered_map_namespace::unordered_map<Anope::string, NickAlias *, ci::hash, std::equal_to<ci::string> > nickalias_map;
 typedef unordered_map_namespace::unordered_map<Anope::string, NickCore *, ci::hash, std::equal_to<ci::string> > nickcore_map;
-typedef unordered_map_namespace::unordered_map<Anope::string, NickRequest *, ci::hash, std::equal_to<ci::string> > nickrequest_map;
 
 extern CoreExport nickalias_map NickAliasList;
 extern CoreExport nickcore_map NickCoreList;
-extern CoreExport nickrequest_map NickRequestList;
 
 /* NickServ nickname structures. */
 
@@ -85,6 +82,9 @@ enum NickCoreFlag
 	NI_AUTOOP,
 	/* This nickcore is forbidden, which means the nickalias for it is aswell */
 	NI_FORBIDDEN,
+	/* If set means the nick core does not have their email addrses confirmed.
+	 */
+	NI_UNCONFIRMED,
 
 	NI_END
 };
@@ -92,22 +92,7 @@ enum NickCoreFlag
 const Anope::string NickCoreFlagStrings[] = {
 	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
 	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
-	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", ""
-};
-
-class CoreExport NickRequest : public Extensible
-{
- public:
-	NickRequest(const Anope::string &nickname);
-
-	~NickRequest();
-
-	Anope::string nick;
-	Anope::string passcode;
-	Anope::string password;
-	Anope::string email;
-	time_t requested;
-	time_t lastmail; /* Unsaved */
+	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", ""
 };
 
 class NickCore;

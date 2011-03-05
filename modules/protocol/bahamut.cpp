@@ -296,7 +296,8 @@ class BahamutIRCdMessage : public IRCdMessage
 				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
 				{
 					user->Login(na->nc);
-					user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+						user->SetMode(NickServ, UMODE_REGISTERED);
 				}
 				else
 					validate_user(user);

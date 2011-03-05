@@ -22,7 +22,6 @@ enum MDType
 	MD_NONE,
 	MD_NC,
 	MD_NA,
-	MD_NR,
 	MD_BI,
 	MD_CH
 };
@@ -52,7 +51,6 @@ static void ReadDatabase(Module *m = NULL)
 
 	NickCore *nc = NULL;
 	NickAlias *na = NULL;
-	NickRequest *nr = NULL;
 	BotInfo *bi = NULL;
 	ChannelInfo *ci = NULL;
 
@@ -100,11 +98,6 @@ static void ReadDatabase(Module *m = NULL)
 				na = findnick(params[2]);
 				Type = MD_NA;
 			}
-			else if (params[0].equals_ci("NR"))
-			{
-				nr = findrequestnick(params[1]);
-				Type = MD_NR;
-			}
 			else if (params[0].equals_ci("BI"))
 			{
 				bi = findbot(params[1]);
@@ -143,20 +136,6 @@ static void ReadDatabase(Module *m = NULL)
 							m->OnDatabaseReadMetadata(na, key, params);
 						else
 							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, key, params));
-					}
-					catch (const DatabaseException &ex)
-					{
-						Log() << "[db_plain]: " << ex.GetReason();
-					}
-				}
-				else if (Type == MD_NR && nr)
-				{
-					try
-					{
-						if (m)
-							m->OnDatabaseReadMetadata(nr, key, params);
-						else
-							FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(nr, key, params));
 					}
 					catch (const DatabaseException &ex)
 					{
@@ -290,17 +269,6 @@ static void LoadNickAlias(const std::vector<Anope::string> &params)
 	na->last_seen = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
 
 	Log(LOG_DEBUG_2) << "[db_plain}: Loaded nickalias for " << na->nick;
-}
-
-static void LoadNickRequest(const std::vector<Anope::string> &params)
-{
-	NickRequest *nr = new NickRequest(params[0]);
-	nr->passcode = params[1];
-	nr->password = params[2];
-	nr->email = params[3];
-	nr->requested = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
-
-	Log(LOG_DEBUG_2) << "[db_plain]: Loaded nickrequest for " << nr->nick;
 }
 
 static void LoadBotInfo(const std::vector<Anope::string> &params)
@@ -480,8 +448,6 @@ class DBPlain : public Module
 			LoadNickCore(otherparams);
 		else if (key.equals_ci("NA"))
 			LoadNickAlias(otherparams);
-		else if (key.equals_ci("NR"))
-			LoadNickRequest(otherparams);
 		else if (key.equals_ci("BI"))
 			LoadBotInfo(otherparams);
 		else if (key.equals_ci("CH"))
@@ -764,15 +730,6 @@ class DBPlain : public Module
 		BackupDatabase();
 
 		db_buffer << "VER 2" << endl;
-
-		for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
-		{
-			NickRequest *nr = it->second;
-
-			db_buffer << "NR " << nr->nick << " " << nr->passcode << " " << nr->password << " " << nr->email << " " << nr->requested << endl;
-
-			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, nr));
-		}
 
 		for (nickcore_map::const_iterator nit = NickCoreList.begin(), nit_end = NickCoreList.end(); nit != nit_end; ++nit)
 		{

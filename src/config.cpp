@@ -480,7 +480,7 @@ bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anop
 {
 	if (config->NSEmailReg)
 	{
-		if (value.equals_ci("preregexpire"))
+		if (value.equals_ci("unconfirmedexpire"))
 		{
 			if (!data.GetInteger() && !dotime(data.GetValue()))
 				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
@@ -1070,6 +1070,7 @@ void ServerConfig::Read()
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&this->NSEmailReg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&this->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
+		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&this->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
 		{"nickserv", "languages", "", new ValueContainerString(&this->Languages), DT_STRING, NoValidation},
 		{"nickserv", "defaultlanguage", "0", new ValueContainerString(&this->NSDefLanguage), DT_STRING, NoValidation},
@@ -1078,7 +1079,7 @@ void ServerConfig::Read()
 		{"nickserv", "expire", "21d", new ValueContainerTime(&this->NSExpire), DT_TIME, NoValidation},
 		{"nickserv", "suspendexpire", "0", new ValueContainerTime(&this->NSSuspendExpire), DT_TIME, NoValidation},
 		{"nickserv", "forbidexpire", "0", new ValueContainerTime(&this->NSForbidExpire), DT_TIME, NoValidation},
-		{"nickserv", "preregexpire", "0", new ValueContainerTime(&this->NSRExpire), DT_TIME, ValidateEmailReg},
+		{"nickserv", "unconfirmedexpire", "0", new ValueContainerTime(&this->NSUnconfirmedExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerUInt(&this->NSMaxAliases), DT_UINTEGER, NoValidation},
 		{"nickserv", "accessmax", "0", new ValueContainerUInt(&this->NSAccessMax), DT_UINTEGER, ValidateNotZero},
 		{"nickserv", "enforceruser", "", new ValueContainerString(&temp_nsuserhost), DT_STRING, ValidateNotEmpty},

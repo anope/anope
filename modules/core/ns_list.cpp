@@ -97,67 +97,53 @@ class CommandNSList : public Command
 		mync = u->Account();
 
 		source.Reply(_(LIST_HEADER), pattern.c_str());
-		if (!unconfirmed)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
-			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+			NickAlias *na = it->second;
+
+			/* Don't show private and forbidden nicks to non-services admins. */
+			if (na->HasFlag(NS_FORBIDDEN) && !is_servadmin)
+				continue;
+			else if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
+				continue;
+			else if (forbidden && !na->HasFlag(NS_FORBIDDEN))
+				continue;
+			else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
+					continue;
+			else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
+				continue;
+			else if (unconfirmed && na->nc->HasFlag(NI_UNCONFIRMED))
+				continue;
+
+			/* We no longer compare the pattern against the output buffer.
+			 * Instead we build a nice nick!user@host buffer to compare.
+			 * The output is then generated separately. -TheShadow */
+			snprintf(buf, sizeof(buf), "%s!%s", na->nick.c_str(), !na->last_usermask.empty() && !na->HasFlag(NS_FORBIDDEN) ? na->last_usermask.c_str() : "*@*");
+			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern))
 			{
-				NickAlias *na = it->second;
-
-				/* Don't show private and forbidden nicks to non-services admins. */
-				if (na->HasFlag(NS_FORBIDDEN) && !is_servadmin)
-					continue;
-				if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
-					continue;
-				if (forbidden && !na->HasFlag(NS_FORBIDDEN))
-					continue;
-				else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
-					continue;
-				else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
-					continue;
-
-				/* We no longer compare the pattern against the output buffer.
-				 * Instead we build a nice nick!user@host buffer to compare.
-				 * The output is then generated separately. -TheShadow */
-				snprintf(buf, sizeof(buf), "%s!%s", na->nick.c_str(), !na->last_usermask.empty() && !na->HasFlag(NS_FORBIDDEN) ? na->last_usermask.c_str() : "*@*");
-				if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern))
+				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
 				{
-					if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
-					{
-						if (is_servadmin && na->HasFlag(NS_NO_EXPIRE))
-							noexpire_char = '!';
-						else
-							noexpire_char = ' ';
-						if (na->nc->HasFlag(NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
-							snprintf(buf, sizeof(buf), "%-20s  [Hostname Hidden]", na->nick.c_str());
-						else if (na->HasFlag(NS_FORBIDDEN))
-							snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", na->nick.c_str());
-						else if (na->nc->HasFlag(NI_SUSPENDED))
-							snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick.c_str());
-						else
-							snprintf(buf, sizeof(buf), "%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
-						source.Reply("   %c%s", noexpire_char, buf);
-					}
-					++count;
-				}
-			}
-		}
-
-		if (unconfirmed || is_servadmin)
-		{
-			noexpire_char = ' ';
-
-			for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; ++it)
-			{
-				NickRequest *nr = it->second;
-
-				snprintf(buf, sizeof(buf), "%s!*@*", nr->nick.c_str());
-				if ((nr->nick.equals_ci(pattern) || Anope::Match(buf, pattern)) && ++nnicks <= Config->NSListMax)
-				{
-					snprintf(buf, sizeof(buf), "%-20s  [UNCONFIRMED]", nr->nick.c_str());
+					if (is_servadmin && na->HasFlag(NS_NO_EXPIRE))
+						noexpire_char = '!';
+					else
+						noexpire_char = ' ';
+					if (na->nc->HasFlag(NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
+						snprintf(buf, sizeof(buf), "%-20s  [Hostname Hidden]", na->nick.c_str());
+					else if (na->HasFlag(NS_FORBIDDEN))
+						snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", na->nick.c_str());
+					else if (na->nc->HasFlag(NI_SUSPENDED))
+						snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick.c_str());
+					else if (na->nc->HasFlag(NI_UNCONFIRMED))
+						snprintf(buf, sizeof(buf), "%-20s  [Unconfirmed]", na->nick.c_str());
+					else
+						snprintf(buf, sizeof(buf), "%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
 					source.Reply("   %c%s", noexpire_char, buf);
 				}
+				++count;
 			}
 		}
+			
+
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
 		return MOD_CONT;
 	}

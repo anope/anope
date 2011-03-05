@@ -14,7 +14,6 @@
 
 nickalias_map NickAliasList;
 nickcore_map NickCoreList;
-nickrequest_map NickRequestList;
 
 typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
 typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
@@ -169,13 +168,6 @@ void ns_init()
 
 int validate_user(User *u)
 {
-	NickRequest *nr = findrequestnick(u->nick);
-	if (nr)
-	{
-		u->SendMessage(NickServ, _(NICK_IS_PREREG));
-		return 0;
-	}
-
 	NickAlias *na = findnick(u->nick);
 	if (!na)
 		return 0;
@@ -291,31 +283,7 @@ void expire_nicks()
 	}
 }
 
-void expire_requests()
-{
-	for (nickrequest_map::const_iterator it = NickRequestList.begin(), it_end = NickRequestList.end(); it != it_end; )
-	{
-		NickRequest *nr = it->second;
-		++it;
-
-		if (Config->NSRExpire && Anope::CurTime - nr->requested >= Config->NSRExpire)
-		{
-			Log(LOG_NORMAL, "expire") << "Request for nick " << nr->nick << " expiring";
-			delete nr;
-		}
-	}
-}
-
 /*************************************************************************/
-
-NickRequest *findrequestnick(const Anope::string &nick)
-{
-	nickrequest_map::const_iterator it = NickRequestList.find(nick);
-
-	if (it != NickRequestList.end())
-		return it->second;
-	return NULL;
-}
 
 NickAlias *findnick(const Anope::string &nick)
 {

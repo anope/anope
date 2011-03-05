@@ -27,18 +27,9 @@ class CommandNSGetPass : public Command
 		const Anope::string &nick = params[0];
 		Anope::string tmp_pass;
 		NickAlias *na;
-		NickRequest *nr = NULL;
 
 		if (!(na = findnick(nick)))
-		{
-			if ((nr = findrequestnick(nick)))
-			{
-				Log(LOG_ADMIN, u, this) << "for " << nr->nick;
-				source.Reply(_("Passcode for %s is \002%s\002."), nick.c_str(), nr->passcode.c_str());
-			}
-			else
-				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-		}
+			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
 			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())

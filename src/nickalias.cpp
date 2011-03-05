@@ -1,25 +1,6 @@
 #include "services.h"
 #include "modules.h"
 
-NickRequest::NickRequest(const Anope::string &nickname)
-{
-	if (nickname.empty())
-		throw CoreException("Empty nick passed to NickRequest constructor");
-
-	this->requested = this->lastmail = 0;
-
-	this->nick = nickname;
-
-	NickRequestList[this->nick] = this;
-}
-
-NickRequest::~NickRequest()
-{
-	FOREACH_MOD(I_OnDelNickRequest, OnDelNickRequest(this));
-
-	NickRequestList.erase(this->nick);
-}
-
 /** Default constructor
  * @param nick The nick
  * @param nickcore The nickcofe for this nick

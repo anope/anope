@@ -274,7 +274,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		if (u && nc)
 		{
 			u->Login(nc);
-			if (user_na && user_na->nc == nc)
+			if (user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(NickServ, UMODE_REGISTERED);
 		}
 	}

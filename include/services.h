@@ -448,7 +448,6 @@ template<typename T> inline T convertTo(const Anope::string &s, bool failIfLefto
 class User;
 class NickCore;
 class NickAlias;
-class NickRequest;
 class BotInfo;
 class ChannelInfo;
 class Channel;
@@ -879,7 +878,6 @@ struct MailInfo
 	FILE *pipe;
 	User *sender;
 	NickCore *recipient;
-	NickRequest *recip;
 };
 
 /*************************************************************************/

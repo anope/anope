@@ -69,43 +69,6 @@ int tolower(char c)
 
 /*************************************************************************/
 
-/**
- * merge_args:  Take an argument count and argument vector and merge them
- *              into a single string in which each argument is separated by
- *              a space.
- * @param int Number of Args
- * @param argv Array
- * @return string of the merged array
- */
-const char *merge_args(int argc, const char **argv)
-{
-	int i;
-	static char s[4096];
-	char *t;
-
-	t = s;
-	for (i = 0; i < argc; ++i)
-		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++, i < argc - 1 ? " " : "");
-	return s;
-}
-
-/*
- * XXX: temporary "safe" version to avoid casting, it's still ugly.
- */
-const char *merge_args(int argc, char **argv)
-{
-	int i;
-	static char s[4096];
-	char *t;
-
-	t = s;
-	for (i = 0; i < argc; ++i)
-		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++, i < argc - 1 ? " " : "");
-	return s;
-}
-
-/*************************************************************************/
-
 NumberList::NumberList(const Anope::string &list, bool descending) : is_valid(true), desc(descending)
 {
 	Anope::string error;
@@ -839,12 +802,12 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
  * @param ... any number of parameters
  * @return a Anope::string
  */
-Anope::string Anope::printf(const char *fmt, ...)
+Anope::string Anope::printf(const Anope::string &fmt, ...)
 {
 	va_list args;
 	char buf[1024];
-	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, args);
+	va_start(args, fmt.c_str());
+	vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 	va_end(args);
 	return buf;
 }

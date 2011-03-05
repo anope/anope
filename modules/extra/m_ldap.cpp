@@ -222,7 +222,10 @@ class ModuleLDAP : public Module, public Pipe
 	~ModuleLDAP()
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
+		{
 			it->second->SetExitState();
+			it->second->Wakeup();
+		}
 		LDAPServices.clear();
 	}
 
@@ -239,7 +242,7 @@ class ModuleLDAP : public Module, public Pipe
 
 			for (i = 0, num = config.Enumerate("ldap"); i < num; ++i)
 			{
-				if (config.ReadValue("ldap", "name", "", i) == cname)
+				if (config.ReadValue("ldap", "name", "main", i) == cname)
 				{
 					break;
 				}
@@ -250,6 +253,7 @@ class ModuleLDAP : public Module, public Pipe
 				Log(LOG_NORMAL, "ldap") << "LDAP: Removing server connection " << cname;
 
 				s->SetExitState();
+				s->Wakeup();
 				this->LDAPServices.erase(cname);
 			}
 		}

@@ -13,130 +13,52 @@
 
 #include "module.h"
 
-static bool SendRegmail(User *u, NickRequest *nr);
+static bool SendRegmail(User *u, NickAlias *na);
 
 class CommandNSConfirm : public Command
 {
- protected:
-	CommandReturn ActuallyConfirmNick(CommandSource &source, NickRequest *nr, bool force)
-	{
-		User *u = source.u;
-		NickAlias *na = new NickAlias(nr->nick, new NickCore(nr->nick));
-		Anope::string tmp_pass;
-
-		na->nc->pass = nr->password;
-
-		if (force)
-		{
-			na->last_usermask = "*@*";
-			na->last_realname = "unknown";
-		}
-		else
-		{
-			Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
-			na->last_usermask = last_usermask;
-			na->last_realname = u->realname;
-			if (Config->NSAddAccessOnReg)
-				na->nc->AddAccess(create_mask(u));
-		}
-
-		if (!nr->email.empty())
-			na->nc->email = nr->email;
-
-		if (!force)
-		{
-			u->Login(na->nc);
-			Log(LOG_COMMAND, u, this) << "to register " << nr->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
-			if (Config->NSAddAccessOnReg)
-				source.Reply(_("Nickname \002%s\002 registered under your account: %s"), u->nick.c_str(), na->nc->GetAccess(0).c_str());
-			else
-				source.Reply(_("Nickname \002%s\002 registered."), u->nick.c_str());
-			delete nr;
-
-			ircdproto->SendAccountLogin(u, u->Account());
-			ircdproto->SetAutoIdentificationToken(u);
-
-			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
-				source.Reply(_("Your password is \002%s\002 - remember this for later use."), tmp_pass.c_str());
-
-			u->lastnickreg = Anope::CurTime;
-		}
-		else
-		{
-			Log(LOG_COMMAND, u, this) << "to confirm " << nr->nick << " (email: " << (!nr->email.empty() ? nr->email : "none") << ")";
-			source.Reply(_("Nickname \002%s\002 confirmed"), nr->nick.c_str());
-			User *user = finduser(nr->nick);
-			/* Delrequest must be called before validate_user */
-			delete nr;
-			if (user)
-				validate_user(user);
-		}
-
-		FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
-
-		return MOD_CONT;
-	}
-
-	CommandReturn DoConfirm(CommandSource &source, const std::vector<Anope::string> &params)
-	{
-		User *u = source.u;
-		Anope::string passcode = !params.empty() ? params[0] : "";
-
-		NickRequest *nr = findrequestnick(u->nick);
-
-		if (Config->NSEmailReg)
-		{
-			if (passcode.empty())
-			{
-				this->OnSyntaxError(source, "");
-				return MOD_CONT;
-			}
-
-			if (!nr)
-			{
-				if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
-				{
-					/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
-					   of the user they are trying to validate, and push that user through regardless of passcode */
-					nr = findrequestnick(passcode);
-					if (nr)
-					{
-						ActuallyConfirmNick(source, nr, true);
-						return MOD_CONT;
-					}
-				}
-				source.Reply(_("Registration step 1 may have expired, please use \"%R%s register <password> <email>\" first."), Config->s_NickServ.c_str());
-
-				return MOD_CONT;
-			}
-
-			if (!nr->passcode.equals_cs(passcode))
-			{
-				source.Reply(_(NICK_CONFIRM_INVALID));
-				return MOD_CONT;
-			}
-		}
-
-		if (!nr)
-		{
-			source.Reply(_("Sorry, registration failed."));
-			return MOD_CONT;
-		}
-
-		ActuallyConfirmNick(source, nr, false);
-		return MOD_CONT;
-	}
-
  public:
-	CommandNSConfirm(const Anope::string &cmdn, int min, int max) : Command(cmdn, min, max)
+	CommandNSConfirm() : Command("CONFIRM", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Confirm a nickserv auth code");
+		this->SetDesc("Confirm an auth code");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoConfirm(source, params);
+		User *u = source.u;
+		const Anope::string &passcode = params[0];
+
+		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
+		{
+			NickAlias *na = findnick(passcode);
+			if (na == NULL)
+				source.Reply(_(NICK_X_NOT_REGISTERED), passcode.c_str());
+			else if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
+			{
+				na->nc->UnsetFlag(NI_UNCONFIRMED);
+				Log(LOG_ADMIN, u, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";
+				source.Reply(_("Nick \002%s\002 has been confirmed."), na->nick.c_str());
+			}
+		}
+		else if (u->Account())
+		{
+			Anope::string code;
+			if (u->Account()->GetExtRegular<Anope::string>("ns_register_passcode", code) && code == passcode)
+			{
+				u->Account()->Shrink("ns_register_passcode");
+				Log(LOG_COMMAND, u, this) << "to confirm their email";
+				source.Reply(_("Your email address of \002%s\002 has been confirmed."), u->Account()->email.c_str());
+				u->Account()->UnsetFlag(NI_UNCONFIRMED);
+			}
+			else
+				source.Reply(_("Invalid passcode."));
+		}
+		else
+			source.Reply(_("Invalid passcode."));
+
+		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -144,16 +66,14 @@ class CommandNSConfirm : public Command
 		User *u = source.u;
 		source.Reply(_("Syntax: \002CONFIRM \037passcode\037\002\n"
 				" \n"
-				"This is the second step of nickname registration process.\n"
-				"You must perform this command in order to get your nickname\n"
-				"registered with %s. The passcode (or called auth code also)\n"
-				"is sent to your e-mail address in the first step of the\n"
-				"registration process. For more information about the first\n"
-				"stage of the registration process, type: \002%R%s HELP REGISTER\002\n"
+				"This command is used by several commands as a way to confirm\n"
+				"changes made to your account.\n"
+				" \n"
+				"This is most commonly used to confirm your email address once\n"
+				"you register or change it.\n"
 				" \n"
 				"This is also used after the RESETPASS command has been used to\n"
-				"force identify you to your nick so you may change your password."),
-				NickServ->nick.c_str());
+				"force identify you to your nick so you may change your password."));
 		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
 			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
 				"replace \037passcode\037 with a users nick to force validate them."));
@@ -166,10 +86,10 @@ class CommandNSConfirm : public Command
 	}
 };
 
-class CommandNSRegister : public CommandNSConfirm
+class CommandNSRegister : public Command
 {
  public:
-	CommandNSRegister() : CommandNSConfirm("REGISTER", 1, 2)
+	CommandNSRegister() : Command("REGISTER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc("Register a nickname");
@@ -178,22 +98,11 @@ class CommandNSRegister : public CommandNSConfirm
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		NickRequest *nr = NULL, *anr = NULL;
 		NickAlias *na;
 		size_t prefixlen = Config->NSGuestNickPrefix.length();
 		size_t nicklen = u->nick.length();
 		Anope::string pass = params[0];
 		Anope::string email = params.size() > 1 ? params[1] : "";
-		Anope::string passcode;
-		int idx, min = 1, max = 62;
-		int chars[] = {
-			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
-			'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-		};
-		std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
 
 		if (readonly)
 		{
@@ -204,12 +113,6 @@ class CommandNSRegister : public CommandNSConfirm
 		if (!u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
 		{
 			source.Reply(_("You must have been using this nick for at least %d seconds to register."), Config->NickRegDelay);
-			return MOD_CONT;
-		}
-
-		if ((anr = findrequestnick(u->nick)))
-		{
-			source.Reply(_(NICK_REQUESTED));
 			return MOD_CONT;
 		}
 
@@ -231,7 +134,7 @@ class CommandNSRegister : public CommandNSConfirm
 		}
 
 		if (Config->RestrictOperNicks)
-			for (it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
 			{
 				Anope::string nick = it->first;
 
@@ -265,38 +168,46 @@ class CommandNSRegister : public CommandNSConfirm
 			source.Reply(_(MAIL_X_INVALID), email.c_str());
 		else
 		{
-			for (idx = 0; idx < 9; ++idx)
-				passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
-			nr = new NickRequest(u->nick);
-			nr->passcode = passcode;
-			enc_encrypt(pass, nr->password);
+			na = new NickAlias(u->nick, new NickCore(u->nick));
+			enc_encrypt(pass, na->nc->pass);
 			if (!email.empty())
-				nr->email = email;
-			nr->requested = Anope::CurTime;
-			FOREACH_MOD(I_OnMakeNickRequest, OnMakeNickRequest(nr));
+				na->nc->email = email;
+
+			Anope::string last_usermask = u->GetIdent() + "@" + u->GetDisplayedHost();
+			na->last_usermask = last_usermask;
+			na->last_realname = u->realname;
+			if (Config->NSAddAccessOnReg)
+				na->nc->AddAccess(create_mask(u));
+
+			u->Login(na->nc);
+
+			Log(LOG_COMMAND, u, this) << "to register " << na->nick << " (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";
+
+			FOREACH_MOD(I_OnNickRegister, OnNickRegister(na));
+
+			if (Config->NSAddAccessOnReg)
+				source.Reply(_("Nickname \002%s\002 registered under your account: %s"), u->nick.c_str(), na->nc->GetAccess(0).c_str());
+			else
+				source.Reply(_("Nickname \002%s\002 registered."), u->nick.c_str());
+
+			Anope::string tmp_pass;
+			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
+				source.Reply(_("Your password is \002%s\002 - remember this for later use."), tmp_pass.c_str());
+
 			if (Config->NSEmailReg)
 			{
-				if (SendRegmail(u, nr))
+				na->nc->SetFlag(NI_UNCONFIRMED);
+				if (SendRegmail(u, na))
 				{
-					source.Reply(_("A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration.\n"
-					  "If you need to cancel your registration, use \"%R%s drop <password>\"."),
-					  email.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+					source.Reply(_("A passcode has been sent to %s, please type %R%s confirm <passcode> to confirm your email address."), email.c_str(), NickServ->nick.c_str());
+					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(na->nc, Config->NSUnconfirmedExpire).c_str());
+				}
+			}
 
-					Log(LOG_COMMAND, u, this) << "send registration verification code to " << nr->email;
-				}
-				else
-				{
-					Log(LOG_COMMAND, u, this) << "unable to send registration verification mail";
-					source.Reply(_("Nick NOT registered, please try again later."));
-					delete nr;
-					return MOD_CONT;
-				}
-			}
-			else
-			{
-				std::vector<Anope::string> empty_params;
-				return this->DoConfirm(source, empty_params);
-			}
+			ircdproto->SendAccountLogin(u, u->Account());
+			ircdproto->SetAutoIdentificationToken(u);
+
+			u->lastnickreg = Anope::CurTime;
 		}
 
 		return MOD_CONT;
@@ -353,46 +264,53 @@ class CommandNSResend : public Command
  public:
 	CommandNSResend() : Command("RESEND", 0, 0)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Resend a nickserv auth code");
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!Config->NSEmailReg)
+			return MOD_CONT;
+
 		User *u = source.u;
-		NickRequest *nr = NULL;
-		if (Config->NSEmailReg)
+		NickAlias *na = findnick(u->nick);
+
+		if (na == NULL)
+			source.Reply(_(NICK_NOT_REGISTERED));
+		else if (na->nc != u->Account() || u->Account()->HasFlag(NI_UNCONFIRMED) == false)
+			source.Reply(_("Your account is already confirmed."));
+		else
 		{
-			if ((nr = findrequestnick(u->nick)))
+			if (Anope::CurTime < u->Account()->lastmail + Config->NSResendDelay)
+				source.Reply(_("Cannot send mail now; please retry a little later."));
+			else if (!SendRegmail(u, na))
 			{
-				if (Anope::CurTime < nr->lastmail + Config->NSResendDelay)
-				{
-					source.Reply(_("Cannot send mail now; please retry a little later."));
-					return MOD_CONT;
-				}
-				if (!SendRegmail(u, nr))
-				{
-					nr->lastmail = Anope::CurTime;
-					source.Reply(_("Your passcode has been re-sent to %s."), nr->email.c_str());
-					Log(LOG_COMMAND, u, this) << "resend registration verification code for " << nr->nick;
-				}
-				else
-				{
-					Log(LOG_COMMAND, u, this) << "unable to resend registration verification code for " << nr->nick;
-					return MOD_CONT;
-				}
+				na->nc->lastmail = Anope::CurTime;
+				source.Reply(_("Your passcode has been re-sent to %s."), na->nc->email.c_str());
+				Log(LOG_COMMAND, u, this) << "to resend registration verification code";
 			}
+			else
+				Log() << "Unable to resend registration verification code for " << u->nick;
 		}
+
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
+		if (!Config->NSEmailReg)
+			return false;
+
 		source.Reply(_("Syntax: \002RESEND\002\n"
 				" \n"
 				"This command will re-send the auth code (also called passcode)\n"
 				"to the e-mail address of the user whom is performing it."));
 		return true;
+	}
+
+	void OnServHelp(CommandSource &source)
+	{
+		if (Config->NSEmailReg)
+			source.Reply(_("Resend the registration passcode"));
 	}
 };
 
@@ -403,7 +321,7 @@ class NSRegister : public Module
 	CommandNSResend commandnsrsend;
 
  public:
-	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandnsconfirm("CONFIRM", 1, 1)
+	NSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
@@ -414,21 +332,40 @@ class NSRegister : public Module
 	}
 };
 
-static bool SendRegmail(User *u, NickRequest *nr)
+static bool SendRegmail(User *u, NickAlias *na)
 {
-	char subject[BUFSIZE], message[BUFSIZE];
+	Anope::string code;
+	if (na->nc->GetExtRegular<Anope::string>("ns_register_passcode", code) == false)
+	{
+		int chars[] = {
+			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
+			'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+			'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y',
+			'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+		};
+		int idx, min = 1, max = 62;
+		for (idx = 0; idx < 9; ++idx)
+			code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+		na->nc->Extend("ns_register_passcode", new ExtensibleItemRegular<Anope::string>(code));
+	}
 
-	snprintf(subject, sizeof(subject), GetString(NULL, "Nickname Registration (%s)").c_str(), nr->nick.c_str());
-	snprintf(message, sizeof(message), GetString(NULL, "Hi,\n"
+	Anope::string subject = Anope::printf(_("Nickname Registration (%s)"), na->nick.c_str());
+	Anope::string message = Anope::printf(_("Hi,\n"
 	" \n"
 	"You have requested to register the nickname %s on %s.\n"
 	"Please type \" %R%s confirm %s \" to complete registration.\n"
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators.").c_str(), nr->nick.c_str(), Config->NetworkName.c_str(), Config->s_NickServ.c_str(), nr->passcode.c_str(), Config->NetworkName.c_str());
+	"%s administrators."), na->nick.c_str(), Config->NetworkName.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, nr, NickServ, subject, message);
+	if (Config->UseStrictPrivMsg)
+		message = message.replace_all_cs("%R", "/");
+	else
+		message = message.replace_all_cs("%R", "/msg ");
+
+	return Mail(u, na->nc, NickServ, subject, message);
 }
 
 MODULE_INIT(NSRegister)

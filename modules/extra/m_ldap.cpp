@@ -115,7 +115,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			if (type <= 0 || this->GetExitState())
 				continue;
 
-			bool notify = false;
 			int cur_id = ldap_msgid(result);
 
 			this->Lock();
@@ -152,7 +151,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 							ldap_result->error = ldap_err2string(parse_result);
 						else if (errcode != LDAP_SUCCESS)
 							ldap_result->error = ldap_err2string(errcode);
-						notify = true;
 						break;
 					}
 					case LDAP_RES_SEARCH_ENTRY:
@@ -175,7 +173,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 						if (ber != NULL)
 							ber_free(ber, 0);
 
-						notify = true;
 						break;
 					}
 					default:
@@ -192,8 +189,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			this->results.push_back(std::make_pair(i, ldap_result));
 			this->Unlock();
 
-			if (notify)
-				me->Notify();
+			me->Notify();
 		}
 	}
 

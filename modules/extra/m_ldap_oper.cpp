@@ -49,7 +49,11 @@ class IdentifyInterface : public LDAPInterface
 		}
 		catch (const LDAPException &ex)
 		{
-			Log() << "m_ldap_oper: " << ex.GetReason();
+			if (u->Account()->ot != NULL)
+			{
+				u->Account()->ot = NULL;
+				Log() << "m_ldap_oper: Removed services operator from " << u->nick << " (" << u->Account()->display << ")";
+			}
 		}
 	}
 

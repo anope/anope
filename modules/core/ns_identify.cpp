@@ -63,7 +63,7 @@ class CommandNSIdentify : public Command
 			else
 			{
 				if (u->IsIdentified())
-					Log(LOG_COMMAND, "nickserv/identify") << "to log out of account " << u->Account()->display;
+					Log(LOG_COMMAND, u, this) << "to log out of account " << u->Account()->display;
 
 				na->last_realname = u->realname;
 				na->last_seen = Anope::CurTime;
@@ -96,8 +96,7 @@ class CommandNSIdentify : public Command
 					"any third-party person."), NickServ->nick.c_str());
 				}
 
-				if (u->IsIdentified())
-					check_memos(u);
+				check_memos(u);
 			}
 		}
 		return MOD_CONT;

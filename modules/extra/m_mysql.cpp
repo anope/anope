@@ -134,30 +134,19 @@ class DispatcherThread : public Thread, public Condition
 	void Run();
 };
 
-/** The pipe used by the SocketEngine to notify the main thread when
- * we have results from queries
- */
-class MySQLPipe : public Pipe
-{
- public:
-	void OnNotify();
-};
-
 class ModuleSQL;
 static ModuleSQL *me;
-class ModuleSQL : public Module
+class ModuleSQL : public Module, public Pipe
 {
- public:
 	/* SQL connections */
 	std::map<Anope::string, MySQLService *> MySQLServices;
+ public:
 	/* Pending query requests */
 	std::deque<QueryRequest> QueryRequests;
 	/* Pending finished requests with results */
 	std::deque<QueryResult> FinishedRequests;
 	/* The thread used to execute queries */
 	DispatcherThread *DThread;
-	/* Notify pipe */
-	MySQLPipe *SQLPipe;
 
 	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
@@ -165,8 +154,6 @@ class ModuleSQL : public Module
 
 		Implementation i[] = { I_OnReload, I_OnModuleUnload };
 		ModuleManager::Attach(i, this,  2);
-
-		SQLPipe = new MySQLPipe();
 
 		DThread = new DispatcherThread();
 		threadEngine.Start(DThread);
@@ -184,8 +171,6 @@ class ModuleSQL : public Module
 		DThread->Wakeup();
 		DThread->Join();
 		delete DThread;
-
-		delete SQLPipe;
 	}
 
 	void OnReload(bool startup)
@@ -195,7 +180,7 @@ class ModuleSQL : public Module
 
 		for (std::map<Anope::string, MySQLService *>::iterator it = this->MySQLServices.begin(); it != this->MySQLServices.end();)
 		{
-			const Anope::string cname = it->first;
+			const Anope::string &cname = it->first;
 			MySQLService *s = it->second;
 			++it;
 
@@ -266,7 +251,28 @@ class ModuleSQL : public Module
 
 		this->DThread->Unlock();
 
-		this->SQLPipe->OnNotify();
+		this->OnNotify();
+	}
+
+	void OnNotify()
+	{
+		this->DThread->Lock();
+		std::deque<QueryResult> finishedRequests = this->FinishedRequests;
+		this->FinishedRequests.clear();
+		this->DThread->Unlock();
+
+		for (std::deque<QueryResult>::const_iterator it = finishedRequests.begin(), it_end = finishedRequests.end(); it != it_end; ++it)
+		{
+			const QueryResult &qr = *it;
+
+			if (!qr.sqlinterface)
+				throw SQLException("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
+
+			if (qr.result.GetError().empty())
+				qr.sqlinterface->OnResult(qr.result);
+			else
+				qr.sqlinterface->OnError(qr.result);
+		}
 	}
 };
 
@@ -386,33 +392,12 @@ void DispatcherThread::Run()
 		else
 		{
 			if (!me->FinishedRequests.empty())
-				me->SQLPipe->Notify();
+				me->Notify();
 			this->Wait();
 		}
 	}
 
 	this->Unlock();
-}
-
-void MySQLPipe::OnNotify()
-{
-	me->DThread->Lock();
-	std::deque<QueryResult> finishedRequests = me->FinishedRequests;
-	me->FinishedRequests.clear();
-	me->DThread->Unlock();
-
-	for (std::deque<QueryResult>::const_iterator it = finishedRequests.begin(), it_end = finishedRequests.end(); it != it_end; ++it)
-	{
-		const QueryResult &qr = *it;
-
-		if (!qr.sqlinterface)
-			throw SQLException("NULL qr.sqlinterface in MySQLPipe::OnNotify() ?");
-
-		if (qr.result.GetError().empty())
-			qr.sqlinterface->OnResult(qr.result);
-		else
-			qr.sqlinterface->OnError(qr.result);
-	}
 }
 
 MODULE_INIT(ModuleSQL)

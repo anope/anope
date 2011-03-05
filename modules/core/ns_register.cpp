@@ -26,8 +26,6 @@ class CommandNSConfirm : public Command
 
 		na->nc->pass = nr->password;
 
-		na->nc->memos.memomax = Config->MSMaxMemos;
-
 		if (force)
 		{
 			na->last_usermask = "*@*";
@@ -42,8 +40,6 @@ class CommandNSConfirm : public Command
 				na->nc->AddAccess(create_mask(u));
 		}
 
-		na->time_registered = na->last_seen = Anope::CurTime;
-		na->nc->language = Config->NSDefLanguage;
 		if (!nr->email.empty())
 			na->nc->email = nr->email;
 

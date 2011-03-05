@@ -32,7 +32,6 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<
 		throw CoreException("Empty nickcore passed to NickAlias constructor");
 
 	this->time_registered = this->last_seen = Anope::CurTime;
-
 	this->nick = nickname;
 	this->nc = nickcore;
 	this->nc->aliases.push_back(this);

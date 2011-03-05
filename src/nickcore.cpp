@@ -12,6 +12,8 @@ NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_EN
 	this->ot = NULL;
 	this->channelcount = 0;
 	this->lastmail = 0;
+	this->memos.memomax = Config->MSMaxMemos;
+	this->language = Config->NSDefLanguage;
 
 	this->display = coredisplay;
 

@@ -41,7 +41,10 @@ class AsynchCommandMutex : public CommandMutex
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, command, params));
 		if (MOD_RESULT == EVENT_STOP)
+		{
+			source.DoReply();
 			return;
+		}
 
 		if (!command->permission.empty() && !u->Account()->HasCommand(command->permission))
 		{

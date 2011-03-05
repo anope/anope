@@ -202,9 +202,10 @@ class CommandBSBadwords : public Command
 
 			bool override = !check_access(u, ci, CA_BADWORDS);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << badword->word;
-			ci->EraseBadWord(i);
 
 			u->SendMessage(BotServ, BOT_BADWORDS_DELETED, badword->word.c_str(), ci->name.c_str());
+
+			ci->EraseBadWord(i);
 		}
 
 		return MOD_CONT;

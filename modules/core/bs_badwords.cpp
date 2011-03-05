@@ -206,9 +206,10 @@ class CommandBSBadwords : public Command
 
 			bool override = !check_access(source.u, ci, CA_BADWORDS);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "DEL " << badword->word;
-			ci->EraseBadWord(i);
 
 			source.Reply(_("\002%s\002 deleted from %s bad words list."), badword->word.c_str(), ci->name.c_str());
+
+			ci->EraseBadWord(i);
 		}
 
 		return MOD_CONT;

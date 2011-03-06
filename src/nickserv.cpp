@@ -242,14 +242,18 @@ void expire_nicks()
 		++it;
 
 		User *u = finduser(na->nick);
-		if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified() : u->IsRecognized()))
+		if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified(true) : u->IsRecognized(true)))
 		{
 			Log(LOG_DEBUG_2) << "NickServ: updating last seen time for " << na->nick;
 			na->last_seen = Anope::CurTime;
-			continue;
 		}
 
 		bool expire = false;
+
+		if (na->nc->HasFlag(NI_UNCONFIRMED))
+			if (Config->NSUnconfirmedExpire && Anope::CurTime - na->time_registered >= Config->NSUnconfirmedExpire)
+				expire = true;
+
 		if (na->nc->HasFlag(NI_SUSPENDED))
 		{
 			if (Config->NSSuspendExpire && Anope::CurTime - na->last_seen >= Config->NSSuspendExpire)

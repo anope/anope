@@ -49,7 +49,7 @@ NickAlias::~NickAlias()
 	/* Second thing to do: look for a user using the alias
 	 * being deleted, and make appropriate changes */
 	User *u = finduser(this->nick);
-	if (u && u->Account())
+	if (u && u->Account() == this->nc)
 	{
 		ircdproto->SendAccountLogout(u, u->Account());
 		u->RemoveMode(NickServ, UMODE_REGISTERED);

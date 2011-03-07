@@ -31,7 +31,7 @@ const Anope::string UserModeNameStrings[] = {
 	"UMODE_REGPRIV", "UMODE_PROTECTED", "UMODE_NO_CTCP", "UMODE_WEBTV", "UMODE_WEBIRC", "UMODE_WHOIS", "UMODE_ADMIN", "UMODE_DEAF",
 	"UMODE_GLOBOPS", "UMODE_HELPOP", "UMODE_INVIS", "UMODE_OPER", "UMODE_PRIV", "UMODE_GOD", "UMODE_REGISTERED",
 	"UMODE_SNOMASK", "UMODE_VHOST", "UMODE_WALLOPS", "UMODE_CLOAK", "UMODE_SSL", "UMODE_SOFTCALLERID", "UMODE_CALLERID",
-	"UMODE_COMMONCHANS", "UMODE_HIDDEN", "UMODE_STRIPCOLOR", "UMODE_INVISIBLE_OPER",
+	"UMODE_COMMONCHANS", "UMODE_HIDDEN", "UMODE_STRIPCOLOR", "UMODE_INVISIBLE_OPER", "UMODE_RESTRICTED"
 
 	""
 };
@@ -65,20 +65,20 @@ const Anope::string ChannelModeNameStrings[] = {
 	"CMODE_BEGIN",
 
 	/* Channel modes */
-	"CMODE_BLOCKCOLOR", " CMODE_FLOOD", " CMODE_INVITE", " CMODE_KEY", " CMODE_LIMIT", " CMODE_MODERATED", " CMODE_NOEXTERNAL",
-	"CMODE_PRIVATE", " CMODE_REGISTERED", " CMODE_SECRET", " CMODE_TOPIC", " CMODE_AUDITORIUM", " CMODE_SSL", " CMODE_ADMINONLY",
-	"CMODE_NOCTCP", " CMODE_FILTER", " CMODE_NOKNOCK", " CMODE_REDIRECT", " CMODE_REGMODERATED", " CMODE_NONICK", " CMODE_OPERONLY",
-	"CMODE_NOKICK", " CMODE_REGISTEREDONLY", " CMODE_STRIPCOLOR", " CMODE_NONOTICE", " CMODE_NOINVITE", " CMODE_ALLINVITE",
-	"CMODE_BLOCKCAPS", " CMODE_PERM", " CMODE_NICKFLOOD", " CMODE_JOINFLOOD", " CMODE_DELAYEDJOIN", " CMODE_NOREJOIN",
+	"CMODE_BLOCKCOLOR", "CMODE_FLOOD", "CMODE_INVITE", "CMODE_KEY", "CMODE_LIMIT", "CMODE_MODERATED", "CMODE_NOEXTERNAL",
+	"CMODE_PRIVATE", "CMODE_REGISTERED", "CMODE_SECRET", "CMODE_TOPIC", "CMODE_AUDITORIUM", "CMODE_SSL", "CMODE_ADMINONLY",
+	"CMODE_NOCTCP", "CMODE_FILTER", "CMODE_NOKNOCK", "CMODE_REDIRECT", "CMODE_REGMODERATED", "CMODE_NONICK", "CMODE_OPERONLY",
+	"CMODE_NOKICK", "CMODE_REGISTEREDONLY", "CMODE_STRIPCOLOR", "CMODE_NONOTICE", "CMODE_NOINVITE", "CMODE_ALLINVITE",
+	"CMODE_BLOCKCAPS", "CMODE_PERM", "CMODE_NICKFLOOD", "CMODE_JOINFLOOD", "CMODE_DELAYEDJOIN", "CMODE_NOREJOIN",
 	"CMODE_BANDWIDTH",
 
 	/* b/e/I */
-	"CMODE_BAN", " CMODE_EXCEPT",
+	"CMODE_BAN", "CMODE_EXCEPT",
 	"CMODE_INVITEOVERRIDE",
 
 	/* v/h/o/a/q */
-	"CMODE_VOICE", " CMODE_HALFOP", " CMODE_OP",
-	"CMODE_PROTECT", " CMODE_OWNER",
+	"CMODE_VOICE", "CMODE_HALFOP", "CMODE_OP",
+	"CMODE_PROTECT", "CMODE_OWNER",
 
 	""
 };
@@ -115,8 +115,6 @@ class CoreExport Mode : public Base
  public:
 	/* Class of mode this is */
 	ModeClass Class;
-	/* The mode name, as a string */
-	Anope::string NameAsString;
 	/* Mode char for this */
 	char ModeChar;
 	/* Type of mode this is */
@@ -124,11 +122,10 @@ class CoreExport Mode : public Base
 
 	/** Default constructor
 	 * @param mClass The type of mode this is
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param type The mode type
 	 */
-	Mode(ModeClass mClass, const Anope::string &mNameAsString, char modeChar, ModeType type);
+	Mode(ModeClass mClass, char modeChar, ModeType type);
 
 	/** Default destructor
 	 */
@@ -145,14 +142,17 @@ class CoreExport UserMode : public Mode
 
 	/** Default constructor
 	 * @param nName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserMode(UserModeName mName, const Anope::string &mNameAsString, char modeChar);
+	UserMode(UserModeName mName, char modeChar);
 
 	/** Default destructor
 	 */
 	virtual ~UserMode();
+
+	/** Returns the mode name as a string
+	 */
+	const Anope::string NameAsString();
 };
 
 class CoreExport UserModeParam : public UserMode
@@ -160,10 +160,9 @@ class CoreExport UserModeParam : public UserMode
  public:
  	/** Default constructor
 	 * @param mName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	UserModeParam(UserModeName mName, const Anope::string &mNameAsString, char modeChar);
+	UserModeParam(UserModeName mName, char modeChar);
 
 	/** Check if the param is valid
 	 * @param value The param
@@ -182,10 +181,9 @@ class CoreExport ChannelMode : public Mode
 
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelMode(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar);
+	ChannelMode(ChannelModeName mName, char modeChar);
 
 	/** Default destructor
 	 */
@@ -196,6 +194,10 @@ class CoreExport ChannelMode : public Mode
 	 * @param u The user, or NULL
 	 */
 	bool CanSet(User *u) const;
+
+	/** Returns the mode name as a string
+	 */
+	const Anope::string NameAsString();
 };
 
 
@@ -206,10 +208,9 @@ class CoreExport ChannelModeList : public ChannelMode
  public:
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 */
-	ChannelModeList(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar);
+	ChannelModeList(ChannelModeName mName, char modeChar);
 
 	/** Default destructor
 	 */
@@ -242,11 +243,10 @@ class CoreExport ChannelModeParam : public ChannelMode
  public:
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param MinusArg true if this mode sends no arg when unsetting
 	 */
-	ChannelModeParam(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, bool MinusArg = false);
+	ChannelModeParam(ChannelModeName mName, char modeChar, bool MinusArg = false);
 
 	/** Default destructor
 	 */
@@ -272,11 +272,10 @@ class CoreExport ChannelModeStatus : public ChannelMode
 
 	/** Default constructor
 	 * @param mName The mode name
-	 * @param mNameAsString The mode name as a string
 	 * @param modeChar The mode char
 	 * @param mSymbol The symbol for the mode, eg @ % +
 	 */
-	ChannelModeStatus(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, char mSymbol);
+	ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol);
 
 	/** Default destructor
 	 */
@@ -288,7 +287,7 @@ class CoreExport ChannelModeStatus : public ChannelMode
 class CoreExport ChannelModeBan : public ChannelModeList
 {
  public:
-	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, "CMODE_BAN", modeChar) { }
+	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, modeChar) { }
 
 	void OnAdd(Channel *chan, const Anope::string &mask);
 
@@ -300,7 +299,7 @@ class CoreExport ChannelModeBan : public ChannelModeList
 class CoreExport ChannelModeExcept : public ChannelModeList
 {
  public:
-	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, "CMODE_EXCEPT", modeChar) { }
+	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, modeChar) { }
 
 	void OnAdd(Channel *chan, const Anope::string &mask);
 
@@ -312,7 +311,7 @@ class CoreExport ChannelModeExcept : public ChannelModeList
 class CoreExport ChannelModeInvex : public ChannelModeList
 {
  public:
-	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, "CMODE_INVITEOVERRIDE", modeChar) { }
+	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, modeChar) { }
 
 	void OnAdd(Channel *chan, const Anope::string &mask);
 
@@ -325,7 +324,7 @@ class CoreExport ChannelModeInvex : public ChannelModeList
 class CoreExport ChannelModeKey : public ChannelModeParam
 {
  public:
-	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, "CMODE_KEY", modeChar) { }
+	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, modeChar) { }
 
 	bool IsValid(const Anope::string &value) const;
 };
@@ -335,7 +334,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
 class ChannelModeFlood : public ChannelModeParam
 {
  public:
-	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, "CMODE_FLOOD", modeChar, minusNoArg) { }
+	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
 
 	bool IsValid(const Anope::string &value) const;
 };
@@ -346,7 +345,7 @@ class ChannelModeFlood : public ChannelModeParam
 class CoreExport ChannelModeAdmin : public ChannelMode
 {
  public:
-	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, "CMODE_ADMINONLY", modeChar) { }
+	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, modeChar) { }
 
 	/* Opers only */
 	bool CanSet(User *u) const;
@@ -358,7 +357,7 @@ class CoreExport ChannelModeAdmin : public ChannelMode
 class CoreExport ChannelModeOper : public ChannelMode
 {
  public:
-	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, "CMODE_OPERONLY", modeChar) { }
+	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, modeChar) { }
 
 	/* Opers only */
 	bool CanSet(User *u) const;
@@ -370,7 +369,7 @@ class CoreExport ChannelModeOper : public ChannelMode
 class CoreExport ChannelModeRegistered : public ChannelMode
 {
  public:
-	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, "CMODE_REGISTERED", modeChar) { }
+	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, modeChar) { }
 
 	/* No one mlocks +r */
 	bool CanSet(User *u) const;
@@ -437,18 +436,9 @@ class CoreExport ModeManager
 	static void StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool Set, const Anope::string &Param, StackerType Type);
 
  public:
-	/* List of all modes Anope knows about */
-	static std::map<Anope::string, Mode *> Modes;
-
-	/* User modes */
-	static std::map<char, UserMode *> UserModesByChar;
-	static std::map<UserModeName, UserMode *> UserModesByName;
-	/* Channel modes */
-	static std::map<char, ChannelMode *> ChannelModesByChar;
-	static std::map<ChannelModeName, ChannelMode *> ChannelModesByName;
-	/* Although there are two different maps for UserModes and ChannelModes
-	 * the pointers in each are the same. This is used to increase efficiency.
-	 */
+ 	/* List of all modes Anope knows about */
+	static std::vector<ChannelMode *> ChannelModes;
+	static std::vector<UserMode *> UserModes;
 
 	/** Add a user mode to Anope
 	 * @param um A UserMode or UserMode derived class
@@ -486,11 +476,17 @@ class CoreExport ModeManager
 	 */
 	static UserMode *FindUserModeByName(UserModeName Name);
 
-	/** Find a mode by name
+	/** Find channel mode by string
 	 * @param name The mode name
 	 * @return The mode
 	 */
-	static Mode *FindModeByName(const Anope::string &name);
+	static ChannelMode *FindChannelModeByString(const Anope::string &name);
+
+	/** Find user mode by string
+	 * @param name The mode name
+	 * @return The mode
+	 */
+	static UserMode *FindUserModeByString(const Anope::string &name);
 
 	/** Gets the channel mode char for a symbol (eg + returns v)
 	 * @param Value The symbol

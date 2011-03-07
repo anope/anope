@@ -848,7 +848,7 @@ class DBPlain : public Module
 							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 							if (!cm || cm->Type != MODE_REGULAR)
 								continue;
-							db_buffer << " " << cm->NameAsString;
+							db_buffer << " " << cm->NameAsString();
 						}
 					}
 				}
@@ -870,7 +870,7 @@ class DBPlain : public Module
 							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 							if (!cm || cm->Type != MODE_REGULAR)
 								continue;
-							db_buffer << " " << cm->NameAsString;
+							db_buffer << " " << cm->NameAsString();
 						}
 					}
 				}
@@ -895,7 +895,7 @@ class DBPlain : public Module
 							continue;
 
 						if (!ml.param.empty())
-							db_buffer << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString << " " << ml.param << endl;
+							db_buffer << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString() << " " << ml.param << endl;
 					}
 				}
 			}

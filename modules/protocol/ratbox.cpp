@@ -539,11 +539,11 @@ class ProtoRatbox : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeBan('b'));
@@ -551,18 +551,18 @@ class ProtoRatbox : public Module
 		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
 
 		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
 	}
 
  public:

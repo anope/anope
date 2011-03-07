@@ -164,16 +164,13 @@ class CommandCSMode : public Command
 				case '*':
 					if (adding == -1)
 						break;
-					for (std::map<Anope::string, Mode *>::const_iterator it = ModeManager::Modes.begin(), it_end = ModeManager::Modes.end(); it != it_end; ++it)
+					for (unsigned j = 0; j < ModeManager::ChannelModes.size(); ++j)
 					{
-						Mode *m = it->second;
-						if (m->Class == MC_CHANNEL)
+						ChannelMode *cm = ModeManager::ChannelModes[j];
+						if (cm->CanSet(u))
 						{
-							ChannelMode *cm = debug_cast<ChannelMode *>(m);
 							if (cm->Type == MODE_REGULAR || (!adding && cm->Type == MODE_PARAM))
 							{
-								if (!cm->CanSet(u))
-									continue;
 								if (adding)
 									ci->c->SetMode(NULL, cm);
 								else

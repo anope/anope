@@ -13,17 +13,8 @@
 std::list<std::pair<Base *, StackerInfo *> > ModeManager::StackerObjects;
 
 /* List of all modes Anope knows about */
-std::map<Anope::string, Mode *> ModeManager::Modes;
-
-/* User modes */
-std::map<char, UserMode *> ModeManager::UserModesByChar;
-std::map<UserModeName, UserMode *> ModeManager::UserModesByName;
-/* Channel modes */
-std::map<char, ChannelMode *> ModeManager::ChannelModesByChar;
-std::map<ChannelModeName, ChannelMode *> ModeManager::ChannelModesByName;
-/* Although there are two different maps for UserModes and ChannelModes
- * the pointers in each are the same. This is used to increase efficiency.
- */
+std::vector<ChannelMode *> ModeManager::ChannelModes;
+std::vector<UserMode *> ModeManager::UserModes;
 
 /* Number of generic modes we support */
 unsigned GenericChannelModes = 0, GenericUserModes = 0;
@@ -86,12 +77,12 @@ Anope::string ChannelStatus::BuildCharPrefixList() const
 {
 	Anope::string ret;
 
-	for (std::map<char, ChannelMode *>::const_iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 	{
-		if (this->HasFlag(it->second->Name))
-		{
-			ret += it->second->ModeChar;
-		}
+		ChannelMode *cm = ModeManager::ChannelModes[i];
+
+		if (this->HasFlag(cm->Name))
+			ret += cm->ModeChar;
 	}
 
 	return ret;
@@ -101,12 +92,14 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 {
 	Anope::string ret;
 
-	for (std::map<char, ChannelMode *>::const_iterator it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 	{
-		if (this->HasFlag(it->second->Name))
+		ChannelMode *cm = ModeManager::ChannelModes[i];
+
+		if (this->HasFlag(cm->Name))
 		{
-			ChannelModeStatus *cm = debug_cast<ChannelModeStatus *>(it->second);
-			ret += cm->Symbol;
+			ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+			ret += cms->Symbol;
 		}
 	}
 
@@ -115,11 +108,10 @@ Anope::string ChannelStatus::BuildModePrefixList() const
 
 /** Default constructor
  * @param mClass The type of mode this is
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param modeType The mode type
  */
-Mode::Mode(ModeClass mClass, const Anope::string &mNameAsString, char modeChar, ModeType modeType) : Class(mClass), NameAsString(mNameAsString), ModeChar(modeChar), Type(modeType)
+Mode::Mode(ModeClass mClass, char modeChar, ModeType modeType) : Class(mClass), ModeChar(modeChar), Type(modeType)
 {
 }
 
@@ -131,10 +123,9 @@ Mode::~Mode()
 
 /** Default constructor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserMode::UserMode(UserModeName mName, const Anope::string &mNameAsString, char modeChar) : Mode(MC_USER, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
+UserMode::UserMode(UserModeName mName, char modeChar) : Mode(MC_USER, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -144,22 +135,29 @@ UserMode::~UserMode()
 {
 }
 
+/** Returns the mode name as a string
+ */
+const Anope::string UserMode::NameAsString()
+{
+	if (this->Name > UMODE_END)
+		return this->ModeChar;
+	return UserModeNameStrings[this->Name];
+}
+
 /** Default constructor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-UserModeParam::UserModeParam(UserModeName mName, const Anope::string &mNameAsString, char modeChar) : UserMode(mName, mNameAsString, modeChar)
+UserModeParam::UserModeParam(UserModeName mName, char modeChar) : UserMode(mName, modeChar)
 {
 	this->Type = MODE_PARAM;
 }
 
 /** Default constrcutor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelMode::ChannelMode(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar) : Mode(MC_CHANNEL, mNameAsString, modeChar, MODE_REGULAR), Name(mName)
+ChannelMode::ChannelMode(ChannelModeName mName, char modeChar) : Mode(MC_CHANNEL, modeChar, MODE_REGULAR), Name(mName)
 {
 }
 
@@ -180,12 +178,20 @@ bool ChannelMode::CanSet(User *u) const
 	return true;
 }
 
+/** Returns the mode name as a string
+ */
+const Anope::string ChannelMode::NameAsString()
+{
+	if (this->Name > CMODE_END)
+		return this->ModeChar;
+	return ChannelModeNameStrings[this->Name];
+}
+
 /** Default constructor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  */
-ChannelModeList::ChannelModeList(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar) : ChannelMode(mName, mNameAsString, modeChar)
+ChannelModeList::ChannelModeList(ChannelModeName mName, char modeChar) : ChannelMode(mName, modeChar)
 {
 	this->Type = MODE_LIST;
 }
@@ -198,11 +204,10 @@ ChannelModeList::~ChannelModeList()
 
 /** Default constructor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param MinusArg true if the mode sends no arg when unsetting
  */
-ChannelModeParam::ChannelModeParam(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, bool MinusArg) : ChannelMode(mName, mNameAsString, modeChar), MinusNoArg(MinusArg)
+ChannelModeParam::ChannelModeParam(ChannelModeName mName, char modeChar, bool MinusArg) : ChannelMode(mName, modeChar), MinusNoArg(MinusArg)
 {
 	this->Type = MODE_PARAM;
 }
@@ -215,11 +220,10 @@ ChannelModeParam::~ChannelModeParam()
 
 /** Default constructor
  * @param mName The mode name
- * @param mNameAsString The mode name as a string
  * @param modeChar The mode char
  * @param mSymbol The symbol for the mode, eg @ % +
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, const Anope::string &mNameAsString, char modeChar, char mSymbol) : ChannelMode(mName, mNameAsString, modeChar), Symbol(mSymbol)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol) : ChannelMode(mName, modeChar), Symbol(mSymbol)
 {
 	this->Type = MODE_STATUS;
 }
@@ -545,22 +549,19 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
  */
 bool ModeManager::AddUserMode(UserMode *um)
 {
-	if (ModeManager::UserModesByChar.insert(std::make_pair(um->ModeChar, um)).second)
+	if (ModeManager::FindUserModeByChar(um->ModeChar) != NULL)
+		return false;
+	
+	if (um->Name == UMODE_END)
 	{
-		if (um->Name == UMODE_END)
-		{
-			um->Name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
-			Log() << "ModeManager: Added generic support for user mode " << um->ModeChar;
-		}
-		ModeManager::UserModesByName.insert(std::make_pair(um->Name, um));
-		ModeManager::Modes.insert(std::make_pair(um->NameAsString, um));
-
-		FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
-
-		return true;
+		um->Name = static_cast<UserModeName>(UMODE_END + ++GenericUserModes);
+		Log() << "ModeManager: Added generic support for user mode " << um->ModeChar;
 	}
+	ModeManager::UserModes.push_back(um);
 
-	return false;
+	FOREACH_MOD(I_OnUserModeAdd, OnUserModeAdd(um));
+
+	return true;
 }
 
 /** Add a channel mode to Anope
@@ -569,25 +570,22 @@ bool ModeManager::AddUserMode(UserMode *um)
  */
 bool ModeManager::AddChannelMode(ChannelMode *cm)
 {
-	if (ModeManager::ChannelModesByChar.insert(std::make_pair(cm->ModeChar, cm)).second)
+	if (ModeManager::FindChannelModeByChar(cm->ModeChar) != NULL)
+		return false;
+
+	if (cm->Name == CMODE_END)
 	{
-		if (cm->Name == CMODE_END)
-		{
-			cm->Name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
-			Log() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
-		}
-		ModeManager::ChannelModesByName.insert(std::make_pair(cm->Name, cm));
-		ModeManager::Modes.insert(std::make_pair(cm->NameAsString, cm));
-
-		/* Apply this mode to the new default mlock if its used */
-		SetDefaultMLock(Config);
-
-		FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
-
-		return true;
+		cm->Name = static_cast<ChannelModeName>(CMODE_END + ++GenericChannelModes);
+		Log() << "ModeManager: Added generic support for channel mode " << cm->ModeChar;
 	}
+	ModeManager::ChannelModes.push_back(cm);
 
-	return false;
+	/* Apply this mode to the new default mlock if its used */
+	SetDefaultMLock(Config);
+
+	FOREACH_MOD(I_OnChannelModeAdd, OnChannelModeAdd(cm));
+
+	return true;
 }
 /** Find a channel mode
  * @param Mode The mode
@@ -595,10 +593,12 @@ bool ModeManager::AddChannelMode(ChannelMode *cm)
  */
 ChannelMode *ModeManager::FindChannelModeByChar(char Mode)
 {
-	std::map<char, ChannelMode *>::iterator it = ModeManager::ChannelModesByChar.find(Mode);
-
-	if (it != ModeManager::ChannelModesByChar.end())
-		return it->second;
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+	{
+		ChannelMode *cm = ModeManager::ChannelModes[i];
+		if (cm->ModeChar == Mode)
+			return cm;
+	}
 
 	return NULL;
 }
@@ -609,25 +609,13 @@ ChannelMode *ModeManager::FindChannelModeByChar(char Mode)
  */
 UserMode *ModeManager::FindUserModeByChar(char Mode)
 {
-	std::map<char, UserMode *>::iterator it = ModeManager::UserModesByChar.find(Mode);
+	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
+	{
+		UserMode *um = ModeManager::UserModes[i];
+		if (um->ModeChar == Mode)
+			return um;
+	}
 
-	if (it != ModeManager::UserModesByChar.end())
-		return it->second;
-
-	return NULL;
-}
-
-/** Find a mode by name
- * @param name The mode name
- * @return The mode
- */
-Mode *ModeManager::FindModeByName(const Anope::string &name)
-{
-	std::map<Anope::string, Mode *>::const_iterator it = ModeManager::Modes.find(name);
-
-	if (it != ModeManager::Modes.end())
-		return it->second;
-	
 	return NULL;
 }
 
@@ -637,10 +625,12 @@ Mode *ModeManager::FindModeByName(const Anope::string &name)
  */
 ChannelMode *ModeManager::FindChannelModeByName(ChannelModeName Name)
 {
-	std::map<ChannelModeName, ChannelMode *>::iterator it = ModeManager::ChannelModesByName.find(Name);
-
-	if (it != ModeManager::ChannelModesByName.end())
-		return it->second;
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+	{
+		ChannelMode *cm = ModeManager::ChannelModes[i];
+		if (cm->Name == Name)
+			return cm;
+	}
 
 	return NULL;
 }
@@ -651,13 +641,48 @@ ChannelMode *ModeManager::FindChannelModeByName(ChannelModeName Name)
  */
 UserMode *ModeManager::FindUserModeByName(UserModeName Name)
 {
-	std::map<UserModeName, UserMode *>::iterator it = ModeManager::UserModesByName.find(Name);
-
-	if (it != ModeManager::UserModesByName.end())
-		return it->second;
+	for (unsigned i = 0; i < ModeManager::UserModes.size(); ++i)
+	{
+		UserMode *um = ModeManager::UserModes[i];
+		if (um->Name == Name)
+			return um;
+	}
 
 	return NULL;
 }
+
+/** Find channel mode by string
+ * @param name The mode name
+ * @return The mode
+ */
+ChannelMode *ModeManager::FindChannelModeByString(const Anope::string &name)
+{
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+	{
+		ChannelMode *cm = ModeManager::ChannelModes[i];
+		if (cm->NameAsString() == name || Anope::string(cm->ModeChar) == name)
+			return cm;
+	}
+
+	return NULL;
+}
+
+/** Find user mode by string
+ * @param name The mode name
+ * @return The mode
+ */
+UserMode *ModeManager::FindUserModeByString(const Anope::string &name)
+{
+	for (size_t i = UMODE_BEGIN + 1; i != UMODE_END; ++i)
+	{
+		UserMode *um = ModeManager::FindUserModeByName(static_cast<UserModeName>(i));
+		if (um != NULL && (um->NameAsString() == name || Anope::string(um->ModeChar) == name))
+			return um;
+	}
+
+	return NULL;
+}
+
 
 /** Gets the channel mode char for a symbol (eg + returns v)
  * @param Value The symbol
@@ -665,19 +690,15 @@ UserMode *ModeManager::FindUserModeByName(UserModeName Name)
  */
 char ModeManager::GetStatusChar(char Value)
 {
-	std::map<char, ChannelMode *>::iterator it, it_end;
-	ChannelMode *cm;
-	ChannelModeStatus *cms;
-
-	for (it = ModeManager::ChannelModesByChar.begin(), it_end = ModeManager::ChannelModesByChar.end(); it != it_end; ++it)
+	for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 	{
-		cm = it->second;
+		ChannelMode *cm = ModeManager::ChannelModes[i];
 		if (cm->Type == MODE_STATUS)
 		{
-			cms = debug_cast<ChannelModeStatus *>(cm);
+			ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
 
 			if (Value == cms->Symbol)
-				return it->first;
+				return cms->ModeChar;
 		}
 	}
 

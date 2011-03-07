@@ -124,9 +124,9 @@ class PlexusProto : public IRCDProto
 	{
 		send_cmd(Config->Numeric, "SJOIN %ld %s +%s :%s", static_cast<long>(c->creation_time), c->name.c_str(), c->GetModes(true, true).c_str(), user->GetUID().c_str());
 		if (status)
-			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
-				if (status->HasFlag(static_cast<ChannelModeName>(i)))
-					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
+			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+				if (status->HasFlag(ModeManager::ChannelModes[i]->Name))
+					c->SetMode(user, ModeManager::ChannelModes[i], user->nick, false);
 	}
 
 	void SendAkill(User *, const XLine *x)
@@ -579,21 +579,21 @@ class ProtoPlexus : public Module
 	void AddModes()
 	{
 		/* Add user modes */
-		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, "UMODE_ADMIN", 'a'));
-		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, "UMODE_INVIS", 'i'));
-		ModeManager::AddUserMode(new UserMode(UMODE_OPER, "UMODE_OPER", 'o'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, "UMODE_SNOMASK", 's'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, "UMODE_WALLOPS", 'w'));
-		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, "UMODE_DEAF", 'D'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, "UMODE_SOFTCALLERID", 'G'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, "UMODE_NETADMIN", 'M'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, "UMODE_REGPRIV", 'R'));
-		ModeManager::AddUserMode(new UserMode(UMODE_SSL, "UMODE_SSL", 'S'));
-		ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, "UMODE_WEBIRC", 'W'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, "UMODE_CALLERID", 'g'));
-		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, "UMODE_PRIV", 'p'));
-		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, "UMODE_REGISTERED", 'r'));
-		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, "UMODE_CLOAK", 'x'));
+		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));
+		ModeManager::AddUserMode(new UserMode(UMODE_INVIS, 'i'));
+		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'D'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, 'G'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'M'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
+		ModeManager::AddUserMode(new UserMode(UMODE_SSL, 'S'));
+		ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, 'W'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CALLERID, 'g'));
+		ModeManager::AddUserMode(new UserMode(UMODE_PRIV, 'p'));
+		ModeManager::AddUserMode(new UserMode(UMODE_REGISTERED, 'r'));
+		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
 
 		/* b/e/I */
 		ModeManager::AddChannelMode(new ChannelModeBan('b'));
@@ -602,31 +602,31 @@ class ProtoPlexus : public Module
 	
 		/* l/k */
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
-		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, "CMODE_LIMIT", 'l'));
+		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, "CMODE_VOICE", 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, "CMODE_HALFOP", 'h', '%'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, "CMODE_OP", 'o', '@'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, "CMODE_PROTECT", 'a', '&'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, "CMODE_OWNER", 'q', '~'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~'));
 
 		/* Add channel modes */
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, "CMODE_BANDWIDTH", 'B'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, "CMODE_REGMODERATED", 'M'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, "CMODE_NONOTICE", 'N'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, 'B'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'N'));
 		ModeManager::AddChannelMode(new ChannelModeOper('O'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, "CMODE_REGISTEREDONLY", 'R'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGISTEREDONLY, 'R'));
 
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, "CMODE_SSL", 'S'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, "CMODE_BLOCKCOLOR", 'c'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, "CMODE_INVITE", 'i'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, "CMODE_MODERATED", 'm'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, "CMODE_NOEXTERNAL", 'n'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, "CMODE_PRIVATE", 'p'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, "CMODE_SECRET", 's'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, "CMODE_TOPIC", 't'));
-		ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, "CMODE_PERM", 'z'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SSL, 'S'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOEXTERNAL, 'n'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PRIVATE, 'p'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_SECRET, 's'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_TOPIC, 't'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_PERM, 'z'));
 	}
 
  public:

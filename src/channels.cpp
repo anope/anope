@@ -74,14 +74,12 @@ void Channel::Reset()
 
 		if (findbot(uc->user->nick))
 		{
-			for (std::map<char, ChannelMode *>::iterator mit = ModeManager::ChannelModesByChar.begin(), mit_end = ModeManager::ChannelModesByChar.end(); mit != mit_end; ++mit)
+			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 			{
-				ChannelMode *cm = mit->second;
+				ChannelMode *cm = ModeManager::ChannelModes[i];
 
 				if (flags.HasFlag(cm->Name))
-				{
 					this->SetMode(NULL, cm, uc->user->nick, false);
-				}
 			}
 		}
 	}

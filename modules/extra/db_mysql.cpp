@@ -53,7 +53,7 @@ static Anope::string MakeMLock(ChannelInfo *ci, bool status)
 				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 				if (!cm || cm->Type != MODE_REGULAR)
 					continue;
-				ret += " " + cm->NameAsString;
+				ret += " " + cm->NameAsString();
 			}
 		}
 
@@ -96,7 +96,7 @@ static Anope::string GetMLockParams(ChannelInfo *ci, bool onoff)
 			{
 				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 				if (cm)
-					ret += " " + cm->NameAsString + " " + ml.param;
+					ret += " " + cm->NameAsString() + " " + ml.param;
 			}
 		}
 	}

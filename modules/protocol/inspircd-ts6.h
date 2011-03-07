@@ -113,9 +113,9 @@ class InspIRCdTS6Proto : public IRCDProto
 		 * merge these modes with +nrt and other mlocked modes
 		 */
 		if (status)
-			for (size_t i = CMODE_BEGIN + 1; i != CMODE_END; ++i)
-				if (status->HasFlag(static_cast<ChannelModeName>(i)))
-					c->SetMode(user, static_cast<ChannelModeName>(i), user->nick, false);
+			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+				if (status->HasFlag(ModeManager::ChannelModes[i]->Name))
+					c->SetMode(user, ModeManager::ChannelModes[i], user->nick, false);
 	}
 
 	/* UNSQLINE */

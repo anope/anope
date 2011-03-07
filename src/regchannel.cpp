@@ -496,36 +496,29 @@ void ChannelInfo::LoadMLock()
 {
 	this->ClearMLock();
 
-	std::vector<Anope::string> modenames_on, modenames_off;
-
 	// Force +r
 	ChannelMode *chm = ModeManager::FindChannelModeByName(CMODE_REGISTERED);
 	if (chm)
 		this->SetMLock(chm, true);
-	this->GetExtRegular("db_mlock_modes_on", modenames_on);
-	this->GetExtRegular("db_mlock_modes_off", modenames_off);
 
-	if (!modenames_on.empty() || !modenames_off.empty())
+	std::vector<Anope::string> modenames;
+	if (this->GetExtRegular("db_mlock_modes_on", modenames))
 	{
-		for (std::vector<Anope::string>::iterator it = modenames_on.begin(), it_end = modenames_on.end(); it != it_end; ++it)
+		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
 		{
-			Mode *m = ModeManager::FindModeByName(*it);
-
-			if (m && m->NameAsString.equals_cs(*it))
-			{
-				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm, true);
-			}
+			ChannelMode *m = ModeManager::FindChannelModeByString(*it);
+			if (m)
+				this->SetMLock(m, true);
 		}
-		for (std::vector<Anope::string>::iterator it = modenames_off.begin(), it_end = modenames_off.end(); it != it_end; ++it)
-		{
-			Mode *m = ModeManager::FindModeByName(*it);
+	}
 
-			if (m && m->NameAsString.equals_cs(*it))
-			{
-				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm, false);
-			}
+	if (this->GetExtRegular("db_mlock_modes_off", modenames))
+	{
+		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
+		{
+			ChannelMode *m = ModeManager::FindChannelModeByString(*it);
+			if (m)
+				this->SetMLock(m, false);
 		}
 	}
 
@@ -534,12 +527,9 @@ void ChannelInfo::LoadMLock()
 	{
 		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
 		{
-			Mode *m = ModeManager::FindModeByName(it->first);
-			if (m && m->Class == MC_CHANNEL)
-			{
-				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm, true, it->second);
-			}
+			ChannelMode *m = ModeManager::FindChannelModeByString(it->first);
+			if (m)
+				this->SetMLock(m, true, it->second);
 		}
 	
 	}
@@ -547,12 +537,9 @@ void ChannelInfo::LoadMLock()
 	{
 		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
 		{
-			Mode *m = ModeManager::FindModeByName(it->first);
-			if (m && m->Class == MC_CHANNEL)
-			{
-				ChannelMode *cm = debug_cast<ChannelMode *>(m);
-				this->SetMLock(cm, false, it->second);
-			}
+			ChannelMode *m = ModeManager::FindChannelModeByString(it->first);
+			if (m)
+				this->SetMLock(m, false, it->second);
 		}
 	}
 

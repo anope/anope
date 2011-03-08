@@ -311,6 +311,60 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	return true;
 }
 
+template<typename T> class InspIRCdExtBan : public T
+{
+ public:
+	InspIRCdExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+
+	bool Matches(User *u, const Entry *e)
+	{
+		const Anope::string &mask = e->mask;
+
+		if (mask.find("A:") == 0 || mask.find("B:") == 0 || mask.find("c:") == 0 || mask.find("C:") == 0 ||
+			mask.find("m:") == 0 || mask.find("N:") == 0 || mask.find("p:") == 0 || mask.find("Q:") == 0 ||
+			mask.find("N:") == 0 || mask.find("p:") == 0 || mask.find("Q:") == 0 || mask.find("S:") == 0 ||
+			mask.find("T:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			Entry en(this->Name, real_mask);
+			if (en.Matches(u))
+				return true;
+		}
+		else if (mask.find("j:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			Channel *c = findchan(real_mask);
+			if (c != NULL && c->FindUser(u) != NULL)
+				return true;
+		}
+		else if (mask.find("M:") == 0 || mask.find("R:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (u->IsIdentified() && real_mask.equals_ci(u->Account()->display))
+				return true;
+		}
+		else if (mask.find("r:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (Anope::Match(u->realname, real_mask))
+				return true;
+		}
+		else if (mask.find("s:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (Anope::Match(u->server->GetName(), real_mask))
+				return true;
+		}
+
+		return false;
+	}
+};
+
 class Inspircd12IRCdMessage : public InspircdIRCdMessage
 {
  public:
@@ -388,13 +442,13 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 						switch (modebuf[t])
 						{
 							case 'b':
-								ModeManager::AddChannelMode(new ChannelModeBan('b'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeBan>(CMODE_BAN, 'b'));
 								continue;
 							case 'e':
-								ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeList>(CMODE_EXCEPT, 'e'));
 								continue;
 							case 'I':
-								ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I'));
 								continue;
 							/* InspIRCd sends q and a here if they have no prefixes */
 							case 'q':
@@ -674,19 +728,6 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 		return true;
 	}
 };
-
-bool ChannelModeFlood::IsValid(const Anope::string &value) const
-{
-	try
-	{
-		Anope::string rest;
-		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-			return true;
-	}
-	catch (const CoreException &) { }
-	
-	return false;
-}
 
 class ProtoInspIRCd : public Module
 {

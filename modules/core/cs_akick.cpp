@@ -219,7 +219,7 @@ class CommandCSAKick : public Command
 
 				ChanAccess *u2_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
 				int16 u2_level = u2_access ? u2_access->level : 0, u_level = u_access ? u_access->level : 0;
-				Entry entry_mask(mask);
+				Entry entry_mask(CMODE_BEGIN, mask);
 
 				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && entry_mask.Matches(u2))
 				{

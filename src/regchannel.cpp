@@ -762,7 +762,7 @@ bool ChannelInfo::CheckKick(User *user)
 			}
 			else
 			{
-				Entry akick_mask(autokick->mask);
+				Entry akick_mask(CMODE_BEGIN, autokick->mask);
 				if (akick_mask.Matches(user))
 					do_kick = true;
 			}

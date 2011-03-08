@@ -348,6 +348,107 @@ class UnrealIRCdProto : public IRCDProto
 	}
 };
 
+template<typename T> class UnrealExtBan : public T
+{
+ public:
+	UnrealExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+
+	bool Matches(User *u, const Entry *e)
+	{
+		const Anope::string &mask = e->mask;
+
+		if (mask.find("~c:") == 0)
+		{
+			Anope::string channel = mask.substr(3);
+
+			ChannelMode *cm = NULL;
+			if (channel[0] != '#')
+			{
+				char modeChar = ModeManager::GetStatusChar(channel[0]);
+				channel.erase(channel.begin());
+				cm = ModeManager::FindChannelModeByChar(modeChar);
+				if (cm != NULL && cm->Type != MODE_STATUS)
+					cm = NULL;
+			}
+
+			Channel *c = findchan(channel);
+			if (c != NULL)
+			{
+				UserContainer *uc = c->FindUser(u);
+				if (uc != NULL)
+					if (cm == NULL || uc->Status->HasFlag(cm->Name))
+						return true;
+			}
+		}
+		else if (mask.find("~j:") == 0 || mask.find("~n:") == 0 || mask.find("~q:") == 0)
+		{
+			Anope::string real_mask = mask.substr(3);
+
+			Entry en(this->Name, real_mask);
+			if (en.Matches(u))
+				return true;
+		}
+		else if (mask.find("~r:") == 0)
+		{
+			Anope::string real_mask = mask.substr(3);
+
+			if (Anope::Match(u->realname, real_mask))
+				return true;
+		}
+		else if (mask.find("~R:") == 0)
+		{
+			if (u->HasMode(UMODE_REGISTERED) && mask.equals_ci(u->nick))
+				return true;
+		}
+	
+		return false;
+	}
+};
+
+class ChannelModeFlood : public ChannelModeParam
+{
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+
+	/* Borrowed part of this check from UnrealIRCd */
+	bool IsValid(const Anope::string &value) const
+	{
+		if (value.empty())
+			return false;
+		try
+		{
+			Anope::string rest;
+			if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
+				return true;
+		}
+		catch (const ConvertException &) { }
+	
+		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
+		size_t end_bracket = value.find(']', 1);
+		if (end_bracket == Anope::string::npos)
+			return false;
+		Anope::string xbuf = value.substr(0, end_bracket);
+		if (value[end_bracket + 1] != ':')
+			return false;
+		commasepstream args(xbuf.substr(1));
+		Anope::string arg;
+		while (args.GetToken(arg))
+		{
+			/* <number><1 letter>[optional: '#'+1 letter] */
+			size_t p = 0;
+			while (p < arg.length() && isdigit(arg[p]))
+				++p;
+			if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
+				continue; /* continue instead of break for forward compatability. */
+			int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
+			if (v < 1 || v > 999)
+				return false;
+		}
+
+		return true;
+	}
+};
+
 class Unreal32IRCdMessage : public IRCdMessage
 {
  public:
@@ -521,13 +622,13 @@ class Unreal32IRCdMessage : public IRCdMessage
 					switch (modebuf[t])
 					{
 						case 'b':
-							ModeManager::AddChannelMode(new ChannelModeBan('b'));
+							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeBan>(CMODE_BAN, 'b'));
 							continue;
 						case 'e':
-							ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeList>(CMODE_EXCEPT, 'e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I'));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
@@ -543,7 +644,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 							ModeManager::AddChannelMode(new ChannelModeKey('k'));
 							continue;
 						case 'f':
-							ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+							ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 							continue;
 						case 'L':
 							ModeManager::AddChannelMode(new ChannelModeParam(CMODE_REDIRECT, 'L'));
@@ -722,7 +823,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 					if (!cm)
 					{
-						Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
+						Log() << "Received unknown mode prefix " << ch << " in SJOIN string";
 						continue;
 					}
 
@@ -933,43 +1034,6 @@ bool event_sdesc(const Anope::string &source, const std::vector<Anope::string> &
 	if (s)
 		s->SetDescription(params[0]);
 
-	return true;
-}
-
-/* Borrowed part of this check from UnrealIRCd */
-bool ChannelModeFlood::IsValid(const Anope::string &value) const
-{
-	if (value.empty())
-		return false;
-	try
-	{
-		Anope::string rest;
-		if (value[0] != ':' && convertTo<unsigned>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<unsigned>(rest.substr(1), rest, false) > 0 && rest.empty())
-			return true;
-	}
-	catch (const ConvertException &) { }
-	
-	/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-	size_t end_bracket = value.find(']', 1);
-	if (end_bracket == Anope::string::npos)
-		return false;
-	Anope::string xbuf = value.substr(0, end_bracket);
-	if (value[end_bracket + 1] != ':')
-		return false;
-	commasepstream args(xbuf.substr(1));
-	Anope::string arg;
-	while (args.GetToken(arg))
-	{
-		/* <number><1 letter>[optional: '#'+1 letter] */
-		size_t p = 0;
-		while (p < arg.length() && isdigit(arg[p]))
-			++p;
-		if (p == arg.length() || !(arg[p] == 'c' || arg[p] == 'j' || arg[p] == 'k' || arg[p] == 'm' || arg[p] == 'n' || arg[p] == 't'))
-			continue; /* continue instead of break for forward compatability. */
-		int v = arg.substr(0, p).is_number_only() ? convertTo<int>(arg.substr(0, p)) : 0;
-		if (v < 1 || v > 999)
-			return false;
-	}
 	return true;
 }
 

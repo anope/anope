@@ -9,6 +9,25 @@
  * Based on the original code of Services by Andy Church.
  */
 
+class ChannelModeFlood : public ChannelModeParam
+{
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+
+	bool IsValid(const Anope::string &value) const
+	{
+		try
+		{
+			Anope::string rest;
+			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+				return true;
+		}
+		catch (const ConvertException &) { }
+
+		return false;
+	}
+};
+
 class InspIRCdTS6Proto : public IRCDProto
 {
  private:

@@ -321,6 +321,81 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	return true;
 }
 
+template<typename T> class InspIRCdExtBan : public T
+{
+ public:
+	InspIRCdExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+
+	bool Matches(User *u, const Entry *e)
+	{
+		const Anope::string &mask = e->mask;
+
+		if (mask.find("A:") == 0 || mask.find("B:") == 0 || mask.find("c:") == 0 || mask.find("C:") == 0 ||
+			mask.find("m:") == 0 || mask.find("N:") == 0 || mask.find("p:") == 0 || mask.find("Q:") == 0 ||
+			mask.find("S:") == 0 || mask.find("T:") == 0)
+		{
+			Anope::string real_mask = mask.substr(3);
+
+			Entry en(this->Name, real_mask);
+			if (en.Matches(u))
+				return true;
+		}
+		else if (mask.find("j:") == 0)
+		{
+			Anope::string channel = mask.substr(3);
+
+			ChannelMode *cm = NULL;
+			if (channel[0] != '#')
+			{
+				char modeChar = ModeManager::GetStatusChar(channel[0]);
+				channel.erase(channel.begin());
+				cm = ModeManager::FindChannelModeByChar(modeChar);
+				if (cm != NULL && cm->Type != MODE_STATUS)
+					cm = NULL;
+			}
+
+			Channel *c = findchan(channel);
+			if (c != NULL)
+			{
+				UserContainer *uc = c->FindUser(u);
+				if (uc != NULL)
+					if (cm == NULL || uc->Status->HasFlag(cm->Name))
+						return true;
+			}
+		}
+		else if (mask.find("R:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (u->IsIdentified() && real_mask.equals_ci(u->Account()->display))
+				return true;
+		}
+		else if (mask.find("r:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (Anope::Match(u->realname, real_mask))
+				return true;
+		}
+		else if (mask.find("s:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (Anope::Match(u->server->GetName(), real_mask))
+				return true;
+		}
+		else if (mask.find("z:") == 0)
+		{
+			Anope::string real_mask = mask.substr(2);
+
+			if (Anope::Match(u->fingerprint, real_mask))
+				return true;
+		}
+
+		return false;
+	}
+};
+
 class Inspircd20IRCdMessage : public InspircdIRCdMessage
 {
  public:
@@ -387,9 +462,9 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("auditorium"))
 					cm = new ChannelMode(CMODE_AUDITORIUM, modechar[0]);
 				else if (modename.equals_cs("ban"))
-					cm = new ChannelModeBan(modechar[0]);
+					cm = new InspIRCdExtBan<ChannelModeBan>(CMODE_BAN, modechar[0]);
 				else if (modename.equals_cs("banexception"))
-					cm = new ChannelModeExcept(modechar[0]);
+					cm = new InspIRCdExtBan<ChannelModeList>(CMODE_EXCEPT, 'e');
 				else if (modename.equals_cs("blockcaps"))
 					cm = new ChannelMode(CMODE_BLOCKCAPS, modechar[0]);
 				else if (modename.equals_cs("blockcolor"))
@@ -407,7 +482,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("halfop"))
 					cm = new ChannelModeStatus(CMODE_HALFOP, modechar[1], modechar[0]);
 				else if (modename.equals_cs("invex"))
-					cm = new ChannelModeInvex(modechar[0]);
+					cm = new InspIRCdExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I');
 				else if (modename.equals_cs("inviteonly"))
 					cm = new ChannelMode(CMODE_INVITE, modechar[0]);
 				else if (modename.equals_cs("joinflood"))
@@ -648,19 +723,6 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 		return true;
 	}
 };
-
-bool ChannelModeFlood::IsValid(const Anope::string &value) const
-{
-	try
-	{
-		Anope::string rest;
-		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-			return true;
-	}
-	catch (const ConvertException &) { }
-
-	return false;
-}
 
 class ProtoInspIRCd : public Module
 {

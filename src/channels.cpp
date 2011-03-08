@@ -1234,9 +1234,10 @@ void MassChannelModes(BotInfo *bi, const Anope::string &modes)
 static const Anope::string EntryFlagString[] = { "ENTRYTYPE_NONE", "ENTRYTYPE_CIDR", "ENTRYTYPE_NICK_WILD", "ENTRYTYPE_NICK", "ENTRYTYPE_USER_WILD", "ENTRYTYPE_USER", "ENTRYTYPE_HOST_WILD", "ENTRYTYPE_HOST", "" };
 
 /** Constructor
+ * @param mode What mode this host is for - can be CMODE_BEGIN for unknown/no mode
  * @param _host A full nick!ident@host/cidr mask
  */
-Entry::Entry(const Anope::string &_host) : Flags<EntryType>(EntryFlagString)
+Entry::Entry(ChannelModeName mode, const Anope::string &_host) : Flags<EntryType>(EntryFlagString), modename(mode)
 {
 	this->SetFlag(ENTRYTYPE_NONE);
 	this->cidr_len = 0;
@@ -1330,8 +1331,7 @@ const Anope::string Entry::GetMask()
  */
 bool Entry::Matches(User *u, bool full) const
 {
-	if (!this->FlagCount())
-		return false;
+	bool ret = true;
 	
 	if (this->HasFlag(ENTRYTYPE_CIDR))
 	{
@@ -1339,39 +1339,43 @@ bool Entry::Matches(User *u, bool full) const
 		{
 			cidr cidr_mask(this->host, this->cidr_len);
 			if (!u->ip() || !cidr_mask.match(u->ip))
-			{
-				return false;
-			}
+				ret = false;
 			/* If we're not matching fully and their displayed host isnt their IP */
 			else if (!full && u->ip.addr() != u->GetDisplayedHost())
-			{
-				return false;
-			}
+				ret = false;
 		}
 		catch (const SocketException &)
 		{
-			return false;
+			ret = false;
 		}
 	}
 	if (this->HasFlag(ENTRYTYPE_NICK) && !this->nick.equals_ci(u->nick))
-		return false;
+		ret = false;
 	if (this->HasFlag(ENTRYTYPE_USER) && !this->user.equals_ci(u->GetVIdent()) && (!full ||
 		!this->user.equals_ci(u->GetIdent())))
-		return false;
+		ret = false;
 	if (this->HasFlag(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
 		(!this->host.equals_ci(u->host) && !this->host.equals_ci(u->chost) && !this->host.equals_ci(u->vhost) &&
 		(!u->ip() || !this->host.equals_ci(u->ip.addr())))))
-		return false;
+		ret = false;
 	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
-		return false;
+		ret = false;
 	if (this->HasFlag(ENTRYTYPE_USER_WILD) && !Anope::Match(u->GetVIdent(), this->user) && (!full ||
 		!Anope::Match(u->GetIdent(), this->user)))
-		return false;
+		ret = false;
 	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
 		(!Anope::Match(u->host, this->host) && !Anope::Match(u->chost, this->host) &&
 		!Anope::Match(u->vhost, this->host) && (!u->ip() || !Anope::Match(u->ip.addr(), this->host)))))
-		return false;
+		ret = false;
+	
+	ChannelMode *cm = ModeManager::FindChannelModeByName(this->modename);
+	if (cm != NULL && cm->Type == MODE_LIST)
+	{
+		ChannelModeList *cml = debug_cast<ChannelModeList *>(cm);
+		if (cml->Matches(u, this))
+			ret = true;
+	}
 
-	return true;
+	return ret;
 }
 

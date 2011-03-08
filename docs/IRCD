@@ -147,12 +147,6 @@ How To Add IRCd Support
 
    ModeManager::AddChannelMode(new ChannelModeOper('O'));
 
-   The CMODE_FLOOD param also has its own class, but due to the wide range of
-   valid parameters accepted across IRCds, your protocol module MUST have the
-   IsValid function for this.
-
-   bool ChannelModeFlood::IsValid(const Anope::string &value) { }
-
 4) Functions and Events
 
     A brief word about functions and events. All events are captured by creating a Message struct

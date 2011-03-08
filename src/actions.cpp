@@ -78,7 +78,7 @@ void common_unban(ChannelInfo *ci, User *u, bool full)
 	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = ci->c->GetModeList(CMODE_BAN);
 	for (; bans.first != bans.second;)
 	{
-		Entry ban(bans.first->second);
+		Entry ban(CMODE_BAN, bans.first->second);
 		++bans.first;
 		if (ban.Matches(u, full))
 			ci->c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());

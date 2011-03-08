@@ -179,7 +179,7 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 		/* We check for bans */
 		for (; bans.first != bans.second; ++bans.first)
 		{
-			Entry ban(bans.first->second);
+			Entry ban(CMODE_BAN, bans.first->second);
 			if (ban.Matches(this))
 				c->RemoveMode(NULL, CMODE_BAN, ban.GetMask());
 		}

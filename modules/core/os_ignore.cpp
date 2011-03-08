@@ -91,7 +91,7 @@ class OSIgnoreService : public IgnoreService
 		{
 			for (; ign != ign_end; ++ign)
 			{
-				Entry ignore_mask(ign->mask);
+				Entry ignore_mask(CMODE_BEGIN, ign->mask);
 				if (ignore_mask.Matches(u))
 					break;
 			}

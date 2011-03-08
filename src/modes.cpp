@@ -294,73 +294,12 @@ void ChannelModeBan::OnAdd(Channel *chan, const Anope::string &mask)
 	{
 		BotInfo *bi = chan->ci->bi;
 
-		Entry ban(mask);
+		Entry ban(CMODE_BAN, mask);
 		if (ban.Matches(bi))
 			chan->RemoveMode(NULL, CMODE_BAN, mask);
 	}
 
 	Log(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
-}
-
-/** Remove a ban from the channel
- * @param chan The channel
- * @param mask The ban
- */
-void ChannelModeBan::OnDel(Channel *chan, const Anope::string &mask)
-{
-	if (!chan || mask.empty())
-		return;
-
-	Log(LOG_DEBUG) << "Deleted ban " << mask << " from channel " << chan->name;
-}
-
-/** Add an except to the channel
- * @param chan The channel
- * @param mask The except
- */
-void ChannelModeExcept::OnAdd(Channel *chan, const Anope::string &mask)
-{
-	if (!chan || mask.empty())
-		return;
-
-	Log(LOG_DEBUG) << "Added except " << mask << " to channel " << chan->name;
-}
-
-/** Remove an except from the channel
- * @param chan The channel
- * @param mask The except
- */
-void ChannelModeExcept::OnDel(Channel *chan, const Anope::string &mask)
-{
-	if (!chan || mask.empty())
-		return;
-
-	Log(LOG_DEBUG) << "Deleted except " << mask << " to channel " << chan->name;
-}
-
-/** Add an invex to the channel
- * @param chan The channel
- * @param mask The invex
- */
-void ChannelModeInvex::OnAdd(Channel *chan, const Anope::string &mask)
-{
-	if (!chan || mask.empty())
-		return;
-
-	Log(LOG_DEBUG) << "Added invite " << mask << " to channel " << chan->name;
-
-}
-
-/** Remove an invex from the channel
- * @param chan The channel
- * @param mask The index
- */
-void ChannelModeInvex::OnDel(Channel *chan, const Anope::string &mask)
-{
-	if (!chan || mask.empty())
-		return;
-
-	Log(LOG_DEBUG) << "Deleted invite " << mask << " to channel " << chan->name;
 }
 
 void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)

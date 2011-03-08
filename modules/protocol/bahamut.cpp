@@ -410,7 +410,7 @@ class BahamutIRCdMessage : public IRCdMessage
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 					if (!cm)
 					{
-						Log() << "Receeved unknown mode prefix " << buf[0] << " in SJOIN string";
+						Log() << "Receeved unknown mode prefix " << cm << " in SJOIN string";
 						continue;
 					}
 
@@ -528,18 +528,24 @@ bool event_burst(const Anope::string &source, const std::vector<Anope::string> &
 	return true;
 }
 
-bool ChannelModeFlood::IsValid(const Anope::string &value) const
+class ChannelModeFlood : public ChannelModeParam
 {
-	try
-	{
-		Anope::string rest;
-		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-			return true;
-	}
-	catch (const ConvertException &) { }
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
 
-	return false;
-}
+	bool IsValid(const Anope::string &value) const
+	{
+		try
+		{
+			Anope::string rest;
+			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+				return true;
+		}
+		catch (const ConvertException &) { }
+
+		return false;
+	}
+};
 
 class ProtoBahamut : public Module
 {
@@ -562,7 +568,7 @@ class ProtoBahamut : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeBan('b'));
+		ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
@@ -571,7 +577,7 @@ class ProtoBahamut : public Module
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_INVITE, 'i'));
-		ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+		ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));
 		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_MODERATED, 'm'));

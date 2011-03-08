@@ -222,6 +222,14 @@ class CoreExport ChannelModeList : public ChannelMode
 	 */
 	virtual bool IsValid(const Anope::string &mask) const { return true; }
 
+	/** Checks if mask affects user
+	 * Should only be used for extbans or other weird ircd-specific things.
+	 * @param u The user
+	 * @param e The entry to match against
+	 * @return true on match
+	 */
+	virtual bool Matches(User *u, const Entry *e) { return false; }
+
 	/** Called when a mask is added to a channel
 	 * @param chan The channel
 	 * @param mask The mask
@@ -233,7 +241,6 @@ class CoreExport ChannelModeList : public ChannelMode
 	 * @param mask The mask
 	 */
 	virtual void OnDel(Channel *chan, const Anope::string &mask) { }
-
 };
 
 /** This is a mode with a paramater, eg +k/l. These modes should use/inherit from this
@@ -287,37 +294,10 @@ class CoreExport ChannelModeStatus : public ChannelMode
 class CoreExport ChannelModeBan : public ChannelModeList
 {
  public:
-	ChannelModeBan(char modeChar) : ChannelModeList(CMODE_BAN, modeChar) { }
+	ChannelModeBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
 	void OnAdd(Channel *chan, const Anope::string &mask);
-
-	void OnDel(Channel *chan, const Anope::string &mask);
 };
-
-/** Channel mode +e
- */
-class CoreExport ChannelModeExcept : public ChannelModeList
-{
- public:
-	ChannelModeExcept(char modeChar) : ChannelModeList(CMODE_EXCEPT, modeChar) { }
-
-	void OnAdd(Channel *chan, const Anope::string &mask);
-
-	void OnDel(Channel *chan, const Anope::string &mask);
-};
-
-/** Channel mode +I
- */
-class CoreExport ChannelModeInvex : public ChannelModeList
-{
- public:
-	ChannelModeInvex(char modeChar) : ChannelModeList(CMODE_INVITEOVERRIDE, modeChar) { }
-
-	void OnAdd(Channel *chan, const Anope::string &mask);
-
-	void OnDel(Channel *chan, const Anope::string &mask);
-};
-
 
 /** Channel mode +k (key)
  */
@@ -325,16 +305,6 @@ class CoreExport ChannelModeKey : public ChannelModeParam
 {
  public:
 	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, modeChar) { }
-
-	bool IsValid(const Anope::string &value) const;
-};
-
-/** Channel mode +f (flood)
- */
-class ChannelModeFlood : public ChannelModeParam
-{
- public:
-	ChannelModeFlood(char modeChar, bool minusNoArg = false) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
 
 	bool IsValid(const Anope::string &value) const;
 };

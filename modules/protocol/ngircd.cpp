@@ -425,8 +425,8 @@ class ProtongIRCd : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeBan('b'));
-		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+		ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));

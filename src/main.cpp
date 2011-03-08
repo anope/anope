@@ -491,7 +491,8 @@ int main(int ac, char **av, char **envp)
 				threadEngine.Process();
 
 				/* Process any modes that need to be (un)set */
-				ModeManager::ProcessModes();
+				if (Me != NULL && Me->IsSynced())
+					ModeManager::ProcessModes();
 
 				/* Process the socket engine */
 				SocketEngine->Process();

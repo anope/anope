@@ -452,7 +452,7 @@ class BotInfo;
 class ChannelInfo;
 class Channel;
 class Server;
-struct EList;
+class Entry;
 struct Session;
 
 #include "threadengine.h"
@@ -818,16 +818,18 @@ enum EntryType
 
 class CoreExport Entry : public Flags<EntryType>
 {
-	Anope::string mask;
+	ChannelModeName modename;
 
  public:
 	unsigned char cidr_len;
+	Anope::string mask;
 	Anope::string nick, user, host;
 
 	/** Constructor
 	 * @param _host A full nick!ident@host/cidr mask
+ 	 * @param mode What mode this host is for - can be CMODE_BEGIN for unknown/no mode
 	 */
-	Entry(const Anope::string &_host);
+	Entry(ChannelModeName mode, const Anope::string &_host);
 
 	/** Get the banned mask for this entry
 	 * @return The mask

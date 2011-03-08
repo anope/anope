@@ -264,6 +264,25 @@ class InspIRCdProto : public IRCDProto
 
 };
 
+class ChannelModeFlood : public ChannelModeParam
+{
+ public:
+	ChannelModeFlood(char modeChar, bool minusNoArg) : ChannelModeParam(CMODE_FLOOD, modeChar, minusNoArg) { }
+
+	bool IsValid(const Anope::string &value) const
+	{
+		try
+		{
+			Anope::string rest;
+			if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
+				return true;
+		}
+		catch (const ConvertException &) { }
+
+		return false;
+	}
+};
+
 class InspircdIRCdMessage : public IRCdMessage
 {
  public:
@@ -374,13 +393,13 @@ class InspircdIRCdMessage : public IRCdMessage
 						switch (modebuf[t])
 						{
 							case 'b':
-								ModeManager::AddChannelMode(new ChannelModeBan('b'));
+								ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
 								continue;
 							case 'e':
-								ModeManager::AddChannelMode(new ChannelModeExcept('e'));
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));
 								continue;
 							case 'I':
-								ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
 								continue;
 							default:
 								ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));
@@ -406,7 +425,7 @@ class InspircdIRCdMessage : public IRCdMessage
 						switch (modebuf[t])
 						{
 							case 'f':
-								ModeManager::AddChannelMode(new ChannelModeFlood('f'));
+								ModeManager::AddChannelMode(new ChannelModeFlood('f', false));
 								continue;
 							case 'l':
 								ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l', true));
@@ -842,19 +861,6 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 {
 	Me->GetLinks().front()->Sync(true);
 	return true;
-}
-
-bool ChannelModeFlood::IsValid(const Anope::string &value) const
-{
-	try
-	{
-		Anope::string rest;
-		if (!value.empty() && value[0] != ':' && convertTo<int>(value[0] == '*' ? value.substr(1) : value, rest, false) > 0 && rest[0] == ':' && rest.length() > 1 && convertTo<int>(rest.substr(1), rest, false) > 0 && rest.empty())
-			return true;
-	}
-	catch (const ConvertException &) { }
-
-	return false;
 }
 
 class ProtoInspIRCd : public Module

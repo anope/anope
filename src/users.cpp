@@ -870,7 +870,7 @@ bool matches_list(Channel *c, User *user, ChannelModeName mode)
 	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = c->GetModeList(mode);
 	for (; modes.first != modes.second; ++modes.first)
 	{
-		Entry e(modes.first->second);
+		Entry e(mode, modes.first->second);
 		if (e.Matches(user))
 			return true;
 	}

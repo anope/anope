@@ -366,7 +366,7 @@ class PlexusIRCdMessage : public IRCdMessage
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 				if (!cm)
 				{
-					Log() << "Received unknown mode prefix " << buf[0] << " in SJOIN string";
+					Log() << "Received unknown mode prefix " << ch << " in SJOIN string";
 					continue;
 				}
 
@@ -596,9 +596,9 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeBan('b'));
-		ModeManager::AddChannelMode(new ChannelModeExcept('e'));
-		ModeManager::AddChannelMode(new ChannelModeInvex('I'));
+		ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));
+		ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
 	
 		/* l/k */
 		ModeManager::AddChannelMode(new ChannelModeKey('k'));

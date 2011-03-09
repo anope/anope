@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "version.h"
 
 IRCDVar myIrcd[] = {
 	{"ngIRCd",	/* ircd name */
@@ -79,7 +80,7 @@ class ngIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		send_cmd("", "PASS %s 0210-IRC+ Anope|17~9:CLHSo P", uplink_server->password.c_str());
+		send_cmd("", "PASS %s 0210-IRC+ Anope|%d.%d.%d:CLHSo P", uplink_server->password.c_str(), VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
 		/* finish the enhanced server handshake and register the connection */

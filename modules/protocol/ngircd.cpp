@@ -132,7 +132,10 @@ class ngIRCdProto : public IRCDProto
 
 	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->ServerName, "CHANINFO %s %s", c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
+		Anope::string mlock_modes = get_mlock_modes(c->ci, true);
+		if (mlock_modes.empty())
+			mlock_modes = "+";
+		send_cmd(Config->ServerName, "CHANINFO %s %s", c->name.c_str(), mlock_modes.c_str());
 	}
 	void SendTopic(BotInfo *bi, Channel *c)
 	{

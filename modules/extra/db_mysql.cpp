@@ -37,76 +37,6 @@ static std::vector<Anope::string> MakeVector(const Anope::string &buf)
 	return params;
 }
 
-static Anope::string MakeMLock(ChannelInfo *ci, bool status)
-{
-	Anope::string ret;
-
-	if ((!Me || !Me->IsSynced()) && ci->GetExtRegular(status ? "db_mlock_modes_on" : "db_mlock_modes_off", ret))
-		;
-	else
-	{
-		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-		{
-			const ModeLock &ml = it->second;
-			if (ml.set == status)
-			{
-				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-				if (!cm || cm->Type != MODE_REGULAR)
-					continue;
-				ret += " " + cm->NameAsString();
-			}
-		}
-
-		if (!ret.empty())
-			ret.erase(ret.begin());
-	}
-
-	return ret;
-}
-
-static inline Anope::string GetMLockOn(ChannelInfo *ci)
-{
-	return MakeMLock(ci, true);
-}
-
-static inline Anope::string GetMLockOff(ChannelInfo *ci)
-{
-	return MakeMLock(ci, false);
-}
-
-static Anope::string GetMLockParams(ChannelInfo *ci, bool onoff)
-{
-	Anope::string ret;
-
-	std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
-	if ((!Me || !Me->IsSynced()) && ci->GetExtRegular(onoff ? "db_mlp" : "db_mlp_off", oldparams))
-	{
-		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
-		{
-			ret += " " + it->first + " " + it->second;
-		}
-	}
-	else
-	{
-		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-		{
-			const ModeLock &ml = it->second;
-
-			if (!ml.param.empty() && ml.set == onoff)
-			{
-				ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-				if (cm)
-					ret += " " + cm->NameAsString() + " " + ml.param;
-			}
-		}
-	}
-
-	if (!ret.empty())
-		ret.erase(ret.begin());
-
-	return ret;
-}
-
 static NickAlias *CurNick = NULL;
 static NickCore *CurCore = NULL;
 static ChannelInfo *CurChannel = NULL;
@@ -223,7 +153,7 @@ class DBMySQL : public Module
 			/* ChanServ */
 			I_OnAccessAdd, I_OnAccessDel, I_OnAccessChange, I_OnAccessClear, I_OnLevelChange,
 			I_OnChanForbidden, I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
-			I_OnAkickAdd, I_OnAkickDel,
+			I_OnAkickAdd, I_OnAkickDel, I_OnMLock, I_OnUnMLock,
 			/* BotServ */
 			I_OnBotCreate, I_OnBotChange, I_OnBotDelete,
 			I_OnBotAssign, I_OnBotUnAssign,
@@ -236,7 +166,7 @@ class DBMySQL : public Module
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 40);
+		ModuleManager::Attach(i, this, 42);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -428,51 +358,6 @@ class DBMySQL : public Module
 					ci->botflags.FromString(flags);
 				}
 
-				if (!r.Get(i, "mlock_on").empty())
-				{
-					std::vector<Anope::string> modes;
-
-					spacesepstream sep(r.Get(i, "mlock_on"));
-					Anope::string buf;
-					while (sep.GetToken(buf))
-						modes.push_back(buf);
-
-					ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-				}
-				if (!r.Get(i, "mlock_off").empty())
-				{
-					std::vector<Anope::string> modes;
-
-					spacesepstream sep(r.Get(i, "mlock_off"));
-					Anope::string buf;
-					while (sep.GetToken(buf))
-						modes.push_back(buf);
-
-					ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-				}
-				if (!r.Get(i, "mlock_params").empty())
-				{
-					std::vector<std::pair<Anope::string, Anope::string> > mlp;
-
-					spacesepstream sep(r.Get(i, "mlock_params"));
-					Anope::string buf, buf2;
-					while (sep.GetToken(buf) && sep.GetToken(buf2))
-						mlp.push_back(std::make_pair(buf, buf2));
-
-					ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
-				}
-				if (!r.Get(i, "mlock_params_off").empty())
-				{
-					std::vector<std::pair<Anope::string, Anope::string> > mlp;
-
-					spacesepstream sep(r.Get(i, "mlock_params_off"));
-					Anope::string buf, buf2;
-					while (sep.GetToken(buf) && sep.GetToken(buf2))
-						mlp.push_back(std::make_pair(buf, buf2));
-
-					ci->Extend("db_mlp_off", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
-				}
-
 				if (!r.Get(i, "flags").empty())
 				{
 					spacesepstream sep(r.Get(i, "flags"));
@@ -573,7 +458,7 @@ class DBMySQL : public Module
 			ci->levels[atoi(r.Get(i, "position").c_str())] = atoi(r.Get(i, "level").c_str());
 		}
 
-		r = SQL->RunQuery("SELECT * FROM `anope_cs_info_metadata");
+		r = SQL->RunQuery("SELECT * FROM `anope_cs_info_metadata`");
 		for (int i = 0; i < r.Rows(); ++i)
 		{
 			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
@@ -586,6 +471,26 @@ class DBMySQL : public Module
 			EventReturn MOD_RESULT;
 			std::vector<Anope::string> Params = MakeVector(r.Get(i, "value"));
 			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, ci->name, Params));
+		}
+
+		r = SQL->RunQuery("SELECT * FROM `anope_cs_mlock`");
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			ChannelInfo *ci = cs_findchan(r.Get(i, "channel"));
+			if (!ci)
+			{
+				Log() << "MySQL: Channel mlock for nonexistant channel " << r.Get(i, "channel");
+				continue;
+			}
+
+			std::vector<Anope::string> mlocks;
+			ci->GetExtRegular("db_mlock", mlocks);
+
+			Anope::string modestring = r.Get(i, "status") + " " + r.Get(i, "mode") + " " + r.Get(i, "setter") + " " + r.Get(i, "created") + " " + r.Get(i, "param");
+
+			mlocks.push_back(modestring);
+
+			ci->Extend("db_mlock", new ExtensibleItemRegular<std::vector<Anope::string> >(mlocks));
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_ms_info`");
@@ -806,13 +711,6 @@ class DBMySQL : public Module
 				{
 					this->RunQuery("UPDATE `anope_cs_info` SET `descr` = '" + this->Escape(ci->desc) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
 				}
-				else if (params[1].equals_ci("MLOCK"))
-				{
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_on` = '" + GetMLockOn(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_off` = '" + GetMLockOff(ci) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_params` = '" + GetMLockParams(ci, true) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
-					this->RunQuery("UPDATE `anope_cs_info` SET `mlock_params_off` = '" + GetMLockParams(ci, false) + "' WHERE `name` = '" + this->Escape(ci->name) + "'");
-				}
 				else if (params[1].equals_ci("BANTYPE"))
 				{
 					this->RunQuery("UPDATE `anope_cs_info` SET `bantype` = " + stringify(ci->bantype) + " WHERE `name` = '" + this->Escape(ci->name) + "'");
@@ -1022,17 +920,25 @@ class DBMySQL : public Module
 
 	void OnChanRegistered(ChannelInfo *ci)
 	{
-		Anope::string mlockon = GetMLockOn(ci), mlockoff = GetMLockOff(ci), mlockparams = GetMLockParams(ci, true), mlockparams_off = GetMLockParams(ci, false);
-		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, mlock_on, mlock_off, mlock_params, mlock_params_off, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
+		this->RunQuery("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES('" +
 			this->Escape(ci->name) + "', '" + this->Escape(ci->founder ? ci->founder->display : "") + "', '" +
 			this->Escape(ci->successor ? ci->successor->display : "") + "', '" + this->Escape(ci->desc) + "', " +
 			stringify(ci->time_registered) + ", " + stringify(ci->last_used) + ", '" + this->Escape(ci->last_topic) + "', '" +
 			this->Escape(ci->last_topic_setter) + "', " + stringify(ci->last_topic_time) + ", '" + ToString(ci->ToString()) + "', '" + 
-			this->Escape(ci->forbidby) + "', '" + this->Escape(ci->forbidreason) + "', " +  stringify(ci->bantype) + ", '" +
-			mlockon + "', '" + mlockoff + "', '" + mlockparams + "', '" + mlockparams_off + "', " +
+			this->Escape(ci->forbidby) + "', '" + this->Escape(ci->forbidreason) + "', " +  stringify(ci->bantype) + ", " +
 			stringify(ci->memos.memomax) + ", '" + this->Escape(ci->bi ? ci->bi->nick : "") + "', '" + ToString(ci->botflags.ToString()) +
 			"', " + stringify(ci->capsmin) + ", " + stringify(ci->capspercent) + ", " + stringify(ci->floodlines) + ", " + stringify(ci->floodsecs) + ", " + stringify(ci->repeattimes) + ") " +
-			"ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), mlock_on=VALUES(mlock_on), mlock_off=VALUES(mlock_off), mlock_params=VALUES(mlock_params), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
+			"ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
+
+		this->RunQuery("DELETE from `anope_cs_mlock` WHERE `channel` = '" + this->Escape(ci->name) + "'");
+		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
+		{
+			const ModeLock &ml = it->second;
+			ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+
+			if (cm != NULL)
+				this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(ml.set ? 1 : 0) + ", '" + this->Escape(ml.setter) + "', " + stringify(ml.created) + ", '" + this->Escape(ml.param) + "')");
+		}
 	}
 
 	void OnChanSuspend(ChannelInfo *ci)
@@ -1053,6 +959,22 @@ class DBMySQL : public Module
 	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
 	{
 		this->RunQuery("DELETE FROM `anope_cs_akick` WHERE `channel`= '" + this->Escape(ci->name) + "' AND `mask` = '" + (ak->HasFlag(AK_ISNICK) ? ak->nc->display : ak->mask));
+	}
+
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock)
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
+		if (cm != NULL)
+			this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(lock->set ? 1 : 0) + ", '" + this->Escape(lock->setter) + "', " + stringify(lock->created) + ", '" + this->Escape(lock->param) + "')");
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnUnMLock(ChannelInfo *ci, ChannelMode *mode, const Anope::string &param)
+	{
+		ChannelMode *cm = ModeManager::FindChannelModeByName(mode->Name);
+		if (cm != NULL)
+			this->RunQuery("DELETE FROM `anope_cs_mlock` WHERE `channel` = '" + this->Escape(ci->name) + "' AND `mode` = '" + mode->NameAsString() + "' AND `param` = '" + this->Escape(param) + "'");
+		return EVENT_CONTINUE;
 	}
 
 	void OnBotCreate(BotInfo *bi)

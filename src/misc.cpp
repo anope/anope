@@ -1050,37 +1050,6 @@ bool SupportedWindowsVersion()
 #endif
 
 /*************************************************************************/
-/* This 2 functions were originally found in Bahamut */
-
-/**
- * Turn a cidr value into a netmask
- * @param cidr CIDR value
- * @return Netmask value
- */
-uint32 cidr_to_netmask(uint16 cidr)
-{
-	if (!cidr)
-		return 0;
-
-	return 0xFFFFFFFF - (1 << (32 - cidr)) + 1;
-}
-
-/**
- * Turn a netmask into a cidr value
- * @param mask Netmask
- * @return CIDR value
- */
-uint16 netmask_to_cidr(uint32 mask)
-{
-	int tmp = 0;
-
-	while (!(mask & (1 << tmp)) && tmp < 32)
-		++tmp;
-
-	return 32 - tmp;
-}
-
-/*************************************************************************/
 
 /**
  * Check if the given string is some sort of wildcard
@@ -1103,86 +1072,6 @@ bool str_is_pure_wildcard(const Anope::string &str)
 }
 
 /*************************************************************************/
-
-/**
- * Check if the given string is an IP or CIDR mask, and fill the given
- * ip/cidr params if so.
- * @param str String to check
- * @param ip The ipmask to fill when a CIDR is found
- * @param mask The CIDR mask to fill when a CIDR is found
- * @param host Displayed host
- * @return 1 for IP/CIDR, 0 for anything else
- */
-bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host)
-{
-	int octets[4] = { -1, -1, -1, -1 };
-	std::vector<Anope::string> octets_str = BuildStringVector(str, '.');
-
-	if (octets_str.size() != 4)
-		return false;
-
-	Anope::string cidr_str;
-	for (unsigned i = 0; i < 4; ++i)
-	{
-		Anope::string octet = octets_str[i];
-
-		if (i == 3)
-		{
-			size_t slash = octet.find('/');
-			if (slash != Anope::string::npos)
-			{
-				cidr_str = octet.substr(slash + 1);
-				octet = octet.substr(0, slash);
-			}
-		}
-
-		if (!octet.is_number_only())
-			return false;
-
-		octets[i] = convertTo<int>(octet);
-		/* Bail out if the octet is invalid or wrongly terminated */
-		if (octets[i] < 0 || octets[i] > 255)
-			return false;
-	}
-
-	/* Fill the IP - the dirty way */
-	ip = octets[3];
-	ip += octets[2] * 256;
-	ip += octets[1] * 65536;
-	ip += octets[0] * 16777216;
-
-	uint16 cidr;
-	if (!cidr_str.empty())
-	{
-		Anope::string s;
-		/* There's a CIDR mask here! */
-		cidr = convertTo<uint16>(cidr_str.substr(1), s, false);
-		/* Bail out if the CIDR is invalid or the string isn't done yet */
-		if (cidr > 32 || !s.empty())
-			return false;
-	}
-	else
-		/* No CIDR mask here - use 32 so the whole ip will be matched */
-		cidr = 32;
-
-	mask = cidr_to_netmask(cidr);
-	/* Apply the mask to avoid 255.255.255.255/8 bans */
-	ip &= mask;
-
-	/* Refill the octets to fill the host */
-	octets[0] = (ip & 0xFF000000) / 16777216;
-	octets[1] = (ip & 0x00FF0000) / 65536;
-	octets[2] = (ip & 0x0000FF00) / 256;
-	octets[3] = (ip & 0x000000FF);
-
-	host = stringify(octets[0]) + "." + stringify(octets[1]) + "." + stringify(octets[2]) + "." + stringify(octets[3]);
-	if (cidr != 32)
-		host += "/" + stringify(cidr);
-
-	return true;
-}
-
-/********************************************************************************/
 
 /** Converts a string to hex
  * @param the data to be converted

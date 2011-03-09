@@ -51,39 +51,6 @@ static void ChanInfoUpdate(const SQLResult &res)
 		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
 		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
 
-		Anope::string mlock_on = res.Get(0, "mlock_on"),
-				mlock_off = res.Get(0, "mlock_off"),
-				mlock_params = res.Get(0, "mlock_params"),
-				mlock_params_off = res.Get(0, "mlock_params_off");
-
-		Anope::string mode;
-		std::vector<Anope::string> modes;
-
-		spacesepstream sep(mlock_on);
-		while (sep.GetToken(mode))
-			modes.push_back(mode);
-		ci->Extend("db_mlock_modes_on", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-		modes.clear();
-		sep = mlock_off;
-		while (sep.GetToken(mode))
-			modes.push_back(mode);
-		ci->Extend("db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-		modes.clear();
-		sep = mlock_params;
-		while (sep.GetToken(mode))
-			modes.push_back(mode);
-		ci->Extend("mlock_params", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-		modes.clear();
-		sep = mlock_params_off;
-		while (sep.GetToken(mode))
-			modes.push_back(mode);
-		ci->Extend("mlock_params_off", new ExtensibleItemRegular<std::vector<Anope::string> >(modes));
-
-		ci->LoadMLock();
-
 		if (res.Get(0, "botnick").equals_cs(ci->bi ? ci->bi->nick : "") == false)
 		{
 			if (ci->bi)

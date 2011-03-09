@@ -259,13 +259,8 @@ E char *str_signed(unsigned char *str);
 E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
 E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
 
-E uint32 cidr_to_netmask(uint16 cidr);
-E uint16 netmask_to_cidr(uint32 mask);
-
 E bool str_is_wildcard(const Anope::string &str);
 E bool str_is_pure_wildcard(const Anope::string &str);
-
-E bool str_is_cidr(const Anope::string &str, uint32 &ip, uint32 &mask, Anope::string &host);
 
 /**** modes.cpp ****/
 /* Number of generic modes we support */

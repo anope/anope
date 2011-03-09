@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 31, 2010 at 03:02 AM
+-- Generation Time: Mar 09, 2011 at 01:23 AM
 -- Server version: 5.1.50
 -- PHP Version: 5.3.3-pl1-gentoo
 
@@ -108,10 +108,6 @@ CREATE TABLE IF NOT EXISTS `anope_cs_info` (
   `forbidby` text NOT NULL,
   `forbidreason` text NOT NULL,
   `bantype` smallint(6) NOT NULL DEFAULT '0',
-  `mlock_on` text NOT NULL,
-  `mlock_off` text NOT NULL,
-  `mlock_params` text NOT NULL,
-  `mlock_params_off` text NOT NULL,
   `memomax` smallint(5) unsigned NOT NULL DEFAULT '0',
   `botnick` varchar(255) NOT NULL DEFAULT '',
   `botflags` text NOT NULL,
@@ -147,6 +143,22 @@ CREATE TABLE IF NOT EXISTS `anope_cs_levels` (
   `position` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '0',
   UNIQUE KEY `channel` (`channel`,`position`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `anope_cs_mlock`
+--
+
+CREATE TABLE IF NOT EXISTS `anope_cs_mlock` (
+  `channel` varchar(255) NOT NULL,
+  `mode` varchar(127) NOT NULL,
+  `status` int(11) NOT NULL,
+  `setter` varchar(255) NOT NULL,
+  `created` int(11) NOT NULL,
+  `param` varchar(255) NOT NULL,
+  KEY `FK_anope_cs_mlock` (`channel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -392,6 +404,13 @@ CASCADE ON UPDATE CASCADE;
 --
 ALTER TABLE `anope_cs_levels`
   ADD CONSTRAINT `FK_anope_cs_levels_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE ON 
+UPDATE CASCADE;
+
+--
+-- Constraints for table `anope_cs_mlock`
+--
+ALTER TABLE `anope_cs_mlock`
+  ADD CONSTRAINT `FK_anope_cs_mlock_channel` FOREIGN KEY (`channel`) REFERENCES `anope_cs_info` (`name`) ON DELETE CASCADE ON 
 UPDATE CASCADE;
 
 --

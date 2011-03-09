@@ -129,10 +129,7 @@ class CommandCSMode : public Command
 					Anope::string modeparam = ml.param;
 					if (!modeparam.empty())
 						modeparam = " " + modeparam;
-					Anope::string setter = ml.setter;
-					if (setter.empty())
-						setter = ci->founder ? ci->founder->display : "Unknown";
-					source.Reply(_("%c%c%s, by %s on %s"), ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), setter.c_str(), do_strftime(ml.created).c_str());
+					source.Reply(_("%c%c%s, by %s on %s"), ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), ml.setter.c_str(), do_strftime(ml.created).c_str());
 				}
 			}
 		}

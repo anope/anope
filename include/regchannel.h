@@ -302,7 +302,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @param created When the mlock was created
 	 * @return true on success, false on failure (module blocking)
 	 */
-	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", const Anope::string &setter = "", time_t created = Anope::CurTime);
+	bool SetMLock(ChannelMode *mode, bool status, const Anope::string &param = "", Anope::string setter = "", time_t created = Anope::CurTime);
 
 	/** Remove a mlock
 	 * @param mode The mode

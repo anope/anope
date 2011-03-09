@@ -501,52 +501,30 @@ void ChannelInfo::LoadMLock()
 	if (chm)
 		this->SetMLock(chm, true);
 
-	std::vector<Anope::string> modenames;
-	if (this->GetExtRegular("db_mlock_modes_on", modenames))
+	std::vector<Anope::string> mlock;
+	if (this->GetExtRegular("db_mlock", mlock))
 	{
-		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
+		for (unsigned i = 0; i < mlock.size(); ++i)
 		{
-			ChannelMode *m = ModeManager::FindChannelModeByString(*it);
-			if (m)
-				this->SetMLock(m, true);
-		}
-	}
+			std::vector<Anope::string> mlockv = BuildStringVector(mlock[i]);
 
-	if (this->GetExtRegular("db_mlock_modes_off", modenames))
-	{
-		for (std::vector<Anope::string>::iterator it = modenames.begin(), it_end = modenames.end(); it != it_end; ++it)
-		{
-			ChannelMode *m = ModeManager::FindChannelModeByString(*it);
-			if (m)
-				this->SetMLock(m, false);
-		}
-	}
+			bool set = mlockv[0] == "1";
+			ChannelMode *cm = ModeManager::FindChannelModeByString(mlockv[1]);
+			const Anope::string &setter = mlockv[2];
+			time_t created = Anope::CurTime;
+			try
+			{
+				created = convertTo<time_t>(mlockv[3]);
+			}
+			catch (const ConvertException &) { }
+			const Anope::string &param = mlockv.size() > 4 ? mlockv[4] : "";
 
-	std::vector<std::pair<Anope::string, Anope::string> > params;
-	if (this->GetExtRegular("db_mlp", params))
-	{
-		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
-		{
-			ChannelMode *m = ModeManager::FindChannelModeByString(it->first);
-			if (m)
-				this->SetMLock(m, true, it->second);
+			if (cm != NULL)
+				this->SetMLock(cm, set, param, setter, created);
 		}
-	
-	}
-	if (this->GetExtRegular("db_mlp_off", params))
-	{
-		for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = params.begin(), it_end = params.end(); it != it_end; ++it)
-		{
-			ChannelMode *m = ModeManager::FindChannelModeByString(it->first);
-			if (m)
-				this->SetMLock(m, false, it->second);
-		}
-	}
 
-	this->Shrink("db_mlock_modes_on");
-	this->Shrink("db_mlock_modes_off");
-	this->Shrink("db_mlp");
-	this->Shrink("db_mlp_off");
+		this->Shrink("db_mlock");
+	}
 
 	/* Create perm channel */
 	if (this->HasFlag(CI_PERSIST) && !this->c)
@@ -605,8 +583,10 @@ bool ChannelInfo::HasMLock(ChannelMode *mode, const Anope::string &param, bool s
  * @param param The param to use for this mode, if required
  * @return true on success, false on failure (module blocking)
  */
-bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &param, const Anope::string &setter, time_t created)
+bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &param, Anope::string setter, time_t created)
 {
+	if (setter.empty())
+		setter = this->founder ? this->founder->display : "Unknown";
 	std::pair<ChannelModeName, ModeLock> ml = std::make_pair(mode->Name, ModeLock(status, mode->Name, param, setter, created));
 
 	EventReturn MOD_RESULT;
@@ -615,7 +595,26 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 		return false;
 
 	/* First, remove this */
-	this->RemoveMLock(mode, param);
+	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
+		this->mode_locks.erase(mode->Name);
+	else
+	{
+		// For list or status modes, we must check the parameter
+		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name);
+		if (it != this->mode_locks.end())
+		{
+			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mode->Name);
+			for (; it != it_end; ++it)
+			{
+				const ModeLock &modelock = it->second;
+				if (modelock.param == param)
+				{
+					this->mode_locks.erase(it);
+					break;
+				}
+			}
+		}
+	}
 	
 	this->mode_locks.insert(ml);
 

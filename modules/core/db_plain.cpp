@@ -614,32 +614,17 @@ class DBPlain : public Module
 					ak->SetFlag(AK_ISNICK);
 	
 			}
-			else if (key.equals_ci("MLOCK_ON") || key.equals_ci("MLOCK_OFF"))
+			else if (key.equals_ci("MLOCK"))
 			{
-				bool Set = key.equals_ci("MLOCK_ON");
+				std::vector<Anope::string> mlocks;
+				ci->GetExtRegular("db_mlock", mlocks);
 
-				/* For now store mlock in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-				ci->Extend(Set ? "db_mlock_modes_on" : "db_mlock_modes_off", new ExtensibleItemRegular<std::vector<Anope::string> >(params));
-			}
-			else if (key.equals_ci("MLP"))
-			{
-				std::vector<std::pair<Anope::string, Anope::string> > mlp;
-				ci->GetExtRegular("db_mlp", mlp);
-	
-				mlp.push_back(std::make_pair(params[0], params[1]));
+				Anope::string mlock_string = params[0] + " " + params[1] + " " + params[2] + " " + params[3];
+				if (params.size() > 4)
+					mlock_string += " " +  params[4];
 
-				/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-				ci->Extend("db_mlp", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
-			}
-			else if (key.equals_ci("MLP_OFF"))
-			{
-				std::vector<std::pair<Anope::string, Anope::string> > mlp;
-				ci->GetExtRegular("db_mlp_off", mlp);
-
-				mlp.push_back(std::make_pair(params[0], params[1]));
-
-				/* For now store mlocked modes in extensible, Anope hasn't yet connected to the IRCd and doesn't know what modes exist */
-				ci->Extend("db_mlp_off", new ExtensibleItemRegular<std::vector<std::pair<Anope::string, Anope::string> > >(mlp));
+				mlocks.push_back(mlock_string);
+				ci->Extend("db_mlock", new ExtensibleItemRegular<std::vector<Anope::string> >(mlocks));
 			}
 			else if (key.equals_ci("MI"))
 			{
@@ -832,70 +817,19 @@ class DBPlain : public Module
 					db_buffer << ci->GetAkick(k)->reason;
 				db_buffer << endl;
 			}
-			db_buffer << "MD MLOCK_ON";
 			{
-				std::vector<Anope::string> oldmodes;
-				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_on", oldmodes))
-					for (unsigned i = 0; i < oldmodes.size(); ++i)
-						db_buffer << " " << oldmodes[i];
-				else
-				{
-					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-					{
-						const ModeLock &ml = it->second;
-						if (ml.set)
-						{
-							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-							if (!cm || cm->Type != MODE_REGULAR)
-								continue;
-							db_buffer << " " << cm->NameAsString();
-						}
-					}
-				}
-			}
-			db_buffer << endl;
-			db_buffer << "MD MLOCK_OFF";
-			{
-				std::vector<Anope::string> oldmodes;
-				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlock_modes_off", oldmodes))
-					for (unsigned i = 0; i < oldmodes.size(); ++i)
-						db_buffer << " " << oldmodes[i];
-				else
-				{
-					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-					{
-						const ModeLock &ml = it->second;
-						if (!ml.set)
-						{
-							ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-							if (!cm || cm->Type != MODE_REGULAR)
-								continue;
-							db_buffer << " " << cm->NameAsString();
-						}
-					}
-				}
-			}
-			db_buffer << endl;
-			{
-				std::vector<std::pair<Anope::string, Anope::string> > oldparams;;
-				if ((!Me || !Me->IsSynced()) && ci->GetExtRegular("db_mlp", oldparams))
-				{
-					for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = oldparams.begin(), it_end = oldparams.end(); it != it_end; ++it)
-					{
-						db_buffer << "MD MLP " << it->first << " " << it->second << endl;
-					}
-				}
+				std::vector<Anope::string> mlocks;
+				if (ci->GetExtRegular("db_mlock", mlocks))
+					for (unsigned i = 0; i < mlocks.size(); ++i)
+						db_buffer << mlocks[i] << endl;
 				else
 				{
 					for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 					{
 						const ModeLock &ml = it->second;
 						ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-						if (!cm)
-							continue;
-
-						if (!ml.param.empty())
-							db_buffer << "MD MLP" << (ml.set ? " " : "_OFF ") << cm->NameAsString() << " " << ml.param << endl;
+						if (cm != NULL)
+							db_buffer << "MD MLOCK " << (ml.set ? 1 : 0) << " " << cm->NameAsString() << " " << ml.setter << " " << ml.created << " " << ml.param << endl;
 					}
 				}
 			}

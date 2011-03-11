@@ -32,7 +32,7 @@ class CommandCSInfo : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
-		this->SetDesc("Lists information about the named registered channel");
+		this->SetDesc(_("Lists information about the named registered channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

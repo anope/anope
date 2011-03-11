@@ -474,7 +474,7 @@ class CommandCSAKick : public Command
  public:
 	CommandCSAKick() : Command("AKICK", 2, 4)
 	{
-		this->SetDesc("Maintain the AutoKick list");
+		this->SetDesc(_("Maintain the AutoKick list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

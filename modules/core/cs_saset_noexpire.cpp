@@ -18,7 +18,7 @@ class CommandCSSASetNoexpire : public Command
  public:
 	CommandCSSASetNoexpire() : Command("NOEXPIRE", 2, 2, "chanserv/saset/noexpire")
 	{
-		this->SetDesc("Prevent the channel from expiring");
+		this->SetDesc(_("Prevent the channel from expiring"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

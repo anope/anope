@@ -19,7 +19,7 @@ class CommandNSList : public Command
  public:
 	CommandNSList() : Command("LIST", 1, 2)
 	{
-		this->SetDesc("List all registered nicknames that match a given pattern");
+		this->SetDesc(_("List all registered nicknames that match a given pattern"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -191,7 +191,7 @@ class CommandOSStats : public Command
  public:
 	CommandOSStats() : Command("STATS", 0, 1, "operserv/stats")
 	{
-		this->SetDesc("Show status of Services and network");
+		this->SetDesc(_("Show status of Services and network"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

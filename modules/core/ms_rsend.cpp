@@ -18,7 +18,7 @@ class CommandMSRSend : public Command
  public:
 	CommandMSRSend() : Command("RSEND", 2, 2)
 	{
-		this->SetDesc("Sends a memo and requests a read receipt");
+		this->SetDesc(_("Sends a memo and requests a read receipt"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

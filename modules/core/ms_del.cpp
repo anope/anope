@@ -43,7 +43,7 @@ class CommandMSDel : public Command
  public:
 	CommandMSDel() : Command("DEL", 0, 2)
 	{
-		this->SetDesc("Delete a memo or memos");
+		this->SetDesc(_("Delete a memo or memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

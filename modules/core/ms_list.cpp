@@ -55,7 +55,7 @@ class CommandMSList : public Command
  public:
 	CommandMSList() : Command("LIST", 0, 2)
 	{
-		this->SetDesc("List your memos");
+		this->SetDesc(_("List your memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

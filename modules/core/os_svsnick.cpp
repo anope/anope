@@ -18,7 +18,7 @@ class CommandOSSVSNick : public Command
  public:
 	CommandOSSVSNick() : Command("SVSNICK", 2, 2, "operserv/svsnick")
 	{
-		this->SetDesc("Forcefully change a user's nickname");
+		this->SetDesc(_("Forcefully change a user's nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

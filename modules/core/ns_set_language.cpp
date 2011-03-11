@@ -18,7 +18,7 @@ class CommandNSSetLanguage : public Command
  public:
 	CommandNSSetLanguage(const Anope::string &spermission = "") : Command("LANGUAGE", 2, 2, spermission)
 	{
-		this->SetDesc("Set the language Services will use when messaging you");
+		this->SetDesc(_("Set the language Services will use when messaging you"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

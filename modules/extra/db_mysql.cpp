@@ -53,7 +53,7 @@ class CommandSQLSync : public Command
  public:
 	CommandSQLSync() : Command("SQLSYNC", 0, 0, "operserv/sqlsync")
 	{
-		this->SetDesc("Import your databases to SQL");
+		this->SetDesc(_("Import your databases to SQL"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params);

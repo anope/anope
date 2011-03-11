@@ -18,7 +18,7 @@ class CommandBSAct : public Command
  public:
 	CommandBSAct() : Command("ACT", 2, 2)
 	{
-		this->SetDesc("Makes the bot do the equivalent of a \"/me\" command");
+		this->SetDesc(_("Makes the bot do the equivalent of a \"/me\" command"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

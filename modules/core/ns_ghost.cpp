@@ -19,7 +19,7 @@ class CommandNSGhost : public Command
 	CommandNSGhost() : Command("GHOST", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Disconnects a \"ghost\" IRC session using your nick");
+		this->SetDesc(_("Disconnects a \"ghost\" IRC session using your nick"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

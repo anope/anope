@@ -40,7 +40,7 @@ class CommandOSModInfo : public Command
  public:
 	CommandOSModInfo() : Command("MODINFO", 1, 1)
 	{
-		this->SetDesc("Info about a loaded module");
+		this->SetDesc(_("Info about a loaded module"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

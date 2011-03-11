@@ -18,7 +18,7 @@ class CommandCSClone : public Command
 public:
 	CommandCSClone() : Command("CLONE", 2, 3)
 	{
-		this->SetDesc("Copy all settings from one channel to another");
+		this->SetDesc(_("Copy all settings from one channel to another"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

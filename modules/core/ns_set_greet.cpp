@@ -18,7 +18,7 @@ class CommandNSSetGreet : public Command
  public:
 	CommandNSSetGreet(const Anope::string &spermission = "") : Command("GREET", 1, 2, spermission)
 	{
-		this->SetDesc("Associate a greet message with your nickname");
+		this->SetDesc(_("Associate a greet message with your nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

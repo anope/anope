@@ -304,7 +304,7 @@ class CommandBSBot : public Command
 	CommandBSBot() : Command("BOT", 1, 6)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
-		this->SetDesc("Maintains network bot list");
+		this->SetDesc(_("Maintains network bot list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

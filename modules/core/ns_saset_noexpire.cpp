@@ -18,7 +18,7 @@ class CommandNSSASetNoexpire : public Command
  public:
 	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 2, "nickserv/saset/noexpire")
 	{
-		this->SetDesc("Prevent the nickname from expiring");
+		this->SetDesc(_("Prevent the nickname from expiring"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -249,7 +249,7 @@ class CommandCSMode : public Command
  public:
 	CommandCSMode() : Command("MODE", 3, 4)
 	{
-		this->SetDesc("Control modes and mode locks on a channel");
+		this->SetDesc(_("Control modes and mode locks on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

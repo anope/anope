@@ -18,7 +18,7 @@ class CommandMSIgnore : public Command
  public:
 	CommandMSIgnore() : Command("IGNORE", 1, 3)
 	{
-		this->SetDesc("Manage your memo ignore list");
+		this->SetDesc(_("Manage your memo ignore list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

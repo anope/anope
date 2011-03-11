@@ -31,7 +31,7 @@ class CommandNSInfo : public Command
 	CommandNSInfo() : Command("INFO", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Displays information about a given nickname");
+		this->SetDesc(_("Displays information about a given nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

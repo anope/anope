@@ -18,7 +18,7 @@ class CommandNSForbid : public Command
  public:
 	CommandNSForbid() : Command("FORBID", 1, 2, "nickserv/forbid")
 	{
-		this->SetDesc("Prevents a nickname from being registered");
+		this->SetDesc(_("Prevents a nickname from being registered"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

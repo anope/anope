@@ -170,7 +170,7 @@ class CommandOSSet : public Command
  public:
 	CommandOSSet() : Command("SET", 1, 2, "operserv/set")
 	{
-		this->SetDesc("Set various global Services options");
+		this->SetDesc(_("Set various global Services options"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

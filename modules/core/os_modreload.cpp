@@ -18,7 +18,7 @@ class CommandOSModReLoad : public Command
  public:
 	CommandOSModReLoad() : Command("MODRELOAD", 1, 1, "operserv/modload")
 	{
-		this->SetDesc("Reload a module");
+		this->SetDesc(_("Reload a module"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

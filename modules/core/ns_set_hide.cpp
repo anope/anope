@@ -18,7 +18,7 @@ class CommandNSSetHide : public Command
  public:
 	CommandNSSetHide(const Anope::string &spermission = "") : Command("HIDE", 2, 3, spermission)
 	{
-		this->SetDesc("Hide certain pieces of nickname information");
+		this->SetDesc(_("Hide certain pieces of nickname information"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

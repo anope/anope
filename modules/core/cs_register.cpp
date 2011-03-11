@@ -19,7 +19,7 @@ class CommandCSRegister : public Command
 	CommandCSRegister() : Command("REGISTER", 2, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
-		this->SetDesc("Register a channel");
+		this->SetDesc(_("Register a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

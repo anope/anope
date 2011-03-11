@@ -18,7 +18,7 @@ class CommandNSGetPass : public Command
  public:
 	CommandNSGetPass() : Command("GETPASS", 1, 1, "nickserv/getpass")
 	{
-		this->SetDesc("Retrieve the password for a nickname");
+		this->SetDesc(_("Retrieve the password for a nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

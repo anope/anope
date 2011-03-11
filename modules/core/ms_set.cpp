@@ -201,7 +201,7 @@ class CommandMSSet : public Command
  public:
 	CommandMSSet() : Command("SET", 2, 5)
 	{
-		this->SetDesc("Set options related to memos");
+		this->SetDesc(_("Set options related to memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

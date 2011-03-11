@@ -18,7 +18,7 @@ class CommandMSCheck : public Command
  public:
 	CommandMSCheck() : Command("CHECK", 1, 1)
 	{
-		this->SetDesc("Checks if last memo to a nick was read");
+		this->SetDesc(_("Checks if last memo to a nick was read"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

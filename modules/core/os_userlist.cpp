@@ -18,7 +18,7 @@ class CommandOSUserList : public Command
  public:
 	CommandOSUserList() : Command("USERLIST", 0, 2)
 	{
-		this->SetDesc("Lists all user records");
+		this->SetDesc(_("Lists all user records"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandOSModUnLoad : public Command
  public:
 	CommandOSModUnLoad() : Command("MODUNLOAD", 1, 1, "operserv/modload")
 	{
-		this->SetDesc("Un-Load a module");
+		this->SetDesc(_("Un-Load a module"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

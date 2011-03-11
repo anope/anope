@@ -34,7 +34,7 @@ class CommandOSConfig : public Command
  public:
 	CommandOSConfig() : Command("CONFIG", 1, 4, "operserv/config")
 	{
-		this->SetDesc("View and change configuration file settings");
+		this->SetDesc(_("View and change configuration file settings"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

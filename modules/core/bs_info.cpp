@@ -43,7 +43,7 @@ class CommandBSInfo : public Command
 	CommandBSInfo() : Command("INFO", 1, 1)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
-		this->SetDesc("Allows you to see BotServ information about a channel or a bot");
+		this->SetDesc(_("Allows you to see BotServ information about a channel or a bot"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

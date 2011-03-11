@@ -18,7 +18,7 @@ class CommandOSNOOP : public Command
  public:
 	CommandOSNOOP() : Command("NOOP", 2, 2, "operserv/noop")
 	{
-		this->SetDesc("Temporarily remove all O:lines of a server remotely");
+		this->SetDesc(_("Temporarily remove all O:lines of a server remotely"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

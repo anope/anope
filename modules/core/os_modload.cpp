@@ -18,7 +18,7 @@ class CommandOSModLoad : public Command
  public:
 	CommandOSModLoad() : Command("MODLOAD", 1, 1, "operserv/modload")
 	{
-		this->SetDesc("Load a module");
+		this->SetDesc(_("Load a module"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandCSGetKey : public Command
  public:
 	CommandCSGetKey() : Command("GETKEY", 1, 1)
 	{
-		this->SetDesc("Returns the key of the given channel");
+		this->SetDesc(_("Returns the key of the given channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

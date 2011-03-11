@@ -18,7 +18,7 @@ class CommandHSSet : public Command
  public:
 	CommandHSSet() : Command("SET", 2, 2, "hostserv/set")
 	{
-		this->SetDesc("Set the vhost of another user");
+		this->SetDesc(_("Set the vhost of another user"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

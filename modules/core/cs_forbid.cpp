@@ -19,7 +19,7 @@ class CommandCSForbid : public Command
 	CommandCSForbid() : Command("FORBID", 1, 2, "chanserv/forbid")
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
-		this->SetDesc("Prevent a channel from being used");
+		this->SetDesc(_("Prevent a channel from being used"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

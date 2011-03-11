@@ -18,7 +18,7 @@ class CommandOSChanList : public Command
  public:
 	CommandOSChanList() : Command("CHANLIST", 0, 2)
 	{
-		this->SetDesc("Lists all channel records");
+		this->SetDesc(_("Lists all channel records"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

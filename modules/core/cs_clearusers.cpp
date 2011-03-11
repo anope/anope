@@ -18,7 +18,7 @@ class CommandCSClearUsers : public Command
  public:
 	CommandCSClearUsers() : Command("CLEARUSERS", 1, 1)
 	{
-		this->SetDesc("Tells ChanServ to clear (kick) all users on a channel");
+		this->SetDesc(_("Tells ChanServ to clear (kick) all users on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

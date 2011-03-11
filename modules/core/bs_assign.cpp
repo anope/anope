@@ -18,7 +18,7 @@ class CommandBSAssign : public Command
  public:
 	CommandBSAssign() : Command("ASSIGN", 2, 2)
 	{
-		this->SetDesc("Assigns a bot to a channel");
+		this->SetDesc(_("Assigns a bot to a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -403,7 +403,7 @@ class CommandCSQOP : public XOPBase
  public:
 	CommandCSQOP() : XOPBase("QOP")
 	{
-		this->SetDesc("Modify the list of QOP users");
+		this->SetDesc(_("Modify the list of QOP users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -464,7 +464,7 @@ class CommandCSAOP : public XOPBase
  public:
 	CommandCSAOP() : XOPBase("AOP")
 	{
-		this->SetDesc("Modify the list of AOP users");
+		this->SetDesc(_("Modify the list of AOP users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -526,7 +526,7 @@ class CommandCSHOP : public XOPBase
  public:
 	CommandCSHOP() : XOPBase("HOP")
 	{
-		this->SetDesc("Maintains the HOP (HalfOP) list for a channel");
+		this->SetDesc(_("Maintains the HOP (HalfOP) list for a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -586,7 +586,7 @@ class CommandCSSOP : public XOPBase
  public:
 	CommandCSSOP() : XOPBase("SOP")
 	{
-		this->SetDesc("Modify the list of SOP users");
+		this->SetDesc(_("Modify the list of SOP users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -647,7 +647,7 @@ class CommandCSVOP : public XOPBase
  public:
 	CommandCSVOP() : XOPBase("VOP")
 	{
-		this->SetDesc("Maintains the VOP (VOicePeople) list for a channel");
+		this->SetDesc(_("Maintains the VOP (VOicePeople) list for a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

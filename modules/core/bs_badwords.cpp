@@ -228,7 +228,7 @@ class CommandBSBadwords : public Command
  public:
 	CommandBSBadwords() : Command("BADWORDS", 2, 3)
 	{
-		this->SetDesc("Maintains bad words list");
+		this->SetDesc(_("Maintains bad words list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

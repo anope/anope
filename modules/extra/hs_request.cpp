@@ -47,7 +47,7 @@ class CommandHSRequest : public Command
  public:
 	CommandHSRequest() : Command("REQUEST", 1, 1)
 	{
-		this->SetDesc("Request a vHost for your nick");
+		this->SetDesc(_("Request a vHost for your nick"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -134,7 +134,7 @@ class CommandHSActivate : public Command
  public:
 	CommandHSActivate() : Command("ACTIVATE", 1, 1, "hostserv/set")
 	{
-		this->SetDesc("Approve the requested vHost of a user");
+		this->SetDesc(_("Approve the requested vHost of a user"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -191,7 +191,7 @@ class CommandHSReject : public Command
  public:
 	CommandHSReject() : Command("REJECT", 1, 2, "hostserv/set")
 	{
-		this->SetDesc("Reject the requested vHost of a user");
+		this->SetDesc(_("Reject the requested vHost of a user"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -281,7 +281,7 @@ class CommandHSWaiting : public HSListBase
  public:
 	CommandHSWaiting() : HSListBase("WAITING", 0, 0)
 	{
-		this->SetDesc("Convenience command for LIST +req");
+		this->SetDesc(_("Convenience command for LIST +req"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

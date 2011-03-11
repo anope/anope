@@ -18,7 +18,7 @@ class CommandOSRestart : public Command
  public:
 	CommandOSRestart() : Command("RESTART", 0, 0, "operserv/restart")
 	{
-		this->SetDesc("Save databases and restart Services");
+		this->SetDesc(_("Save databases and restart Services"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

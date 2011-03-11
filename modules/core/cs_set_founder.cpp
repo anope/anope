@@ -18,7 +18,7 @@ class CommandCSSetFounder : public Command
  public:
 	CommandCSSetFounder(const Anope::string &cpermission = "") : Command("FOUNDER", 2, 2, cpermission)
 	{
-		this->SetDesc("Set the founder of a channel");
+		this->SetDesc(_("Set the founder of a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

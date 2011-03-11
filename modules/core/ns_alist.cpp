@@ -18,7 +18,7 @@ class CommandNSAList : public Command
  public:
 	CommandNSAList() : Command("ALIST", 0, 2)
 	{
-		this->SetDesc("List channels you have access on");
+		this->SetDesc(_("List channels you have access on"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

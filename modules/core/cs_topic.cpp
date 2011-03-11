@@ -18,7 +18,7 @@ class CommandCSTopic : public Command
  public:
 	CommandCSTopic() : Command("TOPIC", 1, 2)
 	{
-		this->SetDesc("Manipulate the topic of the specified channel");
+		this->SetDesc(_("Manipulate the topic of the specified channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

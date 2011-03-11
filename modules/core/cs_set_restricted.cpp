@@ -17,7 +17,7 @@ class CommandCSSetRestricted : public Command
  public:
 	CommandCSSetRestricted(const Anope::string &cpermission = "") : Command("RESTRICTED", 2, 2, cpermission)
 	{
-		this->SetDesc("Restrict access to the channel");
+		this->SetDesc(_("Restrict access to the channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

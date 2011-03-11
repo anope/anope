@@ -48,7 +48,7 @@ class CommandCSAppendTopic : public Command
  public:
 	CommandCSAppendTopic() : Command("APPENDTOPIC", 2, 2)
 	{
-		this->SetDesc("Add text to a channels topic");
+		this->SetDesc(_("Add text to a channels topic"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

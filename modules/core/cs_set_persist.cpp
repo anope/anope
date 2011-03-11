@@ -18,7 +18,7 @@ class CommandCSSetPersist : public Command
  public:
 	CommandCSSetPersist(const Anope::string &cpermission = "") : Command("PERSIST", 2, 2, cpermission)
 	{
-		this->SetDesc("Set the channel as permanent");
+		this->SetDesc(_("Set the channel as permanent"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

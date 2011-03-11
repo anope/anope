@@ -21,7 +21,7 @@ class CommandNSSASet : public Command
  public:
 	CommandNSSASet() : Command("SASET", 2, 4)
 	{
-		this->SetDesc("Set SET-options on another nickname");
+		this->SetDesc(_("Set SET-options on another nickname"));
 	}
 
 	~CommandNSSASet()
@@ -129,7 +129,7 @@ class CommandNSSASetDisplay : public Command
  public:
 	CommandNSSASetDisplay() : Command("DISPLAY", 2, 2, "nickserv/saset/display")
 	{
-		this->SetDesc("Set the display of the group in Services");
+		this->SetDesc(_("Set the display of the group in Services"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -172,7 +172,7 @@ class CommandNSSASetPassword : public Command
  public:
 	CommandNSSASetPassword() : Command("PASSWORD", 2, 2, "nickserv/saset/password")
 	{
-		this->SetDesc("Set the nickname password");
+		this->SetDesc(_("Set the nickname password"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -21,7 +21,7 @@ class CommandNSResetPass : public Command
 	CommandNSResetPass() : Command("RESETPASS", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Helps you reset lost passwords");
+		this->SetDesc(_("Helps you reset lost passwords"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

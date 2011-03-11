@@ -57,7 +57,7 @@ class CommandOSDefcon : public Command
  public:
 	CommandOSDefcon() : Command("DEFCON", 1, 1, "operserv/defcon")
 	{
-		this->SetDesc("Manipulate the DefCon system");
+		this->SetDesc(_("Manipulate the DefCon system"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

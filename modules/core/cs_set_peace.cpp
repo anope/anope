@@ -18,7 +18,7 @@ class CommandCSSetPeace : public Command
  public:
 	CommandCSSetPeace(const Anope::string &cpermission = "") : Command("PEACE", 2, 2, cpermission)
 	{
-		this->SetDesc("Regulate the use of critical commands");
+		this->SetDesc(_("Regulate the use of critical commands"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

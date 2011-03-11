@@ -18,7 +18,7 @@ class CommandCSKick : public Command
  public:
 	CommandCSKick() : Command("KICK", 2, 3)
 	{
-		this->SetDesc("Kicks a selected nick from a channel");
+		this->SetDesc(_("Kicks a selected nick from a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

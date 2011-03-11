@@ -18,7 +18,7 @@ class CommandOSOLine : public Command
  public:
 	CommandOSOLine() : Command("OLINE", 2, 2, "operserv/oline")
 	{
-		this->SetDesc("Give Operflags to a certain user");
+		this->SetDesc(_("Give Operflags to a certain user"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

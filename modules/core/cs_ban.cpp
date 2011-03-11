@@ -18,7 +18,7 @@ class CommandCSBan : public Command
  public:
 	CommandCSBan(const Anope::string &cname) : Command("BAN", 2, 3)
 	{
-		this->SetDesc("Bans a selected nick on a channel");
+		this->SetDesc(_("Bans a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

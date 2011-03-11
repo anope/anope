@@ -18,7 +18,7 @@ class CommandOSMode : public Command
  public:
 	CommandOSMode() : Command("MODE", 2, 2, "operserv/mode")
 	{
-		this->SetDesc("Change channel or user modes");
+		this->SetDesc(_("Change channel or user modes"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

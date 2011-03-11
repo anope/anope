@@ -18,7 +18,7 @@ class CommandCSSetDescription : public Command
  public:
 	CommandCSSetDescription(const Anope::string &cpermission = "") : Command("DESC", 2, 2, cpermission)
 	{
-		this->SetDesc("Set the channel description");
+		this->SetDesc(_("Set the channel description"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

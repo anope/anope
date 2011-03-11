@@ -18,7 +18,7 @@ class CommandCSUnban : public Command
  public:
 	CommandCSUnban() : Command("UNBAN", 1, 2)
 	{
-		this->SetDesc("Remove all bans preventing a user from entering a channel");
+		this->SetDesc(_("Remove all bans preventing a user from entering a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

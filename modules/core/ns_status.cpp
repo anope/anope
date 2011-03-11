@@ -19,7 +19,7 @@ class CommandNSStatus : public Command
 	CommandNSStatus() : Command("STATUS", 0, 16)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Returns the owner status of the given nickname");
+		this->SetDesc(_("Returns the owner status of the given nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandCSSetSecureOps : public Command
  public:
 	CommandCSSetSecureOps(const Anope::string &cpermission = "") : Command("SECUREOPS", 2, 2, cpermission)
 	{
-		this->SetDesc("Stricter control of chanop status");
+		this->SetDesc(_("Stricter control of chanop status"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

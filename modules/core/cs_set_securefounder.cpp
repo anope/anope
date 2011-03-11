@@ -18,7 +18,7 @@ class CommandCSSetSecureFounder : public Command
  public:
 	CommandCSSetSecureFounder(const Anope::string &cpermission = "") : Command("SECUREFOUNDER", 2, 2, cpermission)
 	{
-		this->SetDesc("Stricter control of channel founder status");
+		this->SetDesc(_("Stricter control of channel founder status"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

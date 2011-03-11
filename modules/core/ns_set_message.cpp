@@ -18,7 +18,7 @@ class CommandNSSetMessage : public Command
  public:
 	CommandNSSetMessage(const Anope::string &spermission = "") : Command("MSG", 2, 2, spermission)
 	{
-		this->SetDesc("Change the communication method of Services");
+		this->SetDesc(_("Change the communication method of Services"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

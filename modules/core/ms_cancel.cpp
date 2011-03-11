@@ -20,7 +20,7 @@ class CommandMSCancel : public Command
  public:
 	CommandMSCancel() : Command("CANCEL", 1, 1)
 	{
-		this->SetDesc("Cancel last memo you sent");
+		this->SetDesc(_("Cancel last memo you sent"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

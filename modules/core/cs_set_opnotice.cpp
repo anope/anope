@@ -18,7 +18,7 @@ class CommandCSSetOpNotice : public Command
  public:
 	CommandCSSetOpNotice(const Anope::string &cpermission = "") : Command("OPNOTICE", 2, 2, cpermission)
 	{
-		this->SetDesc("Send a notice when OP/DEOP commands are used");
+		this->SetDesc(_("Send a notice when OP/DEOP commands are used"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

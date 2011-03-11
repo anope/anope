@@ -18,7 +18,7 @@ class CommandCSSuspend : public Command
  public:
 	CommandCSSuspend() : Command("SUSPEND", 1, 2, "chanserv/suspend")
 	{ 
-		this->SetDesc("Prevent a channel from being used preserving channel data and settings");
+		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -96,7 +96,7 @@ class CommandCSUnSuspend : public Command
 	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1, "chanserv/suspend")
 	{
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
-		this->SetDesc("Releases a suspended channel");
+		this->SetDesc(_("Releases a suspended channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

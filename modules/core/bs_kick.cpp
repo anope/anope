@@ -19,7 +19,7 @@ class CommandBSKick : public Command
  public:
 	CommandBSKick() : Command("KICK", 3, 6)
 	{
-		this->SetDesc("Configures kickers");
+		this->SetDesc(_("Configures kickers"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandNSSetAutoOp : public Command
  public:
 	CommandNSSetAutoOp(const Anope::string &spermission = "") : Command("AUTOOP", 1, 2, spermission)
 	{
-		this->SetDesc("Should services op you automatically.");
+		this->SetDesc(_("Should services op you automatically."));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -90,7 +90,7 @@ class CommandCSOp : public CommandModeBase
  public:
 	CommandCSOp() : CommandModeBase("OP")
 	{
-		this->SetDesc("Gives Op status to a selected nick on a channel");
+		this->SetDesc(_("Gives Op status to a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -124,7 +124,7 @@ class CommandCSDeOp : public CommandModeBase
  public:
 	CommandCSDeOp() : CommandModeBase("DEOP")
 	{
-		this->SetDesc("Deops a selected nick on a channel");
+		this->SetDesc(_("Deops a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -158,7 +158,7 @@ class CommandCSVoice : public CommandModeBase
  public:
 	CommandCSVoice() : CommandModeBase("VOICE")
 	{
-		this->SetDesc("Voices a selected nick on a channel");
+		this->SetDesc(_("Voices a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -193,7 +193,7 @@ class CommandCSDeVoice : public CommandModeBase
  public:
 	CommandCSDeVoice() : CommandModeBase("DEVOICE")
 	{
-		this->SetDesc("Devoices a selected nick on a channel");
+		this->SetDesc(_("Devoices a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -228,7 +228,7 @@ class CommandCSHalfOp : public CommandModeBase
  public:
 	CommandCSHalfOp() : CommandModeBase("HALFOP")
 	{
-		this->SetDesc("Halfops a selected nick on a channel");
+		this->SetDesc(_("Halfops a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -265,7 +265,7 @@ class CommandCSDeHalfOp : public CommandModeBase
  public:
 	CommandCSDeHalfOp() : CommandModeBase("DEHALFOP")
 	{
-		this->SetDesc("Dehalfops a selected nick on a channel");
+		this->SetDesc(_("Dehalfops a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -303,7 +303,7 @@ class CommandCSProtect : public CommandModeBase
  public:
 	CommandCSProtect() : CommandModeBase("PROTECT")
 	{
-		this->SetDesc("Protects a selected nick on a channel");
+		this->SetDesc(_("Protects a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -340,7 +340,7 @@ class CommandCSDeProtect : public CommandModeBase
  public:
 	CommandCSDeProtect() : CommandModeBase("DEPROTECT")
 	{
-		this->SetDesc("Deprotects a selected nick on a channel");
+		this->SetDesc(_("Deprotects a selected nick on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -376,7 +376,7 @@ class CommandCSOwner : public CommandModeBase
  public:
 	CommandCSOwner() : CommandModeBase("OWNER")
 	{
-		this->SetDesc("Gives you owner status on channel");
+		this->SetDesc(_("Gives you owner status on channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -412,7 +412,7 @@ class CommandCSDeOwner : public CommandModeBase
  public:
 	CommandCSDeOwner() : CommandModeBase("DEOWNER")
 	{
-		this->SetDesc("Removes your owner status on a channel");
+		this->SetDesc(_("Removes your owner status on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

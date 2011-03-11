@@ -18,7 +18,7 @@ class CommandHSSetAll : public Command
  public:
 	CommandHSSetAll() : Command("SETALL", 2, 2, "hostserv/set")
 	{
-		this->SetDesc("Set the vhost for all nicks in a group");
+		this->SetDesc(_("Set the vhost for all nicks in a group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

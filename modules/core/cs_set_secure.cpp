@@ -18,7 +18,7 @@ class CommandCSSetSecure : public Command
  public:
 	CommandCSSetSecure(const Anope::string &cpermission = "") : Command("SECURE", 2, 2, cpermission)
 	{
-		this->SetDesc("Activate " + ChanServ->nick + "'s security features");
+		this->SetDesc(Anope::printf(_("Activate %s's security features"), ChanServ->nick.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

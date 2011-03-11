@@ -18,7 +18,7 @@ class CommandCSSetSuccessor : public Command
  public:
 	CommandCSSetSuccessor(const Anope::string &cpermission = "") : Command("SUCCESSOR", 1, 2, cpermission)
 	{
-		this->SetDesc("Set the successor for a channel");
+		this->SetDesc(_("Set the successor for a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

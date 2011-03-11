@@ -349,7 +349,7 @@ class CommandOSAKill : public Command
  public:
 	CommandOSAKill() : Command("AKILL", 1, 4, "operserv/akill")
 	{
-		this->SetDesc("Manipulate the AKILL list");
+		this->SetDesc(_("Manipulate the AKILL list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

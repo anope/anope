@@ -19,7 +19,7 @@ class CommandBSSet : public Command
 	CommandBSSet() : Command("SET", 3, 3)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
-		this->SetDesc("Configures bot options");
+		this->SetDesc(_("Configures bot options"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

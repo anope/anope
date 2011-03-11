@@ -19,7 +19,7 @@ class CommandCSSetXOP : public Command
  public:
 	CommandCSSetXOP(const Anope::string &cpermission = "") : Command("XOP", 2, 2, cpermission)
 	{
-		this->SetDesc("Toggle the user privilege system");
+		this->SetDesc(_("Toggle the user privilege system"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

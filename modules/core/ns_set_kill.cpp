@@ -18,7 +18,7 @@ class CommandNSSetKill : public Command
  public:
 	CommandNSSetKill(const Anope::string &spermission = "") : Command("KILL", 2, 3, spermission)
 	{
-		this->SetDesc("Turn protection on or off");
+		this->SetDesc(_("Turn protection on or off"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

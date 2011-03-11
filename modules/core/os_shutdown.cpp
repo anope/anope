@@ -18,7 +18,7 @@ class CommandOSShutdown : public Command
  public:
 	CommandOSShutdown() : Command("SHUTDOWN", 0, 0, "operserv/shutdown")
 	{
-		this->SetDesc("Terminate services with save");
+		this->SetDesc(_("Terminate services with save"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

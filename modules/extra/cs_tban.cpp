@@ -57,7 +57,7 @@ class CommandCSTBan : public Command
  public:
 	CommandCSTBan() : Command("TBAN", 3, 3)
 	{
-		this->SetDesc("Bans the user for a given length of time");
+		this->SetDesc(_("Bans the user for a given length of time"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

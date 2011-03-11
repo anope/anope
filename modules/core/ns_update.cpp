@@ -18,7 +18,7 @@ class CommandNSUpdate : public Command
  public:
 	CommandNSUpdate() : Command("UPDATE", 0, 0)
 	{
-		this->SetDesc("Updates your current status, i.e. it checks for new memos");
+		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -363,7 +363,7 @@ class CommandOSSNLine : public Command
  public:
 	CommandOSSNLine() : Command("SNLINE", 1, 3, "operserv/snline")
 	{
-		this->SetDesc("Manipulate the SNLINE list");
+		this->SetDesc(_("Manipulate the SNLINE list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandNSSuspend : public Command
  public:
 	CommandNSSuspend() : Command("SUSPEND", 2, 2, "nickserv/suspend")
 	{
-		this->SetDesc("Suspend a given nick");
+		this->SetDesc(_("Suspend a given nick"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -102,7 +102,7 @@ class CommandNSUnSuspend : public Command
  public:
 	CommandNSUnSuspend() : Command("UNSUSPEND", 1, 1, "nickserv/suspend")
 	{
-		this->SetDesc("Unsuspend a given nick");
+		this->SetDesc(_("Unsuspend a given nick"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

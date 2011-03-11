@@ -18,7 +18,7 @@ class CommandOSChanKill : public Command
  public:
 	CommandOSChanKill() : Command("CHANKILL", 2, 3, "operserv/chankill")
 	{
-		this->SetDesc("AKILL all users on a specific channel");
+		this->SetDesc(_("AKILL all users on a specific channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

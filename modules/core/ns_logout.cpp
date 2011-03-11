@@ -18,7 +18,7 @@ class CommandNSLogout : public Command
  public:
 	CommandNSLogout() : Command("LOGOUT", 0, 2)
 	{
-		this->SetDesc("Reverses the effect of the IDENTIFY command");
+		this->SetDesc(_("Reverses the effect of the IDENTIFY command"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

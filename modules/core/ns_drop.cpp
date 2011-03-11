@@ -19,7 +19,7 @@ class CommandNSDrop : public Command
 	CommandNSDrop() : Command("DROP", 0, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Cancel the registration of a nickname");
+		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

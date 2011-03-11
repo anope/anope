@@ -18,7 +18,7 @@ class CommandCSSetTopicLock : public Command
  public:
 	CommandCSSetTopicLock(const Anope::string &cpermission = "") : Command("TOPICLOCK", 2, 2, cpermission)
 	{
-		this->SetDesc("Topic can only be changed with TOPIC");
+		this->SetDesc(_("Topic can only be changed with TOPIC"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

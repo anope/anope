@@ -18,7 +18,7 @@ class CommandHSGroup : public Command
  public:
 	CommandHSGroup() : Command("GROUP", 0, 0)
 	{
-		this->SetDesc("Syncs the vhost for all nicks in a group");
+		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

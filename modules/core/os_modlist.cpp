@@ -18,7 +18,7 @@ class CommandOSModList : public Command
  public:
 	CommandOSModList() : Command("MODLIST", 0, 1, "operserv/modlist")
 	{
-		this->SetDesc("List loaded modules");
+		this->SetDesc(_("List loaded modules"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

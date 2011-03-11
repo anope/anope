@@ -169,7 +169,7 @@ class CommandOSSession : public Command
  public:
 	CommandOSSession() : Command("SESSION", 2, 2, "operserv/session")
 	{
-		this->SetDesc("View the list of host sessions");
+		this->SetDesc(_("View the list of host sessions"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -434,7 +434,7 @@ class CommandOSException : public Command
  public:
 	CommandOSException() : Command("EXCEPTION", 1, 5)
 	{
-		this->SetDesc("Modify the session-limit exception list");
+		this->SetDesc(_("Modify the session-limit exception list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

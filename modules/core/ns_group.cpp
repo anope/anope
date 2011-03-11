@@ -19,7 +19,7 @@ class CommandNSGroup : public Command
 	CommandNSGroup() : Command("GROUP", 2, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Join a group");
+		this->SetDesc(_("Join a group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -176,7 +176,7 @@ class CommandNSUngroup : public Command
  public:
 	CommandNSUngroup() : Command("UNGROUP", 0, 1)
 	{
-		this->SetDesc("Remove a nick from a group");
+		this->SetDesc(_("Remove a nick from a group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -241,7 +241,7 @@ class CommandNSGList : public Command
  public:
 	CommandNSGList() : Command("GLIST", 0, 1)
 	{
-		this->SetDesc("Lists all nicknames in your group");
+		this->SetDesc(_("Lists all nicknames in your group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

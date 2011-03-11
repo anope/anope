@@ -18,7 +18,7 @@ class CommandCSSetBanType : public Command
  public:
 	CommandCSSetBanType(const Anope::string &cpermission = "") : Command("BANTYPE", 2, 2, cpermission)
 	{
-		this->SetDesc("Set how Services make bans on the channel");
+		this->SetDesc(_("Set how Services make bans on the channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

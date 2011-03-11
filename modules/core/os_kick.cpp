@@ -18,7 +18,7 @@ class CommandOSKick : public Command
  public:
 	CommandOSKick() : Command("KICK", 3, 3, "operserv/kick")
 	{
-		this->SetDesc("Kick a user from a channel");
+		this->SetDesc(_("Kick a user from a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

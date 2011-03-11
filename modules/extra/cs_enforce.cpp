@@ -123,7 +123,7 @@ class CommandCSEnforce : public Command
  public:
 	CommandCSEnforce() : Command("ENFORCE", 1, 2)
 	{
-		this->SetDesc("Enforce various channel modes and set options");
+		this->SetDesc(_("Enforce various channel modes and set options"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandMSInfo : public Command
  public:
 	CommandMSInfo() : Command("INFO", 0, 1)
 	{
-		this->SetDesc("Displays information about your memos");
+		this->SetDesc(_("Displays information about your memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

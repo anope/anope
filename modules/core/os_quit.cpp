@@ -19,7 +19,7 @@ class CommandOSQuit : public Command
  public:
 	CommandOSQuit() : Command("QUIT", 0, 0, "operserv/quit")
 	{
-		this->SetDesc("Terminate the Services program with no save");
+		this->SetDesc(_("Terminate the Services program with no save"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -18,7 +18,7 @@ class CommandHSDelAll : public Command
  public:
 	CommandHSDelAll() : Command("DELALL", 1, 1, "hostserv/del")
 	{
-		this->SetDesc("Delete the vhost for all nicks in a group");
+		this->SetDesc(_("Delete the vhost for all nicks in a group"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

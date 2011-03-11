@@ -21,7 +21,7 @@ class CommandNSConfirm : public Command
 	CommandNSConfirm() : Command("CONFIRM", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Confirm an auth code");
+		this->SetDesc(_("Confirm an auth code"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -92,7 +92,7 @@ class CommandNSRegister : public Command
 	CommandNSRegister() : Command("REGISTER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Register a nickname");
+		this->SetDesc(_("Register a nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -235,7 +235,7 @@ class CommandOSIgnore : public Command
  public:
 	CommandOSIgnore() : Command("IGNORE", 1, 4, "operserv/ignore")
 	{
-		this->SetDesc("Modify the Services ignore list");
+		this->SetDesc(_("Modify the Services ignore list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -21,7 +21,7 @@ class CommandCSSASet : public Command
  public:
 	CommandCSSASet() : Command("SASET", 2, 3)
 	{
-		this->SetDesc("Forcefully set channel options and information");
+		this->SetDesc(_("Forcefully set channel options and information"));
 	}
 
 	~CommandCSSASet()

@@ -21,7 +21,7 @@ class CommandNSSendPass : public Command
 	CommandNSSendPass() : Command("SENDPASS", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Forgot your password? Try this");
+		this->SetDesc(_("Forgot your password? Try this"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

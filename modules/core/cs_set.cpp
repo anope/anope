@@ -21,7 +21,7 @@ class CommandCSSet : public Command
  public:
 	CommandCSSet() : Command("SET", 2, 3)
 	{
-		this->SetDesc("Set channel options and information");
+		this->SetDesc(_("Set channel options and information"));
 	}
 
 	~CommandCSSet()

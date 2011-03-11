@@ -18,7 +18,7 @@ class CommandOSUpdate : public Command
  public:
 	CommandOSUpdate() : Command("UPDATE", 0, 0, "operserv/update")
 	{
-		this->SetDesc("Force the Services databases to be updated immediately");
+		this->SetDesc(_("Force the Services databases to be updated immediately"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

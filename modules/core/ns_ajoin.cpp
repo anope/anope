@@ -73,7 +73,7 @@ class CommandNSAJoin : public Command
  public:
 	CommandNSAJoin() : Command("AJOIN", 1, 3)
 	{
-		this->SetDesc("Manage your auto join list");
+		this->SetDesc(_("Manage your auto join list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -19,7 +19,7 @@ class CommandNSRelease : public Command
 	CommandNSRelease() : Command("RELEASE", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Regain custody of your nick after RECOVER");
+		this->SetDesc(_("Regain custody of your nick after RECOVER"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

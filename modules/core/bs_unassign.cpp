@@ -18,7 +18,7 @@ class CommandBSUnassign : public Command
  public:
 	CommandBSUnassign() : Command("UNASSIGN", 1, 1)
 	{
-		this->SetDesc("Unassigns a bot from a channel");
+		this->SetDesc(_("Unassigns a bot from a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

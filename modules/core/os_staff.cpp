@@ -18,7 +18,7 @@ class CommandOSStaff : public Command
  public:
 	CommandOSStaff() : Command("STAFF", 0, 0, "operserv/staff")
 	{
-		this->SetDesc("Display Services staff and online status");
+		this->SetDesc(_("Display Services staff and online status"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

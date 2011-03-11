@@ -18,7 +18,7 @@ class CommandOSReload : public Command
  public:
 	CommandOSReload() : Command("RELOAD", 0, 0, "operserv/reload")
 	{
-		this->SetDesc("Reload services' configuration file");
+		this->SetDesc(_("Reload services' configuration file"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

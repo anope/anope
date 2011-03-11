@@ -18,7 +18,7 @@ class CommandMSSendAll : public Command
  public:
 	CommandMSSendAll() : Command("SENDALL", 1, 1, "memoserv/sendall")
 	{
-		this->SetDesc("Send a memo to all registered users");
+		this->SetDesc(_("Send a memo to all registered users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

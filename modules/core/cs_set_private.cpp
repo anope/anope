@@ -18,7 +18,7 @@ class CommandCSSetPrivate : public Command
  public:
 	CommandCSSetPrivate(const Anope::string &cpermission = "") : Command("PRIVATE", 2, 2, cpermission)
 	{
-		this->SetDesc("Hide channel from LIST command");
+		this->SetDesc(_("Hide channel from LIST command"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

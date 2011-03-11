@@ -343,7 +343,7 @@ class CommandOSSQLine : public Command
  public:
 	CommandOSSQLine() : Command("SQLINE", 1, 4, "operserv/sqline")
 	{
-		this->SetDesc("Manipulate the SQLINE list");
+		this->SetDesc(_("Manipulate the SQLINE list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

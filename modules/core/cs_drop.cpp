@@ -20,7 +20,7 @@ class CommandCSDrop : public Command
 	{
 		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
-		this->SetDesc("Cancel the registration of a channel");
+		this->SetDesc(_("Cancel the registration of a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

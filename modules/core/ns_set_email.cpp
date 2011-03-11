@@ -51,7 +51,7 @@ class CommandNSSetEmail : public Command
  public:
 	CommandNSSetEmail(const Anope::string &spermission = "") : Command("EMAIL", 1, 2, spermission)
 	{
-		this->SetDesc("Associate an E-mail address with your nickname");
+		this->SetDesc(_("Associate an E-mail address with your nickname"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

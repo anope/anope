@@ -18,7 +18,7 @@ class CommandHSDel : public Command
  public:
 	CommandHSDel() : Command("DEL", 1, 1, "hostserv/del")
 	{
-		this->SetDesc("Delete the vhost of another user");
+		this->SetDesc(_("Delete the vhost of another user"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

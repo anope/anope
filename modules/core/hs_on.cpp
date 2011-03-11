@@ -18,7 +18,7 @@ class CommandHSOn : public Command
  public:
 	CommandHSOn() : Command("ON", 0, 0)
 	{
-		this->SetDesc("Activates your assigned vhost");
+		this->SetDesc(_("Activates your assigned vhost"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -51,7 +51,7 @@ class CommandMSRead : public Command
  public:
 	CommandMSRead() : Command("READ", 1, 2)
 	{
-		this->SetDesc("Read a memo or memos");
+		this->SetDesc(_("Read a memo or memos"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

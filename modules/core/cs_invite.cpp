@@ -18,7 +18,7 @@ class CommandCSInvite : public Command
  public:
 	CommandCSInvite() : Command("INVITE", 1, 3)
 	{
-		this->SetDesc("Tells ChanServ to invite you into a channel");
+		this->SetDesc(_("Tells ChanServ to invite you into a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

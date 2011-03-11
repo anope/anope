@@ -18,7 +18,7 @@ class CommandMSStaff : public Command
  public:
 	CommandMSStaff() : Command("STAFF", 1, 1, "memoserv/staff")
 	{
-		this->SetDesc("Send a memo to all opers/admins");
+		this->SetDesc(_("Send a memo to all opers/admins"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

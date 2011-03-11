@@ -18,7 +18,7 @@ class CommandCSStatus : public Command
  public:
 	CommandCSStatus() : Command("STATUS", 2, 2, "chanserv/status")
 	{
-		this->SetDesc("Returns the current access level of a user on a channel");
+		this->SetDesc(_("Returns the current access level of a user on a channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

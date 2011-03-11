@@ -21,7 +21,7 @@ class CommandNSSet : public Command
  public:
 	CommandNSSet() : Command("SET", 1, 3)
 	{
-		this->SetDesc("Set options, including kill protection");
+		this->SetDesc(_("Set options, including kill protection"));
 	}
 
 	~CommandNSSet()
@@ -126,7 +126,7 @@ class CommandNSSetDisplay : public Command
  public:
 	CommandNSSetDisplay() : Command("DISPLAY", 1)
 	{
-		this->SetDesc("Set the display of your group in Services");
+		this->SetDesc(_("Set the display of your group in Services"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -166,7 +166,7 @@ class CommandNSSetPassword : public Command
  public:
 	CommandNSSetPassword() : Command("PASSWORD", 1)
 	{
-		this->SetDesc("Set your nickname password");
+		this->SetDesc(_("Set your nickname password"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

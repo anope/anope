@@ -18,7 +18,7 @@ class CommandCSSetSignKick : public Command
  public:
 	CommandCSSetSignKick(const Anope::string &cpermission = "") : Command("SIGNKICK", 2, 2, cpermission)
 	{
-		this->SetDesc("Sign kicks that are done with KICK command");
+		this->SetDesc(_("Sign kicks that are done with KICK command"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

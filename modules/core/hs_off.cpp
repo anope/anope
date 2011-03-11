@@ -18,7 +18,7 @@ class CommandHSOff : public Command
  public:
 	CommandHSOff() : Command("OFF", 0, 0)
 	{
-		this->SetDesc("Deactivates your assigned vhost");
+		this->SetDesc(_("Deactivates your assigned vhost"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

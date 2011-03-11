@@ -393,7 +393,7 @@ class CommandCSAccess : public Command
  public:
 	CommandCSAccess() : Command("ACCESS", 2, 4)
 	{
-		this->SetDesc("Modify the list of privileged users");
+		this->SetDesc(_("Modify the list of privileged users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -669,7 +669,7 @@ class CommandCSLevels : public Command
  public:
 	CommandCSLevels() : Command("LEVELS", 2, 4)
 	{
-		this->SetDesc("Redefine the meanings of access levels");
+		this->SetDesc(_("Redefine the meanings of access levels"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

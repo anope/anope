@@ -22,7 +22,7 @@ class CommandNSGetEMail : public Command
  public:
 	CommandNSGetEMail() : Command("GETEMAIL", 1, 1, "nickserv/getemail")
 	{
-		this->SetDesc("Matches and returns all users that registered using given email");
+		this->SetDesc(_("Matches and returns all users that registered using given email"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

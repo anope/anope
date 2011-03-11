@@ -18,7 +18,7 @@ class CommandHSList : public Command
  public:
 	CommandHSList() : Command("LIST", 0, 1, "hostserv/list")
 	{
-		this->SetDesc("Displays one or more vhost entries.");
+		this->SetDesc(_("Displays one or more vhost entries."));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

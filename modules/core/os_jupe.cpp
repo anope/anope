@@ -18,7 +18,7 @@ class CommandOSJupe : public Command
  public:
 	CommandOSJupe() : Command("JUPE", 1, 2, "operserv/jupe")
 	{
-		this->SetDesc("\"Jupiter\" a server");
+		this->SetDesc(_("\"Jupiter\" a server"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

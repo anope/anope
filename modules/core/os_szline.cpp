@@ -345,7 +345,7 @@ class CommandOSSZLine : public Command
  public:
 	CommandOSSZLine() : Command("SZLINE", 1, 4, "operserv/szline")
 	{
-		this->SetDesc("Manipulate the SZLINE list");
+		this->SetDesc(_("Manipulate the SZLINE list"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -117,7 +117,7 @@ class CommandNSAccess : public Command
  public:
 	CommandNSAccess() : Command("ACCESS", 1, 3)
 	{
-		this->SetDesc("Modify the list of authorized addresses");
+		this->SetDesc(_("Modify the list of authorized addresses"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

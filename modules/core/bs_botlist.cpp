@@ -18,7 +18,7 @@ class CommandBSBotList : public Command
  public:
 	CommandBSBotList() : Command("BOTLIST", 0, 0)
 	{
-		this->SetDesc("Lists available bots");
+		this->SetDesc(_("Lists available bots"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

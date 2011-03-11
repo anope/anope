@@ -18,7 +18,7 @@ class CommandOSGlobal : public Command
  public:
 	CommandOSGlobal() : Command("GLOBAL", 1, 1, "operserv/global")
 	{
-		this->SetDesc("Send a message to all users");
+		this->SetDesc(_("Send a message to all users"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

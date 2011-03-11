@@ -99,7 +99,7 @@ class CommandEntryMessage : public Command
  public:
 	CommandEntryMessage(const Anope::string &cname) : Command(cname, 2, 3)
 	{
-		this->SetDesc("Manage the channel's entry messages");
+		this->SetDesc(_("Manage the channel's entry messages"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

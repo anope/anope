@@ -20,7 +20,7 @@ class CommandCSList : public Command
 	CommandCSList() : Command("LIST", 1, 2)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
-		this->SetDesc("Lists all registered channels matching the given pattern");
+		this->SetDesc(_("Lists all registered channels matching the given pattern"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

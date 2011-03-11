@@ -19,7 +19,7 @@ class CommandNSIdentify : public Command
 	CommandNSIdentify() : Command("IDENTIFY", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Identify yourself with your password");
+		this->SetDesc(_("Identify yourself with your password"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

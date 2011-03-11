@@ -19,7 +19,7 @@ class CommandNSRecover : public Command
 	CommandNSRecover() : Command("RECOVER", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetDesc("Kill another user who has taken your nick");
+		this->SetDesc(_("Kill another user who has taken your nick"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

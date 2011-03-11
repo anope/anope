@@ -294,7 +294,7 @@ class CommandOSLogonNews : public NewsBase
  public:
 	CommandOSLogonNews() : NewsBase("LOGONNEWS")
 	{
-		this->SetDesc("Define messages to be shown to users at logon");
+		this->SetDesc(_("Define messages to be shown to users at logon"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -330,7 +330,7 @@ class CommandOSOperNews : public NewsBase
  public:
 	CommandOSOperNews() : NewsBase("OPERNEWS")
 	{
-		this->SetDesc("Define messages to be shown to users who oper");
+		this->SetDesc(_("Define messages to be shown to users who oper"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -366,7 +366,7 @@ class CommandOSRandomNews : public NewsBase
  public:
 	CommandOSRandomNews() : NewsBase("RANDOMNEWS")
 	{
-		this->SetDesc("Define messages to be randomly shown to users at logon");
+		this->SetDesc(_("Define messages to be randomly shown to users at logon"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

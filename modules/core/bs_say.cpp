@@ -18,7 +18,7 @@ class CommandBSSay : public Command
  public:
 	CommandBSSay() : Command("SAY", 2, 2)
 	{
-		this->SetDesc("Makes the bot say the given text on the given channel");
+		this->SetDesc(_("Makes the bot say the given text on the given channel"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

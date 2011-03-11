@@ -23,8 +23,8 @@ class ModuleAlias : public Module
  public:
 	ModuleAlias(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		Implementation i[] = { I_OnReload, I_OnPreCommandRun };
-		ModuleManager::Attach(i, this, 2);
+		Implementation i[] = { I_OnReload, I_OnPreCommandRun, I_OnBotFantasy };
+		ModuleManager::Attach(i, this, 3);
 
 		OnReload(false);
 	}
@@ -69,11 +69,13 @@ class ModuleAlias : public Module
 		{
 			const CommandAlias &alias = it->second;
 			
-			if (!fantasy && !bi->nick.equals_ci(alias.source_client))
+			if (!u->HasMode(UMODE_OPER) && alias.operonly)
 				continue;
 			else if (fantasy != alias.fantasy)
 				continue;
-			else if (!u->HasMode(UMODE_OPER) && alias.operonly)
+			else if (fantasy && alias.fantasy) // OnBotFantasy gets this!
+				return EVENT_STOP;
+			else if (!bi->nick.equals_ci(alias.source_client))
 				continue;
 
 			BotInfo *target = findbot(alias.target_client);
@@ -84,6 +86,37 @@ class ModuleAlias : public Module
 		}
 
 		return EVENT_CONTINUE;
+	}
+
+	void OnBotFantasy(const Anope::string &command, User *u, ChannelInfo *ci, const Anope::string &params)
+	{
+		std::multimap<Anope::string, CommandAlias, std::less<ci::string> >::const_iterator it = aliases.find(command), it_end = it;
+		if (it_end != aliases.end())
+			it_end = aliases.upper_bound(command);
+		for (; it != it_end; ++it)
+		{
+			const CommandAlias &alias = it->second;
+
+			if (!u->HasMode(UMODE_OPER) && alias.operonly)
+				continue;
+
+			BotInfo *target = findbot(alias.target_client);
+			if (!target)
+				target = ChanServ;
+
+			Anope::string full_message = alias.target_command;
+			if (target == ChanServ || target == BotServ)
+			{
+				Command *target_c = FindCommand(target, alias.target_command);
+				if (target_c && !target_c->HasFlag(CFLAG_STRIP_CHANNEL))
+					full_message += " " + ci->name;
+			}
+			if (!params.empty())
+				full_message += + " " + params;
+
+			mod_run_cmd(target, u, ci, full_message);
+			break;
+		}
 	}
 };
 

@@ -46,12 +46,12 @@ class CommandBSSet : public Command
 			if (value.equals_ci("ON"))
 			{
 				bi->SetFlag(BI_PRIVATE);
-				source.Reply(_("Private mode of bot %s is now \002\002."), bi->nick.c_str());
+				source.Reply(_("Private mode of bot %s is now \002on\002."), bi->nick.c_str());
 			}
 			else if (value.equals_ci("OFF"))
 			{
 				bi->UnsetFlag(BI_PRIVATE);
-				source.Reply(_("Private mode of bot %s is now \002\002."), bi->nick.c_str());
+				source.Reply(_("Private mode of bot %s is now \002off\002."), bi->nick.c_str());
 			}
 			else
 				SyntaxError(source, "SET PRIVATE", _("SET \037botname\037 PRIVATE {\037ON|\037}"));
@@ -101,12 +101,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_FANTASY);
-					source.Reply(_("Fantasy mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Fantasy mode is now \002on\002 on channel %s."), ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_FANTASY);
-					source.Reply(_("Fantasy mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
 					SyntaxError(source, "SET FANTASY", _("SET \037channel\037 FANTASY {\037ON|\037}"));
@@ -116,12 +116,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_GREET);
-					source.Reply(_("Greet mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Greet mode is now \002on\002 on channel %s."), ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_GREET);
-					source.Reply(_("Greet mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
 					SyntaxError(source, "SET GREET", _("SET \037channel\037 GREET {\037ON|\037}"));
@@ -133,12 +133,12 @@ class CommandBSSet : public Command
 					ci->botflags.SetFlag(BS_NOBOT);
 					if (ci->bi)
 						ci->bi->UnAssign(u, ci);
-					source.Reply(_("No Bot mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("No Bot mode is now \002on\002 on channel %s."), ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_NOBOT);
-					source.Reply(_("No Bot mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("No Bot mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
 					SyntaxError(source, "SET NOBOT", _("SET \037botname\037 NOBOT {\037ON|\037}"));
@@ -148,12 +148,12 @@ class CommandBSSet : public Command
 				if (value.equals_ci("ON"))
 				{
 					ci->botflags.SetFlag(BS_SYMBIOSIS);
-					source.Reply(_("Symbiosis mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Symbiosis mode is now \002on\002 on channel %s."), ci->name.c_str());
 				}
 				else if (value.equals_ci("OFF"))
 				{
 					ci->botflags.UnsetFlag(BS_SYMBIOSIS);
-					source.Reply(_("Symbiosis mode is now \002\002 on channel %s."), ci->name.c_str());
+					source.Reply(_("Symbiosis mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
 					SyntaxError(source, "SET SYMBIOSIS", _("SET \037channel\037 SYMBIOSIS {\037ON|\037}"));

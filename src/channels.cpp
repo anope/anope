@@ -809,7 +809,7 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 
 	/* Bots get rejoined */
 	if (bi)
-		bi->Join(chname);
+		bi->Join(this, &Config->BotModeList);
 }
 
 /** Kick a user from the channel

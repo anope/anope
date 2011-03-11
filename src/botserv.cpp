@@ -317,41 +317,42 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	/* Fantaisist commands */
 	if (ci->botflags.HasFlag(BS_FANTASY) && buf[0] == Config->BSFantasyCharacter[0] && !was_action)
 	{
-		spacesepstream sep(buf);
-		Anope::string command;
+		Anope::string message = buf;
+		/* Strip off the fantasy character */
+		message.erase(message.begin());
 
-		if (sep.GetToken(command) && command[0] == Config->BSFantasyCharacter[0])
+		size_t space = message.find(' ');
+		Anope::string command, rest;
+		if (space == Anope::string::npos)
+			command = message;
+		else
 		{
-			/* Strip off the fantasy character */
-			command.erase(command.begin());
+			command = message.substr(0, space);
+			rest = message.substr(space + 1);
+		}
 
-			if (check_access(u, ci, CA_FANTASIA))
+		if (check_access(u, ci, CA_FANTASIA))
+		{
+
+			Command *cmd = FindCommand(ChanServ, command);
+
+			/* Command exists and can be called by fantasy */
+			if (cmd && !cmd->HasFlag(CFLAG_DISABLE_FANTASY))
 			{
-				Anope::string message = sep.GetRemaining();
+				Anope::string params = rest;
+				/* Some commands don't need the channel name added.. eg !help */
+				if (!cmd->HasFlag(CFLAG_STRIP_CHANNEL))
+					params = ci->name + " " + params;
+				params = command + " " + params;
 
-				FOREACH_RESULT(I_OnPreCommandRun, OnPreCommandRun(u, ci->bi, command, message, ci));
-				if (MOD_RESULT == EVENT_STOP)
-					return;
-
-				Command *cmd = FindCommand(ChanServ, command);
-
-				/* Command exists and can be called by fantasy */
-				if (cmd && !cmd->HasFlag(CFLAG_DISABLE_FANTASY))
-				{
-					/* Some commands don't need the channel name added.. eg !help */
-					if (!cmd->HasFlag(CFLAG_STRIP_CHANNEL))
-						message = ci->name + " " + message;
-					message = command + " " + message;
-
-					mod_run_cmd(ChanServ, u, ci, message);
-				}
-
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, sep.GetRemaining()));
+				mod_run_cmd(ChanServ, u, ci, params);
 			}
-			else
-			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, ci, sep.GetRemaining()));
-			}
+
+			FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, rest));
+		}
+		else
+		{
+			FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, ci, rest));
 		}
 	}
 }

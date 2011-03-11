@@ -160,7 +160,7 @@ class CommandOSConfig : public Command
 			/* Blocks we should show */
 			const Anope::string show_blocks[] = { "botserv", "chanserv", "defcon", "global", "memoserv", "nickserv", "networkinfo", "operserv", "options", "" };
 
-			Log(LOG_ADMIN, source.u, this);
+			Log(LOG_ADMIN, source.u, this) << "VIEW";
 
 			for (ConfigDataHash::const_iterator it = Config->config_data.begin(), it_end = Config->config_data.end(); it != it_end; ++it)
 			{

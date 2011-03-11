@@ -108,7 +108,7 @@ E Anope::string get_mlock_modes(ChannelInfo *ci, int complete);
 
 /**** config.c ****/
 
-E Anope::string services_conf;
+E ConfigurationFile services_conf;
 E ServerConfig *Config;
 
 /* hostserv.c */
@@ -234,7 +234,7 @@ E size_t strlcat(char *, const char *, size_t);
 #endif
 
 E time_t dotime(const Anope::string &s);
-E Anope::string duration(NickCore *nc, time_t seconds);
+E Anope::string duration(time_t seconds);
 E Anope::string expire_left(NickCore *nc, time_t expires);
 E Anope::string do_strftime(const time_t &t);
 E bool doValidHost(const Anope::string &host, int type);

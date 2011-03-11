@@ -95,7 +95,7 @@ class CommandNSIdentify : public Command
 					source.Reply(_("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
 					time_t time_registered = Anope::CurTime - na->time_registered;
 					if (Config->NSUnconfirmedExpire > time_registered)
-						source.Reply(_("Your account will expire, if not confirmed, in %s"), duration(u->Account(), Config->NSUnconfirmedExpire - time_registered).c_str());
+						source.Reply(_("Your account will expire, if not confirmed, in %s"), duration(Config->NSUnconfirmedExpire - time_registered).c_str());
 				}
 
 				check_memos(u);

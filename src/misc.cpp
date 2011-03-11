@@ -201,11 +201,10 @@ time_t dotime(const Anope::string &s)
 /**
  * Expresses in a string the period of time represented by a given amount
  * of seconds (with days/hours/minutes).
- * @param na Nick Alias
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string duration(NickCore *nc, time_t seconds)
+Anope::string duration(time_t seconds)
 {
 	/* We first calculate everything */
 	time_t days = seconds / 86400;
@@ -248,9 +247,9 @@ Anope::string do_strftime(const time_t &t)
 	char buf[BUFSIZE];
 	strftime(buf, sizeof(buf), "%b %d %H:%M:%S %Y %Z", &tm);
 	if (t < Anope::CurTime)
-		return Anope::string(buf) + " (" + duration(NULL, Anope::CurTime - t) + " ago)";
+		return Anope::string(buf) + " (" + duration(Anope::CurTime - t) + " ago)";
 	else
-		return Anope::string(buf) + " (" + duration(NULL, t - Anope::CurTime) + " from now)";
+		return Anope::string(buf) + " (" + duration(t - Anope::CurTime) + " from now)";
 }
 
 /*************************************************************************/

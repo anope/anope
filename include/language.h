@@ -10,7 +10,7 @@
 #define BAD_USERHOST_MASK		"Mask must be in the form \037user\037@\037host\037."
 #define BAD_EXPIRY_TIME			"Invalid expiry time."
 #define USERHOST_MASK_TOO_WIDE		"%s coverage is too wide; Please use a more specific mask."
-#define READ_ONLY_MODE			"\002Notice:\002 Services is in read-only mode; changes will not be saved!"
+#define READ_ONLY_MODE			"Services are in read-only mode!"
 #define PASSWORD_INCORRECT			"Password incorrect."
 #define ACCESS_DENIED			"Access denied."
 #define MORE_OBSCURE_PASSWORD		"Please try again with a more obscure password. Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters."

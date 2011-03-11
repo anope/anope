@@ -200,7 +200,7 @@ class CommandNSRegister : public Command
 				if (SendRegmail(u, na))
 				{
 					source.Reply(_("A passcode has been sent to %s, please type %R%s confirm <passcode> to confirm your email address."), email.c_str(), NickServ->nick.c_str());
-					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(na->nc, Config->NSUnconfirmedExpire).c_str());
+					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
 

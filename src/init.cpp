@@ -295,7 +295,7 @@ void Init(int ac, char **av)
 	{
 		if (Arg.empty())
 			throw FatalException("The --config option requires a file name");
-		services_conf = Arg;
+		services_conf = ConfigurationFile(Arg, false);
 	}
 
 	if (GetCommandLineArgument("dir", 0, Arg))
@@ -315,9 +315,9 @@ void Init(int ac, char **av)
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
 #ifdef _WIN32
-	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf;
+	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf.GetName();
 #else
-	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf;
+	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "/" << services_conf.GetName();
 #endif
 
 	/* Read configuration file; exit if there are problems. */

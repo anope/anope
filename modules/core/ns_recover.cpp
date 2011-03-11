@@ -51,7 +51,7 @@ class CommandNSRecover : public Command
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
-				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
+				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
 				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
@@ -74,7 +74,7 @@ class CommandNSRecover : public Command
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
-				Anope::string relstr = duration(na->nc, Config->NSReleaseTimeout);
+				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
 				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
@@ -87,7 +87,7 @@ class CommandNSRecover : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		Anope::string relstr = duration(source.u->Account(), Config->NSReleaseTimeout);
+		Anope::string relstr = duration(Config->NSReleaseTimeout);
 
 		source.Reply(_("Syntax: \002RECOVER \037nickname\037 [\037password\037]\002\n"
 				" \n"

@@ -942,6 +942,7 @@ class IRCDProto;
 class IRCdMessage;
 struct Uplink;
 class ServerConfig;
+class ConfigurationFile;
 
 #include "extern.h"
 #include "language.h"

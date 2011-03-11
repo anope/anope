@@ -130,47 +130,9 @@ class CommandOSStats : public Command
 	CommandReturn DoStatsUptime(CommandSource &source)
 	{
 		time_t uptime = Anope::CurTime - start_time;
-		int days = uptime / 86400, hours = (uptime / 3600) % 24, mins = (uptime / 60) % 60, secs = uptime % 60;
 		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), usercnt, opcnt);
 		source.Reply(_("Maximum users: \002%d\002 (%s)"), maxusercnt, do_strftime(maxusertime).c_str());
-		if (days > 1)
-			source.Reply(_("Services up \002%d\002 days, \002%02d:%02d\002"), days, hours, mins, secs);
-		else if (days == 1)
-			source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 day, OPER_STATS_UPTIME_1\002%02d:%02dOPER_STATS_UPTIME_1\002"), days, hours, mins, secs);
-		else
-		{
-			if (hours > 1)
-			{
-				if (mins != 1)
-					source.Reply(_("Services up \002%d\002 hours, \002%d\002 minutes"), hours, mins);
-				else
-					source.Reply(_("Services up OPER_STATS_UPTIME_H1\002%dOPER_STATS_UPTIME_H1\002 hours, OPER_STATS_UPTIME_H1\002%dOPER_STATS_UPTIME_H1\002 minute"), hours, mins, secs);
-			}
-			else if (hours == 1)
-			{
-				if (mins != 1)
-					source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 hour, OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 minutes"), hours, mins, secs);
-				else
-					source.Reply(_("Services up OPER_STATS_UPTIME_1H1\002%dOPER_STATS_UPTIME_1H1\002 hour, OPER_STATS_UPTIME_1H1\002%dOPER_STATS_UPTIME_1H1\002 minute"), hours, mins, secs);
-			}
-			else
-			{
-				if (mins != 1)
-				{
-					if (secs != 1)
-						source.Reply(_("Services up \002%d\002 minutes, \002%d\002 seconds"), mins, secs);
-					else
-						source.Reply(_("Services up OPER_STATS_UPTIME_M1\002%dOPER_STATS_UPTIME_M1\002 minutes, OPER_STATS_UPTIME_M1\002%dOPER_STATS_UPTIME_M1\002 second"), mins, secs);
-				}
-				else
-				{
-					if (secs != 1)
-						source.Reply(_("Services up OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 minute, OPER_STATS_UPTIME_1\002%dOPER_STATS_UPTIME_1\002 seconds"), mins, secs);
-					else
-						source.Reply(_("Services up OPER_STATS_UPTIME_1M1\002%dOPER_STATS_UPTIME_1M1\002 minute, OPER_STATS_UPTIME_1M1\002%dOPER_STATS_UPTIME_1M1\002 second"), mins, secs);
-				}
-			}
-		}
+		source.Reply(_("Services up %s"), duration(uptime).c_str());
 
 		return MOD_CONT;
 	}

@@ -34,8 +34,6 @@ enum ConfigDataType
 	DT_UINTEGER, // Unsigned Integer
 	DT_LUINTEGER, // Long Unsigned Integer
 	DT_CHARPTR, // Char pointer
-	DT_CSSTRING, // std::string
-	DT_CISTRING, // ci::string
 	DT_STRING, // Anope::string
 	DT_BOOLEAN, // Boolean
 	DT_HOSTNAME, // Hostname syntax
@@ -89,11 +87,7 @@ class ValueItem
 	int GetInteger() const;
 	/** Get value as a string */
 	const char *GetString() const;
-	/** Get value as an std::string */
-	inline const std::string GetCSValue() const { return v.str(); }
-	/** Get value as a ci::string */
-	inline const ci::string GetCIValue() const { return v.ci_str(); }
-	/** Get value as a ci::string */
+	/** Get value as an Anope::string */
 	inline const Anope::string &GetValue() const { return v; }
 	/** Get value as a bool */
 	bool GetBool() const;
@@ -177,78 +171,6 @@ template<> class ValueContainer<char **> : public ValueContainerBase
 	}
 };
 
-/** This a specific version of ValueContainer to handle std::string specially
- */
-template<> class ValueContainer<std::string *> : public ValueContainerBase
-{
- private:
-	/** Contained item */
-	std::string *val;
- public:
-	/** Initialize with nothing */
-	ValueContainer() : ValueContainerBase(), val(NULL) { }
-	/** Initialize with an std::string */
-	ValueContainer(std::string *Val) : ValueContainerBase(), val(Val) { }
-	/** Initialize with a copy */
-	ValueContainer(const ValueContainer &Val) : ValueContainerBase(), val(Val.val) { }
-	ValueContainer &operator=(const ValueContainer &Val)
-	{
-		val = Val.val;
-		return *this;
-	}
-	/** Change value to given std::string */
-	void Set(const std::string &newval)
-	{
-		*val = newval;
-	}
-	/** Change value to given ci::string */
-	void Set(const ci::string &newval)
-	{
-		*val = newval.c_str();
-	}
-	/** Change value to given char pointer */
-	void Set(const char *newval)
-	{
-		*val = newval;
-	}
-};
-
-/** This a specific version of ValueContainer to handle ci::string specially
- */
-template<> class ValueContainer<ci::string *> : public ValueContainerBase
-{
- private:
-	/** Contained item */
-	ci::string *val;
- public:
-	/** Initialize with nothing */
-	ValueContainer() : ValueContainerBase(), val(NULL) { }
-	/** Initialize with an std::string */
-	ValueContainer(ci::string *Val) : ValueContainerBase(), val(Val) { }
-	/** Initialize with a copy */
-	ValueContainer(const ValueContainer &Val) : ValueContainerBase(), val(Val.val) { }
-	ValueContainer &operator=(const ValueContainer &Val)
-	{
-		val = Val.val;
-		return *this;
-	}
-	/** Change value to given std::string */
-	void Set(const std::string &newval)
-	{
-		*val = newval.c_str();
-	}
-	/** Change value to given ci::string */
-	void Set(const ci::string &newval)
-	{
-		*val = newval;
-	}
-	/** Change value to given char pointer */
-	void Set(const char *newval)
-	{
-		*val = newval;
-	}
-};
-
 /** This a specific version of ValueContainer to handle Anope::string specially
  */
 template<> class ValueContainer<Anope::string *> : public ValueContainerBase
@@ -268,16 +190,7 @@ template<> class ValueContainer<Anope::string *> : public ValueContainerBase
 		val = Val.val;
 		return *this;
 	}
-	/** Change value to given std::string */
-	void Set(const std::string &newval)
-	{
-		*val = newval;
-	}
-	/** Change value to given ci::string */
-	void Set(const ci::string &newval)
-	{
-		*val = newval;
-	}
+
 	/** Change value to given Anope::string */
 	void Set(const Anope::string &newval)
 	{
@@ -320,16 +233,6 @@ typedef ValueContainer<int *> ValueContainerInt;
 typedef ValueContainer<time_t *> ValueContainerTime;
 
 /** A specialization of ValueContainer to hold a pointer to
- * an std::string
- */
-typedef ValueContainer<std::string *> ValueContainerCSString;
-
-/** A specialization of ValueContainer to hold a pointer to
- * an ci::string
- */
-typedef ValueContainer<ci::string *> ValueContainerCIString;
-
-/** A specialization of ValueContainer to hold a pointer to
  * an Anope::string
  */
 typedef ValueContainer<Anope::string *> ValueContainerString;
@@ -348,43 +251,89 @@ typedef bool (*MultiValidator)(ServerConfig *, const Anope::string &, const Anop
  */
 typedef bool (*MultiNotify)(ServerConfig *, const Anope::string &);
 
-/** Holds a core configuration item and its callbacks
+bool ValidateNotEmpty(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateNotZero(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateGuestPrefix(ServerConfig *conf, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data);
+bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateDefCon(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data);
+bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
+
+/** Represents a configuration file
  */
-struct InitialConfig
+class ConfigurationFile
 {
-	/** Tag name */
-	const Anope::string tag;
-	/** Value name */
-	const Anope::string value;
-	/** Default, if not defined */
-	const Anope::string default_value;
-	/** Value containers */
-	ValueContainerBase *val;
-	/** Data types */
-	int datatype;
-	/** Validation function */
-	Validator validation_function;
+	Anope::string name;
+	bool executable;
+	FILE *fp;
+ public:
+	ConfigurationFile(const Anope::string &, bool);
+	~ConfigurationFile();
+	const Anope::string &GetName() const;
+
+	bool IsOpen() const;
+	bool Open();
+	void Close();
+	bool End() const;
+	Anope::string Read();
 };
 
-/** Holds a core configuration item and its callbacks
- * where there may be more than one item
+/** Holds all of the core configuration items
  */
-struct MultiConfig
+class ConfigItems
 {
-	/** Tag name */
-	const Anope::string tag;
-	/** One or more items within tag */
-	const Anope::string items[17];
-	/** One or more defaults for items within tags */
-	const Anope::string items_default[17];
-	/** One or more data types */
-	int datatype[17];
-	/** Initialization function */
-	MultiNotify init_function;
-	/** Validation function */
-	MultiValidator validation_function;
-	/** Completion function */
-	MultiNotify finish_function;
+ public:
+	/** Holds a core configuration item and its callbacks
+	 */
+	struct Item
+	{
+		/** Tag name */
+		Anope::string tag;
+		/** Value name */
+		Anope::string value;
+		/** Default, if not defined */
+		Anope::string default_value;
+		/** Value containers */
+		ValueContainerBase *val;
+		/** Data types */
+		int datatype;
+		/** Validation function */
+		Validator validation_function;
+	} *Values;
+
+	/** Holds a core configuration item and its callbacks
+	 * where there may be more than one item
+	 */
+	struct MultiItem
+	{
+		/** Tag name */
+		Anope::string tag;
+		/** One or more items within tag */
+		Anope::string items[17];
+		/** One or more defaults for items within tags */
+		Anope::string items_default[17];
+		/** One or more data types */
+		int datatype[17];
+		/** Initialization function */
+		MultiNotify init_function;
+		/** Validation function */
+		MultiValidator validation_function;
+		/** Completion function */
+		MultiNotify finish_function;
+	} *MultiValues;
+
+	ConfigItems(ServerConfig *conf);
+	~ConfigItems();
 };
 
 /** This class holds the bulk of the runtime configuration for Anope.
@@ -398,8 +347,6 @@ class CoreExport ServerConfig
 	 */
 	bool CheckOnce(const Anope::string &);
  public:
-	/* Error from the config */
-	std::ostringstream errstr;
 	/** This holds all the information in the config file,
 	 * it's indexed by tag name to a vector of key/values.
 	 */
@@ -407,15 +354,16 @@ class CoreExport ServerConfig
 	/** Construct a new ServerConfig
 	 */
 	ServerConfig();
+
 	/** Read the entire configuration into memory
 	 * and initialize this class. All other methods
 	 * should be used only by the core.
 	 */
 	void Read();
-	/** Load 'filename' into 'target', with the new config parser everything is parsed into
+	/** Load the configuration file into 'this'. With the new config parser everything is parsed into
 	 * tag/key/value at load-time rather than at read-value time.
 	 */
-	bool LoadConf(ConfigDataHash &, const Anope::string &);
+	void LoadConf(ConfigurationFile &file);
 	// Both these return true if the value existed or false otherwise
 	/** Writes 'length' chars into 'result' as a string
 	 */
@@ -857,7 +805,7 @@ class CoreExport ConfigReader
 	long error;
  public:
 	/** Default constructor.
-	 * This constructor initialises the ConfigReader class to read services.conf.
+	 * This constructor initialises the ConfigReader class to read the configuration file(s).
 	 */
 	ConfigReader();
 	/** Overloaded constructor.

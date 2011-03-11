@@ -29,13 +29,14 @@ class CommandOSReload : public Command
 			delete Config;
 			Config = newconfig;
 			FOREACH_MOD(I_OnReload, OnReload(false));
+			source.Reply(_("Services' configuration file has been reloaded."));
 		}
 		catch (const ConfigException &ex)
 		{
 			Log() << "Error reloading configuration file: " << ex.GetReason();
+			source.Reply(_("Error reloading confguration file: ") + ex.GetReason());
 		}
 
-		source.Reply(_("Services' configuration file has been reloaded."));
 		return MOD_CONT;
 	}
 

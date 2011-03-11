@@ -72,8 +72,7 @@ class CommandNSRelease : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
-		User *u = source.u;
-		Anope::string relstr = duration(u->Account(), Config->NSReleaseTimeout);
+		Anope::string relstr = duration(Config->NSReleaseTimeout);
 
 		source.Reply(_("Syntax: \002RELEASE \037nickname\037 [\037password\037]\002\n"
 				" \n"

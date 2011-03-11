@@ -95,7 +95,7 @@ static void DisplayNews(User *u, NewsType Type)
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			u->SendMessage(OperServ, msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
+			u->SendMessage(Type != NEWS_OPER && Global ? Global : OperServ, msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 

@@ -261,7 +261,7 @@ bool Server::IsULined() const
  */
 Server *Server::Find(const Anope::string &name, Server *s)
 {
-	Log(LOG_DEBUG) << "Server::Find called for " << name;
+	Log(LOG_DEBUG_2) << "Server::Find called for " << name;
 
 	if (!s)
 		s = Me;
@@ -276,7 +276,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
 				return serv;
-			Log(LOG_DEBUG) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
+			Log(LOG_DEBUG_2) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);
 			if (server)
 				return server;

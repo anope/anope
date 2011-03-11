@@ -289,6 +289,15 @@ class InspircdIRCdMessage : public IRCdMessage
 		return true;
 	}
 
+	bool OnPrivmsg(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		/* Ignore privmsgs from the server, which can happen. */
+		if (Server::Find(source) != NULL)
+			return true;
+
+		return IRCdMessage::OnPrivmsg(source, params);
+	}
+
 	/*
 	 * [Nov 04 00:08:46.308435 2009] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
 	 * 0: name

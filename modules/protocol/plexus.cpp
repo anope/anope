@@ -554,15 +554,7 @@ bool event_eob(const Anope::string &source, const std::vector<Anope::string> &pa
 {
 	Server *s = Server::Find(source);
 	if (s)
-	{
 		s->Sync(true);
-		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
-		{
-			User *u = *it;
-			if (u->server == s && !u->IsIdentified())
-				validate_user(u);
-		}
-	}
 
 	return true;
 }
@@ -644,6 +636,19 @@ class ProtoPlexus : public Module
 		pmodule_ircd_message(&this->ircd_message);
 
 		this->AddModes();
+
+		Implementation i[] = { I_OnServerSync };
+		ModuleManager::Attach(i, this, 1);
+	}
+
+	void OnServerSync(Server *s)
+	{
+		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+		{
+			User *u = *it;
+			if (u->server == s && !u->IsIdentified())
+				validate_user(u);
+		}
 	}
 };
 

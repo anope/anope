@@ -308,13 +308,6 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	if (!s)
 		throw CoreException("Got ENDBURST without a source");
 
-	for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
-	{
-		User *u = *it;
-		if (u->server == s && !u->IsIdentified())
-			validate_user(u);
-	}
-
 	Log(LOG_DEBUG) << "Processed ENDBURST for " << s->GetName();
 
 	s->Sync(true);
@@ -754,12 +747,23 @@ class ProtoInspIRCd : public Module
 		
 		Capab.SetFlag(CAPAB_NOQUIT);
 
-		ModuleManager::Attach(I_OnUserNickChange, this);
+		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &)
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
+	}
+
+	void OnServerSync(Server *s)
+	{
+		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+		{
+			User *u = *it;
+			if (u->server == s && !u->IsIdentified())
+				validate_user(u);
+		}
 	}
 };
 

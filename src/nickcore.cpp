@@ -129,3 +129,42 @@ void NickCore::ClearAccess()
 	FOREACH_MOD(I_OnNickClearAccess, OnNickClearAccess(this));
 	this->access.clear();
 }
+
+void NickCore::AddCert(const Anope::string &entry)
+{
+	this->cert.push_back(entry);
+	FOREACH_MOD(I_OnNickAddCert, OnNickAddCert(this, entry));
+}
+
+Anope::string NickCore::GetCert(unsigned entry) const
+{
+	if (this->cert.empty() || entry >= this->cert.size())
+		return "";
+	return this->cert[entry];
+}
+
+bool NickCore::FindCert(const Anope::string &entry)
+{
+	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
+		if (this->cert[i] == entry)
+			return true;
+
+	return false;
+}
+
+void NickCore::EraseCert(const Anope::string &entry)
+{
+	for (unsigned i = 0, end = this->cert.size(); i < end; ++i)
+		if (this->cert[i] == entry)
+		{
+			FOREACH_MOD(I_OnNickEraseCert, OnNickEraseCert(this, entry));
+			this->cert.erase(this->cert.begin() + i);
+			break;
+		}
+}
+
+void NickCore::ClearCert()
+{
+	FOREACH_MOD(I_OnNickClearCert, OnNickClearCert(this));
+	this->cert.clear();
+}

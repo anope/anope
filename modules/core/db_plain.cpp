@@ -485,6 +485,8 @@ class DBPlain : public Module
 				nc->greet = params[0];
 			else if (key.equals_ci("ACCESS"))
 				nc->AddAccess(params[0]);
+			else if (key.equals_ci("CERT"))
+				nc->AddCert(params[0]);
 			else if (key.equals_ci("FLAGS"))
 				nc->FromString(params);
 			else if (key.equals_ci("MI"))
@@ -736,6 +738,11 @@ class DBPlain : public Module
 			{
 				for (std::vector<Anope::string>::iterator it = nc->access.begin(), it_end = nc->access.end(); it != it_end; ++it)
 					db_buffer << "MD ACCESS " << *it << endl;
+			}
+			if (!nc->cert.empty())
+			{
+				for (std::vector<Anope::string>::iterator it = nc->cert.begin(), it_end = nc->cert.end(); it != it_end; ++it)
+					db_buffer << "MD CERT " << *it << endl;
 			}
 			if (nc->FlagCount())
 				db_buffer << "MD FLAGS " << ToString(nc->ToString()) << endl;

@@ -42,7 +42,8 @@ class CommandNSGhost : public Command
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't ghost yourself!"));
 		else if ((u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))) ||
-				(!pass.empty() && enc_check_password(pass, na->nc->pass) == 1))
+				(!pass.empty() && enc_check_password(pass, na->nc->pass) == 1) ||
+				(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 		{
 			if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
 				source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));

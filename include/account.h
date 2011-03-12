@@ -152,6 +152,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	Anope::string greet;	/* Greet associated to the nick */
 	Anope::string language;	/* Language name */
 	std::vector<Anope::string> access; /* Access list, vector of strings */
+	std::vector<Anope::string> cert; /* ssl certificate list, vector of strings */
 	MemoInfo memos;
 	uint16 channelcount; /* Number of channels currently registered */
 
@@ -217,6 +218,47 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	 * Deletes all the memory allocated in the access list vector and then clears the vector.
 	 */
 	void ClearAccess();
+
+	/** Add an entry to the nick's certificate list
+	 *
+	 * @param entry The fingerprint to add to the cert list
+	 *
+	 * Adds a new entry into the cert list.
+	 */
+	void AddCert(const Anope::string &entry);
+
+	/** Get an entry from the nick's cert list by index
+	 *
+	 * @param entry Index in the certificaate list vector to retrieve
+	 * @return The fingerprint entry of the given index if within bounds, an empty string if the vector is empty or the index is out of bounds
+	 *
+	 * Retrieves an entry from the certificate list corresponding to the given index.
+	 */
+	Anope::string GetCert(unsigned entry) const;
+
+	/** Find an entry in the nick's cert list
+	 *
+	 * @param entry The fingerprint to search for
+	 * @return True if the fingerprint is found in the cert list, false otherwise
+	 *
+	 * Search for an fingerprint within the cert list.
+	 */
+	bool FindCert(const Anope::string &entry);
+
+	/** Erase a fingerprint from the nick's certificate list
+	 *
+	 * @param entry The fingerprint to remove
+	 *
+	 * Removes the specified fingerprint from the cert list.
+	 */
+	void EraseCert(const Anope::string &entry);
+
+	/** Clears the entire nick's cert list
+	 *
+	 * Deletes all the memory allocated in the certificate list vector and then clears the vector.
+	 */
+	void ClearCert();
+
 };
 
 /** Timer for colliding nicks to force people off of nicknames

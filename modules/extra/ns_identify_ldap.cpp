@@ -42,7 +42,7 @@ class IdentifyInterface : public LDAPInterface, public Command
 		this->requests.erase(it);
 
 		User *u = *ii->user;
-		NickAlias *this_na = findnick(u->nick), *na = findnick(ii->account);
+		NickAlias *na = findnick(ii->account);
 
 		if (!na)
 		{
@@ -60,28 +60,9 @@ class IdentifyInterface : public LDAPInterface, public Command
 		
 		if (u->Account())
 			Log(LOG_COMMAND, u, this) << "to log out of account " << u->Account()->display;
-
-		na->last_realname = u->realname;
-		na->last_seen = Anope::CurTime;
-
-		u->Login(na->nc);
-		ircdproto->SendAccountLogin(u, u->Account());
-		ircdproto->SetAutoIdentificationToken(u);
-
-		if (this_na && this_na->nc == na->nc && this_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(NickServ, UMODE_REGISTERED);
-
-		u->UpdateHost();
-
-		Log(LOG_COMMAND, u, this) << "and identified for account " << u->Account()->display << " using LDAP";
+		Log(LOG_COMMAND, u, this) << "and identified for account " << na->nc->display << " using LDAP";
 		u->SendMessage(NickServ, _("Password accepted - you are now recognized."));
-		if (ircd->vhost)
-			do_on_id(u);
-		if (Config->NSModeOnID)
-			do_setmodes(u);
-
-		FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
-
+		u->Identify(na);
 		delete ii;
 	}
 

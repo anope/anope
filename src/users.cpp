@@ -334,6 +334,63 @@ void User::Collide(NickAlias *na)
 		kill_user(Config->s_NickServ, this, "Services nickname-enforcer kill");
 }
 
+/** Identify the user to the Nick
+ * updates last_seen, logs the user in,
+ * send messages, checks for mails, set vhost and more
+ * @param the NickAlias
+ */
+void User::Identify(NickAlias *na)
+{
+	if (!na)
+	{
+		Log() << "User::Identify() called with NULL pointer";
+		return;
+	}
+
+	if (this->nick.equals_ci(na->nick))
+	{
+		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		na->last_usermask = last_usermask;
+		na->last_realname = this->realname;
+		na->last_seen = Anope::CurTime;
+	}
+
+	this->Login(na->nc);
+	ircdproto->SendAccountLogin(this, this->Account());
+	ircdproto->SetAutoIdentificationToken(this);
+
+	if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+		this->SetMode(NickServ, UMODE_REGISTERED);
+	if (ircd->vhost)
+		do_on_id(this);
+	if (Config->NSModeOnID)
+		do_setmodes(this);
+
+	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
+
+	if (Config->NSForceEmail && na->nc->email.empty())
+	{
+		this->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
+						"This e-mail will allow you to retrieve your password in\n"
+						"case you forget it."));
+		this->SendMessage(NickServ, _("Type \002%R%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
+						"Your privacy is respected; this e-mail won't be given to\n"
+						"any third-party person."), NickServ->nick.c_str());
+	}
+
+	if (na->nc->HasFlag(NI_UNCONFIRMED))
+	{
+		this->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
+		time_t time_registered = Anope::CurTime - na->time_registered;
+		if (Config->NSUnconfirmedExpire > time_registered)
+			this->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), duration(Config->NSUnconfirmedExpire - time_registered).c_str());
+	}
+
+	check_memos(this);
+
+}
+
+
 /** Login the user to a NickCore
  * @param core The account the user is useing
  */

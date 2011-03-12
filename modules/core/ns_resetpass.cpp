@@ -102,30 +102,13 @@ class NSResetPass : public Module
 					na->nc->Shrink("ns_resetpass_code");
 					na->nc->Shrink("ns_resetpass_time");
 
-					NickAlias *this_na = findnick(u->nick);
-
-					if (this_na && this_na == na)
-					{
-						u->UpdateHost();
-						na->last_realname = u->realname;
-						na->last_seen = Anope::CurTime;
-						u->SetMode(NickServ, UMODE_REGISTERED);
-					}
-
-					u->Login(na->nc);
-					ircdproto->SendAccountLogin(u, u->Account());
-					ircdproto->SetAutoIdentificationToken(u);
-					na->nc->UnsetFlag(NI_UNCONFIRMED);
-					FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(u));
-
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
+
+					na->nc->UnsetFlag(NI_UNCONFIRMED);
+					u->Identify(na);
+
 					source.Reply(_("You are now identified for your nick. Change your password using \"%R%s SET PASSWORD \002newpassword\002\" now."), Config->s_NickServ.c_str());
 
-					if (ircd->vhost)
-						do_on_id(u);
-					if (Config->NSModeOnID)
-						do_setmodes(u);
-					check_memos(u);
 				}
 				else
 					return EVENT_CONTINUE;

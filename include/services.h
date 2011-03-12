@@ -486,6 +486,7 @@ struct IRCDVar
 	int ts6;						/* ircd is TS6 */
 	const char *globaltldprefix;	/* TLD prefix used for Global */
 	unsigned maxmodes;				/* Max modes to send per line */
+	int certfp;					/* IRCd sends a SSL users certificate fingerprint */
 };
 
 /*************************************************************************/

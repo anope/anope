@@ -68,7 +68,8 @@ class CommandNSRecover : public Command
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
+					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
 				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);

@@ -16,7 +16,7 @@
 class CommandNSGroup : public Command
 {
  public:
-	CommandNSGroup() : Command("GROUP", 2, 2)
+	CommandNSGroup() : Command("GROUP", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Join a group"));
@@ -27,7 +27,7 @@ class CommandNSGroup : public Command
 		User *u = source.u;
 
 		const Anope::string &nick = params[0];
-		Anope::string pass = params[1];
+		Anope::string pass = params.size() > 1 ? params[1] : "";
 
 		if (readonly)
 		{
@@ -78,15 +78,8 @@ class CommandNSGroup : public Command
 					"for more information."), target->nick.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		else
 		{
-			int res = enc_check_password(pass, target->nc->pass);
-			if (res == -1)
-			{
-				Log(LOG_COMMAND, u, this) << "failed group for " << na->nick << " (invalid password)";
-				source.Reply(_(PASSWORD_INCORRECT));
-				if (bad_password(u))
-					return MOD_STOP;
-			}
-			else
+			if ((!pass.empty() && enc_check_password(pass, target->nc->pass)) ||
+					(!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint)))
 			{
 				/* If the nick is already registered, drop it.
 				 * If not, check that it is valid.
@@ -124,6 +117,17 @@ class CommandNSGroup : public Command
 				u->lastnickreg = Anope::CurTime;
 
 				check_memos(u);
+			}
+			else if (pass.empty())
+			{
+				this->OnSyntaxError(source, "");
+			}
+			else
+			{
+				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick << " (invalid password)";
+				source.Reply(_(PASSWORD_INCORRECT));
+				if (bad_password(u))
+					return MOD_STOP;
 			}
 		}
 		return MOD_CONT;

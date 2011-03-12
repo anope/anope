@@ -42,6 +42,7 @@ IRCDVar myIrcd[] = {
 	 1,					/* ts6 */
 	 "$",				/* TLD Prefix for Global */
 	 20,				/* Max number of modes we can send per line */
+	 1,					/* IRCd sends a SSL users certificate fingerprint */
 	 }
 	,
 	{NULL}

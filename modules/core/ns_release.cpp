@@ -43,6 +43,7 @@ class CommandNSRelease : public Command
 			if (res == 1)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
+				na->Release();
 				source.Reply(_("Services' hold on your nick has been released."));
 			}
 			else
@@ -58,7 +59,8 @@ class CommandNSRelease : public Command
 		}
 		else
 		{
-			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)))
+			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
+					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
 				na->Release();
 				source.Reply(_("Services' hold on your nick has been released."));

@@ -887,6 +887,23 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) { }
 
+	/** called from NickCore::ClearCert()
+	 * @param nc pointer to the NickCore
+	 */
+	virtual void OnNickClearCert(NickCore *nc) { }
+
+	/** Called when a user adds an entry to their cert list
+	 * @param nc The nick
+	 * @param entry The entry
+	 */
+	virtual void OnNickAddCert(NickCore *nc, const Anope::string &entry) { }
+
+	/** Called from NickCore::EraseCert()
+	 * @param nc pointer to the NickCore
+	 * @param entry The fingerprint
+	 */
+	virtual void OnNickEraseCert(NickCore *nc, const Anope::string &entry) { }
+
 	/** Called when a user requests info for a nick
 	 * @param source The user requesting info
 	 * @param na The nick the user is requesting info from
@@ -1059,6 +1076,7 @@ enum Implementation
 		I_OnNickRegister, I_OnNickSuspended, I_OnNickUnsuspended,
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
+		I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
 		I_OnNickInfo, I_OnFindNick, I_OnFindCore,
 
 		/* ChanServ */

@@ -164,6 +164,13 @@ class CoreExport User : public Extensible
 	 */
 	void Collide(NickAlias *na);
 
+	/** Identify the user to the Nick
+	 * updates last_seen, logs the user in,
+	 * send messages, checks for mails, set vhost and more
+	 * @param the NickAlias
+	 */
+	void Identify(NickAlias *na);
+
 	/** Login the user to a NickCore
 	 * @param core The account the user is useing
 	 */

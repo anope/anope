@@ -31,14 +31,14 @@ class CommandCSSetRestricted : public Command
 			ci->SetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] < 0)
 				ci->levels[CA_NOJOIN] = 0;
-			source.Reply(_("Restricted access option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Restricted access option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_RESTRICTED);
 			if (ci->levels[CA_NOJOIN] >= 0)
 				ci->levels[CA_NOJOIN] = -2;
-			source.Reply(_("Restricted access option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Restricted access option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "RESTRICTED");

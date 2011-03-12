@@ -33,12 +33,12 @@ class CommandNSSetSecure : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_SECURE);
-			source.Reply(_("Secure option is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Secure option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_SECURE);
-			source.Reply(_("Secure option is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Secure option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SECURE");

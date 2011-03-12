@@ -68,14 +68,14 @@ class CommandCSSetXOP : public Command
 			}
 
 			Log(LOG_COMMAND, u, this, ci) << "to enable XOP";
-			source.Reply(_("xOP lists system for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("xOP lists system for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_XOP);
 
 			Log(LOG_COMMAND, u, this, ci) << "to disable XOP";
-			source.Reply(_("xOP lists system for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("xOP lists system for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "XOP");

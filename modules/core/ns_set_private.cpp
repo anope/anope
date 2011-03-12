@@ -33,12 +33,12 @@ class CommandNSSetPrivate : public Command
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_PRIVATE);
-			source.Reply(_("Private option is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Private option is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(NI_PRIVATE);
-			source.Reply(_("Private option is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Private option is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");

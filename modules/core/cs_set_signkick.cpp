@@ -31,7 +31,7 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->SetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			source.Reply(_("Signed kick option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("LEVEL"))
 		{
@@ -44,7 +44,7 @@ class CommandCSSetSignKick : public Command
 		{
 			ci->UnsetFlag(CI_SIGNKICK);
 			ci->UnsetFlag(CI_SIGNKICK_LEVEL);
-			source.Reply(_("Signed kick option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Signed kick option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "SIGNKICK");

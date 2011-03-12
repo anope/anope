@@ -15,6 +15,27 @@
 
 class CommandCSMode : public Command
 {
+	bool CanSet(User *u, ChannelInfo *ci, ChannelModeName mode)
+	{
+		switch (mode)
+		{
+			case CMODE_OWNER:
+				return check_access(u, ci, CA_OWNER);
+			case CMODE_PROTECT:
+				return check_access(u, ci, CA_PROTECT);
+			case CMODE_OP:	
+				return check_access(u, ci, CA_OPDEOP);
+			case CMODE_HALFOP:
+				return check_access(u, ci, CA_HALFOP);
+			case CMODE_VOICE:
+				return check_access(u, ci, CA_VOICE);
+			default:
+				break;
+		}
+
+		return false;
+	}
+
 	void DoLock(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
@@ -199,15 +220,35 @@ class CommandCSMode : public Command
 								ci->c->RemoveMode(NULL, cm);
 							break;
 						case MODE_STATUS:
+						{
 							if (!sep.GetToken(param))
 								break;
+
+							if (!this->CanSet(u, ci, cm->Name))
+							{
+								source.Reply(_("You do not have access to set mode %c."), cm->ModeChar);
+								break;
+							}
+
+							ChanAccess *u_access = ci->GetAccess(u);
+							int16 u_level = u_access ? u_access->level : 0;
+
 							if (str_is_wildcard(param))
 							{
 								for (CUserList::const_iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 								{
 									UserContainer *uc = *it;
 
-									if (Anope::Match(u->GetMask(), param))
+									ChanAccess *targ_access = ci->GetAccess(uc->user);
+									int16 t_level = targ_access ? targ_access->level : 0;
+
+									if (t_level > u_level)
+									{
+										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
+										continue;
+									}
+
+									if (Anope::Match(uc->user->GetMask(), param))
 									{
 										if (adding)
 											ci->c->SetMode(NULL, cm, uc->user->nick);
@@ -218,12 +259,24 @@ class CommandCSMode : public Command
 							}
 							else
 							{
+								User *target = finduser(param);
+								if (target != NULL)
+								{
+									ChanAccess *targ_access = ci->GetAccess(target);
+									int16 t_level = targ_access ? targ_access->level : 0;
+									if (t_level > u_level)
+									{
+										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
+										break;
+									}
+								}
 								if (adding)
 									ci->c->SetMode(NULL, cm, param);
 								else
 									ci->c->RemoveMode(NULL, cm, param);
 							}
 							break;
+						}
 						case MODE_LIST:
 							if (!sep.GetToken(param))
 								break;

@@ -56,7 +56,7 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002read-write\002 mode."));
 		}
 		else
-			source.Reply(_("Setting for READONLY must be \002\002 or \002\002."));
+			source.Reply(_("Setting for READONLY must be \002on\002 or \002off\002."));
 
 		return MOD_CONT;
 	}
@@ -94,7 +94,7 @@ class CommandOSSet : public Command
 			ircdproto->SendGlobops(OperServ, GetString(NULL, _("%s is no longer a Super-Admin")).c_str(), u->nick.c_str());
 		}
 		else
-			source.Reply(_("Setting for SuperAdmin must be \002\002 or \002\002 (must be enabled in services.conf)"));
+			source.Reply(_("Setting for SuperAdmin must be \002on\002 or \002off\002 (must be enabled in services.conf)"));
 
 		return MOD_CONT;
 	}
@@ -163,7 +163,7 @@ class CommandOSSet : public Command
 			source.Reply(_("Services are now in \002expire\002 mode."));
 		}
 		else
-			source.Reply(_("Setting for NOEXPIRE must be \002\002 or \002\002."));
+			source.Reply(_("Setting for NOEXPIRE must be \002on\002 or \002off\002."));
 
 		return MOD_CONT;
 	}

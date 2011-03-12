@@ -36,14 +36,14 @@ class CommandNSSetKill : public Command
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			source.Reply(_("Protection is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Protection is now \002on\002 for \002%s\002."), nc->display.c_str());
 		}
 		else if (param.equals_ci("QUICK"))
 		{
 			nc->SetFlag(NI_KILLPROTECT);
 			nc->SetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			source.Reply(_("Protection is now \002\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
+			source.Reply(_("Protection is now \002on\002 for \002%s\002, with a reduced delay."), nc->display.c_str());
 		}
 		else if (param.equals_ci("IMMED"))
 		{
@@ -52,7 +52,7 @@ class CommandNSSetKill : public Command
 				nc->SetFlag(NI_KILLPROTECT);
 				nc->SetFlag(NI_KILL_IMMED);
 				nc->UnsetFlag(NI_KILL_QUICK);
-				source.Reply(_("Protection is now \002\002 for \002%s\002, with no delay."), nc->display.c_str());
+				source.Reply(_("Protection is now \002on\002 for \002%s\002, with no delay."), nc->display.c_str());
 			}
 			else
 				source.Reply(_("The \002IMMED\002 option is not available on this network."));
@@ -62,7 +62,7 @@ class CommandNSSetKill : public Command
 			nc->UnsetFlag(NI_KILLPROTECT);
 			nc->UnsetFlag(NI_KILL_QUICK);
 			nc->UnsetFlag(NI_KILL_IMMED);
-			source.Reply(_("Protection is now \002\002 for \002%s\002."), nc->display.c_str());
+			source.Reply(_("Protection is now \002off\002 for \002%s\002."), nc->display.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "KILL");

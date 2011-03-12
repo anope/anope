@@ -30,12 +30,12 @@ class CommandCSSetPrivate : public Command
 		if (params[1].equals_ci("ON"))
 		{
 			ci->SetFlag(CI_PRIVATE);
-			source.Reply(_("Private option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Private option for %s is now \002on\002."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
 			ci->UnsetFlag(CI_PRIVATE);
-			source.Reply(_("Private option for %s is now \002\002."), ci->name.c_str());
+			source.Reply(_("Private option for %s is now \002off\002."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PRIVATE");

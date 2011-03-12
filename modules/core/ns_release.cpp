@@ -41,6 +41,7 @@ class CommandNSRelease : public Command
 			if (res == 1)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
+				na->Release();
 				u->SendMessage(NickServ, NICK_RELEASED);
 			}
 			else

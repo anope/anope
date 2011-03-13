@@ -310,7 +310,7 @@ void get_operserv_stats(long *nrec, long *memuse)
 
 		for (i = 0; i < end; ++i)
 		{
-			x = SNLine->GetEntry(i);
+			x = SQLine->GetEntry(i);
 
 			mem += x->GetNick().length() + 1;
 			mem += x->GetUser().length() + 1;

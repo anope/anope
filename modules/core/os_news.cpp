@@ -40,7 +40,7 @@ struct NewsMessages msgarray[] = {
 	  _("Added new logon news item (#%d)."),
 	  _("Syntax: \002LOGONNEWS DEL {\037num\037 | ALL}"),
 	  _("Logon news item #%s not found!"),
-	  _("LOGONNEWS {ADD|DEL|LIST} [\037text\037|\037num\037]\002"),
+	  _("Logon news item #%d deleted."),
 	  _("No logon news items to delete!"),
 	  _("All logon news items deleted.")}
 	 },

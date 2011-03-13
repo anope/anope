@@ -299,8 +299,12 @@ namespace Anope
 	extern CoreExport time_t CurTime;
 
 	extern CoreExport string Version();
-
-	extern CoreExport string Build();
+	extern CoreExport string VersionShort();
+	extern CoreExport string VersionBuildString();
+	extern CoreExport int VersionMajor();
+	extern CoreExport int VersionMinor();
+	extern CoreExport int VersionPatch();
+	extern CoreExport int VersionBuild();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)

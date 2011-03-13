@@ -165,9 +165,9 @@ extern CoreExport std::list<Module *> Modules;
 class Version
 {
  private:
-	unsigned Major;
-	unsigned Minor;
-	unsigned Build;
+	int Major;
+	int Minor;
+	int Build;
 
  public:
 	/** Constructor
@@ -175,7 +175,7 @@ class Version
 	 * @param vMinor The minor version numbber
 	 * @param vBuild The build version numbber
 	 */
-	Version(unsigned vMajor, unsigned vMinor, unsigned vBuild);
+	Version(int vMajor, int vMinor, int vBuild);
 
 	/** Destructor
 	 */
@@ -184,17 +184,17 @@ class Version
 	/** Get the major version of Anope this was built against
 	 * @return The major version
 	 */
-	unsigned GetMajor() const;
+	int GetMajor() const;
 
 	/** Get the minor version of Anope this was built against
 	 * @return The minor version
 	 */
-	unsigned GetMinor() const;
+	int GetMinor() const;
 
 	/** Get the build version this was built against
 	 * @return The build version
 	 */
-	unsigned GetBuild() const;
+	int GetBuild() const;
 };
 
 /* Forward declaration of CallBack class for the Module class */

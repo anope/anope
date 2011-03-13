@@ -7,7 +7,6 @@
  */
 
 #include "modules.h"
-#include "version.h"
 #include <algorithm> // std::find
 
 std::map<Anope::string, Service *> ModuleManager::ServiceProviders;
@@ -174,23 +173,23 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	m->handle = handle;
 
 	Version v = m->GetVersion();
-	if (v.GetMajor() < VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() < VERSION_MINOR))
+	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
 	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
+		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionMajor() << "." << Anope::VersionMinor();
 		DeleteModule(m);
 		return MOD_ERR_VERSION;
 	}
-	else if (v.GetMajor() > VERSION_MAJOR || (v.GetMajor() == VERSION_MAJOR && v.GetMinor() > VERSION_MINOR))
+	else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
 	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << VERSION_MAJOR << "." << VERSION_MINOR;
+		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionMajor() << "." << Anope::VersionMinor();
 		DeleteModule(m);
 		return MOD_ERR_VERSION;
 	}
-	else if (v.GetBuild() < VERSION_BUILD)
-		Log() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
-	else if (v.GetBuild() > VERSION_BUILD)
-		Log() << "Module " << modname << " is compiled against a newer revision of Anope " << v.GetBuild() << ", this is " << VERSION_BUILD;
-	else if (v.GetBuild() == VERSION_BUILD)
+	else if (v.GetBuild() < Anope::VersionBuild())
+		Log() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << Anope::VersionBuild();
+	else if (v.GetBuild() > Anope::VersionBuild())
+		Log() << "Module " << modname << " is compiled against a newer revision of Anope " << v.GetBuild() << ", this is " << Anope::VersionBuild();
+	else if (v.GetBuild() == Anope::VersionBuild())
 		Log(LOG_DEBUG) << "Module " << modname << " compiled against current version of Anope " << v.GetBuild();
 
 	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))

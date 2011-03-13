@@ -11,6 +11,8 @@
  */
 
 #include "services.h"
+#include "version.h"
+#include "modules.h"
 
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)
@@ -805,7 +807,7 @@ Anope::string Anope::printf(const Anope::string &fmt, ...)
 {
 	va_list args;
 	char buf[1024];
-	va_start(args, fmt.c_str());
+	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 	va_end(args);
 	return buf;
@@ -1149,4 +1151,29 @@ const Anope::string Anope::LastError()
 	return errbuf;
 #endif
 }
+
+Version Module::GetVersion() const
+{
+	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+}
+
+Anope::string Anope::Version()
+{
+	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + stringify(VERSION_BUILD) + ")";
+}
+
+Anope::string Anope::VersionShort()
+{
+	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH);
+}
+
+Anope::string Anope::VersionBuildString()
+{
+	return "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
+}
+
+int Anope::VersionMajor() { return VERSION_MAJOR; }
+int Anope::VersionMinor() { return VERSION_MINOR; }
+int Anope::VersionPatch() { return VERSION_PATCH; }
+int Anope::VersionBuild() { return VERSION_BUILD; }
 

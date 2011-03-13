@@ -197,7 +197,7 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd("", "BURST");
-		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::Build().c_str());
+		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
 	}
 
 	/* CHGIDENT */

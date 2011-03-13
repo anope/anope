@@ -10,7 +10,6 @@
  */
 
 #include "modules.h"
-#include "version.h"
 
 message_map MessageMap;
 std::list<Module *> Modules;
@@ -196,27 +195,27 @@ int Module::DelCommand(BotInfo *bi, Command *c)
 bool moduleMinVersion(int major, int minor, int patch, int build)
 {
 	bool ret = false;
-	if (VERSION_MAJOR > major) /* Def. new */
+	if (Anope::VersionMajor() > major) /* Def. new */
 		ret = true;
-	else if (VERSION_MAJOR == major) /* Might be newer */
+	else if (Anope::VersionMajor() == major) /* Might be newer */
 	{
 		if (minor == -1)
 			return true; /* They dont care about minor */
-		if (VERSION_MINOR > minor) /* Def. newer */
+		if (Anope::VersionMinor() > minor) /* Def. newer */
 			ret = true;
-		else if (VERSION_MINOR == minor) /* Might be newer */
+		else if (Anope::VersionMinor() == minor) /* Might be newer */
 		{
 			if (patch == -1)
 				return true; /* They dont care about patch */
-			if (VERSION_PATCH > patch)
+			if (Anope::VersionPatch() > patch)
 				ret = true;
-			else if (VERSION_PATCH == patch)
+			else if (Anope::VersionPatch() == patch)
 			{
 #if 0
 // XXX
 				if (build == -1)
 					return true; /* They dont care about build */
-				if (VERSION_BUILD >= build)
+				if (Anope::VersionBuild >= build)
 					ret = true;
 #endif
 			}
@@ -278,11 +277,6 @@ void ModuleRunTimeDirCleanUp()
 	FindClose(hList);
 #endif
 	Log(LOG_DEBUG) << "Module run time directory has been cleaned out";
-}
-
-Version Module::GetVersion() const
-{
-	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
 void Module::SendMessage(CommandSource &source, const char *fmt, ...)

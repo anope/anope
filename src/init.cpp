@@ -229,13 +229,13 @@ void Init(int ac, char **av)
 
 	if (GetCommandLineArgument("version", 'v'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
 		throw FatalException();
 	}
 
 	if (GetCommandLineArgument("help", 'h'))
 	{
-		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::Build();
+		Log(LOG_TERMINAL) << "Anope-" << Anope::Version() << " -- " << Anope::VersionBuildString();
 		Log(LOG_TERMINAL) << "Anope IRC Services (http://www.anope.org)";
 		Log(LOG_TERMINAL) << "Usage ./" << services_bin << " [options] ...";
 		Log(LOG_TERMINAL) << "-c, --config=filename.conf";
@@ -313,7 +313,7 @@ void Init(int ac, char **av)
 
 	init_core_messages();
 
-	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::Build();
+	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
 #ifdef _WIN32
 	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf.GetName();
 #else

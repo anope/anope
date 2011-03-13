@@ -26,7 +26,6 @@
 #include "services.h"
 #include "timers.h"
 #include "modules.h"
-#include "version.h"
 
 // getrlimit.
 #ifndef _WIN32
@@ -553,15 +552,3 @@ int main(int ac, char **av, char **envp)
 
 	return 0;
 }
-
-Anope::string Anope::Version()
-{
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + stringify(VERSION_BUILD) + ")";
-}
-
-Anope::string Anope::Build()
-{
-	return "build #" + stringify(BUILD) + ", compiled " + Anope::compiled;
-}
-
-

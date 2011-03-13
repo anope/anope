@@ -27,6 +27,8 @@ void InitLanguages()
 		Log() << "Error calling bindtextdomain, " << Anope::LastError();
 	else
 		Log(LOG_DEBUG) << "Successfully bound anope to " << services_dir << "/languages/";
+	
+	setlocale(LC_ALL, "");
 #else
 	Log() << "Can not load languages, gettext is not installed";
 #endif

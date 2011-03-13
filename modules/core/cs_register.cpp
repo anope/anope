@@ -117,7 +117,7 @@ class CommandCSRegister : public Command
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
 			"\002%R%s HELP\002 for information on how to do so."),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+			ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

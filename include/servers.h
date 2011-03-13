@@ -132,10 +132,6 @@ class CoreExport Server : public Flags<ServerFlag>
 	 */
 	void DelLink(Server *s);
 
-	/** Remove all links from this server
-	 */
-	void ClearLinks();
-
 	/** Finish syncing this server and optionally all links to it
 	 * @param SyncLinks True to sync the links for this server too (if any)
 	 */

@@ -23,8 +23,10 @@ CapabInfo Capab_Info[] = {
 	{"", CAPAB_END}
 };
 
-static const Anope::string CapabFlags = "";
-Flags<CapabType, CAPAB_END> Capab(&CapabFlags);
+const Anope::string CapabFlags[] = {
+	"NOQUIT", "TSMODE", "UNCONNECT", "QS", ""
+};
+Flags<CapabType, CAPAB_END> Capab(CapabFlags);
 
 /** Constructor
  * @param uplink The uplink this server is from, is only NULL when creating Me
@@ -46,7 +48,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 	{
 		this->UplinkServer->AddLink(this);
 
-		/* Check to be sure the uplink server only has one uplink, otherwise we introduce our clients if we jupe servers */
+		/* Check to be sure this isn't a juped server */
 		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
 			/* Bring in our pseudo-clients */
@@ -89,7 +91,7 @@ Server::~Server()
 		this->UplinkServer->DelLink(this);
 
 	for (unsigned i = this->Links.size(); i > 0; --i)
-		delete this->Links[i - 1];
+		this->Links[i - 1]->Delete(this->QReason);
 }
 
 /** Delete this server with a reason
@@ -187,15 +189,6 @@ void Server::DelLink(Server *s)
 	Log(this, "quit") << "quit " << s->GetName();
 }
 
-/** Remov all links from this server
- */
-void Server::ClearLinks()
-{
-	for (unsigned i = 0, j = this->Links.size(); i < j; ++i)
-		delete this->Links[i];
-	this->Links.clear();
-}
-
 /** Finish syncing this server and optionally all links to it
  * @param SyncLinks True to sync the links for this server too (if any)
  */
@@ -205,6 +198,10 @@ void Server::Sync(bool SyncLinks)
 		return;
 
 	this->UnsetFlag(SERVER_SYNCING);
+
+	Log(this, "sync") << "is done syncing";
+
+	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
 
 	if (SyncLinks && !this->Links.empty())
 	{
@@ -217,15 +214,9 @@ void Server::Sync(bool SyncLinks)
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
 		ircdproto->SendEOB();
 		Me->Sync(false);
-	}
 
-	Log(this, "sync") << "is done syncing";
-
-	FOREACH_MOD(I_OnServerSync, OnServerSync(this));
-
-	if (this->GetUplink() && this->GetUplink() == Me)
-	{
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
+
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 			if (it->second->ci)
 				it->second->ci->RestoreTopic();

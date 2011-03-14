@@ -488,7 +488,7 @@ class CommandCSAKick : public Command
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
-		else if (!check_access(u, ci, CA_AKICK) && !u->Account()->HasPriv("chanserv/access/modify"))
+		else if (!check_access(u, ci, CA_AKICK) && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));

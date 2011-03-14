@@ -248,8 +248,8 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			if (u->Account())
 			{
 				request->reply("account", iface->Sanitize(u->Account()->display));
-				if (u->Account()->ot)
-					request->reply("opertype", iface->Sanitize(u->Account()->ot->GetName()));
+				if (u->Account()->o)
+					request->reply("opertype", iface->Sanitize(u->Account()->o->ot->GetName()));
 			}
 
 			Anope::string channels;

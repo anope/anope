@@ -156,28 +156,16 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	MemoInfo memos;
 	uint16 channelcount; /* Number of channels currently registered */
 
-	OperType *ot;
+	Oper *o;
 
 	/* Unsaved data */
 	time_t lastmail;				/* Last time this nick record got a mail */
 	std::list<NickAlias *> aliases;	/* List of aliases */
 
-	/** Check whether this opertype has access to run the given command string.
-	  * @param cmdstr The string to check, e.g. botserv/set/private.
-	  * @return True if this opertype may run the specified command, false otherwise.
-	  */
-	virtual bool HasCommand(const Anope::string &cmdstr) const;
-
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.
 	 */
 	virtual bool IsServicesOper() const;
-
-	/** Check whether this opertype has access to the given special permission.
-	  * @param privstr The priv to check for, e.g. users/auspex.
-	  * @return True if this opertype has the specified priv, false otherwise.
-	  */
-	virtual bool HasPriv(const Anope::string &privstr) const;
 
 	/** Add an entry to the nick's access list
 	 *

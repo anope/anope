@@ -1,6 +1,7 @@
 #include "module.h"
 #include "ldap.h"
 
+static std::set<Oper *> my_opers;
 static Anope::string opertype_attribute;
 
 class IdentifyInterface : public LDAPInterface
@@ -36,22 +37,32 @@ class IdentifyInterface : public LDAPInterface
 
 			const Anope::string &opertype = attr.get(opertype_attribute);
 
-			for (std::list<OperType *>::iterator oit = Config->MyOperTypes.begin(), oit_end = Config->MyOperTypes.end(); oit != oit_end; ++oit)
+			OperType *ot = OperType::Find(opertype);
+			if (ot != NULL && (u->Account()->o == NULL || ot != u->Account()->o->ot))
 			{
-				OperType *ot = *oit;
-				if (ot->GetName() == opertype && ot != u->Account()->ot)
+				Oper *o = u->Account()->o;
+				if (o != NULL && my_opers.count(o) > 0)
 				{
-					u->Account()->ot = ot;
-					Log() << "m_ldap_oper: Tied " << u->nick << " (" << u->Account()->display << ") to opertype " << ot->GetName();
-					break;
+					my_opers.erase(o);
+					delete o;
 				}
+				o = new Oper(u->nick, "", "", ot);
+				my_opers.insert(o);
+				u->Account()->o = o;
+				Log() << "m_ldap_oper: Tied " << u->nick << " (" << u->Account()->display << ") to opertype " << ot->GetName();
 			}
 		}
 		catch (const LDAPException &ex)
 		{
-			if (u->Account()->ot != NULL)
+			if (u->Account()->o != NULL)
 			{
-				u->Account()->ot = NULL;
+				if (my_opers.count(u->Account()->o) > 0)
+				{
+					my_opers.erase(u->Account()->o);
+					delete u->Account()->o;
+				}
+				u->Account()->o = NULL;
+
 				Log() << "m_ldap_oper: Removed services operator from " << u->nick << " (" << u->Account()->display << ")";
 			}
 		}
@@ -79,8 +90,8 @@ class LDAPOper : public Module
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		Implementation i[] = { I_OnReload, I_OnNickIdentify };
-		ModuleManager::Attach(i, this, 2);
+		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
+		ModuleManager::Attach(i, this, 3);
 
 		OnReload(false);
 	}
@@ -94,6 +105,10 @@ class LDAPOper : public Module
 		this->basedn = config.ReadValue("m_ldap_oper", "basedn", "", 0);
 		this->filter = config.ReadValue("m_ldap_oper", "filter", "", 0);
 		opertype_attribute = config.ReadValue("m_ldap_oper", "opertype_attribute", "", 0);
+
+		for (std::set<Oper *>::iterator it = my_opers.begin(), it_end = my_opers.end(); it != it_end; ++it)
+			delete *it;
+		my_opers.clear();
 	}
 
 	void OnNickIdentify(User *u)
@@ -113,6 +128,16 @@ class LDAPOper : public Module
 		catch (const LDAPException &ex)
 		{
 			Log() << "m_ldapoper: " << ex.GetReason();
+		}
+	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		if (nc->o != NULL && my_opers.count(nc->o) > 0)
+		{
+			my_opers.erase(nc->o);
+			delete nc->o;
+			nc->o = NULL;
 		}
 	}
 };

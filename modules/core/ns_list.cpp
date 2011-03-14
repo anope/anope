@@ -43,7 +43,7 @@ class CommandNSList : public Command
 		const NickCore *mync;
 		unsigned nnicks;
 		char buf[BUFSIZE];
-		bool is_servadmin = u->Account()->IsServicesOper();
+		bool is_servadmin = u->IsServicesOper();
 		char noexpire_char = ' ';
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, forbidden, unconfirmed;
@@ -151,7 +151,7 @@ class CommandNSList : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]\002\n"
 					" \n"
 					"Lists all registered nicknames which match the given\n"
@@ -202,7 +202,7 @@ class CommandNSList : public Command
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			SyntaxError(source, "LIST", _("LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 		else
 			SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));

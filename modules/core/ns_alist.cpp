@@ -36,7 +36,7 @@ class CommandNSAList : public Command
 		Anope::string nick;
 		NickAlias *na;
 
-		int is_servadmin = u->Account()->IsServicesOper();
+		int is_servadmin = u->IsServicesOper();
 		unsigned lev_param = 0;
 
 		if (!is_servadmin)
@@ -134,7 +134,7 @@ class CommandNSAList : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002ALIST [\037nickname\037] [\037level\037]\002\n"
 					" \n"
 					"With no parameters, lists channels you have access on. With\n"

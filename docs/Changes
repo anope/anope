@@ -14,6 +14,8 @@ A Added m_alias
 A Added support for XMLRPC queries
 A Added /botserv set msg
 A Added /operserv config
+A Added /ns cert
+A Added /operserv login
 F Changed the GHOST command to not allow ghosting unidentified users if the RECOVER command exists
 F Some failed logic in /operserv exception that prevents proper exceptions from being added
 F Fixed the anope_os_sxlines MySQL table and code to work after restarting

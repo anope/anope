@@ -197,6 +197,23 @@ class CoreExport User : public Extensible
 	 */
 	virtual bool IsRecognized(bool CheckSecure = false);
 
+	/** Check if the user is a services oper
+	 * @return true if they are an oper
+	 */
+	bool IsServicesOper();
+
+	/** Check whether this user has access to run the given command string.
+	  * @param cmdstr The string to check, e.g. botserv/set/private.
+	  * @return True if this user may run the specified command, false otherwise.
+	  */
+	bool HasCommand(const Anope::string &cmdstr);
+
+	/** Check whether this user has access to the given special permission.
+	  * @param privstr The priv to check for, e.g. users/auspex.
+	  * @return True if this user has the specified priv, false otherwise.
+	  */
+	bool HasPriv(const Anope::string &privstr);
+
 	/** Update the last usermask stored for a user, and check to see if they are recognized
 	 */
 	void UpdateHost();

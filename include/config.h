@@ -757,7 +757,7 @@ class CoreExport ServerConfig
 	/* List of available opertypes */
 	std::list<OperType *> MyOperTypes;
 	/* List of pairs of opers and their opertype from the config */
-	std::list<std::pair<Anope::string, Anope::string> > Opers;
+	std::vector<Oper *> Opers;
 };
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.

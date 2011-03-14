@@ -462,6 +462,46 @@ bool User::IsRecognized(bool CheckSecure)
 	return OnAccess;
 }
 
+/** Check if the user is a services oper
+ * @return true if they are an oper
+ */
+bool User::IsServicesOper()
+{
+	if (!this->nc || !this->nc->o)
+		// No opertype.
+		return false;
+	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
+		// Certfp mismatch
+		return false;
+	else if (!this->nc->o->password.empty() && !this->GetExt("os_login_password_correct"))
+		// Not identified
+		return false;
+
+	return true;
+}
+
+/** Check whether this user has access to run the given command string.
+  * @param cmdstr The string to check, e.g. botserv/set/private.
+  * @return True if this user may run the specified command, false otherwise.
+  */
+bool User::HasCommand(const Anope::string &command)
+{
+	if (this->IsServicesOper())
+		return this->nc->o->ot->HasCommand(command);
+	return false;
+}
+
+/** Check whether this user has access to the given special permission.
+  * @param privstr The priv to check for, e.g. users/auspex.
+  * @return True if this user has the specified priv, false otherwise.
+  */
+bool User::HasPriv(const Anope::string &priv)
+{
+	if (this->IsServicesOper())
+		return this->nc->o->ot->HasPriv(priv);
+	return false;
+}
+
 /** Update the last usermask stored for a user, and check to see if they are recognized
  */
 void User::UpdateHost()

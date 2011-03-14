@@ -107,7 +107,7 @@ class CommandEntryMessage : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		if (ci && (IsFounder(u, ci) || u->Account()->HasCommand("chanserv/entrymsg")))
+		if (ci && (IsFounder(u, ci) || u->HasCommand("chanserv/entrymsg")))
 		{
 			bool success = true;
 			if (params[1].equals_ci("LIST"))

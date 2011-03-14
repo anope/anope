@@ -49,7 +49,7 @@ class CommandCSSetFounder : public Command
 		}
 
 		nc = na->nc;
-		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->Account()->HasPriv("chanserv/no-register-limit"))
+		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
 			return MOD_CONT;

@@ -42,12 +42,16 @@ class CommandNSGroup : public Command
 		}
 
 		if (Config->RestrictOperNicks)
-			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
-				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(it->first) != Anope::string::npos)
+			for (unsigned i = 0; i < Config->Opers.size(); ++i)
+			{
+				Oper *o = Config->Opers[i];
+
+				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 					return MOD_CONT;
 				}
+			}
 
 		NickAlias *target, *na = findnick(u->nick);
 		if (!(target = findnick(nick)))
@@ -255,7 +259,7 @@ class CommandNSGList : public Command
 
 		const NickCore *nc = u->Account();
 
-		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->Account()->IsServicesOper()))
+		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->IsServicesOper()))
 			source.Reply(_(ACCESS_DENIED), Config->s_NickServ.c_str());
 		else if (!nick.empty() && (!findnick(nick) || !(nc = findnick(nick)->nc)))
 			source.Reply(nick.empty() ? _(NICK_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nick.c_str());
@@ -276,7 +280,7 @@ class CommandNSGList : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002GLIST [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, lists all nicknames that are in\n"

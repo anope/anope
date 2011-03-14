@@ -37,7 +37,7 @@ class CommandMSHelp : public Command
 				"registered in order to send a memo.\n"
 				"%s's commands include:"), MemoServ->nick.c_str(), MemoServ->nick.c_str());
 		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
-			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		source.Reply(_("Type \002%R%s HELP \037command\037\002 for help on any of the\n"
 				"above commands.\n"

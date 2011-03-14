@@ -39,7 +39,7 @@ class CommandMSRSend : public Command
 		if (Config->MSMemoReceipt == 1)
 		{
 			/* Services opers and above can use rsend */
-			if (u->Account()->IsServicesOper())
+			if (u->IsServicesOper())
 				memo_send(source, nick, text, 3);
 			else
 				source.Reply(_(ACCESS_DENIED));

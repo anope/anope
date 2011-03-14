@@ -10,6 +10,25 @@
 
 #include "hashcomp.h"
 
+class OperType;
+
+struct Oper
+{
+	Anope::string name;
+	Anope::string password;
+	Anope::string certfp;
+	OperType *ot;
+
+	Oper(const Anope::string &n, const Anope::string &p, const Anope::string &c, OperType *o) :
+		name(n), password(p), certfp(c), ot(o) { }
+	
+	/** Find an oper block by name
+	 * @param name The name
+	 * @return the oper block
+	 */
+	static Oper *Find(const Anope::string &name);
+};
+
 class CoreExport OperType
 {
  private:
@@ -36,6 +55,12 @@ class CoreExport OperType
 	 */
 	std::set<OperType *> inheritances;
  public:
+	/** Find an oper type by name
+	 * @param name The name
+	 * @return The oper type
+	 */
+	static OperType *Find(const Anope::string &name);
+
 	/** Create a new opertype of the given name.
 	 * @param nname The opertype name, e.g. "sra".
 	 */

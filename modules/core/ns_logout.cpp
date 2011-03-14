@@ -29,11 +29,11 @@ class CommandNSLogout : public Command
 		const Anope::string &param = params.size() > 1 ? params[1] : "";
 
 		User *u2;
-		if (!u->Account()->IsServicesOper() && !nick.empty())
+		if (!u->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
 			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
-		else if (!nick.empty() && u2->Account() && !u2->Account()->IsServicesOper())
+		else if (!nick.empty() && !u2->IsServicesOper())
 			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else
 		{
@@ -64,7 +64,7 @@ class CommandNSLogout : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002LOGOUT [\037nickname\037 [REVALIDATE]]\002\n"
 					" \n"
 					"Without a parameter, reverses the effect of the \002IDENTIFY\002 \n"

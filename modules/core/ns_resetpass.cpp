@@ -29,7 +29,7 @@ class CommandNSResetPass : public Command
 		User *u = source.u;
 		NickAlias *na;
 
-		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/resetpass")))
+		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/resetpass")))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!(na = findnick(params[0])))
 			source.Reply(_(NICK_X_NOT_REGISTERED), params[0].c_str());

@@ -30,7 +30,7 @@ class CommandNSSendPass : public Command
 		const Anope::string &nick = params[0];
 		NickAlias *na;
 
-		if (Config->RestrictMail && (!u->Account() || !u->Account()->HasCommand("nickserv/sendpass")))
+		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/sendpass")))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!(na = findnick(nick)))
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());

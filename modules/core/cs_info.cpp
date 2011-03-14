@@ -42,7 +42,7 @@ class CommandCSInfo : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("chanserv/auspex");
+		bool has_auspex = u->IsIdentified() && u->HasPriv("chanserv/auspex");
 		bool show_all = false;
 
 		if (ci->HasFlag(CI_FORBIDDEN))

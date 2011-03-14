@@ -127,7 +127,7 @@ class CommandNSAccess : public Command
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		NickAlias *na;
-		if (cmd.equals_ci("LIST") && u->Account()->IsServicesOper() && !mask.empty() && (na = findnick(params[1])))
+		if (cmd.equals_ci("LIST") && u->IsServicesOper() && !mask.empty() && (na = findnick(params[1])))
 			return this->DoServAdminList(source, params, na->nc);
 
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)

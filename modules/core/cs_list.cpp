@@ -30,7 +30,7 @@ class CommandCSList : public Command
 		Anope::string pattern = params[0];
 		unsigned nchans;
 		char buf[BUFSIZE];
-		bool is_servadmin = u->Account()->HasCommand("chanserv/list");
+		bool is_servadmin = u->HasCommand("chanserv/list");
 		int count = 0, from = 0, to = 0;
 		bool forbidden = false, suspended = false, channoexpire = false;
 

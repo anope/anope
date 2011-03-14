@@ -28,7 +28,7 @@ class CommandCSGetKey : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		if (!check_access(u, ci, CA_GETKEY) && !u->Account()->HasCommand("chanserv/getkey"))
+		if (!check_access(u, ci, CA_GETKEY) && !u->HasCommand("chanserv/getkey"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;

@@ -19,24 +19,12 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<
 
 	NickAliasList[this->nick] = this;
 
-	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+	if (this->nc->o == NULL)
 	{
-		if (this->nc->ot)
-			break;
-		if (!this->nick.equals_ci(it->first))
-			continue;
-
-		for (std::list<OperType *>::iterator tit = Config->MyOperTypes.begin(), tit_end = Config->MyOperTypes.end(); tit != tit_end; ++tit)
-		{
-			OperType *ot = *tit;
-
-			if (ot->GetName().equals_ci(it->second))
-			{
-				Log() << "Tied oper " << this->nc->display << " to type " << ot->GetName();
-				this->nc->ot = ot;
-				break;
-			}
-		}
+		Oper *o = Oper::Find(this->nick);
+		if (o == NULL)
+			o = Oper::Find(this->nc->display);
+		this->nc->o = o;
 	}
 }
 

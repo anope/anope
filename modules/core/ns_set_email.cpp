@@ -80,7 +80,7 @@ class CommandNSSetEmail : public Command
 			return MOD_CONT;
 		}
 
-		if (!param.empty() && Config->NSConfirmEmailChanges && !u->Account()->IsServicesOper())
+		if (!param.empty() && Config->NSConfirmEmailChanges && !u->IsServicesOper())
 		{
 			u->Account()->Extend("ns_set_email", new ExtensibleItemRegular<Anope::string>(param));
 			Anope::string old = u->Account()->email;

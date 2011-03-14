@@ -25,11 +25,11 @@ class CommandOSStaff : public Command
 	{
 		source.Reply(_("On Level Nick"));
 
-		for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+		for (unsigned i = 0; i < Config->Opers.size(); ++i)
 		{
-			Anope::string nick = it->first, type = it->second;
+			Oper *o = Config->Opers[i];
 
-			NickAlias *na = findnick(nick);
+			NickAlias *na = findnick(o->name);
 			if (na)
 			{
 				NickCore *nc = na->nc;
@@ -38,12 +38,12 @@ class CommandOSStaff : public Command
 					User *u2 = *uit;
 
 					if (na->nick.equals_ci(u2->nick))
-						source.Reply(_(" %c %s  %s"), '*', type.c_str(), u2->nick.c_str());
+						source.Reply(_(" %c %s  %s"), '*', o->ot->GetName().c_str(), u2->nick.c_str());
 					else
-						source.Reply(_(" %c %s  %s [%s]"), '*', type.c_str(), na->nick.c_str(), u2->nick.c_str());
+						source.Reply(_(" %c %s  %s [%s]"), '*', o->ot->GetName().c_str(), na->nick.c_str(), u2->nick.c_str());
 				}
 				if (nc->Users.empty())
-					source.Reply(_(" %c %s  %s"), ' ', type.c_str(), na->nick.c_str());
+					source.Reply(_(" %c %s  %s"), ' ', o->ot->GetName().c_str(), na->nick.c_str());
 			}
 		}
 

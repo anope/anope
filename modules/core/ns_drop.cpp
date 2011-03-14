@@ -51,7 +51,7 @@ class CommandNSDrop : public Command
 		if (is_mine && nick.empty())
 			my_nick = na->nick;
 
-		if (!is_mine && !u->Account()->HasPriv("nickserv/drop"))
+		if (!is_mine && !u->HasPriv("nickserv/drop"))
 			source.Reply(_(ACCESS_DENIED));
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
 			source.Reply(_(ACCESS_DENIED));
@@ -90,7 +90,7 @@ class CommandNSDrop : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->HasPriv("nickserv/drop"))
+		if (u->Account() && u->HasPriv("nickserv/drop"))
 			source.Reply(_("Syntax: \002DROP [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, drops your nickname from the\n"

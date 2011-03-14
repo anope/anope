@@ -9,7 +9,7 @@ NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_EN
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
 
-	this->ot = NULL;
+	this->o = NULL;
 	this->channelcount = 0;
 	this->lastmail = 0;
 	this->memos.memomax = Config->MSMaxMemos;
@@ -65,30 +65,9 @@ NickCore::~NickCore()
 	}
 }
 
-bool NickCore::HasCommand(const Anope::string &cmdstr) const
-{
-	if (!this->ot)
-		// No opertype.
-		return false;
-
-	return this->ot->HasCommand(cmdstr);
-}
-
 bool NickCore::IsServicesOper() const
 {
-	if (this->ot)
-		return true;
-
-	return false;
-}
-
-bool NickCore::HasPriv(const Anope::string &privstr) const
-{
-	if (!this->ot)
-		// No opertype.
-		return false;
-
-	return this->ot->HasPriv(privstr);
+	return this->o != NULL;
 }
 
 void NickCore::AddAccess(const Anope::string &entry)

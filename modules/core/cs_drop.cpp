@@ -38,19 +38,19 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if (ci->HasFlag(CI_FORBIDDEN) && !u->Account()->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_FORBIDDEN) && !u->HasCommand("chanserv/drop"))
 		{
 			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
 			return MOD_CONT;
 		}
 
-		if (ci->HasFlag(CI_SUSPENDED) && !u->Account()->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
 		{
 			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
 			return MOD_CONT;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->Account()->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->HasCommand("chanserv/drop"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
@@ -82,7 +82,7 @@ class CommandCSDrop : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002DROP \037channel\037\002\n"
 					" \n"
 					"Unregisters the named channel.  Only \002Services Operators\002\n"

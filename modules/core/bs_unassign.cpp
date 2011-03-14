@@ -30,7 +30,7 @@ class CommandBSUnassign : public Command
 
 		if (readonly)
 			source.Reply(_(BOT_ASSIGN_READONLY));
-		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
+		else if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
 			source.Reply(_(BOT_NOT_ASSIGNED));

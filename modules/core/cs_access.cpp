@@ -110,7 +110,7 @@ class AccessDelCallback : public NumberList
  public:
 	AccessDelCallback(CommandSource &_source, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), Deleted(0), Denied(false)
 	{
-		if (!check_access(source.u, source.ci, CA_ACCESS_CHANGE) && source.u->Account()->HasPriv("chanserv/access/modify"))
+		if (!check_access(source.u, source.ci, CA_ACCESS_CHANGE) && source.u->HasPriv("chanserv/access/modify"))
 			this->override = true;
 	}
 
@@ -143,7 +143,7 @@ class AccessDelCallback : public NumberList
 
 		ChanAccess *u_access = ci->GetAccess(u);
 		int16 u_level = u_access ? u_access->level : 0;
-		if (u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+		if (u_level <= access->level && !u->HasPriv("chanserv/access/modify"))
 		{
 			Denied = true;
 			return;
@@ -179,7 +179,7 @@ class CommandCSAccess : public Command
 
 		ChanAccess *u_access = ci->GetAccess(u);
 		int16 u_level = u_access ? u_access->level : 0;
-		if (level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
+		if (level >= u_level && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
@@ -211,7 +211,7 @@ class CommandCSAccess : public Command
 		if (access)
 		{
 			/* Don't allow lowering from a level >= u_level */
-			if (access->level >= u_level && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (access->level >= u_level && !u->HasPriv("chanserv/access/modify"))
 			{
 				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
@@ -267,7 +267,7 @@ class CommandCSAccess : public Command
 			int16 u_level = u_access ? u_access->level : 0;
 			if (!access)
 				source.Reply(_("\002%s\002 not found on %s access list."), mask.c_str(), ci->name.c_str());
-			else if (access->nc != u->Account() && check_access(u, ci, CA_NOJOIN) && u_level <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			else if (access->nc != u->Account() && check_access(u, ci, CA_NOJOIN) && u_level <= access->level && !u->HasPriv("chanserv/access/modify"))
 				source.Reply(_(ACCESS_DENIED));
 			else
 			{
@@ -373,7 +373,7 @@ class CommandCSAccess : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		if (!IsFounder(u, ci) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if (!IsFounder(u, ci) && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(_(ACCESS_DENIED));
 		else
 		{
@@ -688,7 +688,7 @@ class CommandCSLevels : public Command
 			this->OnSyntaxError(source, cmd);
 		else if (ci->HasFlag(CI_XOP))
 			source.Reply(_("Levels are not available as xOP is enabled on this channel."));
-		else if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
+		else if (!check_access(u, ci, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(_(ACCESS_DENIED));
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, params);

@@ -663,7 +663,7 @@ class DBMySQL : public Module
 
 		if (service == NickServ)
 		{
-			if (u->Account() && ((command->name.equals_ci("SET") && !params.empty()) || (command->name.equals_ci("SASET") && u->Account()->HasCommand("nickserv/saset") && params.size() > 1)))
+			if (u->Account() && ((command->name.equals_ci("SET") && !params.empty()) || (command->name.equals_ci("SASET") && u->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
 				Anope::string cmd = (command->name.equals_ci("SET") ? params[0] : params[1]);
 				NickCore *nc = (command->name.equals_ci("SET") ? u->Account() : findcore(params[0]));
@@ -697,7 +697,7 @@ class DBMySQL : public Module
 			{
 				if (!ci)
 					return;
-				if (!u->Account()->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
+				if (!u->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
 					return;
 				if (params[1].equals_ci("FOUNDER") && ci->founder)
 				{
@@ -727,7 +727,7 @@ class DBMySQL : public Module
 			{
 				if (!ci)
 					return;
-				if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
+				if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
 					return;
 				if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
 				{
@@ -756,12 +756,12 @@ class DBMySQL : public Module
 			}
 			else if (command->name.equals_ci("SET") && params.size() > 2)
 			{
-				if (ci && !check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
+				if (ci && !check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
 					return;
 				BotInfo *bi = NULL;
 				if (!ci)
 					bi = findbot(params[0]);
-				if (bi && params[1].equals_ci("PRIVATE") && u->Account()->HasPriv("botserv/set/private"))
+				if (bi && params[1].equals_ci("PRIVATE") && u->HasPriv("botserv/set/private"))
 				{
 					this->RunQuery("UPDATE `anope_bs_core` SET `flags` = '" + ToString(bi->ToString()) + "' WHERE `nick` = '" + this->Escape(bi->nick) + "'");
 				}

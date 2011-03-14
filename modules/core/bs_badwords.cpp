@@ -58,7 +58,7 @@ class BadwordsDelCallback : public NumberList
  public:
 	BadwordsDelCallback(CommandSource &_source, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), c(_c), Deleted(0), override(false)
 	{
-		if (!check_access(source.u, source.ci, CA_BADWORDS) && source.u->Account()->HasPriv("botserv/administration"))
+		if (!check_access(source.u, source.ci, CA_BADWORDS) && source.u->HasPriv("botserv/administration"))
 			this->override = true;
 	}
 
@@ -245,7 +245,7 @@ class CommandBSBadwords : public Command
 			return MOD_CONT;
 		}
 
-		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->Account()->HasPriv("botserv/administration")))
+		if (!check_access(u, ci, CA_BADWORDS) && (!need_args || !u->HasPriv("botserv/administration")))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;

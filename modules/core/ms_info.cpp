@@ -31,7 +31,7 @@ class CommandMSInfo : public Command
 		const Anope::string &nname = !params.empty() ? params[0] : "";
 		int hardmax = 0;
 
-		if (!nname.empty() && nname[0] != '#' && u->Account()->HasPriv("memoserv/info"))
+		if (!nname.empty() && nname[0] != '#' && u->HasPriv("memoserv/info"))
 		{
 			na = findnick(nname);
 			if (!na)
@@ -159,14 +159,14 @@ class CommandMSInfo : public Command
 
 			if (!mi->memomax)
 			{
-				if (!u->Account()->IsServicesOper() && hardmax)
+				if (!u->IsServicesOper() && hardmax)
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos.  You cannot change this limit."));
 				else
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos."));
 			}
 			else if (mi->memomax > 0)
 			{
-				if (!u->Account()->IsServicesOper() && hardmax)
+				if (!u->IsServicesOper() && hardmax)
 					source.Reply(_("Your memo limit is \002%d\002, and may not be changed."), mi->memomax);
 				else
 					source.Reply(_("Your memo limit is \002%d\002."), mi->memomax);
@@ -190,7 +190,7 @@ class CommandMSInfo : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_("Syntax: \002INFO [\037nick\037 | \037channel\037]\002\n"
 					"Without a parameter, displays information on the number of\n"
 					"memos you have, how many of them are unread, and how many\n"

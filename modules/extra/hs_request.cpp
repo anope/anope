@@ -423,12 +423,17 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 		host = vHost;
 
 	if (HSRequestMemoOper == 1)
-		for (it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+		for (unsigned i = 0; i < Config->Opers.size(); ++i)
 		{
-			Anope::string nick = it->first;
+			Oper *o = Config->Opers[i];
+			
+			NickAlias *na = findnick(o->name);
+			if (!na)
+				continue;
+
 			char message[BUFSIZE];
 			snprintf(message, sizeof(message), _("[auto memo] vHost \002%s\002 has been requested."), host.c_str());
-			memo_send(source, nick, message, 2);
+			memo_send(source, na->nick, message, 2);
 		}
 }
 

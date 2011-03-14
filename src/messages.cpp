@@ -37,15 +37,13 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
 			else
 			{
-				std::list<std::pair<Anope::string, Anope::string> >::iterator it, it_end;
-
-				for (it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+				for (unsigned i = 0; i < Config->Opers.size(); ++i)
 				{
-					Anope::string nick = it->first, type = it->second;
+					Oper *o = Config->Opers[i];
 
-					NickCore *nc = findcore(nick);
-					if (nc)
-						ircdproto->SendNumeric(Config->ServerName, 243, source, "O * * %s %s 0", nick.c_str(), type.c_str());
+					NickAlias *na = findnick(o->name);
+					if (na)
+						ircdproto->SendNumeric(Config->ServerName, 243, source, "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
 				}
 
 				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);

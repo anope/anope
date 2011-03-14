@@ -185,12 +185,14 @@ int validate_user(User *u)
 		u->Collide(na);
 		return 0;
 	}
+
 	if (!u->IsIdentified() && !u->fingerprint.empty() && na->nc->FindCert(u->fingerprint))
 	{
 		u->SendMessage(NickServ, _("SSL Fingerprint accepted, you are now identified"));
 		u->Identify(na);
 		return 1;
 	}
+
 	if (!na->nc->HasFlag(NI_SECURE) && u->IsRecognized())
 	{
 		na->last_seen = Anope::CurTime;

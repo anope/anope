@@ -33,7 +33,7 @@ class CommandBSSet : public Command
 
 		if (readonly)
 			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
-		else if (u->Account()->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
+		else if (u->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
 		{
 			BotInfo *bi;
 
@@ -59,7 +59,7 @@ class CommandBSSet : public Command
 		}
 		else if (!(ci = cs_findchan(chan)))
 			source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
-		else if (!u->Account()->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
+		else if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
 			source.Reply(_(ACCESS_DENIED));
 		else
 		{
@@ -126,7 +126,7 @@ class CommandBSSet : public Command
 				else
 					SyntaxError(source, "SET GREET", _("SET \037channel\037 GREET {\037ON|\037}"));
 			}
-			else if (u->Account()->HasCommand("botserv/set/nobot") && option.equals_ci("NOBOT"))
+			else if (u->HasCommand("botserv/set/nobot") && option.equals_ci("NOBOT"))
 			{
 				if (value.equals_ci("ON"))
 				{
@@ -218,7 +218,7 @@ class CommandBSSet : public Command
 					"Note: access to this command is controlled by the\n"
 					"level SET."), BotServ->nick.c_str());
 			User *u = source.u;
-			if (u->Account() && u->Account()->IsServicesOper())
+			if (u->IsServicesOper())
 				source.Reply(_("These options are reserved to Services Operators:\n"
 						" \n"
 						"    NOBOT            Prevent a bot from being assigned to \n"

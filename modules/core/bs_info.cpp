@@ -65,12 +65,12 @@ class CommandBSInfo : public Command
 			source.Reply(_("    Options : %s"), bi->HasFlag(BI_PRIVATE) ? _("Private") : _("None"));
 			source.Reply(_("    Used on : %d channel(s)"), bi->chancount);
 
-			if (u->Account()->HasPriv("botserv/administration"))
+			if (u->HasPriv("botserv/administration"))
 				this->send_bot_channels(source, bi);
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("botserv/administration"))
+			if (!check_access(u, ci, CA_FOUNDER) && !u->HasPriv("botserv/administration"))
 			{
 				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;

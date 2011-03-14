@@ -156,7 +156,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
-	if (!c->permission.empty() && !u->Account()->HasCommand(c->permission))
+	if (!c->permission.empty() && !u->HasCommand(c->permission))
 	{
 		u->SendMessage(bi, _(ACCESS_DENIED));
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
@@ -201,7 +201,7 @@ void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cm
 	source.service = ci ? ci->bi : bi;
 	source.fantasy = ci != NULL;
 
-	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission))) || !c->OnHelp(source, subcommand))
+	if (!c || (Config->HidePrivilegedCommands && !c->permission.empty() && !u->HasCommand(c->permission)) || !c->OnHelp(source, subcommand))
 		source.Reply( _("No help available for \002%s\002."), cmd.c_str());
 	else
 	{
@@ -215,7 +215,7 @@ void mod_help_cmd(BotInfo *bi, User *u, ChannelInfo *ci, const Anope::string &cm
 		if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 			source.Reply( _("You need to be identified to use this command."));
 		/* User doesn't have the proper permission to use this command */
-		else if (!c->permission.empty() && (!u->Account() || !u->Account()->HasCommand(c->permission)))
+		else if (!c->permission.empty() && !u->HasCommand(c->permission))
 			source.Reply(_("You cannot use this command."));
 		/* User can use this command */
 		else

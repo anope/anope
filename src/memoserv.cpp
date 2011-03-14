@@ -167,7 +167,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	bool ischan, isforbid;
 	MemoInfo *mi;
 	Anope::string sender = u && u->Account() ? u->Account()->display : "";
-	int is_servoper = u && u->Account() && u->Account()->IsServicesOper();
+	bool is_servoper = u != NULL && u->IsServicesOper();
 
 	if (readonly)
 		u->SendMessage(MemoServ, _(MEMO_SEND_DISABLED));
@@ -217,7 +217,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	{
 		if (!z || z == 3)
 			source.Reply(_("Memo sent to \002%s\002."), name.c_str());
-		if ((!u->Account() || !u->Account()->IsServicesOper()) && mi->HasIgnore(u))
+		if (!u->IsServicesOper() && mi->HasIgnore(u))
 			return;
 
 		u->lastmemosend = Anope::CurTime;

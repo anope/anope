@@ -792,8 +792,10 @@ static bool DoneOperTypes(ServerConfig *, const Anope::string &)
 static bool InitOpers(ServerConfig *config, const Anope::string &)
 {
 	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
-		it->second->ot = NULL;
+		it->second->o = NULL;
 
+	for (unsigned i = 0; i < config->Opers.size(); ++i)
+		delete config->Opers[i];
 	config->Opers.clear();
 
 	return true;
@@ -803,6 +805,8 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 {
 	Anope::string name = values[0].GetValue();
 	Anope::string type = values[1].GetValue();
+	Anope::string password = values[2].GetValue();
+	Anope::string certfp = values[3].GetValue();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(config, "oper", "name", vi))
@@ -811,35 +815,35 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 	ValueItem vi2(type);
 	if (!ValidateNotEmpty(config, "oper", "type", vi2))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+	
+	OperType *ot = NULL;
+	for (std::list<OperType *>::iterator it = config->MyOperTypes.begin(), it_end = config->MyOperTypes.end(); it != it_end; ++it)
+		if ((*it)->GetName() == type)
+			ot = *it;
+	if (ot == NULL)
+		throw ConfigException("Oper block for " + name + " has invalid oper type " + type);
+	
+	Oper *o = new Oper(name, password, certfp, ot);
+	config->Opers.push_back(o);
 
-	config->Opers.push_back(std::make_pair(name, type));
 	return true;
 }
 
 static bool DoneOpers(ServerConfig *config, const Anope::string &)
 {
-	for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = config->Opers.begin(), it_end = config->Opers.end(); it != it_end; ++it)
+	for (unsigned i = 0; i < config->Opers.size(); ++i)
 	{
-		Anope::string nick = it->first, type = it->second;
+		Oper *o = config->Opers[i];
 
-		NickAlias *na = findnick(nick);
+		NickAlias *na = findnick(o->name);
 		if (!na)
 			// Nonexistant nick
 			continue;
 
-		if (!na->nc)
-			throw CoreException("Nick with no core?");
-
-		for (std::list<OperType *>::iterator tit = config->MyOperTypes.begin(), tit_end = config->MyOperTypes.end(); tit != tit_end; ++tit)
-		{
-			OperType *ot = *tit;
-			if (ot->GetName().equals_ci(type))
-			{
-				Log() << "Tied oper " << na->nc->display << " to type " << type;
-				na->nc->ot = ot;
-			}
-		}
+		na->nc->o = o;
+		Log() << "Tied oper " << na->nc->display << " to type " << o->ot->GetName();
 	}
+
 	return true;
 }
 
@@ -1295,9 +1299,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
 			InitOperTypes, DoOperType, DoneOperTypes},
 		{"oper",
-			{"name", "type", ""},
-			{"", "", ""},
-			{DT_CHARPTR, DT_CHARPTR},
+			{"name", "type", "password", "certfp", ""},
+			{"", "", "", "", ""},
+			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
 			InitOpers, DoOper, DoneOpers},
 		{"",
 			{""},

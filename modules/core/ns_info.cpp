@@ -40,7 +40,7 @@ class CommandNSInfo : public Command
 
 		const Anope::string &nick = params[0];
 		NickAlias *na = findnick(nick);
-		bool has_auspex = u->IsIdentified() && u->Account()->HasPriv("nickserv/auspex");
+		bool has_auspex = u->IsIdentified() && u->HasPriv("nickserv/auspex");
 
 		if (!na)
 		{
@@ -71,7 +71,7 @@ class CommandNSInfo : public Command
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
 
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
-				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->ot->GetName().c_str());
+				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
 
 			if (nick_online)
 			{

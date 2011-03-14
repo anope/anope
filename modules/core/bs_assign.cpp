@@ -41,13 +41,13 @@ class CommandBSAssign : public Command
 			return MOD_CONT;
 		}
 
-		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->Account()->HasPriv("botserv/administration")))
+		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->HasPriv("botserv/administration")))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
 		}
 
-		if (bi->HasFlag(BI_PRIVATE) && !u->Account()->HasCommand("botserv/assign/private"))
+		if (bi->HasFlag(BI_PRIVATE) && !u->HasCommand("botserv/assign/private"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;

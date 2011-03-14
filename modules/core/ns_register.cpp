@@ -29,7 +29,7 @@ class CommandNSConfirm : public Command
 		User *u = source.u;
 		const Anope::string &passcode = params[0];
 
-		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
+		if (u->Account() && u->HasPriv("nickserv/confirm"))
 		{
 			NickAlias *na = findnick(passcode);
 			if (na == NULL)
@@ -74,7 +74,7 @@ class CommandNSConfirm : public Command
 				" \n"
 				"This is also used after the RESETPASS command has been used to\n"
 				"force identify you to your nick so you may change your password."));
-		if (u->Account() && u->Account()->HasPriv("nickserv/confirm"))
+		if (u->Account() && u->HasPriv("nickserv/confirm"))
 			source.Reply(_("Additionally, Services Operators with the \037nickserv/confirm\037 permission can\n"
 				"replace \037passcode\037 with a users nick to force validate them."));
 		return true;
@@ -134,16 +134,16 @@ class CommandNSRegister : public Command
 		}
 
 		if (Config->RestrictOperNicks)
-			for (std::list<std::pair<Anope::string, Anope::string> >::iterator it = Config->Opers.begin(), it_end = Config->Opers.end(); it != it_end; ++it)
+			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
-				Anope::string nick = it->first;
+				Oper *o = Config->Opers[i];
 
-				if (u->nick.find_ci(nick) != Anope::string::npos && !u->HasMode(UMODE_OPER))
+				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(o->name) != Anope::string::npos)
 				{
 					source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 					return MOD_CONT;
 				}
-		}
+			}
 
 		if (Config->NSForceEmail && email.empty())
 			this->OnSyntaxError(source, "");

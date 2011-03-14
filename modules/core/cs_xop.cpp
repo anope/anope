@@ -131,7 +131,7 @@ class XOPBase : public Command
 		ChanAccess *access = ci->GetAccess(u);
 		uint16 ulev = access ? access->level : 0;
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if ((level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
@@ -152,7 +152,7 @@ class XOPBase : public Command
 			/**
 			 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
 			 **/
-			if (access->level >= ulev && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (access->level >= ulev && !u->HasPriv("chanserv/access/modify"))
 			{
 				source.Reply(_(ACCESS_DENIED));
 				return MOD_CONT;
@@ -220,7 +220,7 @@ class XOPBase : public Command
 		ChanAccess *access = ci->GetAccess(u);
 		uint16 ulev = access ? access->level : 0;
 
-		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
@@ -242,7 +242,7 @@ class XOPBase : public Command
 		}
 		else
 		{
-			if (access->nc != u->Account() && ulev <= access->level && !u->Account()->HasPriv("chanserv/access/modify"))
+			if (access->nc != u->Account() && ulev <= access->level && !u->HasPriv("chanserv/access/modify"))
 				source.Reply(_(ACCESS_DENIED));
 			else
 			{
@@ -270,7 +270,7 @@ class XOPBase : public Command
 		ChanAccess *access = ci->GetAccess(u);
 		uint16 ulev = access ? access->level : 0;
 
-		if (!ulev && !u->Account()->HasCommand("chanserv/access/list"))
+		if (!ulev && !u->HasCommand("chanserv/access/list"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;
@@ -336,7 +336,7 @@ class XOPBase : public Command
 			return MOD_CONT;
 		}
 
-		if (!check_access(u, ci, CA_FOUNDER) && !u->Account()->HasPriv("chanserv/access/modify"))
+		if (!check_access(u, ci, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(_(ACCESS_DENIED));
 			return MOD_CONT;

@@ -42,13 +42,13 @@ class CommandCSHelp : public Command
 				ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(),
 				ChanServ->nick.c_str());
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
-			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		if (Config->CSExpire >= 86400)
 			source.Reply(_("Note that any channel which is not used for %d days\n"
 			"(i.e. which no user on the channel's access list enters\n"
 			"for that period of time) will be automatically dropped."), Config->CSExpire / 86400);
-		if (u->Account() && u->Account()->IsServicesOper())
+		if (u->IsServicesOper())
 			source.Reply(_(" \n"
 					"Services Operators can also drop any channel without needing\n"
 					"to identify via password, and may view the access, AKICK,\n"

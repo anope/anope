@@ -32,7 +32,7 @@ class CommandHSHelp : public Command
 		User *u = source.u;
 		source.Reply(_("%s commands"), Config->s_HostServ.c_str());
 		for (CommandMap::const_iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; ++it)
-			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || (u->Account() && u->Account()->HasCommand(it->second->permission)))
+			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 	}
 };

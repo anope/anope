@@ -7,6 +7,33 @@
 
 #include "services.h"
 
+
+Oper *Oper::Find(const Anope::string &name)
+{
+	for (unsigned i = 0; i < Config->Opers.size(); ++i)
+	{
+		Oper *o = Config->Opers[i];
+
+		if (o->name.equals_ci(name))
+			return o;
+	}
+
+	return NULL;
+}
+
+OperType *OperType::Find(const Anope::string &name)
+{
+	for (std::list<OperType *>::iterator it = Config->MyOperTypes.begin(), it_end = Config->MyOperTypes.end(); it != it_end; ++it)
+	{
+		OperType *ot = *it;
+
+		if (ot->GetName() == name)
+			return ot;
+	}
+
+	return NULL;
+}
+
 OperType::OperType(const Anope::string &nname) : name(nname)
 {
 }

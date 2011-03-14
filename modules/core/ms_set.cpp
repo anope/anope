@@ -78,7 +78,7 @@ class CommandMSSet : public Command
 		int16 limit;
 		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
-		bool is_servadmin = u->Account()->HasPriv("memoserv/set-limit");
+		bool is_servadmin = u->HasPriv("memoserv/set-limit");
 
 		if (p1[0] == '#')
 		{
@@ -258,7 +258,7 @@ class CommandMSSet : public Command
 		else if (subcommand.equals_ci("LIMIT"))
 		{
 			User *u = source.u;
-			if (u->Account() && u->Account()->IsServicesOper())
+			if (u->IsServicesOper())
 				source.Reply(_("Syntax: \002SET LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
 						" \n"
 						"Sets the maximum number of memos a user or channel is\n"

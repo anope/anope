@@ -38,7 +38,7 @@ class CommandBSKick : public Command
 			SyntaxError(source, "KICK", _("KICK \037channel\037 \037option\037 {\037ON|\037} [\037settings\037]"));
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
 			SyntaxError(source, "KICK", _("KICK \037channel\037 \037option\037 {\037ON|\037} [\037settings\037]"));
-		else if (!check_access(u, ci, CA_SET) && !u->Account()->HasPriv("botserv/administration"))
+		else if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
 			source.Reply(_(BOT_NOT_ASSIGNED));

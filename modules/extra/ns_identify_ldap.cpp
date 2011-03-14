@@ -217,7 +217,7 @@ class NSIdentifyLDAP : public Module
 
 	void OnNickIdentify(User *u)
 	{
-		if (email_attribute.empty())
+		if (email_attribute.empty() || !this->ldap)
 			return;
 
 		try

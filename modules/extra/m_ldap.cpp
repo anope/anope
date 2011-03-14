@@ -221,6 +221,8 @@ class ModuleLDAP : public Module, public Pipe
 		{
 			it->second->SetExitState();
 			it->second->Wakeup();
+			it->second->Join();
+			delete it->second;
 		}
 		LDAPServices.clear();
 	}

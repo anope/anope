@@ -171,8 +171,8 @@ class CommandOSSQLine : public Command
 		if (!mask.empty() && !reason.empty())
 		{
 			unsigned int affected = 0;
-			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
-				if (Anope::Match((*it)->nick, mask))
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				if (Anope::Match(it->second->nick, mask))
 					++affected;
 			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 

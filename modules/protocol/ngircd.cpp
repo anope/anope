@@ -46,9 +46,13 @@ class ngIRCdProto : public IRCDProto
 	void SendAkill(User *u, const XLine *x)
 	{
 		if (SGLine && u == NULL)
-			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
-				if (SGLine->Check(*it) != NULL)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			{
+				u = it->second;
+				++it;
+				if (SGLine->Check(u) != NULL)
 					break;
+			}
 	}
 
 	void SendAkillDel(const XLine*) { }

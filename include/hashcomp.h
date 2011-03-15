@@ -162,12 +162,6 @@ namespace irc
 		 * @return Pointer to the first occurance of c in s1
 		 */
 		static const char *find(const char *s1, int n, char c);
-
-		/** Convert a char to lowercase
-		 * @param c1 The character to convert
-		 * @return The lowercase version of the char
-		 */
-		static const char chartolower(char c1);
 	};
 
 	/** This typedef declares irc::string based upon irc_char_traits.
@@ -239,12 +233,6 @@ namespace ci
 		 * @return Pointer to the first occurance of c in s1
 		 */
 		static const char *find(const char *s1, int n, char c);
-
-		/** Convert a char to lowercase
-		 * @param c1 The character to convert
-		 * @return The lowercase version of the char
-		 */
-		static const char chartolower(char c1);
 	};
 
 	/** This typedef declares ci::string based upon ci_char_traits.
@@ -271,17 +259,6 @@ namespace ci
 
 namespace std
 {
-	/** The std_char_traits class is used for normal comparison of strings.
-	 */
-	struct CoreExport std_char_traits : char_traits<char>
-	{
-		/** Convert a char to lowercase
-		 * @param c1 The character to convert
-		 * @return The lowercase version of the char
-		 */
-		static const char chartolower(char c1);
-	};
-
 	/** An overload for std::equal_to<ci::string> that uses Anope::string, passed for the fourth temmplate
 	 * argument for unordered_map
 	 */

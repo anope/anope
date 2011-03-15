@@ -174,8 +174,8 @@ class CommandOSSZLine : public Command
 			if (user && user->ip())
 				mask = user->ip.addr();
 			unsigned int affected = 0;
-			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
-				if ((*it)->ip() && Anope::Match((*it)->ip.addr(), mask))
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+				if (it->second->ip() && Anope::Match(it->second->ip.addr(), mask))
 					++affected;
 			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
 

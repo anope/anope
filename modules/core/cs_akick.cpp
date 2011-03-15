@@ -213,9 +213,9 @@ class CommandCSAKick : public Command
 		{
 			/* Match against all currently online users with equal or
 			 * higher access. - Viper */
-			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 			{
-				User *u2 = *it;
+				User *u2 = it->second;
 
 				ChanAccess *u2_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
 				int16 u2_level = u2_access ? u2_access->level : 0, u_level = u_access ? u_access->level : 0;

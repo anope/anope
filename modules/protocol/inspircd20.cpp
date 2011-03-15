@@ -759,9 +759,9 @@ class ProtoInspIRCd : public Module
 
 	void OnServerSync(Server *s)
 	{
-		for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
-			User *u = *it;
+			User *u = it->second;
 			if (u->server == s && !u->IsIdentified())
 				validate_user(u);
 		}

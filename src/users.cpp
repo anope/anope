@@ -12,8 +12,8 @@
 #include "services.h"
 #include "modules.h"
 
-patricia_tree<User *, ci::ci_char_traits> UserListByNick;
-patricia_tree<User *> UserListByUID;
+Anope::insensitive_map<User *> UserListByNick;
+Anope::map<User *> UserListByUID;
 
 int32 opcnt = 0;
 uint32 usercnt = 0, maxusercnt = 0;
@@ -42,9 +42,9 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->uid = suid;
 	this->isSuperAdmin = 0;
 
-	UserListByNick.insert(snick, this);
+	UserListByNick[snick] = this;
 	if (!suid.empty())
-		UserListByUID.insert(suid, this);
+		UserListByUID[suid] = this;
 
 	this->nc = NULL;
 
@@ -68,7 +68,7 @@ void User::SetNewNick(const Anope::string &newnick)
 
 	this->nick = newnick;
 
-	UserListByNick.insert(this->nick, this);
+	UserListByNick[this->nick] = this;
 
 	OnAccess = false;
 	NickAlias *na = findnick(this->nick);
@@ -761,9 +761,9 @@ void get_user_stats(long &count, long &mem)
 {
 	count = mem = 0;
 
-	for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+	for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 	{
-		User *user = *it;
+		User *user = it->second;
 
 		++count;
 		mem += sizeof(*user);
@@ -784,9 +784,19 @@ void get_user_stats(long &count, long &mem)
 User *finduser(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircd->ts6)
-		return UserListByUID.find(nick);
+	{
+		Anope::map<User *>::iterator it = UserListByUID.find(nick);
+		if (it != UserListByUID.end())
+			return it->second;
+	}
+	else
+	{
+		Anope::insensitive_map<User *>::iterator it = UserListByNick.find(nick);
+		if (it != UserListByNick.end())
+			return it->second;
+	}
 
-	return UserListByNick.find(nick);
+	return NULL;
 }
 
 /*************************************************************************/

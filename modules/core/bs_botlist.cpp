@@ -26,9 +26,9 @@ class CommandBSBotList : public Command
 		User *u = source.u;
 		unsigned count = 0;
 
-		for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
-			BotInfo *bi = *it;
+			BotInfo *bi = it->second;
 
 			if (!bi->HasFlag(BI_PRIVATE))
 			{
@@ -43,9 +43,9 @@ class CommandBSBotList : public Command
 		{
 			source.Reply(_("Bots reserved to IRC operators:"));
 
-			for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+			for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
-				BotInfo *bi = *it;
+				BotInfo *bi = it->second;
 
 				if (bi->HasFlag(BI_PRIVATE))
 				{

@@ -501,23 +501,9 @@ bool nickIsServices(const Anope::string &tempnick, bool bot)
 		nick = nick.substr(0, at);
 	}
 
-	if (!Config->s_NickServ.empty() && nick.equals_ci(Config->s_NickServ))
-		return true;
-	else if (!Config->s_ChanServ.empty() && nick.equals_ci(Config->s_ChanServ))
-		return true;
-	else if (!Config->s_HostServ.empty() && nick.equals_ci(Config->s_HostServ))
-		return true;
-	else if (!Config->s_MemoServ.empty() && nick.equals_ci(Config->s_MemoServ))
-		return true;
-	else if (!Config->s_BotServ.empty() && nick.equals_ci(Config->s_BotServ))
-		return true;
-	else if (!Config->s_OperServ.empty() && nick.equals_ci(Config->s_OperServ))
-		return true;
-	else if (!Config->s_GlobalNoticer.empty() && nick.equals_ci(Config->s_GlobalNoticer))
-		return true;
-	else if (!Config->s_BotServ.empty() && bot && BotListByNick.find(nick))
-		return true;
-
+	BotInfo *bi = findbot(nick);
+	if (bi)
+		return bot ? true : bi->HasFlag(BI_CORE);
 	return false;
 }
 

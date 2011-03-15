@@ -640,9 +640,9 @@ class DBMySQL : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, CurChannel));
 		}
 
-		for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
-			CurBot = *it;
+			CurBot = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
 
 			/* This is for the core bots, bots added by users are already handled by an event */
@@ -1222,8 +1222,8 @@ static void SaveDatabases()
 
 	me->RunQuery("TRUNCATE TABLE `anope_bs_core`");
 
-	for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
-		me->OnBotCreate(*it);
+	for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		me->OnBotCreate(it->second);
 
 	me->RunQuery("TRUNCATE TABLE `anope_cs_info`");
 	me->RunQuery("TRUNCATE TABLE `anope_bs_badwords`");

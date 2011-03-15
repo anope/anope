@@ -170,11 +170,9 @@ void do_restart_services()
 	if (quitmsg.empty())
 		quitmsg = "Restarting";
 	/* Send a quit for all of our bots */
-	patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick);
-	for (bool next = it.next(); next;)
+	for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
-		BotInfo *bi = *it;
-		next = it.next();
+		BotInfo *bi = it->second;
 
 		/* Don't use quitmsg here, it may contain information you don't want people to see */
 		ircdproto->SendQuit(bi, "Restarting");
@@ -214,11 +212,9 @@ static void services_shutdown()
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
-		patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick);
-		for (bool next = it.next(); next;)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
-			BotInfo *bi = *it;
-			next = it.next();
+			BotInfo *bi = it->second;
 
 			/* Don't use quitmsg here, it may contain information you don't want people to see */
 			ircdproto->SendQuit(bi, "Shutting down");
@@ -230,11 +226,10 @@ static void services_shutdown()
 
 		ircdproto->SendSquit(Config->ServerName, quitmsg);
 
-		patricia_tree<User *, ci::ci_char_traits>::iterator uit(UserListByNick);
-		for (bool next = uit.next(); next;)
+		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{
-			User *u = *uit;
-			next = uit.next();
+			User *u = it->second;
+			++it;
 			delete u;
 		}
 	}
@@ -505,11 +500,10 @@ int main(int ac, char **av, char **envp)
 				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
 				/* Clear all of our users, but not our bots */
-				patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick);
-				for (bool next = it.next(); next;)
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 				{
-					User *u = *it;
-					next = it.next();
+					User *u = it->second;
+					++it;
 
 					if (u->server != Me)
 						delete u;

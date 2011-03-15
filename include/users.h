@@ -8,8 +8,8 @@
 #ifndef USERS_H
 #define USERS_H
 
-extern CoreExport patricia_tree<User *, ci::ci_char_traits> UserListByNick;
-extern CoreExport patricia_tree<User *> UserListByUID;
+extern CoreExport Anope::insensitive_map<User *> UserListByNick;
+extern CoreExport Anope::map<User *> UserListByUID;
 
 class CoreExport ChannelStatus : public Flags<ChannelModeName, CMODE_END * 2>
 {

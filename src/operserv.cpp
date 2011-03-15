@@ -593,11 +593,10 @@ XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 	{
 		Anope::string rreason = "G-Lined: " + reason;
 
-		patricia_tree<User *, ci::ci_char_traits>::iterator uit(UserListByNick);
-		for (bool next = uit.next(); next;)
+		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{
-			User *user = *uit;
-			next = uit.next();
+			User *user = it->second;
+			++it;
 
 			if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
 				kill_user(Config->ServerName, user, rreason);
@@ -727,11 +726,10 @@ XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_
 		}
 		else
 		{
-			patricia_tree<User *, ci::ci_char_traits>::iterator uit(UserListByNick);
-			for (bool next = uit.next(); next;)
+			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
-				User *user = *uit;
-				next = uit.next();
+				User *user = it->second;
+				++it;
 
 				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
 					kill_user(Config->ServerName, user, rreason);

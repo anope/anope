@@ -32,9 +32,9 @@ void InitLogChannels(ServerConfig *config)
 				c->SetFlag(CH_LOGCHAN);
 				c->SetFlag(CH_PERSIST);
 
-				for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+				for (Anope::insensitive_map<BotInfo *>::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 				{
-					BotInfo *bi = *it;
+					BotInfo *bi = it->second;
 
 					if (bi->HasFlag(BI_CORE) && !c->FindUser(bi))
 						bi->Join(c, &config->BotModeList);

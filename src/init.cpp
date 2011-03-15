@@ -57,9 +57,9 @@ void introduce_user(const Anope::string &user)
 	}
 
 	/* We make the bots go online */
-	for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+	for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
 	{
-		User *u = *it;
+		User *u = it->second;
 
 		ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
 

@@ -139,9 +139,9 @@ class CommandOSSession : public Command
 			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
 			source.Reply(_("Sessions  Host"));
 
-			for (patricia_tree<Session *>::iterator it(SessionList); it.next();)
+			for (Anope::map<Session *>::iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
 			{
-				Session *session = *it;
+				Session *session = it->second;
 
 				if (session->count >= mincount)
 					source.Reply(_("%6d    %s"), session->count, session->host.c_str());

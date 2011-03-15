@@ -34,9 +34,9 @@ void get_botserv_stats(long *nrec, long *memuse)
 {
 	long count = 0, mem = 0;
 
-	for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+	for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
-		BotInfo *bi = *it;
+		BotInfo *bi = it->second;
 
 		++count;
 		mem += sizeof(*bi);
@@ -361,11 +361,19 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 
 BotInfo *findbot(const Anope::string &nick)
 {
-	BotInfo *bi;
+	BotInfo *bi = NULL;
 	if (isdigit(nick[0]) && ircd->ts6)
-		bi = BotListByUID.find(nick);
+	{
+		Anope::map<BotInfo *>::iterator it = BotListByUID.find(nick);
+		if (it != BotListByUID.end())
+			bi = it->second;
+	}
 	else
-		bi = BotListByNick.find(nick);
+	{
+		Anope::insensitive_map<BotInfo *>::iterator it = BotListByNick.find(nick);
+		if (it != BotListByNick.end())
+			bi = it->second;
+	}
 	
 	FOREACH_MOD(I_OnFindBot, OnFindBot(nick));
 	

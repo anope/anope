@@ -39,11 +39,10 @@ class CommandOSNOOP : public Command
 			source.Reply(_("All O:lines of \002%s\002 have been removed."), server.c_str());
 
 			/* Kill all the IRCops of the server */
-			patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick);
-			for (bool next = it.next(); next;)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
-				User *u2 = *it;
-				next = it.next();
+				User *u2 = it->second;
+				++it;
 
 				if (u2 && u2->HasMode(UMODE_OPER) && Anope::Match(u2->server->GetName(), server, true))
 					kill_user(Config->s_OperServ, u2, reason);

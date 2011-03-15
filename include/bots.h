@@ -12,8 +12,8 @@
 
 class BotInfo;
 
-extern CoreExport patricia_tree<BotInfo *, ci::ci_char_traits> BotListByNick;
-extern CoreExport patricia_tree<BotInfo *> BotListByUID;
+extern CoreExport Anope::insensitive_map<BotInfo *> BotListByNick;
+extern CoreExport Anope::map<BotInfo *> BotListByUID;
 
 /** Flags settable on a bot
  */

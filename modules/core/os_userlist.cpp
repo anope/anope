@@ -53,9 +53,9 @@ class CommandOSUserList : public Command
 			source.Reply(_("Users list:\n"
 					"Nick                 Mask"));
 
-			for (patricia_tree<User *, ci::ci_char_traits>::iterator it(UserListByNick); it.next();)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
-				User *u2 = *it;
+				User *u2 = it->second;
 
 				if (!pattern.empty())
 				{

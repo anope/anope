@@ -782,9 +782,9 @@ class DBPlain : public Module
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}
 
-		for (patricia_tree<BotInfo *, ci::ci_char_traits>::iterator it(BotListByNick); it.next();)
+		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
-			BotInfo *bi = *it;
+			BotInfo *bi = it->second;
 
 			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
 			if (bi->FlagCount())

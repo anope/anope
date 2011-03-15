@@ -20,6 +20,9 @@ class Message;
 
 namespace Anope
 {
+	template<typename T> class map : public std::map<string, T> { };
+	template<typename T> class insensitive_map : public std::map<string, T, std::less<ci::string> > { };
+
 	/**
 	 * A wrapper string class around all the other string classes, this class will
 	 * allow us to only require one type of string everywhere that can be converted

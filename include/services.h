@@ -202,7 +202,6 @@ extern "C" void __pfnBkCheck() {}
 #include <set>
 
 #include "anope.h"
-#include "patricia.h"
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -897,7 +896,7 @@ struct Exception
 
 /*************************************************************************/
 
-extern CoreExport patricia_tree<Session *> SessionList;
+extern CoreExport Anope::map<Session *> SessionList;
 
 struct Session
 {

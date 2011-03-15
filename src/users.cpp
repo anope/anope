@@ -455,7 +455,7 @@ bool User::IsRecognized(bool CheckSecure)
 	{
 		NickAlias *na = findnick(this->nick);
 
-		if (!na || !na->nc->HasFlag(NI_SECURE))
+		if (!na || na->nc->HasFlag(NI_SECURE))
 			return false;
 	}
 

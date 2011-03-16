@@ -18,6 +18,7 @@ class CommandOSHelp : public Command
  public:
 	CommandOSHelp() : Command("HELP", 1, 1)
 	{
+		this->SetDesc(_("Displays this list and give information about commands"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

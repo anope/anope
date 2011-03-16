@@ -19,6 +19,7 @@ class CommandMSHelp : public Command
 	CommandMSHelp() : Command("HELP", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
+		this->SetDesc(_("Displays this list and give information about commands"));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

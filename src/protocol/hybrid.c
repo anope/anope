@@ -716,12 +716,14 @@ void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void hybrid_cmd_vhost_off(User * u)
 {
-    /* does not support vhosting */
+	if (ircd->vhost)
+		send_cmd(NULL, "ENCAP * CHGHOST %s %s", u->nick, u->host);
 }
 
 void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-    /* does not support vhosting */
+	if (ircd->vhost)
+		send_cmd(NULL, "ENCAP * CHGHOST %s %s", nick, vhost);
 }
 
 void hybrid_cmd_unsqline(char *user)
@@ -1285,7 +1287,8 @@ void hybrid_cmd_release_svshold(char *nick)
 /* SVSNICK */
 void hybrid_cmd_svsnick(char *nick, char *newnick, time_t when)
 {
-    /* Not Supported by this IRCD */
+	if (ircd->svsnick)
+		send_cmd(NULL, "SVSNICK %s %s", nick, newnick);
 }
 
 void hybrid_cmd_guest_nick(char *nick, char *user, char *host, char *real,
@@ -1385,7 +1388,7 @@ void hybrid_cmd_swhois(char *source, char *who, char *mask)
 
 int anope_event_notice(char *source, int ac, char **av)
 {
-    return MOD_CONT;
+    return hybrid_event_notice(source, ac, av);
 }
 
 int anope_event_admin(char *source, int ac, char **av)
@@ -1459,6 +1462,47 @@ void hybrid_cmd_ctcp(char *source, char *dest, char *buf)
 
     send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
     free(s);
+}
+
+static int on_server_connect(int argc, char **argv)
+{
+	Server *s = findserver(servlist, argv[0]);
+	if (s != NULL && s->uplink == me_server && !(s->flags & SERVER_JUPED))
+	{
+		/* Test these commands to see if they exist */
+		send_cmd(s_ChanServ, "SVSNICK %s %s", s_ChanServ, s_ChanServ);
+		send_cmd(s_ChanServ, "ENCAP * CHGHOST %s .", s_ChanServ);
+	}
+	
+	return MOD_CONT;
+}
+
+int hybrid_event_notice(char *source, int argc, char **argv)
+{
+	if (argc > 1)
+	{
+		Server *s = findserver(servlist, source);
+		if (s != NULL)
+		{
+			if (!ircd->svsnick && !strcmp(argv[0], s_ChanServ) && strstr(argv[1], "already in use"))
+			{
+				ircd->svsnick = 1;
+				alog("SVSNICK support enabled");
+			}
+			else if (!ircd->vhost && !strcmp(argv[0], s_ChanServ) && !strcmp(argv[1], "Invalid hostname"))
+			{
+				ircd->vhost = 1;
+				ircd->hostservmode = ircd->hostservaliasmode = sstrdup("+o");
+				alog("VHost support enabled");
+				if (s_HostServ)
+	        			anope_cmd_nick(s_HostServ, desc_HostServ, ircd->hostservmode);
+				if (s_HostServAlias)
+					anope_cmd_nick(s_HostServAlias, desc_HostServAlias, ircd->hostservaliasmode);
+			}
+		}
+	}
+	
+	return MOD_CONT;
 }
 
 
@@ -1550,6 +1594,7 @@ void moduleAddAnopeCmds()
  **/
 int AnopeInit(int argc, char **argv)
 {
+    EvtHook *hook;
 
     moduleAddAuthor("Anope");
     moduleAddVersion(VERSION_STRING);
@@ -1579,6 +1624,9 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAnopeCmds();
     moduleAddIRCDMsgs();
+
+    hook = createEventHook(EVENT_SERVER_CONNECT, on_server_connect);
+    moduleAddEventHook(hook);
 
     return MOD_CONT;
 }

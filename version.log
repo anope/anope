@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3065"
+VERSION_BUILD="3066"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3066 - Added support m_services.c and m_change.c from Hybrid's contrib folder
 #Revision 3065 - Change to users masked host instead of the real one after turning vhost off in inspircd.
 #Revision 3063 - Fixed opping our clients on ratbox when TS6 is not used.
 #Revision 3062 - Do not show SENDPASS in NickServ and ChanServ help to users who can't use it

@@ -17,9 +17,10 @@ Anope Version 1.8 - GIT
 2/23   F Fixed rejoining our clients if they are kicked on a TS6 IRCd    [  #00]
 3/2    F Fixed showing SENDPASS in HELP to users who can't use it        [  #00]
 3/3    F Fixed opping our clients on ratbox when not using TS6           [  #00]
+3/4    F Fixed setting a users host in InspIRCd when vhost is turned off [  #00]
 10/31  A Added support for plexus3's channel mode +z                     [#1202]
 2/23   A Added account tracking support to ratbox protocol module        [  #00]
-3/4    F Fixed setting a users host in InspIRCd when vhost is turned off [  #00]
+3/21   A Added support for Hybrid's m_services and m_change              [  #00]
 
 Anope Version 1.8.5
 -------------------

@@ -114,3 +114,4 @@ int hybrid_flood_mode_check(char *value);
 void hybrid_cmd_jupe(char *jserver, char *who, char *reason);
 int hybrid_valid_nick(char *nick);
 void hybrid_cmd_ctcp(char *source, char *dest, char *buf);
+int hybrid_event_notice(char *source, int argc, char **argv);

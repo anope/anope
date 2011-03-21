@@ -716,14 +716,20 @@ void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void hybrid_cmd_vhost_off(User * u)
 {
-	if (ircd->vhost)
+	if (ircd->vhost && ircd->vident)
+	{
+		send_cmd(NULL, "ENCAP * CHGIDENT %s %s", u->nick, u->username);
 		send_cmd(NULL, "ENCAP * CHGHOST %s %s", u->nick, u->host);
+	}
 }
 
 void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-	if (ircd->vhost)
+	if (ircd->vhost && ircd->vident)
+	{
+		send_cmd(NULL, "ENCAP * CHGIDENT %s %s", nick, vIdent);
 		send_cmd(NULL, "ENCAP * CHGHOST %s %s", nick, vhost);
+	}
 }
 
 void hybrid_cmd_unsqline(char *user)
@@ -1491,7 +1497,7 @@ int hybrid_event_notice(char *source, int argc, char **argv)
 			}
 			else if (!ircd->vhost && !strcmp(argv[0], s_ChanServ) && !strcmp(argv[1], "Invalid hostname"))
 			{
-				ircd->vhost = 1;
+				ircd->vhost = ircd->vident = 1;
 				ircd->hostservmode = ircd->hostservaliasmode = sstrdup("+o");
 				alog("VHost support enabled");
 				if (s_HostServ)

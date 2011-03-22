@@ -433,7 +433,7 @@ void cs_remove_nick(NickCore *nc)
 				{
 					ChanAccess *ca = ci->GetAccess(j);
 					
-					if (!ca->nc->IsServicesOper() && Config->CSMaxReg && ca->nc->channelcount >= Config->CSMaxReg)
+					if (!ca->nc || (!ca->nc->IsServicesOper() && Config->CSMaxReg && ca->nc->channelcount >= Config->CSMaxReg))
 						continue;
 					if (!highest || ca->level > highest->level)
 						highest = ca;

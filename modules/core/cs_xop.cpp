@@ -306,7 +306,7 @@ class XOPBase : public Command
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(_("%s list for %s:\n  Num  Nick"), ci->name.c_str());
+					source.Reply(_("%s list for %s:\n  Num  Nick"), this->name.c_str(), ci->name.c_str());
 				}
 
 				XOPListCallback::DoList(source, access, i + 1, level);

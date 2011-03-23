@@ -45,9 +45,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
  public:
 	void Run(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
 	{
-		if (request->name == "login")
-			this->DoLogin(iface, source, request);
-		else if (request->name == "command")
+		if (request->name == "command")
 			this->DoCommand(iface, source, request);
 		else if (request->name == "checkAuthentication")
 			this->DoCheckAuthentication(iface, source, request);
@@ -99,29 +97,6 @@ class MyXMLRPCEvent : public XMLRPCEvent
 					delete *u;
 				}
 			}
-		}
-	}
-
-	void DoLogin(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
-	{
-		if (source->logged_in)
-			request->reply("result", "Logged in");
-		else
-		{
-			XMLRPCListenSocket *ls = static_cast<XMLRPCListenSocket *>(source->LS);
-
-			if (ls->username.empty() && ls->password.empty())
-			{
-				request->reply("result", "Logged in");
-				source->logged_in = true;
-			}
-			else if (request->data.size() > 1 && request->data[0] == ls->username && request->data[1] == ls->password)
-			{
-				request->reply("result", "Logged in");
-				source->logged_in = true;
-			}
-			else
-				request->reply("error", "Invalid credentials");
 		}
 	}
 

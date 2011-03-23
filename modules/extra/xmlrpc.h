@@ -9,9 +9,7 @@ class XMLRPCClientSocket : public ClientSocket
 	Anope::string query;
 
  public:
-	bool logged_in;
-
-	XMLRPCClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr) : ClientSocket(ls, fd, addr), logged_in(false) { }
+	XMLRPCClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr) : ClientSocket(ls, fd, addr) { }
 
 	virtual ~XMLRPCClientSocket() { }
 

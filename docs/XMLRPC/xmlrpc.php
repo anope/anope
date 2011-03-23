@@ -1,5 +1,4 @@
 <?php
-
 /* XMLRPC Functions
  *
  * (C) 2003-2011 Anope Team
@@ -9,29 +8,21 @@
 
 class AnopeXMLRPC
 {
-	private $Host, $Bind, $Port, $Username, $Pass;
+	private $Host, $Bind, $Port;
 
 	private $Socket;
 
-	function __construct($Host, $Port, $Bind = NULL, $Username = NULL, $Pass = NULL)
+	function __construct($Host, $Port, $Bind = NULL)
 	{
 		$this->Host = $Host;
 		$this->Port = $Port;
 		$this->Bind = $Bind;
-		$this->Username = $Username;
-		$this->Pass = $Pass;
 
 		$this->Socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 		if ($Bind && socket_bind($this->Socket, $this->Bind) == false)
 			$his->Socket = false;
 		if (socket_connect($this->Socket, $this->Host, $this->Port) == false)
 			$this->Socket = false;
-
-		if ($Username && $Pass)
-		{
-			/* Login to XMLRPC, if required */
-			$this->RunXMLRPC("login", array($Username, $Pass));
-		}
 	}
 
 	function __destruct()
@@ -52,10 +43,11 @@ class AnopeXMLRPC
 		socket_write($this->Socket, $xmlquery);
 
 		$inbuf = socket_read($this->Socket, 4096);
-		$inxmlrpc = xmlrpc_decode($inbuf);
+		$inbuf = substr($inbuf, strpos($inbuf, "\r\n\r\n") + 4);
+		$response = xmlrpc_decode($inbuf);
 
-		if (isset($inxmlrpc[0]))
-			return $inxmlrpc[0];
+		if (isset($response[0]))
+			return $response[0];
 		return NULL;
 	}
 

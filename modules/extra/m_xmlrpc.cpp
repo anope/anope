@@ -4,15 +4,20 @@
 
 class MyXMLRPCClientSocket : public XMLRPCClientSocket
 {
+	/* Used to skip the (optional) HTTP header,  which we really don't care about */
+	bool in_query;
  public:
-	MyXMLRPCClientSocket(XMLRPCListenSocket *ls, int fd, const sockaddrs &addr) : XMLRPCClientSocket(ls, fd, addr)
+	MyXMLRPCClientSocket(XMLRPCListenSocket *ls, int fd, const sockaddrs &addr) : XMLRPCClientSocket(ls, fd, addr), in_query(false)
 	{
-		if (ls->username.empty() && ls->password.empty())
-			this->logged_in = true;
 	}
 
 	bool Read(const Anope::string &message)
 	{
+		if (message.find("xml version") != Anope::string::npos)
+			this->in_query = true;
+		else if (!this->in_query)
+			return true;
+
 		this->query += message;
 		Log(LOG_DEBUG) << "m_xmlrpc: " << message;
 
@@ -20,8 +25,8 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 		{
 			Log(LOG_DEBUG) << "m_xmlrpc: Processing message";
 			this->HandleMessage();
-			this->query.clear();
 		}
+
 		return true;
 	}
 
@@ -85,13 +90,29 @@ class MyXMLRPCListenSocket : public XMLRPCListenSocket
 	ClientSocket *OnAccept(int fd, const sockaddrs &addr)
 	{
 		MyXMLRPCClientSocket *socket = new MyXMLRPCClientSocket(this, fd, addr);
-		if (std::find(this->allowed.begin(), this->allowed.end(), addr.addr()) != this->allowed.end())
-			Log() << "m_xmlrpc: Accepted connection " << fd << " from " << addr.addr();
-		else
+
+		socket->SetFlag(SF_DEAD);
+		for (unsigned i = 0, j = this->allowed.size(); i < j; ++i)
 		{
-			Log() << "m_xmlrpc: Dropping disallowed connection " << fd << " from " << addr.addr();
-			socket->SetFlag(SF_DEAD);
+			try
+			{
+				cidr cidr_mask(this->allowed[i]);
+				if (cidr_mask.match(socket->clientaddr))
+				{
+					Log() << "m_xmlrpc: Accepted connection " << fd << " from " << addr.addr();
+					socket->UnsetFlag(SF_DEAD);
+					break;
+				}
+			}
+			catch (const SocketException &ex)
+			{
+				Log() << "m_xmlrpc: Error checking incoming connection against mask " << this->allowed[i] << ": " << ex.GetReason();
+			}
 		}
+
+		if (socket->HasFlag(SF_DEAD))
+			Log() << "m_xmlrpc: Dropping disallowed connection " << fd << " from " << addr.addr();
+
 		return socket;
 	}
 };
@@ -127,8 +148,17 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface
 			reply += "<member>\n<name>" + it->first + "</name>\n<value>\n<string>" + this->Sanitize(it->second) + "</string>\n</value>\n</member>\n";
 		}
 		reply += "</struct>\n</value>\n</param>\n</params>\n</methodCall>";
+
+		source->Write("HTTP/1.1 200 OK");
+		source->Write("Connection: close");
+		source->Write("Content-Type: text/xml");
+		source->Write("Content-Length: " + stringify(reply.length()));
+		source->Write("Server: Anope IRC Services version " + Anope::VersionShort());
+		source->Write("");
 		
 		source->Write(reply);
+
+		Log(LOG_DEBUG) << reply;
 	}
 
 	Anope::string Sanitize(const Anope::string &string)
@@ -149,9 +179,9 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface
 			special_chars("\n", "&#xA;"),
 			special_chars("\002", ""), // bold
 			special_chars("\003", ""), // color
-			special_chars("\35", ""), // italics
-			special_chars("\031", ""), // underline
-			special_chars("\26", ""), // reverses
+			special_chars("\035", ""), // italics
+			special_chars("\037", ""), // underline
+			special_chars("\026", ""), // reverses
 			special_chars("", "")
 		};
 
@@ -198,6 +228,23 @@ class ModuleXMLRPC : public Module
 
 	~ModuleXMLRPC()
 	{
+		/* Clean up our sockets and our listening sockets */
+		for (std::map<int, Socket *>::const_iterator it = SocketEngine->Sockets.begin(), it_end = SocketEngine->Sockets.end(); it != it_end; ++it)
+		{
+			Socket *s = it->second;
+
+			if (s->Type == SOCKTYPE_CLIENT)
+			{
+				ClientSocket *cs = debug_cast<ClientSocket *>(s);
+				for (unsigned i = 0; i < this->listen_sockets.size(); ++i)
+					if (cs->LS == this->listen_sockets[i])
+					{
+						delete cs;
+						break;
+					}
+			}
+		}
+
 		for (unsigned i = 0; i < this->listen_sockets.size(); ++i)
 			delete this->listen_sockets[i];
 		this->listen_sockets.clear();
@@ -267,8 +314,7 @@ void MyXMLRPCClientSocket::HandleMessage()
 			request.data.push_back(data);
 	}
 
-	if (request.name == "login" || this->logged_in)
-		me->xmlrpcinterface.RunXMLRPC(this, &request);
+	me->xmlrpcinterface.RunXMLRPC(this, &request);
 }
 
 MODULE_INIT(ModuleXMLRPC)

@@ -29,11 +29,11 @@ int decrypt_password_md5(NickAlias *na, char *pass, char *tmp_pass);
 
 int AnopeInit(int argc, char **argv)
 {
+	Command *c;
+
 	moduleAddAuthor("Anope");
 	moduleAddVersion(VERSION_STRING);
 	moduleSetType(SUPPORTED);
-
-	Command *c;
 
 	c = createCommand("ID", do_atheme_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);
 	moduleAddCommand(NICKSERV, c, MOD_HEAD);
@@ -264,7 +264,7 @@ int decrypt_password_posix(NickAlias *na, char *pass, char *tmp_pass)
 typedef unsigned char md5_byte_t; /* 8-bit byte */
 typedef unsigned int md5_word_t; /* 32-bit word */
 
-///* Define the state of the MD5 Algorithm. */
+/* Define the state of the MD5 Algorithm. */
 typedef struct md5_state_s {
     md5_word_t count[2];	/* message length in bits, lsw first */
     md5_word_t abcd[4];		/* digest buffer */

@@ -67,7 +67,7 @@ void hs_help(User * u);
 void my_add_host_request(char *nick, char *vIdent, char *vhost,
                          char *creator, int32 tmp_time);
 int my_isvalidchar(const char c);
-void my_memo_lang(User * u, char *name, int z, int number, ...);
+void my_memo_lang(User * u, char *name, int z, char *source, int number, ...);
 void req_send_memos(User * u, char *vHost);
 void show_list(User * u);
 int hs_do_waiting(User * u);
@@ -255,7 +255,7 @@ int hs_do_request(User * u)
     return MOD_CONT;
 }
 
-void my_memo_lang(User * u, char *name, int z, int number, ...)
+void my_memo_lang(User * u, char *name, int z, char *source, int number, ...)
 {
     va_list va;
     char buffer[4096], outbuf[4096];
@@ -294,7 +294,10 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
             va_start(va, number);
             vsnprintf(buffer, 4095, outbuf, va);
             va_end(va);
-            memo_send(u, name, buffer, z);
+            if (source)
+                memo_send_from(u, name, buffer, z, source);
+            else
+                memo_send(u, name, buffer, z);
         }
         free(buf);
     } else {
@@ -314,36 +317,36 @@ void req_send_memos(User * u, char *vHost)
     if (HSRequestMemoOper == 1) {
         for (i = 0; i < servopers.count; i++) {
             my_memo_lang(u, (((NickCore *) servopers.list[i])->display), z,
-                         LNG_REQUEST_MEMO, vHost);
+                         u->na->nick, LNG_REQUEST_MEMO, vHost);
         }
         for (i = 0; i < servadmins.count; i++) {
             my_memo_lang(u, (((NickCore *) servadmins.list[i])->display),
-                         z, LNG_REQUEST_MEMO, vHost);
+                         z, u->na->nick, LNG_REQUEST_MEMO, vHost);
         }
         for (i = 0; i < RootNumber; i++) {
-            my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, vHost);
+            my_memo_lang(u, ServicesRoots[i], z, u->na->nick, LNG_REQUEST_MEMO, vHost);
         }
     }
     if (HSRequestMemoSetters == 1) {
         for (i = 0; i < HostNumber; i++) {
-            my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, vHost);
+            my_memo_lang(u, HostSetters[i], z, u->na->nick, LNG_REQUEST_MEMO, vHost);
         }
     }
 }
 
 int hsreqevt_nick_dropped(int argc, char **argv)
 {
-	HostCore *tmp;
-	boolean found = false;
+    HostCore *tmp;
+    boolean found = false;
 
-	if (!argc)
-		return MOD_CONT;
+    if (!argc)
+        return MOD_CONT;
 
-	tmp = findHostCore(hs_request_head, argv[0], &found);
-	if (found)
-		hs_request_head = deleteHostCore(hs_request_head, tmp);
+    tmp = findHostCore(hs_request_head, argv[0], &found);
+    if (found)
+        hs_request_head = deleteHostCore(hs_request_head, tmp);
 
-	return MOD_CONT;
+    return MOD_CONT;
 }
 
 int hs_do_reject(User * u)
@@ -374,10 +377,10 @@ int hs_do_reject(User * u)
 
         if (HSRequestMemoUser) {
             if (reason)
-                my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON,
+                my_memo_lang(u, hc->nick, 2, NULL, LNG_REJECT_MEMO_REASON,
                              reason);
             else
-                my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
+                my_memo_lang(u, hc->nick, 2, NULL, LNG_REJECT_MEMO);
         }
 
         hs_request_head = deleteHostCore(hs_request_head, tmp);
@@ -423,7 +426,7 @@ int hs_do_activate(User * u)
                         time(NULL));
 
             if (HSRequestMemoUser)
-                my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
+                my_memo_lang(u, hc->nick, 2, NULL, LNG_ACTIVATE_MEMO);
 
             hs_request_head = deleteHostCore(hs_request_head, tmp);
             moduleNoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
@@ -432,7 +435,7 @@ int hs_do_activate(User * u)
             moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
         }
     } else {
-	notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
+        notice_lang(s_HostServ, u, NICK_X_NOT_REGISTERED, nick);
     }
 
     free(nick);

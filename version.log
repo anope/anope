@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="5"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3066"
+VERSION_BUILD="3067"
 
 # $Log$ # Changes since 1.8.5 Release
+#Revision 3067 - Fixed bug #1252 - The group display nick showing in HS req memos instead of the requesting alias. Also cleaned up the mess in Changes...
 #Revision 3066 - Added support m_services.c and m_change.c from Hybrid's contrib folder
 #Revision 3065 - Change to users masked host instead of the real one after turning vhost off in inspircd.
 #Revision 3063 - Fixed opping our clients on ratbox when TS6 is not used.

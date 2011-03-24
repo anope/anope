@@ -183,7 +183,8 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 /*************************************************************************/
 
 /**
- * Split from do_send, this way we can easily send a memo from any point
+ * Split from do_send, this way we can easily send a memo from any point.
+ *
  * @param u User Struct
  * @param name Target of the memo
  * @param text Memo Text
@@ -196,12 +197,30 @@ MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
  */
 void memo_send(User * u, char *name, char *text, int z)
 {
+    memo_send_from(u, name, text, z, u->na->nc->display);
+}
+
+/**
+ * Split from do_send, this way we can easily send a memo from any point.
+ *
+ * @param u User Struct
+ * @param name Target of the memo
+ * @param text Memo Text
+ * @param z type see info
+ * @param source Nickname of the alias the memo originates from.
+ *	0 - reply to user
+ *	1 - silent
+ *	2 - silent with no delay timer
+ *	3 - reply to user and request read receipt
+ * @return void
+ */
+void memo_send_from(User * u, char *name, char *text, int z, char *source)
+{
     int ischan;
     int isforbid;
     Memo *m;
     MemoInfo *mi;
     time_t now = time(NULL);
-    char *source = u->na->nc->display;
     int is_servoper = is_services_oper(u);
 
     if (readonly) {

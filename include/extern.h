@@ -817,6 +817,7 @@ E void memoserv(User * u, char *buf);
 E void check_memos(User * u);
 E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
 E void memo_send(User * u, char *name, char *text, int z);
+E void memo_send_from(User * u, char *name, char *text, int z, char *source);
 E int delmemo(MemoInfo * mi, int num);
 
 /**** messages.c ****/

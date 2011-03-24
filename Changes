@@ -1,26 +1,27 @@
 Anope Version 1.8 - GIT
 -----------------------
-9/11   F Fixed db-convert handling some vhost collisions                 [  #00]
-9/14   F Fixed ./configure failing with partial SQL installations        [  #00]
-9/28   F Fixed ForkForMail to always work                                [  #00]
-9/28   F Fixed /nickserv saset display to use nicktracking if enabled    [#1193]
-9/28   F Fixed /nickserv group to use nicktracking if enabled            [#1194]
+10/31  A Added support for plexus3's channel mode +z                     [#1202]
+02/23  A Added account tracking support to ratbox protocol module        [  #00]
+03/21  A Added support for Hybrid's m_services and m_change              [  #00]
+09/11  F Fixed db-convert handling some vhost collisions                 [  #00]
+09/14  F Fixed ./configure failing with partial SQL installations        [  #00]
+09/28  F Fixed ForkForMail to always work                                [  #00]
+09/28  F Fixed /nickserv saset display to use nicktracking if enabled    [#1193]
+09/28  F Fixed /nickserv group to use nicktracking if enabled            [#1194]
 12/12  F Remove vhost requests from nicks that expire                    [  #00]
 12/15  F Fixed /cs enforce #channel to say SET was enforced not (null)   [#1213]
 12/23  F Fixed /cs (un)ban and akick from matching users real hosts/IP   [#1079]
-1/19   F Fixed 'make install' recompiling src/tools                      [#1227]
-1/21   F Fixed many incorrect apostrophe usages                          [#1223]
-1/28   F Fixed not introducing our clients with usermode k on InspIRCd2.0[  #00]
-1/29   F Updated german language file.                                   [  #00]
-2/05   F Fixed wiki URLs in Windows configure script                     [  #00]
-2/11   F Fixed build on Mac                                              [  #00]
-2/23   F Fixed rejoining our clients if they are kicked on a TS6 IRCd    [  #00]
-3/2    F Fixed showing SENDPASS in HELP to users who can't use it        [  #00]
-3/3    F Fixed opping our clients on ratbox when not using TS6           [  #00]
-3/4    F Fixed setting a users host in InspIRCd when vhost is turned off [  #00]
-10/31  A Added support for plexus3's channel mode +z                     [#1202]
-2/23   A Added account tracking support to ratbox protocol module        [  #00]
-3/21   A Added support for Hybrid's m_services and m_change              [  #00]
+01/19  F Fixed 'make install' recompiling src/tools                      [#1227]
+01/21  F Fixed many incorrect apostrophe usages                          [#1223]
+01/28  F Fixed not introducing our clients with usermode k on InspIRCd2.0[  #00]
+01/29  F Updated german language file.                                   [  #00]
+02/05  F Fixed wiki URLs in Windows configure script                     [  #00]
+02/11  F Fixed build on Mac                                              [  #00]
+02/23  F Fixed rejoining our clients if they are kicked on a TS6 IRCd    [  #00]
+03/02  F Fixed showing SENDPASS in HELP to users who can't use it        [  #00]
+03/03  F Fixed opping our clients on ratbox when not using TS6           [  #00]
+03/04  F Fixed setting a users host in InspIRCd when vhost is turned off [  #00]
+03/24  F Fixed groups display nick showing in HS req memos for aliases.  [#1252]
 
 Anope Version 1.8.5
 -------------------
@@ -48,7 +49,7 @@ Anope Version 1.8.5
 09/10  F Fixed pseudo-clients always getting oper on InspIRCd.           [  #00]
 
 Provided by Han` <Han@mefalcon.org> - 2010
-8/14   F Updated german language file.                                   [  #00]
+08/14   F Updated german language file.                                   [  #00]
 
 Anope Version 1.8.4
 -------------------

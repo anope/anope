@@ -27,7 +27,7 @@ class CommandCSInfo : public Command
 	}
 
  public:
-	CommandCSInfo() : Command("INFO", 1, 1)
+	CommandCSInfo() : Command("INFO", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);

@@ -75,11 +75,11 @@ class CommandNSGroup : public Command
 		else if (na && na->nc != u->Account())
 			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
-			source.Reply(_("Your nick is already registered; type \002%R%s DROP\002 first."), Config->s_NickServ.c_str());
+			source.Reply(_("Your nick is already registered; type \002%s%s DROP\002 first."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
 			source.Reply(_("There are too many nicks in %s's group; list them and drop some.\n"
-					"Type \002%R%s HELP GLIST\002 and \002%R%s HELP DROP\002\n"
-					"for more information."), target->nick.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+					"Type \002%s%s HELP GLIST\002 and \002%s%s HELP DROP\002\n"
+					"for more information."), target->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else
 		{
 			if ((!pass.empty() && enc_check_password(pass, target->nc->pass)) ||
@@ -156,7 +156,7 @@ class CommandNSGroup : public Command
 				"You can use this command even if you have not registered\n"
 				"your nick yet. If your nick is already registered, you'll\n"
 				"need to identify yourself before using this command. Type\n"
-				"\037%R%s HELP IDENTIFY\037 for more information. This\n"
+				"\037%s%s HELP IDENTIFY\037 for more information. This\n"
 				"last may be not possible on your IRC network.\n"
 				" \n"
 				"It is recommended to use this command with a non-registered\n"
@@ -169,7 +169,7 @@ class CommandNSGroup : public Command
 				"not possible.\n"
 				" \n"
 				"\037Note\037: all the nicknames of a group have the same password."),
-				NickServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

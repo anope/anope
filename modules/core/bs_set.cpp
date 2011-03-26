@@ -213,10 +213,10 @@ class CommandBSSet : public Command
 					"    SYMBIOSIS        Allow the bot to act as a real bot\n"
 					"    MSG              Configure how fantasy commands should be replied to\n"
 					" \n"
-					"Type \002%R%s HELP SET \037option\037\002 for more information\n"
+					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
 					"on a specific option.\n"
 					"Note: access to this command is controlled by the\n"
-					"level SET."), BotServ->nick.c_str());
+					"level SET."), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 			User *u = source.u;
 			if (u->IsServicesOper())
 				source.Reply(_("These options are reserved to Services Operators:\n"

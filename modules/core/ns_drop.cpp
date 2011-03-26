@@ -114,8 +114,8 @@ class CommandNSDrop : public Command
 					"your password as the \002password\002 parameter.\n"
 					" \n"
 					"In order to use this command, you must first identify\n"
-					"with your password (\002%R%s HELP IDENTIFY\002 for more\n"
-					"information)."), NickServ->nick.c_str(), NickServ->nick.c_str());
+					"with your password (\002%s%s HELP IDENTIFY\002 for more\n"
+					"information)."), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 
 		return true;
 	}

@@ -54,11 +54,11 @@ class CommandCSTopic : public Command
 				"Causes %s to set the channel topic to the one\n"
 				"specified. If \002topic\002 is not given, then an empty topic\n"
 				"is set. This command is most useful in conjunction\n"
-				"with \002SET TOPICLOCK\002. See \002%R%s HELP SET TOPICLOCK\002\n"
+				"with \002SET TOPICLOCK\002. See \002%s%s HELP SET TOPICLOCK\002\n"
 				"for more information.\n"
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"channel."), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

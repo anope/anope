@@ -18,7 +18,7 @@ class CommandNSSetPrivate : public Command
  public:
 	CommandNSSetPrivate(const Anope::string &spermission = "") : Command("PRIVATE", 2, 2, spermission)
 	{
-		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%R%s LIST\002"), NickServ->nick.c_str()));
+		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)

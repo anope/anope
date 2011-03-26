@@ -40,11 +40,11 @@ class CommandMSHelp : public Command
 		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
-		source.Reply(_("Type \002%R%s HELP \037command\037\002 for help on any of the\n"
+		source.Reply(_("Type \002%s%s HELP \037command\037\002 for help on any of the\n"
 				"above commands.\n"
 				"(*) By default, any user with at least level 10 access on a\n"
 				"    channel can read that channel's memos. This can be\n"
-				"    changed with the %s \002LEVELS\002 command."), MemoServ->nick.c_str(), Config->s_ChanServ.c_str());
+				"    changed with the %s \002LEVELS\002 command."), Config->UseStrictPrivMsgString.c_str(), MemoServ->nick.c_str(), Config->s_ChanServ.c_str());
 	}
 };
 

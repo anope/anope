@@ -236,11 +236,6 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 
 void User::SendMessage(BotInfo *source, Anope::string msg)
 {
-	if (Config->UseStrictPrivMsg)
-		msg = msg.replace_all_cs("%R", "/");
-	else
-		msg = msg.replace_all_cs("%R", "/msg ");
-
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
 	* - The user is not registered and NSDefMsg is enabled
@@ -373,9 +368,9 @@ void User::Identify(NickAlias *na)
 		this->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
 						"This e-mail will allow you to retrieve your password in\n"
 						"case you forget it."));
-		this->SendMessage(NickServ, _("Type \002%R%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
+		this->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
 						"Your privacy is respected; this e-mail won't be given to\n"
-						"any third-party person."), NickServ->nick.c_str());
+						"any third-party person."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_UNCONFIRMED))

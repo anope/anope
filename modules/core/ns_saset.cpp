@@ -80,9 +80,9 @@ class CommandNSSASet : public Command
 					"Sets various nickname options. \037option\037 can be one of:"));
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
-			source.Reply(_("Type \002%R%s HELP SASET \037option\037\002 for more information\n"
+			source.Reply(_("Type \002%s%s HELP SASET \037option\037\002 for more information\n"
 					"on a specific option. The options will be set on the given\n"
-					"\037nickname\037."), NickServ->nick.c_str());
+					"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 			return true;
 		}
 		else

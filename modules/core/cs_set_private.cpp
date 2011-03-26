@@ -48,8 +48,8 @@ class CommandCSSetPrivate : public Command
 		source.Reply(_("Syntax: \002%s \037channel\037 PRIVATE {ON | OFF}\002\n"
 				" \n"
 				"Enables or disables the \002private\002 option for a channel.\n"
-				"When \002private\002 is set, a \002%R%s LIST\002 will not\n"
-				"include the channel in any lists."), this->name.c_str(), ChanServ->nick.c_str());
+				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
+				"include the channel in any lists."), this->name.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

@@ -32,16 +32,11 @@ static bool SendConfirmMail(User *u)
 	Anope::string message = Anope::printf(_("Hi,\n"
 	" \n"
 	"You have requested to change your email address to %s.\n"
-	"Please type \" %R%s confirm %s \" to confirm this change.\n"
+	"Please type \" %s%s confirm %s \" to confirm this change.\n"
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators."), u->Account()->email.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
-
-	if (Config->UseStrictPrivMsg)
-		message = message.replace_all_cs("%R", "/");
-	else
-		message = message.replace_all_cs("%R", "/msg ");
+	"%s administrators."), u->Account()->email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
 	return Mail(u, u->Account(), NickServ, subject, message);
 }

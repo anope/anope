@@ -57,7 +57,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 
 	if (!c)
 	{
-		u->SendMessage(bi, _("Unknown command \002%s\002.  \"%R%s HELP\" for help."), command.c_str(), bi->nick.c_str());
+		u->SendMessage(bi, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), command.c_str(), Config->UseStrictPrivMsgString.c_str(), bi->nick.c_str());
 		PopLanguage();
 		return;
 	}

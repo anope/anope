@@ -199,7 +199,7 @@ class CommandNSRegister : public Command
 				na->nc->SetFlag(NI_UNCONFIRMED);
 				if (SendRegmail(u, na))
 				{
-					source.Reply(_("A passcode has been sent to %s, please type %R%s confirm <passcode> to confirm your email address."), email.c_str(), NickServ->nick.c_str());
+					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
@@ -245,8 +245,8 @@ class CommandNSRegister : public Command
 				"that will allow you to register other nicks later sharing\n"
 				"the same configuration, the same set of memos and the\n"
 				"same channel privileges. For more information on this\n"
-				"feature, type \002%R%s HELP GROUP\002."),
-				NickServ->nick.c_str(), NickServ->nick.c_str(), NickServ->nick.c_str());
+				"feature, type \002%s%s HELP GROUP\002."),
+				NickServ->nick.c_str(), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 
@@ -354,16 +354,11 @@ static bool SendRegmail(User *u, NickAlias *na)
 	Anope::string message = Anope::printf(_("Hi,\n"
 	" \n"
 	"You have requested to register the nickname %s on %s.\n"
-	"Please type \" %R%s confirm %s \" to complete registration.\n"
+	"Please type \" %s%s confirm %s \" to complete registration.\n"
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators."), na->nick.c_str(), Config->NetworkName.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
-
-	if (Config->UseStrictPrivMsg)
-		message = message.replace_all_cs("%R", "/");
-	else
-		message = message.replace_all_cs("%R", "/msg ");
+	"%s administrators."),  na->nick.c_str(), Config->NetworkName.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
 	return Mail(u, na->nc, NickServ, subject, message);
 }

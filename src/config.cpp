@@ -147,6 +147,12 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 		}
 	}
 
+	if (UseStrictPrivMsg)
+		UseStrictPrivMsgString = "/";
+	else
+		UseStrictPrivMsgString ="/msg ";
+
+
 	if (!BSDefaults.empty())
 	{
 		spacesepstream options(BSDefaults);

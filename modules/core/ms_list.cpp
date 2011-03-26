@@ -33,9 +33,9 @@ class MemoListCallback : public NumberList
 		{
 			SentHeader = true;
 			if (ci)
-				source.Reply(_("Memos for %s.  To read, type: \002%R%s READ %s \037num\037\002"), ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+				source.Reply(_("Memos for %s. To read, type: \002%s%s READ %s \037num\037\002"), ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 			else
-				source.Reply(_("Memos for %s.  To read, type: \002%R%s READ \037num\037\002"), source.u->nick.c_str(), Config->s_MemoServ.c_str());
+				source.Reply(_("Memos for %s. To read, type: \002%s%s READ \037num\037\002"), source.u->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
 
 			source.Reply(_(" Num  Sender            Date/Time"));
 		}
@@ -130,9 +130,9 @@ class CommandMSList : public Command
 					{
 						SentHeader = true;
 						if (ci)
-							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%R%s READ %s \037num\037\002") : _("Memos for %s. To read, type: \002%R%s READ %s \037num\037\002"), ci->name.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
+							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%s%s READ %s \037num\037\002") : _("Memos for %s. To read, type: \002%sR%s READ %s \037num\037\002"), ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
 						else
-							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%R%s READ \037num\037\002") : _("Memos for %s. To read, type: \002%R%s READ \037num\037\002"), u->nick.c_str(), Config->s_MemoServ.c_str());
+							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%s%s READ \037num\037\002") : _("Memos for %s. To read, type: \002%s%s READ \037num\037\002"), u->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
 						source.Reply(_(" Num  Sender            Date/Time"));
 					}
 

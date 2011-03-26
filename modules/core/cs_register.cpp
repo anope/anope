@@ -110,14 +110,14 @@ class CommandCSRegister : public Command
 			"to change all of the channel settings for the channel;\n"
 			"%s will also automatically give the founder\n"
 			"channel-operator privileges when s/he enters the channel.\n"
-			"See the \002ACCESS\002 command (\002%R%s HELP ACCESS\002) for\n"
+			"See the \002ACCESS\002 command (\002%s%s HELP ACCESS\002) for\n"
 			"information on giving a subset of these privileges to\n"
 			"other channel users.\n"
 			" \n"
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
-			"\002%R%s HELP\002 for information on how to do so."),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+			"\002%s%s HELP\002 for information on how to do so."),
+			ChanServ->nick.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

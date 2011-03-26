@@ -434,11 +434,11 @@ class CommandCSAccess : public Command
 			if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 				source.Reply(_("You can't use this command. \n"
 						"Use the AOP, SOP, HOP and VOP commands instead.\n"
-						"Type \002%R%s HELP \037command\037\002 for more information."), Config->s_ChanServ.c_str());
+						"Type \002%s%s HELP \037command\037\002 for more information."), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 			else
 				source.Reply(_("You can't use this command. \n"
 						"Use the AOP, SOP and VOP commands instead.\n"
-						"Type \002%R%s HELP \037command\037\002 for more information."), Config->s_ChanServ.c_str());
+						"Type \002%s%s HELP \037command\037\002 for more information."), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		}
 		else if (readonly && !is_list)
 			source.Reply(_("Sorry, channel access list modification is temporarily disabled."));
@@ -470,7 +470,7 @@ class CommandCSAccess : public Command
 				"list specifies which users are allowed chanop status or\n"
 				"access to %s commands on the channel.  Different\n"
 				"user levels allow for access to different subsets of\n"
-				"privileges; \002%R%s HELP ACCESS LEVELS\002 for more\n"
+				"privileges; \002%s%s HELP ACCESS LEVELS\002 for more\n"
 				"specific information.  Any nick not on the access list has\n"
 				"a user level of 0.\n"
 				" \n"
@@ -504,7 +504,7 @@ class CommandCSAccess : public Command
 				" \n"
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
 				"access list."),
-				ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		source.Reply(_("\002User access levels\002\n"
 				" \n"
 				"By default, the following access levels are defined:\n"
@@ -522,8 +522,8 @@ class CommandCSAccess : public Command
 				"   \002     <0\002   May not be opped.\n"
 				" \n"
 				"These levels may be changed, or new ones added, using the\n"
-				"\002LEVELS\002 command; type \002%R%s HELP LEVELS\002 for\n"
-				"information."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
+				"information."), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -583,7 +583,7 @@ class CommandCSLevels : public Command
 				}
 			}
 
-			source.Reply(_("Setting \002%s\002 not known.  Type \002%R%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->s_ChanServ.c_str());
+			source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		}
 
 		return MOD_CONT;
@@ -613,7 +613,7 @@ class CommandCSLevels : public Command
 				}
 			}
 
-		source.Reply(_("Setting \002%s\002 not known.  Type \002%R%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->s_ChanServ.c_str());
+		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 
 		return MOD_CONT;
 	}

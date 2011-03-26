@@ -236,8 +236,8 @@ class CommandMSSet : public Command
 					"    LIMIT       Sets the maximum number of memos you can\n"
 					"                   receive\n"
 					" \n"
-					"Type \002%R%s HELP SET \037option\037\002 for more information\n"
-					"on a specific option."), MemoServ->nick.c_str());
+					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
+					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), MemoServ->nick.c_str());
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
 					"Changes when you will be notified about new memos:\n"

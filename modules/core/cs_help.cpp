@@ -38,9 +38,9 @@ class CommandCSHelp : public Command
 				"malicious users from \"taking over\" channels by limiting\n"
 				"who is allowed channel operator privileges. Available\n"
 				"commands are listed below; to use them, type\n"
-				"\002%R%s \037command\037\002. For more information on a\n"
-				"specific command, type \002%R%s HELP \037command\037\002."),
-				ChanServ->nick.c_str(), ChanServ->nick.c_str(), ChanServ->nick.c_str(),
+				"\002%s%s \037command\037\002. For more information on a\n"
+				"specific command, type \002%s%s HELP \037command\037\002."),
+				ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
 				ChanServ->nick.c_str());
 		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))

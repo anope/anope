@@ -485,6 +485,9 @@ class CoreExport ServerConfig
 	bool UsePrivmsg;
 	/* Services only respond to full PRIVMSG client@services.server.name messages */
 	bool UseStrictPrivMsg;
+	/* This is not a configurable option.
+	 * Config::Config will set it depending on the value of UseStrictPrivMsg */
+	Anope::string UseStrictPrivMsgString;
 	/* Number of seconds between consecutive uses of the REGISTER command
 	 * Not to be confused with NSRegDelay */
 	unsigned NickRegDelay;

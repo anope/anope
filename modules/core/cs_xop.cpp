@@ -368,7 +368,7 @@ class XOPBase : public Command
 
 		if (!ci->HasFlag(CI_XOP))
 			source.Reply(_("You can't use this command. Use the ACCESS command instead.\n"
-					"Type \002%R%s HELP ACCESS\002 for more information."), Config->s_ChanServ.c_str());
+					"Type \002%s%s HELP ACCESS\002 for more information."), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, params, level);
 		else if (cmd.equals_ci("DEL"))
@@ -446,10 +446,10 @@ class CommandCSQOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), ChanServ->nick.c_str(),
-				ChanServ->nick.c_str());
+				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -509,9 +509,9 @@ class CommandCSAOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -569,9 +569,9 @@ class CommandCSHOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -630,9 +630,9 @@ class CommandCSSOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -690,9 +690,9 @@ class CommandCSVOP : public XOPBase
 				" \n"
 				"This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
-				"\002%R%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%R%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

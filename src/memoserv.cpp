@@ -59,7 +59,7 @@ void check_memos(User *u)
 	{
 		u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
 		if (newcnt == 1 && (nc->memos.memos[i - 1]->HasFlag(MF_UNREAD)))
-			u->SendMessage(MemoServ, _("Type \002%R%s READ LAST\002 to read it."), Config->s_MemoServ.c_str());
+			u->SendMessage(MemoServ, _("Type \002%s%s READ LAST\002 to read it."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
 		else if (newcnt == 1)
 		{
 			for (i = 0; i < end; ++i)
@@ -67,10 +67,10 @@ void check_memos(User *u)
 				if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
 					break;
 			}
-			u->SendMessage(MemoServ, _("Type \002%R%s READ %d\002 to read it."), Config->s_MemoServ.c_str(), i);
+			u->SendMessage(MemoServ, _("Type \002%s%s READ %d\002 to read it."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), i);
 		}
 		else
-			u->SendMessage(MemoServ, _("Type \002%R%s LIST NEW\002 to list them."), Config->s_MemoServ.c_str());
+			u->SendMessage(MemoServ, _("Type \002%s%s LIST NEW\002 to list them."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
 	}
 	if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax)
 	{

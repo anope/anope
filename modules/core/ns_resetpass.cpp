@@ -107,7 +107,7 @@ class NSResetPass : public Module
 					na->nc->UnsetFlag(NI_UNCONFIRMED);
 					u->Identify(na);
 
-					source.Reply(_("You are now identified for your nick. Change your password using \"%R%s SET PASSWORD \002newpassword\002\" now."), Config->s_NickServ.c_str());
+					source.Reply(_("You are now identified for your nick. Change your password using \"%s%s SET PASSWORD \002newpassword\002\" now."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 
 				}
 				else
@@ -142,16 +142,11 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	"Hi,\n"
 	" \n"
 	"You have requested to have the password for %s reset.\n"
-	"To reset your password, type %R%s CONFIRM %s %s\n"
+	"To reset your password, type %s%s CONFIRM %s %s\n"
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators."), na->nick.c_str(), Config->s_NickServ.c_str(), na->nick.c_str(), passcode.c_str(), Config->NetworkName.c_str());
-
-	if (Config->UseStrictPrivMsg)
-		message = message.replace_all_cs("%R", "/");
-	else
-		message = message.replace_all_cs("%R", "/msg ");
+	"%s administrators."), na->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), na->nick.c_str(), passcode.c_str(), Config->NetworkName.c_str());
 
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
 	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));

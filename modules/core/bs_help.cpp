@@ -37,10 +37,11 @@ class CommandBSHelp : public Command
 				"It has been created for users that can't host or\n"
 				"configure a bot, or for use on networks that don't\n"
 				"allow user bots. Available commands are listed \n"
-				"below; to use them, type \002%R%s \037command\037\002.  For \n"
-				"more information on a specific command, type \002%R\n"
-				"%s HELP \037command\037\002."),
-				BotServ->nick.c_str(), BotServ->nick.c_str(), BotServ->nick.c_str());
+				"below; to use them, type \002%s%s \037command\037\002. For\n"
+				"more information on a specific command, type\n"
+				"\002%s%s HELP \037command\037\002."),
+				BotServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);

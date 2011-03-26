@@ -104,14 +104,14 @@ class CommandNSRecover : public Command
 				"remain online for %s to ensure that the other\n"
 				"user does not immediately reconnect; after that time, you\n"
 				"can reclaim your nick.  Alternatively, use the \002RELEASE\002\n"
-				"command (\002%R%s HELP RELEASE\002) to get the nick\n"
+				"command (\002%s%s HELP RELEASE\002) to get the nick\n"
 				"back sooner.\n"
 				" \n"
 				"In order to use the \002RECOVER\002 command for a nick, your\n"
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), NickServ->nick.c_str(), NickServ->nick.c_str(), relstr.c_str(),
+				"the nickname."), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str(), relstr.c_str(),
 				NickServ->nick.c_str());
 
 		return true;

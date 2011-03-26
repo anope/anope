@@ -63,8 +63,8 @@ class CommandCSSetSignKick : public Command
 				" \n"
 				"If you use \002LEVEL\002, those who have a level that is superior \n"
 				"or equal to the SIGNKICK level on the channel won't have their \n"
-				"kicks signed. See \002%R%s HELP LEVELS\002 for more information."), this->name.c_str(),
-				ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"kicks signed. See \002%s%s HELP LEVELS\002 for more information."), this->name.c_str(),
+				ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

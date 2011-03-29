@@ -103,9 +103,6 @@ typedef unsigned long uint32;
 #endif
 
 #ifdef _WIN32
-# ifdef MSVCPP
-#  define snprintf _snprintf
-# endif
 # define popen _popen
 # define pclose _pclose
 # define ftruncate _chsize

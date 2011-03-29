@@ -43,6 +43,19 @@
 #include <fcntl.h>
 #include <typeinfo>
 
+#if GETTEXT_FOUND
+# include <libintl.h>
+# define _(x) anope_gettext(x)
+#  ifdef _WIN32
+     /* Redefine snprintf and undefine vsnprintf because liblintl defines it to its own function */
+#    undef snprintf
+#    define snprintf _snprintf
+#    undef vsnprintf
+#  endif
+#else
+# define _(x) x
+#endif
+
 #ifndef _WIN32
 # include <unistd.h>
 # include <grp.h>
@@ -138,13 +151,6 @@ extern "C" void __pfnBkCheck() {}
 #if INTTYPE_WORKAROUND
 # undef int16
 # undef int32
-#endif
-
-#if GETTEXT_FOUND
-# include <libintl.h>
-# define _(x) anope_gettext(x)
-#else
-# define _(x) x
 #endif
 
 /** This definition is used as shorthand for the various classes
@@ -508,7 +514,7 @@ const Anope::string MemoFlagStrings[] = {
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
-class Memo : public Flags<MemoFlag>
+class CoreExport Memo : public Flags<MemoFlag>
 {
  public:
 	Memo();

@@ -51,7 +51,7 @@ enum ConfigDataType
  * The callback function can then alter the values of the ValueItem
  * classes to validate the settings.
  */
-class ValueItem
+class CoreExport ValueItem
 {
  private:
 	/** Actual data */
@@ -290,7 +290,7 @@ class ConfigurationFile
 
 /** Holds all of the core configuration items
  */
-class ConfigItems
+class CoreExport ConfigItems
 {
  public:
 	/** Holds a core configuration item and its callbacks

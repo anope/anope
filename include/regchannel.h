@@ -204,11 +204,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 
 	/** Erase an entry from the channel access list
 	 *
-	 * @param access The access to remove
+	 * @param taccess The access to remove
 	 *
 	 * Clears the memory used by the given access entry and removes it from the vector.
 	 */
-	void EraseAccess(ChanAccess *access);
+	void EraseAccess(ChanAccess *taccess);
 
 	/** Clear the entire channel access list
 	 *
@@ -327,11 +327,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
 
 	/** Get details for a specific mlock
-	 * @param name The mode name
+	 * @param mname The mode name
  	 * @param An optional param to match with
 	 * @return The MLock, if any
 	 */
-	ModeLock *GetMLock(ChannelModeName name, const Anope::string &param = "");
+	ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
 
 	/** Check whether a user is permitted to be on this channel
 	 * @param u The user

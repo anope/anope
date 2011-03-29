@@ -89,16 +89,16 @@ ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 	{
-		ChanAccess *access = ci->GetAccess(i);
-		this->AddAccess(access->mask, access->level, access->creator, access->last_seen);
+		ChanAccess *taccess = ci->GetAccess(i);
+		this->AddAccess(taccess->mask, taccess->level, taccess->creator, taccess->last_seen);
 	}
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
-		AutoKick *akick = ci->GetAkick(i);
-		if (akick->HasFlag(AK_ISNICK))
-			this->AddAkick(akick->creator, akick->nc, akick->reason, akick->addtime, akick->last_used);
+		AutoKick *takick = ci->GetAkick(i);
+		if (takick->HasFlag(AK_ISNICK))
+			this->AddAkick(takick->creator, takick->nc, takick->reason, takick->addtime, takick->last_used);
 		else
-			this->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
+			this->AddAkick(takick->creator, takick->mask, takick->reason, takick->addtime, takick->last_used);
 	}
 	for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
 	{
@@ -222,15 +222,15 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 	ChanAccess *highest = NULL;
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 	{
-		ChanAccess *access = this->access[i];
+		ChanAccess *taccess = this->access[i];
 
-		if (level && level != access->level)
+		if (level && level != taccess->level)
 			continue;
 		/* Access entry is a mask and we match it */
-		else if (!access->nc && (Anope::Match(u->nick, access->mask) || Anope::Match(u->GetDisplayedMask(), access->mask)))
+		else if (!taccess->nc && (Anope::Match(u->nick, taccess->mask) || Anope::Match(u->GetDisplayedMask(), taccess->mask)))
 			;
 		/* Access entry is a nick core and we are identified for that account */
-		else if (access->nc && u->IsIdentified() && u->Account() == access->nc) 
+		else if (taccess->nc && u->IsIdentified() && u->Account() == taccess->nc) 
 			;
 		else
 			continue;
@@ -238,8 +238,8 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 		if (u->IsIdentified() || (na && u->IsRecognized() && !this->HasFlag(CI_SECURE)))
 		{
 			/* Use the highest level access available */
-			if (!highest || access->level > highest->level)
-				highest = access;
+			if (!highest || taccess->level > highest->level)
+				highest = taccess;
 		}
 	}
 
@@ -316,15 +316,15 @@ void ChannelInfo::EraseAccess(unsigned index)
 
 /** Erase an entry from the channel access list
  *
- * @param access The access to remove
+ * @param taccess The access to remove
  *
  * Clears the memory used by the given access entry and removes it from the vector.
  */
-void ChannelInfo::EraseAccess(ChanAccess *access)
+void ChannelInfo::EraseAccess(ChanAccess *taccess)
 {
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 	{
-		if (this->access[i] == access)
+		if (this->access[i] == taccess)
 		{
 			this->access.erase(this->access.begin() + i);
 			break;
@@ -685,20 +685,20 @@ std::pair<ChannelInfo::ModeList::iterator, ChannelInfo::ModeList::iterator> Chan
 }
 
 /** Get details for a specific mlock
- * @param name The mode name
+ * @param mname The mode name
  * @param param An optional param to match with
  * @return The MLock, if any
  */
-ModeLock *ChannelInfo::GetMLock(ChannelModeName name, const Anope::string &param)
+ModeLock *ChannelInfo::GetMLock(ChannelModeName mname, const Anope::string &param)
 {
-	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(name);
+	std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mname);
 	if (it != this->mode_locks.end())
 	{
 		if (param.empty())
 			return &it->second;
 		else
 		{
-			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(name);
+			std::multimap<ChannelModeName, ModeLock>::iterator it_end = this->mode_locks.upper_bound(mname);
 			for (; it != it_end; ++it)
 			{
 				if (Anope::Match(param, it->second.param))

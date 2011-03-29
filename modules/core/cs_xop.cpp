@@ -438,8 +438,8 @@ class CommandCSQOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002QOP CLEAR\002 command clears all entries of the\n"
-				"QOP list.\n"
-				" \n"
+				"QOP list.\n"));
+		source.Reply(_(" \n"
 				"The \002QOP\002 commands are limited to\n"
 				"founders (unless SECUREOPS is off). However, any user on the\n"
 				"QOP list may use the \002QOP LIST\002 command.\n"
@@ -448,7 +448,8 @@ class CommandCSQOP : public XOPBase
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
+				"the access list and xOP list systems."),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
@@ -500,8 +501,8 @@ class CommandCSAOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002AOP CLEAR\002 command clears all entries of the\n"
-				"AOP list.\n"
-				" \n"
+				"AOP list.\n"));
+		source.Reply(_(" \n"
 				"The \002AOP ADD\002 and \002AOP DEL\002 commands are limited to\n"
 				"SOPs or above, while the \002AOP CLEAR\002 command can only\n"
 				"be used by the channel founder. However, any user on the\n"
@@ -561,8 +562,8 @@ class CommandCSHOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002HOP CLEAR\002 command clears all entries of the\n"
-				"HOP list.\n"
-				" \n"
+				"HOP list.\n"));
+		source.Reply(_(" \n"
 				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are \n"
 				"limited to AOPs or above, while the \002HOP CLEAR\002 command \n"
 				"can only be used by the channel founder.\n"
@@ -622,7 +623,8 @@ class CommandCSSOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002SOP CLEAR\002 command clears all entries of the\n"
-				"SOP list.\n"
+				"SOP list.\n"));
+		source.Reply(_(
 				" \n"
 				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are \n"
 				"limited to the channel founder. However, any user on the\n"
@@ -682,7 +684,8 @@ class CommandCSVOP : public XOPBase
 				"      7 through 9.\n"
 				"      \n"
 				"The \002VOP CLEAR\002 command clears all entries of the\n"
-				"VOP list.\n"
+				"VOP list.\n"));
+		source.Reply(_(
 				" \n"
 				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are \n"
 				"limited to AOPs or above, while the \002VOP CLEAR\002 command \n"

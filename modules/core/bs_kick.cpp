@@ -479,7 +479,7 @@ class CommandBSKick : public Command
 					"on a specific option.\n"
 					" \n"
 					"Note: access to this command is controlled by the\n"
-					"level SET."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+					"level SET."), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 		else if (subcommand.equals_ci("BADWORDS"))
 			source.Reply(_("Syntax: \002KICK \037#channel\037 BADWORDS {\037ON|OFF\037} [\037ttb\037]\002\n"
 					"Sets the bad words kicker on or off. When enabled, this\n"
@@ -490,7 +490,7 @@ class CommandBSKick : public Command
 					"more information.\n"
 					"ttb is the number of times a user can be kicked\n"
 					"before it get banned. Don't give ttb to disable\n"
-					"the ban system once activated."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+					"the ban system once activated."), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 		else if (subcommand.equals_ci("BOLDS"))
 			source.Reply(_("Syntax: \002KICK \037channel\037 BOLDS {\037ON|OFF\037} [\037ttb\037]\002\n"
 					"Sets the bolds kicker on or off. When enabled, this\n"

@@ -1,4 +1,4 @@
-/* RequiredLibraries: ldap */
+/* RequiredLibraries: ldap,lber */
 
 #include "module.h"
 #include "ldap.h"

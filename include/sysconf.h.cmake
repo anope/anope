@@ -8,14 +8,12 @@
 #cmakedefine HAVE_STDINT_H 1
 #cmakedefine HAVE_STDDEF_H 1
 #cmakedefine HAVE_BACKTRACE 1
-#cmakedefine HAVE_GETTIMEOFDAY 1
 #cmakedefine HAVE_SETGRENT 1
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE_STRICMP 1
 #cmakedefine HAVE_STRINGS_H 1
 #cmakedefine HAVE_STRLCAT 1
 #cmakedefine HAVE_STRLCPY 1
-#cmakedefine HAVE_SYS_SELECT_H 1
 #cmakedefine HAVE_UMASK 1
 #cmakedefine HAVE_EVENTFD 1
 #cmakedefine GETTEXT_FOUND 1

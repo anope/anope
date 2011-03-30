@@ -52,7 +52,6 @@ static Anope::string GetTimeStamp()
 	if (time(&t) < 0)
 		throw CoreException("time() failed");
 	tm tm = *localtime(&t);
-#if HAVE_GETTIMEOFDAY
 	if (debug)
 	{
 		char *s;
@@ -64,7 +63,6 @@ static Anope::string GetTimeStamp()
 		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
 	}
 	else
-#endif
 		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
 
 	return tbuf;

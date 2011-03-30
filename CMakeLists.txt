@@ -227,6 +227,8 @@ include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${An
 # If using Windows, always add the _WIN32 define
 if(WIN32)
   add_definitions(-D_WIN32)
+  # And include the windows specific folder for our anope_windows.h
+  include_directories(${Anope_SOURCE_DIR}/src/win32)
 endif(WIN32)
 
 # If using Visual Studio, set the C++ flags accordingly
@@ -329,11 +331,9 @@ endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEB
 # Check for the existance of the following include files
 check_include_file(sys/types.h HAVE_SYS_TYPES_H)
 check_include_file(strings.h HAVE_STRINGS_H)
-check_include_file(sys/select.h HAVE_SYS_SELECT_H)
 check_include_file(sys/eventfd.h HAVE_SYS_EVENTFD_H)
 
 # Check for the existance of the following functions
-check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_function_exists(setgrent HAVE_SETGRENT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(stricmp HAVE_STRICMP)

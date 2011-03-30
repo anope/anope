@@ -123,4 +123,20 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t size)
 	return NULL;
 }
 
+/** Like gettimeofday(), but it works on Windows.
+ * @param tv A timeval struct
+ * @param tz Should be NULL, it is not used
+ * @return 0 on success
+ */
+int gettimeofday(timeval *tv, char *)
+{
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	
+	tv->tv_sec = Anope::CurTime;
+	tv->tv_usec = st.wMilliseconds;
+	
+	return 0;
+}
+
 #endif

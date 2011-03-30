@@ -46,12 +46,6 @@
 #if GETTEXT_FOUND
 # include <libintl.h>
 # define _(x) anope_gettext(x)
-#  ifdef _WIN32
-     /* Redefine snprintf and undefine vsnprintf because liblintl defines it to its own function */
-#    undef snprintf
-#    define snprintf _snprintf
-#    undef vsnprintf
-#  endif
 #else
 # define _(x) x
 #endif
@@ -72,31 +66,7 @@
 # define MARK_DEPRECATED __attribute((deprecated))
 # define DeleteFile unlink
 #else
-# include <winsock2.h>
-# include <ws2tcpip.h>
-# include <windows.h>
-# include <sys/timeb.h>
-# include <direct.h>
-# include <io.h>
-# ifdef MODULE_COMPILE
-#  define CoreExport __declspec(dllimport)
-#  define DllExport __declspec(dllexport)
-# else
-#  define CoreExport __declspec(dllexport)
-#  define DllExport __declspec(dllimport)
-# endif
-/* VS2008 hates having this define before its own */
-# define vsnprintf _vsnprintf
-/* We have our own inet_pton and inet_ntop (Windows doesn't have its own) */
-# define inet_pton inet_pton_
-# define inet_ntop inet_ntop_
-# define setenv(x, y, z) SetEnvironmentVariable(x, y)
-# define unsetenv(x) SetEnvironmentVariable(x, NULL)
-# define MARK_DEPRECATED
-
-extern CoreExport USHORT WindowsGetLanguage(const char *lang);
-extern CoreExport int inet_pton(int af, const char *src, void *dst);
-extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
+# include "anope_windows.h"
 #endif
 
 /* Telling compilers about printf()-like functions: */
@@ -112,10 +82,6 @@ extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size
 
 #if HAVE_STRINGS_H
 # include <strings.h>
-#endif
-
-#if HAVE_SYS_SELECT_H
-# include <sys/select.h>
 #endif
 
 #ifdef _AIX
@@ -140,18 +106,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 #undef toupper
 #define tolower tolower_
 #define toupper toupper_
-
-#ifdef __WINS__
-# ifndef BKCHECK
-#  define BKCHECK
-extern "C" void __pfnBkCheck() {}
-#  endif
-#endif
-
-#if INTTYPE_WORKAROUND
-# undef int16
-# undef int32
-#endif
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.

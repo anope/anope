@@ -10,8 +10,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 {
 	Anope::string server;
 	int port;
-	Anope::string binddn;
-	Anope::string password;
 
 	LDAP *con;
 
@@ -21,7 +19,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	query_queue queries;
 	result_queue results;
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, "ldap/" + n), server(s), port(po), binddn(b), password(p)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po) : LDAPProvider(o, "ldap/" + n), server(s), port(po)
 	{
 		if (ldap_initialize(&this->con, this->server.c_str()) != LDAP_SUCCESS)
 			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + Anope::LastError());
@@ -264,12 +262,10 @@ class ModuleLDAP : public Module, public Pipe
 			{
 				Anope::string server = config.ReadValue("ldap", "server", "127.0.0.1", i);
 				int port = config.ReadInteger("ldap", "port", "389", i, true);
-				Anope::string binddn = config.ReadValue("ldap", "binddn", "", i);
-				Anope::string password = config.ReadValue("ldap", "password", "", i);
 
 				try
 				{
-					LDAPService *ss = new LDAPService(this, connname, server, port, binddn, password);
+					LDAPService *ss = new LDAPService(this, connname, server, port);
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 					ModuleManager::RegisterService(ss);
 

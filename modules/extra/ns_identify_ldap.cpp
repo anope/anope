@@ -120,7 +120,7 @@ class OnIdentifyInterface : public LDAPInterface
 			if (!email.equals_ci(u->Account()->email))
 			{
 				u->Account()->email = email;
-				u->SendMessage(NickServ, "Your email has been updated to \002%s\002", email.c_str());
+				u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log() << "ns_identify_ldap: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}

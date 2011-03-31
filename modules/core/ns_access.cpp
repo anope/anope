@@ -133,7 +133,7 @@ class CommandNSAccess : public Command
 		if (!mask.empty() && mask.find('@') == Anope::string::npos)
 		{
 			source.Reply(_(BAD_USERHOST_MASK));
-			source.Reply(_(MORE_INFO), Config->s_NickServ.c_str(), "ACCESS");
+			source.Reply(_(MORE_INFO), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), "ACCESS");
 		}
 		else if (u->Account()->HasFlag(NI_SUSPENDED))
 			source.Reply(_(NICK_X_SUSPENDED), u->Account()->display.c_str());

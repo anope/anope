@@ -208,9 +208,9 @@ int validate_user(User *u)
 	if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 	{
 		if (na->nc->HasFlag(NI_SECURE))
-			u->SendMessage(NickServ, _(NICK_IS_SECURE), Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, _(NICK_IS_SECURE), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else
-			u->SendMessage(NickServ, _(NICK_IS_REGISTERED), Config->s_NickServ.c_str());
+			u->SendMessage(NickServ, _(NICK_IS_REGISTERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 	}
 
 	if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())

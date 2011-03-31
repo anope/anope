@@ -134,8 +134,8 @@ void add_session(User *u)
 			if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)
 			{
 				const Anope::string &akillmask = "*@" + u->host;
-				XLine *x = new XLine(akillmask, Config->s_OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded");
-				SGLine->AddXLine(x);
+				const Anope::string &akillreason = "Session limit exceeded for " + u->host;
+				SGLine->Add(NULL, NULL, akillmask, Anope::CurTime + Config->SessionAutoKillExpiry, akillreason);
 				ircdproto->SendGlobops(OperServ, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 			}
 		}

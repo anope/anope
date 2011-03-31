@@ -35,7 +35,7 @@ class CommandBSAct : public Command
 
 		if (!ci->bi)
 		{
-			source.Reply(_(BOT_NOT_ASSIGNED));
+			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 			return MOD_CONT;
 		}
 

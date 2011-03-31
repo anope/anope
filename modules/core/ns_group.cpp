@@ -73,7 +73,7 @@ class CommandNSGroup : public Command
 		else if (na && target->nc == na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
 			source.Reply(_("Your nick is already registered; type \002%s%s DROP\002 first."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())

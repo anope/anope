@@ -218,8 +218,8 @@ class CommandMSSet : public Command
 			return this->DoLimit(source, params, mi);
 		else
 		{
-			source.Reply(_(NICK_SET_UNKNOWN_OPTION), cmd.c_str());
-			source.Reply(_(MORE_INFO), Config->s_MemoServ.c_str(), "SET");
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), cmd.c_str());
+			source.Reply(_(MORE_INFO), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;

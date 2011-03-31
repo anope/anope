@@ -65,7 +65,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		u->SendMessage(bi, _(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
+		u->SendMessage(bi, _(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for unregistered user " << u->GetMask() << " with command " << command;
 		PopLanguage();
 		return;

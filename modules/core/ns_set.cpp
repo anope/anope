@@ -60,7 +60,7 @@ class CommandNSSet : public Command
 			mod_run_cmd(NickServ, u, NULL, c, params[0], cmdparams);
 		}
 		else
-			source.Reply(_(NICK_SET_UNKNOWN_OPTION), params[0].c_str());
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), params[0].c_str());
 
 		return MOD_CONT;
 	}

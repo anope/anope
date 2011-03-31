@@ -182,7 +182,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 	else if (!u->IsIdentified() && !u->IsRecognized())
 	{
 		if (!z || z == 3)
-			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 	}
 	else if (!(mi = getmemoinfo(name, ischan, isforbid)))
 	{
@@ -248,13 +248,13 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 						NickAlias *na = *it;
 						User *user = finduser(na->nick);
 						if (user && user->IsIdentified())
-							user->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+							user->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 					}
 				}
 				else
 				{
 					if ((u = finduser(name)) && u->IsIdentified() && nc->HasFlag(NI_MEMO_RECEIVE))
-						u->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						u->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), sender.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				} /* if (flags & MEMO_RECEIVE) */
 			}
 			/* if (MSNotifyAll) */
@@ -277,7 +277,7 @@ void memo_send(CommandSource &source, const Anope::string &name, const Anope::st
 					if (check_access(cu->user, c->ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, _(MEMO_NEW_X_MEMO_ARRIVED), c->ci->name.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(MemoServ, _(MEMO_NEW_X_MEMO_ARRIVED), c->ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), c->ci->name.c_str(), mi->memos.size());
 					}
 				}
 			} /* MSNotifyAll */

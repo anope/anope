@@ -53,7 +53,7 @@ class CommandNSRecover : public Command
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
-				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(_(NICK_RECOVERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
@@ -77,7 +77,7 @@ class CommandNSRecover : public Command
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
-				source.Reply(_(NICK_RECOVERED), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(_(NICK_RECOVERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 				source.Reply(_(ACCESS_DENIED));

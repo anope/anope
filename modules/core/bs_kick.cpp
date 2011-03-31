@@ -41,7 +41,7 @@ class CommandBSKick : public Command
 		else if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
-			source.Reply(_(BOT_NOT_ASSIGNED));
+			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -451,7 +451,7 @@ class CommandBSKick : public Command
 				}
 			}
 			else
-				source.Reply(_(UNKNOWN_OPTION), option.c_str(), this->name.c_str());
+				source.Reply(_(UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), option.c_str(), this->name.c_str());
 		}
 		return MOD_CONT;
 	}

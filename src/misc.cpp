@@ -789,12 +789,12 @@ bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case
  * @param ... any number of parameters
  * @return a Anope::string
  */
-Anope::string Anope::printf(const Anope::string &fmt, ...)
+Anope::string Anope::printf(const char *fmt, ...)
 {
 	va_list args;
 	char buf[1024];
 	va_start(args, fmt);
-	vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
+	vsnprintf(buf, sizeof(buf), fmt, args);
 	va_end(args);
 	return buf;
 }

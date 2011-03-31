@@ -117,6 +117,6 @@ const char *anope_gettext(const char *string)
 void SyntaxError(CommandSource &source, const Anope::string &command, const Anope::string &message)
 {
 	source.Reply(_("Syntax: \002%s\002"), message.c_str());
-	source.Reply(_(_(MORE_INFO)), source.owner->nick.c_str(), command.c_str());
+	source.Reply(_(_(MORE_INFO)), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), command.c_str());
 }
 

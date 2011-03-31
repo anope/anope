@@ -6,7 +6,7 @@
  * Please read COPYING and README for further details.
  */
 
-#define MORE_INFO			"\002%R%s HELP %s\002 for more information."
+#define MORE_INFO			"\002%s%s HELP %s\002 for more information."
 #define BAD_USERHOST_MASK		"Mask must be in the form \037user\037@\037host\037."
 #define BAD_EXPIRY_TIME			"Invalid expiry time."
 #define USERHOST_MASK_TOO_WIDE		"%s coverage is too wide; Please use a more specific mask."
@@ -29,7 +29,7 @@
 #define CHAN_X_FORBIDDEN_OPER		"Channel \002%s\002 has been forbidden by %s:\n" \
 						"%s"
 #define NICK_IDENTIFY_REQUIRED		"Password authentication required for that command.\n" \
-						"Retry after typing \002%R%s IDENTIFY \037password\037\002."
+						"Retry after typing \002%s%s IDENTIFY \037password\037\002."
 #define MAIL_X_INVALID			"\002%s\002 is not a valid e-mail address."
 #define NO_REASON			"No reason"
 #define UNKNOWN				"<unknown>"
@@ -37,11 +37,11 @@
 #define END_OF_ANY_LIST			"End of \002%s\002 list."
 #define LIST_INCORRECT_RANGE		"Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002."
 #define UNKNOWN_OPTION			"Unknown option \002%s\002.\n" \
-						"Type %R%S HELP %s for more information."
+						"Type %s%s HELP %s for more information."
 #define NICK_IS_REGISTERED		"This nick is owned by someone else.  Please choose another.\n" \
-						"(If this is your nick, type \002%R%s IDENTIFY \037password\037\002.)"
+						"(If this is your nick, type \002%s%s IDENTIFY \037password\037\002.)"
 #define NICK_IS_SECURE			"This nickname is registered and protected.  If it is your\n" \
-						"nick, type \002%R%s IDENTIFY \037password\037\002.  Otherwise,\n" \
+						"nick, type \002%s%s IDENTIFY \037password\037\002.  Otherwise,\n" \
 						"please choose a different nick."
 #define FORCENICKCHANGE_NOW		"This nickname has been registered; you may not use it."
 #define NICK_CANNOT_BE_REGISTERED	"Nickname \002%s\002 may not be registered."
@@ -59,7 +59,7 @@
 #define NICK_LIST_SYNTAX		"LIST \037pattern\037"
 #define LIST_HEADER			"List of entries matching \002%s\002:"
 #define NICK_RECOVERED			"User claiming your nick has been killed.\n" \
-						"\002%R%s RELEASE %s\002 to get it back before %s timeout."
+						"\002%s%s RELEASE %s\002 to get it back before %s timeout."
 #define NICK_REQUESTED			"This nick has already been requested, please check your e-mail address for the pass code"
 #define NICK_CONFIRM_INVALID		"Invalid passcode has been entered, please check the e-mail again, and retry"
 #define CHAN_NOT_ALLOWED_TO_JOIN	"You are not permitted to be on this channel."
@@ -72,7 +72,7 @@
 #define CHAN_SET_DISABLED		"Sorry, channel option setting is temporarily disabled."
 #define CHAN_SETTING_CHANGED		"%s for %s set to %s."
 #define CHAN_SETTING_UNSET		"%s for %s unset."
-#define CHAN_SET_MLOCK_DEPRECATED	"MLOCK is deprecated. Use \002%R%s HELP MODE\002 instead."
+#define CHAN_SET_MLOCK_DEPRECATED	"MLOCK is deprecated. Use \002%s%s HELP MODE\002 instead."
 #define CHAN_ACCESS_LEVEL_RANGE		"Access level must be between %d and %d inclusive."
 #define CHAN_ACCESS_LIST_HEADER		"Access list for %s:\n" \
 						"  Num   Lev  Mask"
@@ -87,9 +87,9 @@
 #define CHAN_LIST_ENTRY			"%3d    %s\n" \
 						"  Added by %s on %s"
 #define MEMO_NEW_X_MEMO_ARRIVED		"There is a new memo on channel %s.\n" \
-						"Type \002%R%s READ %s %d\002 to read it."
+						"Type \002%s%s READ %s %d\002 to read it."
 #define MEMO_NEW_MEMO_ARRIVED		"You have a new memo from %s.\n" \
-						"Type \002%R%s READ %d\002 to read it."
+						"Type \002%s%s READ %d\002 to read it."
 #define MEMO_HAVE_NO_MEMOS		"You have no memos."
 #define MEMO_X_HAS_NO_MEMOS		"%s has no memos."
 #define MEMO_SEND_SYNTAX		"SEND {\037nick\037 | \037channel\037} \037memo-text\037"
@@ -98,7 +98,7 @@
 #define MEMO_X_HAS_NO_NEW_MEMOS		"%s has no new memos."
 #define BOT_DOES_NOT_EXIST		"Bot \002%s\002 does not exist."
 #define BOT_NOT_ASSIGNED		"You must assign a bot to the channel before using this command.\n" \
-						"Type %R%S HELP ASSIGN for more information."
+						"Type %s%s HELP ASSIGN for more information."
 #define BOT_NOT_ON_CHANNEL		"Bot is not on channel \002%s\002."
 #define BOT_ASSIGN_READONLY		"Sorry, bot assignment is temporarily disabled."
 #define ENABLED				"Enabled"

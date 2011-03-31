@@ -343,7 +343,7 @@ namespace Anope
 	 * @param ... any number of parameters
 	 * @return a Anope::string
 	 */
-	extern CoreExport string printf(const Anope::string &fmt, ...);
+	extern CoreExport string printf(const char *fmt, ...);
 
 	/** Return the last error, uses errno/GetLastError() to determin this
 	 * @return An error message

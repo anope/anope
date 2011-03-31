@@ -63,8 +63,8 @@ class CommandCSSet : public Command
 		}
 		else
 		{
-			source.Reply(_(NICK_SET_UNKNOWN_OPTION), params[1].c_str());
-			source.Reply(_(MORE_INFO), Config->s_ChanServ.c_str(), "SET");
+			source.Reply(_(NICK_SET_UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), params[1].c_str());
+			source.Reply(_(MORE_INFO), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;

@@ -137,7 +137,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	for (idx = 0; idx < 20; ++idx)
 		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 
-	Anope::string subject = Anope::printf(GetString(na->nc, "Reset password request for %s"), na->nick.c_str());
+	Anope::string subject = Anope::printf(GetString(na->nc, "Reset password request for %s").c_str(), na->nick.c_str());
 	Anope::string message = Anope::printf(GetString(na->nc,
 	"Hi,\n"
 	" \n"
@@ -146,7 +146,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators."), na->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), na->nick.c_str(), passcode.c_str(), Config->NetworkName.c_str());
+	"%s administrators.").c_str(), na->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), na->nick.c_str(), passcode.c_str(), Config->NetworkName.c_str());
 
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
 	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));

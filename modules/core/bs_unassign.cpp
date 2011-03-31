@@ -33,7 +33,7 @@ class CommandBSUnassign : public Command
 		else if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
-			source.Reply(_(BOT_NOT_ASSIGNED));
+			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
 			source.Reply(_("You can not unassign bots while persist is set on the channel."));
 		else

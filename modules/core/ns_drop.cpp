@@ -42,7 +42,7 @@ class CommandNSDrop : public Command
 
 		if (!u->Account())
 		{
-			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->s_NickServ.c_str());
+			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 			return MOD_CONT;
 		}
 

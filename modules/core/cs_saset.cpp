@@ -60,7 +60,7 @@ class CommandCSSASet : public Command
 		else
 		{
 			source.Reply(_("Unknown SASET option \002%s\002."), params[1].c_str());
-			source.Reply(_(MORE_INFO), Config->s_ChanServ.c_str(), "SET");
+			source.Reply(_(MORE_INFO), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), "SET");
 		}
 
 		return MOD_CONT;

@@ -87,7 +87,7 @@ class CommandNSRelease : public Command
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), NickServ->nick.c_str());
+				"the nickname."), NickServ->nick.c_str(), relstr.c_str());
 
 
 		return true;

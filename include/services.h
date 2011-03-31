@@ -57,6 +57,7 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
+# include <sys/time.h>
 # include <dirent.h>
 # ifdef HAVE_BACKTRACE
 #  include <execinfo.h>
@@ -74,10 +75,6 @@
 # define FORMAT(type, fmt, start) __attribute__((format(type, fmt, start)))
 #else
 # define FORMAT(type, fmt, start)
-#endif
-
-#ifdef HAVE_GETTIMEOFDAY
-# include <sys/time.h>
 #endif
 
 #if HAVE_STRINGS_H

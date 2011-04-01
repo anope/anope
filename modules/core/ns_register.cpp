@@ -36,6 +36,7 @@ class CommandNSConfirm : public Command
 				source.Reply(_(NICK_X_NOT_REGISTERED), passcode.c_str());
 			else if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				source.Reply(_("Nick \002%s\002 is already confirmed."), na->nick.c_str());
+			else
 			{
 				na->nc->UnsetFlag(NI_UNCONFIRMED);
 				Log(LOG_ADMIN, u, this) << "to confirm nick " << na->nick << " (" << na->nc->display << ")";

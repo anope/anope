@@ -25,7 +25,7 @@ class CommandNSGhost : public Command
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[0];
-		Anope::string pass = params.size() > 1 ? params[1] : "";
+		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
 		User *u = source.u;
 		User *user = finduser(nick);
@@ -41,28 +41,46 @@ class CommandNSGhost : public Command
 			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't ghost yourself!"));
-		else if ((u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))) ||
-				(!pass.empty() && enc_check_password(pass, na->nc->pass) == 1) ||
-				(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
-		{
-			if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
-				source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
-			else
-			{
-				Log(LOG_COMMAND, u, this) << "for " << nick;
-				Anope::string buf = "GHOST command used by " + u->nick;
-				kill_user(Config->s_NickServ, user, buf);
-				source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
-			}
-		}
 		else
 		{
-			source.Reply(_(ACCESS_DENIED));
-			if (!pass.empty())
+			bool ok = false;
+			if (u->Account() == na->nc)
+				ok = true;
+			else if (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc))
+				ok = true;
+			else if (!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint))
+				ok = true;
+			else if (!pass.empty())
 			{
-				Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
-				if (bad_password(u))
-					return MOD_STOP;
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na->nc->display, pass));
+				if (MOD_RESULT == EVENT_STOP)
+					return MOD_CONT;
+				else if (MOD_RESULT == EVENT_ALLOW)
+					ok = true;
+			}
+
+			if (ok)
+			{
+				if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
+					source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
+				else
+				{
+					Log(LOG_COMMAND, u, this) << "for " << nick;
+					Anope::string buf = "GHOST command used by " + u->nick;
+					kill_user(Config->s_NickServ, user, buf);
+					source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
+				}
+			}
+			else
+			{
+				source.Reply(_(ACCESS_DENIED));
+				if (!pass.empty())
+				{
+					Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
+					if (bad_password(u))
+						return MOD_STOP;
+				}
 			}
 		}
 

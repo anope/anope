@@ -30,30 +30,28 @@ class CommandNSIdentify : public Command
 		Anope::string pass = params[params.size() - 1];
 
 		NickAlias *na = findnick(nick);
-		if (!na)
-			source.Reply(_(NICK_NOT_REGISTERED));
-		else if (na->HasFlag(NS_FORBIDDEN))
+		if (na && na->HasFlag(NS_FORBIDDEN))
 			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
-		else if (na->nc->HasFlag(NI_SUSPENDED))
+		else if (na && na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
-		/* You can now identify for other nicks without logging out first,
-		 * however you can not identify again for the group you're already
-		 * identified as
-		 */
-		else if (u->Account() && u->Account() == na->nc)
+		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));
 		else
 		{
-			int res = enc_check_password(pass, na->nc->pass);
-			if (!res)
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, nick, pass));
+			if (MOD_RESULT == EVENT_STOP)
+				return MOD_CONT;
+
+			if (!na)
+				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			else if (MOD_RESULT != EVENT_ALLOW)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
 				source.Reply(_(PASSWORD_INCORRECT));
 				if (bad_password(u))
 					return MOD_STOP;
 			}
-			else if (res == -1)
-				source.Reply(_("Sorry, identification failed."));
 			else
 			{
 				if (u->IsIdentified())

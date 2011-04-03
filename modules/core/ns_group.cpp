@@ -27,7 +27,7 @@ class CommandNSGroup : public Command
 		User *u = source.u;
 
 		const Anope::string &nick = params[0];
-		Anope::string pass = params.size() > 1 ? params[1] : "";
+		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
 		if (readonly)
 		{
@@ -82,8 +82,19 @@ class CommandNSGroup : public Command
 					"for more information."), target->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		else
 		{
-			if ((!pass.empty() && enc_check_password(pass, target->nc->pass)) ||
-					(!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint)))
+			bool ok = false;
+			if (!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint))
+				ok = true;
+			else if (!pass.empty())
+			{
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, target->nc->display, pass));
+				if (MOD_RESULT == EVENT_STOP)
+					return MOD_CONT;
+				else if (MOD_RESULT == EVENT_ALLOW)
+					ok = true;
+			}
+			if (ok)
 			{
 				/* If the nick is already registered, drop it.
 				 * If not, check that it is valid.
@@ -122,13 +133,9 @@ class CommandNSGroup : public Command
 
 				check_memos(u);
 			}
-			else if (pass.empty())
-			{
-				this->OnSyntaxError(source, "");
-			}
 			else
 			{
-				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick << " (invalid password)";
+				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick;
 				source.Reply(_(PASSWORD_INCORRECT));
 				if (bad_password(u))
 					return MOD_STOP;

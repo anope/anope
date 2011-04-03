@@ -118,7 +118,6 @@ E void HostServSyncVhosts(NickAlias *na);
 /**** encrypt.c ****/
 E int enc_encrypt(const Anope::string &src, Anope::string &dest);
 E int enc_decrypt(const Anope::string &src, Anope::string &dest);
-E int enc_check_password(Anope::string &plaintext, Anope::string &password);
 
 /**** hostserv.c  ****/
 E void get_hostserv_stats(long *nrec, long *memuse);

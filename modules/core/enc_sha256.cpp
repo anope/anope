@@ -252,9 +252,8 @@ class ESHA256 : public Module
 		this->SetAuthor("Anope");
 		this->SetType(ENCRYPTION);
 
-		ModuleManager::Attach(I_OnEncrypt, this);
-		ModuleManager::Attach(I_OnDecrypt, this);
-		ModuleManager::Attach(I_OnCheckPassword, this);
+		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
+		ModuleManager::Attach(i, this, 3);
 
 		use_iv = false;
 	}
@@ -287,26 +286,36 @@ class ESHA256 : public Module
 		return EVENT_STOP;
 	}
 
-	EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password)
+	EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
 	{
-		if (!hashm.equals_cs("sha256"))
+		NickAlias *na = findnick(account);
+		NickCore *nc = na ? na->nc : NULL;
+		if (na == NULL)
 			return EVENT_CONTINUE;
-		Anope::string buf;
 
-		GetIVFromPass(password);
+		size_t pos = nc->pass.find(':');
+		if (pos == Anope::string::npos)
+			return EVENT_CONTINUE;
+		Anope::string hash_method(nc->pass.begin(), nc->pass.begin() + pos);
+		if (!hash_method.equals_cs("sha256"))
+			return EVENT_CONTINUE;
+
+		GetIVFromPass(nc->pass);
 		use_iv = true;
-		this->OnEncrypt(plaintext, buf);
+		Anope::string buf;
+		this->OnEncrypt(password, buf);
 
-		if (password.equals_cs(buf))
+		if (nc->pass.equals_cs(buf))
 		{
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
 			if (!this->name.equals_ci(Config->EncModuleList.front()))
-				enc_encrypt(plaintext, password);
+				enc_encrypt(password, nc->pass);
 			return EVENT_ALLOW;
 		}
-		return EVENT_STOP;
+
+		return EVENT_CONTINUE;
 	}
 };
 

@@ -113,13 +113,18 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 			if (!na)
 				request->reply("error", "Invalid account");
-			else if (enc_check_password(password, na->nc->pass) == 1)
-			{
-				request->reply("result", "Success");
-				request->reply("account", na->nc->display);
-			}
 			else
-				request->reply("error", "Invalid password");
+			{
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(NULL, NULL, std::vector<Anope::string>(), na->nc->display, password));
+				if (MOD_RESULT == EVENT_ALLOW)
+				{
+					request->reply("result", "Success");
+					request->reply("account", na->nc->display);
+				}
+				else
+					request->reply("error", "Invalid password");
+			}
 		}
 	}
 

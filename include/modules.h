@@ -404,7 +404,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) { return EVENT_CONTINUE; }
 	virtual EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) { return EVENT_CONTINUE; }
-	virtual EventReturn OnCheckPassword(const Anope::string &hashm, Anope::string &plaintext, Anope::string &password) { return EVENT_CONTINUE; }
 
 	/** Called on fantasy command
 	 * @param command The command
@@ -923,6 +922,16 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnFindCore(const Anope::string &nick) { }
 
+	/** Check whether a users password is correct.
+	 * @param u The user
+	 * @param command The command the user is doing
+	 * @param params Command params
+	 * @param account The account the password should be checked against
+	 * @param password The password
+	 * @return EVENT_ALLOW to allow the password, EVENT_STOP to stop processing completely
+	 */
+	virtual EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) { return EVENT_CONTINUE; }
+
 	/** Called when we get informed about a users SSL fingerprint
 	 *  when we call this, the fingerprint should already be stored in the user struct
 	 * @param u pointer to the user
@@ -1077,7 +1086,7 @@ enum Implementation
 		I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay,
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 		I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
-		I_OnNickInfo, I_OnFindNick, I_OnFindCore,
+		I_OnNickInfo, I_OnFindNick, I_OnFindCore, I_OnCheckAuthentication,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
@@ -1115,7 +1124,7 @@ enum Implementation
 		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
 		I_OnPreCommand, I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
-		I_OnEncrypt, I_OnEncryptCheckLen, I_OnDecrypt, I_OnCheckPassword,
+		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
 		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnObjectDestroy,
 	I_END

@@ -39,8 +39,12 @@ class CommandNSRelease : public Command
 			source.Reply(_("Nick \002%s\002 isn't being held."), nick.c_str());
 		else if (!pass.empty())
 		{
-			int res = enc_check_password(pass, na->nc->pass);
-			if (res == 1)
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na->nc->display, pass));
+			if (MOD_RESULT == EVENT_STOP)
+				return MOD_CONT;
+
+			if (MOD_RESULT == EVENT_ALLOW)
 			{
 				Log(LOG_COMMAND, u, this) << "released " << na->nick;
 				na->Release();
@@ -49,12 +53,9 @@ class CommandNSRelease : public Command
 			else
 			{
 				source.Reply(_(ACCESS_DENIED));
-				if (!res)
-				{
-					Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
-					if (bad_password(u))
-						return MOD_STOP;
-				}
+				Log(LOG_COMMAND, u, this) << "invalid password for " << nick;
+				if (bad_password(u))
+					return MOD_STOP;
 			}
 		}
 		else

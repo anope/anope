@@ -27,7 +27,7 @@ class CommandNSRecover : public Command
 		User *u = source.u;
 
 		const Anope::string &nick = params[0];
-		Anope::string pass = params.size() > 1 ? params[1] : "";
+		const Anope::string &pass = params.size() > 1 ? params[1] : "";
 
 		NickAlias *na;
 		User *u2;
@@ -43,9 +43,12 @@ class CommandNSRecover : public Command
 			source.Reply(_("You can't recover yourself!"));
 		else if (!pass.empty())
 		{
-			int res = enc_check_password(pass, na->nc->pass);
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na->nc->display, pass));
+			if (MOD_RESULT == EVENT_STOP)
+				return MOD_CONT;
 
-			if (res == 1)
+			if (MOD_RESULT == EVENT_ALLOW)
 			{
 				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);
@@ -58,12 +61,9 @@ class CommandNSRecover : public Command
 			else
 			{
 				source.Reply(_(ACCESS_DENIED));
-				if (!res)
-				{
-					Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
-					if (bad_password(u))
-						return MOD_STOP;
-				}
+				Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
+				if (bad_password(u))
+					return MOD_STOP;
 			}
 		}
 		else

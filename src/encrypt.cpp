@@ -50,26 +50,3 @@ int enc_decrypt(const Anope::string &src, Anope::string &dest)
 	return -1;
 }
 
-/**
- * Check an input password `plaintext' against a stored, encrypted password
- * `password'.  Return value is:
- *   1 if the password matches
- *   0 if the password does not match
- *   0 if an error occurred while checking
- **/
-int enc_check_password(Anope::string &plaintext, Anope::string &password)
-{
-	size_t pos = password.find(':');
-	if (pos == Anope::string::npos)
-	{
-		Log() << "Error: enc_check_password() called with invalid password string (" << password << ")";
-		return 0;
-	}
-	Anope::string hashm(password.begin(), password.begin() + pos);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnCheckPassword, OnCheckPassword(hashm, plaintext, password));
-	if (MOD_RESULT == EVENT_ALLOW)
-		return 1;
-	return 0;
-}

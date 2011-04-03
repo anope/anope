@@ -443,8 +443,8 @@ class CommandCSQOP : public XOPBase
 				"The \002QOP\002 commands are limited to\n"
 				"founders (unless SECUREOPS is off). However, any user on the\n"
 				"QOP list may use the \002QOP LIST\002 command.\n"
-				" \n"
-				"This command may have been disabled for your channel, and\n"
+				" \n"));
+		source.Reply(_("This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
@@ -507,12 +507,14 @@ class CommandCSAOP : public XOPBase
 				"SOPs or above, while the \002AOP CLEAR\002 command can only\n"
 				"be used by the channel founder. However, any user on the\n"
 				"AOP list may use the \002AOP LIST\002 command.\n"
-				" \n"
-				"This command may have been disabled for your channel, and\n"
+				" \n"));
+		source.Reply(_("This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"the access list and xOP list systems."),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), 
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -567,12 +569,14 @@ class CommandCSHOP : public XOPBase
 				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are \n"
 				"limited to AOPs or above, while the \002HOP CLEAR\002 command \n"
 				"can only be used by the channel founder.\n"
-				" \n"
-				"This command may have been disabled for your channel, and\n"
+				" \n"));
+		source.Reply(_("This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"the access list and xOP list systems."),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -629,12 +633,14 @@ class CommandCSSOP : public XOPBase
 				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are \n"
 				"limited to the channel founder. However, any user on the\n"
 				"AOP list may use the \002SOP LIST\002 command.\n"
-				" \n"
-				"This command may have been disabled for your channel, and\n"
+				" \n"));
+		source.Reply(_("This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"the access list and xOP list systems."),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 
@@ -690,12 +696,14 @@ class CommandCSVOP : public XOPBase
 				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are \n"
 				"limited to AOPs or above, while the \002VOP CLEAR\002 command \n"
 				"can only be used by the channel founder.\n"
-				" \n"
-				"This command may have been disabled for your channel, and\n"
+				" \n"));
+		source.Reply(_("This command may have been disabled for your channel, and\n"
 				"in that case you need to use the access list. See \n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
-				"the access list and xOP list systems."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"the access list and xOP list systems."),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
 		return true;
 	}
 

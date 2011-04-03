@@ -52,7 +52,7 @@ class CommandNSCert : public Command
 		if (!source.u->fingerprint.empty() && !nc->FindCert(source.u->fingerprint))
 		{
 			nc->AddCert(source.u->fingerprint);
-			source.Reply(_("\002%s\002 added to your certificate list"), source.u->fingerprint.c_str());
+			source.Reply(_("\002%s\002 added to your certificate list."), source.u->fingerprint.c_str());
 			return MOD_CONT;
 		}
 
@@ -79,7 +79,7 @@ class CommandNSCert : public Command
 		if (!source.u->fingerprint.empty() && nc->FindCert(source.u->fingerprint))
 		{
 			nc->EraseCert(source.u->fingerprint);
-			source.Reply(_("\002%s\002 deleted from your certificate list"), source.u->fingerprint.c_str());
+			source.Reply(_("\002%s\002 deleted from your certificate list."), source.u->fingerprint.c_str());
 			return MOD_CONT;
 		}
 

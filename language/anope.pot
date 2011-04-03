@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-29 13:44-0400\n"
+"POT-Creation-Date: 2011-04-03 08:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,12 +62,7 @@ msgstr ""
 msgid "%s added to your access list."
 msgstr ""
 
-#: modules/core/ns_cert.cpp:55
-#, c-format
-msgid "%s added to your certificate list"
-msgstr ""
-
-#: modules/core/ns_cert.cpp:72
+#: modules/core/ns_cert.cpp:55 modules/core/ns_cert.cpp:72
 #, c-format
 msgid "%s added to your certificate list."
 msgstr ""
@@ -217,12 +213,7 @@ msgstr ""
 msgid "%s deleted from your access list."
 msgstr ""
 
-#: modules/core/ns_cert.cpp:82
-#, c-format
-msgid "%s deleted from your certificate list"
-msgstr ""
-
-#: modules/core/ns_cert.cpp:98
+#: modules/core/ns_cert.cpp:82 modules/core/ns_cert.cpp:98
 #, c-format
 msgid "%s deleted from your certificate list."
 msgstr ""
@@ -424,11 +415,11 @@ msgstr ""
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr ""
 
-#: modules/core/ns_register.cpp:256
+#: modules/core/ns_register.cpp:257
 msgid "password email"
 msgstr ""
 
-#: modules/core/ns_register.cpp:258
+#: modules/core/ns_register.cpp:259
 msgid "password [email]"
 msgstr ""
 
@@ -466,7 +457,6 @@ msgid ""
 msgstr ""
 
 #: modules/core/cs_xop.cpp:505
-#, c-format
 msgid ""
 " \n"
 "The AOP ADD and AOP DEL commands are limited to\n"
@@ -474,71 +464,42 @@ msgid ""
 "be used by the channel founder. However, any user on the\n"
 "AOP list may use the AOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:566
-#, c-format
+#: modules/core/cs_xop.cpp:568
 msgid ""
 " \n"
 "The HOP ADD, HOP DEL and HOP LIST commands are \n"
 "limited to AOPs or above, while the HOP CLEAR command \n"
 "can only be used by the channel founder.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
 #: modules/core/cs_xop.cpp:442
-#, c-format
 msgid ""
 " \n"
 "The QOP commands are limited to\n"
 "founders (unless SECUREOPS is off). However, any user on the\n"
 "QOP list may use the QOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:628
-#, c-format
+#: modules/core/cs_xop.cpp:632
 msgid ""
 " \n"
 "The SOP ADD, SOP DEL and SOP CLEAR commands are \n"
 "limited to the channel founder. However, any user on the\n"
 "AOP list may use the SOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:689
-#, c-format
+#: modules/core/cs_xop.cpp:695
 msgid ""
 " \n"
 "The VOP ADD, VOP DEL and VOP LIST commands are \n"
 "limited to AOPs or above, while the VOP CLEAR command \n"
 "can only be used by the channel founder.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
 #: modules/core/bs_info.cpp:215
@@ -1007,12 +968,7 @@ msgstr ""
 msgid "%s cannot receive memos."
 msgstr ""
 
-#: modules/core/hs_help.cpp:34
-#, c-format
-msgid "%s commands"
-msgstr ""
-
-#: modules/core/os_help.cpp:33
+#: modules/core/hs_help.cpp:34 modules/core/os_help.cpp:33
 #, c-format
 msgid "%s commands:"
 msgstr ""
@@ -1243,7 +1199,7 @@ msgid ""
 "read his/her memo."
 msgstr ""
 
-#: modules/core/ns_register.cpp:202
+#: modules/core/ns_register.cpp:203
 #, c-format
 msgid ""
 "A passcode has been sent to %s, please type %s%s confirm <passcode> to "
@@ -1292,7 +1248,7 @@ msgid ""
 "list} [reason]]"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:521
+#: modules/core/cs_xop.cpp:523
 msgid "AOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr ""
 
@@ -1374,7 +1330,7 @@ msgstr ""
 msgid "Added new random news item (#%d)."
 msgstr ""
 
-#: modules/core/ns_register.cpp:78
+#: modules/core/ns_register.cpp:79
 msgid ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
@@ -1948,7 +1904,7 @@ msgstr ""
 msgid "Cancel the registration of a nickname"
 msgstr ""
 
-#: modules/core/ns_register.cpp:284
+#: modules/core/ns_register.cpp:285
 msgid "Cannot send mail now; please retry a little later."
 msgstr ""
 
@@ -2523,9 +2479,9 @@ msgstr ""
 msgid "Displays one or more vhost entries."
 msgstr ""
 
-#: modules/core/ns_help.cpp:22 modules/core/os_help.cpp:21
 #: modules/core/bs_help.cpp:23 modules/core/cs_help.cpp:23
 #: modules/core/hs_help.cpp:22 modules/core/ms_help.cpp:22
+#: modules/core/ns_help.cpp:22 modules/core/os_help.cpp:21
 msgid "Displays this list and give information about commands"
 msgstr ""
 
@@ -2604,7 +2560,7 @@ msgstr ""
 msgid "End of list - %d/%d channels shown."
 msgstr ""
 
-#: modules/core/ns_list.cpp:147 modules/core/cs_list.cpp:119
+#: modules/core/cs_list.cpp:119 modules/core/ns_list.cpp:147
 #, c-format
 msgid "End of list - %d/%d matches shown."
 msgstr ""
@@ -2810,7 +2766,7 @@ msgstr ""
 msgid "HALFOP [#channel] [nick]"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:581
+#: modules/core/cs_xop.cpp:585
 msgid "HOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr ""
 
@@ -2835,7 +2791,7 @@ msgid ""
 "%s administrators."
 msgstr ""
 
-#: modules/core/ns_register.cpp:354
+#: modules/core/ns_register.cpp:355
 #, c-format
 msgid ""
 "Hi,\n"
@@ -2906,7 +2862,7 @@ msgstr ""
 msgid "If you do not change within one minute, I will change your nick."
 msgstr ""
 
-#: modules/core/ns_register.cpp:203
+#: modules/core/ns_register.cpp:204
 #, c-format
 msgid ""
 "If you do not confirm your email address within %s your account will expire."
@@ -2950,7 +2906,7 @@ msgid ""
 "matched against nicks or usernames."
 msgstr ""
 
-#: modules/core/ns_register.cpp:56 modules/core/ns_register.cpp:59
+#: modules/core/ns_register.cpp:57 modules/core/ns_register.cpp:60
 msgid "Invalid passcode."
 msgstr ""
 
@@ -3177,11 +3133,11 @@ msgstr ""
 msgid "Maintains network bot list"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:530
+#: modules/core/cs_xop.cpp:532
 msgid "Maintains the HOP (HalfOP) list for a channel"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:652
+#: modules/core/cs_xop.cpp:658
 msgid "Maintains the VOP (VOicePeople) list for a channel"
 msgstr ""
 
@@ -3315,7 +3271,7 @@ msgstr ""
 msgid "Modify the list of QOP users"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:590
+#: modules/core/cs_xop.cpp:594
 msgid "Modify the list of SOP users"
 msgstr ""
 
@@ -3336,7 +3292,7 @@ msgstr ""
 msgid "Module %s is already loaded."
 msgstr ""
 
-#: modules/core/os_modunload.cpp:32 modules/core/os_modreload.cpp:32
+#: modules/core/os_modreload.cpp:32 modules/core/os_modunload.cpp:32
 #, c-format
 msgid "Module %s isn't loaded."
 msgstr ""
@@ -3405,7 +3361,7 @@ msgstr ""
 msgid "News list is full!"
 msgstr ""
 
-#: modules/core/ns_register.cpp:42
+#: modules/core/ns_register.cpp:43
 #, c-format
 msgid "Nick %s has been confirmed."
 msgstr ""
@@ -3490,17 +3446,17 @@ msgstr ""
 msgid "Nickname %s has been dropped."
 msgstr ""
 
-#: modules/core/ns_register.cpp:189
+#: modules/core/ns_register.cpp:190
 #, c-format
 msgid "Nickname %s registered under your account: %s"
 msgstr ""
 
-#: modules/core/ns_register.cpp:191
+#: modules/core/ns_register.cpp:192
 #, c-format
 msgid "Nickname %s registered."
 msgstr ""
 
-#: modules/core/ns_register.cpp:353
+#: modules/core/ns_register.cpp:354
 #, c-format
 msgid "Nickname Registration (%s)"
 msgstr ""
@@ -3622,8 +3578,8 @@ msgstr ""
 msgid "No signed kick when SIGNKICK LEVEL is used"
 msgstr ""
 
-#: modules/core/ns_info.cpp:122 modules/core/cs_info.cpp:101
 #: modules/core/bs_info.cpp:65 modules/core/bs_info.cpp:215
+#: modules/core/cs_info.cpp:101 modules/core/ns_info.cpp:122
 msgid "None"
 msgstr ""
 
@@ -3773,7 +3729,7 @@ msgstr ""
 msgid "Please wait %d seconds before using the GROUP command again."
 msgstr ""
 
-#: modules/core/ns_register.cpp:151
+#: modules/core/ns_register.cpp:152
 #, c-format
 msgid "Please wait %d seconds before using the REGISTER command again."
 msgstr ""
@@ -3813,8 +3769,8 @@ msgstr ""
 msgid "Prevents a nickname from being registered"
 msgstr ""
 
-#: modules/core/ns_info.cpp:118 modules/core/cs_info.cpp:87
-#: modules/core/bs_info.cpp:65
+#: modules/core/bs_info.cpp:65 modules/core/cs_info.cpp:87
+#: modules/core/ns_info.cpp:118
 msgid "Private"
 msgstr ""
 
@@ -3942,7 +3898,7 @@ msgstr ""
 msgid "Register a channel"
 msgstr ""
 
-#: modules/core/ns_register.cpp:95
+#: modules/core/ns_register.cpp:96
 msgid "Register a nickname"
 msgstr ""
 
@@ -3974,7 +3930,7 @@ msgstr ""
 msgid "Removes your owner status on a channel"
 msgstr ""
 
-#: modules/core/ns_register.cpp:313
+#: modules/core/ns_register.cpp:314
 msgid "Resend the registration passcode"
 msgstr ""
 
@@ -4281,7 +4237,7 @@ msgid ""
 "reason]]"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:643
+#: modules/core/cs_xop.cpp:649
 msgid "SOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr ""
 
@@ -4738,7 +4694,7 @@ msgstr ""
 msgid "Sorry, nickname grouping is temporarily disabled."
 msgstr ""
 
-#: modules/core/ns_register.cpp:109
+#: modules/core/ns_register.cpp:110
 msgid "Sorry, nickname registration is temporarily disabled."
 msgstr ""
 
@@ -5425,7 +5381,7 @@ msgid ""
 "     CONFIG MODIFY nickserv forcemail no"
 msgstr ""
 
-#: modules/core/ns_register.cpp:67
+#: modules/core/ns_register.cpp:68
 msgid ""
 "Syntax: CONFIRM passcode\n"
 " \n"
@@ -5780,7 +5736,7 @@ msgid ""
 "and above on the channel, or to HOPs or those with level 4 \n"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:540
+#: modules/core/cs_xop.cpp:542
 msgid ""
 "Syntax: HOP channel ADD mask\n"
 "        HOP channel DEL {mask | entry-num | list}\n"
@@ -6575,7 +6531,7 @@ msgid ""
 "%s%s HELP for information on how to do so."
 msgstr ""
 
-#: modules/core/ns_register.cpp:218
+#: modules/core/ns_register.cpp:219
 #, c-format
 msgid ""
 "Syntax: REGISTER password [email]\n"
@@ -6637,7 +6593,7 @@ msgid ""
 "session limitation, etc.)"
 msgstr ""
 
-#: modules/core/ns_register.cpp:303
+#: modules/core/ns_register.cpp:304
 msgid ""
 "Syntax: RESEND\n"
 " \n"
@@ -7328,7 +7284,7 @@ msgid ""
 "SNLINE CLEAR clears all entries of the SNLINE list."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:600
+#: modules/core/cs_xop.cpp:604
 msgid ""
 "Syntax: SOP channel ADD mask\n"
 "        SOP channel DEL {mask | entry-num | list}\n"
@@ -7639,7 +7595,7 @@ msgid ""
 "and above for self voicing."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:662
+#: modules/core/cs_xop.cpp:668
 msgid ""
 "Syntax: VOP channel ADD mask\n"
 "        VOP channel DEL {mask | entry-num | list}\n"
@@ -7915,6 +7871,18 @@ msgstr ""
 msgid "This channel may not be used."
 msgstr ""
 
+#: modules/core/cs_xop.cpp:447 modules/core/cs_xop.cpp:511
+#: modules/core/cs_xop.cpp:573 modules/core/cs_xop.cpp:637
+#: modules/core/cs_xop.cpp:700
+#, c-format
+msgid ""
+"This command may have been disabled for your channel, and\n"
+"in that case you need to use the access list. See \n"
+"%s%s HELP ACCESS for information about the access list,\n"
+"and %s%s HELP SET XOP to know how to toggle between \n"
+"the access list and xOP list systems."
+msgstr ""
+
 #: modules/core/ns_info.cpp:129
 msgid "This nickname is currently suspended"
 msgstr ""
@@ -8070,9 +8038,9 @@ msgstr ""
 msgid "Unable to load module %s"
 msgstr ""
 
-#: modules/core/os_modunload.cpp:38 modules/core/os_modunload.cpp:44
-#: modules/core/os_modunload.cpp:58 modules/core/os_modreload.cpp:38
-#: modules/core/os_modreload.cpp:44 modules/core/os_modreload.cpp:54
+#: modules/core/os_modreload.cpp:38 modules/core/os_modreload.cpp:44
+#: modules/core/os_modreload.cpp:54 modules/core/os_modunload.cpp:38
+#: modules/core/os_modunload.cpp:44 modules/core/os_modunload.cpp:58
 #, c-format
 msgid "Unable to remove module %s"
 msgstr ""
@@ -8081,7 +8049,7 @@ msgstr ""
 msgid "Unassigns a bot from a channel"
 msgstr ""
 
-#: modules/core/ns_saset.cpp:68 modules/core/cs_saset.cpp:62
+#: modules/core/cs_saset.cpp:62 modules/core/ns_saset.cpp:68
 #, c-format
 msgid "Unknown SASET option %s."
 msgstr ""
@@ -8147,7 +8115,7 @@ msgstr ""
 msgid "VOICE [#channel] [nick]"
 msgstr ""
 
-#: modules/core/cs_xop.cpp:704
+#: modules/core/cs_xop.cpp:712
 msgid "VOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr ""
 
@@ -8383,7 +8351,7 @@ msgstr ""
 msgid "You must confirm your account before you can register a channel."
 msgstr ""
 
-#: modules/core/ns_register.cpp:115
+#: modules/core/ns_register.cpp:116
 #, c-format
 msgid "You must have been using this nick for at least %d seconds to register."
 msgstr ""
@@ -8431,7 +8399,7 @@ msgstr ""
 msgid "Your access list is empty."
 msgstr ""
 
-#: modules/core/ns_register.cpp:280
+#: modules/core/ns_register.cpp:281
 msgid "Your account is already confirmed."
 msgstr ""
 
@@ -8469,7 +8437,7 @@ msgid ""
 "that were emailed to you when you registered."
 msgstr ""
 
-#: modules/core/ns_register.cpp:52
+#: modules/core/ns_register.cpp:53
 #, c-format
 msgid "Your email address of %s has been confirmed."
 msgstr ""
@@ -8533,12 +8501,12 @@ msgstr ""
 msgid "Your oper block doesn't require logging in."
 msgstr ""
 
-#: modules/core/ns_register.cpp:288
+#: modules/core/ns_register.cpp:289
 #, c-format
 msgid "Your passcode has been re-sent to %s."
 msgstr ""
 
-#: modules/core/ns_register.cpp:195
+#: modules/core/ns_register.cpp:196
 #, c-format
 msgid "Your password is %s - remember this for later use."
 msgstr ""

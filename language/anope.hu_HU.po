@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-29 13:44-0400\n"
+"POT-Creation-Date: 2011-04-03 08:23+0200\n"
 "PO-Revision-Date: 2010-09-19 20:37-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Hungarian\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -63,12 +64,7 @@ msgstr "%s hozzáadva az SZLINE listához."
 msgid "%s added to your access list."
 msgstr "%s hozzáadva a hozzáférési listádhoz."
 
-#: modules/core/ns_cert.cpp:55
-#, fuzzy, c-format
-msgid "%s added to your certificate list"
-msgstr "%s hozzáadva a hozzáférési listádhoz."
-
-#: modules/core/ns_cert.cpp:72
+#: modules/core/ns_cert.cpp:55 modules/core/ns_cert.cpp:72
 #, fuzzy, c-format
 msgid "%s added to your certificate list."
 msgstr "%s hozzáadva a hozzáférési listádhoz."
@@ -242,12 +238,7 @@ msgstr "%s törölve az SZLINE listáról."
 msgid "%s deleted from your access list."
 msgstr "%s törölve a hozzáférési listádról."
 
-#: modules/core/ns_cert.cpp:82
-#, fuzzy, c-format
-msgid "%s deleted from your certificate list"
-msgstr "%s törölve a hozzáférési listádról."
-
-#: modules/core/ns_cert.cpp:98
+#: modules/core/ns_cert.cpp:82 modules/core/ns_cert.cpp:98
 #, fuzzy, c-format
 msgid "%s deleted from your certificate list."
 msgstr "%s törölve a hozzáférési listádról."
@@ -478,12 +469,12 @@ msgstr "[auto-memo] A memo, amit küldtél meg lett tekintve."
 msgid "[auto-memo] The memo you sent to %s has been viewed."
 msgstr "[auto-memo] A memo, amit %s számára küldtél meg lett tekintve."
 
-#: modules/core/ns_register.cpp:256
+#: modules/core/ns_register.cpp:257
 #, fuzzy
 msgid "password email"
 msgstr "REGISTER jelszó email"
 
-#: modules/core/ns_register.cpp:258
+#: modules/core/ns_register.cpp:259
 #, fuzzy
 msgid "password [email]"
 msgstr "REGISTER jelszó email"
@@ -537,7 +528,6 @@ msgstr ""
 "hozzáférési listáját. (/msg %s ACCESS LIST nick)"
 
 #: modules/core/cs_xop.cpp:505
-#, c-format
 msgid ""
 " \n"
 "The AOP ADD and AOP DEL commands are limited to\n"
@@ -545,71 +535,42 @@ msgid ""
 "be used by the channel founder. However, any user on the\n"
 "AOP list may use the AOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:566
-#, c-format
+#: modules/core/cs_xop.cpp:568
 msgid ""
 " \n"
 "The HOP ADD, HOP DEL and HOP LIST commands are \n"
 "limited to AOPs or above, while the HOP CLEAR command \n"
 "can only be used by the channel founder.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
 #: modules/core/cs_xop.cpp:442
-#, c-format
 msgid ""
 " \n"
 "The QOP commands are limited to\n"
 "founders (unless SECUREOPS is off). However, any user on the\n"
 "QOP list may use the QOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:628
-#, c-format
+#: modules/core/cs_xop.cpp:632
 msgid ""
 " \n"
 "The SOP ADD, SOP DEL and SOP CLEAR commands are \n"
 "limited to the channel founder. However, any user on the\n"
 "AOP list may use the SOP LIST command.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
-#: modules/core/cs_xop.cpp:689
-#, c-format
+#: modules/core/cs_xop.cpp:695
 msgid ""
 " \n"
 "The VOP ADD, VOP DEL and VOP LIST commands are \n"
 "limited to AOPs or above, while the VOP CLEAR command \n"
 "can only be used by the channel founder.\n"
 " \n"
-"This command may have been disabled for your channel, and\n"
-"in that case you need to use the access list. See \n"
-"%s%s HELP ACCESS for information about the access list,\n"
-"and %s%s HELP SET XOP to know how to toggle between \n"
-"the access list and xOP list systems."
 msgstr ""
 
 #: modules/core/bs_info.cpp:215
@@ -1086,12 +1047,7 @@ msgstr "%s nem lehet a %s csatorna successora, mert õ a founder is."
 msgid "%s cannot receive memos."
 msgstr "%s nem fogadhat üzeneteket."
 
-#: modules/core/hs_help.cpp:34
-#, fuzzy, c-format
-msgid "%s commands"
-msgstr "%s parancsok:"
-
-#: modules/core/os_help.cpp:33
+#: modules/core/hs_help.cpp:34 modules/core/os_help.cpp:33
 #, c-format
 msgid "%s commands:"
 msgstr "%s parancsok:"
@@ -1326,7 +1282,7 @@ msgstr ""
 "Az értesítõ üzenet %s részére el lett küldve, informálva\n"
 "õt arról, hogy elolvastad a memoját."
 
-#: modules/core/ns_register.cpp:202
+#: modules/core/ns_register.cpp:203
 #, fuzzy, c-format
 msgid ""
 "A passcode has been sent to %s, please type %s%s confirm <passcode> to "
@@ -1390,7 +1346,7 @@ msgstr ""
 "AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+lejárat] {maszk | sorszám} "
 "[indok]]"
 
-#: modules/core/cs_xop.cpp:521
+#: modules/core/cs_xop.cpp:523
 msgid "AOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr "AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 
@@ -1475,7 +1431,7 @@ msgstr "Hozzáadva az új oper hír:(#%d)."
 msgid "Added new random news item (#%d)."
 msgstr "Hozzáadva az új random news tétel (#%d)."
 
-#: modules/core/ns_register.cpp:78
+#: modules/core/ns_register.cpp:79
 msgid ""
 "Additionally, Services Operators with the nickserv/confirm permission can\n"
 "replace passcode with a users nick to force validate them."
@@ -2102,7 +2058,7 @@ msgstr "    DROP       Törölheted a csatornád regisztrációját"
 msgid "Cancel the registration of a nickname"
 msgstr "    DROP       Nicknév regisztrációjának törlése"
 
-#: modules/core/ns_register.cpp:284
+#: modules/core/ns_register.cpp:285
 msgid "Cannot send mail now; please retry a little later."
 msgstr "Nem lehet most levelet küldeni;  próbáld újra késõbb."
 
@@ -2726,9 +2682,9 @@ msgstr "    INFO   Kiírja az üzenetekkel kapcsolatos információkat"
 msgid "Displays one or more vhost entries."
 msgstr "    LIST        Kiír egy vagy több vhost bejegyzést"
 
-#: modules/core/ns_help.cpp:22 modules/core/os_help.cpp:21
 #: modules/core/bs_help.cpp:23 modules/core/cs_help.cpp:23
 #: modules/core/hs_help.cpp:22 modules/core/ms_help.cpp:22
+#: modules/core/ns_help.cpp:22 modules/core/os_help.cpp:21
 #, fuzzy
 msgid "Displays this list and give information about commands"
 msgstr "    INFO   Kiírja az üzenetekkel kapcsolatos információkat"
@@ -2808,7 +2764,7 @@ msgstr ""
 msgid "End of list - %d/%d channels shown."
 msgstr "Lista vége - %d / %d csatorna megjelenítve."
 
-#: modules/core/ns_list.cpp:147 modules/core/cs_list.cpp:119
+#: modules/core/cs_list.cpp:119 modules/core/ns_list.cpp:147
 #, c-format
 msgid "End of list - %d/%d matches shown."
 msgstr "Lista vége - %d / %d találat megjelenítve."
@@ -3025,7 +2981,7 @@ msgstr "Üdvözlõ mód most ON a %s szobán."
 msgid "HALFOP [#channel] [nick]"
 msgstr "HALFOP #channel [nick]"
 
-#: modules/core/cs_xop.cpp:581
+#: modules/core/cs_xop.cpp:585
 msgid "HOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr "HOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 
@@ -3060,7 +3016,7 @@ msgstr ""
 "\n"
 "%s administrators."
 
-#: modules/core/ns_register.cpp:354
+#: modules/core/ns_register.cpp:355
 #, fuzzy, c-format
 msgid ""
 "Hi,\n"
@@ -3144,7 +3100,7 @@ msgstr "Ha nem váltasz nevet 20 sec.-en belül, én megváltoztatom."
 msgid "If you do not change within one minute, I will change your nick."
 msgstr "Ha nem váltasz nevet 1 percen belül, én megváltoztatom."
 
-#: modules/core/ns_register.cpp:203
+#: modules/core/ns_register.cpp:204
 #, c-format
 msgid ""
 "If you do not confirm your email address within %s your account will expire."
@@ -3198,7 +3154,7 @@ msgstr ""
 "Érvénytelen hosztmaszk. Csak érvényes hosztmaszk lehet,\n"
 "a kivétel nem lehet nick vagy usernév."
 
-#: modules/core/ns_register.cpp:56 modules/core/ns_register.cpp:59
+#: modules/core/ns_register.cpp:57 modules/core/ns_register.cpp:60
 msgid "Invalid passcode."
 msgstr ""
 
@@ -3454,12 +3410,12 @@ msgstr "BADWORDS           Szerkeszti a tiltott szavak listáját"
 msgid "Maintains network bot list"
 msgstr "BOT                Karbantartja a hálózat botjainak listáját"
 
-#: modules/core/cs_xop.cpp:530
+#: modules/core/cs_xop.cpp:532
 #, fuzzy
 msgid "Maintains the HOP (HalfOP) list for a channel"
 msgstr "    HOP        Maintains the HOP (HalfOP) list for a channel"
 
-#: modules/core/cs_xop.cpp:652
+#: modules/core/cs_xop.cpp:658
 #, fuzzy
 msgid "Maintains the VOP (VOicePeople) list for a channel"
 msgstr "    VOP        Maintains the VOP (VOicePeople) list for a channel"
@@ -3612,7 +3568,7 @@ msgstr "    AOP        AutoOperátor lista beállítása"
 msgid "Modify the list of QOP users"
 msgstr "    QOP        Modify the list of QOP users"
 
-#: modules/core/cs_xop.cpp:590
+#: modules/core/cs_xop.cpp:594
 #, fuzzy
 msgid "Modify the list of SOP users"
 msgstr "    SOP        SzuperOperátor lista beállítása"
@@ -3637,7 +3593,7 @@ msgstr "    EXCEPTION   Módosítja a session-korlát/kivétel listát"
 msgid "Module %s is already loaded."
 msgstr "Module %s is already loaded."
 
-#: modules/core/os_modunload.cpp:32 modules/core/os_modreload.cpp:32
+#: modules/core/os_modreload.cpp:32 modules/core/os_modunload.cpp:32
 #, c-format
 msgid "Module %s isn't loaded."
 msgstr "Module %s isn't loaded."
@@ -3706,7 +3662,7 @@ msgstr "%s új üzenetei.  Olvasáshoz,: /msg %s READ %s szám"
 msgid "News list is full!"
 msgstr "A Hírlista tele!"
 
-#: modules/core/ns_register.cpp:42
+#: modules/core/ns_register.cpp:43
 #, fuzzy, c-format
 msgid "Nick %s has been confirmed."
 msgstr "A %s nicknevet dropoltad."
@@ -3791,17 +3747,17 @@ msgstr "Nick %s is now suspended."
 msgid "Nickname %s has been dropped."
 msgstr "A %s nicknevet dropoltad."
 
-#: modules/core/ns_register.cpp:189
+#: modules/core/ns_register.cpp:190
 #, c-format
 msgid "Nickname %s registered under your account: %s"
 msgstr "Ez a nicknév: %s számodra lett regisztrálva: %s"
 
-#: modules/core/ns_register.cpp:191
+#: modules/core/ns_register.cpp:192
 #, fuzzy, c-format
 msgid "Nickname %s registered."
 msgstr "Nickname %s registered."
 
-#: modules/core/ns_register.cpp:353
+#: modules/core/ns_register.cpp:354
 #, c-format
 msgid "Nickname Registration (%s)"
 msgstr "Nicknév Regisztráció (%s)"
@@ -3927,8 +3883,8 @@ msgstr "Nincs törölhetõ random news tétel!"
 msgid "No signed kick when SIGNKICK LEVEL is used"
 msgstr "Nincs signkick, ha a SIGNKICK LEVEL használatban van."
 
-#: modules/core/ns_info.cpp:122 modules/core/cs_info.cpp:101
 #: modules/core/bs_info.cpp:65 modules/core/bs_info.cpp:215
+#: modules/core/cs_info.cpp:101 modules/core/ns_info.cpp:122
 msgid "None"
 msgstr "Nincs"
 
@@ -4085,7 +4041,7 @@ msgstr "Kérlek várj %d másodpercet és próbáld újra."
 msgid "Please wait %d seconds before using the GROUP command again."
 msgstr "Kérlek várj %d másodpercet, mielõtt ismét használod a GROUP parancsot."
 
-#: modules/core/ns_register.cpp:151
+#: modules/core/ns_register.cpp:152
 #, c-format
 msgid "Please wait %d seconds before using the REGISTER command again."
 msgstr " Várj %d másodpercet mielõtt  használnád ezt a parancsot!"
@@ -4134,8 +4090,8 @@ msgstr "    NOEXPIRE   Prevent the nickname from expiring"
 msgid "Prevents a nickname from being registered"
 msgstr "    FORBID     Megelõzi, hogy a nicknév regisztrált legyen"
 
-#: modules/core/ns_info.cpp:118 modules/core/cs_info.cpp:87
-#: modules/core/bs_info.cpp:65
+#: modules/core/bs_info.cpp:65 modules/core/cs_info.cpp:87
+#: modules/core/ns_info.cpp:118
 msgid "Private"
 msgstr "Privát"
 
@@ -4269,7 +4225,7 @@ msgstr "    RELEASE    Visszaadja a neved a RECOVER után"
 msgid "Register a channel"
 msgstr "    REGISTER   Nicknév regisztráció"
 
-#: modules/core/ns_register.cpp:95
+#: modules/core/ns_register.cpp:96
 #, fuzzy
 msgid "Register a nickname"
 msgstr "    REGISTER   Nicknév regisztráció"
@@ -4310,7 +4266,7 @@ msgstr ""
 msgid "Removes your owner status on a channel"
 msgstr "    DEOWNER    Removes your owner status on a channel"
 
-#: modules/core/ns_register.cpp:313
+#: modules/core/ns_register.cpp:314
 msgid "Resend the registration passcode"
 msgstr ""
 
@@ -4641,7 +4597,7 @@ msgstr ""
 "SNLINE {ADD | DEL | LIST | VIEW | CLEAR} [[ +lejárat] {maszk| sorszám }[:"
 "Indok]]"
 
-#: modules/core/cs_xop.cpp:643
+#: modules/core/cs_xop.cpp:649
 msgid "SOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr "SOP #szoba { ADD | DEL | LIST | CLEAR }[ nick | sorszám]"
 
@@ -5146,7 +5102,7 @@ msgstr "Sajnálom,  a nicknevek regisztrációjának törlése  szünetel."
 msgid "Sorry, nickname grouping is temporarily disabled."
 msgstr "Sajnálom, a csoportok használata ideiglenesen le van tiltva."
 
-#: modules/core/ns_register.cpp:109
+#: modules/core/ns_register.cpp:110
 msgid "Sorry, nickname registration is temporarily disabled."
 msgstr "Sajnálom, a nickregisztráció jelenleg nem mûködik."
 
@@ -6262,7 +6218,7 @@ msgid ""
 "     CONFIG MODIFY nickserv forcemail no"
 msgstr ""
 
-#: modules/core/ns_register.cpp:67
+#: modules/core/ns_register.cpp:68
 #, fuzzy
 msgid ""
 "Syntax: CONFIRM passcode\n"
@@ -6876,7 +6832,7 @@ msgstr ""
 "a HOP listán vagy 4-es access szinten szereplõ userek\n"
 "használhatják saját maguknak félop adására."
 
-#: modules/core/cs_xop.cpp:540
+#: modules/core/cs_xop.cpp:542
 #, fuzzy
 msgid ""
 "Syntax: HOP channel ADD mask\n"
@@ -8250,7 +8206,7 @@ msgstr ""
 "first registered your nickname.  If you haven't,\n"
 "/msg %s HELP for information on how to do so."
 
-#: modules/core/ns_register.cpp:218
+#: modules/core/ns_register.cpp:219
 #, fuzzy, c-format
 msgid ""
 "Syntax: REGISTER password [email]\n"
@@ -8360,7 +8316,7 @@ msgstr ""
 "\n"
 "Korlátozva Szervíz adminoknak."
 
-#: modules/core/ns_register.cpp:303
+#: modules/core/ns_register.cpp:304
 msgid ""
 "Syntax: RESEND\n"
 " \n"
@@ -9521,7 +9477,7 @@ msgstr ""
 "\n"
 "Korlátozva Szervíz operatornak."
 
-#: modules/core/cs_xop.cpp:600
+#: modules/core/cs_xop.cpp:604
 #, fuzzy
 msgid ""
 "Syntax: SOP channel ADD mask\n"
@@ -10087,7 +10043,7 @@ msgstr ""
 "a VOP listán vagy 3-as access szinten szereplo userek\n"
 "használhatják saját maguk voiceolására."
 
-#: modules/core/cs_xop.cpp:662
+#: modules/core/cs_xop.cpp:668
 #, fuzzy
 msgid ""
 "Syntax: VOP channel ADD mask\n"
@@ -10445,6 +10401,18 @@ msgstr "Ez a szoba a %s adatbázisában regisztrált."
 msgid "This channel may not be used."
 msgstr "Ez a csatorna nem használható."
 
+#: modules/core/cs_xop.cpp:447 modules/core/cs_xop.cpp:511
+#: modules/core/cs_xop.cpp:573 modules/core/cs_xop.cpp:637
+#: modules/core/cs_xop.cpp:700
+#, c-format
+msgid ""
+"This command may have been disabled for your channel, and\n"
+"in that case you need to use the access list. See \n"
+"%s%s HELP ACCESS for information about the access list,\n"
+"and %s%s HELP SET XOP to know how to toggle between \n"
+"the access list and xOP list systems."
+msgstr ""
+
 #: modules/core/ns_info.cpp:129
 msgid "This nickname is currently suspended"
 msgstr "This nickname is currently suspended"
@@ -10623,9 +10591,9 @@ msgstr "    MODUNLOAD   Kitölti a modult"
 msgid "Unable to load module %s"
 msgstr "Nem sikerült a betölteni a %s modult"
 
-#: modules/core/os_modunload.cpp:38 modules/core/os_modunload.cpp:44
-#: modules/core/os_modunload.cpp:58 modules/core/os_modreload.cpp:38
-#: modules/core/os_modreload.cpp:44 modules/core/os_modreload.cpp:54
+#: modules/core/os_modreload.cpp:38 modules/core/os_modreload.cpp:44
+#: modules/core/os_modreload.cpp:54 modules/core/os_modunload.cpp:38
+#: modules/core/os_modunload.cpp:44 modules/core/os_modunload.cpp:58
 #, c-format
 msgid "Unable to remove module %s"
 msgstr "Nem sikerült eltávolítani a %s modult"
@@ -10635,7 +10603,7 @@ msgstr "Nem sikerült eltávolítani a %s modult"
 msgid "Unassigns a bot from a channel"
 msgstr "UNASSIGN           Unassigns a bot from a channel"
 
-#: modules/core/ns_saset.cpp:68 modules/core/cs_saset.cpp:62
+#: modules/core/cs_saset.cpp:62 modules/core/ns_saset.cpp:68
 #, c-format
 msgid "Unknown SASET option %s."
 msgstr "Unknown SASET option %s."
@@ -10707,7 +10675,7 @@ msgstr ""
 msgid "VOICE [#channel] [nick]"
 msgstr "VOICE #channel [nick]"
 
-#: modules/core/cs_xop.cpp:704
+#: modules/core/cs_xop.cpp:712
 msgid "VOP channel {ADD|DEL|LIST|CLEAR} [nick | entry-list]"
 msgstr "VOP #csatorna { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]"
 
@@ -10962,7 +10930,7 @@ msgstr "A csatornán operátornak kell lenned, hogy regisztrálhasd."
 msgid "You must confirm your account before you can register a channel."
 msgstr "A csatornán operátornak kell lenned, hogy regisztrálhasd."
 
-#: modules/core/ns_register.cpp:115
+#: modules/core/ns_register.cpp:116
 #, c-format
 msgid "You must have been using this nick for at least %d seconds to register."
 msgstr ""
@@ -11011,7 +10979,7 @@ msgstr "Az új memo üzeneteidrõl emailben kapsz értesítést."
 msgid "Your access list is empty."
 msgstr "Your access list is empty."
 
-#: modules/core/ns_register.cpp:280
+#: modules/core/ns_register.cpp:281
 #, fuzzy
 msgid "Your account is already confirmed."
 msgstr "Már be vagy azonosítva. :-)"
@@ -11052,7 +11020,7 @@ msgid ""
 "that were emailed to you when you registered."
 msgstr ""
 
-#: modules/core/ns_register.cpp:52
+#: modules/core/ns_register.cpp:53
 #, fuzzy, c-format
 msgid "Your email address of %s has been confirmed."
 msgstr "Összes O:lines %s módosítva."
@@ -11119,12 +11087,12 @@ msgstr "A nickneved most meg lesz változtatva: %s."
 msgid "Your oper block doesn't require logging in."
 msgstr ""
 
-#: modules/core/ns_register.cpp:288
+#: modules/core/ns_register.cpp:289
 #, c-format
 msgid "Your passcode has been re-sent to %s."
 msgstr "A kód újra el lett küldve erre a címre: %s."
 
-#: modules/core/ns_register.cpp:195
+#: modules/core/ns_register.cpp:196
 #, c-format
 msgid "Your password is %s - remember this for later use."
 msgstr "Jelszavad: %s - jegyezd meg a késõbbi használathoz!"
@@ -11259,3 +11227,14 @@ msgstr "xOP system is not available."
 msgid "{nick | channel} memo-text"
 msgstr "SEND {nick | #szoba} memo-szöveg"
 
+#, fuzzy
+#~ msgid "%s added to your certificate list"
+#~ msgstr "%s hozzáadva a hozzáférési listádhoz."
+
+#, fuzzy
+#~ msgid "%s deleted from your certificate list"
+#~ msgstr "%s törölve a hozzáférési listádról."
+
+#, fuzzy
+#~ msgid "%s commands"
+#~ msgstr "%s parancsok:"

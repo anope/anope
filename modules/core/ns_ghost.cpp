@@ -78,8 +78,7 @@ class CommandNSGhost : public Command
 				if (!pass.empty())
 				{
 					Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
-					if (bad_password(u))
-						return MOD_STOP;
+					bad_password(u);
 				}
 			}
 		}

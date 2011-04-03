@@ -36,8 +36,7 @@ class CommandOSLogin : public Command
 		else if (o->password != password)
 		{
 			source.Reply(_(PASSWORD_INCORRECT));
-			if (bad_password(source.u))
-				return MOD_STOP;
+			bad_password(source.u);
 		}
 		else
 		{

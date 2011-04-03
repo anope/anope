@@ -62,8 +62,7 @@ class CommandNSRecover : public Command
 			{
 				source.Reply(_(ACCESS_DENIED));
 				Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
-				if (bad_password(u))
-					return MOD_STOP;
+				bad_password(u);
 			}
 		}
 		else

@@ -165,8 +165,9 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 		return;
 	}
 
+	dynamic_reference<User> user_reference(u);
 	CommandReturn ret = c->Execute(source, params);
-	if (ret != MOD_STOP)
+	if (ret != MOD_STOP && user_reference)
 	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 		source.DoReply();

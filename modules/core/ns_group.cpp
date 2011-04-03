@@ -137,8 +137,7 @@ class CommandNSGroup : public Command
 			{
 				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick;
 				source.Reply(_(PASSWORD_INCORRECT));
-				if (bad_password(u))
-					return MOD_STOP;
+				bad_password(u);
 			}
 		}
 		return MOD_CONT;

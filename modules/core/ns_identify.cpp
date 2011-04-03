@@ -49,8 +49,7 @@ class CommandNSIdentify : public Command
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
 				source.Reply(_(PASSWORD_INCORRECT));
-				if (bad_password(u))
-					return MOD_STOP;
+				bad_password(u);
 			}
 			else
 			{

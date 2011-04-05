@@ -278,7 +278,7 @@ class CommandBSKick : public Command
 						try
 						{
 							ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb);
-							if (ci->ttb[TTB_REPEAT])
+							if (ci->ttb[TTB_REPEAT] < 0)
 								throw ConvertException();
 						}
 						catch (const ConvertException &)

@@ -354,7 +354,8 @@ void User::Identify(NickAlias *na)
 	ircdproto->SendAccountLogin(this, this->Account());
 	ircdproto->SetAutoIdentificationToken(this);
 
-	if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+	NickAlias *this_na = findnick(this->nick);
+	if (this_na && this_na->nc == na->nc && this_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 		this->SetMode(NickServ, UMODE_REGISTERED);
 	if (ircd->vhost)
 		do_on_id(this);

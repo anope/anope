@@ -39,7 +39,7 @@ class CommandNSIdentify : public Command
 		else
 		{
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, nick, pass));
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na ? na->nc->display : nick, pass));
 			if (MOD_RESULT == EVENT_STOP)
 				return MOD_CONT;
 

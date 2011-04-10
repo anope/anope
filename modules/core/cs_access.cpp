@@ -597,7 +597,7 @@ class CommandCSLevels : public Command
 		const Anope::string &what = params[2];
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
-		if (what.equals_ci("FOUNDER"))
+		if (!what.equals_ci("FOUNDER"))
 			for (int i = 0; levelinfo[i].what >= 0; ++i)
 			{
 				if (what.equals_ci(levelinfo[i].name))

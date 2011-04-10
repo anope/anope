@@ -165,6 +165,9 @@ If no channels are given, the entire channel database is printed out in\n\
 compact format followed by the number of registered channels (with -c, the\n\
 list is suppressed and only the count is printed).  If one or more channels\n\
 are given, detailed information about those channels is displayed.\n\
+\n\
+Channel names will need to be escaped with a backslash.\n\
+For example: ./listchans \\#Anope\n\
 \n");
         exit(usage > 0 ? 1 : 0);
     }

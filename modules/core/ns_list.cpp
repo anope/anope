@@ -112,7 +112,7 @@ class CommandNSList : public Command
 					continue;
 			else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
 				continue;
-			else if (unconfirmed && na->nc->HasFlag(NI_UNCONFIRMED))
+			else if (unconfirmed && !na->nc->HasFlag(NI_UNCONFIRMED))
 				continue;
 
 			/* We no longer compare the pattern against the output buffer.

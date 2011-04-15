@@ -177,7 +177,7 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 			 * percentage of caps to kick for; the rest is ignored. -GD
 			 */
 
-			if (i && l && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
+			if ((i || l) && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
 			{
 				check_ban(ci, u, TTB_CAPS);
 				bot_kick(ci, u, BOT_REASON_CAPS);

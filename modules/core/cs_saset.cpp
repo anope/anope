@@ -42,7 +42,7 @@ class CommandCSSASet : public Command
 		// XXX Remove after 1.9.4 release
 		if (params[1].equals_ci("MLOCK"))
 		{
-			source.Reply(_(CHAN_SET_MLOCK_DEPRECATED));
+			source.Reply(_(CHAN_SET_MLOCK_DEPRECATED), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 			return MOD_CONT;
 		}
 

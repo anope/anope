@@ -109,15 +109,15 @@ void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf)
 	 * way.
 	 */
 
-	bool Allow = false;
-	if (!ci->botflags.HasFlag(BS_DONTKICKOPS) && !ci->botflags.HasFlag(BS_DONTKICKVOICES))
-		Allow = true;
+	bool Allow = true;
+	if (check_access(u, ci, CA_NOKICK))
+		Allow = false;
 	else if (ci->botflags.HasFlag(BS_DONTKICKOPS) && (ci->c->HasUserStatus(u, CMODE_HALFOP) || ci->c->HasUserStatus(u, CMODE_OP) || ci->c->HasUserStatus(u, CMODE_PROTECT) || ci->c->HasUserStatus(u, CMODE_OWNER)))
-		Allow = true;
+		Allow = false;
 	else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && ci->c->HasUserStatus(u, CMODE_VOICE))
-		Allow = true;
+		Allow = false;
 
-	if (!check_access(u, ci, CA_NOKICK) && Allow)
+	if (Allow)
 	{
 		/* Bolds kicker */
 		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)

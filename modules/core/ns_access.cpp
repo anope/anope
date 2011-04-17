@@ -172,7 +172,7 @@ class CommandNSAccess : public Command
 					"        Reverses the previous command.\n"
 					" \n"
 					"    \002ACCESS LIST\002\n"
-					"        Displays the current access list."), ChanServ->nick.c_str());
+					"        Displays the current access list."), NickServ->nick.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

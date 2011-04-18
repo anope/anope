@@ -234,7 +234,10 @@ class CommandNSRegister : public Command
 				"in fact, %s will not allow it. Also, short\n"
 				"passwords are vulnerable to trial-and-error searches, so\n"
 				"you should choose a password at least 5 characters long.\n"
-				"Finally, the space character cannot be used in passwords.\n"
+				"Finally, the space character cannot be used in passwords.\n"),
+				NickServ->nick.c_str(), NickServ->nick.c_str());
+
+		source.Reply(_(
 				" \n"
 				"The parameter \037email\037 is optional and will set the email\n"
 				"for your nick immediately. However, it may be required\n"
@@ -247,7 +250,7 @@ class CommandNSRegister : public Command
 				"the same configuration, the same set of memos and the\n"
 				"same channel privileges. For more information on this\n"
 				"feature, type \002%s%s HELP GROUP\002."),
-				NickServ->nick.c_str(), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
 		return true;
 	}
 

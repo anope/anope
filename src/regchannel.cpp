@@ -215,10 +215,6 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 	if (this->access.empty())
 		return NULL;
 	
-	NickAlias *na = NULL;
-	if (!u->IsIdentified())
-		na = findnick(u->nick);
-
 	ChanAccess *highest = NULL;
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 	{
@@ -230,17 +226,14 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 		else if (!taccess->nc && (Anope::Match(u->nick, taccess->mask) || Anope::Match(u->GetDisplayedMask(), taccess->mask)))
 			;
 		/* Access entry is a nick core and we are identified for that account */
-		else if (taccess->nc && u->IsIdentified() && u->Account() == taccess->nc) 
+		else if (taccess->nc && (u->IsIdentified() || (u->IsRecognized() && !this->HasFlag(CI_SECURE))) && u->Account() == taccess->nc) 
 			;
 		else
 			continue;
 
-		if (u->IsIdentified() || (na && u->IsRecognized() && !this->HasFlag(CI_SECURE)))
-		{
-			/* Use the highest level access available */
-			if (!highest || taccess->level > highest->level)
-				highest = taccess;
-		}
+		/* Use the highest level access available */
+		if (!highest || taccess->level > highest->level)
+			highest = taccess;
 	}
 
 	return highest;

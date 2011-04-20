@@ -41,7 +41,7 @@ class CommandOSModUnLoad : public Command
 	
 		if (m->GetPermanent() || m->type == PROTOCOL)
 		{
-			source.Reply(_("Unable to remove module \002%s\002"));
+			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
 			return MOD_CONT;
 		}
 

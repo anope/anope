@@ -521,7 +521,7 @@ class CommandCSAKick : public Command
 				" \n"
 				"Maintains the \002AutoKick list\002 for a channel.  If a user\n"
 				"on the AutoKick list attempts to join the channel,\n"
-				"%sS will ban that user from the channel, then kick\n"
+				"%s will ban that user from the channel, then kick\n"
 				"the user.\n"
 				" \n"
 				"The \002AKICK ADD\002 command adds the given nick or usermask\n"
@@ -531,7 +531,9 @@ class CommandCSAKick : public Command
 				"banned from the channel\".\n"
 				"When akicking a \037registered nick\037 the nickserv account\n"
 				"will be added to the akick list instead of the mask.\n"
-				"All users within that nickgroup will then be akicked.\n"
+				"All users within that nickgroup will then be akicked.\n"),
+				ChanServ->nick.c_str());
+		source.Reply(_(
 				" \n"
 				"The \002AKICK DEL\002 command removes the given nick or mask\n"
 				"from the AutoKick list.  It does not, however, remove any\n"
@@ -545,12 +547,12 @@ class CommandCSAKick : public Command
 				"The \002AKICK VIEW\002 command is a more verbose version of\n"
 				"\002AKICK LIST\002 command.\n"
 				" \n"
-				"The \002AKICK ENFORCE\002 command causes %sS to enforce the\n"
+				"The \002AKICK ENFORCE\002 command causes %s to enforce the\n"
 				"current AKICK list by removing those users who match an\n"
 				"AKICK mask.\n"
 				" \n"
 				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), ChanServ->nick.c_str(), ChanServ->nick.c_str());
+				"akick list."), ChanServ->nick.c_str());
 		return true;
 	}
 

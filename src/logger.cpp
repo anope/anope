@@ -310,7 +310,7 @@ void LogInfo::ProcessMessage(const Log *l)
 	
 	if (!this->HasType(l->Type))
 		return;
-	else if (!l->Category.empty() && !this->HasType(this->GetList(l->Type), l->Category))
+	else if (!this->HasType(this->GetList(l->Type), l->Category))
 		return;
 	
 	if (!this->Sources.empty())

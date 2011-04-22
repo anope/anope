@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 IRCDVar myIrcd[] = {
 	{"InspIRCd 1.1",	/* ircd name */
@@ -59,7 +60,11 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 		send_cmd(Config->s_OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 	}
 	else
-		ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
+	{
+		BotInfo *bi = findbot(Config->s_OperServ);
+		if (bi)
+			ircdproto->SendGlobops(bi, "CHGHOST not loaded!");
+	}
 }
 
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -210,7 +215,7 @@ class InspIRCdProto : public IRCDProto
 			send_cmd(Config->s_OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
 		}
 		else
-			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
+			Log() << "CHGIDENT not loaded!";
 	}
 
 	/* SVSHOLD - set */
@@ -307,7 +312,7 @@ class InspircdIRCdMessage : public IRCdMessage
 			time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
 
 			User *user = do_nick("", params[1], params[4], params[2], source, params[7], ts, params[6], params[3], "", params[5]);
-			if (user)
+			if (user && nickserv)
 			{
 				user->SetCloakedHost(params[3]);
 
@@ -317,10 +322,10 @@ class InspircdIRCdMessage : public IRCdMessage
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED))
-						user->SetMode(NickServ, UMODE_REGISTERED);
+						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 				}
 				else
-					validate_user(user);
+					nickserv->Validate(user);
 			}
 		}
 		else if (params.size() == 1)
@@ -567,11 +572,11 @@ class InspircdIRCdMessage : public IRCdMessage
 				return false;
 			}
 			if (!has_svsholdmod)
-				ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
 			if (!has_chghostmod)
-				ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!has_chgidentmod)
-				ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 			ircd->svshold = has_svsholdmod;
 		}
 

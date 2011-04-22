@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSLogout : public Command
 {
@@ -38,7 +39,7 @@ class CommandNSLogout : public Command
 		else
 		{
 			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
-				validate_user(u2);
+				nickserv->Validate(u2);
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
 			Log(LOG_COMMAND, u, this) << "to logout " << u2->nick;
@@ -50,7 +51,7 @@ class CommandNSLogout : public Command
 				source.Reply(_("Your nick has been logged out."));
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
-			u2->RemoveMode(NickServ, UMODE_REGISTERED);
+			u2->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
 			ircdproto->SendUnregisteredNick(u2);
 
 			u2->Logout();
@@ -102,7 +103,10 @@ class NSLogout : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnslogout);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnslogout);
 	}
 };
 

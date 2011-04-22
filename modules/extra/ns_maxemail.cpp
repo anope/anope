@@ -59,13 +59,13 @@ class NSMaxEmail : public Module
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		ModuleManager::Attach(I_OnReload, this);
-		ModuleManager::Attach(I_OnPreCommand, this);
+		Implementation i[] = { I_OnReload, I_OnPreCommand };
+		ModuleManager::Attach(i, this, 2);
 
-		OnReload(false);
+		OnReload();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 		this->NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
@@ -75,7 +75,7 @@ class NSMaxEmail : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		BotInfo *service = source.owner;
-		if (service == NickServ)
+		if (service->nick == Config->s_NickServ)
 		{
 			if (command->name.equals_ci("REGISTER"))
 			{

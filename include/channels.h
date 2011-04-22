@@ -12,38 +12,9 @@
 typedef Anope::insensitive_map<Channel *> channel_map;
 extern CoreExport channel_map ChannelList;
 
-struct UserData
-{
-	UserData()
-	{
-		Clear();
-	}
-
-	virtual ~UserData() { }
-
-	void Clear()
-	{
-		last_use = last_start = Anope::CurTime;
-		lines = times = 0;
-		lastline.clear();
-	}
-
-	/* Data validity */
-	time_t last_use;
-
-	/* for flood kicker */
-	int16 lines;
-	time_t last_start;
-
-	/* for repeat kicker */
-	Anope::string lastline;
-	int16 times;
-};
-
-struct UserContainer
+struct UserContainer : public Extensible
 {
 	User *user;
-	UserData ud;
 	ChannelStatus *Status;
 
 	UserContainer(User *u) : user(u) { }
@@ -92,8 +63,6 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 	Anope::string topic;		/* Current topic of the channel */
 	Anope::string topic_setter;	/* Who set the topic */
 	time_t topic_time;		/* When the topic was set*/
-
-	std::list<BanData *> bd;
 
 	time_t server_modetime;		/* Time of last server MODE */
 	time_t chanserv_modetime;	/* Time of last check_modes() */

@@ -87,14 +87,15 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				else
 					request->reply("online", "yes");
 
-				mod_run_cmd(bi, *u, NULL, command);
+				mod_run_cmd(bi, u, NULL, command);
 
 				if (created && u)
 				{
-					XMLRPCUser *myu = debug_cast<XMLRPCUser *>(*u);
+					User *useru = u;
+					XMLRPCUser *myu = debug_cast<XMLRPCUser *>(useru);
 					if (!myu->GetOut().empty())
 						request->reply("return", iface->Sanitize(myu->GetOut()));
-					delete *u;
+					delete u;
 				}
 			}
 		}

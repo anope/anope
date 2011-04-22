@@ -11,136 +11,11 @@
 
 #include "services.h"
 #include "modules.h"
+#include "operserv.h"
 
 std::vector<NewsItem *> News;
 
-std::vector<std::bitset<32> > DefCon;
-bool DefConModesSet = false;
-/* Defcon modes mlocked on */
-Flags<ChannelModeName, CMODE_END * 2> DefConModesOn(ChannelModeNameStrings);
-/* Defcon modes mlocked off */
-Flags<ChannelModeName, CMODE_END * 2> DefConModesOff(ChannelModeNameStrings);
-/* Map of Modesa and Params for DefCon */
-std::map<ChannelModeName, Anope::string> DefConModesOnParams;
-
 XLineManager *SGLine = NULL, *SZLine = NULL, *SQLine = NULL, *SNLine = NULL;
-
-void os_init()
-{
-	if (!Config->s_OperServ.empty())
-	{
-		ModuleManager::LoadModuleList(Config->OperServCoreModules);
-
-		/* Yes, these are in this order for a reason. Most violent->least violent. */
-		XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
-		XLineManager::RegisterXLineManager(SZLine = new SZLineManager());
-		XLineManager::RegisterXLineManager(SQLine = new SQLineManager());
-		XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
-	}
-}
-
-bool SetDefConParam(ChannelModeName Name, const Anope::string &buf)
-{
-	return DefConModesOnParams.insert(std::make_pair(Name, buf)).second;
-}
-
-bool GetDefConParam(ChannelModeName Name, Anope::string &buf)
-{
-	std::map<ChannelModeName, Anope::string>::iterator it = DefConModesOnParams.find(Name);
-
-	buf.clear();
-
-	if (it != DefConModesOnParams.end())
-	{
-		buf = it->second;
-		return true;
-	}
-
-	return false;
-}
-
-void UnsetDefConParam(ChannelModeName Name)
-{
-	std::map<ChannelModeName, Anope::string>::iterator it = DefConModesOnParams.find(Name);
-
-	if (it != DefConModesOnParams.end())
-		DefConModesOnParams.erase(it);
-}
-
-/** Check if a certain defcon option is currently in affect
- * @param Level The level
- * @return true and false
- */
-bool CheckDefCon(DefconLevel Level)
-{
-	if (Config->DefConLevel)
-		return DefCon[Config->DefConLevel][Level];
-	return false;
-}
-
-/** Check if a certain defcon option is in a certain defcon level
- * @param level The defcon level
- * @param Level The defcon level name
- * @return true or false
- */
-bool CheckDefCon(int level, DefconLevel Level)
-{
-	return DefCon[level][Level];
-}
-
-/** Add a defcon level option to a defcon level
- * @param level The defcon level
- * @param Level The defcon level option
- */
-void AddDefCon(int level, DefconLevel Level)
-{
-	DefCon[level][Level] = true;
-}
-
-/** Remove a defcon level option from a defcon level
- * @param level The defcon level
- * @param Level The defcon level option
- */
-void DelDefCon(int level, DefconLevel Level)
-{
-	DefCon[level][Level] = false;
-}
-
-void server_global(const Server *s, const Anope::string &message)
-{
-	if (Config->s_GlobalNoticer.empty())
-		return;
-
-	/* Do not send the notice to ourselves our juped servers */
-	if (s != Me && !s->HasFlag(SERVER_JUPED))
-		notice_server(Config->s_GlobalNoticer, s, "%s", message.c_str());
-
-	if (!s->GetLinks().empty())
-	{
-		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
-			server_global(s->GetLinks()[i], message);
-	}
-}
-
-void oper_global(const Anope::string &nick, const char *fmt, ...)
-{
-	va_list args;
-	char msg[2048]; /* largest valid message is 512, this should cover any global */
-
-	va_start(args, fmt);
-	vsnprintf(msg, sizeof(msg), fmt, args);
-	va_end(args);
-
-	if (!nick.empty() && !Config->AnonymousGlobal)
-	{
-		Anope::string rmsg = "[" + nick + "] " + msg;
-		server_global(Me->GetLinks().front(), rmsg);
-	}
-	else
-		server_global(Me->GetLinks().front(), msg);
-}
-
-/**************************************************************************/
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
@@ -318,14 +193,13 @@ void XLineManager::Clear()
 }
 
 /** Add an entry to this XLine Manager
- * @param bi The bot error replies should be sent from
- * @param u The user adding the XLine
  * @param mask The mask of the XLine
+ * @param creator The creator of the XLine
  * @param expires When this should expire
  * @param reaosn The reason
  * @return A pointer to the XLine
  */
-XLine *XLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
+XLine *XLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 {
 	return NULL;
 }
@@ -468,53 +342,16 @@ void XLineManager::OnExpire(XLine *x)
 {
 }
 
-XLine *SGLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
+XLine *SGLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 {
-	if (mask.find('!') != Anope::string::npos)
-	{
-		if (bi && u)
-			u->SendMessage(bi, _("\002Reminder\002: AKILL masks cannot contain nicknames; make sure you have \002not\002 included a nick portion in your mask."));
-		return NULL;
-	}
-
-	if (mask.find('@') == Anope::string::npos)
-	{
-		if (bi && u)
-			u->SendMessage(bi, _(BAD_USERHOST_MASK));
-		return NULL;
-	}
-
-	if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
-	{
-		if (bi && u)
-			u->SendMessage(bi, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
-		return NULL;
-	}
-
-	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
-	if (canAdd.first)
-	{
-		if (bi && u)
-		{
-			if (canAdd.first == 1)
-				u->SendMessage(bi, _("\002%s\002 already exists on the AKILL list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-		}
-
-		return NULL;
-	}
-
 	Anope::string realreason = reason;
-	if (u && Config->AddAkiller)
-		realreason = "[" + u->nick + "] " + reason;
+	if (!creator.empty() && Config->AddAkiller)
+		realreason = "[" + creator + "] " + reason;
 
-	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, realreason);
+	XLine *x = new XLine(mask, creator, expires, realreason);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(u, x));
+	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(x));
 	if (MOD_RESULT == EVENT_STOP)
 	{
 		delete x;
@@ -543,8 +380,8 @@ void SGLineManager::OnMatch(User *u, XLine *x)
 
 void SGLineManager::OnExpire(XLine *x)
 {
-	if (Config->WallAkillExpire)
-		ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
+	if (Config->WallAkillExpire && operserv)
+		ircdproto->SendGlobops(operserv->Bot(), "AKILL on %s has expired", x->Mask.c_str());
 }
 
 void SGLineManager::Send(User *u, XLine *x)
@@ -552,35 +389,12 @@ void SGLineManager::Send(User *u, XLine *x)
 	ircdproto->SendAkill(u, x);
 }
 
-XLine *SNLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
+XLine *SNLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 {
-	if (!mask.empty() && mask.find_first_not_of("*?") == Anope::string::npos)
-	{
-		if (bi && u)
-			u->SendMessage(bi, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
-		return NULL;
-	}
-
-	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
-	if (canAdd.first)
-	{
-		if (bi && u)
-		{
-			if (canAdd.first == 1)
-				u->SendMessage(bi, _("\002%s\002 already exists on the SNLINE list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-		}
-
-		return NULL;
-	}
-
-	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
+	XLine *x = new XLine(mask, creator, expires, reason);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SNLINE));
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SNLINE));
 	if (MOD_RESULT == EVENT_STOP)
 	{
 		delete x;
@@ -623,8 +437,8 @@ void SNLineManager::OnMatch(User *u, XLine *x)
 
 void SNLineManager::OnExpire(XLine *x)
 {
-	if (Config->WallSNLineExpire)
-		ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
+	if (Config->WallSNLineExpire && operserv)
+		ircdproto->SendGlobops(operserv->Bot(), "SNLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
 void SNLineManager::Send(User *u, XLine *x)
@@ -657,42 +471,12 @@ XLine *SNLineManager::Check(User *u)
 	return NULL;
 }
 
-XLine *SQLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
+XLine *SQLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 {
-	if (mask.find_first_not_of("*") == Anope::string::npos)
-	{
-		if (bi && u)
-			u->SendMessage(OperServ, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
-		return NULL;
-	}
-
-	if (mask[0] == '#' && !ircd->chansqline)
-	{
-		if (bi && u)
-			u->SendMessage(OperServ, _("Channel SQLINEs are not supported by your IRCd, so you can't use them."));
-		return NULL;
-	}
-
-	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
-	if (canAdd.first)
-	{
-		if (bi && u)
-		{
-			if (canAdd.first == 1)
-				u->SendMessage(bi, _("\002%s\002 already exists on the SQLINE list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-		}
-
-		return NULL;
-	}
-
-	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
+	XLine *x = new XLine(mask, creator, expires, reason);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SQLINE));
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SQLINE));
 	if (MOD_RESULT == EVENT_STOP)
 	{
 		delete x;
@@ -761,8 +545,8 @@ void SQLineManager::OnMatch(User *u, XLine *x)
 
 void SQLineManager::OnExpire(XLine *x)
 {
-	if (Config->WallSQLineExpire)
-		ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
+	if (Config->WallSQLineExpire && operserv)
+		ircdproto->SendGlobops(operserv->Bot(), "SQLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
 void SQLineManager::Send(User *u, XLine *x)
@@ -786,40 +570,12 @@ bool SQLineManager::Check(Channel *c)
 	return false;
 }
 
-XLine *SZLineManager::Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason)
+XLine *SZLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 {
-	if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
-	{
-		u->SendMessage(OperServ, _("\002Reminder:\002 you can only add IP masks to the SZLINE list."));
-		return NULL;
-	}
-
-	if (mask.find_first_not_of("*?") == Anope::string::npos)
-	{
-		u->SendMessage(OperServ, _(USERHOST_MASK_TOO_WIDE), mask.c_str());
-		return NULL;
-	}
-
-	std::pair<int, XLine *> canAdd = this->CanAdd(mask, expires);
-	if (canAdd.first)
-	{
-		if (bi && u)
-		{
-			if (canAdd.first == 1)
-				u->SendMessage(bi, _("\002%s\002 already exists on the SZLINE list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				u->SendMessage(bi, _("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				u->SendMessage(bi, _("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-		}
-
-		return NULL;
-	}
-
-	XLine *x = new XLine(mask, u ? u->nick : (OperServ ? OperServ->nick : "OperServ"), expires, reason);
+	XLine *x = new XLine(mask, creator, expires, reason);
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, X_SZLINE));
+	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SZLINE));
 	if (MOD_RESULT == EVENT_STOP)
 	{
 		delete x;
@@ -852,8 +608,8 @@ void SZLineManager::OnMatch(User *u, XLine *x)
 
 void SZLineManager::OnExpire(XLine *x)
 {
-	if (Config->WallSZLineExpire)
-		ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
+	if (Config->WallSZLineExpire && operserv)
+		ircdproto->SendGlobops(operserv->Bot(), "SZLINE on \2%s\2 has expired", x->Mask.c_str());
 }
 
 void SZLineManager::Send(User *u, XLine *x)

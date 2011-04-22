@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hostserv.h"
 
 class CommandHSHelp : public Command
 {
@@ -24,7 +25,7 @@ class CommandHSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(HostServ, source.u, NULL, params[0]);
+		mod_help_cmd(hostserv->Bot(), source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
@@ -32,7 +33,7 @@ class CommandHSHelp : public Command
 	{
 		User *u = source.u;
 		source.Reply(_("%s commands:"), Config->s_HostServ.c_str());
-		for (CommandMap::const_iterator it = HostServ->Commands.begin(), it_end = HostServ->Commands.end(); it != it_end; ++it)
+		for (CommandMap::const_iterator it = hostserv->Bot()->Commands.begin(), it_end = hostserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 	}
@@ -48,7 +49,10 @@ class HSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, &commandhshelp);
+		if (!hostserv)
+			throw ModuleException("HostServ is not loaded!");
+
+		this->AddCommand(hostserv->Bot(), &commandhshelp);
 	}
 };
 

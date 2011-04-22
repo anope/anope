@@ -158,7 +158,7 @@ class ModuleSQL : public Module, public Pipe
 		DThread = new DispatcherThread();
 		threadEngine.Start(DThread);
 
-		OnReload(true);
+		OnReload();
 	}
 
 	~ModuleSQL()
@@ -173,7 +173,7 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload(bool startup)
+	void OnReload()
 	{
 		ConfigReader config;
 		int i, num;

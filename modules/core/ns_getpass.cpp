@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSGetPass : public Command
 {
@@ -71,14 +72,17 @@ class NSGetPass : public Module
  public:
 	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
+		this->SetAuthor("Anope");
+		this->SetType(CORE);
+
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
 		Anope::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
-		this->SetAuthor("Anope");
-		this->SetType(CORE);
-
-		this->AddCommand(NickServ, &commandnsgetpass);
+		this->AddCommand(nickserv->Bot(), &commandnsgetpass);
 	}
 };
 

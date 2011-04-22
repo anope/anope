@@ -6,6 +6,7 @@
  */
 
 #include "module.h"
+#include "chanserv.h"
 
 struct CommandAlias
 {
@@ -26,10 +27,10 @@ class ModuleAlias : public Module
 		Implementation i[] = { I_OnReload, I_OnPreCommandRun, I_OnBotFantasy };
 		ModuleManager::Attach(i, this, 3);
 
-		OnReload(false);
+		OnReload();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 
@@ -102,10 +103,10 @@ class ModuleAlias : public Module
 
 			BotInfo *target = findbot(alias.target_client);
 			if (!target)
-				target = ChanServ;
+				target = chanserv->Bot();
 
 			Anope::string full_message = alias.target_command;
-			if (target == ChanServ || target == BotServ)
+			if (target == chanserv->Bot() || target->nick == Config->s_BotServ)
 			{
 				Command *target_c = FindCommand(target, alias.target_command);
 				if (target_c && !target_c->HasFlag(CFLAG_STRIP_CHANNEL))

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSRegister : public Command
 {
@@ -117,7 +118,7 @@ class CommandCSRegister : public Command
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
 			"\002%s%s HELP\002 for information on how to do so."),
-			ChanServ->nick.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+			Config->s_ChanServ.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -137,7 +138,10 @@ class CSRegister : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsregister);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsregister);
 	}
 };
 

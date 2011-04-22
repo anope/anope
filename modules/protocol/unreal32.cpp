@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */
@@ -107,11 +108,11 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		u->RemoveMode(HostServ, UMODE_CLOAK);
-		u->RemoveMode(HostServ, UMODE_VHOST);
+		BotInfo *bi = findbot(Config->s_HostServ);
+		u->RemoveMode(bi, UMODE_CLOAK);
+		u->RemoveMode(bi, UMODE_VHOST);
 		ModeManager::ProcessModes();
-		u->SetMode(HostServ, UMODE_CLOAK);
-		ModeManager::ProcessModes();
+		u->SetMode(bi, UMODE_CLOAK);
 	}
 
 	void SendAkill(User *, const XLine *x)
@@ -322,12 +323,12 @@ class UnrealIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
+		ircdproto->SendMode(nickserv->Bot(), u, "+d %d", u->timestamp);
 	}
 
 	void SendUnregisteredNick(const User *u)
 	{
-		ircdproto->SendMode(NickServ, u, "+d 1");
+		ircdproto->SendMode(nickserv->Bot(), u, "+d 1");
 	}
 
 	void SendChannel(Channel *c)
@@ -335,7 +336,7 @@ class UnrealIRCdProto : public IRCDProto
 		/* Unreal does not support updating a channels TS without actually joining a user,
 		 * so we will join and part us now
 		 */
-		BotInfo *bi = whosends(c->ci);
+		BotInfo *bi = c->ci->WhoSends();
 		if (c->FindUser(bi) == NULL)
 		{
 			bi->Join(c);
@@ -529,11 +530,11 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
+						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 				}
-				else
-					validate_user(user);
+				else if (nickserv)
+					nickserv->Validate(user);
 			}
 		}
 		else if (params.size() != 2)
@@ -551,11 +552,11 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(NickServ, UMODE_REGISTERED);
+					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
+						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 				}
-				else
-					validate_user(user);
+				else if (nickserv)
+					nickserv->Validate(user);
 			}
 		}
 		else

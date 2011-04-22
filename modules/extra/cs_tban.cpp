@@ -16,6 +16,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 static Module *me;
 
@@ -110,12 +111,15 @@ class CSTBan : public Module
  public:
 	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		me = this;
-
-		this->AddCommand(ChanServ, &commandcstban);
-
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
+
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		me = this;
+
+		this->AddCommand(chanserv->Bot(), &commandcstban);
 	}
 };
 

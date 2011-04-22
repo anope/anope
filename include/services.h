@@ -272,6 +272,7 @@ template<typename T, size_t Size = 32> class Flags
 	const Anope::string *Flag_Strings;
 
  public:
+	Flags() : Flag_Strings(NULL) { }
  	Flags(const Anope::string *flag_strings) : Flag_Strings(flag_strings) { }
 
 	/** Add a flag to this item
@@ -409,7 +410,6 @@ class ChannelInfo;
 class Channel;
 class Server;
 class Entry;
-struct Session;
 
 #include "threadengine.h"
 #include "opertype.h"
@@ -454,13 +454,11 @@ enum MemoFlag
 	/* Memo is unread */
 	MF_UNREAD,
 	/* Sender requests a receipt */
-	MF_RECEIPT,
-	/* Memo is a notification of receipt */
-	MF_NOTIFYS
+	MF_RECEIPT
 };
 
 const Anope::string MemoFlagStrings[] = {
-	"MF_UNREAD", "MF_RECEIPT", "MF_NOTIFYS", ""
+	"MF_UNREAD", "MF_RECEIPT", ""
 };
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
@@ -484,6 +482,23 @@ struct CoreExport MemoInfo
 	void Del(unsigned index);
 	void Del(Memo *m);
 	bool HasIgnore(User *u);
+};
+
+struct Session
+{
+	Anope::string host;		/* Host of the session */
+	unsigned count;			/* Number of clients with this host */
+	unsigned hits;			/* Number of subsequent kills for a host */
+};
+
+struct Exception
+{
+	Anope::string mask;		/* Hosts to which this exception applies */
+	unsigned limit;			/* Session limit for exception */
+	Anope::string who;		/* Nick of person who added the exception */
+	Anope::string reason;		/* Reason for exception's addition */
+	time_t time;			/* When this exception was added */
+	time_t expires;			/* Time when it expires. 0 == no expiry */
 };
 
 /*************************************************************************/
@@ -703,13 +718,6 @@ enum
 #include "account.h"
 #include "bots.h"
 
-struct BanData
-{
-	Anope::string mask;	/* Since a nick is unsure and a User structure is unsafe */
-	time_t last_use;	/* Since time is the only way to check whether it's still useful */
-	int16 ttb[TTB_SIZE];
-};
-
 struct LevelInfo
 {
 	int what;
@@ -801,43 +809,7 @@ struct MailInfo
 
 /*************************************************************************/
 
-struct Exception
-{
-	Anope::string mask;		/* Hosts to which this exception applies */
-	unsigned limit;				/* Session limit for exception */
-	Anope::string who;		/* Nick of person who added the exception */
-	Anope::string reason;	/* Reason for exception's addition */
-	time_t time;			/* When this exception was added */
-	time_t expires;			/* Time when it expires. 0 == no expiry */
-};
-
-/*************************************************************************/
-
-extern CoreExport Anope::map<Session *> SessionList;
-
-struct Session
-{
-	Anope::string host;
-	unsigned count;	/* Number of clients with this host */
-	unsigned hits;	/* Number of subsequent kills for a host */
-};
-
-/*************************************************************************/
-
 /* Defcon */
-enum DefconLevel
-{
-	DEFCON_NO_NEW_CHANNELS,
-	DEFCON_NO_NEW_NICKS,
-	DEFCON_NO_MLOCK_CHANGE,
-	DEFCON_FORCE_CHAN_MODES,
-	DEFCON_REDUCE_SESSION,
-	DEFCON_NO_NEW_CLIENTS,
-	DEFCON_OPER_ONLY,
-	DEFCON_SILENT_OPER_ONLY,
-	DEFCON_AKILL_NEW_CLIENTS,
-	DEFCON_NO_NEW_MEMOS
-};
 
 /*************************************************************************/
 
@@ -863,7 +835,7 @@ class ConfigurationFile;
 
 #include "extern.h"
 #include "language.h"
-#include "operserv.h"
+#include "oper.h"
 #include "mail.h"
 #include "servers.h"
 #include "logger.h"

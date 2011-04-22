@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x",	/* ircd name */
@@ -219,7 +220,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(const User *u)
 	{
-		ircdproto->SendMode(NickServ, u, "+d 1");
+		ircdproto->SendMode(nickserv->Bot(), u, "+d 1");
 	}
 
 	/* SERVER */
@@ -242,7 +243,7 @@ class BahamutIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		ircdproto->SendMode(NickServ, u, "+d %d", u->timestamp);
+		ircdproto->SendMode(nickserv->Bot(), u, "+d %d", u->timestamp);
 	}
 
 	void SendChannel(Channel *c)
@@ -291,17 +292,17 @@ class BahamutIRCdMessage : public IRCdMessage
 			ip.ntop(AF_INET, params[8].c_str());
 
 			User *user = do_nick(source, params[0], params[4], params[5], params[6], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), "", "", params[3]);
-			if (user)
+			if (user && nickserv)
 			{
 				NickAlias *na;
 				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(NickServ, UMODE_REGISTERED);
+						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 				}
 				else
-					validate_user(user);
+					nickserv->Validate(user);
 			}
 		}
 		else
@@ -464,12 +465,12 @@ class BahamutIRCdMessage : public IRCdMessage
 	}
 };
 
-static bool event_xs(BotInfo *bi, const Anope::string &source, const std::vector<Anope::string> &params)
+static bool event_xs(const Anope::string &bot, const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (!params.empty() && bi)
+	if (!params.empty() && !bot.empty())
 	{
 		std::vector<Anope::string> p;
-		p.push_back(bi->nick);
+		p.push_back(bot);
 		p.push_back(params[0]);
 		return ircdmessage->OnPrivmsg(source, p);
 	}
@@ -480,31 +481,31 @@ static bool event_xs(BotInfo *bi, const Anope::string &source, const std::vector
 /* EVENT : OS */
 bool event_os(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	return event_xs(OperServ, source, params);
+	return event_xs(Config->s_OperServ, source, params);
 }
 
 /* EVENT : NS */
 bool event_ns(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	return event_xs(NickServ, source, params);
+	return event_xs(Config->s_NickServ, source, params);
 }
 
 /* EVENT : MS */
 bool event_ms(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	return event_xs(MemoServ, source, params);
+	return event_xs(Config->s_MemoServ, source, params);
 }
 
 /* EVENT : HS */
 bool event_hs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	return event_xs(HostServ, source, params);
+	return event_xs(Config->s_HostServ, source, params);
 }
 
 /* EVENT : CS */
 bool event_cs(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	return event_xs(ChanServ, source, params);
+	return event_xs(Config->s_ChanServ, source, params);
 }
 
 bool event_burst(const Anope::string &source, const std::vector<Anope::string> &params)

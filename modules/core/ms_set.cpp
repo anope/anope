@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSSet : public Command
 {
@@ -237,7 +238,7 @@ class CommandMSSet : public Command
 					"                   receive\n"
 					" \n"
 					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
-					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), MemoServ->nick.c_str());
+					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
 		else if (subcommand.equals_ci("NOTIFY"))
 			source.Reply(_("Syntax: \002SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
 					"Changes when you will be notified about new memos:\n"
@@ -307,7 +308,10 @@ class MSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmsset);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmsset);
 	}
 };
 

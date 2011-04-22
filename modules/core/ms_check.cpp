@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSCheck : public Command
 {
@@ -92,7 +93,10 @@ class MSCheck : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmscheck);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmscheck);
 	}
 };
 

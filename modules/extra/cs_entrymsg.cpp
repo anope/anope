@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 struct EntryMsg
 {
@@ -162,13 +163,16 @@ class CSEntryMessage : public Module
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
+
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
 			
 		Implementation i[] = { I_OnJoinChannel, I_OnReload, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata }; 
 		ModuleManager::Attach(i, this, 4);
 			
-		this->AddCommand(ChanServ, &commandentrymsg);
+		this->AddCommand(chanserv->Bot(), &commandentrymsg);
 
-		this->OnReload(false);
+		this->OnReload();
 	}
 
 	void OnJoinChannel(User *u, Channel *c)
@@ -179,11 +183,11 @@ class CSEntryMessage : public Module
 
 			if (c->ci->GetExtRegular("cs_entrymsg", messages))
 				for (unsigned i = 0; i < messages.size(); ++i)
-					u->SendMessage(whosends(c->ci), "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
 		}
 	}
 		
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 		EntryMsg::MaxEntries = config.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);

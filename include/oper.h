@@ -6,34 +6,16 @@
  * Please read COPYING and README for further details.
  */
 
-#ifndef OPERSERV_H
-#define OPERSERV_H
+#ifndef OPER_H
+#define OPER_H
 
 extern CoreExport std::vector<NewsItem *> News;
-extern CoreExport std::vector<std::bitset<32> > DefCon;
-extern CoreExport bool DefConModesSet;
-extern CoreExport Flags<ChannelModeName, CMODE_END * 2> DefConModesOn;
-extern CoreExport Flags<ChannelModeName, CMODE_END * 2> DefConModesOff;
-extern CoreExport std::map<ChannelModeName, Anope::string> DefConModesOnParams;
 
 class XLineManager;
 extern CoreExport XLineManager *SGLine;
 extern CoreExport XLineManager *SZLine;
 extern CoreExport XLineManager *SQLine;
 extern CoreExport XLineManager *SNLine;
-
-extern CoreExport bool SetDefConParam(ChannelModeName, const Anope::string &);
-extern CoreExport bool GetDefConParam(ChannelModeName, Anope::string &);
-extern CoreExport void UnsetDefConParam(ChannelModeName);
-extern CoreExport bool CheckDefCon(DefconLevel Level);
-extern CoreExport bool CheckDefCon(int level, DefconLevel Level);
-extern CoreExport void AddDefCon(int level, DefconLevel Level);
-extern CoreExport void DelDefCon(int level, DefconLevel Level);
-
-extern CoreExport void os_init();
-
-extern CoreExport void oper_global(const Anope::string &nick, const char *fmt, ...);
-extern CoreExport void server_global(const Server *s, const Anope::string &message);
 
 enum XLineType
 {
@@ -129,14 +111,13 @@ class CoreExport XLineManager
 	void Clear();
 
 	/** Add an entry to this XLine Manager
-	 * @param bi The bot error replies should be sent from
-	 * @param u The user adding the XLine
 	 * @param mask The mask of the XLine
+	 * @param creator The creator of the XLine
 	 * @param expires When this should expire
 	 * @param reaosn The reason
 	 * @return A pointer to the XLine
 	 */
-	virtual XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
+	virtual XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
 
  private:
 	/** Delete an XLine, eg, remove it from the IRCd.
@@ -190,7 +171,7 @@ class CoreExport XLineManager
 class SGLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -204,7 +185,7 @@ class SGLineManager : public XLineManager
 class SNLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -220,7 +201,7 @@ class SNLineManager : public XLineManager
 class SQLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -236,7 +217,7 @@ class SQLineManager : public XLineManager
 class SZLineManager : public XLineManager
 {
  public:
-	XLine *Add(BotInfo *bi, User *u, const Anope::string &mask, time_t expires, const Anope::string &reason);
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
 
 	void Del(XLine *x);
 
@@ -247,4 +228,4 @@ class SZLineManager : public XLineManager
 	void Send(User *u, XLine *x);
 };
 
-#endif // OPERSERV_H
+#endif // OPER_H

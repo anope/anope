@@ -12,14 +12,6 @@
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;
 
-BotInfo *BotServ = NULL;
-BotInfo *ChanServ = NULL;
-BotInfo *Global = NULL;
-BotInfo *HostServ = NULL;
-BotInfo *MemoServ = NULL;
-BotInfo *NickServ = NULL;
-BotInfo *OperServ = NULL;
-
 BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString)
 {
 	this->realname = nreal;
@@ -27,24 +19,6 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 	this->chancount = 0;
 	this->lastmsg = this->created = Anope::CurTime;
-
-	this->SetFlag(BI_CORE);
-	if (!Config->s_ChanServ.empty() && nnick.equals_ci(Config->s_ChanServ))
-		ChanServ = this;
-	else if (!Config->s_BotServ.empty() && nnick.equals_ci(Config->s_BotServ))
-		BotServ = this;
-	else if (!Config->s_HostServ.empty() && nnick.equals_ci(Config->s_HostServ))
-		HostServ = this;
-	else if (!Config->s_OperServ.empty() && nnick.equals_ci(Config->s_OperServ))
-		OperServ = this;
-	else if (!Config->s_MemoServ.empty() && nnick.equals_ci(Config->s_MemoServ))
-		MemoServ = this;
-	else if (!Config->s_NickServ.empty() && nnick.equals_ci(Config->s_NickServ))
-		NickServ = this;
-	else if (!Config->s_GlobalNoticer.empty() && nnick.equals_ci(Config->s_GlobalNoticer))
-		Global = this;
-	else
-		this->UnsetFlag(BI_CORE);
 
 	BotListByNick[this->nick] = this;
 	if (!this->uid.empty())
@@ -60,6 +34,31 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_PROTECTED));
 	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_GOD));
+
+	for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
+	{
+		LogInfo *l = Config->LogInfos[i];
+
+		if (!ircd->join2msg && !l->Inhabit)
+			continue;
+
+		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+		{
+			const Anope::string &target = *sit;
+
+			if (target[0] == '#')
+			{
+				Channel *c = findchan(target);
+				if (!c)
+					c = new Channel(target);
+				c->SetFlag(CH_LOGCHAN);
+				c->SetFlag(CH_PERSIST);
+
+				if (!c->FindUser(this))
+					this->Join(c, &Config->BotModeList);
+			}
+		}
+	}
 }
 
 BotInfo::~BotInfo()
@@ -91,24 +90,6 @@ BotInfo::~BotInfo()
 	BotListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID.erase(this->uid);
-	
-	if (this->HasFlag(BI_CORE))
-	{
-		if (this == ChanServ)
-			ChanServ = NULL;
-		else if (this == BotServ)
-			BotServ = NULL;
-		else if (this == HostServ)
-			HostServ = NULL;
-		else if (this == OperServ)
-			OperServ = NULL;
-		else if (this == MemoServ)
-			MemoServ = NULL;
-		else if (this == NickServ)
-			NickServ = NULL;
-		else if (this == Global)
-			Global = NULL;
-	}
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)
@@ -213,3 +194,9 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 	ircdproto->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 	c->DeleteUser(this);
 }
+
+void BotInfo::OnMessage(User *u, const Anope::string &message)
+{
+	mod_run_cmd(this, u, NULL, message);
+}
+

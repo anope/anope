@@ -16,6 +16,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSGetEMail : public Command
 {
@@ -78,7 +79,10 @@ class NSGetEMail : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsgetemail);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsgetemail);
 	}
 };
 

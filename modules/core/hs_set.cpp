@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hostserv.h"
 
 class CommandHSSet : public Command
 {
@@ -122,7 +123,10 @@ class HSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, &commandhsset);
+		if (!hostserv)
+			throw ModuleException("HostServ is not loaded!");
+
+		this->AddCommand(hostserv->Bot(), &commandhsset);
 	}
 };
 

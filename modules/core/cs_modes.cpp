@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-
+#include "chanserv.h"
 
 class CommandModeBase : public Command
 {
@@ -76,7 +76,7 @@ class CommandModeBase : public Command
 
 			Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
 			if (notice && ci->HasFlag(notice))
-				ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s", com->name.c_str(), u2->nick.c_str(), u->nick.c_str());
+				ircdproto->SendMessage(ci->WhoSends(), c->name, "%s command used for %s by %s", com->name.c_str(), u2->nick.c_str(), u->nick.c_str());
 		}
 	}
 
@@ -462,10 +462,13 @@ class CSModes : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsop);
-		this->AddCommand(ChanServ, &commandcsdeop);
-		this->AddCommand(ChanServ, &commandcsvoice);
-		this->AddCommand(ChanServ, &commandcsdevoice);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsop);
+		this->AddCommand(chanserv->Bot(), &commandcsdeop);
+		this->AddCommand(chanserv->Bot(), &commandcsvoice);
+		this->AddCommand(chanserv->Bot(), &commandcsdevoice);
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
@@ -478,31 +481,31 @@ class CSModes : public Module
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
 		{
-			this->AddCommand(ChanServ, &commandcsowner);
-			this->AddCommand(ChanServ, &commandcsdeowner);
+			this->AddCommand(chanserv->Bot(), &commandcsowner);
+			this->AddCommand(chanserv->Bot(), &commandcsdeowner);
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
 		{
-			this->AddCommand(ChanServ, &commandcsprotect);
-			this->AddCommand(ChanServ, &commandcsdeprotect);
+			this->AddCommand(chanserv->Bot(), &commandcsprotect);
+			this->AddCommand(chanserv->Bot(), &commandcsdeprotect);
 		}
 
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
 		{
-			this->AddCommand(ChanServ, &commandcshalfop);
-			this->AddCommand(ChanServ, &commandcsdehalfop);
+			this->AddCommand(chanserv->Bot(), &commandcshalfop);
+			this->AddCommand(chanserv->Bot(), &commandcsdehalfop);
 		}
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(ChanServ, &commandcsowner);
-		this->DelCommand(ChanServ, &commandcsdeowner);
-		this->DelCommand(ChanServ, &commandcsprotect);
-		this->DelCommand(ChanServ, &commandcsdeprotect);
-		this->DelCommand(ChanServ, &commandcshalfop);
-		this->DelCommand(ChanServ, &commandcsdehalfop);
+		this->DelCommand(chanserv->Bot(), &commandcsowner);
+		this->DelCommand(chanserv->Bot(), &commandcsdeowner);
+		this->DelCommand(chanserv->Bot(), &commandcsprotect);
+		this->DelCommand(chanserv->Bot(), &commandcsdeprotect);
+		this->DelCommand(chanserv->Bot(), &commandcshalfop);
+		this->DelCommand(chanserv->Bot(), &commandcsdehalfop);
 	}
 };
 

@@ -477,7 +477,7 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
 	if (bi)
 		s->bi = bi;
 	else if (Type == ST_CHANNEL)
-		s->bi = whosends(debug_cast<Channel *>(Object)->ci);
+		s->bi = debug_cast<Channel *>(Object)->ci->WhoSends();
 	else if (Type == ST_USER)
 		s->bi = NULL;
 }

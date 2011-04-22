@@ -93,7 +93,7 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	}
 
 	bool fantasy = ci != NULL;
-	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
+/*	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
 	{
 		if (ircdproto->IsChannelValid(params[0]))
 		{
@@ -121,15 +121,15 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 				PopLanguage();
 				return;
 			}
-		}
+		}*/
 		/* A user not giving a channel name for a param that should be a channel */
-		else
+/*		else
 		{
 			u->SendMessage(bi, _(CHAN_X_INVALID), params[0].c_str());
 			PopLanguage();
 			return;
 		}
-	}
+	}*/
 
 	CommandSource source;
 	source.u = u;

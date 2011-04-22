@@ -12,8 +12,6 @@
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE_STRICMP 1
 #cmakedefine HAVE_STRINGS_H 1
-#cmakedefine HAVE_STRLCAT 1
-#cmakedefine HAVE_STRLCPY 1
 #cmakedefine HAVE_UMASK 1
 #cmakedefine HAVE_EVENTFD 1
 #cmakedefine GETTEXT_FOUND 1

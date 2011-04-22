@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSModReLoad : public Command
 {
@@ -58,7 +59,7 @@ class CommandOSModReLoad : public Command
 		status = ModuleManager::LoadModule(mname, u);
 		if (status == MOD_ERR_OK)
 		{
-			ircdproto->SendGlobops(OperServ, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), "%s reloaded module %s", u->nick.c_str(), mname.c_str());
 			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
 
 			/* If a user is loading this module, then the core databases have already been loaded
@@ -104,7 +105,10 @@ class OSModReLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OperServ, &commandosmodreload);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosmodreload);
 	}
 };
 

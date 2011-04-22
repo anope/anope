@@ -167,7 +167,7 @@ template<> class ValueContainer<char **> : public ValueContainerBase
 			return;
 		}
 		*val = new char[s];
-		strlcpy(*val, newval, s);
+		memcpy(*val, newval, s);
 	}
 };
 
@@ -264,7 +264,6 @@ bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anop
 bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
 bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
 bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
-bool ValidateDefCon(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
 bool ValidateNickLen(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data);
 bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
 bool ValidateGlobalOnCycle(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data);
@@ -435,7 +434,7 @@ class CoreExport ServerConfig
 	/* OperServ name */
 	Anope::string s_OperServ;
 	/* Global name */
-	Anope::string s_GlobalNoticer;
+	Anope::string s_Global;
 	/* NickServs realname */
 	Anope::string desc_NickServ;
 	/* ChanServ realname */
@@ -447,18 +446,26 @@ class CoreExport ServerConfig
 	/* OperServ realname */
 	Anope::string desc_OperServ;
 	/* Global realname */
-	Anope::string desc_GlobalNoticer;
+	Anope::string desc_Global;
 
 	/* HostServ Name */
 	Anope::string s_HostServ;
 	/* HostServ realname */
 	Anope::string desc_HostServ;
+	/* Core HostServ modules */
+	Anope::string HostCoreModules;
 
 	/* Filename for the PID file */
 	Anope::string PIDFilename;
 	/* MOTD filename */
 	Anope::string MOTDFilename;
 
+	/* Core MemoServ Modules */
+	Anope::string MemoCoreModules;
+	/* Core OperServ Modules */
+	Anope::string OperCoreModules;
+	/* Core Global Modules */
+	Anope::string GlobalCoreModules;
 	/* True if its ok to not be able to save backs */
 	bool NoBackupOkay;
 	/* Do password checking when new people register */
@@ -578,6 +585,8 @@ class CoreExport ServerConfig
 	bool NSStrictPrivileges;
 	/* Use email to verify new users registering */
 	bool NSEmailReg;
+	/* Core NickServ modules */
+	Anope::string NickCoreModules;
 	/* Set the proper channel modes on users when they identify */
 	bool NSModeOnID;
 	/* Add the users hostnask their access list when they register */
@@ -585,6 +594,8 @@ class CoreExport ServerConfig
 	/* Maximum number of channels on AJoin */
 	unsigned AJoinMax;
 
+	/* Core ChanServ modules */
+	Anope::string ChanCoreModules;
 	/* Default flags for newly registered channels */
 	Flags<ChannelInfoFlag, CI_END> CSDefFlags;
 	/* Max number of channels a user can own */
@@ -621,7 +632,9 @@ class CoreExport ServerConfig
 	/* Who can use memos reciepts */
 	unsigned MSMemoReceipt;
 
-	/* Defai;t BotServ flags */
+	/* Core BotServ modules */
+	Anope::string BotCoreModules;
+	/* Default BotServ flags */
 	Flags<BotServFlag> BSDefFlags;
 	/* How long before botserv forgets a user. This is used for flood kickers etc */
 	time_t BSKeepData;
@@ -710,39 +723,6 @@ class CoreExport ServerConfig
 	std::list<Anope::string> EncModuleList;
 	/* Database modules */
 	std::list<Anope::string> DBModuleList;
-	/* HostServ Core Modules */
-	std::list<Anope::string> HostServCoreModules;
-	/* MemoServ Core Modules */
-	std::list<Anope::string> MemoServCoreModules;
-	/* BotServ Core Modules */
-	std::list<Anope::string> BotServCoreModules;
-	/* OperServ Core Modules */
-	std::list<Anope::string> OperServCoreModules;
-	/* NickServ Core Modules */
-	std::list<Anope::string> NickServCoreModules;
-	/* ChanServ Core Modules */
-	std::list<Anope::string> ChanServCoreModules;
-
-	/* Default defcon level */
-	int DefConLevel;
-	/* Timeout before defcon is reset */
-	time_t DefConTimeOut;
-	/* Session limiit to use when using defcon */
-	unsigned DefConSessionLimit;
-	/* How long to add akills for defcon */
-	time_t DefConAKILL;
-	/* Chan modes for defcon */
-	Anope::string DefConChanModes;
-	/* Should we global on defcon */
-	bool GlobalOnDefcon;
-	/* Should we send DefconMessage aswell? */
-	bool GlobalOnDefconMore;
-	/* Message to send when defcon is off */
-	Anope::string DefConOffMessage;
-	/* Message to send when defcon is on*/
-	Anope::string DefconMessage;
-	/* Reason to akill clients for defcon */
-	Anope::string DefConAkillReason;
 
 	/* The socket engine in use */
 	Anope::string SocketEngine;

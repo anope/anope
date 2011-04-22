@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSAct : public Command
 {
@@ -35,7 +36,7 @@ class CommandBSAct : public Command
 
 		if (!ci->bi)
 		{
-			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
+			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
 			return MOD_CONT;
 		}
 
@@ -83,7 +84,10 @@ class BSAct : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsact);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsact);
 	}
 };
 

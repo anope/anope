@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetTopicLock : public Command
 {
@@ -50,7 +51,7 @@ class CommandCSSetTopicLock : public Command
 				"Enables or disables the \002topic lock\002 option for a channel.\n"
 				"When \002topic lock\002 is set, %s will not allow the\n"
 				"channel topic to be changed except via the \002TOPIC\002\n"
-				"command."), this->name.c_str(), ChanServ->nick.c_str());
+				"command."), this->name.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -84,22 +85,25 @@ class CSSetTopicLock : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssettopiclock);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasettopiclock);
 	}
 
 	~CSSetTopicLock()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssettopiclock);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasettopiclock);
 	}

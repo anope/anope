@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSMode : public Command
 {
@@ -366,7 +367,10 @@ class CSMode : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsmode);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsmode);
 	}
 };
 

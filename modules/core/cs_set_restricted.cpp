@@ -11,6 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetRestricted : public Command
 {
@@ -86,22 +87,25 @@ class CSSetRestricted : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetrestricted);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetrestricted);
 	}
 
 	~CSSetRestricted()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetrestricted);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetrestricted);
 	}

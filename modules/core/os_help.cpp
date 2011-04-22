@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSHelp : public Command
 {
@@ -23,18 +24,18 @@ class CommandOSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(OperServ, source.u, NULL, params[0]);
+		mod_help_cmd(operserv->Bot(), source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
-		source.Reply(_("%s commands:"), OperServ->nick.c_str());
-		for (CommandMap::const_iterator it = OperServ->Commands.begin(), it_end = OperServ->Commands.end(); it != it_end; ++it)
+		source.Reply(_("%s commands:"), Config->s_OperServ.c_str());
+		for (CommandMap::const_iterator it = operserv->Bot()->Commands.begin(), it_end = operserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
-		source.Reply(_("\002Notice:\002 All commands sent to %s are logged!"), OperServ->nick.c_str());
+		source.Reply(_("\002Notice:\002 All commands sent to %s are logged!"), Config->s_OperServ.c_str());
 	}
 };
 
@@ -48,7 +49,10 @@ class OSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoshelp);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoshelp);
 	}
 };
 

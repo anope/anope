@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSUpdate : public Command
 {
@@ -48,7 +49,10 @@ class OSUpdate : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosupdate);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosupdate);
 	}
 };
 

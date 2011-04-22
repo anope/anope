@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 enum
 {
@@ -449,8 +450,8 @@ class CommandCSQOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -513,8 +514,8 @@ class CommandCSAOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), 
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), 
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -575,8 +576,8 @@ class CommandCSHOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -639,8 +640,8 @@ class CommandCSSOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -702,8 +703,8 @@ class CommandCSVOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -727,9 +728,9 @@ class CSXOP : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcssop);
-		this->AddCommand(ChanServ, &commandcsaop);
-		this->AddCommand(ChanServ, &commandcsvop);
+		this->AddCommand(chanserv->Bot(), &commandcssop);
+		this->AddCommand(chanserv->Bot(), &commandcsaop);
+		this->AddCommand(chanserv->Bot(), &commandcsvop);
 
 		if (Me && Me->IsSynced())
 			OnUplinkSync(NULL);
@@ -741,15 +742,15 @@ class CSXOP : public Module
 	void OnUplinkSync(Server *)
 	{
 		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			this->AddCommand(ChanServ, &commandcsqop);
+			this->AddCommand(chanserv->Bot(), &commandcsqop);
 		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			this->AddCommand(ChanServ, &commandcshop);
+			this->AddCommand(chanserv->Bot(), &commandcshop);
 	}
 
 	void OnServerDisconnect()
 	{
-		this->DelCommand(ChanServ, &commandcsqop);
-		this->DelCommand(ChanServ, &commandcshop);
+		this->DelCommand(chanserv->Bot(), &commandcsqop);
+		this->DelCommand(chanserv->Bot(), &commandcshop);
 	}
 };
 

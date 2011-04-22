@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSConfig : public Command
 {
@@ -224,7 +225,10 @@ class OSConfig : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosconfig);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosconfig);
 	}
 };
 

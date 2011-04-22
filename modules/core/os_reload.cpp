@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSReload : public Command
 {
@@ -23,16 +24,18 @@ class CommandOSReload : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		ServerConfig *old_config = Config;
+
 		try
 		{
-			ServerConfig *newconfig = new ServerConfig();
-			delete Config;
-			Config = newconfig;
-			FOREACH_MOD(I_OnReload, OnReload(false));
+			Config = new ServerConfig();
+			FOREACH_MOD(I_OnReload, OnReload());
+			delete old_config;
 			source.Reply(_("Services' configuration file has been reloaded."));
 		}
 		catch (const ConfigException &ex)
 		{
+			Config = old_config;
 			Log() << "Error reloading configuration file: " << ex.GetReason();
 			source.Reply(_("Error reloading confguration file: ") + ex.GetReason());
 		}
@@ -61,7 +64,10 @@ class OSReload : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosreload);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosreload);
 	}
 };
 

@@ -12,6 +12,8 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
+#include "global.h"
 
 #define lenof(a)        (sizeof(a) / sizeof(*(a)))
 
@@ -95,7 +97,7 @@ static void DisplayNews(User *u, NewsType Type)
 			if (Type == NEWS_RANDOM && i == current_news)
 				continue;
 
-			u->SendMessage(Type != NEWS_OPER && Global ? Global : OperServ, msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
+			u->SendMessage(Type != NEWS_OPER && global ? global->Bot() : operserv->Bot(), msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
 
 			++displayed;
 
@@ -406,9 +408,12 @@ class OSNews : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoslogonnews);
-		this->AddCommand(OperServ, &commandosopernews);
-		this->AddCommand(OperServ, &commandosrandomnews);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoslogonnews);
+		this->AddCommand(operserv->Bot(), &commandosopernews);
+		this->AddCommand(operserv->Bot(), &commandosrandomnews);
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 4);
@@ -427,10 +432,13 @@ class OSNews : public Module
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(User *u)
+	void OnUserConnect(dynamic_reference<User> &user, bool &)
 	{
-		DisplayNews(u, NEWS_LOGON);
-		DisplayNews(u, NEWS_RANDOM);
+		if (!user)
+			return;
+
+		DisplayNews(user, NEWS_LOGON);
+		DisplayNews(user, NEWS_RANDOM);
 	}
 
 	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)

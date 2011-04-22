@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetLanguage : public Command
 {
@@ -113,22 +114,25 @@ class NSSetLanguage : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetlanguage);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetlanguage);
 	}
 
 	~NSSetLanguage()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetlanguage);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetlanguage);
 	}

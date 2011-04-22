@@ -295,8 +295,10 @@ bool IRCdMessage::On436(const Anope::string &, const std::vector<Anope::string> 
 bool IRCdMessage::OnAway(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	User *u = finduser(source);
-	if (u && params.empty()) /* un-away */
-		check_memos(u);
+	if (u)
+	{
+		FOREACH_MOD(I_OnUserAway, OnUserAway(u, params.empty() ? "" : params[0]));
+	}
 	return true;
 }
 
@@ -361,7 +363,7 @@ bool IRCdMessage::OnPing(const Anope::string &, const std::vector<Anope::string>
 bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	const Anope::string &receiver = params.size() > 0 ? params[0] : "";
-	const Anope::string &message = params.size() > 1 ? params[1] : "";
+	Anope::string message = params.size() > 1 ? params[1] : "";
 
 	/* Messages from servers can happen on some IRCds, check for . */
 	if (source.empty() || receiver.empty() || message.empty() || source.find('.') != Anope::string::npos)
@@ -380,12 +382,14 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 		return true;
 	}
 
-	if (receiver[0] == '#' && !Config->s_BotServ.empty())
+	if (receiver[0] == '#')
 	{
 		ChannelInfo *ci = cs_findchan(receiver);
 		/* Some paranoia checks */
-		if (ci && !ci->HasFlag(CI_FORBIDDEN) && ci->c && ci->bi)
-			botchanmsgs(u, ci, message);
+		if (ci && !ci->HasFlag(CI_FORBIDDEN) && ci->c)
+		{
+			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, ci, message));
+		}
 	}
 	else
 	{
@@ -433,36 +437,8 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
 				}
 			}
-			else if (bi == ChanServ)
-			{
-				if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
-					u->SendMessage(ChanServ, _(ACCESS_DENIED));
-				else
-					mod_run_cmd(bi, u, NULL, message);
-			}
-			else if (bi == HostServ)
-			{
-				if (!ircd->vhost)
-					u->SendMessage(HostServ, _("%s is currently offline."), Config->s_HostServ.c_str());
-				else
-					mod_run_cmd(bi, u, NULL, message);
-			}
-			else if (bi == OperServ)
-			{
-				if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
-				{
-					u->SendMessage(OperServ, _(ACCESS_DENIED));
-					if (Config->WallBadOS)
-						ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
-				}
-				else
-				{
-					Log(OperServ) << u->nick << ": " <<  message;
-					mod_run_cmd(bi, u, NULL, message);
-				}
-			}
-			else
-				mod_run_cmd(bi, u, NULL, message);
+			
+			bi->OnMessage(u, message);
 		}
 	}
 
@@ -507,17 +483,7 @@ bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::
 
 	FOREACH_MOD(I_OnServerQuit, OnServerQuit(s));
 
-	Anope::string buf;
-	/* If this is a juped server, send a nice global to inform the online
-	 * opers that we received it.
-	 */
-	if (s->HasFlag(SERVER_JUPED))
-	{
-		buf = "Received SQUIT for juped server " + s->GetName();
-		ircdproto->SendGlobops(OperServ, "%s", buf.c_str());
-	}
-
-	buf = s->GetName() + " " + s->GetUplink()->GetName();
+	Anope::string buf = s->GetName() + " " + s->GetUplink()->GetName();
 
 	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
 	{
@@ -547,14 +513,14 @@ bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::
 			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
 			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
 		}
-		else if (!ircd->svshold && (u = finduser(who)) && u->server == Me)
+		else if ((u = finduser(who)) && u->server == Me)
 		{
 			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", u->nick.c_str());
 		}
 		else
-			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such service.", who.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such user.", who.c_str());
 	}
 
 	return true;

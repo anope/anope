@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSChanKill : public Command
 {
@@ -74,7 +75,7 @@ class CommandOSChanKill : public Command
 					if (uc->user->HasMode(UMODE_OPER))
 						continue;
 
-					SGLine->Add(OperServ, u, "*@" + uc->user->host, expires, realreason);
+					SGLine->Add("*@" + uc->user->host, u->nick, expires, realreason);
 					SGLine->Check(uc->user);
 				}
 
@@ -111,7 +112,10 @@ class OSChanKill : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoschankill);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoschankill);
 	}
 };
 

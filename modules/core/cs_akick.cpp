@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 /* Split a usermask up into its constitutent parts.  Returned strings are
  * malloc()'d, and should be free()'d when done with.  Returns "*" for
@@ -532,7 +533,7 @@ class CommandCSAKick : public Command
 				"When akicking a \037registered nick\037 the nickserv account\n"
 				"will be added to the akick list instead of the mask.\n"
 				"All users within that nickgroup will then be akicked.\n"),
-				ChanServ->nick.c_str());
+				Config->s_ChanServ.c_str());
 		source.Reply(_(
 				" \n"
 				"The \002AKICK DEL\002 command removes the given nick or mask\n"
@@ -552,7 +553,7 @@ class CommandCSAKick : public Command
 				"AKICK mask.\n"
 				" \n"
 				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), ChanServ->nick.c_str());
+				"akick list."), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -572,7 +573,10 @@ class CSAKick : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsakick);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsakick);
 	}
 };
 

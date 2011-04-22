@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 static Anope::string TS6UPLINK;
 
@@ -100,19 +101,19 @@ class PlexusProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
@@ -132,7 +133,7 @@ class PlexusProto : public IRCDProto
 
 	void SendAkill(User *, const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
@@ -269,7 +270,7 @@ class PlexusIRCdMessage : public IRCdMessage
 			ip.clear();
 		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip, params[5], params[7], params[3]);
 		if (user && user->server->IsSynced())
-			validate_user(user);
+			nickserv->Validate(user);
 
 		return true;
 	}
@@ -528,7 +529,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 		{
 			u->Login(nc);
 			if (user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(NickServ, UMODE_REGISTERED);
+				u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 		}
 	}
 
@@ -648,7 +649,7 @@ class ProtoPlexus : public Module
 		{
 			User *u = it->second;
 			if (u->server == s && !u->IsIdentified())
-				validate_user(u);
+				nickserv->Validate(u);
 		}
 	}
 };

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSForbid : public Command
 {
@@ -75,7 +76,7 @@ class CommandCSForbid : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(ChanServ, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), "This channel has been forbidden.").c_str());
+				c->Kick(chanserv->Bot(), uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), "This channel has been forbidden.").c_str());
 			}
 		}
 
@@ -121,7 +122,10 @@ class CSForbid : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsforbid);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsforbid);
 	}
 };
 

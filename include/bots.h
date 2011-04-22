@@ -90,6 +90,12 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 * @param reason The reason we're parting
 	 */
 	void Part(Channel *c, const Anope::string &reason = "");
+
+	/** Called when a user messages this bot
+	 * @param u The user
+	 * @param message The users' message
+	 */
+	virtual void OnMessage(User *u, const Anope::string &message);
 };
 
 #endif // BOTS_H

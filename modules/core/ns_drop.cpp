@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSDrop : public Command
 {
@@ -99,7 +100,7 @@ class CommandNSDrop : public Command
 					"With a parameter, drops the named nick from the database.\n"
 					"You may drop any nick within your group without any \n"
 					"special privileges. Dropping any nick is limited to \n"
-					"\002Services Operators\002."), NickServ->nick.c_str());
+					"\002Services Operators\002."), Config->s_NickServ.c_str());
 		else
 			source.Reply(_("Syntax: \002DROP [\037nickname\037 | \037password\037]\002\n"
 					" \n"
@@ -115,7 +116,7 @@ class CommandNSDrop : public Command
 					" \n"
 					"In order to use this command, you must first identify\n"
 					"with your password (\002%s%s HELP IDENTIFY\002 for more\n"
-					"information)."), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+					"information)."), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 
 		return true;
 	}
@@ -131,7 +132,10 @@ class NSDrop : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsdrop);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsdrop);
 	}
 };
 

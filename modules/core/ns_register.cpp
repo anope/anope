@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 static bool SendRegmail(User *u, NickAlias *na);
 
@@ -155,7 +156,7 @@ class CommandNSRegister : public Command
 			/* i.e. there's already such a nick regged */
 			if (na->HasFlag(NS_FORBIDDEN))
 			{
-				Log(NickServ) << u->GetMask() << " tried to register FORBIDden nick " << u->nick;
+				Log(nickserv->Bot()) << u->GetMask() << " tried to register FORBIDden nick " << u->nick;
 				source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
 			}
 			else
@@ -200,7 +201,7 @@ class CommandNSRegister : public Command
 				na->nc->SetFlag(NI_UNCONFIRMED);
 				if (SendRegmail(u, na))
 				{
-					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+					source.Reply(_("A passcode has been sent to %s, please type %s%s confirm <passcode> to confirm your email address."), email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
@@ -235,10 +236,9 @@ class CommandNSRegister : public Command
 				"passwords are vulnerable to trial-and-error searches, so\n"
 				"you should choose a password at least 5 characters long.\n"
 				"Finally, the space character cannot be used in passwords.\n"),
-				NickServ->nick.c_str(), NickServ->nick.c_str());
+				Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 
-		source.Reply(_(
-				" \n"
+		source.Reply(_(" \n"
 				"The parameter \037email\037 is optional and will set the email\n"
 				"for your nick immediately. However, it may be required\n"
 				"on certain networks.\n"
@@ -250,7 +250,7 @@ class CommandNSRegister : public Command
 				"the same configuration, the same set of memos and the\n"
 				"same channel privileges. For more information on this\n"
 				"feature, type \002%s%s HELP GROUP\002."),
-				Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -330,9 +330,12 @@ class NSRegister : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsregister);
-		this->AddCommand(NickServ, &commandnsconfirm);
-		this->AddCommand(NickServ, &commandnsrsend);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsregister);
+		this->AddCommand(nickserv->Bot(), &commandnsconfirm);
+		this->AddCommand(nickserv->Bot(), &commandnsrsend);
 	}
 };
 
@@ -364,7 +367,7 @@ static bool SendRegmail(User *u, NickAlias *na)
 	" \n"
 	"%s administrators."),  na->nick.c_str(), Config->NetworkName.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, na->nc, NickServ, subject, message);
+	return Mail(u, na->nc, nickserv->Bot(), subject, message);
 }
 
 MODULE_INIT(NSRegister)

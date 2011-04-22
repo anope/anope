@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 static Anope::string TS6UPLINK;
 
@@ -103,19 +104,19 @@ class RatboxProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
@@ -142,7 +143,7 @@ class RatboxProto : public IRCDProto
 
 	void SendAkill(User *, const XLine *x)
 	{
-		BotInfo *bi = OperServ;
+		BotInfo *bi = findbot(Config->s_OperServ);
 		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
@@ -269,8 +270,8 @@ class RatboxIRCdMessage : public IRCdMessage
 	{
 		/* Source is always the server */
 		User *user = do_nick("", params[0], params[4], params[5], source, params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
-		if (user && user->server->IsSynced())
-			validate_user(user);
+		if (user && user->server->IsSynced() && nickserv)
+			nickserv->Validate(user);
 
 		return true;
 	}
@@ -579,12 +580,13 @@ class ProtoRatbox : public Module
 
 	void OnServerSync(Server *s)
 	{
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-		{
-			User *u = it->second;
-			if (u->server == s && !u->IsIdentified())
-				validate_user(u);
-		}
+		if (nickserv)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			{
+				User *u = it->second;
+				if (u->server == s && !u->IsIdentified())
+					nickserv->Validate(u);
+			}
 	}
 };
 

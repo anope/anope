@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetKill : public Command
 {
@@ -85,7 +86,7 @@ class CommandNSSetKill : public Command
 				"\002IMMED\002, user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), NickServ->nick.c_str());
+				"network's administrators may have disabled this option."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -117,7 +118,7 @@ class CommandNSSASetKill : public CommandNSSetKill
 				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), NickServ->nick.c_str());
+				"network's administrators may have disabled this option."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -138,22 +139,25 @@ class NSSetKill : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetkill);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetkill);
 	}
 
 	~NSSetKill()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetkill);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetkill);
 	}

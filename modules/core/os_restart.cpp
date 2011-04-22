@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSRestart : public Command
 {
@@ -25,9 +26,6 @@ class CommandOSRestart : public Command
 	{
 		User *u = source.u;
 		quitmsg = "RESTART command received from " + u->nick;
-
-		if (Config->GlobalOnCycle)
-			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
 		do_restart_services();
 		return MOD_CONT;
 	}
@@ -52,7 +50,10 @@ class OSRestart : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosrestart);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosrestart);
 	}
 };
 

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetHide : public Command
 {
@@ -90,7 +91,7 @@ class CommandNSSetHide : public Command
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -117,7 +118,7 @@ class CommandNSSASetHide : public CommandNSSetHide
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), NickServ->nick.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -138,22 +139,25 @@ class NSSetHide : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssethide);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasethide);
 	}
 
 	~NSSetHide()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssethide);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasethide);
 	}

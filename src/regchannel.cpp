@@ -11,6 +11,8 @@
 
 #include "services.h"
 #include "modules.h"
+#include "chanserv.h"
+#include "nickserv.h"
 
 ChanAccess::ChanAccess(const Anope::string &umask)
 {
@@ -162,6 +164,16 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->founder)
 		--this->founder->channelcount;
+}
+
+/** Find which bot should send mode/topic/etc changes for this channel
+ * @return The bot
+ */
+BotInfo *ChannelInfo::WhoSends()
+{
+	if (!this || !this->bi || !this->c || !this->botflags.HasFlag(BS_SYMBIOSIS) || !this->c->FindUser(this->bi))
+		return chanserv ? chanserv->Bot() : (nickserv ? nickserv->Bot() : NULL);
+	return this->bi;
 }
 
 /** Add an entry to the channel access list
@@ -553,7 +565,7 @@ void ChannelInfo::LoadMLock()
 		else
 		{
 			if (!this->bi)
-				whosends(this)->Assign(NULL, this);
+				this->WhoSends()->Assign(NULL, this);
 			if (this->c->FindUser(this->bi) == NULL)
 				this->bi->Join(this->c);
 
@@ -860,7 +872,7 @@ void ChannelInfo::RestoreTopic()
 
 	if ((this->HasFlag(CI_KEEPTOPIC) || this->HasFlag(CI_TOPICLOCK)) && this->last_topic != this->c->topic)
 	{
-		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : whosends(this)->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
+		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : this->WhoSends()->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
 	}
 }
 

@@ -210,7 +210,7 @@ class ModuleLDAP : public Module, public Pipe
 		Implementation i[] = { I_OnReload, I_OnModuleUnload };
 		ModuleManager::Attach(i, this, 2);
 
-		OnReload(true);
+		OnReload();
 	}
 
 	~ModuleLDAP()
@@ -225,7 +225,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload(bool startup)
+	void OnReload()
 	{
 		ConfigReader config;
 		int i, num;

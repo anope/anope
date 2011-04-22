@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass);
 
@@ -79,6 +80,12 @@ class NSSendPass : public Module
  public:
 	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
+		this->SetAuthor("Anope");
+		this->SetType(CORE);
+
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
 		if (!Config->UseMail)
 			throw ModuleException("Not using mail, whut.");
 
@@ -86,10 +93,7 @@ class NSSendPass : public Module
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
-		this->SetAuthor("Anope");
-		this->SetType(CORE);
-
-		this->AddCommand(NickServ, &commandnssendpass);
+		this->AddCommand(nickserv->Bot(), &commandnssendpass);
 	}
 };
 
@@ -108,7 +112,7 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 	" \n"
 	"%s administrators.").c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, na->nc, NickServ, subject, message);
+	return Mail(u, na->nc, nickserv->Bot(), subject, message);
 }
 
 MODULE_INIT(NSSendPass)

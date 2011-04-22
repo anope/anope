@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 static bool SendResetEmail(User *u, NickAlias *na);
 
@@ -68,13 +69,16 @@ class NSResetPass : public Module
  public:
 	NSResetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		if (!Config->UseMail)
-			throw ModuleException("Not using mail.");
-
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsresetpass);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		if (!Config->UseMail)
+			throw ModuleException("Not using mail.");
+
+		this->AddCommand(nickserv->Bot(), &commandnsresetpass);
 
 		ModuleManager::Attach(I_OnPreCommand, this);
 	}
@@ -82,7 +86,7 @@ class NSResetPass : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		if (command->service == NickServ && command->name.equals_ci("CONFIRM") && params.size() > 1)
+		if (command->service->nick == Config->s_NickServ && command->name.equals_ci("CONFIRM") && params.size() > 1)
 		{
 			NickAlias *na = findnick(params[0]);
 
@@ -151,7 +155,7 @@ static bool SendResetEmail(User *u, NickAlias *na)
 	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
 	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));
 
-	return Mail(u, na->nc, NickServ, subject, message);
+	return Mail(u, na->nc, nickserv->Bot(), subject, message);
 }
 
 MODULE_INIT(NSResetPass)

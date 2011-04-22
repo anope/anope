@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSShutdown : public Command
 {
@@ -25,9 +26,6 @@ class CommandOSShutdown : public Command
 	{
 		User *u = source.u;
 		quitmsg = "SHUTDOWN command received from " + u->nick;
-
-		if (Config->GlobalOnCycle)
-			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
 		shutting_down = true;
 		return MOD_CONT;
 	}
@@ -51,7 +49,10 @@ class OSShutdown : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosshutdown);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosshutdown);
 	}
 };
 

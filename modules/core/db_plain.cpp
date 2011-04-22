@@ -11,9 +11,12 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
+#include "os_session.h"
 
 Anope::string DatabaseFile;
 std::stringstream db_buffer;
+service_reference<SessionService> SessionInterface("session");
 
 /** Enum used for what METADATA type we are reading
  */
@@ -317,16 +320,13 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 
 		XLine *x = NULL;
 		if (params[0].equals_ci("SNLINE") && SNLine)
-			x = SNLine->Add(NULL, NULL, mask, expires, reason);
+			x = SNLine->Add(mask, by, expires, reason);
 		else if (params[0].equals_ci("SQLINE") && SQLine)
-			x = SQLine->Add(NULL, NULL, mask, expires, reason);
+			x = SQLine->Add(mask, by, expires, reason);
 		else if (params[0].equals_ci("SZLINE") && SZLine)
-			x = SZLine->Add(NULL, NULL, mask, expires, reason);
+			x = SZLine->Add(mask, by, expires, reason);
 		if (x)
-		{
-			x->By = by;
 			x->Created = seton;
-		}
 	}
 	else if (params[0].equals_ci("AKILL") && SGLine)
 	{
@@ -337,12 +337,9 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 		time_t expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
 		Anope::string reason = params[6];
 
-		XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
+		XLine *x = SGLine->Add(user + "@" + host, by, expires, reason);
 		if (x)
-		{
-			x->By = by;
 			x->Created = seton;
-		}
 	}
 	else if (params[0].equals_ci("EXCEPTION"))
 	{
@@ -353,7 +350,7 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 		exception->time = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
 		exception->expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
 		exception->reason = params[6];
-		exceptions.push_back(exception);
+		SessionInterface->AddException(exception);
 	}
 }
 
@@ -382,7 +379,7 @@ class DBPlain : public Module
 		Implementation i[] = { I_OnReload, I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };
 		ModuleManager::Attach(i, this, 6);
 
-		OnReload(true);
+		OnReload();
 
 		LastDay = 0;
 	}
@@ -412,7 +409,8 @@ class DBPlain : public Module
 			Log(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
-				ircdproto->SendGlobops(OperServ, "Unable to backup database!");
+				if (operserv)
+					ircdproto->SendGlobops(operserv->Bot(), "Unable to backup database!");
 				Log() << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
@@ -432,7 +430,7 @@ class DBPlain : public Module
 		}
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 		DatabaseFile = config.ReadValue("db_plain", "database", "anope.db", 0);
@@ -494,14 +492,12 @@ class DBPlain : public Module
 				Memo *m = new Memo;
 				m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
 				m->sender = params[1];
-				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT"); ++j)
 				{
 					if (params[j].equals_ci("UNREAD"))
 						m->SetFlag(MF_UNREAD);
 					else if (params[j].equals_ci("RECEIPT"))
 						m->SetFlag(MF_RECEIPT);
-					else if (params[j].equals_ci("NOTIFYS"))
-						m->SetFlag(MF_NOTIFYS);
 				}
 				m->text = params[params.size() - 1];
 				nc->memos.memos.push_back(m);
@@ -633,14 +629,12 @@ class DBPlain : public Module
 				Memo *m = new Memo;
 				m->time = params[0].is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
 				m->sender = params[1];
-				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT") || params[j].equals_ci("NOTIFYS"); ++j)
+				for (unsigned j = 2; params[j].equals_ci("UNREAD") || params[j].equals_ci("RECEIPT"); ++j)
 				{
 					if (params[j].equals_ci("UNREAD"))
 						m->SetFlag(MF_UNREAD);
 					else if (params[j].equals_ci("RECEIPT"))
 						m->SetFlag(MF_RECEIPT);
-					else if (params[j].equals_ci("NOTIFYS"))
-						m->SetFlag(MF_NOTIFYS);
 				}
 				m->text = params[params.size() - 1];
 				ci->memos.memos.push_back(m);
@@ -754,8 +748,6 @@ class DBPlain : public Module
 					db_buffer << " UNREAD";
 				if (mi->memos[k]->HasFlag(MF_RECEIPT))
 					db_buffer << " RECEIPT";
-				if (mi->memos[k]->HasFlag(MF_NOTIFYS))
-					db_buffer << " NOTIFYS";
 				db_buffer << " :" << mi->memos[k]->text << endl;
 			}
 			for (unsigned k = 0, end = mi->ignores.size(); k < end; ++k)
@@ -848,8 +840,6 @@ class DBPlain : public Module
 					db_buffer << " UNREAD";
 				if (memos->memos[k]->HasFlag(MF_RECEIPT))
 					db_buffer << " RECEIPT";
-				if (memos->memos[k]->HasFlag(MF_NOTIFYS))
-					db_buffer << " NOTIFYS";
 				db_buffer << " :" << memos->memos[k]->text << endl;
 			}
 			for (unsigned k = 0, end = memos->ignores.size(); k < end; ++k)
@@ -906,7 +896,7 @@ class DBPlain : public Module
 				db_buffer << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
 			}
 
-		for (std::vector<Exception *>::iterator it = exceptions.begin(), it_end = exceptions.end(); it != it_end; ++it)
+		for (SessionService::ExceptionVector::iterator it = SessionInterface->GetExceptions().begin(); it != SessionInterface->GetExceptions().end(); ++it)
 		{
 			Exception *e = *it;
 			db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;

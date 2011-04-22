@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class BadwordsListCallback : public NumberList
 {
@@ -291,7 +292,7 @@ class CommandBSBadwords : public Command
 				"will be done if a user says a word that ends with\n"
 				"\037word\037. If you don't specify anything, a kick will\n"
 				"be issued every time \037word\037 is said by a user.\n"
-				" \n"), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
+				" \n"), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
 		source.Reply(_("The \002BADWORDS DEL\002 command removes the given word from the\n"
 				"bad words list.  If a list of entry numbers is given, those\n"
 				"entries are deleted.  (See the example for LIST below.)\n"
@@ -325,7 +326,10 @@ class BSBadwords : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsbadwords);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsbadwords);
 	}
 };
 

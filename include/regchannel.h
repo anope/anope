@@ -175,6 +175,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
 	int16 repeattimes;				/* For REPEAT kicker */
 
+	/** Find which bot should send mode/topic/etc changes for this channel
+	 * @return The bot
+	 */
+	BotInfo *WhoSends();
+
 	/** Add an entry to the channel access list
 	 *
 	 * @param mask The mask of the access entry

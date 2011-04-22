@@ -45,7 +45,9 @@
 extern CoreExport USHORT WindowsGetLanguage(const char *lang);
 extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
-extern CoreExport int gettimeofday(timeval *tv, char *);
+extern CoreExport int gettimeofday(timeval *tv, void *);
+extern CoreExport Anope::string GetWindowsVersion();
+extern CoreExport bool SupportedWindowsVersion();
  
  #endif // _WIN32
  #endif // WINDOWS_H

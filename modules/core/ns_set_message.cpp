@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetMessage : public Command
 {
@@ -102,22 +103,25 @@ class NSSetMessage : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetmessage);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetmessage);
 	}
 
 	~NSSetMessage()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetmessage);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetmessage);
 	}

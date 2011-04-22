@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSStatus : public Command
 {
@@ -86,7 +87,10 @@ class NSStatus : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsstatus);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsstatus);
 	}
 };
 

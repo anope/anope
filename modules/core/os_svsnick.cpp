@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSSVSNick : public Command
 {
@@ -30,7 +31,7 @@ class CommandOSSVSNick : public Command
 
 		NickAlias *na;
 
-		/* Truncate long nicknames to NICKMAX-2 characters */
+		/* Truncate long nicknames to Config->NickLen characters */
 		if (newnick.length() > Config->NickLen)
 		{
 			source.Reply(_("Nick \002%s\002 was truncated to %d characters."), newnick.c_str(), Config->NickLen, newnick.c_str());
@@ -60,7 +61,7 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
-			ircdproto->SendGlobops(OperServ, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
 		return MOD_CONT;
@@ -90,10 +91,13 @@ class OSSVSNick : public Module
 		if (!ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandossvsnick);
+		this->AddCommand(operserv->Bot(), &commandossvsnick);
 	}
 };
 

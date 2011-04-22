@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSGhost : public Command
 {
@@ -62,7 +63,7 @@ class CommandNSGhost : public Command
 
 			if (ok)
 			{
-				if (!user->IsIdentified() && FindCommand(NickServ, "RECOVER"))
+				if (!user->IsIdentified() && FindCommand(nickserv->Bot(), "RECOVER"))
 					source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
 				else
 				{
@@ -121,7 +122,10 @@ class NSGhost : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsghost);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsghost);
 	}
 };
 

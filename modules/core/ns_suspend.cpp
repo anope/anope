@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSuspend : public Command
 {
@@ -169,8 +170,11 @@ class NSSuspend : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnssuspend);
-		this->AddCommand(NickServ, &commandnsunsuspend);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnssuspend);
+		this->AddCommand(nickserv->Bot(), &commandnsunsuspend);
 	}
 };
 

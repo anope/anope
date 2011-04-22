@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSHelp : public Command
 {
@@ -25,7 +26,7 @@ class CommandBSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(BotServ, source.u, NULL, params[0]);
+		mod_help_cmd(botserv->Bot(), source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
@@ -40,9 +41,9 @@ class CommandBSHelp : public Command
 				"below; to use them, type \002%s%s \037command\037\002. For\n"
 				"more information on a specific command, type\n"
 				"\002%s%s HELP \037command\037\002."),
-				BotServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
-		for (CommandMap::const_iterator it = BotServ->Commands.begin(), it_end = BotServ->Commands.end(); it != it_end; ++it)
+				Config->s_BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
+		for (CommandMap::const_iterator it = botserv->Bot()->Commands.begin(), it_end = botserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		source.Reply(_("Bot will join a channel whenever there is at least\n"
@@ -62,7 +63,10 @@ class BSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbshelp);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbshelp);
 	}
 };
 

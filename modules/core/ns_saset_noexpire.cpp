@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSASetNoexpire : public Command
 {
@@ -70,14 +71,17 @@ class NSSASetNoexpire : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SASET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetnoexpire);
 	}
 
 	~NSSASetNoexpire()
 	{
-		Command *c = FindCommand(NickServ, "SASET");
+		Command *c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetnoexpire);
 	}

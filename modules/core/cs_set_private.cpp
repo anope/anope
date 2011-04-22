@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetPrivate : public Command
 {
@@ -49,7 +50,7 @@ class CommandCSSetPrivate : public Command
 				" \n"
 				"Enables or disables the \002private\002 option for a channel.\n"
 				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
-				"include the channel in any lists."), this->name.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"include the channel in any lists."), this->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -83,22 +84,25 @@ class CSSetPrivate : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetprivate);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetprivate);
 	}
 
 	~CSSetPrivate()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetprivate);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetprivate);
 	}

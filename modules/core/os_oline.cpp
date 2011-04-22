@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSOLine : public Command
 {
@@ -34,16 +35,16 @@ class CommandOSOLine : public Command
 		else if (u2 && flag[0] == '+')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
-			u2->SetMode(OperServ, UMODE_OPER);
-			u2->SendMessage(OperServ, _("You are now an IRC Operator."));
+			u2->SetMode(operserv->Bot(), UMODE_OPER);
+			u2->SendMessage(operserv->Bot(), _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(OperServ, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
@@ -77,10 +78,13 @@ class OSOLine : public Module
 		if (!ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosoline);
+		this->AddCommand(operserv->Bot(), &commandosoline);
 	}
 };
 

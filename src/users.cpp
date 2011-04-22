@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 Anope::insensitive_map<User *> UserListByNick;
 Anope::map<User *> UserListByUID;
@@ -204,9 +205,6 @@ User::~User()
 	while (!this->chans.empty())
 		this->chans.front()->chan->DeleteUser(this);
 
-	if (Config->LimitSessions && !this->server->IsULined())
-		del_session(this);
-
 	UserListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		UserListByUID.erase(this->uid);
@@ -322,7 +320,7 @@ void User::Collide(NickAlias *na)
 			guestnick = Config->NSGuestNickPrefix + stringify(getrandom16());
 		} while (finduser(guestnick));
 
-		this->SendMessage(NickServ, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+		this->SendMessage(nickserv->Bot(), _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 	}
 	else
@@ -354,36 +352,7 @@ void User::Identify(NickAlias *na)
 	ircdproto->SendAccountLogin(this, this->Account());
 	ircdproto->SetAutoIdentificationToken(this);
 
-	NickAlias *this_na = findnick(this->nick);
-	if (this_na && this_na->nc == na->nc && this_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-		this->SetMode(NickServ, UMODE_REGISTERED);
-	if (ircd->vhost)
-		do_on_id(this);
-	if (Config->NSModeOnID)
-		do_setmodes(this);
-
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
-
-	if (Config->NSForceEmail && na->nc->email.empty())
-	{
-		this->SendMessage(NickServ, _("You must now supply an e-mail for your nick.\n"
-						"This e-mail will allow you to retrieve your password in\n"
-						"case you forget it."));
-		this->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
-						"Your privacy is respected; this e-mail won't be given to\n"
-						"any third-party person."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
-	}
-
-	if (na->nc->HasFlag(NI_UNCONFIRMED))
-	{
-		this->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
-		time_t time_registered = Anope::CurTime - na->time_registered;
-		if (Config->NSUnconfirmedExpire > time_registered)
-			this->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), duration(Config->NSUnconfirmedExpire - time_registered).c_str());
-	}
-
-	check_memos(this);
-
 }
 
 
@@ -397,7 +366,6 @@ void User::Login(NickCore *core)
 	core->Users.push_back(this);
 
 	this->UpdateHost();
-	check_memos(this);
 }
 
 /** Logout the user
@@ -698,22 +666,14 @@ void User::SetModesInternal(const char *umodes, ...)
 		{
 			case UMODE_OPER:
 				if (add)
-				{
 					++opcnt;
-					if (Config->WallOper)
-						ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", this->nick.c_str());
-					Log(OperServ) << this->nick << " is now an IRC operator";
-				}
 				else
-				{
 					--opcnt;
 
-					Log(OperServ) << this->nick << " is no longer an IRC operator";
-				}
 				break;
 			case UMODE_REGISTERED:
-				if (add && !this->IsIdentified())
-					this->RemoveMode(NickServ, UMODE_REGISTERED);
+				if (add && !this->IsIdentified() && nickserv)
+					this->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:
@@ -749,32 +709,6 @@ bool User::IsProtected() const
 		return true;
 
 	return false;
-}
-
-/*************************************************************************/
-
-void get_user_stats(long &count, long &mem)
-{
-	count = mem = 0;
-
-	for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-	{
-		User *user = it->second;
-
-		++count;
-		mem += sizeof(*user);
-		if (!user->host.empty())
-			mem += user->host.length() + 1;
-		if (ircd->vhost)
-		{
-			if (!user->vhost.empty())
-				mem += user->vhost.length() + 1;
-		}
-		if (!user->realname.empty())
-			mem += user->realname.length() + 1;
-		mem += user->server->GetName().length() + 1;
-		mem += (sizeof(ChannelContainer) * user->chans.size());
-	}
 }
 
 User *finduser(const Anope::string &nick)
@@ -836,28 +770,14 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			}
 		}
 
-		Log(*user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
+		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
 
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreUserConnect, OnPreUserConnect(*user));
-
-		if (user && MOD_RESULT != EVENT_STOP)
-		{
-			if (Config->LimitSessions && !serv->IsULined())
-				add_session(*user);
-
-			if (!user)
-				return NULL;
-
-			XLineManager::CheckAll(*user);
-		}
-
-		if (!user)
-			return NULL;
-
-		FOREACH_MOD(I_OnUserConnect, OnUserConnect(*user));
+		bool exempt = false;
+		if (user->server && user->server->IsULined())
+			exempt = true;
+		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
 		
-		return user ? *user : NULL;
+		return user;
 	}
 	else
 	{
@@ -898,20 +818,19 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			/* If the new nick isnt registerd or its registerd and not yours */
 			if (!na || na->nc != user->Account())
 			{
-				user->RemoveMode(NickServ, UMODE_REGISTERED);
+				user->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
 				ircdproto->SendUnregisteredNick(user);
 
-				validate_user(user);
+				nickserv->Validate(user);
 			}
 			else
 			{
 				na->last_seen = Anope::CurTime;
 				user->UpdateHost();
-				do_on_id(user);
 				ircdproto->SetAutoIdentificationToken(user);
 				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-					user->SetMode(NickServ, UMODE_REGISTERED);
-				Log(NickServ) << user->GetMask() << " automatically identified for group " << user->Account()->display;
+					user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+				Log(nickserv->Bot()) << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 
 			if (ircd->sqline)

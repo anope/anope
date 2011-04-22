@@ -6,10 +6,11 @@
  */
 
 #include "module.h"
+#include "operserv.h"
 
 struct FakeAkill : public Command
 {
-	FakeAkill() : Command("AKILL", 0, 0) { this->service = OperServ; }
+	FakeAkill() : Command("AKILL", 0, 0) { this->service = findbot(Config->s_OperServ); }
 	CommandReturn Execute(CommandSource &, const std::vector<Anope::string> &) { return MOD_CONT; }
 } fake_akill;
 
@@ -61,18 +62,18 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
 		XLine *x = NULL;
-		if (this->add_to_akill && SGLine && (x = SGLine->Add(NULL, NULL, Anope::string("*@") + user->host, Anope::CurTime + this->blacklist.bantime, reason)))
+		if (this->add_to_akill && SGLine && (x = SGLine->Add(Anope::string("*@") + user->host, Config->s_OperServ, Anope::CurTime + this->blacklist.bantime, reason)))
 		{
-			Log(LOG_COMMAND, OperServ, &fake_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
+			Log(LOG_COMMAND, operserv->Bot(), &fake_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
-				ircdproto->SendAkill(*user, x);
+				ircdproto->SendAkill(user, x);
 		}
 		else
 		{
-			Log(OperServ) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
-			XLine xline(Anope::string("*@") + user->host, OperServ ? OperServ->nick : "OperServ", Anope::CurTime + this->blacklist.bantime, reason);
-			ircdproto->SendAkill(*user, &xline);
+			Log(operserv->Bot()) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
+			XLine xline(Anope::string("*@") + user->host, Config->s_OperServ, Anope::CurTime + this->blacklist.bantime, reason);
+			ircdproto->SendAkill(user, &xline);
 		}
 	}
 };
@@ -90,13 +91,13 @@ class ModuleDNSBL : public Module
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		OnReload(false);
-
-		Implementation i[] = { I_OnReload, I_OnPreUserConnect };
+		Implementation i[] = { I_OnReload, I_OnUserConnect };
 		ModuleManager::Attach(i, this, 2);
+
+		OnReload();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 
@@ -127,17 +128,18 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	EventReturn OnPreUserConnect(User *u)
+	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)
 	{
-		if (!this->check_on_connect && !Me->IsSynced())
-			return EVENT_CONTINUE;
-		if (!this->check_on_netburst && !u->server->IsSynced())
-			return EVENT_CONTINUE;
-		/* At this time we only support IPv4 */
-		if (u->ip.sa.sa_family != AF_INET)
-			return EVENT_CONTINUE;
+		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()))
+			return;
 
-		unsigned long ip = u->ip.sa4.sin_addr.s_addr;
+		if (!this->check_on_netburst && !user->server->IsSynced())
+			return;
+		/* At this time we only support IPv4 */
+		if (user->ip.sa.sa_family != AF_INET)
+			return;
+
+		unsigned long ip = user->ip.sa4.sin_addr.s_addr;
 		unsigned long reverse_ip = ((ip & 0xFF) << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | ((ip & 0xFF000000) >> 24);
 
 		sockaddrs user_ip;
@@ -151,7 +153,7 @@ class ModuleDNSBL : public Module
 			try
 			{
 				Anope::string dnsbl_host = user_ip.addr() + "." + b.name;
-				DNSBLResolver *res = new DNSBLResolver(this, u, b, dnsbl_host, this->add_to_akill);
+				DNSBLResolver *res = new DNSBLResolver(this, user, b, dnsbl_host, this->add_to_akill);
 				res->Process();
 			}
 			catch (const SocketException &ex)
@@ -160,7 +162,7 @@ class ModuleDNSBL : public Module
 			}
 		}
 
-		return EVENT_CONTINUE;
+		return;
 	}
 };
 

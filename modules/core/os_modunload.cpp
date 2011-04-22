@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSModUnLoad : public Command
 {
@@ -52,7 +53,7 @@ class CommandOSModUnLoad : public Command
 		if (status == MOD_ERR_OK)
 		{
 			source.Reply(_("Module \002%s\002 unloaded"), mname.c_str());
-			ircdproto->SendGlobops(OperServ, "%s unloaded module %s", u->nick.c_str(), mname.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), "%s unloaded module %s", u->nick.c_str(), mname.c_str());
 		}
 		else
 			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());
@@ -86,7 +87,10 @@ class OSModUnLoad : public Module
 		this->SetType(CORE);
 		this->SetPermanent(true);
 
-		this->AddCommand(OperServ, &commandosmodunload);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosmodunload);
 	}
 };
 

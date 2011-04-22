@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSAccess : public Command
 {
@@ -172,7 +173,7 @@ class CommandNSAccess : public Command
 					"        Reverses the previous command.\n"
 					" \n"
 					"    \002ACCESS LIST\002\n"
-					"        Displays the current access list."), NickServ->nick.c_str(), NickServ->nick.c_str());
+					"        Displays the current access list."), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -192,7 +193,10 @@ class NSAccess : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsaccess);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsaccess);
 	}
 };
 

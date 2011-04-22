@@ -342,33 +342,6 @@ void Init(int ac, char **av)
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 
-	/* First thing, add our core bots internally. Before modules are loaded and before the database is read
-	 * This is used for modules adding commands and for the BotInfo* poiners in the command classes.
-	 * When these bots are loaded from the databases the proper user/host/rname are added.
-	 *
-	 * If a user renames a bot in the configuration file, the new bot gets created here, and the old bot
-	 * that is in the database gets created aswell, on its old nick. The old nick remains in all the channels
-	 * etc and the new bot becomes the new client to accept commands. The user can use /bs bot del later
-	 * if they want the old bot deleted.
-	 *
-	 * Note that it is important this is after loading the protocol module. The ircd struct must exist for
-	 * the ts6_ functions
-	 */
-	if (!Config->s_OperServ.empty())
-		new BotInfo(Config->s_OperServ, Config->ServiceUser, Config->ServiceHost, Config->desc_OperServ);
-	if (!Config->s_NickServ.empty())
-		new BotInfo(Config->s_NickServ, Config->ServiceUser, Config->ServiceHost, Config->desc_NickServ);
-	if (!Config->s_ChanServ.empty())
-		new BotInfo(Config->s_ChanServ, Config->ServiceUser, Config->ServiceHost, Config->desc_ChanServ);
-	if (!Config->s_HostServ.empty())
-		new BotInfo(Config->s_HostServ, Config->ServiceUser, Config->ServiceHost, Config->desc_HostServ);
-	if (!Config->s_MemoServ.empty())
-		new BotInfo(Config->s_MemoServ, Config->ServiceUser, Config->ServiceHost, Config->desc_MemoServ);
-	if (!Config->s_BotServ.empty())
-		new BotInfo(Config->s_BotServ, Config->ServiceUser, Config->ServiceHost, Config->desc_BotServ);
-	if (!Config->s_GlobalNoticer.empty())
-		new BotInfo(Config->s_GlobalNoticer, Config->ServiceUser, Config->ServiceHost, Config->desc_GlobalNoticer);
-
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config->EncModuleList);
 
@@ -379,14 +352,7 @@ void Init(int ac, char **av)
 	/* Add Database Modules */
 	ModuleManager::LoadModuleList(Config->DBModuleList);
 
-	try
-	{
-		DNSEngine = new DNSManager();
-	}
-	catch (const SocketException &ex)
-	{
-		throw FatalException(ex.GetReason());
-	}
+	DNSEngine = new DNSManager();
 
 #ifndef _WIN32
 	if (!nofork)
@@ -440,14 +406,6 @@ void Init(int ac, char **av)
 	Log(LOG_DEBUG) << "Loading Languages...";
 	InitLanguages();
 
-	/* Initialize subservices */
-	ns_init();
-	cs_init();
-	ms_init();
-	bs_init();
-	os_init();
-	hostserv_init();
-
 	/* load any custom modules */
 	if (!nothird)
 		ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
@@ -455,9 +413,6 @@ void Init(int ac, char **av)
 	/* Initialize random number generator */
 	rand_init();
 	add_entropy_userkeys();
-
-	/* Init log channels */
-	InitLogChannels(Config);
 
 	/* Load up databases */
 	Log() << "Loading databases...";

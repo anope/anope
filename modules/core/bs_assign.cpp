@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSAssign : public Command
 {
@@ -93,7 +94,10 @@ class BSAssign : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsassign);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsassign);
 	}
 };
 

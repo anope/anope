@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSChanList : public Command
 {
@@ -97,9 +98,12 @@ class OSChanList : public Module
 	OSChanList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
+	 	this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoschanlist);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoschanlist);
 	}
 };
 

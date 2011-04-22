@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetSecure : public Command
 {
@@ -56,7 +57,7 @@ class CommandNSSetSecure : public Command
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
+				"\002KILL\002 option."), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -83,7 +84,7 @@ class CommandNSSASetSecure : public CommandNSSetSecure
 				"regardless of whether your address is on the access\n"
 				"list. However, if you are on the access list, %s\n"
 				"will not auto-kill you regardless of the setting of the\n"
-				"\002KILL\002 option."), NickServ->nick.c_str(), NickServ->nick.c_str());
+				"\002KILL\002 option."), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -104,22 +105,25 @@ class NSSetSecure : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetsecure);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetsecure);
 	}
 
 	~NSSetSecure()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetsecure);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetsecure);
 	}

@@ -34,17 +34,6 @@ NickAlias::~NickAlias()
 {
 	FOREACH_MOD(I_OnDelNick, OnDelNick(this));
 
-	/* Second thing to do: look for a user using the alias
-	 * being deleted, and make appropriate changes */
-	User *u = finduser(this->nick);
-	if (u && u->Account() == this->nc)
-	{
-		ircdproto->SendAccountLogout(u, u->Account());
-		u->RemoveMode(NickServ, UMODE_REGISTERED);
-		ircdproto->SendUnregisteredNick(u);
-		u->Logout();
-	}
-
 	/* Accept nicks that have no core, because of database load functions */
 	if (this->nc)
 	{

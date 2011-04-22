@@ -12,13 +12,14 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSInvite : public Command
 {
  public:
 	CommandCSInvite() : Command("INVITE", 1, 3)
 	{
-		this->SetDesc(_("Tells ChanServ to invite you into a channel"));
+		this->SetDesc(Anope::printf(_("Tells %s to invite you into a channel"), Config->s_ChanServ.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -62,9 +63,9 @@ class CommandCSInvite : public Command
 			source.Reply(_("You are already in \002%s\002! "), c->name.c_str());
 		else
 		{
-			ircdproto->SendInvite(whosends(ci), chan, u2->nick);
+			ircdproto->SendInvite(ci->WhoSends(), chan, u2->nick);
 			source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
-			u2->SendMessage(whosends(ci), _("You have been invited to \002%s\002."), c->name.c_str());
+			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -76,7 +77,7 @@ class CommandCSInvite : public Command
 				"Tells %s to invite you into the given channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), ChanServ->nick.c_str());
+				"on the channel."), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -96,7 +97,10 @@ class CSInvite : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsinvite);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsinvite);
 	}
 };
 

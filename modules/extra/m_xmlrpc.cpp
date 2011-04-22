@@ -218,12 +218,12 @@ class ModuleXMLRPC : public Module
 	{
 		me = this;
 
-		OnReload(false);
-
 		ModuleManager::RegisterService(&this->xmlrpcinterface);
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, 1);
+		
+		OnReload();
 	}
 
 	~ModuleXMLRPC()
@@ -250,7 +250,7 @@ class ModuleXMLRPC : public Module
 		this->listen_sockets.clear();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 

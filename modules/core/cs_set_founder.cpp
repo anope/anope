@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetFounder : public Command
 {
@@ -111,22 +112,25 @@ class CSSetFounder : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetfounder);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetfounder);
 	}
 
 	~CSSetFounder()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetfounder);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetfounder);
 	}

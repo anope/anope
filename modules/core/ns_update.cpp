@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSUpdate : public Command
 {
@@ -26,16 +27,11 @@ class CommandNSUpdate : public Command
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 
-		if (!na)
-			return MOD_CONT;
-
-		do_setmodes(u);
-		check_memos(u);
-
 		na->last_realname = u->realname;
 		na->last_seen = Anope::CurTime;
-		if (ircd->vhost)
-			do_on_id(u);
+
+		FOREACH_MOD(I_OnNickUpdate, OnNickUpdate(u));
+
 		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->s_NickServ.c_str());
 		return MOD_CONT;
 	}
@@ -60,7 +56,10 @@ class NSUpdate : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsupdate);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsupdate);
 	}
 };
 

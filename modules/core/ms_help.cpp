@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSHelp : public Command
 {
@@ -24,7 +25,7 @@ class CommandMSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(MemoServ, source.u, NULL, params[0]);
+		mod_help_cmd(memoserv->Bot(), source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
@@ -36,15 +37,15 @@ class CommandMSHelp : public Command
 				"the time or not, or to channels(*). Both the sender's\n"
 				"nickname and the target nickname or channel must be\n"
 				"registered in order to send a memo.\n"
-				"%s's commands include:"), MemoServ->nick.c_str(), MemoServ->nick.c_str());
-		for (CommandMap::const_iterator it = MemoServ->Commands.begin(), it_end = MemoServ->Commands.end(); it != it_end; ++it)
+				"%s's commands include:"), Config->s_MemoServ.c_str(), Config->s_MemoServ.c_str());
+		for (CommandMap::const_iterator it = memoserv->Bot()->Commands.begin(), it_end = memoserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		source.Reply(_("Type \002%s%s HELP \037command\037\002 for help on any of the\n"
 				"above commands.\n"
 				"(*) By default, any user with at least level 10 access on a\n"
 				"    channel can read that channel's memos. This can be\n"
-				"    changed with the %s \002LEVELS\002 command."), Config->UseStrictPrivMsgString.c_str(), MemoServ->nick.c_str(), Config->s_ChanServ.c_str());
+				"    changed with the %s \002LEVELS\002 command."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), Config->s_ChanServ.c_str());
 	}
 };
 
@@ -58,7 +59,10 @@ class MSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmshelp);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmshelp);
 	}
 };
 

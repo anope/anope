@@ -13,13 +13,14 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSLogin : public Command
 {
  public:
 	CommandOSLogin() : Command("LOGIN", 1, 1)
 	{
-		this->SetDesc(Anope::printf(_("Login to %s"), OperServ->nick.c_str()));
+		this->SetDesc(Anope::printf(_("Login to %s"), Config->s_OperServ.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -40,7 +41,7 @@ class CommandOSLogin : public Command
 		}
 		else
 		{
-			Log(LOG_ADMIN, source.u, this) << "and succesfully identified to " << OperServ->nick;
+			Log(LOG_ADMIN, source.u, this) << "and succesfully identified to " << Config->s_OperServ;
 			source.u->Extend("os_login_password_correct");
 			source.Reply(_("Password accepted."));
 		}
@@ -54,7 +55,7 @@ class CommandOSLogin : public Command
 				" \n"
 				"Logs you in to %s so you gain Services Operator privileges.\n"
 				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), OperServ->nick.c_str());
+				"configured without a password."), Config->s_OperServ.c_str());
 		return true;
 	}
 
@@ -74,7 +75,10 @@ class OSLogin : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoslogin);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoslogin);
 	}
 };
 

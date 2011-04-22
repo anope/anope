@@ -31,28 +31,8 @@ NickCore::~NickCore()
 {
 	FOREACH_MOD(I_OnDelCore, OnDelCore(this));
 
-	/* Clean up this nick core from any users online using it
-	 * (ones that /nick but remain unidentified)
-	 */
-	for (std::list<User *>::iterator it = this->Users.begin(); it != this->Users.end();)
-	{
-		User *user = *it++;
-		ircdproto->SendAccountLogout(user, user->Account());
-		user->RemoveMode(NickServ, UMODE_REGISTERED);
-		ircdproto->SendUnregisteredNick(user);
-		user->Logout();
-		FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
-	}
-	this->Users.clear();
-
-	/* (Hopefully complete) cleanup */
-	cs_remove_nick(this);
-
 	/* Remove the core from the list */
 	NickCoreList.erase(this->display);
-
-	/* Log .. */
-	Log(NickServ, "nick") << "deleting nickname group " << this->display;
 
 	/* Clear access before deleting display name, we want to be able to use the display name in the clear access event */
 	this->ClearAccess();

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetPeace : public Command
 {
@@ -50,7 +51,7 @@ class CommandCSSetPeace : public Command
 				"Enables or disables the \002peace\002 option for a channel.\n"
 				"When \002peace\002 is set, a user won't be able to kick,\n"
 				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %s commands."), this->name.c_str(), ChanServ->nick.c_str());
+				"a level superior or equal to his via %s commands."), this->name.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -84,22 +85,25 @@ class CSSetPeace : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetpeace);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetpeace);
 	}
 
 	~CSSetPeace()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetpeace);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetpeace);
 	}

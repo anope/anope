@@ -31,35 +31,15 @@ E void kill_user(const Anope::string &source, User *user, const Anope::string &r
 E bool bad_password(User *u);
 E void common_unban(ChannelInfo *ci, User *u, bool full = false);
 
-E BotInfo *BotServ;
-E BotInfo *ChanServ;
-E BotInfo *Global;
-E BotInfo *HostServ;
-E BotInfo *MemoServ;
-E BotInfo *NickServ;
-E BotInfo *OperServ;
-
 /**** botserv.c ****/
 
-E void get_botserv_stats(long *nrec, long *memuse);
-E void bs_init();
-E void botchanmsgs(User *u, ChannelInfo *ci, const Anope::string &buf);
 E BotInfo *findbot(const Anope::string &nick);
 
-/** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
- * @param uid The UID to search for
- * @return The pseudoclient structure, or NULL if one could not be found
- */
-E Anope::string normalizeBuffer(const Anope::string &);
-
-E void check_ban(ChannelInfo *ci, User *u, int ttbtype);
-E void bot_kick(ChannelInfo *ci, User *u, const char *message, ...);
 E void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 E void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 
 /**** channels.c ****/
 
-E void get_channel_stats(long *nrec, long *memuse);
 
 E Channel *findchan(const Anope::string &chan);
 
@@ -75,27 +55,14 @@ E void MassChannelModes(BotInfo *bi, const Anope::string &modes);
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
-inline BotInfo *whosends(ChannelInfo *ci)
-{
-	if (!ci || !ci->bi || !ci->c || !ci->botflags.HasFlag(BS_SYMBIOSIS) || !ci->c->FindUser(ci->bi))
-		return ChanServ ? ChanServ : NickServ;
-	return ci->bi;
-}
-
 /**** chanserv.c ****/
 
 E LevelInfo levelinfo[];
 
-E void get_chanserv_stats(long *nrec, long *memuse);
 
 E void reset_levels(ChannelInfo *ci);
-E void cs_init();
-E void expire_chans();
-E void cs_remove_nick(NickCore *nc);
 
 E void check_modes(Channel *c);
-E int check_valid_admin(User *user, Channel *chan, int servermode);
-E int check_valid_op(User *user, Channel *chan, int servermode);
 
 E ChannelInfo *cs_findchan(const Anope::string &chan);
 E int check_access(User *user, ChannelInfo *ci, int what);
@@ -111,17 +78,11 @@ E Anope::string get_mlock_modes(ChannelInfo *ci, int complete);
 E ConfigurationFile services_conf;
 E ServerConfig *Config;
 
-/* hostserv.c */
-E void do_on_id(User *u);
-E void HostServSyncVhosts(NickAlias *na);
-
 /**** encrypt.c ****/
 E int enc_encrypt(const Anope::string &src, Anope::string &dest);
 E int enc_decrypt(const Anope::string &src, Anope::string &dest);
 
 /**** hostserv.c  ****/
-E void get_hostserv_stats(long *nrec, long *memuse);
-E void hostserv_init();
 
 /**** init.c ****/
 
@@ -146,9 +107,6 @@ E void PopLanguage();
 E const char *anope_gettext(const char *string);
 E void SyntaxError(CommandSource &source, const Anope::string &command, const Anope::string &message);
 
-/*** logger.cpp ***/
-E void InitLogChannels(ServerConfig *);
-
 /**** main.c ****/
 
 E Anope::string services_dir;
@@ -169,7 +127,6 @@ E time_t start_time;
 E ConnectionSocket *UplinkSock;
 
 E void save_databases();
-E void expire_all();
 E void sighandler(int signum);
 E void do_restart_services();
 
@@ -183,14 +140,6 @@ class CoreExport UplinkSocket : public ConnectionSocket
 
 	bool Read(const Anope::string &buf);
 };
-
-/**** memoserv.c ****/
-
-E void ms_init();
-E void rsend_notify(CommandSource &source, Memo *m, const Anope::string &chan);
-E void check_memos(User *u);
-E MemoInfo *getmemoinfo(const Anope::string &name, bool &ischan, bool &isforbid);
-E void memo_send(CommandSource &source, const Anope::string &name, const Anope::string &text, int z);
 
 /**** messages.cpp ****/
 
@@ -225,12 +174,6 @@ E bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 E bool IsFile(const Anope::string &filename);
 E int toupper(char);
 E int tolower(char);
-#ifndef HAVE_STRLCPY
-E size_t strlcpy(char *, const char *, size_t);
-#endif
-#ifndef HAVE_STRLCAT
-E size_t strlcat(char *, const char *, size_t);
-#endif
 
 E time_t dotime(const Anope::string &s);
 E Anope::string duration(time_t seconds);
@@ -260,6 +203,7 @@ E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' '
 
 E bool str_is_wildcard(const Anope::string &str);
 E bool str_is_pure_wildcard(const Anope::string &str);
+E Anope::string normalizeBuffer(const Anope::string &);
 
 /**** modes.cpp ****/
 /* Number of generic modes we support */
@@ -269,15 +213,9 @@ E void SetDefaultMLock(ServerConfig *config);
 
 /**** nickserv.c ****/
 
-E void get_aliases_stats(long &count, long &mem);
-E void get_core_stats(long &count, long &mem);
 E void change_core_display(NickCore *nc);
 E void change_core_display(NickCore *nc, const Anope::string &newdisplay);
-E int do_setmodes(User *u);
 
-E void ns_init();
-E int validate_user(User *u);
-E void expire_nicks();
 E NickAlias *findnick(const Anope::string &nick);
 E NickCore *findcore(const Anope::string &nick);
 E bool is_on_access(const User *u, const NickCore *nc);
@@ -292,24 +230,6 @@ E void send_cmd(const Anope::string &source, const char *fmt, ...) FORMAT(printf
 
 E void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...) FORMAT(printf, 3, 4);
 
-/**** sessions.c ****/
-
-E std::vector<Exception *> exceptions;
-
-E void get_session_stats(long &count, long &mem);
-E void get_exception_stats(long &count, long &mem);
-
-E void add_session(User *u);
-E void del_session(User *u);
-
-E void expire_exceptions();
-
-E Session *findsession(const Anope::string &host);
-
-E Exception *find_host_exception(const Anope::string &host);
-E Exception *find_hostip_exception(const Anope::string &host, const Anope::string &hostip);
-E int exception_add(User *u, const Anope::string &mask, unsigned limit, const Anope::string &reason, const Anope::string &who, time_t expires);
-
 /**** sockets.cpp ****/
 
 E SocketEngineBase *SocketEngine;
@@ -322,8 +242,6 @@ E SocketIO normalSocketIO;
 E int32 opcnt;
 E uint32 maxusercnt, usercnt;
 E time_t maxusertime;
-
-E void get_user_stats(long &count, long &mem);
 
 E User *finduser(const Anope::string &nick);
 
@@ -341,10 +259,5 @@ E Anope::string create_mask(User *u);
 
 E void b64_encode(const Anope::string &src, Anope::string &target);
 E void b64_decode(const Anope::string &src, Anope::string &target);
-
-#ifdef _WIN32
-E Anope::string GetWindowsVersion();
-E bool SupportedWindowsVersion();
-#endif
 
 #endif /* EXTERN_H */

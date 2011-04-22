@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSRelease : public Command
 {
@@ -87,7 +88,7 @@ class CommandNSRelease : public Command
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), NickServ->nick.c_str(), relstr.c_str());
+				"the nickname."), Config->s_NickServ.c_str(), relstr.c_str());
 
 
 		return true;
@@ -109,7 +110,10 @@ class NSRelease : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsrelease);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsrelease);
 	}
 };
 

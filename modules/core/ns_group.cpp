@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSGroup : public Command
 {
@@ -60,7 +61,7 @@ class CommandNSGroup : public Command
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
 		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
 		{
-			Log(NickServ) << NickServ << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
+			Log(nickserv->Bot()) << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
 			source.Reply(_(NICK_X_SUSPENDED), u->nick.c_str());
 		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
@@ -124,16 +125,13 @@ class CommandNSGroup : public Command
 
 				u->Login(na->nc);
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
+				ircdproto->SendAccountLogin(u, u->Account());
 				ircdproto->SetAutoIdentificationToken(u);
-				if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
-					u->SetMode(NickServ, UMODE_REGISTERED);
 
 				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 				source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
 
 				u->lastnickreg = Anope::CurTime;
-
-				check_memos(u);
 			}
 			else
 			{
@@ -177,7 +175,7 @@ class CommandNSGroup : public Command
 				"not possible.\n"
 				" \n"
 				"\037Note\037: all the nicknames of a group have the same password."),
-				Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+				Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -233,7 +231,7 @@ class CommandNSUngroup : public Command
 			User *user = finduser(na->nick);
 			if (user)
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(NickServ, UMODE_REGISTERED);
+				user->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
 		}
 
 		return MOD_CONT;
@@ -318,9 +316,9 @@ class NSGroup : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsgroup);
-		this->AddCommand(NickServ, &commandnsungroup);
-		this->AddCommand(NickServ, &commandnsglist);
+		this->AddCommand(nickserv->Bot(), &commandnsgroup);
+		this->AddCommand(nickserv->Bot(), &commandnsungroup);
+		this->AddCommand(nickserv->Bot(), &commandnsglist);
 	}
 };
 

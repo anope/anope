@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hostserv.h"
 
 class CommandHSGroup : public Command
 {
@@ -27,7 +28,7 @@ class CommandHSGroup : public Command
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
-			HostServSyncVhosts(na);
+			hostserv->Sync(na);
 			if (!na->hostinfo.GetIdent().empty())
 				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
@@ -60,7 +61,10 @@ class HSGroup : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, &commandhsgroup);
+		if (!hostserv)
+			throw ModuleException("HostServ is not loaded!");
+
+		this->AddCommand(hostserv->Bot(), &commandhsgroup);
 	}
 };
 

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSASetNoexpire : public Command
 {
@@ -68,14 +69,17 @@ class CSSetNoexpire : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SASET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetnoexpire);
 	}
 
 	~CSSetNoexpire()
 	{
-		Command *c = FindCommand(ChanServ, "SASET");
+		Command *c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetnoexpire);
 	}

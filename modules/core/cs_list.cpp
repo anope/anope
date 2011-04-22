@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hashcomp.h"
+#include "chanserv.h"
 
 class CommandCSList : public Command
 {
@@ -147,7 +147,10 @@ class CSList : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcslist);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcslist);
 	}
 };
 

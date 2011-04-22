@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSKick : public Command
 {
@@ -54,9 +55,9 @@ class CommandCSKick : public Command
 			Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
 
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
-				ci->c->Kick(whosends(ci), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
+				ci->c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
-				ci->c->Kick(whosends(ci), u2, "%s", reason.c_str());
+				ci->c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 		}
 		return MOD_CONT;
 	}
@@ -88,7 +89,10 @@ class CSKick : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcskick);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcskick);
 	}
 };
 

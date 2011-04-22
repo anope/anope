@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 #include "os_ignore.h"
 
 class OSIgnoreService : public IgnoreService
@@ -292,7 +293,10 @@ class OSIgnore : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosignore);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosignore);
 
 		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnPreCommandRun, I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, 4);

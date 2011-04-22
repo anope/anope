@@ -39,7 +39,7 @@ class CoreExport Log
 
 	std::stringstream buf;
 
-	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", BotInfo *bi = Global);
+	Log(LogType type = LOG_NORMAL, const Anope::string &category = "", BotInfo *bi = NULL);
 
 	/* LOG_COMMAND/OVERRIDE/ADMIN */
 	Log(LogType type, User *u, Command *c, ChannelInfo *ci = NULL);

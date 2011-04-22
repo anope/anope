@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSMode : public Command
 {
@@ -36,7 +37,7 @@ class CommandOSMode : public Command
 				source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
 			else
 			{
-				c->SetModes(OperServ, false, modes.c_str());
+				c->SetModes(operserv->Bot(), false, modes.c_str());
 
 				Log(LOG_ADMIN, u, this) << modes << " on " << target;
 			}
@@ -48,10 +49,10 @@ class CommandOSMode : public Command
 				source.Reply(_(NICK_X_NOT_IN_USE), target.c_str());
 			else
 			{
-				u2->SetModes(OperServ, "%s", modes.c_str());
+				u2->SetModes(operserv->Bot(), "%s", modes.c_str());
 				source.Reply(_("Changed usermodes of \002%s\002 to %s."), u2->nick.c_str(), modes.c_str());
 
-				u2->SendMessage(OperServ, _("\002%s\002 changed your usermodes to %s."), u->nick.c_str(), modes.c_str());
+				u2->SendMessage(operserv->Bot(), _("\002%s\002 changed your usermodes to %s."), u->nick.c_str(), modes.c_str());
 
 				Log(LOG_ADMIN, u, this) << modes << " on " << target;
 			}
@@ -86,7 +87,10 @@ class OSMode : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosmode);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosmode);
 	}
 };
 

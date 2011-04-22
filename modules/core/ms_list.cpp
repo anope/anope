@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class MemoListCallback : public NumberList
 {
@@ -172,7 +173,10 @@ class MSList : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmslist);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmslist);
 	}
 };
 

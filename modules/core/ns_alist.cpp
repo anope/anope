@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSAList : public Command
 {
@@ -175,7 +176,7 @@ class NSAList : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsalist);
+		this->AddCommand(nickserv->Bot(), &commandnsalist);
 	}
 };
 

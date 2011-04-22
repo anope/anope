@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetOpNotice : public Command
 {
@@ -50,7 +51,7 @@ class CommandCSSetOpNotice : public Command
 				"Enables or disables the \002op-notice\002 option for a channel.\n"
 				"When \002op-notice\002 is set, %s will send a notice to the\n"
 				"channel whenever the \002OP\002 or \002DEOP\002 commands are used for a user\n"
-				"in the channel."), this->name.c_str(), ChanServ->nick.c_str());
+				"in the channel."), this->name.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -84,22 +85,25 @@ class CSSetOpNotice : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetopnotice);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetopnotice);
 	}
 
 	~CSSetOpNotice()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetopnotice);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetopnotice);
 	}

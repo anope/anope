@@ -468,7 +468,21 @@ class dynamic_reference : public dynamic_reference_base
 			this->invalid = false;
 			this->ref = NULL;
 		}
-		return this->ref;
+		return this->ref != NULL;
+	}
+
+	virtual inline operator T*()
+	{
+		if (this->operator bool())
+			return this->ref;
+		return NULL;
+	}
+
+	virtual inline T *operator->()
+	{
+		if (this->operator bool())
+			return this->ref;
+		return NULL;
 	}
 
 	virtual inline void operator=(T *newref)
@@ -483,16 +497,6 @@ class dynamic_reference : public dynamic_reference_base
 		this->ref = newref;
 		if (this->ref)
 			this->ref->AddReference(this);
-	}
-
-	virtual inline T *operator->()
-	{
-		return this->ref;
-	}
-
-	virtual inline T *operator*()
-	{
-		return this->ref;
 	}
 };
 

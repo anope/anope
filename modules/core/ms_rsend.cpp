@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSRSend : public Command
 {
@@ -36,22 +37,34 @@ class CommandMSRSend : public Command
 			return MOD_CONT;
 		}
 
-		if (Config->MSMemoReceipt == 1)
+		if (Config->MSMemoReceipt == 1 && !u->IsServicesOper())
+			source.Reply(_(ACCESS_DENIED));
+		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
 		{
-			/* Services opers and above can use rsend */
-			if (u->IsServicesOper())
-				memo_send(source, nick, text, 3);
-			else
-				source.Reply(_(ACCESS_DENIED));
-		}
-		else if (Config->MSMemoReceipt == 2)
-			/* Everybody can use rsend */
-			memo_send(source, nick, text, 3);
-		else
-		{
-			/* rsend has been disabled */
 			Log() << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
 			source.Reply(_("Sorry, RSEND has been disabled on this network."));
+		}
+		else
+		{
+			MemoServService::MemoResult result = memoserv->Send(u->nick, nick, text);
+			if (result == MemoServService::MEMO_INVALID_TARGET)
+				source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
+			else if (result == MemoServService::MEMO_TOO_FAST)
+				source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
+			else if (result == MemoServService::MEMO_TARGET_FULL)
+				source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
+			else	
+			{
+				source.Reply(_("Memo sent to \002%s\002."), name.c_str());
+
+				bool ischan, isforbid;
+				MemoInfo *mi = memoserv->GetMemoInfo(nick, ischan, isforbid);
+				if (mi == NULL)
+					throw CoreException("NULL mi in ms_rsend");
+				Memo *m = (mi->memos.size() ? mi->memos[mi->memos.size() - 1] : NULL);
+				if (m != NULL)
+					m->SetFlag(MF_RECEIPT);
+			}
 		}
 
 		return MOD_CONT;
@@ -85,12 +98,15 @@ class MSRSend : public Module
 	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		if (!Config->MSMemoReceipt)
-			throw ModuleException("Don't like memo reciepts, or something.");
+			throw ModuleException("Invalid value for memoreceipt");
 
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmsrsend);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmsrsend);
 	}
 };
 

@@ -6,6 +6,7 @@
  */
 
 #include "module.h"
+#include "operserv.h"
 
 class HelpChannel : public Module
 {
@@ -20,23 +21,23 @@ class HelpChannel : public Module
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
 		ModuleManager::Attach(i, this, 2);
 
-		OnReload(true);
+		OnReload();
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)
 	{
-		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
+		if (Name == CMODE_OP && operserv && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{
 			User *u = finduser(param);
 
 			if (u && check_access(u, c->ci, CA_OPDEOPME))
-				u->SetMode(OperServ, UMODE_HELPOP);
+				u->SetMode(operserv->Bot(), UMODE_HELPOP);
 		}
 
 		return EVENT_CONTINUE;
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 

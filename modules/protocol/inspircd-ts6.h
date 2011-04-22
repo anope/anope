@@ -33,25 +33,28 @@ class InspIRCdTS6Proto : public IRCDProto
  private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
+		User *u = finduser(Config->s_HostServ);
 		if (!has_chgidentmod)
-			ircdproto->SendGlobops(OperServ, "CHGIDENT not loaded!");
+			Log() << "CHGIDENT not loaded!";
 		else
-			send_cmd(HostServ ? HostServ->GetUID() : Config->Numeric, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
+			send_cmd(u ? u->GetUID() : Config->Numeric, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
 	}
 
 	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
 	{
+		User *u = finduser(Config->s_HostServ);
 		if (!has_chghostmod)
-			ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
+			Log() << "CHGHOST not loaded!";
 		else
-			send_cmd(HostServ ? HostServ->GetUID() : Config->Numeric, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+			send_cmd(u ? u->GetUID() : Config->Numeric, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 	}
 
  public:
 
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd(OperServ ? OperServ->GetUID() : Config->Numeric, "GLINE %s", x->Mask.c_str());
+		User *u = finduser(Config->s_OperServ);
+		send_cmd(u ? u->GetUID() : Config->Numeric, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
@@ -76,7 +79,8 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(OperServ ? OperServ->GetUID() : Config->Numeric, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
+		User *u = finduser(Config->s_OperServ);
+		send_cmd(u ? u->GetUID() : Config->Numeric, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -175,13 +179,13 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(NickServ->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
+		send_cmd(nickserv->Bot()->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(NickServ->GetUID(), "SVSHOLD %s", nick.c_str());
+		send_cmd(nickserv->Bot()->GetUID(), "SVSHOLD %s", nick.c_str());
 	}
 
 	/* UNSZLINE */

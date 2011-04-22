@@ -52,9 +52,6 @@ Channel::~Channel()
 
 	Log(NULL, this, "destroy");
 
-	for (std::list<BanData *>::iterator it = this->bd.begin(), it_end = this->bd.end(); it != it_end; ++it)
-		delete *it;
-
 	if (this->ci)
 		this->ci->c = NULL;
 
@@ -126,14 +123,6 @@ void Channel::JoinUser(User *user)
 		this->creation_time = this->ci->time_registered;
 		ircdproto->SendChannel(this);
 		this->Reset();
-	}
-
-	if (this->ci && check_access(user, this->ci, CA_MEMO) && this->ci->memos.memos.size() > 0)
-	{
-		if (this->ci->memos.memos.size() == 1)
-			user->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), this->ci->memos.memos.size(), this->ci->name.c_str());
-		else
-			user->SendMessage(MemoServ, _("There are \002%d\002 memos on channel %s."), this->ci->memos.memos.size(), this->ci->name.c_str());
 	}
 
 	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)
@@ -838,8 +827,8 @@ bool Channel::Kick(BotInfo *bi, User *u, const char *reason, ...)
 	FOREACH_RESULT(I_OnBotKick, OnBotKick(bi, this, u, buf));
 	if (MOD_RESULT == EVENT_STOP)
 		return false;
-	ircdproto->SendKick(bi ? bi : whosends(this->ci), this, u, "%s", buf);
-	this->KickInternal(bi ? bi->nick : whosends(this->ci)->nick, u->nick, buf);
+	ircdproto->SendKick(bi ? bi : this->ci->WhoSends(), this, u, "%s", buf);
+	this->KickInternal(bi ? bi->nick : this->ci->WhoSends()->nick, u->nick, buf);
 	return true;
 }
 
@@ -891,7 +880,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	this->topic_setter = u ? u->nick : user;
 	this->topic_time = ts;
 
-	ircdproto->SendTopic(whosends(this->ci), this);
+	ircdproto->SendTopic(this->ci->WhoSends(), this);
 
 	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, this->topic));
 
@@ -910,41 +899,6 @@ Channel *findchan(const Anope::string &chan)
 	if (it != ChannelList.end())
 		return it->second;
 	return NULL;
-}
-
-/*************************************************************************/
-
-/* Return statistics.  Pointers are assumed to be valid. */
-
-void get_channel_stats(long *nrec, long *memuse)
-{
-	long count = 0, mem = 0;
-	Anope::string buf;
-
-	for (channel_map::const_iterator cit = ChannelList.begin(); cit != ChannelList.end(); ++cit)
-	{
-		Channel *chan = cit->second;
-
-		++count;
-		mem += sizeof(*chan);
-		if (!chan->topic.empty())
-			mem += chan->topic.length() + 1;
-		for (CUserList::iterator it = chan->users.begin(), it_end = chan->users.end(); it != it_end; ++it)
-		{
-			mem += sizeof(*it);
-			mem += sizeof((*it)->ud);
-			if (!(*it)->ud.lastline.empty())
-				mem += (*it)->ud.lastline.length() + 1;
-		}
-		for (std::list<BanData *>::iterator it = chan->bd.begin(), it_end = chan->bd.end(); it != it_end; ++it)
-		{
-			if (!(*it)->mask.empty())
-				mem += (*it)->mask.length() + 1;
-			mem += sizeof(*it);
-		}
-	}
-	*nrec = count;
-	*memuse = mem;
 }
 
 /*************************************************************************/

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 static bool SendConfirmMail(User *u)
 {
@@ -38,7 +39,7 @@ static bool SendConfirmMail(User *u)
 	" \n"
 	"%s administrators."), u->Account()->email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, u->Account(), NickServ, subject, message);
+	return Mail(u, u->Account(), nickserv->Bot(), subject, message);
 }
 
 class CommandNSSetEmail : public Command
@@ -139,24 +140,27 @@ class NSSetEmail : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
 		ModuleManager::Attach(I_OnPreCommand, this);
 
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetemail);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetemail);
 	}
 
 	~NSSetEmail()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetemail);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetemail);
 	}
@@ -164,7 +168,7 @@ class NSSetEmail : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		if (command->service == NickServ && command->name.equals_ci("CONFIRM") && !params.empty() && u->IsIdentified())
+		if (command->service->nick == Config->s_NickServ && command->name.equals_ci("CONFIRM") && !params.empty() && u->IsIdentified())
 		{
 			Anope::string new_email, passcode;
 			if (u->Account()->GetExtRegular("ns_set_email", new_email) && u->Account()->GetExtRegular("ns_set_email_passcode", passcode))

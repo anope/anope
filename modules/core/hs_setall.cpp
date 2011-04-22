@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "hostserv.h"
 
 class CommandHSSetAll : public Command
 {
@@ -92,7 +93,7 @@ class CommandHSSetAll : public Command
 		Log(LOG_ADMIN, u, this) << "to set the vhost for all nicks in group " << na->nc->display << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
 		na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
-		HostServSyncVhosts(na);
+		hostserv->Sync(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!vIdent.empty())
 			source.Reply(_("vhost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), vIdent.c_str(), hostmask.c_str());
@@ -129,7 +130,10 @@ class HSSetAll : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(HostServ, &commandhssetall);
+		if (!hostserv)
+			throw ModuleException("HostServ is not loaded!");
+
+		this->AddCommand(hostserv->Bot(), &commandhssetall);
 	}
 };
 

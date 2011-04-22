@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetPersist : public Command
 {
@@ -51,9 +52,9 @@ class CommandCSSetPersist : public Command
 				 */
 				if (!ci->bi && !cm)
 				{
-					ChanServ->Assign(NULL, ci);
-					if (!ci->c->FindUser(ChanServ))
-						ChanServ->Join(ci->c);
+					chanserv->Bot()->Assign(NULL, ci);
+					if (!ci->c->FindUser(chanserv->Bot()))
+						chanserv->Bot()->Join(ci->c);
 				}
 
 				/* Set the perm mode */
@@ -90,7 +91,7 @@ class CommandCSSetPersist : public Command
 				 */
 				if (!cm && Config->s_BotServ.empty() && ci->bi)
 					/* Unassign bot */
-					ChanServ->UnAssign(NULL, ci);
+					chanserv->Bot()->UnAssign(NULL, ci);
 			}
 
 			source.Reply(_("Channel \002%s\002 is no longer persistant."), ci->name.c_str());
@@ -156,22 +157,25 @@ class CSSetPersist : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetpeace);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetpeace);
 	}
 
 	~CSSetPersist()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetpeace);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetpeace);
 	}

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSStaff : public Command
 {
@@ -36,7 +37,7 @@ class CommandMSStaff : public Command
 			NickCore *nc = it->second;
 
 			if (nc->IsServicesOper())
-				memo_send(source, nc->display, text, 0);
+				memoserv->Send(source.u->nick, nc->display, text, true);
 		}
 
 		return MOD_CONT;
@@ -67,7 +68,10 @@ class MSStaff : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmsstaff);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmsstaff);
 	}
 };
 

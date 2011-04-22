@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSIgnore : public Command
 {
@@ -37,7 +38,7 @@ class CommandMSIgnore : public Command
 		}
 
 		bool ischan, isforbid;
-		MemoInfo *mi = getmemoinfo(channel, ischan, isforbid);
+		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan, isforbid);
 		if (!mi)
 		{
 			if (isforbid)
@@ -111,7 +112,10 @@ class MSIgnore : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmsignore);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmsignore);
 	}
 };
 

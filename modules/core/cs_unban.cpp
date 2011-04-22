@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSUnban : public Command
 {
@@ -66,7 +67,7 @@ class CommandCSUnban : public Command
 				"user from entering the given channel.  \n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), ChanServ->nick.c_str());
+				"on the channel."), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -86,7 +87,7 @@ class CSUnban : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsunban);
+		this->AddCommand(chanserv->Bot(), &commandcsunban);
 	}
 };
 

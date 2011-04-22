@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSet : public Command
 {
@@ -59,7 +60,7 @@ class CommandCSSet : public Command
 			Anope::string cmdparams = ci->name;
 			for (std::vector<Anope::string>::const_iterator it = params.begin() + 2, it_end = params.end(); it != it_end; ++it)
 				cmdparams += " " + *it;
-			mod_run_cmd(ChanServ, u, NULL, c, params[1], cmdparams);
+			mod_run_cmd(chanserv->Bot(), u, NULL, c, params[1], cmdparams);
 		}
 		else
 		{
@@ -83,7 +84,7 @@ class CommandCSSet : public Command
 			for (subcommand_map::iterator it = this->subcommands.begin(), it_end = this->subcommands.end(); it != it_end; ++it)
 				it->second->OnServHelp(source);
 			source.Reply(_("Type \002%s%s HELP SET \037option\037\002 for more information on a\n"
-					"particular option."), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+					"particular option."), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 			return true;
 		}
 		else
@@ -135,7 +136,10 @@ class CSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsset);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsset);
 	}
 };
 

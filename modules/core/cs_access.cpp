@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class AccessListCallback : public NumberList
 {
@@ -504,7 +505,7 @@ class CommandCSAccess : public Command
 				" \n"
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
 				"access list."),
-				ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		source.Reply(_("\002User access levels\002\n"
 				" \n"
 				"By default, the following access levels are defined:\n"
@@ -523,7 +524,7 @@ class CommandCSAccess : public Command
 				" \n"
 				"These levels may be changed, or new ones added, using the\n"
 				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
-				"information."), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"information."), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -746,7 +747,7 @@ class CommandCSLevels : public Command
 					"\002HELP ACCESS LEVELS\002).\n"
 					" \n"
 					"For a list of the features and functions whose levels can be\n"
-					"set, see \002HELP LEVELS DESC\002."), ChanServ->nick.c_str());
+					"set, see \002HELP LEVELS DESC\002."), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -767,8 +768,11 @@ class CSAccess : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsaccess);
-		this->AddCommand(ChanServ, &commandcslevels);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsaccess);
+		this->AddCommand(chanserv->Bot(), &commandcslevels);
 	}
 };
 

@@ -1,4 +1,4 @@
-/* OperServ core functions
+/* Global core functions
  *
  * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
@@ -12,11 +12,12 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "global.h"
 
-class CommandOSGlobal : public Command
+class CommandGLGlobal : public Command
 {
  public:
-	CommandOSGlobal() : Command("GLOBAL", 1, 1, "operserv/global")
+	CommandGLGlobal() : Command("GLOBAL", 1, 1, "global/global")
 	{
 		this->SetDesc(_("Send a message to all users"));
 	}
@@ -27,7 +28,7 @@ class CommandOSGlobal : public Command
 		const Anope::string &msg = params[0];
 
 		Log(LOG_ADMIN, u, this);
-		oper_global(u->nick, "%s", msg.c_str());
+		global->SendGlobal(global->Bot(), u->nick, msg);
 		return MOD_CONT;
 	}
 
@@ -36,7 +37,7 @@ class CommandOSGlobal : public Command
 		source.Reply(_("Syntax: \002GLOBAL \037message\037\002\n"
 				" \n"
 				"Allows Administrators to send messages to all users on the \n"
-				"network. The message will be sent from the nick \002%s\002."), Config->s_GlobalNoticer.c_str());
+				"network. The message will be sent from the nick \002%s\002."), Config->s_Global.c_str());
 		return true;
 	}
 
@@ -46,22 +47,21 @@ class CommandOSGlobal : public Command
 	}
 };
 
-class OSGlobal : public Module
+class GLGlobal : public Module
 {
-	CommandOSGlobal commandosglobal;
+	CommandGLGlobal commandglglobal;
 
  public:
-	OSGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		if (Config->s_GlobalNoticer.empty())
+		if (Config->s_Global.empty())
 			throw ModuleException("Global is disabled");
 
-		// Maybe we should put this ON Global?
-		this->AddCommand(OperServ, &commandosglobal);
+		this->AddCommand(global->Bot(), &commandglglobal);
 	}
 };
 
-MODULE_INIT(OSGlobal)
+MODULE_INIT(GLGlobal)

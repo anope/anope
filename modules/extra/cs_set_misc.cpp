@@ -11,6 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetMisc : public Command
 {
@@ -77,8 +78,8 @@ class CSSetMisc : public Module
 		if (Commands.empty())
 			return;
 
-		Command *set = FindCommand(ChanServ, "SET");
-		Command *saset = FindCommand(ChanServ, "SASET");
+		Command *set = FindCommand(chanserv->Bot(), "SET");
+		Command *saset = FindCommand(chanserv->Bot(), "SASET");
 
 		if (!set && !saset)
 			return;
@@ -114,10 +115,13 @@ class CSSetMisc : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
 		Implementation i[] = { I_OnReload, I_OnChanInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 4);
 
-		OnReload(true);
+		OnReload();
 	}
 
 	~CSSetMisc()
@@ -125,12 +129,12 @@ class CSSetMisc : public Module
 		RemoveAll();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		RemoveAll();
 
-		Command *set = FindCommand(ChanServ, "SET");
-		Command *saset = FindCommand(ChanServ, "SASET");
+		Command *set = FindCommand(chanserv->Bot(), "SET");
+		Command *saset = FindCommand(chanserv->Bot(), "SASET");
 		if (!set && !saset)
 			return;
 

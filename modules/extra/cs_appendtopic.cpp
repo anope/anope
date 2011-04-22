@@ -17,8 +17,7 @@
 /*************************************************************************/
 
 #include "module.h"
-
-#define AUTHOR "SGR"
+#include "chanserv.h"
 
 /* ------------------------------------------------------------
  * Name: cs_appendtopic
@@ -110,12 +109,15 @@ class CSAppendTopic : public Module
  public:
 	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		me = this;
-
-		this->SetAuthor(AUTHOR);
+		this->SetAuthor("SGR");
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(ChanServ, &commandcsappendtopic);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		me = this;
+
+		this->AddCommand(chanserv->Bot(), &commandcsappendtopic);
 	}
 };
 

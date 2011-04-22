@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSSet : public Command
 {
@@ -216,7 +217,7 @@ class CommandBSSet : public Command
 					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
 					"on a specific option.\n"
 					"Note: access to this command is controlled by the\n"
-					"level SET."), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
+					"level SET."), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
 			User *u = source.u;
 			if (u->IsServicesOper())
 				source.Reply(_("These options are reserved to Services Operators:\n"
@@ -308,7 +309,10 @@ class BSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsset);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsset);
 	}
 };
 

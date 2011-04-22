@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSTopic : public Command
 {
@@ -58,7 +59,7 @@ class CommandCSTopic : public Command
 				"for more information.\n"
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str());
+				"channel."), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -78,7 +79,7 @@ class CSTopic : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcstopic);
+		this->AddCommand(chanserv->Bot(), &commandcstopic);
 	}
 };
 

@@ -13,6 +13,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSQuit : public Command
 {
@@ -26,9 +27,6 @@ class CommandOSQuit : public Command
 	{
 		User *u = source.u;
 		quitmsg = "QUIT command received from " + u->nick;
-
-		if (Config->GlobalOnCycle)
-			oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
 		quitting = true;
 		return MOD_CONT;
 	}
@@ -56,7 +54,10 @@ class OSQuit : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosquit);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosquit);
 	}
 };
 

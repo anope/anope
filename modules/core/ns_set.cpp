@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSet : public Command
 {
@@ -57,7 +58,7 @@ class CommandNSSet : public Command
 				Log(LOG_COMMAND, u, this) << params[0] << " " << cmdparams;
 			else
 				Log(LOG_COMMAND, u, this) << params[0];
-			mod_run_cmd(NickServ, u, NULL, c, params[0], cmdparams);
+			mod_run_cmd(nickserv->Bot(), u, NULL, c, params[0], cmdparams);
 		}
 		else
 			source.Reply(_(NICK_SET_UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), params[0].c_str());
@@ -79,7 +80,7 @@ class CommandNSSet : public Command
 					"information).\n"
 					" \n"
 					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
-					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str(), (Config->UseStrictPrivMsg ? "/msg " : "/"), NickServ->nick.c_str());
+					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), (Config->UseStrictPrivMsg ? "/msg " : "/"), Config->s_NickServ.c_str());
 			return true;
 		}
 		else
@@ -189,7 +190,7 @@ class CommandNSSetPassword : public Command
 
 		if (enc_encrypt(param, u->Account()->pass) < 0)
 		{
-			Log(NickServ) << "Failed to encrypt password for " << u->Account()->display << " (set)";
+			Log() << "Failed to encrypt password for " << u->Account()->display << " (set)";
 			source.Reply(_(NICK_SASET_PASSWORD_FAILED));
 			return MOD_CONT;
 		}
@@ -231,7 +232,10 @@ class NSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsset);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsset);
 
 		commandnsset.AddSubcommand(this, &commandnssetdisplay);
 		commandnsset.AddSubcommand(this, &commandnssetpassword);

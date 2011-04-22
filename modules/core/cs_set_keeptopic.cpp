@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetKeepTopic : public Command
 {
@@ -51,7 +52,7 @@ class CommandCSSetKeepTopic : public Command
 				"channel. When \002topic retention\002 is set, the topic for the\n"
 				"channel will be remembered by %s even after the\n"
 				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), this->name.c_str(), ChanServ->nick.c_str());
+				"next time the channel is created."), this->name.c_str(), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -85,22 +86,25 @@ class CSSetKeepTopic : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetkeeptopic);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetkeeptopic);
 	}
 
 	~CSSetKeepTopic()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetkeeptopic);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetkeeptopic);
 	}

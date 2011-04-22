@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "chanserv.h"
 
 registered_channel_map RegisteredChannelList;
 
@@ -140,70 +141,6 @@ Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
 
 /*************************************************************************/
 
-/* Return information on memory use.  Assumes pointers are valid. */
-
-void get_chanserv_stats(long *nrec, long *memuse)
-{
-	long count = 0, mem = 0;
-	ModeLock *ml;
-
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
-	{
-		ChannelInfo *ci = it->second;
-
-		++count;
-		mem += sizeof(*ci);
-		if (!ci->desc.empty())
-			mem += ci->desc.length() + 1;
-		mem += ci->GetAccessCount() * sizeof(ChanAccess);
-		mem += ci->GetAkickCount() * sizeof(AutoKick);
-
-		ml = ci->GetMLock(CMODE_KEY);
-		if (ml && !ml->param.empty())
-			mem += ml->param.length() + 1;
-
-		ml = ci->GetMLock(CMODE_FLOOD);
-		if (ml && !ml->param.empty())
-			mem += ml->param.length() + 1;
-
-		ml = ci->GetMLock(CMODE_REDIRECT);
-		if (ml && !ml->param.empty())
-			mem += ml->param.length() + 1;
-
-		if (!ci->last_topic.empty())
-			mem += ci->last_topic.length() + 1;
-		if (!ci->forbidby.empty())
-			mem += ci->forbidby.length() + 1;
-		if (!ci->forbidreason.empty())
-			mem += ci->forbidreason.length() + 1;
-		if (ci->levels)
-			mem += sizeof(*ci->levels) * CA_SIZE;
-		unsigned memos = ci->memos.memos.size();
-		mem += memos * sizeof(Memo);
-		for (unsigned j = 0; j < memos; ++j)
-			if (!ci->memos.memos[j]->text.empty())
-				mem += ci->memos.memos[j]->text.length() + 1;
-		if (ci->ttb)
-			mem += sizeof(*ci->ttb) * TTB_SIZE;
-		mem += ci->GetBadWordCount() * sizeof(BadWord);
-	}
-	*nrec = count;
-	*memuse = mem;
-}
-
-/*************************************************************************/
-/*************************************************************************/
-
-/* ChanServ initialization. */
-
-void cs_init()
-{
-	if (!Config->s_ChanServ.empty())
-		ModuleManager::LoadModuleList(Config->ChanServCoreModules);
-}
-
-/*************************************************************************/
-
 /* Check the current modes on a channel; if they conflict with a mode lock,
  * fix them.
  */
@@ -288,194 +225,6 @@ void check_modes(Channel *c)
 
 /*************************************************************************/
 
-int check_valid_admin(User *user, Channel *chan, int servermode)
-{
-	ChannelMode *cm;
-
-	if (!chan || !chan->ci)
-		return 1;
-
-	if (!(cm = ModeManager::FindChannelModeByName(CMODE_PROTECT)))
-		return 0;
-
-	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->HasFlag(CI_FORBIDDEN))
-		return 0;
-
-	if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT))
-	{
-		user->SendMessage(ChanServ, _("This channel has been registered with %s."), Config->s_ChanServ.c_str());
-		chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
-		return 0;
-	}
-
-	return 1;
-}
-
-/*************************************************************************/
-
-/* Check whether a user is allowed to be opped on a channel; if they
- * aren't, deop them.  If serverop is 1, the +o was done by a server.
- * Return 1 if the user is allowed to be opped, 0 otherwise. */
-
-int check_valid_op(User *user, Channel *chan, int servermode)
-{
-	ChannelMode *owner, *protect, *halfop;
-	if (!chan || !chan->ci)
-		return 1;
-
-	/* They will be kicked; no need to deop, no need to update our internal struct too */
-	if (chan->ci->HasFlag(CI_FORBIDDEN))
-		return 0;
-
-	owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
-	protect = ModeManager::FindChannelModeByName(CMODE_PROTECT);
-	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
-
-	if (servermode && !check_access(user, chan->ci, CA_AUTOOP))
-	{
-		user->SendMessage(ChanServ, _("This channel has been registered with %s."), Config->s_ChanServ.c_str());
-
-		if (owner)
-			chan->RemoveMode(NULL, CMODE_OWNER, user->nick);
-		if (protect)
-			chan->RemoveMode(NULL, CMODE_PROTECT, user->nick);
-		chan->RemoveMode(NULL, CMODE_OP, user->nick);
-		if (halfop && !check_access(user, chan->ci, CA_AUTOHALFOP))
-			chan->RemoveMode(NULL, CMODE_HALFOP, user->nick);
-
-		return 0;
-	}
-
-	return 1;
-}
-
-/*************************************************************************/
-
-/* Remove all channels which have expired. */
-
-void expire_chans()
-{
-	if (!Config->CSExpire)
-		return;
-
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
-	{
-		ChannelInfo *ci = it->second;
-		++it;
-
-		bool expire = false;
-		if (ci->HasFlag(CI_SUSPENDED))
-		{
-			if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
-				expire = true;
-		}
-		else if (ci->HasFlag(CI_FORBIDDEN))
-		{
-			if (Config->CSForbidExpire && Anope::CurTime - ci->last_used >= Config->CSForbidExpire)
-				expire = true;
-		}
-		else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
-			expire = true;
-
-		if (ci->HasFlag(CI_NO_EXPIRE))
-			expire = false;
-
-		if (expire)
-		{
-			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
-			if (MOD_RESULT == EVENT_STOP)
-				continue;
-
-			Anope::string extra;
-			if (ci->HasFlag(CI_FORBIDDEN))
-				extra = "forbidden ";
-			else if (ci->HasFlag(CI_SUSPENDED))
-				extra = "suspended ";
-
-			Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";
-			FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-			delete ci;
-		}
-	}
-}
-
-/*************************************************************************/
-
-// XXX this is slightly inefficient
-void cs_remove_nick(NickCore *nc)
-{
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end;)
-	{
-		ChannelInfo *ci = it->second;
-		++it;
-
-		for (unsigned j = ci->GetAkickCount(); j > 0; --j)
-		{
-			AutoKick *akick = ci->GetAkick(j - 1);
-			if (akick->HasFlag(AK_ISNICK) && akick->nc == nc)
-				ci->EraseAkick(j - 1);
-		}
-
-		if (ci->founder == nc)
-		{
-			NickCore *newowner = NULL;
-			if (ci->successor && (ci->successor->IsServicesOper() || !Config->CSMaxReg || ci->successor->channelcount < Config->CSMaxReg))
-				newowner = ci->successor;
-			else
-			{
-				ChanAccess *highest = NULL;
-				for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
-				{
-					ChanAccess *ca = ci->GetAccess(j);
-					
-					if (!ca->nc || (!ca->nc->IsServicesOper() && Config->CSMaxReg && ca->nc->channelcount >= Config->CSMaxReg) || (ca->nc == nc))
-						continue;
-					if (!highest || ca->level > highest->level)
-						highest = ca;
-				}
-				if (highest)
-					newowner = highest->nc;
-			}
-
-			if (newowner)
-			{
-				Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
-				ci->founder = newowner;
-				ci->successor = NULL;
-				++newowner->channelcount;
-			}
-			else
-			{
-				Log(LOG_NORMAL, "chanserv/expire") << "Deleting channel " << ci->name << " owned by deleted nick " << nc->display;
-
-				if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-				{
-					/* Maybe move this to delchan() ? */
-					if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
-						ci->c->RemoveMode(NULL, CMODE_REGISTERED, true);
-				}
-
-				delete ci;
-				continue;
-			}
-		}
-
-		if (ci->successor == nc)
-			ci->successor = NULL;
-
-		/* Note that it is important we lookup the access for the channel after the new founder
-		 * has been determined incase this user was the founder and also was on the access list!
-		 */
-		ChanAccess *access = ci->GetAccess(nc);
-		if (access)
-			ci->EraseAccess(access);
-	}
-}
-
-/*************************************************************************/
-
 ChannelInfo *cs_findchan(const Anope::string &chan)
 {
 	FOREACH_MOD(I_OnFindChan, OnFindChan(chan));
@@ -533,10 +282,6 @@ int check_access(User *user, ChannelInfo *ci, int what)
 	else
 		return level >= ci->levels[what];
 }
-
-/*************************************************************************/
-/*********************** ChanServ private routines ***********************/
-/*************************************************************************/
 
 /* Reset channel access level values to their default state. */
 
@@ -657,26 +402,29 @@ Anope::string get_xop_level(int level)
 
 ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
-	if (!ChanServ)
+	if (!chanserv)
 		return;
 	if (c->ci)
 		c->ci->SetFlag(CI_INHABIT);
 	if (!c->ci || !c->ci->bi)
-		ChanServ->Join(*c);
+		chanserv->Bot()->Join(c);
 	else if (!c->FindUser(c->ci->bi))
-		c->ci->bi->Join(*c);
+		c->ci->bi->Join(c);
 }
 
 void ChanServTimer::Tick(time_t)
 {
-	if (!c || !c->ci || !ChanServ)
+	if (!c || !c->ci)
 		return;
 
 	c->ci->UnsetFlag(CI_INHABIT);
 
-	if (!c->ci->bi && ChanServ)
-		ChanServ->Part(*c);
+	if (!c->ci->bi)
+	{
+		if (chanserv)
+			chanserv->Bot()->Part(c);
+	}
 	else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
-		c->ci->bi->Part(*c);
+		c->ci->bi->Part(c);
 }
 

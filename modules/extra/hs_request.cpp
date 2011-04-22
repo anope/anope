@@ -16,6 +16,8 @@
  */
 
 #include "module.h"
+#include "hostserv.h"
+#include "memoserv.h"
 
 static bool HSRequestMemoUser = false;
 static bool HSRequestMemoOper = false;
@@ -152,8 +154,8 @@ class CommandHSActivate : public Command
 				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
 				FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
-				if (HSRequestMemoUser)
-					memo_send(source, na->nick, _("[auto memo] Your requested vHost has been approved."), 2);
+				if (HSRequestMemoUser && memoserv)
+					memoserv->Send(Config->s_HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
 				me->SendMessage(source, _("vHost for %s has been activated"), na->nick.c_str());
 				Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!it->second->ident.empty() ? it->second->ident + "@" : "") << it->second->host;
@@ -207,15 +209,15 @@ class CommandHSReject : public Command
 			delete it->second;
 			Requests.erase(it);
 
-			if (HSRequestMemoUser)
+			if (HSRequestMemoUser && memoserv)
 			{
-				char message[BUFSIZE];
+				Anope::string message;
 				if (!reason.empty())
-					snprintf(message, sizeof(message), _("[auto memo] Your requested vHost has been rejected. Reason: %s"), reason.c_str());
+					message = Anope::printf(_("[auto memo] Your requested vHost has been rejected. Reason: %s"), reason.c_str());
 				else
-					snprintf(message, sizeof(message), "%s", _("[auto memo] Your requested vHost has been rejected."));
+					message = _("[auto memo] Your requested vHost has been rejected.");
 
-				memo_send(source, nick, message, 2);
+				memoserv->Send(Config->s_HostServ, nick, message, true);
 			}
 
 			me->SendMessage(source, _("vHost for %s has been rejected"), nick.c_str());
@@ -312,18 +314,21 @@ class HSRequest : public Module
 	{
 		me = this;
 
-		this->AddCommand(HostServ, &commandhsrequest);
-		this->AddCommand(HostServ, &commandhsactive);
-		this->AddCommand(HostServ, &commandhsreject);
-		this->AddCommand(HostServ, &commandhswaiting);
+		if (!hostserv)
+			throw ModuleException("HostServ is not loaded!");
+
+		this->AddCommand(hostserv->Bot(), &commandhsrequest);
+		this->AddCommand(hostserv->Bot(), &commandhsactive);
+		this->AddCommand(hostserv->Bot(), &commandhsreject);
+		this->AddCommand(hostserv->Bot(), &commandhswaiting);
 
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		this->OnReload(false);
-
 		Implementation i[] = { I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
 		ModuleManager::Attach(i, this, 4);
+
+		this->OnReload();
 	}
 
 	~HSRequest()
@@ -339,7 +344,7 @@ class HSRequest : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		BotInfo *service = source.owner;
-		if (service == HostServ)
+		if (service->nick == Config->s_HostServ)
 		{
 			if (command->name.equals_ci("LIST"))
 			{
@@ -348,7 +353,7 @@ class HSRequest : public Module
 				if (!key.empty() && key.equals_ci("+req"))
 				{
 					std::vector<Anope::string> emptyParams;
-					Command *c = FindCommand(HostServ, "WAITING");
+					Command *c = FindCommand(hostserv->Bot(), "WAITING");
 					if (!c)
 						throw CoreException("No waiting command?");
 					c->Execute(source, emptyParams);
@@ -356,7 +361,7 @@ class HSRequest : public Module
 				}
 			}
 		}
-		else if (service == NickServ)
+		else if (service->nick == Config->s_NickServ)
 		{
 			if (command->name.equals_ci("DROP"))
 			{
@@ -402,7 +407,7 @@ class HSRequest : public Module
 		}
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 		HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);
@@ -422,7 +427,7 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 	else
 		host = vHost;
 
-	if (HSRequestMemoOper == 1)
+	if (HSRequestMemoOper == 1 && memoserv)
 		for (unsigned i = 0; i < Config->Opers.size(); ++i)
 		{
 			Oper *o = Config->Opers[i];
@@ -431,9 +436,9 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 			if (!na)
 				continue;
 
-			char message[BUFSIZE];
-			snprintf(message, sizeof(message), _("[auto memo] vHost \002%s\002 has been requested."), host.c_str());
-			memo_send(source, na->nick, message, 2);
+			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.u->GetMask().c_str());
+
+			memoserv->Send(Config->s_HostServ, na->nick, message, true);
 		}
 }
 

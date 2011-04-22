@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSuspend : public Command
 {
@@ -153,8 +154,8 @@ class CSSuspend : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcssuspend);
-		this->AddCommand(ChanServ, &commandcsunsuspend);
+		this->AddCommand(chanserv->Bot(), &commandcssuspend);
+		this->AddCommand(chanserv->Bot(), &commandcsunsuspend);
 	}
 };
 

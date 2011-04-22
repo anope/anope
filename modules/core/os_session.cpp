@@ -12,6 +12,33 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
+#include "os_session.h"
+
+static service_reference<SessionService> sessionservice("session");
+
+class ExpireTimer : public Timer
+{
+ public:
+	ExpireTimer() : Timer(Config->ExpireTimeout, Anope::CurTime, true) { }
+
+	void Tick(time_t)
+	{
+		if (!sessionservice)
+			return;
+		for (unsigned i = sessionservice->GetExceptions().size(); i > 0; --i)
+		{
+			Exception *e = sessionservice->GetExceptions()[i - 1];
+
+			if (!e->expires || e->expires > Anope::CurTime)
+				continue;
+			if (Config->WallExceptionExpire)
+				ircdproto->SendGlobops(operserv->Bot(), "Session exception for %s has expired.", e->mask.c_str());
+			sessionservice->DelException(e);
+			delete e;
+		}
+	}
+};
 
 class ExceptionDelCallback : public NumberList
 {
@@ -35,7 +62,7 @@ class ExceptionDelCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > exceptions.size())
+		if (!Number || Number > sessionservice->GetExceptions().size())
 			return;
 
 		++Deleted;
@@ -45,10 +72,10 @@ class ExceptionDelCallback : public NumberList
 
 	static void DoDel(CommandSource &source, unsigned index)
 	{
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, exceptions[index]));
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, sessionservice->GetExceptions()[index]));
 
-		delete exceptions[index];
-		exceptions.erase(exceptions.begin() + index);
+		sessionservice->DelException(sessionservice->GetExceptions()[index]);
+		delete sessionservice->GetExceptions()[index];
 	}
 };
 
@@ -64,7 +91,7 @@ class ExceptionListCallback : public NumberList
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > exceptions.size())
+		if (!Number || Number > sessionservice->GetExceptions().size())
 			return;
 
 		if (!SentHeader)
@@ -79,10 +106,10 @@ class ExceptionListCallback : public NumberList
 
 	static void DoList(CommandSource &source, unsigned index)
 	{
-		if (index >= exceptions.size())
+		if (index >= sessionservice->GetExceptions().size())
 			return;
 
-		source.Reply(_("%3d  %4d   %s"), index + 1, exceptions[index]->limit, exceptions[index]->mask.c_str());
+		source.Reply(_("%3d  %4d   %s"), index + 1, sessionservice->GetExceptions()[index]->limit, sessionservice->GetExceptions()[index]->mask.c_str());
 	}
 };
 
@@ -95,7 +122,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > exceptions.size())
+		if (!Number || Number > sessionservice->GetExceptions().size())
 			return;
 
 		if (!SentHeader)
@@ -109,12 +136,12 @@ class ExceptionViewCallback : public ExceptionListCallback
 
 	static void DoList(CommandSource &source, unsigned index)
 	{
-		if (index >= exceptions.size())
+		if (index >= sessionservice->GetExceptions().size())
 			return;
 
-		Anope::string expirebuf = expire_left(source.u->Account(), exceptions[index]->expires);
+		Anope::string expirebuf = expire_left(source.u->Account(), sessionservice->GetExceptions()[index]->expires);
 
-		source.Reply(_("%3d.  %s  (by %s on %s; %s)\n " "    Limit: %-4d  - %s"), index + 1, exceptions[index]->mask.c_str(), !exceptions[index]->who.empty() ? exceptions[index]->who.c_str() : "<unknown>", do_strftime((exceptions[index]->time ? exceptions[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), exceptions[index]->limit, exceptions[index]->reason.c_str());
+		source.Reply(_("%3d.  %s  (by %s on %s; %s)\n " "    Limit: %-4d  - %s"), index + 1, sessionservice->GetExceptions()[index]->mask.c_str(), !sessionservice->GetExceptions()[index]->who.empty() ? sessionservice->GetExceptions()[index]->who.c_str() : "<unknown>", do_strftime((sessionservice->GetExceptions()[index]->time ? sessionservice->GetExceptions()[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), sessionservice->GetExceptions()[index]->limit, sessionservice->GetExceptions()[index]->reason.c_str());
 	}
 };
 
@@ -139,7 +166,7 @@ class CommandOSSession : public Command
 			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
 			source.Reply(_("Sessions  Host"));
 
-			for (Anope::map<Session *>::iterator it = SessionList.begin(), it_end = SessionList.end(); it != it_end; ++it)
+			for (SessionService::SessionMap::iterator it = sessionservice->GetSessions().begin(), it_end = sessionservice->GetSessions().end(); it != it_end; ++it)
 			{
 				Session *session = it->second;
 
@@ -154,13 +181,13 @@ class CommandOSSession : public Command
 	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
-		Session *session = findsession(param);
+		Session *session = sessionservice->FindSession(param);
 
 		if (!session)
 			source.Reply(_("\002%s\002 not found on session list."), param.c_str());
 		else
 		{
-			Exception *exception = find_host_exception(param);
+			Exception *exception = sessionservice->FindException(param);
 			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
 		}
 
@@ -225,7 +252,6 @@ class CommandOSException : public Command
 		User *u = source.u;
 		Anope::string mask, expiry, limitstr;
 		unsigned last_param = 3;
-		int x;
 
 		mask = params.size() > 1 ? params[1] : "";
 		if (!mask.empty() && mask[0] == '+')
@@ -277,17 +303,44 @@ class CommandOSException : public Command
 		{
 			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 			{
-				source.Reply(_("Invalid hostmask. Only real hostmasks are valid as exceptions are not matched against nicks or usernames."));
+				source.Reply(_("Invalid hostmask. Only real hostmasks are valid as sessionservice->GetExceptions() are not matched against nicks or usernames."));
 				return MOD_CONT;
 			}
 
-			x = exception_add(u, mask, limit, reason, u->nick, expires);
+			for (std::vector<Exception *>::iterator it = sessionservice->GetExceptions().begin(), it_end = sessionservice->GetExceptions().end(); it != it_end; ++it)
+			{
+				Exception *e = *it;
+				if (e->mask.equals_ci(mask))
+				{
+					if (e->limit != limit)
+					{
+						e->limit = limit;
+						source.Reply(_("Exception for \002%s\002 has been updated to %d."), mask.c_str(), e->limit);
+					}
+					else
+						source.Reply(_("\002%s\002 already exists on the EXCEPTION list."), mask.c_str());
+				}
+			}
 
-			if (x == 1)
+			Exception *exception = new Exception();
+			exception->mask = mask;
+			exception->limit = limit;
+			exception->reason = reason;
+			exception->time = Anope::CurTime;
+			exception->who = u->nick;
+			exception->expires = expires;
+
+			EventReturn MOD_RESULT;
+			FOREACH_RESULT(I_OnExceptionAdd, OnExceptionAdd(exception));
+			if (MOD_RESULT == EVENT_STOP)
+				delete exception;
+			else
+			{
+				sessionservice->AddException(exception);
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
-
-			if (readonly)
-				source.Reply(_(READ_ONLY_MODE));
+				if (readonly)
+					source.Reply(_(READ_ONLY_MODE));
+			}
 		}
 
 		return MOD_CONT;
@@ -310,9 +363,9 @@ class CommandOSException : public Command
 		}
 		else
 		{
-			unsigned i = 0, end = exceptions.size();
+			unsigned i = 0, end = sessionservice->GetExceptions().size();
 			for (; i < end; ++i)
-				if (mask.equals_ci(exceptions[i]->mask))
+				if (mask.equals_ci(sessionservice->GetExceptions()[i]->mask))
 				{
 					ExceptionDelCallback::DoDel(source, i);
 					source.Reply(_("\002%s\002 deleted from session-limit exception list."), mask.c_str());
@@ -348,13 +401,13 @@ class CommandOSException : public Command
 		}
 		catch (const ConvertException &) { }
 
-		if (n1 >= 0 && n1 < exceptions.size() && n2 >= 0 && n2 < exceptions.size() && n1 != n2)
+		if (n1 >= 0 && n1 < sessionservice->GetExceptions().size() && n2 >= 0 && n2 < sessionservice->GetExceptions().size() && n1 != n2)
 		{
-			Exception *temp = exceptions[n1];
-			exceptions[n1] = exceptions[n2];
-			exceptions[n2] = temp;
+			Exception *temp = sessionservice->GetExceptions()[n1];
+			sessionservice->GetExceptions()[n1] = sessionservice->GetExceptions()[n2];
+			sessionservice->GetExceptions()[n2] = temp;
 
-			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), exceptions[n1]->mask.c_str(), n1 + 1, n2 + 1);
+			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), sessionservice->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
 				source.Reply(_(READ_ONLY_MODE));
@@ -367,7 +420,6 @@ class CommandOSException : public Command
 
 	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
@@ -379,8 +431,8 @@ class CommandOSException : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0, end = exceptions.size(); i < end; ++i)
-				if (mask.empty() || Anope::Match(exceptions[i]->mask, mask))
+			for (unsigned i = 0, end = sessionservice->GetExceptions().size(); i < end; ++i)
+				if (mask.empty() || Anope::Match(sessionservice->GetExceptions()[i]->mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -401,7 +453,6 @@ class CommandOSException : public Command
 
 	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		expire_exceptions();
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
@@ -413,8 +464,8 @@ class CommandOSException : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0, end = exceptions.size(); i < end; ++i)
-				if (mask.empty() || Anope::Match(exceptions[i]->mask, mask))
+			for (unsigned i = 0, end = sessionservice->GetExceptions().size(); i < end; ++i)
+				if (mask.empty() || Anope::Match(sessionservice->GetExceptions()[i]->mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -431,6 +482,7 @@ class CommandOSException : public Command
 
 		return MOD_CONT;
 	}
+
  public:
 	CommandOSException() : Command("EXCEPTION", 1, 5)
 	{
@@ -491,10 +543,10 @@ class CommandOSException : public Command
 				"the format of the optional \037expiry\037 parameter.\n"
 				"\002EXCEPTION DEL\002 removes the given mask from the exception list.\n"
 				"\002EXCEPTION MOVE\002 moves exception \037num\037 to \037position\037. The\n"
-				"exceptions inbetween will be shifted up or down to fill the gap.\n"
+				"sessionservice->GetExceptions() inbetween will be shifted up or down to fill the gap.\n"
 				"\002EXCEPTION LIST\002 and \002EXCEPTION VIEW\002 show all current\n"
-				"exceptions; if the optional mask is given, the list is limited\n"
-				"to those exceptions matching the mask. The difference is that\n"
+				"sessionservice->GetExceptions(); if the optional mask is given, the list is limited\n"
+				"to those sessionservice->GetExceptions() matching the mask. The difference is that\n"
 				"\002EXCEPTION VIEW\002 is more verbose, displaying the name of the\n"
 				"person who added the exception, its session limit, reason, \n"
 				"host mask and the expiry date and time.\n"
@@ -502,7 +554,7 @@ class CommandOSException : public Command
 				"Note that a connecting client will \"use\" the first exception\n"
 				"their host matches. Large exception lists and widely matching\n"
 				"exception masks are likely to degrade services' performance."),
-				OperServ->nick.c_str());
+				Config->s_OperServ.c_str());
 		return true;
 	}
 
@@ -514,17 +566,117 @@ class CommandOSException : public Command
 
 class OSSession : public Module
 {
+	SessionService ss;
+	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
 
+	void AddSession(User *u, bool exempt)
+	{
+		Session *session = sessionservice->FindSession(u->host);
+
+		if (session)
+		{
+			bool kill = false;
+			if (Config->DefSessionLimit && session->count >= Config->DefSessionLimit)
+			{
+				kill = true;
+				Exception *exception = sessionservice->FindException(u);
+				if (exception)
+				{
+					kill = false;
+					if (exception->limit && session->count >= exception->limit)
+						kill = true;
+				}
+			}
+
+			/* Previously on IRCds that send a QUIT (InspIRCD) when a user is killed, the session for a host was
+			 * decremented in do_quit, which caused problems and fixed here
+			 *
+			 * Now, we create the user struture before calling this to fix some user tracking issues,
+			 * so we must increment this here no matter what because it will either be
+			 * decremented in do_kill or in do_quit - Adam
+			 */
+			++session->count;
+	
+			if (kill && !exempt)
+			{
+				if (!Config->SessionLimitExceeded.empty())
+					u->SendMessage(operserv->Bot(), Config->SessionLimitExceeded.c_str(), u->host.c_str());
+				if (!Config->SessionLimitDetailsLoc.empty())
+					u->SendMessage(operserv->Bot(), "%s", Config->SessionLimitDetailsLoc.c_str());
+
+				kill_user(Config->s_OperServ, u, "Session limit exceeded");
+
+				++session->hits;
+				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)
+				{
+					const Anope::string &akillmask = "*@" + u->host;
+					const Anope::string &akillreason = "Session limit exceeded for " + u->host;
+					SGLine->Add(akillmask, Config->s_OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, akillreason);
+					ircdproto->SendGlobops(operserv->Bot(), "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
+				}
+			}
+		}
+		else
+		{
+			session = new Session();
+			session->host = u->host;
+			session->count = 1;
+			session->hits = 0;
+
+			sessionservice->AddSession(session);
+		}
+	}
+
+	void DelSession(User *u)
+	{
+		Session *session = sessionservice->FindSession(u->host);
+		if (!session)
+		{
+			if (debug)
+				Log() << "session: Tried to delete non-existant session: " << u->host;
+			return;
+		}
+
+		if (session->count > 1)
+		{
+			--session->count;
+			return;
+		}
+
+		sessionservice->DelSession(session);
+		delete session;
+	}
+
  public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), ss(this)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandossession);
-		this->AddCommand(OperServ, &commandosexception);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
+		ModuleManager::Attach(i, this, 2);
+
+		this->AddCommand(operserv->Bot(), &commandossession);
+		this->AddCommand(operserv->Bot(), &commandosexception);
+
+		ModuleManager::RegisterService(&this->ss);
+	}
+
+	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)
+	{
+		if (user && Config->LimitSessions)
+			this->AddSession(user, exempt);
+	}
+
+	void OnUserLogoff(User *u)
+	{
+		if (Config->LimitSessions && (!u->server || !u->server->IsULined()))
+			this->DelSession(u);
 	}
 };
 

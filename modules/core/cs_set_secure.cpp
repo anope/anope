@@ -12,13 +12,14 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSSetSecure : public Command
 {
  public:
 	CommandCSSetSecure(const Anope::string &cpermission = "") : Command("SECURE", 2, 2, cpermission)
 	{
-		this->SetDesc(Anope::printf(_("Activate %s's security features"), ChanServ->nick.c_str()));
+		this->SetDesc(Anope::printf(_("Activate %s's security features"), Config->s_ChanServ.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -51,7 +52,7 @@ class CommandCSSetSecure : public Command
 			"channel. When \002SECURE\002 is set, only users who have\n"
 			"registered their nicknames with %s and IDENTIFY'd\n"
 			"with their password will be given access to the channel\n"
-			"as controlled by the access list."), this->name.c_str(), NickServ->nick.c_str(), NickServ->nick.c_str());
+			"as controlled by the access list."), this->name.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -85,22 +86,25 @@ class CSSetSecure : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(ChanServ, "SET");
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandcssetsecure);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandcssasetsecure);
 	}
 
 	~CSSetSecure()
 	{
-		Command *c = FindCommand(ChanServ, "SET");
+		Command *c = FindCommand(chanserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandcssetsecure);
 
-		c = FindCommand(ChanServ, "SASET");
+		c = FindCommand(chanserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandcssasetsecure);
 	}

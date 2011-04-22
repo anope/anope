@@ -222,7 +222,7 @@ option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 # Use the following directories as includes
 # Note that it is important the binary include directory comes before the
 # source include directory so the precompiled headers work correctly.
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language)
+include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/core)
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)
@@ -337,8 +337,6 @@ check_include_file(sys/eventfd.h HAVE_SYS_EVENTFD_H)
 check_function_exists(setgrent HAVE_SETGRENT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(stricmp HAVE_STRICMP)
-check_function_exists(strlcat HAVE_STRLCAT)
-check_function_exists(strlcpy HAVE_STRLCPY)
 check_function_exists(umask HAVE_UMASK)
 check_function_exists(backtrace HAVE_BACKTRACE)
 check_function_exists(eventfd HAVE_EVENTFD)

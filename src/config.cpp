@@ -20,16 +20,6 @@ ServerConfig *Config = NULL;
 static Anope::string Modules;
 static Anope::string EncModules;
 static Anope::string DBModules;
-static Anope::string HostCoreModules;
-static Anope::string MemoCoreModules;
-static Anope::string BotCoreModules;
-static Anope::string OperCoreModules;
-static Anope::string NickCoreModules;
-static Anope::string ChanCoreModules;
-static Anope::string DefCon1;
-static Anope::string DefCon2;
-static Anope::string DefCon3;
-static Anope::string DefCon4;
 static Anope::string UlineServers;
 static Anope::string OSNotifications;
 static Anope::string BSDefaults;
@@ -212,12 +202,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 	this->ModulesAutoLoad = BuildStringList(Modules);
 	this->EncModuleList = BuildStringList(EncModules);
 	this->DBModuleList = BuildStringList(DBModules);
-	this->HostServCoreModules = BuildStringList(HostCoreModules);
-	this->MemoServCoreModules = BuildStringList(MemoCoreModules);
-	this->BotServCoreModules = BuildStringList(BotCoreModules);
-	this->OperServCoreModules = BuildStringList(OperCoreModules);
-	this->ChanServCoreModules = BuildStringList(ChanCoreModules);
-	this->NickServCoreModules = BuildStringList(NickCoreModules);
 
 	if (this->LimitSessions)
 	{
@@ -237,93 +221,7 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 	if (this->UserKey1 == this->UserKey2 || this->UserKey1 == this->UserKey3 || this->UserKey3 == this->UserKey2)
 		Log() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
 
-	/**
-	 * Check all DEFCON dependiencies...
-	 **/
-	if (this->DefConLevel)
-	{
-		/* Build DefCon's */
-		DefCon.resize(6);
-		DefCon[5].reset();
-		for (unsigned int level = 1; level < 5; ++level)
-		{
-			DefCon[level] = 0;
-			Anope::string *levelDefinition = NULL;
-			switch (level)
-			{
-				case 1:
-					levelDefinition = &DefCon1;
-					break;
-				case 2:
-					levelDefinition = &DefCon2;
-					break;
-				case 3:
-					levelDefinition = &DefCon3;
-					break;
-				case 4:
-					levelDefinition = &DefCon4;
-			}
-			spacesepstream operations(*levelDefinition);
-			Anope::string operation;
-			while (operations.GetToken(operation))
-			{
-				if (operation.equals_ci("nonewchannels"))
-					AddDefCon(level, DEFCON_NO_NEW_CHANNELS);
-				else if (operation.equals_ci("nonewnicks"))
-					AddDefCon(level, DEFCON_NO_NEW_NICKS);
-				else if (operation.equals_ci("nomlockchanges"))
-					AddDefCon(level, DEFCON_NO_MLOCK_CHANGE);
-				else if (operation.equals_ci("forcechanmodes"))
-					AddDefCon(level, DEFCON_FORCE_CHAN_MODES);
-				else if (operation.equals_ci("reducedsessions"))
-					AddDefCon(level, DEFCON_REDUCE_SESSION);
-				else if (operation.equals_ci("nonewclients"))
-					AddDefCon(level, DEFCON_NO_NEW_CLIENTS);
-				else if (operation.equals_ci("operonly"))
-					AddDefCon(level, DEFCON_OPER_ONLY);
-				else if (operation.equals_ci("silentoperonly"))
-					AddDefCon(level, DEFCON_SILENT_OPER_ONLY);
-				else if (operation.equals_ci("akillnewclients"))
-					AddDefCon(level, DEFCON_AKILL_NEW_CLIENTS);
-				else if (operation.equals_ci("nonewmemos"))
-					AddDefCon(level, DEFCON_NO_NEW_MEMOS);
-			}
-		}
-
-		/* Check any defcon needed settings */
-		for (int defconCount = 1; defconCount <= 5; ++defconCount)
-		{
-			if (CheckDefCon(defconCount, DEFCON_REDUCE_SESSION))
-			{
-				if (!this->DefConSessionLimit)
-				{
-					throw ConfigException("this->DefConSessionLimit missing");
-				}
-			}
-			if (CheckDefCon(defconCount, DEFCON_AKILL_NEW_CLIENTS))
-			{
-				if (!this->DefConAKILL)
-				{
-					throw ConfigException("this->DefConAKILL missing");
-				}
-				if (this->DefConAkillReason.empty())
-				{
-					throw ConfigException("this->DefConAkillReason missing");
-				}
-			}
-			if (CheckDefCon(defconCount, DEFCON_FORCE_CHAN_MODES))
-			{
-				if (this->DefConChanModes.empty())
-				{
-					throw ConfigException("this->DefConChanModes missing");
-				}
-			}
-		}
-	}
-
 	SetDefaultMLock(this);
-	if (ircd)
-		InitLogChannels(this);
 
 	if (IsFile(this->NameServer))
 	{
@@ -614,41 +512,10 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 
 bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_GlobalNoticer.empty())
+	if (!config->s_Global.empty())
 	{
 		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
-	}
-	return true;
-}
-
-bool ValidateDefCon(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
-{
-	if (value.equals_ci("defaultlevel"))
-	{
-		int level = data.GetInteger();
-		if (!level)
-			return true;
-		if (level > 5)
-			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
-	}
-	else if (config->DefConLevel)
-	{
-		if ((value.substr(0, 5).equals_ci("level") && isdigit(value[5])) || value.equals_ci("chanmodes") || value.equals_ci("akillreason"))
-		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
-		}
-		else if (value.equals_ci("message") && config->GlobalOnDefconMore)
-		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
-		}
-		else if (value.equals_ci("sessionlimit") || value.equals_ci("akillexpire"))
-		{
-			if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
-				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
-		}
 	}
 	return true;
 }
@@ -927,10 +794,8 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 						UserContainer *uc = *cit;
 						BotInfo *bi = findbot(uc->user->nick);
 
-						if (bi && bi->HasFlag(BI_CORE))
-						{
+						if (bi)
 							bi->Part(c, "Reloading configuration");
-						}
 					}
 
 					c->UnsetFlag(CH_PERSIST);
@@ -988,6 +853,35 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 bool DoneLogs(ServerConfig *config, const Anope::string &)
 {
 	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
+
+	for (unsigned i = 0; i < config->LogInfos.size(); ++i)
+	{
+		LogInfo *l = config->LogInfos[i];
+
+		if ((!ircd || !ircd->join2msg) && !l->Inhabit)
+			continue;
+
+		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+		{
+			const Anope::string &target = *sit;
+
+			if (target[0] == '#')
+			{
+				Channel *c = findchan(target);
+				if (!c)
+					c = new Channel(target);
+				c->SetFlag(CH_LOGCHAN);
+				c->SetFlag(CH_PERSIST);
+
+				for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+				{
+					BotInfo *bi = it->second;
+					if (!c->FindUser(bi))
+						bi->Join(c, &config->BotModeList);
+				}
+			}
+		}
+	}
 
 	return true;
 }
@@ -1144,10 +1038,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "useprivmsg", "no", new ValueContainerBool(&conf->UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&conf->UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&conf->HideStatsO), DT_BOOLEAN, NoValidation},
-		{"options", "globaloncycle", "no", new ValueContainerBool(&conf->GlobalOnCycle), DT_BOOLEAN, NoValidation},
-		{"options", "globaloncycledown", "", new ValueContainerString(&conf->GlobalOnCycleMessage), DT_STRING, ValidateGlobalOnCycle},
-		{"options", "globaloncycleup", "", new ValueContainerString(&conf->GlobalOnCycleUP), DT_STRING, ValidateGlobalOnCycle},
-		{"options", "anonymousglobal", "no", new ValueContainerBool(&conf->AnonymousGlobal), DT_BOOLEAN, NoValidation},
 		{"options", "nickregdelay", "0", new ValueContainerUInt(&conf->NickRegDelay), DT_UINTEGER, NoValidation},
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&conf->RestrictOperNicks), DT_BOOLEAN, NoValidation},
 		{"options", "newscount", "3", new ValueContainerUInt(&conf->NewsCount), DT_UINTEGER, NoValidation},
@@ -1161,7 +1051,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "nick", "NickServ", new ValueContainerString(&conf->s_NickServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerString(&conf->desc_NickServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&conf->NSEmailReg), DT_BOOLEAN, NoValidation},
-		{"nickserv", "modules", "", new ValueContainerString(&NickCoreModules), DT_STRING, NoValidation},
+		{"nickserv", "modules", "", new ValueContainerString(&conf->NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&conf->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
@@ -1197,7 +1087,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
 		{"chanserv", "nick", "", new ValueContainerString(&conf->s_ChanServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerString(&conf->desc_ChanServ), DT_STRING | DT_NORELOAD, ValidateChanServ},
-		{"chanserv", "modules", "", new ValueContainerString(&ChanCoreModules), DT_STRING, ValidateChanServ},
+		{"chanserv", "modules", "", new ValueContainerString(&conf->ChanCoreModules), DT_STRING, ValidateChanServ},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&conf->CSMaxReg), DT_UINTEGER, ValidateChanServ},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&conf->CSExpire), DT_TIME, ValidateChanServ},
@@ -1213,14 +1103,14 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&conf->CSOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"memoserv", "nick", "", new ValueContainerString(&conf->s_MemoServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"memoserv", "description", "Memo Service", new ValueContainerString(&conf->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateMemoServ},
-		{"memoserv", "modules", "", new ValueContainerString(&MemoCoreModules), DT_STRING, NoValidation},
+		{"memoserv", "modules", "", new ValueContainerString(&Config->MemoCoreModules), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&conf->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&conf->MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&conf->MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&conf->MSMemoReceipt), DT_UINTEGER, NoValidation},
 		{"botserv", "nick", "", new ValueContainerString(&conf->s_BotServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerString(&conf->desc_BotServ), DT_STRING | DT_NORELOAD, ValidateBotServ},
-		{"botserv", "modules", "", new ValueContainerString(&BotCoreModules), DT_STRING, NoValidation},
+		{"botserv", "modules", "", new ValueContainerString(&conf->BotCoreModules), DT_STRING, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerUInt(&conf->BSMinUsers), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&conf->BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
@@ -1231,10 +1121,10 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"botserv", "fantasycharacter", "!", new ValueContainerString(&conf->BSFantasyCharacter), DT_STRING, NoValidation},
 		{"hostserv", "nick", "", new ValueContainerString(&conf->s_HostServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerString(&conf->desc_HostServ), DT_STRING | DT_NORELOAD, ValidateHostServ},
-		{"hostserv", "modules", "", new ValueContainerString(&HostCoreModules), DT_STRING, NoValidation},
+		{"hostserv", "modules", "", new ValueContainerString(&conf->HostCoreModules), DT_STRING, NoValidation},
 		{"operserv", "nick", "", new ValueContainerString(&conf->s_OperServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"operserv", "description", "Operator Service", new ValueContainerString(&conf->desc_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
-		{"operserv", "modules", "", new ValueContainerString(&OperCoreModules), DT_STRING, NoValidation},
+		{"operserv", "modules", "", new ValueContainerString(&conf->OperCoreModules), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&conf->SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&conf->AutokillExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&conf->ChankillExpiry), DT_TIME, ValidateOperServ},
@@ -1255,22 +1145,13 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&conf->SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&conf->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&conf->OSOpersOnly), DT_BOOLEAN, NoValidation},
-		{"global", "nick", "", new ValueContainerString(&conf->s_GlobalNoticer), DT_STRING | DT_NORELOAD, NoValidation},
-		{"global", "description", "Global Noticer", new ValueContainerString(&conf->desc_GlobalNoticer), DT_STRING | DT_NORELOAD, ValidateGlobal},
-		{"defcon", "defaultlevel", "0", new ValueContainerInt(&conf->DefConLevel), DT_INTEGER, ValidateDefCon},
-		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
-		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},
-		{"defcon", "level2", "", new ValueContainerString(&DefCon2), DT_STRING, ValidateDefCon},
-		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
-		{"defcon", "sessionlimit", "0", new ValueContainerUInt(&conf->DefConSessionLimit), DT_UINTEGER, ValidateDefCon},
-		{"defcon", "akillexpire", "0", new ValueContainerTime(&conf->DefConAKILL), DT_TIME, ValidateDefCon},
-		{"defcon", "chanmodes", "", new ValueContainerString(&conf->DefConChanModes), DT_STRING, ValidateDefCon},
-		{"defcon", "timeout", "0", new ValueContainerTime(&conf->DefConTimeOut), DT_TIME, NoValidation},
-		{"defcon", "globalondefcon", "no", new ValueContainerBool(&conf->GlobalOnDefcon), DT_BOOLEAN, NoValidation},
-		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&conf->GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
-		{"defcon", "message", "", new ValueContainerString(&conf->DefconMessage), DT_STRING, ValidateDefCon},
-		{"defcon", "offmessage", "", new ValueContainerString(&conf->DefConOffMessage), DT_STRING, NoValidation},
-		{"defcon", "akillreason", "", new ValueContainerString(&conf->DefConAkillReason), DT_STRING, ValidateDefCon},
+		{"global", "nick", "", new ValueContainerString(&conf->s_Global), DT_STRING | DT_NORELOAD, NoValidation},
+		{"global", "description", "Global Noticer", new ValueContainerString(&conf->desc_Global), DT_STRING | DT_NORELOAD, ValidateGlobal},
+		{"global", "modules", "", new ValueContainerString(&conf->GlobalCoreModules), DT_STRING, NoValidation},
+		{"global", "globaloncycle", "no", new ValueContainerBool(&conf->GlobalOnCycle), DT_BOOLEAN, NoValidation},
+		{"global", "globaloncycledown", "", new ValueContainerString(&conf->GlobalOnCycleMessage), DT_STRING, ValidateGlobalOnCycle},
+		{"global", "globaloncycleup", "", new ValueContainerString(&conf->GlobalOnCycleUP), DT_STRING, ValidateGlobalOnCycle},
+		{"global", "anonymousglobal", "no", new ValueContainerBool(&conf->AnonymousGlobal), DT_BOOLEAN, NoValidation},
 		{"", "", "", NULL, DT_NOTHING, NoValidation}
 	};
 

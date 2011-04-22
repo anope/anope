@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSSendAll : public Command
 {
@@ -39,7 +40,7 @@ class CommandMSSendAll : public Command
 			NickCore *nc = it->second;
 
 			if ((na && na->nc == nc) || !nc->display.equals_ci(u->nick))
-				memo_send(source, nc->display, text, 1);
+				memoserv->Send(u->nick, nc->display, text);
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));
@@ -69,7 +70,10 @@ class MSSendAll : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmssendall);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmssendall);
 	}
 };
 

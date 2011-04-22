@@ -12,8 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-
-void myMemoServHelp(User *u);
+#include "memoserv.h"
 
 class CommandMSCancel : public Command
 {
@@ -30,9 +29,9 @@ class CommandMSCancel : public Command
 		const Anope::string &nname = params[0];
 
 		bool ischan, isforbid;
-		MemoInfo *mi;
+		MemoInfo *mi = memoserv->GetMemoInfo(nname, ischan, isforbid);
 
-		if (!(mi = getmemoinfo(nname, ischan, isforbid)))
+		if (mi == NULL)
 		{
 			if (isforbid)
 				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), nname.c_str());
@@ -42,7 +41,7 @@ class CommandMSCancel : public Command
 		else
 		{
 			for (int i = mi->memos.size() - 1; i >= 0; --i)
-				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender) && !mi->memos[i]->HasFlag(MF_NOTIFYS))
+				if (mi->memos[i]->HasFlag(MF_UNREAD) && u->Account()->display.equals_ci(mi->memos[i]->sender))
 				{
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]));
 					mi->Del(mi->memos[i]);
@@ -80,7 +79,10 @@ class MSCancel : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmscancel);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmscancel);
 	}
 };
 

@@ -93,10 +93,10 @@ class LDAPOper : public Module
 		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
 		ModuleManager::Attach(i, this, 3);
 
-		OnReload(false);
+		OnReload();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 

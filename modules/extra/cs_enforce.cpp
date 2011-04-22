@@ -14,6 +14,7 @@
  */
 
 #include "module.h"
+#include "chanserv.h"
 
 static Module *me;
 
@@ -217,12 +218,15 @@ class CSEnforce : public Module
  public:
 	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
 	{
-		me = this;
-
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		this->AddCommand(ChanServ, &commandcsenforce);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		me = this;
+
+		this->AddCommand(chanserv->Bot(), &commandcsenforce);
 	}
 };
 

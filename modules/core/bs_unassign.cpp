@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSUnassign : public Command
 {
@@ -33,7 +34,7 @@ class CommandBSUnassign : public Command
 		else if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
 			source.Reply(_(ACCESS_DENIED));
 		else if (!ci->bi)
-			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str());
+			source.Reply(_(BOT_NOT_ASSIGNED), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
 		else if (ci->HasFlag(CI_PERSIST) && !cm)
 			source.Reply(_("You can not unassign bots while persist is set on the channel."));
 		else
@@ -75,7 +76,10 @@ class BSUnassign : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsunassign);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsunassign);
 	}
 };
 

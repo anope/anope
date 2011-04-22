@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class SQLineDelCallback : public NumberList
 {
@@ -170,28 +171,40 @@ class CommandOSSQLine : public Command
 			reason += " " + params[3];
 		if (!mask.empty() && !reason.empty())
 		{
-			unsigned int affected = 0;
-			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-				if (Anope::Match(it->second->nick, mask))
-					++affected;
-			float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
-
-			if (percent > 95)
-			{
+			std::pair<int, XLine *> canAdd = SQLine->CanAdd(mask, expires);
+			if (mask.find_first_not_of("*") == Anope::string::npos)
 				source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
-				Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-				return MOD_CONT;
+			else if (canAdd.first == 1)
+				source.Reply(_("\002%s\002 already exists on the SQLINE list."), canAdd.second->Mask.c_str());
+			else if (canAdd.first == 2)
+				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
+			else if (canAdd.first == 3)
+				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
+			else
+			{
+				unsigned int affected = 0;
+				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (Anope::Match(it->second->nick, mask))
+						++affected;
+				float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
+
+				if (percent > 95)
+				{
+					source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
+					Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
+					return MOD_CONT;
+				}
+				XLine *x = SQLine->Add(mask, u->nick, expires, reason);
+
+				if (!x)
+					return MOD_CONT;
+
+				source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
+				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+
+				if (readonly)
+					source.Reply(_(READ_ONLY_MODE));
 			}
-			XLine *x = SQLine->Add(OperServ, u, mask, expires, reason);
-
-			if (!x)
-				return MOD_CONT;
-
-			source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
-			if (readonly)
-				source.Reply(_(READ_ONLY_MODE));
 
 		}
 		else
@@ -430,10 +443,13 @@ class OSSQLine : public Module
 		if (!ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");
 
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandossqline);
+		this->AddCommand(operserv->Bot(), &commandossqline);
 	}
 };
 

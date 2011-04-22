@@ -13,6 +13,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "botserv.h"
 
 class CommandBSInfo : public Command
 {
@@ -227,7 +228,7 @@ class CommandBSInfo : public Command
 				"If the parameter is a channel, then you'll get information\n"
 				"such as enabled kickers. If the parameter is a nick,\n"
 				"you'll get information about a bot, such as creation\n"
-				"time or number of channels it is on."), NickServ->nick.c_str());
+				"time or number of channels it is on."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -247,7 +248,10 @@ class BSInfo : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(BotServ, &commandbsinfo);
+		if (!botserv)
+			throw ModuleException("BotServ is not loaded!");
+
+		this->AddCommand(botserv->Bot(), &commandbsinfo);
 	}
 };
 

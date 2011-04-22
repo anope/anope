@@ -12,13 +12,14 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetPrivate : public Command
 {
  public:
 	CommandNSSetPrivate(const Anope::string &spermission = "") : Command("PRIVATE", 2, 2, spermission)
 	{
-		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str()));
+		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -55,7 +56,7 @@ class CommandNSSetPrivate : public Command
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows your nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				NickServ->nick.c_str(), NickServ->nick.c_str());
+				Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -81,7 +82,7 @@ class CommandNSSASetPrivate : public CommandNSSetPrivate
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows the nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				NickServ->nick.c_str(), NickServ->nick.c_str());
+				Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -102,22 +103,25 @@ class NSSetPrivate : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Command *c = FindCommand(NickServ, "SET");
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->AddSubcommand(this, &commandnssetprivate);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->AddSubcommand(this, &commandnssasetprivate);
 	}
 
 	~NSSetPrivate()
 	{
-		Command *c = FindCommand(NickServ, "SET");
+		Command *c = FindCommand(nickserv->Bot(), "SET");
 		if (c)
 			c->DelSubcommand(&commandnssetprivate);
 
-		c = FindCommand(NickServ, "SASET");
+		c = FindCommand(nickserv->Bot(), "SASET");
 		if (c)
 			c->DelSubcommand(&commandnssasetprivate);
 	}

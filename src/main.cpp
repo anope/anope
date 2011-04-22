@@ -79,22 +79,10 @@ static bool started = false;
 
 /*************************************************************************/
 
-class ExpireTimer : public Timer
-{
- public:
-	ExpireTimer(time_t timeout, time_t now) : Timer(timeout, now, true) { }
-
-	void Tick(time_t)
-	{
-		if (!readonly && !noexpire)
-			expire_all();
-	}
-};
-
 class UpdateTimer : public Timer
 {
  public:
-	UpdateTimer(time_t timeout, time_t now) : Timer(timeout, now, true) { }
+	UpdateTimer(time_t timeout) : Timer(timeout, Anope::CurTime, true) { }
 
 	void Tick(time_t)
 	{
@@ -123,26 +111,6 @@ bool UplinkSocket::Read(const Anope::string &buf)
 
 /*************************************************************************/
 
-/* Run expiration routines */
-
-extern void expire_all()
-{
-	if (noexpire || readonly)
-		// Definitely *do not* want.
-		return;
-
-	FOREACH_MOD(I_OnPreDatabaseExpire, OnPreDatabaseExpire());
-
-	Log(LOG_DEBUG) << "Running expire routines";
-	expire_nicks();
-	expire_chans();
-	expire_exceptions();
-
-	FOREACH_MOD(I_OnDatabaseExpire, OnDatabaseExpire());
-}
-
-/*************************************************************************/
-
 void save_databases()
 {
 	if (readonly)
@@ -160,7 +128,6 @@ void do_restart_services()
 {
 	if (!readonly)
 	{
-		expire_all();
 		save_databases();
 	}
 	Log() << "Restarting";
@@ -261,23 +228,25 @@ void sighandler(int signum)
 		{
 #ifndef _WIN32
 			case SIGHUP:
+			{
 				Log() << "Received SIGHUP: Saving databases & rehashing configuration";
 
-				expire_all();
 				save_databases();
 
+				ServerConfig *old_config = Config;
 				try
 				{
-					ServerConfig *newconfig = new ServerConfig();
-					delete Config;
-					Config = newconfig;
-					FOREACH_MOD(I_OnReload, OnReload(true));
+					Config = new ServerConfig();
+					FOREACH_MOD(I_OnReload, OnReload());
+					delete old_config;
 				}
 				catch (const ConfigException &ex)
 				{
+					Config = old_config;
 					Log() << "Error reloading configuration file: " << ex.GetReason();
 				}
 				break;
+			}
 #endif
 			case SIGINT:
 			case SIGTERM:
@@ -292,11 +261,8 @@ void sighandler(int signum)
 				Log() << "Received signal " << signum << ", exiting.";
 #endif
 
-				if (Config->GlobalOnCycle)
-					oper_global("", "%s", Config->GlobalOnCycleMessage.c_str());
-
-				expire_all();
 				save_databases();
+				services_shutdown();
 			default:
 				fatal = true;
 				break;
@@ -455,8 +421,7 @@ int main(int ac, char **av, char **envp)
 
 		/* Set up timers */
 		time_t last_check = Anope::CurTime;
-		ExpireTimer expireTimer(Config->ExpireTimeout, Anope::CurTime);
-		UpdateTimer updateTimer(Config->UpdateTimeout, Anope::CurTime);
+		UpdateTimer updateTimer(Config->UpdateTimeout);
 
 		/*** Main loop. ***/
 		while (!quitting)
@@ -467,8 +432,6 @@ int main(int ac, char **av, char **envp)
 
 				if (!readonly && (save_data || shutting_down))
 				{
-					if (!noexpire)
-						expire_all();
 					if (shutting_down)
 						ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
 					save_databases();

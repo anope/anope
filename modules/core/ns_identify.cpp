@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSIdentify : public Command
 {
@@ -72,7 +73,7 @@ class CommandNSIdentify : public Command
 				"nick.  Many commands require you to authenticate yourself\n"
 				"with this command before you use them.  The password\n"
 				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), NickServ->nick.c_str());
+				"command."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -92,7 +93,10 @@ class NSIdentify : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsidentify);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsidentify);
 	}
 };
 

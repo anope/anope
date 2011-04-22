@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSASet : public Command
 {
@@ -62,7 +63,7 @@ class CommandNSSASet : public Command
 					Log(LOG_ADMIN, u, this) << params[1] << " " << cmdparams;
 				else
 					Log(LOG_ADMIN, u, this) << params[1] << " for " << params[0];
-				mod_run_cmd(NickServ, u, NULL, c, params[1], cmdparams);
+				mod_run_cmd(nickserv->Bot(), u, NULL, c, params[1], cmdparams);
 			}
 			else
 				source.Reply(_("Unknown SASET option \002%s\002."), cmd.c_str());
@@ -82,7 +83,7 @@ class CommandNSSASet : public Command
 				it->second->OnServHelp(source);
 			source.Reply(_("Type \002%s%s HELP SASET \037option\037\002 for more information\n"
 					"on a specific option. The options will be set on the given\n"
-					"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+					"\037nickname\037."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 			return true;
 		}
 		else
@@ -203,7 +204,7 @@ class CommandNSSASetPassword : public Command
 
 		if (enc_encrypt(params[1], nc->pass))
 		{
-			Log(NickServ) << "Failed to encrypt password for " << nc->display << " (saset)";
+			Log() << "Failed to encrypt password for " << nc->display << " (saset)";
 			source.Reply(_(NICK_SASET_PASSWORD_FAILED), nc->display.c_str());
 			return MOD_CONT;
 		}
@@ -243,7 +244,10 @@ class NSSASet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnssaset);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnssaset);
 
 		commandnssaset.AddSubcommand(this, &commandnssasetdisplay);
 		commandnssaset.AddSubcommand(this, &commandnssasetpassword);

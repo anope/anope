@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSForbid : public Command
 {
@@ -64,7 +65,7 @@ class CommandNSForbid : public Command
 
 		if (curr)
 		{
-			curr->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
+			curr->SendMessage(nickserv->Bot(), _(FORCENICKCHANGE_NOW));
 			curr->Collide(na);
 		}
 
@@ -109,7 +110,10 @@ class NSForbid : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsforbid);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsforbid);
 	}
 };
 

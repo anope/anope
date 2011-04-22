@@ -10,39 +10,10 @@
  */
 
 #include "services.h"
-
-void InitLogChannels(ServerConfig *config)
-{
-	for (unsigned i = 0; i < config->LogInfos.size(); ++i)
-	{
-		LogInfo *l = config->LogInfos[i];
-
-		if (!ircd->join2msg && !l->Inhabit)
-			continue;
-
-		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
-		{
-			const Anope::string &target = *sit;
-
-			if (target[0] == '#')
-			{
-				Channel *c = findchan(target);
-				if (!c)
-					c = new Channel(target);
-				c->SetFlag(CH_LOGCHAN);
-				c->SetFlag(CH_PERSIST);
-
-				for (Anope::insensitive_map<BotInfo *>::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-				{
-					BotInfo *bi = it->second;
-
-					if (bi->HasFlag(BI_CORE) && !c->FindUser(bi))
-						bi->Join(c, &config->BotModeList);
-				}
-			}
-		}
-	}
-}
+#include "modules.h"
+#include "chanserv.h"
+#include "operserv.h"
+#include "global.h"
 
 static Anope::string GetTimeStamp()
 {
@@ -96,10 +67,10 @@ Anope::string LogFile::GetName() const
 
 Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), Type(type), Category(category)
 {
-	if (!b)
-		b = Global;
-	if (b)
-		this->Sources.push_back(b->nick);
+	if (!bi && global)
+		bi = global->Bot();
+	if (bi)
+		this->Sources.push_back(bi->nick);
 }
 
 Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
@@ -110,7 +81,7 @@ Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
 	if (type != LOG_COMMAND && type != LOG_OVERRIDE && type != LOG_ADMIN)
 		throw CoreException("This constructor does not support this log type");
 
-	this->bi = c->service ? c->service : Global;
+	this->bi = c->service ? c->service : (global ? global->Bot() : NULL);
 	this->Category = (c->service ? c->service->nick + "/" : "") + c->name;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
@@ -135,7 +106,7 @@ Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	this->bi = ChanServ;
+	this->bi = chanserv ? chanserv->Bot() : NULL;
 	this->Category = category;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
@@ -150,11 +121,13 @@ Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
 		buf << this->Category << " " << c->name << " ";
 }
 
-Log::Log(User *u, const Anope::string &category) : bi(Global), Type(LOG_USER), Category(category)
+Log::Log(User *u, const Anope::string &category) : bi(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
+	if (!this->bi && global)
+		this->bi = global->Bot();
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
@@ -162,13 +135,15 @@ Log::Log(User *u, const Anope::string &category) : bi(Global), Type(LOG_USER), C
 	buf << "USERS: " << u->GetMask() << " ";
 }
 
-Log::Log(Server *s, const Anope::string &category) : bi(OperServ), Type(LOG_SERVER), Category(category)
+Log::Log(Server *s, const Anope::string &category) : bi(NULL), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
-	if (!this->bi)
-		this->bi = Global;
+	if (operserv)
+		this->bi = operserv->Bot();
+	if (!this->bi && global)
+		this->bi = global->Bot();
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(s->GetName());
@@ -178,8 +153,8 @@ Log::Log(Server *s, const Anope::string &category) : bi(OperServ), Type(LOG_SERV
 
 Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_NORMAL), Category(category)
 {
-	if (!b)
-		this->bi = Global;
+	if (!b && global)
+		this->bi = global->Bot();
 	if (this->bi)
 		this->Sources.push_back(bi->nick);
 }

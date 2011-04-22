@@ -1,5 +1,7 @@
 #include "module.h"
+#include "operserv.h"
 #include "sql.h"
+#include "os_session.h"
 
 static Anope::string ToString(const std::vector<Anope::string> &strings)
 {
@@ -89,6 +91,7 @@ class DBMySQL : public Module
 	service_reference<SQLProvider> SQL;
 
  public:
+	service_reference<SessionService> SessionInterface;
 	time_t lastwarn;
 	bool ro;
 
@@ -99,7 +102,8 @@ class DBMySQL : public Module
 			if (readonly && this->ro)
 			{
 				readonly = this->ro = false;
-				ircdproto->SendGlobops(OperServ, "Found SQL again, going out of readonly mode...");
+				if (operserv)
+					ircdproto->SendGlobops(operserv->Bot(), "Found SQL again, going out of readonly mode...");
 			}
 
 			SQL->Run(&sqlinterface, query);
@@ -108,7 +112,8 @@ class DBMySQL : public Module
 		{
 			if (Anope::CurTime - Config->UpdateTimeout > lastwarn)
 			{
-				ircdproto->SendGlobops(OperServ, "Unable to locate SQL reference, is m_mysql loaded? Going to readonly...");
+				if (operserv)
+					ircdproto->SendGlobops(operserv->Bot(), "Unable to locate SQL reference, is m_mysql loaded? Going to readonly...");
 				readonly = this->ro = true;
 				this->lastwarn = Anope::CurTime;
 			}
@@ -120,7 +125,7 @@ class DBMySQL : public Module
 		return SQL ? SQL->Escape(query) : query;
 	}
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), sqlinterface(this), SQL("mysql/main")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), sqlinterface(this), SQL("mysql/main"), SessionInterface("session")
 	{
 		me = this;
 
@@ -134,7 +139,8 @@ class DBMySQL : public Module
 		};
 		ModuleManager::Attach(i, this, 2);
 
-		this->AddCommand(OperServ, &commandsqlsync);
+		if (operserv)
+			this->AddCommand(operserv->Bot(), &commandsqlsync);
 
 		if (uplink_server)
 			OnServerConnect();
@@ -542,12 +548,9 @@ class DBMySQL : public Module
 				time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : Anope::CurTime;
 				time_t expires = r.Get(i, "expires").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : Anope::CurTime;
 
-				XLine *x = SGLine->Add(NULL, NULL, user + "@" + host, expires, reason);
+				XLine *x = SGLine->Add(user + "@" + host, by, expires, reason);
 				if (x)
-				{
-					x->By = by;
 					x->Created = seton;
-				}
 			}
 		}
 
@@ -562,16 +565,13 @@ class DBMySQL : public Module
 
 			XLine *x = NULL;
 			if (SNLine && r.Get(i, "type").equals_cs("SNLINE"))
-				x = SNLine->Add(NULL, NULL, mask, expires, reason);
+				x = SNLine->Add(mask, by, expires, reason);
 			else if (SQLine && r.Get(i, "type").equals_cs("SQLINE"))
-				x = SQLine->Add(NULL, NULL, mask, expires, reason);
+				x = SQLine->Add(mask, by, expires, reason);
 			else if (SZLine && r.Get(i, "type").equals_cs("SZLINE"))
-				x = SZLine->Add(NULL, NULL, mask, expires, reason);
+				x = SZLine->Add(mask, by, expires, reason);
 			if (x)
-			{
-				x->By = by;
 				x->Created = seton;
-			}
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_os_exceptions`");
@@ -583,7 +583,16 @@ class DBMySQL : public Module
 			Anope::string reason = r.Get(i, "reason");
 			time_t expires = convertTo<time_t>(r.Get(i, "expires"));
 
-			exception_add(NULL, mask, limit, reason, creator, expires);
+			if (SessionInterface)
+			{
+				Exception *e = new Exception();
+				e->mask = mask;
+				e->limit = limit;
+				e->who = creator;
+				e->reason = reason;
+				e->time = expires;
+				SessionInterface->AddException(e);
+			}
 		}
 
 		r = SQL->RunQuery("SELECT * FROM `anope_extra`");
@@ -661,7 +670,7 @@ class DBMySQL : public Module
 		BotInfo *service = command->service;
 		ChannelInfo *ci = source.ci;
 
-		if (service == NickServ)
+		if (service->nick == Config->s_NickServ)
 		{
 			if (u->Account() && ((command->name.equals_ci("SET") && !params.empty()) || (command->name.equals_ci("SASET") && u->HasCommand("nickserv/saset") && params.size() > 1)))
 			{
@@ -691,7 +700,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == ChanServ)
+		else if (service->nick == Config->s_ChanServ)
 		{
 			if (command->name.equals_ci("SET") && u->Account() && params.size() > 1)
 			{
@@ -721,7 +730,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == BotServ)
+		else if (service->nick == Config->s_BotServ)
 		{
 			if (command->name.equals_ci("KICK") && params.size() > 2)
 			{
@@ -773,7 +782,7 @@ class DBMySQL : public Module
 				}
 			}
 		}
-		else if (service == MemoServ)
+		else if (service->nick == Config->s_MemoServ)
 		{
 			if (command->name.equals_ci("IGNORE") && params.size() > 0)
 			{
@@ -1049,18 +1058,12 @@ class DBMySQL : public Module
 		this->RunQuery(query);
 	}
 
-	void OnMemoSend(User *, NickCore *nc, Memo *m)
+	void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m)
 	{
+		const Anope::string &mtype = (!target.empty() && target[0] == '#' ? "CHAN" : "NICK");
 		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(nc->display) + "', '" + ToString(m->ToString()) + "', " + stringify(m->time) + ", '" +
-			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'NICK')");
-	}
-
-	void OnMemoSend(User *, ChannelInfo *ci, Memo *m)
-	{
-		this->RunQuery("INSERT INTO `anope_ms_info` (receiver, flags, time, sender, text, serv) VALUES('" +
-			this->Escape(ci->name) + "', '" + ToString(m->ToString()) + "', " + stringify(m->time) + ", '" +
-			this->Escape(m->sender) + "', '" + this->Escape(m->text) + "', 'CHAN')");
+			this->Escape(target) + "', '" + ToString(m->ToString()) + "', " + stringify(m->time) + ", '" +
+			this->Escape(source) + "', '" + this->Escape(m->text) + "', '" + mtype + "')");
 	}
 
 	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
@@ -1079,7 +1082,7 @@ class DBMySQL : public Module
 			this->RunQuery("DELETE FROM `anope_ms_info` WHERE `receiver` = '" + this->Escape(ci->name) + "'");
 	}
 
-	EventReturn OnAddAkill(User *, XLine *ak)
+	EventReturn OnAddAkill(XLine *ak)
 	{
 		this->RunQuery("INSERT INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES('" +
 			this->Escape(ak->GetUser()) + "', '" + this->Escape(ak->GetHost()) + "', '" + this->Escape(ak->By) + "', '" +
@@ -1095,7 +1098,7 @@ class DBMySQL : public Module
 			this->RunQuery("TRUNCATE TABLE `anope_os_akills`");
 	}
 
-	EventReturn OnExceptionAdd(User *, Exception *ex)
+	EventReturn OnExceptionAdd(Exception *ex)
 	{
 		this->RunQuery("INSERT INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES('" +
 			this->Escape(ex->mask) + "', " + stringify(ex->limit) + ", '" + this->Escape(ex->who) + "', '" + this->Escape(ex->reason) + "', " +
@@ -1108,7 +1111,7 @@ class DBMySQL : public Module
 		this->RunQuery("DELETE FROM `anope_os_exceptions` WHERE `mask` = '" + this->Escape(ex->mask) + "'");
 	}
 
-	EventReturn OnAddXLine(User *, XLine *x, XLineType Type)
+	EventReturn OnAddXLine(XLine *x, XLineType Type)
 	{
 		this->RunQuery(Anope::string("INSERT INTO `anope_os_xlines` (type, mask, xby, reason, seton, expire) VALUES('") +
 			(Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE")) + "', '" +
@@ -1216,7 +1219,7 @@ static void SaveDatabases()
 		{
 			Memo *m = nc->memos.memos[j];
 
-			me->OnMemoSend(NULL, nc, m);
+			me->OnMemoSend(m->sender, nc->display, &nc->memos, m);
 		}
 	}
 
@@ -1267,35 +1270,35 @@ static void SaveDatabases()
 		{
 			Memo *m = ci->memos.memos[j];
 
-			me->OnMemoSend(NULL, ci, m);
+			me->OnMemoSend(m->sender, ci->name, &ci->memos, m);
 		}
 	}
 
 	if (SGLine)
 		for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
-			me->OnAddAkill(NULL, SGLine->GetEntry(i));
+			me->OnAddAkill(SGLine->GetEntry(i));
 
 	if (SZLine)
 		for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(NULL, SZLine->GetEntry(i), X_SZLINE);
+			me->OnAddXLine(SZLine->GetEntry(i), X_SZLINE);
 
 	if (SQLine)
 		for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(NULL, SQLine->GetEntry(i), X_SQLINE);
+			me->OnAddXLine(SQLine->GetEntry(i), X_SQLINE);
 
 	if (SNLine)
 		for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(NULL, SNLine->GetEntry(i), X_SNLINE);
+			me->OnAddXLine(SNLine->GetEntry(i), X_SNLINE);
 
-	for (unsigned i = 0, end = exceptions.size(); i < end; ++i)
-		me->OnExceptionAdd(NULL, exceptions[i]);
+	if (me->SessionInterface)
+		for (SessionService::ExceptionVector::iterator it = me->SessionInterface->GetExceptions().begin(); it != me->SessionInterface->GetExceptions().end(); ++it)
+			me->OnExceptionAdd(*it);
 }
 
 CommandReturn CommandSQLSync::Execute(CommandSource &source, const std::vector<Anope::string> &params)
 {
-	User *u = source.u;
 	SaveDatabases();
-	u->SendMessage(OperServ, _("Updating MySQL."));
+	source.Reply(_("Updating MySQL."));
 	return MOD_CONT;
 }
 

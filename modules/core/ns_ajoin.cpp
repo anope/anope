@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSAJoin : public Command
 {
@@ -117,7 +118,10 @@ class NSAJoin : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsajoin);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsajoin);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 3);
@@ -189,10 +193,10 @@ class NSAJoin : public Module
 			{
 				if (!check_access(u, ci, CA_INVITE))
 					continue;
-				ircdproto->SendInvite(NickServ, channels[i].first, u->nick);
+				ircdproto->SendInvite(nickserv->Bot(), channels[i].first, u->nick);
 			}
 
-			ircdproto->SendSVSJoin(NickServ->nick, u->nick, channels[i].first, key);
+			ircdproto->SendSVSJoin(Config->s_NickServ, u->nick, channels[i].first, key);
 		}
 	}
 

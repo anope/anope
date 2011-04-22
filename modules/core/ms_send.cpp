@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
 
 class CommandMSSend : public Command
 {
@@ -25,7 +26,17 @@ class CommandMSSend : public Command
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
-		memo_send(source, nick, text, 0);
+
+		MemoServService::MemoResult result = memoserv->Send(source.u->nick, nick, text);
+		if (result == MemoServService::MEMO_SUCCESS)
+			source.Reply(_("Memo sent to \002%s\002."), nick.c_str());
+		else if (result == MemoServService::MEMO_INVALID_TARGET)
+			source.Reply(_("\002%s\002 is not a registered unforbidden nick or channel."), nick.c_str());
+		else if (result == MemoServService::MEMO_TOO_FAST)
+			source.Reply(_("Please wait %d seconds before using the SEND command again."), Config->MSSendDelay);
+		else if (result == MemoServService::MEMO_TARGET_FULL)
+			source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
+
 		return MOD_CONT;
 	}
 
@@ -56,7 +67,10 @@ class MSSend : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmssend);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmssend);
 	}
 };
 

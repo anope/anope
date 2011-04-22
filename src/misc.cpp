@@ -14,9 +14,6 @@
 #include "version.h"
 #include "modules.h"
 
-/* Cheaper than isspace() or isblank() */
-#define issp(c) ((c) == 32)
-
 struct arc4_stream
 {
 	uint8 i;
@@ -800,242 +797,6 @@ Anope::string Anope::printf(const char *fmt, ...)
 }
 
 
-/*
-* strlcat and strlcpy were ripped from openssh 2.5.1p2
-* They had the following Copyright info:
-*
-*
-* Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-* 3. The name of the author may not be used to endorse or promote products
-*    derived from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED `AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-* AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
-* THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-#ifndef HAVE_STRLCAT
-size_t strlcat(char *dst, const char *src, size_t siz)
-{
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz, dlen;
-
-	while (n-- && *d)
-		++d;
-
-	dlen = d - dst;
-	n = siz - dlen;
-
-	if (!n)
-		return dlen + strlen(s);
-
-	while (*s)
-	{
-		if (n != 1)
-		{
-			*d++ = *s;
-			--n;
-		}
-
-		++s;
-	}
-
-	*d = '\0';
-	return dlen + (s - src); /* count does not include NUL */
-}
-#endif
-
-#ifndef HAVE_STRLCPY
-size_t strlcpy(char *dst, const char *src, size_t siz)
-{
-	char *d = dst;
-	const char *s = src;
-	size_t n = siz;
-
-	/* Copy as many bytes as will fit */
-	if (n && --n)
-	{
-		do
-		{
-			if (!(*d++ = *s++))
-				break;
-		}
-		while (--n);
-	}
-
-	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (!n)
-	{
-		if (siz)
-			*d = '\0'; /* NUL-terminate dst */
-		while (*s++);
-	}
-
-	return s - src - 1; /* count does not include NUL */
-}
-#endif
-
-#ifdef _WIN32
-Anope::string GetWindowsVersion()
-{
-	OSVERSIONINFOEX osvi;
-	SYSTEM_INFO si;
-
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	ZeroMemory(&si, sizeof(SYSTEM_INFO));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi));
-	if (!bOsVersionInfoEx)
-	{
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
-			return "";
-	}
-	GetSystemInfo(&si);
-
-	Anope::string buf, extra, cputype;
-	/* Determine CPU type 32 or 64 */
-	if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-		cputype = " 64-bit";
-	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-		cputype = " 32-bit";
-	else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
-		cputype = " Itanium 64-bit";
-
-	switch (osvi.dwPlatformId)
-	{
-		/* test for the Windows NT product family. */
-		case VER_PLATFORM_WIN32_NT:
-			/* Windows Vista or Windows Server 2008 */
-			if (osvi.dwMajorVersion == 6 && !osvi.dwMinorVersion)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = " Enterprise Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = " Datacenter Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-					extra = " Home Premium/Basic";
-				if (osvi.wProductType & VER_NT_WORKSTATION)
-					buf = "Microsoft Windows Vista" + cputype + extra;
-				else
-					buf = "Microsoft Windows Server 2008" + cputype + extra;
-			}
-			/* Windows 2003 or Windows XP Pro 64 */
-			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = " Datacenter Edition";
-				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = " Enterprise Edition";
-#ifdef VER_SUITE_COMPUTE_SERVER
-				else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
-					extra = " Compute Cluster Edition";
-#endif
-				else if (osvi.wSuiteMask == VER_SUITE_BLADE)
-					extra = " Web Edition";
-				else
-					extra = " Standard Edition";
-				if (osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-					buf = "Microsoft Windows XP Professional x64 Edition" + extra;
-				else
-					buf = "Microsoft Windows Server 2003 Family" + cputype + extra;
-			}
-			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT)
-					extra = " Embedded";
-				else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-					extra = " Home Edition";
-				buf = "Microsoft Windows XP" + extra;
-			}
-			if (osvi.dwMajorVersion == 5 && !osvi.dwMinorVersion)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-					extra = " Datacenter Server";
-				else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = " Advanced Server";
-				else
-					extra = " Server";
-				buf = "Microsoft Windows 2000" + extra;
-			}
-			if (osvi.dwMajorVersion <= 4)
-			{
-				if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-					extra = " Enterprise Edition";
-				buf = "Microsoft Windows NT Server 4.0" + extra;
-			}
-			break;
-		case VER_PLATFORM_WIN32_WINDOWS:
-			if (osvi.dwMajorVersion == 4 && !osvi.dwMinorVersion)
-			{
-				if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B')
-					extra = " OSR2";
-				buf = "Microsoft Windows 95" + extra;
-			}
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-			{
-				if (osvi.szCSDVersion[1] == 'A')
-					extra = "SE";
-				buf = "Microsoft Windows 98" + extra;
-			}
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-				buf = "Microsoft Windows Millenium Edition";
-	}
-	return buf;
-}
-
-bool SupportedWindowsVersion()
-{
-	OSVERSIONINFOEX osvi;
-
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-	BOOL bOsVersionInfoEx = GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi));
-	if (!bOsVersionInfoEx)
-	{
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-		if (!GetVersionEx(reinterpret_cast<OSVERSIONINFO *>(&osvi)))
-			return false;
-	}
-
-	switch (osvi.dwPlatformId)
-	{
-		/* test for the Windows NT product family. */
-		case VER_PLATFORM_WIN32_NT:
-			/* win nt4 */
-			if (osvi.dwMajorVersion <= 4)
-				return false;
-			/* the rest */
-			return true;
-		/* win95 win98 winME */
-		case VER_PLATFORM_WIN32_WINDOWS:
-			return false;
-	}
-	return false;
-}
-
-#endif
-
 /*************************************************************************/
 
 /**
@@ -1162,4 +923,75 @@ int Anope::VersionMajor() { return VERSION_MAJOR; }
 int Anope::VersionMinor() { return VERSION_MINOR; }
 int Anope::VersionPatch() { return VERSION_PATCH; }
 int Anope::VersionBuild() { return VERSION_BUILD; }
+
+/**
+ * Normalize buffer stripping control characters and colors
+ * @param A string to be parsed for control and color codes
+ * @return A string stripped of control and color codes
+ */
+Anope::string normalizeBuffer(const Anope::string &buf)
+{
+	Anope::string newbuf;
+
+	for (unsigned i = 0, end = buf.length(); i < end; ++i)
+	{
+		switch (buf[i])
+		{
+			/* ctrl char */
+			case 1:
+			/* Bold ctrl char */
+			case 2:
+				break;
+			/* Color ctrl char */
+			case 3:
+				/* If the next character is a digit, its also removed */
+				if (isdigit(buf[i + 1]))
+				{
+					++i;
+
+					/* not the best way to remove colors
+					 * which are two digit but no worse then
+					 * how the Unreal does with +S - TSL
+					 */
+					if (isdigit(buf[i + 1]))
+						++i;
+
+					/* Check for background color code
+					 * and remove it as well
+					 */
+					if (buf[i + 1] == ',')
+					{
+						++i;
+
+						if (isdigit(buf[i + 1]))
+							++i;
+						/* not the best way to remove colors
+						 * which are two digit but no worse then
+						 * how the Unreal does with +S - TSL
+						 */
+						if (isdigit(buf[i + 1]))
+							++i;
+					}
+				}
+
+				break;
+			/* line feed char */
+			case 10:
+			/* carriage returns char */
+			case 13:
+			/* Reverse ctrl char */
+			case 22:
+			/* Italic ctrl char */
+			case 29:
+			/* Underline ctrl char */
+			case 31:
+				break;
+			/* A valid char gets copied into the new buffer */
+			default:
+				newbuf += buf[i];
+		}
+	}
+
+	return newbuf;
+}
 

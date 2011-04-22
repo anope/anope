@@ -1,4 +1,5 @@
 #include "module.h"
+#include "nickserv.h"
 #include "ldap.h"
 
 static Anope::string email_attribute;
@@ -44,8 +45,8 @@ class IdentifyInterface : public LDAPInterface
 			return;
 		}
 
-		User *u = *ii->user;
-		Command *c = *ii->command;
+		User *u = ii->user;
+		Command *c = ii->command;
 
 		u->Extend("m_ldap_authentication_authenticated");
 
@@ -56,7 +57,7 @@ class IdentifyInterface : public LDAPInterface
 			if (Config->NSAddAccessOnReg)
 				na->nc->AddAccess(create_mask(u));
 
-			u->SendMessage(NickServ, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+			u->SendMessage(nickserv->Bot(), _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
 		
 		enc_encrypt(ii->pass, na->nc->pass);
@@ -83,8 +84,8 @@ class IdentifyInterface : public LDAPInterface
 			return;
 		}
 
-		User *u = *ii->user;
-		Command *c = *ii->command;
+		User *u = ii->user;
+		Command *c = ii->command;
 
 		u->Extend("m_ldap_authentication_error");
 
@@ -128,7 +129,7 @@ class OnIdentifyInterface : public LDAPInterface
 			if (!email.equals_ci(u->Account()->email))
 			{
 				u->Account()->email = email;
-				u->SendMessage(NickServ, _("Your email has been updated to \002%s\002"), email.c_str());
+				u->SendMessage(nickserv->Bot(), _("Your email has been updated to \002%s\002"), email.c_str());
 				Log() << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}
@@ -166,10 +167,10 @@ class NSIdentifyLDAP : public Module
 		ModuleManager::Attach(i, this, 4);
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 
-		OnReload(false);
+		OnReload();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		ConfigReader config;
 
@@ -182,7 +183,7 @@ class NSIdentifyLDAP : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		if (this->disable_register && command->service == NickServ && command->name == "REGISTER")
+		if (this->disable_register && nickserv && command->service == nickserv->Bot() && command->name == "REGISTER")
 		{
 			source.Reply(_(this->disable_reason.c_str()));
 			return EVENT_STOP;

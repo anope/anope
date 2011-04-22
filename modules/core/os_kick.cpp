@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSKick : public Command
 {
@@ -46,7 +47,7 @@ class CommandOSKick : public Command
 			return MOD_CONT;
 		}
 
-		c->Kick(OperServ, u2, "%s (%s)", u->nick.c_str(), s.c_str());
+		c->Kick(operserv->Bot(), u2, "%s (%s)", u->nick.c_str(), s.c_str());
 		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name;
 		return MOD_CONT;
 	}
@@ -60,7 +61,7 @@ class CommandOSKick : public Command
 				"command. The kick message will have the nickname of the\n"
 				"IRCop sending the KICK command prepended; for example:\n"
 				" \n"
-				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), OperServ->nick.c_str());
+				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), Config->s_OperServ.c_str());
 		return true;
 	}
 
@@ -80,7 +81,10 @@ class OSKick : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandoskick);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandoskick);
 	}
 };
 

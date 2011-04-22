@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSBan : public Command
 {
@@ -67,9 +68,9 @@ class CommandCSBan : public Command
 				return MOD_CONT;
 
 			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
-				c->Kick(whosends(ci), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
+				c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
-				c->Kick(whosends(ci), u2, "%s", reason.c_str());
+				c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 		}
 
 		return MOD_CONT;
@@ -102,7 +103,10 @@ class CSBan : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsban);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsban);
 	}
 };
 

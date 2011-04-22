@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSRecover : public Command
 {
@@ -50,7 +51,7 @@ class CommandNSRecover : public Command
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
+				u2->SendMessage(nickserv->Bot(), _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
@@ -70,7 +71,7 @@ class CommandNSRecover : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
 					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
-				u2->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
+				u2->SendMessage(nickserv->Bot(), _(FORCENICKCHANGE_NOW));
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
@@ -110,7 +111,7 @@ class CommandNSRecover : public Command
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), NickServ->nick.c_str(), NickServ->nick.c_str(), relstr.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+				"the nickname."), Config->s_NickServ.c_str(), Config->s_NickServ.c_str(), relstr.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 
 		return true;
 	}
@@ -131,7 +132,10 @@ class NSRecover : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnsrecover);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnsrecover);
 	}
 };
 

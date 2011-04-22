@@ -314,9 +314,8 @@ class CoreExport Module : public Extensible
 	virtual void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &kickmsg) { }
 
 	/** Called when Services' configuration has been loaded.
-	 * @param startup True if Services is starting for the first time, false otherwise.
 	 */
-	virtual void OnReload(bool startup) {}
+	virtual void OnReload() { }
 
 	/** Called before a bot is assigned to a channel.
 	 * @param sender The user assigning the bot
@@ -333,20 +332,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) { return EVENT_CONTINUE; }
 
-	/** Called after a user has been introduced, but before any type
-	 * of checking has been done (akills, defcon, s*lines, etc)
-	 * return EVENT_STOP here to allow the user to get by untouched,
-	 * or kill them then return EVENT_STOP to tell Anope the user no
-	 * longer exists
-	 * @param u The user
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnPreUserConnect(User *u) { return EVENT_CONTINUE; }
-
 	/** Called when a new user connects to the network.
 	 * @param u The connecting user.
+	 * @param exempt set to true/is true if the user should be excepted from bans etc
 	 */
-	virtual void OnUserConnect(User *u) { }
+	virtual void OnUserConnect(dynamic_reference<User> &u, bool &exempt) { }
 
 	/** Called when a new server connects to the network.
 	 * @param s The server that has connected to the network
@@ -523,16 +513,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnServerDisconnect() { }
 
-	/** Called before the database expire routines are called
-	* Note: Code that is in seperate expiry routines should just be done
-	* when we save the DB, theres no need to have both
-	*/
-	virtual void OnPreDatabaseExpire() { }
-
-	/** Called when the database expire routines are called
-	 */
-	virtual void OnDatabaseExpire() { }
-
 	/** Called when the flatfile dbs are being written
 	 * @param Write A callback to the function used to insert a line into the database
 	 */
@@ -639,11 +619,10 @@ class CoreExport Module : public Extensible
 	virtual void OnDefconLevel(int level) { }
 
 	/** Called before an akill is added
-	 * @param u The user adding the akill
 	 * @param ak The akill
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddAkill(User *u, XLine *ak) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddAkill(XLine *ak) { return EVENT_CONTINUE; }
 
 	/** Called before an akill is deleted
 	 * @param u The user removing the akill
@@ -652,11 +631,10 @@ class CoreExport Module : public Extensible
 	virtual void OnDelAkill(User *u, XLine *ak) { }
 
 	/** Called after an exception has been added
-	 * @param u The user who added it
 	 * @param ex The exception
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnExceptionAdd(User *u, Exception *ex) { return EVENT_CONTINUE; }
+	virtual EventReturn OnExceptionAdd(Exception *ex) { return EVENT_CONTINUE; }
 
 	/** Called before an exception is deleted
 	 * @param u The user who is deleting it
@@ -665,12 +643,11 @@ class CoreExport Module : public Extensible
 	virtual void OnExceptionDel(User *u, Exception *ex) { }
 
 	/** Called before a XLine is added
-	 * @param u The user adding the XLine
 	 * @param sx The XLine
 	 * @param Type The type of XLine this is
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddXLine(User *u, XLine *x, XLineType Type) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(XLine *x, XLineType Type) { return EVENT_CONTINUE; }
 
 	/** Called before a XLine is deleted
 	 * @param u The user deleting the XLine
@@ -932,11 +909,21 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) { return EVENT_CONTINUE; }
 
+	/** Called when a user does /ns update
+	 * @param u The user
+	 */
+	virtual void OnNickUpdate(User *u) { }
+
 	/** Called when we get informed about a users SSL fingerprint
 	 *  when we call this, the fingerprint should already be stored in the user struct
 	 * @param u pointer to the user
 	 */
 	virtual void OnFingerprint(User *u) { }
+
+	/** Called when a user becomes (un)away
+	 * @param message The message, is .empty() if unaway
+	 */
+	virtual void OnUserAway(User *u, const Anope::string &message) { }
 
 	/** Called when a vhost is deleted
 	 * @param na The nickalias of the vhost
@@ -949,18 +936,12 @@ class CoreExport Module : public Extensible
 	virtual void OnSetVhost(NickAlias *na) { }
 
 	/** Called when a memo is sent
-	 * @param u The user sending the memo
-	 * @param nc The nickcore of who the memo was sent to
+	 * @param source The source of the memo
+	 * @param target The target of the memo
+	 * @param mi Memo info for target
 	 * @param m The memo
 	 */
-	virtual void OnMemoSend(User *u, NickCore *nc, Memo *m) { }
-
-	/** Called when a memo is sent
-	 * @param u The user sending the memo
-	 * @param ci The channel the memo was sent to
-	 * @param m The memo
-	 */
-	virtual void OnMemoSend(User *u, ChannelInfo *ci, Memo *m) { }
+	virtual void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) { }
 
 	/** Called when a memo is deleted
 	 * @param nc The nickcore of the memo being deleted
@@ -1064,10 +1045,8 @@ class CoreExport Module : public Extensible
 	 * @param u The source of the message
 	 * @param ci The channel
 	 * @param msg The message
-	 * @param Allow set to false to make the flood kickers halt
-	 * @return MOD_STOP to stop processing completely
 	 */
-	virtual EventReturn OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg, bool &Allow) { return EVENT_CONTINUE; }
+	virtual void OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg) { }
 
 	/** Called when any object is destroyed
 	 * @param b The object
@@ -1087,6 +1066,7 @@ enum Implementation
 		I_OnNickClearAccess, I_OnNickAddAccess, I_OnNickEraseAccess,
 		I_OnNickClearCert, I_OnNickAddCert, I_OnNickEraseCert,
 		I_OnNickInfo, I_OnFindNick, I_OnFindCore, I_OnCheckAuthentication,
+		I_OnNickUpdate,
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
@@ -1105,8 +1085,8 @@ enum Implementation
 		I_OnMemoSend, I_OnMemoDel,
 
 		/* Users */
-		I_OnPreUserConnect, I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
-		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnFingerprint,
+		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
+		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnFingerprint, I_OnUserAway,
 
 		/* OperServ */
 		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
@@ -1114,7 +1094,6 @@ enum Implementation
 
 		/* Database */
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,
-		I_OnDatabaseExpire,
 		I_OnDatabaseWrite, I_OnDatabaseRead, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata,
 
 		/* Modules */
@@ -1122,7 +1101,7 @@ enum Implementation
 
 		/* Other */
 		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
-		I_OnPreCommand, I_OnPostCommand, I_OnPreDatabaseExpire, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
+		I_OnPreCommand, I_OnPostCommand, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
@@ -1290,10 +1269,6 @@ class service_reference : public dynamic_reference<T>
 
  public:
 	service_reference(const Anope::string &n) : dynamic_reference<T>(static_cast<T *>(ModuleManager::GetService(n))), name(n)
-	{
-	}
-
-	virtual ~service_reference()
 	{
 	}
 

@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "nickserv.h"
 
 /* inspircd-ts6.h uses these */
 static bool has_chghostmod = false;
@@ -56,11 +57,12 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 {
 	if (!has_chghostmod)
 	{
-		ircdproto->SendGlobops(OperServ, "CHGHOST not loaded!");
+		Log() << "CHGHOST not loaded!";
 		return;
 	}
 
-	send_cmd(HostServ ? HostServ->GetUID() : Config->Numeric, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+	User *u = finduser(nick);
+	send_cmd(u ? u->GetUID() : Config->Numeric, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 }
 
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -270,13 +272,14 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 	else if (params[1].equals_cs("accountname"))
 	{
 		User *u = finduser(params[0]);
-		NickAlias *user_na = u ? findnick(u->nick) : NULL;
 		NickCore *nc = findcore(params[2]);
 		if (u && nc)
 		{
 			u->Login(nc);
-			if (user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(NickServ, UMODE_REGISTERED);
+
+			NickAlias *user_na = findnick(u->nick);
+			if (nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 		}
 	}
 
@@ -414,8 +417,8 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 		for (unsigned i = 9; i < params.size() - 1; ++i)
 			modes += Anope::string(" ") + params[i];
 		User *user = do_nick("", params[2], params[5], params[3], source, params[params.size() - 1], ts, params[6], params[4], params[0], modes);
-		if (user && user->server->IsSynced())
-			validate_user(user);
+		if (user && user->server->IsSynced() && nickserv)
+			nickserv->Validate(user);
 
 		return true;
 	}
@@ -704,11 +707,11 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				return false;
 			}
 			if (!has_svsholdmod)
-				ircdproto->SendGlobops(OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+				Log() << "SVSHOLD missing, Usage disabled until module is loaded.";
 			if (!has_chghostmod)
-				ircdproto->SendGlobops(OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+				Log() << "CHGHOST missing, Usage disabled until module is loaded.";
 			if (!has_chgidentmod)
-				ircdproto->SendGlobops(OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+				Log() << "CHGIDENT missing, Usage disabled until module is loaded.";
 			ircd->svshold = has_svsholdmod;
 		}
 
@@ -759,12 +762,13 @@ class ProtoInspIRCd : public Module
 
 	void OnServerSync(Server *s)
 	{
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-		{
-			User *u = it->second;
-			if (u->server == s && !u->IsIdentified())
-				validate_user(u);
-		}
+		if (nickserv)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			{
+				User *u = it->second;
+				if (u->server == s && !u->IsIdentified())
+					nickserv->Validate(u);
+			}
 	}
 };
 

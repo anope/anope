@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSStatus : public Command
 {
@@ -66,7 +67,7 @@ class CSStatus : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsstatus);
+		this->AddCommand(chanserv->Bot(), &commandcsstatus);
 	}
 };
 

@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSHelp : public Command
 {
@@ -24,7 +25,7 @@ class CommandNSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(NickServ, source.u, NULL, params[0]);
+		mod_help_cmd(nickserv->Bot(), source.u, NULL, params[0]);
 		return MOD_CONT;
 	}
 
@@ -36,9 +37,8 @@ class CommandNSHelp : public Command
 				"commands allow for registration and maintenance of\n"
 				"nicknames; to use them, type \002%s%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s HELP \037command\037\002."), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str(),
-				NickServ->nick.c_str());
-		for (CommandMap::const_iterator it = NickServ->Commands.begin(), it_end = NickServ->Commands.end(); it != it_end; ++it)
+				"\002%s%s HELP \037command\037\002."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+		for (CommandMap::const_iterator it = nickserv->Bot()->Commands.begin(), it_end = nickserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		if (u->IsServicesOper())
@@ -46,7 +46,7 @@ class CommandNSHelp : public Command
 					"Services Operators can also drop any nickname without needing\n"
 					"to identify for the nick, and may view the access list for\n"
 					"any nickname (\002%s%s ACCESS LIST \037nick\037\002)."),
-					Config->UseStrictPrivMsgString.c_str(), NickServ->nick.c_str());
+					Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		if (Config->NSExpire >= 86400)
 			source.Reply(_("Nicknames that are not used anymore are subject to \n"
 					"the automatic expiration, i.e. they will be deleted\n"
@@ -57,7 +57,7 @@ class CommandNSHelp : public Command
 				"It is \002NOT\002 intended to facilitate \"stealing\" of\n"
 				"nicknames or other malicious actions. Abuse of %s\n"
 				"will result in, at minimum, loss of the abused\n"
-				"nickname(s)."), NickServ->nick.c_str());
+				"nickname(s)."), Config->s_NickServ.c_str());
 	}
 };
 
@@ -71,7 +71,10 @@ class NSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnshelp);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnshelp);
 	}
 };
 

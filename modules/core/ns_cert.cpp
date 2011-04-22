@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSCert : public Command
 {
@@ -161,7 +162,7 @@ class CommandNSCert : public Command
 				"If you connect to IRC and provide a client certificate with a\n"
 				"matching fingerprint in the cert list, your nick will be\n"
 				"automatically identified to %s.\n"
-				" \n"), NickServ->nick.c_str(), NickServ->nick.c_str());
+				" \n"), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
 		source.Reply(_("Examples:\n"
 				" \n"
 				"    \002CERT ADD <fingerprint>\002\n"
@@ -173,7 +174,7 @@ class CommandNSCert : public Command
 				"        Reverses the previous command.\n"
 				" \n"
 				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."), NickServ->nick.c_str());
+				"        Displays the current certificate list."), Config->s_NickServ.c_str());
 		return true;
 	}
 
@@ -200,7 +201,7 @@ class NSCert : public Module
 			return;
 
 		u->Identify(na);
-		u->SendMessage(NickServ, _("SSL Fingerprint accepted. You are now identified."));
+		u->SendMessage(nickserv->Bot(), _("SSL Fingerprint accepted. You are now identified."));
 		return;
 	}
 
@@ -213,10 +214,13 @@ class NSCert : public Module
 		if (!ircd->certfp)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
 		Implementation i[] = { I_OnUserNickChange, I_OnFingerprint };
 		ModuleManager::Attach(i, this, 2);
 
-		this->AddCommand(NickServ, &commandnscert);
+		this->AddCommand(nickserv->Bot(), &commandnscert);
 	}
 
 	void OnFingerprint(User *u)

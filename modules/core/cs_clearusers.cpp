@@ -12,13 +12,14 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSClearUsers : public Command
 {
  public:
 	CommandCSClearUsers() : Command("CLEARUSERS", 1, 1)
 	{
-		this->SetDesc(_("Tells ChanServ to clear (kick) all users on a channel"));
+		this->SetDesc(Anope::printf(_("Tells %s to kick all users on a channel"), Config->s_ChanServ.c_str()));
 	}
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -57,7 +58,7 @@ class CommandCSClearUsers : public Command
 				"Tells %s to clear (kick) all users certain settings on a channel."
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), ChanServ->nick.c_str());
+				"channel."), Config->s_ChanServ.c_str());
 		return true;
 	}
 
@@ -77,7 +78,10 @@ class CSClearUsers : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcsclearusers);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcsclearusers);
 	}
 };
 

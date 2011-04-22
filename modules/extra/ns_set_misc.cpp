@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "nickserv.h"
 
 class CommandNSSetMisc : public Command
 {
@@ -80,8 +81,8 @@ class NSSetMisc : public Module
 		if (Commands.empty())
 			return;
 
-		Command *set = FindCommand(NickServ, "SET");
-		Command *saset = FindCommand(NickServ, "SASET");
+		Command *set = FindCommand(nickserv->Bot(), "SET");
+		Command *saset = FindCommand(nickserv->Bot(), "SASET");
 
 		if (!set && !saset)
 			return;
@@ -120,7 +121,7 @@ class NSSetMisc : public Module
 		Implementation i[] = { I_OnReload, I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 4);
 
-		OnReload(true);
+		OnReload();
 	}
 
 	~NSSetMisc()
@@ -128,12 +129,12 @@ class NSSetMisc : public Module
 		RemoveAll();
 	}
 
-	void OnReload(bool)
+	void OnReload()
 	{
 		RemoveAll();
 
-		Command *set = FindCommand(NickServ, "SET");
-		Command *saset = FindCommand(NickServ, "SASET");
+		Command *set = FindCommand(nickserv->Bot(), "SET");
+		Command *saset = FindCommand(nickserv->Bot(), "SASET");
 		if (!set && !saset)
 			return;
 

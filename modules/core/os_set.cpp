@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "operserv.h"
 
 class CommandOSSet : public Command
 {
@@ -84,14 +85,14 @@ class CommandOSSet : public Command
 			u->isSuperAdmin = 1;
 			source.Reply(_("You are now a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
-			ircdproto->SendGlobops(OperServ, GetString(NULL, _("%s is now a Super-Admin")).c_str(), u->nick.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), _("%s is now a Super-Admin"), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			u->isSuperAdmin = 0;
 			source.Reply(_("You are no longer a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
-			ircdproto->SendGlobops(OperServ, GetString(NULL, _("%s is no longer a Super-Admin")).c_str(), u->nick.c_str());
+			ircdproto->SendGlobops(operserv->Bot(), _("%s is no longer a Super-Admin"), u->nick.c_str());
 		}
 		else
 			source.Reply(_("Setting for SuperAdmin must be \002on\002 or \002off\002 (must be enabled in services.conf)"));
@@ -206,7 +207,7 @@ class CommandOSSet : public Command
 					"    LIST       List the options"));
 		else if (subcommand.equals_ci("LIST"))
 			source.Reply(_("Syntax: \002SET LIST\n"
-					"Display the various %s settings"), OperServ->nick.c_str());
+					"Display the various %s settings"), Config->s_OperServ.c_str());
 		else if (subcommand.equals_ci("READONLY"))
 			source.Reply(_("Syntax: \002SET READONLY {ON | OFF}\002\n"
 					" \n"
@@ -255,7 +256,10 @@ class OSSet : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(OperServ, &commandosset);
+		if (!operserv)
+			throw ModuleException("OperServ is not loaded!");
+
+		this->AddCommand(operserv->Bot(), &commandosset);
 	}
 };
 

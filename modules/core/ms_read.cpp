@@ -12,6 +12,41 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "memoserv.h"
+
+void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::string &targ)
+{
+	/* Only send receipt if memos are allowed */
+	if (memoserv && !readonly)
+	{
+		/* Get nick alias for sender */
+		NickAlias *na = findnick(m->sender);
+
+		if (!na)
+			return;
+
+		/* Get nick core for sender */
+		NickCore *nc = na->nc;
+
+		if (!nc)
+			return;
+
+		/* Text of the memo varies if the recepient was a
+		   nick or channel */
+		Anope::string text = Anope::printf(GetString(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")).c_str(), targ.c_str());
+
+		/* Send notification */
+		memoserv->Send(source.u->nick, m->sender, text, true);
+
+		/* Notify recepient of the memo that a notification has
+		   been sent to the sender */
+		source.Reply(_("A notification memo has been sent to %s informing him/her you have\n"
+				"read his/her memo."), nc->display.c_str());
+	}
+
+	/* Remove receipt flag from the original memo */
+	m->UnsetFlag(MF_RECEIPT);
+}
 
 class MemoListCallback : public NumberList
 {
@@ -42,7 +77,7 @@ class MemoListCallback : public NumberList
 
 		/* Check if a receipt notification was requested */
 		if (m->HasFlag(MF_RECEIPT))
-			rsend_notify(source, m, ci ? ci->name : "");
+			rsend_notify(source, mi, m, ci ? ci->name : source.u->nick);
 	}
 };
 
@@ -157,7 +192,10 @@ class MSRead : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(MemoServ, &commandmsread);
+		if (!memoserv)
+			throw ModuleException("MemoServ is not loaded!");
+
+		this->AddCommand(memoserv->Bot(), &commandmsread);
 	}
 };
 

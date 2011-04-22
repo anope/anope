@@ -12,7 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hashcomp.h"
+#include "nickserv.h"
 
 class CommandNSList : public Command
 {
@@ -219,7 +219,10 @@ class NSList : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(NickServ, &commandnslist);
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
+
+		this->AddCommand(nickserv->Bot(), &commandnslist);
 	}
 };
 

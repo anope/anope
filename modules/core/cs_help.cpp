@@ -12,6 +12,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include "chanserv.h"
 
 class CommandCSHelp : public Command
 {
@@ -25,7 +26,7 @@ class CommandCSHelp : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		mod_help_cmd(ChanServ, source.u, NULL, params[0]);
+		mod_help_cmd(chanserv->Bot(), source.u, NULL, params[0]);
 
 		return MOD_CONT;
 	}
@@ -40,9 +41,8 @@ class CommandCSHelp : public Command
 				"commands are listed below; to use them, type\n"
 				"\002%s%s \037command\037\002. For more information on a\n"
 				"specific command, type \002%s%s HELP \037command\037\002."),
-				ChanServ->nick.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), ChanServ->nick.c_str(),
-				ChanServ->nick.c_str());
-		for (CommandMap::const_iterator it = ChanServ->Commands.begin(); it != ChanServ->Commands.end(); ++it)
+				Config->s_ChanServ.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), Config->s_ChanServ.c_str());
+		for (CommandMap::const_iterator it = chanserv->Bot()->Commands.begin(); it != chanserv->Bot()->Commands.end(); ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
 		if (Config->CSExpire >= 86400)
@@ -67,7 +67,10 @@ class CSHelp : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		this->AddCommand(ChanServ, &commandcshelp);
+		if (!chanserv)
+			throw ModuleException("ChanServ is not loaded!");
+
+		this->AddCommand(chanserv->Bot(), &commandcshelp);
 	}
 };
 

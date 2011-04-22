@@ -6,8 +6,8 @@
 class NickAlias;
 class NickCore;
 
-typedef unordered_map_namespace::unordered_map<Anope::string, NickAlias *, ci::hash, std::equal_to<ci::string> > nickalias_map;
-typedef unordered_map_namespace::unordered_map<Anope::string, NickCore *, ci::hash, std::equal_to<ci::string> > nickcore_map;
+typedef Anope::insensitive_map<NickAlias *> nickalias_map;
+typedef Anope::insensitive_map<NickCore *> nickcore_map;
 
 extern CoreExport nickalias_map NickAliasList;
 extern CoreExport nickcore_map NickCoreList;

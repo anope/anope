@@ -687,7 +687,7 @@ class DBMySQL : public Module
 				}
 				else if (cmd.equals_ci("KILL") || cmd.equals_ci("SECURE") || cmd.equals_ci("PRIVATE") || cmd.equals_ci("MSG") || cmd.equals_ci("HIDE") || cmd.equals_ci("AUTOOP"))
 				{
-					this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + ToString(CurBot->ToString()) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
+					this->RunQuery("UPDATE `anope_ns_core` SET `flags` = '" + ToString(nc->ToString()) + "' WHERE `display` = '" + this->Escape(nc->display) + "'");
 				}
 			}
 		}
@@ -1133,7 +1133,7 @@ class DBMySQL : public Module
 
 	void OnSetVhost(NickAlias *na)
 	{
-		this->RunQuery("INSERT INTO `anope_hs_core` (nick, vident, vhost, creator, time) VALUES('" + na->nick + "', '" + na->hostinfo.GetIdent() + "', '" + na->hostinfo.GetHost() + "', '" + na->hostinfo.GetCreator() + "', " + stringify(na->hostinfo.GetTime()) + ")");
+		this->RunQuery("INSERT INTO `anope_hs_core` (nick, vident, vhost, creator, time) VALUES('" + this->Escape(na->nick) + "', '" + this->Escape(na->hostinfo.GetIdent()) + "', '" + this->Escape(na->hostinfo.GetHost()) + "', '" + this->Escape(na->hostinfo.GetCreator()) + "', " + stringify(na->hostinfo.GetTime()) + ")");
 	}
 };
 

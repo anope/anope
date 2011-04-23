@@ -969,10 +969,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		 * unsigned blarg;
 		 * {"tag", "value", "0", new ValueContainerUInt(&conf->blarg), DT_UINTEGER, <validation>},
 		 *
-		 * If you want to create a directive using a character pointer without additional validation (see below for hostnames, fields with no spaces, and IP addresses):
-		 * char *blarg;
-		 * {"tag", "value", "", new ValueContainerChar(&conf->blarg), DT_CHARPTR, <validation>},
-		 *
 		 * If you want to create a directive using a string:
 		 * Anope::string blarg;
 		 * {"tag", "value", "", new ValueContainerString(&conf->blarg), DT_STRING, <validation>},
@@ -1000,7 +996,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		 * For the second-to-last argument, you can or (|) in the following values:
 		 * DT_NORELOAD - The variable can't be changed on a reload of the configuration
 		 * DT_ALLOW_WILD - Allows wildcards/CIDR in DT_IPADDRESS
-		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_CHARPTR, DT_STRING, and DT_CISTRING
+		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_STRING
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
@@ -1103,7 +1099,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&conf->CSOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"memoserv", "nick", "", new ValueContainerString(&conf->s_MemoServ), DT_STRING | DT_NORELOAD, NoValidation},
 		{"memoserv", "description", "Memo Service", new ValueContainerString(&conf->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateMemoServ},
-		{"memoserv", "modules", "", new ValueContainerString(&Config->MemoCoreModules), DT_STRING, NoValidation},
+		{"memoserv", "modules", "", new ValueContainerString(&conf->MemoCoreModules), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&conf->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&conf->MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&conf->MSNotifyAll), DT_BOOLEAN, NoValidation},
@@ -1163,7 +1159,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"include",
 			{"type", "name", ""},
 			{"", "", ""},
-			{DT_CHARPTR, DT_CHARPTR},
+			{DT_STRING, DT_STRING},
 			InitInclude, DoInclude, DoneInclude},
 		{"uplink",
 			{"host", "ipv6", "port", "password", ""},
@@ -1173,7 +1169,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"module",
 			{"name", ""},
 			{"", ""},
-			{DT_CHARPTR},
+			{DT_STRING},
 			InitModules, DoModule, DoneModules},
 		{"log",
 			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
@@ -1183,12 +1179,12 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"opertype",
 			{"name", "inherits", "commands", "privs", ""},
 			{"", "", "", "", ""},
-			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOperTypes, DoOperType, DoneOperTypes},
 		{"oper",
 			{"name", "type", "password", "certfp", ""},
 			{"", "", "", "", ""},
-			{DT_CHARPTR, DT_CHARPTR, DT_CHARPTR, DT_CHARPTR},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOpers, DoOper, DoneOpers},
 		{"",
 			{""},
@@ -1273,15 +1269,6 @@ void ServerConfig::Read()
 						else
 							vl.push_back(ValueItem(""));
 						ValidateIP(vl[vl.size() - 1].GetValue(), configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], allow_wild);
-						break;
-					}
-					case DT_CHARPTR:
-					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
-							vl.push_back(ValueItem(item.c_str()));
-						else
-							vl.push_back(ValueItem(""));
 						break;
 					}
 					case DT_STRING:
@@ -1370,13 +1357,6 @@ void ServerConfig::Read()
 				ValueContainerString *vcs = debug_cast<ValueContainerString *>(configitems.Values[Index].val);
 				ValidateIP(vi.GetValue(), configitems.Values[Index].tag, configitems.Values[Index].value, allow_wild);
 				vcs->Set(vi.GetValue());
-				break;
-			}
-			case DT_CHARPTR:
-			{
-				ValueContainerChar *vcc = debug_cast<ValueContainerChar *>(configitems.Values[Index].val);
-				// Make sure we also copy the null terminator
-				vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 				break;
 			}
 			case DT_STRING:
@@ -1774,12 +1754,6 @@ ValueItem::ValueItem(bool value) : v("")
 	n << value;
 	v = n.str();
 }
-
-ValueItem::ValueItem(const char *value) : v(value) { }
-
-ValueItem::ValueItem(const std::string &value) : v(value) { }
-
-ValueItem::ValueItem(const ci::string &value) : v(value) { }
 
 ValueItem::ValueItem(const Anope::string &value) : v(value) { }
 

@@ -33,7 +33,6 @@ enum ConfigDataType
 	DT_INTEGER, // Integer
 	DT_UINTEGER, // Unsigned Integer
 	DT_LUINTEGER, // Long Unsigned Integer
-	DT_CHARPTR, // Char pointer
 	DT_STRING, // Anope::string
 	DT_BOOLEAN, // Boolean
 	DT_HOSTNAME, // Hostname syntax
@@ -42,7 +41,7 @@ enum ConfigDataType
 	DT_TIME, // Time value
 	DT_NORELOAD = 32, // Item can't be reloaded after startup
 	DT_ALLOW_WILD = 64, // Allow wildcards/CIDR in DT_IPADDRESS
-	DT_ALLOW_NEWLINE = 128 // New line characters allowed in DT_CHARPTR
+	DT_ALLOW_NEWLINE = 128 // New line characters allowed in DT_STRING
 };
 
 /** Holds a config value, either string, integer or boolean.
@@ -61,12 +60,6 @@ class CoreExport ValueItem
 	ValueItem(int);
 	/** Initialize with a bool */
 	ValueItem(bool);
-	/** Initialize with a char pointer */
-	ValueItem(const char *);
-	/** Initialize with an std::string */
-	ValueItem(const std::string &);
-	/** Initialize with a ci::string */
-	ValueItem(const ci::string &);
 	/** Initialize with an Anope::string */
 	ValueItem(const Anope::string &);
 	/** Initialize with a long */
@@ -137,40 +130,6 @@ template<typename T> class ValueContainer : public ValueContainerBase
 	}
 };
 
-/** This a specific version of ValueContainer to handle character arrays specially
- */
-template<> class ValueContainer<char **> : public ValueContainerBase
-{
- private:
-	/** Contained item */
-	char **val;
- public:
-	/** Initialize with nothing */
-	ValueContainer() : ValueContainerBase(), val(NULL) { }
-	/** Initialize with a value of type T */
-	ValueContainer(char **Val) : ValueContainerBase(), val(Val) { }
-	/** Initialize with a copy */
-	ValueContainer(const ValueContainer &Val) : ValueContainerBase(), val(Val.val) { }
-	ValueContainer &operator=(const ValueContainer &Val)
-	{
-		val = Val.val;
-		return *this;
-	}
-	/** Change value to type T of size s */
-	void Set(const char *newval, size_t s)
-	{
-		if (*val)
-			delete [] *val;
-		if (!*newval)
-		{
-			*val = NULL;
-			return;
-		}
-		*val = new char[s];
-		memcpy(*val, newval, s);
-	}
-};
-
 /** This a specific version of ValueContainer to handle Anope::string specially
  */
 template<> class ValueContainer<Anope::string *> : public ValueContainerBase
@@ -216,11 +175,6 @@ typedef ValueContainer<unsigned *> ValueContainerUInt;
  * a long unsigned int
  */
 typedef ValueContainer<long unsigned *> ValueContainerLUInt;
-
-/** A specialization of ValueContainer to hold a pointer to
- * a char array.
- */
-typedef ValueContainer<char **> ValueContainerChar;
 
 /** A specialization of ValueContainer to hold a pointer to
  * an int

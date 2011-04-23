@@ -88,13 +88,6 @@ class CommandOSConfig : public Command
 								vcs->Set(vi.GetValue());
 								break;
 							}
-							case DT_CHARPTR:
-							{
-								ValueContainerChar *vcc = debug_cast<ValueContainerChar *>(v->val);
-								// Make sure we also copy the null terminator
-								vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
-								break;
-							}
 							case DT_STRING:
 							{
 								ValueContainerString *vcs = debug_cast<ValueContainerString *>(v->val);

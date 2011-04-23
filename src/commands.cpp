@@ -93,43 +93,8 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	}
 
 	bool fantasy = ci != NULL;
-/*	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && (bi == ChanServ || bi == BotServ))
-	{
-		if (ircdproto->IsChannelValid(params[0]))
-		{
-			ci = cs_findchan(params[0]);
-			if (ci)
-			{
-				if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
-				{
-					u->SendMessage(bi, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
-					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
-					PopLanguage();
-					return;
-				}
-				else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
-				{
-					u->SendMessage(bi, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
-					Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
-					PopLanguage();
-					return;
-				}
-			}
-			else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
-			{
-				u->SendMessage(bi, _(_(CHAN_X_NOT_REGISTERED)), params[0].c_str());
-				PopLanguage();
-				return;
-			}
-		}*/
-		/* A user not giving a channel name for a param that should be a channel */
-/*		else
-		{
-			u->SendMessage(bi, _(CHAN_X_INVALID), params[0].c_str());
-			PopLanguage();
-			return;
-		}
-	}*/
+	if (params.size() > 0 && !c->HasFlag(CFLAG_STRIP_CHANNEL) && ircdproto->IsChannelValid(params[0]))
+		ci = cs_findchan(params[0]);
 
 	CommandSource source;
 	source.u = u;

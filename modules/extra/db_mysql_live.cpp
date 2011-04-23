@@ -141,7 +141,7 @@ class MySQLLiveModule : public Module
 
 	SQLCache chan_cache, nick_cache, core_cache;
 
-	SQLResult RunQuery(const Anope::string &query)
+	SQLResult RunQuery(const SQLQuery &query)
 	{
 		if (!this->SQL)
 			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
@@ -150,11 +150,6 @@ class MySQLLiveModule : public Module
 		if (!res.GetError().empty())
 			throw SQLException(res.GetError());
 		return res;
-	}
-
-	const Anope::string Escape(const Anope::string &query)
-	{
-		return SQL ? SQL->Escape(query) : query;
 	}
 
 	CommandMutex *CurrentCommand()
@@ -186,7 +181,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			Anope::string query = "SELECT * FROM `anope_cs_info` WHERE `name` = '" + this->Escape(chname) + "'";
+			SQLQuery query("SELECT * FROM `anope_cs_info` WHERE `name` = ?");
+			query.setValue(1, chname);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{
@@ -222,7 +218,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			Anope::string query = "SELECT * FROM `anope_ns_alias` WHERE `nick` = '" + this->Escape(nick) + "'";
+			SQLQuery query("SELECT * FROM `anope_ns_alias` WHERE `nick` = ?");
+			query.setValue(1, nick);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{
@@ -258,7 +255,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			Anope::string query = "SELECT * FROM `anope_ns_core` WHERE `display` = '" + this->Escape(nick) + "'";
+			SQLQuery query("SELECT * FROM `anope_ns_core` WHERE `display` = ?");
+			query.setValue(1, nick);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{

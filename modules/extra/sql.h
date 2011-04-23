@@ -9,6 +9,44 @@ class SQLException : public ModuleException
 	virtual ~SQLException() throw() { }
 };
 
+/** A SQL query
+ */
+struct SQLQuery
+{
+	Anope::string query;
+	std::map<Anope::string, Anope::string> parameters;
+
+	SQLQuery() { }
+	SQLQuery(const Anope::string &q) : query(q) { }
+
+	SQLQuery& operator=(const Anope::string &q)
+	{
+		this->query = q;
+		this->parameters.clear();
+		return *this;
+	}
+	
+	bool operator==(const SQLQuery &other) const
+	{
+		return this->query == other.query;
+	}
+
+	inline bool operator!=(const SQLQuery &other) const
+	{
+		return !(*this == other);
+	}
+
+	template<typename T> void setValue(const Anope::string &key, const T& value)
+	{
+		try
+		{
+			Anope::string string_value = stringify(value);
+			this->parameters[key] = string_value;
+		}
+		catch (const ConvertException &ex) { }
+	}
+};
+
 /** A result from a SQL query
  */
 class SQLResult
@@ -16,14 +54,16 @@ class SQLResult
  protected:
 	/* Rows, column, item */
 	std::vector<std::map<Anope::string, Anope::string> > entries;
-	Anope::string query;
+	SQLQuery query;
 	Anope::string error;
  public:
-	SQLResult(const Anope::string &q, const Anope::string &err = "") : query(q), error(err) { }
+ 	Anope::string finished_query;
+
+	SQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err = "") : query(q), error(err), finished_query(fq) { }
 
 	inline operator bool() const { return this->error.empty(); }
 
-	inline const Anope::string &GetQuery() const { return this->query; }
+	inline const SQLQuery &GetQuery() const { return this->query; }
 	inline const Anope::string &GetError() const { return this->error; }
 
 	int Rows() const { return this->entries.size(); }
@@ -73,10 +113,8 @@ class SQLProvider : public Service
  public:
 	SQLProvider(Module *c, const Anope::string &n) : Service(c, n) { }
 
-	virtual void Run(SQLInterface *i, const Anope::string &query) = 0;
+	virtual void Run(SQLInterface *i, const SQLQuery &query) = 0;
 
-	virtual SQLResult RunQuery(const Anope::string &query) = 0;
-
-	virtual const Anope::string Escape(const Anope::string &buf) { return buf; }
+	virtual SQLResult RunQuery(const SQLQuery &query) = 0;
 };
 

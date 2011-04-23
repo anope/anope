@@ -61,7 +61,7 @@ class ChanServBotInfo : public BotInfo
 					}
 					else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
 					{
-						u->SendMessage(this, _(_(CHAN_X_NOT_REGISTERED)), param.c_str());
+						u->SendMessage(this, _(CHAN_X_NOT_REGISTERED), param.c_str());
 						PopLanguage();
 						return;
 					}

@@ -476,7 +476,7 @@ struct CoreExport MemoInfo
 {
 	int16 memomax;
 	std::vector<Memo *> memos;
-	std::vector<ci::string> ignores;
+	std::vector<Anope::string> ignores;
 
 	unsigned GetIndex(Memo *m) const;
 	void Del(unsigned index);

@@ -60,7 +60,7 @@ class CommandMSIgnore : public Command
 		}
 		else if (command.equals_ci("DEL") && !param.empty())
 		{
-			std::vector<ci::string>::iterator it = std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str());
+			std::vector<Anope::string>::iterator it = std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str());
 
 			if (it != mi->ignores.end())
 			{

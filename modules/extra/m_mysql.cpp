@@ -26,11 +26,12 @@ struct QueryRequest
 	/* The interface to use once we have the result to send the data back */
 	SQLInterface *sqlinterface;
 	/* The actual query */
-	Anope::string query;
+	SQLQuery query;
 
-	QueryRequest(MySQLService *s, SQLInterface *i, const Anope::string &q) : service(s), sqlinterface(i), query(q) { }
+	QueryRequest(MySQLService *s, SQLInterface *i, const SQLQuery &q) : service(s), sqlinterface(i), query(q) { }
 };
 
+/** A query result */
 struct QueryResult
 {
 	/* The interface to send the data back on */
@@ -48,11 +49,11 @@ class MySQLResult : public SQLResult
 	MYSQL_RES *res;
 
  public:
-	MySQLResult(const Anope::string &q, MYSQL_RES *r) : SQLResult(q), res(r)
+	MySQLResult(const SQLQuery &q, const Anope::string &fq, MYSQL_RES *r) : SQLResult(q, fq), res(r)
 	{
 		unsigned num_fields = res ? mysql_num_fields(res) : 0;
 
-		Log(LOG_DEBUG) << "SQL query " << q << " returned " << num_fields << " fields";
+		Log(LOG_DEBUG) << "SQL query " << this->finished_query << " returned " << num_fields << " fields";
 
 		if (!num_fields)
 			return;
@@ -79,8 +80,10 @@ class MySQLResult : public SQLResult
 		}
 	}
 
-	MySQLResult(const Anope::string &q, const Anope::string &err) : SQLResult(q, err), res(NULL)
+	MySQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(q, fq, err), res(NULL)
 	{
+		if (this->finished_query.empty())
+			this->finished_query = q.query;
 	}
 
 	~MySQLResult()
@@ -102,6 +105,11 @@ class MySQLService : public SQLProvider
 
 	MYSQL *sql;
 
+	/** Escape a query.
+	 * Note the mutex must be held!
+	 */
+	Anope::string Escape(const Anope::string &query);
+
  public:
 	/* Locked by the SQL thread when a query is pending on this database,
 	 * prevents us from deleting a connection while a query is executing
@@ -113,15 +121,15 @@ class MySQLService : public SQLProvider
 
 	~MySQLService();
 
-	void Run(SQLInterface *i, const Anope::string &query);
+	void Run(SQLInterface *i, const SQLQuery &query);
 
-	SQLResult RunQuery(const Anope::string &query);
-
-	const Anope::string Escape(const Anope::string &buf);
+	SQLResult RunQuery(const SQLQuery &query);
 
 	void Connect();
 
 	bool CheckConnection();
+
+	Anope::string BuildQuery(const SQLQuery &q);
 };
 
 /** The SQL thread used to execute queries
@@ -296,7 +304,7 @@ MySQLService::~MySQLService()
 		if (r.service == this)
 		{
 			if (r.sqlinterface)
-				r.sqlinterface->OnError(SQLResult("", "SQL Interface is going away"));
+				r.sqlinterface->OnError(SQLResult(r.query, "SQL Interface is going away"));
 			me->QueryRequests.erase(me->QueryRequests.begin() + i - 1);
 		}
 	}
@@ -304,7 +312,7 @@ MySQLService::~MySQLService()
 	me->DThread->Unlock();
 }
 
-void MySQLService::Run(SQLInterface *i, const Anope::string &query)
+void MySQLService::Run(SQLInterface *i, const SQLQuery &query)
 {
 	me->DThread->Lock();
 	me->QueryRequests.push_back(QueryRequest(this, i, query));
@@ -312,29 +320,34 @@ void MySQLService::Run(SQLInterface *i, const Anope::string &query)
 	me->DThread->Wakeup();
 }
 
-SQLResult MySQLService::RunQuery(const Anope::string &query)
+SQLResult MySQLService::RunQuery(const SQLQuery &query)
 {
 	this->Lock.Lock();
-	if (this->CheckConnection() && !mysql_real_query(this->sql, query.c_str(), query.length()))
+
+	Anope::string real_query;
+	try
+	{
+		real_query = this->BuildQuery(query);
+	}
+	catch (const SQLException &ex)
+	{
+		this->Lock.Unlock();
+		return MySQLResult(query, real_query, ex.GetReason());
+	}
+
+	if (this->CheckConnection() && !mysql_real_query(this->sql, real_query.c_str(), real_query.length()))
 	{
 		MYSQL_RES *res = mysql_use_result(this->sql);
 
 		this->Lock.Unlock();
-		return MySQLResult(query, res);
+		return MySQLResult(query, real_query, res);
 	}
 	else
 	{
 		Anope::string error = mysql_error(this->sql);
 		this->Lock.Unlock();
-		return MySQLResult(query, error);
+		return MySQLResult(query, real_query, error);
 	}
-}
-
-const Anope::string MySQLService::Escape(const Anope::string &buf)
-{
-	char buffer[BUFSIZE];
-	mysql_escape_string(buffer, buf.c_str(), buf.length());
-	return buffer;
 }
 
 void MySQLService::Connect()
@@ -366,6 +379,23 @@ bool MySQLService::CheckConnection()
 	}
 
 	return true;
+}
+
+Anope::string MySQLService::Escape(const Anope::string &query)
+{
+	char buffer[BUFSIZE];
+	mysql_real_escape_string(this->sql, buffer, query.c_str(), query.length());
+	return buffer;
+}
+
+Anope::string MySQLService::BuildQuery(const SQLQuery &q)
+{
+	Anope::string real_query = q.query;
+
+	for (std::map<Anope::string, Anope::string>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
+		real_query = real_query.replace_all_cs("@" + it->first, "'" + this->Escape(it->second) + "'");
+
+	return real_query;
 }
 
 void DispatcherThread::Run()

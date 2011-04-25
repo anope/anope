@@ -159,7 +159,8 @@ class SSLModule : public Module
 			{
 				new UplinkSocket(uplink_server->ipv6);
 				this->service.Init(UplinkSock);
-				UplinkSock->Connect(uplink_server->host, uplink_server->port, Config->LocalHost);
+				DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
+				UplinkSock->Connect(req.result, uplink_server->port, Config->LocalHost);
 
 				Log() << "Connected to server " << Number << " (" << u->host << ":" << u->port << ") with SSL";
 				return EVENT_ALLOW;
@@ -247,7 +248,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &TargetHost, 
 {
 	if (s->IO == &normalSocketIO)
 		throw SocketException("Attempting to connect uninitialized socket with SQL");
-	
+
 	normalSocketIO.Connect(s, TargetHost, Port, BindHost);
 
 	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(s->IO);

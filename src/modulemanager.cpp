@@ -12,6 +12,60 @@
 std::map<Anope::string, Service *> ModuleManager::ServiceProviders;
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
+void ModuleManager::CleanupRuntimeDirectory()
+{
+	Anope::string dirbuf = services_dir + "/modules/runtime";
+
+	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
+
+#ifndef _WIN32
+	DIR *dirp = opendir(dirbuf.c_str());
+	if (!dirp)
+	{
+		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
+		return;
+	}
+	struct dirent *dp;
+	while ((dp = readdir(dirp)))
+	{
+		if (!dp->d_ino)
+			continue;
+		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
+			continue;
+		Anope::string filebuf = dirbuf + "/" + dp->d_name;
+		DeleteFile(filebuf.c_str());
+	}
+	closedir(dirp);
+#else
+	Anope::string szDir = dirbuf + "/*";
+
+	WIN32_FIND_DATA FileData;
+	HANDLE hList = FindFirstFile(szDir.c_str(), &FileData);
+	if (hList != INVALID_HANDLE_VALUE)
+	{
+		bool fFinished = false;
+		while (!fFinished)
+		{
+			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			{
+				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
+				if (!DeleteFile(filebuf.c_str()))
+					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << Anope::LastError();
+			}
+			if (!FindNextFile(hList, &FileData))
+			{
+				if (GetLastError() == ERROR_NO_MORE_FILES)
+					fFinished = true;
+			}
+		}
+	}
+	else
+		Log(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
+
+	FindClose(hList);
+#endif
+}
+
 void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
 {
 	for (std::list<Anope::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
@@ -215,6 +269,35 @@ ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 	return MOD_ERR_OK;
 }
 
+void ModuleManager::RequireVersion(int major, int minor, int patch, int build)
+{
+	if (Anope::VersionMajor() > major)
+		return;
+	else if (Anope::VersionMajor() == major)
+	{
+		if (minor == -1)
+			return;
+		else if (Anope::VersionMinor() > minor)
+			return;
+		else if (Anope::VersionMinor() == minor)
+		{
+			if (patch == -1)
+				return;
+			else if (Anope::VersionPatch() > patch)
+				return;
+			else if (Anope::VersionPatch() == patch)
+			{
+				if (build == -1)
+					return;
+				else if (Anope::VersionBuild() >= build)
+					return;
+			}
+		}
+	}
+
+	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + "-" + build + " - this is " + Anope::Version());
+}
+
 void ModuleManager::DeleteModule(Module *m)
 {
 	if (!m || !m->handle)
@@ -226,7 +309,7 @@ void ModuleManager::DeleteModule(Module *m)
 	ano_modclearerr();
 	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
 	const char *err = ano_moderr();
-	if (!destroy_func && err && *err)
+	if (!destroy_func || err)
 	{
 		Log() << "No destroy function found for " << m->name << ", chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
@@ -234,11 +317,8 @@ void ModuleManager::DeleteModule(Module *m)
 	else
 		destroy_func(m); /* Let the module delete it self, just in case */
 
-	if (handle)
-	{
-		if (dlclose(handle))
-			Log() << ano_moderr();
-	}
+	if (dlclose(handle))
+		Log() << ano_moderr();
 
 	if (!filename.empty())
 		DeleteFile(filename.c_str());

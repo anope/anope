@@ -205,7 +205,7 @@ static void services_shutdown()
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	ModuleManager::UnloadAll();
 	/* just in case they weren't all removed at least run once */
-	ModuleRunTimeDirCleanUp();
+	ModuleManager::CleanupRuntimeDirectory();
 }
 
 /*************************************************************************/
@@ -402,7 +402,7 @@ int main(int ac, char **av, char **envp)
 #endif
 
 		/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
-		ModuleRunTimeDirCleanUp();
+		ModuleManager::CleanupRuntimeDirectory();
 
 		/* General initialization first */
 		Init(ac, av);

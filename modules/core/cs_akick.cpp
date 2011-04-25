@@ -192,10 +192,17 @@ class CommandCSAKick : public Command
 		}
 
 		/* Check excepts BEFORE we get this far */
-		if (ModeManager::FindChannelModeByName(CMODE_EXCEPT) && is_excepted_mask(ci, mask))
+		if (ci->c)
 		{
-			source.Reply(_(CHAN_EXCEPTED), mask.c_str(), ci->name.c_str());
-			return;
+			std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
+			for (; modes.first != modes.second; ++modes.first)
+			{
+				if (Anope::Match(modes.first->second, mask))
+				{
+					source.Reply(_(CHAN_EXCEPTED), mask.c_str(), ci->name.c_str());
+					return;
+				}
+			}
 		}
 
 		/* Check whether target nick has equal/higher access

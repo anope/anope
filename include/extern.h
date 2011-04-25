@@ -17,8 +17,6 @@
 
 #include "hashcomp.h"
 
-E void ModuleRunTimeDirCleanUp();
-
 /* IRC Variables */
 
 E IRCDVar *ircd;
@@ -27,7 +25,6 @@ E IRCdMessage *ircdmessage;
 
 /**** actions.c ****/
 
-E void kill_user(const Anope::string &source, User *user, const Anope::string &reason);
 E bool bad_password(User *u);
 E void common_unban(ChannelInfo *ci, User *u, bool full = false);
 
@@ -51,7 +48,6 @@ E void do_cmode(const Anope::string &source, const Anope::string &channel, const
 E void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
 E void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
 E void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
-E void MassChannelModes(BotInfo *bi, const Anope::string &modes);
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
@@ -71,7 +67,6 @@ E void update_cs_lastseen(User *user, ChannelInfo *ci);
 E int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
 
 E int levelinfo_maxwidth;
-E Anope::string get_mlock_modes(ChannelInfo *ci, int complete);
 
 /**** config.c ****/
 
@@ -187,7 +182,6 @@ E bool isvalidchar(char c);
 E Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number);
 E Anope::string myStrGetTokenRemainder(const Anope::string &str, char dilim, int token_number);
 E int myNumToken(const Anope::string &str, char dilim);
-E void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer);
 E bool nickIsServices(const Anope::string &nick, bool bot);
 
 E void add_entropy_userkeys();
@@ -195,8 +189,6 @@ E void rand_init();
 E unsigned char getrandom8();
 E uint16 getrandom16();
 E uint32 getrandom32();
-
-E char *str_signed(unsigned char *str);
 
 E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
 E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
@@ -251,13 +243,7 @@ E void do_umode(const Anope::string &user, const Anope::string &modes);
 E void do_kill(User *user, const Anope::string &reason);
 
 E bool matches_list(Channel *c, User *user, ChannelModeName mode);
-E bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask);
 
 E Anope::string create_mask(User *u);
-
-/******************************************************************************/
-
-E void b64_encode(const Anope::string &src, Anope::string &target);
-E void b64_decode(const Anope::string &src, Anope::string &target);
 
 #endif /* EXTERN_H */

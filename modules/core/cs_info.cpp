@@ -100,7 +100,7 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 
 			source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
-			source.Reply(_("      Mode lock: %s"), get_mlock_modes(ci, 1).c_str());
+			source.Reply(_("      Mode lock: %s"), ci->GetMLockAsString(true).c_str());
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))
 				source.Reply(_("      Expires on: %s"), do_strftime(ci->last_used + Config->CSExpire).c_str());

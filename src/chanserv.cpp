@@ -106,41 +106,6 @@ int levelinfo_maxwidth = 0;
 
 /*************************************************************************/
 
-/*  Returns modes for mlock in a nice way. */
-
-Anope::string get_mlock_modes(ChannelInfo *ci, int complete)
-{
-	if (!ci)
-		return "";
-
-	Anope::string pos = "+", neg = "-", params;
-
-	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
-	{
-		const ModeLock &ml = it->second;
-		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
-		if (!cm || cm->Type == MODE_LIST || cm->Type == MODE_STATUS)
-			continue;
-
-		if (ml.set)
-			pos += cm->ModeChar;
-		else
-			neg += cm->ModeChar;
-
-		if (complete && !ml.param.empty() && cm->Type == MODE_PARAM)
-			params += " " + ml.param;
-	}
-
-	if (pos.length() == 1)
-		pos.clear();
-	if (neg.length() == 1)
-		neg.clear();
-
-	return pos + neg + params;
-}
-
-/*************************************************************************/
-
 /* Check the current modes on a channel; if they conflict with a mode lock,
  * fix them.
  */

@@ -166,7 +166,8 @@ class PlexusProto : public IRCDProto
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		EnforceQlinedNick(u->nick, "");
+		XLine x(u->nick, "Reserved for services");
+		ircdproto->SendSQLine(NULL, &x);
 		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 255.255.255.255 %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
@@ -228,7 +229,10 @@ class PlexusProto : public IRCDProto
 
 	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
+		Anope::string modes = c->GetModes(true, true);
+		if (modes.empty())
+			modes = "+";
+		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
 	}
 };
 

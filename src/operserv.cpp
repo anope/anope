@@ -374,7 +374,7 @@ void SGLineManager::Del(XLine *x)
 void SGLineManager::OnMatch(User *u, XLine *x)
 {
 	if (u)
-		kill_user(Config->s_OperServ, u, x->Reason);
+		u->Kill(Config->s_OperServ, x->Reason);
 	ircdproto->SendAkill(u, x);
 }
 
@@ -413,7 +413,7 @@ XLine *SNLineManager::Add(const Anope::string &mask, const Anope::string &creato
 			++it;
 
 			if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
-				kill_user(Config->ServerName, user, rreason);
+				user->Kill(Config->ServerName, rreason);
 		}
 	}
 
@@ -430,7 +430,7 @@ void SNLineManager::OnMatch(User *u, XLine *x)
 	if (u)
 	{
 		Anope::string reason = "G-Lined: " + x->Reason;
-		kill_user(Config->s_OperServ, u, reason);
+		u->Kill(Config->s_OperServ, reason);
 	}
 	this->Send(u, x);
 }
@@ -516,7 +516,7 @@ XLine *SQLineManager::Add(const Anope::string &mask, const Anope::string &creato
 				++it;
 
 				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
-					kill_user(Config->ServerName, user, rreason);
+					user->Kill(Config->ServerName, rreason);
 			}
 		}
 	}
@@ -537,10 +537,10 @@ void SQLineManager::OnMatch(User *u, XLine *x)
 	if (u)
 	{
 		Anope::string reason = "Q-Lined: " + x->Reason;
-		kill_user(Config->s_OperServ, u, reason);
+		u->Kill(Config->s_OperServ, reason);
 	}
 
-	ircdproto->SendSQLine(u, x);
+	this->Send(u, x);
 }
 
 void SQLineManager::OnExpire(XLine *x)
@@ -600,7 +600,7 @@ void SZLineManager::OnMatch(User *u, XLine *x)
 	if (u)
 	{
 		Anope::string reason = "Z-Lined: " + x->Reason;
-		kill_user(Config->s_OperServ, u, reason);
+		u->Kill(Config->s_OperServ, reason);
 	}
 
 	ircdproto->SendSZLine(u, x);

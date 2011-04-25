@@ -436,7 +436,7 @@ class OSDefcon : public Module
 			}
 
 			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-				kill_user(Config->s_OperServ, u, DConfig.akillreason);
+				u->Kill(Config->s_OperServ, DConfig.akillreason);
 
 			return EVENT_STOP;
 		}
@@ -556,7 +556,7 @@ class OSDefcon : public Module
 
 			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 			{
-				kill_user(Config->s_OperServ, u, DConfig.akillreason);
+				u->Kill(Config->s_OperServ, DConfig.akillreason);
 				return;
 			}
 		}
@@ -574,7 +574,7 @@ class OSDefcon : public Module
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			kill_user(Config->s_OperServ, u, DConfig.akillreason);
+			u->Kill(Config->s_OperServ, DConfig.akillreason);
 			return;
 		}
 
@@ -590,7 +590,7 @@ class OSDefcon : public Module
 				if (!Config->SessionLimitDetailsLoc.empty())
 					ircdproto->SendMessage(operserv->Bot(), u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				kill_user(Config->s_OperServ, u, "Defcon session limit exceeded");
+				u->Kill(Config->s_OperServ, "Defcon session limit exceeded");
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
@@ -651,7 +651,8 @@ void runDefCon()
 			{
 				Log(operserv->Bot(), "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
-				MassChannelModes(operserv->Bot(), DConfig.chanmodes);
+				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+					it->second->SetModes(operserv->Bot(), false, "%s", DConfig.chanmodes.c_str());
 			}
 		}
 	}
@@ -666,7 +667,8 @@ void runDefCon()
 				if (!newmodes.empty())
 				{
 					Log(operserv->Bot(), "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
-					MassChannelModes(operserv->Bot(), newmodes);
+					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+						it->second->SetModes(operserv->Bot(), false, "%s", newmodes.c_str());
 				}
 			}
 		}

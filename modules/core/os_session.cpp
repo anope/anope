@@ -606,7 +606,7 @@ class OSSession : public Module
 				if (!Config->SessionLimitDetailsLoc.empty())
 					u->SendMessage(operserv->Bot(), "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				kill_user(Config->s_OperServ, u, "Session limit exceeded");
+				u->Kill(Config->s_OperServ, "Session limit exceeded");
 
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)

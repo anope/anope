@@ -736,6 +736,34 @@ ModeLock *ChannelInfo::GetMLock(ChannelModeName mname, const Anope::string &para
 	return NULL;
 }
 
+Anope::string ChannelInfo::GetMLockAsString(bool complete) const
+{
+	Anope::string pos = "+", neg = "-", params;
+
+	for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = this->GetMLock().begin(), it_end = this->GetMLock().end(); it != it_end; ++it)
+	{
+		const ModeLock &ml = it->second;
+		ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+		if (!cm || cm->Type == MODE_LIST || cm->Type == MODE_STATUS)
+			continue;
+
+		if (ml.set)
+			pos += cm->ModeChar;
+		else
+			neg += cm->ModeChar;
+
+		if (complete && !ml.param.empty() && cm->Type == MODE_PARAM)
+			params += " " + ml.param;
+	}
+
+	if (pos.length() == 1)
+		pos.clear();
+	if (neg.length() == 1)
+		neg.clear();
+
+	return pos + neg + params;
+}
+
 /** Check whether a user is permitted to be on this channel
  * @param u The user
  * @return true if they were banned, false if they are allowed

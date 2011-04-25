@@ -69,7 +69,7 @@ class CommandNSGhost : public Command
 				{
 					Log(LOG_COMMAND, u, this) << "for " << nick;
 					Anope::string buf = "GHOST command used by " + u->nick;
-					kill_user(Config->s_NickServ, user, buf);
+					user->Kill(Config->s_NickServ, buf);
 					source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
 				}
 			}

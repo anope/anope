@@ -129,7 +129,6 @@ class Message;
 
 extern CoreExport Module *FindModule(const Anope::string &name);
 int protocol_module_init();
-extern CoreExport bool moduleMinVersion(int major, int minor, int patch, int build);
 
 enum ModuleReturn
 {
@@ -1125,6 +1124,10 @@ class CoreExport ModuleManager
 	 */
 	static std::vector<Module *> EventHandlers[I_END];
 
+	/** Clean up the module runtime directory
+	 */
+	static void CleanupRuntimeDirectory();
+
 	/** Load up a list of modules.
 	 * @param module_list The list of modules to load
 	 **/
@@ -1143,6 +1146,15 @@ class CoreExport ModuleManager
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static ModuleReturn UnloadModule(Module *m, User * u);
+
+	/** Checks whether this version of Anope is at least major.minor.patch.build
+	 * Throws a ModuleException if not
+	 * @param major The major version
+	 * @param minor The minor vesion
+	 * @param patch The patch version
+	 * @param build The build version
+	 */
+	static void RequireVersion(int major, int minor, int patch, int build);
 
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this

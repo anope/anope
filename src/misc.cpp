@@ -455,28 +455,6 @@ Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim,
 /*************************************************************************/
 
 /**
- * Kill the user to enforce the sqline
- * @param nick to kill
- * @param killer whom is doing the killing
- * @return void
- */
-void EnforceQlinedNick(const Anope::string &nick, const Anope::string &killer)
-{
-	if (findbot(nick))
-		return;
-
-	User *u2 = finduser(nick);
-
-	if (u2)
-	{
-		Log(LOG_NORMAL, "xline") << "Killed Q-lined nick: " << u2->GetMask();
-		kill_user(killer, u2, "This nick is reserved for Services. Please use a non Q-Lined nick.");
-	}
-}
-
-/*************************************************************************/
-
-/**
  * Is the given nick a network service
  * @param nick to check
  * @param int Check if botserv bots
@@ -690,26 +668,6 @@ std::vector<Anope::string> BuildStringVector(const Anope::string &src, char deli
 }
 
 /*************************************************************************/
-
-/**
- * Change an unsigned string to a signed string, overwriting the original
- * string.
- * @param input string
- * @return output string, same as input string.
- */
-
-char *str_signed(unsigned char *str)
-{
-	char *nstr = reinterpret_cast<char *>(str);
-	while (*str)
-	{
-		*nstr = static_cast<char>(*str);
-		++str;
-		++nstr;
-	}
-
-	return nstr;
-}
 
 bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
 {

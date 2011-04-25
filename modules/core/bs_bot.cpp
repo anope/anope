@@ -224,16 +224,16 @@ class CommandBSBot : public Command
 				return MOD_CONT;
 			}
 
-			/* The new nick is really different, so we remove the Q line for
-			the old nick. */
+			/* The new nick is really different, so we remove the Q line for the old nick. */
 			if (ircd->sqline)
 			{
 				XLine x(bi->nick);
 				ircdproto->SendSQLineDel(&x);
 			}
 
-			/* We check whether user with this nick is online, and kill it if so */
-			EnforceQlinedNick(nick, Config->s_BotServ);
+			/* Add a Q line for the new nick */
+			XLine x(nick, "Reserved for services");
+			ircdproto->SendSQLine(NULL, &x);
 		}
 
 		if (!user.empty())
@@ -241,8 +241,6 @@ class CommandBSBot : public Command
 		else
 		{
 			ircdproto->SendChangeBotNick(bi, nick);
-			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(NULL, &x);
 		}
 
 		if (!nick.equals_cs(bi->nick))
@@ -258,8 +256,6 @@ class CommandBSBot : public Command
 		if (!user.empty())
 		{
 			ircdproto->SendClientIntroduction(bi, ircd->pseudoclient_mode);
-			XLine x(bi->nick, "Reserved for services");
-			ircdproto->SendSQLine(NULL, &x);
 			bi->RejoinAll();
 		}
 

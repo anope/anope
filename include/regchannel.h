@@ -376,6 +376,12 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
 
+	/** Get the current mode locks as a string
+	 * @param complete True to show mlock parameters aswell 
+	 * @return A string of mode locks, eg: +nrt
+	 */
+	Anope::string GetMLockAsString(bool complete) const;
+
 	/** Check whether a user is permitted to be on this channel
 	 * @param u The user
 	 * @return true if they are allowed, false if they aren't and were kicked

@@ -141,7 +141,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		EnforceQlinedNick(u->nick, Config->ServerName);
+		XLine x(u->nick, "Reserved for services");
+		ircdproto->SendSQLine(NULL, &x);
 		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), static_cast<long>(u->timestamp), u->GetIdent().c_str(), u->host.c_str(), Config->ServerName.c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
@@ -513,7 +514,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 		else if (params.size() == 11)
 		{
 			Anope::string decoded_ip;
-			b64_decode(params[9], decoded_ip);
+			Anope::B64Decode(params[9], decoded_ip);
 
 			sockaddrs ip;
 			ip.ntop(params[9].length() == 8 ? AF_INET : AF_INET6, decoded_ip.c_str());

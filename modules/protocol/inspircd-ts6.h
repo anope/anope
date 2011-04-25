@@ -244,7 +244,10 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendChannel(Channel *c)
 	{
-		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), get_mlock_modes(c->ci, true).c_str());
+		Anope::string modes = c->GetModes(true, true);
+		if (modes.empty())
+			modes = "+";
+		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), modes.c_str());
 	}
 
 	bool IsNickValid(const Anope::string &nick)

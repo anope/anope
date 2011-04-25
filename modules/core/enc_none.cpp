@@ -25,7 +25,7 @@ class ENone : public Module
 	{
 		Anope::string buf = "plain:";
 		Anope::string cpass;
-		b64_encode(src, cpass);
+		Anope::B64Encode(src, cpass);
 		buf += cpass;
 		Log(LOG_DEBUG_2) << "(enc_none) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
@@ -38,7 +38,7 @@ class ENone : public Module
 			return EVENT_CONTINUE;
 		size_t pos = src.find(':');
 		Anope::string buf = src.substr(pos + 1);
-		b64_decode(buf, dest);
+		Anope::B64Decode(buf, dest);
 		return EVENT_ALLOW;
 	}
 

@@ -212,7 +212,8 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const User *u, const Anope::string &modes)
 	{
-		EnforceQlinedNick(u->nick, Config->s_BotServ);
+		XLine x(u->nick, "Reserved for services");
+		ircdproto->SendSQLine(NULL, &x);
 		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
 	}
 
@@ -248,7 +249,10 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendChannel(Channel *c)
 	{
-		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), get_mlock_modes(c->ci, true).c_str());
+		Anope::string modes = c->GetModes(true, true);
+		if (modes.empty())
+			modes = "+";
+		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
 	}
 };
 

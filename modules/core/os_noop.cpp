@@ -46,7 +46,7 @@ class CommandOSNOOP : public Command
 				++it;
 
 				if (u2 && u2->HasMode(UMODE_OPER) && Anope::Match(u2->server->GetName(), server, true))
-					kill_user(Config->s_OperServ, u2, reason);
+					u2->Kill(Config->s_OperServ, reason);
 			}
 		}
 		else if (cmd.equals_ci("REVOKE"))

@@ -261,7 +261,7 @@ void User::SendMessage(BotInfo *source, Anope::string msg)
  *    back to call do_nick. do_nick changes the nick of the use to the new one, then calls NickAlias::OnCancel
  *    with the users old nick's nickalias (if there is one).
  *
- * 2. Calls kill_user, which will either delete the user immediatly or kill them, wait for the QUIT,
+ * 2. Calls User::Kill, which will either delete the user immediatly or kill them, wait for the QUIT,
  *    then delete the user then. Users destructor then calls NickAlias::OnCancel
  *
  * NickAlias::OnCancel checks for NS_COLLIDED, it then does one of two things.
@@ -324,7 +324,7 @@ void User::Collide(NickAlias *na)
 		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 	}
 	else
-		kill_user(Config->s_NickServ, this, "Services nickname-enforcer kill");
+		this->Kill(Config->s_NickServ, "Services nickname-enforcer kill");
 }
 
 /** Identify the user to the Nick
@@ -711,6 +711,17 @@ bool User::IsProtected() const
 	return false;
 }
 
+void User::Kill(const Anope::string &source, const Anope::string &reason)
+{
+	Anope::string real_source = source.empty() ? Config->ServerName : source;
+	Anope::string real_reason = real_source + " (" + reason + ")";
+
+	ircdproto->SendSVSKill(findbot(source), this, "%s", real_reason.c_str());
+
+	if (!ircd->quitonkill)
+		do_kill(this, real_reason);
+}
+
 User *finduser(const Anope::string &nick)
 {
 	if (isdigit(nick[0]) && ircd->ts6)
@@ -894,24 +905,6 @@ bool matches_list(Channel *c, User *user, ChannelModeName mode)
 	{
 		Entry e(mode, modes.first->second);
 		if (e.Matches(user))
-			return true;
-	}
-
-	return false;
-}
-
-/*************************************************************************/
-
-/* Is the given MASK ban-excepted? */
-bool is_excepted_mask(ChannelInfo *ci, const Anope::string &mask)
-{
-	if (!ci->c || !ModeManager::FindChannelModeByName(CMODE_EXCEPT))
-		return false;
-
-	std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> modes = ci->c->GetModeList(CMODE_EXCEPT);
-	for (; modes.first != modes.second; ++modes.first)
-	{
-		if (Anope::Match(modes.first->second, mask))
 			return true;
 	}
 

@@ -77,7 +77,7 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-void b64_encode(const Anope::string &src, Anope::string &target)
+void Anope::B64Encode(const Anope::string &src, Anope::string &target)
 {
 	size_t src_pos = 0, src_len = src.length();
 	unsigned char input[3];
@@ -118,7 +118,7 @@ void b64_encode(const Anope::string &src, Anope::string &target)
    src from base - 64 numbers into three 8 bit bytes in the target area.
  */
 
-void b64_decode(const Anope::string &src, Anope::string &target)
+void Anope::B64Decode(const Anope::string &src, Anope::string &target)
 {
 	target.clear();
 

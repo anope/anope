@@ -209,10 +209,6 @@ static void write_pidfile()
 
 /*************************************************************************/
 
-/* Overall initialization routines.  Return 0 on success, -1 on failure. */
-
-int openlog_failed = 0, openlog_errno = 0;
-
 void Init(int ac, char **av)
 {
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);

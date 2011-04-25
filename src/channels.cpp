@@ -1168,23 +1168,6 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 
 /*************************************************************************/
 
-/** Set modes on every channel
- * This overrides mlock on channels
- * @param bi The bot to send the modes from
- * @param modes The modes
- */
-void MassChannelModes(BotInfo *bi, const Anope::string &modes)
-{
-	for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-	{
-		Channel *c = it->second;
-
-		if (c->bouncy_modes)
-			return;
-		c->SetModes(bi, false, "%s", modes.c_str());
-	}
-}
-
 static const Anope::string EntryFlagString[] = { "ENTRYTYPE_NONE", "ENTRYTYPE_CIDR", "ENTRYTYPE_NICK_WILD", "ENTRYTYPE_NICK", "ENTRYTYPE_USER_WILD", "ENTRYTYPE_USER", "ENTRYTYPE_HOST_WILD", "ENTRYTYPE_HOST", "" };
 
 /** Constructor

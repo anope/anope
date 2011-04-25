@@ -284,6 +284,12 @@ class CoreExport User : public Extensible
 	 * @return true or false
 	 */
 	bool IsProtected() const;
+
+	/** Kill a user
+	 * @param source The user/server doing the kill
+	 * @param reason The reason for the kill
+	 */
+	void Kill(const Anope::string &source, const Anope::string &reason);
 };
 
 #endif // USERS_H

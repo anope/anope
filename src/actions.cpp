@@ -30,7 +30,7 @@ bool bad_password(User *u)
 	u->invalid_pw_time = Anope::CurTime;
 	if (u->invalid_pw_count >= Config->BadPassLimit)
 	{
-		kill_user("", u, "Too many invalid passwords");
+		u->Kill(Config->ServerName, "Too many invalid passwords");
 		return true;
 	}
 
@@ -39,29 +39,6 @@ bool bad_password(User *u)
 
 /*************************************************************************/
 
-/**
- * Remove a user from the IRC network.
- * @param source is the nick which should generate the kill, or empty for a server-generated kill.
- * @param user to remove
- * @param reason for the kill
- * @return void
- */
-void kill_user(const Anope::string &source, User *user, const Anope::string &reason)
-{
-	if (!user)
-		return;
-
-	Anope::string real_source = source.empty() ? Config->ServerName : source;
-
-	Anope::string buf = real_source + " (" + reason + ")";
-
-	ircdproto->SendSVSKill(findbot(source), user, "%s", buf.c_str());
-
-	if (!ircd->quitonkill)
-		do_kill(user, buf);
-}
-
-/*************************************************************************/
 
 /**
  * Unban the user from a channel

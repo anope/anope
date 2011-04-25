@@ -406,9 +406,10 @@ void expire_chans()
 // XXX this is slightly inefficient
 void cs_remove_nick(NickCore *nc)
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end();)
 	{
 		ChannelInfo *ci = it->second;
+		++it;
 
 		ChanAccess *access = ci->GetAccess(nc);
 		if (access)

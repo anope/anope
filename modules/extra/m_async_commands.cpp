@@ -138,10 +138,7 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 				cm->Destroy();
 		}
 
-		if (current_command == NULL)
-			this->Reset();
-		else
-			this->reset = true;
+		this->reset = true;
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
@@ -189,10 +186,18 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 			else if (cm->destroy)
 			{
 				if (cm->started)
+				{
 					cm->mutex.Unlock();
+					continue;
+				}
 				else
 					delete cm;
-				continue;
+			}
+
+			if (this->reset)
+			{
+				this->Reset();
+				return this->OnNotify();
 			}
 
 			Log(LOG_DEBUG_2) << "Waiting for command thread " << cm->command->name << " from " << cm->source.u->nick;
@@ -220,12 +225,6 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 			PopLanguage();
 
 			current_command = NULL;
-
-			if (this->reset)
-			{
-				this->Reset();
-				return this->OnNotify();
-			}
 		}
 	}
 

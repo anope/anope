@@ -221,6 +221,11 @@ inline DNSRecord::DNSRecord(const Anope::string &n) : name(n)
 	this->created = Anope::CurTime;
 }
 
+DNSRecord::operator bool() const
+{
+	return !this->result.empty();
+}
+
 DNSSocket::DNSSocket() : ConnectionSocket(false, SOCK_DGRAM)
 {
 }
@@ -613,7 +618,6 @@ DNSRecord DNSManager::BlockingQuery(const Anope::string &mask, QueryType qt)
 	DNSRecord result(mask);
 	addrinfo *addrresult, hints;
 
-	result.result = mask;
 	result.type = qt;
 
 	int type = AF_UNSPEC;

@@ -130,9 +130,11 @@ struct DNSRecord
 	/* Record length */
 	unsigned short rdlength;
 
-	inline DNSRecord(const Anope::string &n);
 	/* When this record was created in our cache */
 	time_t created;
+
+	inline DNSRecord(const Anope::string &n);
+	operator bool() const;
 };
 
 /** The socket used to talk to the nameserver, uses UDP

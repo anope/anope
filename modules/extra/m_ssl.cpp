@@ -155,19 +155,25 @@ class SSLModule : public Module
 
 		if (config.ReadFlag("uplink", "ssl", "no", Number - 1))
 		{
-			try
-			{
-				new UplinkSocket(uplink_server->ipv6);
-				this->service.Init(UplinkSock);
-				DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
-				UplinkSock->Connect(req.result, uplink_server->port, Config->LocalHost);
+			DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
 
-				Log() << "Connected to server " << Number << " (" << u->host << ":" << u->port << ") with SSL";
-				return EVENT_ALLOW;
-			}
-			catch (const SocketException &ex)
+			if (!req)
+				Log() << "Unable to connect to server " << uplink_server->host << ":" << uplink_server->port << " using SSL: Invalid hostname/IP";
+			else
 			{
-				Log() << "Unable to connect with SSL to server " << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
+				try
+				{
+					new UplinkSocket(uplink_server->ipv6);
+					this->service.Init(UplinkSock);
+					UplinkSock->Connect(req.result, uplink_server->port, Config->LocalHost);
+
+					Log() << "Connected to server " << Number << " (" << u->host << ":" << u->port << ") with SSL";
+					return EVENT_ALLOW;
+				}
+				catch (const SocketException &ex)
+				{
+					Log() << "Unable to connect with SSL to server " << Number << " (" << u->host << ":" << u->port << "), " << ex.GetReason();
+				}
 			}
 
 			return EVENT_STOP;

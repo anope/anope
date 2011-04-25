@@ -129,17 +129,27 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 	switch (type)
 	{
 		case AF_INET:
-			if (inet_pton(type, address.c_str(), &sa4.sin_addr) < 1)
-				throw SocketException(Anope::string("Invalid host: ") + Anope::LastError());
+		{
+			int i = inet_pton(type, address.c_str(), &sa4.sin_addr);
+			if (i == 0)
+				throw SocketException("Invalid host");
+			else if (i <= -1)
+				throw SocketException("Invalid host: "  + Anope::LastError());
 			sa4.sin_family = type;
 			sa4.sin_port = htons(pport);
 			return;
+		}
 		case AF_INET6:
-			if (inet_pton(type, address.c_str(), &sa6.sin6_addr) < 1)
-				throw SocketException(Anope::string("Invalid host: ") + Anope::LastError());
+		{
+			int i = inet_pton(type, address.c_str(), &sa6.sin6_addr);
+			if (i == 0)
+				throw SocketException("Invalid host");
+			else if (i <= -1)
+				throw SocketException("Invalid host: " + Anope::LastError());
 			sa6.sin6_family = type;
 			sa6.sin6_port = htons(pport);
 			return;
+		}
 		default:
 			break;
 	}

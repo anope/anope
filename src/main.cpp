@@ -369,6 +369,12 @@ static bool Connect()
 
 		DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
 
+		if (!req)
+		{
+			Log() << "Unable to connect to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "): Invalid hostname/IP";
+			continue;
+		}
+		
 		try
 		{
 			new UplinkSocket(uplink_server->ipv6);
@@ -376,7 +382,7 @@ static bool Connect()
 		}
 		catch (const SocketException &ex)
 		{
-			Log() << "Unable to connect to server" << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "), " << ex.GetReason();
+			Log() << "Unable to connect to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "): " << ex.GetReason();
 			continue;
 		}
 

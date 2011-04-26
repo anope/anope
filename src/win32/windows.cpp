@@ -34,6 +34,19 @@ WindowsLanguage WindowsLanguages[] = {
 	{NULL, 0}
 };
 
+WSADATA SocketEngine::wsa;
+
+void OnStartup()
+{
+	if (WSAStartup(MAKEWORD(2, 0), &wsa))
+		throw FatalException("Failed to initialize WinSock library");
+}
+
+void OnShutdown()
+{
+	WSACleanup();
+}
+
 USHORT WindowsGetLanguage(const char *lang)
 {
 	for (int i = 0; WindowsLanguages[i].languageName; ++i)

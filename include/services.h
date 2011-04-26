@@ -59,9 +59,6 @@
 # include <sys/socket.h>
 # include <sys/time.h>
 # include <dirent.h>
-# ifdef HAVE_BACKTRACE
-#  include <execinfo.h>
-# endif
 # define DllExport
 # define CoreExport
 # define MARK_DEPRECATED __attribute((deprecated))

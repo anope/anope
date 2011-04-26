@@ -36,7 +36,7 @@ Pipe::Pipe() : BufferedSocket()
 
 	this->IPv6 = false;
 
-	SocketEngine->AddSocket(this);
+	SocketEngine::AddSocket(this);
 }
 
 bool Pipe::ProcessRead()

@@ -338,8 +338,9 @@ check_function_exists(setgrent HAVE_SETGRENT)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(stricmp HAVE_STRICMP)
 check_function_exists(umask HAVE_UMASK)
-check_function_exists(backtrace HAVE_BACKTRACE)
 check_function_exists(eventfd HAVE_EVENTFD)
+check_function_exists(epoll HAVE_EPOLL)
+check_function_exists(poll HAVE_POLL)
 
 # Check for the existance of the following types
 check_type_size(uint8_t UINT8_T)

@@ -5,18 +5,28 @@ file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 if(WIN32)
   append_to_list(SRC_SRCS win32/windows.cpp)
   append_to_list(SRC_SRCS threadengines/threadengine_win32.cpp)
-  append_to_list(SRC_SRCS socketengines/socketengine_win32.cpp)
+  append_to_list(SRC_SRCS socketengines/pipeengine_win32.cpp)
 # If not using Windows, add the pthread threading engine to the list
 else(WIN32)
   append_to_list(SRC_SRCS threadengines/threadengine_pthread.cpp)
   # If we have eventfd, use it
   if(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
-    append_to_list(SRC_SRCS socketengines/socketengine_eventfd.cpp)
+    append_to_list(SRC_SRCS socketengines/pipeengine_eventfd.cpp)
   # Else fall back to pipe
   else(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
-    append_to_list(SRC_SRCS socketengines/socketengine_pipe.cpp)
+    append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
   endif(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
 endif(WIN32)
+
+if(HAVE_EPOLL)
+  append_to_list(SRC_SRCS socketengines/socketengine_epoll.cpp)
+else(HAVE_EPOLL)
+  if(HAVE_POLL)
+    append_to_list(SRC_SRCS socketengines/socketengine_poll.cpp)
+  else(HAVE_POLL)
+    append_to_list(SRC_SRCS socketengines/socketengine_select.cpp)
+  endif(HAVE_POLL)
+endif(HAVE_EPOLL)
 
 sort_list(SRC_SRCS)
 

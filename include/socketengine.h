@@ -12,47 +12,47 @@
 #ifndef SOCKETENGINE_H
 #define SOCKETENGINE_H
 
-class CoreExport SocketEngineBase
+class CoreExport SocketEngine
 {
- public:
 #ifdef _WIN32
 	/* Windows crap */
-	WSADATA wsa;
+	static WSADATA wsa;
 #endif
+ public:
 	/* Map of sockets */
-	std::map<int, Socket *> Sockets;
+	static std::map<int, Socket *> Sockets;
 
-	/** Default constructor
+	/** Called to initialize the socket engine
 	 */
-	SocketEngineBase();
+	static void Init();
 
-	/** Default destructor
+	/** Called to shutdown the socket engine
 	 */
-	virtual ~SocketEngineBase();
+	static void Shutdown();
 
 	/** Add a socket to the internal list
 	 * @param s The socket
 	 */
-	virtual void AddSocket(Socket *s) { }
+	static void AddSocket(Socket *s);
 
 	/** Delete a socket from the internal list
 	 * @param s The socket
 	 */
-	virtual void DelSocket(Socket *s) { }
+	static void DelSocket(Socket *s);
 
 	/** Mark a socket as writeable
 	 * @param s The socket
 	 */
-	virtual void MarkWritable(Socket *s) { }
+	static void MarkWritable(Socket *s);
 
 	/** Unmark a socket as writeable
 	 * @param s The socket
 	 */
-	virtual void ClearWritable(Socket *s) { }
+	static void ClearWritable(Socket *s);
 
 	/** Read from sockets and do things
 	 */
-	virtual void Process() { }
+	static void Process();
 };
 
 #endif // SOCKETENGINE_H

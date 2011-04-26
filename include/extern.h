@@ -224,7 +224,6 @@ E void notice_server(const Anope::string &source, const Server *s, const char *f
 
 /**** sockets.cpp ****/
 
-E SocketEngineBase *SocketEngine;
 E int32 TotalRead;
 E int32 TotalWritten;
 E SocketIO normalSocketIO;

@@ -65,7 +65,7 @@ Pipe::Pipe() : BufferedSocket()
 	this->WritePipe = newsocket->GetFD();
 	this->IPv6 = false;
 
-	SocketEngine->AddSocket(this);
+	SocketEngine::AddSocket(this);
 	newsocket = NULL;
 }
 

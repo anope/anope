@@ -154,7 +154,7 @@ enum ModuleReturn
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
-enum MODType { MT_BEGIN, THIRD, QATESTED, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, SOCKETENGINE, MT_END };
+enum MODType { MT_BEGIN, THIRD, QATESTED, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
 
 typedef std::multimap<Anope::string, Message *> message_map;
 extern CoreExport message_map MessageMap;

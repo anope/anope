@@ -100,6 +100,7 @@ UplinkSocket::UplinkSocket(bool ipv6) : ConnectionSocket(ipv6)
 
 UplinkSocket::~UplinkSocket()
 {
+	SocketEngine::Process();
 	UplinkSock = NULL;
 }
 
@@ -148,10 +149,14 @@ void do_restart_services()
 		if (!bi->GetUID().empty())
 			UserListByUID.erase(bi->GetUID());
 	}
-	ircdproto->SendSquit(Config->ServerName, quitmsg);
-	SocketEngine->Process();
-	delete UplinkSock;
+
+	FOREACH_MOD(I_OnRestart, OnRestart());
+
 	ModuleManager::UnloadAll();
+	ircdproto->SendSquit(Config->ServerName, quitmsg);
+	delete UplinkSock;
+	SocketEngine::Shutdown();
+
 	chdir(binary_dir.c_str());
 	my_av[0] = const_cast<char *>(("./" + services_bin).c_str());
 	execve(services_bin.c_str(), my_av, my_envp);
@@ -159,8 +164,6 @@ void do_restart_services()
 	{
 		throw FatalException("Restart failed");
 	}
-
-	FOREACH_MOD(I_OnRestart, OnRestart());
 
 	exit(1);
 }
@@ -200,10 +203,12 @@ static void services_shutdown()
 			delete u;
 		}
 	}
-	SocketEngine->Process();
-	delete UplinkSock;
 	FOREACH_MOD(I_OnShutdown, OnShutdown());
 	ModuleManager::UnloadAll();
+	ircdproto->SendSquit(Config->ServerName, quitmsg);
+	delete UplinkSock;
+	SocketEngine::Shutdown();
+
 	/* just in case they weren't all removed at least run once */
 	ModuleManager::CleanupRuntimeDirectory();
 }
@@ -458,7 +463,7 @@ int main(int ac, char **av, char **envp)
 					ModeManager::ProcessModes();
 
 				/* Process the socket engine */
-				SocketEngine->Process();
+				SocketEngine::Process();
 			}
 
 			if (quitting)

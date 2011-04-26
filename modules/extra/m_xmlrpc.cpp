@@ -229,7 +229,7 @@ class ModuleXMLRPC : public Module
 	~ModuleXMLRPC()
 	{
 		/* Clean up our sockets and our listening sockets */
-		for (std::map<int, Socket *>::const_iterator it = SocketEngine->Sockets.begin(), it_end = SocketEngine->Sockets.end(); it != it_end; ++it)
+		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end; ++it)
 		{
 			Socket *s = it->second;
 

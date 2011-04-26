@@ -34,7 +34,6 @@ class CommandOSModList : public Command
 		int showSupported = 1;
 		int showQA = 1;
 		int showDB = 1;
-		int showSocketEngine = 1;
 
 		char core[] = "Core";
 		char third[] = "3rd";
@@ -43,7 +42,6 @@ class CommandOSModList : public Command
 		char supported[] = "Supported";
 		char qa[] = "QATested";
 		char db[] = "Database";
-		char socketengine[] = "SocketEngine";
 
 		if (!param.empty())
 		{
@@ -56,7 +54,6 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showQA = 0;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(third))
 			{
@@ -67,7 +64,6 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showEnc = 0;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(proto))
 			{
@@ -78,7 +74,6 @@ class CommandOSModList : public Command
 				showSupported = 0;
 				showQA = 0;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(supported))
 			{
@@ -89,7 +84,6 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showQA = 0;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(qa))
 			{
@@ -100,7 +94,6 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showQA = 1;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(enc))
 			{
@@ -111,7 +104,6 @@ class CommandOSModList : public Command
 				showEnc = 1;
 				showQA = 0;
 				showDB = 0;
-				showSocketEngine = 0;
 			}
 			else if (param.equals_ci(db))
 			{
@@ -122,12 +114,6 @@ class CommandOSModList : public Command
 				showEnc = 0;
 				showQA = 0;
 				showDB = 1;
-				showSocketEngine = 0;
-			}
-			else if (param == socketengine)
-			{
-				showCore = showThird = showProto = showSupported = showEnc = showQA = showDB = 0;
-				showSocketEngine = 1;
 			}
 		}
 
@@ -185,13 +171,6 @@ class CommandOSModList : public Command
 					if (showDB)
 					{
 						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), db);
-						++count;
-					}
-					break;
-				case SOCKETENGINE:
-					if (showSocketEngine)
-					{
-						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), socketengine);
 						++count;
 					}
 					break;

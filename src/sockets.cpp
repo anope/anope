@@ -1,6 +1,7 @@
 #include "services.h"
 
-SocketEngineBase *SocketEngine = NULL;
+std::map<int, Socket *> SocketEngine::Sockets;
+
 int32 TotalRead = 0;
 int32 TotalWritten = 0;
 
@@ -255,28 +256,6 @@ bool cidr::match(sockaddrs &other)
 	return true;
 }
 
-/** Default constructor
- */
-SocketEngineBase::SocketEngineBase()
-{
-#ifdef _WIN32
-	if (WSAStartup(MAKEWORD(2, 0), &wsa))
-		throw FatalException("Failed to initialize WinSock library");
-#endif
-}
-
-/** Default destructor
- */
-SocketEngineBase::~SocketEngineBase()
-{
-	for (std::map<int, Socket *>::const_iterator it = this->Sockets.begin(), it_end = this->Sockets.end(); it != it_end; ++it)
-		delete it->second;
-	this->Sockets.clear();
-#ifdef _WIN32
-	WSACleanup();
-#endif
-}
-
 /** Receive something from the buffer
  * @param s The socket
  * @param buf The buf to read to
@@ -367,15 +346,14 @@ Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag, 2>(SocketFlagS
 		this->Sock = socket(this->IPv6 ? AF_INET6 : AF_INET, type, 0);
 	else
 		this->Sock = sock;
-	SocketEngine->AddSocket(this);
+	SocketEngine::AddSocket(this);
 }
 
 /** Default destructor
 */
 Socket::~Socket()
 {
-	if (SocketEngine)
-		SocketEngine->DelSocket(this);
+	SocketEngine::DelSocket(this);
 	CloseSocket(this->Sock);
 	this->IO->Destroy();
 }
@@ -526,7 +504,7 @@ bool BufferedSocket::ProcessWrite()
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
 	if (this->WriteBuffer.empty())
-		SocketEngine->ClearWritable(this);
+		SocketEngine::ClearWritable(this);
 
 	return true;
 }
@@ -565,7 +543,7 @@ void BufferedSocket::Write(const char *message, ...)
 void BufferedSocket::Write(const Anope::string &message)
 {
 	WriteBuffer.append(message.str() + "\r\n");
-	SocketEngine->MarkWritable(this);
+	SocketEngine::MarkWritable(this);
 }
 
 /** Get the length of the read buffer

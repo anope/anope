@@ -331,6 +331,9 @@ void Init(int ac, char **av)
 		throw FatalException("Configuration file failed to validate");
 	}
 
+	/* Initialize the socket engine */
+	SocketEngine::Init();
+
 	/* Add IRCD Protocol Module; exit if there are errors */
 	if (protocol_module_init())
 		throw FatalException("Unable to load protocol module");
@@ -340,10 +343,6 @@ void Init(int ac, char **av)
 
 	/* Add Encryption Modules */
 	ModuleManager::LoadModuleList(Config->EncModuleList);
-
-	/* Load the socket engine */
-	if (ModuleManager::LoadModule(Config->SocketEngine, NULL) || !SocketEngine)
-		throw FatalException("Unable to load socket engine " + Config->SocketEngine);
 
 	/* Add Database Modules */
 	ModuleManager::LoadModuleList(Config->DBModuleList);

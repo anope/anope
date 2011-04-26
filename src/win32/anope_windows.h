@@ -42,6 +42,8 @@
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
  
+extern CoreExport void OnStartup();
+extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const char *lang);
 extern CoreExport int inet_pton(int af, const char *src, void *dst);
 extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);

@@ -69,7 +69,7 @@ void DNSRequest::Process()
 	DNSEngine->requests[this->id] = this;
 	DNSEngine->packets.push_back(p);
 
-	SocketEngine->MarkWritable(DNSEngine->sock);
+	SocketEngine::MarkWritable(DNSEngine->sock);
 
 	this->timeout = new DNSRequestTimeout(this, Config->DNSTimeout);
 }
@@ -512,7 +512,8 @@ bool DNSSocket::ProcessWrite()
 		delete r;
 		DNSEngine->packets.erase(DNSEngine->packets.begin() + i - 1);
 	}
-	SocketEngine->ClearWritable(this);
+
+	SocketEngine::ClearWritable(this);
 	return cont;
 }
 

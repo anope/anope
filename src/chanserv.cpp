@@ -451,9 +451,10 @@ void cs_remove_nick(const NickCore *nc)
 	ChanAccess *ca;
 	AutoKick *akick;
 
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end;)
 	{
 		ChannelInfo *ci = it->second;
+		++it;
 
 		if (ci->founder == nc)
 		{

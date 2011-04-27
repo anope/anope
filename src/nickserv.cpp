@@ -243,7 +243,7 @@ int validate_user(User *u)
 
 void expire_nicks()
 {
-	for (nickalias_map::const_iterator it = NickAliasList.begin(); it != NickAliasList.end();)
+	for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end;)
 	{
 		NickAlias *na = it->second;
 		++it;

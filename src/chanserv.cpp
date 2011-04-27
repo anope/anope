@@ -406,14 +406,10 @@ void expire_chans()
 // XXX this is slightly inefficient
 void cs_remove_nick(NickCore *nc)
 {
-	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(); it != RegisteredChannelList.end();)
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end;)
 	{
 		ChannelInfo *ci = it->second;
 		++it;
-
-		ChanAccess *access = ci->GetAccess(nc);
-		if (access)
-			ci->EraseAccess(access);
 
 		for (unsigned j = ci->GetAkickCount(); j > 0; --j)
 		{
@@ -468,6 +464,13 @@ void cs_remove_nick(NickCore *nc)
 
 		if (ci->successor == nc)
 			ci->successor = NULL;
+
+		/* Note that it is important we lookup the access for the channel after the new founder
+		 * has been determined incase this user was the founder and also was on the access list!
+		 */
+		ChanAccess *access = ci->GetAccess(nc);
+		if (access)
+			ci->EraseAccess(access);
 	}
 }
 

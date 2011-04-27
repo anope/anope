@@ -78,7 +78,7 @@ class NSSetMisc : public Module
 
 	void RemoveAll()
 	{
-		if (Commands.empty())
+		if (!nickserv || Commands.empty())
 			return;
 
 		Command *set = FindCommand(nickserv->Bot(), "SET");

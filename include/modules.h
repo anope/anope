@@ -579,17 +579,9 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci) { }
 
-	/** Called before services restart
-	*/
-	virtual void OnPreRestart() { }
-
 	/** Called when services restart
 	*/
 	virtual void OnRestart() { }
-
-	/** Called before services shutdown
-	 */
-	virtual void OnPreShutdown() { }
 
 	/** Called when services shutdown
 	 */
@@ -1100,7 +1092,7 @@ enum Implementation
 
 		/* Other */
 		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
-		I_OnPreCommand, I_OnPostCommand, I_OnPreRestart, I_OnRestart, I_OnPreShutdown, I_OnShutdown, I_OnSignal,
+		I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,

@@ -118,7 +118,7 @@ class OnIdentifyInterface : public LDAPInterface
 		User *u = finduser(it->second);
 		this->requests.erase(it);
 
-		if (!u || !u->Account())
+		if (!u || !u->Account() || r.empty())
 			return;
 
 		try
@@ -146,25 +146,44 @@ class OnIdentifyInterface : public LDAPInterface
 	}
 };
 
+class OnRegisterInterface : public LDAPInterface
+{
+ public:
+	OnRegisterInterface(Module *m) : LDAPInterface(m) { }
+
+	void OnResult(const LDAPResult &r)
+	{
+		Log() << "m_ldap_authentication: Successfully added newly created account to LDAP";
+	}
+
+	void OnError(const LDAPResult &r)
+	{
+		Log() << "m_ldap_authentication: Error adding newly created account to LDAP: " << r.getError();
+	}
+};
+
 class NSIdentifyLDAP : public Module
 {
 	service_reference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
 	OnIdentifyInterface oninterface;
+	OnRegisterInterface orinterface;
 
 	Anope::string binddn;
+	Anope::string object_class;
 	Anope::string username_attribute;
+	Anope::string password_attribute;
 	bool disable_register;
 	Anope::string disable_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), ldap("ldap/main"), iinterface(this), oninterface(this)
+		Module(modname, creator), ldap("ldap/main"), iinterface(this), oninterface(this), orinterface(this)
 	{
 		this->SetAuthor("Anope");
 		this->SetType(SUPPORTED);
 
-		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify };
-		ModuleManager::Attach(i, this, 4);
+		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
+		ModuleManager::Attach(i, this, 5);
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 
 		OnReload();
@@ -175,7 +194,9 @@ class NSIdentifyLDAP : public Module
 		ConfigReader config;
 
 		this->binddn = config.ReadValue("m_ldap_authentication", "binddn", "", 0);
+		this->object_class = config.ReadValue("m_ldap_authentication", "object_class", "", 0);
 		this->username_attribute = config.ReadValue("m_ldap_authentication", "username_attribute", "", 0);
+		this->password_attribute = config.ReadValue("m_ldap_authentication", "password_attribute", "", 0);
 		email_attribute = config.ReadValue("m_ldap_authentication", "email_attribute", "", 0);
 		this->disable_register = config.ReadFlag("m_ldap_authentication", "disable_ns_register", "false", 0);
 		this->disable_reason = config.ReadValue("m_ldap_authentication", "disable_reason", "", 0);
@@ -183,7 +204,7 @@ class NSIdentifyLDAP : public Module
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		if (this->disable_register && nickserv && command->service == nickserv->Bot() && command->name == "REGISTER")
+		if (this->disable_register && !this->disable_reason.empty() && nickserv && command->service == nickserv->Bot() && command->name == "REGISTER")
 		{
 			source.Reply(_(this->disable_reason.c_str()));
 			return EVENT_STOP;
@@ -204,7 +225,7 @@ class NSIdentifyLDAP : public Module
 		else if (u->GetExt("m_ldap_authentication_error"))
 		{
 			u->Shrink("m_ldap_authentication_error");
-			return EVENT_CONTINUE;;
+			return EVENT_CONTINUE;
 		}
 
 		IdentifyInfo *ii = new IdentifyInfo(u, c, params, account, password);
@@ -233,6 +254,43 @@ class NSIdentifyLDAP : public Module
 		{
 			LDAPQuery id = this->ldap->Search(&this->oninterface, this->binddn, "(" + this->username_attribute + "=" + u->Account()->display + ")");
 			this->oninterface.Add(id, u->nick);
+		}
+		catch (const LDAPException &ex)
+		{
+			Log() << "m_ldap_authentication: " << ex.GetReason();
+		}
+	}
+
+	void OnNickRegister(NickAlias *na)
+	{
+		if (this->disable_register || !this->ldap)
+			return;
+
+		try
+		{
+			this->ldap->BindAsAdmin(NULL);
+
+			LDAPMods attributes;
+			attributes.resize(4);
+
+			attributes[0].name = "objectClass";
+			attributes[0].values.push_back("top");
+			attributes[0].values.push_back(this->object_class);
+
+			attributes[1].name = this->username_attribute;
+			attributes[1].values.push_back(na->nick);
+
+			if (!na->nc->email.empty())
+			{
+				attributes[2].name = email_attribute;
+				attributes[2].values.push_back(na->nc->email);
+			}
+
+			attributes[3].name = this->password_attribute;
+			attributes[3].values.push_back(na->nc->pass);
+
+			Anope::string new_dn = this->username_attribute + "=" + na->nick + "," + this->binddn;
+			this->ldap->Add(&this->orinterface, new_dn, attributes);
 		}
 		catch (const LDAPException &ex)
 		{

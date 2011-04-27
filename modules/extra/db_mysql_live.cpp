@@ -163,11 +163,11 @@ class MySQLLiveModule : public Module
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands")
 	{
-		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnPreShutdown };
+		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
 		ModuleManager::Attach(i, this, 4);
 	}
 
-	void OnPreShutdown()
+	void OnShutdown()
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore };
 		for (size_t j = 0; j < 3; ++j)

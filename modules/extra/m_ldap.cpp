@@ -10,8 +10,49 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 {
 	Anope::string server;
 	int port;
+	Anope::string admin_binddn;
+	Anope::string admin_pass;
 
 	LDAP *con;
+
+	LDAPMod **BuildMods(const LDAPMods &attributes)
+	{
+		LDAPMod **mods = new LDAPMod*[attributes.size() + 1];
+		memset(mods, 0, sizeof(LDAPMod*) * (attributes.size() + 1));
+		for (unsigned x = 0; x < attributes.size(); ++x)
+		{
+			const LDAPModification &l = attributes[x];
+			mods[x] = new LDAPMod();
+
+			if (l.op == LDAPModification::LDAP_ADD)
+				mods[x]->mod_op = LDAP_MOD_ADD;
+			else if (l.op == LDAPModification::LDAP_DEL)
+				mods[x]->mod_op = LDAP_MOD_DELETE;
+			else if (l.op == LDAPModification::LDAP_REPLACE)
+				mods[x]->mod_op = LDAP_MOD_REPLACE;
+			else if (l.op != 0)
+				throw LDAPException("Unknown LDAP operation");
+			mods[x]->mod_type = strdup(l.name.c_str());
+			mods[x]->mod_values = new char*[l.values.size() + 1];
+			memset(mods[x]->mod_values, 0, sizeof(char *) * (l.values.size() + 1));
+			for (unsigned j = 0, c = 0; j < l.values.size(); ++j)
+				if (!l.values[j].empty())
+					mods[x]->mod_values[c++] = strdup(l.values[j].c_str());
+		}
+		return mods;
+	}
+
+	void FreeMods(LDAPMod **mods)
+	{
+		for (int i = 0; mods[i] != NULL; ++i)
+		{
+			free(mods[i]->mod_type);
+			for (int j = 0; mods[i]->mod_values[j] != NULL; ++j)
+				free(mods[i]->mod_values[j]);
+			delete [] mods[i]->mod_values;
+		}
+		delete [] mods;
+	}
 
  public:
 	typedef std::map<int, LDAPInterface *> query_queue;
@@ -19,7 +60,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 	query_queue queries;
 	result_queue results;
 
-	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po) : LDAPProvider(o, "ldap/" + n), server(s), port(po)
+	LDAPService(Module *o, const Anope::string &n, const Anope::string &s, int po, const Anope::string &b, const Anope::string &p) : LDAPProvider(o, "ldap/" + n), server(s), port(po), admin_binddn(b), admin_pass(p)
 	{
 		if (ldap_initialize(&this->con, this->server.c_str()) != LDAP_SUCCESS)
 			throw LDAPException("Unable to connect to LDAP service " + this->name + ": " + Anope::LastError());
@@ -51,6 +92,11 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		this->Unlock();
 
 		ldap_unbind_ext(this->con, NULL, NULL);
+	}
+	
+	LDAPQuery BindAsAdmin(LDAPInterface *i)
+	{
+		return this->Bind(i, this->admin_binddn, this->admin_pass);
 	}
 
 	LDAPQuery Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass)
@@ -94,6 +140,67 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
+	LDAPQuery Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes)
+	{
+		LDAPMod **mods = this->BuildMods(attributes);
+		LDAPQuery msgid;
+		int ret = ldap_add_ext(this->con, dn.c_str(), mods, NULL, NULL, &msgid);
+		this->FreeMods(mods);
+
+		if (ret != LDAP_SUCCESS)
+			throw LDAPException(ldap_err2string(ret));
+
+		if (i != NULL)
+		{
+			this->Lock();
+			this->queries[msgid] = i;
+			this->Unlock();
+		}
+		this->Wakeup();
+
+		return msgid;
+	}
+
+	LDAPQuery Del(LDAPInterface *i, const Anope::string &dn)
+	{
+		LDAPQuery msgid;
+		int ret = ldap_delete_ext(this->con, dn.c_str(), NULL, NULL, &msgid);
+
+		if (ret != LDAP_SUCCESS)
+			throw LDAPException(ldap_err2string(ret));
+
+		if (i != NULL)
+		{
+			this->Lock();
+			this->queries[msgid] = i;
+			this->Unlock();
+		}
+		this->Wakeup();
+
+		return msgid;
+	}
+
+	LDAPQuery Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes)
+	{
+		LDAPMod **mods = this->BuildMods(attributes);
+		LDAPQuery msgid;
+		int ret = ldap_modify_ext(this->con, base.c_str(), mods, NULL, NULL, &msgid);
+		this->FreeMods(mods);
+
+		if (ret != LDAP_SUCCESS)
+			throw LDAPException(ldap_err2string(ret));
+
+		if (i != NULL)
+		{
+			this->Lock();
+			this->queries[msgid] = i;
+			this->Unlock();
+		}
+		this->Wakeup();
+
+		return msgid;
+	}
+
 	void Run()
 	{
 		while (!this->GetExitState())
@@ -121,6 +228,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			if (it == this->queries.end())
 			{
 				this->Unlock();
+				ldap_msgfree(result);
 				continue;
 			}
 			LDAPInterface *i = it->second;
@@ -140,9 +248,30 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 				switch (cur_type)
 				{
 					case LDAP_RES_BIND:
-					{
 						ldap_result->type = LDAPResult::QUERY_BIND;
+						break;
+					case LDAP_RES_SEARCH_ENTRY:
+						ldap_result->type = LDAPResult::QUERY_SEARCH;
+					case LDAP_RES_SEARCH_RESULT:
+						break;
+					case LDAP_RES_ADD:
+						ldap_result->type = LDAPResult::QUERY_ADD;
+						break;
+					case LDAP_RES_DELETE:
+						ldap_result->type = LDAPResult::QUERY_DELETE;
+						break;
+					case LDAP_RES_MODIFY:
+						ldap_result->type = LDAPResult::QUERY_MODIFY;
+						break;
+					default:
+						Log(LOG_DEBUG) << "m_ldap: Unknown msg type " << cur_type;
+						continue;
+				}
 
+				switch (cur_type)
+				{
+					case LDAP_RES_BIND:
+					{
 						int errcode = -1;
 						int parse_result = ldap_parse_result(this->con, cur, &errcode, NULL, NULL, NULL, NULL, 0);
 						if (parse_result != LDAP_SUCCESS)
@@ -153,8 +282,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 					}
 					case LDAP_RES_SEARCH_ENTRY:
 					{
-						ldap_result->type = LDAPResult::QUERY_SEARCH;
-
 						BerElement *ber = NULL;
 						for (char *attr = ldap_first_attribute(this->con, cur, &ber); attr; attr = ldap_next_attribute(this->con, cur, ber))
 						{
@@ -173,8 +300,19 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 						break;
 					}
+					case LDAP_RES_ADD:
+					case LDAP_RES_DELETE:
+					case LDAP_RES_MODIFY:
+					{
+						int errcode = -1;
+						int parse_result = ldap_parse_result(this->con, cur, &errcode, NULL, NULL, NULL, NULL, 0);
+						if (parse_result != LDAP_SUCCESS)
+							ldap_result->error = ldap_err2string(parse_result);
+						else if (errcode != LDAP_SUCCESS)
+							ldap_result->error = ldap_err2string(errcode);
+						break;
+					}
 					default:
-						Log(LOG_DEBUG) << "m_ldap: Unknown msg type " << cur_type;
 						continue;
 				}
 
@@ -262,10 +400,12 @@ class ModuleLDAP : public Module, public Pipe
 			{
 				Anope::string server = config.ReadValue("ldap", "server", "127.0.0.1", i);
 				int port = config.ReadInteger("ldap", "port", "389", i, true);
+				Anope::string admin_binddn = config.ReadValue("ldap", "admin_binddn", "", i);
+				Anope::string admin_password = config.ReadValue("ldap", "admin_password", "", i);
 
 				try
 				{
-					LDAPService *ss = new LDAPService(this, connname, server, port);
+					LDAPService *ss = new LDAPService(this, connname, server, port, admin_binddn, admin_password);
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 					ModuleManager::RegisterService(ss);
 

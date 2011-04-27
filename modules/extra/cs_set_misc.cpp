@@ -75,7 +75,7 @@ class CSSetMisc : public Module
 
 	void RemoveAll()
 	{
-		if (Commands.empty())
+		if (!chanserv || Commands.empty())
 			return;
 
 		Command *set = FindCommand(chanserv->Bot(), "SET");

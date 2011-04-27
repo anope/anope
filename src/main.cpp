@@ -133,10 +133,12 @@ void do_restart_services()
 	}
 	Log() << "Restarting";
 
-	FOREACH_MOD(I_OnPreRestart, OnPreRestart());
-
 	if (quitmsg.empty())
 		quitmsg = "Restarting";
+
+	FOREACH_MOD(I_OnRestart, OnRestart());
+	ModuleManager::UnloadAll();
+
 	/* Send a quit for all of our bots */
 	for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 	{
@@ -150,9 +152,6 @@ void do_restart_services()
 			UserListByUID.erase(bi->GetUID());
 	}
 
-	FOREACH_MOD(I_OnRestart, OnRestart());
-
-	ModuleManager::UnloadAll();
 	ircdproto->SendSquit(Config->ServerName, quitmsg);
 	delete UplinkSock;
 	SocketEngine::Shutdown();
@@ -174,11 +173,13 @@ void do_restart_services()
 
 static void services_shutdown()
 {
-	FOREACH_MOD(I_OnPreShutdown, OnPreShutdown());
-
 	if (quitmsg.empty())
 		quitmsg = "Terminating, reason unknown";
 	Log() << quitmsg;
+
+	FOREACH_MOD(I_OnShutdown, OnShutdown());
+	ModuleManager::UnloadAll();
+
 	if (started && UplinkSock)
 	{
 		/* Send a quit for all of our bots */
@@ -203,9 +204,6 @@ static void services_shutdown()
 			delete u;
 		}
 	}
-	FOREACH_MOD(I_OnShutdown, OnShutdown());
-	ModuleManager::UnloadAll();
-	ircdproto->SendSquit(Config->ServerName, quitmsg);
 	delete UplinkSock;
 	SocketEngine::Shutdown();
 
@@ -225,7 +223,6 @@ void sighandler(int signum)
 #else
 		quitmsg = Anope::string("Services terminating via signal ") + stringify(signum);
 #endif
-	bool fatal = false;
 
 	if (started)
 	{
@@ -267,17 +264,13 @@ void sighandler(int signum)
 #endif
 
 				save_databases();
-				services_shutdown();
+				quitting = true;
 			default:
-				fatal = true;
 				break;
 		}
 	}
 
 	FOREACH_MOD(I_OnSignal, OnSignal(signum, quitmsg));
-
-	if (fatal)
-		throw FatalException(quitmsg);
 }
 
 /*************************************************************************/

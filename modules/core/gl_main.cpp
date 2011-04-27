@@ -60,7 +60,7 @@ class GlobalCore : public Module
 		this->SetAuthor("Anope");
 		this->SetType(CORE);
 
-		Implementation i[] = { I_OnPreRestart, I_OnPreShutdown, I_OnNewServer };
+		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer };
 		ModuleManager::Attach(i, this, 3);
 
 		ModuleManager::RegisterService(&this->myglobal);
@@ -88,13 +88,13 @@ class GlobalCore : public Module
 		delete Global;
 	}
 
-	void OnPreRestart()
+	void OnRestart()
 	{
 		if (Config->GlobalOnCycle)
 			global->SendGlobal(global->Bot(), "", Config->GlobalOnCycleMessage);
 	}
 	
-	void OnPreShutdown()
+	void OnShutdown()
 	{
 		if (Config->GlobalOnCycle)
 			global->SendGlobal(global->Bot(), "", Config->GlobalOnCycleMessage);

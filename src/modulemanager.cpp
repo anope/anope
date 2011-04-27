@@ -472,16 +472,17 @@ void ModuleManager::ClearCallBacks(Module *m)
  */
 void ModuleManager::UnloadAll()
 {
-	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)
-	{
-		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; )
-		{
-			Module *m = *it++;
+	std::vector<Anope::string> modules[MT_END];
+	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+		modules[(*it)->type].push_back((*it)->name);
 
-			if (static_cast<MODType>(i) == m->type)
+	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)
+		for (unsigned j = 0; j < modules[i].size(); ++j)
+		{
+			Module *m = FindModule(modules[i][j]);
+			if (m != NULL)
 				UnloadModule(m, NULL);
 		}
-	}
 }
 
 /** Register a service

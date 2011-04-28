@@ -24,6 +24,7 @@ Anope Version 1.8 - GIT
 03/03  F Fixed opping our clients on ratbox when not using TS6           [  #00]
 03/04  F Fixed setting a users host in InspIRCd when vhost is turned off [  #00]
 03/24  F Fixed groups display nick showing in HS req memos for aliases.  [#1252]
+04/28  F Fixed missing NS REGISTER reply when ns_register is not loaded. [#1263]
 
 Anope Version 1.8.5
 -------------------

@@ -23,8 +23,11 @@ void my_add_languages(void);
 int my_ns_register(User * u);
 int my_ns_set(User * u);
 int my_event_reload(int argc, char **argv);
+int my_event_addcommand(int argc, char **argv);
+int my_event_delcommand(int argc, char **argv);
 
 int NSEmailMax = 0;
+int added_register = 0;
 
 #define LNG_NUM_STRINGS		2
 #define LNG_NSEMAILMAX_REACHED		0
@@ -40,12 +43,18 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion(VERSION);
     moduleSetType(SUPPORTED);
 
-    c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1,
-                      -1);
-    if ((status = moduleAddCommand(NICKSERV, c, MOD_HEAD))) {
-        alog("[ns_maxemail] Unable to create REGISTER command: %d",
-             status);
-        return MOD_STOP;
+    /* Only add the command if REGISTER is actually available.
+     * If it s not available, hooking to it will suppress anopes
+     * "Unknown Command" response.. ~ Viper */
+    if (findCommand(NICKSERV, "REGISTER")) {
+        c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1,
+                          -1);
+        if ((status = moduleAddCommand(NICKSERV, c, MOD_HEAD))) {
+            alog("[ns_maxemail] Unable to create REGISTER command: %d",
+                 status);
+            return MOD_STOP;
+        }
+        added_register = 1;
     }
 
     c = createCommand("SET", my_ns_set, NULL, -1, -1, -1, -1, -1);
@@ -57,6 +66,20 @@ int AnopeInit(int argc, char **argv)
     evt = createEventHook(EVENT_RELOAD, my_event_reload);
     if ((status = moduleAddEventHook(evt))) {
         alog("[ns_maxemail] Unable to hook to EVENT_RELOAD: %d", status);
+        return MOD_STOP;
+    }
+
+    /* If the REGISTER command is added after initial load, provide hooks.. */
+    evt = createEventHook(EVENT_ADDCOMMAND, my_event_addcommand);
+    if ((status = moduleAddEventHook(evt))) {
+        alog("[ns_maxemail] Unable to hook to EVENT_ADDCOMMAND: %d", status);
+        return MOD_STOP;
+    }
+
+    /* If the REGISTER command is deleted after initial load, remove hooks.. */
+    evt = createEventHook(EVENT_DELCOMMAND, my_event_delcommand);
+    if ((status = moduleAddEventHook(evt))) {
+        alog("[ns_maxemail] Unable to hook to EVENT_DELCOMMAND: %d", status);
         return MOD_STOP;
     }
 
@@ -115,8 +138,8 @@ int my_ns_register(User * u)
 
     cur_buffer = moduleGetLastBuffer();
     email = myStrGetToken(cur_buffer, ' ', 1);
-	if (!email)
-		return MOD_CONT;
+    if (!email)
+        return MOD_CONT;
 
     ret = check_email_limit_reached(email, u);
     free(email);
@@ -133,10 +156,10 @@ int my_ns_set(User * u)
 
     cur_buffer = moduleGetLastBuffer();
     set = myStrGetToken(cur_buffer, ' ', 0);
-	
-	if (!set)
-		return MOD_CONT;
-	
+
+    if (!set)
+        return MOD_CONT;
+
     if (stricmp(set, "email") != 0) {
         free(set);
         return MOD_CONT;
@@ -144,8 +167,8 @@ int my_ns_set(User * u)
 
     free(set);
     email = myStrGetToken(cur_buffer, ' ', 1);
-	if (!email)
-		return MOD_CONT;
+    if (!email)
+        return MOD_CONT;
 
     ret = check_email_limit_reached(email, u);
     free(email);
@@ -157,6 +180,37 @@ int my_event_reload(int argc, char **argv)
 {
     if ((argc > 0) && (stricmp(argv[0], EVENT_START) == 0))
         my_load_config();
+
+    return MOD_CONT;
+}
+
+int my_event_addcommand(int argc, char **argv)
+{
+    Command *c;
+    int status;
+
+    if (argc == 2 && stricmp(argv[0], "ns_maxemail")
+            && !stricmp(argv[1], "REGISTER") && !added_register) {
+        c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1,
+                          -1);
+        if ((status = moduleAddCommand(NICKSERV, c, MOD_HEAD))) {
+            alog("[ns_maxemail] Unable to create REGISTER command: %d",
+                 status);
+            return MOD_CONT;
+        }
+        added_register = 1;
+    }
+
+    return MOD_CONT;
+}
+
+int my_event_delcommand(int argc, char **argv)
+{
+    if (argc == 2 && stricmp(argv[0], "ns_maxemail")
+            && !stricmp(argv[1], "REGISTER") && added_register) {
+        moduleDelCommand(NICKSERV, "REGISTER");
+        added_register = 0;
+    }
 
     return MOD_CONT;
 }

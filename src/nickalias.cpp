@@ -25,6 +25,8 @@ NickAlias::NickAlias(const Anope::string &nickname, NickCore *nickcore) : Flags<
 		if (o == NULL)
 			o = Oper::Find(this->nc->display);
 		this->nc->o = o;
+		if (this->nc->o != NULL)
+			Log() << "Tied oper " << this->nc->display << " to type " << this->nc->o->ot->GetName();
 	}
 }
 

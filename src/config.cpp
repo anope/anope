@@ -1247,7 +1247,7 @@ void ServerConfig::Read()
 						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
 							vl.push_back(ValueItem(item));
 						else
-							vl.push_back(ValueItem(""));
+							vl.push_back(ValueItem());
 						ValidateNoSpaces(vl[vl.size() - 1].GetValue(), configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum]);
 						break;
 					}
@@ -1257,7 +1257,7 @@ void ServerConfig::Read()
 						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
 							vl.push_back(ValueItem(item));
 						else
-							vl.push_back(ValueItem(""));
+							vl.push_back(ValueItem());
 						ValidateHostname(vl[vl.size() - 1].GetValue(), configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum]);
 						break;
 					}
@@ -1267,7 +1267,7 @@ void ServerConfig::Read()
 						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
 							vl.push_back(ValueItem(item));
 						else
-							vl.push_back(ValueItem(""));
+							vl.push_back(ValueItem());
 						ValidateIP(vl[vl.size() - 1].GetValue(), configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], allow_wild);
 						break;
 					}
@@ -1277,7 +1277,7 @@ void ServerConfig::Read()
 						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
 							vl.push_back(ValueItem(item));
 						else
-							vl.push_back(ValueItem(""));
+							vl.push_back(ValueItem());
 						break;
 					}
 					case DT_INTEGER:
@@ -1734,6 +1734,8 @@ int ServerConfig::ConfVarEnum(ConfigDataHash &target, const Anope::string &tag, 
 	return 0;
 }
 
+ValueItem::ValueItem() { }
+
 ValueItem::ValueItem(int value) : v("")
 {
 	std::stringstream n;
@@ -1756,21 +1758,6 @@ ValueItem::ValueItem(bool value) : v("")
 }
 
 ValueItem::ValueItem(const Anope::string &value) : v(value) { }
-
-void ValueItem::Set(const char *value)
-{
-	v = value;
-}
-
-void ValueItem::Set(const std::string &value)
-{
-	v = value;
-}
-
-void ValueItem::Set(const ci::string &value)
-{
-	v = value;
-}
 
 void ValueItem::Set(const Anope::string &value)
 {

@@ -56,6 +56,8 @@ class CoreExport ValueItem
 	/** Actual data */
 	Anope::string v;
  public:
+ 	/** Initialize with nothing */
+ 	ValueItem();
 	/** Initialize with an int */
 	ValueItem(int);
 	/** Initialize with a bool */
@@ -64,14 +66,6 @@ class CoreExport ValueItem
 	ValueItem(const Anope::string &);
 	/** Initialize with a long */
 	ValueItem(long);
-	/** Change value to a char pointer */
-	//void Set(char *);
-	/** Change value to a const char pointer */
-	void Set(const char *);
-	/** Change value to an std::string */
-	void Set(const std::string &);
-	/** Change value to a ci::string */
-	void Set(const ci::string &);
 	/** Change value to an Anope::string */
 	void Set(const Anope::string &);
 	/** Change value to an int */

@@ -937,7 +937,7 @@ class DBMySQL : public Module
 			ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
 
 			if (cm != NULL)
-				this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(ml.set ? 1 : 0) + ", '" + this->Escape(ml.setter) + "', " + stringify(ml.created) + ", '" + this->Escape(ml.param) + "')");
+				this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(ml.set ? 1 : 0) + ", '" + this->Escape(ml.setter) + "', " + stringify(ml.created) + ", '" + this->Escape(ml.param) + "') ON DUPLICATE KEY UPDATE channel=VALUES(channel), mode=VALUES(mode), status=VALUES(status), setter=VALUES(setter), created=VALUES(created), param=VALUES(param)");
 		}
 	}
 
@@ -965,7 +965,7 @@ class DBMySQL : public Module
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm != NULL)
-			this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(lock->set ? 1 : 0) + ", '" + this->Escape(lock->setter) + "', " + stringify(lock->created) + ", '" + this->Escape(lock->param) + "')");
+			this->RunQuery("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES('" + this->Escape(ci->name) + "', '" + cm->NameAsString() + "', " + stringify(lock->set ? 1 : 0) + ", '" + this->Escape(lock->setter) + "', " + stringify(lock->created) + ", '" + this->Escape(lock->param) + "') ON DUPLICATE KEY UPDATE channel=VALUES(channel), mode=VALUES(mode), status=VALUES(status), setter=VALUES(setter), created=VALUES(created), param=VALUES(param)");
 		return EVENT_CONTINUE;
 	}
 

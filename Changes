@@ -3,6 +3,8 @@ Anope Version 1.8 - GIT
 10/31  A Added support for plexus3's channel mode +z                     [#1202]
 02/23  A Added account tracking support to ratbox protocol module        [  #00]
 03/21  A Added support for Hybrid's m_services and m_change              [  #00]
+03/28  A Added internal events called when a module is loaded/unloaded.  [  #00]
+03/28  A Added internal events called when a command is added/deleted.   [  #00]
 09/11  F Fixed db-convert handling some vhost collisions                 [  #00]
 09/14  F Fixed ./configure failing with partial SQL installations        [  #00]
 09/28  F Fixed ForkForMail to always work                                [  #00]

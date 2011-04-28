@@ -64,3 +64,7 @@
 #define EVENT_ACCESS_CLEAR "access_clear"
 #define EVENT_NICK_LOGOUT "nick_logout"
 #define EVENT_CHAN_KICK "chan_kick"
+#define EVENT_MODLOAD "modload"
+#define EVENT_MODUNLOAD "modunload"
+#define EVENT_ADDCOMMAND "addcommand"
+#define EVENT_DELCOMMAND "delcommand"

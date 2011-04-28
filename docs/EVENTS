@@ -435,3 +435,30 @@ Anope Internal Events
         A user has left the network. This event is emitted before the internal
         removal is performed, so the user still exists internally.
         av[0]  The nickname of the user leaving the network.
+
+    EVENT_MODLOAD
+        A module has been loaded. This event is emitted after the loading
+        sequence has been finished: AnopeInit() has been called and the
+        module has already been added to the modules table.
+        av[0] Name of the loaded module.
+
+    EVENT_MODUNLOAD
+        A module has been unloaded. This event is emitted when the unloading
+        sequence is almost complete: AnopeFini() has been called and all
+        commands, hooks and callbacks have been removed. The module itself
+        is still in memory however.
+        av[0] Name of the unloaded module.
+
+    EVENT_ADDCOMMAND
+        A command hook has been added to anopes command table.
+        Note that the command may have previously existed and merely a new hook
+        was added before or after an existing command hook.
+        av[0] Name of the module adding the command.
+        av[1] Name of the command hook that was added.
+
+    EVENT_DELCOMMAND
+        A command hook has been removed from anopes command table.
+        Note that the command may still exist in anopes command table if other
+        modules have hooks for the same command.
+        av[0] Name of the module deleting the command.
+        av[1] Name of the command hook that was removed.

@@ -713,6 +713,10 @@ int loadModule(Module * m, User * u)
         notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name);
     }
     addModule(m);
+
+    /* Loading is complete.. send out an event in case anyone s interested.. ~ Viper */
+    send_event(EVENT_MODLOAD, 1, m->name);
+
     return MOD_ERR_OK;
 
 #else
@@ -760,6 +764,10 @@ int unloadModule(Module * m, User * u)
     if (prepForUnload(m) != MOD_ERR_OK) {
         return MOD_ERR_UNKNOWN;
     }
+
+    /* Unloading is complete: AnopeFini has been called and all commands, hooks and callbacks
+     * have been removed.. send out an event in case anyone s interested.. ~ Viper */
+    send_event(EVENT_MODUNLOAD, 1, m->name);
 
     if ((ano_modclose(m->handle)) != 0) {
         alog("%s", ano_moderr());
@@ -1277,6 +1285,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 if (debug)
                     alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
                          (void *) c->next, (void *) c);
+                send_event(EVENT_ADDCOMMAND, 2, c->mod_name, c->name);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
 
@@ -1289,6 +1298,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 tail->next = c;
                 c->next = NULL;
 
+                send_event(EVENT_ADDCOMMAND, 2, c->mod_name, c->name);
                 return MOD_ERR_OK;
             } else
                 return MOD_ERR_EXISTS;
@@ -1308,6 +1318,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
     else
         lastHash->next = newHash;
 
+    send_event(EVENT_ADDCOMMAND, 2, c->mod_name, c->name);
     return MOD_ERR_OK;
 }
 
@@ -1343,6 +1354,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                             } else {
                                 current->c = tail->next;
                             }
+                            send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                             return MOD_ERR_OK;
                         }
                         last = tail;
@@ -1351,6 +1363,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     cmdTable[index] = current->next;
                     free(current->name);
+                    send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }
             } else {
@@ -1364,6 +1377,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                             } else {
                                 current->c = tail->next;
                             }
+                            send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                             return MOD_ERR_OK;
                         }
                         last = tail;
@@ -1372,6 +1386,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
                 } else {
                     lastHash->next = current->next;
                     free(current->name);
+                    send_event(EVENT_DELCOMMAND, 2, c->mod_name, c->name);
                     return MOD_ERR_OK;
                 }
             }

@@ -202,14 +202,14 @@ SSLSocketIO::SSLSocketIO()
 
 int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz) const
 {
-	size_t i = SSL_read(this->sslsock, buf, sz);
+	int i = SSL_read(this->sslsock, buf, sz);
 	TotalRead += i;
 	return i;
 }
 
 int SSLSocketIO::Send(Socket *s, const Anope::string &buf) const
 {
-	size_t i = SSL_write(this->sslsock, buf.c_str(), buf.length());
+	int i = SSL_write(this->sslsock, buf.c_str(), buf.length());
 	TotalWritten += i;
 	return i;
 }

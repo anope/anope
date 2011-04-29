@@ -150,6 +150,8 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 		}
 		else if (current_command)
 			return EVENT_CONTINUE;
+		else if (command->name == "RESTART")
+			return EVENT_CONTINUE;
 
 		CommandSource source_copy = source;
 		AsynchCommandMutex *cm = new AsynchCommandMutex(source_copy, command, params);

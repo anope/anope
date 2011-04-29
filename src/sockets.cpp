@@ -522,7 +522,7 @@ bool BufferedSocket::ProcessWrite()
 	if (this->WriteBuffer.empty())
 		return true;
 	int count = this->IO->Send(this, this->WriteBuffer);
-	if (count == -1)
+	if (count <= -1)
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
 	if (this->WriteBuffer.empty())

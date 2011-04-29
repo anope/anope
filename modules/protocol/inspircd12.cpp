@@ -737,7 +737,7 @@ class ProtoInspIRCd : public Module
 	Inspircd12IRCdMessage ircd_message;
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_endburst("ENDBURST", event_endburst),
 		message_time("TIME", event_time), message_rsquit("RSQUIT", event_rsquit),
 		message_svsmode("SVSMODE", OnMode), message_fhost("FHOST", event_chghost),
@@ -749,7 +749,6 @@ class ProtoInspIRCd : public Module
 		message_metadata("METADATA", event_metadata)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
@@ -759,6 +758,9 @@ class ProtoInspIRCd : public Module
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
 		ModuleManager::Attach(i, this, 2);
+
+		if (Config->Numeric.empty())
+			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &)

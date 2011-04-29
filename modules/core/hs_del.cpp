@@ -64,10 +64,9 @@ class HSDel : public Module
 	CommandHSDel commandhsdel;
 
  public:
-	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

@@ -251,10 +251,9 @@ class OSSet : public Module
 	CommandOSSet commandosset;
 
  public:
-	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

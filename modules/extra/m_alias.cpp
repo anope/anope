@@ -22,7 +22,7 @@ class ModuleAlias : public Module
 {
 	std::multimap<Anope::string, CommandAlias, std::less<ci::string> > aliases;
  public:
-	ModuleAlias(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ModuleAlias(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		Implementation i[] = { I_OnReload, I_OnPreCommandRun, I_OnBotFantasy };
 		ModuleManager::Attach(i, this, 3);

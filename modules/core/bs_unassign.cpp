@@ -71,10 +71,9 @@ class BSUnassign : public Module
 	CommandBSUnassign commandbsunassign;
 
  public:
-	BSUnassign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	BSUnassign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!botserv)
 			throw ModuleException("BotServ is not loaded!");

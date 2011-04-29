@@ -96,10 +96,9 @@ class OSUserList : public Module
 	CommandOSUserList commandosuserlist;
 
  public:
-	OSUserList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSUserList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

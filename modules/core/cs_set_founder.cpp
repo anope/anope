@@ -107,10 +107,9 @@ class CSSetFounder : public Module
 	CommandCSSASetFounder commandcssasetfounder;
 
  public:
-	CSSetFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

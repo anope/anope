@@ -55,10 +55,9 @@ class OperServCore : public Module
 	MyOperServService myoperserv;
 
  public:
-	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), myoperserv(this)
+	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myoperserv(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 		this->SetPermanent(true); // Currently, /os modunload os_main explodes for obvious reasons
 
 		Implementation i[] = { I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect };
@@ -87,7 +86,7 @@ class OperServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

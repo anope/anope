@@ -32,7 +32,6 @@ class CommandOSModList : public Command
 		int showProto = 1;
 		int showEnc = 1;
 		int showSupported = 1;
-		int showQA = 1;
 		int showDB = 1;
 
 		char core[] = "Core";
@@ -40,7 +39,6 @@ class CommandOSModList : public Command
 		char proto[] = "Protocol";
 		char enc[] = "Encryption";
 		char supported[] = "Supported";
-		char qa[] = "QATested";
 		char db[] = "Database";
 
 		if (!param.empty())
@@ -52,7 +50,6 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showEnc = 0;
 				showSupported = 0;
-				showQA = 0;
 				showDB = 0;
 			}
 			else if (param.equals_ci(third))
@@ -60,7 +57,6 @@ class CommandOSModList : public Command
 				showCore = 0;
 				showThird = 1;
 				showSupported = 0;
-				showQA = 0;
 				showProto = 0;
 				showEnc = 0;
 				showDB = 0;
@@ -72,7 +68,6 @@ class CommandOSModList : public Command
 				showProto = 1;
 				showEnc = 0;
 				showSupported = 0;
-				showQA = 0;
 				showDB = 0;
 			}
 			else if (param.equals_ci(supported))
@@ -82,17 +77,6 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showSupported = 1;
 				showEnc = 0;
-				showQA = 0;
-				showDB = 0;
-			}
-			else if (param.equals_ci(qa))
-			{
-				showCore = 0;
-				showThird = 0;
-				showProto = 0;
-				showSupported = 0;
-				showEnc = 0;
-				showQA = 1;
 				showDB = 0;
 			}
 			else if (param.equals_ci(enc))
@@ -102,7 +86,6 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showSupported = 0;
 				showEnc = 1;
-				showQA = 0;
 				showDB = 0;
 			}
 			else if (param.equals_ci(db))
@@ -112,7 +95,6 @@ class CommandOSModList : public Command
 				showProto = 0;
 				showSupported = 0;
 				showEnc = 0;
-				showQA = 0;
 				showDB = 1;
 			}
 		}
@@ -153,13 +135,6 @@ class CommandOSModList : public Command
 						++count;
 					}
 					break;
-				case QATESTED:
-					if (showQA)
-					{
-						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), qa);
-						++count;
-					}
-					break;
 				case ENCRYPTION:
 					if (showEnc)
 					{
@@ -188,7 +163,7 @@ class CommandOSModList : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002MODLIST\002 [Core|3rd|protocol|encryption|supported|qatested]\n"
+		source.Reply(_("Syntax: \002MODLIST\002 [Core|3rd|protocol|encryption|supported]\n"
 				" \n"
 				"Lists all currently loaded modules."));
 		return true;
@@ -200,10 +175,9 @@ class OSModList : public Module
 	CommandOSModList commandosmodlist;
 
  public:
-	OSModList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSModList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

@@ -43,10 +43,9 @@ class GLHelp : public Module
 	CommandGLHelp commandoshelp;
 
  public:
-	GLHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	GLHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!global)
 			throw ModuleException("Global is not loaded!");

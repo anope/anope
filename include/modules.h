@@ -127,9 +127,6 @@ else \
 
 class Message;
 
-extern CoreExport Module *FindModule(const Anope::string &name);
-int protocol_module_init();
-
 enum ModuleReturn
 {
 	MOD_ERR_OK,
@@ -137,15 +134,9 @@ enum ModuleReturn
 	MOD_ERR_PARAMS,
 	MOD_ERR_EXISTS,
 	MOD_ERR_NOEXIST,
-	MOD_ERR_NOUSER,
 	MOD_ERR_NOLOAD,
-	MOD_ERR_NOUNLOAD,
-	MOD_ERR_SYNTAX,
-	MOD_ERR_NODELETE,
 	MOD_ERR_UNKNOWN,
 	MOD_ERR_FILE_IO,
-	MOD_ERR_NOSERVICE,
-	MOD_ERR_NO_MOD_NAME,
 	MOD_ERR_EXCEPTION,
 	MOD_ERR_VERSION
 };
@@ -154,7 +145,7 @@ enum ModuleReturn
  */
 enum Priority { PRIORITY_FIRST, PRIORITY_DONTCARE, PRIORITY_LAST, PRIORITY_BEFORE, PRIORITY_AFTER };
 /* Module types, in the order in which they are unloaded. The order these are in is IMPORTANT */
-enum MODType { MT_BEGIN, THIRD, QATESTED, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
+enum ModType { MT_BEGIN, THIRD, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL, MT_END };
 
 typedef std::multimap<Anope::string, Message *> message_map;
 extern CoreExport message_map MessageMap;
@@ -210,6 +201,10 @@ class CoreExport Module : public Extensible
 	 */
 	Anope::string name;
 
+	/** What type this module is
+	 */
+	ModType type;
+
 	/** The temporary path/filename
 	 */
 	Anope::string filename;
@@ -234,23 +229,16 @@ class CoreExport Module : public Extensible
 	 */
 	Anope::string author;
 
-	/** What type this module is
-	 */
-	MODType type;
-
 	/** Creates and initialises a new module.
+	 * @param modname The module name
 	 * @param loadernick The nickname of the user loading the module.
+	 * @param type The module type
 	 */
-	Module(const Anope::string &modname, const Anope::string &loadernick);
+	Module(const Anope::string &modname, const Anope::string &loadernick, ModType type = THIRD);
 
 	/** Destroys a module, freeing resources it has allocated.
 	 */
 	virtual ~Module();
-
-	/** Sets a given type (CORE,PROTOCOL,3RD etc) on a module.
-	 * @param type The type to set the module as.
-	 */
-	void SetType(MODType type);
 
 	/** Toggles the permanent flag on a module. If a module is permanent,
 	 * then it may not be unloaded.
@@ -1039,10 +1027,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg) { }
 
-	/** Called when any object is destroyed
+	/** Called when any object is deleted
 	 * @param b The object
 	 */
-	virtual void OnObjectDestroy(Base *b) { }
+	virtual void OnDeleteObject(Base *b) { }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1096,7 +1084,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
-		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnObjectDestroy,
+		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnDeleteObject,
 	I_END
 };
 
@@ -1138,6 +1126,18 @@ class CoreExport ModuleManager
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static ModuleReturn UnloadModule(Module *m, User * u);
+
+	/** Find a module
+	 * @param name The module name
+	 * @return The module
+	 */
+	static Module *FindModule(const Anope::string &name);
+
+	/** Find the first module of a certain type
+	 * @param type The module type
+	 * @return The module
+	 */
+	static Module *FindFirstOf(ModType type);
 
 	/** Checks whether this version of Anope is at least major.minor.patch.build
 	 * Throws a ModuleException if not
@@ -1231,8 +1231,9 @@ class CoreExport ModuleManager
  private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
+	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
-	static void DeleteModule(Module *m);
+	static ModuleReturn DeleteModule(Module *m);
 };
 
 /** Class used for callbacks within modules

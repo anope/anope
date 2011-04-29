@@ -84,10 +84,9 @@ class CSSetBanType : public Module
 	CommandCSSASetBanType commandcssasetbantype;
 
  public:
-	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

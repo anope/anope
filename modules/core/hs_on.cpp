@@ -64,10 +64,9 @@ class HSOn : public Module
 	CommandHSOn commandhson;
 
  public:
-	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

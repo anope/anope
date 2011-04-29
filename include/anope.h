@@ -316,9 +316,9 @@ namespace Anope
 	 */
 	extern CoreExport bool Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive = false);
 
-	/** Returns a list of pointers to message handlers
-	 * @param The message name as sent by the IRCd
-	 * @return a vector with pointers to the messagehandlers (you can bind more than one handler to a message)
+	/** Find a message in the message table
+	 * @param name The name of the message were looking for
+	 * @return NULL if we cant find it, or a pointer to the Message if we can
 	 */
 	extern CoreExport std::vector<Message *> FindMessage(const string &name);
 
@@ -438,6 +438,7 @@ class CoreExport Base
 	virtual ~Base();
 	void AddReference(dynamic_reference_base *r);
 	void DelReference(dynamic_reference_base *r);
+	static void operator delete(void *ptr);
 };
 
 class dynamic_reference_base : public Base
@@ -469,7 +470,7 @@ class dynamic_reference : public dynamic_reference_base
 			this->invalid = false;
 			this->ref = NULL;
 		}
-		else if (ref)
+		else if (this->operator bool())
 			ref->DelReference(this);
 	}
 
@@ -504,10 +505,10 @@ class dynamic_reference : public dynamic_reference_base
 			this->invalid = false;
 			this->ref = NULL;
 		}
-		else if (this->ref)
+		else if (this->operator bool())
 			this->ref->DelReference(this);
 		this->ref = newref;
-		if (this->ref)
+		if (this->operator bool())
 			this->ref->AddReference(this);
 	}
 };

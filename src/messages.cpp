@@ -83,8 +83,8 @@ bool OnTime(const Anope::string &source, const std::vector<Anope::string> &)
 
 bool OnVersion(const Anope::string &source, const std::vector<Anope::string> &)
 {
-	if (!source.empty())
-		ircdproto->SendNumeric(Config->ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
+	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+	ircdproto->SendNumeric(Config->ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	return true;
 }
 

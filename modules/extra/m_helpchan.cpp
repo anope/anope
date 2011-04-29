@@ -13,10 +13,9 @@ class HelpChannel : public Module
 	Anope::string HelpChan;
 
  public:
-	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HelpChannel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
 		ModuleManager::Attach(i, this, 2);

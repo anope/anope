@@ -109,10 +109,9 @@ class CSTBan : public Module
 	CommandCSTBan commandcstban;
 
  public:
-	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

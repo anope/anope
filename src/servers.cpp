@@ -313,132 +313,63 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
 }
 
-/*************************************************************************/
-
-/* TS6 UID generator common code.
- *
- * Derived from atheme-services, uid.c (hg 2954:116d46894b4c).
- *    -nenolod
- */
-static bool ts6_uid_initted = false;
-static char ts6_new_uid[10];
-
-static void ts6_uid_increment(unsigned slot)
-{
-	if (slot != Config->Numeric.length())
-	{
-		if (ts6_new_uid[slot] == 'Z')
-			ts6_new_uid[slot] = '0';
-		else if (ts6_new_uid[slot] == '9')
-		{
-			ts6_new_uid[slot] = 'A';
-			ts6_uid_increment(slot - 1);
-		}
-		else
-			++ts6_new_uid[slot];
-	}
-	else
-	{
-		if (ts6_new_uid[slot] == 'Z')
-			for (slot = 3; slot < 9; ++slot)
-				ts6_new_uid[slot] = 'A';
-		else
-			++ts6_new_uid[slot];
-	}
-}
-
 /** Recieve the next UID in our list
  * @return The UID
  */
-const char *ts6_uid_retrieve()
+const Anope::string ts6_uid_retrieve()
 {
-	if (!ircd->ts6)
-	{
+	if (!ircd || !ircd->ts6)
 		return "";
-	}
 
-	if (!ts6_uid_initted)
+	static Anope::string current_uid = "AAAAAA";
+	static unsigned current_len = current_uid.length() - 1;
+
+	while (finduser(Config->Numeric + current_uid) != NULL)
 	{
-		snprintf(ts6_new_uid, 10, "%sAAAAAA", Config->Numeric.c_str());
-		ts6_uid_initted = true;
-	}
-
-	ts6_uid_increment(8);
-	return ts6_new_uid;
-}
-
-/*******************************************************************/
-
-/*
- * TS6 SID generator code, provided by DukePyrolator
- */
-
-static bool ts6_sid_initted = false;
-static char ts6_new_sid[4];
-
-static void ts6_sid_increment(unsigned pos)
-{
-	/*
-	 * An SID must be exactly 3 characters long, starts with a digit,
-	 * and the other two characters are A-Z or digits
-	 * The rules for generating an SID go like this...
-	 * --> ABCDEFGHIJKLMNOPQRSTUVWXYZ --> 0123456789 --> WRAP
-	 */
-	if (!pos)
-	{
-		/* At pos 0, if we hit '9', we've run out of available SIDs,
-		 * reset the SID to the smallest possible value and try again. */
-		if (ts6_new_sid[pos] == '9')
-		{
-			ts6_new_sid[0] = '0';
-			ts6_new_sid[1] = 'A';
-			ts6_new_sid[2] = 'A';
-		}
+		char &curChar = current_uid[current_len];
+		if (curChar == 'Z')
+			curChar = '0';
+		else if (curChar != '9')
+			++curChar;
 		else
-			// But if we haven't, just keep incrementing merrily.
-			++ts6_new_sid[0];
-	}
-	else
-	{
-		if (ts6_new_sid[pos] == 'Z')
-			ts6_new_sid[pos] = '0';
-		else if (ts6_new_sid[pos] == '9')
 		{
-			ts6_new_sid[pos] = 'A';
-			ts6_sid_increment(pos - 1);
+			curChar = 'A';
+			if (--current_len == 0)
+				current_len = current_uid.length();
 		}
-		else
-			++ts6_new_sid[pos];
+			
 	}
+
+	return Config->Numeric + current_uid;
 }
 
 /** Return the next SID in our list
  * @return The SID
  */
-const char *ts6_sid_retrieve()
+const Anope::string ts6_sid_retrieve()
 {
-	if (!ircd->ts6)
-	{
+	if (!ircd || !ircd->ts6)
 		return "";
-	}
 
-	if (!ts6_sid_initted)
+	static Anope::string current_sid = Config->Numeric;
+	static unsigned current_len = current_sid.length() - 1;
+
+	while (Server::Find(current_sid) != NULL)
 	{
-		// Initialize ts6_new_sid with the services server SID
-		snprintf(ts6_new_sid, 4, "%s", Config->Numeric.c_str());
-		ts6_sid_initted = true;
+		char &curChar = current_sid[current_len];
+		if (curChar == 'Z')
+			curChar = '0';
+		else if (curChar != '9')
+			++curChar;
+		else
+		{
+			curChar = 'A';
+			if (--current_len == 0)
+				current_len = current_sid.length();
+		}
+			
 	}
 
-	while (1)
-	{
-		// Check if the new SID is used by a known server
-		if (!Server::Find(ts6_new_sid))
-			// return the new SID
-			return ts6_new_sid;
-
-		// Add one to the last SID
-		ts6_sid_increment(2);
-	}
-	/* not reached */
-	return "";
+	return current_sid;
 }
+

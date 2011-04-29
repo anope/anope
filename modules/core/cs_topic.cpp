@@ -74,10 +74,9 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 
  public:
-	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(chanserv->Bot(), &commandcstopic);
 	}

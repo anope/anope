@@ -177,10 +177,9 @@ class NSIdentifyLDAP : public Module
 	Anope::string disable_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), ldap("ldap/main"), iinterface(this), oninterface(this), orinterface(this)
+		Module(modname, creator, SUPPORTED), ldap("ldap/main"), iinterface(this), oninterface(this), orinterface(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
 		ModuleManager::Attach(i, this, 5);

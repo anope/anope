@@ -45,10 +45,9 @@ class OSRestart : public Module
 	CommandOSRestart commandosrestart;
 
  public:
-	OSRestart(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSRestart(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

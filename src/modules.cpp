@@ -14,77 +14,6 @@
 message_map MessageMap;
 std::list<Module *> Modules;
 
-Anope::string ModuleGetErrStr(int status)
-{
-	Anope::string module_err_str[] = {
-		"Module, Okay - No Error",						/* MOD_ERR_OK */
-		"Module Error, Allocating memory",				/* MOD_ERR_MEMORY */
-		"Module Error, Not enough parameters",			/* MOD_ERR_PARAMS */
-		"Module Error, Already loaded",					/* MOD_ERR_EXISTS */
-		"Module Error, File does not exist",			/* MOD_ERR_NOEXIST */
-		"Module Error, No User",						/* MOD_ERR_NOUSER */
-		"Module Error, Error during load time or module returned MOD_STOP", /* MOD_ERR_NOLOAD */
-		"Module Error, Unable to unload",				/* MOD_ERR_NOUNLOAD */
-		"Module Error, Incorrect syntax",				/* MOD_ERR_SYNTAX */
-		"Module Error, Unable to delete",				/* MOD_ERR_NODELETE */
-		"Module Error, Unknown Error occuried",			/* MOD_ERR_UNKOWN */
-		"Module Error, File I/O Error",					/* MOD_ERR_FILE_IO */
-		"Module Error, No Service found for request",	/* MOD_ERR_NOSERVICE */
-		"Module Error, No module name for request"		/* MOD_ERR_NO_MOD_NAME */
-	};
-	return module_err_str[status];
-}
-
-/************************************************/
-
-/**
- * Load the ircd protocol module up
- **/
-int protocol_module_init()
-{
-	int ret = 0;
-
-	Log() << "Loading IRCD Protocol Module: [" << Config->IRCDModule << "]";
-	ret = ModuleManager::LoadModule(Config->IRCDModule, NULL);
-
-	if (ret == MOD_ERR_OK)
-	{
-		FindModule(Config->IRCDModule)->SetType(PROTOCOL);
-		/* This is really NOT the correct place to do config checks, but
-		 * as we only have the ircd struct filled here, we have to over
-		 * here. -GD
-		 */
-		if (ircd->ts6)
-		{
-			if (Config->Numeric.empty())
-			{
-				Log() << "This IRCd protocol requires a server id to be set in Anope's configuration.";
-				ret = -1;
-			}
-		}
-	}
-
-	return ret;
-}
-
-/**
- * Search the list of loaded modules for the given name.
- * @param name the name of the module to find
- * @return a pointer to the module found, or NULL
- */
-Module *FindModule(const Anope::string &name)
-{
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-	{
-		Module *m = *it;
-
-		if (m->name.equals_ci(name))
-			return m;
-	}
-
-	return NULL;
-}
-
 /** Message constructor, adds the message to Anope
  * @param n The message name
  * @param f A callback function
@@ -115,10 +44,10 @@ Message::~Message()
 	}
 }
 
-/** Find  message in the message table
+/** Find a message in the message table
  * @param name The name of the message were looking for
  * @return NULL if we cant find it, or a pointer to the Message if we can
- **/
+ */
 std::vector<Message *> Anope::FindMessage(const Anope::string &name)
 {
 	std::vector<Message *> messages;

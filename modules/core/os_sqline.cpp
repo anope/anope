@@ -438,16 +438,15 @@ class OSSQLine : public Module
 	CommandOSSQLine commandossqline;
 
  public:
-	OSSQLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSQLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
-		if (!ircd->sqline)
+		if (!ircd || !ircd->sqline)
 			throw ModuleException("Your IRCd does not support QLines.");
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(operserv->Bot(), &commandossqline);
 	}

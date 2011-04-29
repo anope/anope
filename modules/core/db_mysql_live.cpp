@@ -1,6 +1,6 @@
 #include "module.h"
-#include "async_commands.h"
-#include "sql.h"
+#include "../extra/async_commands.h"
+#include "../extra/sql.h"
 
 class SQLCache : public Timer
 {
@@ -161,7 +161,7 @@ class MySQLLiveModule : public Module
 
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator), SQL("mysql/main"), ACS("asynch_commands")
+		Module(modname, creator, DATABASE), SQL("mysql/main"), ACS("asynch_commands")
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
 		ModuleManager::Attach(i, this, 4);

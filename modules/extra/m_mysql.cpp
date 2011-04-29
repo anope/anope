@@ -156,7 +156,7 @@ class ModuleSQL : public Module, public Pipe
 	/* The thread used to execute queries */
 	DispatcherThread *DThread;
 
-	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ModuleSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		me = this;
 

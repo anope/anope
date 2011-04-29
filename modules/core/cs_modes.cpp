@@ -457,10 +457,9 @@ class CSModes : public Module
 	CommandCSDeVoice commandcsdevoice;
 
  public:
-	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

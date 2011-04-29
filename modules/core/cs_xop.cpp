@@ -723,10 +723,9 @@ class CSXOP : public Module
 	CommandCSVOP commandcsvop;
 
  public:
-	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(chanserv->Bot(), &commandcssop);
 		this->AddCommand(chanserv->Bot(), &commandcsaop);

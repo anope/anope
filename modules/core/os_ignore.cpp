@@ -288,10 +288,9 @@ class OSIgnore : public Module
 	CommandOSIgnore commandosignore;
 
  public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), osignoreservice(this, "operserv/ignore")
+	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), osignoreservice(this, "operserv/ignore")
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

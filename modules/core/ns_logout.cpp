@@ -98,10 +98,9 @@ class NSLogout : public Module
 	CommandNSLogout commandnslogout;
 
  public:
-	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

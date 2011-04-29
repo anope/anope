@@ -63,10 +63,9 @@ class MSStaff : public Module
 	CommandMSStaff commandmsstaff;
 
  public:
-	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

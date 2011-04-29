@@ -62,10 +62,9 @@ class CSHelp : public Module
 	CommandCSHelp commandcshelp;
 
  public:
-	CSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

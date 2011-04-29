@@ -151,10 +151,9 @@ class ChanServCore : public Module
 	ExpireCallback expires;
 
  public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), mychanserv(this), expires(this)
+	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mychanserv(this), expires(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		ModuleManager::RegisterService(&this->mychanserv);
 
@@ -176,7 +175,7 @@ class ChanServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

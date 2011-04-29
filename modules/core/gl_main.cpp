@@ -55,10 +55,9 @@ class GlobalCore : public Module
 	MyGlobalService myglobal;
 
  public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), myglobal(this)
+	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myglobal(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer };
 		ModuleManager::Attach(i, this, 3);
@@ -80,7 +79,7 @@ class GlobalCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

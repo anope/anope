@@ -107,10 +107,9 @@ class MSIgnore : public Module
 	CommandMSIgnore commandmsignore;
 
  public:
-	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

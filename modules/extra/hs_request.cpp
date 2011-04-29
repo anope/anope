@@ -310,7 +310,7 @@ class HSRequest : public Module
 	CommandHSWaiting commandhswaiting;
 
  public:
-	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		me = this;
 
@@ -323,7 +323,6 @@ class HSRequest : public Module
 		this->AddCommand(hostserv->Bot(), &commandhswaiting);
 
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		Implementation i[] = { I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
 		ModuleManager::Attach(i, this, 4);

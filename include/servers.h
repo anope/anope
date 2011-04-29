@@ -6,8 +6,8 @@ extern CoreExport Server *Me;
 
 extern CoreExport void do_server(const Anope::string &source, const Anope::string &servername, unsigned int hops, const Anope::string &descript, const Anope::string &numeric);
 
-extern CoreExport const char *ts6_uid_retrieve();
-extern CoreExport const char *ts6_sid_retrieve();
+extern CoreExport const Anope::string ts6_uid_retrieve();
+extern CoreExport const Anope::string ts6_sid_retrieve();
 
 /* Types of capab
  */

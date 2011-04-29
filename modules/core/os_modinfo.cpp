@@ -42,7 +42,7 @@ class CommandOSModInfo : public Command
 	{
 		const Anope::string &file = params[0];
 
-		Module *m = FindModule(file);
+		Module *m = ModuleManager::FindModule(file);
 		if (m)
 		{
 			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
@@ -75,10 +75,9 @@ class OSModInfo : public Module
 	CommandOSModInfo commandosmodinfo;
 
  public:
-	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

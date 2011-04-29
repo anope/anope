@@ -113,10 +113,12 @@ class NSSetMisc : public Module
 	}
 
  public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
+
+		if (!nickserv)
+			throw ModuleException("NickServ is not loaded!");
 
 		Implementation i[] = { I_OnReload, I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 4);

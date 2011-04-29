@@ -114,10 +114,9 @@ class CSSetSuccessor : public Module
 	CommandCSSASetSuccessor commandcssasetsuccessor;
 
  public:
-	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

@@ -311,10 +311,9 @@ class NSGroup : public Module
 	CommandNSGList commandnsglist;
 
  public:
-	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(nickserv->Bot(), &commandnsgroup);
 		this->AddCommand(nickserv->Bot(), &commandnsungroup);

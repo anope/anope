@@ -92,10 +92,9 @@ class CSInvite : public Module
 	CommandCSInvite commandcsinvite;
 
  public:
-	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSInvite(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

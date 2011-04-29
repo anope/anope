@@ -12,20 +12,18 @@
 # include <libintl.h>
 #endif
 
-Module::Module(const Anope::string &mname, const Anope::string &creator)
+Module::Module(const Anope::string &modname, const Anope::string &, ModType modtype) : name(modname), type(modtype)
 {
-	this->name = mname; /* Our name */
-	this->type = THIRD;
 	this->handle = NULL;
-
 	this->permanent = false;
-
-	if (FindModule(this->name))
-		throw CoreException("Module already exists!");
-
 	this->created = Anope::CurTime;
-
 	this->SetVersion(Anope::Version());
+
+	if (ModuleManager::FindModule(this->name))
+		throw CoreException("Module already exists!");
+	
+	if (nothird && modtype == THIRD)
+		throw ModuleException("Third party modules may not be loaded");
 
 	Modules.push_back(this);
 
@@ -37,6 +35,8 @@ Module::Module(const Anope::string &mname, const Anope::string &creator)
 
 Module::~Module()
 {
+	if (DNSEngine)
+		DNSEngine->Cleanup(this);
 	/* Detach all event hooks for this module */
 	ModuleManager::DetachAll(this);
 	/* Clear any active callbacks this module has */
@@ -45,11 +45,6 @@ Module::~Module()
 	std::list<Module *>::iterator it = std::find(Modules.begin(), Modules.end(), this);
 	if (it != Modules.end())
 		Modules.erase(it);
-}
-
-void Module::SetType(MODType ntype)
-{
-	this->type = ntype;
 }
 
 void Module::SetPermanent(bool state)

@@ -187,10 +187,9 @@ class MSRead : public Module
 	CommandMSRead commandmsread;
 
  public:
-	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

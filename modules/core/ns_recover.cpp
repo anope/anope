@@ -127,10 +127,9 @@ class NSRecover : public Module
 	CommandNSRecover commandnsrecover;
 
  public:
-	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

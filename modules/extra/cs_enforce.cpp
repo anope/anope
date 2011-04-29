@@ -216,10 +216,9 @@ class CSEnforce : public Module
 	CommandCSEnforce commandcsenforce;
 
  public:
-	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

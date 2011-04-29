@@ -12,10 +12,9 @@
 class ENone : public Module
 {
  public:
-	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ENone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(ENCRYPTION);
 
 		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
 		ModuleManager::Attach(i, this, 3);
@@ -63,7 +62,7 @@ class ENone : public Module
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (!this->name.equals_ci(Config->EncModuleList.front()))
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				enc_encrypt(password, nc->pass);
 			return EVENT_ALLOW;
 		}

@@ -11,8 +11,6 @@ Base::~Base()
 	{
 		(*it)->Invalidate();
 	}
-
-	FOREACH_MOD(I_OnObjectDestroy, OnObjectDestroy(this));
 }
 
 void Base::AddReference(dynamic_reference_base *r)
@@ -23,5 +21,12 @@ void Base::AddReference(dynamic_reference_base *r)
 void Base::DelReference(dynamic_reference_base *r)
 {
 	this->References.erase(r);
+}
+
+void Base::operator delete(void *ptr)
+{
+	Base *b = static_cast<Base *>(ptr);
+	FOREACH_MOD(I_OnDeleteObject, OnDeleteObject(b));
+	::operator delete(b);
 }
 

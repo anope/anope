@@ -98,10 +98,9 @@ class CSBan : public Module
 	CommandCSBan commandcsban;
 
  public:
-	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandcsban("BAN")
+	CSBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsban("BAN")
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

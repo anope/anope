@@ -156,10 +156,9 @@ class MSDel : public Module
 	CommandMSDel commandmsdel;
 
  public:
-	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

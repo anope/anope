@@ -82,7 +82,8 @@ class InspIRCdProto : public InspIRCdTS6Proto
 		send_cmd("", "CAPAB END");
 		SendServer(Me);
 		send_cmd(Config->Numeric, "BURST");
-		send_cmd(Config->Numeric, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
+		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+		send_cmd(Config->Numeric, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	}
 };
 
@@ -731,7 +732,7 @@ class ProtoInspIRCd : public Module
 	InspIRCdProto ircd_proto;
 	Inspircd20IRCdMessage ircd_message;
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_endburst("ENDBURST", event_endburst),
 		message_time("TIME", event_time), message_rsquit("RSQUIT", event_rsquit),
 		message_svsmode("SVSMODE", OnMode), message_fhost("FHOST", event_chghost),
@@ -743,7 +744,6 @@ class ProtoInspIRCd : public Module
 		message_metadata("METADATA", event_metadata)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
@@ -753,6 +753,9 @@ class ProtoInspIRCd : public Module
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
 		ModuleManager::Attach(i, this, 2);
+
+		if (Config->Numeric.empty())
+			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &)

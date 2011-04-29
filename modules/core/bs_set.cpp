@@ -304,10 +304,9 @@ class BSSet : public Module
 	CommandBSSet commandbsset;
 
  public:
-	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!botserv)
 			throw ModuleException("BotServ is not loaded!");

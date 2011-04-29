@@ -341,7 +341,7 @@ class ModuleLDAP : public Module, public Pipe
 	std::map<Anope::string, LDAPService *> LDAPServices;
  public:
 
-	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ModuleLDAP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		me = this;
 

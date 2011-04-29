@@ -371,10 +371,9 @@ class DBPlain : public Module
 	/* Backup file names */
 	std::list<Anope::string> Backups;
  public:
-	DBPlain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	DBPlain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(DATABASE);
 
 		Implementation i[] = { I_OnReload, I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };
 		ModuleManager::Attach(i, this, 6);

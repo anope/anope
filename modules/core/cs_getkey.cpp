@@ -68,10 +68,9 @@ class CSGetKey : public Module
 	CommandCSGetKey commandcsgetkey;
 
  public:
-	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

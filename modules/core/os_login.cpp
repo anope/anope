@@ -70,10 +70,9 @@ class OSLogin : public Module
 	CommandOSLogin commandoslogin;
 
  public:
-	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

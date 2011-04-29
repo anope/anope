@@ -117,10 +117,9 @@ class NSGhost : public Module
 	CommandNSGhost commandnsghost;
 
  public:
-	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

@@ -155,10 +155,9 @@ class BotServCore : public Module
 	BanDataPurger bdpurger;
 
  public:
-	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), mybotserv(this), bdpurger(this)
+	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mybotserv(this), bdpurger(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		ModuleManager::RegisterService(&this->mybotserv);
 
@@ -180,7 +179,7 @@ class BotServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

@@ -188,10 +188,9 @@ class NSAccess : public Module
 	CommandNSAccess commandnsaccess;
 
  public:
-	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSAccess(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

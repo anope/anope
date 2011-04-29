@@ -112,7 +112,7 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 	}
 
  public:
-	ModuleAsynchCommands(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), Pipe(), AsynchCommandsService(this, "asynch_commands"), reset(false)
+	ModuleAsynchCommands(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), Pipe(), AsynchCommandsService(this, "asynch_commands"), reset(false)
 	{
 		me = this;
 
@@ -120,7 +120,7 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 
 		main_mutex.Lock();
 
-		Implementation i[] = { I_OnObjectDestroy, I_OnPreCommand };
+		Implementation i[] = { I_OnDeleteObject, I_OnPreCommand };
 		ModuleManager::Attach(i, this, 2);
 
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
@@ -128,7 +128,7 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 		ModuleManager::RegisterService(this);
 	}
 	
-	void OnObjectDestroy(Base *b)
+	void OnDeleteObject(Base *b)
 	{
 		for (std::list<CommandMutex *>::iterator it = commands.begin(), it_end = commands.end(); it != it_end; ++it)
 		{

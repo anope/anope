@@ -339,7 +339,7 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), session_service("session")
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), session_service("session")
 	{
 		if (!DConfig.defaultlevel)
 			throw ModuleException("Invalid configuration settings");
@@ -347,7 +347,6 @@ class OSDefcon : public Module
 		me = this;
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, 9);

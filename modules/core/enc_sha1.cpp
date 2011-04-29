@@ -168,13 +168,12 @@ void SHA1Final(unsigned char digest[21], SHA1_CTX *context)
 class ESHA1 : public Module
 {
  public:
-	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ESHA1(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(ENCRYPTION);
 
-		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, 3);
+		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
@@ -191,13 +190,6 @@ class ESHA1 : public Module
 		Log(LOG_DEBUG_2) << "(enc_sha1) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
-	}
-
-	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
-	{
-		if (!hashm.equals_cs("sha1"))
-			return EVENT_CONTINUE;
-		return EVENT_STOP;
 	}
 
 	EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
@@ -218,10 +210,7 @@ class ESHA1 : public Module
 		this->OnEncrypt(password, buf);
 		if (nc->pass.equals_cs(buf))
 		{
-			/* when we are NOT the first module in the list,
-			 * we want to re-encrypt the pass with the new encryption
-			 */
-			if (!this->name.equals_ci(Config->EncModuleList.front()))
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				enc_encrypt(password, nc->pass);
 			return EVENT_ALLOW;
 		}

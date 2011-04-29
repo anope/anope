@@ -18,8 +18,6 @@ ConfigurationFile services_conf("services.conf", false); // Services configurati
 ServerConfig *Config = NULL;
 
 static Anope::string Modules;
-static Anope::string EncModules;
-static Anope::string DBModules;
 static Anope::string UlineServers;
 static Anope::string OSNotifications;
 static Anope::string BSDefaults;
@@ -200,8 +198,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 
 	/* Modules Autoload building... :P */
 	this->ModulesAutoLoad = BuildStringList(Modules);
-	this->EncModuleList = BuildStringList(EncModules);
-	this->DBModuleList = BuildStringList(DBModules);
 
 	if (this->LimitSessions)
 	{
@@ -1003,7 +999,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"serverinfo", "name", "", new ValueContainerString(&conf->ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "description", "", new ValueContainerString(&conf->ServerDesc), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "localhost", "", new ValueContainerString(&conf->LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
-		{"serverinfo", "type", "", new ValueContainerString(&conf->IRCDModule), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "id", "", new ValueContainerString(&conf->Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "ident", "", new ValueContainerString(&conf->ServiceUser), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "hostname", "", new ValueContainerString(&conf->ServiceHost), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
@@ -1013,10 +1008,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "nicklen", "31", new ValueContainerUInt(&conf->NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
-		{"options", "encryption", "", new ValueContainerString(&EncModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
-		{"options", "database", "", new ValueContainerString(&DBModules), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"options", "socketengine", "", new ValueContainerString(&conf->SocketEngine), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&conf->UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&conf->UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&conf->UserKey3), DT_LUINTEGER, NoValidation},

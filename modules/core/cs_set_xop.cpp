@@ -28,7 +28,7 @@ class CommandCSSetXOP : public Command
 		User *u = source.u;
 		ChannelInfo *ci = source.ci;
 
-		if (!FindModule("cs_xop"))
+		if (!ModuleManager::FindModule("cs_xop"))
 		{
 			source.Reply(_("xOP system is not available."), "XOP");
 			return MOD_CONT;
@@ -134,10 +134,9 @@ class CSSetXOP : public Module
 	CommandCSSASetXOP commandcssasetxop;
 
  public:
-	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

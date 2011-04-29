@@ -149,10 +149,9 @@ class CSSuspend : public Module
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(chanserv->Bot(), &commandcssuspend);
 		this->AddCommand(chanserv->Bot(), &commandcsunsuspend);

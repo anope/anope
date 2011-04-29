@@ -86,10 +86,9 @@ class ModuleDNSBL : public Module
 	bool add_to_akill;
 
  public:
-	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	ModuleDNSBL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(SUPPORTED);
 
 		Implementation i[] = { I_OnReload, I_OnUserConnect };
 		ModuleManager::Attach(i, this, 2);

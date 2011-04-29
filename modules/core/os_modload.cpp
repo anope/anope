@@ -27,13 +27,6 @@ class CommandOSModLoad : public Command
 		User *u = source.u;
 		const Anope::string &mname = params[0];
 
-		Module *m = FindModule(mname);
-		if (m)
-		{
-			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
-			return MOD_CONT;
-		}
-
 		ModuleReturn status = ModuleManager::LoadModule(mname, u);
 		if (status == MOD_ERR_OK)
 		{
@@ -43,10 +36,12 @@ class CommandOSModLoad : public Command
 			/* If a user is loading this module, then the core databases have already been loaded
 			 * so trigger the event manually
 			 */
-			m = FindModule(mname);
+			Module *m = ModuleManager::FindModule(mname);
 			if (m)
 				m->OnPostLoadDatabases();
 		}
+		else if (status == MOD_ERR_EXISTS)
+			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
 		else
 			source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
 
@@ -73,10 +68,9 @@ class OSModLoad : public Module
 	CommandOSModLoad commandosmodload;
 
  public:
-	OSModLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSModLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 		this->SetPermanent(true);
 
 		if (!operserv)

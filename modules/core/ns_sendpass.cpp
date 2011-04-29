@@ -78,10 +78,9 @@ class NSSendPass : public Module
 	CommandNSSendPass commandnssendpass;
 
  public:
-	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

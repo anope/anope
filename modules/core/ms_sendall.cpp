@@ -65,10 +65,9 @@ class MSSendAll : public Module
 	CommandMSSendAll commandmssendall;
 
  public:
-	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

@@ -82,10 +82,9 @@ class CSSetRestricted : public Module
 	CommandCSSASetRestricted commandcssasetrestricted;
 
  public:
-	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

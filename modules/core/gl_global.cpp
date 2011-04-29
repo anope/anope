@@ -52,10 +52,9 @@ class GLGlobal : public Module
 	CommandGLGlobal commandglglobal;
 
  public:
-	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (Config->s_Global.empty())
 			throw ModuleException("Global is disabled");

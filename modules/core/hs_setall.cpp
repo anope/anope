@@ -125,10 +125,9 @@ class HSSetAll : public Module
 	CommandHSSetAll commandhssetall;
 
  public:
-	HSSetAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSSetAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

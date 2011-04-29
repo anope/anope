@@ -79,10 +79,9 @@ class BSBotList : public Module
 	CommandBSBotList commandbsbotlist;
 
  public:
-	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!botserv)
 			throw ModuleException("BotServ is not loaded!");

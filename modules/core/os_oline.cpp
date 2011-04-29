@@ -73,16 +73,15 @@ class OSOLine : public Module
 	CommandOSOLine commandosoline;
 
  public:
-	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
-		if (!ircd->omode)
+		if (!ircd || !ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(operserv->Bot(), &commandosoline);
 	}

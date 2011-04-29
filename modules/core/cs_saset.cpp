@@ -127,10 +127,9 @@ class CSSASet : public Module
 	CommandCSSASet commandcssaset;
 
  public:
-	CSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

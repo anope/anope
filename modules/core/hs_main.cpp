@@ -44,12 +44,11 @@ class HostServCore : public Module
 	MyHostServService myhostserv;
 
  public:
-	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), myhostserv(this)
+	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myhostserv(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
-		if (!ircd->vhost)
+		if (!ircd || !ircd->vhost)
 			throw ModuleException("Your IRCd does not suppor vhosts");
 
 		ModuleManager::RegisterService(&this->myhostserv);
@@ -72,7 +71,7 @@ class HostServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

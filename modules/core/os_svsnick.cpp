@@ -86,16 +86,15 @@ class OSSVSNick : public Module
 	CommandOSSVSNick commandossvsnick;
 
  public:
-	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
-		if (!ircd->svsnick)
+		if (!ircd || !ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(operserv->Bot(), &commandossvsnick);
 	}

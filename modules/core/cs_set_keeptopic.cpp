@@ -81,10 +81,9 @@ class CSSetKeepTopic : public Module
 	CommandCSSASetKeepTopic commandcssasetkeeptopic;
 
  public:
-	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

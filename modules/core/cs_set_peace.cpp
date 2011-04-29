@@ -80,10 +80,9 @@ class CSSetPeace : public Module
 	CommandCSSASetPeace commandcssasetpeace;
 
  public:
-	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

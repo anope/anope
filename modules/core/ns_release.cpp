@@ -105,10 +105,9 @@ class NSRelease : public Module
 	CommandNSRelease commandnsrelease;
 
  public:
-	NSRelease(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSRelease(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

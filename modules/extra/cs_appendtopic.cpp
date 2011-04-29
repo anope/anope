@@ -107,10 +107,9 @@ class CSAppendTopic : public Module
 	CommandCSAppendTopic commandcsappendtopic;
 
  public:
-	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("SGR");
-		this->SetType(SUPPORTED);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

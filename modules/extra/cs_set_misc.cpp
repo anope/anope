@@ -110,10 +110,9 @@ class CSSetMisc : public Module
 	}
 
  public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

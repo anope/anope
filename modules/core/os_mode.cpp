@@ -82,10 +82,9 @@ class OSMode : public Module
 	CommandOSMode commandosmode;
 
  public:
-	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

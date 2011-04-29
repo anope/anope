@@ -89,10 +89,9 @@ class BSAssign : public Module
 	CommandBSAssign commandbsassign;
 
  public:
-	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!botserv)
 			throw ModuleException("BotServ is not loaded!");

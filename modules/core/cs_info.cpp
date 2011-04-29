@@ -136,10 +136,9 @@ class CSInfo : public Module
 	CommandCSInfo commandcsinfo;
 
  public:
-	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

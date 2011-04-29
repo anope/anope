@@ -66,10 +66,9 @@ class OSStaff : public Module
 	CommandOSStaff commandosstaff;
 
  public:
-	OSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

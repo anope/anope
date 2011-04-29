@@ -171,10 +171,9 @@ class NSInfo : public Module
 	CommandNSInfo commandnsinfo;
 
  public:
-	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

@@ -95,13 +95,12 @@ class MSRSend : public Module
 	CommandMSRSend commandmsrsend;
 
  public:
-	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		if (!Config->MSMemoReceipt)
 			throw ModuleException("Invalid value for memoreceipt");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

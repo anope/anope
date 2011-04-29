@@ -188,13 +188,7 @@ class CommandNSSetPassword : public Command
 			return MOD_CONT;
 		}
 
-		if (enc_encrypt(param, u->Account()->pass) < 0)
-		{
-			Log() << "Failed to encrypt password for " << u->Account()->display << " (set)";
-			source.Reply(_(NICK_SASET_PASSWORD_FAILED));
-			return MOD_CONT;
-		}
-
+		enc_encrypt(param, u->Account()->pass);
 		Anope::string tmp_pass;
 		if (enc_decrypt(u->Account()->pass, tmp_pass) == 1)
 			source.Reply(_(NICK_SASET_PASSWORD_CHANGED_TO), u->Account()->display.c_str(), tmp_pass.c_str());
@@ -227,10 +221,9 @@ class NSSet : public Module
 	CommandNSSetPassword commandnssetpassword;
 
  public:
-	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

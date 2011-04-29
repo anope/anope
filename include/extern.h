@@ -74,8 +74,8 @@ E ConfigurationFile services_conf;
 E ServerConfig *Config;
 
 /**** encrypt.c ****/
-E int enc_encrypt(const Anope::string &src, Anope::string &dest);
-E int enc_decrypt(const Anope::string &src, Anope::string &dest);
+E void enc_encrypt(const Anope::string &src, Anope::string &dest);
+E bool enc_decrypt(const Anope::string &src, Anope::string &dest);
 
 /**** hostserv.c  ****/
 

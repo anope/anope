@@ -27,20 +27,14 @@ class CommandOSModUnLoad : public Command
 		User *u = source.u;
 		const Anope::string &mname = params[0];
 
-		Module *m = FindModule(mname);
+		Module *m = ModuleManager::FindModule(mname);
 		if (!m)
 		{
 			source.Reply(_("Module \002%s\002 isn't loaded."), mname.c_str());
 			return MOD_CONT;
 		}
 		
-		if (!m->handle)
-		{
-			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
-			return MOD_CONT;
-		}
-	
-		if (m->GetPermanent() || m->type == PROTOCOL)
+		if (!m->handle || m->GetPermanent() || m->type == PROTOCOL)
 		{
 			source.Reply(_("Unable to remove module \002%s\002"), m->name.c_str());
 			return MOD_CONT;
@@ -81,10 +75,9 @@ class OSModUnLoad : public Module
 	CommandOSModUnLoad commandosmodunload;
 
  public:
-	OSModUnLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSModUnLoad(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 		this->SetPermanent(true);
 
 		if (!operserv)

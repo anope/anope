@@ -1096,7 +1096,7 @@ class ProtoUnreal : public Module
 	}
 
  public:
-	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoUnreal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_away("6", OnAway),
 		message_join("C", OnJoin),
 		message_kick("H", OnKick), message_kill(".", OnKill),
@@ -1123,7 +1123,6 @@ class ProtoUnreal : public Module
 		message_stats("2", OnStats), message_time(">", OnTime), message_version("+", OnVersion)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);

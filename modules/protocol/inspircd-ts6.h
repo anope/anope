@@ -173,7 +173,8 @@ class InspIRCdTS6Proto : public IRCDProto
 	{
 		SendServer(Me);
 		send_cmd(Config->Numeric, "BURST");
-		send_cmd(Config->Numeric, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
+		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+		send_cmd(Config->Numeric, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	}
 
 	/* SVSHOLD - set */

@@ -54,10 +54,9 @@ class MSHelp : public Module
 	CommandMSHelp commandmshelp;
 
  public:
-	MSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

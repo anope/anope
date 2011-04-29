@@ -88,10 +88,9 @@ class MSCheck : public Module
 	CommandMSCheck commandmscheck;
 
  public:
-	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

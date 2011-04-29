@@ -59,10 +59,9 @@ class OSReload : public Module
 	CommandOSReload commandosreload;
 
  public:
-	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

@@ -171,10 +171,9 @@ class NSAList : public Module
 	CommandNSAList commandnsalist;
 
  public:
-	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(nickserv->Bot(), &commandnsalist);
 	}

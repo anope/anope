@@ -71,10 +71,9 @@ class CSSetDescription : public Module
 	CommandCSSASetDescription commandcssasetdescription;
 
  public:
-	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

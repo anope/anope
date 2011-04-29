@@ -457,16 +457,15 @@ class OSSNLine : public Module
 	CommandOSSNLine commandossnline;
 
  public:
-	OSSNLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSNLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
-		if (!ircd->snline)
+		if (!ircd || !ircd->snline)
 			throw ModuleException("Your IRCd does not support SNLine");
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(operserv->Bot(), &commandossnline);
 	}

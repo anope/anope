@@ -1,6 +1,6 @@
 #include "module.h"
 #include "operserv.h"
-#include "sql.h"
+#include "../extra/sql.h"
 #include "os_session.h"
 
 static Anope::string ToString(const std::vector<Anope::string> &strings)
@@ -120,11 +120,10 @@ class DBMySQL : public Module
 		}
 	}
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), sqlinterface(this), SQL("mysql/main"), SessionInterface("session")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("mysql/main"), SessionInterface("session")
 	{
 		me = this;
 
-		this->SetType(DATABASE);
 
 		this->lastwarn = 0;
 		this->ro = false;

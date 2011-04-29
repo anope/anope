@@ -628,14 +628,13 @@ class ProtoPlexus : public Module
 	}
 
  public:
-	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoPlexus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_tmode("TMODE", event_tmode), message_bmask("BMASK", event_bmask),
 		message_pass("PASS", event_pass), message_tb("TBURST", event_tburst),
 		message_sid("SID", event_sid), message_encap("ENCAP", event_encap),
 		message_eob("EOB", event_eob)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
@@ -645,6 +644,9 @@ class ProtoPlexus : public Module
 
 		Implementation i[] = { I_OnServerSync };
 		ModuleManager::Attach(i, this, 1);
+
+		if (Config->Numeric.empty())
+			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");
 	}
 
 	void OnServerSync(Server *s)

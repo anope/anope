@@ -206,12 +206,11 @@ class NSCert : public Module
 	}
 
  public:
-	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
-		if (!ircd->certfp)
+		if (!ircd || !ircd->certfp)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
 		if (!nickserv)

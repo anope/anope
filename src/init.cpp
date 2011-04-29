@@ -334,18 +334,8 @@ void Init(int ac, char **av)
 	/* Initialize the socket engine */
 	SocketEngine::Init();
 
-	/* Add IRCD Protocol Module; exit if there are errors */
-	if (protocol_module_init())
-		throw FatalException("Unable to load protocol module");
-
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
-
-	/* Add Encryption Modules */
-	ModuleManager::LoadModuleList(Config->EncModuleList);
-
-	/* Add Database Modules */
-	ModuleManager::LoadModuleList(Config->DBModuleList);
 
 	DNSEngine = new DNSManager();
 
@@ -385,7 +375,7 @@ void Init(int ac, char **av)
 	write_pidfile();
 
 	/* Announce ourselves to the logfile. */
-	Log() << "Anope " << Anope::Version() << " (ircd protocol: " << ircd->name << ") starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
+	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 	start_time = Anope::CurTime;
 
 	/* Set signal handlers.  Catch certain signals to let us do things or
@@ -401,13 +391,20 @@ void Init(int ac, char **av)
 	Log(LOG_DEBUG) << "Loading Languages...";
 	InitLanguages();
 
-	/* load any custom modules */
-	if (!nothird)
-		ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
-
 	/* Initialize random number generator */
 	rand_init();
 	add_entropy_userkeys();
+
+	/* load modules */
+	ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
+
+	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
+	if (protocol == NULL)
+		throw FatalException("You must load a protocol module!");
+	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
+		throw FatalException("You must load at least one encryption module");
+	
+	Log() << "Using IRCd protocol " << protocol->name;
 
 	/* Load up databases */
 	Log() << "Loading databases...";

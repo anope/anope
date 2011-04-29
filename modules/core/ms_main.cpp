@@ -185,10 +185,9 @@ class MemoServCore : public Module
 	MyMemoServService mymemoserv;
 
  public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), mymemoserv(this)
+	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mymemoserv(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate };
 		ModuleManager::Attach(i, this, 4);
@@ -210,7 +209,7 @@ class MemoServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

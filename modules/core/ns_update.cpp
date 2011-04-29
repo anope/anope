@@ -51,10 +51,9 @@ class NSUpdate : public Module
 	CommandNSUpdate commandnsupdate;
 
  public:
-	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!nickserv)
 			throw ModuleException("NickServ is not loaded!");

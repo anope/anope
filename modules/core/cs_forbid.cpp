@@ -117,10 +117,9 @@ class CSForbid : public Module
 	CommandCSForbid commandcsforbid;
 
  public:
-	CSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

@@ -74,10 +74,9 @@ class MSCancel : public Module
 	CommandMSCancel commandmscancel;
 
  public:
-	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!memoserv)
 			throw ModuleException("MemoServ is not loaded!");

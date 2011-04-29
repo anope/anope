@@ -214,7 +214,7 @@ class ModuleXMLRPC : public Module
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
-	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), sslref("ssl"), xmlrpcinterface(this, "xmlrpc")
+	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("ssl"), xmlrpcinterface(this, "xmlrpc")
 	{
 		me = this;
 

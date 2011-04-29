@@ -315,13 +315,12 @@ void Decode(unsigned *output, const unsigned char *input, unsigned len)
 class EMD5 : public Module
 {
  public:
-	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	EMD5(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, ENCRYPTION)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(ENCRYPTION);
 
-		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, 3);
+		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
+		ModuleManager::Attach(i, this, 2);
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
@@ -338,13 +337,6 @@ class EMD5 : public Module
 		Log(LOG_DEBUG_2) << "(enc_md5) hashed password from [" << src << "] to [" << buf << "]";
 		dest = buf;
 		return EVENT_ALLOW;
-	}
-
-	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
-	{
-		if (!hashm.equals_cs("md5"))
-			return EVENT_CONTINUE;
-		return EVENT_STOP;
 	}
 
 	EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
@@ -368,7 +360,7 @@ class EMD5 : public Module
 			/* if we are NOT the first module in the list,
 			 * we want to re-encrypt the pass with the new encryption
 			 */
-			if (!this->name.equals_ci(Config->EncModuleList.front()))
+			if (ModuleManager::FindFirstOf(ENCRYPTION) != this)
 				enc_encrypt(password, nc->pass);
 			return EVENT_ALLOW;
 		}

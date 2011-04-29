@@ -95,10 +95,9 @@ class OSChanList : public Module
 	CommandOSChanList commandoschanlist;
 
  public:
-	OSChanList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSChanList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-	 	this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

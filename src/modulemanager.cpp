@@ -126,24 +126,6 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	return MOD_ERR_OK;
 }
 
-static bool IsOneOfModuleTypeLoaded(MODType mt)
-{
-	int pmods = 0;
-
-	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-		if ((*it)->type == mt)
-			++pmods;
-
-	/*
-	 * 2, because module constructors now add modules to the hash.. so 1 (original module)
-	 * and 2 (this module). -- w00t
-	 */
-	if (pmods == 2)
-		return true;
-
-	return false;
-}
-
 /* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593
  *
  * This function will take a pointer from either dlsym or GetProcAddress and cast it in
@@ -176,12 +158,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
 	if (ret != MOD_ERR_OK)
-	{
-		/* XXX: This used to assign filename here, but I don't think that was correct..
-		 * even if it was, it makes life very fucking difficult, so.
-		 */
 		return ret;
-	}
 
 	ano_modclearerr();
 
@@ -246,7 +223,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	else if (v.GetBuild() == Anope::VersionBuild())
 		Log(LOG_DEBUG) << "Module " << modname << " compiled against current version of Anope " << v.GetBuild();
 
-	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
+	if (m->type == PROTOCOL && ModuleManager::FindFirstOf(PROTOCOL) != m)
 	{
 		DeleteModule(m);
 		Log() << "You cannot load two protocol modules";
@@ -260,13 +237,38 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 
 ModuleReturn ModuleManager::UnloadModule(Module *m, User *u)
 {
+	if (!m)
+		return MOD_ERR_PARAMS;
+
 	FOREACH_MOD(I_OnModuleUnload, OnModuleUnload(u, m));
 
-	if (DNSEngine)
-		DNSEngine->Cleanup(m);
+	return DeleteModule(m);
+}
 
-	DeleteModule(m);
-	return MOD_ERR_OK;
+Module *ModuleManager::FindModule(const Anope::string &name)
+{
+	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	{
+		Module *m = *it;
+
+		if (m->name.equals_ci(name))
+			return m;
+	}
+
+	return NULL;
+}
+
+Module *ModuleManager::FindFirstOf(ModType type)
+{
+	for (std::list<Module *>::const_iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+	{
+		Module *m = *it;
+
+		if (m->type == type)
+			return m;
+	}
+
+	return NULL;
 }
 
 void ModuleManager::RequireVersion(int major, int minor, int patch, int build)
@@ -298,10 +300,10 @@ void ModuleManager::RequireVersion(int major, int minor, int patch, int build)
 	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + "-" + build + " - this is " + Anope::Version());
 }
 
-void ModuleManager::DeleteModule(Module *m)
+ModuleReturn ModuleManager::DeleteModule(Module *m)
 {
 	if (!m || !m->handle)
-		return;
+		return MOD_ERR_PARAMS;
 
 	ano_module_t handle = m->handle;
 	Anope::string filename = m->filename;
@@ -322,6 +324,8 @@ void ModuleManager::DeleteModule(Module *m)
 
 	if (!filename.empty())
 		DeleteFile(filename.c_str());
+	
+	return MOD_ERR_OK;
 }
 
 bool ModuleManager::Attach(Implementation i, Module *mod)

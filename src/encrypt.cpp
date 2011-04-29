@@ -14,26 +14,22 @@
 
 /******************************************************************************/
 
-/**
- * Encrypt string `src' of length `len', placing the result in buffer
- * `dest' of size `size'.  Returns 0 on success, -1 on error.
- **/
-int enc_encrypt(const Anope::string &src, Anope::string &dest)
+/** Encrypt the string src into dest
+ * @param src The source string
+ * @param dest The destination strnig
+ */
+void enc_encrypt(const Anope::string &src, Anope::string &dest)
 {
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnEncrypt, OnEncrypt(src, dest));
-	if (MOD_RESULT == EVENT_ALLOW)
-		return 0;
-	return -1;
 }
 
-/**
- * Decrypt encrypted string `src' into buffer `dest' of length `len'.
- * Returns 1 (not 0) on success, -1 if the encryption algorithm does not
- * allow decryption, and -1 if another failure occurred (e.g. destination
- * buffer too small).
- **/
-int enc_decrypt(const Anope::string &src, Anope::string &dest)
+/** Decrypt the encrypted string src into dest
+ * @param src The encrypted string
+ * @param desc The destination string
+ * @return true on success
+ */
+bool enc_decrypt(const Anope::string &src, Anope::string &dest)
 {
 	size_t pos = src.find(':');
 	if (pos == Anope::string::npos)
@@ -46,7 +42,8 @@ int enc_decrypt(const Anope::string &src, Anope::string &dest)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnDecrypt, OnDecrypt(hashm, src, dest));
 	if (MOD_RESULT == EVENT_ALLOW)
-		return 1;
-	return -1;
+		return true;
+
+	return false;
 }
 

@@ -575,10 +575,9 @@ class CSAKick : public Module
 	CommandCSAKick commandcsakick;
 
  public:
-	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

@@ -440,16 +440,15 @@ class OSSZLine : public Module
 	CommandOSSZLine commandosszline;
 
  public:
-	OSSZLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSSZLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
-		if (!ircd->szline)
+		if (!ircd || !ircd->szline)
 			throw ModuleException("Your IRCd does not support ZLINEs");
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");
 
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(operserv->Bot(), &commandosszline);
 	}

@@ -598,13 +598,12 @@ class ProtoBahamut : public Module
 	}
 
  public:
-	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_svsmode("SVSMODE", OnMode), message_cs("CS", event_cs), message_hs("HS", event_hs),
 		message_ms("MS", event_ms), message_ns("NS", event_ns), message_os("OS", event_os),
 		message_burst("BURST", event_burst)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);

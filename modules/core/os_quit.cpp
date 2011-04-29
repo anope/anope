@@ -49,10 +49,9 @@ class OSQuit : public Module
 	CommandOSQuit commandosquit;
 
  public:
-	OSQuit(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	OSQuit(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

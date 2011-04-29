@@ -69,10 +69,9 @@ class HSDelAll : public Module
 	CommandHSDelAll commandhsdelall;
 
  public:
-	HSDelAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSDelAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

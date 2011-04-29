@@ -159,10 +159,9 @@ class CSEntryMessage : public Module
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), commandentrymsg("ENTRYMSG")
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), commandentrymsg("ENTRYMSG")
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

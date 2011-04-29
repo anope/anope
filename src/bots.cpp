@@ -39,7 +39,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	{
 		LogInfo *l = Config->LogInfos[i];
 
-		if (!ircd->join2msg && !l->Inhabit)
+		if (ircd && !ircd->join2msg && !l->Inhabit)
 			continue;
 
 		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)

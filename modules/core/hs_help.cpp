@@ -44,10 +44,9 @@ class HSHelp : public Module
 	CommandHSHelp commandhshelp;
 
  public:
-	HSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSHelp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

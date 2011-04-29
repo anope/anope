@@ -88,10 +88,9 @@ class CSSetSecureFounder : public Module
 	CommandCSSASetSecureFounder commandcssasetsecurefounder;
 
  public:
-	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!chanserv)
 			throw ModuleException("ChanServ is not loaded!");

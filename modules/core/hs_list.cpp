@@ -124,10 +124,9 @@ class HSList : public Module
 	CommandHSList commandhslist;
 
  public:
-	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!hostserv)
 			throw ModuleException("HostServ is not loaded!");

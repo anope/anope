@@ -268,7 +268,7 @@ class ModuleXMLRPCMain : public Module
 	MyXMLRPCEvent stats;
 
  public:
-	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), xmlrpc("xmlrpc")
+	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), xmlrpc("xmlrpc")
 	{
 		if (!xmlrpc)
 			throw ModuleException("Unable to find xmlrpc reference, is m_xmlrpc loaded?");

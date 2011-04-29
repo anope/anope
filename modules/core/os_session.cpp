@@ -650,10 +650,9 @@ class OSSession : public Module
 	}
 
  public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), ss(this)
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), ss(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		if (!operserv)
 			throw ModuleException("OperServ is not loaded!");

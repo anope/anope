@@ -62,10 +62,9 @@ class CSStatus : public Module
 	CommandCSStatus commandcsstatus;
 
  public:
-	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator)
+	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		this->AddCommand(chanserv->Bot(), &commandcsstatus);
 	}

@@ -202,7 +202,8 @@ class InspIRCdProto : public IRCDProto
 		inspircd_cmd_pass(uplink_server->password);
 		SendServer(Me);
 		send_cmd("", "BURST");
-		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, Config->EncModuleList.begin()->c_str(), Anope::VersionBuildString().c_str());
+		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
+		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	}
 
 	/* CHGIDENT */
@@ -890,7 +891,7 @@ class ProtoInspIRCd : public Module
 	}
 
  public:
-	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator),
+	ProtoInspIRCd(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
 		message_endburst("ENDBURST", event_endburst), message_rsquit("RSQUIT", event_rsquit),
 		message_svsmode("SVSMODE", OnMode), message_chghost("CHGHOST", event_chghost),
 		message_chgident("CHGIDENT", event_chgident), message_chgname("CHGNAME", event_chgname),
@@ -900,7 +901,6 @@ class ProtoInspIRCd : public Module
 		message_idle("IDLE", event_idle), message_fjoin("FJOIN", OnSJoin)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(PROTOCOL);
 
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);

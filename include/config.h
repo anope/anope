@@ -342,9 +342,6 @@ class CoreExport ServerConfig
 
 	/** Below here is a list of variables which contain the config files values
 	 */
-	/* IRCd module in use */
-	Anope::string IRCDModule;
-
 	/* Host to connect to **/
 	Anope::string LocalHost;
 	/* List of uplink servers to try and connect to */
@@ -667,13 +664,6 @@ class CoreExport ServerConfig
 
 	/* List of modules to autoload */
 	std::list<Anope::string> ModulesAutoLoad;
-	/* Encryption modules */
-	std::list<Anope::string> EncModuleList;
-	/* Database modules */
-	std::list<Anope::string> DBModuleList;
-
-	/* The socket engine in use */
-	Anope::string SocketEngine;
 
 	/* User keys to use for generating random hashes for pass codes etc */
 	unsigned long UserKey1;

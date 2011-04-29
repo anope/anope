@@ -156,10 +156,9 @@ class NickServCore : public Module
 	ExpireCallback expires;
 
  public:
-	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator), mynickserv(this), expires(this)
+	NickServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mynickserv(this), expires(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetType(CORE);
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup, I_OnNickUpdate };
 		ModuleManager::Attach(i, this, 5);
@@ -181,7 +180,7 @@ class NickServCore : public Module
 		Anope::string module;
 		while (coreModules.GetToken(module))
 		{
-			Module *m = FindModule(module);
+			Module *m = ModuleManager::FindModule(module);
 			if (m != NULL)
 				ModuleManager::UnloadModule(m, NULL);
 		}

@@ -69,9 +69,14 @@ void Command::SetDesc(const Anope::string &d)
 	this->desc = d;
 }
 
+const Anope::string &Command::GetDesc() const
+{
+	return this->desc;
+}
+
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", this->name.c_str(), _(this->desc.c_str()));
+	source.Reply("    %-14s %s", this->name.c_str(), _(this->GetDesc().c_str()));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }

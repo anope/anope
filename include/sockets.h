@@ -234,9 +234,9 @@ class CoreExport BufferedSocket : public Socket
 {
  protected:
 	/* Things to be written to the socket */
-	std::string WriteBuffer;
+	Anope::string WriteBuffer;
 	/* Part of a message sent from the server, but not totally received */
-	std::string extrabuf;
+	Anope::string extrabuf;
 	/* How much data was received from this socket */
 	size_t RecvLen;
 

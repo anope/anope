@@ -31,7 +31,7 @@ class BotServBotInfo : public BotInfo
 		if (sep.GetToken(command) && sep.GetToken(param))
 		{
 			Command *c = FindCommand(this, command);
-			if (c)
+			if (c && !c->HasFlag(CFLAG_STRIP_CHANNEL))
 			{
 				if (ircdproto->IsChannelValid(param))
 				{

@@ -7,17 +7,6 @@ int32 TotalWritten = 0;
 
 SocketIO normalSocketIO;
 
-/** Trims all the \r and \ns from the begining and end of a string
- * @param buffer The buffer to trim
- */
-static void TrimBuf(std::string &buffer)
-{
-	while (!buffer.empty() && (buffer[0] == '\r' || buffer[0] == '\n'))
-		buffer.erase(buffer.begin());
-	while (!buffer.empty() && (buffer[buffer.length() - 1] == '\r' || buffer[buffer.length() - 1] == '\n'))
-		buffer.erase(buffer.length() - 1);
-}
-
 /** Construct the object, sets everything to 0
  */
 sockaddrs::sockaddrs()
@@ -459,19 +448,19 @@ bool BufferedSocket::ProcessRead()
 	if (RecvLen <= 0)
 		return false;
 
-	std::string sbuffer = extrabuf;
-	sbuffer.append(tbuffer);
-	extrabuf.clear();
+	Anope::string sbuffer = this->extrabuf;
+	sbuffer += tbuffer;
+	this->extrabuf.clear();
 	size_t lastnewline = sbuffer.rfind('\n');
-	if (lastnewline == std::string::npos)
+	if (lastnewline == Anope::string::npos)
 	{
-		extrabuf = sbuffer;
+		this->extrabuf = sbuffer;
 		return true;
 	}
-	if (lastnewline < sbuffer.size() - 1)
+	if (lastnewline < sbuffer.length() - 1)
 	{
-		extrabuf = sbuffer.substr(lastnewline);
-		TrimBuf(extrabuf);
+		this->extrabuf = sbuffer.substr(lastnewline);
+		this->extrabuf.trim();
 		sbuffer = sbuffer.substr(0, lastnewline);
 	}
 
@@ -480,13 +469,9 @@ bool BufferedSocket::ProcessRead()
 	Anope::string tbuf;
 	while (stream.GetToken(tbuf))
 	{
-		std::string tmp_tbuf = tbuf.str();
-		TrimBuf(tmp_tbuf);
-		tbuf = tmp_tbuf;
-
-		if (!tbuf.empty())
-			if (!Read(tbuf))
-				return false;
+		tbuf.trim();
+		if (!tbuf.empty() && !Read(tbuf))
+			return false;
 	}
 
 	return true;
@@ -542,7 +527,7 @@ void BufferedSocket::Write(const char *message, ...)
  */
 void BufferedSocket::Write(const Anope::string &message)
 {
-	WriteBuffer.append(message.str() + "\r\n");
+	this->WriteBuffer += message + "\r\n";
 	SocketEngine::MarkWritable(this);
 }
 
@@ -559,7 +544,7 @@ size_t BufferedSocket::ReadBufferLen() const
  */
 size_t BufferedSocket::WriteBufferLen() const
 {
-	return WriteBuffer.length();
+	return this->WriteBuffer.length();
 }
 
 /** Constructor

@@ -27,7 +27,7 @@ class CommandOSModInfo : public Command
 
 			if (c->module && c->module->name.equals_ci(mod_name) && c->service)
 			{
-				source.Reply(_("Providing command: %\002%s %s\002"), c->service->nick.c_str(), c->name.c_str());
+				source.Reply(_("Providing command: \002%s %s\002"), c->service->nick.c_str(), c->name.c_str());
 			}
 		}
 	}

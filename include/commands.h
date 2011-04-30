@@ -110,6 +110,11 @@ class CoreExport Command : public Flags<CommandFlag>, public Base
 	void SetDesc(const Anope::string &d);
 
  public:
+ 	/** Get the command description
+	 * @return The commands description
+	 */
+ 	const Anope::string &GetDesc() const;
+
 	/** Execute this command.
 	 * @param source The source
 	 * @param params Command parameters

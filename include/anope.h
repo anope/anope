@@ -174,6 +174,17 @@ namespace Anope
 		inline void erase(size_type pos = 0, size_type n = std::string::npos) { this->_string.erase(pos, n); }
 
 		/**
+		 * Trim leading and trailing white spaces from the string.
+		 */
+		inline void trim()
+		{
+			while (!this->_string.empty() && isspace(this->_string[0]))
+				this->_string.erase(this->_string.begin());
+			while (!this->_string.empty() && isspace(this->_string[this->_string.length() - 1]))
+				this->_string.erase(this->_string.length() - 1);
+		}
+
+		/**
 		 * Clears the string.
 		 */
 		inline void clear() { this->_string.clear(); }

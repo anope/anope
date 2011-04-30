@@ -313,6 +313,17 @@ void do_server(const Anope::string &source, const Anope::string &servername, uns
 	FOREACH_MOD(I_OnNewServer, OnNewServer(newserver));
 }
 
+static inline char nextID(char &c)
+{
+	if (c == 'Z')
+		c = '0';
+	else if (c != '9')
+		++c;
+	else
+		c = 'A';
+	return c;
+}
+
 /** Recieve the next UID in our list
  * @return The UID
  */
@@ -322,22 +333,11 @@ const Anope::string ts6_uid_retrieve()
 		return "";
 
 	static Anope::string current_uid = "AAAAAA";
-	static unsigned current_len = current_uid.length() - 1;
 
 	while (finduser(Config->Numeric + current_uid) != NULL)
 	{
-		char &curChar = current_uid[current_len];
-		if (curChar == 'Z')
-			curChar = '0';
-		else if (curChar != '9')
-			++curChar;
-		else
-		{
-			curChar = 'A';
-			if (--current_len == 0)
-				current_len = current_uid.length();
-		}
-			
+		int current_len = current_uid.length() - 1;
+		while (current_len >= 0 && nextID(current_uid[current_len--]) == 'A');
 	}
 
 	return Config->Numeric + current_uid;
@@ -352,22 +352,11 @@ const Anope::string ts6_sid_retrieve()
 		return "";
 
 	static Anope::string current_sid = Config->Numeric;
-	static unsigned current_len = current_sid.length() - 1;
 
 	while (Server::Find(current_sid) != NULL)
 	{
-		char &curChar = current_sid[current_len];
-		if (curChar == 'Z')
-			curChar = '0';
-		else if (curChar != '9')
-			++curChar;
-		else
-		{
-			curChar = 'A';
-			if (--current_len == 0)
-				current_len = current_sid.length();
-		}
-			
+		int current_len = current_sid.length() - 1;
+		while (current_len >= 0 && nextID(current_sid[current_len--]) == 'A');
 	}
 
 	return current_sid;

@@ -50,10 +50,10 @@ class AccessListCallback : public NumberList
 		if (source.ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(_("  %3d   %s  %s"), Number + 1, xop.c_str(), access->mask.c_str());
+			source.Reply(_("  %3d   %s  %s"), Number + 1, xop.c_str(), access->GetMask().c_str());
 		}
 		else
-			source.Reply(_("  %3d  %4d  %s"), Number + 1, access->level, access->mask.c_str());
+			source.Reply(_("  %3d  %4d  %s"), Number + 1, access->level, access->GetMask().c_str());
 	}
 };
 
@@ -92,10 +92,10 @@ class AccessViewCallback : public AccessListCallback
 		if (ci->HasFlag(CI_XOP))
 		{
 			Anope::string xop = get_xop_level(access->level);
-			source.Reply(_(CHAN_ACCESS_VIEW_XOP_FORMAT), Number + 1, xop.c_str(), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(_(CHAN_ACCESS_VIEW_XOP_FORMAT), Number + 1, xop.c_str(), access->GetMask().c_str(), access->creator.c_str(), timebuf.c_str());
 		}
 		else
-			source.Reply(_(CHAN_ACCESS_VIEW_AXS_FORMAT), Number + 1, access->level, access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+			source.Reply(_(CHAN_ACCESS_VIEW_AXS_FORMAT), Number + 1, access->level, access->GetMask().c_str(), access->creator.c_str(), timebuf.c_str());
 	}
 };
 
@@ -151,9 +151,9 @@ class AccessDelCallback : public NumberList
 
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + access->mask;
+			Nicks += ", " + access->GetMask();
 		else
-			Nicks = access->mask;
+			Nicks = access->GetMask();
 
 		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
@@ -218,7 +218,7 @@ class CommandCSAccess : public Command
 			}
 			if (access->level == level)
 			{
-				source.Reply(_("Access level for \002%s\002 on %s unchanged from \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
+				source.Reply(_("Access level for \002%s\002 on %s unchanged from \002%d\002."), access->GetMask().c_str(), ci->name.c_str(), level);
 				return MOD_CONT;
 			}
 			access->level = level;
@@ -226,7 +226,7 @@ class CommandCSAccess : public Command
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
 
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
-			source.Reply(_("Access level for \002%s\002 on %s changed to \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
+			source.Reply(_("Access level for \002%s\002 on %s changed to \002%d\002."), access->GetMask().c_str(), ci->name.c_str(), level);
 			return MOD_CONT;
 		}
 
@@ -241,7 +241,7 @@ class CommandCSAccess : public Command
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
-		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
+		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->GetMask().c_str(), ci->name.c_str(), level);
 
 		return MOD_CONT;
 	}
@@ -271,9 +271,9 @@ class CommandCSAccess : public Command
 				source.Reply(_(ACCESS_DENIED));
 			else
 			{
-				source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
+				source.Reply(_("\002%s\002 deleted from %s access list."), access->GetMask().c_str(), ci->name.c_str());
 				bool override = !check_access(u, ci, CA_ACCESS_CHANGE) && access->nc != u->Account();
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask << " from level " << access->level;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->GetMask() << " from level " << access->level;
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
@@ -305,7 +305,7 @@ class CommandCSAccess : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && !Anope::Match(access->mask, nick))
+				if (!nick.empty() && !Anope::Match(access->GetMask(), nick))
 					continue;
 
 				if (!SentHeader)
@@ -347,7 +347,7 @@ class CommandCSAccess : public Command
 			{
 				ChanAccess *access = ci->GetAccess(i);
 
-				if (!nick.empty() && !Anope::Match(access->mask, nick))
+				if (!nick.empty() && !Anope::Match(access->GetMask(), nick))
 					continue;
 
 				if (!SentHeader)

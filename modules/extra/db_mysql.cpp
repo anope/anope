@@ -879,17 +879,17 @@ class DBMySQL : public Module
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(access->level) + ", '" + this->Escape(access->mask) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "')");
+		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(access->level) + ", '" + this->Escape(access->GetMask()) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "')");
 	}
 
 	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		this->RunQuery("DELETE FROM `anope_cs_access` WHERE `display` = '" + this->Escape(access->mask) + "' AND `channel` = '" + this->Escape(ci->name) + "'");
+		this->RunQuery("DELETE FROM `anope_cs_access` WHERE `display` = '" + this->Escape(access->GetMask()) + "' AND `channel` = '" + this->Escape(ci->name) + "'");
 	}
 
 	void OnAccessChange(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(access->level) + ", '" + this->Escape(access->mask) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+		this->RunQuery("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (" + stringify(access->level) + ", '" + this->Escape(access->GetMask()) + "', '" + this->Escape(ci->name) + "', " + stringify(Anope::CurTime) + ", '" + this->Escape(u->nick) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 	}
 
 	void OnAccessClear(ChannelInfo *ci, User *u)
@@ -1248,7 +1248,7 @@ static void SaveDatabases()
 		{
 			ChanAccess *access = ci->GetAccess(j);
 
-			me->RunQuery(Anope::string("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES(") + stringify(access->level) + ", '" + me->Escape(access->mask) + "', '" + me->Escape(ci->name) + "', " + stringify(access->last_seen) + ", '" + me->Escape(access->creator) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+			me->RunQuery(Anope::string("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES(") + stringify(access->level) + ", '" + me->Escape(access->GetMask()) + "', '" + me->Escape(ci->name) + "', " + stringify(access->last_seen) + ", '" + me->Escape(access->creator) + "') ON DUPLICATE KEY UPDATE level=VALUES(level), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 		}
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)

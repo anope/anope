@@ -557,46 +557,6 @@ enum AccessLevel
 	ACCESS_QOP = 10000
 };
 
-/* Channel info structures.  Stored similarly to the nicks, except that
- * the second character of the channel name, not the first, is used to
- * determine the list.  (Hashing based on the first character of the name
- * wouldn't get very far. ;) ) */
-
-/* Access levels for users. */
-struct ChanAccess
-{
-	int16 level;
-	Anope::string mask;	/* Mask of the access entry */
-	NickCore *nc;		/* NC of the entry, if the entry is a valid nickcore */
-	time_t last_seen;
-	Anope::string creator;
-};
-
-/** Flags for auto kick
- */
-enum AutoKickFlag
-{
-	/* Is by nick core, not mask */
-	AK_ISNICK
-};
-
-const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
-
-/* AutoKick data. */
-class AutoKick : public Flags<AutoKickFlag>
-{
- public:
- 	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
-	/* Only one of these can be in use */
-	Anope::string mask;
-	NickCore *nc;
-
-	Anope::string reason;
-	Anope::string creator;
-	time_t addtime;
-	time_t last_used;
-};
-
 /** Flags for badwords
  */
 enum BadWordType

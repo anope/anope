@@ -12,8 +12,26 @@
 #include "services.h"
 #include "modules.h"
 
-// Awesome channel access hack for superadmin and founder
-static ChanAccess dummy_access;
+ChanAccess::ChanAccess(const Anope::string &umask)
+{
+	NickAlias *na = findnick(umask);
+	if (na != NULL)
+		this->nc = na->nc;
+	else
+	{
+		this->nc = NULL;
+		this->mask = umask;
+		if (ircdproto->IsNickValid(this->mask))
+			this->mask += "!*@*";
+	}
+}
+
+const Anope::string &ChanAccess::GetMask()
+{
+	if (this->nc != NULL)
+		return this->nc->display;
+	return this->mask;
+}
 
 /** Default constructor
  * @param chname The channel name
@@ -90,7 +108,7 @@ ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 	{
 		ChanAccess *taccess = ci->GetAccess(i);
-		this->AddAccess(taccess->mask, taccess->level, taccess->creator, taccess->last_seen);
+		this->AddAccess(taccess->GetMask(), taccess->level, taccess->creator, taccess->last_seen);
 	}
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
@@ -159,9 +177,7 @@ ChannelInfo::~ChannelInfo()
 
 ChanAccess *ChannelInfo::AddAccess(const Anope::string &mask, int16 level, const Anope::string &creator, int32 last_seen)
 {
-	ChanAccess *new_access = new ChanAccess();
-	new_access->mask = mask;
-	new_access->nc = findcore(mask);
+	ChanAccess *new_access = new ChanAccess(mask);
 	new_access->level = level;
 	new_access->last_seen = last_seen;
 	if (!creator.empty())
@@ -205,9 +221,9 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 
 	if (u->isSuperAdmin || IsFounder(u, this))
 	{
+		static ChanAccess dummy_access("");
+		new(&dummy_access) ChanAccess(u->nick + "!*@*");
 		dummy_access.level = u->isSuperAdmin ? ACCESS_SUPERADMIN : ACCESS_FOUNDER;
-		dummy_access.mask = u->nick + "!*@*";
-		dummy_access.nc = NULL;
 		dummy_access.last_seen = Anope::CurTime;
 		return &dummy_access;
 	}
@@ -223,7 +239,7 @@ ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
 		if (level && level != taccess->level)
 			continue;
 		/* Access entry is a mask and we match it */
-		else if (!taccess->nc && (Anope::Match(u->nick, taccess->mask) || Anope::Match(u->GetDisplayedMask(), taccess->mask)))
+		else if (!taccess->nc && (Anope::Match(u->nick, taccess->GetMask()) || Anope::Match(u->GetDisplayedMask(), taccess->GetMask())))
 			;
 		/* Access entry is a nick core and we are identified for that account */
 		else if (taccess->nc && (u->IsIdentified() || (u->IsRecognized() && !this->HasFlag(CI_SECURE))) && u->Account() == taccess->nc) 
@@ -251,9 +267,9 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
 {
 	if (nc == this->founder)
 	{
+		static ChanAccess dummy_access("");
+		new(&dummy_access) ChanAccess(nc->display);
 		dummy_access.level = ACCESS_FOUNDER;
-		dummy_access.mask = nc->display;
-		dummy_access.nc = nc;
 		dummy_access.last_seen = Anope::CurTime;
 		return &dummy_access;
 	}
@@ -279,7 +295,12 @@ ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
 ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level, bool wildcard)
 {
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (wildcard ? Anope::Match(this->access[i]->mask, mask) : this->access[i]->mask.equals_ci(mask))
+		if (this->access[i]->nc != NULL)
+		{
+			if (wildcard ? Anope::Match(this->access[i]->nc->display, mask) : this->access[i]->nc->display.equals_ci(mask))
+				return this->access[i];
+		}
+		else if (wildcard ? Anope::Match(this->access[i]->GetMask(), mask) : this->access[i]->GetMask().equals_ci(mask))
 			return this->access[i];
 	return NULL;
 }

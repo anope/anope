@@ -815,7 +815,7 @@ class DBPlain : public Module
 			if (ci->HasFlag(CI_FORBIDDEN))
 				db_buffer << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
-				db_buffer << "MD ACCESS " << ci->GetAccess(k)->mask << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+				db_buffer << "MD ACCESS " << ci->GetAccess(k)->GetMask() << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
 				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<

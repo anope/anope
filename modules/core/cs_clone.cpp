@@ -109,7 +109,7 @@ public:
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
-				target_ci->AddAccess(access->mask, access->level, access->creator, access->last_seen);
+				target_ci->AddAccess(access->GetMask(), access->level, access->creator, access->last_seen);
 			}
 
 			source.Reply(_("All access entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());

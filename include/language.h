@@ -48,7 +48,7 @@
 #define NICK_ALREADY_REGISTERED		"Nickname \002%s\002 is already registered!"
 #define NICK_SET_SYNTAX			"SET \037option\037 \037parameters\037"
 #define NICK_SET_DISABLED		"Sorry, nickname option setting is temporarily disabled."
-#define NICK_SET_UNKNOWN_OPTION		"Unknown SET option \002%s\002."
+#define NICK_SET_UNKNOWN_OPTION		"Unknown SET option \002%s%s\002."
 #define NICK_SET_DISPLAY_CHANGED	"The new display is now \002%s\002."
 #define NICK_SASET_SYNTAX		"SASET \037nickname\037 \037option\037 \037parameters\037"
 #define NICK_SASET_DISPLAY_INVALID	"The new display for \002%s\002 MUST be a nickname of the nickname group!"

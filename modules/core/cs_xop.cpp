@@ -55,7 +55,7 @@ class XOPListCallback : public NumberList
 
 	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level)
 	{
-		source.Reply(_("  %3d  %s"), index, access->mask.c_str());
+		source.Reply(_("  %3d  %s"), index, access->GetMask().c_str());
 	}
 };
 
@@ -95,9 +95,9 @@ class XOPDelCallback : public NumberList
 
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + access->mask;
+			Nicks += ", " + access->GetMask();
 		else
-			Nicks = access->mask;
+			Nicks = access->GetMask();
 
 		FOREACH_MOD(I_OnAccessDel, OnAccessDel(source.ci, source.u, access));
 
@@ -181,12 +181,12 @@ class XOPBase : public Command
 		if (!change)
 		{
 			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
-			source.Reply(("\002%s\002 added to %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
+			source.Reply(("\002%s\002 added to %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
 		}
 		else
 		{
 			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
-			source.Reply(_("\002%s\002 moved to %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
+			source.Reply(_("\002%s\002 moved to %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
 		}
 
 		return MOD_CONT;
@@ -247,9 +247,9 @@ class XOPBase : public Command
 			else
 			{
 				bool override = ulev <= access->level;
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->GetMask();
 
-				source.Reply(_("\002%s\002 deleted from %s %s list."), access->mask.c_str(), ci->name.c_str(), this->name.c_str());
+				source.Reply(_("\002%s\002 deleted from %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
 
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 
@@ -300,7 +300,7 @@ class XOPBase : public Command
 
 				if (access->level != level)
 					continue;
-				else if (!nick.empty() && !Anope::Match(access->mask, nick))
+				else if (!nick.empty() && !Anope::Match(access->GetMask(), nick))
 					continue;
 
 				if (!SentHeader)

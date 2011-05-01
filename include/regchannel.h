@@ -68,6 +68,44 @@ const Anope::string ChannelInfoFlagStrings[] = {
 	"SIGNKICK", "SIGNKICK_LEVEL", "XOP", "SUSPENDED", "PERSIST", ""
 };
 
+class ChanAccess
+{
+	Anope::string mask;	/* Mask of the access entry */
+ public:
+	int16 level;
+	NickCore *nc;		/* NC of the entry, if the entry is a valid nickcore */
+	time_t last_seen;
+	Anope::string creator;
+	
+	ChanAccess(const Anope::string &umask);
+	const Anope::string &GetMask();
+};
+
+/** Flags for auto kick
+ */
+enum AutoKickFlag
+{
+	/* Is by nick core, not mask */
+	AK_ISNICK
+};
+
+const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
+
+/* AutoKick data. */
+class AutoKick : public Flags<AutoKickFlag>
+{
+ public:
+ 	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
+	/* Only one of these can be in use */
+	Anope::string mask;
+	NickCore *nc;
+
+	Anope::string reason;
+	Anope::string creator;
+	time_t addtime;
+	time_t last_used;
+};
+
 struct ModeLock
 {
 	bool set;

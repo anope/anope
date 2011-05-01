@@ -83,7 +83,9 @@ class CommandNSGroup : public Command
 		else
 		{
 			bool ok = false;
-			if (!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint))
+			if (!na && u->Account())
+				ok = true;
+			else if (!u->fingerprint.empty() && target->nc->FindCert(u->fingerprint))
 				ok = true;
 			else if (!pass.empty())
 			{

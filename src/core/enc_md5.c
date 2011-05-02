@@ -73,7 +73,7 @@ typedef void *POINTER;
 #define S43 15
 #define S44 21
 
-void MD5Transform (UINT4 [4], unsigned char [64]);
+void Ano_MD5Transform (UINT4 [4], unsigned char [64]);
 void Encode (unsigned char *, UINT4 *, unsigned int);
 void Decode (UINT4 *, unsigned char *, unsigned int);
 
@@ -120,7 +120,7 @@ Rotation is separate from addition to prevent recomputation.
 
 /* MD5 initialization. Begins an MD5 operation, writing a new context.
  */
-void MD5Init (context)
+void Ano_MD5Init (context)
 MD5_CTX *context;                                        /* context */
 {
   context->count[0] = context->count[1] = 0;
@@ -136,7 +136,7 @@ MD5_CTX *context;                                        /* context */
   operation, processing another message block, and updating the
   context.
  */
-void MD5Update (context, input, inputLen)
+void Ano_MD5Update (context, input, inputLen)
 MD5_CTX *context;                                        /* context */
 unsigned char *input;                                /* input block */
 unsigned int inputLen;                     /* length of input block */
@@ -159,10 +159,10 @@ unsigned int inputLen;                     /* length of input block */
   if (inputLen >= partLen) {
  memcpy
    ((POINTER)&context->buffer[index], (POINTER)input, partLen);
- MD5Transform (context->state, context->buffer);
+ Ano_MD5Transform (context->state, context->buffer);
 
  for (i = partLen; i + 63 < inputLen; i += 64)
-   MD5Transform (context->state, &input[i]);
+   Ano_MD5Transform (context->state, &input[i]);
 
  index = 0;
   }
@@ -178,7 +178,7 @@ unsigned int inputLen;                     /* length of input block */
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
   the message digest and zeroizing the context.
  */
-void MD5Final (digest, context)
+void Ano_MD5Final (digest, context)
 unsigned char digest[16];                         /* message digest */
 MD5_CTX *context;                                       /* context */
 {
@@ -192,10 +192,10 @@ MD5_CTX *context;                                       /* context */
 */
   index = (unsigned int)((context->count[0] >> 3) & 0x3f);
   padLen = (index < 56) ? (56 - index) : (120 - index);
-  MD5Update (context, PADDING, padLen);
+  Ano_MD5Update (context, PADDING, padLen);
 
   /* Append length (before padding) */
-  MD5Update (context, bits, 8);
+  Ano_MD5Update (context, bits, 8);
   /* Store state in digest */
   Encode (digest, context->state, 16);
 
@@ -206,7 +206,7 @@ MD5_CTX *context;                                       /* context */
 
 /* MD5 basic transformation. Transforms state based on block.
  */
-void MD5Transform (state, block)
+void Ano_MD5Transform (state, block)
 UINT4 state[4];
 unsigned char block[64];
 {
@@ -343,13 +343,13 @@ int md5_encrypt(const char *src, int len, char *dest, int size)
     if (size < 16)
 	return -1;
 
-    MD5Init(&context);
-    MD5Update(&context, src, len);
-    MD5Final(dest, &context);
+    Ano_MD5Init(&context);
+    Ano_MD5Update(&context, src, len);
+    Ano_MD5Final(dest, &context);
     
     if(debug) {
         memset(tmp,0,33);
-        binary_to_hex(dest,tmp,16);
+        binary_to_hex((unsigned char *) dest,tmp,16);
 	/* Dont log source if we were encrypting in place :) */
         if (memcmp(src, dest, 16) != 0) {
             alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 

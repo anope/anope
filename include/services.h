@@ -857,7 +857,7 @@ class CoreExport IRCDProto
  public:
 	virtual ~IRCDProto() { }
 
-	virtual void SendSVSNOOP(const Anope::string &, int) { }
+	virtual void SendSVSNOOP(const Server *, bool) { }
 	virtual void SendTopic(BotInfo *, Channel *) = 0;
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(User *, const XLine *) = 0;

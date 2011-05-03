@@ -91,9 +91,9 @@ void unreal_cmd_chgident(const Anope::string &nick, const Anope::string &vIdent)
 class UnrealIRCdProto : public IRCDProto
 {
 	/* SVSNOOP */
-	void SendSVSNOOP(const Anope::string &server, int set)
+	void SendSVSNOOP(const Server *server, bool set)
 	{
-		send_cmd("", "f %s %s", server.c_str(), set ? "+" : "-");
+		send_cmd("", "f %s %s", server->GetName().c_str(), set ? "+" : "-");
 	}
 
 	void SendAkillDel(const XLine *x)

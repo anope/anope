@@ -131,9 +131,9 @@ class BahamutIRCdProto : public IRCDProto
 	}
 
 	/* SVSNOOP */
-	void SendSVSNOOP(const Anope::string &server, int set)
+	void SendSVSNOOP(const Server *server, bool set)
 	{
-		send_cmd("", "SVSNOOP %s %s", server.c_str(), set ? "+" : "-");
+		send_cmd("", "SVSNOOP %s %s", server->GetName().c_str(), set ? "+" : "-");
 	}
 
 	/* SGLINE */

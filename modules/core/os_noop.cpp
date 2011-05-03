@@ -28,34 +28,37 @@ class CommandOSNOOP : public Command
 		const Anope::string &cmd = params[0];
 		const Anope::string &server = params[1];
 
-		if (cmd.equals_ci("SET"))
+		Server *s = Server::Find(server);
+		if (s == NULL)
+			source.Reply(_("Server %s does not exist."), server.c_str());
+		else if (cmd.equals_ci("SET"))
 		{
-			Anope::string reason;
-
 			/* Remove the O:lines */
-			ircdproto->SendSVSNOOP(server, 1);
+			ircdproto->SendSVSNOOP(s, true);
 
-			reason = "NOOP command used by " + u->nick;
-			Log(LOG_ADMIN, u, this) << "on " << server;
-			source.Reply(_("All O:lines of \002%s\002 have been removed."), server.c_str());
+			Log(LOG_ADMIN, u, this) << "SET on " << s->GetName();
+			source.Reply(_("All O:lines of \002%s\002 have been removed."), s->GetName().c_str());
 
+			Anope::string reason = "NOOP command used by " + u->nick;
 			/* Kill all the IRCops of the server */
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 			{
 				User *u2 = it->second;
 				++it;
 
-				if (u2 && u2->HasMode(UMODE_OPER) && Anope::Match(u2->server->GetName(), server, true))
+				if (u2 && u2->HasMode(UMODE_OPER) && u2->server == s)
 					u2->Kill(Config->s_OperServ, reason);
 			}
 		}
 		else if (cmd.equals_ci("REVOKE"))
 		{
-			ircdproto->SendSVSNOOP(server, 0);
-			source.Reply(_("All O:lines of \002%s\002 have been reset."), server.c_str());
+			Log(LOG_ADMIN, u, this) << "REVOKE on " << s->GetName();
+			ircdproto->SendSVSNOOP(s, false);
+			source.Reply(_("All O:lines of \002%s\002 have been reset."), s->GetName().c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
+
 		return MOD_CONT;
 	}
 
@@ -69,9 +72,7 @@ class CommandOSNOOP : public Command
 				"prevent them from rehashing the server (because this\n"
 				"would just cancel the effect).\n"
 				"\002NOOP REVOKE\002 makes all removed O:lines available again\n"
-				"on the given \002server\002.\n"
-				"\002Note:\002 The \002server\002 is not checked at all by the\n"
-				"Services."));
+				"on the given \002server\002.\n"));
 		return true;
 	}
 

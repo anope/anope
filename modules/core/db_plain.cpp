@@ -524,9 +524,7 @@ class DBPlain : public Module
 		{
 			for (unsigned j = 0, end = params.size(); j < end; ++j)
 			{
-				if (params[j].equals_ci("FORBIDDEN"))
-					na->SetFlag(NS_FORBIDDEN);
-				else if (params[j].equals_ci("NOEXPIRE"))
+				if (params[j].equals_ci("NOEXPIRE"))
 					na->SetFlag(NS_NO_EXPIRE);
 			}
 		}
@@ -579,10 +577,10 @@ class DBPlain : public Module
 				ci->last_topic_time = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 				ci->last_topic = params[2];
 			}
-			else if (key.equals_ci("FORBID"))
+			else if (key.equals_ci("SUSPEND"))
 			{
-				ci->forbidby = params[0];
-				ci->forbidreason = params[1];
+				ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(params[0]));
+				ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(params[1]));
 			}
 			else if (key.equals_ci("ACCESS"))
 			{
@@ -803,8 +801,13 @@ class DBPlain : public Module
 			db_buffer << endl;
 			if (ci->FlagCount())
 				db_buffer << "MD FLAGS " << ToString(ci->ToString()) << endl;
-			if (ci->HasFlag(CI_FORBIDDEN))
-				db_buffer << "MD FORBID " << ci->forbidby << " :" << ci->forbidreason << endl;
+			if (ci->HasFlag(CI_SUSPENDED))
+			{
+				Anope::string by, reason;
+				ci->GetExtRegular("suspend_by", by);
+				ci->GetExtRegular("suspend_reason", reason);
+				db_buffer << "MD SUSPEND " << by << " :" << reason << endl;
+			}
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
 				db_buffer << "MD ACCESS " << ci->GetAccess(k)->GetMask() << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)

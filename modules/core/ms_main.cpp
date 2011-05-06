@@ -39,29 +39,21 @@ class MyMemoServService : public MemoServService
 		return MemoServ;
 	}
 
- 	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan, bool &isforbid)
+ 	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan)
 	{
-		isforbid = false;
-
 		if (!target.empty() && target[0] == '#')
 		{
 			ischan = true;
 			ChannelInfo *ci = cs_findchan(target);
 			if (ci != NULL)
-			{
-				isforbid = ci->HasFlag(CI_FORBIDDEN);
 				return &ci->memos;
-			}
 		}
 		else
 		{
 			ischan = false;
 			NickAlias *na = findnick(target);
 			if (na != NULL)
-			{
-				isforbid = na->HasFlag(NS_FORBIDDEN);
 				return &na->nc->memos;
-			}
 		}
 
 		return NULL;
@@ -69,10 +61,10 @@ class MyMemoServService : public MemoServService
 
 	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force)
 	{
-		bool ischan, isforbid;
-		MemoInfo *mi = this->GetMemoInfo(target, ischan, isforbid);
+		bool ischan;
+		MemoInfo *mi = this->GetMemoInfo(target, ischan);
 
-		if (mi == NULL || isforbid == true)
+		if (mi == NULL)
 			return MEMO_INVALID_TARGET;
 
 		User *sender = finduser(source);

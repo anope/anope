@@ -195,7 +195,7 @@ class NSCert : public Module
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)
 			return;
-		if (na->HasFlag(NS_FORBIDDEN) || na->nc->HasFlag(NI_SUSPENDED))
+		if (na->nc->HasFlag(NI_SUSPENDED))
 			return;
 		if (!na->nc->FindCert(u->fingerprint))
 			return;

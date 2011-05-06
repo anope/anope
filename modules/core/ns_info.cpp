@@ -50,13 +50,6 @@ class CommandNSInfo : public Command
 			else
 				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		}
-		else if (na->HasFlag(NS_FORBIDDEN))
-		{
-			if (u->HasMode(UMODE_OPER) && !na->last_usermask.empty())
-				source.Reply(_(NICK_X_FORBIDDEN_OPER), nick.c_str(), na->last_usermask.c_str(), !na->last_realname.empty() ? na->last_realname.c_str() : _(NO_REASON));
-			else
-				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
-		}
 		else
 		{
 			bool nick_online = false, show_hidden = false;

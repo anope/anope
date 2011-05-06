@@ -46,8 +46,6 @@ static void ChanInfoUpdate(const SQLResult &res)
 		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 		ci->ClearFlags();
 		ci->FromString(BuildStringVector(res.Get(0, "flags")));
-		ci->forbidby = res.Get(0, "forbidby");
-		ci->forbidreason = res.Get(0, "forbidreason");
 		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
 		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
 

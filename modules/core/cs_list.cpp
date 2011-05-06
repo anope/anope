@@ -29,10 +29,9 @@ class CommandCSList : public Command
 
 		Anope::string pattern = params[0];
 		unsigned nchans;
-		char buf[BUFSIZE];
 		bool is_servadmin = u->HasCommand("chanserv/list");
 		int count = 0, from = 0, to = 0;
-		bool forbidden = false, suspended = false, channoexpire = false;
+		bool suspended = false, channoexpire = false;
 
 		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
@@ -69,8 +68,6 @@ class CommandCSList : public Command
 			spacesepstream keywords(params[1]);
 			while (keywords.GetToken(keyword))
 			{
-				if (keyword.equals_ci("FORBIDDEN"))
-					forbidden = true;
 				if (keyword.equals_ci("SUSPENDED"))
 					suspended = true;
 				if (keyword.equals_ci("NOEXPIRE"))
@@ -86,9 +83,7 @@ class CommandCSList : public Command
 		{
 			ChannelInfo *ci = it->second;
 
-			if (!is_servadmin && (ci->HasFlag(CI_PRIVATE) || ci->HasFlag(CI_FORBIDDEN) || ci->HasFlag(CI_SUSPENDED)))
-				continue;
-			if (forbidden && !ci->HasFlag(CI_FORBIDDEN))
+			if (!is_servadmin && (ci->HasFlag(CI_PRIVATE) || ci->HasFlag(CI_SUSPENDED)))
 				continue;
 			else if (suspended && !ci->HasFlag(CI_SUSPENDED))
 				continue;
@@ -103,14 +98,13 @@ class CommandCSList : public Command
 					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
 						noexpire_char = '!';
 
-					if (ci->HasFlag(CI_FORBIDDEN))
-						snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", ci->name.c_str());
-					else if (ci->HasFlag(CI_SUSPENDED))
-						snprintf(buf, sizeof(buf), "%-20s  [Suspended]", ci->name.c_str());
+					Anope::string buf;
+					if (ci->HasFlag(CI_SUSPENDED))
+						buf = Anope::printf("%-20s  [Suspended]", ci->name.c_str());
 					else
-						snprintf(buf, sizeof(buf), "%-20s  %s", ci->name.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
+						buf = Anope::printf("%-20s  %s", ci->name.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
 
-					source.Reply("  %c%s", noexpire_char, buf);
+					source.Reply("  %c%s", noexpire_char, buf.c_str());
 				}
 				++count;
 			}

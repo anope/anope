@@ -28,16 +28,11 @@ class CommandMSCancel : public Command
 
 		const Anope::string &nname = params[0];
 
-		bool ischan, isforbid;
-		MemoInfo *mi = memoserv->GetMemoInfo(nname, ischan, isforbid);
+		bool ischan;
+		MemoInfo *mi = memoserv->GetMemoInfo(nname, ischan);
 
 		if (mi == NULL)
-		{
-			if (isforbid)
-				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), nname.c_str());
-			else
-				source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nname.c_str());
-		}
+			source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		else
 		{
 			for (int i = mi->memos.size() - 1; i >= 0; --i)

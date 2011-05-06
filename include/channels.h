@@ -25,6 +25,8 @@ typedef std::list<UserContainer *> CUserList;
 
 enum ChannelFlag
 {
+	/* ChanServ is currently holding the channel */
+	CH_INHABIT,
 	/* Channel still exists when emptied */
 	CH_PERSIST,
 	/* If set the channel is syncing users (channel was just created) and it should not be deleted */
@@ -32,6 +34,8 @@ enum ChannelFlag
 	/* Is a services log channel */
 	CH_LOGCHAN
 };
+
+const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "CH_LOGCHAN", "" };
 
 class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 {

@@ -32,7 +32,6 @@ class CommandCSInfo : public Command
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
-		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 		this->SetDesc(_("Lists information about the named registered channel"));
 	}
 
@@ -45,16 +44,6 @@ class CommandCSInfo : public Command
 
 		bool has_auspex = u->IsIdentified() && u->HasPriv("chanserv/auspex");
 		bool show_all = false;
-
-		if (ci->HasFlag(CI_FORBIDDEN))
-		{
-			if (u->HasMode(UMODE_OPER) && !ci->forbidby.empty())
-				source.Reply(_(CHAN_X_FORBIDDEN_OPER), chan.c_str(), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : _(NO_REASON));
-			else
-				source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
-
-			return MOD_CONT;
-		}
 
 		/* Should we show all fields? Only for sadmins and identified users */
 		if (has_auspex || check_access(u, ci, CA_INFO))
@@ -106,7 +95,12 @@ class CommandCSInfo : public Command
 				source.Reply(_("      Expires on: %s"), do_strftime(ci->last_used + Config->CSExpire).c_str());
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
-			source.Reply(_("      Suspended: [%s] %s"), ci->forbidby.c_str(), !ci->forbidreason.empty() ? ci->forbidreason.c_str() : _(NO_REASON));
+		{
+			Anope::string by, reason;
+			ci->GetExtRegular("suspend_by", by);
+			ci->GetExtRegular("suspend_reason", reason);
+			source.Reply(_("      Suspended: [%s] %s"), by.c_str(), !reason.empty() ? reason.c_str() : _(NO_REASON));
+		}
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, show_all));
 

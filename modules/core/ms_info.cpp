@@ -40,11 +40,6 @@ class CommandMSInfo : public Command
 				source.Reply(_(NICK_X_NOT_REGISTERED), nname.c_str());
 				return MOD_CONT;
 			}
-			else if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), nname.c_str());
-				return MOD_CONT;
-			}
 			mi = &na->nc->memos;
 			hardmax = na->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
 		}

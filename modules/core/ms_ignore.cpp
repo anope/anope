@@ -37,15 +37,10 @@ class CommandMSIgnore : public Command
 			channel = u->nick;
 		}
 
-		bool ischan, isforbid;
-		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan, isforbid);
+		bool ischan;
+		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan);
 		if (!mi)
-		{
-			if (isforbid)
-				source.Reply(ischan ? _(CHAN_X_FORBIDDEN) : _(NICK_X_FORBIDDEN), channel.c_str());
-			else
-				source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), channel.c_str());
-		}
+			source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), channel.c_str());
 		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
 			source.Reply(_(ACCESS_DENIED));
 		else if (command.equals_ci("ADD") && !param.empty())

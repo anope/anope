@@ -76,12 +76,6 @@ class CommandHSSet : public Command
 		NickAlias *na = findnick(nick);
 		if ((na = findnick(nick)))
 		{
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
-				return MOD_CONT;
-			}
-
 			Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
 			na->hostinfo.SetVhost(vIdent, hostmask, u->nick);

@@ -37,20 +37,13 @@ class CommandCSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		/* You should not SUSPEND a FORBIDEN channel */
-		if (ci->HasFlag(CI_FORBIDDEN))
-		{
-			source.Reply(_("Channel \002%s\002 may not be registered."), ci->name.c_str());
-			return MOD_CONT;
-		}
-
 		if (readonly)
 			source.Reply(_(READ_ONLY_MODE));
 
 		ci->SetFlag(CI_SUSPENDED);
-		ci->forbidby = u->nick;
+		ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(u->nick));
 		if (!reason.empty())
-			ci->forbidreason = reason;
+			ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(u->nick));
 
 		if (c)
 		{
@@ -115,11 +108,14 @@ class CommandCSUnSuspend : public Command
 			return MOD_CONT;
 		}
 
-		Log(LOG_ADMIN, u, this, ci) << " was suspended for: " << (!ci->forbidreason.empty() ? ci->forbidreason : "No reason");
+		Anope::string by, reason;
+		ci->GetExtRegular("suspend_by", by);
+		ci->GetExtRegular("suspend_reason", reason);
+		Log(LOG_ADMIN, u, this, ci) << " which was suspended by " << by << " for: " << (!reason.empty() ? reason : "No reason");
 
 		ci->UnsetFlag(CI_SUSPENDED);
-		ci->forbidreason.clear();
-		ci->forbidby.clear();
+		ci->Shrink("suspend_by");
+		ci->Shrink("suspend_reason");
 
 		source.Reply(_("Channel \002%s\002 is now released."), ci->name.c_str());
 

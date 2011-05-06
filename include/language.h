@@ -19,15 +19,10 @@
 #define NICK_X_NOT_REGISTERED		"Nick \002%s\002 isn't registered."
 #define NICK_X_NOT_IN_USE		"Nick \002%s\002 isn't currently in use."
 #define NICK_X_NOT_ON_CHAN		"\002%s\002 is not currently on channel %s."
-#define NICK_X_FORBIDDEN		"Nick \002%s\002 may not be registered or used."
-#define NICK_X_FORBIDDEN_OPER		"Nick \002%s\002 has been forbidden by %s:\n" \
-						"%s"
-#define NICK_X_SUSPENDED			"Nick %s is currently suspended."
+#define NICK_X_SUSPENDED		"Nick %s is currently suspended."
+#define CHAN_X_SUSPENDED		"Channel %s is currently suspended."
 #define CHAN_X_NOT_REGISTERED		"Channel \002%s\002 isn't registered."
 #define CHAN_X_NOT_IN_USE		"Channel \002%s\002 doesn't exist."
-#define CHAN_X_FORBIDDEN		"Channel \002%s\002 may not be registered or used."
-#define CHAN_X_FORBIDDEN_OPER		"Channel \002%s\002 has been forbidden by %s:\n" \
-						"%s"
 #define NICK_IDENTIFY_REQUIRED		"Password authentication required for that command.\n" \
 						"Retry after typing \002%s%s IDENTIFY \037password\037\002."
 #define MAIL_X_INVALID			"\002%s\002 is not a valid e-mail address."

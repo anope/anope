@@ -24,31 +24,17 @@ class CommandNSList : public Command
 
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		/* SADMINS can search for nicks based on their NS_FORBIDDEN and NS_NO_EXPIRE
-		 * status. The keywords FORBIDDEN and NOEXPIRE represent these two states
-		 * respectively. These keywords should be included after the search pattern.
-		 * Multiple keywords are accepted and should be separated by spaces. Only one
-		 * of the keywords needs to match a nick's state for the nick to be displayed.
-		 * Forbidden nicks can be identified by "[Forbidden]" appearing in the last
-		 * seen address field. Nicks with NOEXPIRE set are preceeded by a "!". Only
-		 * SADMINS will be shown forbidden nicks and the "!" indicator.
-		 * Syntax for sadmins: LIST pattern [FORBIDDEN] [NOEXPIRE]
-		 * -TheShadow
-		 *
-		 * UPDATE: SUSPENDED keyword is now accepted as well.
-		 */
 		User *u = source.u;
 
 		Anope::string pattern = params[0];
 		const NickCore *mync;
 		unsigned nnicks;
-		char buf[BUFSIZE];
 		bool is_servadmin = u->IsServicesOper();
 		char noexpire_char = ' ';
 		int count = 0, from = 0, to = 0;
-		bool suspended, nsnoexpire, forbidden, unconfirmed;
+		bool suspended, nsnoexpire, unconfirmed;
 
-		suspended = nsnoexpire = forbidden = unconfirmed = false;
+		suspended = nsnoexpire = unconfirmed = false;
 
 		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
@@ -83,8 +69,6 @@ class CommandNSList : public Command
 			spacesepstream keywords(params[1]);
 			while (keywords.GetToken(keyword))
 			{
-				if (keyword.equals_ci("FORBIDDEN"))
-					forbidden = true;
 				if (keyword.equals_ci("NOEXPIRE"))
 					nsnoexpire = true;
 				if (keyword.equals_ci("SUSPENDED"))
@@ -101,12 +85,8 @@ class CommandNSList : public Command
 		{
 			NickAlias *na = it->second;
 
-			/* Don't show private and forbidden nicks to non-services admins. */
-			if (na->HasFlag(NS_FORBIDDEN) && !is_servadmin)
-				continue;
-			else if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
-				continue;
-			else if (forbidden && !na->HasFlag(NS_FORBIDDEN))
+			/* Don't show private nicks to non-services admins. */
+			if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
 				continue;
 			else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
 					continue;
@@ -118,7 +98,7 @@ class CommandNSList : public Command
 			/* We no longer compare the pattern against the output buffer.
 			 * Instead we build a nice nick!user@host buffer to compare.
 			 * The output is then generated separately. -TheShadow */
-			snprintf(buf, sizeof(buf), "%s!%s", na->nick.c_str(), !na->last_usermask.empty() && !na->HasFlag(NS_FORBIDDEN) ? na->last_usermask.c_str() : "*@*");
+			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_usermask.empty() ? na->last_usermask.c_str() : "*@*");
 			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
@@ -128,16 +108,14 @@ class CommandNSList : public Command
 					else
 						noexpire_char = ' ';
 					if (na->nc->HasFlag(NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
-						snprintf(buf, sizeof(buf), "%-20s  [Hostname Hidden]", na->nick.c_str());
-					else if (na->HasFlag(NS_FORBIDDEN))
-						snprintf(buf, sizeof(buf), "%-20s  [Forbidden]", na->nick.c_str());
+						buf = Anope::printf("%-20s  [Hostname Hidden]", na->nick.c_str());
 					else if (na->nc->HasFlag(NI_SUSPENDED))
-						snprintf(buf, sizeof(buf), "%-20s  [Suspended]", na->nick.c_str());
+						buf = Anope::printf("%-20s  [Suspended]", na->nick.c_str());
 					else if (na->nc->HasFlag(NI_UNCONFIRMED))
-						snprintf(buf, sizeof(buf), "%-20s  [Unconfirmed]", na->nick.c_str());
+						buf = Anope::printf("%-20s  [Unconfirmed]", na->nick.c_str());
 					else
-						snprintf(buf, sizeof(buf), "%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
-					source.Reply("   %c%s", noexpire_char, buf);
+						buf = Anope::printf("%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
+					source.Reply("   %c%s", noexpire_char, buf.c_str());
 				}
 				++count;
 			}
@@ -152,7 +130,7 @@ class CommandNSList : public Command
 	{
 		User *u = source.u;
 		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]\002\n"
+			source.Reply(_("Syntax: \002LIST \037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]\002\n"
 					" \n"
 					"Lists all registered nicknames which match the given\n"
 					"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
@@ -160,8 +138,8 @@ class CommandNSList : public Command
 					"with the \002NOEXPIRE\002 option set will have a \002!\002 appended to\n"
 					"the nickname for Services Operators.\n"
 					" \n"
-					"If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
-					"nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the\n"
+					"If the SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
+					"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
 					"NOEXPIRE flag set will be displayed. If multiple options are\n"
 					"given, all nicks matching at least one option will be displayed.\n"
 					"These options are limited to \037Services Operators\037.  \n"
@@ -203,7 +181,7 @@ class CommandNSList : public Command
 	{
 		User *u = source.u;
 		if (u->IsServicesOper())
-			SyntaxError(source, "LIST", _("LIST \037pattern\037 [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
+			SyntaxError(source, "LIST", _("LIST \037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 		else
 			SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));
 	}

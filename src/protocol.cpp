@@ -386,7 +386,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 	{
 		ChannelInfo *ci = cs_findchan(receiver);
 		/* Some paranoia checks */
-		if (ci && !ci->HasFlag(CI_FORBIDDEN) && ci->c)
+		if (ci && ci->c)
 		{
 			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, ci, message));
 		}
@@ -459,7 +459,7 @@ bool IRCdMessage::OnQuit(const Anope::string &source, const std::vector<Anope::s
 	Log(user, "quit") << "quit (Reason: " << (!reason.empty() ? reason : "no reason") << ")";
 
 	NickAlias *na = findnick(user->nick);
-	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
 		na->last_quit = reason;

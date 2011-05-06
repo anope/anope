@@ -31,8 +31,6 @@ class CommandNSGetPass : public Command
 
 		if (!(na = findnick(nick)))
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 			source.Reply(_(ACCESS_DENIED));
 		else

@@ -19,7 +19,6 @@ class CommandCSDrop : public Command
  public:
 	CommandCSDrop() : Command("DROP", 1, 1)
 	{
-		this->SetFlag(CFLAG_ALLOW_FORBIDDEN);
 		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetDesc(_("Cancel the registration of a channel"));
 	}
@@ -39,15 +38,9 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if (ci->HasFlag(CI_FORBIDDEN) && !u->HasCommand("chanserv/drop"))
-		{
-			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
-			return MOD_CONT;
-		}
-
 		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
 		{
-			source.Reply(_(CHAN_X_FORBIDDEN), chan.c_str());
+			source.Reply(_(CHAN_X_SUSPENDED), chan.c_str());
 			return MOD_CONT;
 		}
 
@@ -59,12 +52,6 @@ class CommandCSDrop : public Command
 
 		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
-
-		if (ircd->chansqline && ci->HasFlag(CI_FORBIDDEN))
-		{
-			XLine x(ci->name);
-			ircdproto->SendSQLineDel(&x);
-		}
 
 		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "founder: " << (ci->founder ? ci->founder->display : "none");

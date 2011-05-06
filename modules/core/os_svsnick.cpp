@@ -29,8 +29,6 @@ class CommandOSSVSNick : public Command
 		Anope::string newnick = params[1];
 		User *u2;
 
-		NickAlias *na;
-
 		/* Truncate long nicknames to Config->NickLen characters */
 		if (newnick.length() > Config->NickLen)
 		{
@@ -56,8 +54,6 @@ class CommandOSSVSNick : public Command
 			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
 		else if (finduser(newnick))
 			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
-		else if ((na = findnick(newnick)) && na->HasFlag(NS_FORBIDDEN))
-			source.Reply(_(NICK_X_FORBIDDEN), newnick.c_str());
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());

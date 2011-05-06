@@ -789,10 +789,10 @@ bool ChannelInfo::CheckKick(User *user)
 		do_kick = true;
 
 	Anope::string mask, reason;
-	if (!user->HasMode(UMODE_OPER) && (this->HasFlag(CI_SUSPENDED) || this->HasFlag(CI_FORBIDDEN)))
+	if (!user->HasMode(UMODE_OPER) && this->HasFlag(CI_SUSPENDED))
 	{
 		get_idealban(this, user, mask);
-		reason = this->forbidreason.empty() ? GetString(user->Account(), _("This channel may not be used.")) : this->forbidreason;
+		reason = GetString(user->Account(), _("This channel may not be used."));
 		set_modes = true;
 		do_kick = true;
 	}
@@ -850,9 +850,9 @@ bool ChannelInfo::CheckKick(User *user)
 	 * ChanServ always enforces channels like this to keep people from deleting bots etc
 	 * that are holding channels.
 	 */
-	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->HasFlag(CI_INHABIT) && !this->c->HasFlag(CH_SYNCING))
+	if (this->c->users.size() == (this->bi && this->c->FindUser(this->bi) ? 2 : 1) && !this->c->HasFlag(CH_INHABIT) && !this->c->HasFlag(CH_SYNCING))
 	{
-		/* If channel was forbidden, etc, set it +si to prevent rejoin */
+		/* Set +si to prevent rejoin */
 		if (set_modes)
 		{
 			c->SetMode(NULL, CMODE_NOEXTERNAL);

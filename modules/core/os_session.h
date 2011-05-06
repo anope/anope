@@ -6,74 +6,26 @@ class SessionService : public Service
  public:
 	typedef Anope::map<Session *> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
- private:
-	SessionMap Sessions;
-	ExceptionVector Exceptions;
- public:
+
 	SessionService(Module *m) : Service(m, "session") { }
 
-	void AddException(Exception *e)
-	{
-		this->Exceptions.push_back(e);
-	}
+	virtual void AddException(Exception *e) = 0;
 
-	void DelException(Exception *e)
-	{
-		ExceptionVector::iterator it = std::find(this->Exceptions.begin(), this->Exceptions.end(), e);
-		if (it != this->Exceptions.end())
-			this->Exceptions.erase(it);
-	}
+	virtual void DelException(Exception *e) = 0;
 
-	Exception *FindException(User *u)
-	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
-		{
-			Exception *e = *it;
-			if (Anope::Match(u->host, e->mask) || (u->ip() && Anope::Match(u->ip.addr(), e->mask)))
-				return e;
-		}
-		return NULL;
-	}
+	virtual Exception *FindException(User *u) = 0;
 
-	Exception *FindException(const Anope::string &host)
-	{
-		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
-		{
-			Exception *e = *it;
-			if (Anope::Match(host, e->mask))
-				return e;
-		}
+	virtual Exception *FindException(const Anope::string &host) = 0;
 
-		return NULL;
-	}
+	virtual ExceptionVector &GetExceptions() = 0;
 
-	ExceptionVector &GetExceptions()
-	{
-		return this->Exceptions;
-	}
+	virtual void AddSession(Session *s) = 0;
 
-	void AddSession(Session *s)
-	{
-		this->Sessions[s->host] = s;
-	}
+	virtual void DelSession(Session *s) = 0;
 
-	void DelSession(Session *s)
-	{
-		this->Sessions.erase(s->host);
-	}
+	virtual Session *FindSession(const Anope::string &mask) = 0;
 
-	Session *FindSession(const Anope::string &mask)
-	{
-		SessionMap::iterator it = this->Sessions.find(mask);
-		if (it != this->Sessions.end())
-			return it->second;
-		return NULL;
-	}
-
-	SessionMap &GetSessions()
-	{
-		return this->Sessions;
-	}
+	virtual SessionMap &GetSessions() = 0;
 };
 
 #endif

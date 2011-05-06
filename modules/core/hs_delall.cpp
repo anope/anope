@@ -29,11 +29,6 @@ class CommandHSDelAll : public Command
 		NickAlias *na = findnick(nick);
 		if (na)
 		{
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
-				return MOD_CONT;
-			}
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			NickCore *nc = na->nc;
 			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)

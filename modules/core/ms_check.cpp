@@ -37,12 +37,6 @@ class CommandMSCheck : public Command
 			return MOD_CONT;
 		}
 
-		if (na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), recipient.c_str());
-			return MOD_CONT;
-		}
-
 		MemoInfo *mi = &na->nc->memos;
 
 		/* Okay, I know this looks strange but we wanna get the LAST memo, so we

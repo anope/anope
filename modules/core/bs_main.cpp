@@ -38,16 +38,9 @@ class BotServBotInfo : public BotInfo
 					ChannelInfo *ci = cs_findchan(param);
 					if (ci)
 					{
-						if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
+						if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 						{
-							u->SendMessage(this, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
-							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
-							PopLanguage();
-							return;
-						}
-						else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
-						{
-							u->SendMessage(this, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
+							u->SendMessage(this, _(_(CHAN_X_SUSPENDED)), ci->name.c_str());
 							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
 							PopLanguage();
 							return;

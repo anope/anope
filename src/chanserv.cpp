@@ -367,10 +367,9 @@ Anope::string get_xop_level(int level)
 
 ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
-	if (!chanserv)
+	if (!chanserv || !c)
 		return;
-	if (c->ci)
-		c->ci->SetFlag(CI_INHABIT);
+	c->SetFlag(CH_INHABIT);
 	if (!c->ci || !c->ci->bi)
 		chanserv->Bot()->Join(c);
 	else if (!c->FindUser(c->ci->bi))
@@ -379,12 +378,12 @@ ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 
 void ChanServTimer::Tick(time_t)
 {
-	if (!c || !c->ci)
+	if (!c)
 		return;
 
-	c->ci->UnsetFlag(CI_INHABIT);
+	c->UnsetFlag(CH_INHABIT);
 
-	if (!c->ci->bi)
+	if (!c->ci || !c->ci->bi)
 	{
 		if (chanserv)
 			chanserv->Bot()->Part(c);

@@ -32,8 +32,6 @@ class CommandNSRelease : public Command
 
 		if (!(na = findnick(nick)))
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
 			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
 		else if (!na->HasFlag(NS_HELD))

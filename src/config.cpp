@@ -1049,7 +1049,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&conf->NSResendDelay), DT_TIME, NoValidation},
 		{"nickserv", "expire", "21d", new ValueContainerTime(&conf->NSExpire), DT_TIME, NoValidation},
 		{"nickserv", "suspendexpire", "0", new ValueContainerTime(&conf->NSSuspendExpire), DT_TIME, NoValidation},
-		{"nickserv", "forbidexpire", "0", new ValueContainerTime(&conf->NSForbidExpire), DT_TIME, NoValidation},
 		{"nickserv", "unconfirmedexpire", "0", new ValueContainerTime(&conf->NSUnconfirmedExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerUInt(&conf->NSMaxAliases), DT_UINTEGER, NoValidation},
 		{"nickserv", "accessmax", "0", new ValueContainerUInt(&conf->NSAccessMax), DT_UINTEGER, ValidateNotZero},

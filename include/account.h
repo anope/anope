@@ -20,8 +20,6 @@ enum NickNameFlag
 {
 	NS_BEGIN,
 
-	/* Nick may not be registered or used */
-	NS_FORBIDDEN,
 	/* Nick never expires */
 	NS_NO_EXPIRE,
 	/* This nick is being held after a kill by an enforcer client

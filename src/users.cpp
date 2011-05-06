@@ -315,13 +315,19 @@ void User::Collide(NickAlias *na)
 	{
 		Anope::string guestnick;
 
+		int i = 0;
 		do
 		{
 			guestnick = Config->NSGuestNickPrefix + stringify(getrandom16());
-		} while (finduser(guestnick));
+		} while (finduser(guestnick) && i++ < 10);
 
-		this->SendMessage(nickserv->Bot(), _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
-		ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
+		if (i == 11)
+			this->Kill(Config->s_NickServ, "Services nickname-enforcer kill");
+		else
+		{
+			this->SendMessage(nickserv->Bot(), _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+			ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
+		}
 	}
 	else
 		this->Kill(Config->s_NickServ, "Services nickname-enforcer kill");
@@ -883,7 +889,7 @@ void do_kill(User *user, const Anope::string &msg)
 	Log(user, "killed") << "was killed (Reason: " << msg << ")";
 
 	NickAlias *na = findnick(user->nick);
-	if (na && !na->HasFlag(NS_FORBIDDEN) && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
+	if (na && !na->nc->HasFlag(NI_SUSPENDED) && (user->IsRecognized() || user->IsIdentified(true)))
 	{
 		na->last_seen = Anope::CurTime;
 		na->last_quit = msg;

@@ -14,8 +14,6 @@
 
 channel_map ChannelList;
 
-static const Anope::string ChannelFlagString[] = { "CH_PERSIST", "CH_SYNCING", "CH_LOGCHAN", "" };
-
 /** Default constructor
  * @param name The channel name
  * @param ts The time the channel was created
@@ -191,7 +189,7 @@ void Channel::DeleteUser(User *user)
 		return;
 
 	/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
-	if (this->ci && this->ci->HasFlag(CI_INHABIT))
+	if (this->HasFlag(CH_INHABIT))
 		return;
 
 	/* check for BSMinUsers and part the BotServ bot from the channel
@@ -791,6 +789,8 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 	if (target->FindChannel(this))
 	{
 		FOREACH_MOD(I_OnUserKicked, OnUserKicked(this, target, source, reason));
+		if (bi)
+			this->SetFlag(CH_INHABIT);
 		this->DeleteUser(target);
 	}
 	else
@@ -798,7 +798,10 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 
 	/* Bots get rejoined */
 	if (bi)
+	{
 		bi->Join(this, &Config->BotModeList);
+		this->UnsetFlag(CH_INHABIT);
+	}
 }
 
 /** Kick a user from the channel
@@ -1108,9 +1111,6 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 	voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 	if (!c || !(ci = c->ci))
-		return;
-
-	if (ci->HasFlag(CI_FORBIDDEN) || c->name[0] == '+')
 		return;
 
 	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";

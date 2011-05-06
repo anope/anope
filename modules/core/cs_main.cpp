@@ -44,16 +44,9 @@ class ChanServBotInfo : public BotInfo
 					ChannelInfo *ci = cs_findchan(param);
 					if (ci)
 					{
-						if (ci->HasFlag(CI_FORBIDDEN) && !c->HasFlag(CFLAG_ALLOW_FORBIDDEN))
+						if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 						{
-							u->SendMessage(this, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
-							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of FORBIDDEN channel " << ci->name;
-							PopLanguage();
-							return;
-						}
-						else if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
-						{
-							u->SendMessage(this, _(_(CHAN_X_FORBIDDEN)), ci->name.c_str());
+							u->SendMessage(this, _(_(CHAN_X_SUSPENDED)), ci->name.c_str());
 							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
 							PopLanguage();
 							return;
@@ -113,11 +106,6 @@ class ExpireCallback : public CallBack
 				if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
 					expire = true;
 			}
-			else if (ci->HasFlag(CI_FORBIDDEN))
-			{
-				if (Config->CSForbidExpire && Anope::CurTime - ci->last_used >= Config->CSForbidExpire)
-					expire = true;
-			}
 			else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
 				expire = true;
 
@@ -132,9 +120,7 @@ class ExpireCallback : public CallBack
 					continue;
 
 				Anope::string extra;
-				if (ci->HasFlag(CI_FORBIDDEN))
-					extra = "forbidden ";
-				else if (ci->HasFlag(CI_SUSPENDED))
+				if (ci->HasFlag(CI_SUSPENDED))
 					extra = "suspended ";
 
 				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";

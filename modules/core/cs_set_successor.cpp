@@ -46,11 +46,6 @@ class CommandCSSetSuccessor : public Command
 				source.Reply(_(NICK_X_NOT_REGISTERED), params[1].c_str());
 				return MOD_CONT;
 			}
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
-				return MOD_CONT;
-			}
 			if (na->nc == ci->founder)
 			{
 				source.Reply(_("%s cannot be the successor on channel %s because he is its founder."), na->nick.c_str(), ci->name.c_str());

@@ -129,12 +129,6 @@ class CommandNSRegister : public Command
 			return MOD_CONT;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), u->nick.c_str());
-			return MOD_CONT;
-		}
-
 		if (Config->RestrictOperNicks)
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
@@ -152,16 +146,7 @@ class CommandNSRegister : public Command
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the REGISTER command again."), (u->lastnickreg + Config->NSRegDelay) - Anope::CurTime);
 		else if ((na = findnick(u->nick)))
-		{
-			/* i.e. there's already such a nick regged */
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				Log(nickserv->Bot()) << u->GetMask() << " tried to register FORBIDden nick " << u->nick;
-				source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
-			}
-			else
-				source.Reply(_(NICK_ALREADY_REGISTERED), u->nick.c_str());
-		}
+			source.Reply(_(NICK_ALREADY_REGISTERED), u->nick.c_str());
 		else if (pass.equals_ci(u->nick) || (Config->StrictPasswords && pass.length() < 5))
 			source.Reply(_(MORE_OBSCURE_PASSWORD));
 		else if (pass.length() > Config->PassLen)

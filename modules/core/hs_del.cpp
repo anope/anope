@@ -29,11 +29,6 @@ class CommandHSDel : public Command
 		NickAlias *na = findnick(nick);
 		if (na)
 		{
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
-				return MOD_CONT;
-			}
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
 			na->hostinfo.RemoveVhost();

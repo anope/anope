@@ -502,8 +502,6 @@ class CoreExport ServerConfig
 	time_t NSExpire;
 	/* How long before suspended nicks expire */
 	time_t NSSuspendExpire;
-	/* How long before forbidden nicks expire */
-	time_t NSForbidExpire;
 	/* Time before unconfirmed nicks expire */
 	time_t NSUnconfirmedExpire;
 	/* Force email when registering */

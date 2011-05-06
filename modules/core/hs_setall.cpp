@@ -37,11 +37,6 @@ class CommandHSSetAll : public Command
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 			return MOD_CONT;
 		}
-		else if (na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
-			return MOD_CONT;
-		}
 
 		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
 		if (!vIdent.empty())

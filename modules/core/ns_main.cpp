@@ -32,13 +32,6 @@ class MyNickServService : public NickServService
 		if (!na)
 			return;
 
-		if (na->HasFlag(NS_FORBIDDEN))
-		{
-			u->SendMessage(NickServ, _("This nickname may not be used.  Please choose another one."));
-			u->Collide(na);
-			return;
-		}
-
 		if (na->nc->HasFlag(NI_SUSPENDED))
 		{
 			u->SendMessage(NickServ, _(NICK_X_SUSPENDED), u->nick.c_str());
@@ -121,11 +114,6 @@ class ExpireCallback : public CallBack
 				if (Config->NSSuspendExpire && Anope::CurTime - na->last_seen >= Config->NSSuspendExpire)
 					expire = true;
 			}
-			else if (na->HasFlag(NS_FORBIDDEN))
-			{
-				if (Config->NSForbidExpire && Anope::CurTime - na->last_seen >= Config->NSForbidExpire)
-					expire = true;
-			}
 			else if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire)
 				expire = true;
 			if (na->HasFlag(NS_NO_EXPIRE))
@@ -138,9 +126,7 @@ class ExpireCallback : public CallBack
 				if (MOD_RESULT == EVENT_STOP)
 					continue;
 				Anope::string extra;
-				if (na->HasFlag(NS_FORBIDDEN))
-					extra = "forbidden ";
-				else if (na->nc->HasFlag(NI_SUSPENDED))
+				if (na->nc->HasFlag(NI_SUSPENDED))
 					extra = "suspended ";
 				Log(LOG_NORMAL, "expire") << "Expiring " << extra << "nickname " << na->nick << " (group: " << na->nc->display << ") (e-mail: " << (na->nc->email.empty() ? "none" : na->nc->email) << ")";
 				FOREACH_MOD(I_OnNickExpire, OnNickExpire(na));

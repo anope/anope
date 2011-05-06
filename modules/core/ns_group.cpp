@@ -36,12 +36,6 @@ class CommandNSGroup : public Command
 			return MOD_CONT;
 		}
 
-		if (!ircdproto->IsNickValid(u->nick))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), u->nick.c_str());
-			return MOD_CONT;
-		}
-
 		if (Config->RestrictOperNicks)
 			for (unsigned i = 0; i < Config->Opers.size(); ++i)
 			{
@@ -69,8 +63,6 @@ class CommandNSGroup : public Command
 			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
 			source.Reply(_(NICK_X_SUSPENDED), target->nick.c_str());
 		}
-		else if (target->HasFlag(NS_FORBIDDEN))
-			source.Reply(_(NICK_X_FORBIDDEN), nick.c_str());
 		else if (na && target->nc == na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())

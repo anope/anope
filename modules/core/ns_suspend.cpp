@@ -42,12 +42,6 @@ class CommandNSSuspend : public Command
 			return MOD_CONT;
 		}
 
-		if (na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
-			return MOD_CONT;
-		}
-
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
 			source.Reply(_(ACCESS_DENIED));
@@ -121,12 +115,6 @@ class CommandNSUnSuspend : public Command
 		if (!na)
 		{
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-			return MOD_CONT;
-		}
-
-		if (na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 			return MOD_CONT;
 		}
 

@@ -143,7 +143,7 @@ class NSAJoin : public Module
 			
 			if (ci != NULL)
 			{
-				if (ci->HasFlag(CI_SUSPENDED) || ci->HasFlag(CI_FORBIDDEN))
+				if (ci->HasFlag(CI_SUSPENDED))
 					continue;
 			}
 			if (c != NULL)

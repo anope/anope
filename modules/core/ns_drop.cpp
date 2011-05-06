@@ -61,12 +61,6 @@ class CommandNSDrop : public Command
 			if (readonly)
 				source.Reply(_(READ_ONLY_MODE));
 
-			if (ircd->sqline && na->HasFlag(NS_FORBIDDEN))
-			{
-				XLine x(na->nick);
-				ircdproto->SendSQLineDel(&x);
-			}
-
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(u, na));
 
 			Log(!is_mine ? LOG_OVERRIDE : LOG_COMMAND, u, this) << "to drop nickname " << na->nick << " (group: " << na->nc->display << ") (email: " << (!na->nc->email.empty() ? na->nc->email : "none") << ")";

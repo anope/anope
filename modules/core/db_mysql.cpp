@@ -348,8 +348,6 @@ class DBMySQL : public Module
 				ci->last_topic = r.Get(i, "last_topic");
 				ci->last_topic_setter = r.Get(i, "last_topic_setter");
 				ci->last_topic_time = r.Get(i, "last_topic_time").is_number_only() ? convertTo<int>(r.Get(i, "last_topic_time")) : Anope::CurTime;
-				ci->forbidby = r.Get(i, "forbidby");
-				ci->forbidreason = r.Get(i, "forbidreason");
 				ci->bantype = r.Get(i, "bantype").is_number_only() ? convertTo<int>(r.Get(i, "bantype")) : 2;
 				ci->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int16>(r.Get(i, "memomax")) : 20;
 				ci->capsmin = r.Get(i, "capsmin").is_number_only() ? convertTo<int>(r.Get(i, "capsmin")) : 0;
@@ -1080,13 +1078,11 @@ class DBMySQL : public Module
 
 	void OnChanForbidden(ChannelInfo *ci)
 	{
-		SQLQuery query("INSERT INTO `anope_cs_info` (name, time_registered, last_used, flags, forbidby, forbidreason) VALUES (@name, @time_registered, @last_used, @flags, @forbidby, @forbidreason)");
+		SQLQuery query("INSERT INTO `anope_cs_info` (name, time_registered, last_used, flags) VALUES (@name, @time_registered, @last_used, @flags)");
 		query.setValue("name", ci->name);
 		query.setValue("time_registered", ci->time_registered);
 		query.setValue("last_used", ci->last_used);
 		query.setValue("flags", ToString(ci->ToString()));
-		query.setValue("forbidby", ci->forbidby);
-		query.setValue("forbidreason", ci->forbidreason);
 		this->RunQuery(query);
 	}
 
@@ -1099,7 +1095,7 @@ class DBMySQL : public Module
 
 	void OnChanRegistered(ChannelInfo *ci)
 	{
-		SQLQuery query("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, forbidby, forbidreason, bantype, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES(@name, @founder, @successor, @descr, @time_registered, @last_used, @last_topic_text, @last_topic_setter, @last_topic_time, @flags, @forbidby, @forbidreason, @bantype, @memomax, @botnick, @botflags, @capsmin, @capspercent, @floodlines, @floodsecs, @repeattimes) ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), forbidby=VALUES(forbidby), forbidreason=VALUES(forbidreason), bantype=VALUES(bantype), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
+		SQLQuery query("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, bantype, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES(@name, @founder, @successor, @descr, @time_registered, @last_used, @last_topic_text, @last_topic_setter, @last_topic_time, @flags, @bantype, @memomax, @botnick, @botflags, @capsmin, @capspercent, @floodlines, @floodsecs, @repeattimes) ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), bantype=VALUES(bantype), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
 		query.setValue("name", ci->name);
 		query.setValue("founder", ci->founder ? ci->founder->display : "");
 		query.setValue("successor", ci->successor ? ci->successor->display : "");
@@ -1110,8 +1106,6 @@ class DBMySQL : public Module
 		query.setValue("last_topic_setter", ci->last_topic_setter);
 		query.setValue("last_topic_time", ci->last_topic_time);
 		query.setValue("flags", ToString(ci->ToString()));
-		query.setValue("forbidby", ci->forbidby);
-		query.setValue("forbidreason", ci->forbidreason);
 		query.setValue("bantype", ci->bantype);
 		query.setValue("memomax", ci->memos.memomax);
 		query.setValue("botnick", ci->bi ? ci->bi->nick : "");
@@ -1149,16 +1143,6 @@ class DBMySQL : public Module
 	{
 		SQLQuery query("UPDATE `anope_cs_info` SET `flags` = @flags WHERE `name` = @name");
 		query.setValue("flags", ToString(ci->ToString()));
-		query.setValue("name", ci->name);
-		this->RunQuery(query);
-
-		query = "UPDATE `anope_cs_info` SET `forbidby` = @forbidby WHERE `name` = @name";
-		query.setValue("forbidby", ci->forbidby);
-		query.setValue("name", ci->name);
-		this->RunQuery(query);
-
-		query = "UPDATE `anope_cs_info` SET `forbidreason` = @forbidreason WHERE `name` = @name";
-		query.setValue("forbidreason", ci->forbidreason);
 		query.setValue("name", ci->name);
 		this->RunQuery(query);
 	}

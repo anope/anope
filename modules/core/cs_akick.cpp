@@ -181,15 +181,7 @@ class CommandCSAKick : public Command
 			mask = nick + "!" + user + "@" + host;
 		}
 		else
-		{
-			if (na->HasFlag(NS_FORBIDDEN))
-			{
-				source.Reply(_(NICK_X_FORBIDDEN), mask.c_str());
-				return;
-			}
-
 			nc = na->nc;
-		}
 
 		/* Check excepts BEFORE we get this far */
 		if (ci->c)
@@ -240,16 +232,13 @@ class CommandCSAKick : public Command
 			 * or higher access. - Viper */
 			for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 			{
-				NickAlias *na2 = it->second;
+				na = it->second;
 
-				if (na2->HasFlag(NS_FORBIDDEN))
-					continue;
-
-				ChanAccess *na2_access = ci->GetAccess(na2->nc), *u_access = ci->GetAccess(u);
-				int16 na2_level = na2_access ? na2_access->level : 0, u_level = u_access ? u_access->level : 0;
-				if (na2->nc && (na2->nc == ci->founder || na2_level >= u_level))
+				ChanAccess *na_access = ci->GetAccess(na->nc), *u_access = ci->GetAccess(u);
+				int16 na_level = na_access ? na_access->level : 0, u_level = u_access ? u_access->level : 0;
+				if (na->nc && (na->nc == ci->founder || na_level >= u_level))
 				{
-					Anope::string buf = na2->nick + "!" + na2->last_usermask;
+					Anope::string buf = na->nick + "!" + na->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
 						source.Reply(_(ACCESS_DENIED));

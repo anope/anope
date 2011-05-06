@@ -57,8 +57,8 @@ class CommandMSRSend : public Command
 			{
 				source.Reply(_("Memo sent to \002%s\002."), name.c_str());
 
-				bool ischan, isforbid;
-				MemoInfo *mi = memoserv->GetMemoInfo(nick, ischan, isforbid);
+				bool ischan;
+				MemoInfo *mi = memoserv->GetMemoInfo(nick, ischan);
 				if (mi == NULL)
 					throw CoreException("NULL mi in ms_rsend");
 				Memo *m = (mi->memos.size() ? mi->memos[mi->memos.size() - 1] : NULL);

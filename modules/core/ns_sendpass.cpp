@@ -35,8 +35,6 @@ class CommandNSSendPass : public Command
 			source.Reply(_(ACCESS_DENIED));
 		else if (!(na = findnick(nick)))
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-		else if (na->HasFlag(NS_FORBIDDEN))
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;

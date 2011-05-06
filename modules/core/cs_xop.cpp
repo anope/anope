@@ -141,11 +141,6 @@ class XOPBase : public Command
 		NickAlias *na = findnick(mask);
 		if (!na && mask.find_first_of("!@*") == Anope::string::npos)
 			mask += "!*@*";
-		else if (na && na->HasFlag(NS_FORBIDDEN))
-		{
-			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
-			return MOD_CONT;
-		}
 
 		access = ci->GetAccess(mask, 0, false);
 		if (access)

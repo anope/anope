@@ -73,7 +73,7 @@ Server::~Server()
 			if (u->server == this)
 			{
 				NickAlias *na = findnick(u->nick);
-				if (na && !na->HasFlag(NS_FORBIDDEN) && (!na->nc->HasFlag(NI_SUSPENDED)) && (u->IsRecognized() || u->IsIdentified()))
+				if (na && !na->nc->HasFlag(NI_SUSPENDED) && (u->IsRecognized() || u->IsIdentified()))
 				{
 					na->last_seen = Anope::CurTime;
 					na->last_quit = this->QReason;

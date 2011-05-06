@@ -105,8 +105,6 @@ CREATE TABLE IF NOT EXISTS `anope_cs_info` (
   `last_topic_setter` text NOT NULL,
   `last_topic_time` int(10) unsigned NOT NULL DEFAULT '0',
   `flags` text NOT NULL,
-  `forbidby` text NOT NULL,
-  `forbidreason` text NOT NULL,
   `bantype` smallint(6) NOT NULL DEFAULT '0',
   `memomax` smallint(5) unsigned NOT NULL DEFAULT '0',
   `botnick` varchar(255) NOT NULL DEFAULT '',

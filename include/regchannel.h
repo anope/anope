@@ -18,8 +18,6 @@ enum ChannelInfoFlag
 {
 	CI_BEGIN,
 
-	/* ChanServ is currently holding the channel */
-	CI_INHABIT,
 	/* Retain the topic even after the channel is emptied */
 	CI_KEEPTOPIC,
 	/* Don't allow non-authorized users to be opped */
@@ -34,8 +32,6 @@ enum ChannelInfoFlag
 	CI_PEACE,
 	/* Don't allow any privileges unless a user is IDENTIFIED with NickServ */
 	CI_SECURE,
-	/* Don't allow the channel to be registered or used */
-	CI_FORBIDDEN,
 	/* Channel does not expire */
 	CI_NO_EXPIRE,
 	/* Channel memo limit may not be changed */
@@ -63,7 +59,7 @@ enum ChannelInfoFlag
 };
 
 const Anope::string ChannelInfoFlagStrings[] = {
-	"BEGIN", "INHABIT", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
+	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
 	"PEACE", "SECURE", "FORBIDDEN", "NO_EXPIRE", "MEMO_HARDMAX", "OPNOTICE", "SECUREFOUNDER",
 	"SIGNKICK", "SIGNKICK_LEVEL", "XOP", "SUSPENDED", "PERSIST", ""
 };
@@ -153,10 +149,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	Anope::string last_topic;		/* The last topic that was set on this channel */
 	Anope::string last_topic_setter;	/* Setter */
 	time_t last_topic_time;			/* Time */
-
-	// These two should be using extensible
-	Anope::string forbidby;
-	Anope::string forbidreason;
 
 	int16 bantype;
 	int16 *levels; /* Access levels for commands */

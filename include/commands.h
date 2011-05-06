@@ -36,7 +36,6 @@ extern CoreExport void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Comman
 enum CommandFlag
 {
 	CFLAG_ALLOW_UNREGISTERED,
-	CFLAG_ALLOW_FORBIDDEN,
 	CFLAG_ALLOW_SUSPENDED,
 	CFLAG_ALLOW_UNREGISTEREDCHANNEL,
 	CFLAG_STRIP_CHANNEL,
@@ -45,7 +44,6 @@ enum CommandFlag
 
 const Anope::string CommandFlagStrings[] = {
 	"CFLAG_ALLOW_UNREGISTERED",
-	"CFLAG_ALLOW_FORBIDDEN",
 	"CFLAG_ALLOW_SUSPENDED",
 	"CFLAG_ALLOW_UNREGISTEREDCHANNEL",
 	"CFLAG_STRIP_CHANNEL",

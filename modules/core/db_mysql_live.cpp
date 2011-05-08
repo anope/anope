@@ -40,7 +40,7 @@ static void ChanInfoUpdate(const SQLResult &res)
 		ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
 		if (!ci)
 			ci = new ChannelInfo(res.Get(0, "name"));
-		ci->founder = findcore(res.Get(0, "founder"));
+		ci->SetFounder(findcore(res.Get(0, "founder")));
 		ci->successor = findcore(res.Get(0, "successor"));
 		ci->desc = res.Get(0, "descr");
 		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));

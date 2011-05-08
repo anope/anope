@@ -60,7 +60,7 @@ enum ChannelInfoFlag
 
 const Anope::string ChannelInfoFlagStrings[] = {
 	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
-	"PEACE", "SECURE", "FORBIDDEN", "NO_EXPIRE", "MEMO_HARDMAX", "OPNOTICE", "SECUREFOUNDER",
+	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "OPNOTICE", "SECUREFOUNDER",
 	"SIGNKICK", "SIGNKICK_LEVEL", "XOP", "SUSPENDED", "PERSIST", ""
 };
 
@@ -118,6 +118,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
  private:
 	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
  private:
+	NickCore *founder;							/* Channel founder */
 	std::vector<ChanAccess *> access;					/* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
@@ -139,7 +140,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	~ChannelInfo();
 
 	Anope::string name; /* Channel name */
-	NickCore *founder;
 	NickCore *successor; /* Who gets the channel if the founder nick is dropped or expires */
 	Anope::string desc;
 
@@ -166,6 +166,16 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16 capsmin, capspercent;		/* For CAPS kicker */
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
 	int16 repeattimes;				/* For REPEAT kicker */
+
+	/** Change the founder of the channek
+	 * @params nc The new founder
+	 */
+	void SetFounder(NickCore *nc);
+
+	/** Get the founder of the channel
+	 * @return The founder
+	 */
+	NickCore *GetFounder() const;
 
 	/** Find which bot should send mode/topic/etc changes for this channel
 	 * @return The bot

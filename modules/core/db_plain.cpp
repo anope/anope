@@ -171,11 +171,6 @@ static void ReadDatabase(Module *m = NULL)
 					catch (const DatabaseException &ex)
 					{
 						Log() << "[db_plain]: " << ex.GetReason();
-						if (!ci->founder)
-						{
-							delete ci;
-							ci = NULL;
-						}
 					}
 				}
 			}
@@ -474,8 +469,6 @@ class DBPlain : public Module
 				nc->language = params[0];
 			else if (key.equals_ci("MEMOMAX"))
 				nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
-			else if (key.equals_ci("CHANCOUNT"))
-				nc->channelcount = params[0].is_pos_number_only() ? convertTo<uint16>(params[0]) : 0;
 			else if (key.equals_ci("EMAIL"))
 				nc->email = params[0];
 			else if (key.equals_ci("GREET"))
@@ -553,11 +546,7 @@ class DBPlain : public Module
 			else if (key.equals_ci("MEMOMAX"))
 				ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
 			else if (key.equals_ci("FOUNDER"))
-			{
-				ci->founder = findcore(params[0]);
-				if (!ci->founder)
-					throw DatabaseException("Deleting founderless channel " + ci->name + " (founder: " + params[0] + ")");
-			}
+				ci->SetFounder(findcore(params[0]));
 			else if (key.equals_ci("SUCCESSOR"))
 				ci->successor = findcore(params[0]);
 			else if (key.equals_ci("LEVELS"))
@@ -716,7 +705,6 @@ class DBPlain : public Module
 			db_buffer << "NC " << nc->display << " " << nc->pass << endl;
 
 			db_buffer << "MD MEMOMAX " << nc->memos.memomax << endl;
-			db_buffer << "MD CHANCOUNT " << nc->channelcount << endl;
 
 			if (!nc->language.empty())
 				db_buffer << "MD LANGUAGE " << nc->language << endl;
@@ -787,8 +775,8 @@ class DBPlain : public Module
 			db_buffer << "CH " << ci->name << " " << ci->time_registered << " " << ci->last_used << endl;
 			db_buffer << "MD BANTYPE " << ci->bantype << endl;
 			db_buffer << "MD MEMOMAX " << ci->memos.memomax << endl;
-			if (ci->founder)
-				db_buffer << "MD FOUNDER " << ci->founder->display << endl;
+			if (ci->GetFounder())
+				db_buffer << "MD FOUNDER " << ci->GetFounder()->display << endl;
 			if (ci->successor)
 				db_buffer << "MD SUCCESSOR " << ci->successor->display << endl;
 			if (!ci->desc.empty())

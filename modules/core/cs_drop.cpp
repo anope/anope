@@ -54,7 +54,7 @@ class CommandCSDrop : public Command
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 
 		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER));
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "founder: " << (ci->founder ? ci->founder->display : "none");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "none");
 
 		delete ci;
 

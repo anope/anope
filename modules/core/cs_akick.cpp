@@ -203,7 +203,7 @@ class CommandCSAKick : public Command
 		{
 			ChanAccess *nc_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
 			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
-			if (nc == ci->founder || nc_level >= u_level)
+			if (nc == ci->GetFounder() || nc_level >= u_level)
 			{
 				source.Reply(_(ACCESS_DENIED));
 				return;
@@ -236,7 +236,7 @@ class CommandCSAKick : public Command
 
 				ChanAccess *na_access = ci->GetAccess(na->nc), *u_access = ci->GetAccess(u);
 				int16 na_level = na_access ? na_access->level : 0, u_level = u_access ? u_access->level : 0;
-				if (na->nc && (na->nc == ci->founder || na_level >= u_level))
+				if (na->nc && (na->nc == ci->GetFounder() || na_level >= u_level))
 				{
 					Anope::string buf = na->nick + "!" + na->last_usermask;
 					if (Anope::Match(buf, mask))

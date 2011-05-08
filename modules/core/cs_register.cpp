@@ -51,7 +51,7 @@ class CommandCSRegister : public Command
 		else
 		{
 			ci = new ChannelInfo(chan);
-			ci->founder = u->Account();
+			ci->SetFounder(u->Account());
 			ci->desc = chdesc;
 
 			if (c && !c->topic.empty())
@@ -64,7 +64,6 @@ class CommandCSRegister : public Command
 				ci->last_topic_setter = Config->s_ChanServ;
 
 			ci->bi = NULL;
-			++ci->founder->channelcount;
 			Log(LOG_COMMAND, u, this, ci);
 			source.Reply(_("Channel \002%s\002 registered under your nickname: %s"), chan.c_str(), u->nick.c_str());
 

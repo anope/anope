@@ -50,7 +50,8 @@ class CommandCSInfo : public Command
 			show_all = true;
 
 		source.Reply(_(CHAN_INFO_HEADER), chan.c_str());
-		source.Reply(_("        Founder: %s"), ci->founder->display.c_str());
+		if (ci->GetFounder())
+			source.Reply(_("        Founder: %s"), ci->GetFounder()->display.c_str());
 
 		if (show_all && ci->successor)
 			source.Reply(_("      Successor: %s"), ci->successor->display.c_str());

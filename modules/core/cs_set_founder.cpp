@@ -36,7 +36,6 @@ class CommandCSSetFounder : public Command
 		}
 
 		NickAlias *na = findnick(params[1]);
-		NickCore *nc, *nc0 = ci->founder;
 
 		if (!na)
 		{
@@ -44,7 +43,7 @@ class CommandCSSetFounder : public Command
 			return MOD_CONT;
 		}
 
-		nc = na->nc;
+		NickCore *nc = na->nc;
 		if (Config->CSMaxReg && nc->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
 		{
 			source.Reply(_("\002%s\002 has too many channels registered."), na->nick.c_str());
@@ -53,13 +52,7 @@ class CommandCSSetFounder : public Command
 
 		Log(!this->permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder to " << nc->display;
 
-		/* Founder and successor must not be the same group */
-		if (nc == ci->successor)
-			ci->successor = NULL;
-
-		--nc0->channelcount;
-		ci->founder = nc;
-		++nc->channelcount;
+		ci->SetFounder(nc);
 
 		source.Reply(_("Founder of %s changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
 

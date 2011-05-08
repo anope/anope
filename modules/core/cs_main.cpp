@@ -123,7 +123,7 @@ class ExpireCallback : public CallBack
 				if (ci->HasFlag(CI_SUSPENDED))
 					extra = "suspended ";
 
-				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->founder ? ci->founder->display : "(none)") << ")";
+				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
 				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
 				delete ci;
 			}
@@ -177,7 +177,7 @@ class ChanServCore : public Module
 			ChannelInfo *ci = it->second;
 			++it;
 
-			if (ci->founder == nc)
+			if (ci->GetFounder() == nc)
 			{
 				NickCore *newowner = NULL;
 				if (ci->successor && (ci->successor->IsServicesOper() || !Config->CSMaxReg || ci->successor->channelcount < Config->CSMaxReg))
@@ -201,9 +201,8 @@ class ChanServCore : public Module
 				if (newowner)
 				{
 					Log(LOG_NORMAL, "chanserv/expire") << "Transferring foundership of " << ci->name << " from deleted nick " << nc->display << " to " << newowner->display;
-					ci->founder = newowner;
+					ci->SetFounder(newowner);
 					ci->successor = NULL;
-					++newowner->channelcount;
 				}
 				else
 				{

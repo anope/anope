@@ -166,6 +166,28 @@ ChannelInfo::~ChannelInfo()
 		--this->founder->channelcount;
 }
 
+/** Change the founder of the channek
+ * @params nc The new founder
+ */
+void ChannelInfo::SetFounder(NickCore *nc)
+{
+	if (this->founder)
+		--this->founder->channelcount;
+	this->founder = nc;
+	if (this->founder)
+		++this->founder->channelcount;
+	if (this->founder == this->successor)
+		this->successor = NULL;
+}
+
+/** Get the founder of the channel
+ * @return The founder
+ */
+NickCore *ChannelInfo::GetFounder() const
+{
+	return this->founder;
+}
+
 /** Find which bot should send mode/topic/etc changes for this channel
  * @return The bot
  */

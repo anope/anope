@@ -196,7 +196,6 @@ class DBMySQL : public Module
 			nc->FromString(flags);
 
 			nc->language = r.Get(i, "language");
-			nc->channelcount = r.Get(i, "channelcount").is_number_only() ? convertTo<int>(r.Get(i, "channelcount")) : 0;
 			nc->memos.memomax = r.Get(i, "memomax").is_number_only() ? convertTo<int16>(r.Get(i, "memomax")) : 20;
 		}
 
@@ -339,7 +338,7 @@ class DBMySQL : public Module
 				}
 
 				ChannelInfo *ci = new ChannelInfo(r.Get(i, "name"));
-				ci->founder = nc;
+				ci->SetFounder(nc);
 				if (!r.Get(i, "successor").empty())
 					ci->successor = findcore(r.Get(i, "successor"));
 				ci->desc = r.Get(i, "descr");
@@ -760,10 +759,10 @@ class DBMySQL : public Module
 					return;
 				if (!u->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
 					return;
-				if (params[1].equals_ci("FOUNDER") && ci->founder)
+				if (params[1].equals_ci("FOUNDER"))
 				{
 					SQLQuery query("UPDATE `anope_cs_info` SET `founder` = @founder WHERE `name` = @name");
-					query.setValue("founder", ci->founder->display);
+					query.setValue("founder", ci->GetFounder() ? ci->GetFounder()->display : "");
 					query.setValue("name", ci->name);
 					this->RunQuery(query);
 				}
@@ -976,14 +975,13 @@ class DBMySQL : public Module
 
 	void InsertCore(NickCore *nc)
 	{
-		SQLQuery query("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, channelcount, memomax) VALUES(@display, @pass, @email, @greet, @flags, @language, @channelcount, @memomax) ON DUPLICATE KEY UPDATE pass=VALUES(pass), email=VALUES(email), greet=VALUES(greet), flags=VALUES(flags), language=VALUES(language), channelcount=VALUES(channelcount), memomax=VALUES(memomax)");
+		SQLQuery query("INSERT INTO `anope_ns_core` (display, pass, email, greet, flags, language, memomax) VALUES(@display, @pass, @email, @greet, @flags, @language, @memomax) ON DUPLICATE KEY UPDATE pass=VALUES(pass), email=VALUES(email), greet=VALUES(greet), flags=VALUES(flags), language=VALUES(language), memomax=VALUES(memomax)");
 		query.setValue("display", nc->display);
 		query.setValue("pass", nc->pass);
 		query.setValue("email", nc->email);
 		query.setValue("greet", nc->greet);
 		query.setValue("flags", ToString(nc->ToString()));
 		query.setValue("language", nc->language);
-		query.setValue("channelcount", nc->channelcount);
 		query.setValue("memomax", nc->memos.memomax);
 		this->RunQuery(query);
 	}
@@ -1097,7 +1095,7 @@ class DBMySQL : public Module
 	{
 		SQLQuery query("INSERT INTO `anope_cs_info` (name, founder, successor, descr, time_registered, last_used, last_topic,  last_topic_setter, last_topic_time, flags, bantype, memomax, botnick, botflags, capsmin, capspercent, floodlines, floodsecs, repeattimes) VALUES(@name, @founder, @successor, @descr, @time_registered, @last_used, @last_topic_text, @last_topic_setter, @last_topic_time, @flags, @bantype, @memomax, @botnick, @botflags, @capsmin, @capspercent, @floodlines, @floodsecs, @repeattimes) ON DUPLICATE KEY UPDATE founder=VALUES(founder), successor=VALUES(successor), descr=VALUES(descr), time_registered=VALUES(time_registered), last_used=VALUES(last_used), last_topic=VALUES(last_topic), last_topic_setter=VALUES(last_topic_setter),  last_topic_time=VALUES(last_topic_time), flags=VALUES(flags), bantype=VALUES(bantype), memomax=VALUES(memomax), botnick=VALUES(botnick), botflags=VALUES(botflags), capsmin=VALUES(capsmin), capspercent=VALUES(capspercent), floodlines=VALUES(floodlines), floodsecs=VALUES(floodsecs), repeattimes=VALUES(repeattimes)");
 		query.setValue("name", ci->name);
-		query.setValue("founder", ci->founder ? ci->founder->display : "");
+		query.setValue("founder", ci->GetFounder() ? ci->GetFounder()->display : "");
 		query.setValue("successor", ci->successor ? ci->successor->display : "");
 		query.setValue("descr", ci->desc);
 		query.setValue("time_registered", ci->time_registered);

@@ -275,7 +275,7 @@ class OSForbid : public Module
 	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		if (source.u->HasMode(UMODE_OPER))
-			return EVEMT_CONTINUE;
+			return EVENT_CONTINUE;
 		else if (command->service->nick == Config->s_NickServ && command->name == "REGISTER" && params.size() > 1)
 		{
 			ForbidData *d = this->forbidService.FindForbid(params[1], FT_EMAIL);

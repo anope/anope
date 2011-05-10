@@ -9,8 +9,6 @@
 #ifndef OPER_H
 #define OPER_H
 
-extern CoreExport std::vector<NewsItem *> News;
-
 class XLineManager;
 extern CoreExport XLineManager *SGLine;
 extern CoreExport XLineManager *SZLine;

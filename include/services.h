@@ -768,33 +768,6 @@ class CoreExport Entry : public Flags<EntryType>
 
 /*************************************************************************/
 
-/* News stuff */
-
-enum NewsType
-{
-	NEWS_LOGON,
-	NEWS_RANDOM,
-	NEWS_OPER
-};
-
-struct NewsMessages
-{
-	NewsType type;
-	Anope::string name;
-	const char *msgs[10];
-};
-
-struct NewsItem
-{
-	NewsType type;
-	uint32 num;
-	Anope::string Text;
-	Anope::string who;
-	time_t time;
-};
-
-/*************************************************************************/
-
 /* Mail data */
 
 struct MailInfo

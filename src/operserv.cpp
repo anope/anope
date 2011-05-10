@@ -13,8 +13,6 @@
 #include "modules.h"
 #include "operserv.h"
 
-std::vector<NewsItem *> News;
-
 XLineManager *SGLine = NULL, *SZLine = NULL, *SQLine = NULL, *SNLine = NULL;
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */

@@ -14,8 +14,7 @@
 #include "module.h"
 #include "operserv.h"
 #include "global.h"
-
-#define lenof(a)        (sizeof(a) / sizeof(*(a)))
+#include "os_news.h"
 
 /* List of messages for each news type.  This simplifies message sending. */
 
@@ -39,7 +38,7 @@ struct NewsMessages msgarray[] = {
 	  _("Logon news items:"),
 	  _("There is no logon news."),
 	  _("Syntax: \002LOGONNEWS ADD \037text\037\002"),
-	  _("Added new logon news item (#%d)."),
+	  _("Added new logon news item."),
 	  _("Syntax: \002LOGONNEWS DEL {\037num\037 | ALL}"),
 	  _("Logon news item #%s not found!"),
 	  _("Logon news item #%d deleted."),
@@ -51,7 +50,7 @@ struct NewsMessages msgarray[] = {
 	  _("Oper news items:"),
 	  _("There is no oper news."),
 	  _("Syntax: \002OPERNEWS ADD \037text\037\002"),
-	  _("Added new oper news item (#%d)."),
+	  _("Added new oper news item."),
 	  _("Syntax: \002OPERNEWS DEL {\037num\037 | ALL}"),
 	  _("Oper news item #%s not found!"),
 	  _("Oper news item #%d deleted."),
@@ -63,7 +62,7 @@ struct NewsMessages msgarray[] = {
 	  _("Random news items:"),
 	  _("There is no random news."),
 	  _("Syntax: \002RANDOMNEWS ADD \037text\037\002"),
-	  _("Added new random news item (#%d)."),
+	  _("Added new random news item."),
 	  _("Syntax: \002RANDOMNEWS DEL {\037num\037 | ALL}"),
 	  _("Random news item #%s not found!"),
 	  _("Random news item #%d deleted."),
@@ -72,118 +71,65 @@ struct NewsMessages msgarray[] = {
 	 }
 };
 
-static void DisplayNews(User *u, NewsType Type)
+class MyNewsService : public NewsService
 {
-	static unsigned current_news = 0;
-	Anope::string msg;
+	std::vector<NewsItem *> newsItems[3];
+ public:
+	MyNewsService(Module *m) : NewsService(m) { }
 
-	if (Type == NEWS_LOGON)
-		msg = _("[\002Logon News\002 - %s] %s");
-	else if (Type == NEWS_OPER)
-		msg = _("[\002Oper News\002 - %s] %s");
-	else if (Type == NEWS_RANDOM)
-		msg = _("[\002Random News\002 - %s] %s");
-	else
-		throw CoreException("news: Invalid type (" + stringify(Type) + ") to display_news()");
-
-	unsigned displayed = 0;
-	bool NewsExists = false;
-	for (unsigned i = 0, end = News.size(); i < end; ++i)
+	~MyNewsService()
 	{
-		if (News[i]->type == Type)
-		{
-			NewsExists = true;
-
-			if (Type == NEWS_RANDOM && i == current_news)
-				continue;
-
-			u->SendMessage(Type != NEWS_OPER && global ? global->Bot() : operserv->Bot(), msg.c_str(), do_strftime(News[i]->time).c_str(), News[i]->Text.c_str());
-
-			++displayed;
-
-			if (Type == NEWS_RANDOM)
-			{
-				current_news = i;
-				return;
-			}
-			else if (displayed >= Config->NewsCount)
-				return;
-		}
-
-		/* Reset to head of list to get first random news value */
-		if (i + 1 == News.size() && Type == NEWS_RANDOM && NewsExists)
-			i = 0;
+		for (unsigned i = 0; i < 3; ++i)
+			for (unsigned j = 0; j < newsItems[i].size(); ++j)
+				delete newsItems[i][j];
 	}
-}
 
-static int add_newsitem(CommandSource &source, const Anope::string &text, NewsType type)
-{
-	int num = 0;
+	void AddNewsItem(NewsItem *n)
+	{
+		this->newsItems[n->type].push_back(n);
+	}
+	
+	void DelNewsItem(NewsItem *n)
+	{
+		std::vector<NewsItem *> &list = this->GetNewsList(n->type);
+		std::vector<NewsItem *>::iterator it = std::find(list.begin(), list.end(), n);
+		if (it != list.end())
+			list.erase(it);
+		delete n;
+	}
 
-	for (unsigned i = News.size(); i > 0; --i)
-		if (News[i - 1]->type == type)
-		{
-			num = News[i - 1]->num;
-			break;
-		}
+	std::vector<NewsItem *> &GetNewsList(NewsType t)
+	{
+		return this->newsItems[t];
+	}
+};
 
-	NewsItem *news = new NewsItem();
-	news->type = type;
-	news->num = num + 1;
-	news->Text = text;
-	news->time = Anope::CurTime;
-	news->who = source.u->nick;
-
-	News.push_back(news);
-
-	return num + 1;
-}
-
-static int del_newsitem(unsigned num, NewsType type)
-{
-	int count = 0;
-
-	for (unsigned i = News.size(); i > 0; --i)
-		if (News[i - 1]->type == type && (num == 0 || News[i - 1]->num == num))
-		{
-			delete News[i - 1];
-			News.erase(News.begin() + i - 1);
-			++count;
-		}
-
-	return count;
-}
-
-static const char **findmsgs(NewsType type, Anope::string &type_name)
+#define lenof(a)        (sizeof(a) / sizeof(*(a)))
+static const char **findmsgs(NewsType type)
 {
 	for (unsigned i = 0; i < lenof(msgarray); ++i)
 		if (msgarray[i].type == type)
-		{
-			type_name = msgarray[i].name;
 			return msgarray[i].msgs;
-		}
 	return NULL;
 }
 
 class NewsBase : public Command
 {
+	service_reference<NewsService> ns;
+
  protected:
 	CommandReturn DoList(CommandSource &source, NewsType type, const char **msgs)
 	{
-		int count = 0;
-
-		for (unsigned i = 0, end = News.size(); i < end; ++i)
-			if (News[i]->type == type)
-			{
-				if (!count)
-					source.Reply(msgs[MSG_LIST_HEADER]);
-				source.Reply(_("%5d (%s by %s)\n""    %s"), News[i]->num, do_strftime(News[i]->time).c_str(), !News[i]->who.empty() ? News[i]->who.c_str() : "<unknown>", News[i]->Text.c_str());
-				++count;
-			}
-		if (!count)
+		std::vector<NewsItem *> &list = this->ns->GetNewsList(type);
+		if (list.empty())
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
+		{
+			source.Reply(msgs[MSG_LIST_HEADER]);
+			for (unsigned i = 0, end = list.size(); i < end; ++i)
+				source.Reply(_("%5d (%s by %s)\n""    %s"), i + 1, do_strftime(list[i]->time).c_str(), !list[i]->who.empty() ? list[i]->who.c_str() : "<unknown>", list[i]->text.c_str());
 			source.Reply(_(END_OF_ANY_LIST), "News");
+		}
 
 		return MOD_CONT;
 	}
@@ -191,22 +137,23 @@ class NewsBase : public Command
 	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
 	{
 		const Anope::string text = params.size() > 1 ? params[1] : "";
-		int n;
 
 		if (text.empty())
 			this->OnSyntaxError(source, "ADD");
 		else
 		{
 			if (readonly)
-			{
 				source.Reply(_(READ_ONLY_MODE));
-				return MOD_CONT;
-			}
-			n = add_newsitem(source, text, type);
-			if (n < 0)
-				source.Reply(_("News list is full!"));
-			else
-				source.Reply(msgs[MSG_ADDED], n);
+
+			NewsItem *news = new NewsItem();
+			news->type = type;
+			news->text = text;
+			news->time = Anope::CurTime;
+			news->who = source.u->nick;
+
+			this->ns->AddNewsItem(news);
+
+			source.Reply(msgs[MSG_ADDED]);
 		}
 
 		return MOD_CONT;
@@ -220,35 +167,35 @@ class NewsBase : public Command
 			this->OnSyntaxError(source, "DEL");
 		else
 		{
-			if (readonly)
-			{
-				source.Reply(_(READ_ONLY_MODE));
-				return MOD_CONT;
-			}
-			if (!text.equals_ci("ALL"))
-			{
-				try
-				{
-					unsigned num = convertTo<unsigned>(text);
-					if (num > 0 && del_newsitem(num, type))
-					{
-						source.Reply(msgs[MSG_DELETED], num);
-						for (unsigned i = 0, end = News.size(); i < end; ++i)
-							if (News[i]->type == type && News[i]->num > num)
-								--News[i]->num;
-						return MOD_CONT;
-					}
-				}
-				catch (const ConvertException &) { }
-
-				source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
-			}
+			std::vector<NewsItem *> &list = this->ns->GetNewsList(type);
+			if (list.empty())
+				source.Reply(msgs[MSG_LIST_NONE]);
 			else
 			{
-				if (del_newsitem(0, type))
-					source.Reply(msgs[MSG_DELETED_ALL]);
+				if (readonly)
+					source.Reply(_(READ_ONLY_MODE));
+				if (!text.equals_ci("ALL"))
+				{
+					try
+					{
+						unsigned num = convertTo<unsigned>(text);
+						if (num > 0 && num <= list.size())
+						{
+							this->ns->DelNewsItem(list[num - 1]);
+							source.Reply(msgs[MSG_DELETED], num);
+							return MOD_CONT;
+						}
+					}
+					catch (const ConvertException &) { }
+
+					source.Reply(msgs[MSG_DEL_NOT_FOUND], text.c_str());
+				}
 				else
-					source.Reply(msgs[MSG_DEL_NONE]);
+				{
+					for (unsigned i = list.size(); i > 0; --i)
+						this->ns->DelNewsItem(list[i - 1]);
+					source.Reply(msgs[MSG_DELETED_ALL]);
+				}
 			}
 		}
 
@@ -257,10 +204,12 @@ class NewsBase : public Command
 
 	CommandReturn DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType type)
 	{
-		const Anope::string &cmd = params[0];
-		Anope::string type_name;
+		if (!this->ns)
+			return MOD_CONT;
 
-		const char **msgs = findmsgs(type, type_name);
+		const Anope::string &cmd = params[0];
+
+		const char **msgs = findmsgs(type);
 		if (!msgs)
 			throw CoreException("news: Invalid type to do_news()");
 
@@ -276,7 +225,7 @@ class NewsBase : public Command
 		return MOD_CONT;
 	}
  public:
-	NewsBase(const Anope::string &newstype) : Command(newstype, 1, 2, "operserv/news")
+	NewsBase(const Anope::string &newstype) : Command(newstype, 1, 2, "operserv/news"), ns("news")
 	{
 	}
 
@@ -398,12 +347,53 @@ class CommandOSRandomNews : public NewsBase
 
 class OSNews : public Module
 {
+	MyNewsService newsservice;
+
 	CommandOSLogonNews commandoslogonnews;
 	CommandOSOperNews commandosopernews;
 	CommandOSRandomNews commandosrandomnews;
 
+	void DisplayNews(User *u, NewsType Type)
+	{
+		std::vector<NewsItem *> &newsList = this->newsservice.GetNewsList(Type);
+		if (newsList.empty())
+			return;
+
+		Anope::string msg;
+		if (Type == NEWS_LOGON)
+			msg = _("[\002Logon News\002 - %s] %s");
+		else if (Type == NEWS_OPER)
+			msg = _("[\002Oper News\002 - %s] %s");
+		else if (Type == NEWS_RANDOM)
+			msg = _("[\002Random News\002 - %s] %s");
+
+		static unsigned cur_rand_news = 0;
+		unsigned displayed = 0;
+		for (unsigned i = 0, end = newsList.size(); i < end; ++i)
+		{
+			if (Type == NEWS_RANDOM && i != cur_rand_news)
+				continue;
+
+			u->SendMessage(Type != NEWS_OPER && global ? global->Bot() : operserv->Bot(), msg.c_str(), do_strftime(newsList[i]->time).c_str(), newsList[i]->text.c_str());
+
+			++displayed;
+
+			if (Type == NEWS_RANDOM)
+			{
+				++cur_rand_news;
+				break;
+			}
+			else if (displayed >= Config->NewsCount)
+				break;
+		}
+
+		/* Reset to head of list to get first random news value */
+		if (Type == NEWS_RANDOM && cur_rand_news >= newsList.size())
+			cur_rand_news = 0;
+	}
+
  public:
-	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), newsservice(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -416,13 +406,8 @@ class OSNews : public Module
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, 4);
-	}
 
-	~OSNews()
-	{
-		for (std::vector<NewsItem *>::iterator it = News.begin(), it_end = News.end(); it != it_end; ++it)
-			delete *it;
-		News.clear();
+		ModuleManager::RegisterService(&this->newsservice);
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)
@@ -445,7 +430,7 @@ class OSNews : public Module
 		if (params[0].equals_ci("OS") && params.size() >= 7 && params[1].equals_ci("NEWS"))
 		{
 			NewsItem *n = new NewsItem();
-			n->num = params[2].is_pos_number_only() ? convertTo<unsigned>(params[2]) : 0;
+			// params[2] was news number
 			n->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
 			n->who = params[4];
 			if (params[5].equals_ci("LOGON"))
@@ -454,8 +439,9 @@ class OSNews : public Module
 				n->type = NEWS_RANDOM;
 			else if (params[5].equals_ci("OPER"))
 				n->type = NEWS_OPER;
-			n->Text = params[6];
-			News.push_back(n);
+			n->text = params[6];
+
+			this->newsservice.AddNewsItem(n);
 
 			return EVENT_STOP;
 		}
@@ -465,18 +451,22 @@ class OSNews : public Module
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		for (std::vector<NewsItem *>::iterator it = News.begin(); it != News.end(); ++it)
+		for (unsigned i = 0; i < 3; ++i)
 		{
-			NewsItem *n = *it;
-			Anope::string ntype;
-			if (n->type == NEWS_LOGON)
-				ntype = "LOGON";
-			else if (n->type == NEWS_RANDOM)
-				ntype = "RANDOM";
-			else if (n->type == NEWS_OPER)
-				ntype = "OPER";
-			Anope::string buf = "OS NEWS " + stringify(n->num) + " " + stringify(n->time) + " " + n->who + " " + ntype + " :" + n->Text;
-			Write(buf);
+			std::vector<NewsItem *> &list = this->newsservice.GetNewsList(static_cast<NewsType>(i));
+			for (std::vector<NewsItem *>::iterator it = list.begin(); it != list.end(); ++it)
+			{
+				NewsItem *n = *it;
+				Anope::string ntype;
+				if (n->type == NEWS_LOGON)
+					ntype = "LOGON";
+				else if (n->type == NEWS_RANDOM)
+					ntype = "RANDOM";
+				else if (n->type == NEWS_OPER)
+					ntype = "OPER";
+				Anope::string buf = "OS NEWS 0 " + stringify(n->time) + " " + n->who + " " + ntype + " :" + n->text;
+				Write(buf);
+			}
 		}
 	}
 };

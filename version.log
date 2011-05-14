@@ -6,11 +6,18 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
-VERSION_PATCH="5"
-VERSION_EXTRA="-git"
-VERSION_BUILD="3071"
+VERSION_PATCH="6"
+VERSION_EXTRA=""
+VERSION_BUILD="3072"
 
-# $Log$ # Changes since 1.8.5 Release
+# $Log$ # Changes since 1.8.6 Release
+
+
+
+
+
+
+# Leading up to 1.8.6 Release
 #Revision 3071 - Removed atheme2anope database converter as its out of date
 #Revision 3070 - Bug #1236 - Fixed crash in enc_md5 on Mac
 #Revision 3069 - Bug #1263 - Fixed /ns REGISTER not getting an "unknown cmd" reply when ns_register is not loaded & ns_maxemail is loaded. (Bug cannot be structurally fixed, needs to be addressed by 3rd party module authors for similar situations.)

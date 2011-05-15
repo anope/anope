@@ -188,7 +188,7 @@ class CommandOSSQLine : public Command
 				return MOD_CONT;
 
 			source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << duration(expires - Anope::CurTime) << " [affects " << affected << " user(s) (" << percent << "%)]";
+			Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 			if (readonly)
 				source.Reply(_(READ_ONLY_MODE));

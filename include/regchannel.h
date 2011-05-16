@@ -68,7 +68,7 @@ const Anope::string ChannelInfoFlagStrings[] = {
 	"SIGNKICK", "SIGNKICK_LEVEL", "XOP", "SUSPENDED", "PERSIST", ""
 };
 
-class ChanAccess
+class CoreExport ChanAccess
 {
 	Anope::string mask;	/* Mask of the access entry */
  public:

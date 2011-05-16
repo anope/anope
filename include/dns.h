@@ -113,7 +113,7 @@ struct DNSPacket
 	inline void FillBuffer(unsigned char *buffer);
 };
 
-struct DNSRecord
+struct CoreExport DNSRecord
 {
 	/* Name of the initial lookup */
 	Anope::string name;
@@ -156,7 +156,7 @@ class DNSSocket : public ConnectionSocket
 
 /** DNS manager, manages the connection and all requests
  */
-class DNSManager : public Timer
+class CoreExport DNSManager : public Timer
 {
 	std::multimap<Anope::string, DNSRecord *> cache;
  public:

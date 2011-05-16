@@ -1,3 +1,23 @@
+Anope Version 1.9.3-p1
+--------------------
+F Fixed bad logic in /os exception preventing valid hosts from being added
+F Fixed /os sqline clear
+F Fixed not applying SQLines to our own clients
+F Fixed crash from deleting nonexistant users on the XOP access lists
+F Fixed crash when /cs set mlock is given an empty string
+F Fixed a potential crash from expiring nicks
+F Fixed build on Debian Lenny
+F Fixed /bs badword del to show what word was deleted
+F Fixed using /ns release with a password
+F Fixed allowing setting a valid TTB with /bs kick repeat
+F Fixed caps kicker
+F Fixed many SQL issues
+F Fixed reading resolv.conf if it has multiple spaces or tabs
+F Fixed creating permanent channels on burst and setting their topics
+F Fixed /cs register to show in HELP
+F Fixed restricting people from registering guest nick names
+F Fixed a potential crash from dropping nicks
+
 Anope Version 1.9.3
 --------------------
 A Added italics BotServ kicks support

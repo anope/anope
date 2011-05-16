@@ -6,7 +6,6 @@ A /chanserv mode command
 A Ability for users to delete their own access in channels
 A Added support for Plexus 3
 A Readded in support for /cs op/deop/etc to op/deop you in all channels
-A Added support for ngIRCd
 A Added LDAP support
 A Added live SQL support
 A Added support for learning tracking/storing/locking all modes at runtime

@@ -1019,7 +1019,7 @@ class DBMySQL : public Module
 	{
 		SQLQuery query("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (@level, @display, @channel, @last_seen, @creator)");
 		query.setValue("level", access->level);
-		query.setValue("display", access->mask);
+		query.setValue("display", access->GetMask());
 		query.setValue("channel", ci->name);
 		query.setValue("last_seen", access->last_seen);
 		query.setValue("creator", access->creator);
@@ -1029,7 +1029,7 @@ class DBMySQL : public Module
 	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
 		SQLQuery query("DELETE FROM `anope_cs_access` WHERE `display` = @display AND `channel` = @channel");
-		query.setValue("display", access->mask);
+		query.setValue("display", access->GetMask());
 		query.setValue("channel", ci->name);
 		this->RunQuery(query);
 	}
@@ -1038,7 +1038,7 @@ class DBMySQL : public Module
 	{
 		SQLQuery query("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (@level, @display, @channel, @last_seen, @creator) ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
 		query.setValue("level", access->level);
-		query.setValue("display", access->mask);
+		query.setValue("display", access->GetMask());
 		query.setValue("channel", ci->name);
 		query.setValue("last_seen", access->last_seen);
 		query.setValue("creator", access->creator);

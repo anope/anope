@@ -193,7 +193,7 @@ class CommandBSSet : public Command
 					SyntaxError(source, "SET MSG", _("SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|\037}"));
 			}
 			else
-				source.Reply(_(UNKNOWN_OPTION), option.c_str(), Config->UseStrictPrivMsgString.c_str(), BotServ->nick.c_str(), this->name.c_str());
+				source.Reply(_(UNKNOWN_OPTION), option.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str(), this->name.c_str());
 		}
 
 		return MOD_CONT;

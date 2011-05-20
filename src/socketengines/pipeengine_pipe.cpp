@@ -44,7 +44,7 @@ Pipe::Pipe() : BufferedSocket()
 	this->WritePipe = fds[1];
 	this->IPv6 = false;
 
-	SocketEngine->AddSocket(this);
+	SocketEngine::AddSocket(this);
 }
 
 bool Pipe::ProcessRead()

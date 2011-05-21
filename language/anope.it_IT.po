@@ -6989,7 +6989,7 @@ msgstr ""
 
 #: modules/core/ms_ignore.cpp:91
 msgid ""
-"Syntax: IGNORE [channek] {ADD|DEL|LIST} [entry]\n"
+"Syntax: IGNORE [channel] {ADD|DEL|LIST} [entry]\n"
 " \n"
 "Allows you to ignore users by nick or host from memoing you. If someone on "
 "your\n"

@@ -84,7 +84,7 @@ class CommandMSIgnore : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002IGNORE [\037channek\037] {\002ADD|DEL|LIST\002} [\037entry\037]\n"
+		source.Reply(_("Syntax: \002IGNORE [\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]\n"
 				" \n"
 				"Allows you to ignore users by nick or host from memoing you. If someone on your\n"
 				"memo ignore list tries to memo you, they will not be told that you have them ignored."));

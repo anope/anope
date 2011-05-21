@@ -124,7 +124,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server)
 	{
-		send_cmd("", "SERVER %s %s %d %s :%s", server->GetName().c_str(), uplink_server ? uplink_server->password.c_str() : "none", server->GetHops(), server->GetSID().c_str(), server->GetDescription().c_str());
+		send_cmd("", "SERVER %s %s %d %s :%s", server->GetName().c_str(), Config->Uplinks[CurrentUplink]->password.c_str(), server->GetHops(), server->GetSID().c_str(), server->GetDescription().c_str());
 	}
 
 	/* JOIN */

@@ -843,6 +843,15 @@ void Anope::Unhex(const Anope::string &src, char *dest)
 	dest[destpos] = 0;
 }
 
+int Anope::LastErrorCode()
+{
+#ifndef _WIN32
+	return errno;
+#else
+	return GetLastError();
+#endif
+}
+
 const Anope::string Anope::LastError()
 {
 #ifndef _WIN32

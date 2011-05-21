@@ -345,7 +345,7 @@ class CoreExport ServerConfig
 	/* Host to connect to **/
 	Anope::string LocalHost;
 	/* List of uplink servers to try and connect to */
-	std::list<Uplink *> Uplinks;
+	std::vector<Uplink *> Uplinks;
 
 	/* Our server name */
 	Anope::string ServerName;
@@ -453,8 +453,6 @@ class CoreExport ServerConfig
 	Anope::string BotModes;
 	/* THe actual modes */
 	ChannelStatus BotModeList;
-	/* How many times to try and reconnect to the uplink before giving up */
-	unsigned MaxRetries;
 	/* How long to wait between connection attempts */
 	int RetryWait;
 	/* If services should hide unprivileged commands */

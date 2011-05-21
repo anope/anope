@@ -25,7 +25,7 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 			if (u && u->HasMode(UMODE_OPER))
 			{
 				ircdproto->SendNumeric(Config->ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - start_time));
+				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", Config->Uplinks[CurrentUplink]->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - start_time));
 			}
 
 			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);

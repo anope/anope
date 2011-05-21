@@ -55,8 +55,8 @@ Anope::string binary_dir; /* Used to store base path for Anope */
 /* Set to 1 if we are to quit */
 bool quitting = false;
 
-/* Set to 1 if we are to quit after saving databases */
-bool shutting_down = false;
+/* Set to true if we are restarting */
+bool restarting = false;
 
 /* Contains a message as to why services is terminating */
 Anope::string quitmsg;
@@ -65,10 +65,7 @@ Anope::string quitmsg;
 bool save_data = false;
 
 /* At what time were we started? */
-time_t start_time;
-
-/* Parameters and environment */
-char **my_av, **my_envp;
+time_t start_time = time(NULL);
 
 time_t Anope::CurTime = time(NULL);
 
@@ -92,22 +89,113 @@ class UpdateTimer : public Timer
 };
 
 ConnectionSocket *UplinkSock = NULL;
+int CurrentUplink = 0;
 
-UplinkSocket::UplinkSocket(bool ipv6) : ConnectionSocket(ipv6)
-{
-	UplinkSock = this;
-}
+static void Connect();
 
-UplinkSocket::~UplinkSocket()
+class ReconnectTimer : public Timer
 {
-	SocketEngine::Process();
-	UplinkSock = NULL;
-}
+ public:
+	ReconnectTimer(int wait) : Timer(wait) { }
 
-bool UplinkSocket::Read(const Anope::string &buf)
+	void Tick(time_t)
+	{
+		Connect();
+	}
+};
+
+class UplinkSocket : public ConnectionSocket
 {
-	process(buf);
-	return true;
+ public:
+	UplinkSocket() : ConnectionSocket(Config->Uplinks[CurrentUplink]->ipv6)
+	{
+		UplinkSock = this;
+	}
+
+	~UplinkSocket()
+	{
+		if (Me && Me->GetUplink() && Me->GetUplink()->IsSynced())
+		{
+			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
+
+			/* Send a quit for all of our bots */
+			for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+			{
+				BotInfo *bi = it->second;
+
+				/* Don't use quitmsg here, it may contain information you don't want people to see */
+				ircdproto->SendQuit(bi, "Shutting down");
+				/* Erase bots from the user list so they don't get nuked later on */
+				UserListByNick.erase(bi->nick);
+				if (!bi->GetUID().empty())
+					UserListByUID.erase(bi->GetUID());
+			}
+
+			/* Clear all of our users, but not our bots */
+			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			{
+				User *u = it->second;
+				++it;
+
+				if (u->server != Me)
+					delete u;
+			}
+
+			ircdproto->SendSquit(Config->ServerName, quitmsg);
+
+			this->ProcessWrite(); // Write out the last bit
+		}
+
+		Me->SetFlag(SERVER_SYNCING);
+		for (unsigned i = Me->GetLinks().size(); i > 0; --i)
+			if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
+				delete Me->GetLinks()[i - 1];
+
+		UplinkSock = NULL;
+
+		if (!quitting)
+		{
+			int Retry = Config->RetryWait;
+			if (Retry <= 0)
+				Retry = 60;
+
+			Log() << "Retrying in " << Retry << " seconds";
+			new ReconnectTimer(Retry);
+		}
+	}
+
+	bool Read(const Anope::string &buf)
+	{
+		process(buf);
+		return true;
+	}
+
+	void OnConnect()
+	{
+		Log() << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
+		ircdproto->SendConnect();
+		FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+	}
+
+	void OnError(const Anope::string &error)
+	{
+		Log() << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
+		this->SetFlag(SF_DEAD);
+	}
+};
+
+static void Connect()
+{
+	if (static_cast<unsigned>(++CurrentUplink) >= Config->Uplinks.size())
+		CurrentUplink = 0;
+
+	Uplink *u = Config->Uplinks[CurrentUplink];
+
+	new UplinkSocket();
+	if (!Config->LocalHost.empty())
+		UplinkSock->Bind(Config->LocalHost);
+	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
+	UplinkSock->Connect(u->host, u->port);
 }
 
 /*************************************************************************/
@@ -120,95 +208,6 @@ void save_databases()
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnSaveDatabase, OnSaveDatabase());
 	Log(LOG_DEBUG) << "Saving databases";
-}
-
-/*************************************************************************/
-
-/* Restarts services */
-void do_restart_services()
-{
-	if (!readonly)
-	{
-		save_databases();
-	}
-	Log() << "Restarting";
-
-	if (quitmsg.empty())
-		quitmsg = "Restarting";
-
-	FOREACH_MOD(I_OnRestart, OnRestart());
-	ModuleManager::UnloadAll();
-
-	/* Send a quit for all of our bots */
-	for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-	{
-		BotInfo *bi = it->second;
-
-		/* Don't use quitmsg here, it may contain information you don't want people to see */
-		ircdproto->SendQuit(bi, "Restarting");
-		/* Erase bots from the user list so they don't get nuked later on */
-		UserListByNick.erase(bi->nick);
-		if (!bi->GetUID().empty())
-			UserListByUID.erase(bi->GetUID());
-	}
-
-	ircdproto->SendSquit(Config->ServerName, quitmsg);
-	delete UplinkSock;
-	SocketEngine::Shutdown();
-
-	chdir(binary_dir.c_str());
-	my_av[0] = const_cast<char *>(("./" + services_bin).c_str());
-	execve(services_bin.c_str(), my_av, my_envp);
-	if (!readonly)
-	{
-		throw FatalException("Restart failed");
-	}
-
-	exit(1);
-}
-
-/*************************************************************************/
-
-/* Terminates services */
-
-static void services_shutdown()
-{
-	if (quitmsg.empty())
-		quitmsg = "Terminating, reason unknown";
-	Log() << quitmsg;
-
-	FOREACH_MOD(I_OnShutdown, OnShutdown());
-	ModuleManager::UnloadAll();
-
-	if (started && UplinkSock)
-	{
-		/* Send a quit for all of our bots */
-		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-		{
-			BotInfo *bi = it->second;
-
-			/* Don't use quitmsg here, it may contain information you don't want people to see */
-			ircdproto->SendQuit(bi, "Shutting down");
-			/* Erase bots from the user list so they don't get nuked later on */
-			UserListByNick.erase(bi->nick);
-			if (!bi->GetUID().empty())
-				UserListByUID.erase(bi->GetUID());
-		}
-
-		ircdproto->SendSquit(Config->ServerName, quitmsg);
-
-		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-		{
-			User *u = it->second;
-			++it;
-			delete u;
-		}
-	}
-	delete UplinkSock;
-	SocketEngine::Shutdown();
-
-	/* just in case they weren't all removed at least run once */
-	ModuleManager::CleanupRuntimeDirectory();
 }
 
 /*************************************************************************/
@@ -314,201 +313,132 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 
 /*************************************************************************/
 
-static bool Connect()
-{
-	/* Connect to the remote server */
-	int servernum = 1;
-	for (std::list<Uplink *>::iterator curr_uplink = Config->Uplinks.begin(), end_uplink = Config->Uplinks.end(); curr_uplink != end_uplink; ++curr_uplink, ++servernum)
-	{
-		uplink_server = *curr_uplink;
-
-		EventReturn MOD_RESULT;
-		FOREACH_RESULT(I_OnPreServerConnect, OnPreServerConnect(*curr_uplink, servernum));
-		if (MOD_RESULT != EVENT_CONTINUE)
-		{
-			if (MOD_RESULT == EVENT_STOP)
-				continue;
-			return true;
-		}
-
-		DNSRecord req = DNSManager::BlockingQuery(uplink_server->host, uplink_server->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
-
-		if (!req)
-		{
-			Log() << "Unable to connect to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "): Invalid hostname/IP";
-			continue;
-		}
-		
-		try
-		{
-			new UplinkSocket(uplink_server->ipv6);
-			UplinkSock->Connect(req.result, uplink_server->port, Config->LocalHost);
-		}
-		catch (const SocketException &ex)
-		{
-			Log() << "Unable to connect to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << "): " << ex.GetReason();
-			continue;
-		}
-
-		Log() << "Connected to server " << servernum << " (" << uplink_server->host << ":" << uplink_server->port << ")";
-		return true;
-	}
-
-	uplink_server = NULL;
-
-	return false;
-}
-
-/*************************************************************************/
-
 /* Main routine.  (What does it look like? :-) ) */
 
 int main(int ac, char **av, char **envp)
 {
-	try
-	{
-		my_av = av;
-		my_envp = envp;
+	int return_code = 0;
 
-		char cwd[PATH_MAX] = "";
+	char cwd[PATH_MAX] = "";
 #ifdef _WIN32
-		GetCurrentDirectory(PATH_MAX, cwd);
+	GetCurrentDirectory(PATH_MAX, cwd);
 #else
-		getcwd(cwd, PATH_MAX);
+	getcwd(cwd, PATH_MAX);
 #endif
-		orig_cwd = cwd;
+	orig_cwd = cwd;
 
 #ifndef _WIN32
-		/* If we're root, issue a warning now */
-		if (!getuid() && !getgid())
-		{
-			fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
-			fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
-			fprintf(stderr, "    as the root superuser.\n");
-		}
+	/* If we're root, issue a warning now */
+	if (!getuid() && !getgid())
+	{
+		fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
+		fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
+		fprintf(stderr, "    as the root superuser.\n");
+	}
 #endif
 
-		binary_dir = GetFullProgDir(av[0]);
-		if (binary_dir[binary_dir.length() - 1] == '.')
-			binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
+	binary_dir = GetFullProgDir(av[0]);
+	if (binary_dir[binary_dir.length() - 1] == '.')
+		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
 #ifdef _WIN32
-		Anope::string::size_type n = binary_dir.rfind('\\');
-		services_dir = binary_dir.substr(0, n) + "\\data";
+	Anope::string::size_type n = binary_dir.rfind('\\');
+	services_dir = binary_dir.substr(0, n) + "\\data";
 #else
-		Anope::string::size_type n = binary_dir.rfind('/');
-		services_dir = binary_dir.substr(0, n) + "/data";
+	Anope::string::size_type n = binary_dir.rfind('/');
+	services_dir = binary_dir.substr(0, n) + "/data";
 #endif
 
-		/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
-		ModuleManager::CleanupRuntimeDirectory();
+	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
+	ModuleManager::CleanupRuntimeDirectory();
 
+	try
+	{
 		/* General initialization first */
 		Init(ac, av);
-
-		/* If the first connect fails give up, don't sit endlessly trying to reconnect */
-		if (!Connect())
-		{
-			Log() << "Can't connect to any servers";
-			return 0;
-		}
-
-		ircdproto->SendConnect();
-		FOREACH_MOD(I_OnServerConnect, OnServerConnect());
-
-		started = true;
-
-		/* Set up timers */
-		time_t last_check = Anope::CurTime;
-		UpdateTimer updateTimer(Config->UpdateTimeout);
-
-		/*** Main loop. ***/
-		while (!quitting)
-		{
-			while (!quitting && UplinkSock)
-			{
-				Log(LOG_DEBUG_2) << "Top of main loop";
-
-				if (!readonly && (save_data || shutting_down))
-				{
-					if (shutting_down)
-						ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
-					save_databases();
-					save_data = false;
-				}
-
-				if (shutting_down)
-				{
-					quitting = true;
-					break;
-				}
-
-				if (Anope::CurTime - last_check >= Config->TimeoutCheck)
-				{
-					TimerManager::TickTimers(Anope::CurTime);
-					last_check = Anope::CurTime;
-				}
-
-				/* Free up any finished threads */
-				threadEngine.Process();
-
-				/* Process any modes that need to be (un)set */
-				if (Me != NULL && Me->IsSynced())
-					ModeManager::ProcessModes();
-
-				/* Process the socket engine */
-				SocketEngine::Process();
-			}
-
-			if (quitting)
-				/* Disconnect and exit */
-				services_shutdown();
-			else
-			{
-				FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
-
-				/* Clear all of our users, but not our bots */
-				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-				{
-					User *u = it->second;
-					++it;
-
-					if (u->server != Me)
-						delete u;
-				}
-
-				Me->SetFlag(SERVER_SYNCING);
-				for (unsigned i = Me->GetLinks().size(); i > 0; --i)
-					if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
-						delete Me->GetLinks()[i - 1];
-
-				unsigned j = 0;
-				for (; j < (Config->MaxRetries ? Config->MaxRetries : j + 1); ++j)
-				{
-					Log() << "Disconnected from the server, retrying in " << Config->RetryWait << " seconds";
-
-					sleep(Config->RetryWait);
-					if (Connect())
-					{
-						ircdproto->SendConnect();
-						FOREACH_MOD(I_OnServerConnect, OnServerConnect());
-						break;
-					}
-				}
-				if (Config->MaxRetries && j == Config->MaxRetries)
-				{
-					Log() << "Max connection retry limit exceeded";
-					quitting = true;
-				}
-			}
-		}
 	}
 	catch (const FatalException &ex)
 	{
-		if (!ex.GetReason().empty())
-			Log(LOG_TERMINAL) << ex.GetReason();
-		if (started)
-			services_shutdown();
+		Log() << ex.GetReason();
 		return -1;
+	}
+
+	try
+	{
+		Connect();
+	}
+	catch (const SocketException &ex)
+	{
+		Log() << ex.GetReason();
+		ModuleManager::UnloadAll();
+		SocketEngine::Shutdown();
+		for (Module *m; (m = ModuleManager::FindFirstOf(PROTOCOL)) != NULL;)
+			ModuleManager::UnloadModule(m, NULL);
+		ModuleManager::CleanupRuntimeDirectory();
+		return -1;
+	}
+
+	started = true;
+
+	/* Set up timers */
+	time_t last_check = Anope::CurTime;
+	UpdateTimer updateTimer(Config->UpdateTimeout);
+
+	/*** Main loop. ***/
+	while (!quitting)
+	{
+		Log(LOG_DEBUG_2) << "Top of main loop";
+
+		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
+		{
+			TimerManager::TickTimers(Anope::CurTime);
+			last_check = Anope::CurTime;
+		}
+
+		/* Free up any finished threads */
+		threadEngine.Process();
+
+		/* Process any modes that need to be (un)set */
+		if (Me->IsSynced())
+			ModeManager::ProcessModes();
+
+		/* Process the socket engine */
+		SocketEngine::Process();
+	}
+
+	if (save_data)
+	{
+		ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
+		save_databases();
+		save_data = false;
+	}
+
+	if (restarting)
+	{
+		FOREACH_MOD(I_OnRestart, OnRestart());
+	}
+	else
+	{
+		FOREACH_MOD(I_OnShutdown, OnShutdown());
+	}
+
+	if (quitmsg.empty())
+		quitmsg = "Terminating, reason unknown";
+	Log() << quitmsg;
+
+	ModuleManager::UnloadAll();
+	SocketEngine::Shutdown();
+	for (Module *m; (m = ModuleManager::FindFirstOf(PROTOCOL)) != NULL;)
+		ModuleManager::UnloadModule(m, NULL);
+
+	ModuleManager::CleanupRuntimeDirectory();
+
+	if (restarting)
+	{
+		chdir(binary_dir.c_str());
+		av[0] = const_cast<char *>(("./" + services_bin).c_str());
+		execve(services_bin.c_str(), av, envp);
+		Log() << "Restart failed";
+		return_code = -1;
 	}
 
 	return 0;

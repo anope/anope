@@ -157,7 +157,7 @@ class PlexusProto : public IRCDProto
 
 	void SendConnect()
 	{
-		plexus_cmd_pass(uplink_server->password);
+		plexus_cmd_pass(Config->Uplinks[CurrentUplink]->password);
 		plexus_cmd_capab();
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);

@@ -2,6 +2,8 @@
 #include "ssl.h"
 #include "xmlrpc.h"
 
+std::vector<XMLRPCListenSocket *> listen_sockets;
+
 class MyXMLRPCClientSocket : public XMLRPCClientSocket
 {
 	/* Used to skip the (optional) HTTP header,  which we really don't care about */
@@ -85,7 +87,17 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 class MyXMLRPCListenSocket : public XMLRPCListenSocket
 {
  public:
-	MyXMLRPCListenSocket(const Anope::string &bindip, int port, bool ipv6, const Anope::string &u, const Anope::string &p, const std::vector<Anope::string> &a) : XMLRPCListenSocket(bindip, port, ipv6, u, p, a) { }
+	MyXMLRPCListenSocket(const Anope::string &bindip, int port, bool ipv6, const Anope::string &u, const Anope::string &p, const std::vector<Anope::string> &a) : XMLRPCListenSocket(bindip, port, ipv6, u, p, a)
+	{
+		listen_sockets.push_back(this);
+	}
+
+	~MyXMLRPCListenSocket()
+	{
+		std::vector<XMLRPCListenSocket *>::iterator it = std::find(listen_sockets.begin(), listen_sockets.end(), this);
+		if (it != listen_sockets.end())
+			listen_sockets.erase(it);
+	}
 	
 	ClientSocket *OnAccept(int fd, const sockaddrs &addr)
 	{
@@ -208,7 +220,6 @@ class ModuleXMLRPC;
 static ModuleXMLRPC *me;
 class ModuleXMLRPC : public Module
 {
-	std::vector<MyXMLRPCListenSocket *> listen_sockets;
 	service_reference<SSLService> sslref;
 
  public:
@@ -229,15 +240,16 @@ class ModuleXMLRPC : public Module
 	~ModuleXMLRPC()
 	{
 		/* Clean up our sockets and our listening sockets */
-		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end; ++it)
+		for (std::map<int, Socket *>::const_iterator it = SocketEngine::Sockets.begin(), it_end = SocketEngine::Sockets.end(); it != it_end;)
 		{
 			Socket *s = it->second;
+			++it;
 
 			if (s->Type == SOCKTYPE_CLIENT)
 			{
 				ClientSocket *cs = debug_cast<ClientSocket *>(s);
-				for (unsigned i = 0; i < this->listen_sockets.size(); ++i)
-					if (cs->LS == this->listen_sockets[i])
+				for (unsigned i = 0; i < listen_sockets.size(); ++i)
+					if (cs->LS == listen_sockets[i])
 					{
 						delete cs;
 						break;
@@ -245,18 +257,18 @@ class ModuleXMLRPC : public Module
 			}
 		}
 
-		for (unsigned i = 0; i < this->listen_sockets.size(); ++i)
-			delete this->listen_sockets[i];
-		this->listen_sockets.clear();
+		for (unsigned i = 0; i < listen_sockets.size(); ++i)
+			delete listen_sockets[i];
+		listen_sockets.clear();
 	}
 
 	void OnReload()
 	{
 		ConfigReader config;
 
-		for (unsigned i = 0; i < this->listen_sockets.size(); ++i)
-			delete this->listen_sockets[i];
-		this->listen_sockets.clear();
+		for (unsigned i = 0; i < listen_sockets.size(); ++i)
+			delete listen_sockets[i];
+		listen_sockets.clear();
 
 		for (int i = 0; i < config.Enumerate("m_xmlrpc"); ++i)
 		{
@@ -282,10 +294,7 @@ class ModuleXMLRPC : public Module
 			{
 				MyXMLRPCListenSocket *xmls = new MyXMLRPCListenSocket(bindip, port, ipv6, username, password, allowed_vector);
 				if (ssl)
-				{
 					sslref->Init(xmls);
-				}
-				this->listen_sockets.push_back(xmls);
 			}
 			catch (const SocketException &ex)
 			{

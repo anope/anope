@@ -160,7 +160,7 @@ class RatboxProto : public IRCDProto
 
 	void SendConnect()
 	{
-		ratbox_cmd_pass(uplink_server->password);
+		ratbox_cmd_pass(Config->Uplinks[CurrentUplink]->password);
 		ratbox_cmd_capab();
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);

@@ -251,7 +251,7 @@ bool cidr::match(sockaddrs &other)
  * @param sz How much to read
  * @return Number of bytes received
  */
-int SocketIO::Recv(Socket *s, char *buf, size_t sz) const
+int SocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
 	size_t i = recv(s->GetFD(), buf, sz, 0);
 	TotalRead += i;
@@ -263,7 +263,7 @@ int SocketIO::Recv(Socket *s, char *buf, size_t sz) const
  * @param buf What to write
  * @return Number of bytes written
  */
-int SocketIO::Send(Socket *s, const Anope::string &buf) const
+int SocketIO::Send(Socket *s, const Anope::string &buf)
 {
 	size_t i = send(s->GetFD(), buf.c_str(), buf.length(), 0);
 	TotalWritten += i;
@@ -272,8 +272,9 @@ int SocketIO::Send(Socket *s, const Anope::string &buf) const
 
 /** Accept a connection from a socket
  * @param s The socket
+ * @return The new client socket
  */
-void SocketIO::Accept(ListenSocket *s)
+ClientSocket *SocketIO::Accept(ListenSocket *s)
 {
 	sockaddrs conaddr;
 
@@ -285,32 +286,44 @@ void SocketIO::Accept(ListenSocket *s)
 #endif
 
 	if (newsock > 0 && newsock != INVALID_SOCKET)
-		s->OnAccept(newsock, conaddr);
+		return s->OnAccept(newsock, conaddr);
 	else
 		throw SocketException("Unable to accept connection: " + Anope::LastError());
+}
+
+/** Bind a socket
+ * @param s The socket
+ * @param ip The IP to bind to
+ * @param port The optional port to bind to
+ */
+void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
+{
+	s->bindaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, ip, port);
+	if (bind(s->GetFD(), &s->bindaddr.sa, s->bindaddr.size()) == -1)
+		throw SocketException("Unable to bind to address: " + Anope::LastError());
 }
 
 /** Connect the socket
   * @param s THe socket
   * @param target IP to connect to
   * @param port to connect to
-  * @param bindip IP to bind to, if any
   */
-void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port, const Anope::string &bindip)
+void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
-	s->bindaddr.clear();
-	s->conaddr.clear();
-
-	if (!bindip.empty())
-	{
-		s->bindaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, bindip, 0);
-		if (bind(s->GetFD(), &s->bindaddr.sa, s->bindaddr.size()) == -1)
-			throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
-	}
-
 	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
-	if (connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size()) == -1 && errno != EINPROGRESS)
-		throw SocketException(Anope::string("Error connecting to server: ") + Anope::LastError());
+	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
+	if (c == -1)
+	{
+		if (Anope::LastErrorCode() != EINPROGRESS)
+			throw SocketException("Error connecting to server: " + Anope::LastError());
+		else
+			SocketEngine::MarkWritable(s);
+	}
+	else
+	{
+		s->OnConnect();
+		s->connected = true;
+	}
 }
 
 /** Empty constructor, used for things such as the pipe socket
@@ -335,6 +348,7 @@ Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag, 2>(SocketFlagS
 		this->Sock = socket(this->IPv6 ? AF_INET6 : AF_INET, type, 0);
 	else
 		this->Sock = sock;
+	this->SetNonBlocking();
 	SocketEngine::AddSocket(this);
 }
 
@@ -391,6 +405,15 @@ bool Socket::SetNonBlocking()
 #endif
 }
 
+/** Bind the socket to an ip and port
+ * @param ip The ip
+ * @param port The port
+ */
+void Socket::Bind(const Anope::string &ip, int port)
+{
+	this->IO->Bind(this, ip, port);
+}
+
 /** Called when there is something to be received for this socket
  * @return true on success, false to drop this socket
  */
@@ -445,7 +468,9 @@ bool BufferedSocket::ProcessRead()
 	char tbuffer[NET_BUFSIZE] = "";
 
 	RecvLen = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
-	if (RecvLen <= 0)
+	if (RecvLen == -2)
+		return true;
+	else if (RecvLen <= 0)
 		return false;
 
 	Anope::string sbuffer = this->extrabuf;
@@ -482,10 +507,10 @@ bool BufferedSocket::ProcessRead()
  */
 bool BufferedSocket::ProcessWrite()
 {
-	if (this->WriteBuffer.empty())
-		return true;
 	int count = this->IO->Send(this, this->WriteBuffer);
-	if (count <= -1)
+	if (count == -2)
+		return true;
+	else if (count <= -1)
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
 	if (this->WriteBuffer.empty())
@@ -557,10 +582,8 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6) : S
 	this->Type = SOCKTYPE_LISTEN;
 	this->SetNonBlocking();
 
-	this->listenaddrs.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
-
-	if (bind(Sock, &this->listenaddrs.sa, this->listenaddrs.size()) == -1)
-		throw SocketException(Anope::string("Unable to bind to address: ") + Anope::LastError());
+	this->bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
+	this->IO->Bind(this, bindip, port);
 
 	if (listen(Sock, 5) == -1)
 		throw SocketException(Anope::string("Unable to listen: ") + Anope::LastError());
@@ -601,7 +624,7 @@ ClientSocket *ListenSocket::OnAccept(int fd, const sockaddrs &addr)
  * @param ipv6 true to use IPv6
  * @param type The socket type, defaults to SOCK_STREAM
  */
-ConnectionSocket::ConnectionSocket(bool ipv6, int type) : BufferedSocket(0, ipv6, type)
+ConnectionSocket::ConnectionSocket(bool ipv6, int type) : BufferedSocket(0, ipv6, type), connected(false)
 {
 	this->Type = SOCKTYPE_CONNECTION;
 }
@@ -609,19 +632,58 @@ ConnectionSocket::ConnectionSocket(bool ipv6, int type) : BufferedSocket(0, ipv6
 /** Connect the socket
  * @param TargetHost The target host to connect to
  * @param Port The target port to connect to
- * @param BindHost The host to bind to for connecting
  */
-void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port, const Anope::string &BindHost)
+void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port)
 {
-	try
+	this->IO->Connect(this, TargetHost, Port);
+}
+
+/** Called when the socket is ready to be written to
+ * @return true on success, false to drop this socket
+ */
+bool ConnectionSocket::ProcessWrite()
+{
+	if (!this->connected)
 	{
-		this->IO->Connect(this, TargetHost, Port, BindHost);
+		SocketEngine::ClearWritable(this);
+
+		int optval = 0;
+		socklen_t optlen = sizeof(optval);
+		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen) && !optval)
+		{
+			this->OnConnect();
+			this->connected = true;
+			return true;
+		}
+
+		errno = optval;
+		this->OnError(Anope::LastError());
+		return false;
 	}
-	catch (const SocketException &)
-	{
-		delete this;
-		throw;
-	}
+
+	return BufferedSocket::ProcessWrite();
+}
+
+/** Called when there is an error for this socket
+ * @return true on success, false to drop this socket
+ */
+void ConnectionSocket::ProcessError()
+{
+	if (!this->connected)
+		this->ProcessWrite();
+}
+
+/** Called on a successful connect
+ */
+void ConnectionSocket::OnConnect()
+{
+}
+
+/** Called when a connection is not successful
+ * @param error The error
+ */
+void ConnectionSocket::OnError(const Anope::string &error)
+{
 }
 
 /** Constructor

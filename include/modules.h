@@ -481,12 +481,9 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanExpire(ChannelInfo *ci) { }
 
-	/** Called before Anope connects to its uplink
-	 * @param u The uplink we're going to connect to
-	 * @param Number What number the uplink is
-	 * @return Other than EVENT_CONTINUE to stop attempting to connect
+	/** Called before Anope connecs to its uplink
 	 */
-	virtual EventReturn OnPreServerConnect(Uplink *u, int Number) { return EVENT_CONTINUE; }
+	virtual void OnPreServerConnect() { }
 
 	/** Called when Anope connects to its uplink
 	 */
@@ -1079,7 +1076,7 @@ enum Implementation
 		I_OnModuleLoad, I_OnModuleUnload,
 
 		/* Other */
-		I_OnReload, I_OnPreServerConnect, I_OnNewServer, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
+		I_OnReload, I_OnNewServer, I_OnPreServerConnect, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
 		I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown, I_OnSignal,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
@@ -1205,8 +1202,7 @@ class CoreExport ModuleManager
 	 */
 	static void ClearCallBacks(Module *m);
 
-	/** Unloading all modules, NEVER call this when Anope isn't shutting down.
-	 * Ever.
+	/** Unloading all modules except the protocol module.
 	 */
 	static void UnloadAll();
 

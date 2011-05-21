@@ -85,7 +85,6 @@ E void introduce_user(const Anope::string &user);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname = 0);
 E bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::string &param);
 E void Init(int ac, char **av);
-E Uplink *uplink_server;
 
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProto *);
@@ -114,27 +113,16 @@ E bool noexpire;
 E bool protocoldebug;
 
 E bool quitting;
-E bool shutting_down;
+E bool restarting;
 E Anope::string quitmsg;
 E bool save_data;
 E time_t start_time;
 
 E ConnectionSocket *UplinkSock;
+E int CurrentUplink;
 
 E void save_databases();
 E void sighandler(int signum);
-E void do_restart_services();
-
-/* The socket to our uplink */
-class CoreExport UplinkSocket : public ConnectionSocket
-{
- public:
-	UplinkSocket(bool ipv6 = false);
-
-	virtual ~UplinkSocket();
-
-	bool Read(const Anope::string &buf);
-};
 
 /**** messages.cpp ****/
 

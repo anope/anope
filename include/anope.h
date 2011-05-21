@@ -368,7 +368,12 @@ namespace Anope
 	 */
 	extern CoreExport string printf(const char *fmt, ...);
 
-	/** Return the last error, uses errno/GetLastError() to determin this
+	/** Return the last error code
+	 * @return The error code
+	 */
+	extern CoreExport int LastErrorCode();
+
+	/** Return the last error, uses errno/GetLastError() to determine this
 	 * @return An error message
 	 */
 	extern CoreExport const Anope::string LastError();

@@ -136,7 +136,7 @@ class DBMySQL : public Module
 		if (operserv)
 			this->AddCommand(operserv->Bot(), &commandsqlsync);
 
-		if (uplink_server)
+		if (CurrentUplink)
 			OnServerConnect();
 	}
 

@@ -42,6 +42,11 @@ void DNSRequest::Process()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Processing request to lookup " << this->address << ", of type " << this->QT;
 
+	if (!DNSEngine)
+		throw SocketException("DNSEngine has not been initialized");
+	else if (!DNSEngine->sock || !DNSEngine->sock->connected)
+		throw SocketException("Connection to nameserver has not been established");
+
 	if (this->use_cache && DNSEngine->CheckCache(this))
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Using cached result";
@@ -236,7 +241,8 @@ DNSSocket::~DNSSocket()
 		delete DNSEngine->packets[i - 1];
 	DNSEngine->packets.clear();
 	Log(LOG_NORMAL, "dns") << "Resolver: Lost connection to nameserver";
-	DNSEngine->sock = NULL;
+	if (DNSEngine)
+		DNSEngine->sock = NULL;
 }
 
 int DNSSocket::SendTo(const unsigned char *buf, size_t len) const
@@ -497,7 +503,10 @@ bool DNSSocket::ProcessRead()
 
 bool DNSSocket::ProcessWrite()
 {
-	Log(LOG_DEBUG_2) << "Resolver: Writing to UDP socket";
+	if (!this->connected)
+		return ConnectionSocket::ProcessWrite();
+
+	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS socket";
 
 	bool cont = true;
 	for (unsigned i = DNSEngine->packets.size(); cont && i > 0; --i)
@@ -515,6 +524,16 @@ bool DNSSocket::ProcessWrite()
 
 	SocketEngine::ClearWritable(this);
 	return cont;
+}
+
+void DNSSocket::OnConnect()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Successfully connected to nameserver";
+}
+
+void DNSSocket::OnError(const Anope::string &error)
+{
+	Log() << "Resolver: Error connecting to nameserver: " << error;
 }
 
 DNSManager::DNSManager() : Timer(300, Anope::CurTime, true)

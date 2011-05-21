@@ -376,7 +376,6 @@ void Init(int ac, char **av)
 
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
-	start_time = Anope::CurTime;
 
 	/* Set signal handlers.  Catch certain signals to let us do things or
 	 * panic as necessary, and ignore all others.

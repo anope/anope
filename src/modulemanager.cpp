@@ -308,6 +308,8 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	ano_module_t handle = m->handle;
 	Anope::string filename = m->filename;
 
+	Log(LOG_DEBUG) << "Unloading module " << m->name;
+
 	ano_modclearerr();
 	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
 	const char *err = ano_moderr();
@@ -471,14 +473,14 @@ void ModuleManager::ClearCallBacks(Module *m)
 		delete m->CallBacks.front();
 }
 
-/** Unloading all modules, NEVER call this when Anope isn't shutting down.
- * Ever.
+/** Unloading all modules except the protocol module.
  */
 void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules[MT_END];
 	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-		modules[(*it)->type].push_back((*it)->name);
+		if ((*it)->type != PROTOCOL)
+			modules[(*it)->type].push_back((*it)->name);
 
 	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)
 		for (unsigned j = 0; j < modules[i].size(); ++j)

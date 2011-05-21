@@ -232,7 +232,7 @@ class BahamutIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		bahamut_cmd_pass(uplink_server->password);
+		bahamut_cmd_pass(Config->Uplinks[CurrentUplink]->password);
 		bahamut_cmd_capab();
 		SendServer(Me);
 		bahamut_cmd_svinfo();

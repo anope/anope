@@ -152,6 +152,10 @@ class DNSSocket : public ConnectionSocket
 	bool ProcessRead();
 
 	bool ProcessWrite();
+
+	void OnConnect();
+
+	void OnError(const Anope::string &error);
 };
 
 /** DNS manager, manages the connection and all requests

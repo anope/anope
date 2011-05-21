@@ -937,6 +937,19 @@ struct Uplink
 	bool ipv6;
 
 	Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
+	bool operator==(const Uplink &other) const
+	{
+		if (this->host != other.host)
+			return false;
+		if (this->port != other.port)
+			return false;
+		if (this->password != other.password)
+			return false;
+		if (this->ipv6 != other.ipv6)
+			return false;
+		return true;
+	}
+	inline bool operator!=(const Uplink &other) const { return !(*this == other); }
 };
 
 /** A class to process numbered lists (passed to most DEL/LIST/VIEW commands).

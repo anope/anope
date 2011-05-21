@@ -137,27 +137,34 @@ class CoreExport SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	virtual int Recv(Socket *s, char *buf, size_t sz) const;
+	virtual int Recv(Socket *s, char *buf, size_t sz);
 
 	/** Write something to the socket
  	 * @param s The socket
 	 * @param buf What to write
 	 * @return Number of bytes written
 	 */
-	virtual int Send(Socket *s, const Anope::string &buf) const;
+	virtual int Send(Socket *s, const Anope::string &buf);
 
 	/** Accept a connection from a socket
 	 * @param s The socket
+	 * @return The new socket
 	 */
-	virtual void Accept(ListenSocket *s);
+	virtual ClientSocket *Accept(ListenSocket *s);
+
+	/** Bind a socket
+	 * @param s The socket
+	 * @param ip The IP to bind to
+	 * @param port The optional port to bind to
+	 */
+	virtual void Bind(Socket *s, const Anope::string &ip, int port = 0);
 
 	/** Connect the socket
 	 * @param s THe socket
 	 * @param target IP to connect to
 	 * @param port to connect to
-	 * @param bindip IP to bind to, if any
 	 */
-	virtual void Connect(ConnectionSocket *s, const Anope::string &target, int port, const Anope::string &bindip = "");
+	virtual void Connect(ConnectionSocket *s, const Anope::string &target, int port);
 
 	/** Called when the socket is destructing
 	 */
@@ -173,6 +180,9 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	bool IPv6;
 
  public:
+	/* Sockaddrs for bind() (if it's bound) */
+	sockaddrs bindaddr;
+
 	/* I/O functions used for this socket */
  	SocketIO *IO;
 
@@ -213,6 +223,12 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	 * @return true if the socket is now non-blocking
 	 */
 	bool SetNonBlocking();
+
+	/** Bind the socket to an ip and port
+	 * @param ip The ip
+	 * @param port The port
+	 */
+	void Bind(const Anope::string &ip, int port = 0);
 
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
@@ -291,10 +307,6 @@ class CoreExport BufferedSocket : public Socket
 
 class CoreExport ListenSocket : public Socket
 {
- protected:
-	/* Sockaddrs for bindip/port */
-	sockaddrs listenaddrs;
-
  public:
 	/** Constructor
 	 * @param bindip The IP to bind to
@@ -323,10 +335,10 @@ class CoreExport ListenSocket : public Socket
 class CoreExport ConnectionSocket : public BufferedSocket
 {
  public:
-	/* Sockaddrs for bindip (if there is one) */
-	sockaddrs bindaddr;
 	/* Sockaddrs for connection ip/port */
 	sockaddrs conaddr;
+	/* True if connected */
+	bool connected;
 
 	/** Constructor
 	 * @param ipv6 true to use IPv6
@@ -337,9 +349,27 @@ class CoreExport ConnectionSocket : public BufferedSocket
 	/** Connect the socket
 	 * @param TargetHost The target host to connect to
 	 * @param Port The target port to connect to
-	 * @param BindHost The host to bind to for connecting
 	 */
-	void Connect(const Anope::string &TargetHost, int Port, const Anope::string &BindHost = "");
+	void Connect(const Anope::string &TargetHost, int Port);
+
+	/** Called when the socket is ready to be written to
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessWrite();
+
+	/** Called when there is an error for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	void ProcessError();
+
+	/** Called on a successful connect
+	 */
+	virtual void OnConnect();
+
+	/** Called when a connection is not successful
+	 * @param error The error
+	 */
+	virtual void OnError(const Anope::string &error);
 };
 
 class CoreExport ClientSocket : public BufferedSocket

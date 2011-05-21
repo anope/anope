@@ -199,7 +199,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		inspircd_cmd_pass(uplink_server->password);
+		inspircd_cmd_pass(Config->Uplinks[CurrentUplink]->password);
 		SendServer(Me);
 		send_cmd("", "BURST");
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);

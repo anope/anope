@@ -563,7 +563,7 @@ bool InitUplinks(ServerConfig *config, const Anope::string &)
 {
 	if (!config->Uplinks.empty())
 	{
-		std::list<Uplink *>::iterator curr_uplink = config->Uplinks.begin(), end_uplink = config->Uplinks.end();
+		std::vector<Uplink *>::iterator curr_uplink = config->Uplinks.begin(), end_uplink = config->Uplinks.end();
 		for (; curr_uplink != end_uplink; ++curr_uplink)
 			delete *curr_uplink;
 	}
@@ -1033,7 +1033,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "mlock", "+nrt", new ValueContainerString(&conf->MLock), DT_STRING, NoValidation},
 		{"options", "nomlock", "", new ValueContainerString(&conf->NoMLock), DT_STRING, NoValidation},
 		{"options", "botmodes", "", new ValueContainerString(&conf->BotModes), DT_STRING, NoValidation},
-		{"options", "maxretries", "10", new ValueContainerUInt(&conf->MaxRetries), DT_UINTEGER, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&conf->RetryWait), DT_INTEGER, ValidateNotZero},
 		{"options", "hideprivilegedcommands", "no", new ValueContainerBool(&conf->HidePrivilegedCommands), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerString(&conf->s_NickServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},

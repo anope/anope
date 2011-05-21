@@ -93,7 +93,7 @@ class CommandMSIgnore : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "IGNORE", _("IGNORE [\037channel\037] {\002ADD|DEL|\002} [\037entry\037]"));
+		SyntaxError(source, "IGNORE", _("IGNORE [\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"));
 	}
 };
 

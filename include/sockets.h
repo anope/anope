@@ -254,7 +254,7 @@ class CoreExport BufferedSocket : public Socket
 	/* Part of a message sent from the server, but not totally received */
 	Anope::string extrabuf;
 	/* How much data was received from this socket */
-	size_t RecvLen;
+	int RecvLen;
 
  public:
 	/** Blank constructor
@@ -297,12 +297,12 @@ class CoreExport BufferedSocket : public Socket
 	/** Get the length of the read buffer
 	 * @return The length of the read buffer
 	 */
-	size_t ReadBufferLen() const;
+	int ReadBufferLen() const;
 
 	/** Get the length of the write buffer
 	 * @return The length of the write buffer
 	 */
-	size_t WriteBufferLen() const;
+	int WriteBufferLen() const;
 };
 
 class CoreExport ListenSocket : public Socket

@@ -115,7 +115,6 @@ E bool protocoldebug;
 E bool quitting;
 E bool restarting;
 E Anope::string quitmsg;
-E bool save_data;
 E time_t start_time;
 
 E ConnectionSocket *UplinkSock;

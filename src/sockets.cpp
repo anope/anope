@@ -467,11 +467,15 @@ bool BufferedSocket::ProcessRead()
 {
 	char tbuffer[NET_BUFSIZE] = "";
 
-	RecvLen = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
-	if (RecvLen == -2)
+	this->RecvLen = 0;
+
+	int len = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
+	if (len == -2)
 		return true;
-	else if (RecvLen <= 0)
+	else if (len <= 0)
 		return false;
+	
+	this->RecvLen = len;
 
 	Anope::string sbuffer = this->extrabuf;
 	sbuffer += tbuffer;
@@ -559,7 +563,7 @@ void BufferedSocket::Write(const Anope::string &message)
 /** Get the length of the read buffer
  * @return The length of the read buffer
  */
-size_t BufferedSocket::ReadBufferLen() const
+int BufferedSocket::ReadBufferLen() const
 {
 	return RecvLen;
 }
@@ -567,7 +571,7 @@ size_t BufferedSocket::ReadBufferLen() const
 /** Get the length of the write buffer
  * @return The length of the write buffer
  */
-size_t BufferedSocket::WriteBufferLen() const
+int BufferedSocket::WriteBufferLen() const
 {
 	return this->WriteBuffer.length();
 }

@@ -209,6 +209,52 @@ static void write_pidfile()
 
 /*************************************************************************/
 
+class SignalReload : public Signal
+{
+ public:
+	SignalReload(int sig) : Signal(sig) { }
+
+	void OnSignal()
+	{
+		Log() << "Received SIGHUP: Saving databases & rehashing configuration";
+
+		save_databases();
+
+		ServerConfig *old_config = Config;
+		try
+		{
+			Config = new ServerConfig();
+			FOREACH_MOD(I_OnReload, OnReload());
+			delete old_config;
+		}
+		catch (const ConfigException &ex)
+		{
+			Config = old_config;
+			Log() << "Error reloading configuration file: " << ex.GetReason();
+		}
+	}
+};
+
+class SignalExit : public Signal
+{
+ public:
+	SignalExit(int sig) : Signal(sig) { }
+
+	void OnSignal()
+	{
+#ifndef _WIN32
+		Log() << "Received " << strsignal(this->signal) << " signal (" << this->signal << "), exiting.";
+		quitmsg = Anope::string("Services terminating via signal ") + strsignal(this->signal) + " (" + stringify(this->signal) + ")";
+#else
+		Log() << "Received signal " << this->signal << ", exiting.";
+		quitmsg = Anope::string("Services terminating via signal ") + stringify(this->signal);
+#endif
+
+		save_databases();
+		quitting = true;
+	}
+};
+
 void Init(int ac, char **av)
 {
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);
@@ -377,14 +423,8 @@ void Init(int ac, char **av)
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 
-	/* Set signal handlers.  Catch certain signals to let us do things or
-	 * panic as necessary, and ignore all others.
-	 */
-#ifndef _WIN32
-	signal(SIGHUP, sighandler);
-#endif
-	signal(SIGTERM, sighandler);
-	signal(SIGINT, sighandler);
+	static SignalReload sig_hup(SIGHUP);
+	static SignalExit sig_term(SIGTERM), sig_int(SIGINT);
 
 	/* Initialize multi-language support */
 	Log(LOG_DEBUG) << "Loading Languages...";

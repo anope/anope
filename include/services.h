@@ -241,6 +241,23 @@ class DatabaseException : public CoreException
 	virtual ~DatabaseException() throw() { }
 };
 
+class Signal
+{
+	static std::vector<Signal *> SignalHandlers;
+	static void SignalHandler(int signal);
+
+	struct sigaction action;
+	sig_atomic_t called;
+ public:
+	static void Process();
+
+	int signal;
+
+	Signal(int s);
+	~Signal();
+	virtual void OnSignal() = 0;
+};
+
 /** Debug cast to be used instead of dynamic_cast, this uses dynamic_cast
  * for debug builds and static_cast on releass builds to speed up the program
  * because dynamic_cast relies on RTTI.

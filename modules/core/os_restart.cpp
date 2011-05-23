@@ -26,7 +26,8 @@ class CommandOSRestart : public Command
 	{
 		User *u = source.u;
 		quitmsg = "RESTART command received from " + u->nick;
-		quitting = save_data = restarting = true;
+		save_databases();
+		quitting = restarting = true;
 		return MOD_CONT;
 	}
 

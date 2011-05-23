@@ -25,7 +25,7 @@ class CommandOSUpdate : public Command
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		source.Reply(_("Updating databases."));
-		save_data = true;
+		save_databases();
 		return MOD_CONT;
 	}
 

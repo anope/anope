@@ -26,7 +26,8 @@ class CommandOSShutdown : public Command
 	{
 		User *u = source.u;
 		quitmsg = "SHUTDOWN command received from " + u->nick;
-		quitting = save_data = true;
+		save_databases();
+		quitting = true;
 		return MOD_CONT;
 	}
 

@@ -61,9 +61,6 @@ bool restarting = false;
 /* Contains a message as to why services is terminating */
 Anope::string quitmsg;
 
-/* Should we update the databases now? */
-bool save_data = false;
-
 /* At what time were we started? */
 time_t start_time = time(NULL);
 
@@ -83,8 +80,7 @@ class UpdateTimer : public Timer
 
 	void Tick(time_t)
 	{
-		if (!readonly)
-			save_databases();
+		save_databases();
 	}
 };
 
@@ -212,65 +208,44 @@ void save_databases()
 
 /*************************************************************************/
 
-/* If we get a weird signal, come here. */
+std::vector<Signal *> Signal::SignalHandlers;
 
-void sighandler(int signum)
+void Signal::SignalHandler(int signal)
 {
-	if (quitmsg.empty())
-#ifndef _WIN32
-		quitmsg = Anope::string("Services terminating via signal ") + strsignal(signum) + " (" + stringify(signum) + ")";
-#else
-		quitmsg = Anope::string("Services terminating via signal ") + stringify(signum);
-#endif
-
-	if (started)
-	{
-		switch (signum)
-		{
-#ifndef _WIN32
-			case SIGHUP:
-			{
-				Log() << "Received SIGHUP: Saving databases & rehashing configuration";
-
-				save_databases();
-
-				ServerConfig *old_config = Config;
-				try
-				{
-					Config = new ServerConfig();
-					FOREACH_MOD(I_OnReload, OnReload());
-					delete old_config;
-				}
-				catch (const ConfigException &ex)
-				{
-					Config = old_config;
-					Log() << "Error reloading configuration file: " << ex.GetReason();
-				}
-				break;
-			}
-#endif
-			case SIGINT:
-			case SIGTERM:
-				signal(signum, SIG_IGN);
-#ifndef _WIN32
-				signal(SIGHUP, SIG_IGN);
-#endif
-
-#ifndef _WIN32
-				Log() << "Received " << strsignal(signum) << " signal (" << signum << "), exiting.";
-#else
-				Log() << "Received signal " << signum << ", exiting.";
-#endif
-
-				save_databases();
-				quitting = true;
-			default:
-				break;
-		}
-	}
-
-	FOREACH_MOD(I_OnSignal, OnSignal(signum, quitmsg));
+	for (unsigned i = 0, j = SignalHandlers.size(); i < j; ++i)
+		if (SignalHandlers[i]->signal == signal)
+			SignalHandlers[i]->called = true;
 }
+
+void Signal::Process()
+{
+	for (unsigned i = 0, j = SignalHandlers.size(); i < j; ++i)
+		if (SignalHandlers[i]->called == true)
+		{
+			Signal *s = SignalHandlers[i];
+			s->called = false;
+			s->OnSignal();
+		}
+}
+
+Signal::Signal(int s) : called(false), signal(s)
+{
+	this->action.sa_flags = 0;
+	sigemptyset(&this->action.sa_mask);
+	this->action.sa_handler = SignalHandler;
+	
+	sigaction(s, &this->action, NULL);
+
+	SignalHandlers.push_back(this);
+}
+
+Signal::~Signal()
+{
+	std::vector<Signal *>::iterator it = std::find(SignalHandlers.begin(), SignalHandlers.end(), this);
+	if (it != SignalHandlers.end())
+		SignalHandlers.erase(it);
+}
+
 
 /*************************************************************************/
 
@@ -388,6 +363,10 @@ int main(int ac, char **av, char **envp)
 	{
 		Log(LOG_DEBUG_2) << "Top of main loop";
 
+		/* Process signals */
+		Signal::Process();
+
+		/* Process timers */
 		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 		{
 			TimerManager::TickTimers(Anope::CurTime);
@@ -403,13 +382,6 @@ int main(int ac, char **av, char **envp)
 
 		/* Process the socket engine */
 		SocketEngine::Process();
-	}
-
-	if (save_data)
-	{
-		ircdproto->SendGlobops(NULL, "Updating databases on shutdown, please wait.");
-		save_databases();
-		save_data = false;
 	}
 
 	if (restarting)

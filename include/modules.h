@@ -572,12 +572,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnShutdown() { }
 
-	/** Called on signal
-	 * @param signum The signum
-	 * @param msg The quitmsg
-	 */
-	virtual void OnSignal(int signum, const Anope::string &msg) { }
-
 	/** Called before a nick expires
 	 * @param na The nick
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
@@ -1077,7 +1071,7 @@ enum Implementation
 
 		/* Other */
 		I_OnReload, I_OnNewServer, I_OnPreServerConnect, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
-		I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown, I_OnSignal,
+		I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,

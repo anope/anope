@@ -78,6 +78,26 @@ class OSLogin : public Module
 			throw ModuleException("OperServ is not loaded!");
 
 		this->AddCommand(operserv->Bot(), &commandoslogin);
+
+		ModuleManager::Attach(I_IsServicesOper, this);
+	}
+
+	~OSLogin()
+	{
+		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			it->second->Shrink("os_login_password_correct");
+	}
+
+	EventReturn IsServicesOper(User *u)
+	{
+		if (!u->Account()->o->password.empty())
+		{
+			if (u->GetExt("os_login_password_correct"))
+				return EVENT_ALLOW;
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

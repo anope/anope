@@ -443,8 +443,10 @@ bool User::IsServicesOper()
 	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
 		// Certfp mismatch
 		return false;
-	else if (!this->nc->o->password.empty() && !this->GetExt("os_login_password_correct"))
-		// Not identified
+	
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_IsServicesOper, IsServicesOper(this));
+	if (MOD_RESULT == EVENT_STOP)
 		return false;
 
 	return true;

@@ -626,6 +626,12 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnDelXLine(User *u, XLine *x, XLineType Type) { }
 
+	/** Called when a user is checked for whether they are a services oper
+	 * @param u The user
+	 * @return EVENT_ALLOW to allow, anything else to deny
+	 */
+	virtual EventReturn IsServicesOper(User *u) { return EVENT_CONTINUE; }
+
 	/** Called when a server quits
 	 * @param server The server
 	 */
@@ -1060,7 +1066,7 @@ enum Implementation
 
 		/* OperServ */
 		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
-		I_OnAddXLine, I_OnDelXLine,
+		I_OnAddXLine, I_OnDelXLine, I_IsServicesOper,
 
 		/* Database */
 		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,

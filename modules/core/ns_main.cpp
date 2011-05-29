@@ -147,7 +147,7 @@ class NickServCore : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup, I_OnNickUpdate };
-		ModuleManager::Attach(i, this, 5);
+		ModuleManager::Attach(i, this, 6);
 
 		ModuleManager::RegisterService(&this->mynickserv);
 		

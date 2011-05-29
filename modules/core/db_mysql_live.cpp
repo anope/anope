@@ -179,8 +179,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_cs_info` WHERE `name` = ?");
-			query.setValue(1, chname);
+			SQLQuery query("SELECT * FROM `anope_cs_info` WHERE `name` = @name");
+			query.setValue("name", chname);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{
@@ -216,8 +216,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_ns_alias` WHERE `nick` = ?");
-			query.setValue(1, nick);
+			SQLQuery query("SELECT * FROM `anope_ns_alias` WHERE `nick` = @nick");
+			query.setValue("nick", nick);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{
@@ -253,8 +253,8 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_ns_core` WHERE `display` = ?");
-			query.setValue(1, nick);
+			SQLQuery query("SELECT * FROM `anope_ns_core` WHERE `display` = @display");
+			query.setValue("display", nick);
 			CommandMutex *current_command = this->CurrentCommand();
 			if (current_command)
 			{

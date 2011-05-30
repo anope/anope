@@ -61,7 +61,7 @@ class CommandNSAList : public Command
 		Anope::string lev = params.size() > lev_param ? params[lev_param] : "";
 
 		/* if a level was given, make sure it's an int for later */
-		int min_level = ACCESS_INVALID;
+		int min_level = 0;
 		if (!lev.empty())
 		{
 			if (lev.equals_ci("FOUNDER"))
@@ -80,7 +80,10 @@ class CommandNSAList : public Command
 				{
 					min_level = convertTo<int>(lev);
 				}
-				catch (const ConvertException &) { }
+				catch (const ConvertException &)
+				{
+					min_level = ACCESS_INVALID;
+				}
 			}
 		}
 

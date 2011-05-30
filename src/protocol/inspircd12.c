@@ -426,6 +426,7 @@ static int has_blockcaps = 0;
 static int has_nickflood = 0;
 static int has_chanfilter = 0;
 static int has_kicknorejoin = 0;
+static int has_cloaking = 0;
 
 void inspircd_set_umode(User *user, int ac, char **av)
 {
@@ -575,8 +576,15 @@ void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void inspircd_cmd_vhost_off(User * u)
 {
-    common_svsmode(u, "-x", NULL);
-    common_svsmode(u, "+x", NULL);
+    if (has_cloaking)
+    {
+        common_svsmode(u, "-x", NULL);
+        common_svsmode(u, "+x", NULL);
+    }
+    else
+    {
+        inspircd_cmd_chghost(u->nick, u->host);
+    }
 
     if (has_chgidentmod && u->username && u->vident && strcmp(u->username, u->vident) != 0)
     {
@@ -1998,6 +2006,9 @@ int anope_event_capab(char *source, int ac, char **av)
         }
         if (strstr(av[1], "m_kicknorejoin.so")) {
             has_kicknorejoin = 1;
+        }
+        if (strstr(av[1], "m_cloaking.so")) {
+            has_cloaking = 1;
         }
     } else if (strcasecmp(av[0], "END") == 0) {
         if (!has_globopsmod) {

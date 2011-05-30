@@ -8,11 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="7"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3073"
+VERSION_BUILD="3074"
 
 # $Log$ # Changes since 1.8.6 Release
-
-
+#Revision 3074 - Bug #1273 - Fixed removing vhosts on InspIRCd when m_cloaking is unloaded 
 
 
 

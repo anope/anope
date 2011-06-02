@@ -542,6 +542,9 @@ void ChannelInfo::ClearBadWords()
  */
 void ChannelInfo::LoadMLock()
 {
+	if (!this->GetExt("db_mlock"))
+		return;
+
 	this->ClearMLock();
 
 	// Force +r
@@ -550,51 +553,27 @@ void ChannelInfo::LoadMLock()
 		this->SetMLock(chm, true);
 
 	std::vector<Anope::string> mlock;
-	if (this->GetExtRegular("db_mlock", mlock))
+	this->GetExtRegular("db_mlock", mlock);
+	for (unsigned i = 0; i < mlock.size(); ++i)
 	{
-		for (unsigned i = 0; i < mlock.size(); ++i)
+		std::vector<Anope::string> mlockv = BuildStringVector(mlock[i]);
+
+		bool set = mlockv[0] == "1";
+		ChannelMode *cm = ModeManager::FindChannelModeByString(mlockv[1]);
+		const Anope::string &setter = mlockv[2];
+		time_t created = Anope::CurTime;
+		try
 		{
-			std::vector<Anope::string> mlockv = BuildStringVector(mlock[i]);
-
-			bool set = mlockv[0] == "1";
-			ChannelMode *cm = ModeManager::FindChannelModeByString(mlockv[1]);
-			const Anope::string &setter = mlockv[2];
-			time_t created = Anope::CurTime;
-			try
-			{
-				created = convertTo<time_t>(mlockv[3]);
-			}
-			catch (const ConvertException &) { }
-			const Anope::string &param = mlockv.size() > 4 ? mlockv[4] : "";
-
-			if (cm != NULL)
-				this->SetMLock(cm, set, param, setter, created);
+			created = convertTo<time_t>(mlockv[3]);
 		}
+		catch (const ConvertException &) { }
+		const Anope::string &param = mlockv.size() > 4 ? mlockv[4] : "";
 
-		this->Shrink("db_mlock");
+		if (cm != NULL)
+			this->SetMLock(cm, set, param, setter, created);
 	}
 
-	/* Create perm channel */
-	if (this->HasFlag(CI_PERSIST) && !this->c)
-	{
-		this->c = new Channel(this->name, this->time_registered);
-		if (ModeManager::FindChannelModeByName(CMODE_PERM) != NULL)
-		{
-			/* At this point, CMODE_PERM *must* be locked on the channel, so this is fine */
-			ircdproto->SendChannel(this->c);
-			this->c->Reset();
-		}
-		else
-		{
-			if (!this->bi)
-				this->WhoSends()->Assign(NULL, this);
-			if (this->c->FindUser(this->bi) == NULL)
-				this->bi->Join(this->c);
-
-			check_modes(this->c);
-			this->RestoreTopic();
-		}
-	}
+	this->Shrink("db_mlock");
 }
 
 /** Check if a mode is mlocked

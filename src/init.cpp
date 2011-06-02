@@ -23,44 +23,9 @@ void introduce_user(const Anope::string &user)
 		throw FatalException("introduce_user loop detected");
 	lasttime = now;
 
-	if (!user.empty())
+	User *u = finduser(user);
+	if (u)
 	{
-		User *u = finduser(user);
-		if (u)
-		{
-			ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
-
-			BotInfo *bi = findbot(u->nick);
-			if (bi)
-			{
-				XLine x(bi->nick, "Reserved for services");
-				ircdproto->SendSQLine(NULL, &x);
-
-				for (UChannelList::const_iterator cit = bi->chans.begin(), cit_end = bi->chans.end(); cit != cit_end; ++cit)
-					ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
-			}
-		}
-
-		return;
-	}
-
-	ircdproto->SendBOB();
-	
-	for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
-	{
-		Server *s = Me->GetLinks()[i];
-
-		if (s->HasFlag(SERVER_JUPED))
-		{
-			ircdproto->SendServer(s);
-		}
-	}
-
-	/* We make the bots go online */
-	for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
-	{
-		User *u = it->second;
-
 		ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
 
 		BotInfo *bi = findbot(u->nick);
@@ -73,10 +38,6 @@ void introduce_user(const Anope::string &user)
 				ircdproto->SendJoin(bi, (*cit)->chan, &Config->BotModeList);
 		}
 	}
-
-	/* Load MLock from the database now that we know what modes exist */
-	for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
-		it->second->LoadMLock();
 }
 
 /*************************************************************************/

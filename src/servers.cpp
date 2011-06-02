@@ -51,8 +51,44 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		/* Check to be sure this isn't a juped server */
 		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
-			/* Bring in our pseudo-clients */
-			introduce_user("");
+			/* Load MLock from the database now that we know what modes exist */
+			for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+				it->second->LoadMLock();
+
+			ircdproto->SendBOB();
+	
+			for (unsigned i = 0; i < Me->GetLinks().size(); ++i)
+			{
+				Server *s = Me->GetLinks()[i];
+
+				if (s->HasFlag(SERVER_JUPED))
+					ircdproto->SendServer(s);
+			}
+
+			/* We make the bots go online */
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(), it_end = UserListByNick.end(); it != it_end; ++it)
+			{
+				User *u = it->second;
+
+				ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+
+				BotInfo *bi = findbot(u->nick);
+				if (bi)
+				{
+					XLine x(bi->nick, "Reserved for services");
+					ircdproto->SendSQLine(NULL, &x);
+				}
+			}
+
+			for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
+			{
+				Channel *c = it->second;
+				if (c->users.empty())
+					ircdproto->SendChannel(c);
+				else
+					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
+						ircdproto->SendJoin((*cit)->user, c, (*cit)->Status);
+			}
 		}
 	}
 }
@@ -210,15 +246,47 @@ void Server::Sync(bool SyncLinks)
 
 	if (this->GetUplink() && this->GetUplink() == Me)
 	{
+		for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		{
+			ChannelInfo *ci = it->second;
+			if (ci->HasFlag(CI_PERSIST))
+			{
+				bool created = false;
+				if (!ci->c)
+				{
+					ci->c = new Channel(ci->name, ci->time_registered);
+					created = true;
+				}
+				if (ModeManager::FindChannelModeByName(CMODE_PERM) != NULL)
+				{
+					ci->c->SetMode(NULL, CMODE_PERM);
+					if (created)
+						ircdproto->SendChannel(ci->c);
+				}
+				else
+				{
+					if (!ci->bi)
+						ci->WhoSends()->Assign(NULL, ci);
+					if (ci->c->FindUser(ci->bi) == NULL)
+						ci->bi->Join(ci->c);
+				}
+			}
+		}
+
 		FOREACH_MOD(I_OnPreUplinkSync, OnPreUplinkSync(this));
+
 		ircdproto->SendEOB();
 		Me->Sync(false);
 
 		FOREACH_MOD(I_OnUplinkSync, OnUplinkSync(this));
 
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-			if (it->second->ci)
-				it->second->ci->RestoreTopic();
+		{
+			Channel *c = it->second;
+			check_modes(c);
+			if (c->ci)
+				c->ci->RestoreTopic();
+		}
 	}
 }
 

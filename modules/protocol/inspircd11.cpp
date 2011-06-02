@@ -160,13 +160,16 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
 		send_cmd(user->nick, "JOIN %s %ld", c->name.c_str(), static_cast<long>(c->creation_time));
 		if (status)
+		{
+			BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (status->HasFlag(ModeManager::ChannelModes[i]->Name))
-					c->SetMode(user, ModeManager::ChannelModes[i], user->nick, false);
+					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
+		}
 	}
 
 	/* UNSQLINE */

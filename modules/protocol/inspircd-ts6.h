@@ -128,7 +128,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(BotInfo *user, Channel *c, const ChannelStatus *status)
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
 		send_cmd(Config->Numeric, "FJOIN %s %ld +%s :,%s", c->name.c_str(), static_cast<long>(c->creation_time), c->GetModes(true, true).c_str(), user->GetUID().c_str());
 		/* Note that we can send this with the FJOIN but choose not to
@@ -136,9 +136,12 @@ class InspIRCdTS6Proto : public IRCDProto
 		 * merge these modes with +nrt and other mlocked modes
 		 */
 		if (status)
+		{
+			BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
 				if (status->HasFlag(ModeManager::ChannelModes[i]->Name))
-					c->SetMode(user, ModeManager::ChannelModes[i], user->nick, false);
+					c->SetMode(setter, ModeManager::ChannelModes[i], user->nick, false);
+		}
 	}
 
 	/* UNSQLINE */
@@ -245,10 +248,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendChannel(Channel *c)
 	{
-		Anope::string modes = c->GetModes(true, true);
-		if (modes.empty())
-			modes = "+";
-		send_cmd(Config->Numeric, "FJOIN %s %ld %s :", c->name.c_str(), static_cast<long>(c->creation_time), modes.c_str());
+		send_cmd(Config->Numeric, "FJOIN %s %ld +%s :", c->name.c_str(), static_cast<long>(c->creation_time), c->GetModes(true, true).c_str());
 	}
 
 	bool IsNickValid(const Anope::string &nick)

@@ -124,13 +124,15 @@ class BanDataPurger : public CallBack
 			std::map<Anope::string, BanData> bandata;
 			if (c->GetExtRegular("bs_main_bandata", bandata))
 			{
-				for (std::map<Anope::string, BanData>::iterator it2 = bandata.begin(), it2_end = bandata.end(); it2 != it2_end; ++it2)
+				for (std::map<Anope::string, BanData>::iterator it2 = bandata.begin(), it2_end = bandata.end(); it2 != it2_end;)
 				{
+					const Anope::string &user = it->first;
 					BanData *bd = &it2->second;
+					++it2;
 
 					if (Anope::CurTime - bd->last_use > Config->BSKeepData)
 					{
-						bandata.erase(it2);
+						bandata.erase(user);
 						continue;
 					}
 				}

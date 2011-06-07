@@ -66,6 +66,14 @@ time_t Timer::GetSetTime() const
 	return settime;
 }
 
+/** Sets the interval between ticks
+ * @param t The new interval
+ */
+void Timer::SetSecs(time_t t)
+{
+	secs = t;
+}
+
 /** Returns the interval between ticks
 * @return The interval
 */

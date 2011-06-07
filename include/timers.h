@@ -63,6 +63,11 @@ class CoreExport Timer : public Extensible
 	 */
 	bool GetRepeat() const;
 
+	/** Set the interval between ticks
+	 * @paramt t The new interval
+	 */
+	void SetSecs(time_t t);
+
 	/** Returns the interval between ticks
 	 * @return The interval
 	 */

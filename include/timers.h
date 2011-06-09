@@ -90,7 +90,7 @@ class CoreExport Timer : public Extensible
  */
 class CoreExport TimerManager : public Extensible
 {
- protected:
+ friend class Timer;
 	/** A list of timers
 	 */
 	static std::vector<Timer *> Timers;

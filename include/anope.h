@@ -157,6 +157,12 @@ namespace Anope
 		inline size_type length() const { return this->_string.length(); }
 
 		/**
+		 * Returns the size of the currently allocated storage space in the string object.
+		 * This can be equal or greater than the length of the string.
+		 */
+		inline size_type capacity() const { return this->_string.capacity(); }
+
+		/**
 		 * Add a char to the end of the string.
 		 */
 		inline void push_back(char c) { return this->_string.push_back(c); }

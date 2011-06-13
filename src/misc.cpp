@@ -203,52 +203,51 @@ time_t dotime(const Anope::string &s)
  * @param seconds time in seconds
  * @return buffer
  */
-Anope::string duration(time_t seconds)
+Anope::string duration(const time_t &t, NickCore *nc)
 {
 	/* We first calculate everything */
-	time_t days = seconds / 86400;
-	seconds -= (days * 86400);
-	time_t hours = seconds / 3600;
-	seconds -= (hours * 3600);
-	time_t minutes = seconds / 60;
-
-	Anope::string buffer;
+	time_t days = (t / 86400);
+	time_t hours = (t / 3600) % 24;
+	time_t minutes = (t / 60) % 60;
+	time_t seconds = (t) % 60;
 
 	if (!days && !hours && !minutes)
-		buffer = stringify(seconds) + " second" + (seconds != 1 ? "s" : "");
+		return stringify(seconds) + " " + (seconds != 1 ? GetString(nc, gtl("seconds")) : GetString(nc, gtl("second")));
 	else
 	{
 		bool need_comma = false;
+		Anope::string buffer;
 		if (days)
 		{
-			buffer = stringify(days) + " day" + (days != 1 ? "s" : "");
+			buffer = stringify(days) + " " + (days != 1 ? GetString(nc, gtl("days")) : GetString(nc, gtl("day")));
 			need_comma = true;
 		}
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " hour" + (hours != 1 ? "s" : "");
+			buffer += stringify(hours) + " " + (hours != 1 ? GetString(nc, gtl("hours")) : GetString(nc, gtl("hour")));
 			need_comma = true;
 		}
 		if (minutes)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(minutes) + " minute" + (minutes != 1 ? "s" : "");
+			buffer += stringify(minutes) + " " + (minutes != 1 ? GetString(nc, gtl("minutes")) : GetString(nc, gtl("minute")));
 		}
+		return buffer;
 	}
-
-	return buffer;
 }
 
-Anope::string do_strftime(const time_t &t)
+Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
 	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), "%b %d %H:%M:%S %Y %Z", &tm);
+	strftime(buf, sizeof(buf), GetString(nc, gtl("%b %d %H:%M:%S %Y %Z")).c_str(), &tm);
+	if (short_output)
+		return buf;
 	if (t < Anope::CurTime)
-		return Anope::string(buf) + " (" + duration(Anope::CurTime - t) + " ago)";
+		return Anope::string(buf) + " " + Anope::printf(GetString(nc, gtl("(%s ago)")).c_str(), duration(Anope::CurTime - t).c_str(), nc);
 	else
-		return Anope::string(buf) + " (" + duration(t - Anope::CurTime) + " from now)";
+		return Anope::string(buf) + " " + Anope::printf(GetString(nc, gtl("(%s from now)")).c_str(), duration(t - Anope::CurTime).c_str(), nc);
 }
 
 /*************************************************************************/
@@ -262,9 +261,9 @@ Anope::string do_strftime(const time_t &t)
 Anope::string expire_left(NickCore *nc, time_t expires)
 {
 	if (!expires)
-		return GetString(nc, _(NO_EXPIRE));
+		return GetString(nc, gtl(NO_EXPIRE));
 	else if (expires <= Anope::CurTime)
-		return GetString(nc, _("expires at next database update"));
+		return GetString(nc, gtl("expires at next database update"));
 	else
 	{
 		char buf[256];
@@ -273,21 +272,21 @@ Anope::string expire_left(NickCore *nc, time_t expires)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), GetString(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")).c_str(), days);
+			snprintf(buf, sizeof(buf), GetString(nc, days == 1 ? gtl("expires in %d day") : gtl("expires in %d days")).c_str(), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), GetString(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")).c_str(), minutes);
+				snprintf(buf, sizeof(buf), GetString(nc, minutes == 1 ? gtl("expires in %d minute") : gtl("expires in %d minutes")).c_str(), minutes);
 			}
 			else
 			{
 				int hours = diff / 3600, minutes;
 				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), GetString(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))).c_str(), hours, minutes);
+				snprintf(buf, sizeof(buf), GetString(nc, hours == 1 && minutes == 1 ? gtl("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? gtl("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? gtl("expires in %d hours, %d minute") : gtl("expires in %d hours, %d minutes")))).c_str(), hours, minutes);
 			}
 		}
 

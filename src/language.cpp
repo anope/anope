@@ -36,7 +36,7 @@ void InitLanguages()
 
 const Anope::string GetString(NickCore *nc, const char *string)
 {
-	return GetString("anope", nc ? nc->language : "", string);
+	return GetString("anope", nc ? Config->NSDefLanguage : "", string);
 }
 
 const Anope::string GetString(const Anope::string &domain, const Anope::string &lang, const char *string)

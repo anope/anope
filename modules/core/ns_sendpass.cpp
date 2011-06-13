@@ -98,8 +98,8 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
-	snprintf(subject, sizeof(subject), GetString(na->nc, "Nickname password (%s)").c_str(), na->nick.c_str());
-	snprintf(message, sizeof(message), GetString(na->nc, 
+	snprintf(subject, sizeof(subject), GetString(na->nc, gtl("Nickname password (%s)")).c_str(), na->nick.c_str());
+	snprintf(message, sizeof(message), GetString(na->nc, gtl(
 	"Hi,\n"
 	" \n"
 	"You have requested to receive the password of nickname %s by e-mail.\n"
@@ -107,7 +107,7 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators.").c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
+	"%s administrators.")).c_str(), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
 
 	return Mail(u, na->nc, nickserv->Bot(), subject, message);
 }

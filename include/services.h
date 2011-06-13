@@ -49,6 +49,7 @@
 #else
 # define _(x) x
 #endif
+# define gtl(x) x
 
 #ifndef _WIN32
 # include <unistd.h>

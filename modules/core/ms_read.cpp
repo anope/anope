@@ -33,7 +33,7 @@ void rsend_notify(CommandSource &source, MemoInfo *mi, Memo *m, const Anope::str
 
 		/* Text of the memo varies if the recepient was a
 		   nick or channel */
-		Anope::string text = Anope::printf(GetString(na->nc, _("\002[auto-memo]\002 The memo you sent to %s has been viewed.")).c_str(), targ.c_str());
+		Anope::string text = Anope::printf(GetString(na->nc, gtl("\002[auto-memo]\002 The memo you sent to %s has been viewed.")).c_str(), targ.c_str());
 
 		/* Send notification */
 		memoserv->Send(source.u->nick, m->sender, text, true);

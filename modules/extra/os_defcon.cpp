@@ -119,14 +119,14 @@ class DefConTimeout : public CallBack
 			DConfig.defaultlevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
 			Log(operserv->Bot(), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
-			ircdproto->SendGlobops(operserv->Bot(), GetString(NULL, _("\002%s\002 Changed the DEFCON level to \002%d\002")).c_str(), Config->s_OperServ.c_str(), level);
+			ircdproto->SendGlobops(operserv->Bot(), GetString(NULL, gtl("\002%s\002 Changed the DEFCON level to \002%d\002")).c_str(), Config->s_OperServ.c_str(), level);
 
 			if (DConfig.globalondefcon)
 			{
 				if (!DConfig.offmessage.empty())
 					global->SendGlobal(global->Bot(), "", DConfig.offmessage);
 				else
-					global->SendGlobal(global->Bot(), "", Anope::printf(GetString(NULL, _("The Defcon Level is now at Level: \002%d\002")).c_str(), DConfig.defaultlevel));
+					global->SendGlobal(global->Bot(), "", Anope::printf(GetString(NULL, gtl("The Defcon Level is now at Level: \002%d\002")).c_str(), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
 					global->SendGlobal(global->Bot(), "", DConfig.message);

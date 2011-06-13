@@ -158,9 +158,9 @@ E int toupper(char);
 E int tolower(char);
 
 E time_t dotime(const Anope::string &s);
-E Anope::string duration(time_t seconds);
+E Anope::string duration(const time_t &seconds, NickCore *nc = NULL);
 E Anope::string expire_left(NickCore *nc, time_t expires);
-E Anope::string do_strftime(const time_t &t);
+E Anope::string do_strftime(const time_t &t, NickCore *nc = NULL, bool short_output = false);
 E bool doValidHost(const Anope::string &host, int type);
 
 E bool isValidHost(const Anope::string &host, int type);

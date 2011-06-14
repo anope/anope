@@ -73,7 +73,9 @@ void Timer::SetSecs(time_t t)
 {
 	secs = t;
 	trigger = Anope::CurTime + t;
-	sort(TimerManager::Timers.begin(), TimerManager::Timers.end(), TimerManager::TimerComparison);
+
+	TimerManager::DelTimer(this);
+	TimerManager::AddTimer(this);
 }
 
 /** Returns the interval between ticks

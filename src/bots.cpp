@@ -66,7 +66,7 @@ BotInfo::~BotInfo()
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		ircdproto->SendQuit(this, NULL);
+		ircdproto->SendQuit(this, "");
 		XLine x(this->nick);
 		ircdproto->SendSQLineDel(&x);
 	}
@@ -79,9 +79,10 @@ BotInfo::~BotInfo()
 			ci->bi = NULL;
 	}
 
-	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end;)
 	{
 		Command *c = it->second;
+		++it;
 
 		if (c->module)
 			c->module->DelCommand(this, c);

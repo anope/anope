@@ -261,7 +261,7 @@ Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
 Anope::string expire_left(NickCore *nc, time_t expires)
 {
 	if (!expires)
-		return GetString(nc, gtl(NO_EXPIRE));
+		return GetString(nc, NO_EXPIRE);
 	else if (expires <= Anope::CurTime)
 		return GetString(nc, gtl("expires at next database update"));
 	else

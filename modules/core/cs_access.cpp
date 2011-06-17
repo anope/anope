@@ -716,7 +716,7 @@ class CommandCSLevels : public Command
 						levelinfo_maxwidth = len;
 				}
 			for (i = 0; levelinfo[i].what >= 0; ++i)
-				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, levelinfo[i].name.c_str(), GetString(source.u->Account(), levelinfo[i].desc).c_str());
+				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, levelinfo[i].name.c_str(), translate(source.u, levelinfo[i].desc));
 		}
 		else
 			source.Reply(_("Syntax: \002LEVELS \037channel\037 SET \037type\037 \037level\037\002\n"

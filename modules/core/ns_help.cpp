@@ -37,7 +37,7 @@ class CommandNSHelp : public Command
 				"commands allow for registration and maintenance of\n"
 				"nicknames; to use them, type \002%s%s \037command\037\002.\n"
 				"For more information on a specific command, type\n"
-				"\002%s%s HELP \037command\037\002."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+				"\002%s%s HELP \037command\037\002."), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		for (CommandMap::const_iterator it = nickserv->Bot()->Commands.begin(), it_end = nickserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);

@@ -82,7 +82,7 @@ class CommandCSTBan : public Command
 				get_idealban(c->ci, u2, mask);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				new TempBan(dotime(time), c, mask);
-				me->SendMessage(source, _("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
+				source.Reply(_("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
 			}
 
 		return MOD_CONT;
@@ -91,8 +91,8 @@ class CommandCSTBan : public Command
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		this->OnSyntaxError(source, "");
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("Bans the given user from a channel for a specified length of\n"
+		source.Reply(" ");
+		source.Reply(_("Bans the given user from a channel for a specified length of\n"
 			"time. If the ban is removed before by hand, it will NOT be replaced."));
 
 		return true;
@@ -100,7 +100,7 @@ class CommandCSTBan : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: TBAN channel nick time"));
+		source.Reply(_("Syntax: TBAN channel nick time"));
 	}
 };
 

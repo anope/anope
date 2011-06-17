@@ -43,8 +43,6 @@ class CommandNSSetLanguage : public Command
 		}
 
 		nc->language = param != "en" ? param : "";
-		PopLanguage();
-		PushLanguage("anope", nc->language);
 		source.Reply(_("Language changed to \002English\002."));
 
 		return MOD_CONT;
@@ -62,9 +60,7 @@ class CommandNSSetLanguage : public Command
 		source.Reply("         en (English)");
 		for (unsigned j = 0; j < languages.size(); ++j)
 		{
-			PushLanguage("anope", languages[j]);
-			const Anope::string &langname = _("English");
-			PopLanguage();
+			const Anope::string &langname = anope_gettext(languages[j].c_str(), _("English"));
 			if (langname == "English")
 				continue;
 			source.Reply("         %s (%s)", languages[j].c_str(), langname.c_str());

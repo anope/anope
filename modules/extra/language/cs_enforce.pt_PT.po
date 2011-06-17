@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"POT-Creation-Date: 2011-06-17 13:49-0400\n"
 "PO-Revision-Date: 2010-09-25 21:24-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Portuguese\n"
@@ -16,13 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cs_enforce.cpp:213
-msgid "    ENFORCE    Enforce various channel modes and set options"
+#: ../cs_enforce.cpp:127
+#, fuzzy
+msgid "Enforce various channel modes and set options"
 msgstr ""
 "    ENFORCE    Verifica o cumprimento de vários modos de canal e opções "
 "ajustadas"
 
-#: ../cs_enforce.cpp:178
+#: ../cs_enforce.cpp:180
 msgid ""
 "Enforce various channel modes and set options. The channel\n"
 "option indicates what channel to enforce the modes and options\n"
@@ -49,13 +50,13 @@ msgstr ""
 "Use RESTRICTED para verificar a opção RESTRICTED, mesmo que ela não esteja\n"
 "ativada."
 
-#: ../cs_enforce.cpp:145 ../cs_enforce.cpp:150 ../cs_enforce.cpp:155
-#: ../cs_enforce.cpp:160 ../cs_enforce.cpp:165
+#: ../cs_enforce.cpp:147 ../cs_enforce.cpp:152 ../cs_enforce.cpp:157
+#: ../cs_enforce.cpp:162 ../cs_enforce.cpp:167
 #, c-format
 msgid "Enforced %s"
 msgstr "Verificado %s"
 
-#: ../cs_enforce.cpp:191
+#: ../cs_enforce.cpp:193
 msgid ""
 "If what is MODES, it will enforce channelmode +R if it is\n"
 "set. If +R is specified for what, the +R channelmode will\n"
@@ -67,7 +68,7 @@ msgstr ""
 "+R também será verificado, mesmo que ele não esteja ativado. Se ele não\n"
 "estiver ativado, os usuários serão banidos para evitar que reentrem no canal."
 
-#: ../cs_enforce.cpp:196
+#: ../cs_enforce.cpp:198
 msgid ""
 "If what is MODES, nothing will be enforced, since it would\n"
 "enforce modes that the current ircd does not support. If +R is\n"
@@ -82,6 +83,6 @@ msgstr ""
 "será verificado. Todos os usuários que estão no canal, mas não estejam\n"
 "identificados para seus nicks serão kickados e banidos do canal."
 
-#: ../cs_enforce.cpp:176 ../cs_enforce.cpp:208
+#: ../cs_enforce.cpp:178 ../cs_enforce.cpp:210
 msgid "Syntax: ENFORCE channel [what]"
 msgstr "Sintaxe: ENFORCE canal [opção]"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"POT-Creation-Date: 2011-06-17 13:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,111 +16,116 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../hs_request.cpp:193
-msgid ""
-"    ACTIVATE    Approve the requested vHost of a user\n"
-"    REJECT      Reject the requested vHost of a user\n"
-"    WAITING     Convenience command for LIST +req"
-msgstr ""
-
-#: ../hs_request.cpp:132
-msgid "    REQUEST     Request a vHost for your nick"
-msgstr ""
-
-#: ../hs_request.cpp:274
+#: ../hs_request.cpp:267
 #, c-format
 msgid "#%d Nick:%s, vhost:%s (%s - %s)"
 msgstr ""
 
-#: ../hs_request.cpp:272
+#: ../hs_request.cpp:265
 #, c-format
 msgid "#%d Nick:%s, vhost:%s@%s (%s - %s)"
 msgstr ""
 
-#: ../hs_request.cpp:181 ../hs_request.cpp:245
+#: ../hs_request.cpp:180 ../hs_request.cpp:238
 msgid "A memo informing the user will also be sent."
 msgstr ""
 
-#: ../hs_request.cpp:179
+#: ../hs_request.cpp:178
 msgid "Activate the requested vHost for the given nick."
 msgstr ""
 
-#: ../hs_request.cpp:278
+#: ../hs_request.cpp:139
+msgid "Approve the requested vHost of a user"
+msgstr ""
+
+#: ../hs_request.cpp:286
+msgid "Convenience command for LIST +req"
+msgstr ""
+
+#: ../hs_request.cpp:271
 #, c-format
 msgid "Displayed all records (Count: %d)"
 msgstr ""
 
-#: ../hs_request.cpp:167 ../hs_request.cpp:234
+#: ../hs_request.cpp:166 ../hs_request.cpp:227
 #, c-format
 msgid "No request for nick %s found."
 msgstr ""
 
-#: ../hs_request.cpp:102
+#: ../hs_request.cpp:105
 #, c-format
 msgid "Please wait %d seconds before requesting a new vHost"
 msgstr ""
 
-#: ../hs_request.cpp:243
+#: ../hs_request.cpp:236
 msgid "Reject the requested vHost for the given nick."
 msgstr ""
 
-#: ../hs_request.cpp:119
+#: ../hs_request.cpp:196
+msgid "Reject the requested vHost of a user"
+msgstr ""
+
+#: ../hs_request.cpp:52
+msgid "Request a vHost for your nick"
+msgstr ""
+
+#: ../hs_request.cpp:122
 msgid ""
 "Request the given vHost to be actived for your nick by the\n"
 "network administrators. Please be patient while your request\n"
 "is being considered."
 msgstr ""
 
-#: ../hs_request.cpp:177 ../hs_request.cpp:188
+#: ../hs_request.cpp:176 ../hs_request.cpp:187
 msgid "Syntax: ACTIVATE nick"
 msgstr ""
 
-#: ../hs_request.cpp:241 ../hs_request.cpp:252
+#: ../hs_request.cpp:234 ../hs_request.cpp:245
 msgid "Syntax: REJECT nick"
 msgstr ""
 
-#: ../hs_request.cpp:65 ../hs_request.cpp:117 ../hs_request.cpp:127
+#: ../hs_request.cpp:68 ../hs_request.cpp:120 ../hs_request.cpp:130
 msgid "Syntax: REQUEST vhost"
 msgstr ""
 
-#: ../hs_request.cpp:307
+#: ../hs_request.cpp:296
 msgid "Syntax: WAITING"
 msgstr ""
 
-#: ../hs_request.cpp:309
+#: ../hs_request.cpp:298
 msgid ""
 "This command is provided for convenience. It is essentially\n"
 "the same as performing a LIST +req ."
 msgstr ""
 
-#: ../hs_request.cpp:108
+#: ../hs_request.cpp:111
 msgid "Your vHost has been requested"
 msgstr ""
 
-#: ../hs_request.cpp:159
+#: ../hs_request.cpp:158
 msgid "[auto memo] Your requested vHost has been approved."
 msgstr ""
 
-#: ../hs_request.cpp:225
+#: ../hs_request.cpp:218
 msgid "[auto memo] Your requested vHost has been rejected."
 msgstr ""
 
-#: ../hs_request.cpp:223
+#: ../hs_request.cpp:216
 #, c-format
 msgid "[auto memo] Your requested vHost has been rejected. Reason: %s"
 msgstr ""
 
-#: ../hs_request.cpp:443
+#: ../hs_request.cpp:438
 #, c-format
-msgid "[auto memo] vHost %s has been requested."
+msgid "[auto memo] vHost %s has been requested by %s."
 msgstr ""
 
-#: ../hs_request.cpp:161
+#: ../hs_request.cpp:160
 #, c-format
 msgid "vHost for %s has been activated"
 msgstr ""
 
-#: ../hs_request.cpp:230
+#: ../hs_request.cpp:223
 #, c-format
 msgid "vHost for %s has been rejected"
 msgstr ""

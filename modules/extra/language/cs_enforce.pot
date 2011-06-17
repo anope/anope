@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"POT-Creation-Date: 2011-06-17 13:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../cs_enforce.cpp:213
-msgid "    ENFORCE    Enforce various channel modes and set options"
+#: ../cs_enforce.cpp:127
+msgid "Enforce various channel modes and set options"
 msgstr ""
 
-#: ../cs_enforce.cpp:178
+#: ../cs_enforce.cpp:180
 msgid ""
 "Enforce various channel modes and set options. The channel\n"
 "option indicates what channel to enforce the modes and options\n"
@@ -35,13 +35,13 @@ msgid ""
 "if it's not enabled."
 msgstr ""
 
-#: ../cs_enforce.cpp:145 ../cs_enforce.cpp:150 ../cs_enforce.cpp:155
-#: ../cs_enforce.cpp:160 ../cs_enforce.cpp:165
+#: ../cs_enforce.cpp:147 ../cs_enforce.cpp:152 ../cs_enforce.cpp:157
+#: ../cs_enforce.cpp:162 ../cs_enforce.cpp:167
 #, c-format
 msgid "Enforced %s"
 msgstr ""
 
-#: ../cs_enforce.cpp:191
+#: ../cs_enforce.cpp:193
 msgid ""
 "If what is MODES, it will enforce channelmode +R if it is\n"
 "set. If +R is specified for what, the +R channelmode will\n"
@@ -49,7 +49,7 @@ msgid ""
 "users will be banned to ensure they don't just rejoin."
 msgstr ""
 
-#: ../cs_enforce.cpp:196
+#: ../cs_enforce.cpp:198
 msgid ""
 "If what is MODES, nothing will be enforced, since it would\n"
 "enforce modes that the current ircd does not support. If +R is\n"
@@ -59,6 +59,6 @@ msgid ""
 "banned from the channel."
 msgstr ""
 
-#: ../cs_enforce.cpp:176 ../cs_enforce.cpp:208
+#: ../cs_enforce.cpp:178 ../cs_enforce.cpp:210
 msgid "Syntax: ENFORCE channel [what]"
 msgstr ""

@@ -616,10 +616,8 @@ class BSKick : public Module
 		if (!ci || !ci->bi || !ci->c || !u || u->server->IsULined())
 			return;
 
-		Anope::string fmt = GetString(u->Account(), message);
+		Anope::string fmt = translate(u, message);
 		va_start(args, message);
-		if (fmt.empty())
-			return;
 		vsnprintf(buf, sizeof(buf), fmt.c_str(), args);
 		va_end(args);
 

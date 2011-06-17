@@ -23,12 +23,9 @@ class ChanServBotInfo : public BotInfo
 
 	void OnMessage(User *u, const Anope::string &message)
 	{
-		PushLanguage("anope", u->Account() ? u->Account()->language : "");
-		
 		if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
 		{
-			u->SendMessage(ChanServ, _(ACCESS_DENIED));
-			PopLanguage();
+			u->SendMessage(ChanServ, ACCESS_DENIED);
 			return;
 		}
 
@@ -46,30 +43,26 @@ class ChanServBotInfo : public BotInfo
 					{
 						if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
 						{
-							u->SendMessage(this, _(_(CHAN_X_SUSPENDED)), ci->name.c_str());
+							u->SendMessage(this, CHAN_X_SUSPENDED, ci->name.c_str());
 							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
-							PopLanguage();
 							return;
 						}
 					}
 					else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
 					{
-						u->SendMessage(this, _(CHAN_X_NOT_REGISTERED), param.c_str());
-						PopLanguage();
+						u->SendMessage(this, CHAN_X_NOT_REGISTERED, param.c_str());
 						return;
 					}
 				}
 				/* A user not giving a channel name for a param that should be a channel */
 				else
 				{
-					u->SendMessage(this, _(CHAN_X_INVALID), param.c_str());
-					PopLanguage();
+					u->SendMessage(this, CHAN_X_INVALID, param.c_str());
 					return;
 				}
 			}
 		}
 
-		PopLanguage();
 		BotInfo::OnMessage(u, message);
 	}
 };

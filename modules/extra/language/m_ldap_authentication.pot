@@ -16,21 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../cs_tban.cpp:85
+#: ../m_ldap_authentication.cpp:60
 #, c-format
-msgid "%s banned from %s, will auto-expire in %s"
+msgid "Your account %s has been successfully created."
 msgstr ""
 
-#: ../cs_tban.cpp:95
-msgid ""
-"Bans the given user from a channel for a specified length of\n"
-"time. If the ban is removed before by hand, it will NOT be replaced."
-msgstr ""
-
-#: ../cs_tban.cpp:61
-msgid "Bans the user for a given length of time"
-msgstr ""
-
-#: ../cs_tban.cpp:103
-msgid "Syntax: TBAN channel nick time"
+#: ../m_ldap_authentication.cpp:132
+#, c-format
+msgid "Your email has been updated to %s"
 msgstr ""

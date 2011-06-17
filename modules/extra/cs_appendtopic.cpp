@@ -87,9 +87,9 @@ class CommandCSAppendTopic : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: APPENDTOPIC channel text"));
+		source.Reply(_("Syntax: APPENDTOPIC channel text"));
 		source.Reply(" ");
-		me->SendMessage(source, _("This command allows users to append text to a currently set\n"
+		source.Reply(("This command allows users to append text to a currently set\n"
 			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
 			"the new, updated topic is locked."));
 
@@ -98,7 +98,7 @@ class CommandCSAppendTopic : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: APPENDTOPIC channel text"));
+		source.Reply(_("Syntax: APPENDTOPIC channel text"));
 	}
 };
 

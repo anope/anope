@@ -45,11 +45,8 @@
 
 #if GETTEXT_FOUND
 # include <libintl.h>
-# define _(x) anope_gettext(x)
-#else
-# define _(x) x
 #endif
-#define gtl(x) x
+#define _(x) x
 
 #ifndef _WIN32
 # include <unistd.h>

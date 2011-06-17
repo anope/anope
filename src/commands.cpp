@@ -53,21 +53,17 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	if (!bi || !u)
 		return;
 	
-	PushLanguage("anope", u->Account() ? u->Account()->language : "");
-
 	if (!c)
 	{
 		u->SendMessage(bi, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), command.c_str(), Config->UseStrictPrivMsgString.c_str(), bi->nick.c_str());
-		PopLanguage();
 		return;
 	}
 
 	// Command requires registered users only
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
-		u->SendMessage(bi, _(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+		u->SendMessage(bi, NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for unregistered user " << u->GetMask() << " with command " << command;
-		PopLanguage();
 		return;
 	}
 
@@ -107,7 +103,6 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	{
 		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
 		source.DoReply();
-		PopLanguage();
 		return;
 	}
 
@@ -116,17 +111,15 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 	if (MOD_RESULT == EVENT_STOP)
 	{
 		source.DoReply();
-		PopLanguage();
 		return;
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
 	if (!c->permission.empty() && !u->HasCommand(c->permission))
 	{
-		u->SendMessage(bi, _(ACCESS_DENIED));
+		u->SendMessage(bi, ACCESS_DENIED);
 		Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		source.DoReply();
-		PopLanguage();
 		return;
 	}
 
@@ -137,8 +130,6 @@ void mod_run_cmd(BotInfo *bi, User *u, ChannelInfo *ci, Command *c, const Anope:
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
 		source.DoReply();
 	}
-
-	PopLanguage();
 }
 
 /**

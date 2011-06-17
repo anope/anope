@@ -243,10 +243,11 @@ void User::SendMessage(BotInfo *source, Anope::string msg)
 	Anope::string tok;
 	while (sep.GetToken(tok))
 	{
+		const char *translated_message = translate(this, tok.c_str());
 		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-			ircdproto->SendPrivmsg(source, this->nick, "%s", tok.c_str());
+			ircdproto->SendPrivmsg(source, this->nick, "%s", translated_message);
 		else
-			ircdproto->SendNotice(source, this->nick, "%s", tok.c_str());
+			ircdproto->SendNotice(source, this->nick, "%s", translated_message);
 	}
 }
 

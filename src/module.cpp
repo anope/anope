@@ -28,8 +28,15 @@ Module::Module(const Anope::string &modname, const Anope::string &, ModType modt
 	Modules.push_back(this);
 
 #if GETTEXT_FOUND
-	if (!bindtextdomain(this->name.c_str(), (services_dir + "/languages/").c_str()))
-		Log() << "Error calling bindtextdomain, " << Anope::LastError();
+	for (unsigned i = 0; i < languages.size(); ++i)
+		if (IsFile("languages/" + languages[i] + "/LC_MESSAGES/" + modname + ".mo"))
+		{
+			if (!bindtextdomain(this->name.c_str(), (services_dir + "/languages/").c_str()))
+				Log() << "Error calling bindtextdomain, " << Anope::LastError();
+			else
+				domains.push_back(modname);
+			break;
+		}
 #endif
 }
 
@@ -45,6 +52,12 @@ Module::~Module()
 	std::list<Module *>::iterator it = std::find(Modules.begin(), Modules.end(), this);
 	if (it != Modules.end())
 		Modules.erase(it);
+
+#if GETTEXT_FOUND
+	std::vector<Anope::string>::iterator dit = std::find(domains.begin(), domains.end(), this->name);
+	if (dit != domains.end())
+		domains.erase(dit);
+#endif
 }
 
 void Module::SetPermanent(bool state)

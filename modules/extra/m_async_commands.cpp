@@ -48,7 +48,7 @@ class AsynchCommandMutex : public CommandMutex
 
 		if (!command->permission.empty() && !u->HasCommand(command->permission))
 		{
-			u->SendMessage(bi, _(ACCESS_DENIED));
+			u->SendMessage(bi, ACCESS_DENIED);
 			Log(LOG_COMMAND, "denied", bi) << "Access denied for user " << u->GetMask() << " with command " << command;
 		}
 		else
@@ -206,7 +206,6 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 			current_command = cm;
 
 			// Unlock to give processing back to the command thread
-			PushLanguage("anope", cm->source.u->Account() ? cm->source.u->Account()->language : "");
 			if (!cm->started)
 			{
 				try
@@ -216,7 +215,6 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 				catch (const CoreException &)
 				{
 					delete cm;
-					PopLanguage();
 					continue;
 				}
 			}
@@ -224,7 +222,6 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 				cm->mutex.Unlock();
 			// Relock to regain processing once the command thread hangs for any reason
 			main_mutex.Lock();
-			PopLanguage();
 
 			current_command = NULL;
 		}

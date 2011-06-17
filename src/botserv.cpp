@@ -51,7 +51,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", translate(requester, ACCESS_DENIED));
 		return;
 	}
 
@@ -62,7 +62,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 
 	if (matches_list(ci->c, u, CMODE_EXCEPT))
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), gtl("User matches channel except.")).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", translate(requester, _("User matches channel except.")));
 		return;
 	}
 
@@ -93,7 +93,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string
 
 	if (ModeManager::FindUserModeByName(UMODE_PROTECTED) && u->IsProtected() && requester != u)
 	{
-		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", GetString(requester->Account(), ACCESS_DENIED).c_str());
+		ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", translate(requester, ACCESS_DENIED));
 		return;
 	}
 

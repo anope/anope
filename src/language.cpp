@@ -2,6 +2,7 @@
 #include <stack>
 
 std::vector<Anope::string> languages;
+std::vector<Anope::string> domains;
 
 void InitLanguages()
 {
@@ -34,49 +35,34 @@ void InitLanguages()
 #endif
 }
 
-const Anope::string GetString(NickCore *nc, const char *string)
+const char *translate(const char *string)
 {
-	return GetString("anope", nc ? nc->language : Config->NSDefLanguage, string);
+	return anope_gettext(Config->NSDefLanguage.c_str(), string);
 }
 
-const Anope::string GetString(const Anope::string &domain, const Anope::string &lang, const char *string)
+const char *translate(User *u, const char *string)
 {
-	PushLanguage(domain, lang);
-	const char *t_string = anope_gettext(string);
-	PopLanguage();
-	return t_string;
+	return translate(u ? u->Account() : NULL, string);
+}
+
+const char *translate(NickCore *nc, const char *string)
+{
+	return anope_gettext(nc ? nc->language.c_str() : Config->NSDefLanguage.c_str(), string);
 }
 
 #if GETTEXT_FOUND
-static std::stack<std::pair<Anope::string, Anope::string > > language_stack;
-
-void PushLanguage(const Anope::string &domain, Anope::string language)
-{
-	if (language.empty() && !Config->NSDefLanguage.empty())
-		language = Config->NSDefLanguage;
-	
-	language_stack.push(std::make_pair(domain, language));
-}
-
-void PopLanguage()
-{
-	language_stack.pop();
-}
 
 /* Used by gettext to make it always dynamically load language strings (so we can drop them in while Anope is running) */
 extern "C" int _nl_msg_cat_cntr;
 
-const char *anope_gettext(const char *string)
+const char *anope_gettext(const char *lang, const char *string)
 {
-	std::pair<Anope::string, Anope::string> lang_info;
-	if (!language_stack.empty())
-		lang_info = language_stack.top();
-	if (*string == 0 || lang_info.first.empty() || lang_info.second.empty())
-		return string;
+	if (!string || !*string || !lang || !*lang)
+		return string ? string : "";
 
 	++_nl_msg_cat_cntr;
 #ifdef _WIN32
-	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang_info.second.c_str()), SUBLANG_DEFAULT), SORT_DEFAULT));
+	SetThreadLocale(MAKELCID(MAKELANGID(WindowsGetLanguage(lang), SUBLANG_DEFAULT), SORT_DEFAULT));
 #else
 	/* First, set LANGUAGE env variable.
 	 * Some systems (Debian) don't care about this, so we must setlocale LC_ALL aswell.
@@ -85,11 +71,13 @@ const char *anope_gettext(const char *string)
 	 * use the LANGUAGE env variable. We must reset the locale to en_US (or, anything not
 	 * C or POSIX) then.
 	 */
-	setenv("LANGUAGE", lang_info.second.c_str(), 1);
-	if (setlocale(LC_ALL, lang_info.second.c_str()) == NULL)
+	setenv("LANGUAGE", lang, 1);
+	if (setlocale(LC_ALL, lang) == NULL)
 		setlocale(LC_ALL, "en_US");
 #endif
-	const char *translated_string = dgettext(lang_info.first.c_str(), string);
+	const char *translated_string = dgettext("anope", string);
+	for (unsigned i = 0; translated_string == string && i < domains.size(); ++i)
+		translated_string = dgettext(domains[i].c_str(), string);
 #ifdef _WIN32
 	SetThreadLocale(MAKELCID(MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), SORT_DEFAULT));
 #else
@@ -97,18 +85,10 @@ const char *anope_gettext(const char *string)
 	setlocale(LC_ALL, "");
 #endif
 
-	return translated_string != NULL ? translated_string : "";
+	return translated_string;
 }
 #else
-void PushLanguage(const Anope::string &, Anope::string)
-{
-}
-
-void PopLanguage()
-{
-}
-
-const char *anope_gettext(const char *string)
+const char *anope_gettext(const char *lang, const char *string)
 {
 	return string != NULL ? string : "";
 }

@@ -90,7 +90,7 @@ class CommandCSEnforce : public Command
 			if (check_access(uc->user, ci, CA_NOJOIN))
 			{
 				get_idealban(ci, uc->user, mask);
-				Anope::string reason = GetString(uc->user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
+				Anope::string reason = translate(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, uc->user, "%s", reason.c_str());
 			}
@@ -114,7 +114,7 @@ class CommandCSEnforce : public Command
 			if (!uc->user->IsIdentified())
 			{
 				get_idealban(ci, uc->user, mask);
-				Anope::string reason = GetString(uc->user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
+				Anope::string reason = translate(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
 				if (!c->HasMode(CMODE_REGISTEREDONLY))
 					c->SetMode(NULL, CMODE_BAN, mask);
 				c->Kick(NULL, uc->user, "%s", reason.c_str());
@@ -144,27 +144,27 @@ class CommandCSEnforce : public Command
 			if (what.empty() || what.equals_ci("SET"))
 			{
 				this->DoSet(c);
-				me->SendMessage(source, _("Enforced %s"), !what.empty() ? what.c_str() : "SET");
+				source.Reply(_("Enforced %s"), !what.empty() ? what.c_str() : "SET");
 			}
 			else if (what.equals_ci("MODES"))
 			{
 				this->DoModes(c);
-				me->SendMessage(source, _("Enforced %s"), what.c_str());
+				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("SECUREOPS"))
 			{
 				this->DoSecureOps(c);
-				me->SendMessage(source, _("Enforced %s"), what.c_str());
+				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("RESTRICTED"))
 			{
 				this->DoRestricted(c);
-				me->SendMessage(source, _("Enforced %s"), what.c_str());
+				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else if (what.equals_ci("+R"))
 			{
 				this->DoCModeR(c);
-				me->SendMessage(source, _("Enforced %s"), what.c_str());
+				source.Reply(_("Enforced %s"), what.c_str());
 			}
 			else
 				this->OnSyntaxError(source, "");
@@ -175,9 +175,9 @@ class CommandCSEnforce : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("Enforce various channel modes and set options. The \037channel\037\n"
+		source.Reply(_("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
+		source.Reply(" ");
+		source.Reply(_("Enforce various channel modes and set options. The \037channel\037\n"
 			"option indicates what channel to enforce the modes and options\n"
 			"on. The \037what\037 option indicates what modes and options to\n"
 			"enforce, and can be any of SET, SECUREOPS, RESTRICTED, MODES,\n"
@@ -188,14 +188,14 @@ class CommandCSEnforce : public Command
 			"SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
 			"enabled. Use RESTRICTED to enfore the RESTRICTED option, also\n"
 			"if it's not enabled."));
-		me->SendMessage(source, " ");
+		source.Reply(" ");
 		if (ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			me->SendMessage(source, _("If \037what\037 is MODES, it will enforce channelmode +R if it is\n"
+			source.Reply(_("If \037what\037 is MODES, it will enforce channelmode +R if it is\n"
 				"set. If +R is specified for \037what\037, the +R channelmode will\n"
 				"also be enforced, but even if it is not set. If it is not set,\n"
 				"users will be banned to ensure they don't just rejoin."));
 		else
-			me->SendMessage(source, _("If \037what\037 is MODES, nothing will be enforced, since it would\n"
+			source.Reply(_("If \037what\037 is MODES, nothing will be enforced, since it would\n"
 				"enforce modes that the current ircd does not support. If +R is\n"
 				"specified for \037what\037, an equalivant of channelmode +R on\n"
 				"other ircds will be enforced. All users that are in the channel\n"
@@ -207,7 +207,7 @@ class CommandCSEnforce : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
+		source.Reply(_("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
 	}
 };
 

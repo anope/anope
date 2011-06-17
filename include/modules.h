@@ -270,12 +270,6 @@ class CoreExport Module : public Extensible
 	 */
 	Version GetVersion() const;
 
-	/** Send a message to a user in their language, if a translation is available
-	 * @param source The source of the message
-	 * @param fmt The message
-	 */
-	void SendMessage(CommandSource &source, const char *fmt, ...);
-
 	/**
 	 * Add a module provided command to the given service.
 	 * @param bi The service to add the command to

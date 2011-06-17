@@ -212,26 +212,26 @@ Anope::string duration(const time_t &t, NickCore *nc)
 	time_t seconds = (t) % 60;
 
 	if (!days && !hours && !minutes)
-		return stringify(seconds) + " " + (seconds != 1 ? GetString(nc, gtl("seconds")) : GetString(nc, gtl("second")));
+		return stringify(seconds) + " " + (seconds != 1 ? translate(nc, _("seconds")) : translate(nc, _("second")));
 	else
 	{
 		bool need_comma = false;
 		Anope::string buffer;
 		if (days)
 		{
-			buffer = stringify(days) + " " + (days != 1 ? GetString(nc, gtl("days")) : GetString(nc, gtl("day")));
+			buffer = stringify(days) + " " + (days != 1 ? translate(nc, _("days")) : translate(nc, _("day")));
 			need_comma = true;
 		}
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " " + (hours != 1 ? GetString(nc, gtl("hours")) : GetString(nc, gtl("hour")));
+			buffer += stringify(hours) + " " + (hours != 1 ? translate(nc, _("hounslaters")) : translate(nc, _("hour")));
 			need_comma = true;
 		}
 		if (minutes)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(minutes) + " " + (minutes != 1 ? GetString(nc, gtl("minutes")) : GetString(nc, gtl("minute")));
+			buffer += stringify(minutes) + " " + (minutes != 1 ? translate(nc, _("minutes")) : translate(nc, _("minute")));
 		}
 		return buffer;
 	}
@@ -240,14 +240,13 @@ Anope::string duration(const time_t &t, NickCore *nc)
 Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
-	char buf[BUFSIZE];
-	strftime(buf, sizeof(buf), GetString(nc, gtl("%b %d %H:%M:%S %Y %Z")).c_str(), &tm);
+	const char *buf = translate(nc, _("%b %d %H:%M:%S %Y %Z"));
 	if (short_output)
 		return buf;
 	if (t < Anope::CurTime)
-		return Anope::string(buf) + " " + Anope::printf(GetString(nc, gtl("(%s ago)")).c_str(), duration(Anope::CurTime - t).c_str(), nc);
+		return Anope::string(buf) + " " + Anope::printf(translate(nc, _("(%s ago)")), duration(Anope::CurTime - t).c_str(), nc);
 	else
-		return Anope::string(buf) + " " + Anope::printf(GetString(nc, gtl("(%s from now)")).c_str(), duration(t - Anope::CurTime).c_str(), nc);
+		return Anope::string(buf) + " " + Anope::printf(translate(nc, _("(%s from now)")), duration(t - Anope::CurTime).c_str(), nc);
 }
 
 /*************************************************************************/
@@ -261,9 +260,9 @@ Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
 Anope::string expire_left(NickCore *nc, time_t expires)
 {
 	if (!expires)
-		return GetString(nc, NO_EXPIRE);
+		return translate(nc, NO_EXPIRE);
 	else if (expires <= Anope::CurTime)
-		return GetString(nc, gtl("expires at next database update"));
+		return translate(nc, _("expires at next database update"));
 	else
 	{
 		char buf[256];
@@ -272,21 +271,21 @@ Anope::string expire_left(NickCore *nc, time_t expires)
 		if (diff >= 86400)
 		{
 			int days = diff / 86400;
-			snprintf(buf, sizeof(buf), GetString(nc, days == 1 ? gtl("expires in %d day") : gtl("expires in %d days")).c_str(), days);
+			snprintf(buf, sizeof(buf), translate(nc, days == 1 ? _("expires in %d day") : _("expires in %d days")), days);
 		}
 		else
 		{
 			if (diff <= 3600)
 			{
 				int minutes = diff / 60;
-				snprintf(buf, sizeof(buf), GetString(nc, minutes == 1 ? gtl("expires in %d minute") : gtl("expires in %d minutes")).c_str(), minutes);
+				snprintf(buf, sizeof(buf), translate(nc, minutes == 1 ? _("expires in %d minute") : _("expires in %d minutes")), minutes);
 			}
 			else
 			{
 				int hours = diff / 3600, minutes;
 				diff -= hours * 3600;
 				minutes = diff / 60;
-				snprintf(buf, sizeof(buf), GetString(nc, hours == 1 && minutes == 1 ? gtl("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? gtl("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? gtl("expires in %d hours, %d minute") : gtl("expires in %d hours, %d minutes")))).c_str(), hours, minutes);
+				snprintf(buf, sizeof(buf), translate(nc, hours == 1 && minutes == 1 ? _("expires in %d hour, %d minute") : (hours == 1 && minutes != 1 ? _("expires in %d hour, %d minutes") : (hours != 1 && minutes == 1 ? _("expires in %d hours, %d minute") : _("expires in %d hours, %d minutes")))), hours, minutes);
 			}
 		}
 

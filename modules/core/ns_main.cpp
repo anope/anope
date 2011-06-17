@@ -34,14 +34,14 @@ class MyNickServService : public NickServService
 
 		if (na->nc->HasFlag(NI_SUSPENDED))
 		{
-			u->SendMessage(NickServ, _(NICK_X_SUSPENDED), u->nick.c_str());
+			u->SendMessage(NickServ, NICK_X_SUSPENDED, u->nick.c_str());
 			u->Collide(na);
 			return;
 		}
 
 		if (!u->IsIdentified() && !u->fingerprint.empty() && na->nc->FindCert(u->fingerprint))
 		{
-			u->SendMessage(NickServ, _("SSL Fingerprint accepted, you are now identified"));
+			u->SendMessage(NickServ, _("SSL Fingerprint accepted, you are now identified."));
 			u->Identify(na);
 			return;
 		}
@@ -58,16 +58,16 @@ class MyNickServService : public NickServService
 		if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			if (na->nc->HasFlag(NI_SECURE))
-				u->SendMessage(NickServ, _(NICK_IS_SECURE), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				u->SendMessage(NickServ, NICK_IS_SECURE, Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 			else
-				u->SendMessage(NickServ, _(NICK_IS_REGISTERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
 		}
 
 		if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
 		{
 			if (na->nc->HasFlag(NI_KILL_IMMED))
 			{
-				u->SendMessage(NickServ, _(FORCENICKCHANGE_NOW));
+				u->SendMessage(NickServ, FORCENICKCHANGE_NOW);
 				u->Collide(na);
 			}
 			else if (na->nc->HasFlag(NI_KILL_QUICK))

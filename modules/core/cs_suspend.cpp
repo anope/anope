@@ -54,7 +54,7 @@ class CommandCSSuspend : public Command
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : GetString(uc->user->Account(), gtl("This channel has been suspended.")).c_str());
+				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : translate(uc->user, _("This channel has been suspended.")));
 			}
 		}
 

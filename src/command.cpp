@@ -29,7 +29,10 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(message, '\n');
 	Anope::string tok;
 	while (sep.GetToken(tok))
-		this->reply.push_back(tok);
+	{
+		const char *translated_message = translate(this->u, tok.c_str());
+		this->reply.push_back(translated_message);
+	}
 }
 
 void CommandSource::DoReply()
@@ -76,7 +79,7 @@ const Anope::string &Command::GetDesc() const
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", this->name.c_str(), _(this->GetDesc().c_str()));
+	source.Reply("    %-14s %s", this->name.c_str(), translate(source.u, (this->GetDesc().c_str())));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }

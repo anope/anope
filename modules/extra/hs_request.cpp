@@ -65,7 +65,7 @@ class CommandHSRequest : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (rawhostmask.empty())
 			{
-				me->SendMessage(source, _("Syntax: \002REQUEST \037vhost\037\002"));
+				source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
 				return MOD_CONT;
 			}
 			if (vIdent.length() > Config->UserLen)
@@ -102,13 +102,13 @@ class CommandHSRequest : public Command
 
 		if (HSRequestMemoOper && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 		{
-			me->SendMessage(source, _("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
+			source.Reply(_("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
 			u->lastmemosend = Anope::CurTime;
 			return MOD_CONT;
 		}
 		my_add_host_request(u->nick, vIdent, hostmask, u->nick, Anope::CurTime);
 
-		me->SendMessage(source, _("Your vHost has been requested"));
+		source.Reply(_("Your vHost has been requested"));
 		req_send_memos(source, vIdent, hostmask);
 		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
@@ -117,9 +117,9 @@ class CommandHSRequest : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002REQUEST \037vhost\037\002"));
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("Request the given vHost to be actived for your nick by the\n"
+		source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
+		source.Reply(" ");
+		source.Reply(_("Request the given vHost to be actived for your nick by the\n"
 			"network administrators. Please be patient while your request\n"
 			"is being considered."));
 		return true;
@@ -127,7 +127,7 @@ class CommandHSRequest : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002REQUEST \037vhost\037\002"));
+		source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
 	}
 };
 
@@ -157,13 +157,13 @@ class CommandHSActivate : public Command
 				if (HSRequestMemoUser && memoserv)
 					memoserv->Send(Config->s_HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
-				me->SendMessage(source, _("vHost for %s has been activated"), na->nick.c_str());
+				source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
 				Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!it->second->ident.empty() ? it->second->ident + "@" : "") << it->second->host;
 				delete it->second;
 				Requests.erase(it);
 			}
 			else
-				me->SendMessage(source, _("No request for nick %s found."), nick.c_str());
+				source.Reply(_("No request for nick %s found."), nick.c_str());
 		}
 		else
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
@@ -173,18 +173,18 @@ class CommandHSActivate : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002ACTIVATE \037nick\037\002"));
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("Activate the requested vHost for the given nick."));
+		source.Reply(_("Syntax: \002ACTIVATE \037nick\037\002"));
+		source.Reply(" ");
+		source.Reply(_("Activate the requested vHost for the given nick."));
 		if (HSRequestMemoUser)
-			me->SendMessage(source, _("A memo informing the user will also be sent."));
+			source.Reply(_("A memo informing the user will also be sent."));
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002ACTIVATE \037nick\037\002"));
+		source.Reply(_("Syntax: \002ACTIVATE \037nick\037\002"));
 	}
 };
 
@@ -220,29 +220,29 @@ class CommandHSReject : public Command
 				memoserv->Send(Config->s_HostServ, nick, message, true);
 			}
 
-			me->SendMessage(source, _("vHost for %s has been rejected"), nick.c_str());
+			source.Reply(_("vHost for %s has been rejected"), nick.c_str());
 			Log(LOG_COMMAND, u, this, NULL) << "to reject vhost for " << nick << " (" << (!reason.empty() ? reason : "") << ")";
 		}
 		else
-			me->SendMessage(source, _("No request for nick %s found."), nick.c_str());
+			source.Reply(_("No request for nick %s found."), nick.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002REJECT \037nick\037\002"));
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("Reject the requested vHost for the given nick."));
+		source.Reply(_("Syntax: \002REJECT \037nick\037\002"));
+		source.Reply(" ");
+		source.Reply(_("Reject the requested vHost for the given nick."));
 		if (HSRequestMemoUser)
-			me->SendMessage(source, _("A memo informing the user will also be sent."));
+			source.Reply(_("A memo informing the user will also be sent."));
 
 		return true;
 	}
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002REJECT \037nick\037\002"));
+		source.Reply(_("Syntax: \002REJECT \037nick\037\002"));
 	}
 };
 
@@ -293,9 +293,9 @@ class CommandHSWaiting : public HSListBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		me->SendMessage(source, _("Syntax: \002WAITING\002"));
-		me->SendMessage(source, " ");
-		me->SendMessage(source, _("This command is provided for convenience. It is essentially\n"
+		source.Reply(_("Syntax: \002WAITING\002"));
+		source.Reply(" ");
+		source.Reply(_("This command is provided for convenience. It is essentially\n"
 			"the same as performing a LIST +req ."));
 
 		return true;

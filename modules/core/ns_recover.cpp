@@ -49,7 +49,7 @@ class CommandNSRecover : public Command
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				u2->SendMessage(nickserv->Bot(), _(FORCENICKCHANGE_NOW));
+				u2->SendMessage(nickserv->Bot(), FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
@@ -69,7 +69,7 @@ class CommandNSRecover : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
 					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
-				u2->SendMessage(nickserv->Bot(), _(FORCENICKCHANGE_NOW));
+				u2->SendMessage(nickserv->Bot(), FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */

@@ -17,16 +17,16 @@
 static BotInfo *MemoServ = NULL;
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
-	Anope::string message = Anope::printf(GetString(nc, gtl(
+	Anope::string message = Anope::printf(translate(nc, _(
 	"Hi %s\n"
 	" \n"
 	"You've just received a new memo from %s. This is memo number %d.\n"
 	" \n"
 	"Memo text:\n"
 	" \n"
-	"%s")).c_str(), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
+	"%s")), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
 
-	return Mail(nc, GetString(nc, gtl("New memo")), message);
+	return Mail(nc, translate(nc, _("New memo")), message);
 }
 
 class MyMemoServService : public MemoServService
@@ -105,7 +105,7 @@ class MyMemoServService : public MemoServService
 					if (check_access(cu->user, ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, _(MEMO_NEW_X_MEMO_ARRIVED), ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
 					}
 				}
 			}
@@ -121,7 +121,7 @@ class MyMemoServService : public MemoServService
 					NickAlias *na = *it;
 					User *user = finduser(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, _(MEMO_NEW_MEMO_ARRIVED), source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
 				}
 			}
 

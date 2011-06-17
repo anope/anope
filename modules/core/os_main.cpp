@@ -25,9 +25,7 @@ class OperServBotInfo : public BotInfo
 	{
 		if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
 		{
-			PushLanguage("anope", u->Account() ? u->Account()->language : "");
-			u->SendMessage(OperServ, _(ACCESS_DENIED));
-			PopLanguage();
+			u->SendMessage(OperServ, ACCESS_DENIED);
 			if (Config->WallBadOS)
 				ircdproto->SendGlobops(this, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 		}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Anope\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-04 03:41-0500\n"
+"POT-Creation-Date: 2011-06-17 13:49-0400\n"
 "PO-Revision-Date: 2010-09-26 00:22-0400\n"
 "Last-Translator: Adam <adam@anope.org>\n"
 "Language-Team: Italian\n"
@@ -17,16 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../cs_tban.cpp:106
-msgid "    TBAN       Bans the user for a given length of time"
-msgstr "    TBAN       Banna l'utente per un periodo di tempo specificato"
-
-#: ../cs_tban.cpp:83
+#: ../cs_tban.cpp:85
 #, c-format
 msgid "%s banned from %s, will auto-expire in %s"
 msgstr "%s bannato da %s, scadrà automaticamente tra %s"
 
-#: ../cs_tban.cpp:93
+#: ../cs_tban.cpp:95
 msgid ""
 "Bans the given user from a channel for a specified length of\n"
 "time. If the ban is removed before by hand, it will NOT be replaced."
@@ -35,6 +31,11 @@ msgstr ""
 "specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrà "
 "rimpiazzato."
 
-#: ../cs_tban.cpp:101
+#: ../cs_tban.cpp:61
+#, fuzzy
+msgid "Bans the user for a given length of time"
+msgstr "    TBAN       Banna l'utente per un periodo di tempo specificato"
+
+#: ../cs_tban.cpp:103
 msgid "Syntax: TBAN channel nick time"
 msgstr "Sintassi: TBAN canale nick tempo"

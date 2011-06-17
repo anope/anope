@@ -35,7 +35,6 @@ class CommandOSHelp : public Command
 		for (CommandMap::const_iterator it = operserv->Bot()->Commands.begin(), it_end = operserv->Bot()->Commands.end(); it != it_end; ++it)
 			if (!Config->HidePrivilegedCommands || it->second->permission.empty() || u->HasCommand(it->second->permission))
 				it->second->OnServHelp(source);
-		source.Reply(_("\002Notice:\002 All commands sent to %s are logged!"), Config->s_OperServ.c_str());
 	}
 };
 

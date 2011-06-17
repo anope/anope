@@ -33,7 +33,6 @@ class OperServBotInfo : public BotInfo
 		}
 		else
 		{
-			Log(OperServ) << u->nick << ": " <<  message;
 			BotInfo::OnMessage(u, message);
 		}
 	}

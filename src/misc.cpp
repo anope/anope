@@ -416,7 +416,7 @@ bool isvalidchar(char c)
 Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number)
 {
 	if (str.empty() || str.find(dilim) == Anope::string::npos)
-		return "";
+		return token_number ? "" : str;
 
 	Anope::string substring;
 	sepstream sep(str, dilim);
@@ -438,7 +438,7 @@ Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_numb
 Anope::string myStrGetTokenRemainder(const Anope::string &str, const char dilim, int token_number)
 {
 	if (str.empty() || str.find(dilim) == Anope::string::npos)
-		return "";
+		return token_number ? "" : str;
 
 	Anope::string substring;
 	sepstream sep(str, dilim);

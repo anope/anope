@@ -332,7 +332,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 		{
 			Server *serv = s->GetLinks()[i];
 
-			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
+			if (serv->GetName().equals_ci(name) || serv->GetSID().equals_cs(name))
 				return serv;
 			Log(LOG_DEBUG_2) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);

@@ -88,11 +88,7 @@ class CoreExport LogInfo
 
 	void AddType(std::list<Anope::string> &list, const Anope::string &type);
 
-	bool HasType(std::list<Anope::string> &list, const Anope::string &type) const;
-
-	std::list<Anope::string> &GetList(LogType type);
-
-	bool HasType(LogType Type);
+	bool HasType(LogType ltype, const Anope::string &type) const;
 
 	void ProcessMessage(const Log *l);
 };

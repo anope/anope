@@ -205,9 +205,39 @@ void LogInfo::AddType(std::list<Anope::string> &list, const Anope::string &type)
 	list.push_back(type);
 }
 
-bool LogInfo::HasType(std::list<Anope::string> &list, const Anope::string &type) const
+bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 {
-	for (std::list<Anope::string>::iterator it = list.begin(), it_end = list.end(); it != it_end; ++it)
+	const std::list<Anope::string> *list = NULL;
+	switch (ltype)
+	{
+		case LOG_ADMIN:
+			list = &this->Admin;
+		case LOG_OVERRIDE:
+			list = &this->Override;
+		case LOG_COMMAND:
+			list = &this->Commands;
+		case LOG_SERVER:
+			list = &this->Servers;
+		case LOG_CHANNEL:
+			list = &this->Channels;
+		case LOG_USER:
+			list = &this->Users;
+		case LOG_NORMAL:
+			list = &this->Normal;
+		case LOG_TERMINAL:
+			return true;
+		case LOG_RAWIO:
+			return debug ? true : this->RawIO;
+		case LOG_DEBUG:
+			return debug ? true : this->Debug;
+		default:
+			break;
+	}
+
+	if (list == NULL)
+		return false;
+
+	for (std::list<Anope::string>::const_iterator it = list->begin(), it_end = list->end(); it != it_end; ++it)
 	{
 		Anope::string cat = *it;
 		bool inverse = false;
@@ -225,67 +255,13 @@ bool LogInfo::HasType(std::list<Anope::string> &list, const Anope::string &type)
 	return false;
 }
 
-std::list<Anope::string> &LogInfo::GetList(LogType type)
-{
-	static std::list<Anope::string> empty;
-
-	switch (type)
-	{
-		case LOG_ADMIN:
-			return this->Admin;
-		case LOG_OVERRIDE:
-			return this->Override;
-		case LOG_COMMAND:
-			return this->Commands;
-		case LOG_SERVER:
-			return this->Servers;
-		case LOG_CHANNEL:
-			return this->Channels;
-		case LOG_USER:
-			return this->Users;
-		case LOG_NORMAL:
-			return this->Normal;
-		default:
-			return empty;
-	}
-}
-
-bool LogInfo::HasType(LogType type)
-{
-	switch (type)
-	{
-		case LOG_ADMIN:
-		case LOG_OVERRIDE:
-		case LOG_COMMAND:
-		case LOG_SERVER:
-		case LOG_CHANNEL:
-		case LOG_USER:
-		case LOG_NORMAL:
-			return !this->GetList(type).empty();
-		case LOG_TERMINAL:
-			return true;
-		case LOG_RAWIO:
-			return debug ? true : this->RawIO;
-		case LOG_DEBUG:
-			return debug ? true : this->Debug;
-		// LOG_DEBUG_[234]
-		default:
-			break;
-	}
-
-	return false;
-}
-
 void LogInfo::ProcessMessage(const Log *l)
 {
 	static time_t lastwarn = Anope::CurTime;
 
 	if (!l)
 		throw CoreException("Bad values passed to LogInfo::ProcessMessages");
-	
-	if (!this->HasType(l->Type))
-		return;
-	else if (!this->HasType(this->GetList(l->Type), l->Category))
+	else if (!this->HasType(l->Type, l->Category))
 		return;
 	
 	if (!this->Sources.empty())

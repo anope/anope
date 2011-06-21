@@ -323,7 +323,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 	if (!s)
 		s = Me;
-	if (s->GetName().equals_cs(name) || s->GetSID().equals_cs(name))
+	if (s->GetName().equals_ci(name) || s->GetSID().equals_cs(name))
 		return s;
 
 	if (!s->GetLinks().empty())

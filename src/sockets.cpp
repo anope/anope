@@ -282,10 +282,10 @@ ClientSocket *SocketIO::Accept(ListenSocket *s)
 	int newsock = accept(s->GetFD(), &conaddr.sa, &size);
 
 #ifndef INVALID_SOCKET
-# define INVALID_SOCKET 0
+# define INVALID_SOCKET -1
 #endif
 
-	if (newsock > 0 && newsock != INVALID_SOCKET)
+	if (newsock >= 0 && newsock != INVALID_SOCKET)
 		return s->OnAccept(newsock, conaddr);
 	else
 		throw SocketException("Unable to accept connection: " + Anope::LastError());

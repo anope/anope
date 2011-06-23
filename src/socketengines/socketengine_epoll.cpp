@@ -32,8 +32,12 @@ void SocketEngine::Shutdown()
 {
 	Process();
 
-	for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; ++it)
-		delete it->second;
+	for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end;)
+	{
+		Socket *s = it->second;
+		++it;
+		delete s;
+	}
 	Sockets.clear();
 
 	delete [] events;

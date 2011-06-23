@@ -125,7 +125,7 @@ class CommandNSSet : public Command
 class CommandNSSetDisplay : public Command
 {
  public:
-	CommandNSSetDisplay() : Command("DISPLAY", 1)
+	CommandNSSetDisplay() : Command("DISPLAY", 2)
 	{
 		this->SetDesc(_("Set the display of your group in Services"));
 	}
@@ -165,7 +165,7 @@ class CommandNSSetDisplay : public Command
 class CommandNSSetPassword : public Command
 {
  public:
-	CommandNSSetPassword() : Command("PASSWORD", 1)
+	CommandNSSetPassword() : Command("PASSWORD", 2)
 	{
 		this->SetDesc(_("Set your nickname password"));
 	}

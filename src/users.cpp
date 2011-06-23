@@ -356,7 +356,8 @@ void User::Identify(NickAlias *na)
 	}
 
 	this->Login(na->nc);
-	ircdproto->SendAccountLogin(this, this->Account());
+	if (!na->nc->HasFlag(NI_UNCONFIRMED))
+		ircdproto->SendAccountLogin(this, this->Account());
 	ircdproto->SetAutoIdentificationToken(this);
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
@@ -847,9 +848,11 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			{
 				na->last_seen = Anope::CurTime;
 				user->UpdateHost();
-				ircdproto->SetAutoIdentificationToken(user);
 				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				{
 					user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+					ircdproto->SetAutoIdentificationToken(user);
+				}
 				Log(nickserv->Bot()) << user->GetMask() << " automatically identified for group " << user->Account()->display;
 			}
 

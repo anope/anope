@@ -117,7 +117,8 @@ class CommandNSGroup : public Command
 
 				u->Login(na->nc);
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
-				ircdproto->SendAccountLogin(u, u->Account());
+				if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
+					ircdproto->SendAccountLogin(u, u->Account());
 				ircdproto->SetAutoIdentificationToken(u);
 
 				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";

@@ -190,8 +190,8 @@ class CommandNSRegister : public Command
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
-
-			ircdproto->SendAccountLogin(u, u->Account());
+			else
+				ircdproto->SendAccountLogin(u, u->Account());
 			ircdproto->SetAutoIdentificationToken(u);
 
 			u->lastnickreg = Anope::CurTime;

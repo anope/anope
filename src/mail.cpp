@@ -45,7 +45,7 @@ bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject,
 	if (!Config->UseMail)
 		u->SendMessage(service, _("Services have been configured to not send mail."));
 	else if (Anope::CurTime - u->lastmail < Config->MailDelay)
-		u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), Config->MailDelay - Anope::CurTime - u->lastmail);
+		u->SendMessage(service, _("Please wait \002%d\002 seconds and retry."), Config->MailDelay - (Anope::CurTime - u->lastmail));
 	else if (nc->email.empty())
 		u->SendMessage(service, _("E-mail for \002%s\002 is invalid."), nc->display.c_str());
 	else

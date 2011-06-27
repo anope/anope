@@ -6,7 +6,7 @@ set_target_properties(version PROPERTIES LINKER_LANGUAGE CXX LINK_FLAGS "${LDFLA
 get_target_property(version_BINARY version LOCATION)
 # Modify version.h from the above executable, with dependencies to version.cpp
 # and all of the source files in the main build
-add_custom_command(OUTPUT version_build
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_build
   COMMAND ${version_BINARY} ${Anope_SOURCE_DIR}/src/version.sh ${CMAKE_CURRENT_BINARY_DIR}/version.h
   DEPENDS version ${SRC_SRCS}
 )
@@ -45,4 +45,4 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # Add a custom target to the above file
-add_custom_target(headers DEPENDS version version_build ${PCH_SOURCES_GCH})
+add_custom_target(headers DEPENDS version ${CMAKE_CURRENT_BINARY_DIR}/version_build ${PCH_SOURCES_GCH})

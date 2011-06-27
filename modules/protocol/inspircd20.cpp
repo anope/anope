@@ -454,7 +454,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				ChannelMode *cm = NULL;
 
 				if (modename.equals_cs("admin"))
-					cm = new ChannelModeStatus(CMODE_PROTECT, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_PROTECT, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("allowinvite"))
 					cm = new ChannelMode(CMODE_ALLINVITE, modechar[0]);
 				else if (modename.equals_cs("auditorium"))
@@ -476,9 +476,9 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("flood"))
 					cm = new ChannelModeFlood(modechar[0], true);
 				else if (modename.equals_cs("founder"))
-					cm = new ChannelModeStatus(CMODE_OWNER, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_OWNER, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("halfop"))
-					cm = new ChannelModeStatus(CMODE_HALFOP, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_HALFOP, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("invex"))
 					cm = new InspIRCdExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I');
 				else if (modename.equals_cs("inviteonly"))
@@ -508,7 +508,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("nonotice"))
 					cm = new ChannelMode(CMODE_NONOTICE, modechar[0]);
 				else if (modename.equals_cs("op"))
-					cm = new ChannelModeStatus(CMODE_OP, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_OP, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("operonly"))
 					cm = new ChannelModeOper(modechar[0]);
 				else if (modename.equals_cs("permanent"))
@@ -530,7 +530,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("topiclock"))
 					cm = new ChannelMode(CMODE_TOPIC, modechar[0]);
 				else if (modename.equals_cs("voice"))
-					cm = new ChannelModeStatus(CMODE_VOICE, modechar[1], modechar[0]);
+					cm = new ChannelModeStatus(CMODE_VOICE, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				/* Unknown status mode, (customprefix) - add it */
 				else if (modechar.length() == 2)
 					cm = new ChannelModeStatus(CMODE_END, modechar[1], modechar[0]);

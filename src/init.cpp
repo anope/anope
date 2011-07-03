@@ -344,8 +344,6 @@ void Init(int ac, char **av)
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 
-	DNSEngine = new DNSManager();
-
 #ifndef _WIN32
 	if (!nofork)
 	{

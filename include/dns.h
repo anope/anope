@@ -137,43 +137,25 @@ struct CoreExport DNSRecord
 	operator bool() const;
 };
 
-/** The socket used to talk to the nameserver, uses UDP
- */
-class DNSSocket : public ConnectionSocket
-{
- private:
-	int SendTo(const unsigned char *buf, size_t len) const;
-	int RecvFrom(char *buf, size_t size, sockaddrs &addrs) const;
-
- public:
-	DNSSocket();
-	virtual ~DNSSocket();
-
-	bool ProcessRead();
-
-	bool ProcessWrite();
-
-	void OnConnect();
-
-	void OnError(const Anope::string &error);
-};
-
 /** DNS manager, manages the connection and all requests
  */
-class CoreExport DNSManager : public Timer
+class CoreExport DNSManager : public Timer, public Socket
 {
 	std::multimap<Anope::string, DNSRecord *> cache;
+	sockaddrs addrs;
  public:
-	DNSSocket *sock;
-
 	std::deque<DNSPacket *> packets;
 	std::map<short, DNSRequest *> requests;
 
 	static const int DNSPort = 53;
 
-	DNSManager();
+	DNSManager(const Anope::string &nameserver, int port);
 
 	~DNSManager();
+
+	bool ProcessRead();
+
+	bool ProcessWrite();
 
 	void AddCache(DNSRecord *rr);
 	bool CheckCache(DNSRequest *request);

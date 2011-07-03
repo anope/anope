@@ -10,12 +10,7 @@ static inline unsigned short GetRandomID()
 DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Module *c) : timeout(NULL), use_cache(cache), id(0), creator(c), address(addr), QT(qt)
 {
 	if (!DNSEngine)
-		DNSEngine = new DNSManager();
-	if (!DNSEngine->sock)
-	{
-		DNSEngine->sock = new DNSSocket();
-		DNSEngine->sock->Connect(Config->NameServer, DNSManager::DNSPort);
-	}
+		DNSEngine = new DNSManager(Config->NameServer, DNSManager::DNSPort);
 	if (DNSEngine->packets.size() == 65535)
 		throw SocketException("DNS queue full");
 }
@@ -26,16 +21,12 @@ DNSRequest::~DNSRequest()
 	if (!this->timeout)
 		return;
 	/* DNSRequest came back, delete the timeout */
-	if (!this->timeout->done)
-	{
+	else if (!this->timeout->done)
 		delete this->timeout;
-	}
 	/* Timeout timed us out, delete us from the requests map */
 	else
-	{
 		/* We can leave the packet, if it comes back later we will drop it */
 		DNSEngine->requests.erase(this->id);
-	}
 }
 
 void DNSRequest::Process()
@@ -44,8 +35,6 @@ void DNSRequest::Process()
 
 	if (!DNSEngine)
 		throw SocketException("DNSEngine has not been initialized");
-	else if (!DNSEngine->sock || !DNSEngine->sock->connected)
-		throw SocketException("Connection to nameserver has not been established");
 
 	if (this->use_cache && DNSEngine->CheckCache(this))
 	{
@@ -74,7 +63,7 @@ void DNSRequest::Process()
 	DNSEngine->requests[this->id] = this;
 	DNSEngine->packets.push_back(p);
 
-	SocketEngine::MarkWritable(DNSEngine->sock);
+	SocketEngine::MarkWritable(DNSEngine);
 
 	this->timeout = new DNSRequestTimeout(this, Config->DNSTimeout);
 }
@@ -231,56 +220,53 @@ DNSRecord::operator bool() const
 	return !this->result.empty();
 }
 
-DNSSocket::DNSSocket() : ConnectionSocket(false, SOCK_DGRAM)
+DNSManager::DNSManager(const Anope::string &nameserver, int port) : Timer(300, Anope::CurTime, true), Socket(0, nameserver.find(':') != Anope::string::npos, SOCK_DGRAM)
 {
+	this->addrs.pton(this->IPv6 ? AF_INET6 : AF_INET, nameserver, port);
 }
 
-DNSSocket::~DNSSocket()
+DNSManager::~DNSManager()
 {
-	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
-		delete DNSEngine->packets[i - 1];
-	DNSEngine->packets.clear();
-	Log(LOG_NORMAL, "dns") << "Resolver: Lost connection to nameserver";
-	if (DNSEngine)
-		DNSEngine->sock = NULL;
-}
+	for (unsigned i = this->packets.size(); i > 0; --i)
+		delete this->packets[i - 1];
+	this->packets.clear();
 
-int DNSSocket::SendTo(const unsigned char *buf, size_t len) const
-{
-	return sendto(this->GetFD(), reinterpret_cast<const char *>(buf), len, 0, &this->conaddr.sa, this->conaddr.size());
-}
-
-int DNSSocket::RecvFrom(char *buf, size_t len, sockaddrs &addrs) const
-{
-	socklen_t x = sizeof(addrs);
-	return recvfrom(this->GetFD(), buf, len, 0, &addrs.sa, &x);
-}
-
-bool DNSSocket::ProcessRead()
-{
-	Log(LOG_DEBUG_2) << "Resolver: Reading from UDP socket";
-
-	sockaddrs from_server;
-	unsigned char packet_buffer[524];
-	int length = this->RecvFrom(reinterpret_cast<char *>(&packet_buffer), sizeof(packet_buffer), from_server);
-
-	if (length < 0)
-		return false;
-
-	if (this->conaddr != from_server)
-	{
-		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->conaddr.addr() << "' != '" << from_server.addr() << "'";
-		return true;
+	for (std::map<short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
+	{	
+		DNSRequest *request = it->second;
+		DNSRecord rr(request->address);
+		rr.error = DNS_ERROR_UNKNOWN;
+		request->OnError(&rr);
+		delete request;
 	}
+	this->requests.clear();
+
+	for (std::multimap<Anope::string, DNSRecord *>::iterator it = this->cache.begin(), it_end = this->cache.end(); it != it_end; ++it)
+		delete it->second;
+	this->cache.clear();
+
+	DNSEngine = NULL;
+}
+
+bool DNSManager::ProcessRead()
+{
+	Log(LOG_DEBUG_2) << "Resolver: Reading from DNS socket";
+
+	unsigned char packet_buffer[524];
+	sockaddrs from_server;
+	socklen_t x = sizeof(from_server);
+	int length = recvfrom(this->GetFD(), &packet_buffer, sizeof(packet_buffer), 0, &from_server.sa, &x);
 
 	if (length < 12)
-	{
-		Log(LOG_DEBUG_2) << "Resolver: Received a corrupted packet";
 		return true;
-	}
-
 	/* Remove header length */
 	length -= 12;
+
+	if (this->addrs != from_server)
+	{
+		Log(LOG_DEBUG_2) << "Resolver: Received an answer from the wrong nameserver, Bad NAT or DNS forging attempt? '" << this->addrs.addr() << "' != '" << from_server.addr() << "'";
+		return true;
+	}
 
 	DNSPacket recv_packet;
 	recv_packet.FillPacket(packet_buffer, length);
@@ -501,49 +487,25 @@ bool DNSSocket::ProcessRead()
 	return true;
 }
 
-bool DNSSocket::ProcessWrite()
+bool DNSManager::ProcessWrite()
 {
-	if (!this->connected)
-		return ConnectionSocket::ProcessWrite();
-
 	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS socket";
 
-	bool cont = true;
-	for (unsigned i = DNSEngine->packets.size(); cont && i > 0; --i)
+	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
 	{
 		DNSPacket *r = DNSEngine->packets[i - 1];
 
 		unsigned char buffer[524];
 		r->FillBuffer(buffer);
 
-		cont = this->SendTo(buffer, r->payload_count + 12) == r->payload_count + 12;
+		sendto(this->GetFD(), buffer, r->payload_count + 12, 0, &this->addrs.sa, this->addrs.size());
 
 		delete r;
-		DNSEngine->packets.erase(DNSEngine->packets.begin() + i - 1);
 	}
+	DNSEngine->packets.clear();
 
 	SocketEngine::ClearWritable(this);
-	return cont;
-}
-
-void DNSSocket::OnConnect()
-{
-	Log(LOG_DEBUG_2) << "Resolver: Successfully connected to nameserver";
-}
-
-void DNSSocket::OnError(const Anope::string &error)
-{
-	Log() << "Resolver: Error connecting to nameserver: " << error;
-}
-
-DNSManager::DNSManager() : Timer(300, Anope::CurTime, true)
-{
-	this->sock = NULL;
-}
-
-DNSManager::~DNSManager()
-{
-	delete this->sock;
+	return true;
 }
 
 void DNSManager::AddCache(DNSRecord *rr)

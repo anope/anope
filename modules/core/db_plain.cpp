@@ -514,13 +514,7 @@ class DBPlain : public Module
 		else if (key.equals_ci("LAST_QUIT"))
 			na->last_quit = params[0];
 		else if (key.equals_ci("FLAGS"))
-		{
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-			{
-				if (params[j].equals_ci("NOEXPIRE"))
-					na->SetFlag(NS_NO_EXPIRE);
-			}
-		}
+			na->FromString(params);
 		else if (key.equals_ci("VHOST"))
 			na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
 
@@ -530,9 +524,7 @@ class DBPlain : public Module
 	EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
 		if (key.equals_ci("FLAGS"))
-			for (unsigned j = 0, end = params.size(); j < end; ++j)
-				if (params[j].equals_ci("PRIVATE"))
-					bi->SetFlag(BI_PRIVATE);
+			bi->FromString(params);
 
 		return EVENT_CONTINUE;
 	}

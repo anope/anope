@@ -212,18 +212,25 @@ bool LogInfo::HasType(LogType ltype, const Anope::string &type) const
 	{
 		case LOG_ADMIN:
 			list = &this->Admin;
+			break;
 		case LOG_OVERRIDE:
 			list = &this->Override;
+			break;
 		case LOG_COMMAND:
 			list = &this->Commands;
+			break;
 		case LOG_SERVER:
 			list = &this->Servers;
+			break;
 		case LOG_CHANNEL:
 			list = &this->Channels;
+			break;
 		case LOG_USER:
 			list = &this->Users;
+			break;
 		case LOG_NORMAL:
 			list = &this->Normal;
+			break;
 		case LOG_TERMINAL:
 			return true;
 		case LOG_RAWIO:

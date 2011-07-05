@@ -240,7 +240,8 @@ Anope::string duration(const time_t &t, NickCore *nc)
 Anope::string do_strftime(const time_t &t, NickCore *nc, bool short_output)
 {
 	tm tm = *localtime(&t);
-	const char *buf = translate(nc, _("%b %d %H:%M:%S %Y %Z"));
+	char buf[BUFSIZE];
+	strftime(buf, sizeof(buf), translate(nc, _("%b %d %H:%M:%S %Y %Z")), &tm);
 	if (short_output)
 		return buf;
 	if (t < Anope::CurTime)

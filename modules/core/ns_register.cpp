@@ -52,6 +52,10 @@ class CommandNSConfirm : public Command
 				Log(LOG_COMMAND, u, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), u->Account()->email.c_str());
 				u->Account()->UnsetFlag(NI_UNCONFIRMED);
+				ircdproto->SendAccountLogin(u, u->Account());
+				NickAlias *na = findnick(u->nick);
+				if (na && na->nc == u->Account())
+					u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
 			}
 			else
 				source.Reply(_("Invalid passcode."));

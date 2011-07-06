@@ -410,7 +410,9 @@ class CommandCSAccess : public Command
 		bool is_del = cmd.equals_ci("DEL");
 
 		bool has_access = false;
-		if (is_list && check_access(u, ci, CA_ACCESS_LIST))
+		if (u->HasPriv("chanserv/access/modify"))
+			has_access = true;
+		else if (is_list && check_access(u, ci, CA_ACCESS_LIST))
 			has_access = true;
 		else if (check_access(u, ci, CA_ACCESS_CHANGE))
 			has_access = true;

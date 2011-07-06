@@ -491,20 +491,20 @@ bool DNSManager::ProcessWrite()
 {
 	Log(LOG_DEBUG_2) << "Resolver: Writing to DNS socket";
 
-	for (unsigned i = DNSEngine->packets.size(); i > 0; --i)
+	DNSPacket *r = DNSEngine->packets.size() ? DNSEngine->packets[0] : NULL;
+	if (r != NULL)
 	{
-		DNSPacket *r = DNSEngine->packets[i - 1];
-
 		unsigned char buffer[524];
 		r->FillBuffer(buffer);
 
 		sendto(this->GetFD(), buffer, r->payload_count + 12, 0, &this->addrs.sa, this->addrs.size());
 
 		delete r;
+		DNSEngine->packets.erase(DNSEngine->packets.begin());
 	}
-	DNSEngine->packets.clear();
 
-	SocketEngine::ClearWritable(this);
+	if (DNSEngine->packets.empty())
+		SocketEngine::ClearWritable(this);
 	return true;
 }
 

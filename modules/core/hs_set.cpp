@@ -27,66 +27,73 @@ class CommandHSSet : public Command
 		User *u = source.u;
 
 		Anope::string nick = params[0];
-		Anope::string rawhostmask = params[1];
-		Anope::string hostmask;
 
-		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
-		if (!vIdent.empty())
+		NickAlias *na = findnick(nick);
+		if (na == NULL)
 		{
-			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
-			if (rawhostmask.empty())
-			{
-				source.Reply(_("SET \002<nick>\002 \002<hostmask>\002."), Config->s_HostServ.c_str());
-				return MOD_CONT;
-			}
-			if (vIdent.length() > Config->UserLen)
-			{
-				source.Reply(_(HOST_SET_IDENTTOOLONG), Config->UserLen);
-				return MOD_CONT;
-			}
-			else
-			{
-				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
-					if (!isvalidchar(*s))
-					{
-						source.Reply(_(HOST_SET_IDENT_ERROR));
-						return MOD_CONT;
-					}
-			}
-			if (!ircd->vident)
-			{
-				source.Reply(_(HOST_NO_VIDENT));
-				return MOD_CONT;
-			}
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return MOD_CONT;
 		}
-		if (rawhostmask.length() < Config->HostLen)
-			hostmask = rawhostmask;
+
+		Anope::string rawhostmask = params[1];
+
+		Anope::string user, host;
+		size_t a = rawhostmask.find('@');
+
+		if (a == Anope::string::npos)
+			host = rawhostmask;
 		else
+		{
+			user = rawhostmask.substr(0, a);
+			host = rawhostmask.substr(a + 1);
+		}
+
+		if (host.empty())
+		{
+			this->OnSyntaxError(source, "");
+			return MOD_CONT;
+		}
+
+		if (!user.empty())
+		{
+			if (user.length() > Config->UserLen)
+			{
+				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
+				return MOD_CONT;
+			}
+			else if (!ircd->vident)
+			{
+				source.Reply(HOST_NO_VIDENT);
+				return MOD_CONT;
+			}
+			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
+				if (!isvalidchar(*s))
+				{
+					source.Reply(HOST_SET_IDENT_ERROR);
+					return MOD_CONT;
+				}
+		}
+
+		if (host.length() > Config->HostLen)
 		{
 			source.Reply(_(HOST_SET_TOOLONG), Config->HostLen);
 			return MOD_CONT;
 		}
 
-		if (!isValidHost(hostmask, 3))
+		if (!isValidHost(host, 3))
 		{
 			source.Reply(_(HOST_SET_ERROR));
 			return MOD_CONT;
 		}
 
-		NickAlias *na = findnick(nick);
-		if ((na = findnick(nick)))
-		{
-			Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
+		Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-			na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
-			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
-			if (!vIdent.empty())
-				source.Reply(_("vhost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), vIdent.c_str(), hostmask.c_str());
-			else
-				source.Reply(_("vhost for \002%s\002 set to \002%s\002."), nick.c_str(), hostmask.c_str());
-		}
+		na->hostinfo.SetVhost(user, host, u->nick);
+		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
+		if (!user.empty())
+			source.Reply(_("vhost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
 		else
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(_("vhost for \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 
 		return MOD_CONT;
 	}

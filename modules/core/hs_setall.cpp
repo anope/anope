@@ -25,75 +25,76 @@ class CommandHSSetAll : public Command
 	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		
-		const Anope::string &nick = params[0];
-		Anope::string rawhostmask = params[1];
 
-		int32 tmp_time;
+		Anope::string nick = params[0];
 
 		NickAlias *na = findnick(nick);
-		if (!na)
+		if (na == NULL)
 		{
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			return MOD_CONT;
 		}
 
-		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
-		if (!vIdent.empty())
+		Anope::string rawhost = params[1];
+
+		Anope::string user, host;
+		size_t a = rawhost.find('@');
+
+		if (a == Anope::string::npos)
+			host = rawhost;
+		else
 		{
-			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
-			if (rawhostmask.empty())
-			{
-				source.Reply(_("vhost for group \002%s\002 set to \002%s\002."), Config->s_HostServ.c_str());
-				return MOD_CONT;
-			}
-			if (vIdent.length() > Config->UserLen)
-			{
-				source.Reply(_(HOST_SET_IDENTTOOLONG), Config->UserLen);
-				return MOD_CONT;
-			}
-			else
-			{
-				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
-					if (!isvalidchar(*s))
-					{
-						source.Reply(_(HOST_SET_IDENT_ERROR));
-						return MOD_CONT;
-					}
-			}
-			if (!ircd->vident)
-			{
-				source.Reply(_(HOST_NO_VIDENT));
-				return MOD_CONT;
-			}
+			user = rawhost.substr(0, a);
+			host = rawhost.substr(a + 1);
 		}
 
-		Anope::string hostmask;
-		if (rawhostmask.length() < Config->HostLen)
-			hostmask = rawhostmask;
-		else
+		if (host.empty())
+		{
+			this->OnSyntaxError(source, "");
+			return MOD_CONT;
+		}
+
+		if (!user.empty())
+		{
+			if (user.length() > Config->UserLen)
+			{
+				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
+				return MOD_CONT;
+			}
+			else if (!ircd->vident)
+			{
+				source.Reply(HOST_NO_VIDENT);
+				return MOD_CONT;
+			}
+			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
+				if (!isvalidchar(*s))
+				{
+					source.Reply(HOST_SET_IDENT_ERROR);
+					return MOD_CONT;
+				}
+		}
+
+		if (host.length() > Config->HostLen)
 		{
 			source.Reply(_(HOST_SET_TOOLONG), Config->HostLen);
 			return MOD_CONT;
 		}
 
-		if (!isValidHost(hostmask, 3))
+		if (!isValidHost(host, 3))
 		{
 			source.Reply(_(HOST_SET_ERROR));
 			return MOD_CONT;
 		}
 
-		tmp_time = Anope::CurTime;
+		Log(LOG_ADMIN, u, this) << "to set the vhost for all nicks in group " << na->nc->display << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		Log(LOG_ADMIN, u, this) << "to set the vhost for all nicks in group " << na->nc->display << " to " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
-
-		na->hostinfo.SetVhost(vIdent, hostmask, u->nick);
+		na->hostinfo.SetVhost(user, host, u->nick);
 		hostserv->Sync(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
-		if (!vIdent.empty())
-			source.Reply(_("vhost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), vIdent.c_str(), hostmask.c_str());
+		if (!user.empty())
+			source.Reply(_("vhost for group \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
 		else
-			source.Reply(_("vhost for group \002%s\002 set to \002%s\002."), nick.c_str(), hostmask.c_str());
+			source.Reply(_("vhost for group \002%s\002 set to \002%s\002."), nick.c_str(), host.c_str());
 		return MOD_CONT;
 	}
 

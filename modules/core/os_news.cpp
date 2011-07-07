@@ -418,7 +418,7 @@ class OSNews : public Module
 
 	void OnUserConnect(dynamic_reference<User> &user, bool &)
 	{
-		if (!user)
+		if (!user || !user->server->IsSynced())
 			return;
 
 		DisplayNews(user, NEWS_LOGON);

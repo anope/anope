@@ -429,6 +429,8 @@ class OSNews : public Module
 
 	void OnUserConnect(User *u)
 	{
+		if (!u || !u->server->IsSynced())
+			return;
 		DisplayNews(u, NEWS_LOGON);
 		DisplayNews(u, NEWS_RANDOM);
 	}

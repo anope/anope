@@ -660,6 +660,18 @@ class BSKick : public Module
 		{
 			Anope::string realbuf = msg;
 
+			/* If it's a /me, cut the CTCP part because the ACTION will cause
+			 * problems with the caps or badwords kicker
+			 */
+			if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
+			{
+				realbuf.erase(0, 8);
+				realbuf.erase(realbuf.length() - 1);
+			}
+
+			if (realbuf.empty())
+				return;
+
 			/* Bolds kicker */
 			if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
 			{

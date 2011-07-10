@@ -164,6 +164,12 @@ class BotServCore : public Module
 
 	~BotServCore()
 	{
+		for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+		{
+			cit->second->Shrink("bs_main_userdata");
+			cit->second->Shrink("bs_main_bandata");
+		}
+
 		spacesepstream coreModules(Config->BotCoreModules);
 		Anope::string module;
 		while (coreModules.GetToken(module))
@@ -190,13 +196,10 @@ class BotServCore : public Module
 			ircdproto->SendCTCP(ci->bi, u->nick, "%s", ctcp.c_str());
 		}
 
-		bool was_action = false;
 
 		Anope::string realbuf = msg;
 
-		/* If it's a /me, cut the CTCP part because the ACTION will cause
-		 * problems with the caps or badwords kicker
-		 */
+		bool was_action = false;
 		if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
 		{
 			realbuf.erase(0, 8);

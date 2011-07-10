@@ -11,12 +11,12 @@
 void CommandSource::Reply(const char *message, ...)
 {
 	va_list args;
-	char buf[BUFSIZE] = "";
+	char buf[4096]; // Messages can be really big.
 
 	if (message)
 	{
 		va_start(args, message);
-		vsnprintf(buf, BUFSIZE - 1, message, args);
+		vsnprintf(buf, sizeof(buf), message, args);
 
 		this->Reply(Anope::string(buf));
 

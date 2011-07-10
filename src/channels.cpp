@@ -483,15 +483,19 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		{
 			ci->UnsetFlag(CI_PERSIST);
 			if (!Config->s_BotServ.empty() && ci->bi && this->FindUser(ci->bi) && Config->BSMinUsers && this->users.size() <= Config->BSMinUsers)
+			{
+				bool empty = this->users.size() == 1;
 				this->ci->bi->Part(this);
+				if (empty)
+					return;
+			}
 		}
-	}
 
-	/* We set -P in an empty channel, delete the channel */
-	if (cm->Name == CMODE_PERM && users.empty())
-	{
-		delete this;
-		return;
+		if (this->users.empty())
+		{
+			delete this;
+			return;
+		}
 	}
 
 	/* Check for mlock */
@@ -698,6 +702,9 @@ void Channel::SetModes(BotInfo *bi, bool EnforceMLock, const char *cmodes, ...)
  */
 void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool EnforceMLock)
 {
+	/* Removing channel modes *may* delete this channel */
+	dynamic_reference<Channel> this_reference(this);
+
 	spacesepstream sep_modes(mode);
 	Anope::string m;
 
@@ -706,7 +713,7 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 	Anope::string modestring;
 	Anope::string paramstring;
 	int add = -1;
-	for (unsigned int i = 0, end = m.length(); i < end; ++i)
+	for (unsigned int i = 0, end = m.length(); i < end && this_reference; ++i)
 	{
 		ChannelMode *cm;
 
@@ -767,6 +774,9 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 		else
 			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
 	}
+
+	if (!this_reference)
+		return;
 
 	if (setter)
 		Log(setter, this, "mode") << modestring << paramstring;

@@ -16,10 +16,10 @@
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
 	{
 		this->SetDesc(_("Set the channel description"));
-		this->SetSyntax(_("\037channel\037 DESC \037description\037"));
+		this->SetSyntax(_("\037channel\037 DESC [\037description\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -38,9 +38,16 @@ class CommandCSSetDescription : public Command
 			return;
 		}
 
-		ci->desc = params[1];
-
-		source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
+		if (params.size() > 1)
+		{
+			ci->desc = params[1];
+			source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
+		}
+		else
+		{
+			ci->desc.clear();
+			source.Reply(_("Description of %s unset."), ci->name.c_str());
+		}
 
 		return;
 	}

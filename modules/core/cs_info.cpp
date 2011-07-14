@@ -60,7 +60,8 @@ class CommandCSInfo : public Command
 		if (show_all && ci->successor)
 			source.Reply(_("      Successor: %s"), ci->successor->display.c_str());
 
-		source.Reply(_("    Description: %s"), ci->desc.c_str());
+		if (!ci->desc.empty())
+			source.Reply(_("    Description: %s"), ci->desc.c_str());
 		source.Reply(_("     Registered: %s"), do_strftime(ci->time_registered).c_str());
 		source.Reply(_("      Last used: %s"), do_strftime(ci->last_used).c_str());
 

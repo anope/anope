@@ -16,16 +16,16 @@
 class CommandCSRegister : public Command
 {
  public:
-	CommandCSRegister(Module *creator) : Command(creator, "chanserv/register", 2, 2)
+	CommandCSRegister(Module *creator) : Command(creator, "chanserv/register", 1, 2)
 	{
 		this->SetDesc(_("Register a channel"));
-		this->SetSyntax(_("\037channel\037 \037description\037"));
+		this->SetSyntax(_("\037channel\037 [\037description\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
-		const Anope::string &chdesc = params[1];
+		const Anope::string &chdesc = params.size() > 1 ? params[1] : "";
 
 		User *u = source.u;
 		Channel *c = findchan(params[0]);
@@ -51,7 +51,8 @@ class CommandCSRegister : public Command
 		{
 			ci = new ChannelInfo(chan);
 			ci->SetFounder(u->Account());
-			ci->desc = chdesc;
+			if (!chdesc.empty())
+				ci->desc = chdesc;
 
 			if (c && !c->topic.empty())
 			{
@@ -101,7 +102,7 @@ class CommandCSRegister : public Command
 		source.Reply(_("Registers a channel in the %s database.  In order\n"
 			"to use this command, you must first be a channel operator\n"
 			"on the channel you're trying to register.\n"
-			"The description, which \002must\002 be included, is a\n"
+			"The description, which is optional, is a\n"
 			"general description of the channel's purpose.\n"
 			" \n"
 			"When you register a channel, you are recorded as the\n"

@@ -16,17 +16,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSGetEMail : public Command
 {
  public:
-	CommandNSGetEMail() : Command("GETEMAIL", 1, 1, "nickserv/getemail")
+	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1, "nickserv/getemail")
 	{
 		this->SetDesc(_("Matches and returns all users that registered using given email"));
+		this->SetSyntax(_("\037user@email-host\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &email = params[0];
@@ -48,25 +48,21 @@ class CommandNSGetEMail : public Command
 		if (j <= 0)
 		{
 			source.Reply(_("No Emails listed for \002%s\002."), email.c_str());
-			return MOD_CONT;
+			return;
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GETEMAIL \037user@emailhost\037\002\n"
-				"Returns the matching nicks that used given email. \002Note\002 that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Returns the matching nicks that used given email. \002Note\002 that\n"
 				"you can not use wildcards for either user or emailhost. Whenever\n"
 				"this command is used, a message including the person who issued\n"
 				"the command and the email it was used on will be logged."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GETMAIL", _("GETEMAIL \002user@email-host\002 No WildCards!!"));
 	}
 };
 
@@ -74,14 +70,12 @@ class NSGetEMail : public Module
 {
 	CommandNSGetEMail commandnsgetemail;
  public:
-	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSGetEMail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsgetemail(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsgetemail);
+		ModuleManager::RegisterService(&commandnsgetemail);
 	}
 };
 

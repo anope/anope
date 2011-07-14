@@ -12,12 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "botserv.h"
 
 class CommandBSBot : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
 		const Anope::string &user = params[2];
@@ -28,60 +27,60 @@ class CommandBSBot : public Command
 		if (findbot(nick))
 		{
 			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (nick.length() > Config->NickLen)
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (user.length() > Config->UserLen)
 		{
 			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
-			return MOD_CONT;
+			return;
 		}
 
 		if (host.length() > Config->HostLen)
 		{
 			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
-			return MOD_CONT;
+			return;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
 			if (!isvalidnick(nick[i]))
 			{
 				source.Reply(_("Bot Nicks may only contain valid nick characters."));
-				return MOD_CONT;
+				return;
 			}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		/* Check the host is valid re RFC 2812 */
 		if (!isValidHost(host, 3))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		for (unsigned i = 0, end = user.length(); i < end && i < Config->UserLen; ++i)
 			if (!isalnum(user[i]))
 			{
 				source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
-				return MOD_CONT;
+				return;
 			}
 
 		/* We check whether the nick is registered, and inform the user
@@ -90,26 +89,21 @@ class CommandBSBot : public Command
 		*/
 		if (findnick(nick))
 		{
-			source.Reply(_(NICK_ALREADY_REGISTERED), nick.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
+			return;
 		}
 
-		if (!(bi = new BotInfo(nick, user, host, real)))
-		{
-			// XXX this cant happen?
-			source.Reply(_("Sorry, bot creation failed."));
-			return MOD_CONT;
-		}
+		bi = new BotInfo(nick, user, host, real);
 
 		Log(LOG_ADMIN, source.u, this) << "ADD " << bi->GetMask() << " " << bi->realname;
 
 		source.Reply(_("%s!%s@%s (%s) added to the bot list."), bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
 
 		FOREACH_MOD(I_OnBotCreate, OnBotCreate(bi));
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoChange(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoChange(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &oldnick = params[1];
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
@@ -121,43 +115,43 @@ class CommandBSBot : public Command
 		if (oldnick.empty() || nick.empty())
 		{
 			this->OnSyntaxError(source, "CHANGE");
-			return MOD_CONT;
+			return;
 		}
 
 		if (!(bi = findbot(oldnick)))
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			return;
 		}
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(oldnick, false))
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			return;
 		}
 
 		if (nick.length() > Config->NickLen)
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (!user.empty() && user.length() > Config->UserLen)
 		{
 			source.Reply(_("Bot Idents may only contain %d characters."), Config->UserLen);
-			return MOD_CONT;
+			return;
 		}
 
 		if (!host.empty() && host.length() > Config->HostLen)
 		{
 			source.Reply(_("Bot Hosts may only contain %d characters."), Config->HostLen);
-			return MOD_CONT;
+			return;
 		}
 
 		if (!oldnick.equals_ci(nick) && nickIsServices(nick, false))
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), oldnick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, oldnick.c_str());
+			return;
 		}
 
 		/* Checks whether there *are* changes.
@@ -168,34 +162,34 @@ class CommandBSBot : public Command
 		if (nick.equals_cs(bi->nick) && (!user.empty() ? user.equals_cs(bi->GetIdent()) : 1) && (!host.empty() ? host.equals_cs(bi->host) : 1) && (!real.empty() ? real.equals_cs(bi->realname) : 1))
 		{
 			source.Reply(_("Old info is equal to the new one."));
-			return MOD_CONT;
+			return;
 		}
 
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		for (unsigned i = 0, end = nick.length(); i < end && i < Config->NickLen; ++i)
 			if (!isvalidnick(nick[i]))
 			{
 				source.Reply(_("Bot Nicks may only contain valid nick characters."));
-				return MOD_CONT;
+				return;
 			}
 
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
 			source.Reply(_("Bot Nicks may only contain valid nick characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (!host.empty() && !isValidHost(host, 3))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (!user.empty())
@@ -203,13 +197,13 @@ class CommandBSBot : public Command
 				if (!isalnum(user[i]))
 				{
 					source.Reply(_("Bot Idents may only contain valid characters."), Config->UserLen);
-					return MOD_CONT;
+					return;
 				}
 
 		if (!nick.equals_ci(bi->nick) && findbot(nick))
 		{
 			source.Reply(_("Bot \002%s\002 already exists."), nick.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!nick.equals_ci(bi->nick))
@@ -220,8 +214,8 @@ class CommandBSBot : public Command
 			*/
 			if (findnick(nick))
 			{
-				source.Reply(_(NICK_ALREADY_REGISTERED), nick.c_str());
-				return MOD_CONT;
+				source.Reply(NICK_ALREADY_REGISTERED, nick.c_str());
+				return;
 			}
 
 			/* The new nick is really different, so we remove the Q line for the old nick. */
@@ -263,10 +257,10 @@ class CommandBSBot : public Command
 		Log(LOG_ADMIN, source.u, this) << "CHANGE " << oldnick << " to " << bi->GetMask() << " " << bi->realname;
 
 		FOREACH_MOD(I_OnBotChange, OnBotChange(bi));
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[1];
 		BotInfo *bi;
@@ -274,19 +268,19 @@ class CommandBSBot : public Command
 		if (nick.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
-			return MOD_CONT;
+			return;
 		}
 
 		if (!(bi = findbot(nick)))
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			return;
 		}
 
 		if (nickIsServices(nick, false))
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			return;
 		}
 
 		FOREACH_MOD(I_OnBotDelete, OnBotDelete(bi));
@@ -295,16 +289,18 @@ class CommandBSBot : public Command
 
 		source.Reply(_("Bot \002%s\002 has been deleted."), nick.c_str());
 		delete bi;
-		return MOD_CONT;
+		return;
 	}
  public:
-	CommandBSBot() : Command("BOT", 1, 6)
+	CommandBSBot(Module *creator) : Command(creator, "botserv/bot", 1, 6)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Maintains network bot list"));
+		this->SetSyntax(_("\002ADD \037nick\037 \037user\037 \037host\037 \037real\037\002"));
+		this->SetSyntax(_("\002CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002"));
+		this->SetSyntax(_("\002DEL \037nick\037\002"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &cmd = params[0];
 		User *u = source.u;
@@ -312,22 +308,22 @@ class CommandBSBot : public Command
 		if (readonly)
 		{
 			source.Reply(_("Sorry, bot modification is temporarily disabled."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (cmd.equals_ci("ADD"))
 		{
 			// ADD nick user host real - 5
-			if (!u->HasCommand("botserv/bot/add"))
+			if (!u->HasCommand("botserv/botserv/bot/add"))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 
 			if (params.size() < 5)
 			{
 				this->OnSyntaxError(source, "ADD");
-				return MOD_CONT;
+				return;
 			}
 
 			std::vector<Anope::string> tempparams = params;
@@ -341,16 +337,16 @@ class CommandBSBot : public Command
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
-			if (!u->HasCommand("botserv/bot/change"))
+			if (!u->HasCommand("botserv/botserv/bot/change"))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 
 			if (params.size() < 3)
 			{
 				this->OnSyntaxError(source, "CHANGE");
-				return MOD_CONT;
+				return;
 			}
 
 			return this->DoChange(source, params);
@@ -358,16 +354,16 @@ class CommandBSBot : public Command
 		else if (cmd.equals_ci("DEL"))
 		{
 			// DEL nick
-			if (!u->HasCommand("botserv/bot/del"))
+			if (!u->HasCommand("botserv/botserv/bot/del"))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 
 			if (params.size() < 1)
 			{
 				this->OnSyntaxError(source, "DEL");
-				return MOD_CONT;
+				return;
 			}
 
 			return this->DoDel(source, params);
@@ -375,16 +371,14 @@ class CommandBSBot : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002BOT ADD \037nick\037 \037user\037 \037host\037 \037real\037\002\n"
-				"        \002BOT CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002\n"
-				"        \002BOT DEL \037nick\037\002\n"
-				" \n"
-				"Allows Services Operators to create, modify, and delete\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services Operators to create, modify, and delete\n"
 				"bots that users will be able to use on their own\n"
 				"channels.\n"
 				" \n"
@@ -401,13 +395,6 @@ class CommandBSBot : public Command
 				"using the nick, they will be killed."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "BOT", _("BOT ADD \037nick\037 \037user\037 \037host\037 \037real\037\n"
-			"\002BOT CHANGE \037oldnick\037 \037newnick\037 [\037user\037 [\037host\037 [\037real\037]]]\002\n"
-			"\002BOT DEL \037nick\037\002"));
-	}
 };
 
 class BSBot : public Module
@@ -415,14 +402,12 @@ class BSBot : public Module
 	CommandBSBot commandbsbot;
 
  public:
-	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	BSBot(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandbsbot(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!botserv)
-			throw ModuleException("BotServ is not loaded!");
-
-		this->AddCommand(botserv->Bot(), &commandbsbot);
+		ModuleManager::RegisterService(&commandbsbot);
 	}
 };
 

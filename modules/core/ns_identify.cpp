@@ -12,18 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSIdentify : public Command
 {
  public:
-	CommandNSIdentify() : Command("IDENTIFY", 1, 2)
+	CommandNSIdentify(Module *creator) : Command(creator, "nickserv/identify", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Identify yourself with your password"));
+		this->SetSyntax(_("[\037account\037] \037password\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -32,22 +32,22 @@ class CommandNSIdentify : public Command
 
 		NickAlias *na = findnick(nick);
 		if (na && na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (u->Account() && na && u->Account() == na->nc)
 			source.Reply(_("You are already identified."));
 		else
 		{
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na ? na->nc->display : nick, pass));
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na ? na->nc->display : nick, pass));
 			if (MOD_RESULT == EVENT_STOP)
-				return MOD_CONT;
+				return;
 
 			if (!na)
-				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 			else if (MOD_RESULT != EVENT_ALLOW)
 			{
 				Log(LOG_COMMAND, u, this) << "and failed to identify";
-				source.Reply(_(PASSWORD_INCORRECT));
+				source.Reply(PASSWORD_INCORRECT);
 				bad_password(u);
 			}
 			else
@@ -60,24 +60,19 @@ class CommandNSIdentify : public Command
 				u->Identify(na);
 			}
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002IDENTIFY [account] \037password\037\002\n"
-				" \n"
-				"Tells %s that you are really the owner of this\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Tells %s that you are really the owner of this\n"
 				"nick.  Many commands require you to authenticate yourself\n"
 				"with this command before you use them.  The password\n"
 				"should be the same one you sent with the \002REGISTER\002\n"
-				"command."), Config->s_NickServ.c_str());
+				"command."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "IDENTIFY", _("IDENTIFY [account] \037password\037"));
 	}
 };
 
@@ -86,14 +81,12 @@ class NSIdentify : public Module
 	CommandNSIdentify commandnsidentify;
 
  public:
-	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSIdentify(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsidentify(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsidentify);
+		ModuleManager::RegisterService(&commandnsidentify);
 	}
 };
 

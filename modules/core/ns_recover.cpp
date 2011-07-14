@@ -12,18 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSRecover : public Command
 {
  public:
-	CommandNSRecover() : Command("RECOVER", 1, 2)
+	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Kill another user who has taken your nick"));
+		this->SetSyntax(_("\037nickname\037 [\037password\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -33,33 +33,33 @@ class CommandNSRecover : public Command
 		NickAlias *na;
 		User *u2;
 		if (!(u2 = finduser(nick)))
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!(na = findnick(u2->nick)))
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't recover yourself!"));
 		else if (!pass.empty())
 		{
 			EventReturn MOD_RESULT;
-			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na->nc->display, pass));
+			FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na->nc->display, pass));
 			if (MOD_RESULT == EVENT_STOP)
-				return MOD_CONT;
+				return;
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				u2->SendMessage(nickserv->Bot(), FORCENICKCHANGE_NOW);
+				u2->SendMessage(source.owner, FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
-				source.Reply(_(NICK_RECOVERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
 			{
-				source.Reply(_(ACCESS_DENIED));
+				source.Reply(ACCESS_DENIED);
 				Log(LOG_COMMAND, u, this) << "with invalid password for " << nick;
 				bad_password(u);
 			}
@@ -69,18 +69,18 @@ class CommandNSRecover : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
 					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
-				u2->SendMessage(nickserv->Bot(), FORCENICKCHANGE_NOW);
+				u2->SendMessage(source.owner, FORCENICKCHANGE_NOW);
 				u2->Collide(na);
 
 				/* Convert Config->NSReleaseTimeout seconds to string format */
 				Anope::string relstr = duration(Config->NSReleaseTimeout);
 
-				source.Reply(_(NICK_RECOVERED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), nick.c_str(), relstr.c_str());
+				source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
 			}
 			else
-				source.Reply(_(ACCESS_DENIED));
+				source.Reply(ACCESS_DENIED);
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -88,9 +88,9 @@ class CommandNSRecover : public Command
 		/* Convert Config->NSReleaseTimeout seconds to string format */
 		Anope::string relstr = duration(Config->NSReleaseTimeout);
 
-		source.Reply(_("Syntax: \002RECOVER \037nickname\037 [\037password\037]\002\n"
-				" \n"
-				"Allows you to recover your nickname if someone else has\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to recover your nickname if someone else has\n"
 				"taken it; this does the same thing that %s does\n"
 				"automatically if someone tries to use a kill-protected\n"
 				"nick.\n"
@@ -109,14 +109,9 @@ class CommandNSRecover : public Command
 				"current address as shown in /WHOIS must be on that nick's\n"
 				"access list, you must be identified and in the group of\n"
 				"that nick, or you must supply the correct password for\n"
-				"the nickname."), Config->s_NickServ.c_str(), Config->s_NickServ.c_str(), relstr.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				"the nickname."), Config->NickServ.c_str(), Config->NickServ.c_str(), relstr.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "RECOVER", _("RECOVER \037nickname\037 [\037password\037]"));
 	}
 };
 
@@ -125,14 +120,12 @@ class NSRecover : public Module
 	CommandNSRecover commandnsrecover;
 
  public:
-	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSRecover(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsrecover(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsrecover);
+		ModuleManager::RegisterService(&commandnsrecover);
 	}
 };
 

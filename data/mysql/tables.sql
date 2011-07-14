@@ -301,31 +301,12 @@ CREATE TABLE IF NOT EXISTS `anope_ns_core_metadata` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `anope_os_akills`
---
-
-CREATE TABLE IF NOT EXISTS `anope_os_akills` (
-  `user` varchar(255) NOT NULL,
-  `host` varchar(255) NOT NULL,
-  `xby` text NOT NULL,
-  `reason` text NOT NULL,
-  `seton` int(10) unsigned NOT NULL DEFAULT '0',
-  `expire` int(10) unsigned NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `anope_os_core`
 --
 
 CREATE TABLE IF NOT EXISTS `anope_os_core` (
   `maxusercnt` int(11) NOT NULL DEFAULT '0',
   `maxusertime` int(10) unsigned NOT NULL DEFAULT '0',
-  `akills_count` int(11) NOT NULL DEFAULT '0',
-  `snlines_count` int(11) NOT NULL DEFAULT '0',
-  `sqlines_count` int(11) NOT NULL DEFAULT '0',
-  `szlines_count` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -350,7 +331,7 @@ CREATE TABLE IF NOT EXISTS `anope_os_exceptions` (
 --
 
 CREATE TABLE IF NOT EXISTS `anope_os_xlines` (
-  `type` varchar(20) NOT NULL,
+  `type` varchar(1) NOT NULL,
   `mask` varchar(255) NOT NULL,
   `xby` text NOT NULL,
   `reason` text NOT NULL,

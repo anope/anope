@@ -17,7 +17,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 /* ------------------------------------------------------------
  * Name: cs_appendtopic
@@ -40,49 +39,48 @@
 /* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING         */
 /* ---------------------------------------------------------------------- */
 
-static Module *me;
-
 class CommandCSAppendTopic : public Command
 {
  public:
-	CommandCSAppendTopic() : Command("APPENDTOPIC", 2, 2)
+	CommandCSAppendTopic(Module *creator) : Command(creator, "APPENDTOPIC", 2, 2)
 	{
 		this->SetDesc(_("Add text to a channels topic"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &newtopic = params[1];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
+		Channel *c = findchan(params[0]);;
 
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
-		else if (!check_access(u, ci, CA_TOPIC))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
+		else if (!c->ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
+		else if (!check_access(u, c->ci, CA_TOPIC))
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			Anope::string topic;
-			if (!ci->last_topic.empty())
+			if (!c->ci->last_topic.empty())
 			{
-				topic = ci->last_topic + " " + newtopic;
-				ci->last_topic.clear();
+				topic = c->ci->last_topic + " " + newtopic;
+				c->ci->last_topic.clear();
 			}
 			else
 				topic = newtopic;
 
-			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
-			ci->UnsetFlag(CI_TOPICLOCK);
+			bool has_topiclock = c->ci->HasFlag(CI_TOPICLOCK);
+			c->ci->UnsetFlag(CI_TOPICLOCK);
 			c->ChangeTopic(u->nick, topic, Anope::CurTime);
 			if (has_topiclock)
-				ci->SetFlag(CI_TOPICLOCK);
+				c->ci->SetFlag(CI_TOPICLOCK);
 
-			bool override = !check_access(u, ci, CA_TOPIC);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "changed topic to " << topic;
+			bool override = !check_access(u, c->ci, CA_TOPIC);
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci) << "changed topic to " << topic;
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -107,16 +105,12 @@ class CSAppendTopic : public Module
 	CommandCSAppendTopic commandcsappendtopic;
 
  public:
-	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+		commandcsappendtopic(this)
 	{
 		this->SetAuthor("SGR");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		me = this;
-
-		this->AddCommand(chanserv->Bot(), &commandcsappendtopic);
+		ModuleManager::RegisterService(&commandcsappendtopic);
 	}
 };
 

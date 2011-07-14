@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetKeepTopic : public Command
 {
  public:
-	CommandCSSetKeepTopic(const Anope::string &cpermission = "") : Command("KEEPTOPIC", 2, 2, cpermission)
+	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Retain topic when channel is not in use"));
+		this->SetSyntax(_("\037channel\037 KEEPTOPIC {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetKeepTopic");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,37 +51,27 @@ class CommandCSSetKeepTopic : public Command
 		else
 			this->OnSyntaxError(source, "KEEPTOPIC");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 KEEPTOPIC {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002topic retention\002 option for a	\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002topic retention\002 option for a	\n"
 				"channel. When \002topic retention\002 is set, the topic for the\n"
 				"channel will be remembered by %s even after the\n"
 				"last user leaves the channel, and will be restored the\n"
-				"next time the channel is created."), this->name.c_str(), Config->s_ChanServ.c_str());
+				"next time the channel is created."), this->name.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET KEEPTOPIC", _("SET \037channel\037 KEEPTOPIC {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 {
  public:
-	CommandCSSASetKeepTopic() : CommandCSSetKeepTopic("chanserv/saset/keeptopic")
+	CommandCSSASetKeepTopic(Module *creator) : CommandCSSetKeepTopic(creator, "chanserv/saset/keeptopic", "chanserv/saset/keeptopic")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET KEEPTOPIC", _("SASET \002channel\002 KEEPTOPIC {ON | OFF}"));
 	}
 };
 
@@ -81,31 +81,13 @@ class CSSetKeepTopic : public Module
 	CommandCSSASetKeepTopic commandcssasetkeeptopic;
 
  public:
-	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetKeepTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetkeeptopic(this), commandcssasetkeeptopic(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetkeeptopic);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetkeeptopic);
-	}
-
-	~CSSetKeepTopic()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetkeeptopic);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetkeeptopic);
+		ModuleManager::RegisterService(&commandcssetkeeptopic);
+		ModuleManager::RegisterService(&commandcssasetkeeptopic);
 	}
 };
 

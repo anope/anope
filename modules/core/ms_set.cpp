@@ -12,12 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 class CommandMSSet : public Command
 {
  private:
-	CommandReturn DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
+	void DoNotify(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
 		User *u = source.u;
 		const Anope::string &param = params[1];
@@ -26,19 +25,19 @@ class CommandMSSet : public Command
 		{
 			u->Account()->SetFlag(NI_MEMO_SIGNON);
 			u->Account()->SetFlag(NI_MEMO_RECEIVE);
-			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), Config->s_MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when you log on and when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("LOGON"))
 		{
 			u->Account()->SetFlag(NI_MEMO_SIGNON);
 			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
-			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), Config->s_MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when you log on or unset /AWAY."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("NEW"))
 		{
 			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
 			u->Account()->SetFlag(NI_MEMO_RECEIVE);
-			source.Reply(_("%s will now notify you of memos when they are sent to you."), Config->s_MemoServ.c_str());
+			source.Reply(_("%s will now notify you of memos when they are sent to you."), Config->MemoServ.c_str());
 		}
 		else if (param.equals_ci("MAIL"))
 		{
@@ -60,15 +59,15 @@ class CommandMSSet : public Command
 			u->Account()->UnsetFlag(NI_MEMO_SIGNON);
 			u->Account()->UnsetFlag(NI_MEMO_RECEIVE);
 			u->Account()->UnsetFlag(NI_MEMO_MAIL);
-			source.Reply(_("%s will not send you any notification of memos."), Config->s_MemoServ.c_str());
+			source.Reply(_("%s will not send you any notification of memos."), Config->MemoServ.c_str());
 		}
 		else
-			SyntaxError(source, "SET NOTIFY", _("SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF }"));
+			this->OnSyntaxError(source, param);
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
+	void DoLimit(CommandSource &source, const std::vector<Anope::string> &params, MemoInfo *mi)
 	{
 		User *u = source.u;
 
@@ -89,13 +88,13 @@ class CommandMSSet : public Command
 			p3 = params.size() > 4 ? params[4] : "";
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
-				return MOD_CONT;
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				return;
 			}
 			else if (!is_servadmin && !check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			mi = &ci->memos;
 		}
@@ -106,8 +105,8 @@ class CommandMSSet : public Command
 				NickAlias *na;
 				if (!(na = findnick(p1)))
 				{
-					source.Reply(_(NICK_X_NOT_REGISTERED), p1.c_str());
-					return MOD_CONT;
+					source.Reply(NICK_X_NOT_REGISTERED, p1.c_str());
+					return;
 				}
 				user = p1;
 				mi = &na->nc->memos;
@@ -117,8 +116,8 @@ class CommandMSSet : public Command
 			}
 			else if (p1.empty() || (!p1.is_pos_number_only() && !p1.equals_ci("NONE")) || (!p2.empty() && !p2.equals_ci("HARD")))
 			{
-				SyntaxError(source, "SET LIMIT", _("SET LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]"));
-				return MOD_CONT;
+				this->OnSyntaxError(source, "");
+				return;
 			}
 			if (!chan.empty())
 			{
@@ -145,18 +144,18 @@ class CommandMSSet : public Command
 		{
 			if (p1.empty() || !p2.empty() || !isdigit(p1[0]))
 			{
-				SyntaxError(source, "SET LIMIT", _("SET LIMIT [\037channel\037] \037limit\037"));
-				return MOD_CONT;
+				this->OnSyntaxError(source, "");
+				return;
 			}
 			if (!chan.empty() && ci->HasFlag(CI_MEMO_HARDMAX))
 			{
 				source.Reply(_("The memo limit for %s may not be changed."), chan.c_str());
-				return MOD_CONT;
+				return;
 			}
 			else if (chan.empty() && nc->HasFlag(NI_MEMO_HARDMAX))
 			{
 				source.Reply(_("You are not permitted to change your memo limit."));
-				return MOD_CONT;
+				return;
 			}
 			limit = -1;
 			try
@@ -172,7 +171,7 @@ class CommandMSSet : public Command
 					source.Reply(_("You cannot set the memo limit for %s higher than %d."), chan.c_str(), Config->MSMaxMemos);
 				else
 					source.Reply(_("You cannot set your memo limit higher than %d."), Config->MSMaxMemos);
-				return MOD_CONT;
+				return;
 			}
 		}
 		mi->memomax = limit;
@@ -197,15 +196,16 @@ class CommandMSSet : public Command
 			else
 				source.Reply(_("Memo limit \002disabled\002 for %s."), !chan.empty() ? chan.c_str() : user.c_str());
 		}
-		return MOD_CONT;
+		return;
 	}
  public:
-	CommandMSSet() : Command("SET", 2, 5)
+	CommandMSSet(Module *creator) : Command(creator, "memoserv/set", 2, 5)
 	{
 		this->SetDesc(_("Set options related to memos"));
+		this->SetSyntax(_("\037option\037 \037parameters\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
@@ -219,28 +219,31 @@ class CommandMSSet : public Command
 			return this->DoLimit(source, params, mi);
 		else
 		{
-			source.Reply(_(NICK_SET_UNKNOWN_OPTION), Config->UseStrictPrivMsgString.c_str(), cmd.c_str());
-			source.Reply(_(MORE_INFO), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), "SET");
+			source.Reply(NICK_SET_UNKNOWN_OPTION, Config->UseStrictPrivMsgString.c_str(), cmd.c_str());
+			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), "SET");
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			source.Reply(_("Syntax: \002SET \037option\037 \037parameters\037\002\n \n"
-					"Sets various memo options.  \037option\037 can be one of:\n"
+		{
+			this->SendSyntax(source);
+			source.Reply(" ");
+			source.Reply(_("Sets various memo options.  \037option\037 can be one of:\n"
 					" \n"
 					"    NOTIFY      Changes when you will be notified about\n"
 					"                   new memos (only for nicknames)\n"
 					"    LIMIT       Sets the maximum number of memos you can\n"
 					"                   receive\n"
 					" \n"
-					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
-					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
+					"Type \002%s%s HELP %s \037option\037\002 for more information\n"
+					"on a specific option."), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+		}
 		else if (subcommand.equals_ci("NOTIFY"))
-			source.Reply(_("Syntax: \002SET NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
+			source.Reply(_("Syntax: \002NOTIFY {ON | LOGON | NEW | MAIL | NOMAIL | OFF}\002\n"
 					"Changes when you will be notified about new memos:\n"
 					" \n"
 					"    ON      You will be notified of memos when you log on,\n"
@@ -260,7 +263,7 @@ class CommandMSSet : public Command
 		{
 			User *u = source.u;
 			if (u->IsServicesOper())
-				source.Reply(_("Syntax: \002SET LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
+				source.Reply(_("Syntax: \002LIMIT [\037user\037 | \037channel\037] {\037limit\037 | NONE} [HARD]\002\n"
 						" \n"
 						"Sets the maximum number of memos a user or channel is\n"
 						"allowed to have.  Setting the limit to 0 prevents the user\n"
@@ -279,7 +282,7 @@ class CommandMSSet : public Command
 						"remove their limit, may not set a limit above %d, and may\n"
 						"not set a hard limit."), Config->MSMaxMemos);
 			else
-				source.Reply(_("Syntax: \002SET LIMIT [\037channel\037] \037limit\037\002\n"
+				source.Reply(_("Syntax: \002LIMIT [\037channel\037] \037limit\037\002\n"
 									" \n"
 									"Sets the maximum number of memos you (or the given channel)\n"
 									"are allowed to have. If you set this to 0, no one will be\n"
@@ -291,11 +294,6 @@ class CommandMSSet : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
-	}
 };
 
 class MSSet : public Module
@@ -303,14 +301,12 @@ class MSSet : public Module
 	CommandMSSet commandmsset;
 
  public:
-	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsset(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsset);
+		ModuleManager::RegisterService(&commandmsset);
 	}
 };
 

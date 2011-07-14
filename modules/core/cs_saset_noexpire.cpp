@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSASetNoexpire : public Command
 {
  public:
-	CommandCSSASetNoexpire() : Command("NOEXPIRE", 2, 2, "chanserv/saset/noexpire")
+	CommandCSSASetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2, "chanserv/saset/noexpire")
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
+		this->SetDesc(_("\037channel\037 NOEXPIRE {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSASetNoexpire");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,21 +51,16 @@ class CommandCSSASetNoexpire : public Command
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET \037channel\037 NOEXPIRE {ON | OFF}\002\n"
-				" \n"
-				"Sets whether the given channel will expire.  Setting this\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether the given channel will expire.  Setting this\n"
 				"to ON prevents the channel from expiring."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET NOEXPIRE", _("SET \037channel\037 NOEXPIRE {ON | OFF}"));
 	}
 };
 
@@ -64,23 +69,12 @@ class CSSetNoexpire : public Module
 	CommandCSSASetNoexpire commandcssasetnoexpire;
 
  public:
-	CSSetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssasetnoexpire(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetnoexpire);
-	}
-
-	~CSSetNoexpire()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetnoexpire);
+		ModuleManager::RegisterService(&commandcssasetnoexpire);
 	}
 };
 

@@ -12,21 +12,24 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSASetNoexpire : public Command
 {
  public:
-	CommandNSSASetNoexpire() : Command("NOEXPIRE", 1, 2, "nickserv/saset/noexpire")
+	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2, "nickserv/saset/noexpire")
 	{
 		this->SetDesc(_("Prevent the nickname from expiring"));
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		NickAlias *na = findnick(params[0]);
-		if (!na)
-			throw CoreException("NULL na in CommandNSSASsetNoexpire");
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		Anope::string param = params.size() > 1 ? params[1] : "";
 
@@ -43,21 +46,16 @@ class CommandNSSASetNoexpire : public Command
 		else
 			this->OnSyntaxError(source, "NOEXPIRE");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 NOEXPIRE {ON | OFF}\002\n"
-				" \n"
-				"Sets whether the given nickname will expire.  Setting this\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether the given nickname will expire.  Setting this\n"
 				"to \002ON\002 prevents the nickname from expiring."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET NOEXPIRE", _("SASET \037nickname\037 NOEXPIRE {ON | OFF}"));
 	}
 };
 
@@ -66,23 +64,12 @@ class NSSASetNoexpire : public Module
 	CommandNSSASetNoexpire commandnssasetnoexpire;
 
  public:
-	NSSASetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSASetNoexpire(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssasetnoexpire(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetnoexpire);
-	}
-
-	~NSSASetNoexpire()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetnoexpire);
+		ModuleManager::RegisterService(&commandnssasetnoexpire);
 	}
 };
 

@@ -12,18 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "botserv.h"
 
 class CommandBSSet : public Command
 {
  public:
-	CommandBSSet() : Command("SET", 3, 3)
+	CommandBSSet(Module *creator) : Command(creator, "botserv/set", 3, 3)
 	{
-		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Configures bot options"));
+		this->SetSyntax(_("\037(channel | bot)\037 \037option\037 \037settings\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];
@@ -34,14 +33,14 @@ class CommandBSSet : public Command
 
 		if (readonly)
 			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
-		else if (u->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
+		else if (u->HasCommand("botserv/botserv/set/private") && option.equals_ci("PRIVATE"))
 		{
 			BotInfo *bi;
 
 			if (!(bi = findbot(chan)))
 			{
-				source.Reply(_(BOT_DOES_NOT_EXIST), chan.c_str());
-				return MOD_CONT;
+				source.Reply(BOT_DOES_NOT_EXIST, chan.c_str());
+				return;
 			}
 
 			if (value.equals_ci("ON"))
@@ -55,13 +54,13 @@ class CommandBSSet : public Command
 				source.Reply(_("Private mode of bot %s is now \002off\002."), bi->nick.c_str());
 			}
 			else
-				SyntaxError(source, "SET PRIVATE", _("SET \037botname\037 PRIVATE {\037ON|\037}"));
-			return MOD_CONT;
+				this->OnSyntaxError(source, "PRIVATE");
+			return;
 		}
 		else if (!(ci = cs_findchan(chan)))
-			source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_SET))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			bool override = !check_access(u, ci, CA_SET);
@@ -80,7 +79,7 @@ class CommandBSSet : public Command
 					source.Reply(_("Bot \002will kick ops\002 on channel %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET DONTKICKOPS", _("SET \037channel\037 DONTKICKOPS {\037ON|\037}"));
+					this->OnSyntaxError(source, "DONTKICKOPS");
 			}
 			else if (option.equals_ci("DONTKICKVOICES"))
 			{
@@ -95,7 +94,7 @@ class CommandBSSet : public Command
 					source.Reply(_("Bot \002will kick voices\002 on channel %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET DONTKICKVOICES", _("SET \037channel\037 DONTKICKVOICES {\037ON|\037}"));
+					this->OnSyntaxError(source, "DONTKICKVOICE");
 			}
 			else if (option.equals_ci("FANTASY"))
 			{
@@ -110,7 +109,7 @@ class CommandBSSet : public Command
 					source.Reply(_("Fantasy mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET FANTASY", _("SET \037channel\037 FANTASY {\037ON|\037}"));
+					this->OnSyntaxError(source, "FANTASY");
 			}
 			else if (option.equals_ci("GREET"))
 			{
@@ -125,9 +124,9 @@ class CommandBSSet : public Command
 					source.Reply(_("Greet mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET GREET", _("SET \037channel\037 GREET {\037ON|\037}"));
+					this->OnSyntaxError(source, "GREET");
 			}
-			else if (u->HasCommand("botserv/set/nobot") && option.equals_ci("NOBOT"))
+			else if (u->HasCommand("botserv/botserv/set/nobot") && option.equals_ci("NOBOT"))
 			{
 				if (value.equals_ci("ON"))
 				{
@@ -142,22 +141,7 @@ class CommandBSSet : public Command
 					source.Reply(_("No Bot mode is now \002off\002 on channel %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET NOBOT", _("SET \037botname\037 NOBOT {\037ON|\037}"));
-			}
-			else if (option.equals_ci("SYMBIOSIS"))
-			{
-				if (value.equals_ci("ON"))
-				{
-					ci->botflags.SetFlag(BS_SYMBIOSIS);
-					source.Reply(_("Symbiosis mode is now \002on\002 on channel %s."), ci->name.c_str());
-				}
-				else if (value.equals_ci("OFF"))
-				{
-					ci->botflags.UnsetFlag(BS_SYMBIOSIS);
-					source.Reply(_("Symbiosis mode is now \002off\002 on channel %s."), ci->name.c_str());
-				}
-				else
-					SyntaxError(source, "SET SYMBIOSIS", _("SET \037channel\037 SYMBIOSIS {\037ON|\037}"));
+					this->OnSyntaxError(source, "NOBOT");
 			}
 			else if (option.equals_ci("MSG"))
 			{
@@ -190,34 +174,33 @@ class CommandBSSet : public Command
 					source.Reply(_("Fantasy replies will be sent via NOTICE to channel ops on %s."), ci->name.c_str());
 				}
 				else
-					SyntaxError(source, "SET MSG", _("SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|\037}"));
+					this->OnSyntaxError(source, "MSG");
 			}
 			else
-				source.Reply(_(UNKNOWN_OPTION), option.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str(), this->name.c_str());
+				source.Reply(UNKNOWN_OPTION, option.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), this->name.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
 		{
-			source.Reply(_("Syntax: \002SET \037(channel | bot)\037 \037option\037 \037parameters\037\002\n"
-					" \n"
-					"Configures bot options.  \037option\037 can be one of:\n"
+			this->SendSyntax(source);
+			source.Reply(" ");
+			source.Reply(_("Configures bot options.  \037option\037 can be one of:\n"
 					" \n"
 					"    DONTKICKOPS      To protect ops against bot kicks\n"
 					"    DONTKICKVOICES   To protect voices against bot kicks\n"
 					"    GREET            Enable greet messages\n"
 					"    FANTASY          Enable fantaisist commands\n"
-					"    SYMBIOSIS        Allow the bot to act as a real bot\n"
 					"    MSG              Configure how fantasy commands should be replied to\n"
 					" \n"
 					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
 					"on a specific option.\n"
 					"Note: access to this command is controlled by the\n"
-					"level SET."), Config->UseStrictPrivMsgString.c_str(), Config->s_BotServ.c_str());
+					"level SET."), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 			User *u = source.u;
 			if (u->IsServicesOper())
 				source.Reply(_("These options are reserved to Services Operators:\n"
@@ -261,13 +244,6 @@ class CommandBSSet : public Command
 					"When it is enabled, the bot will display greet\n"
 					"messages of users joining the channel, provided\n"
 					"they have enough access to the channel."));
-		else if (subcommand.equals_ci("SYMBIOSIS"))
-			source.Reply(_("Syntax: \002SET \037channel\037 SYMBIOSIS {\037ON|OFF\037}\n"
-					" \n"
-					"Enables or disables \002symbiosis\002 mode on a channel.\n"
-					"When it is enabled, the bot will do everything\n"
-					"normally done by %s on channels, such as MODEs,\n"
-					"KICKs, and even the entry message."), Config->s_ChanServ.c_str());
 		else if (subcommand.equals_ci("NOBOT"))
 			source.Reply(_("Syntax: \002SET \037channel\037 NOBOT {\037ON|OFF\037}\002\n"
 					" \n"
@@ -295,7 +271,22 @@ class CommandBSSet : public Command
 
 	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
 	{
-		SyntaxError(source, "SET", _("SET \037(channel | bot)\037 \037option\037 \037settings\037"));
+		if (subcommand.empty())
+			Command::OnSyntaxError(source, "");
+		else if (subcommand.equals_ci("PRIVATE"))
+			this->SendSyntax(source, "\037botname\037 PRIVATE {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("DONTKICKOPS"))
+			this->SendSyntax(source, "\037channel\037 DONTKICKOPS {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("DONTKICKVOICES"))
+			this->SendSyntax(source, "\037channel\037 DONTKICKVOICES {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("FANTASY"))
+			this->SendSyntax(source, "\037channel\037 FANTASY {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("GREET"))
+			this->SendSyntax(source, "\037channel\037 GREET {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("MSG"))
+			this->SendSyntax(source, "\037botname\037 NOBOT {\037ON|OFF\037}");
+		else if (subcommand.equals_ci("NOBOT"))
+			this->SendSyntax(source, "\037botname\037 NOBOT {\037ON|OFF\037}");
 	}
 };
 
@@ -304,14 +295,12 @@ class BSSet : public Module
 	CommandBSSet commandbsset;
 
  public:
-	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	BSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandbsset(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!botserv)
-			throw ModuleException("BotServ is not loaded!");
-
-		this->AddCommand(botserv->Bot(), &commandbsset);
+		ModuleManager::RegisterService(&commandbsset);
 	}
 };
 

@@ -11,9 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
-#include "operserv.h"
-
-XLineManager *SGLine = NULL, *SZLine = NULL, *SQLine = NULL, *SNLine = NULL;
+#include "oper.h"
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
@@ -63,7 +61,7 @@ Anope::string XLine::GetHost() const
 
 /** Constructor
  */
-XLineManager::XLineManager()
+XLineManager::XLineManager(Module *creator, const Anope::string &name, char t) : Service(creator, name), type(t)
 {
 }
 
@@ -73,6 +71,14 @@ XLineManager::XLineManager()
 XLineManager::~XLineManager()
 {
 	this->Clear();
+}
+
+/** The type of xline provided by this service
+ * @return The type
+ */
+const char &XLineManager::Type()
+{
+	return this->type;
 }
 
  /** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
@@ -338,280 +344,5 @@ void XLineManager::OnMatch(User *u, XLine *x)
  */
 void XLineManager::OnExpire(XLine *x)
 {
-}
-
-XLine *SGLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-{
-	Anope::string realreason = reason;
-	if (!creator.empty() && Config->AddAkiller)
-		realreason = "[" + creator + "] " + reason;
-
-	XLine *x = new XLine(mask, creator, expires, realreason);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddAkill, OnAddAkill(x));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete x;
-		return NULL;
-	}
-
-	this->AddXLine(x);
-
-	if (UplinkSock && Config->AkillOnAdd)
-		this->Send(NULL, x);
-
-	return x;
-}
-
-void SGLineManager::Del(XLine *x)
-{
-	ircdproto->SendAkillDel(x);
-}
-
-void SGLineManager::OnMatch(User *u, XLine *x)
-{
-	if (u)
-		u->Kill(Config->s_OperServ, x->Reason);
-	ircdproto->SendAkill(u, x);
-}
-
-void SGLineManager::OnExpire(XLine *x)
-{
-	if (Config->WallAkillExpire && operserv)
-		ircdproto->SendGlobops(operserv->Bot(), "AKILL on %s has expired", x->Mask.c_str());
-}
-
-void SGLineManager::Send(User *u, XLine *x)
-{
-	ircdproto->SendAkill(u, x);
-}
-
-XLine *SNLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-{
-	XLine *x = new XLine(mask, creator, expires, reason);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SNLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete x;
-		return NULL;
-	}
-
-	this->AddXLine(x);
-
-	if (Config->KillonSNline && !ircd->sglineenforce)
-	{
-		Anope::string rreason = "G-Lined: " + reason;
-
-		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-		{
-			User *user = it->second;
-			++it;
-
-			if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
-				user->Kill(Config->ServerName, rreason);
-		}
-	}
-
-	return x;
-}
-
-void SNLineManager::Del(XLine *x)
-{
-	ircdproto->SendSGLineDel(x);
-}
-
-void SNLineManager::OnMatch(User *u, XLine *x)
-{
-	if (u)
-	{
-		Anope::string reason = "G-Lined: " + x->Reason;
-		u->Kill(Config->s_OperServ, reason);
-	}
-	this->Send(u, x);
-}
-
-void SNLineManager::OnExpire(XLine *x)
-{
-	if (Config->WallSNLineExpire && operserv)
-		ircdproto->SendGlobops(operserv->Bot(), "SNLINE on \2%s\2 has expired", x->Mask.c_str());
-}
-
-void SNLineManager::Send(User *u, XLine *x)
-{
-	ircdproto->SendSGLine(u, x);
-}
-
-XLine *SNLineManager::Check(User *u)
-{
-	for (unsigned i = this->XLines.size(); i > 0; --i)
-	{
-		XLine *x = this->XLines[i - 1];
-
-		if (x->Expires && x->Expires < Anope::CurTime)
-		{
-			this->OnExpire(x);
-			this->Del(x);
-			delete x;
-			this->XLines.erase(XLines.begin() + i - 1);
-			continue;
-		}
-
-		if (Anope::Match(u->realname, x->Mask))
-		{
-			this->OnMatch(u, x);
-			return x;
-		}
-	}
-
-	return NULL;
-}
-
-XLine *SQLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-{
-	XLine *x = new XLine(mask, creator, expires, reason);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SQLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete x;
-		return NULL;
-	}
-
-	this->AddXLine(x);
-
-	if (Config->KillonSQline)
-	{
-		Anope::string rreason = "Q-Lined: " + reason;
-
-		if (mask[0] == '#')
-		{
-			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
-			{
-				Channel *c = cit->second;
-
-				if (!Anope::Match(c->name, mask))
-					continue;
-				for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
-				{
-					UserContainer *uc = *it;
-					++it;
-
-					if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
-						continue;
-					c->Kick(NULL, uc->user, "%s", reason.c_str());
-				}
-			}
-		}
-		else
-		{
-			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-			{
-				User *user = it->second;
-				++it;
-
-				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
-					user->Kill(Config->ServerName, rreason);
-			}
-		}
-	}
-
-	if (UplinkSock)
-		this->Send(NULL, x);
-
-	return x;
-}
-
-void SQLineManager::Del(XLine *x)
-{
-	ircdproto->SendSQLineDel(x);
-}
-
-void SQLineManager::OnMatch(User *u, XLine *x)
-{
-	if (u)
-	{
-		Anope::string reason = "Q-Lined: " + x->Reason;
-		u->Kill(Config->s_OperServ, reason);
-	}
-
-	this->Send(u, x);
-}
-
-void SQLineManager::OnExpire(XLine *x)
-{
-	if (Config->WallSQLineExpire && operserv)
-		ircdproto->SendGlobops(operserv->Bot(), "SQLINE on \2%s\2 has expired", x->Mask.c_str());
-}
-
-void SQLineManager::Send(User *u, XLine *x)
-{
-	ircdproto->SendSQLine(u, x);
-}
-
-bool SQLineManager::Check(Channel *c)
-{
-	if (ircd->chansqline && SQLine)
-	{
-		for (std::vector<XLine *>::const_iterator it = SQLine->GetList().begin(), it_end = SQLine->GetList().end(); it != it_end; ++it)
-		{
-			XLine *x = *it;
-
-			if (Anope::Match(c->name, x->Mask))
-				return true;
-		}
-	}
-
-	return false;
-}
-
-XLine *SZLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-{
-	XLine *x = new XLine(mask, creator, expires, reason);
-
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnAddXLine, OnAddXLine(x, X_SZLINE));
-	if (MOD_RESULT == EVENT_STOP)
-	{
-		delete x;
-		return NULL;
-	}
-
-	this->AddXLine(x);
-
-	if (UplinkSock)
-		this->Send(NULL, x);
-
-	return x;
-}
-
-void SZLineManager::Del(XLine *x)
-{
-	ircdproto->SendSZLineDel(x);
-}
-
-void SZLineManager::OnMatch(User *u, XLine *x)
-{
-	if (u)
-	{
-		Anope::string reason = "Z-Lined: " + x->Reason;
-		u->Kill(Config->s_OperServ, reason);
-	}
-
-	ircdproto->SendSZLine(u, x);
-}
-
-void SZLineManager::OnExpire(XLine *x)
-{
-	if (Config->WallSZLineExpire && operserv)
-		ircdproto->SendGlobops(operserv->Bot(), "SZLINE on \2%s\2 has expired", x->Mask.c_str());
-}
-
-void SZLineManager::Send(User *u, XLine *x)
-{
-	ircdproto->SendSZLine(u, x);
 }
 

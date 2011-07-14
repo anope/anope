@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 class CommandMSInfo : public Command
 {
  public:
-	CommandMSInfo() : Command("INFO", 0, 1)
+	CommandMSInfo(Module *creator) : Command(creator, "memoserv/info", 0, 1)
 	{
 		this->SetDesc(_("Displays information about your memos"));
+		this->SetSyntax(_("[\037nick\037 | \037channel\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -37,8 +37,8 @@ class CommandMSInfo : public Command
 			na = findnick(nname);
 			if (!na)
 			{
-				source.Reply(_(NICK_X_NOT_REGISTERED), nname.c_str());
-				return MOD_CONT;
+				source.Reply(NICK_X_NOT_REGISTERED, nname.c_str());
+				return;
 			}
 			mi = &na->nc->memos;
 			hardmax = na->nc->HasFlag(NI_MEMO_HARDMAX) ? 1 : 0;
@@ -47,21 +47,21 @@ class CommandMSInfo : public Command
 		{
 			if (!(ci = cs_findchan(nname)))
 			{
-				source.Reply(_(CHAN_X_NOT_REGISTERED), nname.c_str());
-				return MOD_CONT;
+				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
+				return;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			mi = &ci->memos;
 			hardmax = ci->HasFlag(CI_MEMO_HARDMAX) ? 1 : 0;
 		}
 		else if (!nname.empty()) /* It's not a chan and we aren't services admin */
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 		else
 		{
@@ -180,31 +180,23 @@ class CommandMSInfo : public Command
 			else
 				source.Reply(_("You will not be notified of new memos."));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		User *u = source.u;
-		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002INFO [\037nick\037 | \037channel\037]\002\n"
-					"Without a parameter, displays information on the number of\n"
-					"memos you have, how many of them are unread, and how many\n"
-					"total memos you can receive.\n"
-					" \n"
-					"With a channel parameter, displays the same information for\n"
-					"the given channel.\n"
-					" \n"
-					"With a nickname parameter, displays the same information\n"
-					"for the given nickname.  This use limited to \002Services\n"
-					"admins\002."));
-		else
-			source.Reply(_("Syntax: \002INFO [\037channel\037]\002\n"
-					" \n"
-					"Displays information on the number of memos you have, how\n"
-					"many of them are unread, and how many total memos you can\n"
-					"receive.  With a parameter, displays the same information\n"
-					"for the given channel."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Without a parameter, displays information on the number of\n"
+				"memos you have, how many of them are unread, and how many\n"
+				"total memos you can receive.\n"
+				" \n"
+				"With a channel parameter, displays the same information for\n"
+				"the given channel.\n"
+				" \n"
+				"With a nickname parameter, displays the same information\n"
+				"for the given nickname.  This use limited to \002Services\n"
+				"Operators\002."));
 
 		return true;
 	}
@@ -215,14 +207,12 @@ class MSInfo : public Module
 	CommandMSInfo commandmsinfo;
 
  public:
-	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsinfo(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsinfo);
+		ModuleManager::RegisterService(&commandmsinfo);
 	}
 };
 

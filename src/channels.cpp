@@ -122,27 +122,6 @@ void Channel::JoinUser(User *user)
 		ircdproto->SendChannel(this);
 		this->Reset();
 	}
-
-	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi)
-	{
-		/**
-		 * We let the bot join even if it was an ignored user, as if we don't,
-		 * and the ignored user doesnt just leave, the bot will never
-		 * make it into the channel, leaving the channel botless even for
-		 * legit users - Rob
-		 **/
-		if (this->users.size() >= Config->BSMinUsers && !this->FindUser(this->ci->bi))
-			this->ci->bi->Join(this, &Config->BotModeList);
-		/* Only display the greet if the main uplink we're connected
-		 * to has synced, or we'll get greet-floods when the net
-		 * recovers from a netsplit. -GD
-		 */
-		if (this->FindUser(this->ci->bi) && this->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && check_access(user, this->ci, CA_GREET) && user->server->IsSynced())
-		{
-			ircdproto->SendPrivmsg(this->ci->bi, this->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
-			this->ci->bi->lastmsg = Anope::CurTime;
-		}
-	}
 }
 
 /** Remove a user internally from the channel
@@ -154,6 +133,7 @@ void Channel::DeleteUser(User *user)
 		update_cs_lastseen(user, this->ci);
 
 	Log(user, this, "leaves");
+	FOREACH_MOD(I_OnLeaveChannel, OnLeaveChannel(user, this));
 
 	CUserList::iterator cit, cit_end = this->users.end();
 	for (cit = this->users.begin(); (*cit)->user != user && cit != cit_end; ++cit);
@@ -170,13 +150,12 @@ void Channel::DeleteUser(User *user)
 	UChannelList::iterator uit, uit_end = user->chans.end();
 	for (uit = user->chans.begin(); (*uit)->chan != this && uit != uit_end; ++uit);
 	if (uit == uit_end)
-	{
 		Log(LOG_DEBUG) << "Channel::DeleteUser() tried to delete nonexistant channel " << this->name << " from " << user->nick << "'s channel list";
-		return;
+	else
+	{
+		delete *uit;
+		user->chans.erase(uit);
 	}
-
-	delete *uit;
-	user->chans.erase(uit);
 
 	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
@@ -192,12 +171,7 @@ void Channel::DeleteUser(User *user)
 	if (this->HasFlag(CH_INHABIT))
 		return;
 
-	/* check for BSMinUsers and part the BotServ bot from the channel
-	 * Use <= because the bot is included in this->users.size()
-	 */
-	if (!Config->s_BotServ.empty() && this->ci && this->ci->bi && this->users.size() <= Config->BSMinUsers && this->FindUser(this->ci->bi))
-		this->ci->bi->Part(this->ci->c);
-	else if (this->users.empty())
+	if (this->users.empty())
 		delete this;
 }
 
@@ -298,10 +272,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 			return;
 		}
 
-		BotInfo *bi = NULL;
-		if (!Config->s_BotServ.empty())
-			bi = findbot(param);
-		User *u = bi ? bi : finduser(param);
+		User *u = finduser(param);
 
 		if (!u)
 		{
@@ -411,9 +382,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 			return;
 		}
 
-		BotInfo *bi = NULL;
-		if (!Config->s_BotServ.empty())
-			bi = findbot(param);
+		BotInfo *bi = findbot(param);
 		User *u = bi ? bi : finduser(param);
 
 		if (!u)
@@ -467,16 +436,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		this->UnsetFlag(CH_PERSIST);
 
 		if (ci)
-		{
 			ci->UnsetFlag(CI_PERSIST);
-			if (!Config->s_BotServ.empty() && ci->bi && this->FindUser(ci->bi) && Config->BSMinUsers && this->users.size() <= Config->BSMinUsers)
-			{
-				bool empty = this->users.size() == 1;
-				this->ci->bi->Part(this);
-				if (empty)
-					return;
-			}
-		}
 
 		if (this->users.empty())
 		{
@@ -780,7 +740,7 @@ void Channel::KickInternal(const Anope::string &source, const Anope::string &nic
 {
 	User *sender = finduser(source);
 	BotInfo *bi = NULL;
-	if (!Config->s_BotServ.empty() && this->ci)
+	if (this->ci && this->ci->bi)
 		bi = findbot(nick);
 	User *target = bi ? bi : finduser(nick);
 	if (!target)

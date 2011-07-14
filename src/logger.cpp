@@ -11,9 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
-#include "chanserv.h"
-#include "operserv.h"
-#include "global.h"
+#include "commands.h"
 
 static Anope::string GetTimeStamp()
 {
@@ -67,8 +65,8 @@ Anope::string LogFile::GetName() const
 
 Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), Type(type), Category(category)
 {
-	if (!bi && global)
-		bi = global->Bot();
+	if (!bi)
+		bi = Config ? findbot(Config->Global) : NULL;
 	if (bi)
 		this->Sources.push_back(bi->nick);
 }
@@ -81,8 +79,13 @@ Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
 	if (type != LOG_COMMAND && type != LOG_OVERRIDE && type != LOG_ADMIN)
 		throw CoreException("This constructor does not support this log type");
 
-	this->bi = c->service ? c->service : (global ? global->Bot() : NULL);
-	this->Category = (c->service ? c->service->nick + "/" : "") + c->name;
+	size_t sl = c->name.find('/');
+	this->bi = NULL;
+	if (sl != Anope::string::npos)
+		this->bi = findbot(c->name.substr(0, sl));
+	if (this->bi == NULL)
+		this->bi = Config ? findbot(Config->Global) : NULL;
+	this->Category = c->name;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
@@ -96,7 +99,8 @@ Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
 		buf << "OVERRIDE: ";
 	else
 		buf << "COMMAND: ";
-	buf << u->GetMask() << " used " << c->name << " ";
+	Anope::string cname = sl != Anope::string::npos ? c->name.substr(sl + 1) : c->name;
+	buf << u->GetMask() << " used " << cname << " ";
 	if (ci)
 		buf << "on " << ci->name << " ";
 }
@@ -106,7 +110,7 @@ Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
 	if (!c)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	this->bi = chanserv ? chanserv->Bot() : NULL;
+	this->bi = Config ? findbot(Config->ChanServ) : NULL;
 	this->Category = category;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
@@ -126,8 +130,7 @@ Log::Log(User *u, const Anope::string &category) : bi(NULL), Type(LOG_USER), Cat
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	if (!this->bi && global)
-		this->bi = global->Bot();
+	this->bi = Config ? findbot(Config->Global) : NULL;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
@@ -140,10 +143,9 @@ Log::Log(Server *s, const Anope::string &category) : bi(NULL), Type(LOG_SERVER),
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
-	if (operserv)
-		this->bi = operserv->Bot();
-	if (!this->bi && global)
-		this->bi = global->Bot();
+	this->bi = Config ? findbot(Config->OperServ) : NULL;
+	if (!this->bi)
+		this->bi = Config ? findbot(Config->Global) : NULL;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(s->GetName());
@@ -153,8 +155,8 @@ Log::Log(Server *s, const Anope::string &category) : bi(NULL), Type(LOG_SERVER),
 
 Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_NORMAL), Category(category)
 {
-	if (!b && global)
-		this->bi = global->Bot();
+	if (!this->bi)
+		this->bi = Config ? findbot(Config->Global) : NULL;
 	if (this->bi)
 		this->Sources.push_back(bi->nick);
 }

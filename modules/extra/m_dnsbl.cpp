@@ -6,13 +6,8 @@
  */
 
 #include "module.h"
-#include "operserv.h"
 
-struct FakeAkill : public Command
-{
-	FakeAkill() : Command("AKILL", 0, 0) { this->service = findbot(Config->s_OperServ); }
-	CommandReturn Execute(CommandSource &, const std::vector<Anope::string> &) { return MOD_CONT; }
-} fake_akill;
+static service_reference<XLineManager> akills("xlinemanager/sgline");
 
 struct Blacklist
 {
@@ -62,17 +57,18 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
 		XLine *x = NULL;
-		if (this->add_to_akill && SGLine && (x = SGLine->Add(Anope::string("*@") + user->host, Config->s_OperServ, Anope::CurTime + this->blacklist.bantime, reason)))
+		BotInfo *operserv = findbot(Config->OperServ);
+		if (this->add_to_akill && akills && (x = akills->Add(Anope::string("*@") + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason)))
 		{
-			Log(LOG_COMMAND, operserv->Bot(), &fake_akill) << "for " << user->GetMask() << " (Listed in " << this->blacklist.name << ")";
+			Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
 				ircdproto->SendAkill(user, x);
 		}
 		else
 		{
-			Log(operserv->Bot()) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
-			XLine xline(Anope::string("*@") + user->host, Config->s_OperServ, Anope::CurTime + this->blacklist.bantime, reason);
+			Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name << "(" << reason << ")";
+			XLine xline(Anope::string("*@") + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
 			ircdproto->SendAkill(user, &xline);
 		}
 	}

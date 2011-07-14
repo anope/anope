@@ -69,9 +69,9 @@ class MemoListCallback : public NumberList
 	{
 		Memo *m = mi->memos[index];
 		if (ci)
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %s %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), index + 1);
 		else
-			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), index + 1);
+			source.Reply(_("Memo %d from %s (%s).  To delete, type: \002%s%s DEL %d\002"), index + 1, m->sender.c_str(), do_strftime(m->time).c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), index + 1);
 		source.Reply("%s", m->text.c_str());
 		m->UnsetFlag(MF_UNREAD);
 
@@ -84,12 +84,13 @@ class MemoListCallback : public NumberList
 class CommandMSRead : public Command
 {
  public:
-	CommandMSRead() : Command("READ", 1, 2)
+	CommandMSRead(Module *creator) : Command(creator, "memoserv/read", 1, 2)
 	{
 		this->SetDesc(_("Read a memo or memos"));
+		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | NEW}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -104,13 +105,13 @@ class CommandMSRead : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
-				return MOD_CONT;
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				return;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			mi = &ci->memos;
 		}
@@ -122,9 +123,9 @@ class CommandMSRead : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				source.Reply(_(MEMO_X_HAS_NO_MEMOS), chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(_(MEMO_HAVE_NO_MEMOS));
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -142,9 +143,9 @@ class CommandMSRead : public Command
 				if (!readcount)
 				{
 					if (!chan.empty())
-						source.Reply(_(MEMO_X_HAS_NO_NEW_MEMOS), chan.c_str());
+						source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 					else
-						source.Reply(_(MEMO_HAVE_NO_NEW_MEMOS));
+						source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
 				}
 			}
 			else if (numstr.equals_ci("LAST"))
@@ -158,14 +159,14 @@ class CommandMSRead : public Command
 				list.Process();
 			}
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002READ [\037channel\037] {\037num\037 | \037list\037 | LAST | NEW}\002\n"
-				" \n"
-				"Sends you the text of the memos specified. If LAST is\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sends you the text of the memos specified. If LAST is\n"
 				"given, sends you the memo you most recently received. If\n"
 				"NEW is given, sends you all of your new memos.  Otherwise,\n"
 				"sends you memo number \037num\037. You can also give a list of\n"
@@ -175,11 +176,6 @@ class CommandMSRead : public Command
 				"      Displays memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "READ", _("READ [\037channel\037] {\037list\037 | LAST | NEW}"));
-	}
 };
 
 class MSRead : public Module
@@ -187,14 +183,12 @@ class MSRead : public Module
 	CommandMSRead commandmsread;
 
  public:
-	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSRead(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsread(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsread);
+		ModuleManager::RegisterService(&commandmsread);
 	}
 };
 

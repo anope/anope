@@ -11,18 +11,17 @@
 
 #include "services.h"
 #include "config.h"
+#include "module.h"
 
 /*************************************************************************/
 
 ConfigurationFile services_conf("services.conf", false); // Services configuration file name
 ServerConfig *Config = NULL;
 
-static Anope::string Modules;
 static Anope::string UlineServers;
 static Anope::string OSNotifications;
 static Anope::string BSDefaults;
 static Anope::string CSDefaults;
-static Anope::string temp_nsuserhost;
 static Anope::string NSDefaults;
 
 /*************************************************************************/
@@ -30,21 +29,6 @@ static Anope::string NSDefaults;
 ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), CSDefFlags(ChannelInfoFlagStrings), BSDefFlags(BotServFlagStrings)
 {
 	this->Read();
-
-	if (!temp_nsuserhost.empty())
-	{
-		size_t at = temp_nsuserhost.find('@');
-		if (at == Anope::string::npos)
-		{
-			this->NSEnforcerUser = temp_nsuserhost;
-			this->NSEnforcerHost = this->ServiceHost;
-		}
-		else
-		{
-			this->NSEnforcerUser = temp_nsuserhost.substr(0, at);
-			this->NSEnforcerHost = temp_nsuserhost.substr(at + 1);
-		}
-	}
 
 	if (NSDefaults.empty())
 	{
@@ -155,8 +139,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 				this->BSDefFlags.SetFlag(BS_GREET);
 			else if (option.equals_ci("fantasy"))
 				this->BSDefFlags.SetFlag(BS_FANTASY);
-			else if (option.equals_ci("symbiosis"))
-				this->BSDefFlags.SetFlag(BS_SYMBIOSIS);
 		}
 	}
 
@@ -196,21 +178,10 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->Ulines.push_back(uline);
 	}
 
-	/* Modules Autoload building... :P */
-	this->ModulesAutoLoad = BuildStringList(Modules);
-
 	if (this->LimitSessions)
 	{
 		if (this->MaxSessionKill && !this->SessionAutoKillExpiry)
 			this->SessionAutoKillExpiry = 1800; /* 30 minutes */
-	}
-
-	if (!this->s_BotServ.empty())
-	{
-		if (this->BSFantasyCharacter.empty())
-			this->BSFantasyCharacter = "!";
-		if (this->BSFantasyCharacter.length() > 1)
-			Log() << "*** " << this->BSFantasyCharacter << " is more than 1 character long. Only the first character will be used. The others will be ignored.";
 	}
 
 	/* Check the user keys */
@@ -421,7 +392,7 @@ bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string 
 
 bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_ChanServ.empty())
+	if (!config->ChanServ.empty())
 	{
 		if ((value.equals_ci("decription") || value.equals_ci("autokickreason")) && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when ChanServ is enabled!");
@@ -435,7 +406,7 @@ bool ValidateChanServ(ServerConfig *config, const Anope::string &tag, const Anop
 
 bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_MemoServ.empty())
+	if (!config->MemoServ.empty())
 	{
 		if (value.equals_ci("description"))
 		{
@@ -448,7 +419,7 @@ bool ValidateMemoServ(ServerConfig *config, const Anope::string &tag, const Anop
 
 bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_BotServ.empty())
+	if (!config->BotServ.empty())
 	{
 		if (value.equals_ci("description"))
 		{
@@ -471,7 +442,7 @@ bool ValidateBotServ(ServerConfig *config, const Anope::string &tag, const Anope
 
 bool ValidateHostServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_HostServ.empty())
+	if (!config->HostServ.empty())
 	{
 		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
@@ -494,7 +465,7 @@ bool ValidateLimitSessions(ServerConfig *config, const Anope::string &tag, const
 
 bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_OperServ.empty())
+	if (!config->OperServ.empty())
 	{
 		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when OperServ is enabled!");
@@ -508,7 +479,7 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 
 bool ValidateGlobal(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (!config->s_Global.empty())
+	if (!config->Global.empty())
 	{
 		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when Global is enabled!");
@@ -571,7 +542,7 @@ bool InitUplinks(ServerConfig *config, const Anope::string &)
 	return true;
 }
 
-bool DoUplink(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+static bool DoUplink(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
 	// Validation variables
 	Anope::string host = values[0].GetValue(), password = values[3].GetValue();
@@ -592,7 +563,7 @@ bool DoUplink(ServerConfig *config, const Anope::string &, const Anope::string *
 	return true;
 }
 
-bool DoneUplinks(ServerConfig *config, const Anope::string &)
+static bool DoneUplinks(ServerConfig *config, const Anope::string &)
 {
 	if (config->Uplinks.empty())
 		throw ConfigException("You must define at least one uplink block!");
@@ -746,27 +717,31 @@ static bool DoneInclude(ServerConfig *config, const Anope::string &)
 
 bool InitModules(ServerConfig *, const Anope::string &)
 {
-	Modules.clear();
 	return true;
 }
 
-bool DoModule(ServerConfig *conf, const Anope::string &, const Anope::string *, ValueList &values, int *)
+static bool DoModule(ServerConfig *conf, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
 	// First we validate that there was a name in the module block
 	Anope::string module = values[0].GetValue();
 	ValueItem vi(module);
 	if (!ValidateNotEmpty(conf, "module", "name", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
-	// If the string isn't empty, add a space before we add the module name
-	if (!Modules.empty())
-		Modules += " ";
-	// Add the module name to the string
-	Modules += values[0].GetValue();
+	conf->ModulesAutoLoad.push_back(module);
 	return true;
 }
 
-bool DoneModules(ServerConfig *, const Anope::string &)
+static bool DoneModules(ServerConfig *config, const Anope::string &)
 {
+	if (Config)
+	{
+		for (std::list<Anope::string>::iterator it = Config->ModulesAutoLoad.begin(); it != Config->ModulesAutoLoad.end(); ++it)
+			if (std::find(config->ModulesAutoLoad.begin(), config->ModulesAutoLoad.end(), *it) == config->ModulesAutoLoad.end())
+				ModuleManager::UnloadModule(ModuleManager::FindModule(*it), NULL);
+		for (std::list<Anope::string>::iterator it = config->ModulesAutoLoad.begin(); it != config->ModulesAutoLoad.end(); ++it)
+			if (std::find(Config->ModulesAutoLoad.begin(), Config->ModulesAutoLoad.end(), *it) == Config->ModulesAutoLoad.end())
+				ModuleManager::LoadModule(*it, NULL);
+	}
 	return true;
 }
 
@@ -809,7 +784,7 @@ bool InitLogs(ServerConfig *config, const Anope::string &)
 	return true;
 }
 
-bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+static bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
 {
 	//{"target", "source", "logage", "inhabit", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug"},
 	Anope::string targets = values[0].GetValue();
@@ -846,7 +821,7 @@ bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::string *, 
 	return true;
 }
 
-bool DoneLogs(ServerConfig *config, const Anope::string &)
+static bool DoneLogs(ServerConfig *config, const Anope::string &)
 {
 	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
 
@@ -873,7 +848,7 @@ bool DoneLogs(ServerConfig *config, const Anope::string &)
 				{
 					BotInfo *bi = it->second;
 					if (!c->FindUser(bi))
-						bi->Join(c, &config->BotModeList);
+						bi->Join(c, NULL);
 				}
 			}
 		}
@@ -881,6 +856,106 @@ bool DoneLogs(ServerConfig *config, const Anope::string &)
 
 	return true;
 }
+
+/*************************************************************************/
+
+static bool InitCommands(ServerConfig *config, const Anope::string &)
+{
+	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		it->second->commands.clear();
+	return true;
+}
+
+static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string service = values[0].GetValue();
+	Anope::string name = values[1].GetValue();
+	Anope::string command = values[2].GetValue();
+
+	ValueItem vi(service);
+	if (!ValidateNotEmpty(config, "command", "service", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+	
+	vi = ValueItem(name);
+	if (!ValidateNotEmpty(config, "command", "name", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+	
+	vi = ValueItem(command);
+	if (!ValidateNotEmpty(config, "command", "command", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+	
+	BotInfo *bi = findbot(service);
+	if (bi == NULL)
+		throw ConfigException("Command " + name + " exists for nonexistant service " + service);
+
+	if (bi->commands.count(name))
+		throw ConfigException("Command name " + name + " already exists on " + bi->nick);
+
+	bi->commands[name] = command;
+	return true;
+}
+
+static bool DoneCommands(ServerConfig *config, const Anope::string &)
+{
+	return true;
+}
+
+/*************************************************************************/
+
+static std::set<Anope::string> services;
+static bool InitServices(ServerConfig *config, const Anope::string &)
+{
+	services.clear();
+	return true;
+}
+
+static bool DoServices(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string nick = values[0].GetValue();
+	Anope::string user = values[1].GetValue();
+	Anope::string host = values[2].GetValue();
+	Anope::string gecos = values[3].GetValue();
+
+	ValueItem vi(nick);
+	if (!ValidateNotEmpty(config, "service", "nick", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	vi = ValueItem(user);
+	if (!ValidateNotEmpty(config, "service", "user", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	vi = ValueItem(host);
+	if (!ValidateNotEmpty(config, "service", "host", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	vi = ValueItem(gecos);
+	if (!ValidateNotEmpty(config, "service", "gecos", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	services.insert(nick);
+	BotInfo *bi = findbot(nick);
+	if (bi != NULL)
+		return true;
+	bi = new BotInfo(nick, user, host, gecos);
+	bi->SetFlag(BI_CONF);
+	return true;
+}
+
+static bool DoneServices(ServerConfig *config, const Anope::string &)
+{
+	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end;)
+	{
+		BotInfo *bi = it->second;
+		++it;
+
+		if (bi->HasFlag(BI_CONF) && services.count(bi->nick) == 0)
+			delete bi;
+	}
+	services.clear();
+	return true;
+}
+
+/*************************************************************************/
 
 ConfigurationFile::ConfigurationFile(const Anope::string &n, bool e) : name(n), executable(e), fp(NULL)
 {
@@ -1000,8 +1075,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"serverinfo", "description", "", new ValueContainerString(&conf->ServerDesc), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "localhost", "", new ValueContainerString(&conf->LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
 		{"serverinfo", "id", "", new ValueContainerString(&conf->Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
-		{"serverinfo", "ident", "", new ValueContainerString(&conf->ServiceUser), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"serverinfo", "hostname", "", new ValueContainerString(&conf->ServiceHost), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "pid", "services.pid", new ValueContainerString(&conf->PIDFilename), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "motd", "services.motd", new ValueContainerString(&conf->MOTDFilename), DT_STRING, ValidateNotEmpty},
 		{"networkinfo", "networkname", "", new ValueContainerString(&conf->NetworkName), DT_STRING, ValidateNotEmpty},
@@ -1035,10 +1108,8 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "botmodes", "", new ValueContainerString(&conf->BotModes), DT_STRING, NoValidation},
 		{"options", "retrywait", "60", new ValueContainerInt(&conf->RetryWait), DT_INTEGER, ValidateNotZero},
 		{"options", "hideprivilegedcommands", "no", new ValueContainerBool(&conf->HidePrivilegedCommands), DT_BOOLEAN, NoValidation},
-		{"nickserv", "nick", "NickServ", new ValueContainerString(&conf->s_NickServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "description", "Nickname Registration Service", new ValueContainerString(&conf->desc_NickServ), DT_STRING | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "name", "NickServ", new ValueContainerString(&conf->NickServ), DT_STRING, NoValidation},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&conf->NSEmailReg), DT_BOOLEAN, NoValidation},
-		{"nickserv", "modules", "", new ValueContainerString(&conf->NickCoreModules), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&conf->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
@@ -1051,7 +1122,8 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "unconfirmedexpire", "0", new ValueContainerTime(&conf->NSUnconfirmedExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerUInt(&conf->NSMaxAliases), DT_UINTEGER, NoValidation},
 		{"nickserv", "accessmax", "0", new ValueContainerUInt(&conf->NSAccessMax), DT_UINTEGER, ValidateNotZero},
-		{"nickserv", "enforceruser", "", new ValueContainerString(&temp_nsuserhost), DT_STRING, ValidateNotEmpty},
+		{"nickserv", "enforceruser", "", new ValueContainerString(&conf->NSEnforcerUser), DT_STRING, ValidateNotEmpty},
+		{"nickserv", "enforcerhost", "", new ValueContainerString(&conf->NSEnforcerHost), DT_STRING, ValidateNotEmpty},
 		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&conf->NSReleaseTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&conf->NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&conf->NSNoGroupChange), DT_BOOLEAN, NoValidation},
@@ -1071,9 +1143,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&conf->DontQuoteAddresses), DT_BOOLEAN, NoValidation},
 		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&conf->NameServer), DT_STRING, NoValidation},
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
-		{"chanserv", "nick", "", new ValueContainerString(&conf->s_ChanServ), DT_STRING | DT_NORELOAD, NoValidation},
-		{"chanserv", "description", "Channel Registration Service", new ValueContainerString(&conf->desc_ChanServ), DT_STRING | DT_NORELOAD, ValidateChanServ},
-		{"chanserv", "modules", "", new ValueContainerString(&conf->ChanCoreModules), DT_STRING, ValidateChanServ},
+		{"chanserv", "name", "ChanServ", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
 		{"chanserv", "defaults", "keeptopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, ValidateChanServ},
 		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&conf->CSMaxReg), DT_UINTEGER, ValidateChanServ},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&conf->CSExpire), DT_TIME, ValidateChanServ},
@@ -1087,16 +1157,13 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "listopersonly", "no", new ValueContainerBool(&conf->CSListOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"chanserv", "listmax", "0", new ValueContainerUInt(&conf->CSListMax), DT_UINTEGER, ValidateChanServ},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&conf->CSOpersOnly), DT_BOOLEAN, ValidateChanServ},
-		{"memoserv", "nick", "", new ValueContainerString(&conf->s_MemoServ), DT_STRING | DT_NORELOAD, NoValidation},
-		{"memoserv", "description", "Memo Service", new ValueContainerString(&conf->desc_MemoServ), DT_STRING | DT_NORELOAD, ValidateMemoServ},
-		{"memoserv", "modules", "", new ValueContainerString(&conf->MemoCoreModules), DT_STRING, NoValidation},
+		{"memoserv", "name", "MemoServ", new ValueContainerString(&conf->MemoServ), DT_STRING, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&conf->MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&conf->MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&conf->MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&conf->MSMemoReceipt), DT_UINTEGER, NoValidation},
-		{"botserv", "nick", "", new ValueContainerString(&conf->s_BotServ), DT_STRING | DT_NORELOAD, NoValidation},
-		{"botserv", "description", "Bot Service", new ValueContainerString(&conf->desc_BotServ), DT_STRING | DT_NORELOAD, ValidateBotServ},
-		{"botserv", "modules", "", new ValueContainerString(&conf->BotCoreModules), DT_STRING, NoValidation},
+		{"hostserv", "name", "HostServ", new ValueContainerString(&conf->HostServ), DT_STRING, NoValidation},
+		{"botserv", "name", "BotServ", new ValueContainerString(&conf->BotServ), DT_STRING, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerUInt(&conf->BSMinUsers), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&conf->BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
@@ -1105,12 +1172,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&conf->BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&conf->BSCaseSensitive), DT_BOOLEAN, NoValidation},
 		{"botserv", "fantasycharacter", "!", new ValueContainerString(&conf->BSFantasyCharacter), DT_STRING, NoValidation},
-		{"hostserv", "nick", "", new ValueContainerString(&conf->s_HostServ), DT_STRING | DT_NORELOAD, NoValidation},
-		{"hostserv", "description", "vHost Service", new ValueContainerString(&conf->desc_HostServ), DT_STRING | DT_NORELOAD, ValidateHostServ},
-		{"hostserv", "modules", "", new ValueContainerString(&conf->HostCoreModules), DT_STRING, NoValidation},
-		{"operserv", "nick", "", new ValueContainerString(&conf->s_OperServ), DT_STRING | DT_NORELOAD, NoValidation},
-		{"operserv", "description", "Operator Service", new ValueContainerString(&conf->desc_OperServ), DT_STRING | DT_NORELOAD, ValidateOperServ},
-		{"operserv", "modules", "", new ValueContainerString(&conf->OperCoreModules), DT_STRING, NoValidation},
+		{"operserv", "name", "OperServ", new ValueContainerString(&conf->OperServ), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&conf->SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&conf->AutokillExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&conf->ChankillExpiry), DT_TIME, ValidateOperServ},
@@ -1131,9 +1193,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&conf->SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&conf->AddAkiller), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&conf->OSOpersOnly), DT_BOOLEAN, NoValidation},
-		{"global", "nick", "", new ValueContainerString(&conf->s_Global), DT_STRING | DT_NORELOAD, NoValidation},
-		{"global", "description", "Global Noticer", new ValueContainerString(&conf->desc_Global), DT_STRING | DT_NORELOAD, ValidateGlobal},
-		{"global", "modules", "", new ValueContainerString(&conf->GlobalCoreModules), DT_STRING, NoValidation},
+		{"global", "name", "Global", new ValueContainerString(&conf->Global), DT_STRING, NoValidation},
 		{"global", "globaloncycle", "no", new ValueContainerBool(&conf->GlobalOnCycle), DT_BOOLEAN, NoValidation},
 		{"global", "globaloncycledown", "", new ValueContainerString(&conf->GlobalOnCycleMessage), DT_STRING, ValidateGlobalOnCycle},
 		{"global", "globaloncycleup", "", new ValueContainerString(&conf->GlobalOnCycleUP), DT_STRING, ValidateGlobalOnCycle},
@@ -1161,11 +1221,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", ""},
 			{DT_STRING},
 			InitModules, DoModule, DoneModules},
-		{"log",
-			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
-			{"", "", "7", "yes", "", "", "", "", "", "", "no", "no", ""},
-			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
-			InitLogs, DoLogs, DoneLogs},
 		{"opertype",
 			{"name", "inherits", "commands", "privs", ""},
 			{"", "", "", "", ""},
@@ -1176,6 +1231,21 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", "", "", "", ""},
 			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOpers, DoOper, DoneOpers},
+		{"service",
+			{"nick", "user", "host", "gecos", ""},
+			{"", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			InitServices, DoServices, DoneServices},
+		{"log",
+			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
+			{"", "", "7", "yes", "", "", "", "", "", "", "no", "no", ""},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
+			InitLogs, DoLogs, DoneLogs},
+		{"command",
+			{"service", "name", "command", ""},
+			{"", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING},
+			InitCommands, DoCommands, DoneCommands},
 		{"",
 			{""},
 			{""},
@@ -1424,14 +1494,11 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 			if (in_quote)
 			{
 				if (ch == '"')
-				{
 					in_quote = in_word = false;
-					continue;
-				}
-				wordbuffer += ch;
-				continue;
+				else
+					wordbuffer += ch;
 			}
-			if (in_ml_comment)
+			else if (in_ml_comment)
 			{
 				if (ch == '*' && c + 1 < len && line[c + 1] == '/')
 				{
@@ -1440,8 +1507,8 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 				}
 				continue;
 			}
-			if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/'))
-				break; // Line comment, ignore the rest of the line (much like this one!)
+			else if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/'))
+				c = len - 1; // Line comment, ignore the rest of the line (much like this one!)
 			else if (ch == '/' && c + 1 < len && line[c + 1] == '*')
 			{
 				// Multiline (or less than one line) comment
@@ -1463,7 +1530,6 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 					throw ConfigException("Unexpected quoted string (prior unhandled words): " + file.GetName() + ":" + stringify(linenumber));
 				}
 				in_quote = in_word = true;
-				continue;
 			}
 			else if (ch == '=')
 			{
@@ -1498,41 +1564,17 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 					in_word = false;
 				section = wordbuffer;
 				wordbuffer.clear();
+				continue;
 			}
-			else if (ch == '}')
-			{
-				if (section.empty())
-				{
-					file.Close();
-					throw ConfigException("Stray '}': " + file.GetName() + ":" + stringify(linenumber));
-				}
-				if (!wordbuffer.empty() || !itemname.empty())
-				{
-					// this will allow for the construct:  section { key = value }
-					// but will not allow for anything else, such as:  section { key = value; key = value }
-					if (!sectiondata.empty())
-					{
-						file.Close();
-						throw ConfigException("Unexpected end of section: " + file.GetName() + ":" + stringify(linenumber));
-					}
-					// this is the same as the below section for testing if itemname is non-empty after the loop, but done inside it to allow the above construct
-					Log(LOG_DEBUG) << "ln "<< linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
-					sectiondata.push_back(KeyVal(itemname, wordbuffer));
-					wordbuffer.clear();
-					itemname.clear();
-				}
-				this->config_data.insert(std::pair<Anope::string, KeyValList>(section, sectiondata));
-				section.clear();
-				sectiondata.clear();
-			}
-			else if (ch == ';' || ch == '\r')
-				continue; // Ignore
-			else if (ch == ' ' || ch == '\t')
+			else if (ch == ' ' || ch == '\r' || ch == '\t')
 			{
 				// Terminate word
-				if (in_word)
-					in_word = false;
+				in_word = false;
 			}
+			else if (!in_word && ch == ';')
+				;
+			else if (ch == '}')
+				;
 			else
 			{
 				if (!in_word && !wordbuffer.empty())
@@ -1543,25 +1585,41 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 				wordbuffer += ch;
 				in_word = true;
 			}
-		}
-		if (in_quote)
-		{
-			// Quotes can span multiple lines; all we need to do is go to the next line without clearing things
-			wordbuffer += "\n";
-			continue;
-		}
-		in_word = false;
-		if (!itemname.empty())
-		{
-			if (wordbuffer.empty())
+
+			if (ch == ';' || ch == '}' || c + 1 == len)
 			{
-				file.Close();
-				throw ConfigException("Item without value: " + file.GetName() + ":" + stringify(linenumber));
+				if (in_quote)
+				{
+					// Quotes can span multiple lines; all we need to do is go to the next line without clearing things
+					wordbuffer += "\n";
+					continue;
+				}
+				in_word = false;
+				if (!itemname.empty())
+				{
+					if (wordbuffer.empty())
+					{
+						file.Close();
+						throw ConfigException("Item without value: " + file.GetName() + ":" + stringify(linenumber));
+					}
+					Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
+					sectiondata.push_back(KeyVal(itemname, wordbuffer));
+					wordbuffer.clear();
+					itemname.clear();
+				}
+
+				if (ch == '}')
+				{
+					if (section.empty())
+					{
+						file.Close();
+						throw ConfigException("Stray '}': " + file.GetName() + ":" + stringify(linenumber));
+					}
+					this->config_data.insert(std::pair<Anope::string, KeyValList>(section, sectiondata));
+					section.clear();
+					sectiondata.clear();
+				}
 			}
-			Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
-			sectiondata.push_back(KeyVal(itemname, wordbuffer));
-			wordbuffer.clear();
-			itemname.clear();
 		}
 	}
 	if (in_ml_comment)

@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSReload : public Command
 {
  public:
-	CommandOSReload() : Command("RELOAD", 0, 0, "operserv/reload")
+	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0, "operserv/reload")
 	{
 		this->SetDesc(_("Reload services' configuration file"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ServerConfig *old_config = Config;
 
@@ -40,13 +40,14 @@ class CommandOSReload : public Command
 			source.Reply(_("Error reloading confguration file: ") + ex.GetReason());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002RELOAD\002\n"
-				"Causes Services to reload the configuration file. Note that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Causes Services to reload the configuration file. Note that\n"
 				"some directives still need the restart of the Services to\n"
 				"take effect (such as Services' nicknames, activation of the \n"
 				"session limitation, etc.)"));
@@ -59,14 +60,12 @@ class OSReload : public Module
 	CommandOSReload commandosreload;
 
  public:
-	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSReload(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosreload(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosreload);
+		ModuleManager::RegisterService(&commandosreload);
 	}
 };
 

@@ -16,7 +16,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 static Module *me;
 
@@ -42,11 +41,11 @@ static bool CanBanUser(CommandSource &source, Channel *c, User *u2)
 	ChannelInfo *ci = c->ci;
 	bool ok = false;
 	if (!check_access(u, ci, CA_BAN))
-		source.Reply(_(ACCESS_DENIED));
+		source.Reply(ACCESS_DENIED);
 	else if (matches_list(c, u2, CMODE_EXCEPT))
-		source.Reply(_(CHAN_EXCEPTED), u2->nick.c_str(), ci->name.c_str());
+		source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());
 	else if (u2->IsProtected())
-		source.Reply(_(ACCESS_DENIED));
+		source.Reply(ACCESS_DENIED);
 	else
 		ok = true;
 
@@ -56,25 +55,24 @@ static bool CanBanUser(CommandSource &source, Channel *c, User *u2)
 class CommandCSTBan : public Command
 {
  public:
-	CommandCSTBan() : Command("TBAN", 3, 3)
+	CommandCSTBan(Module *m) : Command(m, "TBAN", 3, 3)
 	{
 		this->SetDesc(_("Bans the user for a given length of time"));
+		this->SetSyntax(_("\037channel\037 \037nick\037 \037time\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
+		Channel *c = findchan(params[0]);
 
-		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
 		const Anope::string &time = params[2];
 
 		User *u2;
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!(u2 = finduser(nick)))
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else
 			if (CanBanUser(source, c, u2))
 			{
@@ -85,7 +83,7 @@ class CommandCSTBan : public Command
 				source.Reply(_("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
 			}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -97,11 +95,6 @@ class CommandCSTBan : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: TBAN channel nick time"));
-	}
 };
 
 class CSTBan : public Module
@@ -109,16 +102,14 @@ class CSTBan : public Module
 	CommandCSTBan commandcstban;
 
  public:
-	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+		commandcstban(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
 		me = this;
 
-		this->AddCommand(chanserv->Bot(), &commandcstban);
+		ModuleManager::RegisterService(&commandcstban);
 	}
 };
 

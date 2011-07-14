@@ -12,46 +12,51 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSClone : public Command
 {
 public:
-	CommandCSClone() : Command("CLONE", 2, 3)
+	CommandCSClone(Module *creator) : Command(creator, "chanserv/clone", 2, 3)
 	{
 		this->SetDesc(_("Copy all settings from one channel to another"));
+		this->SetSyntax(_("\037channel\037 \037target\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &channel = params[0];
 		const Anope::string &target = params[1];
 		Anope::string what = params.size() > 2 ? params[2] : "";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		if (!check_access(u, ci, CA_SET))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 		ChannelInfo *target_ci = cs_findchan(target);
 		if (!target_ci)
 		{
-			source.Reply(_(CHAN_X_NOT_REGISTERED), target.c_str());
-			return MOD_CONT;
+			source.Reply(CHAN_X_NOT_REGISTERED, target.c_str());
+			return;
 		}
 		if (!IsFounder(u, ci) || !IsFounder(u, target_ci))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
 		{
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? _(CHAN_EXCEEDED_CHANNEL_LIMIT) : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
-			return MOD_CONT;
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
+			return;
 		}
 
 		if (what.equals_ci("ALL"))
@@ -98,7 +103,7 @@ public:
 				target_ci->last_topic_time = target_ci->c->topic_time;
 			}
 			else
-				target_ci->last_topic_setter = Config->s_ChanServ;
+				target_ci->last_topic_setter = source.owner->nick;
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 
@@ -143,28 +148,23 @@ public:
 		else
 		{
 			this->OnSyntaxError(source, "");
-			return MOD_CONT;
+			return;
 		}
 
 		Log(LOG_COMMAND, u, this, ci) << "to clone it to " << target_ci->name;
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CLONE \037channel\037 \037target\037 [all | access | akick | badwords]\002\n"
-				" \n"
-				"Copies all settings, access, akicks, etc from channel to the\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Copies all settings, access, akicks, etc from channel to the\n"
 				"target channel. If access, akick, or badwords is specified then only\n"
 				"the respective settings are transferred. You must have founder level\n"
 				"access to \037channel\037 and \037target\037."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CLONE", _("CLONE \037channel\037 \037target\037"));
 	}
 };
 
@@ -173,14 +173,11 @@ class CSClone : public Module
 	CommandCSClone commandcsclone;
 
  public:
-	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSClone(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsclone(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsclone);
+		ModuleManager::RegisterService(&commandcsclone);
 	}
 };
 

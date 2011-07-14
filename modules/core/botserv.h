@@ -52,8 +52,6 @@ class BotServService : public Service
  public:
 	BotServService(Module *m) : Service(m, "BotServ") { }
 
-	virtual BotInfo *Bot() = 0;
-
 	virtual UserData *GetUserData(User *u, Channel *c) = 0;
 
 	virtual BanData *GetBanData(User *u, Channel *c) = 0;

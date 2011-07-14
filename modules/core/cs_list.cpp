@@ -12,31 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSList : public Command
 {
  public:
-	CommandCSList() : Command("LIST", 1, 2)
+	CommandCSList(Module *creator) : Command(creator, "chanserv/list", 1, 2)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
 		this->SetDesc(_("Lists all registered channels matching the given pattern"));
+		this->SetSyntax(_("\037pattern\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
 		Anope::string pattern = params[0];
 		unsigned nchans;
-		bool is_servadmin = u->HasCommand("chanserv/list");
+		bool is_servadmin = u->HasCommand("chanserv/chanserv/list");
 		int count = 0, from = 0, to = 0;
 		bool suspended = false, channoexpire = false;
 
 		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (pattern[0] == '#')
@@ -51,10 +51,10 @@ class CommandCSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(_(LIST_INCORRECT_RANGE));
+				source.Reply(LIST_INCORRECT_RANGE);
 				source.Reply(_("To search for channels starting with #, search for the channel\n"
 					"name without the #-sign prepended (\002anope\002 instead of \002#anope\002)."));
-				return MOD_CONT;
+				return;
 			}
 
 			pattern = "*";
@@ -77,7 +77,7 @@ class CommandCSList : public Command
 
 		Anope::string spattern = "#" + pattern;
 
-		source.Reply(_(LIST_HEADER), pattern.c_str());
+		source.Reply(LIST_HEADER, pattern.c_str());
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -111,23 +111,18 @@ class CommandCSList : public Command
 		}
 
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002LIST \037pattern\037\002\n"
-				" \n"
-				"Lists all registered channels matching the given pattern.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists all registered channels matching the given pattern.\n"
 				"(Channels with the \002PRIVATE\002 option set are not listed.)\n"
 				"Note that a preceding '#' specifies a range, channel names\n"
 				"are to be written without '#'."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));
 	}
 };
 
@@ -136,14 +131,11 @@ class CSList : public Module
 	CommandCSList commandcslist;
 
  public:
-	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcslist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcslist);
+		ModuleManager::RegisterService(&commandcslist);
 	}
 };
 

@@ -12,18 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSDrop : public Command
 {
  public:
-	CommandNSDrop() : Command("DROP", 0, 1)
+	CommandNSDrop(Module *creator) : Command(creator, "nickserv/drop", 0, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -31,20 +30,20 @@ class CommandNSDrop : public Command
 		if (readonly)
 		{
 			source.Reply(_("Sorry, nickname de-registration is temporarily disabled."));
-			return MOD_CONT;
+			return;
 		}
 
 		NickAlias *na = findnick((u->Account() && !nick.empty() ? nick : u->nick));
 		if (!na)
 		{
-			source.Reply(_(NICK_NOT_REGISTERED));
-			return MOD_CONT;
+			source.Reply(NICK_NOT_REGISTERED);
+			return;
 		}
 
 		if (!u->Account())
 		{
-			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
+			return;
 		}
 
 		bool is_mine = u->Account() == na->nc;
@@ -53,13 +52,13 @@ class CommandNSDrop : public Command
 			my_nick = na->nick;
 
 		if (!is_mine && !u->HasPriv("nickserv/drop"))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (Config->NSSecureAdmins && !is_mine && na->nc->IsServicesOper())
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			if (readonly)
-				source.Reply(_(READ_ONLY_MODE));
+				source.Reply(READ_ONLY_MODE);
 
 			FOREACH_MOD(I_OnNickDrop, OnNickDrop(u, na));
 
@@ -79,26 +78,25 @@ class CommandNSDrop : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
 		if (u->Account() && u->HasPriv("nickserv/drop"))
-			source.Reply(_("Syntax: \002DROP [\037nickname\037]\002\n"
+			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
 					" \n"
-					"Without a parameter, drops your nickname from the\n"
-					"%s database.\n"
+					"Without a parameter, deletes your nickname.\n"
 					" \n"
 					"With a parameter, drops the named nick from the database.\n"
 					"You may drop any nick within your group without any \n"
 					"special privileges. Dropping any nick is limited to \n"
-					"\002Services Operators\002."), Config->s_NickServ.c_str());
+					"\002Services Operators\002."), source.command.c_str());
 		else
-			source.Reply(_("Syntax: \002DROP [\037nickname\037 | \037password\037]\002\n"
+			source.Reply(_("Syntax: \002%s [\037nickname\037 | \037password\037]\002\n"
 					" \n"
-					"Drops your nickname from the %s database.  A nick\n"
+					"Deltes your nickname.  A nick\n"
 					"that has been dropped is free for anyone to re-register.\n"
 					" \n"
 					"You may drop a nick within your group by passing it\n"
@@ -109,8 +107,7 @@ class CommandNSDrop : public Command
 					"your password as the \002password\002 parameter.\n"
 					" \n"
 					"In order to use this command, you must first identify\n"
-					"with your password (\002%s%s HELP IDENTIFY\002 for more\n"
-					"information)."), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+					"with your password."), source.command.c_str());
 
 		return true;
 	}
@@ -121,14 +118,12 @@ class NSDrop : public Module
 	CommandNSDrop commandnsdrop;
 
  public:
-	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsdrop(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsdrop);
+		ModuleManager::RegisterService(&commandnsdrop);
 	}
 };
 

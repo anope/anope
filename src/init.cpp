@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "oper.h"
 
 Uplink *uplink_server;
 
@@ -401,6 +402,12 @@ void Init(int ac, char **av)
 		throw FatalException("You must load a protocol module!");
 	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
 		throw FatalException("You must load at least one encryption module");
+
+	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+	{
+		it->second->GenerateUID();
+		it->second->server = Me;
+	}
 	
 	Log() << "Using IRCd protocol " << protocol->name;
 

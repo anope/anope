@@ -12,27 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetSecureFounder : public Command
 {
  public:
-	CommandCSSetSecureFounder(const Anope::string &cpermission = "") : Command("SECUREFOUNDER", 2, 2, cpermission)
+	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Stricter control of channel founder status"));
+		this->SetDesc(_("\037channel\037 SECUREFOUNDER {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetSecureFounder");
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (params[1].equals_ci("ON"))
@@ -48,37 +52,27 @@ class CommandCSSetSecureFounder : public Command
 		else
 			this->OnSyntaxError(source, "SECUREFOUNDER");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 SECUREFOUNDER {ON | OFF}\002\n"
-			" \n"
-			"Enables or disables the \002secure founder\002 option for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel.\n"
 			"When \002secure founder\002 is set, only the real founder will be\n"
 			"able to drop the channel, change its password, its founder and its\n"
 			"successor, and not those who have founder level access through\n"
-			"the access/qop command."), this->name.c_str());
+			"the access/qop command."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET SECUREFOUNDER", _("SET \037channel\037 SECUREFOUNDER {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 {
  public:
-	CommandCSSASetSecureFounder() : CommandCSSetSecureFounder("chanserv/saset/securefounder")
+	CommandCSSASetSecureFounder(Module *creator) : CommandCSSetSecureFounder(creator, "chanserv/saset/securefounder", "chanserv/saset/securefounder")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET SECUREFOUNDER", _("SASET \002channel\002 SECUREFOUNDER {ON | OFF}"));
 	}
 };
 
@@ -88,31 +82,13 @@ class CSSetSecureFounder : public Module
 	CommandCSSASetSecureFounder commandcssasetsecurefounder;
 
  public:
-	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetSecureFounder(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetsecurefounder(this), commandcssasetsecurefounder(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetsecurefounder);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetsecurefounder);
-	}
-
-	~CSSetSecureFounder()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetsecurefounder);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetsecurefounder);
+		ModuleManager::RegisterService(&commandcssetsecurefounder);
+		ModuleManager::RegisterService(&commandcssasetsecurefounder);
 	}
 };
 

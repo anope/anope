@@ -12,179 +12,28 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "botserv.h"
-#include "chanserv.h"
-
-static BotInfo *BotServ = NULL;
-
-class BotServBotInfo : public BotInfo
-{
- public:
-	BotServBotInfo(const Anope::string &bnick, const Anope::string &user = "", const Anope::string &bhost = "", const Anope::string &real = "") : BotInfo(bnick, user, bhost, real) { }
-
-	void OnMessage(User *u, const Anope::string &message)
-	{
-		spacesepstream sep(message);
-		Anope::string command, param;
-		if (sep.GetToken(command) && sep.GetToken(param))
-		{
-			Command *c = FindCommand(this, command);
-			if (c && !c->HasFlag(CFLAG_STRIP_CHANNEL))
-			{
-				if (ircdproto->IsChannelValid(param))
-				{
-					ChannelInfo *ci = cs_findchan(param);
-					if (ci)
-					{
-						if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
-						{
-							u->SendMessage(this, CHAN_X_SUSPENDED, ci->name.c_str());
-							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
-							return;
-						}
-					}
-					else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
-					{
-						u->SendMessage(this, CHAN_X_NOT_REGISTERED, param.c_str());
-						return;
-					}
-				}
-				/* A user not giving a channel name for a param that should be a channel */
-				else
-				{
-					u->SendMessage(this, CHAN_X_INVALID, param.c_str());
-					return;
-				}
-			}
-		}
-
-		BotInfo::OnMessage(u, message);
-	}
-};
-
-class MyBotServService : public BotServService
-{
- public:
-	MyBotServService(Module *m) : BotServService(m) { }
-
-	BotInfo *Bot()
-	{
-		return BotServ;
-	}
-
-	UserData *GetUserData(User *u, Channel *c)
-	{
-		UserData *ud = NULL;
-		UserContainer *uc = c->FindUser(u);
-		if (uc != NULL)
-		{
-			if (!uc->GetExtPointer("bs_main_userdata", ud))
-			{
-				ud = new UserData();
-				uc->Extend("bs_main_userdata", new ExtensibleItemPointer<UserData>(ud));
-			}
-		}
-		return ud;
-	}
-
-	BanData *GetBanData(User *u, Channel *c)
-	{
-		std::map<Anope::string, BanData> bandatamap;
-		if (!c->GetExtRegular("bs_main_bandata", bandatamap));
-			c->Extend("bs_main_bandata", new ExtensibleItemRegular<std::map<Anope::string, BanData> >(bandatamap));
-		c->GetExtRegular("bs_main_bandata", bandatamap);
-
-		BanData *bd = &bandatamap[u->GetMask()];
-		if (bd->last_use && Anope::CurTime - bd->last_use > Config->BSKeepData)
-			bd->Clear();
-		bd->last_use = Anope::CurTime;
-		return bd;
-	}
-};
-
-class BanDataPurger : public CallBack
-{
- public:
-	BanDataPurger(Module *owner) : CallBack(owner, 300, Anope::CurTime, true) { }
-
-	void Tick(time_t)
-	{
-		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
-
-		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-		{
-			Channel *c = it->second;
-			
-			std::map<Anope::string, BanData> bandata;
-			if (c->GetExtRegular("bs_main_bandata", bandata))
-			{
-				for (std::map<Anope::string, BanData>::iterator it2 = bandata.begin(), it2_end = bandata.end(); it2 != it2_end;)
-				{
-					const Anope::string &user = it->first;
-					BanData *bd = &it2->second;
-					++it2;
-
-					if (Anope::CurTime - bd->last_use > Config->BSKeepData)
-					{
-						bandata.erase(user);
-						continue;
-					}
-				}
-
-				if (bandata.empty())
-					c->Shrink("bs_main_bandata");
-			}
-		}
-	}
-};
 
 class BotServCore : public Module
 {
-	MyBotServService mybotserv;
-	BanDataPurger bdpurger;
-
+	Channel *fantasy_channel;
  public:
-	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mybotserv(this), bdpurger(this)
+	BotServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), fantasy_channel(NULL)
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&this->mybotserv);
+		BotInfo *BotServ = findbot(Config->BotServ);
+		if (BotServ == NULL)
+			throw ModuleException("No bot named " + Config->BotServ);
 
-		BotServ = new BotServBotInfo(Config->s_BotServ, Config->ServiceUser, Config->ServiceHost, Config->desc_BotServ);
-		BotServ->SetFlag(BI_CORE);
+		Implementation i[] = { I_OnPrivmsg, I_OnPreCommand, I_OnJoinChannel, I_OnLeaveChannel,
+					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet };
+		ModuleManager::Attach(i, this, 7);
 
-		Implementation i[] = { I_OnPrivmsg };
-		ModuleManager::Attach(i, this, 1);
-
-		spacesepstream coreModules(Config->BotCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
 	}
 
-	~BotServCore()
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg)
 	{
-		for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
-		{
-			cit->second->Shrink("bs_main_userdata");
-			cit->second->Shrink("bs_main_bandata");
-		}
-
-		spacesepstream coreModules(Config->BotCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete BotServ;
-	}
-
-	void OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg)
-	{
-		if (!u || !ci || !ci->c || !ci->bi || msg.empty())
+		if (!u || !c || !c->ci || !c->ci->bi || msg.empty())
 			return;
 
 		/* Answer to ping if needed */
@@ -193,7 +42,7 @@ class BotServCore : public Module
 			Anope::string ctcp = msg;
 			ctcp.erase(ctcp.begin());
 			ctcp.erase(ctcp.length() - 1);
-			ircdproto->SendCTCP(ci->bi, u->nick, "%s", ctcp.c_str());
+			ircdproto->SendCTCP(c->ci->bi, u->nick, "%s", ctcp.c_str());
 		}
 
 
@@ -211,7 +60,7 @@ class BotServCore : public Module
 			return;
 
 		/* Fantaisist commands */
-		if (ci->botflags.HasFlag(BS_FANTASY) && realbuf[0] == Config->BSFantasyCharacter[0] && !was_action && chanserv)
+		if (c->ci->botflags.HasFlag(BS_FANTASY) && realbuf[0] == Config->BSFantasyCharacter[0] && !was_action)
 		{
 			/* Strip off the fantasy character */
 			realbuf.erase(realbuf.begin());
@@ -226,29 +75,128 @@ class BotServCore : public Module
 				rest = realbuf.substr(space + 1);
 			}
 
-			if (check_access(u, ci, CA_FANTASIA))
-			{
-				Command *cmd = FindCommand(chanserv->Bot(), command);
+			BotInfo *bi = findbot(Config->ChanServ);
+			if (bi == NULL)
+				bi = findbot(Config->BotServ);
+			if (bi == NULL || !bi->commands.count(command))
+				return;
 
-				/* Command exists and can be called by fantasy */
-				if (cmd && !cmd->HasFlag(CFLAG_DISABLE_FANTASY))
-				{
-					Anope::string params = rest;
-					/* Some commands don't need the channel name added.. eg !help */
-					if (!cmd->HasFlag(CFLAG_STRIP_CHANNEL))
-						params = ci->name + " " + params;
-					params = command + " " + params;
+			if (check_access(u, c->ci, CA_FANTASIA))
+			{
+
+				this->fantasy_channel = c;
+				bi->OnMessage(u, realbuf);
+				this->fantasy_channel = NULL;
 	
-					mod_run_cmd(chanserv->Bot(), u, ci, params);
-				}
-	
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, ci, rest));
+				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, c->ci, rest));
 			}
 			else
 			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, ci, rest));
+				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, c->ci, rest));
 			}
 		}
+	}
+
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
+	{
+		if (this->fantasy_channel != NULL)
+		{
+			if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
+				params.insert(params.begin(), this->fantasy_channel->name);
+			source.c = this->fantasy_channel;
+		}
+
+		return EVENT_CONTINUE;
+	}
+
+	void OnJoinChannel(User *user, Channel *c)
+	{
+		if (c->ci && c->ci->bi)
+		{
+			/**
+			 * We let the bot join even if it was an ignored user, as if we don't,
+			 * and the ignored user doesnt just leave, the bot will never
+			 * make it into the channel, leaving the channel botless even for
+			 * legit users - Rob
+			 **/
+			if (c->users.size() >= Config->BSMinUsers && !c->FindUser(c->ci->bi))
+				c->ci->bi->Join(c, &Config->BotModeList);
+			/* Only display the greet if the main uplink we're connected
+			 * to has synced, or we'll get greet-floods when the net
+			 * recovers from a netsplit. -GD
+			 */
+			if (c->FindUser(c->ci->bi) && c->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && check_access(user, c->ci, CA_GREET) && user->server->IsSynced())
+			{
+				ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
+				c->ci->bi->lastmsg = Anope::CurTime;
+			}
+		}
+	}
+
+	void OnLeaveChannel(User *u, Channel *c)
+	{
+		/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
+		if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
+			return;
+	
+		/* Channel is syncing from a netburst, don't destroy it as more users are probably wanting to join immediatly
+		 * We also don't part the bot here either, if necessary we will part it after the sync
+		 */
+		if (c->HasFlag(CH_SYNCING))
+			return;
+
+		/* Additionally, do not delete this channel if ChanServ/a BotServ bot is inhabiting it */
+		if (c->HasFlag(CH_INHABIT))
+			return;
+
+		if (c->ci && c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
+		{
+			bool persist = c->HasFlag(CH_PERSIST);
+			c->SetFlag(CH_PERSIST);
+			c->ci->bi->Part(c->ci->c);
+			if (!persist)
+				c->UnsetFlag(CH_PERSIST);
+		}
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->BotServ)
+			return;
+		source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
+			"It has been created for users that can't host or\n"
+			"configure a bot, or for use on networks that don't\n"
+			"allow user bots. Available commands are listed \n"
+			"below; to use them, type \002%s%s \037command\037\002. For\n"
+			"more information on a specific command, type\n"
+			"\002%s%s %s \037command\037\002.\n "),
+			Config->BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(),
+			Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(), source.command.c_str());
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->BotServ)
+			return;
+		source.Reply(_(" \n"
+			"Bot will join a channel whenever there is at least\n"
+			"\002%d\002 user(s) on it. Additionally, all %s commands\n"
+			"can be used if fantasy is enabled by prefixing the command\n"
+			"name with a %c."), Config->BSMinUsers, Config->ChanServ.c_str(), Config->BSFantasyCharacter[0]);
+	}
+
+	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)
+	{
+		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
+		{
+			BotInfo *bi = c->ci->bi;
+
+			Entry ban(CMODE_BAN, param);
+			if (ban.Matches(bi))
+				c->RemoveMode(bi, CMODE_BAN, param);
+		}
+
+		return EVENT_CONTINUE;
 	}
 };
 

@@ -12,24 +12,25 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetGreet : public Command
 {
  public:
-	CommandNSSetGreet(const Anope::string &spermission = "") : Command("GREET", 1, 2, spermission)
+	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Associate a greet message with your nickname"));
+		this->SetSyntax(_("\037message\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetGreet");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
-
-		Anope::string param = params.size() > 1 ? params[1] : "";
 
 		if (!param.empty())
 		{
@@ -42,14 +43,19 @@ class CommandNSSetGreet : public Command
 			source.Reply(_("Greet message for \002%s\002 unset."), nc->display.c_str());
 		}
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params.size() > 0 ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET GREET \037message\037\002\n"
-				" \n"
-				"Makes the given message the greet of your nickname, that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Makes the given message the greet of your nickname, that\n"
 				"will be displayed when joining a channel that has GREET\n"
 				"option enabled, provided that you have the necessary \n"
 				"access on it."));
@@ -60,15 +66,22 @@ class CommandNSSetGreet : public Command
 class CommandNSSASetGreet : public CommandNSSetGreet
 {
  public:
-	CommandNSSASetGreet() : CommandNSSetGreet("nickserv/saset/greet")
+	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1, "nickserv/saset/greet")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 \037message\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 GREET \037message\037\002\n"
-				" \n"
-				"Makes the given message the greet of the nickname, that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Makes the given message the greet of the nickname, that\n"
 				"will be displayed when joining a channel that has GREET\n"
 				"option enabled, provided that the user has the necessary \n"
 				"access on it."));
@@ -82,31 +95,13 @@ class NSSetGreet : public Module
 	CommandNSSASetGreet commandnssasetgreet;
 
  public:
-	NSSetGreet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetGreet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetgreet(this), commandnssasetgreet(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetgreet);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetgreet);
-	}
-
-	~NSSetGreet()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetgreet);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetgreet);
+		ModuleManager::RegisterService(&commandnssetgreet);
+		ModuleManager::RegisterService(&commandnssasetgreet);
 	}
 };
 

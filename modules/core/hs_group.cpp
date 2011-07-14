@@ -12,39 +12,51 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hostserv.h"
 
 class CommandHSGroup : public Command
 {
- public:
-	CommandHSGroup() : Command("GROUP", 0, 0)
+	void Sync(NickAlias *na)
 	{
-		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
+		if (!na || !na->hostinfo.HasVhost())
+			return;
+	
+		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
+		{
+			NickAlias *nick = *it;
+			nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
+		}
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+ public:
+	CommandHSGroup(Module *creator) : Command(creator, "hostserv/group", 0, 0)
+	{
+		this->SetDesc(_("Syncs the vhost for all nicks in a group"));
+		this->SetSyntax("");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
 		{
-			hostserv->Sync(na);
+			this->Sync(na);
 			if (!na->hostinfo.GetIdent().empty())
 				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
 			else
 				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
 		}
 		else
-			source.Reply(_(HOST_NOT_ASSIGNED));
+			source.Reply(HOST_NOT_ASSIGNED);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GROUP\002\n"
-				" \n"
-				"This command allows users to set the vhost of their\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command allows users to set the vhost of their\n"
 				"CURRENT nick to be the vhost for all nicks in the same\n"
 				"group."));
 		return true;
@@ -56,14 +68,12 @@ class HSGroup : public Module
 	CommandHSGroup commandhsgroup;
 
  public:
-	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	HSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandhsgroup(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!hostserv)
-			throw ModuleException("HostServ is not loaded!");
-
-		this->AddCommand(hostserv->Bot(), &commandhsgroup);
+		ModuleManager::RegisterService(&commandhsgroup);
 	}
 };
 

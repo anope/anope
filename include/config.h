@@ -342,7 +342,7 @@ class CoreExport ServerConfig
 
 	/** Below here is a list of variables which contain the config files values
 	 */
-	/* Host to connect to **/
+	/* Host to bind to */
 	Anope::string LocalHost;
 	/* List of uplink servers to try and connect to */
 	std::vector<Uplink *> Uplinks;
@@ -351,10 +351,6 @@ class CoreExport ServerConfig
 	Anope::string ServerName;
 	/* Our servers description */
 	Anope::string ServerDesc;
-	/* The username/ident of services clients */
-	Anope::string ServiceUser;
-	/* The hostname if services clients */
-	Anope::string ServiceHost;
 
 	/* Name of the network were on */
 	Anope::string NetworkName;
@@ -368,49 +364,19 @@ class CoreExport ServerConfig
 	/* Max length of passwords */
 	unsigned PassLen;
 
-	/* NickServ Name */
-	Anope::string s_NickServ;
-	/* ChanServ Name */
-	Anope::string s_ChanServ;
-	/* MemoServ Name */
-	Anope::string s_MemoServ;
-	/* BotServ Name */
-	Anope::string s_BotServ;
-	/* OperServ name */
-	Anope::string s_OperServ;
-	/* Global name */
-	Anope::string s_Global;
-	/* NickServs realname */
-	Anope::string desc_NickServ;
-	/* ChanServ realname */
-	Anope::string desc_ChanServ;
-	/* MemoServ realname */
-	Anope::string desc_MemoServ;
-	/* BotServ realname */
-	Anope::string desc_BotServ;
-	/* OperServ realname */
-	Anope::string desc_OperServ;
-	/* Global realname */
-	Anope::string desc_Global;
-
-	/* HostServ Name */
-	Anope::string s_HostServ;
-	/* HostServ realname */
-	Anope::string desc_HostServ;
-	/* Core HostServ modules */
-	Anope::string HostCoreModules;
-
 	/* Filename for the PID file */
 	Anope::string PIDFilename;
 	/* MOTD filename */
 	Anope::string MOTDFilename;
 
-	/* Core MemoServ Modules */
-	Anope::string MemoCoreModules;
-	/* Core OperServ Modules */
-	Anope::string OperCoreModules;
-	/* Core Global Modules */
-	Anope::string GlobalCoreModules;
+	Anope::string BotServ;
+	Anope::string ChanServ;
+	Anope::string Global;
+	Anope::string HostServ;
+	Anope::string NickServ;
+	Anope::string OperServ;
+	Anope::string MemoServ;
+
 	/* True if its ok to not be able to save backs */
 	bool NoBackupOkay;
 	/* Do password checking when new people register */

@@ -17,19 +17,20 @@
 class CommandMSStaff : public Command
 {
  public:
-	CommandMSStaff() : Command("STAFF", 1, 1, "memoserv/staff")
+	CommandMSStaff(Module *creator) : Command(creator, "memoserv/staff", 1, 1, "memoserv/staff")
 	{
 		this->SetDesc(_("Send a memo to all opers/admins"));
+		this->SetSyntax(_("\037memo-text\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &text = params[0];
 
 		if (readonly)
 		{
-			source.Reply(_(MEMO_SEND_DISABLED));
-			return MOD_CONT;
+			source.Reply(MEMO_SEND_DISABLED);
+			return;
 		}
 
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
@@ -40,21 +41,16 @@ class CommandMSStaff : public Command
 				memoserv->Send(source.u->nick, nc->display, text, true);
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002STAFF\002 \002memo-text\002\n"
-			" \n"
-			"Sends all services staff a memo containing \037memo-text\037."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sends all services staff a memo containing \037memo-text\037."));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "STAFF", _("STAFF \037memo-text\037"));
 	}
 };
 
@@ -63,14 +59,12 @@ class MSStaff : public Module
 	CommandMSStaff commandmsstaff;
 
  public:
-	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSStaff(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsstaff(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsstaff);
+		ModuleManager::RegisterService(&commandmsstaff);
 	}
 };
 

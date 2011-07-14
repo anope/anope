@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include "timers.h"
 #include "hashcomp.h"
-#include "commands.h"
 
 /* Cross OS compatibility macros */
 #ifdef _WIN32
@@ -187,8 +186,9 @@ class Version
 	int GetBuild() const;
 };
 
-/* Forward declaration of CallBack class for the Module class */
 class CallBack;
+class XLineManager;
+class CommandSource;
 
 /** Every module in Anope is actually a class.
  */
@@ -270,22 +270,6 @@ class CoreExport Module : public Extensible
 	 */
 	Version GetVersion() const;
 
-	/**
-	 * Add a module provided command to the given service.
-	 * @param bi The service to add the command to
-	 * @param c The command to add
-	 * @return MOD_ERR_OK on successfully adding the command
-	 */
-	int AddCommand(BotInfo *bi, Command *c);
-
-	/**
-	 * Delete a command from the service given.
-	 * @param bi The service to remove the command from
-	 * @param c Thec command to delete
-	 * @return returns MOD_ERR_OK on success
-	 */
-	int DelCommand(BotInfo *bi, Command *c);
-
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
 	 * @param target The user that has been kicked.
@@ -330,15 +314,17 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnUserNickChange(User *u, const Anope::string &oldnick) { }
 
-	/** Called immediatly when a user tries to run a command
-	 * @param u The user
-	 * @param bi The bot the command is being run from
-	 * @param command The command
-	 * @param message The parameters used for the command
-	 * @param ci If a tanasy command, the channel the comman was used on
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	/** Called when someone uses the generic/help command
+	 * @param source Command source
+	 * @param params Params
 	 */
-	virtual EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci) { return EVENT_CONTINUE; }
+	virtual void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) { }
+
+	/** Called when someone uses the generic/help command
+	 * @param source Command source
+	 * @param params Params
+	 */
+	virtual void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) { }
 
 	/** Called before a command is due to be executed.
 	 * @param source The source of the command
@@ -346,7 +332,7 @@ class CoreExport Module : public Extensible
 	 * @param params The parameters the user is sending
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
+	virtual EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called after a command has been executed.
 	 * @param source The source of the command
@@ -444,6 +430,13 @@ class CoreExport Module : public Extensible
 	 * @param msg The part reason
 	 */
 	virtual void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) { }
+
+	/** Called when a user leaves a channel.
+	 * From either parting, being kicked, or quitting/killed!
+	 * @param u The user
+	 * @param c The channel
+	 */
+	virtual void OnLeaveChannel(User *u, Channel *c) { }
 
 	/** Called before a user joins a channel
 	 * @param u The user
@@ -582,18 +575,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnDefconLevel(int level) { }
 
-	/** Called before an akill is added
-	 * @param ak The akill
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
-	 */
-	virtual EventReturn OnAddAkill(XLine *ak) { return EVENT_CONTINUE; }
-
-	/** Called before an akill is deleted
-	 * @param u The user removing the akill
-	 * @param ak The akill, can be NULL for all akills!
-	 */
-	virtual void OnDelAkill(User *u, XLine *ak) { }
-
 	/** Called after an exception has been added
 	 * @param ex The exception
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
@@ -607,18 +588,19 @@ class CoreExport Module : public Extensible
 	virtual void OnExceptionDel(User *u, Exception *ex) { }
 
 	/** Called before a XLine is added
-	 * @param sx The XLine
-	 * @param Type The type of XLine this is
+	 * @param u The user adding the XLine
+	 * @param x The XLine
+	 * @param xlm The xline manager it was added to
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
 	 */
-	virtual EventReturn OnAddXLine(XLine *x, XLineType Type) { return EVENT_CONTINUE; }
+	virtual EventReturn OnAddXLine(User *u, XLine *x, XLineManager *xlm) { return EVENT_CONTINUE; }
 
 	/** Called before a XLine is deleted
 	 * @param u The user deleting the XLine
-	 * @param sx The XLine, can be NULL for all XLines
-	 * @param Type The type of XLine this is
+	 * @param x The XLine, can be NULL for all XLines
+	 * @param xlm The xline manager it was deleted from
 	 */
-	virtual void OnDelXLine(User *u, XLine *x, XLineType Type) { }
+	virtual void OnDelXLine(User *u, XLine *x, XLineManager *xlm) { }
 
 	/** Called when a user is checked for whether they are a services oper
 	 * @param u The user
@@ -745,6 +727,14 @@ class CoreExport Module : public Extensible
 	 * @param ak The akick
 	 */
 	virtual void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) { }
+
+	/** Called after a user join a channel when we decide whether to kick them or not
+	 * @param u The user
+	 * @param ci The channel
+	 * @param kick Set to true to kick
+	 * @return EVENT_ALLOW to stop processing immediatly
+	 */
+	virtual EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick) { return EVENT_CONTINUE; }
 
 	/** Called when a user requests info for a channel
 	 * @param source The user requesting info
@@ -877,7 +867,7 @@ class CoreExport Module : public Extensible
 	 * @param password The password
 	 * @return EVENT_ALLOW to allow the password, EVENT_STOP to stop processing completely
 	 */
-	virtual EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) { return EVENT_CONTINUE; }
 
 	/** Called when a user does /ns update
 	 * @param u The user
@@ -1013,10 +1003,10 @@ class CoreExport Module : public Extensible
 
 	/** Called when we receive a PRIVMSG for a registered channel we are in
 	 * @param u The source of the message
-	 * @param ci The channel
+	 * @param c The channel
 	 * @param msg The message
 	 */
-	virtual void OnPrivmsg(User *u, ChannelInfo *ci, Anope::string &msg) { }
+	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg) { }
 
 	/** Called when any object is deleted
 	 * @param b The object
@@ -1041,7 +1031,7 @@ enum Implementation
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
-		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel,
+		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 		I_OnChanInfo, I_OnFindChan,
 
 		/* BotServ */
@@ -1056,7 +1046,7 @@ enum Implementation
 
 		/* Users */
 		I_OnUserConnect, I_OnUserNickChange, I_OnUserQuit, I_OnUserLogoff, I_OnPreJoinChannel,
-		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnFingerprint, I_OnUserAway,
+		I_OnJoinChannel, I_OnPrePartChannel, I_OnPartChannel, I_OnLeaveChannel, I_OnFingerprint, I_OnUserAway,
 
 		/* OperServ */
 		I_OnDefconLevel, I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
@@ -1070,8 +1060,8 @@ enum Implementation
 		I_OnModuleLoad, I_OnModuleUnload,
 
 		/* Other */
-		I_OnReload, I_OnNewServer, I_OnPreServerConnect, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect, I_OnPreCommandRun,
-		I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown,
+		I_OnReload, I_OnNewServer, I_OnPreServerConnect, I_OnServerConnect, I_OnPreUplinkSync, I_OnServerDisconnect,
+		I_OnPreHelp, I_OnPostHelp, I_OnPreCommand, I_OnPostCommand, I_OnRestart, I_OnShutdown,
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
@@ -1217,6 +1207,11 @@ class CoreExport ModuleManager
 	 * @return The services, or NULL
 	 */
 	static Service *GetService(const Anope::string &name);
+
+	/** Get the existing service key names
+	 * @return The keys
+	 */
+	static std::vector<Anope::string> GetServiceKeys();
 
  private:
 	/** Call the module_delete function to safely delete the module

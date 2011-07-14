@@ -12,18 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSStatus : public Command
 {
  public:
-	CommandNSStatus() : Command("STATUS", 0, 16)
+	CommandNSStatus(Module *creator) : Command(creator, "nickserv/status", 0, 16)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Returns the owner status of the given nickname"));
+		this->SetSyntax(_("\037nickname\037..."));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = !params.empty() ? params[0] : u->nick;
@@ -48,14 +48,14 @@ class CommandNSStatus : public Command
 				 */
 				source.Reply(_("STATUS %s %d %s"), nickbuf.c_str(), 1, u2->Account() ? u2->Account()->display.c_str() : "");
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002STATUS \037nickname\037...\002\n"
-				" \n"
-				"Returns whether the user using the given nickname is\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Returns whether the user using the given nickname is\n"
 				"recognized as the owner of the nickname. The response has\n"
 				"this format:\n"
 				" \n"
@@ -82,14 +82,12 @@ class NSStatus : public Module
 	CommandNSStatus commandnsstatus;
 
  public:
-	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsstatus(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsstatus);
+		ModuleManager::RegisterService(&commandnsstatus);
 	}
 };
 

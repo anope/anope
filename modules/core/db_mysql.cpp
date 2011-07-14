@@ -1,5 +1,4 @@
 #include "module.h"
-#include "operserv.h"
 #include "../extra/sql.h"
 #include "os_session.h"
 
@@ -53,18 +52,19 @@ static void WriteBotMetadata(const Anope::string &key, const Anope::string &data
 class CommandSQLSync : public Command
 {
  public:
-	CommandSQLSync() : Command("SQLSYNC", 0, 0, "operserv/sqlsync")
+	CommandSQLSync(Module *creator) : Command(creator, "SQLSYNC", 0, 0, "operserv/sqlsync")
 	{
 		this->SetDesc(_("Import your databases to SQL"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params);
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params);
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SQLSYNC\002\n"
-				" \n"
-				"This command syncs your databases with SQL. You should\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command syncs your databases with SQL. You should\n"
 				"only have to execute this command once, when you initially\n"
 				"import your databases into SQL."));
 		return true;
@@ -102,8 +102,9 @@ class DBMySQL : public Module
 			if (readonly && this->ro)
 			{
 				readonly = this->ro = false;
-				if (operserv)
-					ircdproto->SendGlobops(operserv->Bot(), "Found SQL again, going out of readonly mode...");
+				BotInfo *bi = findbot(Config->OperServ);
+				if (bi)
+					ircdproto->SendGlobops(bi, "Found SQL again, going out of readonly mode...");
 			}
 
 			SQL->Run(&sqlinterface, query);
@@ -112,18 +113,18 @@ class DBMySQL : public Module
 		{
 			if (Anope::CurTime - Config->UpdateTimeout > lastwarn)
 			{
-				if (operserv)
-					ircdproto->SendGlobops(operserv->Bot(), "Unable to locate SQL reference, is m_mysql loaded? Going to readonly...");
+				BotInfo *bi = findbot(Config->OperServ);
+				if (bi)
+					ircdproto->SendGlobops(bi, "Unable to locate SQL reference, is m_mysql loaded? Going to readonly...");
 				readonly = this->ro = true;
 				this->lastwarn = Anope::CurTime;
 			}
 		}
 	}
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("mysql/main"), SessionInterface("session")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), commandsqlsync(this), sqlinterface(this), SQL("mysql/main"), SessionInterface("session")
 	{
 		me = this;
-
 
 		this->lastwarn = 0;
 		this->ro = false;
@@ -133,8 +134,7 @@ class DBMySQL : public Module
 		};
 		ModuleManager::Attach(i, this, 2);
 
-		if (operserv)
-			this->AddCommand(operserv->Bot(), &commandsqlsync);
+		ModuleManager::RegisterService(&commandsqlsync);
 
 		if (CurrentUplink)
 			OnServerConnect();
@@ -161,12 +161,12 @@ class DBMySQL : public Module
 			/* MemoServ */
 			I_OnMemoSend, I_OnMemoDel,
 			/* OperServ */
-			I_OnAddAkill, I_OnDelAkill, I_OnExceptionAdd, I_OnExceptionDel,
+			I_OnExceptionAdd, I_OnExceptionDel,
 			I_OnAddXLine, I_OnDelXLine,
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 42);
+		ModuleManager::Attach(i, this, 41);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -546,44 +546,26 @@ class DBMySQL : public Module
 			}
 		}
 
-		if (SQLine)
+		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
 		{
-			query = "SELECT * FROM `anope_os_akills`";
+			XLineManager *xm = *it;
+
+			query = "SELECT * FROM `anope_os_xlines` WHERE `type` = @type";
+			query.setValue("type", Anope::string(xm->Type()));
 			r = SQL->RunQuery(query);
 			for (int i = 0; i < r.Rows(); ++i)
 			{
 				Anope::string user = r.Get(i, "user");
 				Anope::string host = r.Get(i, "host");
-				Anope::string by = r.Get(i, "by");
+				Anope::string by = r.Get(i, "xby");
 				Anope::string reason = r.Get(i, "reason");
 				time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : Anope::CurTime;
 				time_t expires = r.Get(i, "expires").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expires")) : Anope::CurTime;
 
-				XLine *x = SGLine->Add(user + "@" + host, by, expires, reason);
+				XLine *x = xm->Add(user + "@" + host, by, expires, reason);
 				if (x)
 					x->Created = seton;
 			}
-		}
-
-		query = "SELECT * FROM `anope_os_xlines`";
-		r = SQL->RunQuery(query);
-		for (int i = 0; i < r.Rows(); ++i)
-		{
-			Anope::string mask = r.Get(i, "mask");
-			Anope::string by = r.Get(i, "xby");
-			Anope::string reason = r.Get(i, "reason");
-			time_t seton = r.Get(i, "seton").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "seton")) : Anope::CurTime;
-			time_t expires = r.Get(i, "expire").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "expire")) : Anope::CurTime;
-
-			XLine *x = NULL;
-			if (SNLine && r.Get(i, "type").equals_cs("SNLINE"))
-				x = SNLine->Add(mask, by, expires, reason);
-			else if (SQLine && r.Get(i, "type").equals_cs("SQLINE"))
-				x = SQLine->Add(mask, by, expires, reason);
-			else if (SZLine && r.Get(i, "type").equals_cs("SZLINE"))
-				x = SZLine->Add(mask, by, expires, reason);
-			if (x)
-				x->Created = seton;
 		}
 
 		query = "SELECT * FROM `anope_os_exceptions`";
@@ -652,10 +634,6 @@ class DBMySQL : public Module
 		query = "INSERT INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, snlines_count, sqlines_count, szlines_count) VALUES(@maxusercnt, @maxusertime, @akills_count, @snlines_count, @sqlines_count, @szlines_count)";
 		query.setValue("maxusercnt", maxusercnt);
 		query.setValue("maxusertime", maxusertime);
-		query.setValue("akills_count", SGLine ? SGLine->GetCount() : 0);
-		query.setValue("snlines_count", SQLine ? SQLine->GetCount() : 0);
-		query.setValue("sqlines_count", SNLine ? SNLine->GetCount() : 0);
-		query.setValue("szlines_count", SZLine ? SZLine->GetCount() : 0);
 		this->RunQuery(query);
 
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
@@ -678,10 +656,12 @@ class DBMySQL : public Module
 
 		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
+			if (it->second->HasFlag(BI_CONF))
+				continue;
+
 			CurBot = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteBotMetadata, CurBot));
 
-			/* This is for the core bots, bots added by users are already handled by an event */
 			query = "INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(@nick, @user, @host, @rname, @flags, @created, @chancount) ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)";
 			query.setValue("nick", CurBot->nick);
 			query.setValue("user", CurBot->GetIdent());
@@ -703,215 +683,202 @@ class DBMySQL : public Module
 	void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		BotInfo *service = command->service;
-		ChannelInfo *ci = source.ci;
 
-		if (service->nick == Config->s_NickServ)
+		if (command->name.find("nickserv/set/") == 0 || command->name.find("nickserv/saset/") == 0)
 		{
-			if (u->Account() && ((command->name.equals_ci("SET") && !params.empty()) || (command->name.equals_ci("SASET") && u->HasCommand("nickserv/saset") && params.size() > 1)))
+			NickAlias *na = findnick(command->name.find("nickserv/set/") == 0 ? source.u->nick : params[1]);
+			if (!na)
+				return;
+
+			if (command->name == "nickserv/set/password" || command->name == "nickserv/saset/password")
 			{
-				Anope::string cmd = (command->name.equals_ci("SET") ? params[0] : params[1]);
-				NickCore *nc = (command->name.equals_ci("SET") ? u->Account() : findcore(params[0]));
-				if (!nc)
-					return;
-				if (cmd.equals_ci("PASSWORD") && params.size() > 1)
-				{
-					SQLQuery query("UPDATE `anope_ns_core` SET `pass` = @pass WHERE `display` = @display");
-					query.setValue("pass", nc->pass);
-					query.setValue("display", nc->display);
-					this->RunQuery(query);
-				}
-				else if (cmd.equals_ci("LANGUAGE") && params.size() > 1)
-				{
-					SQLQuery query("UPDATE `anope_ns_core` SET `language` = @language WHERE `display` = @display");
-					query.setValue("language", nc->language);
-					query.setValue("display", nc->display);
-					this->RunQuery(query);
-				}
-				else if (cmd.equals_ci("EMAIL"))
-				{
-					SQLQuery query("UPDATE `anope_ns_core` SET `email` = @email WHERE `display` = @display");
-					query.setValue("email", nc->email);
-					query.setValue("display", nc->display);
-					this->RunQuery(query);
-				}
-				else if (cmd.equals_ci("GREET"))
-				{
-					SQLQuery query("UPDATE `anope_ns_core` SET `greet` = @greet WHERE `display` = @display");
-					query.setValue("greet", nc->greet);
-					query.setValue("display", nc->display);
-					this->RunQuery(query);
-				}
-				else if (cmd.equals_ci("KILL") || cmd.equals_ci("SECURE") || cmd.equals_ci("PRIVATE") || cmd.equals_ci("MSG") || cmd.equals_ci("HIDE") || cmd.equals_ci("AUTOOP"))
-				{
-					SQLQuery query("UPDATE `anope_ns_core` SET `flags` = @flags WHERE `display` = @display");
-					query.setValue("flags", ToString(nc->ToString()));
-					query.setValue("display", nc->display);
-					this->RunQuery(query);
-				}
+				SQLQuery query("UPDATE `anope_ns_core` SET `pass` = @pass WHERE `display` = @display");
+				query.setValue("pass", na->nc->pass);
+				query.setValue("display", na->nc->display);
+				this->RunQuery(query);
+			}
+			else if (command->name == "nickserv/set/language" || command->name == "nickserv/saset/language")
+			{
+				SQLQuery query("UPDATE `anope_ns_core` SET `language` = @language WHERE `display` = @display");
+				query.setValue("language", na->nc->language);
+				query.setValue("display", na->nc->display);
+				this->RunQuery(query);
+			}
+			else if (command->name == "nickserv/set/email" || command->name == "nickserv/saset/email")
+			{
+				SQLQuery query("UPDATE `anope_ns_core` SET `email` = @email WHERE `display` = @display");
+				query.setValue("email", na->nc->email);
+				query.setValue("display", na->nc->display);
+				this->RunQuery(query);
+			}
+			else if (command->name == "nickserv/set/greet" || command->name == "nickserv/saset/greet")
+			{
+				SQLQuery query("UPDATE `anope_ns_core` SET `greet` = @greet WHERE `display` = @display");
+				query.setValue("greet", na->nc->greet);
+				query.setValue("display", na->nc->display);
+				this->RunQuery(query);
+			}
+			else
+			{
+				SQLQuery query("UPDATE `anope_ns_core` SET `flags` = @flags WHERE `display` = @display");
+				query.setValue("flags", ToString(na->nc->ToString()));
+				query.setValue("display", na->nc->display);
+				this->RunQuery(query);
 			}
 		}
-		else if (service->nick == Config->s_ChanServ)
+		else if (command->name.find("chanserv/set") == 0 || command->name.find("chanserv/saset") == 0)
 		{
-			if (command->name.equals_ci("SET") && u->Account() && params.size() > 1)
+			ChannelInfo *ci = params.size() > 0 ? cs_findchan(params[0]) : NULL;
+			if (!ci)
+				return;
+
+			if (command->name == "chanserv/set/founder" || command->name == "chanserv/saset/founder")
 			{
-				if (!ci)
-					return;
-				if (!u->HasPriv("chanserv/set") && check_access(u, ci, CA_SET))
-					return;
-				if (params[1].equals_ci("FOUNDER"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `founder` = @founder WHERE `name` = @name");
-					query.setValue("founder", ci->GetFounder() ? ci->GetFounder()->display : "");
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
-				else if (params[1].equals_ci("SUCCESSOR"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `successor` = @successor WHERE `name` = @name");
-					query.setValue("successor", ci->successor ? ci->successor->display : "");
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
-				else if (params[1].equals_ci("DESC"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `descr` = @descr WHERE `name` = @name");
-					query.setValue("descr", ci->desc);
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
-				else if (params[1].equals_ci("BANTYPE"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `bantype` = @bantype WHERE `name` = @name");
-					query.setValue("bantype", ci->bantype);
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
-				else if (params[1].equals_ci("KEEPTOPIC") || params[1].equals_ci("TOPICLOCK") || params[1].equals_ci("PRIVATE") || params[1].equals_ci("SECUREOPS") || params[1].equals_ci("SECUREFOUNDER") || params[1].equals_ci("RESTRICTED") || params[1].equals_ci("SECURE") || params[1].equals_ci("SIGNKICK") || params[1].equals_ci("OPNOTICE") || params[1].equals_ci("XOP") || params[1].equals_ci("PEACE") || params[1].equals_ci("PERSIST") || params[1].equals_ci("NOEXPIRE"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `flags` = @flags WHERE `name` = @name");
-					query.setValue("flags", ToString(ci->ToString()));
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
+				SQLQuery query("UPDATE `anope_cs_info` SET `founder` = @founder WHERE `name` = @name");
+				query.setValue("founder", ci->GetFounder() ? ci->GetFounder()->display : "");
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
+			}
+			else if (command->name == "chanserv/set/successor" || command->name == "chanserv/saset/successor")
+			{
+				SQLQuery query("UPDATE `anope_cs_info` SET `successor` = @successor WHERE `name` = @name");
+				query.setValue("successor", ci->successor ? ci->successor->display : "");
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
+			}
+			else if (command->name == "chanserv/set/desc" || command->name == "chanserv/saset/desc")
+			{
+				SQLQuery query("UPDATE `anope_cs_info` SET `descr` = @descr WHERE `name` = @name");
+				query.setValue("descr", ci->desc);
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
+			}
+			else if (command->name == "chanserv/set/bantype" || command->name == "chanserv/saset/bantype")
+			{
+				SQLQuery query("UPDATE `anope_cs_info` SET `bantype` = @bantype WHERE `name` = @name");
+				query.setValue("bantype", ci->bantype);
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
+			}
+			else
+			{
+				SQLQuery query("UPDATE `anope_cs_info` SET `flags` = @flags WHERE `name` = @name");
+				query.setValue("flags", ToString(ci->ToString()));
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
 			}
 		}
-		else if (service->nick == Config->s_BotServ)
+		else if (command->name == "botserv/kick" && params.size() > 2)
 		{
-			if (command->name.equals_ci("KICK") && params.size() > 2)
+			ChannelInfo *ci = cs_findchan(params[0]);
+			if (!ci)
+				return;
+			if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
+				return;
+			if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
 			{
-				if (!ci)
-					return;
-				if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
-					return;
-				if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
+				if (params[2].equals_ci("ON") || params[2].equals_ci("OFF"))
 				{
-					if (params[2].equals_ci("ON") || params[2].equals_ci("OFF"))
+					for (int i = 0; i < TTB_SIZE; ++i)
 					{
-						for (int i = 0; i < TTB_SIZE; ++i)
-						{
-							SQLQuery query("INSERT INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES(@channel, @ttb_id, @value) ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)");
-							query.setValue("channel", ci->name);
-							query.setValue("ttb_id", i);
-							query.setValue("value", ci->ttb[i]);
-							this->RunQuery(query);
-						}
+						SQLQuery query("INSERT INTO `anope_cs_ttb` (channel, ttb_id, value) VALUES(@channel, @ttb_id, @value) ON DUPLICATE KEY UPDATE channel=VALUES(channel), ttb_id=VALUES(ttb_id), value=VALUES(value)");
+						query.setValue("channel", ci->name);
+						query.setValue("ttb_id", i);
+						query.setValue("value", ci->ttb[i]);
+						this->RunQuery(query);
+					}
 
-						{
-							SQLQuery query("UPDATE `anope_cs_info` SET `botflags` = @botflags WHERE `name` = @name");
-							query.setValue("botflags", ToString(ci->botflags.ToString()));
-							query.setValue("name", ci->name);
-							this->RunQuery(query);
-						}
+					{
+						SQLQuery query("UPDATE `anope_cs_info` SET `botflags` = @botflags WHERE `name` = @name");
+						query.setValue("botflags", ToString(ci->botflags.ToString()));
+						query.setValue("name", ci->name);
+						this->RunQuery(query);
+					}
 
-						if (params[1].equals_ci("CAPS"))
-						{
-							SQLQuery query("UPDATE `anope_cs_info` SET `capsmin` = @capsmin, `capspercent` = @capspercent WHERE `name` = @name");
-							query.setValue("capsmin", ci->capsmin);
-							query.setValue("capspercent", ci->capspercent);
-							query.setValue("name", ci->name);
-							this->RunQuery(query);
-						}
-
-						else if (params[1].equals_ci("FLOOD"))
-						{
-							SQLQuery query("UPDATE `anope_cs_info` SET `floodlines` = @floodlines, `floodsecs` = @floodsecs WHERE `name` = @name");
-							query.setValue("floodlines", ci->floodlines);
-							query.setValue("floodsecs", ci->floodsecs);
-							query.setValue("name", ci->name);
-							this->RunQuery(query);
-						}
-						else if (params[1].equals_ci("REPEAT"))
-						{
-							SQLQuery query("UPDATE `anope_cs_info` SET `repeattimes` = @ WHERE `name` = @");
-							query.setValue("repeattimes", ci->repeattimes);
-							query.setValue("name", ci->name);
-							this->RunQuery(query);
-						}
+					if (params[1].equals_ci("CAPS"))
+					{
+						SQLQuery query("UPDATE `anope_cs_info` SET `capsmin` = @capsmin, `capspercent` = @capspercent WHERE `name` = @name");
+						query.setValue("capsmin", ci->capsmin);
+						query.setValue("capspercent", ci->capspercent);
+						query.setValue("name", ci->name);
+						this->RunQuery(query);
+					}
+					else if (params[1].equals_ci("FLOOD"))
+					{
+						SQLQuery query("UPDATE `anope_cs_info` SET `floodlines` = @floodlines, `floodsecs` = @floodsecs WHERE `name` = @name");
+						query.setValue("floodlines", ci->floodlines);
+						query.setValue("floodsecs", ci->floodsecs);
+						query.setValue("name", ci->name);
+						this->RunQuery(query);
+					}
+					else if (params[1].equals_ci("REPEAT"))
+					{
+						SQLQuery query("UPDATE `anope_cs_info` SET `repeattimes` = @ WHERE `name` = @");
+						query.setValue("repeattimes", ci->repeattimes);
+						query.setValue("name", ci->name);
+						this->RunQuery(query);
 					}
 				}
 			}
-			else if (command->name.equals_ci("SET") && params.size() > 2)
+		}
+		else if (command->name == "botserv/set" && params.size() > 1)
+		{
+			ChannelInfo *ci = cs_findchan(params[0]);
+			if (ci && !check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
+				return;
+			BotInfo *bi = NULL;
+			if (!ci)
+				bi = findbot(params[0]);
+			if (bi && params[1].equals_ci("PRIVATE") && u->HasPriv("botserv/set/private"))
 			{
-				if (ci && !check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
-					return;
-				BotInfo *bi = NULL;
-				if (!ci)
-					bi = findbot(params[0]);
-				if (bi && params[1].equals_ci("PRIVATE") && u->HasPriv("botserv/set/private"))
-				{
-					SQLQuery query("UPDATE `anope_bs_core` SET `flags` = @ WHERE `nick` = @");
-					query.setValue("flags", ToString(bi->ToString()));
-					query.setValue("nick", bi->nick);
-					this->RunQuery(query);
-				}
-				else if (!ci)
-					return;
-				else if (params[1].equals_ci("DONTKICKOPS") || params[1].equals_ci("DONTKICKVOICES") || params[1].equals_ci("FANTASY") || params[1].equals_ci("GREET") || params[1].equals_ci("SYMBIOSIS") || params[1].equals_ci("NOBOT"))
-				{
-					SQLQuery query("UPDATE `anope_cs_info` SET `botflags` = @ WHERE `name` = @");
-					query.setValue("botflags", ToString(ci->botflags.ToString()));
-					query.setValue("name", ci->name);
-					this->RunQuery(query);
-				}
+				SQLQuery query("UPDATE `anope_bs_core` SET `flags` = @ WHERE `nick` = @");
+				query.setValue("flags", ToString(bi->ToString()));
+				query.setValue("nick", bi->nick);
+				this->RunQuery(query);
+			}
+			else if (!ci)
+				return;
+			else if (params[1].equals_ci("DONTKICKOPS") || params[1].equals_ci("DONTKICKVOICES") || params[1].equals_ci("FANTASY") || params[1].equals_ci("GREET") || params[1].equals_ci("SYMBIOSIS") || params[1].equals_ci("NOBOT"))
+			{
+				SQLQuery query("UPDATE `anope_cs_info` SET `botflags` = @ WHERE `name` = @");
+				query.setValue("botflags", ToString(ci->botflags.ToString()));
+				query.setValue("name", ci->name);
+				this->RunQuery(query);
 			}
 		}
-		else if (service->nick == Config->s_MemoServ)
+		else if (command->name == "memoserv/ignore" && params.size() > 0)
 		{
-			if (command->name.equals_ci("IGNORE") && params.size() > 0)
+			Anope::string target = params[0];
+			NickCore *nc = NULL;
+			ChannelInfo *ci = NULL;
+			if (target[0] != '#')
 			{
-				Anope::string target = params[0];
-				NickCore *nc = NULL;
-				ci = NULL;
-				if (target[0] != '#')
-				{
-					target = u->nick;
-					nc = u->Account();
-					if (!nc)
-						return;
-				}
-				else
-				{
-					ci = cs_findchan(target);
-					if (!ci || !check_access(u, ci, CA_MEMO))
-						return;
-				}
+				target = u->nick;
+				nc = u->Account();
+				if (!nc)
+					return;
+			}
+			else
+			{
+				ci = cs_findchan(target);
+				if (!ci || !check_access(u, ci, CA_MEMO))
+					return;
+			}
 
-				MemoInfo *mi = ci ? &ci->memos : &nc->memos;
-				Anope::string table = ci ? "anope_cs_info_metadata" : "anope_ns_core_metadata";
-				Anope::string ename = ci ? "channel" : "nick";
+			MemoInfo *mi = ci ? &ci->memos : &nc->memos;
+			Anope::string table = ci ? "anope_cs_info_metadata" : "anope_ns_core_metadata";
+			Anope::string ename = ci ? "channel" : "nick";
 
-				SQLQuery query("DELETE FROM `" + table + "` WHERE `" + ename + "` = @target AND `name` = 'MEMO_IGNORE'");
-				query.setValue("target", target);
+			SQLQuery query("DELETE FROM `" + table + "` WHERE `" + ename + "` = @target AND `name` = 'MEMO_IGNORE'");
+			query.setValue("target", target);
+			this->RunQuery(query);
+
+			query = "INSERT INTO `" + table + "` VALUES(" + ename + ", name, value) (@target, 'MEMO_IGNORE, @ignore)";
+			query.setValue("target", target);
+			for (unsigned j = 0; j < mi->ignores.size(); ++j)
+			{
+				query.setValue("ignore", mi->ignores[j]);
 				this->RunQuery(query);
-
-				query = "INSERT INTO `" + table + "` VALUES(" + ename + ", name, value) (@target, 'MEMO_IGNORE, @ignore)";
-				query.setValue("target", target);
-				for (unsigned j = 0; j < mi->ignores.size(); ++j)
-				{
-					query.setValue("ignore", mi->ignores[j]);
-					this->RunQuery(query);
-				}
 			}
 		}
 	}
@@ -1334,34 +1301,6 @@ class DBMySQL : public Module
 		this->RunQuery(query);
 	}
 
-	EventReturn OnAddAkill(XLine *ak)
-	{
-		SQLQuery query("INSERT INTO `anope_os_akills` (user, host, xby, reason, seton, expire) VALUES(@user, @host, @xby, @reason, @seton, @expire)");
-		query.setValue("user", ak->GetUser());
-		query.setValue("host", ak->GetHost());
-		query.setValue("xby", ak->By);
-		query.setValue("reason", ak->Reason);
-		query.setValue("seton", ak->Created);
-		query.setValue("expire", ak->Expires);
-		this->RunQuery(query);
-		return EVENT_CONTINUE;
-	}
-
-	void OnDelAkill(User *, XLine *ak)
-	{
-		SQLQuery query;
-
-		if (ak)
-		{
-			query = "DELETE FROM `anope_os_akills` WHERE `host` = @host";
-			query.setValue("host", ak->GetHost());
-		}
-		else
-			query = "TRUNCATE TABLE `anope_os_akills`";
-
-		this->RunQuery(query);
-	}
-
 	EventReturn OnExceptionAdd(Exception *ex)
 	{
 		SQLQuery query("INSERT INTO `anope_os_exceptions` (mask, slimit, who, reason, time, expires) VALUES(@mask, @slimit, @who, @reason, @time, @expires)");
@@ -1381,10 +1320,10 @@ class DBMySQL : public Module
 		this->RunQuery(query);
 	}
 
-	EventReturn OnAddXLine(XLine *x, XLineType Type)
+	EventReturn OnAddXLine(XLine *x, XLineManager *xlm)
 	{
 		SQLQuery query("INSERT INTO `anope_os_xlines` (type, mask, xby, reason, seton, expire) VALUES(@type, @mask, @xby, @reason, @seton, @expire)");
-		query.setValue("type", Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE"));
+		query.setValue("type", Anope::string(xlm->Type()));
 		query.setValue("mask", x->Mask);
 		query.setValue("xby", x->By);
 		query.setValue("reason", x->Reason);
@@ -1394,7 +1333,7 @@ class DBMySQL : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelXLine(User *, XLine *x, XLineType Type)
+	void OnDelXLine(User *, XLine *x, XLineManager *xlm)
 	{
 		SQLQuery query;
 
@@ -1402,12 +1341,12 @@ class DBMySQL : public Module
 		{
 			query = "DELETE FROM `anope_os_xlines` WHERE `mask` = @mask AND `type` = @type";
 			query.setValue("mask", x->Mask);
-			query.setValue("type", Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE"));
+			query.setValue("type", Anope::string(xlm->Type()));
 		}
 		else
 		{
 			query = "DELETE FROM `anope_os_xlines` WHERE `type` = @type";
-			query.setValue("type", Type == X_SNLINE ? "SNLINE" : (Type == X_SQLINE ? "SQLINE" : "SZLINE"));
+			query.setValue("type", Anope::string(xlm->Type()));
 		}
 
 		this->RunQuery(query);
@@ -1602,32 +1541,20 @@ static void SaveDatabases()
 		}
 	}
 
-	if (SGLine)
-		for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
-			me->OnAddAkill(SGLine->GetEntry(i));
-
-	if (SZLine)
-		for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(SZLine->GetEntry(i), X_SZLINE);
-
-	if (SQLine)
-		for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(SQLine->GetEntry(i), X_SQLINE);
-
-	if (SNLine)
-		for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
-			me->OnAddXLine(SNLine->GetEntry(i), X_SNLINE);
+	for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
+		for (unsigned i = 0, end = (*it)->GetCount(); i < end; ++i)
+			me->OnAddXLine((*it)->GetEntry(i), *it);
 
 	if (me->SessionInterface)
 		for (SessionService::ExceptionVector::iterator it = me->SessionInterface->GetExceptions().begin(); it != me->SessionInterface->GetExceptions().end(); ++it)
 			me->OnExceptionAdd(*it);
 }
 
-CommandReturn CommandSQLSync::Execute(CommandSource &source, const std::vector<Anope::string> &params)
+void CommandSQLSync::Execute(CommandSource &source, const std::vector<Anope::string> &params)
 {
 	SaveDatabases();
 	source.Reply(_("Updating MySQL."));
-	return MOD_CONT;
+	return;
 }
 
 MODULE_INIT(DBMySQL)

@@ -77,7 +77,7 @@ class CoreExport User : public Extensible
 	 * @param shost The hostname of the user
 	 * @param suid The unique identifier of the user.
 	 */
-	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid);
+	User(const Anope::string &snick, const Anope::string &sident, const Anope::string &shost, const Anope::string &suid = "");
 
 	/** Destroy a user.
 	 */

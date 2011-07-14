@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 /**
  * Count servers connected to server s
@@ -35,31 +34,35 @@ static int stats_count_servers(Server *s)
 
 class CommandOSStats : public Command
 {
+	service_reference<XLineManager> akills, snlines, sqlines, szlines;
  private:
-	CommandReturn DoStatsAkill(CommandSource &source)
+	void DoStatsAkill(CommandSource &source)
 	{
 		int timeout;
-		/* AKILLs */
-		source.Reply(_("Current number of AKILLs: \002%d\002"), SGLine->GetCount());
-		timeout = Config->AutokillExpiry + 59;
-		if (timeout >= 172800)
-			source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
-		else if (timeout >= 86400)
-			source.Reply(_("Default AKILL expiry time: \0021 day\002"));
-		else if (timeout >= 7200)
-			source.Reply(_("Default AKILL expiry time: \002%d hours\002"), timeout / 3600);
-		else if (timeout >= 3600)
-			source.Reply(_("Default AKILL expiry time: \0021 hour\002"));
-		else if (timeout >= 120)
-			source.Reply(_("Default AKILL expiry time: \002%d minutes\002"), timeout / 60);
-		else if (timeout >= 60)
-			source.Reply(_("Default AKILL expiry time: \0021 minute\002"));
-		else
-			source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
-		if (ircd->snline)
+		if (akills)
+		{
+			/* AKILLs */
+			source.Reply(_("Current number of AKILLs: \002%d\002"), akills->GetCount());
+			timeout = Config->AutokillExpiry + 59;
+			if (timeout >= 172800)
+				source.Reply(_("Default AKILL expiry time: \002%d days\002"), timeout / 86400);
+			else if (timeout >= 86400)
+				source.Reply(_("Default AKILL expiry time: \0021 day\002"));
+			else if (timeout >= 7200)
+				source.Reply(_("Default AKILL expiry time: \002%d hours\002"), timeout / 3600);
+			else if (timeout >= 3600)
+				source.Reply(_("Default AKILL expiry time: \0021 hour\002"));
+			else if (timeout >= 120)
+				source.Reply(_("Default AKILL expiry time: \002%d minutes\002"), timeout / 60);
+			else if (timeout >= 60)
+				source.Reply(_("Default AKILL expiry time: \0021 minute\002"));
+			else
+				source.Reply(_("Default AKILL expiry time: \002No expiration\002"));
+		}
+		if (ircd->snline && snlines)
 		{
 			/* SNLINEs */
-			source.Reply(_("Current number of SNLINEs: \002%d\002"), SNLine->GetCount());
+			source.Reply(_("Current number of SNLINEs: \002%d\002"), snlines->GetCount());
 			timeout = Config->SNLineExpiry + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SNLINE expiry time: \002%d days\002"), timeout / 86400);
@@ -76,10 +79,10 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SNLINE expiry time: \002No expiration\002"));
 		}
-		if (ircd->sqline)
+		if (ircd->sqline && sqlines)
 		{
 			/* SQLINEs */
-			source.Reply(_("Current number of SQLINEs: \002%d\002"), SQLine->GetCount());
+			source.Reply(_("Current number of SQLINEs: \002%d\002"), sqlines->GetCount());
 			timeout = Config->SQLineExpiry + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SQLINE expiry time: \002%d days\002"), timeout / 86400);
@@ -96,10 +99,10 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SQLINE expiry time: \002No expiration\002"));
 		}
-		if (ircd->szline)
+		if (ircd->szline && szlines)
 		{
 			/* SZLINEs */
-			source.Reply(_("Current number of SZLINEs: \002%d\002"), SZLine->GetCount());
+			source.Reply(_("Current number of SZLINEs: \002%d\002"), szlines->GetCount());
 			timeout = Config->SZLineExpiry + 59;
 			if (timeout >= 172800)
 				source.Reply(_("Default SZLINE expiry time: \002%d days\002"), timeout / 86400);
@@ -116,27 +119,27 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SZLINE expiry time: \002No expiration\002"));
 		}
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoStatsReset(CommandSource &source)
+	void DoStatsReset(CommandSource &source)
 	{
 		maxusercnt = usercnt;
 		source.Reply(_("Statistics reset."));
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoStatsUptime(CommandSource &source)
+	void DoStatsUptime(CommandSource &source)
 	{
 		time_t uptime = Anope::CurTime - start_time;
 		source.Reply(_("Current users: \002%d\002 (\002%d\002 ops)"), usercnt, opcnt);
 		source.Reply(_("Maximum users: \002%d\002 (%s)"), maxusercnt, do_strftime(maxusertime).c_str());
 		source.Reply(_("Services up %s"), duration(uptime).c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoStatsUplink(CommandSource &source)
+	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
 
@@ -150,16 +153,18 @@ class CommandOSStats : public Command
 		source.Reply(_("Uplink server: %s"), Me->GetLinks().front()->GetName().c_str());
 		source.Reply(_("Uplink capab: %s"), buf.c_str());
 		source.Reply(_("Servers found: %d"), stats_count_servers(Me->GetLinks().front()));
-		return MOD_CONT;
+		return;
 	}
 
  public:
-	CommandOSStats() : Command("STATS", 0, 1, "operserv/stats")
+	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1, "operserv/stats"),
+		akills("xlinemanager/sgline"), snlines("xlinemanager/snline"), sqlines("xlinemanager/sqline"), szlines("xlinemanager/szline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
+		this->SetSyntax(_("[AKILL | ALL | RESET | UPLINK]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
@@ -177,14 +182,14 @@ class CommandOSStats : public Command
 			else if (!extra.equals_ci("UPLINK"))
 				source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002STATS [AKILL | ALL | RESET | UPLINK]\002\n"
-				" \n"
-				"Without any option, shows the current number of users and\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Without any option, shows the current number of users and\n"
 				"IRCops online (excluding Services), the highest number of\n"
 				"users online since Services was started, and the length of\n"
 				"time Services has been running.\n"
@@ -209,14 +214,12 @@ class OSStats : public Module
 	CommandOSStats commandosstats;
 
  public:
-	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosstats(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosstats);
+		ModuleManager::RegisterService(&commandosstats);
 	}
 };
 

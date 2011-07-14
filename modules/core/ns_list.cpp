@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSList : public Command
 {
  public:
-	CommandNSList() : Command("LIST", 1, 2)
+	CommandNSList(Module *creator) : Command(creator, "nickserv/list", 1, 2)
 	{
 		this->SetDesc(_("List all registered nicknames that match a given pattern"));
+		this->SetSyntax(_("\037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -38,8 +38,8 @@ class CommandNSList : public Command
 
 		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (pattern[0] == '#')
@@ -54,8 +54,8 @@ class CommandNSList : public Command
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(_(LIST_INCORRECT_RANGE));
-				return MOD_CONT;
+				source.Reply(LIST_INCORRECT_RANGE);
+				return;
 			}
 
 			pattern = "*";
@@ -80,7 +80,7 @@ class CommandNSList : public Command
 
 		mync = u->Account();
 
-		source.Reply(_(LIST_HEADER), pattern.c_str());
+		source.Reply(LIST_HEADER, pattern.c_str());
 		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			NickAlias *na = it->second;
@@ -123,67 +123,38 @@ class CommandNSList : public Command
 			
 
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		User *u = source.u;
-		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002LIST \037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]\002\n"
-					" \n"
-					"Lists all registered nicknames which match the given\n"
-					"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
-					"option set will only be displayed to Services Operators.  Nicks\n"
-					"with the \002NOEXPIRE\002 option set will have a \002!\002 appended to\n"
-					"the nickname for Services Operators.\n"
-					" \n"
-					"If the SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
-					"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
-					"NOEXPIRE flag set will be displayed. If multiple options are\n"
-					"given, all nicks matching at least one option will be displayed.\n"
-					"These options are limited to \037Services Operators\037.  \n"
-					"Examples:\n"
-					" \n"
-					"    \002LIST *!joeuser@foo.com\002\n"
-					"        Lists all registered nicks owned by joeuser@foo.com.\n"
-					" \n"
-					"    \002LIST *Bot*!*@*\002\n"
-					"        Lists all registered nicks with \002Bot\002 in their\n"
-					"        names (case insensitive).\n"
-					" \n"
-					"    \002LIST * NOEXPIRE\002\n"
-					"        Lists all registered nicks which have been set to\n"));
-		else
-			source.Reply(_("Syntax: \002LIST \037pattern\037\002\n"
-					" \n"
-					"Lists all registered nicknames which match the given\n"
-					"pattern, in \037nick!user@host\037 format.  Nicks with the\n"
-					"\002PRIVATE\002 option set will not be displayed.\n"
-					" \n"
-					"Examples:\n"
-					" \n"
-					"    \002LIST *!joeuser@foo.com\002\n"
-					"        Lists all nicks owned by joeuser@foo.com.\n"
-					" \n"
-					"    \002LIST *Bot*!*@*\002\n"
-					"        Lists all registered nicks with \002Bot\002 in their\n"
-					"        names (case insensitive).\n"
-					" \n"
-					"    \002LIST *!*@*.bar.org\002\n"
-					"        Lists all nicks owned by users in the \002bar.org\002\n"
-					"        domain."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists all registered nicknames which match the given\n"
+				"pattern, in \037nick!user@host\037 format.  Nicks with the \002PRIVATE\002\n"
+				"option set will only be displayed to Services Operators.  Nicks\n"
+				"with the \002NOEXPIRE\002 option set will have a \002!\002 appended to\n"
+				"the nickname for Services Operators.\n"
+				" \n"
+				"If the SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only\n"
+				"nicks which, respectively, are SUSPENDED, UNCONFIRMED or have the\n"
+				"NOEXPIRE flag set will be displayed. If multiple options are\n"
+				"given, all nicks matching at least one option will be displayed.\n"
+				"These options are limited to \037Services Operators\037.  \n"
+				"\n"
+				"Examples:\n"
+				" \n"
+				"    \002LIST *!joeuser@foo.com\002\n"
+				"        Lists all registered nicks owned by joeuser@foo.com.\n"
+				" \n"
+				"    \002LIST *Bot*!*@*\002\n"
+				"        Lists all registered nicks with \002Bot\002 in their\n"
+				"        names (case insensitive).\n"
+				" \n"
+				"    \002LIST * NOEXPIRE\002\n"
+				"        Lists all registered nicks which have been set to not expire.\n"));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		User *u = source.u;
-		if (u->IsServicesOper())
-			SyntaxError(source, "LIST", _("LIST \037pattern\037 [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]"));
-		else
-			SyntaxError(source, "LIST", _(NICK_LIST_SYNTAX));
 	}
 };
 
@@ -192,14 +163,12 @@ class NSList : public Module
 	CommandNSList commandnslist;
 
  public:
-	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnslist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnslist);
+		ModuleManager::RegisterService(&commandnslist);
 	}
 };
 

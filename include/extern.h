@@ -99,7 +99,6 @@ E const char *translate(const char *string);
 E const char *translate(User *u, const char *string);
 E const char *translate(NickCore *nc, const char *string);
 E const char *anope_gettext(const char *lang, const char *string);
-E void SyntaxError(CommandSource &source, const Anope::string &command, const Anope::string &message);
 
 /**** main.c ****/
 

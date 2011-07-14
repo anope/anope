@@ -12,49 +12,53 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSuspend : public Command
 {
  public:
-	CommandCSSuspend() : Command("SUSPEND", 1, 2, "chanserv/suspend")
+	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 1, 2, "chanserv/suspend")
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
+		this->SetSyntax(_("\037channel\037 [\037reason\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
 
-		/* Assumes that permission checking has already been done. */
 		if (Config->ForceForbidReason && reason.empty())
 		{
 			this->OnSyntaxError(source, "");
-			return MOD_CONT;
+			return;
 		}
 
 		if (readonly)
-			source.Reply(_(READ_ONLY_MODE));
+			source.Reply(READ_ONLY_MODE);
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		ci->SetFlag(CI_SUSPENDED);
 		ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(u->nick));
 		if (!reason.empty())
 			ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(u->nick));
 
-		if (c)
+		if (ci->c)
 		{
-			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; )
 			{
 				UserContainer *uc = *it++;
 
 				if (uc->user->HasMode(UMODE_OPER))
 					continue;
 
-				c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : translate(uc->user, _("This channel has been suspended.")));
+				ci->c->Kick(NULL, uc->user, "%s", !reason.empty() ? reason.c_str() : translate(uc->user, _("This channel has been suspended.")));
 			}
 		}
 
@@ -63,49 +67,50 @@ class CommandCSSuspend : public Command
 
 		FOREACH_MOD(I_OnChanSuspend, OnChanSuspend(ci));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SUSPEND \037channel\037 [\037reason\037]\002\n"
-				" \n"
-				"Disallows anyone from registering or using the given\n"
-				"channel.  May be cancelled by using the UNSUSPEND\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Disallows anyone from using the given channel.\n"
+				"May be cancelled by using the UNSUSPEND\n"
 				"command to preserve all previous channel data/settings.\n"
 				" \n"
 				"Reason may be required on certain networks."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SUSPEND", Config->ForceForbidReason ? _("SUSPEND \037channel\037 \037reason\037") : _("SUSPEND \037channel\037 \037freason\037"));
 	}
 };
 
 class CommandCSUnSuspend : public Command
 {
  public:
-	CommandCSUnSuspend() : Command("UNSUSPEND", 1, 1, "chanserv/suspend")
+	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1, "chanserv/suspend")
 	{
-		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetDesc(_("Releases a suspended channel"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		if (readonly)
-			source.Reply(_(READ_ONLY_MODE));
+			source.Reply(READ_ONLY_MODE);
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		/* Only UNSUSPEND already suspended channels */
 		if (!ci->HasFlag(CI_SUSPENDED))
 		{
 			source.Reply(_("Couldn't release channel \002%s\002!"), ci->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		Anope::string by, reason;
@@ -121,21 +126,16 @@ class CommandCSUnSuspend : public Command
 
 		FOREACH_MOD(I_OnChanUnsuspend, OnChanUnsuspend(ci));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002UNSUSPEND \037channel\037\002\n"
-				" \n"
-				"Releases a suspended channel. All data and settings\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Releases a suspended channel. All data and settings\n"
 				"are preserved from before the suspension."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "UNSUSPEND", _("UNSUSPEND \037channel\037"));
 	}
 };
 
@@ -145,12 +145,13 @@ class CSSuspend : public Module
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
-	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssuspend(this), commandcsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(chanserv->Bot(), &commandcssuspend);
-		this->AddCommand(chanserv->Bot(), &commandcsunsuspend);
+		ModuleManager::RegisterService(&commandcssuspend);
+		ModuleManager::RegisterService(&commandcsunsuspend);
 	}
 };
 

@@ -329,7 +329,7 @@ bool IRCdMessage::OnKill(const Anope::string &source, const std::vector<Anope::s
 		return true;
 
 	/* Recover if someone kills us. */
-	if (!Config->s_BotServ.empty() && u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
+	if (u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
 	{
 		introduce_user(bi->nick);
 		bi->RejoinAll();
@@ -384,11 +384,10 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 
 	if (receiver[0] == '#')
 	{
-		ChannelInfo *ci = cs_findchan(receiver);
-		/* Some paranoia checks */
-		if (ci && ci->c)
+		Channel *c = findchan(receiver);
+		if (c)
 		{
-			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, ci, message));
+			FOREACH_MOD(I_OnPrivmsg, OnPrivmsg(u, c, message));
 		}
 	}
 	else
@@ -500,28 +499,22 @@ bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::
 
 bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	const Anope::string &who = params[0];
-
-	if (!source.empty() && !who.empty())
+	if (!source.empty() && !params.empty())
 	{
-		User *u;
-		BotInfo *bi = findbot(who);
-		if (bi)
+		User *u = finduser(params[0]);
+		if (u && u->server == Me)
 		{
-			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str(), bi->realname.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", bi->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
-			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", who.c_str());
-		}
-		else if ((u = finduser(who)) && u->server == Me)
-		{
+			BotInfo *bi = findbot(u->nick);
 			ircdproto->SendNumeric(Config->ServerName, 311, source, "%s %s %s * :%s", u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->realname.c_str());
+			if (bi)
+				ircdproto->SendNumeric(Config->ServerName, 307, source, "%s :is a registered nick", bi->nick.c_str());
 			ircdproto->SendNumeric(Config->ServerName, 312, source, "%s %s :%s", u->nick.c_str(), Config->ServerName.c_str(), Config->ServerDesc.c_str());
-			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", u->nick.c_str());
+			if (bi)
+				ircdproto->SendNumeric(Config->ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick.c_str(), static_cast<long>(Anope::CurTime - bi->lastmsg), static_cast<long>(start_time));
+			ircdproto->SendNumeric(Config->ServerName, 318, source, "%s :End of /WHOIS list.", params[0].c_str());
 		}
 		else
-			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such user.", who.c_str());
+			ircdproto->SendNumeric(Config->ServerName, 401, source, "%s :No such user.", params[0].c_str());
 	}
 
 	return true;

@@ -225,7 +225,7 @@ Anope::string duration(const time_t &t, NickCore *nc)
 		if (hours)
 		{
 			buffer += need_comma ? ", " : "";
-			buffer += stringify(hours) + " " + (hours != 1 ? translate(nc, _("hounslaters")) : translate(nc, _("hour")));
+			buffer += stringify(hours) + " " + (hours != 1 ? translate(nc, _("hours")) : translate(nc, _("hour")));
 			need_comma = true;
 		}
 		if (minutes)

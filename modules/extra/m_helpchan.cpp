@@ -6,7 +6,6 @@
  */
 
 #include "module.h"
-#include "operserv.h"
 
 class HelpChannel : public Module
 {
@@ -25,12 +24,12 @@ class HelpChannel : public Module
 
 	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)
 	{
-		if (Name == CMODE_OP && operserv && c && c->ci && c->name.equals_ci(this->HelpChan))
+		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{
 			User *u = finduser(param);
 
 			if (u && check_access(u, c->ci, CA_OPDEOPME))
-				u->SetMode(operserv->Bot(), UMODE_HELPOP);
+				u->SetMode(findbot(Config->OperServ), UMODE_HELPOP);
 		}
 
 		return EVENT_CONTINUE;

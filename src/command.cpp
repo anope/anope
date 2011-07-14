@@ -7,6 +7,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "commands.h"
 
 void CommandSource::Reply(const char *message, ...)
 {
@@ -42,34 +43,56 @@ void CommandSource::DoReply()
 		const Anope::string &message = *it;
 
 		// Send to the user if the reply is more than one line
-		if (!this->fantasy || !this->ci || this->reply.size() > 1)
+		if (!this->c || !this->c->ci || this->reply.size() > 1)
 			u->SendMessage(this->service, message);
-		else if (this->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
-			ircdproto->SendPrivmsg(this->service, this->ci->name, message.c_str());
-		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICE))
-			ircdproto->SendNotice(this->service, this->ci->name, message.c_str());
-		else if (this->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
-			ircdproto->SendNoticeChanops(this->service, this->ci->c, message.c_str());
+		else if (this->c->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
+			ircdproto->SendPrivmsg(this->service, this->c->name, message.c_str());
+		else if (this->c->ci->botflags.HasFlag(BS_MSG_NOTICE))
+			ircdproto->SendNotice(this->service, this->c->name, message.c_str());
+		else if (this->c->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
+			ircdproto->SendNoticeChanops(this->service, this->c, message.c_str());
 		else
 			u->SendMessage(this->service, message);
 	}
 }
 
-Command::Command(const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), name(sname), permission(spermission)
+Command::Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Service(owner, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), permission(spermission), module(owner)
 {
-	this->module = NULL;
-	this->service = NULL;
 }
 
 Command::~Command()
 {
-	if (this->module)
-		this->module->DelCommand(this->service, this);
 }
 
 void Command::SetDesc(const Anope::string &d)
 {
 	this->desc = d;
+}
+
+void Command::ClearSyntax()
+{
+	this->syntax.clear();
+}
+
+void Command::SetSyntax(const Anope::string &s)
+{
+	this->syntax.push_back(s);
+}
+
+void Command::SendSyntax(CommandSource &source)
+{
+	if (!this->syntax.empty())
+	{
+		source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), this->syntax[0].c_str());
+		for (unsigned i = 1, j = this->syntax.size(); i < j; ++i)
+			source.Reply("        \002%s %s\002", source.command.c_str(), this->syntax[i].c_str());
+	}
+}
+
+void Command::SendSyntax(CommandSource &source, const Anope::string &syntax)
+{
+	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syntax.c_str());
+	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
 }
 
 const Anope::string &Command::GetDesc() const
@@ -79,30 +102,19 @@ const Anope::string &Command::GetDesc() const
 
 void Command::OnServHelp(CommandSource &source)
 {
-	source.Reply("    %-14s %s", this->name.c_str(), translate(source.u, (this->GetDesc().c_str())));
+	source.Reply("    %-14s %s", source.command.c_str(), translate(source.u, (this->GetDesc().c_str())));
 }
 
 bool Command::OnHelp(CommandSource &source, const Anope::string &subcommand) { return false; }
 
-void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand) { }
+void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
+{
+	this->SendSyntax(source);
+	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
+}
 
 void Command::SetPermission(const Anope::string &reststr)
 {
 	this->permission = reststr;
-}
-
-bool Command::AddSubcommand(Module *creator, Command *c)
-{
-	return false;
-}
-
-bool Command::DelSubcommand(Command *c)
-{
-	return false;
-}
-
-Command *Command::FindSubcommand(const Anope::string &subcommand)
-{
-	return NULL;
 }
 

@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSInfo : public Command
 {
@@ -29,13 +28,14 @@ class CommandNSInfo : public Command
 		}
 	}
  public:
-	CommandNSInfo() : Command("INFO", 1, 2)
+	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Displays information about a given nickname"));
+		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -48,7 +48,7 @@ class CommandNSInfo : public Command
 			if (nickIsServices(nick, true))
 				source.Reply(_("Nick \002%s\002 is part of this Network's Services."), nick.c_str());
 			else
-				source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		}
 		else
 		{
@@ -95,7 +95,7 @@ class CommandNSInfo : public Command
 
 			if (show_hidden)
 			{
-				if (!Config->s_HostServ.empty() && ircd->vhost && na->hostinfo.HasVhost())
+				if (na->hostinfo.HasVhost())
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
 						source.Reply(_("            vhost: %s@%s"), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
@@ -113,7 +113,7 @@ class CommandNSInfo : public Command
 				CheckOptStr(optbuf, NI_MSG, _("Message mode"), na->nc);
 				CheckOptStr(optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
 
-				source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
+				source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{
@@ -139,23 +139,18 @@ class CommandNSInfo : public Command
 			if (na->nc->HasFlag(NI_UNCONFIRMED))
 				source.Reply(_("This nickname is unconfirmed."));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002INFO \037nickname\037\002\n"
-				" \n"
-				"Displays information about the given nickname, such as\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Displays information about the given nickname, such as\n"
 				"the nick's owner, last seen address and time, and nick\n"
 				"options."));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "INFO", _("INFO \037nick\037"));
 	}
 };
 
@@ -164,14 +159,12 @@ class NSInfo : public Module
 	CommandNSInfo commandnsinfo;
 
  public:
-	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsinfo(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsinfo);
+		ModuleManager::RegisterService(&commandnsinfo);
 	}
 };
 

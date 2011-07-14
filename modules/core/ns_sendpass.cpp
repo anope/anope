@@ -12,35 +12,35 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
-static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass);
+static bool SendPassMail(User *u, NickAlias *na, BotInfo *bi, const Anope::string &pass);
 
 class CommandNSSendPass : public Command
 {
  public:
-	CommandNSSendPass() : Command("SENDPASS", 1, 1)
+	CommandNSSendPass(Module *creator) : Command(creator, "nickserv/sendpass", 1, 1)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Forgot your password? Try this"));
+		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
 		NickAlias *na;
 
 		if (Config->RestrictMail && (!u->Account() || !u->HasCommand("nickserv/sendpass")))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!(na = findnick(nick)))
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else
 		{
 			Anope::string tmp_pass;
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 			{
-				if (SendPassMail(u, na, tmp_pass))
+				if (SendPassMail(u, na, source.owner, tmp_pass))
 				{
 					Log(Config->RestrictMail ? LOG_ADMIN : LOG_COMMAND, u, this) << "for " << na->nick;
 					source.Reply(_("Password of \002%s\002 has been sent."), nick.c_str());
@@ -50,24 +50,19 @@ class CommandNSSendPass : public Command
 				source.Reply(_("SENDPASS command unavailable because encryption is in use."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SENDPASS \037nickname\037\002\n"
-				" \n"
-				"Send the password of the given nickname to the e-mail address\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Send the password of the given nickname to the e-mail address\n"
 				"set in the nickname record. This command is really useful\n"
 				"to deal with lost passwords.\n"
 				" \n"
 				"May be limited to \002IRC operators\002 on certain networks."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SENDPASS", _("SENDPASS \037nickname\037"));
 	}
 };
 
@@ -76,25 +71,23 @@ class NSSendPass : public Module
 	CommandNSSendPass commandnssendpass;
 
  public:
-	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSendPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssendpass(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
 		if (!Config->UseMail)
-			throw ModuleException("Not using mail, whut.");
+			throw ModuleException("Not using mail.");
 
 		Anope::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
-		this->AddCommand(nickserv->Bot(), &commandnssendpass);
+		ModuleManager::RegisterService(&commandnssendpass);
 	}
 };
 
-static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
+static bool SendPassMail(User *u, NickAlias *na, BotInfo *bi, const Anope::string &pass)
 {
 	char subject[BUFSIZE], message[BUFSIZE];
 
@@ -109,7 +102,7 @@ static bool SendPassMail(User *u, NickAlias *na, const Anope::string &pass)
 	" \n"
 	"%s administrators.")), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, na->nc, nickserv->Bot(), subject, message);
+	return Mail(u, na->nc, bi, subject, message);
 }
 
 MODULE_INIT(NSSendPass)

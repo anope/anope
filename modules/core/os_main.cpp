@@ -12,98 +12,305 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
-static BotInfo *OperServ = NULL;
+static BotInfo *OperServ;
 
-class OperServBotInfo : public BotInfo
+class SGLineManager : public XLineManager
 {
  public:
-	OperServBotInfo(const Anope::string &bnick, const Anope::string &user = "", const Anope::string &bhost = "", const Anope::string &real = "") : BotInfo(bnick, user, bhost, real) { }
-	
-	void OnMessage(User *u, const Anope::string &message)
+	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
+
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 	{
-		if (!u->HasMode(UMODE_OPER) && Config->OSOpersOnly)
-		{
-			u->SendMessage(OperServ, ACCESS_DENIED);
-			if (Config->WallBadOS)
-				ircdproto->SendGlobops(this, "Denied access to %s from %s!%s@%s (non-oper)", Config->s_OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
-		}
-		else
-		{
-			BotInfo::OnMessage(u, message);
-		}
+		Anope::string realreason = reason;
+		if (!creator.empty() && Config->AddAkiller)
+			realreason = "[" + creator + "] " + reason;
+
+		XLine *x = new XLine(mask, creator, expires, realreason);
+
+		this->AddXLine(x);
+
+		if (UplinkSock && Config->AkillOnAdd)
+			this->Send(NULL, x);
+
+		return x;
+	}
+
+	void Del(XLine *x)
+	{
+		ircdproto->SendAkillDel(x);
+	}
+
+	void OnMatch(User *u, XLine *x)
+	{
+		if (u)
+			u->Kill(Config->OperServ, x->Reason);
+		ircdproto->SendAkill(u, x);
+	}
+
+	void OnExpire(XLine *x)
+	{
+		if (Config->WallAkillExpire)
+			ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
+	}
+	
+	void Send(User *u, XLine *x)
+	{
+		ircdproto->SendAkill(u, x);
 	}
 };
 
-class MyOperServService : public OperServService
+class SZLineManager : public XLineManager
 {
  public:
-	MyOperServService(Module *m) : OperServService(m) { }
+	SZLineManager(Module *creator) : XLineManager(creator, "xlinemanager/szline", 'Z') { }
 
-	BotInfo *Bot()
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 	{
-		return OperServ;
+		XLine *x = new XLine(mask, creator, expires, reason);
+
+		this->AddXLine(x);
+
+		if (UplinkSock)
+			this->Send(NULL, x);
+
+		return x;
+	}
+
+	void Del(XLine *x)
+	{
+		ircdproto->SendSZLineDel(x);
+	}
+
+	void OnMatch(User *u, XLine *x)
+	{
+		if (u)
+		{
+			Anope::string reason = "Z-Lined: " + x->Reason;
+			u->Kill(Config->OperServ, reason);
+		}
+
+		ircdproto->SendSZLine(u, x);
+	}
+
+	void OnExpire(XLine *x)
+	{
+		if (Config->WallSZLineExpire)
+			ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
+	}
+
+	void Send(User *u, XLine *x)
+	{
+		ircdproto->SendSZLine(u, x);
+	}
+};
+
+class SQLineManager : public XLineManager
+{
+ public:
+	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q') { }
+
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
+	{
+		XLine *x = new XLine(mask, creator, expires, reason);
+
+		this->AddXLine(x);
+
+		if (Config->KillonSQline)
+		{
+			Anope::string rreason = "Q-Lined: " + reason;
+
+			if (mask[0] == '#')
+			{
+				for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+				{
+					Channel *c = cit->second;
+
+					if (!Anope::Match(c->name, mask))
+						continue;
+					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+					{
+						UserContainer *uc = *it;
+						++it;
+
+						if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
+							continue;
+						c->Kick(NULL, uc->user, "%s", reason.c_str());
+					}
+				}
+			}
+			else
+			{
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+				{
+					User *user = it->second;
+					++it;
+
+					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
+						user->Kill(Config->ServerName, rreason);
+				}
+			}
+		}
+
+		if (UplinkSock)
+			this->Send(NULL, x);
+
+		return x;
+	}
+
+	void Del(XLine *x)
+	{
+		ircdproto->SendSQLineDel(x);
+	}
+
+	void OnMatch(User *u, XLine *x)
+	{
+		if (u)
+		{
+			Anope::string reason = "Q-Lined: " + x->Reason;
+			u->Kill(Config->OperServ, reason);
+		}
+
+		this->Send(u, x);
+	}
+
+	void OnExpire(XLine *x)
+	{
+		if (Config->WallSQLineExpire)
+			ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
+	}
+
+	void Send(User *u, XLine *x)
+	{
+		ircdproto->SendSQLine(u, x);
+	}
+
+	bool CheckChannel(Channel *c)
+	{
+		if (ircd->chansqline)
+			for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
+				if (Anope::Match(c->name, (*it)->Mask))
+					return true;
+		return false;
+	}
+};
+
+class SNLineManager : public XLineManager
+{
+ public:
+	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
+
+	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
+	{
+		XLine *x = new XLine(mask, creator, expires, reason);
+
+		this->AddXLine(x);
+
+		if (Config->KillonSNline && !ircd->sglineenforce)
+		{
+			Anope::string rreason = "G-Lined: " + reason;
+
+			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			{
+				User *user = it->second;
+				++it;
+
+				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
+					user->Kill(Config->ServerName, rreason);
+			}
+		}
+
+		return x;
+	}
+
+	void Del(XLine *x)
+	{
+		ircdproto->SendSGLineDel(x);
+	}
+
+	void OnMatch(User *u, XLine *x)
+	{
+		if (u)
+		{
+			Anope::string reason = "G-Lined: " + x->Reason;
+			u->Kill(Config->OperServ, reason);
+		}
+		this->Send(u, x);
+	}
+
+	void OnExpire(XLine *x)
+	{
+		if (Config->WallSNLineExpire)
+			ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
+	}
+
+	void Send(User *u, XLine *x)
+	{
+		ircdproto->SendSGLine(u, x);
+	}
+
+	XLine *Check(User *u)
+	{
+		for (unsigned i = this->XLines.size(); i > 0; --i)
+		{
+			XLine *x = this->XLines[i - 1];
+
+			if (x->Expires && x->Expires < Anope::CurTime)
+			{
+				this->OnExpire(x);
+				this->Del(x);
+				delete x;
+				this->XLines.erase(XLines.begin() + i - 1);
+				continue;
+			}
+
+			if (Anope::Match(u->realname, x->Mask))
+			{
+				this->OnMatch(u, x);
+				return x;
+			}
+		}
+
+		return NULL;
 	}
 };
 
 class OperServCore : public Module
 {
-	MyOperServService myoperserv;
+	SGLineManager sglines;
+	SZLineManager szlines;
+	SQLineManager sqlines;
+	SNLineManager snlines;
 
  public:
-	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myoperserv(this)
+	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		sglines(this), szlines(this), sqlines(this), snlines(this)
 	{
 		this->SetAuthor("Anope");
-		this->SetPermanent(true); // Currently, /os modunload os_main explodes for obvious reasons
 
-		Implementation i[] = { I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect };
-		ModuleManager::Attach(i, this, 4);
+		OperServ = findbot(Config->OperServ);
+		if (OperServ == NULL)
+			throw ModuleException("No bot named " + Config->OperServ);
 
-		ModuleManager::RegisterService(&this->myoperserv);
+		Implementation i[] = { I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
+		ModuleManager::Attach(i, this, 6);
+
+		ModuleManager::RegisterService(&sglines);
+		ModuleManager::RegisterService(&szlines);
+		ModuleManager::RegisterService(&sqlines);
+		ModuleManager::RegisterService(&snlines);
 		
-		OperServ = new OperServBotInfo(Config->s_OperServ, Config->ServiceUser, Config->ServiceHost, Config->desc_OperServ);
-		OperServ->SetFlag(BI_CORE);
-
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
-		XLineManager::RegisterXLineManager(SGLine = new SGLineManager());
-		XLineManager::RegisterXLineManager(SZLine = new SZLineManager());
-		XLineManager::RegisterXLineManager(SQLine = new SQLineManager());
-		XLineManager::RegisterXLineManager(SNLine = new SNLineManager());
-
-		spacesepstream coreModules(Config->OperCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~OperServCore()
-	{
-		spacesepstream coreModules(Config->OperCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete SGLine;
-		SGLine = NULL;
-		delete SZLine;
-		SZLine = NULL;
-		delete SQLine;
-		SQLine = NULL;
-		delete SNLine;
-		SNLine = NULL;
-
-		delete OperServ;
+		XLineManager::RegisterXLineManager(&sglines);
+		XLineManager::RegisterXLineManager(&szlines);
+		XLineManager::RegisterXLineManager(&sqlines);
+		XLineManager::RegisterXLineManager(&snlines);
 	}
 
 	void OnServerQuit(Server *server)
 	{
 		if (server->HasFlag(SERVER_JUPED))
-			ircdproto->SendGlobops(operserv->Bot(), "Received SQUIT for juped server %s", server->GetName().c_str());
+			ircdproto->SendGlobops(OperServ, "Received SQUIT for juped server %s", server->GetName().c_str());
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)
@@ -126,6 +333,26 @@ class OperServCore : public Module
 	{
 		if (u && !exempt)
 			XLineManager::CheckAll(u);
+	}
+
+	void OnUserNickChange(User *u, const Anope::string &oldnick)
+	{
+		if (ircd->sqline && !u->HasMode(UMODE_OPER))
+			this->sqlines.Check(u);
+	}
+
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick)
+	{
+		if (this->sqlines.CheckChannel(ci->c))
+			kick = true;
+		return EVENT_CONTINUE;
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->OperServ)
+			return;
+		source.Reply(_("%s commands:"), Config->OperServ.c_str());
 	}
 };
 

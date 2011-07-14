@@ -16,7 +16,6 @@
  */
 
 #include "module.h"
-#include "hostserv.h"
 #include "memoserv.h"
 
 static bool HSRequestMemoUser = false;
@@ -35,8 +34,6 @@ struct HostRequest
 typedef std::map<Anope::string, HostRequest *, std::less<ci::string> > RequestMap;
 RequestMap Requests;
 
-static Module *me;
-
 class CommandHSRequest : public Command
 {
 	bool isvalidchar(char c)
@@ -47,12 +44,13 @@ class CommandHSRequest : public Command
 	}
 
  public:
-	CommandHSRequest() : Command("REQUEST", 1, 1)
+	CommandHSRequest(Module *creator) : Command(creator, "hostserv/request", 1, 1)
 	{
 		this->SetDesc(_("Request a vHost for your nick"));
+		this->SetSyntax(_("vhost"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -65,46 +63,46 @@ class CommandHSRequest : public Command
 			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
 			if (rawhostmask.empty())
 			{
-				source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
-				return MOD_CONT;
+				this->SendSyntax(source);
+				return;
 			}
 			if (vIdent.length() > Config->UserLen)
 			{
-				source.Reply(_(HOST_SET_IDENTTOOLONG), Config->UserLen);
-				return MOD_CONT;
+				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
+				return;
 			}
 			else
 				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
 					if (!isvalidchar(*s))
 					{
-						source.Reply(_(HOST_SET_IDENT_ERROR));
-						return MOD_CONT;
+						source.Reply(HOST_SET_IDENT_ERROR);
+						return;
 					}
 			if (!ircd->vident)
 			{
-				source.Reply(_(HOST_NO_VIDENT));
-				return MOD_CONT;
+				source.Reply(HOST_NO_VIDENT);
+				return;
 			}
 		}
 		if (rawhostmask.length() < Config->HostLen)
 			hostmask = rawhostmask;
 		else
 		{
-			source.Reply(_(HOST_SET_TOOLONG), Config->HostLen);
-			return MOD_CONT;
+			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
+			return;
 		}
 
 		if (!isValidHost(hostmask, 3))
 		{
-			source.Reply(_(HOST_SET_ERROR));
-			return MOD_CONT;
+			source.Reply(HOST_SET_ERROR);
+			return;
 		}
 
 		if (HSRequestMemoOper && Config->MSSendDelay > 0 && u && u->lastmemosend + Config->MSSendDelay > Anope::CurTime)
 		{
 			source.Reply(_("Please wait %d seconds before requesting a new vHost"), Config->MSSendDelay);
 			u->lastmemosend = Anope::CurTime;
-			return MOD_CONT;
+			return;
 		}
 		my_add_host_request(u->nick, vIdent, hostmask, u->nick, Anope::CurTime);
 
@@ -112,34 +110,30 @@ class CommandHSRequest : public Command
 		req_send_memos(source, vIdent, hostmask);
 		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
+		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Request the given vHost to be actived for your nick by the\n"
 			"network administrators. Please be patient while your request\n"
 			"is being considered."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: \002REQUEST \037vhost\037\002"));
-	}
 };
 
 class CommandHSActivate : public Command
 {
  public:
-	CommandHSActivate() : Command("ACTIVATE", 1, 1, "hostserv/set")
+	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1, "hostserv/set")
 	{
 		this->SetDesc(_("Approve the requested vHost of a user"));
+		this->SetSyntax(_("\037nick\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -155,7 +149,7 @@ class CommandHSActivate : public Command
 				FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
 				if (HSRequestMemoUser && memoserv)
-					memoserv->Send(Config->s_HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+					memoserv->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
 				source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
 				Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!it->second->ident.empty() ? it->second->ident + "@" : "") << it->second->host;
@@ -166,14 +160,14 @@ class CommandHSActivate : public Command
 				source.Reply(_("No request for nick %s found."), nick.c_str());
 		}
 		else
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002ACTIVATE \037nick\037\002"));
+		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Activate the requested vHost for the given nick."));
 		if (HSRequestMemoUser)
@@ -181,22 +175,17 @@ class CommandHSActivate : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: \002ACTIVATE \037nick\037\002"));
-	}
 };
 
 class CommandHSReject : public Command
 {
  public:
-	CommandHSReject() : Command("REJECT", 1, 2, "hostserv/set")
+	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2, "hostserv/set")
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -217,7 +206,7 @@ class CommandHSReject : public Command
 				else
 					message = _("[auto memo] Your requested vHost has been rejected.");
 
-				memoserv->Send(Config->s_HostServ, nick, message, true);
+				memoserv->Send(Config->HostServ, nick, message, true);
 			}
 
 			source.Reply(_("vHost for %s has been rejected"), nick.c_str());
@@ -226,12 +215,12 @@ class CommandHSReject : public Command
 		else
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002REJECT \037nick\037\002"));
+		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Reject the requested vHost for the given nick."));
 		if (HSRequestMemoUser)
@@ -239,17 +228,12 @@ class CommandHSReject : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: \002REJECT \037nick\037\002"));
-	}
 };
 
 class HSListBase : public Command
 {
  protected:
-	CommandReturn DoList(CommandSource &source)
+	void DoList(CommandSource &source)
 	{
 		int counter = 1;
 		int from = 0, to = 0;
@@ -270,10 +254,10 @@ class HSListBase : public Command
 		}
 		source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
 
-		return MOD_CONT;
+		return;
 	}
  public:
-	HSListBase(const Anope::string &cmd, int min, int max) : Command(cmd, min, max, "hostserv/set")
+	HSListBase(Module *creator, const Anope::string &cmd, int min, int max) : Command(creator, cmd, min, max, "hostserv/set")
 	{
 	}
 };
@@ -281,22 +265,22 @@ class HSListBase : public Command
 class CommandHSWaiting : public HSListBase
 {
  public:
-	CommandHSWaiting() : HSListBase("WAITING", 0, 0)
+	CommandHSWaiting(Module *creator) : HSListBase(creator, "hostserv/waiting", 0, 0)
 	{
-		this->SetDesc(_("Convenience command for LIST +req"));
+		this->SetDesc(_("Retrieves the vhost requests"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoList(source);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002WAITING\002"));
+		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("This command is provided for convenience. It is essentially\n"
-			"the same as performing a LIST +req ."));
+		source.Reply(_("This command retrieves the vhost requests"));
 
 		return true;
 	}
@@ -310,21 +294,17 @@ class HSRequest : public Module
 	CommandHSWaiting commandhswaiting;
 
  public:
-	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+		commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
-		me = this;
-
-		if (!hostserv)
-			throw ModuleException("HostServ is not loaded!");
-
-		this->AddCommand(hostserv->Bot(), &commandhsrequest);
-		this->AddCommand(hostserv->Bot(), &commandhsactive);
-		this->AddCommand(hostserv->Bot(), &commandhsreject);
-		this->AddCommand(hostserv->Bot(), &commandhswaiting);
-
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnPreCommand, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
+		ModuleManager::RegisterService(&commandhsrequest);
+		ModuleManager::RegisterService(&commandhsactive);
+		ModuleManager::RegisterService(&commandhsreject);
+		ModuleManager::RegisterService(&commandhswaiting);
+
+		Implementation i[] = { I_OnDelNick, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
 		ModuleManager::Attach(i, this, 4);
 
 		this->OnReload();
@@ -340,46 +320,15 @@ class HSRequest : public Module
 		}
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	void OnDelNick(NickAlias *na)
 	{
-		BotInfo *service = source.owner;
-		if (service->nick == Config->s_HostServ)
+		RequestMap::iterator it = Requests.find(na->nick);
+
+		if (it != Requests.end())
 		{
-			if (command->name.equals_ci("LIST"))
-			{
-				Anope::string key = params.size() ? params[0] : "";
-
-				if (!key.empty() && key.equals_ci("+req"))
-				{
-					std::vector<Anope::string> emptyParams;
-					Command *c = FindCommand(hostserv->Bot(), "WAITING");
-					if (!c)
-						throw CoreException("No waiting command?");
-					c->Execute(source, emptyParams);
-					return EVENT_STOP;
-				}
-			}
+			delete it->second;
+			Requests.erase(it);
 		}
-		else if (service->nick == Config->s_NickServ)
-		{
-			if (command->name.equals_ci("DROP"))
-			{
-				NickAlias *na = findnick(source.u->nick);
-
-				if (na)
-				{
-					RequestMap::iterator it = Requests.find(na->nick);
-
-					if (it != Requests.end())
-					{
-						delete it->second;
-						Requests.erase(it);
-					}
-				}
-			}
-		}
-
-		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
@@ -437,7 +386,7 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 
 			Anope::string message = Anope::printf(_("[auto memo] vHost \002%s\002 has been requested by %s."), host.c_str(), source.u->GetMask().c_str());
 
-			memoserv->Send(Config->s_HostServ, na->nick, message, true);
+			memoserv->Send(Config->HostServ, na->nick, message, true);
 		}
 }
 

@@ -14,9 +14,6 @@
  */
 
 #include "module.h"
-#include "chanserv.h"
-
-static Module *me;
 
 class CommandCSEnforce : public Command
 {
@@ -122,22 +119,24 @@ class CommandCSEnforce : public Command
 		}
 	}
  public:
-	CommandCSEnforce() : Command("ENFORCE", 1, 2)
+	CommandCSEnforce(Module *creator) : Command(creator, "ENFORCE", 1, 2)
 	{
 		this->SetDesc(_("Enforce various channel modes and set options"));
+		this->SetSyntax(_("\037channel\037 [\037what\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &what = params.size() > 1 ? params[1] : "";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
+		Channel *c = findchan(params[0]);
 
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
-		else if (!check_access(u, ci, CA_AKICK))
+			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
+		else if (!c->ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
+		else if (!check_access(u, c->ci, CA_AKICK))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
@@ -170,12 +169,12 @@ class CommandCSEnforce : public Command
 				this->OnSyntaxError(source, "");
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
+		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Enforce various channel modes and set options. The \037channel\037\n"
 			"option indicates what channel to enforce the modes and options\n"
@@ -204,11 +203,6 @@ class CommandCSEnforce : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: \002ENFORCE \037channel\037 [\037what\037]\002"));
-	}
 };
 
 class CSEnforce : public Module
@@ -216,16 +210,12 @@ class CSEnforce : public Module
 	CommandCSEnforce commandcsenforce;
 
  public:
-	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+		commandcsenforce(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		me = this;
-
-		this->AddCommand(chanserv->Bot(), &commandcsenforce);
+		ModuleManager::RegisterService(&commandcsenforce);
 	}
 };
 

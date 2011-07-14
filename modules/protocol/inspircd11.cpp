@@ -14,6 +14,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 IRCDVar myIrcd[] = {
 	{"InspIRCd 1.1",	/* ircd name */
@@ -57,11 +58,11 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 	{
 		if (nick.empty() || vhost.empty())
 			return;
-		send_cmd(Config->s_OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+		send_cmd(Config->OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
 	}
 	else
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
+		BotInfo *bi = findbot(Config->OperServ);
 		if (bi)
 			ircdproto->SendGlobops(bi, "CHGHOST not loaded!");
 	}
@@ -86,7 +87,7 @@ class InspIRCdProto : public IRCDProto
 {
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd(Config->s_OperServ, "GLINE %s", x->Mask.c_str());
+		send_cmd(Config->OperServ, "GLINE %s", x->Mask.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
@@ -126,7 +127,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->s_OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
+		send_cmd(source ? source->nick : Config->OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
@@ -175,13 +176,13 @@ class InspIRCdProto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd(Config->s_OperServ, "QLINE %s", x->Mask.c_str());
+		send_cmd(Config->OperServ, "QLINE %s", x->Mask.c_str());
 	}
 
 	/* SQLINE */
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd(Config->ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		send_cmd(Config->ServerName, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -216,7 +217,7 @@ class InspIRCdProto : public IRCDProto
 		{
 			if (nick.empty() || vIdent.empty())
 				return;
-			send_cmd(Config->s_OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
+			send_cmd(Config->OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
 		}
 		else
 			Log() << "CHGIDENT not loaded!";
@@ -225,19 +226,19 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config->s_OperServ, "SVSHOLD %s %ds :Being held for registered user", nick.c_str(), static_cast<int>(Config->NSReleaseTimeout));
+		send_cmd(Config->OperServ, "SVSHOLD %s %ds :Being held for registered user", nick.c_str(), static_cast<int>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config->s_OperServ, "SVSHOLD %s", nick.c_str());
+		send_cmd(Config->OperServ, "SVSHOLD %s", nick.c_str());
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd(Config->s_OperServ, "ZLINE %s", x->Mask.c_str());
+		send_cmd(Config->OperServ, "ZLINE %s", x->Mask.c_str());
 	}
 
 	/* SZLINE */
@@ -326,7 +327,7 @@ class InspircdIRCdMessage : public IRCdMessage
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED))
-						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else
 					nickserv->Validate(user);

@@ -12,23 +12,22 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSCert : public Command
 {
  private:
-	CommandReturn DoServAdminList(CommandSource &source, NickCore *nc)
+	void DoServAdminList(CommandSource &source, NickCore *nc)
 	{
 		if (nc->cert.empty())
 		{
 			source.Reply(_("Certificate list for \002%s\002 is empty."), nc->display.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (nc->HasFlag(NI_SUSPENDED))
 		{
-			source.Reply(_(NICK_X_SUSPENDED), nc->display.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
+			return;
 		}
 
 		source.Reply(_("Certificate list for \002%s\002:"), nc->display.c_str());
@@ -38,78 +37,78 @@ class CommandNSCert : public Command
 			source.Reply("    %s", fingerprint.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 
 		if (nc->cert.size() >= Config->NSAccessMax)
 		{
 			source.Reply(_("Sorry, you can only have %d certificate entries for a nickname."), Config->NSAccessMax);
-			return MOD_CONT;
+			return;
 		}
 
 		if (!source.u->fingerprint.empty() && !nc->FindCert(source.u->fingerprint))
 		{
 			nc->AddCert(source.u->fingerprint);
 			source.Reply(_("\002%s\002 added to your certificate list."), source.u->fingerprint.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 
 		if (nc->FindCert(mask))
 		{
 			source.Reply(_("Fingerprint \002%s\002 already present on your certificate list."), mask.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		nc->AddCert(mask);
 		source.Reply(_("\002%s\002 added to your certificate list."), mask.c_str());
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
+	void DoDel(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 
 		if (!source.u->fingerprint.empty() && nc->FindCert(source.u->fingerprint))
 		{
 			nc->EraseCert(source.u->fingerprint);
 			source.Reply(_("\002%s\002 deleted from your certificate list."), source.u->fingerprint.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
-			return MOD_CONT;
+			return;
 		}
 
 		if (!nc->FindCert(mask))
 		{
 			source.Reply(_("\002%s\002 not found on your certificate list."), mask.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		source.Reply(_("\002%s\002 deleted from your certificate list."), mask.c_str());
 		nc->EraseCert(mask);
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoList(CommandSource &source, NickCore *nc)
+	void DoList(CommandSource &source, NickCore *nc)
 	{
 		User *u = source.u;
 
 		if (nc->cert.empty())
 		{
 			source.Reply(_("Your certificate list is empty."), u->nick.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		source.Reply(_("Cert list:"));
@@ -119,16 +118,19 @@ class CommandNSCert : public Command
 			source.Reply("    %s", fingerprint.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
  public:
-	CommandNSCert() : Command("CERT", 1, 2)
+	CommandNSCert(Module *creator) : Command(creator, "nickserv/cert", 1, 2)
 	{
 		this->SetDesc("Modify the nickname client certificate list");
+		this->SetSyntax("ADD \037fingerprint\037");
+		this->SetSyntax("DEL \037fingerprint\037");
+		this->SetSyntax("LIST");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
@@ -139,7 +141,7 @@ class CommandNSCert : public Command
 			return this->DoServAdminList(source, na->nc);
 
 		if (u->Account()->HasFlag(NI_SUSPENDED))
-			source.Reply(_(NICK_X_SUSPENDED), u->Account()->display.c_str());
+			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, u->Account(), mask);
 		else if (cmd.equals_ci("DEL"))
@@ -149,20 +151,18 @@ class CommandNSCert : public Command
 		else
 			this->OnSyntaxError(source, cmd);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CERT ADD [\037fingerprint\037]\002\n"
-				"        \002CERT DEL [\037<fingerprint>\037]\002\n"
-				"        \002CERT LIST\002\n"
-				" \n"
-				"Modifies or displays the certificate list for your nick.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Modifies or displays the certificate list for your nick.\n"
 				"If you connect to IRC and provide a client certificate with a\n"
 				"matching fingerprint in the cert list, your nick will be\n"
 				"automatically identified to %s.\n"
-				" \n"), Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+				" \n"), Config->NickServ.c_str(), Config->NickServ.c_str());
 		source.Reply(_("Examples:\n"
 				" \n"
 				"    \002CERT ADD <fingerprint>\002\n"
@@ -174,13 +174,8 @@ class CommandNSCert : public Command
 				"        Reverses the previous command.\n"
 				" \n"
 				"    \002CERT LIST\002\n"
-				"        Displays the current certificate list."), Config->s_NickServ.c_str());
+				"        Displays the current certificate list."), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CERT", _("CERT {ADD|DEL|LIST} [\037fingerprint\037]"));
 	}
 };
 
@@ -190,8 +185,9 @@ class NSCert : public Module
 
 	void DoAutoIdentify(User *u)
 	{
+		BotInfo *bi = findbot(Config->NickServ);
 		NickAlias *na = findnick(u->nick);
-		if (!na)
+		if (!bi || !na)
 			return;
 		if (u->IsIdentified() && u->Account() == na->nc)
 			return;
@@ -201,25 +197,23 @@ class NSCert : public Module
 			return;
 
 		u->Identify(na);
-		u->SendMessage(nickserv->Bot(), _("SSL Fingerprint accepted. You are now identified."));
+		u->SendMessage(bi, _("SSL Fingerprint accepted. You are now identified."));
 		return;
 	}
 
  public:
-	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSCert(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnscert(this)
 	{
 		this->SetAuthor("Anope");
 
 		if (!ircd || !ircd->certfp)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
 		Implementation i[] = { I_OnUserNickChange, I_OnFingerprint };
 		ModuleManager::Attach(i, this, 2);
 
-		this->AddCommand(nickserv->Bot(), &commandnscert);
+		ModuleManager::RegisterService(&commandnscert);
 	}
 
 	void OnFingerprint(User *u)

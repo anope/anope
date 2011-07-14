@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSAJoin : public Command
 {
@@ -40,7 +39,7 @@ class CommandNSAJoin : public Command
 		if (channels.size() >= Config->AJoinMax)
 			source.Reply(_("Your auto join list is full."));
 		else if (ircdproto->IsChannelValid(params[1]) == false)
- 			source.Reply(_(CHAN_X_INVALID), params[1].c_str());
+ 			source.Reply(CHAN_X_INVALID, params[1].c_str());
 		else
 		{
 			channels.push_back(std::make_pair(params[1], params.size() > 2 ? params[2] : ""));
@@ -72,12 +71,13 @@ class CommandNSAJoin : public Command
 	}
 
  public:
-	CommandNSAJoin() : Command("AJOIN", 1, 3)
+	CommandNSAJoin(Module *creator) : Command(creator, "nickserv/ajoin", 1, 3)
 	{
 		this->SetDesc(_("Manage your auto join list"));
+		this->SetSyntax(_("{ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (params[0].equals_ci("LIST"))
 			this->DoList(source, params);
@@ -90,21 +90,16 @@ class CommandNSAJoin : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]\002\n"
-				" \n"
-				"This command manages your auto join list. When you identify\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command manages your auto join list. When you identify\n"
 				"you will automatically join the channels on your auto join list"));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "AJOIN", _("AJOIN {ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
 	}
 };
 
@@ -113,14 +108,12 @@ class NSAJoin : public Module
 	CommandNSAJoin commandnsajoin;
 
  public:
-	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsajoin(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsajoin);
+		ModuleManager::RegisterService(&commandnsajoin);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 3);
@@ -134,7 +127,7 @@ class NSAJoin : public Module
 		for (unsigned i = 0; i < channels.size(); ++i)
 		{
 			Channel *c = findchan(channels[i].first);
-			ChannelInfo *ci = c != NULL? c->ci : cs_findchan(channels[i].first);
+			ChannelInfo *ci = c != NULL ? c->ci : cs_findchan(channels[i].first);
 			if (c == NULL && ci != NULL)
 				c = ci->c;
 
@@ -190,12 +183,13 @@ class NSAJoin : public Module
 
 			if (need_invite)
 			{
-				if (!check_access(u, ci, CA_INVITE))
+				BotInfo *bi = findbot(Config->NickServ);
+				if (!bi || !check_access(u, ci, CA_INVITE))
 					continue;
-				ircdproto->SendInvite(nickserv->Bot(), channels[i].first, u->nick);
+				ircdproto->SendInvite(bi, channels[i].first, u->nick);
 			}
 
-			ircdproto->SendSVSJoin(Config->s_NickServ, u->nick, channels[i].first, key);
+			ircdproto->SendSVSJoin(Config->NickServ, u->nick, channels[i].first, key);
 		}
 	}
 

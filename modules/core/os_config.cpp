@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSConfig : public Command
 {
@@ -33,12 +32,13 @@ class CommandOSConfig : public Command
 	}
 
  public:
-	CommandOSConfig() : Command("CONFIG", 1, 4, "operserv/config")
+	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4, "operserv/config")
 	{
 		this->SetDesc(_("View and change configuration file settings"));
+		this->SetSyntax(_("{\037MODIFY\037|\037VIEW\037} [\037block name\037 \037item name\037 \037item value\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &what = params[0];
 
@@ -136,14 +136,14 @@ class CommandOSConfig : public Command
 					catch (const ConfigException &ex)
 					{
 						source.Reply(_("Error changing configuration value: ") + ex.GetReason());
-						return MOD_CONT;
+						return;
 					}
 
 					ChangeHash(Config->config_data, params[1], params[2], params[3]);
 
 					Log(LOG_ADMIN, source.u, this) << "to change the configuration value of " << params[1] << ":" << params[2] << " to " << params[3];
 					source.Reply(_("Value of %s:%s changed to %s"), params[1].c_str(), params[2].c_str(), params[3].c_str());
-					return MOD_CONT;
+					return;
 				}
 			}
 
@@ -173,9 +173,6 @@ class CommandOSConfig : public Command
 				{
 					const Anope::string &first = list[i].first, second = list[i].second;
 
-					if (first == "modules")
-						continue; // Modules list isn't important
-
 					source.Reply(_("  Name: %-15s Value: %s"), first.c_str(), second.c_str());
 				}
 			}
@@ -185,26 +182,21 @@ class CommandOSConfig : public Command
 		else
 			this->OnSyntaxError(source, what);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CONFIG {\037MODIFY\037|\037VIEW\037} [\037block name\037 \037item name\037 \037item value\037]\002\n"
-				"\n"
-				"\002CONFIG\002 allows you to change and view configuration settings.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to change and view configuration settings.\n"
 				"Settings changed by this command are temporary and will not be reflected\n"
 				"back into the configuration file, and will be lost if Anope is shut down,\n"
 				"restarted, or the RELOAD command is used.\n"
 				" \n"
 				"Example:\n"
-				"     \002CONFIG MODIFY nickserv forcemail no\002"));
+				"     \002MODIFY nickserv forcemail no\002"));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CONFIG", _("CONFIG {\037MODIFY\037|\037VIEW\037} [\037block name\037 \037item name\037 \037item value\037]"));
 	}
 };
 
@@ -213,14 +205,12 @@ class OSConfig : public Module
 	CommandOSConfig commandosconfig;
 
  public:
-	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSConfig(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosconfig(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosconfig);
+		ModuleManager::RegisterService(&commandosconfig);
 	}
 };
 

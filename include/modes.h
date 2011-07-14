@@ -295,8 +295,6 @@ class CoreExport ChannelModeBan : public ChannelModeList
 {
  public:
 	ChannelModeBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
-
-	void OnAdd(Channel *chan, const Anope::string &mask);
 };
 
 /** Channel mode +k (key)

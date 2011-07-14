@@ -12,30 +12,30 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSClearUsers : public Command
 {
  public:
-	CommandCSClearUsers() : Command("CLEARUSERS", 1, 1)
+	CommandCSClearUsers(Module *creator) : Command(creator, "chanserv/clearusers", 1, 1)
 	{
-		this->SetDesc(Anope::printf(_("Tells %s to kick all users on a channel"), Config->s_ChanServ.c_str()));
+		this->SetDesc(_("Kicks all users on a channel"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
-
+		Channel *c = findchan(chan);
 		Anope::string modebuf;
 
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
-		else if (!check_access(u, ci, CA_FOUNDER))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+		else if (!c->ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
+		else if (!check_access(u, c->ci, CA_FOUNDER))
+			source.Reply(ACCESS_DENIED);
 		
 		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
 
@@ -48,23 +48,18 @@ class CommandCSClearUsers : public Command
 
 		source.Reply(_("All users have been kicked from \2%s\2."), chan.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CLEARUSERS \037channel\037\002\n"
-				" \n"
-				"Tells %s to clear (kick) all users certain settings on a channel."
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Tells %s to clear (kick) all users certain settings on a channel."
 				" \n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), Config->s_ChanServ.c_str());
+				"channel."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CLEAR", _("CLEARUSERS \037channel\037"));
 	}
 };
 
@@ -73,14 +68,12 @@ class CSClearUsers : public Module
 	CommandCSClearUsers commandcsclearusers;
 
  public:
-	CSClearUsers(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSClearUsers(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsclearusers(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsclearusers);
+		ModuleManager::RegisterService(&commandcsclearusers);
 	}
 };
 

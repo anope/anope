@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandModeBase : public Command
 {
@@ -28,7 +27,7 @@ class CommandModeBase : public Command
 	 * @param levelself The access level required to set this mode on yourself
 	 * @param notice Flag required on a channel to send a notice
 	 */
-	CommandReturn do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
+	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
 	{
 		User *u = source.u;
 
@@ -38,7 +37,7 @@ class CommandModeBase : public Command
 		else
 			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself, notice);
 
-		return MOD_CONT;
+		return;
 	}
 
 	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
@@ -54,19 +53,19 @@ class CommandModeBase : public Command
 		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!ci)
-			source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!set && u2->IsProtected() && !is_same)
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!c->FindUser(u2))
-			source.Reply(_(NICK_X_NOT_ON_CHAN), u2->nick.c_str(), c->name.c_str());
+			source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		else
 		{
 			if (set)
@@ -82,18 +81,21 @@ class CommandModeBase : public Command
 
 
  public:
-	CommandModeBase(const Anope::string &cname) : Command(cname, 0, 2) { }
+	CommandModeBase(Module *creator, const Anope::string &cname) : Command(creator, cname, 0, 2)
+	{
+		this->SetSyntax(_("[\037#channel\037] [\037nick\037]"));
+	}
 };
 
 class CommandCSOp : public CommandModeBase
 {
  public:
-	CommandCSOp() : CommandModeBase("OP")
+	CommandCSOp(Module *creator) : CommandModeBase(creator, "chanserv/op")
 	{
 		this->SetDesc(_("Gives Op status to a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
@@ -102,9 +104,9 @@ class CommandCSOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002OP [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Ops a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Ops a selected nick on a channel. If nick is not given,\n"
 				"it will op you. If channel is not given, it will op you\n"
 				"on every channel.\n"
 				" \n"
@@ -112,22 +114,17 @@ class CommandCSOp : public CommandModeBase
 				"and above on the channel."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "OP", _("OP [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSDeOp : public CommandModeBase
 {
  public:
-	CommandCSDeOp() : CommandModeBase("DEOP")
+	CommandCSDeOp(Module *creator) : CommandModeBase(creator, "chanserv/deop")
 	{
 		this->SetDesc(_("Deops a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
@@ -136,32 +133,27 @@ class CommandCSDeOp : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEOP [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Deops a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply("Deops a selected nick on a channel. If nick is not given,\n"
 				"it will deop you. If channel is not given, it will deop\n"
 				"you on every channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 access \n"
-				"and above on the channel."));
+				"and above on the channel.");
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEOP", _("DEOP [\037#channel\037] [\037nick\037]\002"));
 	}
 };
 
 class CommandCSVoice : public CommandModeBase
 {
  public:
-	CommandCSVoice() : CommandModeBase("VOICE")
+	CommandCSVoice(Module *creator) : CommandModeBase(creator, "chanserv/voice")
 	{
 		this->SetDesc(_("Voices a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
@@ -170,9 +162,9 @@ class CommandCSVoice : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002VOICE [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Voices a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Voices a selected nick on a channel. If nick is not given,\n"
 				"it will voice you. If channel is not given, it will voice you\n"
 				"on every channel.\n"
 				" \n"
@@ -181,22 +173,17 @@ class CommandCSVoice : public CommandModeBase
 				"and above for self voicing."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "VOICE", _("VOICE [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSDeVoice : public CommandModeBase
 {
  public:
-	CommandCSDeVoice() : CommandModeBase("DEVOICE")
+	CommandCSDeVoice(Module *creator) : CommandModeBase(creator, "chanserv/devoice")
 	{
 		this->SetDesc(_("Devoices a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
@@ -205,9 +192,9 @@ class CommandCSDeVoice : public CommandModeBase
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEVOICE [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Devoices a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Devoices a selected nick on a channel. If nick is not given,\n"
 				"it will devoice you. If channel is not given, it will devoice\n"
 				"you on every channel.\n"
 				" \n"
@@ -216,36 +203,31 @@ class CommandCSDeVoice : public CommandModeBase
 				"and above for self devoicing."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEVOICE", _("DEVOICE [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSHalfOp : public CommandModeBase
 {
  public:
-	CommandCSHalfOp() : CommandModeBase("HALFOP")
+	CommandCSHalfOp(Module *creator) : CommandModeBase(creator, "chanserv/halfop")
 	{
 		this->SetDesc(_("Halfops a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002HALFOP [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Halfops a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Halfops a selected nick on a channel. If nick is not given,\n"
 				"it will halfop you. If channel is not given, it will halfop\n"
 				"you on every channel.\n"
 				" \n"
@@ -253,36 +235,31 @@ class CommandCSHalfOp : public CommandModeBase
 				"and above on the channel, or to HOPs or those with level 4 \n"));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "HALFOP", _("HALFOP [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSDeHalfOp : public CommandModeBase
 {
  public:
-	CommandCSDeHalfOp() : CommandModeBase("DEHALFOP")
+	CommandCSDeHalfOp(Module *creator) : CommandModeBase(creator, "chanserv/dehalfop")
 	{
 		this->SetDesc(_("Dehalfops a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEHALFOP [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Dehalfops a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Dehalfops a selected nick on a channel. If nick is not given,\n"
 				"it will dehalfop you. If channel is not given, it will dehalfop\n"
 				"you on every channel.\n"
 				" \n"
@@ -291,36 +268,31 @@ class CommandCSDeHalfOp : public CommandModeBase
 				"and above for self dehalfopping."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEHALFOP", _("DEHALFOP [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSProtect : public CommandModeBase
 {
  public:
-	CommandCSProtect() : CommandModeBase("PROTECT")
+	CommandCSProtect(Module *creator) : CommandModeBase(creator, "chanserv/protect")
 	{
 		this->SetDesc(_("Protects a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002PROTECT [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Protects a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Protects a selected nick on a channel. If nick is not given,\n"
 				"it will protect you. If channel is not given, it will protect\n"
 				"you on every channel.\n"
 				" \n"
@@ -328,118 +300,98 @@ class CommandCSProtect : public CommandModeBase
 				"level 10 and above on the channel for self protecting."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "PROTECT", _("PROTECT [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSDeProtect : public CommandModeBase
 {
  public:
-	CommandCSDeProtect() : CommandModeBase("DEPROTECT")
+	CommandCSDeProtect(Module *creator) : CommandModeBase(creator, "chanserv/deprotect")
 	{
 		this->SetDesc(_("Deprotects a selected nick on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEPROTECT [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Deprotects a selected nick on a channel. If nick is not given,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Deprotects a selected nick on a channel. If nick is not given,\n"
 				"it will deprotect you. If channel is not given, it will deprotect\n"
 				"you on every channel.\n"
 				" \n"
 				"By default, limited to the founder, or to SOPs or those with \n"));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEPROTECT", _("DEROTECT [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSOwner : public CommandModeBase
 {
  public:
-	CommandCSOwner() : CommandModeBase("OWNER")
+	CommandCSOwner(Module *creator) : CommandModeBase(module, "chanserv/owner")
 	{
 		this->SetDesc(_("Gives you owner status on channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002OWNER [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Gives the selected nick owner status on \002channel\002. If nick is not\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Gives the selected nick owner status on \002channel\002. If nick is not\n"
 				"given, it will give you owner. If channel is not given, it will\n"
 				"give you owner on every channel.\n"
 				" \n"
 				"Limited to those with founder access on the channel."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "OWNER", _("OWNER [\037#channel\037] [\037nick\037]\002"));
-	}
 };
 
 class CommandCSDeOwner : public CommandModeBase
 {
  public:
-	CommandCSDeOwner() : CommandModeBase("DEOWNER")
+	CommandCSDeOwner(Module *creator) : CommandModeBase(creator, "chanserv/deowner")
 	{
 		this->SetDesc(_("Removes your owner status on a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
 		if (!cm)
-			return MOD_CONT;
+			return;
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME, CI_BEGIN);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEOWNER [\037#channel\037] [\037nick\037]\002\n"
-				" \n"
-				"Removes owner status from the selected nick on \002channel\002. If nick\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Removes owner status from the selected nick on \002channel\002. If nick\n"
 				"is not given, it will deowner you. If channel is not given, it will\n"
 				"deowner you on every channel.\n"
 				" \n"
 				"Limited to those with founder access on the channel."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEOWNER", _("DEOWNER [\037#channel\037] [\037nick\037]\002"));
 	}
 };
 
@@ -457,54 +409,24 @@ class CSModes : public Module
 	CommandCSDeVoice commandcsdevoice;
 
  public:
-	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSModes(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsowner(this), commandcsdeowner(this), commandcsprotect(this), commandcsdeprotect(this),
+		commandcsop(this), commandcsdeop(this), commandcshalfop(this), commandcsdehalfop(this),
+		commandcsvoice(this), commandcsdevoice(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsop);
-		this->AddCommand(chanserv->Bot(), &commandcsdeop);
-		this->AddCommand(chanserv->Bot(), &commandcsvoice);
-		this->AddCommand(chanserv->Bot(), &commandcsdevoice);
-
-		if (Me && Me->IsSynced())
-			OnUplinkSync(NULL);
-
-		Implementation i[] = {I_OnUplinkSync, I_OnServerDisconnect};
-		ModuleManager::Attach(i, this, 2);
-	}
-
-	void OnUplinkSync(Server *)
-	{
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-		{
-			this->AddCommand(chanserv->Bot(), &commandcsowner);
-			this->AddCommand(chanserv->Bot(), &commandcsdeowner);
-		}
-
-		if (ModeManager::FindChannelModeByName(CMODE_PROTECT))
-		{
-			this->AddCommand(chanserv->Bot(), &commandcsprotect);
-			this->AddCommand(chanserv->Bot(), &commandcsdeprotect);
-		}
-
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-		{
-			this->AddCommand(chanserv->Bot(), &commandcshalfop);
-			this->AddCommand(chanserv->Bot(), &commandcsdehalfop);
-		}
-	}
-
-	void OnServerDisconnect()
-	{
-		this->DelCommand(chanserv->Bot(), &commandcsowner);
-		this->DelCommand(chanserv->Bot(), &commandcsdeowner);
-		this->DelCommand(chanserv->Bot(), &commandcsprotect);
-		this->DelCommand(chanserv->Bot(), &commandcsdeprotect);
-		this->DelCommand(chanserv->Bot(), &commandcshalfop);
-		this->DelCommand(chanserv->Bot(), &commandcsdehalfop);
+		ModuleManager::RegisterService(&commandcsop);
+		ModuleManager::RegisterService(&commandcsdeop);
+		ModuleManager::RegisterService(&commandcsvoice);
+		ModuleManager::RegisterService(&commandcsdevoice);
+		
+		ModuleManager::RegisterService(&commandcsowner);
+		ModuleManager::RegisterService(&commandcsdeowner);
+		ModuleManager::RegisterService(&commandcsprotect);
+		ModuleManager::RegisterService(&commandcsdeprotect);
+		ModuleManager::RegisterService(&commandcshalfop);
+		ModuleManager::RegisterService(&commandcsdehalfop);
 	}
 };
 

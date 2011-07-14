@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 class MemoDelCallback : public NumberList
 {
@@ -42,12 +41,13 @@ class MemoDelCallback : public NumberList
 class CommandMSDel : public Command
 {
  public:
-	CommandMSDel() : Command("DEL", 0, 2)
+	CommandMSDel(Module *creator) : Command(creator, "memoserv/del", 0, 2)
 	{
 		this->SetDesc(_("Delete a memo or memos"));
+		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | ALL}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -62,18 +62,18 @@ class CommandMSDel : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
-				return MOD_CONT;
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				return;
 			}
 			else if (readonly)
 			{
-				source.Reply(_(READ_ONLY_MODE));
-				return MOD_CONT;
+				source.Reply(READ_ONLY_MODE);
+				return;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			mi = &ci->memos;
 		}
@@ -84,9 +84,9 @@ class CommandMSDel : public Command
 		else if (mi->memos.empty())
 		{
 			if (!chan.empty())
-				source.Reply(_(MEMO_X_HAS_NO_MEMOS), chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(_(MEMO_HAVE_NO_MEMOS));
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -121,14 +121,14 @@ class CommandMSDel : public Command
 					source.Reply(_("All of your memos have been deleted."));
 			}
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEL [\037channel\037] {\037num\037 | \037list\037 | LAST | ALL}\002\n"
-				" \n"
-				"Deletes the specified memo or memos. You can supply\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Deletes the specified memo or memos. You can supply\n"
 				"multiple memo numbers or ranges of numbers instead of a\n"
 				"single number, as in the second example below.\n"
 				" \n"
@@ -144,11 +144,6 @@ class CommandMSDel : public Command
 				"      Deletes memos numbered 2 through 5 and 7 through 9."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEL", _("DEL [\037channel\037] {\037num\037 | \037list\037 | ALL}"));
-	}
 };
 
 class MSDel : public Module
@@ -156,14 +151,12 @@ class MSDel : public Module
 	CommandMSDel commandmsdel;
 
  public:
-	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSDel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsdel(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsdel);
+		ModuleManager::RegisterService(&commandmsdel);
 	}
 };
 

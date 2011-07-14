@@ -11,7 +11,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 #include "os_session.h"
 
 Anope::string DatabaseFile;
@@ -305,38 +304,28 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 		maxusercnt = params[1].is_pos_number_only() ? convertTo<uint32>(params[1]) : 0;
 		maxusertime = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 	}
-	else if (params[0].equals_ci("SNLINE") || params[0].equals_ci("SQLINE") || params[0].equals_ci("SZLINE"))
+	else if (params[0].equals_ci("SXLINE"))
 	{
-		Anope::string mask = params[1];
-		Anope::string by = params[2];
-		time_t seton = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
-		time_t expires = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
-		Anope::string reason = params[5];
+		char type = params[1][0];
+		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
+		{
+			XLineManager *xl = *it;
+			if (xl->Type() == type)
+			{
+				Anope::string mask = params[2];
+				Anope::string by = params[3];
+				time_t seton = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
+				time_t expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
+				Anope::string reason = params[6];
 
-		XLine *x = NULL;
-		if (params[0].equals_ci("SNLINE") && SNLine)
-			x = SNLine->Add(mask, by, expires, reason);
-		else if (params[0].equals_ci("SQLINE") && SQLine)
-			x = SQLine->Add(mask, by, expires, reason);
-		else if (params[0].equals_ci("SZLINE") && SZLine)
-			x = SZLine->Add(mask, by, expires, reason);
-		if (x)
-			x->Created = seton;
+				XLine *x = xl->Add(mask, by, expires, reason);
+				if (x)
+					x->Created = seton;
+				break;
+			}
+		}
 	}
-	else if (params[0].equals_ci("AKILL") && SGLine)
-	{
-		Anope::string user = params[1];
-		Anope::string host = params[2];
-		Anope::string by = params[3];
-		time_t seton = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
-		time_t expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
-		Anope::string reason = params[6];
-
-		XLine *x = SGLine->Add(user + "@" + host, by, expires, reason);
-		if (x)
-			x->Created = seton;
-	}
-	else if (params[0].equals_ci("EXCEPTION"))
+	else if (params[0].equals_ci("EXCEPTION") && SessionInterface)
 	{
 		Exception *exception = new Exception();
 		exception->mask = params[1];
@@ -403,8 +392,6 @@ class DBPlain : public Module
 			Log(LOG_DEBUG) << "db_plain: Attemping to rename " << DatabaseFile << " to " << newname;
 			if (rename(DatabaseFile.c_str(), newname.c_str()))
 			{
-				if (operserv)
-					ircdproto->SendGlobops(operserv->Bot(), "Unable to backup database!");
 				Log() << "Unable to back up database!";
 
 				if (!Config->NoBackupOkay)
@@ -755,6 +742,9 @@ class DBPlain : public Module
 		{
 			BotInfo *bi = it->second;
 
+			if (bi->HasFlag(BI_CONF))
+				continue;
+
 			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
 			if (bi->FlagCount())
 				db_buffer << "MD FLAGS " << ToString(bi->ToString()) << endl;
@@ -850,39 +840,22 @@ class DBPlain : public Module
 
 		db_buffer << "OS STATS " << maxusercnt << " " << maxusertime << endl;
 
-		if (SGLine)
-			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
-			{
-				XLine *x = SGLine->GetEntry(i);
-				db_buffer << "OS AKILL " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
-			}
-
-		if (SNLine)
-			for (unsigned i = 0, end = SNLine->GetCount(); i < end; ++i)
-			{
-				XLine *x = SNLine->GetEntry(i);
-				db_buffer << "OS SNLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
-			}
-
-		if (SQLine)
-			for (unsigned i = 0, end = SQLine->GetCount(); i < end; ++i)
-			{
-				XLine *x = SQLine->GetEntry(i);
-				db_buffer << "OS SQLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
-			}
-
-		if (SZLine)
-			for (unsigned i = 0, end = SZLine->GetCount(); i < end; ++i)
-			{
-				XLine *x = SZLine->GetEntry(i);
-				db_buffer << "OS SZLINE " << x->Mask << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
-			}
-
-		for (SessionService::ExceptionVector::iterator it = SessionInterface->GetExceptions().begin(); it != SessionInterface->GetExceptions().end(); ++it)
+		for (std::list<XLineManager *>::iterator it = XLineManager::XLineManagers.begin(), it_end = XLineManager::XLineManagers.end(); it != it_end; ++it)
 		{
-			Exception *e = *it;
-			db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
+			XLineManager *xl = *it;
+			for (unsigned i = 0, end = xl->GetCount(); i < end; ++i)
+			{
+				XLine *x = xl->GetEntry(i);
+				db_buffer << "OS SXLINE " << xl->Type() << " " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << x->Created << " " << x->Expires << " :" << x->Reason << endl;
+			}
 		}
+
+		if (SessionInterface)
+			for (SessionService::ExceptionVector::iterator it = SessionInterface->GetExceptions().begin(); it != SessionInterface->GetExceptions().end(); ++it)
+			{
+				Exception *e = *it;
+				db_buffer << "OS EXCEPTION " << e->mask << " " << e->limit << " " << e->who << " " << e->time << " " << e->expires << " " << e->reason << endl;
+			}
 
 		FOREACH_MOD(I_OnDatabaseWrite, OnDatabaseWrite(Write));
 

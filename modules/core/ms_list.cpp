@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 class MemoListCallback : public NumberList
 {
@@ -33,11 +32,7 @@ class MemoListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			if (ci)
-				source.Reply(_("Memos for %s. To read, type: \002%s%s READ %s \037num\037\002"), ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
-			else
-				source.Reply(_("Memos for %s. To read, type: \002%s%s READ \037num\037\002"), source.u->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
-
+			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.u->nick.c_str());
 			source.Reply(_(" Num  Sender            Date/Time"));
 		}
 
@@ -54,12 +49,13 @@ class MemoListCallback : public NumberList
 class CommandMSList : public Command
 {
  public:
-	CommandMSList() : Command("LIST", 0, 2)
+	CommandMSList(Module *creator) : Command(creator, "memoserv/list", 0, 2)
 	{
 		this->SetDesc(_("List your memos"));
+		this->SetSyntax(_("[\037channel\037] [\037list\037 | NEW]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -75,13 +71,13 @@ class CommandMSList : public Command
 
 			if (!(ci = cs_findchan(chan)))
 			{
-				source.Reply(_(CHAN_X_NOT_REGISTERED), chan.c_str());
-				return MOD_CONT;
+				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+				return;
 			}
 			else if (!check_access(u, ci, CA_MEMO))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			mi = &ci->memos;
 		}
@@ -92,9 +88,9 @@ class CommandMSList : public Command
 		else if (!mi->memos.size())
 		{
 			if (!chan.empty())
-				source.Reply(_(MEMO_X_HAS_NO_MEMOS), chan.c_str());
+				source.Reply(MEMO_X_HAS_NO_MEMOS, chan.c_str());
 			else
-				source.Reply(_(MEMO_HAVE_NO_MEMOS));
+				source.Reply(MEMO_HAVE_NO_MEMOS);
 		}
 		else
 		{
@@ -113,10 +109,10 @@ class CommandMSList : public Command
 					if (i == end)
 					{
 						if (!chan.empty())
-							source.Reply(_(MEMO_X_HAS_NO_NEW_MEMOS), chan.c_str());
+							source.Reply(MEMO_X_HAS_NO_NEW_MEMOS, chan.c_str());
 						else
-							source.Reply(_(MEMO_HAVE_NO_NEW_MEMOS));
-						return MOD_CONT;
+							source.Reply(MEMO_HAVE_NO_NEW_MEMOS);
+						return;
 					}
 				}
 
@@ -130,10 +126,7 @@ class CommandMSList : public Command
 					if (!SentHeader)
 					{
 						SentHeader = true;
-						if (ci)
-							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%s%s READ %s \037num\037\002") : _("Memos for %s. To read, type: \002%sR%s READ %s \037num\037\002"), ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str());
-						else
-							source.Reply(!param.empty() ? _("New memos for %s.  To read, type: \002%s%s READ \037num\037\002") : _("Memos for %s. To read, type: \002%s%s READ \037num\037\002"), u->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
+						source.Reply(_("New memo for %s."), ci ? ci->name.c_str() : u->nick.c_str());
 						source.Reply(_(" Num  Sender            Date/Time"));
 					}
 
@@ -141,25 +134,20 @@ class CommandMSList : public Command
 				}
 			}
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002LIST [\037channel\037] [\037list\037 | NEW]\002\n"
-				" \n"
-				"Lists any memos you currently have.  With \002NEW\002, lists only\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists any memos you currently have.  With \002NEW\002, lists only\n"
 				"new (unread) memos. Unread memos are marked with a \"*\"\n"
 				"to the left of the memo number. You can also specify a list\n"
 				"of numbers, as in the example below:\n"
 				"   \002LIST 2-5,7-9\002\n"
 				"      Lists memos numbered 2 through 5 and 7 through 9."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "LIST", _("LIST [\037channel\037] [\037list\037 | NEW]"));
 	}
 };
 
@@ -168,14 +156,12 @@ class MSList : public Module
 	CommandMSList commandmslist;
 
  public:
-	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmslist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmslist);
+		ModuleManager::RegisterService(&commandmslist);
 	}
 };
 

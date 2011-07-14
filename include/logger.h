@@ -29,6 +29,8 @@ struct LogFile
 	Anope::string GetName() const;
 };
 
+class Command;
+
 class CoreExport Log
 {
  public:

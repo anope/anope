@@ -13,7 +13,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "chanserv.h"
 
 registered_channel_map RegisteredChannelList;
 
@@ -124,8 +123,7 @@ void check_modes(Channel *c)
 	/* Check for mode bouncing */
 	if (c->server_modecount >= 3 && c->chanserv_modecount >= 3)
 	{
-		ircdproto->SendGlobops(NULL, "Warning: unable to set modes on channel %s. Are your servers' U:lines configured correctly?", c->name.c_str());
-		Log() << "Bouncy modes on channel " << c->name;
+		Log() << "Warning: unable to set modes on channel " << c->name << ". Are your servers' U:lines configured correctly?";
 		c->bouncy_modes = 1;
 		return;
 	}
@@ -367,11 +365,12 @@ Anope::string get_xop_level(int level)
 
 ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
 {
-	if (!chanserv || !c)
+	BotInfo *bi = findbot(Config->ChanServ);
+	if (!bi || !c)
 		return;
 	c->SetFlag(CH_INHABIT);
 	if (!c->ci || !c->ci->bi)
-		chanserv->Bot()->Join(c);
+		bi->Join(c);
 	else if (!c->FindUser(c->ci->bi))
 		c->ci->bi->Join(c);
 }
@@ -385,8 +384,9 @@ void ChanServTimer::Tick(time_t)
 
 	if (!c->ci || !c->ci->bi)
 	{
-		if (chanserv)
-			chanserv->Bot()->Part(c);
+		BotInfo *bi = findbot(Config->ChanServ);
+		if (bi)
+			bi->Part(c);
 	}
 	else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
 		c->ci->bi->Part(c);

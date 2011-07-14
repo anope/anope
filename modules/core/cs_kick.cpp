@@ -12,25 +12,25 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSKick : public Command
 {
  public:
-	CommandCSKick() : Command("KICK", 2, 3)
+	CommandCSKick(Module *creator) : Command(creator, "chanserv/kick", 2, 3)
 	{
 		this->SetDesc(_("Kicks a selected nick from a channel"));
+		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &target = params[1];
 		const Anope::string &reason = params.size() > 2 ? params[2] : "Requested";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		Channel *c = findchan(params[0]);
 		bool is_same = target.equals_ci(u->nick);
 		User *u2 = is_same ? u : finduser(target);
 
@@ -38,17 +38,19 @@ class CommandCSKick : public Command
 		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
 
 		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+		else if (!ci)
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
-			source.Reply(_(NICK_X_NOT_IN_USE), target.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!is_same && (ci->HasFlag(CI_PEACE)) && u2_level >= u_level)
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (u2->IsProtected())
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!c->FindUser(u2))
-			source.Reply(_(NICK_X_NOT_ON_CHAN), u2->nick.c_str(), c->name.c_str());
+			source.Reply(NICK_X_NOT_ON_CHAN, u2->nick.c_str(), c->name.c_str());
 		else
 		{
 			 // XXX
@@ -59,23 +61,18 @@ class CommandCSKick : public Command
 			else
 				ci->c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002KICK \037#channel\037 \037nick\037 [\037reason\037]\002\n"
-				" \n"
-				"Kicks a selected nick on a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Kicks a selected nick on a channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 access \n"
 				"and above on the channel."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "KICK", _("KICK \037#channel\037 \037nick\037 [\037reason\037]"));
 	}
 };
 
@@ -84,14 +81,11 @@ class CSKick : public Module
 	CommandCSKick commandcskick;
 
  public:
-	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcskick(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcskick);
+		ModuleManager::RegisterService(&commandcskick);
 	}
 };
 

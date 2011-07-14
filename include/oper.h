@@ -10,17 +10,6 @@
 #define OPER_H
 
 class XLineManager;
-extern CoreExport XLineManager *SGLine;
-extern CoreExport XLineManager *SZLine;
-extern CoreExport XLineManager *SQLine;
-extern CoreExport XLineManager *SNLine;
-
-enum XLineType
-{
-	X_SNLINE,
-	X_SQLINE,
-	X_SZLINE
-};
 
 class CoreExport XLine
 {
@@ -40,23 +29,28 @@ class CoreExport XLine
 	Anope::string GetHost() const;
 };
 
-class CoreExport XLineManager
+class CoreExport XLineManager : public Service
 {
- private:
-	/* List of XLine managers we check users against in XLineManager::CheckAll */
-	static std::list<XLineManager *> XLineManagers;
-
+	char type;
  protected:
 	/* List of XLines in this XLineManager */
 	std::vector<XLine *> XLines;
  public:
+	/* List of XLine managers we check users against in XLineManager::CheckAll */
+	static std::list<XLineManager *> XLineManagers;
+
 	/** Constructor
 	 */
-	XLineManager();
+	XLineManager(Module *creator, const Anope::string &name, char t);
 
 	/** Destructor
 	 */
 	virtual ~XLineManager();
+
+	/** The type of xline provided by this service
+	 * @return The type
+	 */
+	const char &Type();
 
 	/** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
 	 * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
@@ -163,67 +157,6 @@ class CoreExport XLineManager
 	 * @param x The xline
 	 */
 	virtual void Send(User *u, XLine *x) = 0;
-};
-
-/* This is for AKILLS */
-class SGLineManager : public XLineManager
-{
- public:
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
-
-	void Del(XLine *x);
-
-	void OnMatch(User *u, XLine *x);
-
-	void OnExpire(XLine *x);
-	
-	void Send(User *u, XLine *x);
-};
-
-class SNLineManager : public XLineManager
-{
- public:
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
-
-	void Del(XLine *x);
-
-	void OnMatch(User *u, XLine *x);
-
-	void OnExpire(XLine *x);
-
-	void Send(User *u, XLine *x);
-
-	XLine *Check(User *u);
-};
-
-class SQLineManager : public XLineManager
-{
- public:
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
-
-	void Del(XLine *x);
-
-	void OnMatch(User *u, XLine *x);
-
-	void OnExpire(XLine *x);
-
-	void Send(User *u, XLine *x);
-
-	static bool Check(Channel *c);
-};
-
-class SZLineManager : public XLineManager
-{
- public:
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
-
-	void Del(XLine *x);
-
-	void OnMatch(User *u, XLine *x);
-
-	void OnExpire(XLine *x);
-
-	void Send(User *u, XLine *x);
 };
 
 #endif // OPER_H

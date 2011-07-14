@@ -17,12 +17,13 @@
 class CommandMSRSend : public Command
 {
  public:
-	CommandMSRSend() : Command("RSEND", 2, 2)
+	CommandMSRSend(Module *creator) : Command(creator, "memoserv/rsend", 2, 2)
 	{
 		this->SetDesc(_("Sends a memo and requests a read receipt"));
+		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -34,11 +35,11 @@ class CommandMSRSend : public Command
 		if ((na = findnick(nick)) && na->nc == u->Account())
 		{
 			source.Reply(_("You can not request a receipt when sending a memo to yourself."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (Config->MSMemoReceipt == 1 && !u->IsServicesOper())
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (Config->MSMemoReceipt > 2 || Config->MSMemoReceipt == 0)
 		{
 			Log() << "MSMemoReceipt is set misconfigured to " << Config->MSMemoReceipt;
@@ -67,14 +68,14 @@ class CommandMSRSend : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002RSEND {\037nick\037 | \037channel\037} \037memo-text\037\002\n"
-				" \n"
-				"Sends the named \037nick\037 or \037channel\037 a memo containing\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
 				"\037memo-text\037. When sending to a nickname, the recipient will\n"
 				"receive a notice that he/she has a new memo. The target\n"
 				"nickname/channel must be registered.\n"
@@ -83,11 +84,6 @@ class CommandMSRSend : public Command
 				"has been read."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "RSEND", _("RSEND {\037nick\037 | \037channel\037} \037memo-text\037"));
-	}
 };
 
 class MSRSend : public Module
@@ -95,17 +91,15 @@ class MSRSend : public Module
 	CommandMSRSend commandmsrsend;
 
  public:
-	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSRSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsrsend(this)
 	{
+		this->SetAuthor("Anope");
+
 		if (!Config->MSMemoReceipt)
 			throw ModuleException("Invalid value for memoreceipt");
 
-		this->SetAuthor("Anope");
-
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsrsend);
+		ModuleManager::RegisterService(&commandmsrsend);
 	}
 };
 

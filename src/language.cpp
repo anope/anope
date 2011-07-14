@@ -1,5 +1,6 @@
 #include "services.h"
-#include <stack>
+#include "modules.h"
+#include "commands.h"
 
 std::vector<Anope::string> languages;
 std::vector<Anope::string> domains;
@@ -93,10 +94,4 @@ const char *anope_gettext(const char *lang, const char *string)
 	return string != NULL ? string : "";
 }
 #endif
-
-void SyntaxError(CommandSource &source, const Anope::string &command, const Anope::string &message)
-{
-	source.Reply(_("Syntax: \002%s\002"), message.c_str());
-	source.Reply(_(_(MORE_INFO)), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), command.c_str());
-}
 

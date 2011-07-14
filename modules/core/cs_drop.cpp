@@ -12,42 +12,47 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSDrop : public Command
 {
  public:
-	CommandCSDrop() : Command("DROP", 1, 1)
+	CommandCSDrop(Module *creator) : Command(creator, "chanserv/drop", 1, 1)
 	{
-		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetDesc(_("Cancel the registration of a channel"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
 			source.Reply(_("Sorry, channel de-registration is temporarily disabled.")); // XXX: READ_ONLY_MODE?
-			return MOD_CONT;
+			return;
+		}
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
 		}
 
 		ci = cs_findchan(chan);
 
-		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
+		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/chanserv/drop"))
 		{
-			source.Reply(_(CHAN_X_SUSPENDED), chan.c_str());
-			return MOD_CONT;
+			source.Reply(CHAN_X_SUSPENDED, chan.c_str());
+			return;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->HasCommand("chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->HasCommand("chanserv/chanserv/drop"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
@@ -62,29 +67,22 @@ class CommandCSDrop : public Command
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
+		this->SendSyntax(source);
+		source.Reply(" ");
 		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002DROP \037channel\037\002\n"
-					" \n"
-					"Unregisters the named channel.  Only \002Services Operators\002\n"
+			source.Reply(_("Unregisters the named channel.  Only \002Services Operators\002\n"
 					"can drop a channel for which they have not identified."));
 		else
-			source.Reply(_("Syntax: \002DROP \037channel\037\002\n"
-					" \n"
-					"Unregisters the named channel.  Can only be used by\n"
+			source.Reply(_("Unregisters the named channel.  Can only be used by\n"
 					"\002channel founder\002."));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DROP", _("DROP \037channel\037"));
 	}
 };
 
@@ -93,14 +91,11 @@ class CSDrop : public Module
 	CommandCSDrop commandcsdrop;
 
  public:
-	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSDrop(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsdrop(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsdrop);
+		ModuleManager::RegisterService(&commandcsdrop);
 	}
 };
 

@@ -14,7 +14,8 @@
 #include "module.h"
 #include "memoserv.h"
 
-static BotInfo *MemoServ = NULL;
+static BotInfo *MemoServ;
+
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
 	Anope::string message = Anope::printf(translate(nc, _(
@@ -33,11 +34,6 @@ class MyMemoServService : public MemoServService
 {
  public:
 	MyMemoServService(Module *m) : MemoServService(m) { }
-
-	BotInfo *Bot()
-	{
-		return MemoServ;
-	}
 
  	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan)
 	{
@@ -105,7 +101,7 @@ class MyMemoServService : public MemoServService
 					if (check_access(cu->user, ci, CA_MEMO))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
-							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
+							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
 					}
 				}
 			}
@@ -121,7 +117,7 @@ class MyMemoServService : public MemoServService
 					NickAlias *na = *it;
 					User *user = finduser(na->nick);
 					if (user && user->IsIdentified())
-						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), mi->memos.size());
+						user->SendMessage(MemoServ, MEMO_NEW_MEMO_ARRIVED, source.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), mi->memos.size());
 				}
 			}
 
@@ -146,22 +142,7 @@ class MyMemoServService : public MemoServService
 				++newcnt;
 		}
 		if (newcnt > 0)
-		{
 			u->SendMessage(MemoServ, newcnt == 1 ? _("You have 1 new memo.") : _("You have %d new memos."), newcnt);
-			if (newcnt == 1 && (nc->memos.memos[i - 1]->HasFlag(MF_UNREAD)))
-				u->SendMessage(MemoServ, _("Type \002%s%s READ LAST\002 to read it."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
-			else if (newcnt == 1)
-			{
-				for (i = 0; i < end; ++i)
-				{
-					if (nc->memos.memos[i]->HasFlag(MF_UNREAD))
-						break;
-				}
-				u->SendMessage(MemoServ, _("Type \002%s%s READ %d\002 to read it."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str(), i);
-			}
-			else
-				u->SendMessage(MemoServ, _("Type \002%s%s LIST NEW\002 to list them."), Config->UseStrictPrivMsgString.c_str(), Config->s_MemoServ.c_str());
-		}
 		if (nc->memos.memomax > 0 && nc->memos.memos.size() >= nc->memos.memomax)
 		{
 			if (nc->memos.memos.size() > nc->memos.memomax)
@@ -175,38 +156,20 @@ class MyMemoServService : public MemoServService
 class MemoServCore : public Module
 {
 	MyMemoServService mymemoserv;
-
  public:
-	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mymemoserv(this)
+	MemoServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		mymemoserv(this)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate };
-		ModuleManager::Attach(i, this, 4);
+		MemoServ = findbot(Config->MemoServ);
+		if (MemoServ == NULL)
+			throw ModuleException("No bot named " + Config->MemoServ);
+
+		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
+		ModuleManager::Attach(i, this, 6);
 
 		ModuleManager::RegisterService(&this->mymemoserv);
-		
-		MemoServ = new BotInfo(Config->s_MemoServ, Config->ServiceUser, Config->ServiceHost, Config->desc_MemoServ);
-		MemoServ->SetFlag(BI_CORE);
-
-		spacesepstream coreModules(Config->MemoCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~MemoServCore()
-	{
-		spacesepstream coreModules(Config->MemoCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete MemoServ;
 	}
 
 	void OnNickIdentify(User *u)
@@ -234,6 +197,30 @@ class MemoServCore : public Module
 	void OnNickUpdate(User *u)
 	{
 		this->mymemoserv.Check(u);
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->MemoServ)
+			return;
+		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
+			"messages to other IRC users, whether they are online at\n"
+			"the time or not, or to channels(*). Both the sender's\n"
+			"nickname and the target nickname or channel must be\n"
+			"registered in order to send a memo.\n"
+			"%s's commands include:"), Config->MemoServ.c_str(), Config->MemoServ.c_str());
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->MemoServ)
+			return;
+		source.Reply(_(" \n"
+			"Type \002%s%s HELP \037command\037\002 for help on any of the\n"
+			"above commands.\n"
+			"(*) By default, any user with at least level 10 access on a\n"
+			"    channel can read that channel's memos. This can be\n"
+			"    changed with the %s \002LEVELS\002 command."), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), Config->ChanServ.c_str());
 	}
 };
 

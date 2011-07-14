@@ -14,25 +14,18 @@
 #include "module.h"
 #include "global.h"
 
-static BotInfo *Global = NULL;
-
 class MyGlobalService : public GlobalService
 {
-	 void ServerGlobal(Server *s, const Anope::string &message)
-	 {
-	 	if (s != Me && !s->HasFlag(SERVER_JUPED))
-			notice_server(Config->s_Global, s, "%s", message.c_str());
+	void ServerGlobal(Server *s, const Anope::string &message)
+	{
+		if (s != Me && !s->HasFlag(SERVER_JUPED))
+			notice_server(Config->Global, s, "%s", message.c_str());
 		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
 			this->ServerGlobal(s->GetLinks()[i], message);
-	 }
+	}
 
  public:
 	MyGlobalService(Module *m) : GlobalService(m) { }
-
-	BotInfo *Bot()
-	{
-		return Global;
-	}
 
 	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message)
 	{
@@ -52,57 +45,47 @@ class MyGlobalService : public GlobalService
 
 class GlobalCore : public Module
 {
-	MyGlobalService myglobal;
+	MyGlobalService myglobalservice;
 
  public:
-	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myglobal(this)
+	GlobalCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		myglobalservice(this)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer };
+		BotInfo *Global = findbot(Config->Global);
+		if (Global == NULL)
+			throw ModuleException("No bot named " + Config->Global);
+
+		ModuleManager::RegisterService(&this->myglobalservice);
+
+		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
 		ModuleManager::Attach(i, this, 3);
-
-		ModuleManager::RegisterService(&this->myglobal);
-		
-		Global = new BotInfo(Config->s_Global, Config->ServiceUser, Config->ServiceHost, Config->desc_Global);
-		Global->SetFlag(BI_CORE);
-
-		spacesepstream coreModules(Config->GlobalCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~GlobalCore()
-	{
-		spacesepstream coreModules(Config->GlobalCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete Global;
 	}
 
 	void OnRestart()
 	{
 		if (Config->GlobalOnCycle)
-			global->SendGlobal(global->Bot(), "", Config->GlobalOnCycleMessage);
+			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
 	}
 	
 	void OnShutdown()
 	{
 		if (Config->GlobalOnCycle)
-			global->SendGlobal(global->Bot(), "", Config->GlobalOnCycleMessage);
+			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
 	}
 
 	void OnNewServer(Server *s)
 	{
 		if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
-			notice_server(Config->s_Global, s, "%s", Config->GlobalOnCycleUP.c_str());
+			notice_server(Config->Global, s, "%s", Config->GlobalOnCycleUP.c_str());
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->Global)
+			return;
+		source.Reply(_("%s commands:\n"), Config->Global.c_str());
 	}
 };
 

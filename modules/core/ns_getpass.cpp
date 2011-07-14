@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSGetPass : public Command
 {
  public:
-	CommandNSGetPass() : Command("GETPASS", 1, 1, "nickserv/getpass")
+	CommandNSGetPass(Module *creator) : Command(creator, "nickserv/getpass", 1, 1, "nickserv/getpass")
 	{
 		this->SetDesc(_("Retrieve the password for a nickname"));
+		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
@@ -30,9 +30,9 @@ class CommandNSGetPass : public Command
 		NickAlias *na;
 
 		if (!(na = findnick(nick)))
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Config->NSSecureAdmins && na->nc->IsServicesOper())
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
@@ -43,23 +43,18 @@ class CommandNSGetPass : public Command
 			else
 				source.Reply(_("GETPASS command unavailable because encryption is in use."));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GETPASS \037nickname\037\002\n"
-				" \n"
-				"Returns the password for the given nickname.  \002Note\002 that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Returns the password for the given nickname.  \002Note\002 that\n"
 				"whenever this command is used, a message including the\n"
 				"person who issued the command and the nickname it was used\n"
 				"on will be logged and sent out as a WALLOPS/GLOBOPS."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GETPASS", _("GETPASS \037nickname\037"));
 	}
 };
 
@@ -68,18 +63,16 @@ class NSGetPass : public Module
 	CommandNSGetPass commandnsgetpass;
 
  public:
-	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSGetPass(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsgetpass(this)
 	{
 		this->SetAuthor("Anope");
-
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
 
 		Anope::string tmp_pass = "plain:tmp";
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
-		this->AddCommand(nickserv->Bot(), &commandnsgetpass);
+		ModuleManager::RegisterService(&commandnsgetpass);
 	}
 };
 

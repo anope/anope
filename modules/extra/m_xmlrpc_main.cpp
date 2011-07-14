@@ -8,7 +8,7 @@ class XMLRPCUser : public User
 	dynamic_reference<NickAlias> na;
 
  public:
-	XMLRPCUser(const Anope::string &nnick) : User(nnick, Config->ServiceUser, Config->ServiceHost, ""), na(findnick(nick))
+	XMLRPCUser(const Anope::string &nnick) : User(nnick, Config->NSEnforcerUser, Config->NSEnforcerHost, ""), na(findnick(nick))
 	{
 		this->realname = "XMLRPC User";
 		this->server = Me;
@@ -87,7 +87,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 				else
 					request->reply("online", "yes");
 
-				mod_run_cmd(bi, u, NULL, command);
+				bi->OnMessage(u, command);
 
 				if (created && u)
 				{
@@ -131,14 +131,6 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 	void DoStats(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
 	{
-		if (SGLine)
-			request->reply("sglinecount", stringify(SGLine->GetCount()));
-		if (SQLine)
-			request->reply("sqlinecount", stringify(SQLine->GetCount()));
-		if (SNLine)
-			request->reply("snlinecount", stringify(SNLine->GetCount()));
-		if (SZLine)
-			request->reply("szlinecount", stringify(SZLine->GetCount()));
 		request->reply("uptime", stringify(Anope::CurTime - start_time));
 		request->reply("uplinkname", Me->GetLinks().front()->GetName());
 		{

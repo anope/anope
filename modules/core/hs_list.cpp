@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hostserv.h"
 
 class CommandHSList : public Command
 {
  public:
-	CommandHSList() : Command("LIST", 0, 1, "hostserv/list")
+	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1, "hostserv/list")
 	{
 		this->SetDesc(_("Displays one or more vhost entries."));
+		this->SetSyntax(_("\002[<key>|<#X-Y>]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
@@ -37,15 +37,15 @@ class CommandHSList : public Command
 			size_t tmp = key.find('-');
 			if (tmp == Anope::string::npos || tmp == key.length() || tmp == 1)
 			{
-				source.Reply(_(LIST_INCORRECT_RANGE));
-				return MOD_CONT;
+				source.Reply(LIST_INCORRECT_RANGE);
+				return;
 			}
 			for (unsigned i = 1, end = key.length(); i < end; ++i)
 			{
 				if (!isdigit(key[i]) && i != tmp)
 				{
-					source.Reply(_(LIST_INCORRECT_RANGE));
-					return MOD_CONT;
+					source.Reply(LIST_INCORRECT_RANGE);
+					return;
 				}
 				try
 				{
@@ -100,13 +100,14 @@ class CommandHSList : public Command
 			else
 				source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002LIST\002 \002[<key>|<#X-Y>]\002\n"
-				"This command lists registered vhosts to the operator\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command lists registered vhosts to the operator\n"
 				"if a Key is specified, only entries whos nick or vhost match\n"
 				"the pattern given in <key> are displayed e.g. Rob* for all\n"
 				"entries beginning with \"Rob\"\n"
@@ -124,14 +125,12 @@ class HSList : public Module
 	CommandHSList commandhslist;
 
  public:
-	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	HSList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandhslist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!hostserv)
-			throw ModuleException("HostServ is not loaded!");
-
-		this->AddCommand(hostserv->Bot(), &commandhslist);
+		ModuleManager::RegisterService(&commandhslist);
 	}
 };
 

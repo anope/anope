@@ -12,52 +12,59 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "botserv.h"
 
 class CommandBSAssign : public Command
 {
  public:
-	CommandBSAssign() : Command("ASSIGN", 2, 2)
+	CommandBSAssign(Module *creator) : Command(creator, "botserv/assign", 2, 2)
 	{
 		this->SetDesc(_("Assigns a bot to a channel"));
+		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
+
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
-			source.Reply(_(BOT_ASSIGN_READONLY));
-			return MOD_CONT;
+			source.Reply(BOT_ASSIGN_READONLY);
+			return;
+		}
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
 		}
 
 		BotInfo *bi = findbot(nick);
 		if (!bi)
 		{
-			source.Reply(_(BOT_DOES_NOT_EXIST), nick.c_str());
-			return MOD_CONT;
+			source.Reply(BOT_DOES_NOT_EXIST, nick.c_str());
+			return;
 		}
 
 		if (ci->botflags.HasFlag(BS_NOBOT) || (!check_access(u, ci, CA_ASSIGN) && !u->HasPriv("botserv/administration")))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
-		if (bi->HasFlag(BI_PRIVATE) && !u->HasCommand("botserv/assign/private"))
+		if (bi->HasFlag(BI_PRIVATE) && !u->HasCommand("botserv/botserv/assign/private"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
-		if (ci->bi && nick.equals_ci(ci->bi->nick))
+		if (ci->bi == bi)
 		{
 			source.Reply(_("Bot \002%s\002 is already assigned to channel \002%s\002."), ci->bi->nick.c_str(), chan.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		bool override = !check_access(u, ci, CA_ASSIGN);
@@ -65,38 +72,96 @@ class CommandBSAssign : public Command
 
 		bi->Assign(u, ci);
 		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
-		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002ASSIGN \037chan\037 \037nick\037\002\n"
-				" \n"
-				"Assigns a bot pointed out by nick to the channel chan. You\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Assigns a bot pointed out by nick to the channel chan. You\n"
 				"can then configure the bot for the channel so it fits\n"
 				"your needs."));
 		return true;
 	}
+};
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
+class CommandBSUnassign : public Command
+{
+ public:
+	CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
 	{
-		SyntaxError(source, "ASSIGN", _("ASSIGN \037chan\037 \037nick\037"));
+		this->SetDesc(_("Unassigns a bot from a channel"));
+		this->SetSyntax(_("\037channel\037 \037nick\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		User *u = source.u;
+
+		if (readonly)
+		{
+			source.Reply(BOT_ASSIGN_READONLY);
+			return;
+		}
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!u->HasPriv("botserv/administration") && !check_access(u, ci, CA_ASSIGN))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
+
+		if (!ci->bi)
+		{
+			source.Reply(BOT_NOT_ASSIGNED);
+			return;
+		}
+
+		if (ci->HasFlag(CI_PERSIST) && !ModeManager::FindChannelModeByName(CMODE_PERM))
+		{
+			source.Reply(_("You can not unassign bots while persist is set on the channel."));
+			return;
+		}
+
+		bool override = !check_access(u, ci, CA_ASSIGN);
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
+
+		ci->bi->UnAssign(u, ci);
+		source.Reply(_("There is no bot assigned to %s anymore."), ci->name.c_str());
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Unassigns a bot from a channel. When you use this command,\n"
+				"the bot won't join the channel anymore. However, bot\n"
+				"configuration for the channel is kept, so you will always\n"
+				"be able to reassign a bot later without have to reconfigure\n"
+				"it entirely."));
+		return true;
 	}
 };
 
 class BSAssign : public Module
 {
 	CommandBSAssign commandbsassign;
+	CommandBSUnassign commandbsunassign;
 
  public:
-	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	BSAssign(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandbsassign(this), commandbsunassign(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!botserv)
-			throw ModuleException("BotServ is not loaded!");
-
-		this->AddCommand(botserv->Bot(), &commandbsassign);
+		ModuleManager::RegisterService(&commandbsassign);
+		ModuleManager::RegisterService(&commandbsunassign);
 	}
 };
 

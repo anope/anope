@@ -14,6 +14,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 /* inspircd-ts6.h uses these */
 static bool has_globopsmod = false;
@@ -269,7 +270,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 		
 			NickAlias *user_na = findnick(u->nick);
 			if (nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 	}
 
@@ -768,7 +769,7 @@ class ProtoInspIRCd : public Module
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
 		 */
-		u->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
+		u->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
 	}
 
 	void OnServerSync(Server *s)

@@ -12,30 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetMessage : public Command
 {
  public:
-	CommandNSSetMessage(const Anope::string &spermission = "") : Command("MSG", 2, 2, spermission)
+	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Change the communication method of Services"));
+		this->SetSyntax(_("{ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetMessage");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
 
 		if (!Config->UsePrivmsg)
 		{
 			source.Reply(_("Option \002%s\02 cannot be set on this network."), "MSG");
-			return MOD_CONT;
+			return;
 		}
-
-		const Anope::string &param = params.size() > 1 ? params[1] : "";
 
 		if (param.equals_ci("ON"))
 		{
@@ -50,45 +51,47 @@ class CommandNSSetMessage : public Command
 		else
 			this->OnSyntaxError(source, "MSG");
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET MSG {ON | OFF}\002\n"
-				" \n"
-				"Allows you to choose the way Services are communicating with \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to choose the way Services are communicating with \n"
 				"you. With \002MSG\002 set, Services will use messages, else they'll \n"
 				"use notices."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET MSG", _("SET MSG {ON | OFF}"));
 	}
 };
 
 class CommandNSSASetMessage : public CommandNSSetMessage
 {
  public:
-	CommandNSSASetMessage() : CommandNSSetMessage("nickserv/saset/message")
+	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2, "nickserv/saset/message")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 MSG {ON | OFF}\002\n"
-				" \n"
-				"Allows you to choose the way Services are communicating with \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to choose the way Services are communicating with \n"
 				"the given user. With \002MSG\002 set, Services will use messages,\n"
 				"else they'll use notices."));
 		return true;
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		SyntaxError(source, "SASET MSG", _("SASAET \037nickname\037 PRIVATE {ON | OFF}"));
+		this->Run(source, params[0], params[1]);
 	}
 };
 
@@ -98,31 +101,13 @@ class NSSetMessage : public Module
 	CommandNSSASetMessage commandnssasetmessage;
 
  public:
-	NSSetMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetmessage(this), commandnssasetmessage(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetmessage);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetmessage);
-	}
-
-	~NSSetMessage()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetmessage);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetmessage);
+		ModuleManager::RegisterService(&commandnssetmessage);
+		ModuleManager::RegisterService(&commandnssasetmessage);
 	}
 };
 

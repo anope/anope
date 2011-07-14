@@ -12,54 +12,54 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetMisc : public Command
 {
- private:
-	Anope::string Desc;
-
  public:
-	CommandNSSetMisc(const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(cdesc)
+	CommandNSSetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "", size_t min = 1) : Command(owner, "nickserv/set/" + cname, min, min + 1, cpermission)
 	{
 		this->SetDesc(cdesc);
+		this->SetSyntax(_("\037parameter\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetMisc");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
 
 		nc->Shrink("nickserv:" + this->name);
-		if (params.size() > 1)
+		if (!param.empty())
 		{
-			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			source.Reply(_(CHAN_SETTING_CHANGED), this->name.c_str(), nc->display.c_str(), params[1].c_str());
+			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(param));
+			source.Reply(CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), param.c_str());
 		}
 		else
-			source.Reply(_(CHAN_SETTING_UNSET), this->name.c_str(), nc->display.c_str());
+			source.Reply(CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		SyntaxError(source, "SET", _(NICK_SET_SYNTAX));
+		this->Run(source, source.u->Account()->display, params[0]);
 	}
 };
 
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(const Anope::string &cname, const Anope::string &cdesc) : CommandNSSetMisc(cname, cdesc, "nickserv/saset/" + cname)
+	CommandNSSASetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc) : CommandNSSetMisc(creator, "nickserv/saset/" + cname, cdesc, "nickserv/saset/" + cname, 2)
 	{
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		SyntaxError(source, "SASET", _(NICK_SASET_SYNTAX));
+		this->Run(source, params[0], params[1]);
 	}
 };
 
@@ -78,37 +78,8 @@ class NSSetMisc : public Module
 
 	void RemoveAll()
 	{
-		if (!nickserv || Commands.empty())
-			return;
-
-		Command *set = FindCommand(nickserv->Bot(), "SET");
-		Command *saset = FindCommand(nickserv->Bot(), "SASET");
-
-		if (!set && !saset)
-			return;
-
 		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-		{
-			if (set)
-			{
-				Command *c = set->FindSubcommand(it->second->Name);
-				if (c)
-				{
-					set->DelSubcommand(c);
-					delete c;
-				}
-			}
-			if (saset)
-			{
-				Command *c = saset->FindSubcommand(it->second->Name);
-				if (c)
-				{
-					saset->DelSubcommand(c);
-					delete c;
-				}
-			}
-		}
-
+			delete it->second;
 		this->Commands.clear();
 	}
 
@@ -116,9 +87,6 @@ class NSSetMisc : public Module
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
 
 		Implementation i[] = { I_OnReload, I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 4);
@@ -134,11 +102,6 @@ class NSSetMisc : public Module
 	void OnReload()
 	{
 		RemoveAll();
-
-		Command *set = FindCommand(nickserv->Bot(), "SET");
-		Command *saset = FindCommand(nickserv->Bot(), "SASET");
-		if (!set && !saset)
-			return;
 
 		ConfigReader config;
 
@@ -158,10 +121,8 @@ class NSSetMisc : public Module
 				continue;
 			}
 
-			if (set)
-				set->AddSubcommand(this, new CommandNSSetMisc(cname, desc));
-			if (saset)
-				saset->AddSubcommand(this, new CommandNSSASetMisc(cname, desc));
+			ModuleManager::RegisterService(new CommandNSSetMisc(this, cname, desc));
+			ModuleManager::RegisterService(new CommandNSSASetMisc(this, cname, desc));
 		}
 	}
 

@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSOLine : public Command
 {
  public:
-	CommandOSOLine() : Command("OLINE", 2, 2, "operserv/oline")
+	CommandOSOLine(Module *creator) : Command(creator, "operserv/oline", 2, 2, "operserv/oline")
 	{
 		this->SetDesc(_("Give Operflags to a certain user"));
+		this->SetSyntax(_("\037nick\037 \037flags\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
@@ -31,40 +31,35 @@ class CommandOSOLine : public Command
 
 		/* let's check whether the user is online */
 		if (!(u2 = finduser(nick)))
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
-			u2->SetMode(operserv->Bot(), UMODE_OPER);
-			u2->SendMessage(operserv->Bot(), _("You are now an IRC Operator."));
+			ircdproto->SendSVSO(Config->OperServ, nick, flag);
+			u2->SetMode(source.owner, UMODE_OPER);
+			u2->SendMessage(source.owner, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(operserv->Bot(), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			ircdproto->SendGlobops(source.owner, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(Config->s_OperServ, nick, flag);
+			ircdproto->SendSVSO(Config->OperServ, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(operserv->Bot(), "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			ircdproto->SendGlobops(source.owner, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002OLINE \037user\037 \037flags\037\002\n"
-				" \n"
-				"Allows Services Opers to give Operflags to any user.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services Opers to give Operflags to any user.\n"
 				"Flags have to be prefixed with a \"+\" or a \"-\". To\n"
 				"remove all flags simply type a \"-\" instead of any flags."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "OLINE", _("OLINE \037nick\037 \037flags\037"));
 	}
 };
 
@@ -73,17 +68,15 @@ class OSOLine : public Module
 	CommandOSOLine commandosoline;
 
  public:
-	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSOLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosoline(this)
 	{
+		this->SetAuthor("Anope");
+
 		if (!ircd || !ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->SetAuthor("Anope");
-
-		this->AddCommand(operserv->Bot(), &commandosoline);
+		ModuleManager::RegisterService(&commandosoline);
 	}
 };
 

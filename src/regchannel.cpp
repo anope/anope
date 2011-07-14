@@ -11,8 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "chanserv.h"
-#include "nickserv.h"
 
 ChanAccess::ChanAccess(const Anope::string &umask)
 {
@@ -193,9 +191,14 @@ NickCore *ChannelInfo::GetFounder() const
  */
 BotInfo *ChannelInfo::WhoSends()
 {
-	if (!this || !this->bi || !this->c || !this->botflags.HasFlag(BS_SYMBIOSIS) || !this->c->FindUser(this->bi))
-		return chanserv ? chanserv->Bot() : (nickserv ? nickserv->Bot() : NULL);
-	return this->bi;
+	if (this && this->bi)
+		return this->bi;
+	BotInfo *bi = findbot(Config->ChanServ);
+	if (bi)
+		return bi;
+	else if (!BotListByNick.empty())
+		return BotListByNick.begin()->second;
+	return NULL;
 }
 
 /** Add an entry to the channel access list
@@ -786,8 +789,11 @@ bool ChannelInfo::CheckKick(User *user)
 		return false;
 
 	bool set_modes = false, do_kick = false;
-	if (ircd->chansqline && SQLineManager::Check(this->c))
-		do_kick = true;
+
+	EventReturn MOD_RESULT;
+	FOREACH_MOD(I_OnCheckKick, OnCheckKick(user, this, do_kick));
+	if (MOD_RESULT == EVENT_ALLOW)
+		return false;
 
 	Anope::string mask, reason;
 	if (!user->HasMode(UMODE_OPER) && this->HasFlag(CI_SUSPENDED))

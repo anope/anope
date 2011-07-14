@@ -17,20 +17,21 @@
 class CommandMSSendAll : public Command
 {
  public:
-	CommandMSSendAll() : Command("SENDALL", 1, 1, "memoserv/sendall")
+	CommandMSSendAll(Module *creator) : Command(creator, "memoserv/sendall", 1, 1, "memoserv/sendall")
 	{
 		this->SetDesc(_("Send a memo to all registered users"));
+		this->SetSyntax(_("\037memo-text\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &text = params[0];
 
 		if (readonly)
 		{
-			source.Reply(_(MEMO_SEND_DISABLED));
-			return MOD_CONT;
+			source.Reply(MEMO_SEND_DISABLED);
+			return;
 		}
 
 		NickAlias *na = findnick(u->nick);
@@ -44,19 +45,15 @@ class CommandMSSendAll : public Command
 		}
 
 		source.Reply(_("A massmemo has been sent to all registered users."));
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SENDALL\002 \002memo-text\002\n \n"
-				"Sends all registered users a memo containing \037memo-text\037."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sends all registered users a memo containing \037memo-text\037."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SENDALL", _("SENDALL \037memo-text\037"));
 	}
 };
 
@@ -65,14 +62,12 @@ class MSSendAll : public Module
 	CommandMSSendAll commandmssendall;
 
  public:
-	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSSendAll(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmssendall(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmssendall);
+		ModuleManager::RegisterService(&commandmssendall);
 	}
 };
 

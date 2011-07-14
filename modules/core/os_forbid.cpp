@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 #include "os_forbid.h"
 
 class MyForbidService : public ForbidService
@@ -64,7 +63,7 @@ class MyForbidService : public ForbidService
 				else if (d->type == FT_EMAIL)
 					type = "email";
 
-				Log(operserv->Bot(), Config->s_OperServ + "/forbid") << "Expiring forbid for " << d->mask << " type " << type;
+				Log(LOG_NORMAL, Config->OperServ + "/forbid") << "Expiring forbid for " << d->mask << " type " << type;
 				this->forbidData.erase(this->forbidData.begin() + i - 1);
 				delete d;
 			}
@@ -78,15 +77,18 @@ class CommandOSForbid : public Command
 {
 	service_reference<ForbidService> fs;
  public:
-	CommandOSForbid() : Command("FORBID", 1, 5, "operserv/forbid"), fs("forbid")
+	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5, "operserv/forbid"), fs("forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
+		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));
+		this->SetSyntax(_("DEL {NICK|CHAN|EMAIL} \037entry\037"));
+		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL)"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!this->fs)
-			return MOD_CONT;
+			return;
 
 		const Anope::string &command = params[0];
 		const Anope::string &subcommand = params.size() > 1 ? params[1] : "";
@@ -180,23 +182,16 @@ class CommandOSForbid : public Command
 		else
 			this->OnSyntaxError(source, command);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002FORBID ADD {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037\002 [\037reason\037]\n"
-				"       \002FORBID DEL {NICK|CHAN|EMAIL} \037entry\037\002\n"
-				"	\002FORBID LIST (NICK|CHAN|EMAIL)"
-				"\n"
-				"Forbid allows you to forbid usage of certain nicknames, channels,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "FORBID", _("FORBID {ADD|DEL|LIST} {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037 [\037reason\037]"));
 	}
 };
 
@@ -206,24 +201,22 @@ class OSForbid : public Module
 	CommandOSForbid commandosforbid;
 
  public:
-	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), forbidService(this)
+	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		forbidService(this), commandosforbid(this)
 	{
 		this->SetAuthor("Anope");
-
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand, I_OnDatabaseWrite, I_OnDatabaseRead };
 		ModuleManager::Attach(i, this, 6);
 		
 		ModuleManager::RegisterService(&this->forbidService);
 
-		this->AddCommand(operserv->Bot(), &commandosforbid);
+		ModuleManager::RegisterService(&commandosforbid);
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)
 	{
-		if (!u || exempt || !operserv)
+		if (!u || exempt)
 			return;
 
 		this->OnUserNickChange(u, "");
@@ -231,27 +224,32 @@ class OSForbid : public Module
 
 	void OnUserNickChange(User *u, const Anope::string &)
 	{
-		if (!operserv || u->HasMode(UMODE_OPER))
+		if (u->HasMode(UMODE_OPER))
 			return;
 
 		ForbidData *d = this->forbidService.FindForbid(u->nick, FT_NICK);
 		if (d != NULL)
 		{
-			if (d->reason.empty())
-				u->SendMessage(operserv->Bot(), _("This nickname has been forbidden."));
-			else
-				u->SendMessage(operserv->Bot(), _("This nickname has been forbidden: %s"), d->reason.c_str());
+			BotInfo *bi = findbot(Config->OperServ);
+			if (bi)
+			{
+				if (d->reason.empty())
+					u->SendMessage(bi, _("This nickname has been forbidden."));
+				else
+					u->SendMessage(bi, _("This nickname has been forbidden: %s"), d->reason.c_str());
+			}
 			u->Collide(NULL);
 		}
 	}
 
 	void OnJoinChannel(User *u, Channel *c)
 	{
-		if (!operserv || u->HasMode(UMODE_OPER))
+		if (u->HasMode(UMODE_OPER))
 			return;
 
+		BotInfo *bi = findbot(Config->OperServ);
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
-		if (d != NULL)
+		if (bi != NULL && d != NULL)
 		{			
 			if (!c->HasFlag(CH_INHABIT))
 			{
@@ -266,17 +264,17 @@ class OSForbid : public Module
 			}
 
 			if (d->reason.empty())
-				c->Kick(operserv->Bot(), u, _("This channel has been forbidden."));
+				c->Kick(bi, u, _("This channel has been forbidden."));
 			else
-				c->Kick(operserv->Bot(), u, _("This channel has been forbidden: %s"), d->reason.c_str());
+				c->Kick(bi, u, _("This channel has been forbidden: %s"), d->reason.c_str());
 		}
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
 		if (source.u->HasMode(UMODE_OPER))
 			return EVENT_CONTINUE;
-		else if (command->service->nick == Config->s_NickServ && command->name == "REGISTER" && params.size() > 1)
+		else if (command->name == "nickserv/register" && params.size() > 1)
 		{
 			ForbidData *d = this->forbidService.FindForbid(params[1], FT_EMAIL);
 			if (d != NULL)
@@ -285,9 +283,9 @@ class OSForbid : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->service->nick == Config->s_NickServ && command->name == "SET" && params.size() > 2 && params[0].equals_ci("EMAIL"))
+		else if (command->name == "nickserv/set/email" && params.size() > 0)
 		{
-			ForbidData *d =this->forbidService.FindForbid(params[1], FT_EMAIL);
+			ForbidData *d = this->forbidService.FindForbid(params[0], FT_EMAIL);
 			if (d != NULL)
 			{
 				source.Reply("Your email address is not allowed, choose a different one.");

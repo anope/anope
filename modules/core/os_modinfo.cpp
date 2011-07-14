@@ -12,33 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSModInfo : public Command
 {
-	void showModuleCmdLoaded(BotInfo *bi, const Anope::string &mod_name, CommandSource &source)
-	{
-		if (!bi)
-			return;
-
-		for (CommandMap::iterator it = bi->Commands.begin(), it_end = bi->Commands.end(); it != it_end; ++it)
-		{
-			Command *c = it->second;
-
-			if (c->module && c->module->name.equals_ci(mod_name) && c->service)
-			{
-				source.Reply(_("Providing command: \002%s %s\002"), c->service->nick.c_str(), c->name.c_str());
-			}
-		}
-	}
-
  public:
-	CommandOSModInfo() : Command("MODINFO", 1, 1)
+	CommandOSModInfo(Module *creator) : Command(creator, "operserv/modinfo", 1, 1)
 	{
 		this->SetDesc(_("Info about a loaded module"));
+		this->SetSyntax(_("\037modname\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &file = params[0];
 
@@ -47,42 +31,212 @@ class CommandOSModInfo : public Command
 		{
 			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
 
-			for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-				this->showModuleCmdLoaded(it->second, m->name, source);
+			std::vector<Anope::string> services = ModuleManager::GetServiceKeys();
+			for (unsigned i = 0; i < services.size(); ++i)
+			{
+				Service *s = ModuleManager::GetService(services[i]);
+				if (!s || s->owner != m)
+					continue;
+				source.Reply(_("   Providing service: \002%s\002"), s->name.c_str());
+
+				for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+				{
+					BotInfo *bi = it->second;
+
+					for (command_map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+					{
+						if (cit->second != s->name)
+							continue;
+						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), cit->first.c_str(), bi->nick.c_str(), s->name.c_str());
+					}
+				}
+			}
 		}
 		else
 			source.Reply(_("No information about module \002%s\002 is available"), file.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002MODINFO\002 \002FileName\002\n"
-				" \n"
-				"This command lists information about the specified loaded module"));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command lists information about the specified loaded module"));
 		return true;
 	}
+};
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
+class CommandOSModList : public Command
+{
+ public:
+	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1, "operserv/modlist")
 	{
-		SyntaxError(source, "MODINFO", _("MODINFO \037FileName\037"));
+		this->SetDesc(_("List loaded modules"));
+		this->SetSyntax(_("[Core|3rd|protocol|encryption|supported]"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		const Anope::string &param = !params.empty() ? params[0] : "";
+
+		int count = 0;
+		int showCore = 0;
+		int showThird = 1;
+		int showProto = 1;
+		int showEnc = 1;
+		int showSupported = 1;
+		int showDB = 1;
+
+		char core[] = "Core";
+		char third[] = "3rd";
+		char proto[] = "Protocol";
+		char enc[] = "Encryption";
+		char supported[] = "Supported";
+		char db[] = "Database";
+
+		if (!param.empty())
+		{
+			if (param.equals_ci(core))
+			{
+				showCore = 1;
+				showThird = 0;
+				showProto = 0;
+				showEnc = 0;
+				showSupported = 0;
+				showDB = 0;
+			}
+			else if (param.equals_ci(third))
+			{
+				showCore = 0;
+				showThird = 1;
+				showSupported = 0;
+				showProto = 0;
+				showEnc = 0;
+				showDB = 0;
+			}
+			else if (param.equals_ci(proto))
+			{
+				showCore = 0;
+				showThird = 0;
+				showProto = 1;
+				showEnc = 0;
+				showSupported = 0;
+				showDB = 0;
+			}
+			else if (param.equals_ci(supported))
+			{
+				showCore = 0;
+				showThird = 0;
+				showProto = 0;
+				showSupported = 1;
+				showEnc = 0;
+				showDB = 0;
+			}
+			else if (param.equals_ci(enc))
+			{
+				showCore = 0;
+				showThird = 0;
+				showProto = 0;
+				showSupported = 0;
+				showEnc = 1;
+				showDB = 0;
+			}
+			else if (param.equals_ci(db))
+			{
+				showCore = 0;
+				showThird = 0;
+				showProto = 0;
+				showSupported = 0;
+				showEnc = 0;
+				showDB = 1;
+			}
+		}
+
+		source.Reply(_("Current Module list:"));
+
+		for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
+		{
+			Module *m = *it;
+
+			switch (m->type)
+			{
+				case CORE:
+					if (showCore)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), core);
+						++count;
+					}
+					break;
+				case THIRD:
+					if (showThird)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), third);
+						++count;
+					}
+					break;
+				case PROTOCOL:
+					if (showProto)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), proto);
+						++count;
+					}
+					break;
+				case SUPPORTED:
+					if (showSupported)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), supported);
+						++count;
+					}
+					break;
+				case ENCRYPTION:
+					if (showEnc)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), enc);
+						++count;
+					}
+					break;
+				case DATABASE:
+					if (showDB)
+					{
+						source.Reply(_("Module: \002%s\002 [%s] [%s]"), m->name.c_str(), m->version.c_str(), db);
+						++count;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		if (!count)
+			source.Reply(_("No modules currently loaded"));
+		else
+			source.Reply(_("%d Modules loaded."), count);
+
+		return;
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists all currently loaded modules."));
+		return true;
 	}
 };
 
 class OSModInfo : public Module
 {
 	CommandOSModInfo commandosmodinfo;
+	CommandOSModList commandosmodlist;
 
  public:
-	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSModInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosmodinfo(this), commandosmodlist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosmodinfo);
+		ModuleManager::RegisterService(&commandosmodinfo);
+		ModuleManager::RegisterService(&commandosmodlist);
 	}
 };
 

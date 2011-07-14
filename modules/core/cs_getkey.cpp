@@ -12,54 +12,55 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSGetKey : public Command
 {
  public:
-	CommandCSGetKey() : Command("GETKEY", 1, 1)
+	CommandCSGetKey(Module *creator) : Command(creator, "chanserv/getkey", 1, 1)
 	{
 		this->SetDesc(_("Returns the key of the given channel"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-
-		if (!check_access(u, ci, CA_GETKEY) && !u->HasCommand("chanserv/getkey"))
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+
+		if (!check_access(u, ci, CA_GETKEY) && !u->HasCommand("chanserv/chanserv/getkey"))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		Anope::string key;
 		if (!ci->c || !ci->c->GetParam(CMODE_KEY, key))
 		{
 			source.Reply(_("The channel \002%s\002 has no key."), chan.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		bool override = !check_access(u, ci, CA_GETKEY);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GETKEY \037channel\037\002\n"
-				" \n"
-				"Returns the key of the given channel."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Returns the key of the given channel."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GETKEY", _("GETKEY \037channel\037"));
 	}
 };
 
@@ -68,14 +69,11 @@ class CSGetKey : public Module
 	CommandCSGetKey commandcsgetkey;
 
  public:
-	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSGetKey(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcsgetkey(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsgetkey);
+		ModuleManager::RegisterService(&commandcsgetkey);
 	}
 };
 

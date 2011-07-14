@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hostserv.h"
 
 class CommandHSOn : public Command
 {
  public:
-	CommandHSOn() : Command("ON", 0, 0)
+	CommandHSOn(Module *creator) : Command(creator, "hostserv/on", 0, 0)
 	{
 		this->SetDesc(_("Activates your assigned vhost"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
@@ -44,15 +44,16 @@ class CommandHSOn : public Command
 			u->UpdateHost();
 		}
 		else
-			source.Reply(_(HOST_NOT_ASSIGNED));
+			source.Reply(HOST_NOT_ASSIGNED);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002ON\002\n"
-				"Activates the vhost currently assigned to the nick in use.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Activates the vhost currently assigned to the nick in use.\n"
 				"When you use this command any user who performs a /whois\n"
 				"on you will see the vhost instead of your real IP address."));
 		return true;
@@ -64,14 +65,12 @@ class HSOn : public Module
 	CommandHSOn commandhson;
 
  public:
-	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	HSOn(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandhson(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!hostserv)
-			throw ModuleException("HostServ is not loaded!");
-
-		this->AddCommand(hostserv->Bot(), &commandhson);
+		ModuleManager::RegisterService(&commandhson);
 	}
 };
 

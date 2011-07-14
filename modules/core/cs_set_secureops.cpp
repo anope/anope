@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetSecureOps : public Command
 {
  public:
-	CommandCSSetSecureOps(const Anope::string &cpermission = "") : Command("SECUREOPS", 2, 2, cpermission)
+	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Stricter control of chanop status"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetSecureIos");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,35 +51,25 @@ class CommandCSSetSecureOps : public Command
 		else
 			this->OnSyntaxError(source, "SECUREOPS");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET \037%s\037 SECUREOPS {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002secure ops\002 option for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002secure ops\002 option for a channel.\n"
 				"When \002secure ops\002 is set, users who are not on the userlist\n"
-				"will not be allowed chanop status."), this->name.c_str());
+				"will not be allowed chanop status."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET SECUREOPS", _("SET \037channel\037 SECUREOPS {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 {
  public:
-	CommandCSSASetSecureOps() : CommandCSSetSecureOps("chanserv/saset/secureops")
+	CommandCSSASetSecureOps(Module *creator) : CommandCSSetSecureOps(creator, "chanserv/saset/secureops", "chanserv/saset/secureops")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET SECUREOPS", _("SASET \002channel\002 SECUREOPS {ON | OFF}"));
 	}
 };
 
@@ -79,31 +79,13 @@ class CSSetSecureOps : public Module
 	CommandCSSASetSecureOps commandcssasetsecureops;
 
  public:
-	CSSetSecureOps(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetSecureOps(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetsecureops(this), commandcssasetsecureops(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetsecureops);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetsecureops);
-	}
-
-	~CSSetSecureOps()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetsecureops);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetsecureops);
+		ModuleManager::RegisterService(&commandcssetsecureops);
+		ModuleManager::RegisterService(&commandcssasetsecureops);
 	}
 };
 

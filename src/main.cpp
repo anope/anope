@@ -110,7 +110,7 @@ class UplinkSocket : public ConnectionSocket
 
 	~UplinkSocket()
 	{
-		if (Me && Me->GetUplink() && Me->GetUplink()->IsSynced())
+		if (Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
@@ -396,6 +396,8 @@ int main(int ac, char **av, char **envp)
 	if (quitmsg.empty())
 		quitmsg = "Terminating, reason unknown";
 	Log() << quitmsg;
+
+	delete UplinkSock;
 
 	ModuleManager::UnloadAll();
 	SocketEngine::Shutdown();

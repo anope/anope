@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSMode : public Command
 {
@@ -37,10 +36,9 @@ class CommandCSMode : public Command
 		return false;
 	}
 
-	void DoLock(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
@@ -159,10 +157,9 @@ class CommandCSMode : public Command
 			this->OnSyntaxError(source, subcommand);
 	}
 	
-	void DoSet(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
@@ -301,38 +298,39 @@ class CommandCSMode : public Command
 	}
 
  public:
-	CommandCSMode() : Command("MODE", 3, 4)
+	CommandCSMode(Module *creator) : Command(creator, "chanserv/mode", 3, 4)
 	{
 		this->SetDesc(_("Control modes and mode locks on a channel"));
+		this->SetSyntax(_("\037channel\037 LOCK {ADD|DEL|LIST} [\037what\037]"));
+		this->SetSyntax(_("\037channel\037 SET \037modes\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &subcommand = params[1];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
+		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (!ci || !ci->c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
-		else if (!check_access(u, ci, CA_MODE) && !u->HasCommand("chanserv/mode"))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+		else if (!check_access(u, ci, CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
+			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
-			this->DoLock(source, params);
+			this->DoLock(source, ci, params);
 		else if (subcommand.equals_ci("SET"))
-			this->DoSet(source, params);
+			this->DoSet(source, ci, params);
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002MODE \037channel\037 LOCK {ADD|DEL|LIST} [\037what\037]\002\n"
-			"        \002MODE \037channel\037 SET \037modes\037\002\n"
-			" \n"
-			"Mainly controls mode locks and mode access (which is different from channel access)\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Mainly controls mode locks and mode access (which is different from channel access)\n"
 			"on a channel.\n"
 			" \n"
 			"The \002MODE LOCK\002 command allows you to add, delete, and view mode locks on a channel.\n"
@@ -350,11 +348,6 @@ class CommandCSMode : public Command
 			"       Clears all extended bans that start with ~c:"));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "MODE", _("MODE \037channel\037 {LOCK|SET} [\037modes\037 | {ADD|DEL|LIST} [\037what\037]]"));
-	}
 };
 
 class CSMode : public Module
@@ -362,14 +355,12 @@ class CSMode : public Module
 	CommandCSMode commandcsmode;
 
  public:
-	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSMode(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsmode(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsmode);
+		ModuleManager::RegisterService(&commandcsmode);
 	}
 };
 

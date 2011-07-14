@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 enum
 {
@@ -27,20 +26,21 @@ enum
 class XOPListCallback : public NumberList
 {
 	CommandSource &source;
+	ChannelInfo *ci;
 	int level;
 	Command *c;
 	bool SentHeader;
  public:
-	XOPListCallback(CommandSource &_source, const Anope::string &numlist, int _level, Command *_c) : NumberList(numlist, false), source(_source), level(_level), c(_c), SentHeader(false)
+	XOPListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist, int _level, Command *_c) : NumberList(numlist, false), source(_source), ci(_ci), level(_level), c(_c), SentHeader(false)
 	{
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > source.ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
-		ChanAccess *access = source.ci->GetAccess(Number - 1);
+		ChanAccess *access = ci->GetAccess(Number - 1);
 
 		if (level != access->level)
 			return;
@@ -48,7 +48,7 @@ class XOPListCallback : public NumberList
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(_("%s list for %s:\n  Num  Nick"), this->c->name.c_str(), source.ci->name.c_str());
+			source.Reply(_("%s list for %s:\n  Num  Nick"), this->c->name.c_str(), ci->name.c_str());
 		}
 
 		DoList(source, access, Number - 1, level);
@@ -63,36 +63,37 @@ class XOPListCallback : public NumberList
 class XOPDelCallback : public NumberList
 {
 	CommandSource &source;
+	ChannelInfo *ci;
 	Command *c;
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool override;
  public:
-	XOPDelCallback(CommandSource &_source, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), c(_c), Deleted(0), override(_override)
+	XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override)
 	{
 	}
 
 	~XOPDelCallback()
 	{
 		if (!Deleted)
-			 source.Reply(_("No matching entries on %s %s list."), source.ci->name.c_str(), this->c->name.c_str());
+			 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), this->c->name.c_str());
 		else
 		{
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, source.ci) << "deleted access of users " << Nicks;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
-				source.Reply(_("Deleted one entry from %s %s list."), source.ci->name.c_str(), this->c->name.c_str());
+				source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), this->c->name.c_str());
 			else
-				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, source.ci->name.c_str(), this->c->name.c_str());
+				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), this->c->name.c_str());
 		}
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > source.ci->GetAccessCount())
+		if (!Number || Number > ci->GetAccessCount())
 			return;
 
-		ChanAccess *access = source.ci->GetAccess(Number - 1);
+		ChanAccess *access = ci->GetAccess(Number - 1);
 
 		++Deleted;
 		if (!Nicks.empty())
@@ -100,19 +101,18 @@ class XOPDelCallback : public NumberList
 		else
 			Nicks = access->GetMask();
 
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(source.ci, source.u, access));
+		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source.u, access));
 
-		source.ci->EraseAccess(Number - 1);
+		ci->EraseAccess(Number - 1);
 	}
 };
 
 class XOPBase : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params, int level)
+	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 		int change = 0;
@@ -120,13 +120,13 @@ class XOPBase : public Command
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 
 		if (readonly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		ChanAccess *access = ci->GetAccess(u);
@@ -134,8 +134,8 @@ class XOPBase : public Command
 
 		if ((level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		NickAlias *na = findnick(mask);
@@ -150,8 +150,8 @@ class XOPBase : public Command
 			 **/
 			if (access->level >= ulev && !u->HasPriv("chanserv/access/modify"))
 			{
-				source.Reply(_(ACCESS_DENIED));
-				return MOD_CONT;
+				source.Reply(ACCESS_DENIED);
+				return;
 			}
 			++change;
 		}
@@ -159,7 +159,7 @@ class XOPBase : public Command
 		if (!change && ci->GetAccessCount() >= Config->CSAccessMax)
 		{
 			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!change)
@@ -185,32 +185,31 @@ class XOPBase : public Command
 			source.Reply(_("\002%s\002 moved to %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params, int level)
+	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
-			return MOD_CONT;
+			return;
 		}
 
 		if (readonly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
 			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		ChanAccess *access = ci->GetAccess(u);
@@ -218,8 +217,8 @@ class XOPBase : public Command
 
 		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		access = ci->GetAccess(mask, 0, false);
@@ -228,18 +227,18 @@ class XOPBase : public Command
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
 			bool override = level >= ulev || ulev < ACCESS_AOP;
-			XOPDelCallback list(source, this, override, mask);
+			XOPDelCallback list(source, ci, this, override, mask);
 			list.Process();
 		}
 		else if (!access || access->level != level)
 		{
 			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 		else
 		{
 			if (access->nc != u->Account() && ulev <= access->level && !u->HasPriv("chanserv/access/modify"))
-				source.Reply(_(ACCESS_DENIED));
+				source.Reply(ACCESS_DENIED);
 			else
 			{
 				bool override = ulev <= access->level;
@@ -253,23 +252,22 @@ class XOPBase : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params, int level)
+	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		ChanAccess *access = ci->GetAccess(u);
 		uint16 ulev = access ? access->level : 0;
 
-		if (!ulev && !u->HasCommand("chanserv/access/list"))
+		if (!ulev && !u->HasCommand("chanserv/chanserv/access/list"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		bool override = !ulev;
@@ -278,12 +276,12 @@ class XOPBase : public Command
 		if (!ci->GetAccessCount())
 		{
 			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPListCallback list(source, nick, level, this);
+			XOPListCallback list(source, ci, nick, level, this);
 			list.Process();
 		}
 		else
@@ -312,30 +310,29 @@ class XOPBase : public Command
 				source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), this->name.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoClear(CommandSource &source, int level)
+	void DoClear(CommandSource &source, ChannelInfo *ci, int level)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		if (readonly)
 		{
 			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
 			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
-			return MOD_CONT;
+			return;
 		}
 
 		if (!check_access(u, ci, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		bool override = !check_access(u, ci, CA_FOUNDER);
@@ -352,69 +349,72 @@ class XOPBase : public Command
 
 		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), this->name.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
  protected:
-	CommandReturn DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level)
+	void DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level)
 	{
-		ChannelInfo *ci = source.ci;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		const Anope::string &cmd = params[1];
 
 		if (!ci->HasFlag(CI_XOP))
-			source.Reply(_("You can't use this command. Use the ACCESS command instead.\n"
-					"Type \002%s%s HELP ACCESS\002 for more information."), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+			source.Reply(_("You can't use this command. Use the ACCESS command instead."));
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, params, level);
+			return this->DoAdd(source, ci, params, level);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, params, level);
+			return this->DoDel(source, ci, params, level);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, params, level);
+			return this->DoList(source, ci, params, level);
 		else if (cmd.equals_ci("CLEAR"))
-			return this->DoClear(source, level);
+			return this->DoClear(source, ci, level);
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
  public:
-	XOPBase(const Anope::string &command) : Command(command, 2, 4)
+	XOPBase(Module *modname, const Anope::string &command) : Command(modname, command, 2, 4)
 	{
+		this->SetSyntax("\037channel\037 ADD \037mask\037");
+		this->SetSyntax("\037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}");
+		this->SetSyntax("\037channel\037 LIST [\037mask\037 | \037list\037]");
+		this->SetSyntax("\037channel\037 CLEAR");
 	}
 
 	virtual ~XOPBase()
 	{
 	}
 
-	virtual CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
+	virtual void Execute(CommandSource &source, const std::vector<Anope::string> &params) = 0;
 
 	virtual bool OnHelp(CommandSource &source, const Anope::string &subcommand) = 0;
-
-	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) = 0;
 };
 
 class CommandCSQOP : public XOPBase
 {
  public:
-	CommandCSQOP() : XOPBase("QOP")
+	CommandCSQOP(Module *creator) : XOPBase(creator, "chanserv/qop")
 	{
 		this->SetDesc(_("Modify the list of QOP users"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(source, params, ACCESS_QOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002QOP \037channel\037 ADD \037mask\037\002\n"
-				"        \002QOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002QOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002QOP \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002QOP\002 (AutoOwner) \002list\002 for a channel. The QOP \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002QOP\002 (AutoOwner) \002list\002 for a channel. The QOP \n"
 				"list gives users the right to be auto-owner on your channel,\n"
 				"which gives them almost (or potentially, total) access.\n"
 				" \n"
@@ -445,38 +445,30 @@ class CommandCSQOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "QOP", _("QOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 };
 
 class CommandCSAOP : public XOPBase
 {
  public:
-	CommandCSAOP() : XOPBase("AOP")
+	CommandCSAOP(Module *creator) : XOPBase(creator, "chanserv/aop")
 	{
 		this->SetDesc(_("Modify the list of AOP users"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(source, params, ACCESS_AOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002AOP \037channel\037 ADD \037mask\037\002\n"
-				"        \002AOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002AOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002AOP \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002AOP\002 (AutoOP) \002list\002 for a channel. The AOP \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002AOP\002 (AutoOP) \002list\002 for a channel. The AOP \n"
 				"list gives users the right to be auto-opped on your channel,\n"
 				"to unban or invite themselves if needed, to have their\n"
 				"greet message showed on join, and so on.\n"
@@ -509,38 +501,30 @@ class CommandCSAOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), 
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), 
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "AOP", _("AOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 };
 
 class CommandCSHOP : public XOPBase
 {
  public:
-	CommandCSHOP() : XOPBase("HOP")
+	CommandCSHOP(Module *creator) : XOPBase(creator, "chanserv/hop")
 	{
 		this->SetDesc(_("Maintains the HOP (HalfOP) list for a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(source, params, ACCESS_HOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002HOP \037channel\037 ADD \037mask\037\002\n"
-				"        \002HOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002HOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002HOP \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002HOP\002 (HalfOP) \002list\002 for a channel. The HOP \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002HOP\002 (HalfOP) \002list\002 for a channel. The HOP \n"
 				"list gives users the right to be auto-halfopped on your \n"
 				"channel.\n"
 				" \n"
@@ -571,38 +555,30 @@ class CommandCSHOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "HOP", _("HOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 };
 
 class CommandCSSOP : public XOPBase
 {
  public:
-	CommandCSSOP() : XOPBase("SOP")
+	CommandCSSOP(Module *creator) : XOPBase(creator, "chanserv/sop")
 	{
 		this->SetDesc(_("Modify the list of SOP users"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(source, params, ACCESS_SOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SOP \037channel\037 ADD \037mask\037\002\n"
-				"        \002SOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002SOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002SOP \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002SOP\002 (SuperOP) \002list\002 for a channel. The SOP \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002SOP\002 (SuperOP) \002list\002 for a channel. The SOP \n"
 				"list gives users all rights given by the AOP list, and adds\n"
 				"those needed to use the AutoKick and the BadWords lists, \n"
 				"to send and read channel memos, and so on.\n"
@@ -635,38 +611,30 @@ class CommandCSSOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SOP", _("SOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 };
 
 class CommandCSVOP : public XOPBase
 {
  public:
-	CommandCSVOP() : XOPBase("VOP")
+	CommandCSVOP(Module *creator) : XOPBase(creator, "chanserv/vop")
 	{
 		this->SetDesc(_("Maintains the VOP (VOicePeople) list for a channel"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		return this->DoXop(source, params, ACCESS_VOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002VOP \037channel\037 ADD \037mask\037\002\n"
-				"        \002VOP \037channel\037 DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002VOP \037channel\037 LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002VOP \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002VOP\002 (VOicePeople) \002list\002 for a channel.  \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002VOP\002 (VOicePeople) \002list\002 for a channel.  \n"
 				"The VOP list allows users to be auto-voiced and to voice \n"
 				"themselves if they aren't.\n"
 				" \n"
@@ -698,14 +666,9 @@ class CommandCSVOP : public XOPBase
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
 				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
 				"the access list and xOP list systems."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "VOP", _("VOP \037channel\037 {ADD|DEL|LIST|CLEAR} [\037nick\037 | \037entry-list\037]"));
 	}
 };
 
@@ -718,33 +681,16 @@ class CSXOP : public Module
 	CommandCSVOP commandcsvop;
 
  public:
-	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsqop(this), commandcssop(this), commandcsaop(this), commandcshop(this), commandcsvop(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(chanserv->Bot(), &commandcssop);
-		this->AddCommand(chanserv->Bot(), &commandcsaop);
-		this->AddCommand(chanserv->Bot(), &commandcsvop);
-
-		if (Me && Me->IsSynced())
-			OnUplinkSync(NULL);
-
-		Implementation i[] = {I_OnUplinkSync, I_OnServerDisconnect};
-		ModuleManager::Attach(i, this, 2);
-	}
-
-	void OnUplinkSync(Server *)
-	{
-		if (ModeManager::FindChannelModeByName(CMODE_OWNER))
-			this->AddCommand(chanserv->Bot(), &commandcsqop);
-		if (ModeManager::FindChannelModeByName(CMODE_HALFOP))
-			this->AddCommand(chanserv->Bot(), &commandcshop);
-	}
-
-	void OnServerDisconnect()
-	{
-		this->DelCommand(chanserv->Bot(), &commandcsqop);
-		this->DelCommand(chanserv->Bot(), &commandcshop);
+		ModuleManager::RegisterService(&commandcssop);
+		ModuleManager::RegisterService(&commandcsaop);
+		ModuleManager::RegisterService(&commandcsqop);
+		ModuleManager::RegisterService(&commandcsvop);
+		ModuleManager::RegisterService(&commandcshop);
 	}
 };
 

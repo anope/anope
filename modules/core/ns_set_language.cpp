@@ -12,24 +12,25 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetLanguage : public Command
 {
  public:
-	CommandNSSetLanguage(const Anope::string &spermission = "") : Command("LANGUAGE", 2, 2, spermission)
+	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Set the language Services will use when messaging you"));
+		this->SetSyntax(_("\037language\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetLanguage");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
-
-		Anope::string param = params[1];
 
 		for (unsigned j = 0; j < languages.size(); ++j)
 		{
@@ -38,21 +39,26 @@ class CommandNSSetLanguage : public Command
 			else if (j + 1 == languages.size())
 			{
 				this->OnSyntaxError(source, "");
-				return MOD_CONT;
+				return;
 			}
 		}
 
 		nc->language = param != "en" ? param : "";
 		source.Reply(_("Language changed to \002English\002."));
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &param)
+	{
+		this->Run(source, source.u->Account()->display, param[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET LANGUAGE \037language\037\002\n"
-				" \n"
-				"Changes the language Services uses when sending messages to\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Changes the language Services uses when sending messages to\n"
 				"you (for example, when responding to a command you send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
@@ -68,34 +74,31 @@ class CommandNSSetLanguage : public Command
 
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET LANGUAGE", _("SET LANGUAGE \037language\037"));
-	}
 };
 
 class CommandNSSASetLanguage : public CommandNSSetLanguage
 {
  public:
-	CommandNSSASetLanguage() : CommandNSSetLanguage("nickserv/saset/language")
+	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2, "nickserv/saset/language")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 \037language\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET LANGUAGE \037language\037\002\n"
-				" \n"
-				"Changes the language Services uses when sending messages to\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Changes the language Services uses when sending messages to\n"
 				"you (for example, when responding to a command you send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET LANGUAGE", _("SASET \037nickname\037 LANGUAGE \037number\037"));
 	}
 };
 
@@ -105,31 +108,13 @@ class NSSetLanguage : public Module
 	CommandNSSASetLanguage commandnssasetlanguage;
 
  public:
-	NSSetLanguage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetLanguage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetlanguage(this), commandnssasetlanguage(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetlanguage);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetlanguage);
-	}
-
-	~NSSetLanguage()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetlanguage);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetlanguage);
+		ModuleManager::RegisterService(&commandnssetlanguage);
+		ModuleManager::RegisterService(&commandnssasetlanguage);
 	}
 };
 

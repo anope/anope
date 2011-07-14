@@ -17,33 +17,33 @@
 class CommandGLGlobal : public Command
 {
  public:
-	CommandGLGlobal() : Command("GLOBAL", 1, 1, "global/global")
+	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1, "global/global")
 	{
 		this->SetDesc(_("Send a message to all users"));
+		this->SetSyntax(_("\037message\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &msg = params[0];
 
-		Log(LOG_ADMIN, u, this);
-		global->SendGlobal(global->Bot(), u->nick, msg);
-		return MOD_CONT;
+		if (!global)
+			source.Reply("No global reference, is gl_main loaded?");
+		else
+		{
+			Log(LOG_ADMIN, u, this);
+			global->SendGlobal(findbot(Config->Global), u->nick, msg);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GLOBAL \037message\037\002\n"
-				" \n"
-				"Allows Administrators to send messages to all users on the \n"
-				"network. The message will be sent from the nick \002%s\002."), Config->s_Global.c_str());
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Administrators to send messages to all users on the \n"
+				"network. The message will be sent from the nick \002%s\002."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GLOBAL", _("GLOBAL \037message\037"));
 	}
 };
 
@@ -52,14 +52,12 @@ class GLGlobal : public Module
 	CommandGLGlobal commandglglobal;
 
  public:
-	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	GLGlobal(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandglglobal(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (Config->s_Global.empty())
-			throw ModuleException("Global is disabled");
-
-		this->AddCommand(global->Bot(), &commandglglobal);
+		ModuleManager::RegisterService(&commandglglobal);
 	}
 };
 

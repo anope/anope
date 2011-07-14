@@ -14,18 +14,13 @@
 #include "module.h"
 #include "nickserv.h"
 
-static BotInfo *NickServ = NULL;
+static BotInfo *NickServ;
 
 class MyNickServService : public NickServService
 {
  public:
 	MyNickServService(Module *m) : NickServService(m) { }
 
-	BotInfo *Bot()
-	{
-		return NickServ;
-	}
-	
 	void Validate(User *u)
 	{
 		NickAlias *na = findnick(u->nick);
@@ -58,9 +53,9 @@ class MyNickServService : public NickServService
 		if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			if (na->nc->HasFlag(NI_SECURE))
-				u->SendMessage(NickServ, NICK_IS_SECURE, Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				u->SendMessage(NickServ, NICK_IS_SECURE, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 			else
-				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		}
 
 		if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
@@ -146,32 +141,15 @@ class NickServCore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup, I_OnNickUpdate };
-		ModuleManager::Attach(i, this, 6);
+		NickServ = findbot(Config->NickServ);
+		if (NickServ == NULL)
+			throw ModuleException("No bot named " + Config->NickServ);
+
+		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
+		I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
+		ModuleManager::Attach(i, this, 9);
 
 		ModuleManager::RegisterService(&this->mynickserv);
-		
-		NickServ = new BotInfo(Config->s_NickServ, Config->ServiceUser, Config->ServiceHost, Config->desc_NickServ);
-		NickServ->SetFlag(BI_CORE);
-
-		spacesepstream coreModules(Config->NickCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~NickServCore()
-	{
-		spacesepstream coreModules(Config->NickCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete NickServ;
 	}
 
 	void OnDelNick(NickAlias *na)
@@ -232,7 +210,7 @@ class NickServCore : public Module
 							"case you forget it."));
 			u->SendMessage(NickServ, _("Type \002%s%s SET EMAIL \037e-mail\037\002 in order to set your e-mail.\n"
 							"Your privacy is respected; this e-mail won't be given to\n"
-							"any third-party person."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+							"any third-party person."), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		}
 
 		if (u->Account()->HasFlag(NI_UNCONFIRMED))
@@ -260,6 +238,68 @@ class NickServCore : public Module
 			if (c)
 				chan_set_correct_modes(u, c, 1);
 		}
+	}
+
+	void OnUserNickChange(User *u, const Anope::string &oldnick)
+	{
+		NickAlias *na = findnick(u->nick);
+		/* If the new nick isnt registerd or its registerd and not yours */
+		if (!na || na->nc != u->Account())
+		{
+			u->RemoveMode(NickServ, UMODE_REGISTERED);
+			ircdproto->SendUnregisteredNick(u);
+
+			this->mynickserv.Validate(u);
+		}
+		else
+		{
+			if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			{
+				u->SetMode(NickServ, UMODE_REGISTERED);
+				ircdproto->SetAutoIdentificationToken(u);
+			}
+			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
+		}
+	}
+
+	void OnUserModeSet(User *u, UserModeName Name)
+	{
+		if (Name == UMODE_REGISTERED && !u->IsIdentified())
+			u->RemoveMode(NickServ, Name);
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->NickServ)
+			return;
+		source.Reply(_("\002%s\002 allows you to \"register\" a nickname and\n"
+			"prevent others from using it. The following\n"
+			"commands allow for registration and maintenance of\n"
+			"nicknames; to use them, type \002%s%s \037command\037\002.\n"
+			"For more information on a specific command, type\n"
+			"\002%s%s %s \037command\037\002.\n "), Config->NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), source.command.c_str());
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->NickServ)
+			return;
+		if (source.u->IsServicesOper())
+			source.Reply(_(" \n"
+				"Services Operators can also drop any nickname without needing\n"
+				"to identify for the nick, and may view the access list for\n"
+				"any nickname."));
+		if (Config->NSExpire >= 86400)
+			source.Reply(_("Nicknames that are not used anymore are subject to \n"
+				"the automatic expiration, i.e. they will be deleted\n"
+				"after %d days if not used."), Config->NSExpire / 86400);
+		source.Reply(_(" \n"
+			"\002NOTICE:\002 This service is intended to provide a way for\n"
+			"IRC users to ensure their identity is not compromised.\n"
+			"It is \002NOT\002 intended to facilitate \"stealing\" of\n"
+			"nicknames or other malicious actions. Abuse of %s\n"
+			"will result in, at minimum, loss of the abused\n"
+			"nickname(s)."), Config->NickServ.c_str());
 	}
 };
 

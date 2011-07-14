@@ -12,6 +12,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 static Anope::string TS6UPLINK;
 
@@ -104,20 +105,20 @@ class RatboxProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
 	void SendSQLineDel(const XLine *x)
@@ -143,8 +144,8 @@ class RatboxProto : public IRCDProto
 
 	void SendAkill(User *, const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)

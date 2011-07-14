@@ -660,8 +660,6 @@ enum BotServFlag
 	BS_DONTKICKVOICES,
 	/* BotServ bot accepts fantasy commands */
 	BS_FANTASY,
-	/* BotServ bot sets modes etc instead of ChanServ */
-	BS_SYMBIOSIS,
 	/* BotServ should show greets */
 	BS_GREET,
 	/* BotServ bots are not allowed to be in this channel */
@@ -696,7 +694,7 @@ enum BotServFlag
 };
 
 const Anope::string BotServFlagStrings[] = {
-	"BEGIN", "DONTKICKOPS", "DONTKICKVOICES", "FANTASY", "SYMBIOSIS", "GREET", "NOBOT",
+	"BEGIN", "DONTKICKOPS", "DONTKICKVOICES", "FANTASY", "GREET", "NOBOT",
 	"KICK_BOLDs", "KICK_COLORS", "KICK_REVERSES", "KICK_UNDERLINES", "KICK_BADWORDS", "KICK_CAPS",
 	"KICK_FLOOD", "KICK_REPEAT", "KICK_ITALICS", "KICK_AMSGS", "MSG_PRIVMSG", "MSG_NOTICE",
 	"MSG_NOTICEOPS", ""
@@ -817,10 +815,10 @@ class IRCdMessage;
 struct Uplink;
 class ServerConfig;
 class ConfigurationFile;
+class XLine;
 
 #include "extern.h"
 #include "language.h"
-#include "oper.h"
 #include "mail.h"
 #include "servers.h"
 #include "logger.h"

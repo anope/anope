@@ -33,7 +33,7 @@ class InspIRCdTS6Proto : public IRCDProto
  private:
 	void SendChgIdentInternal(const Anope::string &nick, const Anope::string &vIdent)
 	{
-		User *u = finduser(Config->s_HostServ);
+		User *u = finduser(Config->HostServ);
 		if (!has_chgidentmod)
 			Log() << "CHGIDENT not loaded!";
 		else
@@ -42,7 +42,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
 	{
-		User *u = finduser(Config->s_HostServ);
+		User *u = finduser(Config->HostServ);
 		if (!has_chghostmod)
 			Log() << "CHGHOST not loaded!";
 		else
@@ -53,7 +53,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendAkillDel(const XLine *x)
 	{
-		User *u = finduser(Config->s_OperServ);
+		User *u = finduser(Config->OperServ);
 		send_cmd(u ? u->GetUID() : Config->Numeric, "GLINE %s", x->Mask.c_str());
 	}
 
@@ -79,7 +79,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		User *u = finduser(Config->s_OperServ);
+		User *u = finduser(Config->OperServ);
 		send_cmd(u ? u->GetUID() : Config->Numeric, "ADDLINE G %s@%s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
@@ -153,7 +153,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd(Config->Numeric, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->s_OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		send_cmd(Config->Numeric, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -183,13 +183,17 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(nickserv->Bot()->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
+		BotInfo *bi = findbot(Config->NickServ);
+		if (bi)
+			send_cmd(bi->GetUID(), "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(nickserv->Bot()->GetUID(), "SVSHOLD %s", nick.c_str());
+		BotInfo *bi = findbot(Config->NickServ);
+		if (bi)
+			send_cmd(bi->GetUID(), "SVSHOLD %s", nick.c_str());
 	}
 
 	/* UNSZLINE */

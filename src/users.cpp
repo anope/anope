@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "modules.h"
-#include "nickserv.h"
 
 Anope::insensitive_map<User *> UserListByNick;
 Anope::map<User *> UserListByUID;
@@ -309,6 +308,9 @@ void User::SendMessage(BotInfo *source, Anope::string msg)
  */
 void User::Collide(NickAlias *na)
 {
+	BotInfo *bi = findbot(Config->NickServ);
+	if (!bi)
+		return;
 	if (na)
 		na->SetFlag(NS_COLLIDED);
 
@@ -323,15 +325,15 @@ void User::Collide(NickAlias *na)
 		} while (finduser(guestnick) && i++ < 10);
 
 		if (i == 11)
-			this->Kill(Config->s_NickServ, "Services nickname-enforcer kill");
+			this->Kill(Config->NickServ, "Services nickname-enforcer kill");
 		else
 		{
-			this->SendMessage(nickserv->Bot(), _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
+			this->SendMessage(bi, _("Your nickname is now being changed to \002%s\002"), guestnick.c_str());
 			ircdproto->SendForceNickChange(this, guestnick, Anope::CurTime);
 		}
 	}
 	else
-		this->Kill(Config->s_NickServ, "Services nickname-enforcer kill");
+		this->Kill(Config->NickServ, "Services nickname-enforcer kill");
 }
 
 /** Identify the user to the Nick
@@ -679,11 +681,6 @@ void User::SetModesInternal(const char *umodes, ...)
 					++opcnt;
 				else
 					--opcnt;
-
-				break;
-			case UMODE_REGISTERED:
-				if (add && !this->IsIdentified() && nickserv)
-					this->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
 				break;
 			case UMODE_CLOAK:
 			case UMODE_VHOST:
@@ -836,30 +833,10 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 				old_na->OnCancel(user);
 
 			NickAlias *na = findnick(user->nick);
-			/* If the new nick isnt registerd or its registerd and not yours */
-			if (!na || na->nc != user->Account())
-			{
-				user->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
-				ircdproto->SendUnregisteredNick(user);
-
-				nickserv->Validate(user);
-			}
-			else
+			if (na && na->nc == user->Account())
 			{
 				na->last_seen = Anope::CurTime;
 				user->UpdateHost();
-				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				{
-					user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
-					ircdproto->SetAutoIdentificationToken(user);
-				}
-				Log(nickserv->Bot()) << user->GetMask() << " automatically identified for group " << user->Account()->display;
-			}
-
-			if (ircd->sqline)
-			{
-				if (user->HasMode(UMODE_OPER) && SQLine->Check(user))
-					return NULL;
 			}
 		}
 

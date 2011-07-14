@@ -12,25 +12,38 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetBanType : public Command
 {
  public:
-	CommandCSSetBanType(const Anope::string &cpermission = "") : Command("BANTYPE", 2, 2, cpermission)
+	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set how Services make bans on the channel"));
+		this->SetSyntax(_("\037channel\037 BANTYPE \037bantype\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetBanType");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		try
 		{
-			ci->bantype = convertTo<int16>(params[1]);
+			int16 new_type = convertTo<int16>(params[1]);
+			if (new_type < 0 || new_type > 3)
+				throw ConvertException("Invalid range");
+			ci->bantype = new_type;
 			source.Reply(_("Ban type for channel %s is now #%d."), ci->name.c_str(), ci->bantype);
 		}
 		catch (const ConvertException &)
@@ -38,14 +51,14 @@ class CommandCSSetBanType : public Command
 			source.Reply(_("\002%s\002 is not a valid ban type."), params[1].c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 BANTYPE \037bantype\037\002\n"
-				" \n"
-				"Sets the ban type that will be used by services whenever\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets the ban type that will be used by services whenever\n"
 				"they need to ban someone from your channel.\n"
 				" \n"
 				"bantype is a number between 0 and 3 that means:\n"
@@ -56,25 +69,13 @@ class CommandCSSetBanType : public Command
 				"3: ban in the form *!*user@*.domain"), this->name.c_str());
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
-	}
 };
 
 class CommandCSSASetBanType : public CommandCSSetBanType
 {
  public:
-	CommandCSSASetBanType() : CommandCSSetBanType("chanserv/saset/bantype")
+	CommandCSSASetBanType(Module *creator) : CommandCSSetBanType(creator, "chanserv/saset/bantype", "chanserv/saset/bantype")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 
@@ -84,31 +85,13 @@ class CSSetBanType : public Module
 	CommandCSSASetBanType commandcssasetbantype;
 
  public:
-	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetBanType(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetbantype(this), commandcssasetbantype(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetbantype);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetbantype);
-	}
-
-	~CSSetBanType()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetbantype);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetbantype);
+		ModuleManager::RegisterService(&commandcssetbantype);
+		ModuleManager::RegisterService(&commandcssasetbantype);
 	}
 };
 

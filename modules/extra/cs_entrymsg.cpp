@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 struct EntryMsg
 {
@@ -41,7 +40,7 @@ class CommandEntryMessage : public Command
 		{
 			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
 			for (unsigned i = 0; i < messages.size(); ++i)
-				source.Reply(_(CHAN_LIST_ENTRY), i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
+				source.Reply(CHAN_LIST_ENTRY, i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
 			source.Reply(_("End of entry message list."));
 		}
 		else
@@ -98,17 +97,24 @@ class CommandEntryMessage : public Command
 	}
 
  public:
-	CommandEntryMessage(const Anope::string &cname) : Command(cname, 2, 3)
+	CommandEntryMessage(Module *creator) : Command(creator, "ENTRYMSG", 2, 3)
 	{
 		this->SetDesc(_("Manage the channel's entry messages"));
+		this->SetSyntax(_("\037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
-		if (ci && (IsFounder(u, ci) || u->HasCommand("chanserv/entrymsg")))
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (IsFounder(u, ci) || u->HasCommand("chanserv/entrymsg"))
 		{
 			bool success = true;
 			if (params[1].equals_ci("LIST"))
@@ -133,23 +139,16 @@ class CommandEntryMessage : public Command
 				Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << params[1];
 		}
 		else
-		{
-			source.Reply(_(ACCESS_DENIED));
-		}
+			source.Reply(ACCESS_DENIED);
 
-		return MOD_CONT;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "ENTRYMSG", _("ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002ENTRYMSG \037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]\002\n"
-				" \n"
-				"Controls what messages will be sent to users when they join the channel."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Controls what messages will be sent to users when they join the channel."));
 		return true;
 	}
 };
@@ -159,17 +158,14 @@ class CSEntryMessage : public Module
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), commandentrymsg("ENTRYMSG")
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), commandentrymsg(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-			
 		Implementation i[] = { I_OnJoinChannel, I_OnReload, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata }; 
 		ModuleManager::Attach(i, this, 4);
 			
-		this->AddCommand(chanserv->Bot(), &commandentrymsg);
+		ModuleManager::RegisterService(&commandentrymsg);
 
 		this->OnReload();
 	}

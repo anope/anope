@@ -6,8 +6,6 @@ class NickServService : public Service
  public:
 	NickServService(Module *m) : Service(m, "NickServ") { }
 
-	virtual BotInfo *Bot() = 0;
-
 	virtual void Validate(User *u) = 0;
 };
 

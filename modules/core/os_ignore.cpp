@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 #include "os_ignore.h"
 
 class OSIgnoreService : public IgnoreService
@@ -145,11 +144,11 @@ class OSIgnoreService : public IgnoreService
 class CommandOSIgnore : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		service_reference<IgnoreService> ignore_service("operserv/ignore");
 		if (!ignore_service)
-			return MOD_CONT;
+			return;
 
 		const Anope::string &time = params.size() > 1 ? params[1] : "";
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
@@ -158,7 +157,7 @@ class CommandOSIgnore : public Command
 		if (time.empty() || nick.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 		else
 		{
@@ -167,7 +166,7 @@ class CommandOSIgnore : public Command
 			if (t <= -1)
 			{
 				source.Reply(_("You have to enter a valid number as time."));
-				return MOD_CONT;
+				return;
 			}
 
 			ignore_service->AddIgnore(nick, source.u->nick, reason, t);
@@ -177,14 +176,14 @@ class CommandOSIgnore : public Command
 				source.Reply(_("\002%s\002 will now be ignored for \002%s\002."), nick.c_str(), time.c_str());
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoList(CommandSource &source)
+	void DoList(CommandSource &source)
 	{
 		service_reference<IgnoreService> ignore_service("operserv/ignore");
 		if (!ignore_service)
-			return MOD_CONT;
+			return;
 
 		const std::list<IgnoreData> &ignores = ignore_service->GetIgnores();
 		if (ignores.empty())
@@ -201,14 +200,14 @@ class CommandOSIgnore : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		service_reference<IgnoreService> ignore_service("operserv/ignore");
 		if (!ignore_service)
-			return MOD_CONT;
+			return;
 
 		const Anope::string nick = params.size() > 1 ? params[1] : "";
 		if (nick.empty())
@@ -218,28 +217,32 @@ class CommandOSIgnore : public Command
 		else
 			source.Reply(_("Nick \002%s\002 not found on ignore list."), nick.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoClear(CommandSource &source)
+	void DoClear(CommandSource &source)
 	{
 		service_reference<IgnoreService> ignore_service("operserv/ignore");
 		if (!ignore_service)
-			return MOD_CONT;
+			return;
 
 		ignore_service->ClearIgnores();
 		source.Reply(_("Ignore list has been cleared."));
 
-		return MOD_CONT;
+		return;
 	}
 
  public:
-	CommandOSIgnore() : Command("IGNORE", 1, 4, "operserv/ignore")
+	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4, "operserv/ignore")
 	{
 		this->SetDesc(_("Modify the Services ignore list"));
+		this->SetSyntax(_("ADD \037time\037 \037nick\037 \037reason\037"));
+		this->SetSyntax(_("DEL \037nick\037"));
+		this->SetSyntax(_("LIST"));
+		this->SetSyntax(_("CLEAR"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &cmd = params[0];
 
@@ -254,14 +257,14 @@ class CommandOSIgnore : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002IGNORE {ADD|DEL|LIST|CLEAR} [\037time\037] [\037nick\037] [\037reason\037]\002\n"
-				" \n"
-				"Allows Services Operators to make Services ignore a nick or mask\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services Operators to make Services ignore a nick or mask\n"
 				"for a certain time or until the next restart. The default\n"
 				"time format is seconds. You can specify it by using units.\n"
 				"Valid units are: \037s\037 for seconds, \037m\037 for minutes, \n"
@@ -275,11 +278,6 @@ class CommandOSIgnore : public Command
 				"Ignores will not be enforced on IRC Operators."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "IGNORE", _("IGNORE {ADD|DEL|LIST|CLEAR} [\037time\037] [\037nick\037] [\037reason\037]\002"));
-	}
 };
 
 class OSIgnore : public Module
@@ -288,17 +286,15 @@ class OSIgnore : public Module
 	CommandOSIgnore commandosignore;
 
  public:
-	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), osignoreservice(this, "operserv/ignore")
+	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		osignoreservice(this, "operserv/ignore"), commandosignore(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
+		ModuleManager::RegisterService(&commandosignore);
 
-		this->AddCommand(operserv->Bot(), &commandosignore);
-
-		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnPreCommandRun, I_OnBotPrivmsg };
-		ModuleManager::Attach(i, this, 4);
+		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnBotPrivmsg };
+		ModuleManager::Attach(i, this, 3);
 
 		ModuleManager::RegisterService(&this->osignoreservice);
 	}
@@ -325,40 +321,27 @@ class OSIgnore : public Module
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
-		if (ignore_service)
+		for (std::list<IgnoreData>::iterator ign = this->osignoreservice.GetIgnores().begin(), ign_end = this->osignoreservice.GetIgnores().end(); ign != ign_end; )
 		{
-			for (std::list<IgnoreData>::iterator ign = ignore_service->GetIgnores().begin(), ign_end = ignore_service->GetIgnores().end(); ign != ign_end; )
+			if (ign->time && ign->time <= Anope::CurTime)
 			{
-				if (ign->time && ign->time <= Anope::CurTime)
-				{
-					Log(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
-					ign = ignore_service->GetIgnores().erase(ign);
-				}
-				else
-				{
-					std::stringstream buf;
-					buf << "OS IGNORE " << ign->mask << " " << ign->time << " " << ign->creator << " :" << ign->reason;
-					Write(buf.str());
-					++ign;
-				}
+				Log(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
+				ign = this->osignoreservice.GetIgnores().erase(ign);
+			}
+			else
+			{
+				std::stringstream buf;
+				buf << "OS IGNORE " << ign->mask << " " << ign->time << " " << ign->creator << " :" << ign->reason;
+				Write(buf.str());
+				++ign;
 			}
 		}
 	}
 
-	EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci)
-	{
-		return this->OnBotPrivmsg(u, bi, message);
-	}
-
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, const Anope::string &message)
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
-		if (ignore_service)
-		{
-			if (ignore_service->Find(u->nick))
-				return EVENT_STOP;
-		}
+		if (this->osignoreservice.Find(u->nick))
+			return EVENT_STOP;
 
 		return EVENT_CONTINUE;
 	}

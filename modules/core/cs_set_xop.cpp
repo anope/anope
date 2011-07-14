@@ -11,31 +11,40 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 #define CHECKLEV(lev) (ci->levels[(lev)] != ACCESS_INVALID && access->level >= ci->levels[(lev)])
 
 class CommandCSSetXOP : public Command
 {
  public:
-	CommandCSSetXOP(const Anope::string &cpermission = "") : Command("XOP", 2, 2, cpermission)
+	CommandCSSetXOP(Module *creator, const Anope::string &cname = "chanserv/set/xop", const Anope::string &cpermission = "") : Command(creator, "chanserv/xop", 2, 2, cpermission)
 	{
 		this->SetDesc(_("Toggle the user privilege system"));
+		this->SetSyntax(_("\037channel\037 XOP {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		if (!ModuleManager::FindModule("cs_xop"))
 		{
-			source.Reply(_("xOP system is not available."), "XOP");
-			return MOD_CONT;
+			source.Reply(_("xOP system is not available."));
+			return;
 		}
 
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetXOP");
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -81,14 +90,14 @@ class CommandCSSetXOP : public Command
 		else
 			this->OnSyntaxError(source, "XOP");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 XOP {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the xOP lists system for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the xOP lists system for a channel.\n"
 				"When \002XOP\002 is set, you have to use the \002AOP\002/\002SOP\002/\002VOP\002\n"
 				"commands in order to give channel privileges to\n"
 				"users, else you have to use the \002ACCESS\002 command.\n"
@@ -105,26 +114,16 @@ class CommandCSSetXOP : public Command
 				"the \002LEVELS\002 command.\n"
 				" \n"
 				"Switching from xOP lists system to access list system\n"
-				"causes no problem though."), this->name.c_str());
+				"causes no problem though."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET XOP", _("SET \037channel\037 XOP {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetXOP : public CommandCSSetXOP
 {
  public:
-	CommandCSSASetXOP() : CommandCSSetXOP("chanserv/saset/xop")
+	CommandCSSASetXOP(Module *creator) : CommandCSSetXOP(creator, "chanserv/saset/xop", "chanserv/saset/xop")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET XOP", _("SASET \002channel\002 XOP {ON | OFF}"));
 	}
 };
 
@@ -134,31 +133,13 @@ class CSSetXOP : public Module
 	CommandCSSASetXOP commandcssasetxop;
 
  public:
-	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetxop(this), commandcssasetxop(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetxop);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetxop);
-	}
-
-	~CSSetXOP()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetxop);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetxop);
+		ModuleManager::RegisterService(&commandcssetxop);
+		ModuleManager::RegisterService(&commandcssasetxop);
 	}
 };
 

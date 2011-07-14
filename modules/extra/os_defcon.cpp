@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 #include "global.h"
 #include "os_session.h"
 
@@ -30,7 +29,6 @@ enum DefconLevel
 	DEFCON_NO_NEW_MEMOS
 };
 
-static Module *me = NULL;
 bool DefConModesSet = false;
 
 struct DefconConfig
@@ -118,18 +116,17 @@ class DefConTimeout : public CallBack
 		{
 			DConfig.defaultlevel = level;
 			FOREACH_MOD(I_OnDefconLevel, OnDefconLevel(level));
-			Log(operserv->Bot(), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
-			ircdproto->SendGlobops(operserv->Bot(), translate(_("\002%s\002 Changed the DEFCON level to \002%d\002")), Config->s_OperServ.c_str(), level);
+			Log(findbot(Config->OperServ), "operserv/defcon") << "Defcon level timeout, returning to level " << level;
 
 			if (DConfig.globalondefcon)
 			{
 				if (!DConfig.offmessage.empty())
-					global->SendGlobal(global->Bot(), "", DConfig.offmessage);
+					global->SendGlobal(findbot(Config->Global), "", DConfig.offmessage);
 				else
-					global->SendGlobal(global->Bot(), "", Anope::printf(translate(_("The Defcon Level is now at Level: \002%d\002")), DConfig.defaultlevel));
+					global->SendGlobal(findbot(Config->Global), "", Anope::printf(translate(_("The Defcon Level is now at Level: \002%d\002")), DConfig.defaultlevel));
 
 				if (!DConfig.message.empty())
-					global->SendGlobal(global->Bot(), "", DConfig.message);
+					global->SendGlobal(findbot(Config->Global), "", DConfig.message);
 			}
 
 			runDefCon();
@@ -165,12 +162,13 @@ class CommandOSDefcon : public Command
 	}
 
  public:
-	CommandOSDefcon() : Command("DEFCON", 1, 1, "operserv/defcon")
+	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1, "operserv/defcon")
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
+		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &lvl = params[0];
@@ -179,7 +177,7 @@ class CommandOSDefcon : public Command
 		{
 			source.Reply(_("Services are now at DEFCON \002%d\002"), DConfig.defaultlevel);
 			this->SendLevels(source);
-			return MOD_CONT;
+			return;
 		}
 
 		int newLevel = 0;
@@ -192,7 +190,7 @@ class CommandOSDefcon : public Command
 		if (newLevel < 1 || newLevel > 5)
 		{
 			this->OnSyntaxError(source, "");
-			return MOD_CONT;
+			return;
 		}
 
 		DConfig.defaultlevel = newLevel;
@@ -206,49 +204,46 @@ class CommandOSDefcon : public Command
 		}
 
 		if (DConfig.timeout)
-			timeout = new DefConTimeout(me, 5);
+			timeout = new DefConTimeout(this->module, 5);
 
 		source.Reply(_("Services are now at DEFCON \002%d\002"), DConfig.defaultlevel);
 		this->SendLevels(source);
 		Log(LOG_ADMIN, u, this) << "to change defcon level to " << newLevel;
-		ircdproto->SendGlobops(operserv->Bot(), _("\002%s\002 Changed the DEFCON level to \002%d\002"), u->nick.c_str(), newLevel);
+
 		/* Global notice the user what is happening. Also any Message that
 		   the Admin would like to add. Set in config file. */
 		if (DConfig.globalondefcon)
 		{
 			if (DConfig.defaultlevel == 5 && !DConfig.offmessage.empty())
-				global->SendGlobal(global->Bot(), "", DConfig.offmessage);
+				global->SendGlobal(findbot(Config->Global), "", DConfig.offmessage);
 			else if (DConfig.defaultlevel != 5)
 			{
-				global->SendGlobal(global->Bot(), "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
+				global->SendGlobal(findbot(Config->Global), "", Anope::printf(_("The Defcon level is now at: \002%d\002"), DConfig.defaultlevel));
 				if (!DConfig.message.empty())
-					global->SendGlobal(global->Bot(), "", DConfig.message);
+					global->SendGlobal(findbot(Config->Global), "", DConfig.message);
 			}
 		}
 
 		/* Run any defcon functions, e.g. FORCE CHAN MODE */
 		runDefCon();
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002DEFCON\002 [\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]\n"
-				"The defcon system can be used to implement a pre-defined\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("The defcon system can be used to implement a pre-defined\n"
 				"set of restrictions to services useful during an attempted\n"
 				"attack on the network."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "DEFCON", _("DEFCON [\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));
 	}
 };
 
 class OSDefcon : public Module
 {
 	service_reference<SessionService> session_service;
+	service_reference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
 
 	void ParseModeString()
@@ -339,22 +334,17 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), session_service("session")
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), session_service("session"), akills("xlinemanager/sgline"), commandosdefcon(this)
 	{
 		if (!DConfig.defaultlevel)
 			throw ModuleException("Invalid configuration settings");
 
-		me = this;
-
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommandRun, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
-		ModuleManager::Attach(i, this, 9);
+		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
+		ModuleManager::Attach(i, this, 8);
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosdefcon);
+		ModuleManager::RegisterService(&commandosdefcon);
 
 		this->OnReload();
 	}
@@ -378,9 +368,9 @@ class OSDefcon : public Module
 		dconfig.offmessage = config.ReadValue("defcon", "offmessage", 0);
 
 		if (dconfig.defaultlevel < 1 || dconfig.defaultlevel > 5)
-			throw ConfigException("The value for <os_defcon:defaultlevel> must be between 1 and 5");
+			throw ConfigException("The value for <defcon:defaultlevel> must be between 1 and 5");
 		else if (dconfig.akillexpire <= 0)
-			throw ConfigException("The value for <os_defcon:akillexpire> must be greater than zero!");
+			throw ConfigException("The value for <defcon:akillexpire> must be greater than zero!");
 
 		for (unsigned level = 1; level < 5; ++level)
 		{
@@ -411,11 +401,11 @@ class OSDefcon : public Module
 			}
 
 			if (dconfig.Check(level, DEFCON_REDUCE_SESSION) && dconfig.sessionlimit <= 0)
-				throw ConfigException("The value for <os_defcon:sessionlimit> must be greater than zero!");
+				throw ConfigException("The value for <defcon:sessionlimit> must be greater than zero!");
 			else if (dconfig.Check(level, DEFCON_AKILL_NEW_CLIENTS) && dconfig.akillreason.empty())
-				throw ConfigException("The value for <os_defcon:akillreason> must not be empty!");
+				throw ConfigException("The value for <defcon:akillreason> must not be empty!");
 			else if (dconfig.Check(level, DEFCON_FORCE_CHAN_MODES) && dconfig.chanmodes.empty())
-				throw ConfigException("The value for <os_defcon:chanmodes> must not be empty!");
+				throw ConfigException("The value for <defcon:chanmodes> must not be empty!");
 		}
 
 		DConfig = dconfig;
@@ -426,16 +416,16 @@ class OSDefcon : public Module
 	{
 		if (!exempt && u->server->IsSynced() && DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && !u->server->IsULined())
 		{
-			if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
+			if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 			{
-				Log(operserv->Bot(), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = SGLine->Add("*@" + u->host, Config->s_OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
+				Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
+				XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
 				if (x)
-					x->By = Config->s_OperServ;
+					x->By = Config->OperServ;
 			}
 
 			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-				u->Kill(Config->s_OperServ, DConfig.akillreason);
+				u->Kill(Config->OperServ, DConfig.akillreason);
 
 			return EVENT_STOP;
 		}
@@ -449,7 +439,7 @@ class OSDefcon : public Module
 
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && cm && DConfig.DefConModesOff.HasFlag(Name))
 		{
-			c->RemoveMode(operserv->Bot(), Name, param);
+			c->RemoveMode(findbot(Config->OperServ), Name, param);
 
 			return EVENT_STOP;
 		}
@@ -466,9 +456,9 @@ class OSDefcon : public Module
 			Anope::string param;
 
 			if (DConfig.GetDefConParam(Name, param))
-				c->SetMode(operserv->Bot(), Name, param);
+				c->SetMode(findbot(Config->OperServ), Name, param);
 			else
-				c->SetMode(operserv->Bot(), Name);
+				c->SetMode(findbot(Config->OperServ), Name);
 
 			return EVENT_STOP;
 
@@ -477,61 +467,38 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreCommandRun(User *&u, BotInfo *&bi, Anope::string &command, Anope::string &message, ChannelInfo *&ci)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
-		if (!u->HasMode(UMODE_OPER) && (DConfig.Check(DEFCON_OPER_ONLY) || DConfig.Check(DEFCON_SILENT_OPER_ONLY)))
+		if (command->name == "nickserv/register" || command->name == "nickserv/group")
 		{
-			if (!DConfig.Check(DEFCON_SILENT_OPER_ONLY))
-				u->SendMessage(bi, _("Services are in Defcon mode, Please try again later."));
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
-	{
-		BotInfo *service = command->service;
-		if (service->nick == Config->s_NickServ)
-		{
-			if (command->name.equals_ci("REGISTER") || command->name.equals_ci("GROUP"))
+			if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			{
-				if (DConfig.Check(DEFCON_NO_NEW_NICKS))
-				{
-					source.Reply(_("Services are in Defcon mode, Please try again later."));
-					return EVENT_STOP;
-				}
+				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				return EVENT_STOP;
 			}
 		}
-		else if (service->nick == Config->s_ChanServ)
+		else if (command->name == "chanserv/set/mlock")
 		{
-			if (command->name.equals_ci("SET"))
+			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{
-				if (!params.empty() && params[0].equals_ci("MLOCK") && DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
-				{
-					source.Reply(_("Services are in Defcon mode, Please try again later."));
-					return EVENT_STOP;
-				}
-			}
-			else if (command->name.equals_ci("REGISTER"))
-			{
-				if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
-				{
-					source.Reply(_("Services are in Defcon mode, Please try again later."));
-					return EVENT_STOP;
-				}
+				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				return EVENT_STOP;
 			}
 		}
-		else if (service->nick == Config->s_MemoServ)
+		else if (command->name == "chanserv/register")
 		{
-			if (command->name.equals_ci("SEND") || command->name.equals_ci("SENDALL"))
+			if (DConfig.Check(DEFCON_NO_NEW_CHANNELS))
 			{
-				if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
-				{
-					source.Reply(_("Services are in Defcon mode, Please try again later."));
-					return EVENT_STOP;
-				}
+				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				return EVENT_STOP;
+			}
+		}
+		else if (command->name == "memoserv/send")
+		{
+			if (DConfig.Check(DEFCON_NO_NEW_MEMOS))
+			{
+				source.Reply(_("Services are in Defcon mode, Please try again later."));
+				return EVENT_STOP;
 			}
 		}
 
@@ -543,37 +510,33 @@ class OSDefcon : public Module
 		if (exempt || !u || !u->server->IsSynced() || u->server->IsULined())
 			return;
 
-		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
+		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
-			if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-			{
-				Log(operserv->Bot(), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = SGLine->Add("*@" + u->host, Config->s_OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
-				if (x)
-					x->By = Config->s_OperServ;
-			}
-
-			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-			{
-				u->Kill(Config->s_OperServ, DConfig.akillreason);
-				return;
-			}
+			Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
+			XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
+			if (x)
+				x->By = Config->OperServ;
+		}
+		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
+		{
+			u->Kill(Config->OperServ, DConfig.akillreason);
+			return;
 		}
 
 		if (!DConfig.sessionlimit)
 			return;
 
-		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
+		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
-			Log(operserv->Bot(), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-			XLine *x = SGLine->Add("*@" + u->host, Config->s_OperServ, Anope::CurTime + DConfig.akillexpire, !DConfig.akillreason.empty() ? DConfig.akillreason : "DEFCON AKILL");
+			Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
+			XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, !DConfig.akillreason.empty() ? DConfig.akillreason : "DEFCON AKILL");
 			if (x)
-				x->By = Config->s_OperServ;
+				x->By = Config->OperServ;
 		}
 
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
-			u->Kill(Config->s_OperServ, DConfig.akillreason);
+			u->Kill(Config->OperServ, DConfig.akillreason);
 			return;
 		}
 
@@ -585,16 +548,16 @@ class OSDefcon : public Module
 			if (session && session->count > DConfig.sessionlimit)
 			{
 				if (!Config->SessionLimitExceeded.empty())
-					ircdproto->SendMessage(operserv->Bot(), u->nick, Config->SessionLimitExceeded.c_str(), u->host.c_str());
+					ircdproto->SendMessage(findbot(Config->OperServ), u->nick, Config->SessionLimitExceeded.c_str(), u->host.c_str());
 				if (!Config->SessionLimitDetailsLoc.empty())
-					ircdproto->SendMessage(operserv->Bot(), u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
+					ircdproto->SendMessage(findbot(Config->OperServ), u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				u->Kill(Config->s_OperServ, "Defcon session limit exceeded");
+				u->Kill(Config->OperServ, "Defcon session limit exceeded");
 				++session->hits;
-				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
+				if (akills && Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
-					SGLine->Add("*@" + u->host, Config->s_OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded");
-					ircdproto->SendGlobops(operserv->Bot(), "[DEFCON] Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
+					akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded");
+					ircdproto->SendGlobops(findbot(Config->OperServ), "[DEFCON] Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
 				}
 			}
 		}
@@ -609,7 +572,7 @@ class OSDefcon : public Module
 	void OnChannelCreate(Channel *c)
 	{
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES))
-			c->SetModes(operserv->Bot(), false, "%s", DConfig.chanmodes.c_str());
+			c->SetModes(findbot(Config->OperServ), false, "%s", DConfig.chanmodes.c_str());
 	}
 };
 
@@ -648,10 +611,10 @@ void runDefCon()
 		{
 			if (DConfig.chanmodes[0] == '+' || DConfig.chanmodes[0] == '-')
 			{
-				Log(operserv->Bot(), "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
+				Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: setting " << DConfig.chanmodes << " on all channels";
 				DefConModesSet = true;
 				for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-					it->second->SetModes(operserv->Bot(), false, "%s", DConfig.chanmodes.c_str());
+					it->second->SetModes(findbot(Config->OperServ), false, "%s", DConfig.chanmodes.c_str());
 			}
 		}
 	}
@@ -665,9 +628,9 @@ void runDefCon()
 				Anope::string newmodes = defconReverseModes(DConfig.chanmodes);
 				if (!newmodes.empty())
 				{
-					Log(operserv->Bot(), "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
+					Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: setting " << newmodes << " on all channels";
 					for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
-						it->second->SetModes(operserv->Bot(), false, "%s", newmodes.c_str());
+						it->second->SetModes(findbot(Config->OperServ), false, "%s", newmodes.c_str());
 				}
 			}
 		}

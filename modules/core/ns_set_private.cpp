@@ -12,24 +12,25 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetPrivate : public Command
 {
  public:
-	CommandNSSetPrivate(const Anope::string &spermission = "") : Command("PRIVATE", 2, 2, spermission)
+	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
-		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str()));
+		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str()));
+		this->SetSyntax(_("{ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetPrivate");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
-
-		Anope::string param = params[1];
 
 		if (param.equals_ci("ON"))
 		{
@@ -44,51 +45,53 @@ class CommandNSSetPrivate : public Command
 		else
 			this->OnSyntaxError(source, "PRIVATE");
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET PRIVATE {ON | OFF}\002\n"
-				" \n"
-				"Turns %s's privacy option on or off for your nick.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns %s's privacy option on or off for your nick.\n"
 				"With \002PRIVATE\002 set, your nickname will not appear in\n"
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows your nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+				Config->NickServ.c_str(), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET PRIVATE", _("SET PRIVATE {ON | OFF}"));
 	}
 };
 
 class CommandNSSASetPrivate : public CommandNSSetPrivate
 {
  public:
-	CommandNSSASetPrivate() : CommandNSSetPrivate("nickserv/saset/private")
+	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2, "nickserv/saset/private")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 PRIVATE {ON | OFF}\002\n"
-				" \n"
-				"Turns %s's privacy option on or off for the nick.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns %s's privacy option on or off for the nick.\n"
 				"With \002PRIVATE\002 set, the nickname will not appear in\n"
 				"nickname lists generated with %s's \002LIST\002 command.\n"
 				"(However, anyone who knows the nickname can still get\n"
 				"information on it using the \002INFO\002 command.)"),
-				Config->s_NickServ.c_str(), Config->s_NickServ.c_str());
+				Config->NickServ.c_str(), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET PRIVATE", _("SASET \037nickname\037 PRIVATE {ON | OFF}"));
 	}
 };
 
@@ -98,31 +101,13 @@ class NSSetPrivate : public Module
 	CommandNSSASetPrivate commandnssasetprivate;
 
  public:
-	NSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetprivate(this), commandnssasetprivate(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetprivate);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetprivate);
-	}
-
-	~NSSetPrivate()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetprivate);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetprivate);
+		ModuleManager::RegisterService(&commandnssetprivate);
+		ModuleManager::RegisterService(&commandnssasetprivate);
 	}
 };
 

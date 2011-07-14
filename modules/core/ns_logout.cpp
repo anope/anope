@@ -17,12 +17,13 @@
 class CommandNSLogout : public Command
 {
  public:
-	CommandNSLogout() : Command("LOGOUT", 0, 2)
+	CommandNSLogout(Module *creator) : Command(creator, "nickserv/logout", 0, 2)
 	{
 		this->SetDesc(_("Reverses the effect of the IDENTIFY command"));
+		this->SetSyntax(_("[\037nickname\037 [REVALIDATE]]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -33,12 +34,12 @@ class CommandNSLogout : public Command
 		if (!u->IsServicesOper() && !nick.empty())
 			this->OnSyntaxError(source, "");
 		else if (!(u2 = (!nick.empty() ? finduser(nick) : u)))
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!nick.empty() && !u2->IsServicesOper())
 			source.Reply(_("You can't logout %s because they are a Services Operator."), nick.c_str());
 		else
 		{
-			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE"))
+			if (!nick.empty() && !param.empty() && param.equals_ci("REVALIDATE") && nickserv)
 				nickserv->Validate(u2);
 
 			u2->isSuperAdmin = 0; /* Dont let people logout and remain a SuperAdmin */
@@ -51,7 +52,7 @@ class CommandNSLogout : public Command
 				source.Reply(_("Your nick has been logged out."));
 
 			ircdproto->SendAccountLogout(u2, u2->Account());
-			u2->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
+			u2->RemoveMode(source.owner, UMODE_REGISTERED);
 			ircdproto->SendUnregisteredNick(u2);
 
 			u2->Logout();
@@ -59,37 +60,23 @@ class CommandNSLogout : public Command
 			/* Send out an event */
 			FOREACH_MOD(I_OnNickLogout, OnNickLogout(u2));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		User *u = source.u;
-		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002LOGOUT [\037nickname\037 [REVALIDATE]]\002\n"
-					" \n"
-					"Without a parameter, reverses the effect of the \002IDENTIFY\002 \n"
-					"command, i.e. make you not recognized as the real owner of the nick\n"
-					"anymore. Note, however, that you won't be asked to reidentify\n"
-					"yourself.\n"
-					" \n"
-					"With a parameter, does the same for the given nick. If you \n"
-					"specify REVALIDATE as well, Services will ask the given nick\n"
-					"to re-identify. This use limited to \002Services Operators\002."));
-		else
-			source.Reply(_("Syntax: \002LOGOUT\002\n"
-					" \n"
-					"This reverses the effect of the \002IDENTIFY\002 command, i.e.\n"
-					"make you not recognized as the real owner of the nick\n"
-					"anymore. Note, however, that you won't be asked to reidentify\n"
-					"yourself."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Without a parameter, reverses the effect of the \002IDENTIFY\002 \n"
+				"command, i.e. make you not recognized as the real owner of the nick\n"
+				"anymore. Note, however, that you won't be asked to reidentify\n"
+				"yourself.\n"
+				" \n"
+				"With a parameter, does the same for the given nick. If you \n"
+				"specify REVALIDATE as well, Services will ask the given nick\n"
+				"to re-identify. This use limited to \002Services Operators\002."));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "LOGOUT", _("LOGOUT"));
 	}
 };
 
@@ -98,14 +85,12 @@ class NSLogout : public Module
 	CommandNSLogout commandnslogout;
 
  public:
-	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSLogout(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnslogout(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnslogout);
+		ModuleManager::RegisterService(&commandnslogout);
 	}
 };
 

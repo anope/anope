@@ -523,3 +523,14 @@ Service *ModuleManager::GetService(const Anope::string &name)
 	return NULL;
 }
 
+/** Get the existing service key names
+ * @return The keys
+ */
+std::vector<Anope::string> ModuleManager::GetServiceKeys()
+{
+	std::vector<Anope::string> keys;
+	for (std::map<Anope::string, Service *>::const_iterator it = ModuleManager::ServiceProviders.begin(), it_end = ModuleManager::ServiceProviders.end(); it != it_end; ++it)
+		keys.push_back(it->first);
+	return keys;
+}
+

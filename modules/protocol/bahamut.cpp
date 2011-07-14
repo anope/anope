@@ -13,6 +13,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "oper.h"
 #include "nickserv.h"
 
 IRCDVar myIrcd[] = {
@@ -224,7 +225,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* nc_change was = 1, and there is no na->status */
 	void SendUnregisteredNick(const User *u)
 	{
-		ircdproto->SendMode(nickserv->Bot(), u, "+d 1");
+		ircdproto->SendMode(findbot(Config->NickServ), u, "+d 1");
 	}
 
 	/* SERVER */
@@ -247,7 +248,7 @@ class BahamutIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		ircdproto->SendMode(nickserv->Bot(), u, "+d %d", u->timestamp);
+		ircdproto->SendMode(findbot(Config->NickServ), u, "+d %d", u->timestamp);
 	}
 
 	void SendChannel(Channel *c)
@@ -306,7 +307,7 @@ class BahamutIRCdMessage : public IRCdMessage
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else
 					nickserv->Validate(user);
@@ -472,49 +473,6 @@ class BahamutIRCdMessage : public IRCdMessage
 	}
 };
 
-static bool event_xs(const Anope::string &bot, const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (!params.empty() && !bot.empty())
-	{
-		std::vector<Anope::string> p;
-		p.push_back(bot);
-		p.push_back(params[0]);
-		return ircdmessage->OnPrivmsg(source, p);
-	}
-
-	return true;
-}
-
-/* EVENT : OS */
-bool event_os(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	return event_xs(Config->s_OperServ, source, params);
-}
-
-/* EVENT : NS */
-bool event_ns(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	return event_xs(Config->s_NickServ, source, params);
-}
-
-/* EVENT : MS */
-bool event_ms(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	return event_xs(Config->s_MemoServ, source, params);
-}
-
-/* EVENT : HS */
-bool event_hs(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	return event_xs(Config->s_HostServ, source, params);
-}
-
-/* EVENT : CS */
-bool event_cs(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	return event_xs(Config->s_ChanServ, source, params);
-}
-
 bool event_burst(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	Server *s = Server::Find(source);
@@ -558,7 +516,7 @@ class ChannelModeFlood : public ChannelModeParam
 
 class ProtoBahamut : public Module
 {
-	Message message_svsmode, message_cs, message_hs, message_ms, message_ns, message_os, message_burst;
+	Message message_svsmode, message_burst;
 	
 	BahamutIRCdProto ircd_proto;
 	BahamutIRCdMessage ircd_message;
@@ -602,9 +560,7 @@ class ProtoBahamut : public Module
 
  public:
 	ProtoBahamut(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, PROTOCOL),
-		message_svsmode("SVSMODE", OnMode), message_cs("CS", event_cs), message_hs("HS", event_hs),
-		message_ms("MS", event_ms), message_ns("NS", event_ns), message_os("OS", event_os),
-		message_burst("BURST", event_burst)
+		message_svsmode("SVSMODE", OnMode), message_burst("BURST", event_burst)
 	{
 		this->SetAuthor("Anope");
 

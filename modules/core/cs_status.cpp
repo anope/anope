@@ -12,20 +12,26 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSStatus : public Command
 {
  public:
-	CommandCSStatus() : Command("STATUS", 2, 2, "chanserv/status")
+	CommandCSStatus(Module *creator) : Command(creator, "chanserv/status", 2, 2, "chanserv/status")
 	{
 		this->SetDesc(_("Returns the current access level of a user on a channel"));
+		this->SetSyntax(_("\037channel\037 \037item\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
 		const Anope::string &nick = params[1];
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		User *u2 = finduser(nick);
 		ChanAccess *u2_access = ci->GetAccess(u2);
@@ -33,14 +39,14 @@ class CommandCSStatus : public Command
 			source.Reply(_("STATUS %s %s %d"), ci->name.c_str(), u2->nick.c_str(), u2_access ? u2_access->level : 0);
 		else /* !u2 */
 			source.Reply(_("STATUS ERROR Nick %s not online"), nick.c_str());
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002STATUS \037channel\037 \037nickname\037\002\n"
-				" \n"
-				"Returns the current access level of the given nick on the\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Returns the current access level of the given nick on the\n"
 				"given channel.  The reply is of the form:\n"
 				" \n"
 				"    STATUS \037channel\037 \037nickname\037 \037access-level\037\n"
@@ -50,11 +56,6 @@ class CommandCSStatus : public Command
 				"    STATUS ERROR \037error-message\037"));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "STATUS", _("STATUS \037channel\037 \037item\037"));
-	}
 };
 
 class CSStatus : public Module
@@ -62,11 +63,12 @@ class CSStatus : public Module
 	CommandCSStatus commandcsstatus;
 
  public:
-	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSStatus(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsstatus(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(chanserv->Bot(), &commandcsstatus);
+		ModuleManager::RegisterService(&commandcsstatus);
 	}
 };
 

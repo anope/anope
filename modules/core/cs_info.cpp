@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSInfo : public Command
 {
@@ -28,19 +27,24 @@ class CommandCSInfo : public Command
 	}
 
  public:
-	CommandCSInfo() : Command("INFO", 1, 2)
+	CommandCSInfo(Module *creator) : Command(creator, "chanserv/info", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
-		this->SetFlag(CFLAG_ALLOW_SUSPENDED);
 		this->SetDesc(_("Lists information about the named registered channel"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		bool has_auspex = u->IsIdentified() && u->HasPriv("chanserv/auspex");
 		bool show_all = false;
@@ -49,7 +53,7 @@ class CommandCSInfo : public Command
 		if (has_auspex || check_access(u, ci, CA_INFO))
 			show_all = true;
 
-		source.Reply(_(CHAN_INFO_HEADER), chan.c_str());
+		source.Reply(CHAN_INFO_HEADER, chan.c_str());
 		if (ci->GetFounder())
 			source.Reply(_("        Founder: %s"), ci->GetFounder()->display.c_str());
 
@@ -89,7 +93,7 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 
-			source.Reply(_(NICK_INFO_OPTIONS), optbuf.empty() ? _("None") : optbuf.c_str());
+			source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
 			source.Reply(_("      Mode lock: %s"), ci->GetMLockAsString(true).c_str());
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))
@@ -100,29 +104,24 @@ class CommandCSInfo : public Command
 			Anope::string by, reason;
 			ci->GetExtRegular("suspend_by", by);
 			ci->GetExtRegular("suspend_reason", reason);
-			source.Reply(_("      Suspended: [%s] %s"), by.c_str(), !reason.empty() ? reason.c_str() : _(NO_REASON));
+			source.Reply(_("      Suspended: [%s] %s"), by.c_str(), !reason.empty() ? reason.c_str() : NO_REASON);
 		}
 
 		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, show_all));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002INFO \037channel\037\002\n"
-				" \n"
-				"Lists information about the named registered channel,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists information about the named registered channel,\n"
 				"including its founder, time of registration, last time\n"
 				"used, description, and mode lock, if any. If \002ALL\002 is \n"
 				"specified, the entry message and successor will also \n"
 				"be displayed."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "INFO", _("INFO \037channel\037"));
 	}
 };
 
@@ -131,14 +130,12 @@ class CSInfo : public Module
 	CommandCSInfo commandcsinfo;
 
  public:
-	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSInfo(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsinfo(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsinfo);
+		ModuleManager::RegisterService(&commandcsinfo);
 	}
 };
 

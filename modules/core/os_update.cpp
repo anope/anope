@@ -12,28 +12,28 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSUpdate : public Command
 {
  public:
-	CommandOSUpdate() : Command("UPDATE", 0, 0, "operserv/update")
+	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0, "operserv/update")
 	{
 		this->SetDesc(_("Force the Services databases to be updated immediately"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		source.Reply(_("Updating databases."));
 		save_databases();
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002UPDATE\002\n"
-				" \n"
-				"Causes Services to update all database files as soon as you\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Causes Services to update all database files as soon as you\n"
 				"send the command."));
 		return true;
 	}
@@ -44,14 +44,12 @@ class OSUpdate : public Module
 	CommandOSUpdate commandosupdate;
 
  public:
-	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosupdate(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosupdate);
+		ModuleManager::RegisterService(&commandosupdate);
 	}
 };
 

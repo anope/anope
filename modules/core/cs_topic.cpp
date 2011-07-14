@@ -12,60 +12,58 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSTopic : public Command
 {
  public:
-	CommandCSTopic() : Command("TOPIC", 1, 2)
+	CommandCSTopic(Module *creator) : Command(creator, "chanserv/topic", 1, 2)
 	{
 		this->SetDesc(_("Manipulate the topic of the specified channel"));
+		this->SetSyntax(_("\037channel\037 [\037topic\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &topic = params.size() > 1 ? params[1] : "";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
 
-		if (!c)
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
-		else if (!check_access(u, ci, CA_TOPIC) && !u->HasCommand("chanserv/topic"))
-			source.Reply(_(ACCESS_DENIED));
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!ci->c)
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+		else if (!check_access(u, ci, CA_TOPIC) && !u->HasCommand("chanserv/chanserv/topic"))
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			bool has_topiclock = ci->HasFlag(CI_TOPICLOCK);
 			ci->UnsetFlag(CI_TOPICLOCK);
-			c->ChangeTopic(u->nick, topic, Anope::CurTime);
+			ci->c->ChangeTopic(u->nick, topic, Anope::CurTime);
 			if (has_topiclock)
 				ci->SetFlag(CI_TOPICLOCK);
 	
 			bool override = !check_access(u, ci, CA_TOPIC);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change the topic to " << (!topic.empty() ? topic : "No topic");
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002TOPIC \037channel\037 [\037topic\037]\002\n"
-				" \n"
-				"Causes %s to set the channel topic to the one\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Causes %s to set the channel topic to the one\n"
 				"specified. If \002topic\002 is not given, then an empty topic\n"
 				"is set. This command is most useful in conjunction\n"
-				"with \002SET TOPICLOCK\002. See \002%s%s HELP SET TOPICLOCK\002\n"
-				"for more information.\n"
-				" \n"
+				"with topic lock.\n"
 				"By default, limited to those with founder access on the\n"
-				"channel."), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				"channel."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "TOPIC", _("TOPIC \037channel\037 [\037topic\037]"));
 	}
 };
 
@@ -74,11 +72,12 @@ class CSTopic : public Module
 	CommandCSTopic commandcstopic;
 
  public:
-	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcstopic(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(chanserv->Bot(), &commandcstopic);
+		ModuleManager::RegisterService(&commandcstopic);
 	}
 };
 

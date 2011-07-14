@@ -8,12 +8,12 @@
 #ifndef BOTS_H
 #define BOTS_H
 
-#include "commands.h"
-
 class BotInfo;
 
 extern CoreExport Anope::insensitive_map<BotInfo *> BotListByNick;
 extern CoreExport Anope::map<BotInfo *> BotListByUID;
+typedef Anope::insensitive_map<BotInfo *> botinfo_map;
+typedef Anope::insensitive_map<Anope::string> command_map;
 
 /** Flags settable on a bot
  */
@@ -25,11 +25,13 @@ enum BotFlag
 	BI_CORE,
 	/* This bot can only be assigned by IRCops */
 	BI_PRIVATE,
+	/* This bot is defined in the config */
+	BI_CONF,
 
 	BI_END
 };
 
-static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "" };
+static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF", "" };
 
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 {
@@ -37,7 +39,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	uint32 chancount;
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
-	CommandMap Commands;	/* Commands on this bot */
+	command_map commands; /* Commands, actual name to service name */
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -50,6 +52,8 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	/** Destroy a bot, clearing up appropriately.
 	 */
 	virtual ~BotInfo();
+
+	void GenerateUID();
 
 	/** Change the nickname for the bot.
 	 * @param newnick The nick to change to

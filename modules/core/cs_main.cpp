@@ -12,154 +12,20 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
-
-static BotInfo *ChanServ = NULL;
-
-class ChanServBotInfo : public BotInfo
-{
- public:
-	ChanServBotInfo(const Anope::string &bnick, const Anope::string &user = "", const Anope::string &bhost = "", const Anope::string &real = "") : BotInfo(bnick, user, bhost, real) { }
-
-	void OnMessage(User *u, const Anope::string &message)
-	{
-		if (!u->HasMode(UMODE_OPER) && Config->CSOpersOnly)
-		{
-			u->SendMessage(ChanServ, ACCESS_DENIED);
-			return;
-		}
-
-		spacesepstream sep(message);
-		Anope::string command, param;
-		if (sep.GetToken(command) && sep.GetToken(param))
-		{
-			Command *c = FindCommand(this, command);
-			if (c && !c->HasFlag(CFLAG_STRIP_CHANNEL))
-			{
-				if (ircdproto->IsChannelValid(param))
-				{
-					ChannelInfo *ci = cs_findchan(param);
-					if (ci)
-					{
-						if (ci->HasFlag(CI_SUSPENDED) && !c->HasFlag(CFLAG_ALLOW_SUSPENDED))
-						{
-							u->SendMessage(this, CHAN_X_SUSPENDED, ci->name.c_str());
-							Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << command << " because of SUSPENDED channel " << ci->name;
-							return;
-						}
-					}
-					else if (!c->HasFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL))
-					{
-						u->SendMessage(this, CHAN_X_NOT_REGISTERED, param.c_str());
-						return;
-					}
-				}
-				/* A user not giving a channel name for a param that should be a channel */
-				else
-				{
-					u->SendMessage(this, CHAN_X_INVALID, param.c_str());
-					return;
-				}
-			}
-		}
-
-		BotInfo::OnMessage(u, message);
-	}
-};
-
-class MyChanServService : public ChanServService
-{
- public:
-	MyChanServService(Module *m) : ChanServService(m) { }
-
-	BotInfo *Bot()
-	{
-		return ChanServ;
-	}
-};
-
-class ExpireCallback : public CallBack
-{
- public:
-	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
-
-	void Tick(time_t)
-	{
-		if (!Config->CSExpire || noexpire || readonly)
-			return;
-
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
-		{
-			ChannelInfo *ci = it->second;
-			++it;
-
-			bool expire = false;
-			if (ci->HasFlag(CI_SUSPENDED))
-			{
-				if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
-					expire = true;
-			}
-			else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
-				expire = true;
-
-			if (ci->HasFlag(CI_NO_EXPIRE))
-				expire = false;
-
-			if (expire)
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
-				if (MOD_RESULT == EVENT_STOP)
-					continue;
-
-				Anope::string extra;
-				if (ci->HasFlag(CI_SUSPENDED))
-					extra = "suspended ";
-
-				Log(LOG_NORMAL, "chanserv/expire", ChanServ) << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
-				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-				delete ci;
-			}
-		}
-	}
-};
 
 class ChanServCore : public Module
 {
-	MyChanServService mychanserv;
-	ExpireCallback expires;
-
  public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), mychanserv(this), expires(this)
+	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&this->mychanserv);
+		BotInfo *ChanServ = findbot(Config->ChanServ);
+		if (ChanServ == NULL)
+			throw ModuleException("No bot named " + Config->ChanServ);
 
-		ChanServ = new ChanServBotInfo(Config->s_ChanServ, Config->ServiceUser, Config->ServiceHost, Config->desc_ChanServ);
-		ChanServ->SetFlag(BI_CORE);
-
-		Implementation i[] = { I_OnDelCore, I_OnDelChan };
-		ModuleManager::Attach(i, this, 2);
-
-		spacesepstream coreModules(Config->ChanCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~ChanServCore()
-	{
-		spacesepstream coreModules(Config->ChanCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete ChanServ;
+		Implementation i[] = { I_OnDelChan, I_OnPreHelp, I_OnPostHelp };
+		ModuleManager::Attach(i, this, 3);
 	}
 
 	void OnDelCore(NickCore *nc)
@@ -222,10 +88,34 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnDelChan(ChannelInfo *ci)
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
-			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
+		if (!params.empty() || source.owner->nick != Config->ChanServ)
+			return;
+		source.Reply(_("\002%s\002 allows you to register and control various\n"
+			"aspects of channels. %s can often prevent\n"
+			"malicious users from \"taking over\" channels by limiting\n"
+			"who is allowed channel operator privileges. Available\n"
+			"commands are listed below; to use them, type\n"
+			"\002%s%s \037command\037\002. For more information on a\n"
+			"specific command, type \002%s%s HELP \037command\037\002.\n "),
+			Config->ChanServ.c_str(), Config->ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->ChanServ.c_str(), Config->ChanServ.c_str(), source.command.c_str());
+	}
+
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->ChanServ)
+			return;
+		if (Config->CSExpire >= 86400)
+			source.Reply(_(" \n"
+				"Note that any channel which is not used for %d days\n"
+				"(i.e. which no user on the channel's access list enters\n"
+				"for that period of time) will be automatically dropped."), Config->CSExpire / 86400);
+		if (source.u->IsServicesOper())
+			source.Reply(_(" \n"
+				"Services Operators can also drop any channel without needing\n"
+				"to identify via password, and may view the access, akick,\n"
+				"and level setting lists for any channel."));
 	}
 };
 

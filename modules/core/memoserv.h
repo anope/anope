@@ -14,8 +14,6 @@ class MemoServService : public Service
 
 	MemoServService(Module *m) : Service(m, "MemoServ") { }
 
-	virtual BotInfo *Bot() = 0;
-
 	/** Retrieve the memo info for a nick or channel
 	 * @param target Target
 	 * @param ischan Set to true if target is a channel

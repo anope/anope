@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "botserv.h"
 
 class CommandBSBotList : public Command
 {
  public:
-	CommandBSBotList() : Command("BOTLIST", 0, 0)
+	CommandBSBotList(Module *creator) : Command(creator, "botserv/botlist", 0, 0)
 	{
 		this->SetDesc(_("Lists available bots"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		unsigned count = 0;
@@ -40,7 +40,7 @@ class CommandBSBotList : public Command
 			}
 		}
 
-		if (u->HasCommand("botserv/botlist") && count < BotListByNick.size())
+		if (u->HasCommand("botserv/botserv/botlist") && count < BotListByNick.size())
 		{
 			source.Reply(_("Bots reserved to IRC operators:"));
 
@@ -62,14 +62,14 @@ class CommandBSBotList : public Command
 		else
 			source.Reply(_("%d bots available."), count);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002BOTLIST\002\n"
-				" \n"
-				"Lists all available bots on this network."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists all available bots on this network."));
 		return true;
 	}
 };
@@ -79,14 +79,12 @@ class BSBotList : public Module
 	CommandBSBotList commandbsbotlist;
 
  public:
-	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	BSBotList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandbsbotlist(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!botserv)
-			throw ModuleException("BotServ is not loaded!");
-
-		this->AddCommand(botserv->Bot(), &commandbsbotlist);
+		ModuleManager::RegisterService(&commandbsbotlist);
 	}
 };
 

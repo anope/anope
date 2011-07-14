@@ -11,51 +11,44 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetMisc : public Command
 {
 	Anope::string Desc;
  public:
-	CommandCSSetMisc(const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(cname, 1, 2, cpermission), Desc(cdesc)
+	CommandCSSetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(creator, "chanserv/set/" + cname, 1, 2, cpermission), Desc(cdesc)
 	{
 		this->SetDesc(cdesc);
+		this->SetSyntax(_("\037channel\037 \037option\037 \037parameters\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetMisc");
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		ci->Shrink("chanserv:" + this->name);
 		if (params.size() > 1)
 		{
 			ci->Extend("chanserv:" + this->name, new ExtensibleItemRegular<Anope::string>(params[1]));
-			source.Reply(_(CHAN_SETTING_CHANGED), this->name.c_str(), ci->name.c_str(), params[1].c_str());
+			source.Reply(CHAN_SETTING_CHANGED, this->name.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
-			source.Reply(_(CHAN_SETTING_UNSET), this->name.c_str(), ci->name.c_str());
+			source.Reply(CHAN_SETTING_UNSET, this->name.c_str(), ci->name.c_str());
 
-		return MOD_CONT;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
+		return;
 	}
 };
 
 class CommandCSSASetMisc : public CommandCSSetMisc
 {
  public:
-	CommandCSSASetMisc(const Anope::string &cname, const Anope::string &cdesc) : CommandCSSetMisc(cname, cdesc, "chanserv/saset/" + cname)
+	CommandCSSASetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc) : CommandCSSetMisc(creator, cname, cdesc, "chanserv/saset/" + cname)
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 
@@ -75,37 +68,8 @@ class CSSetMisc : public Module
 
 	void RemoveAll()
 	{
-		if (!chanserv || Commands.empty())
-			return;
-
-		Command *set = FindCommand(chanserv->Bot(), "SET");
-		Command *saset = FindCommand(chanserv->Bot(), "SASET");
-
-		if (!set && !saset)
-			return;
-
 		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-		{
-			if (set)
-			{
-				Command *c = set->FindSubcommand(it->second->Name);
-				if (c)
-				{
-					set->DelSubcommand(c);
-					delete c;
-				}
-			}
-			if (saset)
-			{
-				Command *c = saset->FindSubcommand(it->second->Name);
-				if (c)
-				{
-					saset->DelSubcommand(c);
-					delete c;
-				}
-			}
-		}
-
+			delete it->second;
 		this->Commands.clear();
 	}
 
@@ -113,9 +77,6 @@ class CSSetMisc : public Module
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
 	{
 		this->SetAuthor("Anope");
-
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
 
 		Implementation i[] = { I_OnReload, I_OnChanInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, 4);
@@ -131,11 +92,6 @@ class CSSetMisc : public Module
 	void OnReload()
 	{
 		RemoveAll();
-
-		Command *set = FindCommand(chanserv->Bot(), "SET");
-		Command *saset = FindCommand(chanserv->Bot(), "SASET");
-		if (!set && !saset)
-			return;
 
 		ConfigReader config;
 
@@ -155,10 +111,8 @@ class CSSetMisc : public Module
 				continue;
 			}
 
-			if (set)
-				set->AddSubcommand(this, new CommandCSSetMisc(cname, desc));
-			if (saset)
-				saset->AddSubcommand(this, new CommandCSSASetMisc(cname, desc));
+			ModuleManager::RegisterService(new CommandCSSetMisc(this, cname, desc));
+			ModuleManager::RegisterService(new CommandCSSASetMisc(this, cname, desc));
 		}
 	}
 

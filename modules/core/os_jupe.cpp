@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSJupe : public Command
 {
  public:
-	CommandOSJupe() : Command("JUPE", 1, 2, "operserv/jupe")
+	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2, "operserv/jupe")
 	{
 		this->SetDesc(_("\"Jupiter\" a server"));
+		this->SetSyntax(_("\037server\037 [\037reason\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &jserver = params[0];
@@ -43,14 +43,14 @@ class CommandOSJupe : public Command
 
 			Log(LOG_ADMIN, u, this) << "on " << jserver << " (" << rbuf << ")";
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002JUPE \037server\037 [\037reason\037]\002\n"
-				" \n"
-				"Tells Services to jupiter a server -- that is, to create\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Tells Services to jupiter a server -- that is, to create\n"
 				"a fake \"server\" connected to Services which prevents\n"
 				"the real server of that name from connecting.  The jupe\n"
 				"may be removed using a standard \002SQUIT\002. If a reason is\n"
@@ -60,11 +60,6 @@ class CommandOSJupe : public Command
 				"person who jupitered the server."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "JUPE", _("JUPE \037servername\037 [\037reason\037]"));
-	}
 };
 
 class OSJupe : public Module
@@ -72,14 +67,12 @@ class OSJupe : public Module
 	CommandOSJupe commandosjupe;
 
  public:
-	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSJupe(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosjupe(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosjupe);
+		ModuleManager::RegisterService(&commandosjupe);
 	}
 };
 

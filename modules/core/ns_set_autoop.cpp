@@ -12,25 +12,26 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp(const Anope::string &spermission = "") : Command("AUTOOP", 1, 2, spermission)
+	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Should services op you automatically."));
+		this->SetSyntax(_("{ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
-		if (!na)
-			throw CoreException("NULL na in CommandNSSetAutoOp");
+		NickAlias *na = findnick(user);
+		if (na == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
 		
-		Anope::string param = params.size() > 1 ? params[1] : "";
-
 		if (param.equals_ci("ON"))
 		{
 			nc->SetFlag(NI_AUTOOP);
@@ -44,44 +45,46 @@ class CommandNSSetAutoOp : public Command
 		else
 			this->OnSyntaxError(source, "AUTOOP");
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET AUTOOP {ON | OFF}\002\n"
-				" \n"
-				"Sets whether you will be opped automatically. Set to ON to \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether you will be opped automatically. Set to ON to \n"
 				"allow ChanServ to op you automatically when entering channels."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET AUTOOP", _("SET AUTOOP {ON | OFF}"));
 	}
 };
 
 class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 {
  public:
-	CommandNSSASetAutoOp() : CommandNSSetAutoOp("nickserv/saset/autoop")
+	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2, "nickserv/saset/autoop")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 AUTOOP {ON | OFF}\002\n"
-				" \n"
-				"Sets whether the given nickname will be opped automatically.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets whether the given nickname will be opped automatically.\n"
 				"Set to \002ON\002 to allow ChanServ to op the given nickname \n"
 				"omatically when joining channels."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET AUTOOP", _("SASET \037nickname\037 AUTOOP {ON | OFF}"));
 	}
 };
 
@@ -91,31 +94,13 @@ class NSSetAutoOp : public Module
 	CommandNSSASetAutoOp commandnssasetautoop;
 
  public:
-	NSSetAutoOp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetAutoOp(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetautoop(this), commandnssasetautoop(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetautoop);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetautoop);
-	}
-
-	~NSSetAutoOp()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetautoop);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetautoop);
+		ModuleManager::RegisterService(&commandnssetautoop);
+		ModuleManager::RegisterService(&commandnssasetautoop);
 	}
 };
 

@@ -17,12 +17,13 @@
 class CommandMSSend : public Command
 {
  public:
-	CommandMSSend() : Command("SEND", 2, 2)
+	CommandMSSend(Module *creator) : Command(creator, "memoserv/send", 2, 2)
 	{
 		this->SetDesc(_("Send a memo to a nick or channel"));
+		this->SetSyntax(_("{\037nick\037 | \037channel\037} \037memo-text\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
@@ -37,23 +38,18 @@ class CommandMSSend : public Command
 		else if (result == MemoServService::MEMO_TARGET_FULL)
 			source.Reply(_("%s currently has too many memos and cannot receive more."), nick.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SEND {\037nick\037 | \037channel\037} \037memo-text\037\002\n"
-				" \n"
-				"Sends the named \037nick\037 or \037channel\037 a memo containing\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sends the named \037nick\037 or \037channel\037 a memo containing\n"
 				"\037memo-text\037. When sending to a nickname, the recipient will\n"
 				"receive a notice that he/she has a new memo. The target\n"
 				"nickname/channel must be registered."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SEND", _(MEMO_SEND_SYNTAX));
 	}
 };
 
@@ -62,14 +58,12 @@ class MSSend : public Module
 	CommandMSSend commandmssend;
 
  public:
-	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSSend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmssend(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmssend);
+		ModuleManager::RegisterService(&commandmssend);
 	}
 };
 

@@ -12,6 +12,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 static Anope::string TS6UPLINK;
 
@@ -101,20 +102,20 @@ class PlexusProto : public IRCDProto
 
 	void SendSGLineDel(const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNXLINE * %s", x->Mask.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNXLINE * %s", x->Mask.c_str());
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
 	}
 
 	void SendSQLineDel(const XLine *x)
@@ -136,8 +137,8 @@ class PlexusProto : public IRCDProto
 
 	void SendAkill(User *, const XLine *x)
 	{
-		BotInfo *bi = findbot(Config->s_OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		BotInfo *bi = findbot(Config->OperServ);
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
@@ -536,7 +537,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 		{
 			u->Login(nc);
 			if (user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 	}
 

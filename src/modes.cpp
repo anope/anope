@@ -279,29 +279,6 @@ bool ChannelModeRegistered::CanSet(User *u) const
 	return false;
 }
 
-/** Add a ban to the channel
- * @param chan The channel
- * @param mask The ban
- */
-void ChannelModeBan::OnAdd(Channel *chan, const Anope::string &mask)
-{
-	/* check for NULL values otherwise we will segfault */
-	if (!chan || mask.empty())
-		return;
-
-	/* Check whether it matches a botserv bot */
-	if (!Config->s_BotServ.empty() && Config->BSSmartJoin && chan->ci && chan->ci->bi && chan->FindUser(chan->ci->bi))
-	{
-		BotInfo *bi = chan->ci->bi;
-
-		Entry ban(CMODE_BAN, mask);
-		if (ban.Matches(bi))
-			chan->RemoveMode(NULL, CMODE_BAN, mask);
-	}
-
-	Log(LOG_DEBUG) << "Added ban " << mask << " to channel " << chan->name;
-}
-
 void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
 {
 	ChannelMode *cm = NULL;

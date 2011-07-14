@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSSVSNick : public Command
 {
  public:
-	CommandOSSVSNick() : Command("SVSNICK", 2, 2, "operserv/svsnick")
+	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2, "operserv/svsnick")
 	{
 		this->SetDesc(_("Forcefully change a user's nickname"));
+		this->SetSyntax(_("\037nick\037 \037newnick\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
@@ -40,40 +40,35 @@ class CommandOSSVSNick : public Command
 		if (newnick[0] == '-' || isdigit(newnick[0]))
 		{
 			source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
-			return MOD_CONT;
+			return;
 		}
 		for (unsigned i = 0, end = newnick.length(); i < end; ++i)
 			if (!isvalidnick(newnick[i]))
 			{
 				source.Reply(_("Nick \002%s\002 is an illegal nickname and cannot be used."), newnick.c_str());
-				return MOD_CONT;
+				return;
 			}
 
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (finduser(newnick))
 			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
-			ircdproto->SendGlobops(operserv->Bot(), "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
+			ircdproto->SendGlobops(source.owner, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SVSNICK \037nick\037 \037newnick\037\002\n"
-				" \n"
-				"Forcefully changes a user's nickname from nick to newnick."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Forcefully changes a user's nickname from nick to newnick."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SVSNICK", _("SVSNICK \037nick\037 \037newnick\037 "));
 	}
 };
 
@@ -82,17 +77,15 @@ class OSSVSNick : public Module
 	CommandOSSVSNick commandossvsnick;
 
  public:
-	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSSVSNick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandossvsnick(this)
 	{
+		this->SetAuthor("Anope");
+
 		if (!ircd || !ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->SetAuthor("Anope");
-
-		this->AddCommand(operserv->Bot(), &commandossvsnick);
+		ModuleManager::RegisterService(&commandossvsnick);
 	}
 };
 

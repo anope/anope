@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSAList : public Command
 {
  public:
-	CommandNSAList() : Command("ALIST", 0, 2)
+	CommandNSAList(Module *creator) : Command(creator, "nickserv/alist", 0, 2)
 	{
 		this->SetDesc(_("List channels you have access on"));
+		this->SetSyntax(_("[\037nickname\037] [\037level\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		/*
 		 * List the channels that the given nickname has access on
@@ -88,9 +88,9 @@ class CommandNSAList : public Command
 		}
 
 		if (!na)
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
-			source.Reply(_(CHAN_ACCESS_LEVEL_RANGE), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
+			source.Reply(CHAN_ACCESS_LEVEL_RANGE, ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
 			int chan_count = 0;
@@ -130,38 +130,29 @@ class CommandNSAList : public Command
 
 			source.Reply(_("End of list - %d/%d channels shown."), match_count, chan_count);
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		User *u = source.u;
-		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002ALIST [\037nickname\037] [\037level\037]\002\n"
-					" \n"
-					"With no parameters, lists channels you have access on. With\n"
-					"one parameter, lists channels that \002nickname\002 has access \n"
-					"on. With two parameters lists channels that \002nickname\002 has \n"
-					"\002level\002 access or greater on.\n"
-					"This use limited to \002Services Operators\002."));
-		else
-			source.Reply(_("Syntax: \002ALIST [\037level\037]\002\n"
-					" \n"
-					"Lists all channels you have access on. Optionally, you can specify\n"
-					"a level in XOP or ACCESS format. The resulting list will only\n"
-					"include channels where you have the given level of access.\n"
-					"Examples:\n"
-					"    \002ALIST Founder\002\n"
-					"        Lists all channels where you have Founder\n"
-					"        access.\n"
-					"    \002ALIST AOP\002\n"
-					"        Lists all channels where you have AOP\n"
-					"        access or greater.\n"
-					"    \002ALIST 10\002\n"
-					"        Lists all channels where you have level 10\n"
-					"        access or greater.\n"
-					"Channels that have the \037NOEXPIRE\037 option set will be\n"
-					"prefixed by an exclamation mark."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Lists all channels you have access on. Optionally, you can specify\n"
+				"a level in XOP or ACCESS format. The resulting list will only\n"
+				"include channels where you have the given level of access.\n"
+				"Examples:\n"
+				"    \002ALIST Founder\002\n"
+				"        Lists all channels where you have Founder\n"
+				"        access.\n"
+				"    \002ALIST AOP\002\n"
+				"        Lists all channels where you have AOP\n"
+				"        access or greater.\n"
+				"    \002ALIST 10\002\n"
+				"        Lists all channels where you have level 10\n"
+				"        access or greater.\n"
+				"Channels that have the \037NOEXPIRE\037 option set will be\n"
+				"prefixed by an exclamation mark. The nickname parameter is\n"
+				"limited to Services Operators"));
 
 		return true;
 	}
@@ -172,11 +163,12 @@ class NSAList : public Module
 	CommandNSAList commandnsalist;
 
  public:
-	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSAList(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsalist(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(nickserv->Bot(), &commandnsalist);
+		ModuleManager::RegisterService(&commandnsalist);
 	}
 };
 

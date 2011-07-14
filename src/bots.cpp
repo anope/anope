@@ -8,6 +8,7 @@
 #include "services.h"
 #include "modules.h"
 #include "commands.h"
+#include "oper.h"
 
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;
@@ -35,30 +36,31 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_PROTECTED));
 	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_GOD));
 
-	for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
-	{
-		LogInfo *l = Config->LogInfos[i];
-
-		if (ircd && !ircd->join2msg && !l->Inhabit)
-			continue;
-
-		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
+	if (Config)
+		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
 		{
-			const Anope::string &target = *sit;
+			LogInfo *l = Config->LogInfos[i];
 
-			if (target[0] == '#')
+			if (ircd && !ircd->join2msg && !l->Inhabit)
+				continue;
+
+			for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
 			{
-				Channel *c = findchan(target);
-				if (!c)
-					c = new Channel(target);
-				c->SetFlag(CH_LOGCHAN);
-				c->SetFlag(CH_PERSIST);
+				const Anope::string &target = *sit;
 
-				if (!c->FindUser(this))
-					this->Join(c, &Config->BotModeList);
+				if (target[0] == '#')
+				{
+					Channel *c = findchan(target);
+					if (!c)
+						c = new Channel(target);
+					c->SetFlag(CH_LOGCHAN);
+					c->SetFlag(CH_PERSIST);
+
+					if (!c->FindUser(this))
+						this->Join(c, &Config->BotModeList);
+				}
 			}
 		}
-	}
 }
 
 BotInfo::~BotInfo()
@@ -79,18 +81,18 @@ BotInfo::~BotInfo()
 			ci->bi = NULL;
 	}
 
-	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end;)
-	{
-		Command *c = it->second;
-		++it;
-
-		if (c->module)
-			c->module->DelCommand(this, c);
-	}
-
 	BotListByNick.erase(this->nick);
 	if (!this->uid.empty())
 		BotListByUID.erase(this->uid);
+}
+
+void BotInfo::GenerateUID()
+{
+	if (!this->uid.empty())
+		throw CoreException("Bot already has a uid?");
+	this->uid = ts6_uid_retrieve();
+	BotListByUID[this->uid] = this;
+	UserListByUID[this->uid] = this;
 }
 
 void BotInfo::SetNewNick(const Anope::string &newnick)
@@ -154,7 +156,7 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 
 void BotInfo::Join(Channel *c, ChannelStatus *status)
 {
-	if (Config->BSSmartJoin)
+	if (Config && ircdproto && Config->BSSmartJoin)
 	{
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList(CMODE_BAN);
 
@@ -179,7 +181,8 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 	}
 
 	c->JoinUser(this);
-	ircdproto->SendJoin(this, c, status);
+	if (ircdproto)
+		ircdproto->SendJoin(this, c, status);
 
 	FOREACH_MOD(I_OnBotJoin, OnBotJoin(c, this));
 }
@@ -198,6 +201,91 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 
 void BotInfo::OnMessage(User *u, const Anope::string &message)
 {
-	mod_run_cmd(this, u, NULL, message);
+	std::vector<Anope::string> params = BuildStringVector(message);
+
+	command_map::iterator it = this->commands.end();
+	unsigned count = 0;
+	for (unsigned max = params.size(); it == this->commands.end() && max > 0; --max)
+	{
+		Anope::string full_command;
+		for (unsigned i = 0; i < max; ++i)
+			full_command += " " + params[i];
+		full_command.erase(full_command.begin());
+
+		++count;
+		it = this->commands.find(full_command);
+	}
+
+	if (it == this->commands.end())
+	{
+		u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		return;
+	}
+
+	service_reference<Command> c(it->second);
+	if (!c)
+	{
+		u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		Log(this) << "Command " << it->first << " exists on me, but its service " << it->second << " was not found!";
+		return;
+	}
+
+	// Command requires registered users only
+	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
+	{
+		u->SendMessage(this, NICK_IDENTIFY_REQUIRED);
+		Log(LOG_COMMAND, "denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
+		return;
+	}
+
+	for (unsigned i = 0, j = params.size() - (count - 1); i < j; ++i)
+		params.erase(params.begin());
+
+	while (c->MaxParams > 0 && params.size() > c->MaxParams)
+	{
+		params[c->MaxParams - 1] += " " + params[c->MaxParams];
+		params.erase(params.begin() + c->MaxParams);
+	}
+
+	CommandSource source;
+	source.u = u;
+	source.c = NULL;
+	source.owner = this;
+	source.service = this;
+	source.command = it->first;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
+	if (MOD_RESULT == EVENT_STOP)
+	{
+		source.DoReply();
+		return;
+	}
+
+
+	if (params.size() < c->MinParams)
+	{
+		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
+		source.DoReply();
+		return;
+	}
+
+	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
+	if (!c->permission.empty() && !u->HasCommand(c->permission))
+	{
+		u->SendMessage(this, ACCESS_DENIED);
+		Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
+		source.DoReply();
+		return;
+	}
+
+	dynamic_reference<User> user_reference(u);
+	c->Execute(source, params);
+	if (user_reference)
+	{
+		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
+		if (user_reference)
+			source.DoReply();
+	}
 }
 

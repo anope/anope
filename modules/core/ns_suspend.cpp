@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSuspend : public Command
 {
  public:
-	CommandNSSuspend() : Command("SUSPEND", 2, 2, "nickserv/suspend")
+	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 2, "nickserv/suspend")
 	{
 		this->SetDesc(_("Suspend a given nick"));
+		this->SetSyntax(_("\037nickname\037 \037reason\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -31,21 +31,21 @@ class CommandNSSuspend : public Command
 
 		if (readonly)
 		{
-			source.Reply(_(READ_ONLY_MODE));
-			return MOD_CONT;
+			source.Reply(READ_ONLY_MODE);
+			return;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		na->nc->SetFlag(NI_SUSPENDED);
@@ -76,52 +76,50 @@ class CommandNSSuspend : public Command
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: SUSPEND nickname reason\n"
-			"SUSPENDs a nickname from being used."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Suspends a registered nickname, which prevents from being used\n"
+				"while keeping all the data for that nick."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SUSPEND", _("SUSPEND nickname reason"));
 	}
 };
 
 class CommandNSUnSuspend : public Command
 {
  public:
-	CommandNSUnSuspend() : Command("UNSUSPEND", 1, 1, "nickserv/suspend")
+	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1, "nickserv/suspend")
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
+		this->SetSyntax(_("\037nickname\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
 
 		if (readonly)
 		{
-			source.Reply(_(READ_ONLY_MODE));
-			return MOD_CONT;
+			source.Reply(READ_ONLY_MODE);
+			return;
 		}
 
 		NickAlias *na = findnick(nick);
 		if (!na)
 		{
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
 		}
 
 		if (Config->NSSecureAdmins && na->nc->IsServicesOper())
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		na->nc->UnsetFlag(NI_SUSPENDED);
@@ -131,19 +129,15 @@ class CommandNSUnSuspend : public Command
 
 		FOREACH_MOD(I_OnNickUnsuspended, OnNickUnsuspended(na));
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: UNSUSPEND nickname\n"
-			"UNSUSPENDS a nickname from being used."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Unsuspends a nickname which allows it to be used again."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "UNSUSPEND", _("UNSUSPEND nickname"));
 	}
 };
 
@@ -153,15 +147,13 @@ class NSSuspend : public Module
 	CommandNSUnSuspend commandnsunsuspend;
 
  public:
-	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssuspend(this), commandnsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnssuspend);
-		this->AddCommand(nickserv->Bot(), &commandnsunsuspend);
+		ModuleManager::RegisterService(&commandnssuspend);
+		ModuleManager::RegisterService(&commandnsunsuspend);
 	}
 };
 

@@ -12,71 +12,23 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "hostserv.h"
-
-static BotInfo *HostServ = NULL;
-
-class MyHostServService : public HostServService
-{
- public:
-	MyHostServService(Module *m) : HostServService(m) { }
-
-	BotInfo *Bot()
-	{
-		return HostServ;
-	}
-
-	void Sync(NickAlias *na)
-	{
-		if (!na || !na->hostinfo.HasVhost())
-			return;
-	
-		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
-		{
-			NickAlias *nick = *it;
-			nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
-		}
-	}
-};
 
 class HostServCore : public Module
 {
-	MyHostServService myhostserv;
-
  public:
-	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), myhostserv(this)
+	HostServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
 	{
 		this->SetAuthor("Anope");
 
 		if (!ircd || !ircd->vhost)
 			throw ModuleException("Your IRCd does not suppor vhosts");
+	
+		BotInfo *HostServ = findbot(Config->HostServ);
+		if (HostServ == NULL)
+			throw ModuleException("No bot named " + Config->HostServ);
 
-		ModuleManager::RegisterService(&this->myhostserv);
-		
-		HostServ = new BotInfo(Config->s_HostServ, Config->ServiceUser, Config->ServiceHost, Config->desc_HostServ);
-		HostServ->SetFlag(BI_CORE);
-
-		Implementation i[] = { I_OnNickIdentify, I_OnNickUpdate };
-		ModuleManager::Attach(i, this, 2);
-
-		spacesepstream coreModules(Config->HostCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-			ModuleManager::LoadModule(module, NULL);
-	}
-
-	~HostServCore()
-	{
-		spacesepstream coreModules(Config->HostCoreModules);
-		Anope::string module;
-		while (coreModules.GetToken(module))
-		{
-			Module *m = ModuleManager::FindModule(module);
-			if (m != NULL)
-				ModuleManager::UnloadModule(m, NULL);
-		}
-
-		delete HostServ;
+		Implementation i[] = { I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
+		ModuleManager::Attach(i, this, 3);
 	}
 
 	void OnNickIdentify(User *u)
@@ -105,16 +57,27 @@ class HostServCore : public Module
 			if (ircd->vident && !na->hostinfo.GetIdent().empty())
 				u->SetVIdent(na->hostinfo.GetIdent());
 
-			if (!na->hostinfo.GetIdent().empty())
-				u->SendMessage(HostServ, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
-			else
-				u->SendMessage(HostServ, _("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
+			BotInfo *bi = findbot(Config->HostServ);
+			if (bi)
+			{
+				if (!na->hostinfo.GetIdent().empty())
+					u->SendMessage(bi, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				else
+					u->SendMessage(bi, _("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
+			}
 		}
 	}
 
 	void OnNickUpdate(User *u)
 	{
 		this->OnNickIdentify(u);
+	}
+
+	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		if (!params.empty() || source.owner->nick != Config->HostServ)
+			return;
+		source.Reply(_("%s commands:\n"), Config->HostServ.c_str());
 	}
 };
 

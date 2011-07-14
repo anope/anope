@@ -17,12 +17,13 @@
 class CommandMSIgnore : public Command
 {
  public:
-	CommandMSIgnore() : Command("IGNORE", 1, 3)
+	CommandMSIgnore(Module *creator) : Command(creator, "memoserv/ignore", 1, 3)
 	{
 		this->SetDesc(_("Manage your memo ignore list"));
+		this->SetSyntax(_("[\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -40,9 +41,9 @@ class CommandMSIgnore : public Command
 		bool ischan;
 		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan);
 		if (!mi)
-			source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), channel.c_str());
+			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
 		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{
 			if (std::find(mi->ignores.begin(), mi->ignores.end(), param.ci_str()) == mi->ignores.end())
@@ -79,21 +80,16 @@ class CommandMSIgnore : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002IGNORE [\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]\n"
-				" \n"
-				"Allows you to ignore users by nick or host from memoing you. If someone on your\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to ignore users by nick or host from memoing you. If someone on your\n"
 				"memo ignore list tries to memo you, they will not be told that you have them ignored."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "IGNORE", _("IGNORE [\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"));
 	}
 };
 
@@ -102,14 +98,12 @@ class MSIgnore : public Module
 	CommandMSIgnore commandmsignore;
 
  public:
-	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmsignore(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmsignore);
+		ModuleManager::RegisterService(&commandmsignore);
 	}
 };
 

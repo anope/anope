@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSKick : public Command
 {
  public:
-	CommandOSKick() : Command("KICK", 3, 3, "operserv/kick")
+	CommandOSKick(Module *creator) : Command(creator, "operserv/kick", 3, 3, "operserv/kick")
 	{
 		this->SetDesc(_("Kick a user from a channel"));
+		this->SetSyntax(_("\037channel\037 \037user\037 \037reason\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &chan = params[0];
@@ -33,41 +33,36 @@ class CommandOSKick : public Command
 
 		if (!(c = findchan(chan)))
 		{
-			source.Reply(_(CHAN_X_NOT_IN_USE), chan.c_str());
-			return MOD_CONT;
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			return;
 		}
 		else if (c->bouncy_modes)
 		{
 			source.Reply(_("Services is unable to change modes. Are your servers' U:lines configured correctly?"));
-			return MOD_CONT;
+			return;
 		}
 		else if (!(u2 = finduser(nick)))
 		{
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+			return;
 		}
 
-		c->Kick(operserv->Bot(), u2, "%s (%s)", u->nick.c_str(), s.c_str());
+		c->Kick(source.owner, u2, "%s (%s)", u->nick.c_str(), s.c_str());
 		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name;
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002KICK \037channel\037 \037user\037 \037reason\037\002\n"
-				" \n"
-				"Allows staff to kick a user from any channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows staff to kick a user from any channel.\n"
 				"Parameters are the same as for the standard /KICK\n"
 				"command. The kick message will have the nickname of the\n"
 				"IRCop sending the KICK command prepended; for example:\n"
 				" \n"
-				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), Config->s_OperServ.c_str());
+				"*** SpamMan has been kicked off channel #my_channel by %s (Alcan (Flood))"), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "KICK", _("KICK \037channel\037 \037user\037 \037reason\037"));
 	}
 };
 
@@ -76,14 +71,12 @@ class OSKick : public Module
 	CommandOSKick commandoskick;
 
  public:
-	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandoskick(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandoskick);
+		ModuleManager::RegisterService(&commandoskick);
 	}
 };
 

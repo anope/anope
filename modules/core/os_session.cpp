@@ -12,7 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 #include "os_session.h"
 
 static service_reference<SessionService> sessionservice("session");
@@ -103,8 +102,9 @@ class ExpireTimer : public Timer
 
 			if (!e->expires || e->expires > Anope::CurTime)
 				continue;
-			if (Config->WallExceptionExpire)
-				ircdproto->SendGlobops(operserv->Bot(), "Session exception for %s has expired.", e->mask.c_str());
+			BotInfo *bi = findbot(Config->OperServ);
+			if (Config->WallExceptionExpire && bi)
+				ircdproto->SendGlobops(bi, "Session exception for %s has expired.", e->mask.c_str());
 			sessionservice->DelException(e);
 			delete e;
 		}
@@ -219,7 +219,7 @@ class ExceptionViewCallback : public ExceptionListCallback
 class CommandOSSession : public Command
 {
  private:
-	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 
@@ -246,10 +246,10 @@ class CommandOSSession : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string param = params[1];
 		Session *session = sessionservice->FindSession(param);
@@ -262,22 +262,24 @@ class CommandOSSession : public Command
 			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
 		}
 
-		return MOD_CONT;
+		return;
 	}
  public:
-	CommandOSSession() : Command("SESSION", 2, 2, "operserv/session")
+	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2, "operserv/session")
 	{
 		this->SetDesc(_("View the list of host sessions"));
+		this->SetSyntax(_("LIST \037threshold\037"));
+		this->SetSyntax(_("VIEW \037host\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
 		{
 			source.Reply(_("Session limiting is disabled."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (cmd.equals_ci("LIST"))
@@ -287,15 +289,14 @@ class CommandOSSession : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SESSION LIST \037threshold\037\002\n"
-				"        \002SESSION VIEW \037host\037\002\n"
-				" \n"
-				"Allows Services Operators to view the session list.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services Operators to view the session list.\n"
 				"\002SESSION LIST\002 lists hosts with at least \037threshold\037 sessions.\n"
 				"The threshold must be a number greater than 1. This is to \n"
 				"prevent accidental listing of the large number of single \n"
@@ -308,17 +309,12 @@ class CommandOSSession : public Command
 				"hosts and groups thereof."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SESSION", _("SESSION LIST \037limit\037"));
-	}
 };
 
 class CommandOSException : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		Anope::string mask, expiry, limitstr;
@@ -337,7 +333,7 @@ class CommandOSException : public Command
 		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 
 		Anope::string reason = params[last_param];
@@ -346,14 +342,14 @@ class CommandOSException : public Command
 		if (reason.empty())
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 
 		time_t expires = !expiry.empty() ? dotime(expiry) : Config->ExceptionExpiry;
 		if (expires < 0)
 		{
-			source.Reply(_(BAD_EXPIRY_TIME));
-			return MOD_CONT;
+			source.Reply(BAD_EXPIRY_TIME);
+			return;
 		}
 		else if (expires > 0)
 			expires += Anope::CurTime;
@@ -368,14 +364,14 @@ class CommandOSException : public Command
 		if (limit < 0 || limit > static_cast<int>(Config->MaxSessionLimit))
 		{
 			source.Reply(_("Invalid session limit. It must be a valid integer greater than or equal to zero and less than \002%d\002."), Config->MaxSessionLimit);
-			return MOD_CONT;
+			return;
 		}
 		else
 		{
 			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 			{
 				source.Reply(_("Invalid hostmask. Only real hostmasks are valid as sessionservice->GetExceptions() are not matched against nicks or usernames."));
-				return MOD_CONT;
+				return;
 			}
 
 			for (std::vector<Exception *>::iterator it = sessionservice->GetExceptions().begin(), it_end = sessionservice->GetExceptions().end(); it != it_end; ++it)
@@ -410,21 +406,21 @@ class CommandOSException : public Command
 				sessionservice->AddException(exception);
 				source.Reply(_("Session limit for \002%s\002 set to \002%d\002."), mask.c_str(), limit);
 				if (readonly)
-					source.Reply(_(READ_ONLY_MODE));
+					source.Reply(READ_ONLY_MODE);
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
 
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
-			return MOD_CONT;
+			return;
 		}
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
@@ -447,12 +443,12 @@ class CommandOSException : public Command
 		}
 
 		if (readonly)
-			source.Reply(_(READ_ONLY_MODE));
+			source.Reply(READ_ONLY_MODE);
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoMove(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoMove(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &n1str = params.size() > 1 ? params[1] : ""; /* From position */
 		const Anope::string &n2str = params.size() > 2 ? params[2] : ""; /* To position */
@@ -461,7 +457,7 @@ class CommandOSException : public Command
 		if (n2str.empty())
 		{
 			this->OnSyntaxError(source, "MOVE");
-			return MOD_CONT;
+			return;
 		}
 
 		n1 = n2 = -1;
@@ -481,15 +477,15 @@ class CommandOSException : public Command
 			source.Reply(_("Exception for \002%s\002 (#%d) moved to position \002%d\002."), sessionservice->GetExceptions()[n1]->mask.c_str(), n1 + 1, n2 + 1);
 
 			if (readonly)
-				source.Reply(_(READ_ONLY_MODE));
+				source.Reply(READ_ONLY_MODE);
 		}
 		else
 			this->OnSyntaxError(source, "MOVE");
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
@@ -519,10 +515,10 @@ class CommandOSException : public Command
 				source.Reply(_("No matching entries on session-limit exception list."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string mask = params.size() > 1 ? params[1] : "";
 
@@ -551,23 +547,28 @@ class CommandOSException : public Command
 				source.Reply(_("No matching entries on session-limit exception list."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
  public:
-	CommandOSException() : Command("EXCEPTION", 1, 5)
+	CommandOSException(Module *creator) : Command(creator, "operserv/exception", 1, 5)
 	{
 		this->SetDesc(_("Modify the session-limit exception list"));
+		this->SetSyntax(_("ADD [\037+expiry\037] \037mask\037 \037limit\037 \037reason\037"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037list\037}"));
+		this->SetSyntax(_("MOVE \037num\037 \037position\037"));
+		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
+		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &cmd = params[0];
 
 		if (!Config->LimitSessions)
 		{
 			source.Reply(_("Session limiting is disabled."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (cmd.equals_ci("ADD"))
@@ -583,27 +584,24 @@ class CommandOSException : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002EXCEPTION ADD [\037+expiry\037] \037mask\037 \037limit\037 \037reason\037\002\n"
-				"        \002EXCEPTION DEL {\037mask\037 | \037list\037}\002\n"
-				"        \002EXCEPTION MOVE \037num\037 \037position\037\002\n"
-				"        \002EXCEPTION LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002EXCEPTION VIEW [\037mask\037 | \037list\037]\002\n"
-				" \n"
-				"Allows Services Operators to manipulate the list of hosts that\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services Operators to manipulate the list of hosts that\n"
 				"have specific session limits - allowing certain machines, \n"
 				"such as shell servers, to carry more than the default number\n"
 				"of clients at a time. Once a host reaches its session limit,\n"
 				"all clients attempting to connect from that host will be\n"
 				"killed. Before the user is killed, they are notified, via a\n"
 				"/NOTICE from %s, of a source of help regarding session\n"
-				"limiting. The content of this notice is a config setting.\n"
-				" \n"
-				"\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
+				"limiting. The content of this notice is a config setting.\n"),
+				Config->OperServ.c_str());
+		source.Reply(" ");
+		source.Reply(_("\002EXCEPTION ADD\002 adds the given host mask to the exception list.\n"
 				"Note that \002nick!user@host\002 and \002user@host\002 masks are invalid!\n"
 				"Only real host masks, such as \002box.host.dom\002 and \002*.host.dom\002,\n"
 				"are allowed because sessions limiting does not take nick or\n"
@@ -623,15 +621,8 @@ class CommandOSException : public Command
 				"host mask and the expiry date and time.\n"
 				" \n"
 				"Note that a connecting client will \"use\" the first exception\n"
-				"their host matches. Large exception lists and widely matching\n"
-				"exception masks are likely to degrade services' performance."),
-				Config->s_OperServ.c_str());
+				"their host matches."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "EXCEPTION", _("EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [\037params\037]"));
 	}
 };
 
@@ -641,6 +632,7 @@ class OSSession : public Module
 	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
+	service_reference<XLineManager> akills;
 
 	void AddSession(User *u, bool exempt)
 	{
@@ -672,20 +664,25 @@ class OSSession : public Module
 	
 			if (kill && !exempt)
 			{
-				if (!Config->SessionLimitExceeded.empty())
-					u->SendMessage(operserv->Bot(), Config->SessionLimitExceeded.c_str(), u->host.c_str());
-				if (!Config->SessionLimitDetailsLoc.empty())
-					u->SendMessage(operserv->Bot(), "%s", Config->SessionLimitDetailsLoc.c_str());
+				BotInfo *bi = findbot(Config->OperServ);
+				if (bi)
+				{
+					if (!Config->SessionLimitExceeded.empty())
+						u->SendMessage(bi, Config->SessionLimitExceeded.c_str(), u->host.c_str());
+					if (!Config->SessionLimitDetailsLoc.empty())
+						u->SendMessage(bi, "%s", Config->SessionLimitDetailsLoc.c_str());
+				}
 
-				u->Kill(Config->s_OperServ, "Session limit exceeded");
+				u->Kill(Config->OperServ, "Session limit exceeded");
 
 				++session->hits;
-				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && SGLine)
+				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
 				{
 					const Anope::string &akillmask = "*@" + u->host;
 					const Anope::string &akillreason = "Session limit exceeded for " + u->host;
-					SGLine->Add(akillmask, Config->s_OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, akillreason);
-					ircdproto->SendGlobops(operserv->Bot(), "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
+					akills->Add(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, akillreason);
+					if (bi)
+						ircdproto->SendGlobops(bi, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 				}
 			}
 		}
@@ -721,18 +718,16 @@ class OSSession : public Module
 	}
 
  public:
-	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), ss(this)
+	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		ss(this), commandossession(this), commandosexception(this), akills("xlinemanager/sgline")
 	{
 		this->SetAuthor("Anope");
-
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
 		ModuleManager::Attach(i, this, 2);
 
-		this->AddCommand(operserv->Bot(), &commandossession);
-		this->AddCommand(operserv->Bot(), &commandosexception);
+		ModuleManager::RegisterService(&commandossession);
+		ModuleManager::RegisterService(&commandosexception);
 
 		ModuleManager::RegisterService(&this->ss);
 	}

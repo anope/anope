@@ -12,56 +12,54 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(const Anope::string &cpermission = "") : Command("DESC", 2, 2, cpermission)
+	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set the channel description"));
+		this->SetSyntax(_("\037channel\037 DESC \037description\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetDescription");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		ci->desc = params[1];
 
 		source.Reply(_("Description of %s changed to \002%s\002."), ci->name.c_str(), ci->desc.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 DESC \037description\037\002\n"
-				" \n"
-				"Sets the description for the channel, which shows up with\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Sets the description for the channel, which shows up with\n"
 				"the \002LIST\002 and \002INFO\002 commands."), this->name.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
 	}
 };
 
 class CommandCSSASetDescription : public CommandCSSetDescription
 {
  public:
-	CommandCSSASetDescription() : CommandCSSetDescription("chanserv/saset/description")
+	CommandCSSASetDescription(Module *creator) : CommandCSSetDescription(creator, "chanserv/saset/description", "chanserv/saset/description")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 
@@ -71,31 +69,13 @@ class CSSetDescription : public Module
 	CommandCSSASetDescription commandcssasetdescription;
 
  public:
-	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetDescription(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetdescription(this), commandcssasetdescription(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetdescription);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetdescription);
-	}
-
-	~CSSetDescription()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetdescription);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetdescription);
+		ModuleManager::RegisterService(&commandcssetdescription);
+		ModuleManager::RegisterService(&commandcssasetdescription);
 	}
 };
 

@@ -12,9 +12,8 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
-static bool SendConfirmMail(User *u)
+static bool SendConfirmMail(User *u, BotInfo *bi)
 {
 	int chars[] = {
 		' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -37,43 +36,45 @@ static bool SendConfirmMail(User *u)
 	" \n"
 	"If you don't know why this mail was sent to you, please ignore it silently.\n"
 	" \n"
-	"%s administrators."), u->Account()->email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
+	"%s administrators."), u->Account()->email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
 
-	return Mail(u, u->Account(), nickserv->Bot(), subject, message);
+	return Mail(u, u->Account(), bi, subject, message);
 }
 
 class CommandNSSetEmail : public Command
 {
  public:
-	CommandNSSetEmail(const Anope::string &spermission = "") : Command("EMAIL", 1, 2, spermission)
+	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0, const Anope::string &spermission = "") : Command(creator, cname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Associate an E-mail address with your nickname"));
+		this->SetSyntax(_("\037address\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
 		User *u = source.u;
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetEmail");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
-
-		Anope::string param = params.size() > 1 ? params[1] : "";
 
 		if (param.empty() && Config->NSForceEmail)
 		{
 			source.Reply(_("You cannot unset the e-mail on this network."));
-			return MOD_CONT;
+			return;
 		}
 		else if (Config->NSSecureAdmins && u->Account() != nc && nc->IsServicesOper())
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 		else if (!param.empty() && !MailValidate(param))
 		{
-			source.Reply(_(MAIL_X_INVALID), param.c_str());
-			return MOD_CONT;
+			source.Reply(MAIL_X_INVALID, param.c_str());
+			return;
 		}
 
 		if (!param.empty() && Config->NSConfirmEmailChanges && !u->IsServicesOper())
@@ -81,7 +82,7 @@ class CommandNSSetEmail : public Command
 			u->Account()->Extend("ns_set_email", new ExtensibleItemRegular<Anope::string>(param));
 			Anope::string old = u->Account()->email;
 			u->Account()->email = param;
-			if (SendConfirmMail(u))
+			if (SendConfirmMail(u, source.owner))
 				source.Reply(_("A confirmation email has been sent to \002%s\002. Follow the instructions in it to change your email address."), param.c_str());
 			u->Account()->email = old;
 		}
@@ -99,14 +100,19 @@ class CommandNSSetEmail : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params.size() ? params[0] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET EMAIL \037address\037\002\n"
-				" \n"
-				"Associates the given E-mail address with your nickname.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Associates the given E-mail address with your nickname.\n"
 				"This address will be displayed whenever someone requests\n"
 				"information on the nickname with the \002INFO\002 command."));
 		return true;
@@ -116,15 +122,22 @@ class CommandNSSetEmail : public Command
 class CommandNSSASetEmail : public CommandNSSetEmail
 {
  public:
-	CommandNSSASetEmail() : CommandNSSetEmail("nickserv/saset/email")
+	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2, "nickserv/saset/email")
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 \037address\037"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 EMAIL \037address\037\002\n"
-				" \n"
-				"Associates the given E-mail address with the nickname."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Associates the given E-mail address with the nickname."));
 		return true;
 	}
 };
@@ -135,39 +148,21 @@ class NSSetEmail : public Module
 	CommandNSSASetEmail commandnssasetemail;
 
  public:
-	NSSetEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetEmail(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetemail(this), commandnssasetemail(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
 		ModuleManager::Attach(I_OnPreCommand, this);
 
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetemail);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetemail);
+		ModuleManager::RegisterService(&commandnssetemail);
+		ModuleManager::RegisterService(&commandnssasetemail);
 	}
 
-	~NSSetEmail()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetemail);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetemail);
-	}
-
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		if (command->service->nick == Config->s_NickServ && command->name.equals_ci("CONFIRM") && !params.empty() && u->IsIdentified())
+		if (command->name == "nickserv/confirm" && !params.empty() && u->IsIdentified())
 		{
 			Anope::string new_email, passcode;
 			if (u->Account()->GetExtRegular("ns_set_email", new_email) && u->Account()->GetExtRegular("ns_set_email_passcode", passcode))

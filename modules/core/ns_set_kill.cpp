@@ -12,25 +12,25 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetKill : public Command
 {
  public:
-	CommandNSSetKill(const Anope::string &spermission = "") : Command("KILL", 2, 3, spermission)
+	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Turn protection on or off"));
+		this->SetSyntax(_("{ON | QUICK | IMMED | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
 	{
-		NickAlias *na = findnick(params[0]);
+		NickAlias *na = findnick(user);
 		if (!na)
-			throw CoreException("NULL na in CommandNSSetKill");
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
-
-		Anope::string param = params[1];
-		Anope::string arg = params.size() > 2 ? params[2] : "";
 
 		if (param.equals_ci("ON"))
 		{
@@ -68,14 +68,19 @@ class CommandNSSetKill : public Command
 		else
 			this->OnSyntaxError(source, "KILL");
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params[0]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET KILL {ON | QUICK | IMMED | OFF}\002\n"
-				" \n"
-				"Turns the automatic protection option for your nick\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns the automatic protection option for your nick\n"
 				"on or off.  With protection on, if another user\n"
 				"tries to take your nick, they will be given one minute to\n"
 				"change to another nick, after which %s will forcibly change\n"
@@ -86,28 +91,30 @@ class CommandNSSetKill : public Command
 				"\002IMMED\002, user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), Config->s_NickServ.c_str());
+				"network's administrators may have disabled this option."), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET KILL", Config->NSAllowKillImmed ? _("SET KILL {ON | QUICK | IMMED | OFF}") : _("SET KILL {ON | QUICK | OFF}"));
 	}
 };
 
 class CommandNSSASetKill : public CommandNSSetKill
 {
  public:
-	CommandNSSASetKill() : CommandNSSetKill("nickserv/saset/kill")
+	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2, "nickserv/saset/kill")
 	{
+		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->ClearSyntax();
+		this->Run(source, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 KILL {ON | QUICK | IMMED | OFF}\002\n"
-				" \n"
-				"Turns the automatic protection option for the nick\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Turns the automatic protection option for the nick\n"
 				"on or off. With protection on, if another user\n"
 				"tries to take the nick, they will be given one minute to\n"
 				"change to another nick, after which %s will forcibly change\n"
@@ -118,13 +125,8 @@ class CommandNSSASetKill : public CommandNSSetKill
 				"\002IMMED\002, the user's nick will be changed immediately \037without\037 being\n"
 				"warned first or given a chance to change their nick; please\n"
 				"do not use this option unless necessary. Also, your\n"
-				"network's administrators may have disabled this option."), Config->s_NickServ.c_str());
+				"network's administrators may have disabled this option."), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET KILL", Config->NSAllowKillImmed ? _("SASET \037nickname\037 KILL {ON | QUICK | IMMED | OFF}") : _("SASET \037nickname\037 KILL {ON | QUICK | OFF}"));
 	}
 };
 
@@ -134,31 +136,13 @@ class NSSetKill : public Module
 	CommandNSSASetKill commandnssasetkill;
 
  public:
-	NSSetKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssetkill(this), commandnssasetkill(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssetkill);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasetkill);
-	}
-
-	~NSSetKill()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssetkill);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasetkill);
+		ModuleManager::RegisterService(&commandnssetkill);
+		ModuleManager::RegisterService(&commandnssasetkill);
 	}
 };
 

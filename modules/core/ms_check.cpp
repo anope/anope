@@ -12,17 +12,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "memoserv.h"
 
 class CommandMSCheck : public Command
 {
  public:
-	CommandMSCheck() : Command("CHECK", 1, 1)
+	CommandMSCheck(Module *creator) : Command(creator, "memoserv/check", 1, 1)
 	{
 		this->SetDesc(_("Checks if last memo to a nick was read"));
+		this->SetSyntax(_("\037nick\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -33,8 +33,8 @@ class CommandMSCheck : public Command
 		NickAlias *na = findnick(recipient);
 		if (!na)
 		{
-			source.Reply(_(NICK_X_NOT_REGISTERED), recipient.c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_NOT_REGISTERED, recipient.c_str());
+			return;
 		}
 
 		MemoInfo *mi = &na->nc->memos;
@@ -59,21 +59,16 @@ class CommandMSCheck : public Command
 		if (!found)
 			source.Reply(_("Nick %s doesn't have a memo from you."), na->nick.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CHECK \037nick\037\002\n"
-				" \n"
-				"Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Checks whether the _last_ memo you sent to \037nick\037 has been read\n"
 				"or not. Note that this does only work with nicks, not with chans."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CHECK", _("CHECK \037nickname\037"));
 	}
 };
 
@@ -82,14 +77,12 @@ class MSCheck : public Module
 	CommandMSCheck commandmscheck;
 
  public:
-	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSCheck(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmscheck(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmscheck);
+		ModuleManager::RegisterService(&commandmscheck);
 	}
 };
 

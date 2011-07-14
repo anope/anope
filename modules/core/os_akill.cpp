@@ -12,7 +12,8 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
+
+static service_reference<XLineManager> akills("xlinemanager/sgline");
 
 class AkillDelCallback : public NumberList
 {
@@ -38,7 +39,7 @@ class AkillDelCallback : public NumberList
 		if (!Number)
 			return;
 
-		XLine *x = SGLine->GetEntry(Number - 1);
+		XLine *x = akills->GetEntry(Number - 1);
 
 		if (!x)
 			return;
@@ -49,7 +50,7 @@ class AkillDelCallback : public NumberList
 
 	static void DoDel(CommandSource &source, XLine *x)
 	{
-		SGLine->DelXLine(x);
+		akills->DelXLine(x);
 	}
 };
 
@@ -68,7 +69,7 @@ class AkillListCallback : public NumberList
 		if (!SentHeader)
 			source.Reply(_("No matching entries on the AKILL list."));
 		else
-			source.Reply(_(END_OF_ANY_LIST), "Akill");
+			source.Reply(END_OF_ANY_LIST, "Akill");
 	}
 
 	void HandleNumber(unsigned Number)
@@ -76,7 +77,7 @@ class AkillListCallback : public NumberList
 		if (!Number)
 			return;
 
-		XLine *x = SGLine->GetEntry(Number - 1);
+		XLine *x = akills->GetEntry(Number - 1);
 
 		if (!x)
 			return;
@@ -93,7 +94,7 @@ class AkillListCallback : public NumberList
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(_(OPER_LIST_FORMAT), Number + 1, x->Mask.c_str(), x->Reason.c_str());
+		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
 	}
 };
 
@@ -109,7 +110,7 @@ class AkillViewCallback : public AkillListCallback
 		if (!Number)
 			return;
 
-		XLine *x = SGLine->GetEntry(Number - 1);
+		XLine *x = akills->GetEntry(Number - 1);
 
 		if (!x)
 			return;
@@ -125,14 +126,14 @@ class AkillViewCallback : public AkillListCallback
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
 	{
-		source.Reply(_(OPER_VIEW_FORMAT), Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
+		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
 	}
 };
 
 class CommandOSAKill : public Command
 {
  private:
-	CommandReturn DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		unsigned last_param = 2;
@@ -156,8 +157,8 @@ class CommandOSAKill : public Command
 		/* Do not allow less than a minute expiry time */
 		if (expires && expires < 60)
 		{
-			source.Reply(_(BAD_EXPIRY_TIME));
-			return MOD_CONT;
+			source.Reply(BAD_EXPIRY_TIME);
+			return;
 		}
 		else if (expires > 0)
 			expires += Anope::CurTime;
@@ -165,7 +166,7 @@ class CommandOSAKill : public Command
 		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(source, "ADD");
-			return MOD_CONT;
+			return;
 		}
 
 		Anope::string reason = params[last_param];
@@ -173,13 +174,13 @@ class CommandOSAKill : public Command
 			reason += " " + params[3];
 		if (!mask.empty() && !reason.empty())
 		{
-			std::pair<int, XLine *> canAdd = SGLine->CanAdd(mask, expires);
+			std::pair<int, XLine *> canAdd = akills->CanAdd(mask, expires);
 			if (mask.find('!') != Anope::string::npos)
 				source.Reply(_("\002Reminder\002: AKILL masks cannot contain nicknames; make sure you have \002not\002 included a nick portion in your mask."));
 			else if (mask.find('@') == Anope::string::npos)
-				source.Reply(_(BAD_USERHOST_MASK));
+				source.Reply(BAD_USERHOST_MASK);
 			else if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
-				source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
+				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			else if (canAdd.first == 1)
 				source.Reply(_("\002%s\002 already exists on the AKILL list."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 2)
@@ -199,31 +200,36 @@ class CommandOSAKill : public Command
 
 				if (percent > 95)
 				{
-					source.Reply(_(USERHOST_MASK_TOO_WIDE), mask.c_str());
+					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 					Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-					return MOD_CONT;
+					return;
 				}
 
-				XLine *x = SGLine->Add(mask, u->nick, expires, reason);
+				XLine *x = akills->Add(mask, u->nick, expires, reason);
 
-				if (!x)
-					return MOD_CONT;
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
+				if (MOD_RESULT == EVENT_STOP)
+				{
+					delete x;
+					return;
+				}
 
 				source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
 				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 				if (readonly)
-					source.Reply(_(READ_ONLY_MODE));
+					source.Reply(READ_ONLY_MODE);
 			}
 		}
 		else
 			this->OnSyntaxError(source, "ADD");
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
@@ -231,13 +237,13 @@ class CommandOSAKill : public Command
 		if (mask.empty())
 		{
 			this->OnSyntaxError(source, "DEL");
-			return MOD_CONT;
+			return;
 		}
 
-		if (SGLine->GetList().empty())
+		if (akills->GetList().empty())
 		{
 			source.Reply(_("AKILL list is empty."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
@@ -247,32 +253,32 @@ class CommandOSAKill : public Command
 		}
 		else
 		{
-			XLine *x = SGLine->HasEntry(mask);
+			XLine *x = akills->HasEntry(mask);
 
 			if (!x)
 			{
 				source.Reply(_("\002%s\002 not found on the AKILL list."), mask.c_str());
-				return MOD_CONT;
+				return;
 			}
 
-			FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, x));
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
 
 			AkillDelCallback::DoDel(source, x);
 			source.Reply(_("\002%s\002 deleted from the AKILL list."), mask.c_str());
 		}
 
 		if (readonly)
-			source.Reply(_(READ_ONLY_MODE));
+			source.Reply(READ_ONLY_MODE);
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (SGLine->GetList().empty())
+		if (akills->GetList().empty())
 		{
 			source.Reply(_("AKILL list is empty."));
-			return MOD_CONT;
+			return;
 		}
 
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
@@ -286,9 +292,9 @@ class CommandOSAKill : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
+			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
 			{
-				XLine *x = SGLine->GetEntry(i);
+				XLine *x = akills->GetEntry(i);
 
 				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
@@ -306,18 +312,18 @@ class CommandOSAKill : public Command
 			if (!SentHeader)
 				source.Reply(_("No matching entries on the AKILL list."));
 			else
-				source.Reply(_(END_OF_ANY_LIST), "Akill");
+				source.Reply(END_OF_ANY_LIST, "Akill");
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoView(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (SGLine->GetList().empty())
+		if (akills->GetList().empty())
 		{
 			source.Reply(_("AKILL list is empty."));
-			return MOD_CONT;
+			return;
 		}
 
 		const Anope::string &mask = params.size() > 1 ? params[1] : "";
@@ -331,9 +337,9 @@ class CommandOSAKill : public Command
 		{
 			bool SentHeader = false;
 
-			for (unsigned i = 0, end = SGLine->GetCount(); i < end; ++i)
+			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
 			{
-				XLine *x = SGLine->GetEntry(i);
+				XLine *x = akills->GetEntry(i);
 
 				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
 				{
@@ -351,27 +357,35 @@ class CommandOSAKill : public Command
 				source.Reply(_("No matching entries on the AKILL list."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoClear(CommandSource &source)
+	void DoClear(CommandSource &source)
 	{
 		User *u = source.u;
-		FOREACH_MOD(I_OnDelAkill, OnDelAkill(u, NULL));
-		SGLine->Clear();
+		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, akills));
+		akills->Clear();
 		source.Reply(_("The AKILL list has been cleared."));
 
-		return MOD_CONT;
+		return;
 	}
  public:
-	CommandOSAKill() : Command("AKILL", 1, 4, "operserv/akill")
+	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 4, "operserv/akill")
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
+		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
+		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
+		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
+		this->SetSyntax(_("CLEAR"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &cmd = params[0];
+
+		if (!akills)
+			return;
 
 		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, params);
@@ -386,18 +400,14 @@ class CommandOSAKill : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002AKILL ADD [+\037expiry\037] \037mask\037 \037reason\037\002\n"
-				"        \002AKILL DEL {\037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002AKILL LIST [\037mask\037 | \037list\037]\002\n"
-				"        \002AKILL VIEW [\037mask\037 | \037list\037]\002\n"
-				"        \002AKILL CLEAR\002\n"
-				" \n"
-				"Allows Services operators to manipulate the AKILL list. If\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows Services operators to manipulate the AKILL list. If\n"
 				"a user matching an AKILL mask attempts to connect, Services\n"
 				"will issue a KILL for that user and, on supported server\n"
 				"types, will instruct all servers to add a ban (K-line) for\n"
@@ -435,11 +445,6 @@ class CommandOSAKill : public Command
 				"\002AKILL CLEAR\002 clears all entries of the AKILL list."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "AKILL", _("AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+\037expiry\037] {\037nick\037 | \037mask\037 | \037entry-list\037} [\037reason\037]]"));
-	}
 };
 
 class OSAKill : public Module
@@ -447,14 +452,12 @@ class OSAKill : public Module
 	CommandOSAKill commandosakill;
 
  public:
-	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSAKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosakill(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosakill);
+		ModuleManager::RegisterService(&commandosakill);
 	}
 };
 

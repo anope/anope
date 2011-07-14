@@ -12,25 +12,24 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSRegister : public Command
 {
  public:
-	CommandCSRegister() : Command("REGISTER", 2, 2)
+	CommandCSRegister(Module *creator) : Command(creator, "chanserv/register", 2, 2)
 	{
-		this->SetFlag(CFLAG_ALLOW_UNREGISTEREDCHANNEL);
 		this->SetDesc(_("Register a channel"));
+		this->SetSyntax(_("\037channel\037 \037description\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &chdesc = params[1];
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = findchan(chan);
+		Channel *c = findchan(params[0]);
+		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (readonly)
 			source.Reply(_("Sorry, channel registration is temporarily disabled."));
@@ -39,15 +38,15 @@ class CommandCSRegister : public Command
 		else if (chan[0] == '&')
 			source.Reply(_("Local channels cannot be registered."));
 		else if (chan[0] != '#')
-			source.Reply(_(CHAN_SYMBOL_REQUIRED));
+			source.Reply(CHAN_SYMBOL_REQUIRED);
 		else if (!ircdproto->IsChannelValid(chan))
-			source.Reply(_(CHAN_X_INVALID), chan.c_str());
+			source.Reply(CHAN_X_INVALID, chan.c_str());
 		else if (ci)
 			source.Reply(_("Channel \002%s\002 is already registered!"), chan.c_str());
 		else if (c && !c->HasUserStatus(u, CMODE_OP))
 			source.Reply(_("You must be a channel operator to register the channel."));
 		else if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? _(CHAN_EXCEEDED_CHANNEL_LIMIT) : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
+			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
 		else
 		{
 			ci = new ChannelInfo(chan);
@@ -61,7 +60,7 @@ class CommandCSRegister : public Command
 				ci->last_topic_time = c->topic_time;
 			}
 			else
-				ci->last_topic_setter = Config->s_ChanServ;
+				ci->last_topic_setter = source.owner->nick;
 
 			ci->bi = NULL;
 			Log(LOG_COMMAND, u, this, ci);
@@ -92,14 +91,14 @@ class CommandCSRegister : public Command
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(ci));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002REGISTER \037channel\037 \037description\037\002\n"
-			" \n"
-			"Registers a channel in the %s database.  In order\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Registers a channel in the %s database.  In order\n"
 			"to use this command, you must first be a channel operator\n"
 			"on the channel you're trying to register.\n"
 			"The description, which \002must\002 be included, is a\n"
@@ -117,29 +116,76 @@ class CommandCSRegister : public Command
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
 			"\002%s%s HELP\002 for information on how to do so."),
-			Config->s_ChanServ.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+			source.owner->nick.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
 	}
+};
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
+class ExpireCallback : public CallBack
+{
+ public:
+	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
+
+	void Tick(time_t)
 	{
-		SyntaxError(source, "REGISTER", _("REGISTER \037channel\037 \037description\037"));
+		if (!Config->CSExpire || noexpire || readonly)
+			return;
+
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
+		{
+			ChannelInfo *ci = it->second;
+			++it;
+
+			bool expire = false;
+			if (ci->HasFlag(CI_SUSPENDED))
+			{
+				if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
+					expire = true;
+			}
+			else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
+				expire = true;
+
+			if (ci->HasFlag(CI_NO_EXPIRE))
+				expire = false;
+
+			if (expire)
+			{
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
+				if (MOD_RESULT == EVENT_STOP)
+					continue;
+
+				Anope::string extra;
+				if (ci->HasFlag(CI_SUSPENDED))
+					extra = "suspended ";
+
+				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
+				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
+				delete ci;
+			}
+		}
 	}
 };
 
 class CSRegister : public Module
 {
 	CommandCSRegister commandcsregister;
+	ExpireCallback ecb;
 
  public:
-	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsregister(this), ecb(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
+		ModuleManager::RegisterService(&commandcsregister);
+		ModuleManager::Attach(I_OnDelChan, this);
+	}
 
-		this->AddCommand(chanserv->Bot(), &commandcsregister);
+	void OnDelChan(ChannelInfo *ci)
+	{
+		if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
+			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 	}
 };
 

@@ -12,18 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSGroup : public Command
 {
  public:
-	CommandNSGroup() : Command("GROUP", 1, 2)
+	CommandNSGroup(Module *creator) : Command(creator, "nickserv/group", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Join a group"));
+		this->SetSyntax(_("\037target\037 \037password\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -33,7 +33,7 @@ class CommandNSGroup : public Command
 		if (readonly)
 		{
 			source.Reply(_("Sorry, nickname grouping is temporarily disabled."));
-			return MOD_CONT;
+			return;
 		}
 
 		if (Config->RestrictOperNicks)
@@ -43,36 +43,29 @@ class CommandNSGroup : public Command
 
 				if (!u->HasMode(UMODE_OPER) && u->nick.find_ci(o->name) != Anope::string::npos)
 				{
-					source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
-					return MOD_CONT;
+					source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+					return;
 				}
 			}
 
 		NickAlias *target, *na = findnick(u->nick);
 		if (!(target = findnick(nick)))
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (Anope::CurTime < u->lastnickreg + Config->NSRegDelay)
 			source.Reply(_("Please wait %d seconds before using the GROUP command again."), (Config->NSRegDelay + u->lastnickreg) - Anope::CurTime);
-		else if (u->Account() && u->Account()->HasFlag(NI_SUSPENDED))
-		{
-			Log(nickserv->Bot()) << u->GetMask() << " tried to use GROUP from SUSPENDED nick " << target->nick;
-			source.Reply(_(NICK_X_SUSPENDED), u->nick.c_str());
-		}
 		else if (target && target->nc->HasFlag(NI_SUSPENDED))
 		{
 			Log(LOG_COMMAND, u, this) << "tried to use GROUP for SUSPENDED nick " << target->nick;
-			source.Reply(_(NICK_X_SUSPENDED), target->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, target->nick.c_str());
 		}
 		else if (na && target->nc == na->nc)
 			source.Reply(_("You are already a member of the group of \002%s\002."), target->nick.c_str());
 		else if (na && na->nc != u->Account())
-			source.Reply(_(NICK_IDENTIFY_REQUIRED), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+			source.Reply(NICK_IDENTIFY_REQUIRED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		else if (na && Config->NSNoGroupChange)
-			source.Reply(_("Your nick is already registered; type \002%s%s DROP\002 first."), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+			source.Reply(_("Your nick is already registered."));
 		else if (Config->NSMaxAliases && (target->nc->aliases.size() >= Config->NSMaxAliases) && !target->nc->IsServicesOper())
-			source.Reply(_("There are too many nicks in %s's group; list them and drop some.\n"
-					"Type \002%s%s HELP GLIST\002 and \002%s%s HELP DROP\002\n"
-					"for more information."), target->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+			source.Reply(_("There are too many nicks in %s's group."));
 		else
 		{
 			bool ok = false;
@@ -83,9 +76,9 @@ class CommandNSGroup : public Command
 			else if (!pass.empty())
 			{
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, target->nc->display, pass));
+				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, target->nc->display, pass));
 				if (MOD_RESULT == EVENT_STOP)
-					return MOD_CONT;
+					return;
 				else if (MOD_RESULT == EVENT_ALLOW)
 					ok = true;
 			}
@@ -103,8 +96,8 @@ class CommandNSGroup : public Command
 
 					if (nicklen <= prefixlen + 7 && nicklen >= prefixlen + 1 && !u->nick.find_ci(Config->NSGuestNickPrefix) && !u->nick.substr(prefixlen).find_first_not_of("1234567890"))
 					{
-						source.Reply(_(NICK_CANNOT_BE_REGISTERED), u->nick.c_str());
-						return MOD_CONT;
+						source.Reply(NICK_CANNOT_BE_REGISTERED, u->nick.c_str());
+						return;
 					}
 				}
 
@@ -129,18 +122,18 @@ class CommandNSGroup : public Command
 			else
 			{
 				Log(LOG_COMMAND, u, this) << "failed group for " << target->nick;
-				source.Reply(_(PASSWORD_INCORRECT));
+				source.Reply(PASSWORD_INCORRECT);
 				bad_password(u);
 			}
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GROUP \037target\037 \037password\037\002\n"
-				" \n"
-				"This command makes your nickname join the \037target\037 nickname's \n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command makes your nickname join the \037target\037 nickname's \n"
 				"group. \037password\037 is the password of the target nickname.\n"
 				" \n"
 				"Joining a group will allow you to share your configuration,\n"
@@ -152,11 +145,9 @@ class CommandNSGroup : public Command
 				"shared things described above, as long as there is at\n"
 				"least one nick remaining in the group.\n"
 				" \n"
-				"You can use this command even if you have not registered\n"
+				"You may be able to use this command even if you have not registered\n"
 				"your nick yet. If your nick is already registered, you'll\n"
-				"need to identify yourself before using this command. Type\n"
-				"\037%s%s HELP IDENTIFY\037 for more information. This\n"
-				"last may be not possible on your IRC network.\n"
+				"need to identify yourself before using this command.\n"
 				" \n"
 				"It is recommended to use this command with a non-registered\n"
 				"nick because it will be registered automatically when \n"
@@ -167,26 +158,21 @@ class CommandNSGroup : public Command
 				"You can only be in one group at a time. Group merging is\n"
 				"not possible.\n"
 				" \n"
-				"\037Note\037: all the nicknames of a group have the same password."),
-				Config->UseStrictPrivMsgString.c_str(), Config->s_NickServ.c_str());
+				"\037Note\037: all the nicknames of a group have the same password."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GROUP", _("\037target\037 \037password\037"));
 	}
 };
 
 class CommandNSUngroup : public Command
 {
  public:
-	CommandNSUngroup() : Command("UNGROUP", 0, 1)
+	CommandNSUngroup(Module *creator) : Command(creator, "nickserv/ungroup", 0, 1)
 	{
 		this->SetDesc(_("Remove a nick from a group"));
+		this->SetSyntax(_("[\037nick\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -195,7 +181,7 @@ class CommandNSUngroup : public Command
 		if (u->Account()->aliases.size() == 1)
 			source.Reply(_("Your nick is not grouped to anything, you can't ungroup it."));
 		else if (!na)
-			source.Reply(_(NICK_X_NOT_REGISTERED), !nick.empty() ? nick.c_str() : u->nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, !nick.empty() ? nick.c_str() : u->nick.c_str());
 		else if (na->nc != u->Account())
 			source.Reply(_("The nick %s is not in your group."), na->nick.c_str());
 		else
@@ -224,17 +210,17 @@ class CommandNSUngroup : public Command
 			User *user = finduser(na->nick);
 			if (user)
 				/* The user on the nick who was ungrouped may be identified to the old group, set -r */
-				user->RemoveMode(nickserv->Bot(), UMODE_REGISTERED);
+				user->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002UNGROUP \037[nick]\037\002\n"
-				" \n"
-				"This command ungroups your nick, or if given, the specificed nick,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("This command ungroups your nick, or if given, the specificed nick,\n"
 				"from the group it is in. The ungrouped nick keeps its registration\n"
 				"time, password, email, greet, language, url, and icq. Everything\n"
 				"else is reset. You may not ungroup yourself if there is only one\n"
@@ -246,12 +232,12 @@ class CommandNSUngroup : public Command
 class CommandNSGList : public Command
 {
  public:
-	CommandNSGList() : Command("GLIST", 0, 1)
+	CommandNSGList(Module *creator) : Command(creator, "nickserv/glist", 0, 1)
 	{
 		this->SetDesc(_("Lists all nicknames in your group"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -259,9 +245,9 @@ class CommandNSGList : public Command
 		const NickCore *nc = u->Account();
 
 		if (!nick.empty() && (!nick.equals_ci(u->nick) && !u->IsServicesOper()))
-			source.Reply(_(ACCESS_DENIED), Config->s_NickServ.c_str());
+			source.Reply(ACCESS_DENIED, Config->NickServ.c_str());
 		else if (!nick.empty() && (!findnick(nick) || !(nc = findnick(nick)->nc)))
-			source.Reply(nick.empty() ? _(NICK_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(nick.empty() ? NICK_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nick.c_str());
 		else
 		{
 			source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
@@ -273,25 +259,26 @@ class CommandNSGList : public Command
 			}
 			source.Reply(_("%d nicknames in the group."), nc->aliases.size());
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		User *u = source.u;
 		if (u->IsServicesOper())
-			source.Reply(_("Syntax: \002GLIST [\037nickname\037]\002\n"
+			source.Reply(_("Syntax: \002%s [\037nickname\037]\002\n"
 					" \n"
 					"Without a parameter, lists all nicknames that are in\n"
 					"your group.\n"
 					" \n"
 					"With a parameter, lists all nicknames that are in the\n"
 					"group of the given nick.\n"
-					"This use limited to \002Services Operators\002."));
+					"This use limited to \002Services Operators\002."),
+					source.command.c_str());
 		else
-			source.Reply(_("Syntax: \002GLIST\002\n"
+			source.Reply(_("Syntax: \002%s\002\n"
 					" \n"
-					"Lists all nicks in your group."));
+					"Lists all nicks in your group."), source.command.c_str());
 
 		return true;
 	}
@@ -304,13 +291,14 @@ class NSGroup : public Module
 	CommandNSGList commandnsglist;
 
  public:
-	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSGroup(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsgroup(this), commandnsungroup(this), commandnsglist(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(nickserv->Bot(), &commandnsgroup);
-		this->AddCommand(nickserv->Bot(), &commandnsungroup);
-		this->AddCommand(nickserv->Bot(), &commandnsglist);
+		ModuleManager::RegisterService(&commandnsgroup);
+		ModuleManager::RegisterService(&commandnsungroup);
+		ModuleManager::RegisterService(&commandnsglist);
 	}
 };
 

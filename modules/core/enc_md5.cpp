@@ -339,7 +339,7 @@ class EMD5 : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
+	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
 	{
 		NickAlias *na = findnick(account);
 		NickCore *nc = na ? na->nc : NULL;

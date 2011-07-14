@@ -12,18 +12,23 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
+
+static service_reference<XLineManager> akills("xlinemanager/sgline");
 
 class CommandOSChanKill : public Command
 {
  public:
-	CommandOSChanKill() : Command("CHANKILL", 2, 3, "operserv/chankill")
+	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3, "operserv/chankill")
 	{
 		this->SetDesc(_("AKILL all users on a specific channel"));
+		this->SetSyntax(_("[+\037expiry\037] \037channel\037 \037reason\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!akills)
+			return;
+
 		User *u = source.u;
 		Anope::string expiry, channel;
 		time_t expires;
@@ -43,8 +48,8 @@ class CommandOSChanKill : public Command
 			expires *= 86400;
 		if (expires && expires < 60)
 		{
-			source.Reply(_(BAD_EXPIRY_TIME));
-			return MOD_CONT;
+			source.Reply(BAD_EXPIRY_TIME);
+			return;
 		}
 		else if (expires > 0)
 			expires += Anope::CurTime;
@@ -52,7 +57,7 @@ class CommandOSChanKill : public Command
 		if (params.size() <= last_param)
 		{
 			this->OnSyntaxError(source, "");
-			return MOD_CONT;
+			return;
 		}
 
 		Anope::string reason = params[last_param];
@@ -75,30 +80,26 @@ class CommandOSChanKill : public Command
 					if (uc->user->HasMode(UMODE_OPER))
 						continue;
 
-					SGLine->Add("*@" + uc->user->host, u->nick, expires, realreason);
-					SGLine->Check(uc->user);
+					akills->Add("*@" + uc->user->host, u->nick, expires, realreason);
+					akills->Check(uc->user);
 				}
 
 				Log(LOG_ADMIN, u, this) << "(" << realreason << ")";
 			}
 			else
-				source.Reply(_(CHAN_X_NOT_IN_USE), channel.c_str());
+				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CHANKILL [+\037expiry\037] \037channel\037 \037reason\037\002\n"
-				"Puts an AKILL for every nick on the specified channel. It\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Puts an AKILL for every nick on the specified channel. It\n"
 				"uses the entire and complete real ident@host for every nick,\n"
 				"then enforces the AKILL."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CHANKILL", _("CHANKILL [+\037expiry\037] {\037#channel\037} [\037reason\037]"));
 	}
 };
 
@@ -107,14 +108,12 @@ class OSChanKill : public Module
 	CommandOSChanKill commandoschankill;
 
  public:
-	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSChanKill(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandoschankill(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandoschankill);
+		ModuleManager::RegisterService(&commandoschankill);
 	}
 };
 

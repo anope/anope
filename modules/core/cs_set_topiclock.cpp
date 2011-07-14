@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetTopicLock : public Command
 {
  public:
-	CommandCSSetTopicLock(const Anope::string &cpermission = "") : Command("TOPICLOCK", 2, 2, cpermission)
+	CommandCSSetTopicLock(Module *creator, const Anope::string &cname = "chanserv/set/topiclock", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Topic can only be changed with TOPIC"));
+		this->SetSyntax(_("\037channel\037 TOPICLOCK {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetTopicLock");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,36 +51,25 @@ class CommandCSSetTopicLock : public Command
 		else
 			this->OnSyntaxError(source, "TOPICLOCK");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 TOPICLOCK {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002topic lock\002 option for a channel.\n"
-				"When \002topic lock\002 is set, %s will not allow the\n"
-				"channel topic to be changed except via the \002TOPIC\002\n"
-				"command."), this->name.c_str(), Config->s_ChanServ.c_str());
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002topic lock\002 option for a channel.\n"
+				"When \002topic lock\002 is set, the channel topic will be unchangable\n"
+				" except via the \002TOPIC\002 command."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET", _("SET \037channel\037 TOPICLOCK {ON | OFF}"));;
 	}
 };
 
 class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 {
  public:
-	CommandCSSASetTopicLock() : CommandCSSetTopicLock("chanserv/saset/topiclock")
+	CommandCSSASetTopicLock(Module *creator) : CommandCSSetTopicLock(creator, "chanserv/saset/topiclock", "chanserv/saset/topiclock")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET", _("SASET \002channel\002 TOPICLOCK {ON | OFF}"));
 	}
 };
 
@@ -80,31 +79,10 @@ class CSSetTopicLock : public Module
 	CommandCSSASetTopicLock commandcssasettopiclock;
 
  public:
-	CSSetTopicLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetTopicLock(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssettopiclock(this), commandcssasettopiclock(this)
 	{
 		this->SetAuthor("Anope");
-
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssettopiclock);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasettopiclock);
-	}
-
-	~CSSetTopicLock()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssettopiclock);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasettopiclock);
 	}
 };
 

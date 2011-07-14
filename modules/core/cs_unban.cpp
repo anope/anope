@@ -12,32 +12,37 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSUnban : public Command
 {
  public:
-	CommandCSUnban() : Command("UNBAN", 1, 2)
+	CommandCSUnban(Module *creator) : Command(creator, "chanserv/unban", 1, 2)
 	{
 		this->SetDesc(_("Remove all bans preventing a user from entering a channel"));
+		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		Channel *c = ci->c;
 
-		if (!c)
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
 		{
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
-			return MOD_CONT;
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (ci->c == NULL)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
+			return;
 		}
 
 		if (!check_access(u, ci, CA_UNBAN))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		User *u2 = u;
@@ -46,34 +51,29 @@ class CommandCSUnban : public Command
 
 		if (!u2)
 		{
-			source.Reply(_(NICK_X_NOT_IN_USE), params[1].c_str());
-			return MOD_CONT;
+			source.Reply(NICK_X_NOT_IN_USE, params[1].c_str());
+			return;
 		}
 
 		common_unban(ci, u2, u == u2);
 		if (u2 == u)
-			source.Reply(_("You have been unbanned from \002%s\002."), c->name.c_str());
+			source.Reply(_("You have been unbanned from \002%s\002."), ci->c->name.c_str());
 		else
-			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), c->name.c_str());
+			source.Reply(_("\002%s\002 has been unbanned from \002%s\002."), u2->nick.c_str(), ci->c->name.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002UNBAN \037channel\037 [\037nick\037]\002\n"
-				" \n"
-				"Tells %s to remove all bans preventing you or the given\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
 				"user from entering the given channel.  \n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
-				"on the channel."), Config->s_ChanServ.c_str());
+				"on the channel."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "UNBAN", _("UNBAN \037channel\037 [\037nick\037]"));
 	}
 };
 
@@ -82,11 +82,12 @@ class CSUnban : public Module
 	CommandCSUnban commandcsunban;
 
  public:
-	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSUnban(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsunban(this)
 	{
 		this->SetAuthor("Anope");
 
-		this->AddCommand(chanserv->Bot(), &commandcsunban);
+		ModuleManager::RegisterService(&commandcsunban);
 	}
 };
 

@@ -71,24 +71,17 @@ class NSMaxEmail : public Module
 		Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
-		BotInfo *service = source.owner;
-		if (service->nick == Config->s_NickServ)
+		if (command->name == "nickserv/register")
 		{
-			if (command->name.equals_ci("REGISTER"))
-			{
-				if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
-					return EVENT_STOP;
-			}
-			else if (command->name.equals_ci("SET"))
-			{
-				Anope::string set = params[0];
-				Anope::string email = params.size() > 1 ? params[1] : "";
-
-				if (set.equals_ci("email") && this->CheckLimitReached(source, email))
-					return EVENT_STOP;
-			}
+			if (this->CheckLimitReached(source, params.size() > 1 ? params[1] : ""))
+				return EVENT_STOP;
+		}
+		else if (command->name == "nickserv/set/email")
+		{
+			if (this->CheckLimitReached(source, params.size() > 0 ? params[0] : ""))
+				return EVENT_STOP;
 		}
 
 		return EVENT_CONTINUE;

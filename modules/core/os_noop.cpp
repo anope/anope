@@ -12,17 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSNOOP : public Command
 {
  public:
-	CommandOSNOOP() : Command("NOOP", 2, 2, "operserv/noop")
+	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2, "operserv/noop")
 	{
 		this->SetDesc(_("Temporarily remove all O:lines of a server remotely"));
+		this->SetSyntax(_("SET \037server\037"));
+		this->SetSyntax(_("REVOKE \037server\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
@@ -47,7 +48,7 @@ class CommandOSNOOP : public Command
 				++it;
 
 				if (u2 && u2->HasMode(UMODE_OPER) && u2->server == s)
-					u2->Kill(Config->s_OperServ, reason);
+					u2->Kill(Config->OperServ, reason);
 			}
 		}
 		else if (cmd.equals_ci("REVOKE"))
@@ -59,26 +60,20 @@ class CommandOSNOOP : public Command
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002NOOP SET \037server\037\002\n"
-				"          \002NOOP REVOKE \037server\037\002\n"
-				"\n"
-				"\002NOOP SET\002 remove all O:lines of the given\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("\002NOOP SET\002 remove all O:lines of the given\n"
 				"\002server\002 and kill all IRCops currently on it to\n"
 				"prevent them from rehashing the server (because this\n"
 				"would just cancel the effect).\n"
 				"\002NOOP REVOKE\002 makes all removed O:lines available again\n"
 				"on the given \002server\002.\n"));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "NOOP", _("NOOP {SET|REVOKE} \037server\037"));
 	}
 };
 
@@ -87,14 +82,12 @@ class OSNOOP : public Module
 	CommandOSNOOP commandosnoop;
 
  public:
-	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSNOOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosnoop(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosnoop);
+		ModuleManager::RegisterService(&commandosnoop);
 	}
 };
 

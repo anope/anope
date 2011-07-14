@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetPersist : public Command
 {
  public:
-	CommandCSSetPersist(const Anope::string &cpermission = "") : Command("PERSIST", 2, 2, cpermission)
+	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set the channel as permanent"));
+		this->SetSyntax(_("\037channel\037 PERSIST {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetPersist");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PERM);
 
@@ -52,9 +62,15 @@ class CommandCSSetPersist : public Command
 				 */
 				if (!ci->bi && !cm)
 				{
-					chanserv->Bot()->Assign(NULL, ci);
-					if (!ci->c->FindUser(chanserv->Bot()))
-						chanserv->Bot()->Join(ci->c);
+					BotInfo *bi = findbot(Config->ChanServ);
+					if (!bi)
+					{
+						source.Reply(_("ChanServ is required to enable persist on this network."));
+						return;
+					}
+					bi->Assign(NULL, ci);
+					if (!ci->c->FindUser(bi))
+						bi->Join(ci->c);
 				}
 
 				/* Set the perm mode */
@@ -89,9 +105,17 @@ class CommandCSSetPersist : public Command
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot
 				 * which was assigned when persist was set on
 				 */
-				if (!cm && Config->s_BotServ.empty() && ci->bi)
+				if (!cm && Config->BotServ.empty() && ci->bi)
+				{
+					BotInfo *bi = findbot(Config->ChanServ);
+					if (!bi)
+					{
+						source.Reply(_("ChanServ is required to enable persist on this network."));
+						return;
+					}
 					/* Unassign bot */
-					chanserv->Bot()->UnAssign(NULL, ci);
+					bi->UnAssign(NULL, ci);
+				}
 			}
 
 			source.Reply(_("Channel \002%s\002 is no longer persistant."), ci->name.c_str());
@@ -99,13 +123,14 @@ class CommandCSSetPersist : public Command
 		else
 			this->OnSyntaxError(source, "PERSIST");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 PERSIST {ON | OFF}\002\n"
-				"Enables or disables the persistant channel setting.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the persistant channel setting.\n"
 				"When persistant is set, the service bot will remain\n"
 				"in the channel when it has emptied of users.\n"
 				" \n"
@@ -123,26 +148,16 @@ class CommandCSSetPersist : public Command
 				"and is is set or unset (for any reason, including MLOCK),\n"
 				"persist is automatically set and unset for the channel aswell.\n"
 				"Additionally, services will set or unset this mode when you\n"
-				"set persist on or off."), this->name.c_str());
+				"set persist on or off."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET PERSIST", _("SET \037channel\037 PERSIST {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetPersist : public CommandCSSetPersist
 {
  public:
-	CommandCSSASetPersist() : CommandCSSetPersist("chanserv/saset/persist")
+	CommandCSSASetPersist(Module *creator) : CommandCSSetPersist(creator, "chanserv/saset/persist", "chanserv/saset/persist")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET PERSIST", _("SASET \002channel\002 PERSIST {ON | OFF}"));
 	}
 };
 
@@ -152,31 +167,13 @@ class CSSetPersist : public Module
 	CommandCSSASetPersist commandcssasetpeace;
 
  public:
-	CSSetPersist(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetPersist(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetpeace(this), commandcssasetpeace(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetpeace);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetpeace);
-	}
-
-	~CSSetPersist()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetpeace);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetpeace);
+		ModuleManager::RegisterService(&commandcssetpeace);
+		ModuleManager::RegisterService(&commandcssasetpeace);
 	}
 };
 

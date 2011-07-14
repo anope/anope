@@ -6,8 +6,6 @@ class GlobalService : public Service
  public:
 	GlobalService(Module *m) : Service(m, "Global") { }
 
-	virtual BotInfo *Bot() = 0;
-
 	/** Send out a global message to all users
 	 * @param sender Our client which should send the global
 	 * @param source The sender of the global

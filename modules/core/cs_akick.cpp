@@ -12,12 +12,6 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
-
-/* Split a usermask up into its constitutent parts.  Returned strings are
- * malloc()'d, and should be free()'d when done with.  Returns "*" for
- * missing parts.
- */
 
 static void split_usermask(const Anope::string &mask, Anope::string &nick, Anope::string &user, Anope::string &host)
 {
@@ -56,69 +50,70 @@ class AkickListCallback : public NumberList
 {
  protected:
 	CommandSource &source;
+	ChannelInfo *ci;
 	bool SentHeader;
  public:
-	AkickListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
+	AkickListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), ci(_ci), SentHeader(false)
 	{
 	}
 
 	~AkickListCallback()
 	{
 		if (!SentHeader)
-			source.Reply(_("No matching entries on %s autokick list."), source.ci->name.c_str());
+			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 	}
 
 	virtual void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > source.ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(_("Autokick list for %s:"), source.ci->name.c_str());
+			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 		}
 
-		DoList(source, Number - 1, source.ci->GetAkick(Number - 1));
+		DoList(source, ci, Number - 1, ci->GetAkick(Number - 1));
 	}
 
-	static void DoList(CommandSource &source, unsigned index, AutoKick *akick)
+	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
-		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
+		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : NO_REASON);
 	}
 };
 
 class AkickViewCallback : public AkickListCallback
 {
  public:
-	AkickViewCallback(CommandSource &_source, const Anope::string &numlist) : AkickListCallback(_source, numlist)
+	AkickViewCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : AkickListCallback(_source, _ci, numlist)
 	{
 	}
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > source.ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(_("Autokick list for %s:"), source.ci->name.c_str());
+			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 		}
 
-		DoList(source, Number - 1, source.ci->GetAkick(Number - 1));
+		DoList(source, ci, Number - 1, ci->GetAkick(Number - 1));
 	}
 
-	static void DoList(CommandSource &source, unsigned index, AutoKick *akick)
+	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned index, AutoKick *akick)
 	{
 		Anope::string timebuf;
 
 		if (akick->addtime)
 			timebuf = do_strftime(akick->addtime);
 		else
-			timebuf = _(UNKNOWN);
+			timebuf = UNKNOWN;
 
-		source.Reply(_(CHAN_AKICK_VIEW_FORMAT), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : UNKNOWN, timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
+		source.Reply(CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : UNKNOWN, timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
 
 		if (akick->last_used)
 			source.Reply(_("    Last used %s"), do_strftime(akick->last_used).c_str());
@@ -128,17 +123,17 @@ class AkickViewCallback : public AkickListCallback
 class AkickDelCallback : public NumberList
 {
 	CommandSource &source;
+	ChannelInfo *ci;
 	Command *c;
 	unsigned Deleted;
  public:
-	AkickDelCallback(CommandSource &_source, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), c(_c), Deleted(0)
+	AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0)
 	{
 	}
 
 	~AkickDelCallback()
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 		bool override = !check_access(u, ci, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
 
@@ -152,20 +147,19 @@ class AkickDelCallback : public NumberList
 
 	void HandleNumber(unsigned Number)
 	{
-		if (!Number || Number > source.ci->GetAkickCount())
+		if (!Number || Number > ci->GetAkickCount())
 			return;
 
 		++Deleted;
-		source.ci->EraseAkick(Number - 1);
+		ci->EraseAkick(Number - 1);
 	}
 };
 
 class CommandCSAKick : public Command
 {
-	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		Anope::string mask = params[2];
 		Anope::string reason = params.size() > 3 ? params[3] : "";
@@ -191,7 +185,7 @@ class CommandCSAKick : public Command
 			{
 				if (Anope::Match(modes.first->second, mask))
 				{
-					source.Reply(_(CHAN_EXCEPTED), mask.c_str(), ci->name.c_str());
+					source.Reply(CHAN_EXCEPTED, mask.c_str(), ci->name.c_str());
 					return;
 				}
 			}
@@ -205,7 +199,7 @@ class CommandCSAKick : public Command
 			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
 			if (nc == ci->GetFounder() || nc_level >= u_level)
 			{
-				source.Reply(_(ACCESS_DENIED));
+				source.Reply(ACCESS_DENIED);
 				return;
 			}
 		}
@@ -223,7 +217,7 @@ class CommandCSAKick : public Command
 
 				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && entry_mask.Matches(u2))
 				{
-					source.Reply(_(ACCESS_DENIED));
+					source.Reply(ACCESS_DENIED);
 					return;
 				}
 			}
@@ -241,7 +235,7 @@ class CommandCSAKick : public Command
 					Anope::string buf = na->nick + "!" + na->last_usermask;
 					if (Anope::Match(buf, mask))
 					{
-						source.Reply(_(ACCESS_DENIED));
+						source.Reply(ACCESS_DENIED);
 						return;
 					}
 				}
@@ -276,13 +270,12 @@ class CommandCSAKick : public Command
 
 		source.Reply(_("\002%s\002 added to %s autokick list."), mask.c_str(), ci->name.c_str());
 
-		this->DoEnforce(source);
+		this->DoEnforce(source, ci);
 	}
 
-	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		const Anope::string &mask = params[2];
 		AutoKick *akick;
@@ -297,7 +290,7 @@ class CommandCSAKick : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickDelCallback list(source, this, mask);
+			AkickDelCallback list(source, ci, this, mask);
 			list.Process();
 		}
 		else
@@ -328,10 +321,9 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
@@ -346,7 +338,7 @@ class CommandCSAKick : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickListCallback list(source, mask);
+			AkickListCallback list(source, ci, mask);
 			list.Process();
 		}
 		else
@@ -371,7 +363,7 @@ class CommandCSAKick : public Command
 					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 				}
 
-				AkickListCallback::DoList(source, i, akick);
+				AkickListCallback::DoList(source, ci, i, akick);
 			}
 
 			if (!SentHeader)
@@ -379,10 +371,9 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoView(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
@@ -397,7 +388,7 @@ class CommandCSAKick : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickViewCallback list(source, mask);
+			AkickViewCallback list(source, ci, mask);
 			list.Process();
 		}
 		else
@@ -422,7 +413,7 @@ class CommandCSAKick : public Command
 					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
 				}
 
-				AkickViewCallback::DoList(source, i, akick);
+				AkickViewCallback::DoList(source, ci, i, akick);
 			}
 
 			if (!SentHeader)
@@ -430,16 +421,15 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoEnforce(CommandSource &source)
+	void DoEnforce(CommandSource &source, ChannelInfo *ci)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 		Channel *c = ci->c;
 		int count = 0;
 
 		if (!c)
 		{
-			source.Reply(_(CHAN_X_NOT_IN_USE), ci->name.c_str());
+			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
 			return;
 		}
 
@@ -457,10 +447,9 @@ class CommandCSAKick : public Command
 		source.Reply(_("AKICK ENFORCE for \002%s\002 complete; \002%d\002 users were affected."), ci->name.c_str(), count);
 	}
 
-	void DoClear(CommandSource &source)
+	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
 		bool override = !check_access(u, ci, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
@@ -469,54 +458,61 @@ class CommandCSAKick : public Command
 	}
 
  public:
-	CommandCSAKick() : Command("AKICK", 2, 4)
+	CommandCSAKick(Module *creator) : Command(creator, "chanserv/akick", 2, 4)
 	{
 		this->SetDesc(_("Maintain the AutoKick list"));
+		this->SetSyntax(_("\037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 DEL {\037nick\037 | \037mask\037 | \037entry-num\037 | \037list\037}"));
+		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037entry-num\037 | \037list\037]"));
+		this->SetSyntax(_("\002AKICK \037channel\037 VIEW [\037mask\037 | \037entry-num\037 | \037list\037]"));
+		this->SetSyntax(_("\037channel\037 ENFORCE"));
+		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		Anope::string chan = params[0];
 		Anope::string cmd = params[1];
 		Anope::string mask = params.size() > 2 ? params[2] : "";
 
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
+
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
 		else if (!check_access(u, ci, CA_AKICK) && !u->HasPriv("chanserv/access/modify"))
-			source.Reply(_(ACCESS_DENIED));
+			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));
 		else if (cmd.equals_ci("ADD"))
-			this->DoAdd(source, params);
+			this->DoAdd(source, ci, params);
 		else if (cmd.equals_ci("DEL"))
-			this->DoDel(source, params);
+			this->DoDel(source, ci, params);
 		else if (cmd.equals_ci("LIST"))
-			this->DoList(source, params);
+			this->DoList(source, ci, params);
 		else if (cmd.equals_ci("VIEW"))
-			this->DoView(source, params);
+			this->DoView(source, ci, params);
 		else if (cmd.equals_ci("ENFORCE"))
-			this->DoEnforce(source);
+			this->DoEnforce(source, ci);
 		else if (cmd.equals_ci("CLEAR"))
-			this->DoClear(source);
+			this->DoClear(source, ci);
 		else
 			this->OnSyntaxError(source, "");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002AKICK \037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]\002\n"
-				"        \002AKICK \037channel\037 DEL {\037nick\037 | \037mask\037 | \037entry-num\037 | \037list\037}\002\n"
-				"        \002AKICK \037channel\037 LIST [\037mask\037 | \037entry-num\037 | \037list\037]\002\n"
-				"        \002AKICK \037channel\037 VIEW [\037mask\037 | \037entry-num\037 | \037list\037]\002\n"
-				"        \002AKICK \037channel\037 ENFORCE\002\n"
-				"        \002AKICK \037channel\037 CLEAR\002\n"
-				" \n"
-				"Maintains the \002AutoKick list\002 for a channel.  If a user\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Maintains the \002AutoKick list\002 for a channel.  If a user\n"
 				"on the AutoKick list attempts to join the channel,\n"
 				"%s will ban that user from the channel, then kick\n"
 				"the user.\n"
@@ -529,7 +525,7 @@ class CommandCSAKick : public Command
 				"When akicking a \037registered nick\037 the nickserv account\n"
 				"will be added to the akick list instead of the mask.\n"
 				"All users within that nickgroup will then be akicked.\n"),
-				Config->s_ChanServ.c_str());
+				source.owner->nick.c_str());
 		source.Reply(_(
 				" \n"
 				"The \002AKICK DEL\002 command removes the given nick or mask\n"
@@ -549,13 +545,8 @@ class CommandCSAKick : public Command
 				"AKICK mask.\n"
 				" \n"
 				"The \002AKICK CLEAR\002 command clears all entries of the\n"
-				"akick list."), Config->s_ChanServ.c_str());
+				"akick list."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "AKICK", _("AKICK \037channel\037 {ADD | DEL | LIST | VIEW | ENFORCE | CLEAR} [\037nick-or-usermask\037] [\037reason\037]"));
 	}
 };
 
@@ -564,14 +555,12 @@ class CSAKick : public Module
 	CommandCSAKick commandcsakick;
 
  public:
-	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSAKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcsakick(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		this->AddCommand(chanserv->Bot(), &commandcsakick);
+		ModuleManager::RegisterService(&commandcsakick);
 	}
 };
 

@@ -53,12 +53,9 @@ class AsynchCommandMutex : public CommandMutex
 		}
 		else
 		{
-			CommandReturn ret = command->Execute(source, params);
-			if (ret != MOD_STOP)
-			{
-				FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, command, params));
-				source.DoReply();
-			}
+			command->Execute(source, params);
+			FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, command, params));
+			source.DoReply();
 		}
 
 		main_mutex.Unlock();
@@ -134,14 +131,14 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 		{
 			AsynchCommandMutex *cm = debug_cast<AsynchCommandMutex *>(*it);
 
-			if (cm->started && (cm->command == b || cm->source.u == b || cm->source.owner == b || cm->source.service == b || cm->source.ci == b))
+			if (cm->started && (cm->command == b || cm->source.u == b || cm->source.owner == b || cm->source.service == b))
 				cm->Destroy();
 		}
 
 		this->reset = true;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
 		if (ignore_pre_command)
 		{

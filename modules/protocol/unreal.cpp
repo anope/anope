@@ -14,6 +14,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */
@@ -98,7 +99,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config->s_OperServ.c_str());
+		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config->OperServ.c_str());
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
@@ -108,7 +109,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		BotInfo *bi = findbot(Config->s_HostServ);
+		BotInfo *bi = findbot(Config->HostServ);
 		u->RemoveMode(bi, UMODE_CLOAK);
 		u->RemoveMode(bi, UMODE_VHOST);
 		ModeManager::ProcessModes();
@@ -259,7 +260,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config->s_OperServ.c_str());
+		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config->OperServ.c_str());
 	}
 
 	/* SZLINE */
@@ -327,12 +328,12 @@ class UnrealIRCdProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		ircdproto->SendMode(nickserv->Bot(), u, "+d %d", u->timestamp);
+		ircdproto->SendMode(findbot(Config->NickServ), u, "+d %d", u->timestamp);
 	}
 
 	void SendUnregisteredNick(const User *u)
 	{
-		ircdproto->SendMode(nickserv->Bot(), u, "+d 1");
+		ircdproto->SendMode(findbot(Config->NickServ), u, "+d 1");
 	}
 
 	void SendChannel(Channel *c)
@@ -535,7 +536,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
-						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else if (nickserv)
 					nickserv->Validate(user);
@@ -557,7 +558,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
-						user->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else if (nickserv)
 					nickserv->Validate(user);

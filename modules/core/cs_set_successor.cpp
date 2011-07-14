@@ -12,27 +12,36 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetSuccessor : public Command
 {
  public:
-	CommandCSSetSuccessor(const Anope::string &cpermission = "") : Command("SUCCESSOR", 1, 2, cpermission)
+	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
+		this->SetSyntax(_("\037channel\037 SUCCESSOR \037nick\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetSuccessor");
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
 		{
-			source.Reply(_(ACCESS_DENIED));
-			return MOD_CONT;
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		NickCore *nc;
@@ -43,13 +52,13 @@ class CommandCSSetSuccessor : public Command
 
 			if (!na)
 			{
-				source.Reply(_(NICK_X_NOT_REGISTERED), params[1].c_str());
-				return MOD_CONT;
+				source.Reply(NICK_X_NOT_REGISTERED, params[1].c_str());
+				return;
 			}
 			if (na->nc == ci->GetFounder())
 			{
 				source.Reply(_("%s cannot be the successor on channel %s they are the founder."), na->nick.c_str(), ci->name.c_str());
-				return MOD_CONT;
+				return;
 			}
 			nc = na->nc;
 		}
@@ -65,41 +74,29 @@ class CommandCSSetSuccessor : public Command
 		else
 			source.Reply(_("Successor for \002%s\002 unset."), ci->name.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 SUCCESSOR \037nick\037\002\n"
-				" \n"
-				"Changes the successor of a channel. If the founder's\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Changes the successor of a channel. If the founder's\n"
 				"nickname expires or is dropped while the channel is still\n"
 				"registered, the successor will become the new founder of the\n"
 				"channel.  However, if the successor already has too many\n"
 				"channels registered (%d), the channel will be dropped\n"
 				"instead, just as if no successor had been set.  The new\n"
-				"nickname must be a registered one."), this->name.c_str());
+				"nickname must be a registered one."), Config->CSMaxReg);
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SET", _(CHAN_SET_SYNTAX));
 	}
 };
 
 class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 {
  public:
-	CommandCSSASetSuccessor() : CommandCSSetSuccessor("chanserv/saset/successor")
+	CommandCSSASetSuccessor(Module *creator) : CommandCSSetSuccessor(creator, "chanserv/saset/successor", "chanserv/saset/successor")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		// XXX
-		SyntaxError(source, "SASET", _(CHAN_SASET_SYNTAX));
 	}
 };
 
@@ -109,31 +106,13 @@ class CSSetSuccessor : public Module
 	CommandCSSASetSuccessor commandcssasetsuccessor;
 
  public:
-	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetSuccessor(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetsuccessor(this), commandcssasetsuccessor(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetsuccessor);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetsuccessor);
-	}
-
-	~CSSetSuccessor()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetsuccessor);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetsuccessor);
+		ModuleManager::RegisterService(&commandcssetsuccessor);
+		ModuleManager::RegisterService(&commandcssasetsuccessor);
 	}
 };
 

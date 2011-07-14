@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetSignKick : public Command
 {
  public:
-	CommandCSSetSignKick(const Anope::string &cpermission = "") : Command("SIGNKICK", 2, 2, cpermission)
+	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Sign kicks that are done with KICK command"));
+		this->SetSyntax(_("\037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetSignKick");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -49,42 +59,29 @@ class CommandCSSetSignKick : public Command
 		}
 		else
 			this->OnSyntaxError(source, "SIGNKICK");
-
-		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET \037%s\037 SIGNKICK {ON | LEVEL | OFF}\002\n"
-				" \n"
-				"Enables or disables signed kicks for a\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables signed kicks for a\n"
 				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"%s KICK command will have the nick that used the\n"
+				"KICK command will have the nick that used the\n"
 				"command in their reason.\n"
 				" \n"
 				"If you use \002LEVEL\002, those who have a level that is superior \n"
 				"or equal to the SIGNKICK level on the channel won't have their \n"
-				"kicks signed. See \002%s%s HELP LEVELS\002 for more information."), this->name.c_str(),
-				Config->s_ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				"kicks signed."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET SIGNKICK", _("SET \037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
 	}
 };
 
 class CommandCSSASetSignKick : public CommandCSSetSignKick
 {
  public:
-	CommandCSSASetSignKick() : CommandCSSetSignKick("chanserv/saset/signkick")
+	CommandCSSASetSignKick(Module *creator) : CommandCSSetSignKick(creator, "chanserv/saset/signkick", "chanserv/saset/signkick")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET SIGNKICK", _("SASET \002channel\002 SIGNKICK {ON | OFF}"));
 	}
 };
 
@@ -94,31 +91,13 @@ class CSSetSignKick : public Module
 	CommandCSSASetSignKick commandcssasetsignkick;
 
  public:
-	CSSetSignKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetSignKick(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetsignkick(this), commandcssasetsignkick(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetsignkick);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetsignkick);
-	}
-
-	~CSSetSignKick()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetsignkick);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetsignkick);
+		ModuleManager::RegisterService(&commandcssetsignkick);
+		ModuleManager::RegisterService(&commandcssasetsignkick);
 	}
 };
 

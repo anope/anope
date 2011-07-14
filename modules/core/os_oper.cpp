@@ -12,17 +12,20 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSOper : public Command
 {
  public:
-	CommandOSOper() : Command("OPER", 1, 3, "operserv/oper")
+	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3, "operserv/oper")
 	{
 		this->SetDesc(_("View and change services operators"));
+		this->SetSyntax(_("ADD \037oper\037 \037type\037"));
+		this->SetSyntax(_("DEL [\037oper\037]"));
+		this->SetSyntax(_("INFO [\037type\037]"));
+		this->SetSyntax(_("LIST"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &subcommand = params[0];
 
@@ -33,7 +36,7 @@ class CommandOSOper : public Command
 
 			NickAlias *na = findnick(oper);
 			if (na == NULL)
-				source.Reply(_(NICK_X_NOT_REGISTERED), oper.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else
 			{
 				OperType *ot = OperType::Find(type);
@@ -56,7 +59,7 @@ class CommandOSOper : public Command
 
 			NickAlias *na = findnick(oper);
 			if (na == NULL)
-				source.Reply(_(NICK_X_NOT_REGISTERED), oper.c_str());
+				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
 			else if (!na->nc || !na->nc->o)
 				source.Reply(_("Nick \2%s\2 is not a services operator."), oper.c_str());
 			else
@@ -146,22 +149,17 @@ class CommandOSOper : public Command
 		else
 			this->OnSyntaxError(source, subcommand);
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002OPER {ADD|DEL|LIST|INFO} [\037oper\037] [\037type\037\002\n"
-				"\n"
-				"\002OPER\002 allows you to change and view services operators.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to change and view services operators.\n"
 				"Note that operators removed by this command but are still set in\n"
 				"the configuration file are not permanently affected by this."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "OPER", _("OPER {ADD|DEL|LIST|INFO} [\037oper\037] [\037type\037"));
 	}
 };
 
@@ -170,17 +168,15 @@ class OSOper : public Module
 	CommandOSOper commandosoper;
 
  public:
-	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosoper(this)
 	{
 		this->SetAuthor("Anope");
-
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
 
 		Implementation i[] = { I_OnDatabaseWrite, I_OnDatabaseRead };
 		ModuleManager::Attach(i, this, 2);
 
-		this->AddCommand(operserv->Bot(), &commandosoper);
+		ModuleManager::RegisterService(&commandosoper);
 	}
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
@@ -212,7 +208,7 @@ class OSOper : public Module
 			if (ot == NULL)
 				return EVENT_CONTINUE;
 			nc->o = new Oper(nc->display, "", "", ot);
-			Log(LOG_NORMAL, "operserv/oper", operserv->Bot()) << "Tied oper " << nc->display << " to type " << ot->GetName();
+			Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
 		}
 		return EVENT_CONTINUE;
 	}

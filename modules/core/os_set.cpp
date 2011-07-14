@@ -12,12 +12,11 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSSet : public Command
 {
  private:
-	CommandReturn DoList(CommandSource &source)
+	void DoList(CommandSource &source)
 	{
 		Log(LOG_ADMIN, source.u, this);
 
@@ -30,10 +29,10 @@ class CommandOSSet : public Command
 		index = noexpire ? _("%s is enabled") : _("%s is disabled");
 		source.Reply(index.c_str(), "NOEXPIRE");
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoSetReadOnly(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
@@ -41,7 +40,7 @@ class CommandOSSet : public Command
 		if (setting.empty())
 		{
 			this->OnSyntaxError(source, "READONLY");
-			return MOD_CONT;
+			return;
 		}
 
 		if (setting.equals_ci("ON"))
@@ -59,10 +58,10 @@ class CommandOSSet : public Command
 		else
 			source.Reply(_("Setting for READONLY must be \002on\002 or \002off\002."));
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoSetSuperAdmin(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
@@ -70,7 +69,7 @@ class CommandOSSet : public Command
 		if (setting.empty())
 		{
 			this->OnSyntaxError(source, "SUPERADMIN");
-			return MOD_CONT;
+			return;
 		}
 
 		/**
@@ -85,22 +84,22 @@ class CommandOSSet : public Command
 			u->isSuperAdmin = 1;
 			source.Reply(_("You are now a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
-			ircdproto->SendGlobops(operserv->Bot(), _("%s is now a Super-Admin"), u->nick.c_str());
+			ircdproto->SendGlobops(source.owner, _("%s is now a Super-Admin"), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
 			u->isSuperAdmin = 0;
 			source.Reply(_("You are no longer a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
-			ircdproto->SendGlobops(operserv->Bot(), _("%s is no longer a Super-Admin"), u->nick.c_str());
+			ircdproto->SendGlobops(source.owner, _("%s is no longer a Super-Admin"), u->nick.c_str());
 		}
 		else
 			source.Reply(_("Setting for SuperAdmin must be \002on\002 or \002off\002 (must be enabled in services.conf)"));
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoSetDebug(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
@@ -108,7 +107,7 @@ class CommandOSSet : public Command
 		if (setting.empty())
 		{
 			this->OnSyntaxError(source, "DEBUG");
-			return MOD_CONT;
+			return;
 		}
 
 		if (setting.equals_ci("ON"))
@@ -130,17 +129,17 @@ class CommandOSSet : public Command
 				debug = convertTo<int>(setting);
 				Log(LOG_ADMIN, u, this) << "DEBUG " << debug;
 				source.Reply(_("Services are now in debug mode (level %d)."), debug);
-				return MOD_CONT;
+				return;
 			}
 			catch (const ConvertException &) { }
 			
 			source.Reply(_("Setting for DEBUG must be \002ON\002, \002OFF\002, or a positive number."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
-	CommandReturn DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
+	void DoSetNoExpire(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &setting = params.size() > 1 ? params[1] : "";
@@ -148,7 +147,7 @@ class CommandOSSet : public Command
 		if (setting.empty())
 		{
 			this->OnSyntaxError(source, "NOEXPIRE");
-			return MOD_CONT;
+			return;
 		}
 
 		if (setting.equals_ci("ON"))
@@ -166,15 +165,16 @@ class CommandOSSet : public Command
 		else
 			source.Reply(_("Setting for NOEXPIRE must be \002on\002 or \002off\002."));
 
-		return MOD_CONT;
+		return;
 	}
  public:
-	CommandOSSet() : Command("SET", 1, 2, "operserv/set")
+	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2, "operserv/set")
 	{
 		this->SetDesc(_("Set various global Services options"));
+		this->SetSyntax(_("\037option\037 \037setting\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &option = params[0];
 
@@ -191,25 +191,28 @@ class CommandOSSet : public Command
 		else
 			source.Reply(_("Unknown option \002%s\002."), option.c_str());
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		if (subcommand.empty())
-			source.Reply(_("Syntax: \002SET \037option\037 \037setting\037\002\n"
-					"Sets various global Services options.  Option names\n"
+		{
+			this->SendSyntax(source);
+			source.Reply(" ");
+			source.Reply(_("Sets various global Services options.  Option names\n"
 					"currently defined are:\n"
 					"    READONLY   Set read-only or read-write mode\n"
 					"    DEBUG      Activate or deactivate debug mode\n"
 					"    NOEXPIRE   Activate or deactivate no expire mode\n"
 					"    SUPERADMIN Activate or deactivate super-admin mode\n"
 					"    LIST       List the options"));
+		}
 		else if (subcommand.equals_ci("LIST"))
-			source.Reply(_("Syntax: \002SET LIST\n"
-					"Display the various %s settings"), Config->s_OperServ.c_str());
+			source.Reply(_("Syntax: \002LIST\n"
+					"Display the various %s settings"), Config->OperServ.c_str());
 		else if (subcommand.equals_ci("READONLY"))
-			source.Reply(_("Syntax: \002SET READONLY {ON | OFF}\002\n"
+			source.Reply(_("Syntax: \002READONLY {ON | OFF}\002\n"
 					" \n"
 					"Sets read-only mode on or off.  In read-only mode, normal\n"
 					"users will not be allowed to modify any Services data,\n"
@@ -223,14 +226,14 @@ class CommandOSSet : public Command
 					"This option is equivalent to the command-line option\n"
 					"\002-readonly\002."));
 		else if (subcommand.equals_ci("NOEXPIRE"))
-			source.Reply(_("Syntax: \002SET NOEXPIRE {ON | OFF}\002\n"
+			source.Reply(_("Syntax: \002NOEXPIRE {ON | OFF}\002\n"
 					"Sets no expire mode on or off. In no expire mode, nicks,\n"
 					"channels, akills and exceptions won't expire until the\n"
 					"option is unset.\n"
 					"This option is equivalent to the command-line option\n"
 					"\002-noexpire\002."));
 		else if (subcommand.equals_ci("SUPERADMIN"))
-			source.Reply(_("Syntax: \002SET SUPERADMIN {ON | OFF}\002\n"
+			source.Reply(_("Syntax: \002SUPERADMIN {ON | OFF}\002\n"
 					"Setting this will grant you extra privileges such as the\n"
 					"ability to be \"founder\" on all channel's etc...\n"
 					"This option is \002not\002 persistent, and should only be used when\n"
@@ -239,11 +242,6 @@ class CommandOSSet : public Command
 			return false;
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "SET", _("SET \037option\037 \037setting\037"));
-	}
 };
 
 class OSSet : public Module
@@ -251,14 +249,12 @@ class OSSet : public Module
 	CommandOSSet commandosset;
 
  public:
-	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSSet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosset(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosset);
+		ModuleManager::RegisterService(&commandosset);
 	}
 };
 

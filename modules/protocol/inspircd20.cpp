@@ -14,6 +14,7 @@
 #include "services.h"
 #include "modules.h"
 #include "nickserv.h"
+#include "oper.h"
 
 /* inspircd-ts6.h uses these */
 static bool has_chghostmod = false;
@@ -280,7 +281,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 
 			NickAlias *user_na = findnick(u->nick);
 			if (nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
-				u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 	}
 

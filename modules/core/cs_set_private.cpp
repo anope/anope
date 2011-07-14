@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetPrivate : public Command
 {
  public:
-	CommandCSSetPrivate(const Anope::string &cpermission = "") : Command("PRIVATE", 2, 2, cpermission)
+	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Hide channel from LIST command"));
+		this->SetSyntax(_("\037channel\037 PRIVATE {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetPrivate");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,35 +51,26 @@ class CommandCSSetPrivate : public Command
 		else
 			this->OnSyntaxError(source, "PRIVATE");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 PRIVATE {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002private\002 option for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002private\002 option for a channel.\n"
 				"When \002private\002 is set, a \002%s%s LIST\002 will not\n"
-				"include the channel in any lists."), this->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->s_ChanServ.c_str());
+				"include the channel in any lists."),
+				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET PRIVATE", _("SET \037channel\037 PRIVATE {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetPrivate : public CommandCSSetPrivate
 {
  public:
-	CommandCSSASetPrivate() : CommandCSSetPrivate("chanserv/saset/private")
+	CommandCSSASetPrivate(Module *creator) : CommandCSSetPrivate(creator, "chanserv/saset/private", "chanserv/saset/private")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET PRIVATE", _("SASET \002channel\002 PRIVATE {ON | OFF}"));
 	}
 };
 
@@ -79,31 +80,13 @@ class CSSetPrivate : public Module
 	CommandCSSASetPrivate commandcssasetprivate;
 
  public:
-	CSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetPrivate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetprivate(this), commandcssasetprivate(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetprivate);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetprivate);
-	}
-
-	~CSSetPrivate()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetprivate);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetprivate);
+		ModuleManager::RegisterService(&commandcssetprivate);
+		ModuleManager::RegisterService(&commandcssasetprivate);
 	}
 };
 

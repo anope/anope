@@ -12,18 +12,18 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSGhost : public Command
 {
  public:
-	CommandNSGhost() : Command("GHOST", 1, 2)
+	CommandNSGhost(Module *creator) : Command(creator, "nickserv/ghost", 1, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Disconnects a \"ghost\" IRC session using your nick"));
+		this->SetSyntax("\037nickname\037 [\037password\037]");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &nick = params[0];
 		const Anope::string &pass = params.size() > 1 ? params[1] : "";
@@ -33,11 +33,11 @@ class CommandNSGhost : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!user)
-			source.Reply(_(NICK_X_NOT_IN_USE), nick.c_str());
+			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (!na)
-			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))
-			source.Reply(_(NICK_X_SUSPENDED), na->nick.c_str());
+			source.Reply(NICK_X_SUSPENDED, na->nick.c_str());
 		else if (nick.equals_ci(u->nick))
 			source.Reply(_("You can't ghost yourself!"));
 		else
@@ -52,28 +52,28 @@ class CommandNSGhost : public Command
 			else if (!pass.empty())
 			{
 				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(u, this, params, na->nc->display, pass));
+				FOREACH_RESULT(I_OnCheckAuthentication, OnCheckAuthentication(this, &source, params, na->nc->display, pass));
 				if (MOD_RESULT == EVENT_STOP)
-					return MOD_CONT;
+					return;
 				else if (MOD_RESULT == EVENT_ALLOW)
 					ok = true;
 			}
 
 			if (ok)
 			{
-				if (!user->IsIdentified() && FindCommand(nickserv->Bot(), "RECOVER"))
+				if (!user->IsIdentified())
 					source.Reply(_("You may not ghost an unidentified user, use RECOVER instead."));
 				else
 				{
 					Log(LOG_COMMAND, u, this) << "for " << nick;
 					Anope::string buf = "GHOST command used by " + u->nick;
-					user->Kill(Config->s_NickServ, buf);
+					user->Kill(Config->NickServ, buf);
 					source.Reply(_("Ghost with your nick has been killed."), nick.c_str());
 				}
 			}
 			else
 			{
-				source.Reply(_(ACCESS_DENIED));
+				source.Reply(ACCESS_DENIED);
 				if (!pass.empty())
 				{
 					Log(LOG_COMMAND, u, this) << "with an invalid password for " << nick;
@@ -82,14 +82,14 @@ class CommandNSGhost : public Command
 			}
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002GHOST \037nickname\037 [\037password\037]\002\n"
-				""
-				"itermminates a \"ghost\" IRC session using your nick.  A\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("itermminates a \"ghost\" IRC session using your nick.  A\n"
 				"ghost\" session is one which is not actually connected,\n"
 				"but which the IRC server believes is still online for one\n"
 				"reason or another. Typically, this happens if your\n"
@@ -103,11 +103,6 @@ class CommandNSGhost : public Command
 				"the nickname."));
 		return true;
 	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "GHOST", _("GHOST \037nickname\037 [\037password\037]"));
-	}
 };
 
 class NSGhost : public Module
@@ -115,14 +110,12 @@ class NSGhost : public Module
 	CommandNSGhost commandnsghost;
 
  public:
-	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSGhost(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsghost(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsghost);
+		ModuleManager::RegisterService(&commandnsghost);
 	}
 };
 

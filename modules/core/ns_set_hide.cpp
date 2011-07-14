@@ -12,28 +12,28 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSSetHide : public Command
 {
  public:
-	CommandNSSetHide(const Anope::string &spermission = "") : Command("HIDE", 2, 3, spermission)
+	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
+		this->SetSyntax(_("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)
 	{
-		NickAlias *na = findnick(params[0]);
-		if (!na)
-			throw CoreException("NULL na in CommandNSSetHide");
+		NickAlias *na = findnick(user);
+		if (user == NULL)
+		{
+			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
+			return;
+		}
 		NickCore *nc = na->nc;
 
 		Anope::string onmsg, offmsg;
 		NickCoreFlag flag;
-
-		Anope::string param = params[1];
-		Anope::string arg = params.size() > 2 ? params[2] : "";
 
 		if (param.equals_ci("EMAIL"))
 		{
@@ -62,69 +62,71 @@ class CommandNSSetHide : public Command
 		else
 		{
 			this->OnSyntaxError(source, "HIDE");
-			return MOD_CONT;
+			return;
 		}
 
 		if (arg.equals_ci("ON"))
 		{
 			nc->SetFlag(flag);
-			source.Reply(onmsg.c_str(), nc->display.c_str(), Config->s_NickServ.c_str());
+			source.Reply(onmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
 		else if (arg.equals_ci("OFF"))
 		{
 			nc->UnsetFlag(flag);
-			source.Reply(offmsg.c_str(), nc->display.c_str(), Config->s_NickServ.c_str());
+			source.Reply(offmsg.c_str(), nc->display.c_str(), Config->NickServ.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "HIDE");
 
-		return MOD_CONT;
+		return;
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->Run(source, source.u->Account()->display, params[0], params[1]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}\002\n"
-				" \n"
-				"Allows you to prevent certain pieces of information from\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to prevent certain pieces of information from\n"
 				"being displayed when someone does a %s \002INFO\002 on your\n"
 				"nick.  You can hide your E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), your services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->s_NickServ.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET HIDE", _("SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 };
 
 class CommandNSSASetHide : public CommandNSSetHide
 {
  public:
-	CommandNSSASetHide() : CommandNSSetHide("nickserv/saset/command")
+	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3, "nickserv/saset/hide")
 	{
+		this->SetSyntax("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		this->ClearSyntax();
+		this->Run(source, params[0], params[1], params[2]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002SASET \037nickname\037 HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}\002\n"
-				" \n"
-				"Allows you to prevent certain pieces of information from\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Allows you to prevent certain pieces of information from\n"
 				"being displayed when someone does a %s \002INFO\002 on the\n"
 				"nick.  You can hide the E-mail address (\002EMAIL\002), last seen\n"
 				"user@host mask (\002USERMASK\002), the services access status\n"
 				"(\002STATUS\002) and  last quit message (\002QUIT\002).\n"
 				"The second parameter specifies whether the information should\n"
-				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->s_NickServ.c_str());
+				"be displayed (\002OFF\002) or hidden (\002ON\002)."), Config->NickServ.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET HIDE", _("SASET NICK_SASET_HIDE_SYNTAX37nicknameNICK_SASET_HIDE_SYNTAX37 HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
 	}
 };
 
@@ -134,31 +136,13 @@ class NSSetHide : public Module
 	CommandNSSASetHide commandnssasethide;
 
  public:
-	NSSetHide(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSSetHide(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnssethide(this), commandnssasethide(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandnssethide);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandnssasethide);
-	}
-
-	~NSSetHide()
-	{
-		Command *c = FindCommand(nickserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandnssethide);
-
-		c = FindCommand(nickserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandnssasethide);
+		ModuleManager::RegisterService(&commandnssethide);
+		ModuleManager::RegisterService(&commandnssasethide);
 	}
 };
 

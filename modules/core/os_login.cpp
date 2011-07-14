@@ -13,17 +13,17 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
 class CommandOSLogin : public Command
 {
  public:
-	CommandOSLogin() : Command("LOGIN", 1, 1)
+	CommandOSLogin(Module *creator) : Command(creator, "operserv/login", 1, 1)
 	{
-		this->SetDesc(Anope::printf(_("Login to %s"), Config->s_OperServ.c_str()));
+		this->SetDesc(Anope::printf(_("Login to %s"), Config->OperServ.c_str()));
+		this->SetSyntax(_("\037password\037"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &password = params[0];
 
@@ -36,32 +36,27 @@ class CommandOSLogin : public Command
 			source.Reply(_("You are already identified."));
 		else if (o->password != password)
 		{
-			source.Reply(_(PASSWORD_INCORRECT));
+			source.Reply(PASSWORD_INCORRECT);
 			bad_password(source.u);
 		}
 		else
 		{
-			Log(LOG_ADMIN, source.u, this) << "and succesfully identified to " << Config->s_OperServ;
+			Log(LOG_ADMIN, source.u, this) << "and succesfully identified to " << source.owner->nick;
 			source.u->Extend("os_login_password_correct");
 			source.Reply(_("Password accepted."));
 		}
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002LOGIN\002 \037password\037\n"
-				" \n"
-				"Logs you in to %s so you gain Services Operator privileges.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Logs you in to %s so you gain Services Operator privileges.\n"
 				"This command may be unnecessary if your oper block is\n"
-				"configured without a password."), Config->s_OperServ.c_str());
+				"configured without a password."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "LOGIN", _("LOGIN \037password\037"));
 	}
 };
 
@@ -70,14 +65,12 @@ class OSLogin : public Module
 	CommandOSLogin commandoslogin;
 
  public:
-	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandoslogin(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandoslogin);
+		ModuleManager::RegisterService(&commandoslogin);
 
 		ModuleManager::Attach(I_IsServicesOper, this);
 	}

@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetPeace : public Command
 {
  public:
-	CommandCSSetPeace(const Anope::string &cpermission = "") : Command("PEACE", 2, 2, cpermission)
+	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Regulate the use of critical commands"));
+		this->SetSyntax(_("\037channel\037 PEACE {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetPeace");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,36 +51,26 @@ class CommandCSSetPeace : public Command
 		else
 			this->OnSyntaxError(source, "PEACE");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 PEACE {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002peace\002 option for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002peace\002 option for a channel.\n"
 				"When \002peace\002 is set, a user won't be able to kick,\n"
 				"ban or remove a channel status of a user that has\n"
-				"a level superior or equal to his via %s commands."), this->name.c_str(), Config->s_ChanServ.c_str());
+				"a level superior or equal to his via %s commands."), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET PEACE", _("SET \037channel\037 PEACE {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetPeace : public CommandCSSetPeace
 {
  public:
-	CommandCSSASetPeace() : CommandCSSetPeace("chanserv/saset/peace")
+	CommandCSSASetPeace(Module *creator) : CommandCSSetPeace(creator, "chanserv/saset/peace", "chanserv/saset/peace")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET PEACE", _("SASET \002channel\002 PEACE {ON | OFF}"));
 	}
 };
 
@@ -80,31 +80,13 @@ class CSSetPeace : public Module
 	CommandCSSASetPeace commandcssasetpeace;
 
  public:
-	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetPeace(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetpeace(this), commandcssasetpeace(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetpeace);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetpeace);
-	}
-
-	~CSSetPeace()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetpeace);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetpeace);
+		ModuleManager::RegisterService(&commandcssetpeace);
+		ModuleManager::RegisterService(&commandcssasetpeace);
 	}
 };
 

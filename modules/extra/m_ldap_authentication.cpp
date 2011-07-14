@@ -8,11 +8,12 @@ struct IdentifyInfo
 {
 	dynamic_reference<User> user;
 	dynamic_reference<Command> command;
+	CommandSource source;
 	std::vector<Anope::string> params;
 	Anope::string account;
 	Anope::string pass;
 
-	IdentifyInfo(User *u, Command *c, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p) : user(u), command(c), params(pa), account(a), pass(p) { }
+	IdentifyInfo(User *u, Command *c, CommandSource &s, const std::vector<Anope::string> &pa, const Anope::string &a, const Anope::string &p) : user(u), command(c), source(s), params(pa), account(a), pass(p) { }
 };
 
 
@@ -57,15 +58,14 @@ class IdentifyInterface : public LDAPInterface
 			if (Config->NSAddAccessOnReg)
 				na->nc->AddAccess(create_mask(u));
 
-			u->SendMessage(nickserv->Bot(), _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
+			BotInfo *bi = findbot(Config->NickServ);
+			if (bi)
+				u->SendMessage(bi, _("Your account \002%s\002 has been successfully created."), na->nick.c_str());
 		}
 		
 		enc_encrypt(ii->pass, na->nc->pass);
 
-		Anope::string params;
-		for (unsigned i = 0; i < ii->params.size(); ++i)
-			params += ii->params[i] + " ";
-		mod_run_cmd(c->service, u, NULL, c, c->name, params);
+		c->Execute(ii->source, ii->params);
 
 		delete ii;
 	}
@@ -89,10 +89,7 @@ class IdentifyInterface : public LDAPInterface
 
 		u->Extend("m_ldap_authentication_error");
 
-		Anope::string params;
-		for (unsigned i = 0; i < ii->params.size(); ++i)
-			params += ii->params[i] + " ";
-		mod_run_cmd(c->service, u, NULL, c, c->name, params);
+		c->Execute(ii->source, ii->params);
 
 		delete ii;
 	}
@@ -129,7 +126,9 @@ class OnIdentifyInterface : public LDAPInterface
 			if (!email.equals_ci(u->Account()->email))
 			{
 				u->Account()->email = email;
-				u->SendMessage(nickserv->Bot(), _("Your email has been updated to \002%s\002"), email.c_str());
+				BotInfo *bi = findbot(Config->NickServ);
+				if (bi)
+					u->SendMessage(bi, _("Your email has been updated to \002%s\002"), email.c_str());
 				Log() << "m_ldap_authentication: Updated email address for " << u->nick << " (" << u->Account()->display << ") to " << email;
 			}
 		}
@@ -201,9 +200,9 @@ class NSIdentifyLDAP : public Module
 		this->disable_reason = config.ReadValue("m_ldap_authentication", "disable_reason", "", 0);
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
 	{
-		if (this->disable_register && !this->disable_reason.empty() && nickserv && command->service == nickserv->Bot() && command->name == "REGISTER")
+		if (this->disable_register && !this->disable_reason.empty() && command->name == "nickserv/register")
 		{
 			source.Reply(_(this->disable_reason.c_str()));
 			return EVENT_STOP;
@@ -212,11 +211,14 @@ class NSIdentifyLDAP : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnCheckAuthentication(User *u, Command *c, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
+	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
 	{
-		if (u == NULL || c == NULL || !this->ldap)
+
+		if (c == NULL || source == NULL || !this->ldap)
 			return EVENT_CONTINUE;
-		else if (u->GetExt("m_ldap_authentication_authenticated"))
+
+		User *u = source->u;
+		if (u->GetExt("m_ldap_authentication_authenticated"))
 		{
 			u->Shrink("m_ldap_authentication_authenticated");
 			return EVENT_ALLOW;
@@ -227,7 +229,7 @@ class NSIdentifyLDAP : public Module
 			return EVENT_CONTINUE;
 		}
 
-		IdentifyInfo *ii = new IdentifyInfo(u, c, params, account, password);
+		IdentifyInfo *ii = new IdentifyInfo(u, c, *source,  params, account, password);
 		try
 		{
 			Anope::string full_binddn = this->username_attribute + "=" + account + "," + this->binddn;

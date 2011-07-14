@@ -12,35 +12,42 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "nickserv.h"
 
 class CommandNSUpdate : public Command
 {
  public:
-	CommandNSUpdate() : Command("UPDATE", 0, 0)
+	CommandNSUpdate(Module *creator) : Command(creator, "nickserv/update", 0, 0)
 	{
 		this->SetDesc(_("Updates your current status, i.e. it checks for new memos"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
+
+		if (!na)
+		{
+			source.Reply(NICK_NOT_REGISTERED);
+			return;
+		}
 
 		na->last_realname = u->realname;
 		na->last_seen = Anope::CurTime;
 
 		FOREACH_MOD(I_OnNickUpdate, OnNickUpdate(u));
 
-		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->s_NickServ.c_str());
-		return MOD_CONT;
+		source.Reply(_("Status updated (memos, vhost, chmodes, flags)."), Config->NickServ.c_str());
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: UPDATE\n"
-				"Updates your current status, i.e. it checks for new memos,\n"
-				"sets needed chanmodes (ModeonID) and updates your vhost and\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Updates your current status, i.e. it checks for new memos,\n"
+				"sets needed channel modes and updates your vhost and\n"
 				"your userflags (lastseentime, etc)."));
 		return true;
 	}
@@ -51,14 +58,12 @@ class NSUpdate : public Module
 	CommandNSUpdate commandnsupdate;
 
  public:
-	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	NSUpdate(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandnsupdate(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!nickserv)
-			throw ModuleException("NickServ is not loaded!");
-
-		this->AddCommand(nickserv->Bot(), &commandnsupdate);
+		ModuleManager::RegisterService(&commandnsupdate);
 	}
 };
 

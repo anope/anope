@@ -11,21 +11,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetRestricted : public Command
 {
  public:
-	CommandCSSetRestricted(const Anope::string &cpermission = "") : Command("RESTRICTED", 2, 2, cpermission)
+	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Restrict access to the channel"));
+		this->SetSyntax(_("\037channel\037 RESTRICTED {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetRestricted");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -44,35 +54,25 @@ class CommandCSSetRestricted : public Command
 		else
 			this->OnSyntaxError(source, "RESTRICTED");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 RESTRICTED {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002restricted access\002 option for a\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002restricted access\002 option for a\n"
 				"channel. When \002restricted access\002 is set, users not on the access list will\n"
-				"instead be kicked and banned from the channel."), this->name.c_str());
+				"instead be kicked and banned from the channel."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET RESTRICTED", _("SET \037channel\037 RESTRICTED {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetRestricted : public CommandCSSetRestricted
 {
  public:
-	CommandCSSASetRestricted() : CommandCSSetRestricted("chanserv/saset/restricted")
+	CommandCSSASetRestricted(Module *creator) : CommandCSSetRestricted(creator, "chanserv/saset/restricted", "chanserv/saset/restricted")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SASET RESTRICTED", _("SASET \002channel\002 RESTRICTED {ON | OFF}"));
 	}
 };
 
@@ -82,31 +82,13 @@ class CSSetRestricted : public Module
 	CommandCSSASetRestricted commandcssasetrestricted;
 
  public:
-	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetRestricted(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetrestricted(this), commandcssasetrestricted(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetrestricted);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetrestricted);
-	}
-
-	~CSSetRestricted()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetrestricted);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetrestricted);
+		ModuleManager::RegisterService(&commandcssetrestricted);
+		ModuleManager::RegisterService(&commandcssasetrestricted);
 	}
 };
 

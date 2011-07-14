@@ -17,12 +17,13 @@
 class CommandMSCancel : public Command
 {
  public:
-	CommandMSCancel() : Command("CANCEL", 1, 1)
+	CommandMSCancel(Module *creator) : Command(creator, "memoserv/cancel", 1, 1)
 	{
-		this->SetDesc(_("Cancel last memo you sent"));
+		this->SetDesc(_("Cancel the last memo you sent"));
+		this->SetSyntax(_("{\037nick\037 | \037channel\037}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
@@ -32,7 +33,7 @@ class CommandMSCancel : public Command
 		MemoInfo *mi = memoserv->GetMemoInfo(nname, ischan);
 
 		if (mi == NULL)
-			source.Reply(ischan ? _(CHAN_X_NOT_REGISTERED) : _(NICK_X_NOT_REGISTERED), nname.c_str());
+			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nname.c_str());
 		else
 		{
 			for (int i = mi->memos.size() - 1; i >= 0; --i)
@@ -41,26 +42,21 @@ class CommandMSCancel : public Command
 					FOREACH_MOD(I_OnMemoDel, OnMemoDel(findnick(nname)->nc, mi, mi->memos[i]));
 					mi->Del(mi->memos[i]);
 					source.Reply(_("Last memo to \002%s\002 has been cancelled."), nname.c_str());
-					return MOD_CONT;
+					return;
 				}
 
 			source.Reply(_("No memo was cancelable."));
 		}
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002CANCEL {\037nick\037 | \037channel\037}\002\n"
-				" \n"
-				"Cancels the last memo you sent to the given nick or channel,\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Cancels the last memo you sent to the given nick or channel,\n"
 				"provided it has not been read at the time you use the command."));
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		SyntaxError(source, "CANCEL", _("CANCEL {\037nick\037 | \037channel\037}"));
 	}
 };
 
@@ -69,14 +65,12 @@ class MSCancel : public Module
 	CommandMSCancel commandmscancel;
 
  public:
-	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	MSCancel(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandmscancel(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!memoserv)
-			throw ModuleException("MemoServ is not loaded!");
-
-		this->AddCommand(memoserv->Bot(), &commandmscancel);
+		ModuleManager::RegisterService(&commandmscancel);
 	}
 };
 

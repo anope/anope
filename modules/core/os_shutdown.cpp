@@ -12,47 +12,105 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "operserv.h"
 
-class CommandOSShutdown : public Command
+class CommandOSQuit : public Command
 {
  public:
-	CommandOSShutdown() : Command("SHUTDOWN", 0, 0, "operserv/shutdown")
+	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0, "operserv/quit")
 	{
-		this->SetDesc(_("Terminate services with save"));
+		this->SetDesc(_("Terminate Services WITHOUT saving"));
+		this->SetSyntax("");
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		quitmsg = "SHUTDOWN command received from " + u->nick;
-		save_databases();
+		quitmsg = "QUIT command received from " + u->nick;
 		quitting = true;
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002SHUTDOWN\002\n"
-				" \n"
-				"Causes Services to save all databases and then shut down."));
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Causes Services to do an immediate shutdown; databases are\n"
+				"\002not\002 saved.  This command should not be used unless\n"
+				"damage to the in-memory copies of the databases is feared\n"
+				"and they should not be saved."));
+		return true;
+	}
+};
+
+class CommandOSRestart : public Command
+{
+ public:
+	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0, "operserv/restart")
+	{
+		this->SetDesc(_("Save databases and restart Services"));
+		this->SetSyntax("");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		User *u = source.u;
+		quitmsg = "RESTART command received from " + u->nick;
+		save_databases();
+		quitting = restarting = true;
+		return;
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(_("Causes Services to save all databases and then restart\n"
+				"(i.e. exit and immediately re-run the executable)."));
+		return true;
+	}
+};
+
+class CommandOSShutdown : public Command
+{
+ public:
+	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0, "operserv/shutdown")
+	{
+		this->SetDesc(_("Terminate services with save"));
+		this->SetSyntax("");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		User *u = source.u;
+		quitmsg = source.command + " command received from " + u->nick;
+		save_databases();
+		quitting = true;
+		return;
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Causes Services to save all databases and then shut down."));
 		return true;
 	}
 };
 
 class OSShutdown : public Module
 {
+	CommandOSQuit commandosquit;
+	CommandOSRestart commandosrestart;
 	CommandOSShutdown commandosshutdown;
 
  public:
-	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	OSShutdown(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandosquit(this), commandosrestart(this), commandosshutdown(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!operserv)
-			throw ModuleException("OperServ is not loaded!");
-
-		this->AddCommand(operserv->Bot(), &commandosshutdown);
+		ModuleManager::RegisterService(&commandosquit);
+		ModuleManager::RegisterService(&commandosrestart);
+		ModuleManager::RegisterService(&commandosshutdown);
 	}
 };
 

@@ -12,21 +12,31 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "chanserv.h"
 
 class CommandCSSetOpNotice : public Command
 {
  public:
-	CommandCSSetOpNotice(const Anope::string &cpermission = "") : Command("OPNOTICE", 2, 2, cpermission)
+	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/notice", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Send a notice when OP/DEOP commands are used"));
+		this->SetSyntax(_("\037channel\037 OPNOTICE {ON | OFF}"));
 	}
 
-	CommandReturn Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		ChannelInfo *ci = source.ci;
-		if (!ci)
-			throw CoreException("NULL ci in CommandCSSetOpNotice");
+		User *u = source.u;
+		ChannelInfo *ci = cs_findchan(params[0]);
+		if (ci == NULL)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+
+		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
+			return;
+		}
 
 		if (params[1].equals_ci("ON"))
 		{
@@ -41,36 +51,26 @@ class CommandCSSetOpNotice : public Command
 		else
 			this->OnSyntaxError(source, "OPNOTICE");
 
-		return MOD_CONT;
+		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &)
 	{
-		source.Reply(_("Syntax: \002%s \037channel\037 OPNOTICE {ON | OFF}\002\n"
-				" \n"
-				"Enables or disables the \002op-notice\002 option for a channel.\n"
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Enables or disables the \002op-notice\002 option for a channel.\n"
 				"When \002op-notice\002 is set, %s will send a notice to the\n"
 				"channel whenever the \002OP\002 or \002DEOP\002 commands are used for a user\n"
-				"in the channel."), this->name.c_str(), Config->s_ChanServ.c_str());
+				"in the channel."), this->name.c_str(), source.owner->nick.c_str());
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET OPNOTICE", _("SET \037channel\037 OPNOTICE {ON | OFF}"));
 	}
 };
 
 class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 {
  public:
-	CommandCSSASetOpNotice() : CommandCSSetOpNotice("chanserv/saset/opnotice")
+	CommandCSSASetOpNotice(Module *creator) : CommandCSSetOpNotice(creator, "chanserv/saset/opnotice", "chanserv/saset/opnotice")
 	{
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &)
-	{
-		SyntaxError(source, "SET OPNOTICE", _("SASET \002channel\002 OPNOTICE {ON | OFF}"));
 	}
 };
 
@@ -80,31 +80,13 @@ class CSSetOpNotice : public Module
 	CommandCSSASetOpNotice commandcssasetopnotice;
 
  public:
-	CSSetOpNotice(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	CSSetOpNotice(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
+		commandcssetopnotice(this), commandcssasetopnotice(this)
 	{
 		this->SetAuthor("Anope");
 
-		if (!chanserv)
-			throw ModuleException("ChanServ is not loaded!");
-
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->AddSubcommand(this, &commandcssetopnotice);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->AddSubcommand(this, &commandcssasetopnotice);
-	}
-
-	~CSSetOpNotice()
-	{
-		Command *c = FindCommand(chanserv->Bot(), "SET");
-		if (c)
-			c->DelSubcommand(&commandcssetopnotice);
-
-		c = FindCommand(chanserv->Bot(), "SASET");
-		if (c)
-			c->DelSubcommand(&commandcssasetopnotice);
+		ModuleManager::RegisterService(&commandcssetopnotice);
+		ModuleManager::RegisterService(&commandcssasetopnotice);
 	}
 };
 

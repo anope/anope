@@ -197,10 +197,6 @@ class CommandCSAccess : public Command
 
 		bool override = !check_access(u, ci, CA_ACCESS_CHANGE) || level >= u_level;
 
-		NickAlias *na = findnick(mask);
-		if (!na && mask.find_first_of("!@*") == Anope::string::npos)
-			mask += "!*@*";
-
 		ChanAccess *access = ci->GetAccess(mask, 0, false);
 		if (access)
 		{

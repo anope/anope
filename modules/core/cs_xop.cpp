@@ -138,10 +138,6 @@ class XOPBase : public Command
 			return;
 		}
 
-		NickAlias *na = findnick(mask);
-		if (!na && mask.find_first_of("!@*") == Anope::string::npos)
-			mask += "!*@*";
-
 		access = ci->GetAccess(mask, 0, false);
 		if (access)
 		{

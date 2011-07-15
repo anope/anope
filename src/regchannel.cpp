@@ -21,8 +21,6 @@ ChanAccess::ChanAccess(const Anope::string &umask)
 	{
 		this->nc = NULL;
 		this->mask = umask;
-		if (ircdproto->IsNickValid(this->mask))
-			this->mask += "!*@*";
 	}
 }
 

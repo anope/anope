@@ -17,7 +17,7 @@
 class CommandCSSetXOP : public Command
 {
  public:
-	CommandCSSetXOP(Module *creator, const Anope::string &cname = "chanserv/set/xop", const Anope::string &cpermission = "") : Command(creator, "chanserv/xop", 2, 2, cpermission)
+	CommandCSSetXOP(Module *creator, const Anope::string &cname = "chanserv/set/xop", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Toggle the user privilege system"));
 		this->SetSyntax(_("\037channel\037 XOP {ON | OFF}"));

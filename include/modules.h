@@ -999,7 +999,7 @@ class CoreExport Module : public Extensible
 	 * @param message The message
 	 * @return EVENT_STOP to halt processing
 	 */
-	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, const Anope::string &message) { return EVENT_CONTINUE; }
+	virtual EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) { return EVENT_CONTINUE; }
 
 	/** Called when we receive a PRIVMSG for a registered channel we are in
 	 * @param u The source of the message

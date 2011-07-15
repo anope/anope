@@ -791,7 +791,7 @@ bool ChannelInfo::CheckKick(User *user)
 	bool set_modes = false, do_kick = false;
 
 	EventReturn MOD_RESULT;
-	FOREACH_MOD(I_OnCheckKick, OnCheckKick(user, this, do_kick));
+	FOREACH_RESULT(I_OnCheckKick, OnCheckKick(user, this, do_kick));
 	if (MOD_RESULT == EVENT_ALLOW)
 		return false;
 

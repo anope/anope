@@ -292,8 +292,8 @@ class OperServCore : public Module
 		if (OperServ == NULL)
 			throw ModuleException("No bot named " + Config->OperServ);
 
-		Implementation i[] = { I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
-		ModuleManager::Attach(i, this, 6);
+		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
+		ModuleManager::Attach(i, this, 7);
 
 		ModuleManager::RegisterService(&sglines);
 		ModuleManager::RegisterService(&szlines);
@@ -305,6 +305,17 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&szlines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
+	}
+
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	{
+		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
+		{
+			u->SendMessage(bi, ACCESS_DENIED);
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 
 	void OnServerQuit(Server *server)

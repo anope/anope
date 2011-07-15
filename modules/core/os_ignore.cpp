@@ -338,7 +338,7 @@ class OSIgnore : public Module
 		}
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, const Anope::string &message)
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
 	{
 		if (this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

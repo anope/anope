@@ -24,8 +24,19 @@ class ChanServCore : public Module
 		if (ChanServ == NULL)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
-		Implementation i[] = { I_OnDelChan, I_OnPreHelp, I_OnPostHelp };
-		ModuleManager::Attach(i, this, 3);
+		Implementation i[] = { I_OnBotPrivmsg, I_OnDelChan, I_OnPreHelp, I_OnPostHelp };
+		ModuleManager::Attach(i, this, 4);
+	}
+
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	{
+		if (Config->CSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->ChanServ)
+		{
+			u->SendMessage(bi, ACCESS_DENIED);
+			return EVENT_STOP;
+		}
+
+		return EVENT_CONTINUE;
 	}
 
 	void OnDelCore(NickCore *nc)

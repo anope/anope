@@ -19,7 +19,7 @@ class CommandCSSet : public Command
 	CommandCSSet(Module *creator) : Command(creator, "chanserv/set", 2, 3)
 	{
 		this->SetDesc(_("Set channel options and information"));
-		this->SetSyntax(_("\037channel\037 \037option\037 \037parameters\037"));
+		this->SetSyntax(_("\037option\037 \037channel\037 \037parameters\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

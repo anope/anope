@@ -19,7 +19,7 @@ class CommandCSSASet : public Command
 	CommandCSSASet(Module *creator) : Command(creator, "chanserv/saset", 2, 3, "chanserv/saset")
 	{
 		this->SetDesc(_("Forcefully set channel options and information"));
-		this->SetSyntax(_("\002channel\002 \037option\037 \037parameters\037"));
+		this->SetSyntax(_("\037option\037 \037channel\037 \037parameters\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

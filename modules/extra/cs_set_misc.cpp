@@ -19,7 +19,7 @@ class CommandCSSetMisc : public Command
 	CommandCSSetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "") : Command(creator, "chanserv/set/" + cname, 1, 2, cpermission), Desc(cdesc)
 	{
 		this->SetDesc(cdesc);
-		this->SetSyntax(_("\037channel\037 \037option\037 \037parameters\037"));
+		this->SetSyntax(_("\037channel\037 \037parameters\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

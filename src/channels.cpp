@@ -1100,7 +1100,7 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
-	if ((ci->HasFlag(CI_SECUREOPS) || c->HasFlag(CH_SYNCING)) && !user->server->IsULined())
+	if ((ci->HasFlag(CI_SECUREOPS) || (c->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
 	{
 		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !check_access(user, ci, CA_FOUNDER))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);

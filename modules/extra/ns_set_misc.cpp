@@ -16,9 +16,8 @@
 class CommandNSSetMisc : public Command
 {
  public:
-	CommandNSSetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc, const Anope::string &cpermission = "", size_t min = 1) : Command(owner, "nickserv/set/" + cname, min, min + 1, cpermission)
+	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", const Anope::string &cpermission = "", size_t min = 1) : Command(creator, cname, min, min + 1, cpermission)
 	{
-		this->SetDesc(cdesc);
 		this->SetSyntax(_("\037parameter\037"));
 	}
 
@@ -32,14 +31,14 @@ class CommandNSSetMisc : public Command
 		}
 		NickCore *nc = na->nc;
 
-		nc->Shrink("nickserv:" + this->name);
+		nc->Shrink("ns_set_misc:" + source.command.replace_all_cs(" ", "_"));
 		if (!param.empty())
 		{
-			nc->Extend("nickserv:" + this->name, new ExtensibleItemRegular<Anope::string>(param));
-			source.Reply(CHAN_SETTING_CHANGED, this->name.c_str(), nc->display.c_str(), param.c_str());
+			nc->Extend("ns_set_misc:" + source.command.replace_all_cs(" ", "_"), new ExtensibleItemRegular<Anope::string>(param));
+			source.Reply(CHAN_SETTING_CHANGED, source.command.c_str(), nc->display.c_str(), param.c_str());
 		}
 		else
-			source.Reply(CHAN_SETTING_UNSET, this->name.c_str(), nc->display.c_str());
+			source.Reply(CHAN_SETTING_UNSET, source.command.c_str(), nc->display.c_str());
 
 		return;
 	}
@@ -53,8 +52,10 @@ class CommandNSSetMisc : public Command
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(Module *creator, const Anope::string &cname, const Anope::string &cdesc) : CommandNSSetMisc(creator, "nickserv/saset/" + cname, cdesc, "nickserv/saset/" + cname, 2)
+	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", "nickserv/saset/misc", 2)
 	{
+		this->ClearSyntax();
+		this->SetSyntax(_("\037nickname\037 \037parameter\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -65,95 +66,58 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 class NSSetMisc : public Module
 {
-	struct CommandInfo
-	{
-		Anope::string Name;
-		Anope::string Desc;
-		bool ShowHidden;
-
-		CommandInfo(const Anope::string &name, const Anope::string &cdesc, bool showhidden) : Name(name), Desc(cdesc), ShowHidden(showhidden) { }
-	};
-
-	std::map<Anope::string, CommandInfo *> Commands;
-
-	void RemoveAll()
-	{
-		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-			delete it->second;
-		this->Commands.clear();
-	}
+	CommandNSSetMisc commandnssetmisc;
+	CommandNSSASetMisc commandnssasetmisc;
 
  public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED)
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+		commandnssetmisc(this), commandnssasetmisc(this)
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnReload, I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
-		ModuleManager::Attach(i, this, 4);
+		Implementation i[] = { I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
+		ModuleManager::Attach(i, this, 3);
 
-		OnReload();
-	}
-
-	~NSSetMisc()
-	{
-		RemoveAll();
-	}
-
-	void OnReload()
-	{
-		RemoveAll();
-
-		ConfigReader config;
-
-		for (int i = 0, num = config.Enumerate("ns_set_misc"); i < num; ++i)
-		{
-			Anope::string cname = config.ReadValue("ns_set_misc", "name", "", i);
-			if (cname.empty())
-				continue;
-			Anope::string desc = config.ReadValue("ns_set_misc", "desc", "", i);
-			bool showhidden = config.ReadFlag("ns_set_misc", "privileged", "no", i);
-
-			CommandInfo *info = new CommandInfo(cname, desc, showhidden);
-			if (!this->Commands.insert(std::make_pair(cname, info)).second)
-			{
-				Log() << "ns_set_misc: Warning, unable to add duplicate entry " << cname;
-				delete info;
-				continue;
-			}
-
-			ModuleManager::RegisterService(new CommandNSSetMisc(this, cname, desc));
-			ModuleManager::RegisterService(new CommandNSSASetMisc(this, cname, desc));
-		}
+		ModuleManager::RegisterService(&this->commandnssetmisc);
+		ModuleManager::RegisterService(&this->commandnssasetmisc);
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)
 	{
-		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		std::deque<Anope::string> list;
+		na->nc->GetExtList(list);
+
+		for (unsigned i = 0; i < list.size(); ++i)
 		{
-			if (!ShowHidden && it->second->ShowHidden)
+			if (list[i].find("ns_set_misc:") != 0)
 				continue;
 
 			Anope::string value;
-			if (na->nc->GetExtRegular("nickserv:" + it->first, value))
-				source.Reply("      %s: %s", it->first.c_str(), value.c_str());
+			if (na->nc->GetExtRegular(list[i], value))
+				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), value.c_str());
 		}
 	}
 
 	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc)
 	{
-		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+		std::deque<Anope::string> list;
+		nc->GetExtList(list);
+
+		for (unsigned i = 0; i < list.size(); ++i)
 		{
+			if (list[i].find("ns_set_misc:") != 0)
+				continue;
+
 			Anope::string value;
-			if (nc->GetExtRegular("nickserv:" + it->first, value))
-				WriteMetadata(it->first, ":" + value);
+			if (nc->GetExtRegular(list[i], value))
+				WriteMetadata(list[i], ":" + value);
 		}
 	}
 
 	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
 	{
-		for (std::map<Anope::string, CommandInfo *>::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
-			if (key == it->first)
-				nc->Extend("nickserv:" + it->first, new ExtensibleItemRegular<Anope::string>(params[0]));
+		if (key.find("ns_set_misc:") == 0)
+			nc->Extend(key, new ExtensibleItemRegular<Anope::string>(params[0]));
 
 		return EVENT_CONTINUE;
 	}

@@ -97,7 +97,7 @@ class CommandEntryMessage : public Command
 	}
 
  public:
-	CommandEntryMessage(Module *creator) : Command(creator, "ENTRYMSG", 2, 3)
+	CommandEntryMessage(Module *creator) : Command(creator, "chanserv/entrymsg", 2, 3)
 	{
 		this->SetDesc(_("Manage the channel's entry messages"));
 		this->SetSyntax(_("\037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));

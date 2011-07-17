@@ -42,7 +42,7 @@
 class CommandCSAppendTopic : public Command
 {
  public:
-	CommandCSAppendTopic(Module *creator) : Command(creator, "APPENDTOPIC", 2, 2)
+	CommandCSAppendTopic(Module *creator) : Command(creator, "chanserv/appendtopic", 2, 2)
 	{
 		this->SetDesc(_("Add text to a channels topic"));
 	}

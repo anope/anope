@@ -119,7 +119,7 @@ class CommandCSEnforce : public Command
 		}
 	}
  public:
-	CommandCSEnforce(Module *creator) : Command(creator, "ENFORCE", 1, 2)
+	CommandCSEnforce(Module *creator) : Command(creator, "chanserv/enforce", 1, 2)
 	{
 		this->SetDesc(_("Enforce various channel modes and set options"));
 		this->SetSyntax(_("\037channel\037 [\037what\037]"));

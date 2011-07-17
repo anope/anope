@@ -55,44 +55,51 @@ class CommandHSRequest : public Command
 		User *u = source.u;
 
 		Anope::string rawhostmask = params[0];
-		Anope::string hostmask;
+		
+		Anope::string user, host;
+		size_t a = rawhostmask.find('@');
 
-		Anope::string vIdent = myStrGetToken(rawhostmask, '@', 0); /* Get the first substring, @ as delimiter */
-		if (!vIdent.empty())
+		if (a == Anope::string::npos)
+			host = rawhostmask;
+		else
 		{
-			rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1); /* get the remaining string */
-			if (rawhostmask.empty())
-			{
-				this->SendSyntax(source);
-				return;
-			}
-			if (vIdent.length() > Config->UserLen)
+			user = rawhostmask.substr(0, a);
+			host = rawhostmask.substr(a + 1);
+		}
+
+		if (host.empty())
+		{
+			this->OnSyntaxError(source, "");
+			return;
+		}
+
+		if (!user.empty())
+		{
+			if (user.length() > Config->UserLen)
 			{
 				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
 				return;
 			}
-			else
-				for (Anope::string::iterator s = vIdent.begin(), s_end = vIdent.end(); s != s_end; ++s)
-					if (!isvalidchar(*s))
-					{
-						source.Reply(HOST_SET_IDENT_ERROR);
-						return;
-					}
-			if (!ircd->vident)
+			else if (!ircd->vident)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
+			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
+				if (!isvalidchar(*s))
+				{
+					source.Reply(HOST_SET_IDENT_ERROR);
+					return;
+				}
 		}
-		if (rawhostmask.length() < Config->HostLen)
-			hostmask = rawhostmask;
-		else
+
+		if (host.length() > Config->HostLen)
 		{
 			source.Reply(HOST_SET_TOOLONG, Config->HostLen);
 			return;
 		}
 
-		if (!isValidHost(hostmask, 3))
+		if (!isValidHost(host, 3))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;
@@ -104,11 +111,11 @@ class CommandHSRequest : public Command
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}
-		my_add_host_request(u->nick, vIdent, hostmask, u->nick, Anope::CurTime);
+		my_add_host_request(u->nick, user, host, u->nick, Anope::CurTime);
 
 		source.Reply(_("Your vHost has been requested"));
-		req_send_memos(source, vIdent, hostmask);
-		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!vIdent.empty() ? vIdent + "@" : "") << hostmask;
+		req_send_memos(source, user, host);
+		Log(LOG_COMMAND, u, this, NULL) << "to request new vhost " << (!user.empty() ? user + "@" : "") << host;
 
 		return;
 	}

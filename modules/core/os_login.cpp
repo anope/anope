@@ -41,7 +41,7 @@ class CommandOSLogin : public Command
 		}
 		else
 		{
-			Log(LOG_ADMIN, source.u, this) << "and succesfully identified to " << source.owner->nick;
+			Log(LOG_ADMIN, source.u, this) << "and successfully identified to " << source.owner->nick;
 			source.u->Extend("os_login_password_correct");
 			source.Reply(_("Password accepted."));
 		}

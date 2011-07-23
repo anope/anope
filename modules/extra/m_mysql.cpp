@@ -227,7 +227,7 @@ class ModuleSQL : public Module, public Pipe
 					this->MySQLServices.insert(std::make_pair(connname, ss));
 					ModuleManager::RegisterService(ss);
 
-					Log(LOG_NORMAL, "mysql") << "MySQL: Sucessfully connected to server " << connname << " (" << server << ")";
+					Log(LOG_NORMAL, "mysql") << "MySQL: Successfully connected to server " << connname << " (" << server << ")";
 				}
 				catch (const SQLException &ex)
 				{

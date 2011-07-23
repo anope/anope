@@ -245,6 +245,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                     mustkick = 1;
                 } else if (bw->type == BW_SINGLE) {
                     int len = strlen(bw->word);
+		    int buf_len = strlen(nbuf);
 
                     if ((BSCaseSensitive && !strcmp(nbuf, bw->word))
                         || (!BSCaseSensitive
@@ -252,23 +253,13 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         mustkick = 1;
                         /* two next if are quite odd isn't it? =) */
                     } else if ((strchr(nbuf, ' ') == nbuf + len)
-                               &&
-                               ((BSCaseSensitive
-                                 && !strcmp(nbuf, bw->word))
-                                || (!BSCaseSensitive
-                                    && (stristr(nbuf, bw->word) ==
-                                        nbuf)))) {
+                               && ((BSCaseSensitive && strstr(nbuf, bw->word) == nbuf)
+                                || (!BSCaseSensitive && stristr(nbuf, bw->word) == nbuf))) {
                         mustkick = 1;
                     } else {
-                        if ((strrchr(nbuf, ' ') ==
-                             nbuf + strlen(nbuf) - len - 1)
-                            &&
-                            ((BSCaseSensitive
-                              && (strstr(nbuf, bw->word) ==
-                                  nbuf + strlen(nbuf) - len))
-                             || (!BSCaseSensitive
-                                 && (stristr(nbuf, bw->word) ==
-                                     nbuf + strlen(nbuf) - len)))) {
+                        if (len < buf_len && (strrchr(nbuf, ' ') == nbuf + buf_len - len - 1)
+                            && ((BSCaseSensitive && (strstr(nbuf, bw->word) == nbuf + buf_len - len))
+                             || (!BSCaseSensitive && (stristr(nbuf, bw->word) == nbuf + buf_len - len)))) {
                             mustkick = 1;
                         } else {
                             char *wordbuf = scalloc(len + 3, 1);
@@ -313,16 +304,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                     }
                 } else if (bw->type == BW_END) {
                     int len = strlen(bw->word);
+		    int buf_len = strlen(nbuf);
 
-                    if ((BSCaseSensitive
-                         &&
-                         (!strncmp
-                          (nbuf + strlen(nbuf) - len, bw->word, len)))
-                        || (!BSCaseSensitive
-                            &&
-                            (!strnicmp
-                             (nbuf + strlen(nbuf) - len, bw->word,
-                              len)))) {
+                    if ((BSCaseSensitive && len <= buf_len && !strncmp(nbuf + buf_len - len, bw->word, len))
+                        || (!BSCaseSensitive && len <= buf_len && !strnicmp(nbuf + buf_len - len, bw->word, len))) {
                         mustkick = 1;
                     } else {
                         char *wordbuf = scalloc(len + 2, 1);

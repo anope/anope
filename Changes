@@ -1,7 +1,7 @@
 Anope Version 1.8 - GIT
 -----------------------
 05/30  F Fixed removing vhosts on InspIRCd when m_cloaking is unloaded   [#1273]
-
+07/23  F Fixed a potential crash in the badwords kicker                  [  #00]
 
 Anope Version 1.8.6
 -------------------

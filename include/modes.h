@@ -193,7 +193,7 @@ class CoreExport ChannelMode : public Mode
 	 * NOTE: User CAN be NULL, this is for checking if it can be locked with defcon
 	 * @param u The user, or NULL
 	 */
-	bool CanSet(User *u) const;
+	virtual bool CanSet(User *u) const;
 
 	/** Returns the mode name as a string
 	 */

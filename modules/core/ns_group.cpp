@@ -255,7 +255,7 @@ class CommandNSGList : public Command
 			{
 				NickAlias *na2 = *it;
 
-				source.Reply(na2->HasFlag(NS_NO_EXPIRE) ? _("   %s (does not expire)") : _("   %s (expires in %s)"), na2->nick.c_str(), do_strftime(na2->last_seen + Config->NSExpire).c_str());
+				source.Reply(na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire ? _("   %s (does not expire)") : _("   %s (expires in %s)"), na2->nick.c_str(), do_strftime(na2->last_seen + Config->NSExpire).c_str());
 			}
 			source.Reply(_("%d nicknames in the group."), nc->aliases.size());
 		}

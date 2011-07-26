@@ -19,7 +19,7 @@ class CommandCSSetSecure : public Command
 	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Activate security features"));
-		this->SetSyntax(_("\037channel\037 SECURE {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

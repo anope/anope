@@ -243,6 +243,18 @@ class PlexusProto : public IRCDProto
 class PlexusIRCdMessage : public IRCdMessage
 {
  public:
+ 	/*
+	 * params[0] = ts
+	 * params[1] = channel
+	 */
+	bool OnJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() < 2)
+			return IRCdMessage::OnJoin(source, params);
+		do_join(source, params[1], params[0]);
+		return true;
+	}
+
 	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
 		if (params.size() < 2)
@@ -588,7 +600,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
 		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'D'));
 		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, 'G'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'M'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
 		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
 		ModeManager::AddUserMode(new UserMode(UMODE_SSL, 'S'));
 		ModeManager::AddUserMode(new UserMode(UMODE_WEBIRC, 'W'));

@@ -19,7 +19,7 @@ class CommandCSSetPeace : public Command
 	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Regulate the use of critical commands"));
-		this->SetSyntax(_("\037channel\037 PEACE {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

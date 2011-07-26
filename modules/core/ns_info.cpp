@@ -125,7 +125,7 @@ class CommandNSInfo : public Command
 
 				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				{
-					if (na->HasFlag(NS_NO_EXPIRE))
+					if (na->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire)
 						source.Reply(_("This nickname will not expire."));
 					else
 						source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());

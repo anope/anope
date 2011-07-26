@@ -19,7 +19,7 @@ class CommandCSSetTopicLock : public Command
 	CommandCSSetTopicLock(Module *creator, const Anope::string &cname = "chanserv/set/topiclock", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Topic can only be changed with TOPIC"));
-		this->SetSyntax(_("\037channel\037 TOPICLOCK {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

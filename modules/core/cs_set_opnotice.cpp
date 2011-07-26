@@ -19,7 +19,7 @@ class CommandCSSetOpNotice : public Command
 	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/notice", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Send a notice when OP/DEOP commands are used"));
-		this->SetSyntax(_("\037channel\037 OPNOTICE {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

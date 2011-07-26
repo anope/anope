@@ -19,7 +19,7 @@ class CommandCSSetDescription : public Command
 	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
 	{
 		this->SetDesc(_("Set the channel description"));
-		this->SetSyntax(_("\037channel\037 DESC [\037description\037]"));
+		this->SetSyntax(_("\037channel\037 [\037description\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

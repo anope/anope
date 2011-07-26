@@ -19,7 +19,7 @@ class CommandCSSetPersist : public Command
 	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set the channel as permanent"));
-		this->SetSyntax(_("\037channel\037 PERSIST {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

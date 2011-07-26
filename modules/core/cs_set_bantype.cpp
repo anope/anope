@@ -19,7 +19,7 @@ class CommandCSSetBanType : public Command
 	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set how Services make bans on the channel"));
-		this->SetSyntax(_("\037channel\037 BANTYPE \037bantype\037"));
+		this->SetSyntax(_("\037channel\037 \037bantype\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

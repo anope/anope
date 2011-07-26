@@ -18,7 +18,7 @@ class CommandCSSetRestricted : public Command
 	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Restrict access to the channel"));
-		this->SetSyntax(_("\037channel\037 RESTRICTED {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

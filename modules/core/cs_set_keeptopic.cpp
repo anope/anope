@@ -19,7 +19,7 @@ class CommandCSSetKeepTopic : public Command
 	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Retain topic when channel is not in use"));
-		this->SetSyntax(_("\037channel\037 KEEPTOPIC {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

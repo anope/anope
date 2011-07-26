@@ -16,10 +16,10 @@
 class CommandCSSetFounder : public Command
 {
  public:
-	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder", const Anope::string &cpermission = "") : Command(creator, "chanserv/founder", 2, 2, cpermission)
+	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Set the founder of a channel"));
-		this->SetSyntax(_("\037channel\037 FOUNDER \037nick\037"));
+		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

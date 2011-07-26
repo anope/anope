@@ -19,7 +19,7 @@ class CommandCSSetPrivate : public Command
 	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Hide channel from LIST command"));
-		this->SetSyntax(_("\037channel\037 PRIVATE {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

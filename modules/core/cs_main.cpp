@@ -24,7 +24,7 @@ class ChanServCore : public Module
 		if (ChanServ == NULL)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
-		Implementation i[] = { I_OnBotPrivmsg, I_OnDelChan, I_OnPreHelp, I_OnPostHelp };
+		Implementation i[] = { I_OnBotPrivmsg, I_OnDelCore, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, 4);
 	}
 

@@ -463,7 +463,7 @@ class CommandCSAccess : public Command
 				"access to %s commands on the channel.  Different\n"
 				"user levels allow for access to different subsets of\n"
 				"privileges. Any nick not on the access list has\n"
-				"a user level of 0."));
+				"a user level of 0."), source.owner->nick.c_str());
 		source.Reply(" ");
 		source.Reply(_("The \002ACCESS ADD\002 command adds the given mask to the\n"
 				"access list with the given user level; if the mask is\n"
@@ -494,8 +494,7 @@ class CommandCSAccess : public Command
 				"to \002ACCESS LIST\002 but shows the creator and last used time.\n"
 				" \n"
 				"The \002ACCESS CLEAR\002 command clears all entries of the\n"
-				"access list."),
-				source.owner->nick.c_str());
+				"access list."));
 		source.Reply(_("\002User access levels\002\n"
 				" \n"
 				"By default, the following access levels are defined:\n"

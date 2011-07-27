@@ -19,7 +19,7 @@ class CommandCSSetSecureFounder : public Command
 	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
 	{
 		this->SetDesc(_("Stricter control of channel founder status"));
-		this->SetDesc(_("\037channel\037 {ON | OFF}"));
+		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

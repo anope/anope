@@ -72,10 +72,13 @@ class CommandEntryMessage : public Command
 			try
 			{
 				unsigned i = convertTo<unsigned>(message);
-				if (i <= messages.size())
+				if (i > 0 && i <= messages.size())
 				{
 					messages.erase(messages.begin() + i - 1);
-					ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
+					if (!messages.empty())
+						ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
+					else
+						ci->Shrink("cs_entrymsg");
 					source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
 				}
 				else

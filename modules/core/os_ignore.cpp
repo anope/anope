@@ -146,7 +146,7 @@ class CommandOSIgnore : public Command
  private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
+		service_reference<IgnoreService> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -181,7 +181,7 @@ class CommandOSIgnore : public Command
 
 	void DoList(CommandSource &source)
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
+		service_reference<IgnoreService> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -205,7 +205,7 @@ class CommandOSIgnore : public Command
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
+		service_reference<IgnoreService> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -222,7 +222,7 @@ class CommandOSIgnore : public Command
 
 	void DoClear(CommandSource &source)
 	{
-		service_reference<IgnoreService> ignore_service("operserv/ignore");
+		service_reference<IgnoreService> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -287,7 +287,7 @@ class OSIgnore : public Module
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		osignoreservice(this, "operserv/ignore"), commandosignore(this)
+		osignoreservice(this, "ignore"), commandosignore(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -303,7 +303,7 @@ class OSIgnore : public Module
 	{
 		if (params.size() >= 4 && params[0].equals_ci("OS") && params[1].equals_ci("IGNORE"))
 		{
-			service_reference<IgnoreService> ignore_service("operserv/ignore");
+			service_reference<IgnoreService> ignore_service("ignore");
 			if (ignore_service)
 			{
 				const Anope::string &mask = params[2];

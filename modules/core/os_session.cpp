@@ -143,10 +143,11 @@ class ExceptionDelCallback : public NumberList
 
 	static void DoDel(CommandSource &source, unsigned index)
 	{
-		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, sessionservice->GetExceptions()[index]));
+		Exception *e = sessionservice->GetExceptions()[index];
+		FOREACH_MOD(I_OnExceptionDel, OnExceptionDel(source.u, e));
 
-		sessionservice->DelException(sessionservice->GetExceptions()[index]);
-		delete sessionservice->GetExceptions()[index];
+		sessionservice->DelException(e);
+		delete e;
 	}
 };
 

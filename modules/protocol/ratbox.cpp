@@ -252,6 +252,18 @@ class RatboxProto : public IRCDProto
 class RatboxIRCdMessage : public IRCdMessage
 {
  public:
+ 	/*
+	 * params[0] = ts
+	 * params[1] = channel
+	 */
+	bool OnJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	{
+		if (params.size() < 2)
+			return IRCdMessage::OnJoin(source, params);
+		do_join(source, params[1], params[0]);
+		return true;
+	}
+
 	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
 	{
 		if (params.size() < 2)

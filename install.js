@@ -74,15 +74,19 @@ var buildPackages = [
                                                         'name' : 'Microsoft Visual Studio 2010 (64bit)',
                                                         'libpaths' : [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\lib',
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Lib',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Lib',
+                                                                     'Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Lib'
 								     ],
                                                         'incpaths': [
                                                                      'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\include',
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\include'
-                                                         ],
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Include',
+                                                                     'Program Files (x86)\\Microsoft SDKs\\Windows\\v7.0A\\Include'
+                                                                    ],
                                                          'nmake' : [
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
-                                                         ],
+                                                                   'Program Files (x86)\\Microsoft Visual Studio 10.0\\VC\\bin',
+                                                                   ],
 							 'additional_switches' : [ '/w' ],
 							 'installedDrive' : 'C'
                                         },
@@ -90,14 +94,18 @@ var buildPackages = [
                                                         'name' : 'Microsoft Visual Studio 2010',
                                                         'libpaths' : [
                                                                      'Program Files\\Microsoft Visual Studio 10.0\\VC\\lib',
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Lib',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Lib',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0A\\Lib'
                                                                      ],
                                                         'incpaths' : [
                                                                      'Program Files\\Microsoft Visual Studio 10.0\\VC\\include',
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.1\\Include',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0\\Include',
+                                                                     'Program Files\\Microsoft SDKs\\Windows\\v7.0A\\Include'
                                                                      ],
                                                         'nmake' : [
-                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                                  'Program Files\\Microsoft Visual Studio 10.0\\VC\\bin',
                                                                   ],
                                                         'additional_switches' : [ '/w' ],
                                                         'installedDrive' : 'C'
@@ -113,7 +121,7 @@ var buildPackages = [
                                                                      'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
                                                                      ],
                                                         'nmake' : [
-														             'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                                  'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
                                                                   ],
                                                         'additional_switches' : [ '/w' ],
                                                         'installedDrive' : 'C'

@@ -20,35 +20,41 @@ Anope for Windows
         * Current Anope source:
             http://sourceforge.net/project/showfiles.php?group_id=94081
 
-        If you have Visual C++ 6, 7 (.NET 2002/2003) or 8 (2005) skip ahead to step 2, else you
+        If you have Visual C++ 6, 7 (.NET 2002/2003), 8 (2005) or 10 (2010) skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
-        downloaded, install these packages.
+        downloaded, install one of the following, for best results use MS VC 2010.
 
-		* Microsoft Visual C++ 2008 Express Edition:
+		* Microsoft Visual C++ 2010 Express
 			http://www.microsoft.com/express/vc/
 
 		or
 
-        * Microsoft Visual C++ 2005 Express Edition:
-            http://msdn.microsoft.com/vstudio/express/visualc/download/
+		* Microsoft Visual C++ 2008 Express Edition:
+			http://www.microsoft.com/visualstudio/en-us/products/2008-editions/express
+
+		or
+
+		* Microsoft Visual C++ 2005 Express Edition:
+			http://msdn.microsoft.com/vstudio/express/visualc/download/
             
-		then download and install:
+	if you installed Visual C++ 2010, it comes included with an SDK, so skip ahead to step 2, otherwise
+	install the following PlatformSDK:
 
-        * Microsoft Windows PlatformSDK: (Requires WGA validation)
-	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
+		* Microsoft Windows PlatformSDK: (Requires WGA validation)
+			http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
-	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
-	    versions of Windows.)
+			(NOTE: Although this says for Windows Server 2003, it does infact work on all supported
+			versions of Windows.)
 	    
-	    When installing, you should select the Custom option, and ensure that the top option relating to 
-	    the registering of environment varibales, is enabled in addition to the default selections.
+			When installing, you should select the Custom option, and ensure that the top option relating to
+			the registering of environment variables, is enabled in addition to the default selections.
 
-	    If you do not do this, you may run into problems with the PSDK not being found properly during install.
+			If you do not do this, you may run into problems with the PSDK not being found properly during install.
 
-        * MySQL for Windows (only needed if building with MySQL enabled):
-            http://dev.mysql.com/
+		* MySQL for Windows (only needed if building with MySQL enabled):
+			http://dev.mysql.com/
 
-	    (NOTE: Anope can be compiled against MySQL Version 3.23 and above)
+			(NOTE: Anope can be compiled against MySQL Version 3.23 and above)
 
 
     2) Unpack the Anope tarball with your favorite uncompression program

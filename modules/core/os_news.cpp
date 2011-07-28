@@ -235,7 +235,7 @@ class NewsBase : public Command
 class CommandOSLogonNews : public NewsBase
 {
  public:
-	CommandOSLogonNews(Module *creator) : NewsBase(creator, "operserv/loginnews")
+	CommandOSLogonNews(Module *creator) : NewsBase(creator, "operserv/logonnews")
 	{
 		this->SetDesc(_("Define messages to be shown to users at logon"));
 	}

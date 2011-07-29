@@ -25,7 +25,7 @@ class CommandNSSetHide : public Command
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param, const Anope::string &arg)
 	{
 		NickAlias *na = findnick(user);
-		if (user == NULL)
+		if (!na)
 		{
 			source.Reply(NICK_X_NOT_REGISTERED, user.c_str());
 			return;

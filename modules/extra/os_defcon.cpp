@@ -46,7 +46,8 @@ struct DefconConfig
 
 	DefconConfig()
 	{
-		this->DefCon.resize(5);
+		this->DefCon.resize(6);
+		this->defcons.resize(5);
 	}
 
 	bool Check(DefconLevel level)
@@ -339,14 +340,18 @@ class OSDefcon : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
-		ModuleManager::Attach(i, this, 8);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&commandosdefcon);
 
-		this->OnReload();
-
-		if (!DConfig.defaultlevel)
-			throw ModuleException("Invalid configuration settings");
+		try
+		{
+			this->OnReload();
+		}
+		catch (const ConfigException &ex)
+		{
+			throw ModuleException(ex.GetReason());
+		}
 	}
 
 	void OnReload()
@@ -360,6 +365,7 @@ class OSDefcon : public Module
 		dconfig.defcons[2] = config.ReadValue("defcon", "level2", 0);
 		dconfig.defcons[1] = config.ReadValue("defcon", "level1", 0);
 		dconfig.sessionlimit = config.ReadInteger("defcon", "sessionlimit", 0, 0);
+		dconfig.akillreason = config.ReadValue("defcon", "akillreason", 0);
 		dconfig.akillexpire = dotime(config.ReadValue("defcon", "akillexpire", 0));
 		dconfig.chanmodes = config.ReadValue("defcon", "chanmodes", 0);
 		dconfig.timeout = dotime(config.ReadValue("defcon", "timeout", 0));

@@ -168,31 +168,29 @@ class CommandOSStats : public Command
 	{
 		Anope::string extra = !params.empty() ? params[0] : "";
 
-		if (extra.equals_ci("ALL"))
-			extra.clear();
-
-		if (extra.empty() || extra.equals_ci("AKILL"))
-			return this->DoStatsAkill(source);
-		else if (extra.equals_ci("RESET"))
+		if (extra.equals_ci("RESET"))
 			return this->DoStatsReset(source);
-		else if (extra.empty() || extra.equals_ci("UPTIME"))
-			this->DoStatsUptime(source);
-		else if (extra.empty() || extra.equals_ci("UPLINK"))
-			this->DoStatsUplink(source);
-			else if (!extra.equals_ci("UPLINK"))
-				source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 
-		return;
+		if (extra.equals_ci("ALL") || extra.equals_ci("AKILL"))
+			this->DoStatsAkill(source);
+
+		if (extra.empty() || extra.equals_ci("ALL") || extra.equals_ci("UPTIME"))
+			this->DoStatsUptime(source);
+
+		if (extra.equals_ci("ALL") || extra.equals_ci("UPLINK"))
+			this->DoStatsUplink(source);
+
+		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("UPLINK"))
+			source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Without any option, shows the current number of users and\n"
-				"IRCops online (excluding Services), the highest number of\n"
-				"users online since Services was started, and the length of\n"
-				"time Services has been running.\n"
+		source.Reply(_("Without any option, shows the current number of users online,\n"
+				"and the highest number of users online since Services was\n"
+				"started, and the length of time Services has been running.\n"
 				" \n"
 				"With the \002AKILL\002 option, displays the current size of the\n"
 				"AKILL list and the current default expiry time.\n"
@@ -204,7 +202,7 @@ class CommandOSStats : public Command
 				"server Anope uses as an uplink to the network.\n"
 				" \n"
 				"The \002ALL\002 displays the user and uptime statistics, and\n"
-				"everything you'd see with \002MEMORY\002 and \002UPLINK\002 options."));
+				"everything you'd see with the \002UPLINK\002 option."));
 		return true;
 	}
 };

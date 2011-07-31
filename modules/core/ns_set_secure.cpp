@@ -105,6 +105,9 @@ class NSSetSecure : public Module
 		commandnssetsecure(this), commandnssasetsecure(this)
 	{
 		this->SetAuthor("Anope");
+
+		ModuleManager::RegisterService(&commandnssetsecure);
+		ModuleManager::RegisterService(&commandnssasetsecure);
 	}
 };
 

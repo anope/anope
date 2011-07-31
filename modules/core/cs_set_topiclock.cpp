@@ -83,6 +83,9 @@ class CSSetTopicLock : public Module
 		commandcssettopiclock(this), commandcssasettopiclock(this)
 	{
 		this->SetAuthor("Anope");
+
+		ModuleManager::RegisterService(&commandcssettopiclock);
+		ModuleManager::RegisterService(&commandcssasettopiclock);
 	}
 };
 

@@ -76,7 +76,7 @@ class NSSetMisc : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->commandnssetmisc);
 		ModuleManager::RegisterService(&this->commandnssasetmisc);

@@ -90,7 +90,7 @@ class LDAPOper : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnNickIdentify, I_OnDelCore };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
 	}

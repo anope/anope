@@ -294,7 +294,7 @@ class OSIgnore : public Module
 		ModuleManager::RegisterService(&commandosignore);
 
 		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnBotPrivmsg };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->osignoreservice);
 	}

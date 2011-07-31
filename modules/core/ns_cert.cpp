@@ -211,7 +211,7 @@ class NSCert : public Module
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
 		Implementation i[] = { I_OnUserNickChange, I_OnFingerprint };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&commandnscert);
 	}

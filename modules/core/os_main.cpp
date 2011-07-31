@@ -293,7 +293,7 @@ class OperServCore : public Module
 			throw ModuleException("No bot named " + Config->OperServ);
 
 		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
-		ModuleManager::Attach(i, this, 7);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&sglines);
 		ModuleManager::RegisterService(&szlines);

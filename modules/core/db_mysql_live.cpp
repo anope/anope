@@ -162,7 +162,7 @@ class MySQLLiveModule : public Module
 		Module(modname, creator, DATABASE), SQL("mysql/main"), ACS("asynch_commands")
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
-		ModuleManager::Attach(i, this, 4);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnShutdown()

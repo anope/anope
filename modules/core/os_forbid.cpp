@@ -207,7 +207,7 @@ class OSForbid : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand, I_OnDatabaseWrite, I_OnDatabaseRead };
-		ModuleManager::Attach(i, this, 6);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		
 		ModuleManager::RegisterService(&this->forbidService);
 

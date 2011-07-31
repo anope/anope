@@ -27,7 +27,7 @@ class BotServCore : public Module
 
 		Implementation i[] = { I_OnPrivmsg, I_OnPreCommand, I_OnJoinChannel, I_OnLeaveChannel,
 					I_OnPreHelp, I_OnPostHelp, I_OnChannelModeSet };
-		ModuleManager::Attach(i, this, 7);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 	}
 

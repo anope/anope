@@ -17,7 +17,7 @@ class HelpChannel : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChannelModeSet, I_OnReload };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
 	}

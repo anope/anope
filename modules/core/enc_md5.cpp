@@ -320,7 +320,7 @@ class EMD5 : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)

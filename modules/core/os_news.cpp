@@ -381,7 +381,7 @@ class OSNews : public Module
 		ModuleManager::RegisterService(&commandosrandomnews);
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
-		ModuleManager::Attach(i, this, 4);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->newsservice);
 	}

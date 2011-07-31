@@ -232,7 +232,7 @@ class ModuleXMLRPC : public Module
 		ModuleManager::RegisterService(&this->xmlrpcinterface);
 
 		Implementation i[] = { I_OnReload };
-		ModuleManager::Attach(i, this, 1);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		
 		OnReload();
 	}

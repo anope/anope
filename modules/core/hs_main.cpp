@@ -28,7 +28,7 @@ class HostServCore : public Module
 			throw ModuleException("No bot named " + Config->HostServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnNickUpdate, I_OnPreHelp };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNickIdentify(User *u)

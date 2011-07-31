@@ -116,7 +116,7 @@ class NSAJoin : public Module
 		ModuleManager::RegisterService(&commandnsajoin);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnNickIdentify(User *u)

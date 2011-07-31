@@ -591,7 +591,7 @@ class ProtoRatbox : public Module
 		this->AddModes();
 
 		Implementation i[] = { I_OnServerSync };
-		ModuleManager::Attach(i, this, 1);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (Config->Numeric.empty())
 			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");

@@ -174,7 +174,7 @@ class OSOper : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnDatabaseWrite, I_OnDatabaseRead };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&commandosoper);
 	}

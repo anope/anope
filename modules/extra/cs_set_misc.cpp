@@ -60,7 +60,7 @@ class CSSetMisc : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChanInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->commandcssetmisc);
 		ModuleManager::RegisterService(&this->commandcssasetmisc);

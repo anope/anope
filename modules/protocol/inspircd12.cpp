@@ -758,7 +758,7 @@ class ProtoInspIRCd : public Module
 		Capab.SetFlag(CAPAB_NOQUIT);
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (Config->Numeric.empty())
 			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");

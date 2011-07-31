@@ -252,7 +252,7 @@ class ESHA256 : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		use_iv = false;
 	}

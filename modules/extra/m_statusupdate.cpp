@@ -15,7 +15,7 @@ class StatusUpdate : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnAccessAdd, I_OnAccessChange, I_OnAccessDel, I_OnAccessClear };
-		ModuleManager::Attach(i, this, 4);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access)

@@ -60,7 +60,7 @@ class GlobalCore : public Module
 		ModuleManager::RegisterService(&this->myglobalservice);
 
 		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnRestart()

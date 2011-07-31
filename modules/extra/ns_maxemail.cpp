@@ -59,7 +59,7 @@ class NSMaxEmail : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
 	}

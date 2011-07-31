@@ -181,7 +181,7 @@ class NSIdentifyLDAP : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnPreCommand, I_OnCheckAuthentication, I_OnNickIdentify, I_OnNickRegister };
-		ModuleManager::Attach(i, this, 5);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 
 		OnReload();

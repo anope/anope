@@ -167,7 +167,7 @@ class MemoServCore : public Module
 			throw ModuleException("No bot named " + Config->MemoServ);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
-		ModuleManager::Attach(i, this, 6);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->mymemoserv);
 	}

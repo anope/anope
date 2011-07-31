@@ -147,7 +147,7 @@ class NickServCore : public Module
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
 		I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
-		ModuleManager::Attach(i, this, 9);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&this->mynickserv);
 	}

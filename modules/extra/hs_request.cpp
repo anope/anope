@@ -312,7 +312,7 @@ class HSRequest : public Module
 		ModuleManager::RegisterService(&commandhswaiting);
 
 		Implementation i[] = { I_OnDelNick, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
-		ModuleManager::Attach(i, this, 4);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
 	}

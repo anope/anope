@@ -360,7 +360,7 @@ class DBPlain : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnDatabaseRead, I_OnLoadDatabase, I_OnDatabaseReadMetadata, I_OnSaveDatabase, I_OnModuleLoad };
-		ModuleManager::Attach(i, this, 6);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		OnReload();
 

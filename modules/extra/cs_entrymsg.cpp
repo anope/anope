@@ -166,7 +166,7 @@ class CSEntryMessage : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnJoinChannel, I_OnReload, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata }; 
-		ModuleManager::Attach(i, this, 4);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 			
 		ModuleManager::RegisterService(&commandentrymsg);
 

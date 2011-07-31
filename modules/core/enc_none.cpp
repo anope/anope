@@ -17,7 +17,7 @@ class ENone : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnEncrypt, I_OnDecrypt, I_OnCheckAuthentication };
-		ModuleManager::Attach(i, this, 3);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)

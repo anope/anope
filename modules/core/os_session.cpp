@@ -725,7 +725,7 @@ class OSSession : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&commandossession);
 		ModuleManager::RegisterService(&commandosexception);

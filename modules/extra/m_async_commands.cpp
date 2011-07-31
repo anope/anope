@@ -118,7 +118,7 @@ class ModuleAsynchCommands : public Module, public Pipe, public AsynchCommandsSe
 		main_mutex.Lock();
 
 		Implementation i[] = { I_OnDeleteObject, I_OnPreCommand };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 

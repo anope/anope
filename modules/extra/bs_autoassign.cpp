@@ -21,7 +21,7 @@ class BSAutoAssign : public Module
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChanRegistered, I_OnReload };
-		ModuleManager::Attach(i, this, 2);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
 	}

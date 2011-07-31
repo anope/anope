@@ -19,7 +19,7 @@ class CommandCSSASetNoexpire : public Command
 	CommandCSSASetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2, "chanserv/saset/noexpire")
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
-		this->SetDesc(_("\037channel\037 NOEXPIRE {ON | OFF}"));
+		this->SetDesc(_("\037channel\037 {ON | OFF}"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

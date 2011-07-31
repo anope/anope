@@ -143,7 +143,7 @@ class ExpireCallback : public CallBack
 				if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
 					expire = true;
 			}
-			else if (!ci->c && Anope::CurTime - ci->last_used >= Config->CSExpire)
+			else if (!ci->c && Config->CSExpire && Anope::CurTime - ci->last_used >= Config->CSExpire)
 				expire = true;
 
 			if (ci->HasFlag(CI_NO_EXPIRE))

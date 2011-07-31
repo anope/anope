@@ -291,6 +291,15 @@ ClientSocket *SocketIO::Accept(ListenSocket *s)
 		throw SocketException("Unable to accept connection: " + Anope::LastError());
 }
 
+/** Check if a connection has been accepted
+ * @param s The client socket
+ * @return -1 on error, 0 to wait, 1 on success
+ */
+int SocketIO::Accepted(ClientSocket *cs)
+{
+	return 1;
+}
+
 /** Bind a socket
  * @param s The socket
  * @param ip The IP to bind to
@@ -321,9 +330,18 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 	}
 	else
 	{
-		s->OnConnect();
 		s->connected = true;
+		s->OnConnect();
 	}
+}
+
+/** Check if this socket is connected
+ * @param s The socket
+ * @return -1 for error, 0 for wait, 1 for connected
+ */
+int SocketIO::Connected(ConnectionSocket *s)
+{
+	return s->connected == true ? 1 : -1;
 }
 
 /** Empty constructor, used for things such as the pipe socket
@@ -465,16 +483,15 @@ BufferedSocket::~BufferedSocket()
  */
 bool BufferedSocket::ProcessRead()
 {
-	char tbuffer[NET_BUFSIZE] = "";
+	char tbuffer[NET_BUFSIZE];
 
 	this->RecvLen = 0;
 
 	int len = this->IO->Recv(this, tbuffer, sizeof(tbuffer) - 1);
-	if (len == -2)
-		return true;
-	else if (len <= 0)
+	if (len <= 0)
 		return false;
 	
+	tbuffer[len] = 0;
 	this->RecvLen = len;
 
 	Anope::string sbuffer = this->extrabuf;
@@ -512,9 +529,7 @@ bool BufferedSocket::ProcessRead()
 bool BufferedSocket::ProcessWrite()
 {
 	int count = this->IO->Send(this, this->WriteBuffer);
-	if (count == -2)
-		return true;
-	else if (count <= -1)
+	if (count <= -1)
 		return false;
 	this->WriteBuffer = this->WriteBuffer.substr(count);
 	if (this->WriteBuffer.empty())
@@ -589,7 +604,7 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6) : S
 	this->bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
 	this->IO->Bind(this, bindip, port);
 
-	if (listen(Sock, 5) == -1)
+	if (listen(Sock, SOMAXCONN) == -1)
 		throw SocketException(Anope::string("Unable to listen: ") + Anope::LastError());
 }
 
@@ -642,6 +657,34 @@ void ConnectionSocket::Connect(const Anope::string &TargetHost, int Port)
 	this->IO->Connect(this, TargetHost, Port);
 }
 
+/** Called when there is something to be received for this socket
+ * @return true on success, false to drop this socket
+ */
+bool ConnectionSocket::ProcessRead()
+{
+	if (!this->connected)
+	{
+		int optval = 0;
+		socklen_t optlen = sizeof(optval);
+		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen) && !optval)
+		{
+			this->connected = true;
+			this->OnConnect();
+		}
+		else
+			errno = optval;
+	}
+
+	int i = this->IO->Connected(this);
+	if (i == 1)
+		return BufferedSocket::ProcessRead();
+	else if (i == 0)
+		return true;
+
+	this->OnError(Anope::LastError());
+	return false;
+}
+
 /** Called when the socket is ready to be written to
  * @return true on success, false to drop this socket
  */
@@ -649,23 +692,25 @@ bool ConnectionSocket::ProcessWrite()
 {
 	if (!this->connected)
 	{
-		SocketEngine::ClearWritable(this);
-
 		int optval = 0;
 		socklen_t optlen = sizeof(optval);
 		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen) && !optval)
 		{
-			this->OnConnect();
 			this->connected = true;
-			return true;
+			this->OnConnect();
 		}
-
-		errno = optval;
-		this->OnError(Anope::LastError());
-		return false;
+		else
+			errno = optval;
 	}
 
-	return BufferedSocket::ProcessWrite();
+	int i = this->IO->Connected(this);
+	if (i == 1)
+		return BufferedSocket::ProcessWrite();
+	else if (i == 0)
+		return true;
+	
+	this->OnError(Anope::LastError());
+	return false;
 }
 
 /** Called when there is an error for this socket
@@ -673,8 +718,6 @@ bool ConnectionSocket::ProcessWrite()
  */
 void ConnectionSocket::ProcessError()
 {
-	if (!this->connected)
-		this->ProcessWrite();
 }
 
 /** Called on a successful connect
@@ -698,5 +741,31 @@ void ConnectionSocket::OnError(const Anope::string &error)
 ClientSocket::ClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr) : BufferedSocket(fd, ls->IsIPv6()), LS(ls), clientaddr(addr)
 {
 	this->Type = SOCKTYPE_CLIENT;
+}
+
+/** Called when there is something to be received for this socket
+ * @return true on success, false to drop this socket
+ */
+bool ClientSocket::ProcessRead()
+{
+	int i = this->IO->Accepted(this);
+	if (i == 1)
+		return BufferedSocket::ProcessRead();
+	else if (i == 0)
+		return true;
+	return false;
+}
+
+/** Called when the socket is ready to be written to
+ * @return true on success, false to drop this socket
+ */
+bool ClientSocket::ProcessWrite()
+{
+	int i = this->IO->Accepted(this);
+	if (i == 1)
+		return BufferedSocket::ProcessWrite();
+	else if (i == 0)
+		return true;
+	return false;
 }
 

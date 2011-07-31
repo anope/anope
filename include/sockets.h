@@ -152,6 +152,12 @@ class CoreExport SocketIO
 	 */
 	virtual ClientSocket *Accept(ListenSocket *s);
 
+	/** Check if a connection has been accepted
+	 * @param s The client socket
+	 * @return -1 on error, 0 to wait, 1 on success
+	 */
+	virtual int Accepted(ClientSocket *cs);
+
 	/** Bind a socket
 	 * @param s The socket
 	 * @param ip The IP to bind to
@@ -160,11 +166,17 @@ class CoreExport SocketIO
 	virtual void Bind(Socket *s, const Anope::string &ip, int port = 0);
 
 	/** Connect the socket
-	 * @param s THe socket
+	 * @param s The socket
 	 * @param target IP to connect to
 	 * @param port to connect to
 	 */
 	virtual void Connect(ConnectionSocket *s, const Anope::string &target, int port);
+
+	/** Check if this socket is connected
+	 * @param s The socket
+	 * @return -1 for error, 0 for wait, 1 for connected
+	 */
+	virtual int Connected(ConnectionSocket *s);
 
 	/** Called when the socket is destructing
 	 */
@@ -352,6 +364,11 @@ class CoreExport ConnectionSocket : public BufferedSocket
 	 */
 	void Connect(const Anope::string &TargetHost, int Port);
 
+	/** Called when there is something to be received for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessRead();
+
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
@@ -386,6 +403,16 @@ class CoreExport ClientSocket : public BufferedSocket
 	 * @param addr Address the connection came from
 	 */
 	ClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr);
+
+	/** Called when there is something to be received for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessRead();
+
+	/** Called when the socket is ready to be written to
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessWrite();
 };
 
 class CoreExport Pipe : public BufferedSocket

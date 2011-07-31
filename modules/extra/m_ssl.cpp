@@ -28,11 +28,6 @@ class MySSLService : public SSLService
 
 class SSLSocketIO : public SocketIO
 {
-	/** Check whether this socket has a pending connect() or accept()
-	 * @return 0 if neither, -1 if connect/accept fails, -2 to wait more
-	 */
-	int CheckState();
-
  public:
 	/* The SSL socket for this socket */
 	SSL *sslsock;
@@ -64,12 +59,24 @@ class SSLSocketIO : public SocketIO
 	 */
 	ClientSocket *Accept(ListenSocket *s);
 
+	/** Check if a connection has been accepted
+	 * @param s The client socket
+	 * @return -1 on error, 0 to wait, 1 on success
+	 */
+	int Accepted(ClientSocket *cs);
+
 	/** Connect the socket
 	 * @param s THe socket
 	 * @param target IP to connect to
 	 * @param port to connect to
 	 */
 	void Connect(ConnectionSocket *s, const Anope::string &target, int port);
+
+	/** Check if this socket is connected
+	 * @param s The socket
+ 	 * @return -1 for error, 0 for wait, 1 for connected
+	 */
+	int Connected(ConnectionSocket *s);
 
 	/** Called when the socket is destructing
 	 */
@@ -187,34 +194,6 @@ void MySSLService::Init(Socket *s)
 	s->IO = new SSLSocketIO();
 }
 
-int SSLSocketIO::CheckState()
-{
-	if (this->connected == 0 || this->accepted == 0)
-	{
-		int ret;
-		if (this->connected == 0)
-			ret = SSL_connect(this->sslsock);
-		else if (this->accepted == 0)
-			ret = SSL_accept(this->sslsock);
-		if (ret <= 0)
-		{
-			int error = SSL_get_error(this->sslsock, ret);
-
-			if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
-				// Wait more
-				return -2;
-			return -1;
-		}
-
-		if (this->connected == 0)
-			this->connected = 1;
-		else if (this->accepted == 0)
-			this->accepted = 1;
-	}
-
-	return 0;
-}
-
 SSLSocketIO::SSLSocketIO() : connected(-1), accepted(-1)
 {
 	this->sslsock = NULL;
@@ -222,22 +201,14 @@ SSLSocketIO::SSLSocketIO() : connected(-1), accepted(-1)
 
 int SSLSocketIO::Recv(Socket *s, char *buf, size_t sz)
 {
-	int i = this->CheckState();
-	if (i < 0)
-		return i;
-
-	i = SSL_read(this->sslsock, buf, sz);
+	int i = SSL_read(this->sslsock, buf, sz);
 	TotalRead += i;
 	return i;
 }
 
 int SSLSocketIO::Send(Socket *s, const Anope::string &buf)
 {
-	int i = this->CheckState();
-	if (i < 0)
-		return i;
-
-	i = SSL_write(this->sslsock, buf.c_str(), buf.length());
+	int i = SSL_write(this->sslsock, buf.c_str(), buf.length());
 	TotalWritten += i;
 	return i;
 }
@@ -260,11 +231,47 @@ ClientSocket *SSLSocketIO::Accept(ListenSocket *s)
 	if (!SSL_set_fd(IO->sslsock, newsocket->GetFD()))
 		throw SocketException("Unable to set SSL fd");
 
-	IO->accepted = 0;
-	if (this->CheckState() == -1)
+	int ret = SSL_accept(IO->sslsock);
+	if (ret <= 0)
+	{
+		IO->accepted = 0;
+		int error = SSL_get_error(IO->sslsock, ret);
+		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
+		{
+			SocketEngine::MarkWritable(newsocket);
+			return newsocket;
+		}
+		
 		throw SocketException("Unable to accept new SSL connection: " + Anope::string(ERR_error_string(ERR_get_error(), NULL)));
+	}
 	
+	IO->accepted = 1;
 	return newsocket;
+}
+
+int SSLSocketIO::Accepted(ClientSocket *cs)
+{
+	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(cs->IO);
+
+	if (IO->accepted == 0)
+	{
+		int ret = SSL_accept(IO->sslsock);
+		if (ret <= 0)
+		{
+			int error = SSL_get_error(IO->sslsock, ret);
+			if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
+			{
+				SocketEngine::MarkWritable(cs);
+				return 0;
+			}
+
+			return -1;
+		}
+		IO->accepted = 1;
+		return 0;
+	}
+
+	return IO->accepted;
 }
 
 void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
@@ -283,9 +290,49 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 	if (!SSL_set_fd(IO->sslsock, s->GetFD()))
 		throw SocketException("Unable to set SSL fd");
 
-	IO->connected = 0;
-	if (this->CheckState() == -1)
+	int ret = SSL_connect(IO->sslsock);
+	if (ret <= 0)
+	{
+		IO->connected = 0;
+		int error = SSL_get_error(IO->sslsock, ret);
+		if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
+		{
+			SocketEngine::MarkWritable(s);
+			return;
+		}
+
 		throw SocketException("Unable to connect to server: " + Anope::string(ERR_error_string(ERR_get_error(), NULL)));
+	}
+
+	IO->connected = 1;
+}
+
+int SSLSocketIO::Connected(ConnectionSocket *s)
+{
+	if (s->IO == &normalSocketIO)
+		throw SocketException("Connected() called for non ssl socket?");
+	
+	int i = SocketIO::Connected(s);
+	if (i != 1)
+		return i;
+
+	SSLSocketIO *IO = debug_cast<SSLSocketIO *>(s->IO);
+
+	if (IO->connected == 0)
+	{
+		int ret = SSL_connect(IO->sslsock);
+		if (ret <= 0)
+		{
+			int error = SSL_get_error(IO->sslsock, ret);
+			if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
+				return 0;
+			return -1;
+		}
+		IO->connected = 1;
+		return 0; // poll for next read/write (which will be real), don't assume ones available
+	}
+	
+	return IO->connected;
 }
 
 void SSLSocketIO::Destroy()

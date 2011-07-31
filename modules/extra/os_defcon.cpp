@@ -336,9 +336,6 @@ class OSDefcon : public Module
  public:
 	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), session_service("session"), akills("xlinemanager/sgline"), commandosdefcon(this)
 	{
-		if (!DConfig.defaultlevel)
-			throw ModuleException("Invalid configuration settings");
-
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
@@ -347,6 +344,9 @@ class OSDefcon : public Module
 		ModuleManager::RegisterService(&commandosdefcon);
 
 		this->OnReload();
+
+		if (!DConfig.defaultlevel)
+			throw ModuleException("Invalid configuration settings");
 	}
 
 	void OnReload()

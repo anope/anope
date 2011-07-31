@@ -96,7 +96,15 @@ class ReconnectTimer : public Timer
 
 	void Tick(time_t)
 	{
-		Connect();
+		try
+		{
+			Connect();
+		}
+		catch (const SocketException &ex)
+		{
+			quitmsg = ex.GetReason();
+			quitting = true;
+		}
 	}
 };
 
@@ -343,13 +351,9 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		Log() << ex.GetReason();
-		ModuleManager::UnloadAll();
-		SocketEngine::Shutdown();
-		for (Module *m; (m = ModuleManager::FindFirstOf(PROTOCOL)) != NULL;)
-			ModuleManager::UnloadModule(m, NULL);
-		ModuleManager::CleanupRuntimeDirectory();
-		return -1;
+		quitmsg = ex.GetReason();
+		quitting = true;
+		return_code = -1;
 	}
 
 	started = true;
@@ -415,5 +419,5 @@ int main(int ac, char **av, char **envp)
 		return_code = -1;
 	}
 
-	return 0;
+	return return_code;
 }

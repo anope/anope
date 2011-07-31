@@ -324,7 +324,7 @@ void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int por
 	if (c == -1)
 	{
 		if (Anope::LastErrorCode() != EINPROGRESS)
-			throw SocketException("Error connecting to server: " + Anope::LastError());
+			s->OnError(Anope::LastError());
 		else
 			SocketEngine::MarkWritable(s);
 	}
@@ -718,6 +718,11 @@ bool ConnectionSocket::ProcessWrite()
  */
 void ConnectionSocket::ProcessError()
 {
+	int optval = 0;
+	socklen_t optlen = sizeof(optval);
+	getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen);
+	errno = optval;
+	this->OnError(optval ? Anope::LastError() : "");
 }
 
 /** Called on a successful connect

@@ -301,7 +301,7 @@ void SSLSocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int 
 			return;
 		}
 
-		throw SocketException("Unable to connect to server: " + Anope::string(ERR_error_string(ERR_get_error(), NULL)));
+		s->ProcessError();
 	}
 
 	IO->connected = 1;
@@ -326,6 +326,8 @@ int SSLSocketIO::Connected(ConnectionSocket *s)
 			int error = SSL_get_error(IO->sslsock, ret);
 			if (ret == -1 && (error == SSL_ERROR_WANT_READ || error == SSL_ERROR_WANT_WRITE))
 				return 0;
+
+			s->ProcessError();
 			return -1;
 		}
 		IO->connected = 1;

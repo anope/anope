@@ -583,12 +583,14 @@ static bool DoOperType(ServerConfig *config, const Anope::string &, const Anope:
 	Anope::string inherits = values[1].GetValue();
 	Anope::string commands = values[2].GetValue();
 	Anope::string privs = values[3].GetValue();
+	Anope::string modes = values[4].GetValue();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(config, "opertype", "name", vi))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 
 	OperType *ot = new OperType(name);
+	ot->modes = modes;
 
 	Anope::string tok;
 	spacesepstream cmdstr(commands);
@@ -1220,9 +1222,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING},
 			InitModules, DoModule, DoneModules},
 		{"opertype",
-			{"name", "inherits", "commands", "privs", ""},
-			{"", "", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{"name", "inherits", "commands", "privs", "modes", ""},
+			{"", "", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOperTypes, DoOperType, DoneOperTypes},
 		{"oper",
 			{"name", "type", "password", "certfp", ""},

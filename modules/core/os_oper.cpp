@@ -144,6 +144,8 @@ class CommandOSOper : public Command
 						buf.clear();
 					}
 				}
+				if (!ot->modes.empty())
+					source.Reply(_("Opertype \2%s\2 receives modes \2%s\2 once identifying."), ot->GetName().c_str(), ot->modes.c_str());
 			}
 		}
 		else

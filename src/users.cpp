@@ -363,6 +363,14 @@ void User::Identify(NickAlias *na)
 	ircdproto->SetAutoIdentificationToken(this);
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
+
+	if (na->nc->o != NULL && na->nc->o->ot != NULL && !na->nc->o->ot->modes.empty())
+	{
+		BotInfo *bi = findbot(Config->OperServ);
+		this->SetModes(bi, "%s", na->nc->o->ot->modes.c_str());
+		if (bi != NULL)
+			this->SendMessage(bi, "Changing your usermodes to \002%s\002", na->nc->o->ot->modes.c_str());
+	}
 }
 
 

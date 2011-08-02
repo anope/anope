@@ -55,6 +55,10 @@ class CoreExport OperType
 	 */
 	std::set<OperType *> inheritances;
  public:
+ 	/** Modes to set when someone identifys using this opertype
+	 */
+	Anope::string modes;
+
 	/** Find an oper type by name
 	 * @param name The name
 	 * @return The oper type

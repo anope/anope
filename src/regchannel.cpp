@@ -61,9 +61,9 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
+ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
 {
-	*this = *ci;
+	*this = ci;
 
 	if (this->founder)
 		++this->founder->channelcount;
@@ -76,21 +76,35 @@ ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 		++this->bi->chancount;
 
 	for (int i = 0; i < TTB_SIZE; ++i)
-		this->ttb[i] = ci->ttb[i];
+		this->ttb[i] = ci.ttb[i];
 	
-	// XXX access
-
-	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
+	for (unsigned i = 0; i < ci.GetAccessCount(); ++i)
 	{
-		AutoKick *takick = ci->GetAkick(i);
+		ChanAccess *taccess = ci.GetAccess(i);
+		AccessProvider *provider = taccess->provider;
+
+		ChanAccess *newaccess = provider->Create();
+		newaccess->ci = taccess->ci;
+		newaccess->mask = taccess->mask;
+		newaccess->creator = taccess->creator;
+		newaccess->last_seen = taccess->last_seen;
+		newaccess->created = taccess->created;
+		newaccess->Unserialize(taccess->Serialize());
+
+		this->AddAccess(newaccess);
+	}
+
+	for (unsigned i = 0; i < ci.GetAkickCount(); ++i)
+	{
+		AutoKick *takick = ci.GetAkick(i);
 		if (takick->HasFlag(AK_ISNICK))
 			this->AddAkick(takick->creator, takick->nc, takick->reason, takick->addtime, takick->last_used);
 		else
 			this->AddAkick(takick->creator, takick->mask, takick->reason, takick->addtime, takick->last_used);
 	}
-	for (unsigned i = 0; i < ci->GetBadWordCount(); ++i)
+	for (unsigned i = 0; i < ci.GetBadWordCount(); ++i)
 	{
-		BadWord *bw = ci->GetBadWord(i);
+		BadWord *bw = ci.GetBadWord(i);
 		this->AddBadWord(bw->word, bw->type);
 	}
 }
@@ -158,20 +172,20 @@ BotInfo *ChannelInfo::WhoSends()
 {
 	if (this && this->bi)
 		return this->bi;
-	BotInfo *bi = findbot(Config->ChanServ);
-	if (bi)
-		return bi;
+	BotInfo *tbi = findbot(Config->ChanServ);
+	if (tbi)
+		return tbi;
 	else if (!BotListByNick.empty())
 		return BotListByNick.begin()->second;
 	return NULL;
 }
 
 /** Add an entry to the channel access list
- * @param access The entry
+ * @param taccess The entry
  */
-void ChannelInfo::AddAccess(ChanAccess *access)
+void ChannelInfo::AddAccess(ChanAccess *taccess)
 {
-	this->access.push_back(access);
+	this->access.push_back(taccess);
 }
 
 /** Get an entry from the channel access list by index
@@ -750,6 +764,13 @@ bool ChannelInfo::CheckKick(User *user)
 				break;
 			}
 		}
+	}
+
+	if (!do_kick && this->HasFlag(CI_RESTRICTED) && this->AccessFor(user).empty() && (!this->founder || user->Account() != this->founder))
+	{
+		do_kick = true;
+		get_idealban(this, user, mask);
+		reason = translate(user->Account(), CHAN_NOT_ALLOWED_TO_JOIN);
 	}
 
 	if (!do_kick)

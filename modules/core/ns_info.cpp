@@ -148,7 +148,7 @@ class CommandNSInfo : public Command
 		source.Reply(" ");
 		source.Reply(_("Displays information about the given nickname, such as\n"
 				"the nick's owner, last seen address and time, and nick\n"
-				"options. If no nick is given, an you are identified,\n"
+				"options. If no nick is given, and you are identified,\n"
 				"your account name is used, else your current nickname is\n"
 				"used."));
 

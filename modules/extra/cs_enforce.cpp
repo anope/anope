@@ -69,34 +69,24 @@ class CommandCSEnforce : public Command
 
 	void DoRestricted(Channel *c)
 	{
-		/*ChannelInfo *ci;
-		int16 old_nojoin_level;
-		Anope::string mask;
-
-		if (!(ci = c->ci))
+		ChannelInfo *ci = c->ci;
+		if (ci == NULL)
 			return;
-
-		old_nojoin_level = ci->levels[CA_NOJOIN];
-		if (ci->levels[CA_NOJOIN] < 0)
-			ci->levels[CA_NOJOIN] = 0;
 
 		for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
 		{
 			UserContainer *uc = *it++;
+			User *user = uc->user;
 
-			if (check_access(uc->user, ci, CA_NOJOIN))
+			if (ci->AccessFor(user).empty())
 			{
-				get_idealban(ci, uc->user, mask);
-				Anope::string reason = translate(uc->user, CHAN_NOT_ALLOWED_TO_JOIN);
+				Anope::string mask;
+				get_idealban(ci, user, mask);
+				Anope::string reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
 				c->SetMode(NULL, CMODE_BAN, mask);
-				c->Kick(NULL, uc->user, "%s", reason.c_str());
+				c->Kick(NULL, user, "%s", reason.c_str());
 			}
 		}
-
-		ci->levels[CA_NOJOIN] = old_nojoin_level;
-		XXX
-		*/
-
 	}
 
 	void DoCModeR(Channel *c)

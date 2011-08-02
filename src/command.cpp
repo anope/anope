@@ -56,7 +56,7 @@ void CommandSource::DoReply()
 	}
 }
 
-Command::Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Service(owner, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), permission(spermission), module(owner)
+Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Service(o, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), permission(spermission), module(owner)
 {
 }
 
@@ -89,9 +89,9 @@ void Command::SendSyntax(CommandSource &source)
 	}
 }
 
-void Command::SendSyntax(CommandSource &source, const Anope::string &syntax)
+void Command::SendSyntax(CommandSource &source, const Anope::string &syn)
 {
-	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syntax.c_str());
+	source.Reply(_("Syntax: \002%s %s\002"), source.command.c_str(), syn.c_str());
 	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
 }
 

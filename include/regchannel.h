@@ -118,7 +118,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/** Copy constructor
 	 * @param ci The ChannelInfo to copy settings to
 	 */
-	ChannelInfo(ChannelInfo *ci);
+	ChannelInfo(ChannelInfo &ci);
 
 	/** Default destructor
 	 */

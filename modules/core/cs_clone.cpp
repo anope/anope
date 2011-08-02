@@ -65,7 +65,7 @@ public:
 		if (what.empty())
 		{
 			delete target_ci;
-			target_ci = new ChannelInfo(ci);
+			target_ci = new ChannelInfo(*ci);
 			target_ci->name = target;
 			RegisteredChannelList[target_ci->name] = target_ci;
 			target_ci->c = findchan(target_ci->name);

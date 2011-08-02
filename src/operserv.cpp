@@ -61,7 +61,7 @@ Anope::string XLine::GetHost() const
 
 /** Constructor
  */
-XLineManager::XLineManager(Module *creator, const Anope::string &name, char t) : Service(creator, name), type(t)
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, xname), type(t)
 {
 }
 

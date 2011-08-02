@@ -28,18 +28,18 @@ class CommandNSInfo : public Command
 		}
 	}
  public:
-	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 1, 2)
+	CommandNSInfo(Module *creator) : Command(creator, "nickserv/info", 0, 2)
 	{
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 		this->SetDesc(_("Displays information about a given nickname"));
-		this->SetSyntax(_("\037nickname\037"));
+		this->SetSyntax(_("[\037nickname\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 
-		const Anope::string &nick = params[0];
+		const Anope::string &nick = params.size() ? params[0] : (u->Account() ? u->Account()->display : u->nick);
 		NickAlias *na = findnick(nick);
 		bool has_auspex = u->IsIdentified() && u->HasPriv("nickserv/auspex");
 
@@ -148,7 +148,9 @@ class CommandNSInfo : public Command
 		source.Reply(" ");
 		source.Reply(_("Displays information about the given nickname, such as\n"
 				"the nick's owner, last seen address and time, and nick\n"
-				"options."));
+				"options. If no nick is given, an you are identified,\n"
+				"your account name is used, else your current nickname is\n"
+				"used."));
 
 		return true;
 	}

@@ -34,8 +34,11 @@ class CommandCSClearUsers : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!check_access(u, c->ci, CA_FOUNDER))
+		else if (!c->ci->HasPriv(u, CA_FOUNDER))
+		{
 			source.Reply(ACCESS_DENIED);
+			return;
+		}
 		
 		Anope::string buf = "CLEARUSERS command from " + u->nick + " (" + u->Account()->display + ")";
 

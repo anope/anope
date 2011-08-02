@@ -646,13 +646,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access) { }
 
-	/** Called when access is changed
-	 * @param ci The channel
-	 * @param u The user who changed the access
-	 * @param u access The access changed
-	 */
-	virtual void OnAccessChange(ChannelInfo *ci, User *u, ChanAccess *access) { }
-
 	/** Called when access is added
 	 * @param ci The channel
 	 * @param u The user who added the access
@@ -1029,7 +1022,7 @@ enum Implementation
 		I_OnNickUpdate,
 
 		/* ChanServ */
-		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd, I_OnAccessChange,
+		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 		I_OnChanInfo, I_OnFindChan,
@@ -1239,17 +1232,6 @@ class CallBack : public Timer
 		if (it != m->CallBacks.end())
 			m->CallBacks.erase(it);
 	}
-};
-
-class CoreExport Service : public Base
-{
- public:
-	Module *owner;
-	Anope::string name;
-
-	Service(Module *o, const Anope::string &n);
-
-	virtual ~Service();
 };
 
 template<typename T>

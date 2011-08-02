@@ -12,25 +12,6 @@
 #include "services.h"
 #include "modules.h"
 
-ChanAccess::ChanAccess(const Anope::string &umask)
-{
-	NickAlias *na = findnick(umask);
-	if (na != NULL)
-		this->nc = na->nc;
-	else
-	{
-		this->nc = NULL;
-		this->mask = umask;
-	}
-}
-
-const Anope::string &ChanAccess::GetMask()
-{
-	if (this->nc != NULL)
-		return this->nc->display;
-	return this->mask;
-}
-
 /** Default constructor
  * @param chname The channel name
  */
@@ -41,7 +22,6 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 
 	this->founder = this->successor = NULL;
 	this->last_topic_time = 0;
-	this->levels = NULL;
 	this->c = findchan(chname);
 	if (this->c)
 		this->c->ci = this;
@@ -69,11 +49,11 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 	this->memos.memomax = Config->MSMaxMemos;
 	this->last_used = this->time_registered = Anope::CurTime;
 
-	this->ttb = new int16[TTB_SIZE];
+	for (int i = 0; i < CA_SIZE; ++i)
+		this->levels[i] = 0;
+
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = 0;
-
-	reset_levels(this);
 
 	RegisteredChannelList[this->name] = this;
 }
@@ -95,19 +75,11 @@ ChannelInfo::ChannelInfo(ChannelInfo *ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 	if (this->bi)
 		++this->bi->chancount;
 
-	this->ttb = new int16[TTB_SIZE];
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = ci->ttb[i];
+	
+	// XXX access
 
-	this->levels = new int16[CA_SIZE];
-	for (int i = 0; i < CA_SIZE; ++i)
-		this->levels[i] = ci->levels[i];
-
-	for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
-	{
-		ChanAccess *taccess = ci->GetAccess(i);
-		this->AddAccess(taccess->GetMask(), taccess->level, taccess->creator, taccess->last_seen);
-	}
 	for (unsigned i = 0; i < ci->GetAkickCount(); ++i)
 	{
 		AutoKick *takick = ci->GetAkick(i);
@@ -145,8 +117,6 @@ ChannelInfo::~ChannelInfo()
 	this->ClearAccess();
 	this->ClearAkick();
 	this->ClearBadWords();
-	if (this->levels)
-		delete [] this->levels;
 
 	if (!this->memos.memos.empty())
 	{
@@ -154,9 +124,6 @@ ChannelInfo::~ChannelInfo()
 			delete this->memos.memos[i];
 		this->memos.memos.clear();
 	}
-
-	if (this->ttb)
-		delete [] this->ttb;
 
 	if (this->founder)
 		--this->founder->channelcount;
@@ -200,29 +167,11 @@ BotInfo *ChannelInfo::WhoSends()
 }
 
 /** Add an entry to the channel access list
- *
- * @param mask The mask of the access entry
- * @param level The channel access level the user has on the channel
- * @param creator The user who added the access
- * @param last_seen When the user was last seen within the channel
- * @return The new access class
- *
- * Creates a new access list entry and inserts it into the access list.
+ * @param access The entry
  */
-
-ChanAccess *ChannelInfo::AddAccess(const Anope::string &mask, int16 level, const Anope::string &creator, int32 last_seen)
+void ChannelInfo::AddAccess(ChanAccess *access)
 {
-	ChanAccess *new_access = new ChanAccess(mask);
-	new_access->level = level;
-	new_access->last_seen = last_seen;
-	if (!creator.empty())
-		new_access->creator = creator;
-	else
-		new_access->creator = "Unknown";
-
-	this->access.push_back(new_access);
-
-	return new_access;
+	this->access.push_back(access);
 }
 
 /** Get an entry from the channel access list by index
@@ -240,104 +189,68 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
 	return this->access[index];
 }
 
-/** Get an entry from the channel access list by NickCore
+/** Check if a user has a privilege on a channel
  *
  * @param u The User to find within the access list vector
- * @param level Optional channel access level to compare the access entries to
- * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
+ * @param priv The privilege to check for.
+ * @return true if the user has the privilege
  *
- * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
+ * Retrieves an entry from the access list that matches the given User and NickCore.
  */
-
-ChanAccess *ChannelInfo::GetAccess(User *u, int16 level)
+bool ChannelInfo::HasPriv(User *u, ChannelAccess priv)
 {
-	if (!u)
-		return NULL;
+	AccessGroup group = this->AccessFor(u);
 
-	if (u->isSuperAdmin || IsFounder(u, this))
+	if (this->founder && u->Account() == this->founder)
 	{
-		static ChanAccess dummy_access("");
-		new(&dummy_access) ChanAccess(u->nick + "!*@*");
-		dummy_access.level = u->isSuperAdmin ? ACCESS_SUPERADMIN : ACCESS_FOUNDER;
-		dummy_access.last_seen = Anope::CurTime;
-		return &dummy_access;
-	}
-	
-	if (this->access.empty())
-		return NULL;
-	
-	ChanAccess *highest = NULL;
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-	{
-		ChanAccess *taccess = this->access[i];
-
-		if (level && level != taccess->level)
-			continue;
-		/* Access entry is a mask and we match it */
-		else if (!taccess->nc && (Anope::Match(u->nick, taccess->GetMask()) || Anope::Match(u->GetDisplayedMask(), taccess->GetMask())))
-			;
-		/* Access entry is a nick core and we are identified for that account */
-		else if (taccess->nc && (u->IsIdentified() || (u->IsRecognized() && !this->HasFlag(CI_SECURE))) && u->Account() == taccess->nc) 
-			;
-		else
-			continue;
-
-		/* Use the highest level access available */
-		if (!highest || taccess->level > highest->level)
-			highest = taccess;
-	}
-
-	return highest;
-}
-
-/** Get an entry from the channel access list by NickCore
- *
- * @param u The NickCore to find within the access list vector
- * @param level Optional channel access level to compare the access entries to
- * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
- *
- * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
- */
-ChanAccess *ChannelInfo::GetAccess(NickCore *nc, int16 level)
-{
-	if (nc == this->founder)
-	{
-		static ChanAccess dummy_access("");
-		new(&dummy_access) ChanAccess(nc->display);
-		dummy_access.level = ACCESS_FOUNDER;
-		dummy_access.last_seen = Anope::CurTime;
-		return &dummy_access;
-	}
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-	{
-		if (level && this->access[i]->level != level)
-			continue;
-		if (this->access[i]->nc && this->access[i]->nc == nc)
-			return this->access[i];
-	}
-	return NULL;
-}
-
-/** Get an entry from the channel access list by mask
- *
- * @param u The mask to find within the access list vector
- * @param level Optional channel access level to compare the access entries to
- * @param wildcard True to match using wildcards
- * @return A ChanAccess struct corresponding to the mask, or NULL if not found
- *
- * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
- */
-ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level, bool wildcard)
-{
-	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
-		if (this->access[i]->nc != NULL)
+		switch (priv)
 		{
-			if (wildcard ? Anope::Match(this->access[i]->nc->display, mask) : this->access[i]->nc->display.equals_ci(mask))
-				return this->access[i];
+			case CA_AUTOOWNER:
+			case CA_AUTOPROTECT:
+			case CA_AUTOOP:
+			case CA_AUTOHALFOP:
+			case CA_AUTOVOICE:
+				break;
+			default:
+				return true;
 		}
-		else if (wildcard ? Anope::Match(this->access[i]->GetMask(), mask) : this->access[i]->GetMask().equals_ci(mask))
-			return this->access[i];
-	return NULL;
+	}
+
+
+	if (group.HasPriv(CA_FOUNDER) || group.HasPriv(priv))
+		return true;
+
+	return false;
+}
+
+AccessGroup ChannelInfo::AccessFor(User *u)
+{
+	NickCore *nc = u->Account();
+	if (nc == NULL && u->IsRecognized())
+	{
+		NickAlias *na = findnick(u->nick);
+		if (na != NULL)
+			nc = na->nc;
+	}
+
+	AccessGroup group;
+
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (this->access[i]->Matches(u, nc))
+			group.push_back(this->access[i]);
+	
+	return group;
+}
+
+AccessGroup ChannelInfo::AccessFor(NickCore *nc)
+{
+	AccessGroup group;
+
+	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
+		if (this->access[i]->Matches(NULL, nc))
+			group.push_back(this->access[i]);
+
+	return group;
 }
 
 /** Get the size of the accss vector for this channel
@@ -345,7 +258,7 @@ ChanAccess *ChannelInfo::GetAccess(const Anope::string &mask, int16 level, bool 
  */
 unsigned ChannelInfo::GetAccessCount() const
 {
-	return this->access.empty() ? 0 : this->access.size();
+	return this->access.size();
 }
 
 /** Erase an entry from the channel access list
@@ -375,6 +288,7 @@ void ChannelInfo::EraseAccess(ChanAccess *taccess)
 	{
 		if (this->access[i] == taccess)
 		{
+			delete this->access[i];
 			this->access.erase(this->access.begin() + i);
 			break;
 		}
@@ -836,13 +750,6 @@ bool ChannelInfo::CheckKick(User *user)
 				break;
 			}
 		}
-	}
-
-	if (!do_kick && check_access(user, this, CA_NOJOIN))
-	{
-		get_idealban(this, user, mask);
-		reason = translate(user, CHAN_NOT_ALLOWED_TO_JOIN);
-		do_kick = true;
 	}
 
 	if (!do_kick)

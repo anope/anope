@@ -69,7 +69,7 @@ class CommandCSEnforce : public Command
 
 	void DoRestricted(Channel *c)
 	{
-		ChannelInfo *ci;
+		/*ChannelInfo *ci;
 		int16 old_nojoin_level;
 		Anope::string mask;
 
@@ -94,6 +94,9 @@ class CommandCSEnforce : public Command
 		}
 
 		ci->levels[CA_NOJOIN] = old_nojoin_level;
+		XXX
+		*/
+
 	}
 
 	void DoCModeR(Channel *c)
@@ -136,7 +139,7 @@ class CommandCSEnforce : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!check_access(u, c->ci, CA_AKICK))
+		else if (!c->ci->HasPriv(u, CA_AKICK))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

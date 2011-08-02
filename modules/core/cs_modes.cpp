@@ -15,32 +15,7 @@
 
 class CommandModeBase : public Command
 {
- protected:
-	/** do_util: not a command, but does the job of others
-	 * @param source The source of the command
-	 * @param com The command calling this function
-	 * @param cm A channel mode class
-	 * @param chan The channel its being set on
-	 * @param nick The nick the modes being set on
-	 * @param set Is the mode being set or removed
-	 * @param level The acecss level required to set this mode on someone else
-	 * @param levelself The access level required to set this mode on yourself
-	 * @param notice Flag required on a channel to send a notice
-	 */
-	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
-	{
-		User *u = source.u;
-
-		if (chan.empty())
-			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
-				do_mode(source, com, cm, (*it)->chan->name, u->nick, set, level, levelself, notice);
-		else
-			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself, notice);
-
-		return;
-	}
-
-	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, int level, int levelself, ChannelInfoFlag notice)
+	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself, ChannelInfoFlag notice)
 	{
 		User *u = source.u;
 		User *u2 = finduser(nick);
@@ -49,8 +24,7 @@ class CommandModeBase : public Command
 
 		bool is_same = u == u2;
 
-		ChanAccess *u_access = ci ? ci->GetAccess(u) : NULL, *u2_access = ci && u2 ? ci->GetAccess(u2) : NULL;
-		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
+		AccessGroup u_access = ci ? ci->AccessFor(u) : AccessGroup(), u2_access = ci && u2 ? ci->AccessFor(u2) : AccessGroup();
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
@@ -58,9 +32,9 @@ class CommandModeBase : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (is_same ? !check_access(u, ci, levelself) : !check_access(u, ci, level))
+		else if (is_same ? !ci->HasPriv(u, levelself) : !ci->HasPriv(u, level))
 			source.Reply(ACCESS_DENIED);
-		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_level >= u_level)
+		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);
 		else if (!set && u2->IsProtected() && !is_same)
 			source.Reply(ACCESS_DENIED);
@@ -79,6 +53,30 @@ class CommandModeBase : public Command
 		}
 	}
 
+ protected:
+	/** do_util: not a command, but does the job of others
+	 * @param source The source of the command
+	 * @param com The command calling this function
+	 * @param cm A channel mode class
+	 * @param chan The channel its being set on
+	 * @param nick The nick the modes being set on
+	 * @param set Is the mode being set or removed
+	 * @param level The acecss level required to set this mode on someone else
+	 * @param levelself The access level required to set this mode on yourself
+	 * @param notice Flag required on a channel to send a notice
+	 */
+	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself, ChannelInfoFlag notice)
+	{
+		User *u = source.u;
+
+		if (chan.empty())
+			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end(); ++it)
+				do_mode(source, com, cm, (*it)->chan->name, u->nick, set, level, levelself, notice);
+		else
+			do_mode(source, com, cm, chan, !nick.empty() ? nick : u->nick, set, level, levelself, notice);
+
+		return;
+	}
 
  public:
 	CommandModeBase(Module *creator, const Anope::string &cname) : Command(creator, cname, 0, 2)

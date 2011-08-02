@@ -34,8 +34,7 @@ class CommandCSKick : public Command
 		bool is_same = target.equals_ci(u->nick);
 		User *u2 = is_same ? u : finduser(target);
 
-		ChanAccess *u_access = ci->GetAccess(u), *u2_access = ci->GetAccess(u2);
-		uint16 u_level = u_access ? u_access->level : 0, u2_level = u2_access ? u2_access->level : 0;
+		AccessGroup u_access = ci->AccessFor(u), u2_access = ci->AccessFor(u2);
 
 		if (!c)
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
@@ -43,9 +42,9 @@ class CommandCSKick : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
-		else if (!is_same ? !check_access(u, ci, CA_KICK) : !check_access(u, ci, CA_KICKME))
+		else if (!ci->HasPriv(u, CA_KICK))
 			source.Reply(ACCESS_DENIED);
-		else if (!is_same && (ci->HasFlag(CI_PEACE)) && u2_level >= u_level)
+		else if (!is_same && (ci->HasFlag(CI_PEACE)) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);
 		else if (u2->IsProtected())
 			source.Reply(ACCESS_DENIED);
@@ -56,7 +55,7 @@ class CommandCSKick : public Command
 			 // XXX
 			Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
 
-			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(u, ci, CA_SIGNKICK)))
+			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !ci->HasPriv(u, CA_SIGNKICK)))
 				ci->c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
 				ci->c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());

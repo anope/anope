@@ -32,13 +32,13 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !check_access(u, ci, CA_SET))
+		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER))
+		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

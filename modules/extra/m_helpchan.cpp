@@ -28,7 +28,7 @@ class HelpChannel : public Module
 		{
 			User *u = finduser(param);
 
-			if (u && check_access(u, c->ci, CA_OPDEOPME))
+			if (u && c->ci->HasPriv(u, CA_OPDEOPME))
 				u->SetMode(findbot(Config->OperServ), UMODE_HELPOP);
 		}
 

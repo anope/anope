@@ -108,7 +108,7 @@ class CommandMSRead : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (!check_access(u, ci, CA_MEMO))
+			else if (!ci->HasPriv(u, CA_MEMO))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

@@ -58,14 +58,15 @@ class ChanServCore : public Module
 					for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
 					{
 						ChanAccess *ca = ci->GetAccess(j);
-					
-						if (!ca->nc || (!ca->nc->IsServicesOper() && Config->CSMaxReg && ca->nc->channelcount >= Config->CSMaxReg) || (ca->nc == nc))
+						NickCore *anc = findcore(ca->mask);
+
+						if (!anc || (!anc->IsServicesOper() && Config->CSMaxReg && anc->channelcount >= Config->CSMaxReg) || (anc == nc))
 							continue;
-						if (!highest || ca->level > highest->level)
+						if (!highest || *ca > *highest)
 							highest = ca;
 					}
 					if (highest)
-						newowner = highest->nc;
+						newowner = findcore(highest->mask);
 				}
 
 				if (newowner)
@@ -86,9 +87,17 @@ class ChanServCore : public Module
 			if (ci->successor == nc)
 				ci->successor = NULL;
 
-			ChanAccess *access = ci->GetAccess(nc);
-			if (access)
-				ci->EraseAccess(access);
+			for (unsigned j = 0; j < ci->GetAccessCount(); ++j)
+			{
+				ChanAccess *ca = ci->GetAccess(j);
+				NickCore *anc = findcore(ca->mask);
+
+				if (anc && anc == nc)
+				{
+					ci->EraseAccess(j);
+					break;
+				}
+			}
 
 			for (unsigned j = ci->GetAkickCount(); j > 0; --j)
 			{

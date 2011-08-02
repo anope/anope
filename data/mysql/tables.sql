@@ -63,11 +63,13 @@ CREATE TABLE IF NOT EXISTS `anope_bs_info_metadata` (
 --
 
 CREATE TABLE IF NOT EXISTS `anope_cs_access` (
-  `level` int(11) NOT NULL DEFAULT '0',
-  `display` varchar(255) NOT NULL DEFAULT '',
+  `provider` varchar(255) NOT NULL DEFAULT '',
+  `data` varchar(255) NOT NULL DEFAULT '',
+  `mask` varchar(255) NOT NULL DEFAULT '',
   `channel` varchar(255) NOT NULL DEFAULT '',
   `last_seen` int(10) unsigned NOT NULL DEFAULT '0',
   `creator` varchar(255) NOT NULL DEFAULT '',
+  `created` int(11) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `channel` (`channel`,`display`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

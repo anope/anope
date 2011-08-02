@@ -1071,47 +1071,51 @@ void do_cmode(const Anope::string &source, const Anope::string &channel, const A
  **/
 void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 {
-	ChannelInfo *ci;
-	ChannelMode *owner, *admin, *op, *halfop, *voice;
+	ChannelMode *owner = ModeManager::FindChannelModeByName(CMODE_OWNER),
+		*admin = ModeManager::FindChannelModeByName(CMODE_PROTECT),
+		*op = ModeManager::FindChannelModeByName(CMODE_OP),
+		*halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP),
+		*voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-	owner = ModeManager::FindChannelModeByName(CMODE_OWNER);
-	admin = ModeManager::FindChannelModeByName(CMODE_PROTECT);
-	op = ModeManager::FindChannelModeByName(CMODE_OP);
-	halfop = ModeManager::FindChannelModeByName(CMODE_HALFOP);
-	voice = ModeManager::FindChannelModeByName(CMODE_VOICE);
+	if (user == NULL || c == NULL)
+		return;
+	
+	ChannelInfo *ci = c->ci;
 
-	if (!c || !(ci = c->ci))
+	if (ci == NULL)
 		return;
 
 	Log(LOG_DEBUG) << "Setting correct user modes for " << user->nick << " on " << c->name << " (" << (give_modes ? "" : "not ") << "giving modes)";
 
+	AccessGroup u_access = ci->AccessFor(user);
+
 	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{
-		if (owner && check_access(user, ci, CA_AUTOOWNER))
+		if (owner && u_access.HasPriv(CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);
-		else if (admin && check_access(user, ci, CA_AUTOPROTECT))
+		else if (admin && u_access.HasPriv(CA_AUTOPROTECT))
 			c->SetMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && check_access(user, ci, CA_AUTOOP))
+		if (op && u_access.HasPriv(CA_AUTOOP))
 			c->SetMode(NULL, CMODE_OP, user->nick);
-		else if (halfop && check_access(user, ci, CA_AUTOHALFOP))
+		else if (halfop && u_access.HasPriv(CA_AUTOHALFOP))
 			c->SetMode(NULL, CMODE_HALFOP, user->nick);
-		else if (voice && check_access(user, ci, CA_AUTOVOICE))
+		else if (voice && u_access.HasPriv(CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
 	if ((ci->HasFlag(CI_SECUREOPS) || (c->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
 	{
-		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !check_access(user, ci, CA_FOUNDER))
+		if (owner && c->HasUserStatus(user, CMODE_OWNER) && !u_access.HasPriv(CA_AUTOOWNER) && !u_access.HasPriv(CA_PROTECTME))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
 
-		if (admin && c->HasUserStatus(user, CMODE_PROTECT) && !check_access(user, ci, CA_AUTOPROTECT) && !check_access(user, ci, CA_PROTECTME))
+		if (admin && c->HasUserStatus(user, CMODE_PROTECT) && !u_access.HasPriv(CA_AUTOPROTECT) && !u_access.HasPriv(CA_PROTECTME))
 			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && c->HasUserStatus(user, CMODE_OP) && !check_access(user, ci, CA_AUTOOP) && !check_access(user, ci, CA_OPDEOPME))
+		if (op && c->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv(CA_AUTOOP) && !u_access.HasPriv(CA_OPDEOPME))
 			c->RemoveMode(NULL, CMODE_OP, user->nick);
 
-		if (halfop && c->HasUserStatus(user, CMODE_HALFOP) && !check_access(user, ci, CA_AUTOHALFOP) && !check_access(user, ci, CA_HALFOPME))
+		if (halfop && c->HasUserStatus(user, CMODE_HALFOP) && !u_access.HasPriv(CA_AUTOHALFOP) && !u_access.HasPriv(CA_HALFOPME))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 	}
 

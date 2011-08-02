@@ -151,7 +151,7 @@ class DBMySQL : public Module
 			I_OnNickRegister, I_OnChangeCoreDisplay,
 			I_OnNickSuspended, I_OnDelNick,
 			/* ChanServ */
-			I_OnAccessAdd, I_OnAccessDel, I_OnAccessChange, I_OnAccessClear, I_OnLevelChange,
+			I_OnAccessAdd, I_OnAccessDel, I_OnAccessClear, I_OnLevelChange,
 			I_OnChanForbidden, I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
 			I_OnAkickAdd, I_OnAkickDel, I_OnMLock, I_OnUnMLock,
 			/* BotServ */
@@ -166,7 +166,7 @@ class DBMySQL : public Module
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 41);
+		ModuleManager::Attach(i, this, 40);
 	}
 
 	EventReturn OnLoadDatabase()
@@ -425,7 +425,22 @@ class DBMySQL : public Module
 				continue;
 			}
 
-			ci->AddAccess(r.Get(i, "display"), atoi(r.Get(i, "level").c_str()), r.Get(i, "creator"), (r.Get(i, "last_seen").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : Anope::CurTime));
+			const Anope::string &provider = r.Get(i, "provider"), &data = r.Get(i, "data");
+			service_reference<AccessProvider> ap(provider);
+			if (!ap)
+			{
+				Log() << "MySQL: Access entry for " << ci->name << " using nonexistant provider " << provider;
+				continue;
+			}
+
+			ChanAccess *access = ap->Create();
+			access->ci = ci;
+			access->mask = r.Get(i, "mask");
+			access->creator = r.Get(i, "creator");
+			access->last_seen = r.Get(i, "last_seen").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : Anope::CurTime;
+			access->created = r.Get(i, "created").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "created")) : Anope::CurTime;
+			access->Unserialize(data);
+			ci->AddAccess(access);
 		}
 
 		query = "SELECT * FROM `anope_cs_akick`";
@@ -773,7 +788,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(params[0]);
 			if (!ci)
 				return;
-			if (!check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
+			if (!ci->HasPriv(u, CA_SET) && !u->HasPriv("botserv/administration"))
 				return;
 			if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
 			{
@@ -824,7 +839,7 @@ class DBMySQL : public Module
 		else if (command->name == "botserv/set" && params.size() > 1)
 		{
 			ChannelInfo *ci = cs_findchan(params[0]);
-			if (ci && !check_access(u, ci, CA_SET) && !u->HasPriv("botserv/administration"))
+			if (ci && !ci->HasPriv(u, CA_SET) && !u->HasPriv("botserv/administration"))
 				return;
 			BotInfo *bi = NULL;
 			if (!ci)
@@ -861,7 +876,7 @@ class DBMySQL : public Module
 			else
 			{
 				ci = cs_findchan(target);
-				if (!ci || !check_access(u, ci, CA_MEMO))
+				if (!ci || !ci->HasPriv(u, CA_MEMO))
 					return;
 			}
 
@@ -984,9 +999,10 @@ class DBMySQL : public Module
 
 	void OnAccessAdd(ChannelInfo *ci, User *, ChanAccess *access)
 	{
-		SQLQuery query("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (@level, @display, @channel, @last_seen, @creator)");
-		query.setValue("level", access->level);
-		query.setValue("display", access->GetMask());
+		SQLQuery query("INSERT INTO `anope_cs_access` (provider, data, mask, channel, last_seen, creator) VALUES (@provider, @data, @mask, @channel, @last_seen, @creator) ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
+		query.setValue("provider", access->provider->name);
+		query.setValue("data", access->Serialize());
+		query.setValue("mask", access->mask);
 		query.setValue("channel", ci->name);
 		query.setValue("last_seen", access->last_seen);
 		query.setValue("creator", access->creator);
@@ -995,20 +1011,9 @@ class DBMySQL : public Module
 
 	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		SQLQuery query("DELETE FROM `anope_cs_access` WHERE `display` = @display AND `channel` = @channel");
-		query.setValue("display", access->GetMask());
+		SQLQuery query("DELETE FROM `anope_cs_access` WHERE `mask` = @mask AND `channel` = @channel");
+		query.setValue("mask", access->mask);
 		query.setValue("channel", ci->name);
-		this->RunQuery(query);
-	}
-
-	void OnAccessChange(ChannelInfo *ci, User *, ChanAccess *access)
-	{
-		SQLQuery query("INSERT INTO `anope_cs_access` (level, display, channel, last_seen, creator) VALUES (@level, @display, @channel, @last_seen, @creator) ON DUPLICATE KEY UPDATE level=VALUES(level), display=VALUES(display), channel=VALUES(channel), last_seen=VALUES(last_seen), creator=VALUES(creator)");
-		query.setValue("level", access->level);
-		query.setValue("display", access->GetMask());
-		query.setValue("channel", ci->name);
-		query.setValue("last_seen", access->last_seen);
-		query.setValue("creator", access->creator);
 		this->RunQuery(query);
 	}
 
@@ -1520,7 +1525,7 @@ static void SaveDatabases()
 		{
 			ChanAccess *access = ci->GetAccess(j);
 
-			me->OnAccessChange(ci, NULL, access);
+			me->OnAccessAdd(ci, NULL, access);
 		}
 
 		for (unsigned j = 0, end = ci->GetAkickCount(); j < end; ++j)

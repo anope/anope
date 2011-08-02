@@ -35,7 +35,7 @@ class CommandCSGetKey : public Command
 		}
 
 
-		if (!check_access(u, ci, CA_GETKEY) && !u->HasCommand("chanserv/chanserv/getkey"))
+		if (!ci->HasPriv(u, CA_GETKEY) && !u->HasCommand("chanserv/chanserv/getkey"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -48,7 +48,7 @@ class CommandCSGetKey : public Command
 			return;
 		}
 
-		bool override = !check_access(u, ci, CA_GETKEY);
+		bool override = !ci->HasPriv(u, CA_GETKEY);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		source.Reply(_("Key for channel \002%s\002 is \002%s\002."), chan.c_str(), key.c_str());

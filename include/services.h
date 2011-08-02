@@ -345,6 +345,20 @@ template<typename T, size_t Size = 32> class Flags
 	}
 };
 
+class Module;
+
+class CoreExport Service : public Base
+{
+ public:
+	Module *owner;
+	Anope::string name;
+
+	Service(Module *o, const Anope::string &n);
+
+	virtual ~Service();
+};
+
+
 #include "sockets.h"
 #include "socketengine.h"
 #include "extensible.h"
@@ -562,28 +576,6 @@ class CoreExport HostInfo
 	const time_t GetTime() const;
 };
 
-enum AccessLevel
-{
-	/* Note that these two levels also serve as exclusive boundaries for valid
-	 * access levels.  ACCESS_FOUNDER may be assumed to be strictly greater
-	 * than any valid access level, and ACCESS_INVALID may be assumed to be
-	 * strictly less than any valid access level. Also read below.
-	 */
-	ACCESS_FOUNDER = 10001, /* Numeric level indicating founder access */
-	ACCESS_INVALID = -10000, /* Used in levels[] for disabled settings */
-	/* There is one exception to the above access levels: SuperAdmins will have
-	 * access level 10001. This level is never stored, however; it is only used
-	 * in comparison and to let SuperAdmins win from founders where needed
-	 */
-	ACCESS_SUPERADMIN = 10002,
-	/* Levels for xOP */
-	ACCESS_VOP = 3,
-	ACCESS_HOP = 4,
-	ACCESS_AOP = 5,
-	ACCESS_SOP = 10,
-	ACCESS_QOP = 10000
-};
-
 /** Flags for badwords
  */
 enum BadWordType
@@ -603,51 +595,6 @@ struct BadWord
 {
 	Anope::string word;
 	BadWordType type;
-};
-
-/* Indices for cmd_access[]: */
-enum ChannelAccess
-{
-	CA_INVITE,
-	CA_AKICK,
-	CA_SET,			/* but not FOUNDER or PASSWORD */
-	CA_UNBAN,
-	CA_AUTOOP,
-	CA_AUTOVOICE,
-	CA_OPDEOP,		/* ChanServ commands OP and DEOP */
-	CA_ACCESS_LIST,
-	CA_NOJOIN,		/* Maximum */
-	CA_ACCESS_CHANGE,
-	CA_MEMO,
-	CA_ASSIGN,		/* BotServ ASSIGN command */
-	CA_BADWORDS,	/* BotServ BADWORDS command */
-	CA_NOKICK,		/* Not kicked by the bot */
-	CA_FANTASIA,
-	CA_SAY,
-	CA_GREET,
-	CA_VOICEME,
-	CA_VOICE,
-	CA_GETKEY,
-	CA_AUTOHALFOP,
-	CA_AUTOPROTECT,
-	CA_OPDEOPME,
-	CA_HALFOPME,
-	CA_HALFOP,
-	CA_PROTECTME,
-	CA_PROTECT,
-	CA_KICKME,
-	CA_KICK,
-	CA_SIGNKICK,
-	CA_BANME,
-	CA_BAN,
-	CA_TOPIC,
-	CA_MODE,
-	CA_INFO,
-	CA_AUTOOWNER,
-	CA_OWNER,
-	CA_OWNERME,
-	CA_FOUNDER,
-	CA_SIZE
 };
 
 /* BotServ SET flags */
@@ -716,6 +663,7 @@ enum
 	TTB_SIZE
 };
 
+#include "access.h"
 #include "regchannel.h"
 
 /*************************************************************************/

@@ -42,7 +42,7 @@ class CommandMSIgnore : public Command
 		MemoInfo *mi = memoserv->GetMemoInfo(channel, ischan);
 		if (!mi)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
-		else if (ischan && !check_access(u, cs_findchan(channel), CA_MEMO))
+		else if (ischan && !cs_findchan(channel)->HasPriv(u, CA_MEMO))
 			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{

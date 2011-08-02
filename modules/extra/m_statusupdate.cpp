@@ -7,6 +7,19 @@
 
 #include "module.h"
 
+static struct ModeInfo
+{
+	ChannelAccess priv;
+	ChannelModeName name;
+} modeInfo[] = {
+	{ CA_AUTOOWNER, CMODE_OWNER },
+	{ CA_AUTOPROTECT, CMODE_PROTECT },
+	{ CA_AUTOOP, CMODE_OP },
+	{ CA_AUTOHALFOP, CMODE_HALFOP },
+	{ CA_AUTOVOICE, CMODE_VOICE },
+	{ CA_SIZE, CMODE_END }
+};
+
 class StatusUpdate : public Module
 {
  public:
@@ -14,41 +27,42 @@ class StatusUpdate : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnAccessAdd, I_OnAccessChange, I_OnAccessDel, I_OnAccessClear };
+		Implementation i[] = { I_OnAccessAdd, I_OnAccessDel };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *u, ChanAccess *access)
-	{
-		this->OnAccessChange(ci, u, access);
-	}
-
-	void OnAccessChange(ChannelInfo *ci, User *, ChanAccess *access)
 	{
 		if (ci->c)
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 			{
 				User *user = (*it)->user;
 
-				if (user == ci->bi)
-					continue;
-
-				ChanAccess *highest = ci->GetAccess(user);
-
-				if (!access || (highest == access))
-					chan_set_correct_modes(user, ci->c, 1);
+				if (access->Matches(user, user->Account()))
+				{
+					for (int i = 0; modeInfo[i].priv != CA_SIZE; ++i)
+						if (access->HasPriv(modeInfo[i].priv))
+							ci->c->SetMode(NULL, modeInfo[i].name, user->nick);
+						else
+							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
+				}
 			}
 	}
 
 	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		access->level = 0;
-		this->OnAccessChange(ci, u, access);
-	}
+		if (ci->c)
+			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
+			{
+				User *user = (*it)->user;
 
-	void OnAccessClear(ChannelInfo *ci, User *u)
-	{
-		this->OnAccessChange(ci, u, NULL);
+				if (access->Matches(user, user->Account()))
+				{
+					for (int i = 0; modeInfo[i].priv != CA_SIZE; ++i)
+						if (access->HasPriv(modeInfo[i].priv))
+							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
+				}
+			}
 	}
 };
 

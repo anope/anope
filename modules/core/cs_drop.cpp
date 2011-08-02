@@ -49,7 +49,7 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER)) && !u->HasCommand("chanserv/chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER)) && !u->HasCommand("chanserv/chanserv/drop"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -58,7 +58,7 @@ class CommandCSDrop : public Command
 		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
 
-		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !check_access(u, ci, CA_FOUNDER));
+		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "none");
 
 		delete ci;

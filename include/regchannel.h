@@ -44,8 +44,6 @@ enum ChannelInfoFlag
 	CI_SIGNKICK,
 	/* Sign kicks if level is < than the one defined by the SIGNKIGK level */
 	CI_SIGNKICK_LEVEL,
-	/* Uses XOP */
-	CI_XOP,
 	/* Channel is suspended */
 	CI_SUSPENDED,
 	/* Channel still exists when emptied, this can be caused by setting a perm
@@ -61,20 +59,7 @@ enum ChannelInfoFlag
 const Anope::string ChannelInfoFlagStrings[] = {
 	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
 	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "OPNOTICE", "SECUREFOUNDER",
-	"SIGNKICK", "SIGNKICK_LEVEL", "XOP", "SUSPENDED", "PERSIST", ""
-};
-
-class CoreExport ChanAccess
-{
-	Anope::string mask;	/* Mask of the access entry */
- public:
-	int16 level;
-	NickCore *nc;		/* NC of the entry, if the entry is a valid nickcore */
-	time_t last_seen;
-	Anope::string creator;
-	
-	ChanAccess(const Anope::string &umask);
-	const Anope::string &GetMask();
+	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", ""
 };
 
 /** Flags for auto kick
@@ -117,9 +102,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 {
  private:
 	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
- private:
+
 	NickCore *founder;							/* Channel founder */
-	std::vector<ChanAccess *> access;					/* List of authorized users */
+	std::vector<ChanAccess *> access;                                       /* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
 	ModeList mode_locks;
@@ -151,17 +136,16 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	time_t last_topic_time;			/* Time */
 
 	int16 bantype;
-	int16 *levels; /* Access levels for commands */
+	int16 levels[CA_SIZE];
 
 	MemoInfo memos;
 
 	Channel *c; /* Pointer to channel record (if channel is currently in use) */
 
 	/* For BotServ */
-
 	BotInfo *bi;					/* Bot used on this channel */
 	Flags<BotServFlag> botflags;
-	int16 *ttb;						/* Times to ban for each kicker */
+	int16 ttb[TTB_SIZE];				/* Times to ban for each kicker */
 
 	int16 capsmin, capspercent;		/* For CAPS kicker */
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
@@ -183,16 +167,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	BotInfo *WhoSends();
 
 	/** Add an entry to the channel access list
-	 *
-	 * @param mask The mask of the access entry
-	 * @param level The channel access level the user has on the channel
-	 * @param creator The user who added the access
-	 * @param last_seen When the user was last seen within the channel
-	 * @return The new access class
-	 *
-	 * Creates a new access list entry and inserts it into the access list.
+	 * @param access The entry
 	 */
-	ChanAccess *AddAccess(const Anope::string &mask, int16 level, const Anope::string &creator, int32 last_seen = 0);
+	void AddAccess(ChanAccess *access);
 
 	/** Get an entry from the channel access list by index
 	 *
@@ -203,36 +180,16 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	ChanAccess *GetAccess(unsigned index);
 
-	/** Get an entry from the channel access list by User
+	/** Check if a user has a privilege on a channel
 	 *
 	 * @param u The User to find within the access list vector
-	 * @param level Optional channel access level to compare the access entries to
-	 * @return A ChanAccess struct corresponding to the User, or NULL if not found
-	 *
-	 * Retrieves an entry from the access list that matches the given User, optionally also matching a certain level.
+	 * @param priv The privilege to check for.
+	 * @return true if the user has the privilege
 	 */
-	ChanAccess *GetAccess(User *u, int16 level = 0);
+	bool HasPriv(User *u, ChannelAccess priv);
 
-	/** Get an entry from the channel access list by NickCore
-	 *
-	 * @param u The NickCore to find within the access list vector
-	 * @param level Optional channel access level to compare the access entries to
-	 * @return A ChanAccess struct corresponding to the NickCore, or NULL if not found
-	 *
-	 * Retrieves an entry from the access list that matches the given NickCore, optionally also matching a certain level.
-	 */
-	ChanAccess *GetAccess(NickCore *nc, int16 level = 0);
-	
-	/** Get an entry from the channel access list by mask
-	 *
-	 * @param u The mask to find within the access list vector
-	 * @param level Optional channel access level to compare the access entries to
-	 * @param wildcard True to match using wildcards
-	 * @return A ChanAccess struct corresponding to the mask, or NULL if not found
-	 *
-	 * Retrieves an entry from the access list that matches the given mask, optionally also matching a certain level.
-	 */
-	ChanAccess *GetAccess(const Anope::string &mask, int16 level = 0, bool wildcard = true);
+	AccessGroup AccessFor(User *u);
+	AccessGroup AccessFor(NickCore *nc);
 
 	/** Get the size of the accss vector for this channel
 	 * @return The access vector size

@@ -42,7 +42,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		if (!check_access(u, ci, CA_INVITE))
+		if (!ci->HasPriv(u, CA_INVITE))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

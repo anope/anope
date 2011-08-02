@@ -42,8 +42,6 @@ E Channel *findchan(const Anope::string &chan);
 
 E User *nc_on_chan(Channel *c, const NickCore *nc);
 
-E Anope::string get_xop_level(int level);
-
 E void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
 E void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
 E void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
@@ -53,20 +51,12 @@ E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
 /**** chanserv.c ****/
 
-E LevelInfo levelinfo[];
-
-
-E void reset_levels(ChannelInfo *ci);
-
 E void check_modes(Channel *c);
 
 E ChannelInfo *cs_findchan(const Anope::string &chan);
-E int check_access(User *user, ChannelInfo *ci, int what);
 E bool IsFounder(User *user, ChannelInfo *ci);
 E void update_cs_lastseen(User *user, ChannelInfo *ci);
 E int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
-
-E int levelinfo_maxwidth;
 
 /**** config.c ****/
 

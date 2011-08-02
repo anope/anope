@@ -13,25 +13,205 @@
 
 #include "module.h"
 
-enum
+enum XOPType
 {
-	XOP_AOP,
-	XOP_SOP,
-	XOP_VOP,
-	XOP_HOP,
 	XOP_QOP,
-	XOP_TYPES
+	XOP_SOP,
+	XOP_AOP,
+	XOP_HOP,
+	XOP_VOP,
+	XOP_UNKNOWN
+};
+
+static struct XOPAccess
+{
+	XOPType type;
+	Anope::string name;
+	ChannelAccess access[CA_SIZE];
+} xopAccess[] = {
+	{ XOP_QOP, "QOP",
+		{
+			CA_SIGNKICK,
+			CA_SET,
+			CA_AUTOOWNER,
+			CA_OWNERME,
+			CA_PROTECT,
+			CA_INFO,
+			CA_SIZE
+		}
+	},
+	{ XOP_SOP, "SOP",
+		{
+			CA_AUTOPROTECT,
+			CA_AKICK,
+			CA_BADWORDS,
+			CA_ASSIGN,
+			CA_MEMO,
+			CA_ACCESS_CHANGE,
+			CA_PROTECTME,
+			CA_OPDEOP,
+			CA_SIZE
+		}
+	},
+	{ XOP_AOP, "AOP",
+		{
+			CA_TOPIC,
+			CA_MODE,
+			CA_GETKEY,
+			CA_INVITE,
+			CA_UNBAN,
+			CA_AUTOOP,
+			CA_OPDEOPME,
+			CA_HALFOP,
+			CA_SAY,
+			CA_NOKICK,
+			CA_SIZE
+		}
+	},
+	{ XOP_HOP, "HOP",
+		{
+			CA_AUTOHALFOP,
+			CA_HALFOPME,
+			CA_KICK,
+			CA_BAN,
+			CA_FANTASIA,
+			CA_SIZE
+		}
+	},
+	{ XOP_VOP, "VOP",
+		{
+			CA_AUTOVOICE,
+			CA_VOICEME,
+			CA_ACCESS_LIST,
+			CA_SIZE
+		}
+	},
+	{ XOP_UNKNOWN, "", { }
+	}
+};
+
+class XOPChanAccess : public ChanAccess
+{
+ public:
+	XOPType type;
+
+ 	XOPChanAccess(AccessProvider *p) : ChanAccess(p)
+	{
+	}
+
+	bool Matches(User *u, NickCore *nc)
+	{
+		if (u && (Anope::Match(u->nick, this->mask) || Anope::Match(u->GetMask(), this->mask)))
+			return true;
+		else if (nc && Anope::Match(nc->display, this->mask))
+			return true;
+		return false;
+	}
+
+	bool HasPriv(ChannelAccess priv)
+	{
+		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
+		{
+			XOPAccess &x = xopAccess[i];
+
+			if (this->type > x.type)
+				continue;
+
+			for (int j = 0; x.access[j] != CA_SIZE; ++j)
+				if (x.access[j] == priv)
+					return true;
+		}
+
+		return false;
+	}
+
+	Anope::string Serialize()
+	{
+		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
+		{
+			XOPAccess &x = xopAccess[i];
+
+			if (this->type == x.type)
+				return x.name;
+		}
+
+		return "";
+	}
+
+	void Unserialize(const Anope::string &data)
+	{
+		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
+		{
+			XOPAccess &x = xopAccess[i];
+
+			if (data == x.name)
+			{
+				this->type = x.type;
+				return;
+			}
+		}
+
+		this->type = XOP_UNKNOWN;
+	}
+
+	static XOPType DetermineLevel(ChanAccess *access)
+	{
+		if (access->provider->name == "access/xop")
+		{
+			XOPChanAccess *xaccess = debug_cast<XOPChanAccess *>(access);
+			return xaccess->type;
+		}
+		else
+		{
+			int count[XOP_UNKNOWN];
+			for (int i = 0; i < XOP_UNKNOWN; ++i)
+				count[i] = 0;
+
+			for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
+			{
+				XOPAccess &x = xopAccess[i];
+
+				for (int j = 0; x.access[j] != CA_SIZE; ++j)
+					if (access->HasPriv(x.access[j]))
+						++count[x.type];
+			}
+
+			XOPType max = XOP_UNKNOWN;
+			int maxn = 0;
+			for (int i = 0; i < XOP_UNKNOWN; ++i)
+				if (count[i] > maxn)
+				{
+					max = static_cast<XOPType>(i);
+					maxn = count[i];
+				}
+
+			return max;
+		}
+	}
+};
+
+class XOPAccessProvider : public AccessProvider
+{
+ public:
+	XOPAccessProvider(Module *o) : AccessProvider(o, "access/xop")
+	{
+	}
+
+	ChanAccess *Create()
+	{
+		return new XOPChanAccess(this);
+	}
 };
 
 class XOPListCallback : public NumberList
 {
 	CommandSource &source;
 	ChannelInfo *ci;
-	int level;
+	XOPType type;
 	Command *c;
 	bool SentHeader;
  public:
-	XOPListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist, int _level, Command *_c) : NumberList(numlist, false), source(_source), ci(_ci), level(_level), c(_c), SentHeader(false)
+	XOPListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist, XOPType _type, Command *_c) : NumberList(numlist, false), source(_source), ci(_ci), type(_type), c(_c), SentHeader(false)
 	{
 	}
 
@@ -42,21 +222,21 @@ class XOPListCallback : public NumberList
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
 
-		if (level != access->level)
+		if (this->type != XOPChanAccess::DetermineLevel(access))
 			return;
 
 		if (!SentHeader)
 		{
 			SentHeader = true;
-			source.Reply(_("%s list for %s:\n  Num  Nick"), this->c->name.c_str(), ci->name.c_str());
+			source.Reply(_("%s list for %s:\n  Num  Nick"), source.command.c_str(), ci->name.c_str());
 		}
 
-		DoList(source, access, Number - 1, level);
+		DoList(source, access, Number - 1, this->type);
 	}
 
-	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, int level)
+	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, XOPType type)
 	{
-		source.Reply(_("  %3d  %s"), index, access->GetMask().c_str());
+		source.Reply(_("  %3d  %s"), index, access->mask.c_str());
 	}
 };
 
@@ -68,23 +248,24 @@ class XOPDelCallback : public NumberList
 	unsigned Deleted;
 	Anope::string Nicks;
 	bool override;
+	XOPType type;
  public:
-	XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override)
+	XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, XOPType _type, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override), type(_type)
 	{
 	}
 
 	~XOPDelCallback()
 	{
 		if (!Deleted)
-			 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), this->c->name.c_str());
+			 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 		else
 		{
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "deleted access of users " << Nicks;
 
 			if (Deleted == 1)
-				source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), this->c->name.c_str());
+				source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
 			else
-				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), this->c->name.c_str());
+				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), source.command.c_str());
 		}
 	}
 
@@ -95,11 +276,14 @@ class XOPDelCallback : public NumberList
 
 		ChanAccess *access = ci->GetAccess(Number - 1);
 
+		if (this->type != XOPChanAccess::DetermineLevel(access))
+			return;
+
 		++Deleted;
 		if (!Nicks.empty())
-			Nicks += ", " + access->GetMask();
+			Nicks += ", " + access->mask;
 		else
-			Nicks = access->GetMask();
+			Nicks = access->mask;
 
 		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source.u, access));
 
@@ -110,12 +294,11 @@ class XOPDelCallback : public NumberList
 class XOPBase : public Command
 {
  private:
-	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
+	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
 		User *u = source.u;
 
 		Anope::string mask = params.size() > 2 ? params[2] : "";
-		int change = 0;
 
 		if (mask.empty())
 		{
@@ -125,66 +308,66 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
 		}
 
-		ChanAccess *access = ci->GetAccess(u);
-		uint16 ulev = access ? access->level : 0;
+		AccessGroup access = ci->AccessFor(u);
+		ChanAccess *highest = access.Highest();
+		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
 
-		if ((level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
+		if (((access.HasPriv(CA_FOUNDER) || level >= u_level) || !access.HasPriv(CA_ACCESS_CHANGE)) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		access = ci->GetAccess(mask, 0, false);
-		if (access)
+		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
-			/**
-			 * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
-			 **/
-			if (access->level >= ulev && !u->HasPriv("chanserv/access/modify"))
+			ChanAccess *a = ci->GetAccess(i);
+
+			if (a->mask.equals_ci(mask))
 			{
-				source.Reply(ACCESS_DENIED);
-				return;
+				if (XOPChanAccess::DetermineLevel(a) >= u_level && !u->HasPriv("chanserv/access/modify"))
+				{
+					source.Reply(ACCESS_DENIED);
+					return;
+				}
+
+				ci->EraseAccess(i);
+				break;
 			}
-			++change;
 		}
 
-		if (!change && ci->GetAccessCount() >= Config->CSAccessMax)
+		if (ci->GetAccessCount() >= Config->CSAccessMax)
 		{
-			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, this->name.c_str());
+			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, source.command.c_str());
 			return;
 		}
 
-		if (!change)
-			access = ci->AddAccess(mask, level, u->nick);
-		else
-		{
-			access->level = level;
-			access->last_seen = 0;
-			access->creator = u->nick;
-		}
+		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+			mask += "!*@*";
 
-		bool override = (level >= ulev || ulev < ACCESS_AOP || (access && access->level > ulev));
+		service_reference<AccessProvider> provider("access/xop");
+		if (!provider)
+			return;
+		XOPChanAccess *acc = debug_cast<XOPChanAccess *>(provider->Create());
+		acc->ci = ci;
+		acc->mask = mask;
+		acc->creator = u->nick;
+		acc->type = level;
+		acc->last_seen = 0;
+		acc->created = Anope::CurTime;
+		ci->AddAccess(acc);
+
+		bool override = level >= u_level || !access.HasPriv(CA_ACCESS_CHANGE);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " as level " << level;
 
-		if (!change)
-		{
-			FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
-			source.Reply(("\002%s\002 added to %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
-		}
-		else
-		{
-			FOREACH_MOD(I_OnAccessChange, OnAccessChange(ci, u, access));
-			source.Reply(_("\002%s\002 moved to %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
-		}
-
-		return;
+		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
+		source.Reply(("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
-	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
+	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
 		User *u = source.u;
 
@@ -198,80 +381,84 @@ class XOPBase : public Command
 
 		if (readonly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
 			return;
 		}
 
-		ChanAccess *access = ci->GetAccess(u);
-		uint16 ulev = access ? access->level : 0;
-
-		if ((!access || access->nc != u->Account()) && (level >= ulev || ulev < ACCESS_AOP) && !u->HasPriv("chanserv/access/modify"))
+		AccessGroup access = ci->AccessFor(u);
+		ChanAccess *highest = access.Highest();
+		bool override = false;
+		if (!mask.equals_ci(u->Account()->display) && !access.HasPriv(CA_ACCESS_CHANGE) && (!highest || level >= XOPChanAccess::DetermineLevel(highest)))
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
+			if (u->HasPriv("chanserv/access/modify"))
+				override = true;
+			else
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
 		}
-
-		access = ci->GetAccess(mask, 0, false);
 
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			bool override = level >= ulev || ulev < ACCESS_AOP;
-			XOPDelCallback list(source, ci, this, override, mask);
+			XOPDelCallback list(source, ci, this, override, level, mask);
 			list.Process();
-		}
-		else if (!access || access->level != level)
-		{
-			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), this->name.c_str());
-			return;
 		}
 		else
 		{
-			if (access->nc != u->Account() && ulev <= access->level && !u->HasPriv("chanserv/access/modify"))
-				source.Reply(ACCESS_DENIED);
-			else
+			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				bool override = ulev <= access->level;
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->GetMask();
+				ChanAccess *a = ci->GetAccess(i);
 
-				source.Reply(_("\002%s\002 deleted from %s %s list."), access->GetMask().c_str(), ci->name.c_str(), this->name.c_str());
+				if (a->mask.equals_ci(mask) && XOPChanAccess::DetermineLevel(a) == level)
+				{
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << a->mask;
 
-				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
+					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
-				ci->EraseAccess(access);
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, a));
+					ci->EraseAccess(a);
+
+					return;
+				}
 			}
+			
+			source.Reply(_("\002%s\002 not found on %s %s list."), mask.c_str(), ci->name.c_str(), source.command.c_str());
 		}
-
-		return;
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, int level)
+	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)
 	{
 		User *u = source.u;
 
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
-		ChanAccess *access = ci->GetAccess(u);
-		uint16 ulev = access ? access->level : 0;
+		AccessGroup access = ci->AccessFor(u);
+		bool override = false;
 
-		if (!ulev && !u->HasCommand("chanserv/chanserv/access/list"))
+		if (!access.HasPriv(CA_ACCESS_LIST))
 		{
-			source.Reply(ACCESS_DENIED);
-			return;
+			if (u->HasCommand("chanserv/access/list"))
+				override = true;
+			else
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
 		}
 
-		bool override = !ulev;
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
 			return;
 		}
 
@@ -286,70 +473,70 @@ class XOPBase : public Command
 
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
-				access = ci->GetAccess(i);
+				ChanAccess *a = ci->GetAccess(i);
 
-				if (access->level != level)
+				if (XOPChanAccess::DetermineLevel(a) != level)
 					continue;
-				else if (!nick.empty() && !Anope::Match(access->GetMask(), nick))
+				else if (!nick.empty() && !Anope::Match(a->mask, nick))
 					continue;
 
 				if (!SentHeader)
 				{
 					SentHeader = true;
-					source.Reply(_("%s list for %s:\n  Num  Nick"), this->name.c_str(), ci->name.c_str());
+					source.Reply(_("%s list for %s:\n  Num  Nick"), source.command.c_str(), ci->name.c_str());
 				}
 
-				XOPListCallback::DoList(source, access, i + 1, level);
+				XOPListCallback::DoList(source, a, i + 1, level);
 			}
 
 			if (!SentHeader)
-				source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), this->name.c_str());
+				source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 		}
 
 		return;
 	}
 
-	void DoClear(CommandSource &source, ChannelInfo *ci, int level)
+	void DoClear(CommandSource &source, ChannelInfo *ci, XOPType level)
 	{
 		User *u = source.u;
 
 		if (readonly)
 		{
-			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), this->name.c_str());
+			source.Reply(_("Sorry, channel %s list modification is temporarily disabled."), source.command.c_str());
 			return;
 		}
 
 		if (!ci->GetAccessCount())
 		{
-			source.Reply(_("%s %s list is empty."), ci->name.c_str(), this->name.c_str());
+			source.Reply(_("%s %s list is empty."), ci->name.c_str(), source.command.c_str());
 			return;
 		}
 
-		if (!check_access(u, ci, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
+		if (!ci->HasPriv(u, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = !check_access(u, ci, CA_FOUNDER);
+		bool override = !ci->HasPriv(u, CA_FOUNDER);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR level " << level;
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			ChanAccess *access = ci->GetAccess(i - 1);
-			if (access->level == level)
+			if (XOPChanAccess::DetermineLevel(access) == level)
 				ci->EraseAccess(i - 1);
 		}
 
 		FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
 
-		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), this->name.c_str());
+		source.Reply(_("Channel %s %s list has been cleared."), ci->name.c_str(), source.command.c_str());
 
 		return;
 	}
 
  protected:
-	void DoXop(CommandSource &source, const std::vector<Anope::string> &params, int level)
+	void DoXop(CommandSource &source, const std::vector<Anope::string> &params, XOPType level)
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
@@ -360,9 +547,7 @@ class XOPBase : public Command
 
 		const Anope::string &cmd = params[1];
 
-		if (!ci->HasFlag(CI_XOP))
-			source.Reply(_("You can't use this command. Use the ACCESS command instead."));
-		else if (cmd.equals_ci("ADD"))
+		if (cmd.equals_ci("ADD"))
 			return this->DoAdd(source, ci, params, level);
 		else if (cmd.equals_ci("DEL"))
 			return this->DoDel(source, ci, params, level);
@@ -403,7 +588,7 @@ class CommandCSQOP : public XOPBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_QOP);
+		return this->DoXop(source, params, XOP_QOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -457,7 +642,7 @@ class CommandCSAOP : public XOPBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_AOP);
+		return this->DoXop(source, params, XOP_AOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -513,7 +698,7 @@ class CommandCSHOP : public XOPBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_HOP);
+		return this->DoXop(source, params, XOP_HOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -567,7 +752,7 @@ class CommandCSSOP : public XOPBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_SOP);
+		return this->DoXop(source, params, XOP_SOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -623,7 +808,7 @@ class CommandCSVOP : public XOPBase
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		return this->DoXop(source, params, ACCESS_VOP);
+		return this->DoXop(source, params, XOP_VOP);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -670,6 +855,7 @@ class CommandCSVOP : public XOPBase
 
 class CSXOP : public Module
 {
+	XOPAccessProvider accessprovider;
 	CommandCSQOP commandcsqop;
 	CommandCSSOP commandcssop;
 	CommandCSAOP commandcsaop;
@@ -678,10 +864,11 @@ class CSXOP : public Module
 
  public:
 	CSXOP(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcsqop(this), commandcssop(this), commandcsaop(this), commandcshop(this), commandcsvop(this)
+		accessprovider(this), commandcsqop(this), commandcssop(this), commandcsaop(this), commandcshop(this), commandcsvop(this)
 	{
 		this->SetAuthor("Anope");
 
+		ModuleManager::RegisterService(&accessprovider);
 		ModuleManager::RegisterService(&commandcssop);
 		ModuleManager::RegisterService(&commandcsaop);
 		ModuleManager::RegisterService(&commandcsqop);

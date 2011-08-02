@@ -37,7 +37,7 @@ class CommandCSTopic : public Command
 
 		if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!check_access(u, ci, CA_TOPIC) && !u->HasCommand("chanserv/chanserv/topic"))
+		else if (!ci->HasPriv(u, CA_TOPIC) && !u->HasCommand("chanserv/chanserv/topic"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
@@ -47,7 +47,7 @@ class CommandCSTopic : public Command
 			if (has_topiclock)
 				ci->SetFlag(CI_TOPICLOCK);
 	
-			bool override = !check_access(u, ci, CA_TOPIC);
+			bool override = !ci->HasPriv(u, CA_TOPIC);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change the topic to " << (!topic.empty() ? topic : "No topic");
 		}
 		return;

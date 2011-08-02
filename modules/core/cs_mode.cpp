@@ -20,15 +20,15 @@ class CommandCSMode : public Command
 		switch (mode)
 		{
 			case CMODE_OWNER:
-				return check_access(u, ci, CA_OWNER);
+				return ci->HasPriv(u, CA_OWNER);
 			case CMODE_PROTECT:
-				return check_access(u, ci, CA_PROTECT);
+				return ci->HasPriv(u, CA_PROTECT);
 			case CMODE_OP:	
-				return check_access(u, ci, CA_OPDEOP);
+				return ci->HasPriv(u, CA_OPDEOP);
 			case CMODE_HALFOP:
-				return check_access(u, ci, CA_HALFOP);
+				return ci->HasPriv(u, CA_HALFOP);
 			case CMODE_VOICE:
-				return check_access(u, ci, CA_VOICE);
+				return ci->HasPriv(u, CA_VOICE);
 			default:
 				break;
 		}
@@ -228,8 +228,7 @@ class CommandCSMode : public Command
 								break;
 							}
 
-							ChanAccess *u_access = ci->GetAccess(u);
-							int16 u_level = u_access ? u_access->level : 0;
+							AccessGroup u_access = ci->AccessFor(u);
 
 							if (str_is_wildcard(param))
 							{
@@ -237,10 +236,9 @@ class CommandCSMode : public Command
 								{
 									UserContainer *uc = *it;
 
-									ChanAccess *targ_access = ci->GetAccess(uc->user);
-									int16 t_level = targ_access ? targ_access->level : 0;
+									AccessGroup targ_access = ci->AccessFor(uc->user);
 
-									if (t_level > u_level)
+									if (targ_access > u_access)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), uc->user->nick.c_str());
 										continue;
@@ -260,9 +258,8 @@ class CommandCSMode : public Command
 								User *target = finduser(param);
 								if (target != NULL)
 								{
-									ChanAccess *targ_access = ci->GetAccess(target);
-									int16 t_level = targ_access ? targ_access->level : 0;
-									if (t_level > u_level)
+									AccessGroup targ_access = ci->AccessFor(target);
+									if (targ_access > u_access)
 									{
 										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
 										break;
@@ -314,7 +311,7 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!check_access(u, ci, CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
+		else if (!ci->HasPriv(u, CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

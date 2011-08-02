@@ -36,7 +36,7 @@ public:
 			return;
 		}
 
-		if (!check_access(u, ci, CA_SET))
+		if (!ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -111,7 +111,7 @@ public:
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
-			target_ci->ClearAccess();
+			/*target_ci->ClearAccess();
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
@@ -119,6 +119,8 @@ public:
 			}
 
 			source.Reply(_("All access entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
+			XXX
+			*/
 		}
 		else if (what.equals_ci("AKICK"))
 		{

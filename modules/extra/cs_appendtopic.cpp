@@ -58,7 +58,7 @@ class CommandCSAppendTopic : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!check_access(u, c->ci, CA_TOPIC))
+		else if (!c->ci->HasPriv(u, CA_TOPIC))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
@@ -77,7 +77,7 @@ class CommandCSAppendTopic : public Command
 			if (has_topiclock)
 				c->ci->SetFlag(CI_TOPICLOCK);
 
-			bool override = !check_access(u, c->ci, CA_TOPIC);
+			bool override = c->ci->HasPriv(u, CA_TOPIC);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci) << "changed topic to " << topic;
 		}
 		return;

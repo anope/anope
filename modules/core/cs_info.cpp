@@ -50,7 +50,7 @@ class CommandCSInfo : public Command
 		bool show_all = false;
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (has_auspex || check_access(u, ci, CA_INFO))
+		if (has_auspex || ci->HasPriv(u, CA_INFO))
 			show_all = true;
 
 		source.Reply(CHAN_INFO_HEADER, chan.c_str());
@@ -90,7 +90,6 @@ class CommandCSInfo : public Command
 			else
 				CheckOptStr(optbuf, CI_SIGNKICK_LEVEL, _("Signed kicks"), ci, u->Account());
 			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, u->Account());
-			CheckOptStr(optbuf, CI_XOP, _("xOP lists system"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 

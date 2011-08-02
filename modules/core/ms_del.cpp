@@ -70,7 +70,7 @@ class CommandMSDel : public Command
 				source.Reply(READ_ONLY_MODE);
 				return;
 			}
-			else if (!check_access(u, ci, CA_MEMO))
+			else if (!ci->HasPriv(u, CA_MEMO))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

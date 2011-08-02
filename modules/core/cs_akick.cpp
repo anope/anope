@@ -134,7 +134,7 @@ class AkickDelCallback : public NumberList
 	~AkickDelCallback()
 	{
 		User *u = source.u;
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
 
 		if (!Deleted)
@@ -195,9 +195,8 @@ class CommandCSAKick : public Command
 		* or whether the mask matches a user with higher/equal access - Viper */
 		if (ci->HasFlag(CI_PEACE) && nc)
 		{
-			ChanAccess *nc_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
-			int16 nc_level = nc_access ? nc_access->level : 0, u_level = u_access ? u_access->level : 0;
-			if (nc == ci->GetFounder() || nc_level >= u_level)
+			AccessGroup nc_access = ci->AccessFor(nc), u_access = ci->AccessFor(u);
+			if (nc == ci->GetFounder() || nc_access >= u_access)
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -211,11 +210,10 @@ class CommandCSAKick : public Command
 			{
 				User *u2 = it->second;
 
-				ChanAccess *u2_access = ci->GetAccess(nc), *u_access = ci->GetAccess(u);
-				int16 u2_level = u2_access ? u2_access->level : 0, u_level = u_access ? u_access->level : 0;
+				AccessGroup nc_access = ci->AccessFor(nc), u_access = ci->AccessFor(u);
 				Entry entry_mask(CMODE_BEGIN, mask);
 
-				if ((check_access(u2, ci, CA_FOUNDER) || u2_level >= u_level) && entry_mask.Matches(u2))
+				if ((ci->HasPriv(u2, CA_FOUNDER) || nc_access >= u_access) && entry_mask.Matches(u2))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -228,9 +226,8 @@ class CommandCSAKick : public Command
 			{
 				na = it->second;
 
-				ChanAccess *na_access = ci->GetAccess(na->nc), *u_access = ci->GetAccess(u);
-				int16 na_level = na_access ? na_access->level : 0, u_level = u_access ? u_access->level : 0;
-				if (na->nc && (na->nc == ci->GetFounder() || na_level >= u_level))
+				AccessGroup nc_access = ci->AccessFor(na->nc), u_access = ci->AccessFor(u);
+				if (na->nc && (na->nc == ci->GetFounder() || nc_access >= u_access))
 				{
 					Anope::string buf = na->nick + "!" + na->last_usermask;
 					if (Anope::Match(buf, mask))
@@ -263,7 +260,7 @@ class CommandCSAKick : public Command
 		else
 			akick = ci->AddAkick(u->nick, mask, reason);
 
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << ": " << reason;
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
@@ -312,7 +309,7 @@ class CommandCSAKick : public Command
 				return;
 			}
 
-			bool override = !check_access(u, ci, CA_AKICK);
+			bool override = !ci->HasPriv(u, CA_AKICK);
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << mask;
 
 			ci->EraseAkick(i);
@@ -327,7 +324,7 @@ class CommandCSAKick : public Command
 
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
 
 		if (!ci->GetAkickCount())
@@ -377,7 +374,7 @@ class CommandCSAKick : public Command
 
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
 
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "VIEW";
 
 		if (!ci->GetAkickCount())
@@ -441,7 +438,7 @@ class CommandCSAKick : public Command
 				++count;
 		}
 
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ENFORCE, affects " << count << " users";
 
 		source.Reply(_("AKICK ENFORCE for \002%s\002 complete; \002%d\002 users were affected."), ci->name.c_str(), count);
@@ -450,7 +447,7 @@ class CommandCSAKick : public Command
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
 		User *u = source.u;
-		bool override = !check_access(u, ci, CA_AKICK);
+		bool override = !ci->HasPriv(u, CA_AKICK);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		ci->ClearAkick();
@@ -486,7 +483,7 @@ class CommandCSAKick : public Command
 
 		if (mask.empty() && (cmd.equals_ci("ADD") || cmd.equals_ci("DEL")))
 			this->OnSyntaxError(source, cmd);
-		else if (!check_access(u, ci, CA_AKICK) && !u->HasPriv("chanserv/access/modify"))
+		else if (!ci->HasPriv(u, CA_AKICK) && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (!cmd.equals_ci("LIST") && !cmd.equals_ci("VIEW") && !cmd.equals_ci("ENFORCE") && readonly)
 			source.Reply(_("Sorry, channel autokick list modification is temporarily disabled."));

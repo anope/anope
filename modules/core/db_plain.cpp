@@ -181,49 +181,48 @@ static void ReadDatabase(Module *m = NULL)
 
 struct ChannelLevel
 {
+	ChannelAccess Level;
 	Anope::string Name;
-	int Level;
 };
 
 ChannelLevel ChannelLevels[] = {
-	{"INVITE", CA_INVITE},
-	{"AKICK", CA_AKICK},
-	{"SET", CA_SET},
-	{"UNBAN", CA_UNBAN},
-	{"AUTOOP", CA_AUTOOP},
-	{"AUTOVOICE", CA_AUTOVOICE},
-	{"OPDEOP", CA_OPDEOP},
-	{"ACCESS_LIST", CA_ACCESS_LIST},
-	{"NOJOIN", CA_NOJOIN},
-	{"ACCESS_CHANGE", CA_ACCESS_CHANGE},
-	{"MEMO", CA_MEMO},
-	{"ASSIGN", CA_ASSIGN},
-	{"BADWORDS", CA_BADWORDS},
-	{"NOKICK", CA_NOKICK},
-	{"FANTASIA", CA_FANTASIA},
-	{"SAY", CA_SAY},
-	{"GREET", CA_GREET},
-	{"VOICEME", CA_VOICEME},
-	{"VOICE", CA_VOICE},
-	{"GETKEY", CA_GETKEY},
-	{"AUTOHALFOP", CA_AUTOHALFOP},
-	{"AUTOPROTECT", CA_AUTOPROTECT},
-	{"OPDEOPME", CA_OPDEOPME},
-	{"HALFOPME", CA_HALFOPME},
-	{"HALFOP", CA_HALFOP},
-	{"PROTECTME", CA_PROTECTME},
-	{"PROTECT", CA_PROTECT},
-	{"KICKME", CA_KICKME},
-	{"KICK", CA_KICK},
-	{"SIGNKICK", CA_SIGNKICK},
-	{"BANME", CA_BANME},
-	{"BAN", CA_BAN},
-	{"TOPIC", CA_TOPIC},
-	{"INFO", CA_INFO},
-	{"AUTOOWNER", CA_AUTOOWNER},
-	{"OWNER", CA_OWNER},
-	{"OWNERME", CA_OWNERME},
-	{"", -1}
+	{ CA_ACCESS_LIST, "ACCESS_LIST" },
+	{ CA_NOKICK, "NOKICK" },
+	{ CA_FANTASIA, "FANTASIA" },
+	{ CA_GREET, "GREET" },
+	{ CA_AUTOVOICE, "AUTOVOICE" },
+	{ CA_VOICEME, "VOICEME" },
+	{ CA_VOICE, "VOICE" },
+	{ CA_INFO, "INFO" },
+	{ CA_SAY, "SAY" },
+	{ CA_AUTOHALFOP, "AUTOHALFOP" },
+	{ CA_HALFOPME, "HALFOPME" },
+	{ CA_HALFOP, "HALFOP" },
+	{ CA_KICK, "KICK" },
+	{ CA_SIGNKICK, "SIGNKICK" },
+	{ CA_BAN, "BAN" },
+	{ CA_TOPIC, "TOPIC" },
+	{ CA_MODE, "MODE" },
+	{ CA_GETKEY, "GETKEY" },
+	{ CA_INVITE, "INVITE" },
+	{ CA_UNBAN, "UNBAN" },
+	{ CA_AUTOOP, "AUTOOP" },
+	{ CA_OPDEOPME, "OPDEOPME" },
+	{ CA_OPDEOP, "OPDEOP" },
+	{ CA_AUTOPROTECT, "AUTOPROTECT" },
+	{ CA_AKICK, "AKICK" },
+	{ CA_BADWORDS, "BADWORDS" },
+	{ CA_ASSIGN, "ASSIGN" },
+	{ CA_MEMO, "MEMO" },
+	{ CA_ACCESS_CHANGE, "ACCESS_CHANGE" },
+	{ CA_PROTECTME, "PROTECTME" },
+	{ CA_PROTECT, "PROTECT" },
+	{ CA_SET, "SET" },
+	{ CA_AUTOOWNER, "AUTOPROTECT" },
+	{ CA_OWNERME, "OWNERME" },
+	{ CA_OWNER, "OWNER" },
+	{ CA_FOUNDER, "FOUNDER" },
+	{ CA_SIZE, "" }
 };
 
 static Anope::string ToString(const std::vector<Anope::string> &strings)
@@ -531,7 +530,7 @@ class DBPlain : public Module
 			else if (key.equals_ci("LEVELS"))
 			{
 				for (unsigned j = 0, end = params.size(); j < end; j += 2)
-					for (int i = 0; ChannelLevels[i].Level != -1; ++i)
+					for (int i = 0; ChannelLevels[i].Level != CA_SIZE; ++i)
 						if (params[j].equals_ci(ChannelLevels[i].Name))
 							ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
 			}
@@ -552,9 +551,19 @@ class DBPlain : public Module
 			}
 			else if (key.equals_ci("ACCESS"))
 			{
-				int level = params[1].is_number_only() ? convertTo<int>(params[1]) : 0;
-				time_t last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
-				ci->AddAccess(params[0], level, params[3], last_seen);
+				service_reference<AccessProvider> provider(params[0]);
+				if (!provider)
+					throw DatabaseException("Access entry for nonexistant provider " + params[0]);
+
+				ChanAccess *access = provider->Create();
+				access->ci = ci;
+				access->mask = params[1];
+				access->Unserialize(params[2]);
+				access->last_seen = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
+				access->creator = params[4];
+				access->created = params.size() > 5 && params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
+
+				ci->AddAccess(access);
 			}
 			else if (key.equals_ci("AKICK"))
 			{
@@ -766,7 +775,7 @@ class DBPlain : public Module
 			if (!ci->last_topic.empty())
 				db_buffer << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
 			db_buffer << "MD LEVELS";
-			for (int j = 0; ChannelLevels[j].Level != -1; ++j)
+			for (int j = 0; ChannelLevels[j].Level != CA_SIZE; ++j)
 				db_buffer << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
 			db_buffer << endl;
 			if (ci->FlagCount())
@@ -779,7 +788,10 @@ class DBPlain : public Module
 				db_buffer << "MD SUSPEND " << by << " :" << reason << endl;
 			}
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
-				db_buffer << "MD ACCESS " << ci->GetAccess(k)->GetMask() << " " << ci->GetAccess(k)->level << " " << ci->GetAccess(k)->last_seen << " " << ci->GetAccess(k)->creator << endl;
+			{
+				ChanAccess *access = ci->GetAccess(k);
+				db_buffer << "MD ACCESS " << access->provider->name << " " << access->mask << " " << access->Serialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
+			}
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{
 				db_buffer << "MD AKICK 0 " << (ci->GetAkick(k)->HasFlag(AK_ISNICK) ? "NICK " : "MASK ") <<

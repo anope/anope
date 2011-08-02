@@ -55,9 +55,8 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 		return;
 	}
 
-	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
-	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(u->nick) && u_level >= req_level)
+	AccessGroup u_access = ci->AccessFor(u), req_access = ci->AccessFor(requester);
+	if (ci->HasFlag(CI_PEACE) && u != requester && u_access >= req_access)
 		return;
 
 	if (matches_list(ci->c, u, CMODE_EXCEPT))
@@ -72,7 +71,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
 	/* Check if we need to do a signkick or not -GD */
-	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
+	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv(CA_SIGNKICK)))
 		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
 		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());
@@ -97,12 +96,11 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string
 		return;
 	}
 
-	ChanAccess *u_access = ci->GetAccess(u), *req_access = ci->GetAccess(requester);
-	int16 u_level = u_access ? u_access->level : 0, req_level = req_access ? req_access->level : 0;
-	if (ci->HasFlag(CI_PEACE) && !requester->nick.equals_ci(u->nick) && u_level >= req_level)
+	AccessGroup u_access = ci->AccessFor(u), req_access = ci->AccessFor(requester);
+	if (ci->HasFlag(CI_PEACE) && requester != u && u_access >= req_access)
 		return;
 
-	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !check_access(requester, ci, CA_SIGNKICK)))
+	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv(CA_SIGNKICK)))
 		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
 		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());

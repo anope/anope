@@ -1,4 +1,3 @@
 config.cache
-include/version.h
 include/sysconf.h
 build/

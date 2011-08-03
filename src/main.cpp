@@ -129,10 +129,6 @@ class UplinkSocket : public ConnectionSocket
 
 				/* Don't use quitmsg here, it may contain information you don't want people to see */
 				ircdproto->SendQuit(bi, "Shutting down");
-				/* Erase bots from the user list so they don't get nuked later on */
-				UserListByNick.erase(bi->nick);
-				if (!bi->GetUID().empty())
-					UserListByUID.erase(bi->GetUID());
 			}
 
 			/* Clear all of our users, but not our bots */

@@ -420,7 +420,7 @@ class BahamutIRCdMessage : public IRCdMessage
 					ChannelMode *cm = ModeManager::FindChannelModeByChar(ch);
 					if (!cm)
 					{
-						Log() << "Receeved unknown mode prefix " << cm << " in SJOIN string";
+						Log() << "Received unknown mode prefix " << cm << " in SJOIN string";
 						continue;
 					}
 

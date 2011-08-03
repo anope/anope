@@ -389,7 +389,7 @@ class InspircdIRCdMessage : public IRCdMessage
 				ChannelMode *cm = ModeManager::FindChannelModeByChar(buf[0]);
 				if (!cm)
 				{
-					Log() << "Receeved unknown mode prefix " << buf[0] << " in FJOIN string";
+					Log() << "Received unknown mode prefix " << buf[0] << " in FJOIN string";
 					buf.erase(buf.begin());
 					continue;
 				}

@@ -761,7 +761,7 @@ class ProtoInspIRCd : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		if (Config->Numeric.empty())
-			throw ModuleException("This IRCd protocol requires a server id to be set in Anope's configuration.");
+			Config->Numeric = ts6_sid_retrieve();
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &)

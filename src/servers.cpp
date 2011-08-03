@@ -420,7 +420,13 @@ const Anope::string ts6_sid_retrieve()
 	if (!ircd || !ircd->ts6)
 		return "";
 
-	static Anope::string current_sid = Config->Numeric;
+	static Anope::string current_sid;
+	if (current_sid.empty())
+	{
+		current_sid = Config->Numeric;
+		if (current_sid.empty())
+			current_sid = "00A";
+	}
 
 	while (Server::Find(current_sid) != NULL)
 	{

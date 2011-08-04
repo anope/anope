@@ -3,21 +3,15 @@ Legend:
 	? = unsure
 	+ = in progress
 
-1.9.4
+1.9.5
 -----
-[x] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
-[x] Allow users to delete their own access
-[x] ChanServ CLONE command
-[x] XMLRPC to execute commands and get data from Anope
-[+] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
-[x] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
-[ ] understanding extbans for /cs unban etc.
-[ ] (optional?) A way to confirm email changes by users
-[ ] Auto identify through SSL key
-[ ] Optional os_login system that can also use SSL keys.
-[ ] os_info module to show useful configuration settings to services opers.
-[ ] Remove nick requests. Instead use an unconfirmed nick group which cant recieve umode +r and auto expires after 1d?
-[ ] LDAP
+[+] More LDAP
+[x] Rewrite silly forbid system
+[x] Fix the modules language system to work without needing its own functions..
+[x] Rewrite commands system
+[x] Rewrite access system
+[ ] Customize email messages
+[ ] Configurable bot usermodes
 
 Future
 ------
@@ -27,19 +21,14 @@ Future
 [ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
 [ ] Allow channel founders to change the fantasy trigger for their channel.
-[ ] CIDR Akills, session exceptions, etc
+[+] CIDR Akills, session exceptions, etc
 [?] Language charset stuff, including collation (1.9.1? phoenix?)
 [?] a way for a module to queue itself (or even another module) for unloading
-[ ] Useful/common "third party" modules to core distro
-  [ ] NS AJOIN
+[+] Useful/common "third party" modules to core distro
+  [x] NS AJOIN
   [x] CS ENTRYMSG
 [?] Don't allow soper accounts to expire
 [?] Reason for CS SET RESTRICTED
-[x] AKILL/SGLINE/etc..
-  [x] Setter
-  [x] Time added
-  [+] Time modified (can they be modified?)
-  [x] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
-  [x] Reason
-  [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
+[ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
+[ ] No nickname ownership?

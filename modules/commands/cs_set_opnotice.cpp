@@ -16,7 +16,7 @@
 class CommandCSSetOpNotice : public Command
 {
  public:
-	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/notice") : Command(creator, cname, 2, 2)
+	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/opnotice") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Send a notice when OP/DEOP commands are used"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));

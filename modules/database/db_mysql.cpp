@@ -1,6 +1,6 @@
 #include "module.h"
 #include "../extra/sql.h"
-#include "os_session.h"
+#include "../commands/os_session.h"
 
 static Anope::string ToString(const std::vector<Anope::string> &strings)
 {

@@ -32,3 +32,4 @@ Future
 [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
 [ ] No nickname ownership?
+[ ] More commands need to be split up such as /bs bot, /ms set, /bs kick, /bs set, /os set? etc.

@@ -11,7 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#include "os_session.h"
+#include "../commands/os_session.h"
 
 Anope::string DatabaseFile;
 std::stringstream db_buffer;

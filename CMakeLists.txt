@@ -222,7 +222,7 @@ option(USE_RUN_CC_PL "Use run-cc.pl for building" OFF)
 # Use the following directories as includes
 # Note that it is important the binary include directory comes before the
 # source include directory so the precompiled headers work correctly.
-include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/core)
+include_directories(${Anope_BINARY_DIR}/include ${Anope_SOURCE_DIR}/include ${Anope_BINARY_DIR}/language ${Anope_SOURCE_DIR}/modules/pseudoclients)
 
 # If using Windows, always add the _WIN32 define
 if(WIN32)

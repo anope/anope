@@ -1,0 +1,2 @@
+Third party modules, eg, modules not shipped with Anope are to be placed here.
+After doing so, run ./Config, make, make install and with some luck your module will work!

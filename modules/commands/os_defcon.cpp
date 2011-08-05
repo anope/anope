@@ -335,7 +335,7 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), session_service("session"), akills("xlinemanager/sgline"), commandosdefcon(this)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), session_service("session"), akills("xlinemanager/sgline"), commandosdefcon(this)
 	{
 		this->SetAuthor("Anope");
 

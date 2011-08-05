@@ -102,7 +102,7 @@ class CSTBan : public Module
 	CommandCSTBan commandcstban;
 
  public:
-	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandcstban(this)
 	{
 		this->SetAuthor("Anope");

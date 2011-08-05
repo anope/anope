@@ -301,7 +301,7 @@ class HSRequest : public Module
 	CommandHSWaiting commandhswaiting;
 
  public:
-	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
 		this->SetAuthor("Anope");

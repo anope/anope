@@ -203,7 +203,7 @@ class CSEnforce : public Module
 	CommandCSEnforce commandcsenforce;
 
  public:
-	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	CSEnforce(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandcsenforce(this)
 	{
 		this->SetAuthor("Anope");

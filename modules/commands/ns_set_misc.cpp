@@ -70,7 +70,7 @@ class NSSetMisc : public Module
 	CommandNSSASetMisc commandnssasetmisc;
 
  public:
-	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandnssetmisc(this), commandnssasetmisc(this)
 	{
 		this->SetAuthor("Anope");

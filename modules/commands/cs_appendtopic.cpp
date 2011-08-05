@@ -105,7 +105,7 @@ class CSAppendTopic : public Module
 	CommandCSAppendTopic commandcsappendtopic;
 
  public:
-	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	CSAppendTopic(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandcsappendtopic(this)
 	{
 		this->SetAuthor("SGR");

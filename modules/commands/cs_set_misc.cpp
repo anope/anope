@@ -54,7 +54,7 @@ class CSSetMisc : public Module
 	CommandCSSASetMisc commandcssasetmisc;
 
  public:
-	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED),
+	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
 		commandcssetmisc(this), commandcssasetmisc(this)
 	{
 		this->SetAuthor("Anope");

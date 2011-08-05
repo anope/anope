@@ -161,7 +161,7 @@ class CSEntryMessage : public Module
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), commandentrymsg(this)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandentrymsg(this)
 	{
 		this->SetAuthor("Anope");
 

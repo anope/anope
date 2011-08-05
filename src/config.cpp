@@ -871,6 +871,7 @@ static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope:
 	Anope::string service = values[0].GetValue();
 	Anope::string name = values[1].GetValue();
 	Anope::string command = values[2].GetValue();
+	Anope::string permission = values[3].GetValue();
 
 	ValueItem vi(service);
 	if (!ValidateNotEmpty(config, "command", "service", vi))
@@ -891,7 +892,7 @@ static bool DoCommands(ServerConfig *config, const Anope::string &, const Anope:
 	if (bi->commands.count(name))
 		throw ConfigException("Command name " + name + " already exists on " + bi->nick);
 
-	bi->commands[name] = command;
+	bi->SetCommand(name, command, permission);
 	return true;
 }
 
@@ -1127,7 +1128,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&conf->NSReleaseTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&conf->NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&conf->NSNoGroupChange), DT_BOOLEAN, NoValidation},
-		{"nickserv", "listopersonly", "no", new ValueContainerBool(&conf->NSListOpersOnly), DT_BOOLEAN, NoValidation},
 		{"nickserv", "listmax", "0", new ValueContainerUInt(&conf->NSListMax), DT_UINTEGER, ValidateNotZero},
 		{"nickserv", "guestnickprefix", "", new ValueContainerString(&conf->NSGuestNickPrefix), DT_STRING, ValidateGuestPrefix},
 		{"nickserv", "secureadmins", "no", new ValueContainerBool(&conf->NSSecureAdmins), DT_BOOLEAN, NoValidation},
@@ -1154,7 +1154,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&conf->CSAutokickMax), DT_UINTEGER, ValidateChanServ},
 		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerString(&conf->CSAutokickReason), DT_STRING, ValidateChanServ},
 		{"chanserv", "inhabit", "0", new ValueContainerTime(&conf->CSInhabit), DT_TIME, ValidateChanServ},
-		{"chanserv", "listopersonly", "no", new ValueContainerBool(&conf->CSListOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"chanserv", "listmax", "0", new ValueContainerUInt(&conf->CSListMax), DT_UINTEGER, ValidateChanServ},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&conf->CSOpersOnly), DT_BOOLEAN, ValidateChanServ},
 		{"memoserv", "name", "", new ValueContainerString(&conf->MemoServ), DT_STRING, NoValidation},
@@ -1242,9 +1241,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"command",
-			{"service", "name", "command", ""},
-			{"", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING},
+			{"service", "name", "command", "permission", ""},
+			{"", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitCommands, DoCommands, DoneCommands},
 		{"",
 			{""},

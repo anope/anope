@@ -18,7 +18,7 @@ static service_reference<XLineManager> akills("xlinemanager/sgline");
 class CommandOSChanKill : public Command
 {
  public:
-	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3, "operserv/chankill")
+	CommandOSChanKill(Module *creator) : Command(creator, "operserv/chankill", 2, 3)
 	{
 		this->SetDesc(_("AKILL all users on a specific channel"));
 		this->SetSyntax(_("[+\037expiry\037] \037channel\037 \037reason\037"));

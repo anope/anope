@@ -16,7 +16,7 @@
 class CommandCSSetSecureFounder : public Command
 {
  public:
-	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetSecureFounder(Module *creator, const Anope::string &cname = "chanserv/set/securefounder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of channel founder status"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -33,7 +33,7 @@ class CommandCSSetSecureFounder : public Command
 		}
 
 
-		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
+		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -71,7 +71,7 @@ class CommandCSSetSecureFounder : public Command
 class CommandCSSASetSecureFounder : public CommandCSSetSecureFounder
 {
  public:
-	CommandCSSASetSecureFounder(Module *creator) : CommandCSSetSecureFounder(creator, "chanserv/saset/securefounder", "chanserv/saset/securefounder")
+	CommandCSSASetSecureFounder(Module *creator) : CommandCSSetSecureFounder(creator, "chanserv/saset/securefounder")
 	{
 	}
 };

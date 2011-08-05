@@ -17,7 +17,7 @@
 class CommandGLGlobal : public Command
 {
  public:
-	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1, "global/global")
+	CommandGLGlobal(Module *creator) : Command(creator, "global/global", 1, 1)
 	{
 		this->SetDesc(_("Send a message to all users"));
 		this->SetSyntax(_("\037message\037"));

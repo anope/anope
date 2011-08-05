@@ -168,7 +168,7 @@ class CommandOSSet : public Command
 		return;
 	}
  public:
-	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2, "operserv/set")
+	CommandOSSet(Module *creator) : Command(creator, "operserv/set", 1, 2)
 	{
 		this->SetDesc(_("Set various global Services options"));
 		this->SetSyntax(_("\037option\037 \037setting\037"));

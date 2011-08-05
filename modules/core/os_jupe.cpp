@@ -16,7 +16,7 @@
 class CommandOSJupe : public Command
 {
  public:
-	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2, "operserv/jupe")
+	CommandOSJupe(Module *creator) : Command(creator, "operserv/jupe", 1, 2)
 	{
 		this->SetDesc(_("\"Jupiter\" a server"));
 		this->SetSyntax(_("\037server\037 [\037reason\037]"));

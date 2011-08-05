@@ -16,7 +16,7 @@
 class CommandCSSetPeace : public Command
 {
  public:
-	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetPeace(Module *creator, const Anope::string &cname = "chanserv/set/peace") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Regulate the use of critical commands"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetPeace : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -69,7 +69,7 @@ class CommandCSSetPeace : public Command
 class CommandCSSASetPeace : public CommandCSSetPeace
 {
  public:
-	CommandCSSASetPeace(Module *creator) : CommandCSSetPeace(creator, "chanserv/saset/peace", "chanserv/saset/peace")
+	CommandCSSASetPeace(Module *creator) : CommandCSSetPeace(creator, "chanserv/saset/peace")
 	{
 	}
 };

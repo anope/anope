@@ -16,7 +16,7 @@
 class CommandNSSetMessage : public Command
 {
  public:
-	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetMessage(Module *creator, const Anope::string &sname = "nickserv/set/message", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Change the communication method of Services"));
 		this->SetSyntax(_("{ON | OFF}"));
@@ -73,7 +73,7 @@ class CommandNSSetMessage : public Command
 class CommandNSSASetMessage : public CommandNSSetMessage
 {
  public:
-	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2, "nickserv/saset/message")
+	CommandNSSASetMessage(Module *creator) : CommandNSSetMessage(creator, "nickserv/saset/message", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));

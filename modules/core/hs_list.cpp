@@ -16,7 +16,7 @@
 class CommandHSList : public Command
 {
  public:
-	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1, "hostserv/list")
+	CommandHSList(Module *creator) : Command(creator, "hostserv/list", 0, 1)
 	{
 		this->SetDesc(_("Displays one or more vhost entries."));
 		this->SetSyntax(_("\002[<key>|<#X-Y>]"));

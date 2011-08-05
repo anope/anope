@@ -16,7 +16,7 @@
 class CommandOSOper : public Command
 {
  public:
-	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3, "operserv/oper")
+	CommandOSOper(Module *creator) : Command(creator, "operserv/oper", 1, 3)
 	{
 		this->SetDesc(_("View and change services operators"));
 		this->SetSyntax(_("ADD \037oper\037 \037type\037"));

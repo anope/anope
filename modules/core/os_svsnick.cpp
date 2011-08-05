@@ -16,7 +16,7 @@
 class CommandOSSVSNick : public Command
 {
  public:
-	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2, "operserv/svsnick")
+	CommandOSSVSNick(Module *creator) : Command(creator, "operserv/svsnick", 2, 2)
 	{
 		this->SetDesc(_("Forcefully change a user's nickname"));
 		this->SetSyntax(_("\037nick\037 \037newnick\037"));

@@ -16,7 +16,7 @@
 class CommandOSNOOP : public Command
 {
  public:
-	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2, "operserv/noop")
+	CommandOSNOOP(Module *creator) : Command(creator, "operserv/noop", 2, 2)
 	{
 		this->SetDesc(_("Temporarily remove all O:lines of a server remotely"));
 		this->SetSyntax(_("SET \037server\037"));

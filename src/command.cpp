@@ -56,7 +56,7 @@ void CommandSource::DoReply()
 	}
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params, const Anope::string &spermission) : Service(o, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), permission(spermission), module(owner)
+Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params) : Service(o, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), module(owner)
 {
 }
 
@@ -111,10 +111,5 @@ void Command::OnSyntaxError(CommandSource &source, const Anope::string &subcomma
 {
 	this->SendSyntax(source);
 	source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), source.command.c_str());
-}
-
-void Command::SetPermission(const Anope::string &reststr)
-{
-	this->permission = reststr;
 }
 

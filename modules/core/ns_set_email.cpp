@@ -44,7 +44,7 @@ static bool SendConfirmMail(User *u, BotInfo *bi)
 class CommandNSSetEmail : public Command
 {
  public:
-	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0, const Anope::string &spermission = "") : Command(creator, cname, min, min + 1, spermission)
+	CommandNSSetEmail(Module *creator, const Anope::string &cname = "nickserv/set/email", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
 		this->SetDesc(_("Associate an E-mail address with your nickname"));
 		this->SetSyntax(_("\037address\037"));
@@ -122,7 +122,7 @@ class CommandNSSetEmail : public Command
 class CommandNSSASetEmail : public CommandNSSetEmail
 {
  public:
-	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2, "nickserv/saset/email")
+	CommandNSSASetEmail(Module *creator) : CommandNSSetEmail(creator, "nickserv/saset/email", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037address\037"));

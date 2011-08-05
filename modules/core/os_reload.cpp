@@ -16,7 +16,7 @@
 class CommandOSReload : public Command
 {
  public:
-	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0, "operserv/reload")
+	CommandOSReload(Module *creator) : Command(creator, "operserv/reload", 0, 0)
 	{
 		this->SetDesc(_("Reload services' configuration file"));
 		this->SetSyntax("");

@@ -482,8 +482,6 @@ class CoreExport ServerConfig
 	Anope::string NSEnforcerHost;
 	/* How long before recovered nicks are released */
 	time_t NSReleaseTimeout;
-	/* /nickserv list is oper only */
-	bool NSListOpersOnly;
 	/* Max number of entries that can be returned from the list command */
 	unsigned NSListMax;
 	/* Only allow usermode +a etc on real services admins */
@@ -523,8 +521,6 @@ class CoreExport ServerConfig
 	Anope::string CSAutokickReason;
 	/* Time ChanServ should stay in the channel to hold it to keep users from getting in */
 	time_t CSInhabit;
-	/* ChanServ's LIST command is oper only */
-	bool CSListOpersOnly;
 	/* Max number of entries allowed to be returned from the LIST command */
 	unsigned CSListMax;
 	/* true to make ChanServ oper only */

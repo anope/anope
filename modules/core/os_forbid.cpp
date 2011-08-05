@@ -77,7 +77,7 @@ class CommandOSForbid : public Command
 {
 	service_reference<ForbidService> fs;
  public:
-	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5, "operserv/forbid"), fs("forbid")
+	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
 		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));

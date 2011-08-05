@@ -134,7 +134,7 @@ class CommandHSRequest : public Command
 class CommandHSActivate : public Command
 {
  public:
-	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1, "hostserv/set")
+	CommandHSActivate(Module *creator) : Command(creator, "hostserv/activate", 1, 1)
 	{
 		this->SetDesc(_("Approve the requested vHost of a user"));
 		this->SetSyntax(_("\037nick\037"));
@@ -187,7 +187,7 @@ class CommandHSActivate : public Command
 class CommandHSReject : public Command
 {
  public:
-	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2, "hostserv/set")
+	CommandHSReject(Module *creator) : Command(creator, "hostserv/reject", 1, 2)
 	{
 		this->SetDesc(_("Reject the requested vHost of a user"));
 	}
@@ -264,7 +264,7 @@ class HSListBase : public Command
 		return;
 	}
  public:
-	HSListBase(Module *creator, const Anope::string &cmd, int min, int max) : Command(creator, cmd, min, max, "hostserv/set")
+	HSListBase(Module *creator, const Anope::string &cmd, int min, int max) : Command(creator, cmd, min, max)
 	{
 	}
 };

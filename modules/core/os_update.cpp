@@ -16,7 +16,7 @@
 class CommandOSUpdate : public Command
 {
  public:
-	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0, "operserv/update")
+	CommandOSUpdate(Module *creator) : Command(creator, "operserv/update", 0, 0)
 	{
 		this->SetDesc(_("Force the Services databases to be updated immediately"));
 		this->SetSyntax("");

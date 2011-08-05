@@ -16,7 +16,7 @@
 class CommandOSQuit : public Command
 {
  public:
-	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0, "operserv/quit")
+	CommandOSQuit(Module *creator) : Command(creator, "operserv/quit", 0, 0)
 	{
 		this->SetDesc(_("Terminate Services WITHOUT saving"));
 		this->SetSyntax("");
@@ -45,7 +45,7 @@ class CommandOSQuit : public Command
 class CommandOSRestart : public Command
 {
  public:
-	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0, "operserv/restart")
+	CommandOSRestart(Module *creator) : Command(creator, "operserv/restart", 0, 0)
 	{
 		this->SetDesc(_("Save databases and restart Services"));
 		this->SetSyntax("");
@@ -72,7 +72,7 @@ class CommandOSRestart : public Command
 class CommandOSShutdown : public Command
 {
  public:
-	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0, "operserv/shutdown")
+	CommandOSShutdown(Module *creator) : Command(creator, "operserv/shutdown", 0, 0)
 	{
 		this->SetDesc(_("Terminate services with save"));
 		this->SetSyntax("");

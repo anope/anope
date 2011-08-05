@@ -16,7 +16,7 @@
 class CommandNSSetPrivate : public Command
 {
  public:
-	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetPrivate(Module *creator, const Anope::string &sname = "nickserv/set/private", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(Anope::printf(_("Prevent the nickname from appearing in a \002%s%s LIST\002"), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str()));
 		this->SetSyntax(_("{ON | OFF}"));
@@ -70,7 +70,7 @@ class CommandNSSetPrivate : public Command
 class CommandNSSASetPrivate : public CommandNSSetPrivate
 {
  public:
-	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2, "nickserv/saset/private")
+	CommandNSSASetPrivate(Module *creator) : CommandNSSetPrivate(creator, "nickserv/saset/private", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));

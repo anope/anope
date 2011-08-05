@@ -16,7 +16,7 @@
 class CommandNSGetPass : public Command
 {
  public:
-	CommandNSGetPass(Module *creator) : Command(creator, "nickserv/getpass", 1, 1, "nickserv/getpass")
+	CommandNSGetPass(Module *creator) : Command(creator, "nickserv/getpass", 1, 1)
 	{
 		this->SetDesc(_("Retrieve the password for a nickname"));
 		this->SetSyntax(_("\037nickname\037"));

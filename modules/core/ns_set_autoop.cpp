@@ -16,7 +16,7 @@
 class CommandNSSetAutoOp : public Command
 {
  public:
-	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetAutoOp(Module *creator, const Anope::string &sname = "nickserv/set/autoop", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Should services op you automatically."));
 		this->SetSyntax(_("{ON | OFF}"));
@@ -66,7 +66,7 @@ class CommandNSSetAutoOp : public Command
 class CommandNSSASetAutoOp : public CommandNSSetAutoOp
 {
  public:
-	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2, "nickserv/saset/autoop")
+	CommandNSSASetAutoOp(Module *creator) : CommandNSSetAutoOp(creator, "nickserv/saset/autoop", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));

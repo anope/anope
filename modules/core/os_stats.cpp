@@ -157,7 +157,7 @@ class CommandOSStats : public Command
 	}
 
  public:
-	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1, "operserv/stats"),
+	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
 		akills("xlinemanager/sgline"), snlines("xlinemanager/snline"), sqlines("xlinemanager/sqline"), szlines("xlinemanager/szline")
 	{
 		this->SetDesc(_("Show status of Services and network"));

@@ -17,7 +17,7 @@
 class CommandMSSendAll : public Command
 {
  public:
-	CommandMSSendAll(Module *creator) : Command(creator, "memoserv/sendall", 1, 1, "memoserv/sendall")
+	CommandMSSendAll(Module *creator) : Command(creator, "memoserv/sendall", 1, 1)
 	{
 		this->SetDesc(_("Send a memo to all registered users"));
 		this->SetSyntax(_("\037memo-text\037"));

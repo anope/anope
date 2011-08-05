@@ -203,7 +203,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 {
 	std::vector<Anope::string> params = BuildStringVector(message);
 
-	command_map::iterator it = this->commands.end();
+	BotInfo::command_map::iterator it = this->commands.end();
 	unsigned count = 0;
 	for (unsigned max = params.size(); it == this->commands.end() && max > 0; --max)
 	{
@@ -222,11 +222,12 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 		return;
 	}
 
-	service_reference<Command> c(it->second);
+	CommandInfo &info = it->second;
+	service_reference<Command> c(info.name);
 	if (!c)
 	{
 		u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
-		Log(this) << "Command " << it->first << " exists on me, but its service " << it->second << " was not found!";
+		Log(this) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}
 
@@ -253,6 +254,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	source.owner = this;
 	source.service = this;
 	source.command = it->first;
+	source.permission = info.permission;
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
@@ -271,7 +273,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	}
 
 	// If the command requires a permission, and they aren't registered or don't have the required perm, DENIED
-	if (!c->permission.empty() && !u->HasCommand(c->permission))
+	if (!info.permission.empty() && !u->HasCommand(info.permission))
 	{
 		u->SendMessage(this, ACCESS_DENIED);
 		Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
@@ -287,5 +289,30 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 		if (user_reference)
 			source.DoReply();
 	}
+}
+
+/** Link a command name to a command in services
+ * @param cname The command name
+ * @param sname The service name
+ * @param permission Permission required to execute the command, if any
+ */
+void BotInfo::SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission)
+{
+	CommandInfo ci;
+	ci.name = sname;
+	ci.permission = permission;
+	this->commands[cname] = ci;
+}
+
+/** Get command info for a command
+ * @param cname The command name
+ * @return A struct containing service name and permission
+ */
+CommandInfo *BotInfo::GetCommand(const Anope::string &cname)
+{
+	command_map::iterator it = this->commands.find(cname);
+	if (it != this->commands.end())
+		return &it->second;
+	return NULL;
 }
 

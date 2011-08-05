@@ -16,7 +16,7 @@
 class CommandCSSetSecure : public Command
 {
  public:
-	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetSecure(Module *creator, const Anope::string &cname = "chanserv/set/secure") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Activate security features"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetSecure : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -70,7 +70,7 @@ class CommandCSSetSecure : public Command
 class CommandCSSASetSecure : public CommandCSSetSecure
 {
  public:
-	CommandCSSASetSecure(Module *creator) : CommandCSSetSecure(creator, "chanserv/saset/secure", "chanserv/saset/secure")
+	CommandCSSASetSecure(Module *creator) : CommandCSSetSecure(creator, "chanserv/saset/secure")
 	{
 	}
 };

@@ -16,7 +16,7 @@
 class CommandNSSetKill : public Command
 {
  public:
-	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetKill(Module *creator, const Anope::string &sname = "nickserv/set/kill", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn protection on or off"));
 		this->SetSyntax(_("{ON | QUICK | IMMED | OFF}"));
@@ -99,7 +99,7 @@ class CommandNSSetKill : public Command
 class CommandNSSASetKill : public CommandNSSetKill
 {
  public:
-	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2, "nickserv/saset/kill")
+	CommandNSSASetKill(Module *creator) : CommandNSSetKill(creator, "nickserv/saset/kill", 2)
 	{
 		this->SetSyntax(_("\037nickname\037 {ON | QUICK | IMMED | OFF}"));
 	}

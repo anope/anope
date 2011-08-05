@@ -16,7 +16,7 @@
 class CommandNSSetMisc : public Command
 {
  public:
-	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", const Anope::string &cpermission = "", size_t min = 1) : Command(creator, cname, min, min + 1, cpermission)
+	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 1) : Command(creator, cname, min, min + 1)
 	{
 		this->SetSyntax(_("\037parameter\037"));
 	}
@@ -52,7 +52,7 @@ class CommandNSSetMisc : public Command
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", "nickserv/saset/misc", 2)
+	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037parameter\037"));

@@ -16,7 +16,7 @@
 class CommandCSSetPersist : public Command
 {
  public:
-	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetPersist(Module *creator, const Anope::string &cname = "chanserv/set/persist") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the channel as permanent"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetPersist : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -156,7 +156,7 @@ class CommandCSSetPersist : public Command
 class CommandCSSASetPersist : public CommandCSSetPersist
 {
  public:
-	CommandCSSASetPersist(Module *creator) : CommandCSSetPersist(creator, "chanserv/saset/persist", "chanserv/saset/persist")
+	CommandCSSASetPersist(Module *creator) : CommandCSSetPersist(creator, "chanserv/saset/persist")
 	{
 	}
 };

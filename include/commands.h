@@ -30,6 +30,12 @@ const Anope::string CommandFlagStrings[] = {
 	""
 };
 
+struct CommandInfo
+{
+	Anope::string name;
+	Anope::string permission;
+};
+
 /* The source for a command */
 struct CoreExport CommandSource
 {
@@ -43,6 +49,8 @@ struct CoreExport CommandSource
 	BotInfo *service;
 	/* The actual name of the command being executed */
 	Anope::string command;
+	/* The permission of the command being executed */
+	Anope::string permission;
 
 	std::list<Anope::string> reply;
 
@@ -64,8 +72,6 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	size_t MaxParams;
 	/* Minimum parameters required to use this command */
 	size_t MinParams;
-	/* Permission needed to use this comand */
-	Anope::string permission;
 
 	/* Module which owns us */
 	Module *module;
@@ -77,7 +83,7 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	 * @param max_params The maximum number of parameters the parser will create, after max_params, all will be combined into the last argument.
 	 * NOTE: If max_params is not set (default), there is no limit to the max number of params.
 	 */
-	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0, const Anope::string &spermission = "");
+	Command(Module *owner, const Anope::string &sname, size_t min_params, size_t max_params = 0);
 
 	virtual ~Command();
 
@@ -117,11 +123,6 @@ class CoreExport Command : public Service, public Flags<CommandFlag>
 	 * @param subcommand The subcommand the user tried to use
 	 */
 	virtual void OnSyntaxError(CommandSource &source, const Anope::string &subcommand);
-
-	/** Set which command permission (e.g. chanserv/forbid) is required for this command.
-	 * @param reststr The permission required to successfully execute this command
-	 */
-	void SetPermission(const Anope::string &reststr);
 };
 
 #endif // COMMANDS_H

@@ -16,7 +16,7 @@
 class CommandNSSetGreet : public Command
 {
  public:
-	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetGreet(Module *creator, const Anope::string &sname = "nickserv/set/greet", size_t min = 0) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Associate a greet message with your nickname"));
 		this->SetSyntax(_("\037message\037"));
@@ -66,7 +66,7 @@ class CommandNSSetGreet : public Command
 class CommandNSSASetGreet : public CommandNSSetGreet
 {
  public:
-	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1, "nickserv/saset/greet")
+	CommandNSSASetGreet(Module *creator) : CommandNSSetGreet(creator, "nickserv/saset/greet", 1)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037message\037"));

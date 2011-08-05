@@ -16,7 +16,7 @@
 class CommandOSModLoad : public Command
 {
  public:
-	CommandOSModLoad(Module *creator) : Command(creator, "operserv/modload", 1, 1, "operserv/modload")
+	CommandOSModLoad(Module *creator) : Command(creator, "operserv/modload", 1, 1)
 	{
 		this->SetDesc(_("Load a module"));
 		this->SetSyntax(_("\037modname\037"));
@@ -61,7 +61,7 @@ class CommandOSModLoad : public Command
 class CommandOSModReLoad : public Command
 {
  public:
-	CommandOSModReLoad(Module *creator) : Command(creator, "operserv/modreload", 1, 1, "operserv/modload")
+	CommandOSModReLoad(Module *creator) : Command(creator, "operserv/modreload", 1, 1)
 	{
 		this->SetDesc(_("Reload a module"));
 		this->SetSyntax(_("\037modname\037"));
@@ -131,7 +131,7 @@ class CommandOSModReLoad : public Command
 class CommandOSModUnLoad : public Command
 {
  public:
-	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1, "operserv/modload")
+	CommandOSModUnLoad(Module *creator) : Command(creator, "operserv/modunload", 1, 1)
 	{
 		this->SetDesc(_("Un-Load a module"));
 		this->SetSyntax(_("\037modname\037"));

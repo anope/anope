@@ -32,7 +32,7 @@ class CommandOSConfig : public Command
 	}
 
  public:
-	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4, "operserv/config")
+	CommandOSConfig(Module *creator) : Command(creator, "operserv/config", 1, 4)
 	{
 		this->SetDesc(_("View and change configuration file settings"));
 		this->SetSyntax(_("{\037MODIFY\037|\037VIEW\037} [\037block name\037 \037item name\037 \037item value\037]"));

@@ -16,7 +16,7 @@
 class CommandCSSetOpNotice : public Command
 {
  public:
-	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/notice", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetOpNotice(Module *creator, const Anope::string &cname = "chanserv/set/notice") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Send a notice when OP/DEOP commands are used"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetOpNotice : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -69,7 +69,7 @@ class CommandCSSetOpNotice : public Command
 class CommandCSSASetOpNotice : public CommandCSSetOpNotice
 {
  public:
-	CommandCSSASetOpNotice(Module *creator) : CommandCSSetOpNotice(creator, "chanserv/saset/opnotice", "chanserv/saset/opnotice")
+	CommandCSSASetOpNotice(Module *creator) : CommandCSSetOpNotice(creator, "chanserv/saset/opnotice")
 	{
 	}
 };

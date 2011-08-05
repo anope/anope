@@ -16,7 +16,7 @@
 class CommandHSDel : public Command
 {
  public:
-	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1, "hostserv/del")
+	CommandHSDel(Module *creator) : Command(creator, "hostserv/del", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost of another user"));
 		this->SetSyntax(_("\037nick\037"));
@@ -51,7 +51,7 @@ class CommandHSDel : public Command
 class CommandHSDelAll : public Command
 {
  public:
-	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1, "hostserv/del")
+	CommandHSDelAll(Module *creator) : Command(creator, "hostserv/delall", 1, 1)
 	{
 		this->SetDesc(_("Delete the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037nick\037"));

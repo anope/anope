@@ -16,7 +16,7 @@
 class CommandCSSetKeepTopic : public Command
 {
  public:
-	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetKeepTopic(Module *creator, const Anope::string &cname = "chanserv/set/keeptopic") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Retain topic when channel is not in use"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetKeepTopic : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -70,7 +70,7 @@ class CommandCSSetKeepTopic : public Command
 class CommandCSSASetKeepTopic : public CommandCSSetKeepTopic
 {
  public:
-	CommandCSSASetKeepTopic(Module *creator) : CommandCSSetKeepTopic(creator, "chanserv/saset/keeptopic", "chanserv/saset/keeptopic")
+	CommandCSSASetKeepTopic(Module *creator) : CommandCSSetKeepTopic(creator, "chanserv/saset/keeptopic")
 	{
 	}
 };

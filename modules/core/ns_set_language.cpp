@@ -16,7 +16,7 @@
 class CommandNSSetLanguage : public Command
 {
  public:
-	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetLanguage(Module *creator, const Anope::string &sname = "nickserv/set/language", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Set the language Services will use when messaging you"));
 		this->SetSyntax(_("\037language\037"));
@@ -79,7 +79,7 @@ class CommandNSSetLanguage : public Command
 class CommandNSSASetLanguage : public CommandNSSetLanguage
 {
  public:
-	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2, "nickserv/saset/language")
+	CommandNSSASetLanguage(Module *creator) : CommandNSSetLanguage(creator, "nickserv/saset/language", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 \037language\037"));

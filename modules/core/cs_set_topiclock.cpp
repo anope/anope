@@ -16,7 +16,7 @@
 class CommandCSSetTopicLock : public Command
 {
  public:
-	CommandCSSetTopicLock(Module *creator, const Anope::string &cname = "chanserv/set/topiclock", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetTopicLock(Module *creator, const Anope::string &cname = "chanserv/set/topiclock") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Topic can only be changed with TOPIC"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetTopicLock : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -68,7 +68,7 @@ class CommandCSSetTopicLock : public Command
 class CommandCSSASetTopicLock : public CommandCSSetTopicLock
 {
  public:
-	CommandCSSASetTopicLock(Module *creator) : CommandCSSetTopicLock(creator, "chanserv/saset/topiclock", "chanserv/saset/topiclock")
+	CommandCSSASetTopicLock(Module *creator) : CommandCSSetTopicLock(creator, "chanserv/saset/topiclock")
 	{
 	}
 };

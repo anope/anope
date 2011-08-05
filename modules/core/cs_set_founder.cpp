@@ -16,7 +16,7 @@
 class CommandCSSetFounder : public Command
 {
  public:
-	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetFounder(Module *creator, const Anope::string &cname = "chanserv/set/founder") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set the founder of a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
@@ -32,13 +32,13 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (this->permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER)))
+		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER)))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -59,7 +59,7 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		Log(!this->permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder to " << nc->display;
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder to " << nc->display;
 
 		ci->SetFounder(nc);
 
@@ -81,7 +81,7 @@ class CommandCSSetFounder : public Command
 class CommandCSSASetFounder : public CommandCSSetFounder
 {
  public:
-	CommandCSSASetFounder(Module *creator) : CommandCSSetFounder(creator, "chanserv/saset/founder", "chanserv/saset/founder")
+	CommandCSSASetFounder(Module *creator) : CommandCSSetFounder(creator, "chanserv/saset/founder")
 	{
 	}
 };

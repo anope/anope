@@ -16,7 +16,7 @@
 class CommandCSSetSecureOps : public Command
 {
  public:
-	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetSecureOps(Module *creator, const Anope::string &cname = "chanserv/set/secureops") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Stricter control of chanop status"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetSecureOps : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -68,7 +68,7 @@ class CommandCSSetSecureOps : public Command
 class CommandCSSASetSecureOps : public CommandCSSetSecureOps
 {
  public:
-	CommandCSSASetSecureOps(Module *creator) : CommandCSSetSecureOps(creator, "chanserv/saset/secureops", "chanserv/saset/secureops")
+	CommandCSSASetSecureOps(Module *creator) : CommandCSSetSecureOps(creator, "chanserv/saset/secureops")
 	{
 	}
 };

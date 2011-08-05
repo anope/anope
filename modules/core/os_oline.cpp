@@ -16,7 +16,7 @@
 class CommandOSOLine : public Command
 {
  public:
-	CommandOSOLine(Module *creator) : Command(creator, "operserv/oline", 2, 2, "operserv/oline")
+	CommandOSOLine(Module *creator) : Command(creator, "operserv/oline", 2, 2)
 	{
 		this->SetDesc(_("Give Operflags to a certain user"));
 		this->SetSyntax(_("\037nick\037 \037flags\037"));

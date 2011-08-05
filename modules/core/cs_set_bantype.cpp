@@ -16,7 +16,7 @@
 class CommandCSSetBanType : public Command
 {
  public:
-	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetBanType(Module *creator, const Anope::string &cname = "chanserv/set/bantype") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Set how Services make bans on the channel"));
 		this->SetSyntax(_("\037channel\037 \037bantype\037"));
@@ -32,7 +32,7 @@ class CommandCSSetBanType : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -74,7 +74,7 @@ class CommandCSSetBanType : public Command
 class CommandCSSASetBanType : public CommandCSSetBanType
 {
  public:
-	CommandCSSASetBanType(Module *creator) : CommandCSSetBanType(creator, "chanserv/saset/bantype", "chanserv/saset/bantype")
+	CommandCSSASetBanType(Module *creator) : CommandCSSetBanType(creator, "chanserv/saset/bantype")
 	{
 	}
 };

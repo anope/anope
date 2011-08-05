@@ -32,19 +32,22 @@ class CommandHelp : public Command
 
 		if (params.empty())
 		{
-			for (command_map::iterator it = bi->commands.begin(), it_end = bi->commands.end(); it != it_end; ++it)
+			for (BotInfo::command_map::iterator it = bi->commands.begin(), it_end = bi->commands.end(); it != it_end; ++it)
 			{
+				const Anope::string &c_name = it->first;
+				CommandInfo &info = it->second;
+
 				// Smaller command exists
-				Anope::string cmd = myStrGetToken(it->first, ' ', 0);
+				Anope::string cmd = myStrGetToken(c_name, ' ', 0);
 				if (cmd != it->first && bi->commands.count(cmd))
 					continue;
 
-				service_reference<Command> c(it->second);
+				service_reference<Command> c(info.name);
 				if (!c)
 					continue;
-				if (!Config->HidePrivilegedCommands || c->permission.empty() || u->HasCommand(c->permission))
+				if (!Config->HidePrivilegedCommands || info.permission.empty() || u->HasCommand(info.permission))
 				{
-					source.command = it->first;
+					source.command = c_name;
 					c->OnServHelp(source);
 				}
 			}
@@ -59,15 +62,17 @@ class CommandHelp : public Command
 					full_command += " " + params[i];
 				full_command.erase(full_command.begin());
 
-				std::map<Anope::string, Anope::string>::iterator it = bi->commands.find(full_command);
+				BotInfo::command_map::iterator it = bi->commands.find(full_command);
 				if (it == bi->commands.end())
 					continue;
 
-				service_reference<Command> c(it->second);
+				CommandInfo &info = it->second;
+
+				service_reference<Command> c(info.name);
 				if (!c)
 					continue;
 
-				if (Config->HidePrivilegedCommands && !c->permission.empty() && !u->HasCommand(c->permission))
+				if (Config->HidePrivilegedCommands && !info.permission.empty() && !u->HasCommand(info.permission))
 					continue;
 
 				const Anope::string &subcommand = params.size() > max ? params[max] : "";
@@ -76,19 +81,24 @@ class CommandHelp : public Command
 					continue;
 
 				helped = true;
-				source.Reply(" ");
 
 				/* Inform the user what permission is required to use the command */
-				if (!c->permission.empty())
-					source.Reply(_("Access to this command requires the permission \002%s\002 to be present in your opertype."), c->permission.c_str());
+				if (!info.permission.empty())
+				{
+					source.Reply(" ");
+					source.Reply(_("Access to this command requires the permission \002%s\002 to be present in your opertype."), info.permission.c_str());
+				}
 				if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
+				{
+					if (info.permission.empty())
+						source.Reply(" ");
 					source.Reply( _("You need to be identified to use this command."));
+				}
 				/* User doesn't have the proper permission to use this command */
-				else if (!c->permission.empty() && !u->HasCommand(c->permission))
+				else if (!info.permission.empty() && !u->HasCommand(info.permission))
+				{
 					source.Reply(_("You cannot use this command."));
-				/* User can use this command */
-				else
-					source.Reply(_("You can use this command."));
+				}
 
 				break;
 			}

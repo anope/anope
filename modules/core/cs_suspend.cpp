@@ -16,7 +16,7 @@
 class CommandCSSuspend : public Command
 {
  public:
-	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 1, 2, "chanserv/suspend")
+	CommandCSSuspend(Module *creator) : Command(creator, "chanserv/suspend", 1, 2)
 	{ 
 		this->SetDesc(_("Prevent a channel from being used preserving channel data and settings"));
 		this->SetSyntax(_("\037channel\037 [\037reason\037]"));
@@ -86,7 +86,7 @@ class CommandCSSuspend : public Command
 class CommandCSUnSuspend : public Command
 {
  public:
-	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1, "chanserv/suspend")
+	CommandCSUnSuspend(Module *creator) : Command(creator, "chanserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Releases a suspended channel"));
 		this->SetSyntax(_("\037channel\037"));

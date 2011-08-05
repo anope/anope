@@ -16,7 +16,7 @@
 class CommandOSMode : public Command
 {
  public:
-	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 2, "operserv/mode")
+	CommandOSMode(Module *creator) : Command(creator, "operserv/mode", 2, 2)
 	{
 		this->SetDesc(_("Change channel modes"));
 		this->SetSyntax(_("\037channel\037 \037modes\037"));
@@ -54,7 +54,7 @@ class CommandOSMode : public Command
 class CommandOSUMode : public Command
 {
  public:
-	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2, "operserv/umode")
+	CommandOSUMode(Module *creator) : Command(creator, "operserv/umode", 2, 2)
 	{
 		this->SetDesc(_("Change channel or user modes"));
 		this->SetSyntax(_("\037user\037 \037modes\037"));

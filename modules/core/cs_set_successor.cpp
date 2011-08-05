@@ -16,7 +16,7 @@
 class CommandCSSetSuccessor : public Command
 {
  public:
-	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
+	CommandCSSetSuccessor(Module *creator, const Anope::string &cname = "chanserv/set/successor") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the successor for a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
@@ -32,13 +32,13 @@ class CommandCSSetSuccessor : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (this->permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
+		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -65,7 +65,7 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Log(!this->permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none");
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none");
 
 		ci->successor = nc;
 
@@ -95,7 +95,7 @@ class CommandCSSetSuccessor : public Command
 class CommandCSSASetSuccessor : public CommandCSSetSuccessor
 {
  public:
-	CommandCSSASetSuccessor(Module *creator) : CommandCSSetSuccessor(creator, "chanserv/saset/successor", "chanserv/saset/successor")
+	CommandCSSASetSuccessor(Module *creator) : CommandCSSetSuccessor(creator, "chanserv/saset/successor")
 	{
 	}
 };

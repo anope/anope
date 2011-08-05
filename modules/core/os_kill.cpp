@@ -16,7 +16,7 @@
 class CommandOSKill : public Command
 {
  public:
-	CommandOSKill(Module *creator) : Command(creator, "operserv/kill", 1, 2, "operserv/kill")
+	CommandOSKill(Module *creator) : Command(creator, "operserv/kill", 1, 2)
 	{
 		this->SetDesc(_("Kill a user"));
 		this->SetSyntax(_("\037user\037 [\037reason\037]"));

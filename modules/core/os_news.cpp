@@ -216,7 +216,7 @@ class NewsBase : public Command
 		return;
 	}
  public:
-	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2, "operserv/news"), ns("news")
+	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("news")
 	{
 		this->SetSyntax(_("ADD \037text\037"));
 		this->SetSyntax(_("DEL {\037num\037 | ALL}"));

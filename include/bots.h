@@ -13,7 +13,6 @@ class BotInfo;
 extern CoreExport Anope::insensitive_map<BotInfo *> BotListByNick;
 extern CoreExport Anope::map<BotInfo *> BotListByUID;
 typedef Anope::insensitive_map<BotInfo *> botinfo_map;
-typedef Anope::insensitive_map<Anope::string> command_map;
 
 /** Flags settable on a bot
  */
@@ -39,6 +38,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	uint32 chancount;
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
+	typedef Anope::insensitive_map<CommandInfo> command_map;
 	command_map commands; /* Commands, actual name to service name */
 
 	/** Create a new bot.
@@ -100,6 +100,19 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 * @param message The users' message
 	 */
 	virtual void OnMessage(User *u, const Anope::string &message);
+
+	/** Link a command name to a command in services
+	 * @param cname The command name
+	 * @param sname The service name
+	 * @param permission Permission required to execute the command, if any
+	 */
+	void SetCommand(const Anope::string &cname, const Anope::string &sname, const Anope::string &permission = "");
+
+	/** Get command info for a command
+	 * @param cname The command name
+	 * @return A struct containing service name and permission
+	 */
+	CommandInfo *GetCommand(const Anope::string &cname);
 };
 
 #endif // BOTS_H

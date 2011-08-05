@@ -16,7 +16,7 @@
 class CommandNSSetHide : public Command
 {
  public:
-	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2, const Anope::string &spermission = "") : Command(creator, sname, min, min + 1, spermission)
+	CommandNSSetHide(Module *creator, const Anope::string &sname = "nickserv/set/hide", size_t min = 2) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Hide certain pieces of nickname information"));
 		this->SetSyntax(_("{EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}"));
@@ -104,7 +104,7 @@ class CommandNSSetHide : public Command
 class CommandNSSASetHide : public CommandNSSetHide
 {
  public:
-	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3, "nickserv/saset/hide")
+	CommandNSSASetHide(Module *creator) : CommandNSSetHide(creator, "nickserv/saset/hide", 3)
 	{
 		this->SetSyntax("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
 	}

@@ -674,6 +674,7 @@ enum
 
 #include "users.h"
 #include "account.h"
+#include "commands.h"
 #include "bots.h"
 
 struct LevelInfo

@@ -16,7 +16,7 @@
 class CommandCSSetSignKick : public Command
 {
  public:
-	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetSignKick(Module *creator, const Anope::string &cname = "chanserv/set/signkick") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Sign kicks that are done with KICK command"));
 		this->SetSyntax(_("\037channel\037 SIGNKICK {ON | LEVEL | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetSignKick : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -80,7 +80,7 @@ class CommandCSSetSignKick : public Command
 class CommandCSSASetSignKick : public CommandCSSetSignKick
 {
  public:
-	CommandCSSASetSignKick(Module *creator) : CommandCSSetSignKick(creator, "chanserv/saset/signkick", "chanserv/saset/signkick")
+	CommandCSSASetSignKick(Module *creator) : CommandCSSetSignKick(creator, "chanserv/saset/signkick")
 	{
 	}
 };

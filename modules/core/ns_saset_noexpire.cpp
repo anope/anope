@@ -16,7 +16,7 @@
 class CommandNSSASetNoexpire : public Command
 {
  public:
-	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2, "nickserv/saset/noexpire")
+	CommandNSSASetNoexpire(Module *creator) : Command(creator, "nickserv/saset/noexpire", 1, 2)
 	{
 		this->SetDesc(_("Prevent the nickname from expiring"));
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));

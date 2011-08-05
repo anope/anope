@@ -16,7 +16,7 @@
 class CommandHSSet : public Command
 {
  public:
-	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2, "hostserv/set")
+	CommandHSSet(Module *creator) : Command(creator, "hostserv/set", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost of another user"));
 		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
@@ -123,7 +123,7 @@ class CommandHSSetAll : public Command
 	}
 
  public:
-	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2, "hostserv/set")
+	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost for all nicks in a group"));
 		this->SetSyntax(_("\037nick\037 \037hostmask>\037"));

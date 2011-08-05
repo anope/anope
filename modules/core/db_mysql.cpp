@@ -52,7 +52,7 @@ static void WriteBotMetadata(const Anope::string &key, const Anope::string &data
 class CommandSQLSync : public Command
 {
  public:
-	CommandSQLSync(Module *creator) : Command(creator, "SQLSYNC", 0, 0, "operserv/sqlsync")
+	CommandSQLSync(Module *creator) : Command(creator, "SQLSYNC", 0, 0)
 	{
 		this->SetDesc(_("Import your databases to SQL"));
 		this->SetSyntax("");

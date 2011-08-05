@@ -370,7 +370,7 @@ class CommandOSAKill : public Command
 		return;
 	}
  public:
-	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 4, "operserv/akill")
+	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 4)
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));

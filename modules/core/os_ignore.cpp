@@ -233,7 +233,7 @@ class CommandOSIgnore : public Command
 	}
 
  public:
-	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4, "operserv/ignore")
+	CommandOSIgnore(Module *creator) : Command(creator, "operserv/ignore", 1, 4)
 	{
 		this->SetDesc(_("Modify the Services ignore list"));
 		this->SetSyntax(_("ADD \037time\037 \037nick\037 \037reason\037"));

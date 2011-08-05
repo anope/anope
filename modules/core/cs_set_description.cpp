@@ -16,7 +16,7 @@
 class CommandCSSetDescription : public Command
 {
  public:
-	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
+	CommandCSSetDescription(Module *creator, const Anope::string &cname = "chanserv/set/description") : Command(creator, cname, 1, 2)
 	{
 		this->SetDesc(_("Set the channel description"));
 		this->SetSyntax(_("\037channel\037 [\037description\037]"));
@@ -32,7 +32,7 @@ class CommandCSSetDescription : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -65,7 +65,7 @@ class CommandCSSetDescription : public Command
 class CommandCSSASetDescription : public CommandCSSetDescription
 {
  public:
-	CommandCSSASetDescription(Module *creator) : CommandCSSetDescription(creator, "chanserv/saset/description", "chanserv/saset/description")
+	CommandCSSASetDescription(Module *creator) : CommandCSSetDescription(creator, "chanserv/saset/description")
 	{
 	}
 };

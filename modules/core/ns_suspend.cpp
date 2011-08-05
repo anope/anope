@@ -16,7 +16,7 @@
 class CommandNSSuspend : public Command
 {
  public:
-	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 2, "nickserv/suspend")
+	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 2)
 	{
 		this->SetDesc(_("Suspend a given nick"));
 		this->SetSyntax(_("\037nickname\037 \037reason\037"));
@@ -92,7 +92,7 @@ class CommandNSSuspend : public Command
 class CommandNSUnSuspend : public Command
 {
  public:
-	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1, "nickserv/suspend")
+	CommandNSUnSuspend(Module *creator) : Command(creator, "nickserv/unsuspend", 1, 1)
 	{
 		this->SetDesc(_("Unsuspend a given nick"));
 		this->SetSyntax(_("\037nickname\037"));

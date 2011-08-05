@@ -266,7 +266,7 @@ class CommandOSSession : public Command
 		return;
 	}
  public:
-	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2, "operserv/session")
+	CommandOSSession(Module *creator) : Command(creator, "operserv/session", 2, 2)
 	{
 		this->SetDesc(_("View the list of host sessions"));
 		this->SetSyntax(_("LIST \037threshold\037"));

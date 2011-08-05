@@ -163,7 +163,7 @@ class CommandOSDefcon : public Command
 	}
 
  public:
-	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1, "operserv/defcon")
+	CommandOSDefcon(Module *creator) : Command(creator, "operserv/defcon", 1, 1)
 	{
 		this->SetDesc(_("Manipulate the DefCon system"));
 		this->SetSyntax(_("[\0021\002|\0022\002|\0023\002|\0024\002|\0025\002]"));

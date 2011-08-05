@@ -16,7 +16,7 @@
 class CommandNSSetSecure : public Command
 {
  public:
-	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1, const Anope::string &cpermission = "") : Command(creator, sname, min, min + 1, cpermission)
+	CommandNSSetSecure(Module *creator, const Anope::string &sname = "nickserv/set/secure", size_t min = 1) : Command(creator, sname, min, min + 1)
 	{
 		this->SetDesc(_("Turn nickname security on or off"));
 		this->SetSyntax(_("{ON | OFF}"));
@@ -69,7 +69,7 @@ class CommandNSSetSecure : public Command
 class CommandNSSASetSecure : public CommandNSSetSecure
 {
  public:
-	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2, "nickserv/saset/secure")
+	CommandNSSASetSecure(Module *creator) : CommandNSSetSecure(creator, "nickserv/saset/secure", 2)
 	{
 		this->ClearSyntax();
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));

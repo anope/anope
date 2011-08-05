@@ -15,7 +15,7 @@
 class CommandCSSetRestricted : public Command
 {
  public:
-	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetRestricted(Module *creator, const Anope::string &cname = "chanserv/set/restricted") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Restrict access to the channel"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -31,7 +31,7 @@ class CommandCSSetRestricted : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -67,7 +67,7 @@ class CommandCSSetRestricted : public Command
 class CommandCSSASetRestricted : public CommandCSSetRestricted
 {
  public:
-	CommandCSSASetRestricted(Module *creator) : CommandCSSetRestricted(creator, "chanserv/saset/restricted", "chanserv/saset/restricted")
+	CommandCSSASetRestricted(Module *creator) : CommandCSSetRestricted(creator, "chanserv/saset/restricted")
 	{
 	}
 };

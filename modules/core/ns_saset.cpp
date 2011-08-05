@@ -33,14 +33,17 @@ class CommandNSSASet : public Command
 		this->SendSyntax(source);
 		source.Reply(_("Sets various nickname options. \037option\037 can be one of:"));
 		Anope::string this_name = source.command;
-		for (command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (BotInfo::command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
 		{
-			if (it->first.find_ci(this_name + " ") == 0)
+			const Anope::string &c_name = it->first;
+			CommandInfo &info = it->second;
+
+			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				service_reference<Command> command(it->second);
+				service_reference<Command> command(info.name);
 				if (command)
 				{
-					source.command = it->first;
+					source.command = c_name;
 					command->OnServHelp(source);
 				}
 			}
@@ -55,7 +58,7 @@ class CommandNSSASet : public Command
 class CommandNSSASetDisplay : public Command
 {
  public:
-	CommandNSSASetDisplay(Module *creator) : Command(creator, "nickserv/saset/display", 2, 2, "nickserv/saset/display")
+	CommandNSSASetDisplay(Module *creator) : Command(creator, "nickserv/saset/display", 2, 2)
 	{
 		this->SetDesc(_("Set the display of the group in Services"));
 		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
@@ -95,7 +98,7 @@ class CommandNSSASetDisplay : public Command
 class CommandNSSASetPassword : public Command
 {
  public:
-	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2, "nickserv/saset/password")
+	CommandNSSASetPassword(Module *creator) : Command(creator, "nickserv/saset/password", 2, 2)
 	{
 		this->SetDesc(_("Set the nickname password"));
 		this->SetSyntax(_("\037nickname\037 \037new-password\037"));

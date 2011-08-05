@@ -36,12 +36,6 @@ class CommandNSList : public Command
 
 		suspended = nsnoexpire = unconfirmed = false;
 
-		if (Config->NSListOpersOnly && !u->HasMode(UMODE_OPER)) /* reverse the help logic */
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
 		if (pattern[0] == '#')
 		{
 			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */

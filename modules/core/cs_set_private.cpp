@@ -16,7 +16,7 @@
 class CommandCSSetPrivate : public Command
 {
  public:
-	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private", const Anope::string &cpermission = "") : Command(creator, cname, 2, 2, cpermission)
+	CommandCSSetPrivate(Module *creator, const Anope::string &cname = "chanserv/set/private") : Command(creator, cname, 2, 2)
 	{
 		this->SetDesc(_("Hide channel from LIST command"));
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSetPrivate : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -69,7 +69,7 @@ class CommandCSSetPrivate : public Command
 class CommandCSSASetPrivate : public CommandCSSetPrivate
 {
  public:
-	CommandCSSASetPrivate(Module *creator) : CommandCSSetPrivate(creator, "chanserv/saset/private", "chanserv/saset/private")
+	CommandCSSASetPrivate(Module *creator) : CommandCSSetPrivate(creator, "chanserv/saset/private")
 	{
 	}
 };

@@ -16,7 +16,7 @@
 class CommandCSSASetNoexpire : public Command
 {
  public:
-	CommandCSSASetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2, "chanserv/saset/noexpire")
+	CommandCSSASetNoexpire(Module *creator) : Command(creator, "chanserv/saset/noexpire", 2, 2)
 	{
 		this->SetDesc(_("Prevent the channel from expiring"));
 		this->SetDesc(_("\037channel\037 {ON | OFF}"));
@@ -32,7 +32,7 @@ class CommandCSSASetNoexpire : public Command
 			return;
 		}
 
-		if (!this->permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

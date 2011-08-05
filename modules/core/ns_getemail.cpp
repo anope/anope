@@ -20,7 +20,7 @@
 class CommandNSGetEMail : public Command
 {
  public:
-	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1, "nickserv/getemail")
+	CommandNSGetEMail(Module *creator) : Command(creator, "nickserv/getemail", 1, 1)
 	{
 		this->SetDesc(_("Matches and returns all users that registered using given email"));
 		this->SetSyntax(_("\037user@email-host\037"));

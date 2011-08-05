@@ -278,7 +278,7 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
  public:
-	CommandOSSXLineBase(Module *creator, const Anope::string &cmd, const Anope::string &perm) : Command(creator, cmd, 1, 3, perm)
+	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 3)
 	{
 		this->SetDesc(Anope::printf(_("Manipulate the %s list"), cmd.c_str()));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
@@ -430,7 +430,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	service_reference<XLineManager> snlines;
  public:
- 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "SNLINE", "operserv/snline"), snlines("xlinemanager/snline")
+ 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("xlinemanager/snline")
 	{
 	}
 
@@ -580,7 +580,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
  	service_reference<XLineManager> sqlines;
  public:
-	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "SQLINE", "operserv/sqline"), sqlines("xlinemanager/sqline")
+	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("xlinemanager/sqline")
 	{
 	}
 
@@ -736,7 +736,7 @@ class CommandOSSZLine : public CommandOSSXLineBase
 
 	service_reference<XLineManager> szlines;
  public:
-	CommandOSSZLine(Module *creator) : CommandOSSXLineBase(creator, "SZLINE", "operserv/szline"), szlines("xlinemanager/szline")
+	CommandOSSZLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/szline"), szlines("xlinemanager/szline")
 	{
 	}
 

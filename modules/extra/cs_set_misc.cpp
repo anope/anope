@@ -15,7 +15,7 @@
 class CommandCSSetMisc : public Command
 {
  public:
-	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc", const Anope::string &cpermission = "") : Command(creator, cname, 1, 2, cpermission)
+	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 \037parameters\037"));
 	}
@@ -43,7 +43,7 @@ class CommandCSSetMisc : public Command
 class CommandCSSASetMisc : public CommandCSSetMisc
 {
  public:
-	CommandCSSASetMisc(Module *creator) : CommandCSSetMisc(creator, "chanserv/saset/misc", "chanserv/saset/misc")
+	CommandCSSASetMisc(Module *creator) : CommandCSSetMisc(creator, "chanserv/saset/misc")
 	{
 	}
 };

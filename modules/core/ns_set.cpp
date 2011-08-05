@@ -34,14 +34,17 @@ class CommandNSSet : public Command
 		source.Reply(" ");
 		source.Reply(_("Sets various nickname options.  \037option\037 can be one of:"));
 		Anope::string this_name = source.command;
-		for (command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
+		for (BotInfo::command_map::iterator it = source.owner->commands.begin(), it_end = source.owner->commands.end(); it != it_end; ++it)
 		{
-			if (it->first.find_ci(this_name + " ") == 0)
+			const Anope::string &c_name = it->first;
+			CommandInfo &info = it->second;
+
+			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				service_reference<Command> command(it->second);
+				service_reference<Command> command(info.name);
 				if (command)
 				{
-					source.command = it->first;
+					source.command = c_name;
 					command->OnServHelp(source);
 				}
 			}

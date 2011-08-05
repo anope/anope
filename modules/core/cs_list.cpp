@@ -33,12 +33,6 @@ class CommandCSList : public Command
 		int count = 0, from = 0, to = 0;
 		bool suspended = false, channoexpire = false;
 
-		if (Config->CSListOpersOnly && !u->HasMode(UMODE_OPER))
-		{
-			source.Reply(ACCESS_DENIED);
-			return;
-		}
-
 		if (pattern[0] == '#')
 		{
 			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */

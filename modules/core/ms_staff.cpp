@@ -17,7 +17,7 @@
 class CommandMSStaff : public Command
 {
  public:
-	CommandMSStaff(Module *creator) : Command(creator, "memoserv/staff", 1, 1, "memoserv/staff")
+	CommandMSStaff(Module *creator) : Command(creator, "memoserv/staff", 1, 1)
 	{
 		this->SetDesc(_("Send a memo to all opers/admins"));
 		this->SetSyntax(_("\037memo-text\037"));

@@ -43,11 +43,13 @@ class CommandOSModInfo : public Command
 				{
 					BotInfo *bi = it->second;
 
-					for (command_map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
+					for (BotInfo::command_map::const_iterator cit = bi->commands.begin(), cit_end = bi->commands.end(); cit != cit_end; ++cit)
 					{
-						if (cit->second != s->name)
+						const Anope::string &c_name = cit->first;
+						const CommandInfo &info = cit->second;
+						if (info.name != s->name)
 							continue;
-						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), cit->first.c_str(), bi->nick.c_str(), s->name.c_str());
+						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), s->name.c_str());
 					}
 				}
 			}
@@ -70,7 +72,7 @@ class CommandOSModInfo : public Command
 class CommandOSModList : public Command
 {
  public:
-	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1, "operserv/modlist")
+	CommandOSModList(Module *creator) : Command(creator, "operserv/modlist", 0, 1)
 	{
 		this->SetDesc(_("List loaded modules"));
 		this->SetSyntax(_("[Core|3rd|protocol|encryption|supported]"));

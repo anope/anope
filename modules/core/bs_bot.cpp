@@ -314,7 +314,7 @@ class CommandBSBot : public Command
 		if (cmd.equals_ci("ADD"))
 		{
 			// ADD nick user host real - 5
-			if (!u->HasCommand("botserv/botserv/bot/add"))
+			if (!u->HasCommand("botserv/bot/add"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -337,7 +337,7 @@ class CommandBSBot : public Command
 		{
 			// CHANGE oldn newn user host real - 6
 			// but only oldn and newn are required
-			if (!u->HasCommand("botserv/botserv/bot/change"))
+			if (!u->HasCommand("botserv/bot/change"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;
@@ -354,7 +354,7 @@ class CommandBSBot : public Command
 		else if (cmd.equals_ci("DEL"))
 		{
 			// DEL nick
-			if (!u->HasCommand("botserv/botserv/bot/del"))
+			if (!u->HasCommand("botserv/bot/del"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

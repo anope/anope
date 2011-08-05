@@ -36,8 +36,15 @@ class CommandNSAJoin : public Command
 		std::vector<std::pair<Anope::string, Anope::string> > channels;
 		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
 
+		unsigned i;
+		for (i = 0; i < channels.size(); ++i)
+			if (channels[i].first.equals_ci(params[1]))
+				break;
+
 		if (channels.size() >= Config->AJoinMax)
 			source.Reply(_("Your auto join list is full."));
+		else if (i != channels.size())
+			source.Reply(_("%s is already on your auto join list."), params[1].c_str());
 		else if (ircdproto->IsChannelValid(params[1]) == false)
  			source.Reply(CHAN_X_INVALID, params[1].c_str());
 		else

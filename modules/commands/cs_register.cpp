@@ -82,7 +82,7 @@ class CommandCSRegister : public Command
 						c->RemoveMode(NULL, cm, u->nick);
 				}
 
-				/* Mark the channel as persistant */
+				/* Mark the channel as persistent */
 				if (c->HasMode(CMODE_PERM))
 					ci->SetFlag(CI_PERSIST);
 				/* Persist may be in def cflags, set it here */

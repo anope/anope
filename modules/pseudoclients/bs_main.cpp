@@ -135,7 +135,7 @@ class BotServCore : public Module
 
 	void OnLeaveChannel(User *u, Channel *c)
 	{
-		/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
+		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 		if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
 			return;
 	

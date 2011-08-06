@@ -157,7 +157,7 @@ void Channel::DeleteUser(User *user)
 		user->chans.erase(uit);
 	}
 
-	/* Channel is persistant, it shouldn't be deleted and the service bot should stay */
+	/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 	if (this->HasFlag(CH_PERSIST) || (this->ci && this->ci->HasFlag(CI_PERSIST)))
 		return;
 
@@ -309,7 +309,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 		cml->OnAdd(this, param);
 	}
 
-	/* Channel mode +P or so was set, mark this channel as persistant */
+	/* Channel mode +P or so was set, mark this channel as persistent */
 	if (cm->Name == CMODE_PERM)
 	{
 		this->SetFlag(CH_PERSIST);

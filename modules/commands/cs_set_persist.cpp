@@ -83,7 +83,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			source.Reply(_("Channel \002%s\002 is now persistant."), ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 is now persistent."), ci->name.c_str());
 		}
 		else if (params[1].equals_ci("OFF"))
 		{
@@ -118,7 +118,7 @@ class CommandCSSetPersist : public Command
 				}
 			}
 
-			source.Reply(_("Channel \002%s\002 is no longer persistant."), ci->name.c_str());
+			source.Reply(_("Channel \002%s\002 is no longer persistent."), ci->name.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "PERSIST");
@@ -130,11 +130,11 @@ class CommandCSSetPersist : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Enables or disables the persistant channel setting.\n"
-				"When persistant is set, the service bot will remain\n"
+		source.Reply(_("Enables or disables the persistent channel setting.\n"
+				"When persistent is set, the service bot will remain\n"
 				"in the channel when it has emptied of users.\n"
 				" \n"
-				"If your IRCd does not a permanent (persistant) channel\n"
+				"If your IRCd does not a permanent (persistent) channel\n"
 				"mode you must have a service bot in your channel to\n"
 				"set persist on, and it can not be unassigned while persist\n"
 				"is on.\n"
@@ -144,7 +144,7 @@ class CommandCSSetPersist : public Command
 				"join your channel when you set persist on (and leave when\n"
 				"it has been set off).\n"
 				" \n"
-				"If your IRCd has a permanent (persistant) channel mode\n"
+				"If your IRCd has a permanent (persistent) channel mode\n"
 				"and is is set or unset (for any reason, including MLOCK),\n"
 				"persist is automatically set and unset for the channel aswell.\n"
 				"Additionally, services will set or unset this mode when you\n"

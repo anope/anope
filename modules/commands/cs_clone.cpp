@@ -85,7 +85,7 @@ public:
 						target_ci->c->RemoveMode(NULL, cm, u->nick);
 				}
 
-				/* Mark the channel as persistant */
+				/* Mark the channel as persistent */
 				if (target_ci->c->HasMode(CMODE_PERM))
 					target_ci->SetFlag(CI_PERSIST);
 				/* Persist may be in def cflags, set it here */

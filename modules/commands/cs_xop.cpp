@@ -361,7 +361,7 @@ class XOPBase : public Command
 		ci->AddAccess(acc);
 
 		bool override = level >= u_level || !access.HasPriv(CA_ACCESS_CHANGE);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " as level " << level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
 		source.Reply(("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
@@ -519,7 +519,7 @@ class XOPBase : public Command
 		}
 
 		bool override = !ci->HasPriv(u, CA_FOUNDER);
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR level " << level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{

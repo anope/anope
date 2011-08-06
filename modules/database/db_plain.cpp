@@ -549,7 +549,23 @@ class DBPlain : public Module
 				ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(params[0]));
 				ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(params[1]));
 			}
-			else if (key.equals_ci("ACCESS"))
+			else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
+			{
+				service_reference<AccessProvider> provider("access/access");
+				if (!provider)
+					throw DatabaseException("Access entry for nonexistant provider " + params[0]);
+
+				ChanAccess *access = provider->Create();
+				access->ci = ci;
+				access->mask = params[0];
+				access->Unserialize(params[1]);
+				access->last_seen = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
+				access->creator = params[3];
+				access->created = Anope::CurTime;
+
+				ci->AddAccess(access);
+			}
+			else if (key.equals_ci("ACCESS2"))
 			{
 				service_reference<AccessProvider> provider(params[0]);
 				if (!provider)
@@ -790,7 +806,7 @@ class DBPlain : public Module
 			for (unsigned k = 0, end = ci->GetAccessCount(); k < end; ++k)
 			{
 				ChanAccess *access = ci->GetAccess(k);
-				db_buffer << "MD ACCESS " << access->provider->name << " " << access->mask << " " << access->Serialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
+				db_buffer << "MD ACCESS2 " << access->provider->name << " " << access->mask << " " << access->Serialize() << " " << access->last_seen << " " << access->creator << " " << access->created << endl;
 			}
 			for (unsigned k = 0, end = ci->GetAkickCount(); k < end; ++k)
 			{

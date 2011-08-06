@@ -689,6 +689,27 @@ static bool DoneOpers(ServerConfig *config, const Anope::string &)
 
 /*************************************************************************/
 
+static std::map<Anope::string, Anope::string> defines;
+static bool InitDefine(ServerConfig *config, const Anope::string &)
+{
+	defines.clear();
+	return true;
+}
+
+static bool DoDefine(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string name = values[0].GetValue(), value = values[1].GetValue();
+	defines[name] = value;
+	return true;
+}
+
+static bool DoneDefine(ServerConfig *config, const Anope::string &)
+{
+	return true;
+}
+
+/*************************************************************************/
+
 static bool InitInclude(ServerConfig *config, const Anope::string &)
 {
 	return true;
@@ -1203,6 +1224,11 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 	/* These tags can occur multiple times, and therefore they have special code to read them
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiItem MultiItems[] = {
+		{"define",
+			{"name", "value", ""},
+			{"", "", ""},
+			{DT_STRING, DT_STRING},
+			InitDefine, DoDefine, DoneDefine},
 		/* Include must be first so we can pull in the extra files before processing
 		 * anything else! */
 		{"include",
@@ -1298,12 +1324,15 @@ void ServerConfig::Read()
 				dt &= ~DT_NORELOAD;
 
 				ConfigDataHash &hash = (noreload && Config ? Config->config_data : this->config_data);
+				Anope::string item;
+				bool has_value = ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines);
+				if (defines.count(item) > 0)
+					item = defines[item];
 				switch (dt)
 				{
 					case DT_NOSPACES:
 					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
+						if (has_value)
 							vl.push_back(ValueItem(item));
 						else
 							vl.push_back(ValueItem());
@@ -1312,8 +1341,7 @@ void ServerConfig::Read()
 					}
 					case DT_HOSTNAME:
 					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
+						if (has_value)
 							vl.push_back(ValueItem(item));
 						else
 							vl.push_back(ValueItem());
@@ -1322,8 +1350,7 @@ void ServerConfig::Read()
 					}
 					case DT_IPADDRESS:
 					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
+						if (has_value)
 							vl.push_back(ValueItem(item));
 						else
 							vl.push_back(ValueItem());
@@ -1332,8 +1359,7 @@ void ServerConfig::Read()
 					}
 					case DT_STRING:
 					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
+						if (has_value)
 							vl.push_back(ValueItem(item));
 						else
 							vl.push_back(ValueItem());
@@ -1343,17 +1369,16 @@ void ServerConfig::Read()
 					case DT_UINTEGER:
 					case DT_LUINTEGER:
 					{
-						int item = 0;
-						if (ConfValueInteger(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item))
-							vl.push_back(ValueItem(item));
+						int titem = 0;
+						if (ConfValueInteger(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, titem))
+							vl.push_back(ValueItem(titem));
 						else
 							vl.push_back(ValueItem(0));
 						break;
 					}
 					case DT_TIME:
 					{
-						Anope::string item;
-						if (ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines))
+						if (has_value)
 						{
 #ifdef _WIN32
 							long time = static_cast<long>(dotime(item));
@@ -1368,8 +1393,8 @@ void ServerConfig::Read()
 					}
 					case DT_BOOLEAN:
 					{
-						bool item = ConfValueBool(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum);
-						vl.push_back(ValueItem(item));
+						bool titem = ConfValueBool(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum);
+						vl.push_back(ValueItem(titem));
 					}
 				}
 			}
@@ -1390,6 +1415,8 @@ void ServerConfig::Read()
 
 		ConfigDataHash &hash = (noreload && Config ? Config->config_data : this->config_data);
 		ConfValue(hash, configitems.Values[Index].tag, configitems.Values[Index].value, configitems.Values[Index].default_value, 0, item, allow_newlines);
+		if (defines.count(item) > 0)
+			item = defines[item];
 		ValueItem vi(item);
 
 		if (!configitems.Values[Index].validation_function(this, configitems.Values[Index].tag, configitems.Values[Index].value, vi))

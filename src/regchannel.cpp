@@ -226,13 +226,17 @@ bool ChannelInfo::HasPriv(User *u, ChannelAccess priv)
 			case CA_AUTOVOICE:
 				break;
 			default:
+				this->last_used = Anope::CurTime;
 				return true;
 		}
 	}
 
 
 	if (group.HasPriv(CA_FOUNDER) || group.HasPriv(priv))
+	{
+		this->last_used = Anope::CurTime;
 		return true;
+	}
 
 	return false;
 }

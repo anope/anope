@@ -39,11 +39,17 @@ class CommandNSAList : public Command
 			int chan_count = 0;
 
 			source.Reply(_("Channels that \002%s\002 has access on:\n"
-					"  Num  Channel              Level"), na->nick.c_str());
+					"  Num  Channel              Access"), na->nick.c_str());
 
 			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 			{
 				ChannelInfo *ci = it->second;
+
+				if (ci->GetFounder() && ci->GetFounder() == na->nc)
+				{
+					source.Reply(_("  %3d %c%-20s Founder"), ++chan_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str());
+					continue;
+				}
 
 				AccessGroup access = ci->AccessFor(na->nc);
 				if (access.empty())

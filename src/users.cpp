@@ -40,7 +40,7 @@ User::User(const Anope::string &snick, const Anope::string &sident, const Anope:
 	this->ident = sident;
 	this->host = shost;
 	this->uid = suid;
-	this->isSuperAdmin = 0;
+	this->SuperAdmin = false;
 
 	UserListByNick[snick] = this;
 	if (!suid.empty())
@@ -815,7 +815,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 			Log() << "user: NICK from nonexistent nick " << source;
 			return NULL;
 		}
-		user->isSuperAdmin = 0; /* Dont let people nick change and stay SuperAdmins */
+		user->SuperAdmin = false;
 
 		Log(user, "nick") << "(" << user->realname << ") changed nick to " << nick;
 

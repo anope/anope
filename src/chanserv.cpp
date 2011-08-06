@@ -124,7 +124,7 @@ bool IsFounder(User *user, ChannelInfo *ci)
 	if (!user || !ci)
 		return false;
 
-	if (user->isSuperAdmin)
+	if (user->SuperAdmin)
 		return true;
 
 	if (user->Account() && user->Account() == ci->GetFounder())

@@ -81,14 +81,14 @@ class CommandOSSet : public Command
 			source.Reply(_("SuperAdmin setting not enabled in services.conf"));
 		else if (setting.equals_ci("ON"))
 		{
-			u->isSuperAdmin = 1;
+			u->SuperAdmin = true;
 			source.Reply(_("You are now a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN ON";
 			ircdproto->SendGlobops(source.owner, _("%s is now a Super-Admin"), u->nick.c_str());
 		}
 		else if (setting.equals_ci("OFF"))
 		{
-			u->isSuperAdmin = 0;
+			u->SuperAdmin = false;
 			source.Reply(_("You are no longer a SuperAdmin"));
 			Log(LOG_ADMIN, u, this) << "SUPERADMIN OFF";
 			ircdproto->SendGlobops(source.owner, _("%s is no longer a Super-Admin"), u->nick.c_str());

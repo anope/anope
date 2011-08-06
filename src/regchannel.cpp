@@ -215,6 +215,9 @@ bool ChannelInfo::HasPriv(User *u, ChannelAccess priv)
 {
 	AccessGroup group = this->AccessFor(u);
 
+	if (u->SuperAdmin)
+		return true;
+
 	if (this->founder && u->Account() == this->founder)
 	{
 		switch (priv)
@@ -256,6 +259,8 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(u, nc))
 			group.push_back(this->access[i]);
+	
+	group.SuperAdmin = u->SuperAdmin;
 	
 	return group;
 }
@@ -707,7 +712,7 @@ bool ChannelInfo::CheckKick(User *user)
 	if (!user || !this->c)
 		return false;
 
-	if (user->isSuperAdmin)
+	if (user->SuperAdmin)
 		return false;
 
 	/* We don't enforce services restrictions on clients on ulined services

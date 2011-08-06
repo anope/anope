@@ -741,6 +741,13 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnFindChan(const Anope::string &chname) { }
 
+	/** Checks if access has the channel privilege 'priv'.
+	 * @param access THe access struct
+	 * @param priv The privilege being checked for
+	 * @return EVENT_ALLOW for yes, EVENT_STOP to stop all processing
+	 */
+	virtual EventReturn OnCheckPriv(ChanAccess *access, ChannelAccess priv) { return EVENT_CONTINUE; }
+
 	/** Called when a nick is dropped
 	 * @param u The user dropping the nick
 	 * @param na The nick
@@ -1025,7 +1032,7 @@ enum Implementation
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
-		I_OnChanInfo, I_OnFindChan,
+		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

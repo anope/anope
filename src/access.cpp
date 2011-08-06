@@ -75,13 +75,21 @@ bool ChanAccess::operator<=(ChanAccess &other)
 
 AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
 {
+	this->SuperAdmin = false;
 }
 
 bool AccessGroup::HasPriv(ChannelAccess priv) const
 {
+	if (this->SuperAdmin)
+		return true;
 	for (unsigned i = this->size(); i > 0; --i)
-		if (this->at(i - 1)->HasPriv(priv))
+	{
+		ChanAccess *access = this->at(i - 1);
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnCheckPriv, OnCheckPriv(access, priv));
+		if (MOD_RESULT == EVENT_ALLOW || access->HasPriv(priv))
 			return true;
+	}
 	return false;
 }
 

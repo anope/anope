@@ -78,6 +78,7 @@ class CoreExport ChanAccess
 class AccessGroup : public std::vector<ChanAccess *>
 {
  public:
+	bool SuperAdmin;
 	AccessGroup();
 	bool HasPriv(ChannelAccess priv) const;
 	ChanAccess *Highest() const;

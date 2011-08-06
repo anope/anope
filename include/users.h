@@ -54,8 +54,7 @@ class CoreExport User : public Extensible
 	Server *server;			/* Server user is connected to */
 	time_t timestamp;		/* Timestamp of the nick */
 	time_t my_signon;		/* When did _we_ see the user? */
-
-	int isSuperAdmin;		/* is SuperAdmin on or off? */
+	bool SuperAdmin;		/* is SuperAdmin on or off? */
 
 	/* Channels the user is in */
 	UChannelList chans;

@@ -201,7 +201,11 @@ void BotInfo::Part(Channel *c, const Anope::string &reason)
 
 void BotInfo::OnMessage(User *u, const Anope::string &message)
 {
+	if (this->commands.empty())
+		return;
+
 	std::vector<Anope::string> params = BuildStringVector(message);
+	bool has_help = this->commands.find("HELP") != this->commands.end();
 
 	BotInfo::command_map::iterator it = this->commands.end();
 	unsigned count = 0;
@@ -218,7 +222,10 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 
 	if (it == this->commands.end())
 	{
-		u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		if (has_help)
+			u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		else
+			u->SendMessage(this, _("Unknown command \002%s\002."), message.c_str());
 		return;
 	}
 
@@ -226,7 +233,10 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	service_reference<Command> c(info.name);
 	if (!c)
 	{
-		u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		if (has_help)
+			u->SendMessage(this, _("Unknown command \002%s\002. \"%s%s HELP\" for help."), message.c_str(), Config->UseStrictPrivMsgString.c_str(), this->nick.c_str());
+		else
+			u->SendMessage(this, _("Unknown command \002%s\002."), message.c_str());
 		Log(this) << "Command " << it->first << " exists on me, but its service " << info.name << " was not found!";
 		return;
 	}

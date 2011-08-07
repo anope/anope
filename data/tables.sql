@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Apr 28, 2011 at 07:08 PM
+-- Generation Time: Aug 07, 2011 at 03:53 PM
 -- Server version: 5.1.50
--- PHP Version: 5.3.3-pl1-gentoo
+-- PHP Version: 5.3.6-pl0-gentoo
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `anope_cs_access` (
   `last_seen` int(10) unsigned NOT NULL DEFAULT '0',
   `creator` varchar(255) NOT NULL DEFAULT '',
   `created` int(11) unsigned NOT NULL DEFAULT '0',
-  UNIQUE KEY `channel` (`channel`,`display`)
+  UNIQUE KEY `channel` (`channel`,`mask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS `anope_ns_core_metadata` (
 
 CREATE TABLE IF NOT EXISTS `anope_os_core` (
   `maxusercnt` int(11) NOT NULL DEFAULT '0',
-  `maxusertime` int(10) unsigned NOT NULL DEFAULT '0',
+  `maxusertime` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

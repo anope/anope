@@ -56,6 +56,8 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 		this->ttb[i] = 0;
 
 	RegisteredChannelList[this->name] = this;
+
+	FOREACH_MOD(I_OnCreateChan, OnCreateChan(this));
 }
 
 /** Copy constructor

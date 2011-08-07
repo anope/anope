@@ -692,6 +692,11 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnChanUnsuspend(ChannelInfo *ci) { }
 
+	/** Called when a channel is being created, for any reason
+	 * @param ci The channel
+	 */
+	virtual void OnCreateChan(ChannelInfo *ci) { }
+
 	/** Called when a channel is being deleted, for any reason
 	 * @param ci The channel
 	 */
@@ -1030,7 +1035,7 @@ enum Implementation
 
 		/* ChanServ */
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
-		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnDelChan, I_OnChannelCreate,
+		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv,
 

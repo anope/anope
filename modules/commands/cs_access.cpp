@@ -94,7 +94,7 @@ class AccessChanAccess : public ChanAccess
 	{
 		for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
 			if (defaultLevels[i].priv == priv)
-				return DetermineLevel(this) >= this->ci->levels[priv];
+				return this->ci->levels[priv] != ACCESS_INVALID && DetermineLevel(this) >= this->ci->levels[priv];
 		return false;
 	}
 
@@ -884,8 +884,8 @@ class CSAccess : public Module
 		ModuleManager::RegisterService(&commandcsaccess);
 		ModuleManager::RegisterService(&commandcslevels);
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered };
-		ModuleManager::Attach(i, this, 2);
+		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCreateChan };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
 	}
@@ -901,12 +901,19 @@ class CSAccess : public Module
 			const Anope::string &value = config.ReadValue("chanserv", l.config_name, "", 0);
 			if (value.equals_ci("founder"))
 				l.default_level = ACCESS_FOUNDER;
+			else if (value.equals_ci("disabled"))
+				l.default_level = ACCESS_INVALID;
 			else
 				l.default_level = config.ReadInteger("chanserv", l.config_name, 0, false);
 		}
 	}
 
 	void OnChanRegistered(ChannelInfo *ci)
+	{
+		reset_levels(ci);
+	}
+
+	void OnCreateChan(ChannelInfo *ci)
 	{
 		reset_levels(ci);
 	}

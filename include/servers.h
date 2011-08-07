@@ -107,6 +107,11 @@ class CoreExport Server : public Flags<ServerFlag>
 	 */
 	const Anope::string &GetDescription() const;
 
+	/** Change this servers SID
+	 * @param sid The new SID
+	 */
+	void SetSID(const Anope::string &sid);
+
 	/** Get the server numeric/SID
 	 * @return The numeric/SID
 	 */

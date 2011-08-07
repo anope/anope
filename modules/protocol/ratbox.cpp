@@ -592,9 +592,6 @@ class ProtoRatbox : public Module
 
 		Implementation i[] = { I_OnServerSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		if (Config->Numeric.empty())
-			Config->Numeric = ts6_sid_retrieve();
 	}
 
 	void OnServerSync(Server *s)

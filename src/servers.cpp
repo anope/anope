@@ -171,6 +171,14 @@ const Anope::string &Server::GetDescription() const
 	return this->Description;
 }
 
+/** Change this servers SID
+ * @param sid The new SID
+ */
+void Server::SetSID(const Anope::string &sid)
+{
+	this->SID = sid;
+}
+
 /** Get the server numeric/SID
  * @return The numeric/SID
  */

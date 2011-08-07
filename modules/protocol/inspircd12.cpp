@@ -759,9 +759,6 @@ class ProtoInspIRCd : public Module
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		if (Config->Numeric.empty())
-			Config->Numeric = ts6_sid_retrieve();
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &)

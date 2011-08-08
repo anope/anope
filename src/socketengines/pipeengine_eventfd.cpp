@@ -10,7 +10,7 @@ class PipeIO : public SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) const
+	int Recv(Socket *s, char *buf, size_t sz)
 	{
 		static eventfd_t dummy;
 		return !eventfd_read(s->GetFD(), &dummy);
@@ -21,7 +21,7 @@ class PipeIO : public SocketIO
 	 * @param buf What to write
 	 * @return Number of bytes written
 	 */
-	int Send(Socket *s, const Anope::string &buf) const
+	int Send(Socket *s, const Anope::string &buf)
 	{
 		return !eventfd_write(s->GetFD(), 1);
 	}

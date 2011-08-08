@@ -23,7 +23,7 @@ class PipeIO : public SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz) const
+	int Recv(Socket *s, char *buf, size_t sz)
 	{
 		static char dummy[512];
 		return recv(s->GetFD(), dummy, 512, 0);
@@ -34,7 +34,7 @@ class PipeIO : public SocketIO
 	 * @param buf What to write
 	 * @return Number of bytes written
 	 */
-	int Send(Socket *s, const Anope::string &buf) const
+	int Send(Socket *s, const Anope::string &buf)
 	{
 		static const char dummy = '*';
 		Pipe *pipe = debug_cast<Pipe *>(s);

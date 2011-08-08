@@ -189,7 +189,7 @@ class CommandOSSet : public Command
 		else if (option.equals_ci("NOEXPIRE"))
 			return this->DoSetNoExpire(source, params);
 		else
-			source.Reply(_("Unknown option \002%s\002."), option.c_str());
+			this->OnSyntaxError(source, "");
 
 		return;
 	}

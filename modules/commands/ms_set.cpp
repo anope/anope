@@ -62,7 +62,7 @@ class CommandMSSet : public Command
 			source.Reply(_("%s will not send you any notification of memos."), Config->MemoServ.c_str());
 		}
 		else
-			this->OnSyntaxError(source, param);
+			this->OnSyntaxError(source, "");
 
 		return;
 	}
@@ -219,8 +219,7 @@ class CommandMSSet : public Command
 			return this->DoLimit(source, params, mi);
 		else
 		{
-			source.Reply(NICK_SET_UNKNOWN_OPTION, Config->UseStrictPrivMsgString.c_str(), cmd.c_str());
-			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), "SET");
+			this->OnSyntaxError(source, "");
 		}
 
 		return;

@@ -177,7 +177,7 @@ class CommandBSSet : public Command
 					this->OnSyntaxError(source, "MSG");
 			}
 			else
-				source.Reply(UNKNOWN_OPTION, option.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), this->name.c_str());
+				this->OnSyntaxError(source, "");
 		}
 
 		return;
@@ -284,9 +284,11 @@ class CommandBSSet : public Command
 		else if (subcommand.equals_ci("GREET"))
 			this->SendSyntax(source, "\037channel\037 GREET {\037ON|OFF\037}");
 		else if (subcommand.equals_ci("MSG"))
-			this->SendSyntax(source, "\037botname\037 NOBOT {\037ON|OFF\037}");
+			this->SendSyntax(source, "\037channel\037 MSG {\037ON|OFF\037}");
 		else if (subcommand.equals_ci("NOBOT"))
-			this->SendSyntax(source, "\037botname\037 NOBOT {\037ON|OFF\037}");
+			this->SendSyntax(source, "\037channel\037 NOBOT {\037ON|OFF\037}");
+		else
+			this->OnSyntaxError(source, "");
 	}
 };
 

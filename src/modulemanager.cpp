@@ -84,45 +84,50 @@ void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
 	Anope::string input = services_dir + "/modules/" + name + ".so";
-	FILE *source = fopen(input.c_str(), "rb");
-	if (!source)
-		return MOD_ERR_NOEXIST;
 
+	int source = open(input.c_str(), O_RDONLY);
+	if (source == -1)
+		return MOD_ERR_NOEXIST;
+	
+	struct stat s;
+	if (stat(input.c_str(), &s) == -1)
+		return MOD_ERR_NOEXIST;
+	else if (!S_ISREG(s.st_mode))
+		return MOD_ERR_NOEXIST;
+	
 	char *tmp_output = strdup(output.c_str());
-#ifndef _WIN32
-	int srcfp = mkstemp(tmp_output);
-	if (srcfp == -1)
-#else
-	if (!mktemp(tmp_output))
-#endif
+	int target = mkstemp(tmp_output);
+	if (target == -1)
 	{
 		free(tmp_output);
-		fclose(source);
+		close(source);
 		return MOD_ERR_FILE_IO;
 	}
 	output = tmp_output;
-	free(tmp_output); // XXX
+	free(tmp_output);
 
 	Log(LOG_DEBUG) << "Runtime module location: " << output;
 
-	FILE *target;
-#ifndef _WIN32
-	target = fdopen(srcfp, "w");
-#else
-	target = fopen(output.c_str(), "wb");
-#endif
-	if (!target)
+	char *buffer = new char[s.st_size];
+	bool err = false;
+	for (;;)
 	{
-		fclose(source);
-		return MOD_ERR_FILE_IO;
+		int read_len = read(source, buffer, s.st_size);
+		if (read_len <= 0)
+			break;
+		int writ_len = write(target, buffer, read_len);
+		if (writ_len < 0)
+		{
+			err = true;
+			break;
+		}
 	}
-
-	int ch;
-	while ((ch = fgetc(source)) != EOF)
-		fputc(ch, target);
-	fclose(source);
-	if (fclose(target))
+	delete [] buffer;
+	
+	close(source);
+	if (close(target) == -1 || err == true)
 		return MOD_ERR_FILE_IO;
+
 	return MOD_ERR_OK;
 }
 

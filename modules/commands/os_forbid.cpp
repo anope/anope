@@ -144,6 +144,7 @@ class CommandOSForbid : public Command
 			{
 				Log(LOG_ADMIN, source.u, this) << "to remove forbid " << d->mask << " of type " << subcommand;
 				source.Reply(_("%s deleted from the %s forbid list."), d->mask.c_str(), subcommand.c_str());
+				this->fs->RemoveForbid(d);
 			}
 			else
 				source.Reply(_("Forbid on %s was not found."), entry.c_str());

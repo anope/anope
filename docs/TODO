@@ -11,13 +11,13 @@ Legend:
 [x] XMLRPC to execute commands and get data from Anope
 [+] fantasy: allow replies/notifications to fantasy commands to go to the channel via notice
 [x] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
-[ ] understanding extbans for /cs unban etc.
-[ ] (optional?) A way to confirm email changes by users
-[ ] Auto identify through SSL key
-[ ] Optional os_login system that can also use SSL keys.
-[ ] os_info module to show useful configuration settings to services opers.
-[ ] Remove nick requests. Instead use an unconfirmed nick group which cant recieve umode +r and auto expires after 1d?
-[ ] LDAP
+[x] understanding extbans for /cs unban etc.
+[x] (optional?) A way to confirm email changes by users
+[x] Auto identify through SSL key
+[x] Optional os_login system that can also use SSL keys.
+[x] os_info module to show useful configuration settings to services opers.
+[x] Remove nick requests. Instead use an unconfirmed nick group which cant recieve umode +r and auto expires after 1d?
+[x] LDAP
 
 Future
 ------

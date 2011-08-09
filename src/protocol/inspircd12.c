@@ -127,7 +127,7 @@ IRCDVar myIrcd[] = {
      1,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
-     0,                         /* reports sync state */
+     1,                         /* reports sync state */
      1,                         /* CIDR channelbans */
      0,                         /* +j */
      CMODE_j,                   /* +j Mode */
@@ -1803,6 +1803,7 @@ int anope_event_burst(char *source, int ac, char **av)
 
 int anope_event_eob(char *source, int ac, char **av)
 {
+    Server *s = findserver_uid(servlist, source);
     User *u = u_intro_regged;
     u_intro_regged = NULL;
 
@@ -1813,6 +1814,9 @@ int anope_event_eob(char *source, int ac, char **av)
         common_svsmode(u, "-r", NULL);
         validate_user(u);
     }
+
+    if (s != NULL)
+    	finish_sync(s, 1);
 
     /* End of burst.. */
     burst = 0;

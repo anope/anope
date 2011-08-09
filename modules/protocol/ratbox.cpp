@@ -500,8 +500,13 @@ bool event_pong(const Anope::string &source, const std::vector<Anope::string> &p
 
 bool event_tmode(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	if (params[1][0] == '#' || params[1][0] == '&')
-		do_cmode(source, params[0], params[1], params[2]);
+	if (params[1][0] == '#')
+	{
+		Anope::string modes = params[2];
+		for (unsigned i = 3; i < params.size(); ++i)
+			modes += " " + params[i];
+		do_cmode(source, params[1], modes, params[0]);
+	}
 	return true;
 }
 

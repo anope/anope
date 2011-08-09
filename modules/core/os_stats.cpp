@@ -198,36 +198,31 @@ class CommandOSStats : public Command
 	{
 		const Anope::string &extra = !params.empty() ? params[0] : "";
 
-		if (!extra.empty() && !extra.equals_ci("ALL"))
-		{
-			if (extra.equals_ci("AKILL"))
-				return this->DoStatsAkill(source);
-			else if (extra.equals_ci("RESET"))
-				return this->DoStatsReset(source);
-			else if (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK"))
-				source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
-		}
+		if (extra.equals_ci("RESET"))
+			return this->DoStatsReset();
 
-		if (extra.empty() || (!extra.equals_ci("MEMORY") && !extra.equals_ci("UPLINK")))
+		if (extra.equals_ci("ALL") || extra.equals_ci("AKILL"))
+			this->DoStatsAkill(source);
+
+		if (extra.empty() || extra.equals_ci("ALL") || extra.equals_ci("UPTIME"))
 			this->DoStatsUptime(source);
 
-		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("UPLINK")))
+		if (extra.equals_ci("ALL") || extra.equals_ci("UPLINK"))
 			this->DoStatsUplink(source);
 
-		if (!extra.empty() && (extra.equals_ci("ALL") || extra.equals_ci("MEMORY")))
-			this->DoStatsMemory(source);
+		if (!extra.empty() && !extra.equals_ci("ALL") && !extra.equals_ci("AKILL") && !extra.equals_ci("UPLINK"))
+			source.Reply(_("Unknown STATS option \002%s\002."), extra.c_str());
 
 		return MOD_CONT;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: \002STATS [AKILL | ALL | RESET | MEMORY | UPLINK]\002\n"
+		source.Reply(_("Syntax: \002STATS [AKILL | ALL | RESET | UPLINK]\002\n"
 				" \n"
-				"Without any option, shows the current number of users and\n"
-				"IRCops online (excluding Services), the highest number of\n"
-				"users online since Services was started, and the length of\n"
-				"time Services has been running.\n"
+				"Without any option, shows the current number of users online,\n"
+				"and the highest number of users online since Services was\n"
+				"started, and the length of time Services has been running.\n"
 				" \n"
 				"With the \002AKILL\002 option, displays the current size of the\n"
 				"AKILL list and the current default expiry time.\n"
@@ -235,15 +230,11 @@ class CommandOSStats : public Command
 				"The \002RESET\002 option currently resets the maximum user count\n"
 				"to the number of users currently present on the network.\n"
 				" \n"
-				"The \002MEMORY\002 option displays information on the memory\n"
-				"usage of Services. Using this option can freeze Services for\n"
-				"a short period of time on large networks; don't overuse it!\n"
-				" \n"
 				"The \002UPLINK\002 option displays information about the current\n"
 				"server Anope uses as an uplink to the network.\n"
 				" \n"
 				"The \002ALL\002 displays the user and uptime statistics, and\n"
-				"everything you'd see with \002MEMORY\002 and \002UPLINK\002 options."));
+				"everything you'd see with the \002UPLINK\002 option."));
 		return true;
 	}
 };

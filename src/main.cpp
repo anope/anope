@@ -122,23 +122,13 @@ class UplinkSocket : public ConnectionSocket
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
-			/* Send a quit for all of our bots */
-			for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-			{
-				BotInfo *bi = it->second;
-
-				/* Don't use quitmsg here, it may contain information you don't want people to see */
-				ircdproto->SendQuit(bi, "Shutting down");
-			}
-
-			/* Clear all of our users, but not our bots */
-			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
 				User *u = it->second;
-				++it;
 
-				if (u->server != Me)
-					delete u;
+				if (u->server == Me)
+					/* Don't use quitmsg here, it may contain information you don't want people to see */
+					ircdproto->SendQuit(u, "Shutting down");
 			}
 
 			ircdproto->SendSquit(Config->ServerName, quitmsg);
@@ -146,12 +136,13 @@ class UplinkSocket : public ConnectionSocket
 			this->ProcessWrite(); // Write out the last bit
 		}
 
-		Me->SetFlag(SERVER_SYNCING);
 		for (unsigned i = Me->GetLinks().size(); i > 0; --i)
 			if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
-				delete Me->GetLinks()[i - 1];
+				Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
 
 		UplinkSock = NULL;
+
+		Me->SetFlag(SERVER_SYNCING);
 
 		if (!quitting)
 		{

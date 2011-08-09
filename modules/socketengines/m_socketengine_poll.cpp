@@ -1,9 +1,11 @@
 #include "module.h"
 
 #ifndef _WIN32
-# include <ulimit.h>
 # include <sys/poll.h>
 # include <poll.h>
+# include <sys/types.h>
+# include <sys/time.h>
+# include <sys/resource.h>
 # ifndef POLLRDHUP
 #  define POLLRDHUP 0
 # endif
@@ -24,17 +26,12 @@ class SocketEnginePoll : public SocketEngineBase
 	SocketEnginePoll()
 	{
 		SocketCount = 0;
-#ifndef _WIN32
-		max = ulimit(4, 0);
-#else
-		max = 1024;
-#endif
 
-		if (max <= 0)
-		{
-			Log() << "Can't determine maximum number of open sockets";
-			throw ModuleException("Can't determine maximum number of open sockets");
-		}
+		rlimit fd_limit;
+		if (getrlimit(RLIMIT_NOFILE, &fd_limit) == -1)
+			throw CoreException(Anope::LastError());
+
+		max = fd_limit.rlim_cur;
 
 		events = new pollfd[max];
 	}

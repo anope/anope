@@ -326,7 +326,7 @@ class CommandCSAccess : public Command
 			if (mask.equals_ci(access->mask))
 			{
 				/* Don't allow lowering from a level >= u_level */
-				if (AccessChanAccess::DetermineLevel(access) >= u_level && !u->HasPriv("chanserv/access/modify"))
+				if (AccessChanAccess::DetermineLevel(access) >= u_level && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;

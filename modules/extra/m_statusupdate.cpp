@@ -41,10 +41,9 @@ class StatusUpdate : public Module
 				if (access->Matches(user, user->Account()))
 				{
 					for (int i = 0; modeInfo[i].priv != CA_SIZE; ++i)
-						if (access->HasPriv(modeInfo[i].priv))
-							ci->c->SetMode(NULL, modeInfo[i].name, user->nick);
-						else
+						if (!access->HasPriv(modeInfo[i].priv))
 							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
+					chan_set_correct_modes(user, ci->c, 1);
 				}
 			}
 	}

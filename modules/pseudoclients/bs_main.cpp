@@ -104,6 +104,7 @@ class BotServCore : public Module
 			if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
 				params.insert(params.begin(), this->fantasy_channel->name);
 			source.c = this->fantasy_channel;
+			source.service = this->fantasy_channel->ci->WhoSends();
 		}
 
 		return EVENT_CONTINUE;

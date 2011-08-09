@@ -50,7 +50,7 @@ class CommandCSInfo : public Command
 		bool show_all = false;
 
 		/* Should we show all fields? Only for sadmins and identified users */
-		if (has_auspex || ci->HasPriv(u, CA_INFO))
+		if (has_auspex || ci->AccessFor(u).HasPriv(CA_INFO))
 			show_all = true;
 
 		source.Reply(CHAN_INFO_HEADER, chan.c_str());

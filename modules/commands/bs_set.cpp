@@ -59,11 +59,11 @@ class CommandBSSet : public Command
 		}
 		else if (!(ci = cs_findchan(chan)))
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
-		else if (!u->HasPriv("botserv/administration") && !ci->HasPriv(u, CA_SET))
+		else if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv(CA_SET))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			bool override = !ci->HasPriv(u, CA_SET);
+			bool override = !ci->AccessFor(u).HasPriv(CA_SET);
 			Log(override ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << option << " " << value;
 
 			if (option.equals_ci("DONTKICKOPS"))

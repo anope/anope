@@ -180,14 +180,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	ChanAccess *GetAccess(unsigned index);
 
-	/** Check if a user has a privilege on a channel
-	 *
-	 * @param u The User to find within the access list vector
-	 * @param priv The privilege to check for.
-	 * @return true if the user has the privilege
+	/** Retrieve the access for a user or group in the form of a vector of access entries
+	 * (as multiple entries can affect a single user).
 	 */
-	bool HasPriv(User *u, ChannelAccess priv);
-
 	AccessGroup AccessFor(User *u);
 	AccessGroup AccessFor(NickCore *nc);
 

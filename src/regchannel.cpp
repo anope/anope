@@ -205,47 +205,6 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
 	return this->access[index];
 }
 
-/** Check if a user has a privilege on a channel
- *
- * @param u The User to find within the access list vector
- * @param priv The privilege to check for.
- * @return true if the user has the privilege
- *
- * Retrieves an entry from the access list that matches the given User and NickCore.
- */
-bool ChannelInfo::HasPriv(User *u, ChannelAccess priv)
-{
-	AccessGroup group = this->AccessFor(u);
-
-	if (u->SuperAdmin)
-		return true;
-
-	if (this->founder && u->Account() == this->founder)
-	{
-		switch (priv)
-		{
-			case CA_AUTOOWNER:
-			case CA_AUTOPROTECT:
-			case CA_AUTOOP:
-			case CA_AUTOHALFOP:
-			case CA_AUTOVOICE:
-				break;
-			default:
-				this->last_used = Anope::CurTime;
-				return true;
-		}
-	}
-
-
-	if (group.HasPriv(CA_FOUNDER) || group.HasPriv(priv))
-	{
-		this->last_used = Anope::CurTime;
-		return true;
-	}
-
-	return false;
-}
-
 AccessGroup ChannelInfo::AccessFor(User *u)
 {
 	NickCore *nc = u->Account();
@@ -265,6 +224,9 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(u, nc))
 			group.push_back(this->access[i]);
+	
+	if (!group.empty())
+		this->last_used = Anope::CurTime;
 	
 	return group;
 }

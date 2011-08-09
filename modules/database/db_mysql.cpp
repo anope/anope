@@ -788,7 +788,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(params[0]);
 			if (!ci)
 				return;
-			if (!ci->HasPriv(u, CA_SET) && !u->HasPriv("botserv/administration"))
+			if (!ci->AccessFor(u).HasPriv(CA_SET) && !u->HasPriv("botserv/administration"))
 				return;
 			if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
 			{
@@ -839,7 +839,7 @@ class DBMySQL : public Module
 		else if (command->name == "botserv/set" && params.size() > 1)
 		{
 			ChannelInfo *ci = cs_findchan(params[0]);
-			if (ci && !ci->HasPriv(u, CA_SET) && !u->HasPriv("botserv/administration"))
+			if (ci && !ci->AccessFor(u).HasPriv(CA_SET) && !u->HasPriv("botserv/administration"))
 				return;
 			BotInfo *bi = NULL;
 			if (!ci)
@@ -876,7 +876,7 @@ class DBMySQL : public Module
 			else
 			{
 				ci = cs_findchan(target);
-				if (!ci || !ci->HasPriv(u, CA_MEMO))
+				if (!ci || !ci->AccessFor(u).HasPriv(CA_MEMO))
 					return;
 			}
 

@@ -70,7 +70,7 @@ class CommandBSInfo : public Command
 		}
 		else if ((ci = cs_findchan(query)))
 		{
-			if (!ci->HasPriv(u, CA_FOUNDER) && !u->HasPriv("botserv/administration"))
+			if (!ci->AccessFor(u).HasPriv(CA_FOUNDER) && !u->HasPriv("botserv/administration"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

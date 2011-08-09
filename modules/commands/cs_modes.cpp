@@ -32,7 +32,7 @@ class CommandModeBase : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 		else if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (is_same ? !ci->HasPriv(u, levelself) : !ci->HasPriv(u, level))
+		else if (is_same ? !ci->AccessFor(u).HasPriv(levelself) : !ci->AccessFor(u).HasPriv(level))
 			source.Reply(ACCESS_DENIED);
 		else if (!set && !is_same && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);

@@ -39,7 +39,7 @@ class CommandCSUnban : public Command
 			return;
 		}
 
-		if (!ci->HasPriv(u, CA_UNBAN))
+		if (!ci->AccessFor(u).HasPriv(CA_UNBAN))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

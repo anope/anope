@@ -166,7 +166,7 @@ class NSAJoin : public Module
 					Anope::string k;
 					if (c->GetParam(CMODE_KEY, k))
 					{
-						if (ci->HasPriv(u, CA_GETKEY))
+						if (ci->AccessFor(u).HasPriv(CA_GETKEY))
 							key = k;
 						else if (key != k)
 							need_invite = true;
@@ -191,7 +191,7 @@ class NSAJoin : public Module
 			if (need_invite)
 			{
 				BotInfo *bi = findbot(Config->NickServ);
-				if (!bi || !ci->HasPriv(u, CA_INVITE))
+				if (!bi || !ci->AccessFor(u).HasPriv(CA_INVITE))
 					continue;
 				ircdproto->SendInvite(bi, channels[i].first, u->nick);
 			}

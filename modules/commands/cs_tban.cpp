@@ -40,7 +40,7 @@ static bool CanBanUser(CommandSource &source, Channel *c, User *u2)
 	User *u = source.u;
 	ChannelInfo *ci = c->ci;
 	bool ok = false;
-	if (!ci->HasPriv(u, CA_BAN))
+	if (!ci->AccessFor(u).HasPriv(CA_BAN))
 		source.Reply(ACCESS_DENIED);
 	else if (matches_list(c, u2, CMODE_EXCEPT))
 		source.Reply(CHAN_EXCEPTED, u2->nick.c_str(), ci->name.c_str());

@@ -32,13 +32,13 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->AccessFor(u).HasPriv(CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER)))
+		if (source.permission.empty() && (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv(CA_FOUNDER)))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

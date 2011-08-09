@@ -316,7 +316,7 @@ class XOPBase : public Command
 		ChanAccess *highest = access.Highest();
 		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
 
-		if (((access.HasPriv(CA_FOUNDER) || level >= u_level) || !access.HasPriv(CA_ACCESS_CHANGE)) && !u->HasPriv("chanserv/access/modify"))
+		if ((!access.HasPriv(CA_FOUNDER) && !access.HasPriv(CA_ACCESS_CHANGE) && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -328,7 +328,7 @@ class XOPBase : public Command
 
 			if (a->mask.equals_ci(mask))
 			{
-				if (XOPChanAccess::DetermineLevel(a) >= u_level && !u->HasPriv("chanserv/access/modify"))
+				if (XOPChanAccess::DetermineLevel(a) >= u_level && !access.Founder && !u->HasPriv("chanserv/access/modify"))
 				{
 					source.Reply(ACCESS_DENIED);
 					return;
@@ -360,7 +360,7 @@ class XOPBase : public Command
 		acc->created = Anope::CurTime;
 		ci->AddAccess(acc);
 
-		bool override = level >= u_level || !access.HasPriv(CA_ACCESS_CHANGE);
+		bool override = (level >= u_level && !access.Founder) || !access.HasPriv(CA_ACCESS_CHANGE);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
@@ -512,13 +512,13 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (!ci->HasPriv(u, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
+		if (!ci->AccessFor(u).HasPriv(CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = !ci->HasPriv(u, CA_FOUNDER);
+		bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)

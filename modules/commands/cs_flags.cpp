@@ -361,9 +361,9 @@ class CommandCSFlags : public Command
 		bool has_access = false;
 		if (u->HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->HasPriv(u, CA_ACCESS_LIST))
+		else if (is_list && ci->AccessFor(u).HasPriv(CA_ACCESS_LIST))
 			has_access = true;
-		else if (ci->HasPriv(u, CA_ACCESS_CHANGE))
+		else if (ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
 			has_access = true;
 
 		if (!has_access)

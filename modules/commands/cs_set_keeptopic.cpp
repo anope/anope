@@ -32,7 +32,7 @@ class CommandCSSetKeepTopic : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->HasPriv(u, CA_SET))
+		if (source.permission.empty() && !ci->AccessFor(u).HasPriv(CA_SET))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

@@ -20,15 +20,15 @@ class CommandCSMode : public Command
 		switch (mode)
 		{
 			case CMODE_OWNER:
-				return ci->HasPriv(u, CA_OWNER);
+				return ci->AccessFor(u).HasPriv(CA_OWNER);
 			case CMODE_PROTECT:
-				return ci->HasPriv(u, CA_PROTECT);
+				return ci->AccessFor(u).HasPriv(CA_PROTECT);
 			case CMODE_OP:	
-				return ci->HasPriv(u, CA_OPDEOP);
+				return ci->AccessFor(u).HasPriv(CA_OPDEOP);
 			case CMODE_HALFOP:
-				return ci->HasPriv(u, CA_HALFOP);
+				return ci->AccessFor(u).HasPriv(CA_HALFOP);
 			case CMODE_VOICE:
-				return ci->HasPriv(u, CA_VOICE);
+				return ci->AccessFor(u).HasPriv(CA_VOICE);
 			default:
 				break;
 		}
@@ -311,7 +311,7 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!ci->HasPriv(u, CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
+		else if (!ci->AccessFor(u).HasPriv(CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

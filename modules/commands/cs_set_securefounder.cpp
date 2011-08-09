@@ -33,7 +33,7 @@ class CommandCSSetSecureFounder : public Command
 		}
 
 
-		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->HasPriv(u, CA_FOUNDER))
+		if (source.permission.empty() && ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv(CA_FOUNDER))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

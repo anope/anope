@@ -121,6 +121,8 @@ class AccessChanAccess : public ChanAccess
 			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
 				if (access->ci->levels[defaultLevels[i].priv] > highest && access->HasPriv(defaultLevels[i].priv))
 					highest = access->ci->levels[defaultLevels[i].priv];
+			if (highest >= ACCESS_FOUNDER)
+				highest = ACCESS_FOUNDER - 1;
 			return highest;
 		}
 	}
@@ -230,7 +232,7 @@ class AccessDelCallback : public NumberList
  public:
 	AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false)
 	{
-		if (!ci->HasPriv(source.u, CA_ACCESS_CHANGE) && source.u->HasPriv("chanserv/access/modify"))
+		if (!ci->AccessFor(source.u).HasPriv(CA_ACCESS_CHANGE) && source.u->HasPriv("chanserv/access/modify"))
 			this->override = true;
 	}
 
@@ -305,7 +307,7 @@ class CommandCSAccess : public Command
 		AccessGroup u_access = ci->AccessFor(u);
 		ChanAccess *highest = u_access.Highest();
 		int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
-		if (!ci->HasPriv(u, CA_FOUNDER) && level >= u_level && !u->HasPriv("chanserv/access/modify"))
+		if (level >= u_level && !u_access.Founder)
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -316,7 +318,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		bool override = !ci->HasPriv(u, CA_ACCESS_CHANGE) || level >= u_level;
+		bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) || level >= u_level;
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
@@ -393,7 +395,7 @@ class CommandCSAccess : public Command
 					else
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
-						bool override = !ci->HasPriv(u, CA_ACCESS_CHANGE) && !access->mask.equals_ci(u->Account()->display);
+						bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) && !access->mask.equals_ci(u->Account()->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
@@ -542,9 +544,9 @@ class CommandCSAccess : public Command
 		bool has_access = false;
 		if (u->HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->HasPriv(u, CA_ACCESS_LIST))
+		else if (is_list && ci->AccessFor(u).HasPriv(CA_ACCESS_LIST))
 			has_access = true;
-		else if (ci->HasPriv(u, CA_ACCESS_CHANGE))
+		else if (ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
 			has_access = true;
 		else if (is_del)
 		{
@@ -683,7 +685,7 @@ class CommandCSLevels : public Command
 					ci->levels[l.priv] = level;
 					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
 
-					bool override = !ci->HasPriv(u, CA_FOUNDER);
+					bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << l.name << " to " << level;
 
 					if (level == ACCESS_FOUNDER)
@@ -717,7 +719,7 @@ class CommandCSLevels : public Command
 					ci->levels[l.priv] = ACCESS_INVALID;
 					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, l.priv));
 
-					bool override = !ci->HasPriv(u, CA_FOUNDER);
+					bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
 					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << l.name;
 
 					source.Reply(_("\002%s\002 disabled on channel %s."), l.name.c_str(), ci->name.c_str());
@@ -767,7 +769,7 @@ class CommandCSLevels : public Command
 		reset_levels(ci);
 		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
 
-		bool override = !ci->HasPriv(u, CA_FOUNDER);
+		bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
@@ -804,7 +806,7 @@ class CommandCSLevels : public Command
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
-		else if (!ci->HasPriv(u, CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
+		else if (!ci->AccessFor(u).HasPriv(CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);

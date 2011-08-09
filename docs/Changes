@@ -1,5 +1,20 @@
 Anope Version 1.9.5
 --------------------
+A Extended LDAP support
+A Added os_oper, os_kill, os_forbid, m_statusupdate, cs_sync, and bs_autoassign
+A Added a new configuration file format
+A Added a new commands system
+A Added a new access system, and cs_flags
+F Fixed not logging debug logs to file
+F Fixed the mail delay time
+F Fixed sending account data for unconfirmed nicks
+F Fixed poll() engine build on FreeBSD
+F Fixed really large HELP replies being truncated
+F Fixed sometimes appending !*@* to valid hosts on access lists
+F Fixed m_ssl sometimes failing connecting for no reason
+F Fixed crash in cs_entrymsg
+F Fixed setting -P on channels with only a botserv bot in it
+F Fixed modemanager complaining about prefixless modes on InspIRCd
 
 Anope Version 1.9.4
 --------------------

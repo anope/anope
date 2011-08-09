@@ -403,7 +403,7 @@ void Init(int ac, char **av)
 	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
 		throw FatalException("You must load at least one encryption module");
 
-	if (ircd->ts6 && Config->Numeric.empty());
+	if (ircd->ts6 && Config->Numeric.empty())
 	{
 		Anope::string numeric = ts6_sid_retrieve();
 		Me->SetSID(numeric);

@@ -80,9 +80,10 @@ BotInfo::~BotInfo()
 			ci->bi = NULL;
 	}
 
-	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end; ++it)
+	for (CommandMap::const_iterator it = this->Commands.begin(), it_end = this->Commands.end(); it != it_end;)
 	{
 		Command *c = it->second;
+		++it;
 
 		if (c->module)
 			c->module->DelCommand(this, c);

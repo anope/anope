@@ -13,6 +13,12 @@
 #include "modules.h"
 #include "access.h"
 
+enum
+{
+	ACCESS_INVALID = -10000,
+	ACCESS_FOUNDER = 10001
+};
+
 AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, n)
 {
 }
@@ -75,12 +81,17 @@ bool ChanAccess::operator<=(ChanAccess &other)
 
 AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
 {
-	this->SuperAdmin = false;
+	this->ci = NULL;
+	this->SuperAdmin = this->Founder = false;
 }
 
 bool AccessGroup::HasPriv(ChannelAccess priv) const
 {
 	if (this->SuperAdmin)
+		return true;
+	else if (ci->levels[priv] == ACCESS_INVALID)
+		return false;
+	else if (this->Founder)
 		return true;
 	for (unsigned i = this->size(); i > 0; --i)
 	{

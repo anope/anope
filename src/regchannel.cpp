@@ -258,11 +258,13 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 
 	AccessGroup group;
 
+	group.SuperAdmin = u->SuperAdmin;
+	group.Founder = IsFounder(u, this);
+	group.ci = this;	
+
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(u, nc))
 			group.push_back(this->access[i]);
-	
-	group.SuperAdmin = u->SuperAdmin;
 	
 	return group;
 }
@@ -270,6 +272,9 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 AccessGroup ChannelInfo::AccessFor(NickCore *nc)
 {
 	AccessGroup group;
+
+	group.Founder = (this->founder && this->founder == nc);
+	group.ci = this;
 
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(NULL, nc))

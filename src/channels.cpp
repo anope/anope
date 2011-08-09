@@ -1060,17 +1060,6 @@ void do_cmode(const Anope::string &source, const Anope::string &channel, const A
 
 /*************************************************************************/
 
-enum
-{
-	ACCESS_INVALID = -10000,
-	ACCESS_FOUNDER = 10001
-};
-
-static inline bool ShouldSet(AccessGroup &u_access, User *u, ChannelInfo *ci, ChannelAccess priv)
-{
-	return u_access.HasPriv(priv) || (IsFounder(u, ci) && ci->levels[priv] != ACCESS_INVALID);
-}
-
 /**
  * Set the correct modes, or remove the ones granted without permission,
  * for the specified user on ths specified channel. This doesn't give
@@ -1102,31 +1091,31 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 
 	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{
-		if (owner && ShouldSet(u_access, user, ci, CA_AUTOOWNER))
+		if (owner && u_access.HasPriv(CA_AUTOOWNER))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);
-		else if (admin && ShouldSet(u_access, user, ci, CA_AUTOPROTECT))
+		else if (admin && u_access.HasPriv(CA_AUTOPROTECT))
 			c->SetMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && ShouldSet(u_access, user, ci, CA_AUTOOP))
+		if (op && u_access.HasPriv(CA_AUTOOP))
 			c->SetMode(NULL, CMODE_OP, user->nick);
-		else if (halfop && ShouldSet(u_access, user, ci, CA_AUTOHALFOP))
+		else if (halfop && u_access.HasPriv(CA_AUTOHALFOP))
 			c->SetMode(NULL, CMODE_HALFOP, user->nick);
-		else if (voice && ShouldSet(u_access, user, ci, CA_AUTOVOICE))
+		else if (voice && u_access.HasPriv(CA_AUTOVOICE))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
 	if ((ci->HasFlag(CI_SECUREOPS) || (c->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
 	{
-		if (owner && !ShouldSet(u_access, user, ci, CA_AUTOOWNER) && !ShouldSet(u_access, user, ci, CA_OWNERME))
+		if (owner && !u_access.HasPriv(CA_AUTOOWNER) && !u_access.HasPriv(CA_OWNERME))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
 
-		if (admin && !ShouldSet(u_access, user, ci, CA_AUTOPROTECT) && !ShouldSet(u_access, user, ci, CA_PROTECTME))
+		if (admin && !u_access.HasPriv(CA_AUTOPROTECT) && !u_access.HasPriv(CA_PROTECTME))
 			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && c->HasUserStatus(user, CMODE_OP) && !ShouldSet(u_access, user, ci, CA_AUTOOP) && !ShouldSet(u_access, user, ci, CA_OPDEOPME))
+		if (op && c->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv(CA_AUTOOP) && !u_access.HasPriv(CA_OPDEOPME))
 			c->RemoveMode(NULL, CMODE_OP, user->nick);
 
-		if (halfop && !ShouldSet(u_access, user, ci, CA_AUTOHALFOP) && !ShouldSet(u_access, user, ci, CA_HALFOPME))
+		if (halfop && !u_access.HasPriv(CA_AUTOHALFOP) && !u_access.HasPriv(CA_HALFOPME))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 	}
 

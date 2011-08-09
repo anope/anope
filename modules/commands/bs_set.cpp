@@ -284,7 +284,7 @@ class CommandBSSet : public Command
 		else if (subcommand.equals_ci("GREET"))
 			this->SendSyntax(source, "\037channel\037 GREET {\037ON|OFF\037}");
 		else if (subcommand.equals_ci("MSG"))
-			this->SendSyntax(source, "\037channel\037 MSG {\037ON|OFF\037}");
+			this->SendSyntax(source, "\037channel\037 MSG {\037PRIVMSG|NOTICE|NOTICEOPS|OFF\037}");
 		else if (subcommand.equals_ci("NOBOT"))
 			this->SendSyntax(source, "\037channel\037 NOBOT {\037ON|OFF\037}");
 		else

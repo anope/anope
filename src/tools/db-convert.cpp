@@ -357,6 +357,12 @@ int main(int argc, char *argv[])
 		std::string cpass;
 		for (nc = nclists[i]; nc; nc = nc->next)
 		{
+			if (!nc->display)
+			{
+				std::cout << "Skipping core with no display" << std::endl;
+				continue;
+			}
+
 			if (nc->aliascount < 1)
 			{
 				std::cout << "Skipping core with 0 or less aliases (wtf?)" << std::endl;
@@ -429,8 +435,8 @@ int main(int argc, char *argv[])
 				memos = nc->memos.memos;
 				for (j = 0; j < nc->memos.memocount; ++j, ++memos)
 				{
-					if (!memos->text)
-						break;
+					if (!memos->text || !memos->sender)
+						continue;
 					fs << "MD MI " << memos->time << " " << memos->sender;
 					if (memos->flags & MF_UNREAD)
 						fs << " UNREAD";
@@ -469,7 +475,7 @@ int main(int argc, char *argv[])
 						fs << "MD FLAGS" << (na->status & NS_FORBIDDEN ? " FORBIDDEN" : "") << (na->status & NS_NO_EXPIRE ? " NOEXPIRE" : "") << std::endl;
 
 					HostCore *hc = findHostCore(na->nick);
-					if (hc)
+					if (hc && hc->creator && hc->vHost)
 						fs << "MD VHOST " << hc->creator << " " << hc->time << " " << hc->vHost << " :" << (hc->vIdent ? hc->vIdent : "") << std::endl;
 				}
 			}
@@ -828,10 +834,10 @@ int main(int argc, char *argv[])
 				fs << "MD URL :" << ci->url << std::endl;
 			if (ci->email)
 				fs << "MD EMAIL :" << ci->email << std::endl;
-			if (ci->last_topic)  // MD CH topic <setter> <time> :topic
+			if (ci->last_topic && ci->last_topic_setter)  // MD CH topic <setter> <time> :topic
 				fs << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time <<  " :" << ci->last_topic << std::endl;
 			if (ci->flags & CI_FORBIDDEN)
-				fs << "MD FORBID " << ci->forbidby << " :" << (ci->forbidreason ? ci->forbidreason : "no reason given") << std::endl;
+				fs << "MD FORBID " << (ci->forbidby ? ci->forbidby : "db-convert") << " :" << (ci->forbidreason ? ci->forbidreason : "no reason given") << std::endl;
 
 			for (j = 0; j < ci->accesscount; ++j)
 				// MD ACCESS <display> <level> <last_seen> <creator> - creator isn't in 1.9.0-1, but is in 1.9.2

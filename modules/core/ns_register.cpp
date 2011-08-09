@@ -55,7 +55,7 @@ class CommandNSConfirm : public Command
 				ircdproto->SendAccountLogin(u, u->Account());
 				NickAlias *na = findnick(u->nick);
 				if (na && na->nc == u->Account())
-					u->SetMode(nickserv->Bot(), UMODE_REGISTERED);
+					u->SetMode(NickServ, UMODE_REGISTERED);
 			}
 			else
 				source.Reply(_("Invalid passcode."));

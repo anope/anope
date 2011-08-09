@@ -199,7 +199,7 @@ class CommandOSStats : public Command
 		const Anope::string &extra = !params.empty() ? params[0] : "";
 
 		if (extra.equals_ci("RESET"))
-			return this->DoStatsReset();
+			return this->DoStatsReset(source);
 
 		if (extra.equals_ci("ALL") || extra.equals_ci("AKILL"))
 			this->DoStatsAkill(source);

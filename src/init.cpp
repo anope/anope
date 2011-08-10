@@ -217,6 +217,14 @@ class SignalExit : public Signal
 	}
 };
 
+class SignalNothing : public Signal
+{
+ public:
+	SignalNothing(int sig) : Signal(sig) { }
+
+	void OnSignal() { }
+};
+
 void Init(int ac, char **av)
 {
 	int started_from_term = isatty(0) && isatty(1) && isatty(2);
@@ -385,6 +393,7 @@ void Init(int ac, char **av)
 
 	static SignalReload sig_hup(SIGHUP);
 	static SignalExit sig_term(SIGTERM), sig_int(SIGINT);
+	static SignalNothing sig_pipe(SIGPIPE);
 
 	/* Initialize multi-language support */
 	Log(LOG_DEBUG) << "Loading Languages...";

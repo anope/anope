@@ -13,6 +13,9 @@
  #ifndef SIGHUP
  # define SIGHUP -1
  #endif
+ #ifndef SIGPIPE
+ # define SIGPIPE -1
+ #endif
  
  struct sigaction
  {

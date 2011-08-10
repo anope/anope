@@ -197,9 +197,9 @@ class CommandCSFlags : public Command
 								continue;
 						}
 						if (add == 1)
-							current_flags.insert(f);
+							current_flags.insert(l.default_char);
 						else if (add == 0)
-							current_flags.erase(f);
+							current_flags.erase(l.default_char);
 					}
 					break;
 				default:

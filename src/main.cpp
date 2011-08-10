@@ -225,11 +225,14 @@ void Signal::Process()
 
 Signal::Signal(int s) : called(false), signal(s)
 {
+	memset(&this->old, 0, sizeof(this->old));
+
 	this->action.sa_flags = 0;
 	sigemptyset(&this->action.sa_mask);
 	this->action.sa_handler = SignalHandler;
 	
-	sigaction(s, &this->action, NULL);
+	if (sigaction(s, &this->action, &this->old) == -1)
+		throw CoreException("Unable to install signal " + stringify(s) + ": " + Anope::LastError());
 
 	SignalHandlers.push_back(this);
 }
@@ -239,6 +242,8 @@ Signal::~Signal()
 	std::vector<Signal *>::iterator it = std::find(SignalHandlers.begin(), SignalHandlers.end(), this);
 	if (it != SignalHandlers.end())
 		SignalHandlers.erase(it);
+	
+	sigaction(this->signal, &this->old, NULL);
 }
 
 

@@ -244,7 +244,7 @@ class Signal
 	static std::vector<Signal *> SignalHandlers;
 	static void SignalHandler(int signal);
 
-	struct sigaction action;
+	struct sigaction action, old;
 	sig_atomic_t called;
  public:
 	static void Process();

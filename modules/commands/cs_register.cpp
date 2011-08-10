@@ -187,6 +187,8 @@ class CSRegister : public Module
 	{
 		if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
+		if (ci->c && ci->HasFlag(CI_PERSIST))
+			ci->c->RemoveMode(NULL, CMODE_PERM, "", false);
 	}
 };
 

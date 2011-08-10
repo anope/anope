@@ -666,7 +666,7 @@ bool ConnectionSocket::ProcessRead()
 	{
 		int optval = 0;
 		socklen_t optlen = sizeof(optval);
-		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen) && !optval)
+		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, reinterpret_cast<char *>(&optval), &optlen) && !optval)
 		{
 			this->connected = true;
 			this->OnConnect();
@@ -694,7 +694,7 @@ bool ConnectionSocket::ProcessWrite()
 	{
 		int optval = 0;
 		socklen_t optlen = sizeof(optval);
-		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen) && !optval)
+		if (!getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, reinterpret_cast<char *>(&optval), &optlen) && !optval)
 		{
 			this->connected = true;
 			this->OnConnect();
@@ -720,7 +720,7 @@ void ConnectionSocket::ProcessError()
 {
 	int optval = 0;
 	socklen_t optlen = sizeof(optval);
-	getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, &optval, &optlen);
+	getsockopt(this->GetFD(), SOL_SOCKET, SO_ERROR, reinterpret_cast<char *>(&optval), &optlen);
 	errno = optval;
 	this->OnError(optval ? Anope::LastError() : "");
 }

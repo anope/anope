@@ -41,6 +41,15 @@
 #define snprintf _snprintf
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
+#define stat _stat
+#define S_ISREG(x) ((x) & _S_IFREG)
+
+#include "sigaction/sigaction.h"
+
+namespace Anope
+{
+	class string;
+}
  
 extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
@@ -50,6 +59,7 @@ extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size
 extern CoreExport int gettimeofday(timeval *tv, void *);
 extern CoreExport Anope::string GetWindowsVersion();
 extern CoreExport bool SupportedWindowsVersion();
+extern int mkstemp(char *input);
  
  #endif // _WIN32
  #endif // WINDOWS_H

@@ -44,7 +44,7 @@ enum ChannelAccess
 
 class ChanAccess;
 
-class AccessProvider : public Service
+class CoreExport AccessProvider : public Service
 {
  public:
 	AccessProvider(Module *o, const Anope::string &n);
@@ -75,7 +75,7 @@ class CoreExport ChanAccess
 	bool operator<=(ChanAccess &other);
 };
 
-class AccessGroup : public std::vector<ChanAccess *>
+class CoreExport AccessGroup : public std::vector<ChanAccess *>
 {
  public:
  	ChannelInfo *ci;

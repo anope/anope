@@ -12,7 +12,7 @@
 
 class OperType;
 
-struct Oper
+struct CoreExport Oper
 {
 	Anope::string name;
 	Anope::string password;

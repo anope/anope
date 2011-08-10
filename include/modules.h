@@ -188,7 +188,7 @@ class Version
 
 class CallBack;
 class XLineManager;
-class CommandSource;
+struct CommandSource;
 
 /** Every module in Anope is actually a class.
  */

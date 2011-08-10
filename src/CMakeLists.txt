@@ -4,6 +4,7 @@ file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 # If using Windows, add the windows.cpp, the win32 threading engine, and the socket engine to the list
 if(WIN32)
   append_to_list(SRC_SRCS win32/windows.cpp)
+  append_to_list(SRC_SRCS win32/sigaction/sigaction.cpp)
   append_to_list(SRC_SRCS threadengines/threadengine_win32.cpp)
   append_to_list(SRC_SRCS socketengines/pipeengine_win32.cpp)
 # If not using Windows, add the pthread threading engine to the list

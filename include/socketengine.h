@@ -14,10 +14,6 @@
 
 class CoreExport SocketEngine
 {
-#ifdef _WIN32
-	/* Windows crap */
-	static WSADATA wsa;
-#endif
  public:
 	/* Map of sockets */
 	static std::map<int, Socket *> Sockets;

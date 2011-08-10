@@ -249,7 +249,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 
 /** Timer for colliding nicks to force people off of nicknames
  */
-class NickServCollide : public Timer
+class CoreExport NickServCollide : public Timer
 {
 	dynamic_reference<User> u;
 	Anope::string nick;
@@ -273,7 +273,7 @@ class NickServCollide : public Timer
 
 /** Timers for releasing nicks to be available for use
  */
-class NickServRelease : public User, public Timer
+class CoreExport NickServRelease : public User, public Timer
 {
 	Anope::string nick;
 

@@ -255,7 +255,7 @@ bool DNSManager::ProcessRead()
 	unsigned char packet_buffer[524];
 	sockaddrs from_server;
 	socklen_t x = sizeof(from_server);
-	int length = recvfrom(this->GetFD(), &packet_buffer, sizeof(packet_buffer), 0, &from_server.sa, &x);
+	int length = recvfrom(this->GetFD(), reinterpret_cast<char *>(&packet_buffer), sizeof(packet_buffer), 0, &from_server.sa, &x);
 
 	if (length < 12)
 		return true;
@@ -497,7 +497,7 @@ bool DNSManager::ProcessWrite()
 		unsigned char buffer[524];
 		r->FillBuffer(buffer);
 
-		sendto(this->GetFD(), buffer, r->payload_count + 12, 0, &this->addrs.sa, this->addrs.size());
+		sendto(this->GetFD(), reinterpret_cast<char *>(buffer), r->payload_count + 12, 0, &this->addrs.sa, this->addrs.size());
 
 		delete r;
 		DNSEngine->packets.erase(DNSEngine->packets.begin());

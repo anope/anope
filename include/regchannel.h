@@ -357,7 +357,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 /** A timer used to keep the BotServ bot/ChanServ in the channel
  * after kicking the last user in a channel
  */
-class ChanServTimer : public Timer
+class CoreExport ChanServTimer : public Timer
 {
  private:
 	dynamic_reference<Channel> c;

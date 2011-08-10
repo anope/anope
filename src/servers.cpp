@@ -255,7 +255,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 
 	if (!s)
 		s = Me;
-	if (s->GetName().equals_cs(name) || s->GetSID().equals_cs(name))
+	if (s->GetName().equals_ci(name) || s->GetSID().equals_cs(name))
 		return s;
 
 	if (!s->GetLinks().empty())
@@ -264,7 +264,7 @@ Server *Server::Find(const Anope::string &name, Server *s)
 		{
 			Server *serv = s->GetLinks()[i];
 
-			if (serv->GetName().equals_cs(name) || serv->GetSID().equals_cs(name))
+			if (serv->GetName().equals_ci(name) || serv->GetSID().equals_cs(name))
 				return serv;
 			Log(LOG_DEBUG_2) << "Server::Find checking " << serv->GetName() << " server tree for " << name;
 			Server *server = Server::Find(name, serv);

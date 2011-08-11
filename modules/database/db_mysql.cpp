@@ -244,6 +244,7 @@ class DBMySQL : public Module
 			na->last_quit = r.Get(i, "last_quit");
 			na->last_realname = r.Get(i, "last_realname");
 			na->last_usermask = r.Get(i, "last_usermask");
+			na->last_realhost = r.Get(i, "last_realhost");
 			na->time_registered = r.Get(i, "time_registered").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "time_registered")) : Anope::CurTime;
 			na->last_seen = r.Get(i, "last_seen").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "last_seen")) : Anope::CurTime;
 
@@ -943,11 +944,12 @@ class DBMySQL : public Module
 
 	void InsertAlias(NickAlias *na)
 	{
-		SQLQuery query("INSERT INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, time_registered, last_seen, flags, display) VALUES(@nick, @last_quit, @last_realname, @last_usermask, @time_registered, @last_seen, @flags, @display) ON DUPLICATE KEY UPDATE last_quit=VALUES(last_quit), last_realname=VALUES(last_realname), last_usermask=VALUES(last_usermask), time_registered=VALUES(time_registered), last_seen=VALUES(last_seen), flags=VALUES(flags), display=VALUES(display)");
+		SQLQuery query("INSERT INTO `anope_ns_alias` (nick, last_quit, last_realname, last_usermask, last_realhost, time_registered, last_seen, flags, display) VALUES(@nick, @last_quit, @last_realname, @last_usermask, @last_realhost, @time_registered, @last_seen, @flags, @display) ON DUPLICATE KEY UPDATE last_quit=VALUES(last_quit), last_realname=VALUES(last_realname), last_usermask=VALUES(last_usermask), last_realhost=VALUES(last_realhost), time_registered=VALUES(time_registered), last_seen=VALUES(last_seen), flags=VALUES(flags), display=VALUES(display)");
 		query.setValue("nick", na->nick);
 		query.setValue("last_quit", na->last_quit);
 		query.setValue("last_realname", na->last_realname);
 		query.setValue("last_usermask", na->last_usermask);
+		query.setValue("last_realhost", na->last_realhost);
 		query.setValue("time_registered", na->time_registered);
 		query.setValue("last_seen", na->last_seen);
 		query.setValue("flags", ToString(na->ToString()));

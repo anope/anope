@@ -495,6 +495,8 @@ class DBPlain : public Module
 	{
 		if (key.equals_ci("LAST_USERMASK"))
 			na->last_usermask = params[0];
+		else if (key.equals_ci("LAST_REALHOST"))
+			na->last_realhost = params[0];
 		else if (key.equals_ci("LAST_REALNAME"))
 			na->last_realname = params[0];
 		else if (key.equals_ci("LAST_QUIT"))
@@ -751,6 +753,8 @@ class DBPlain : public Module
 			db_buffer << "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << endl;
 			if (!na->last_usermask.empty())
 				db_buffer << "MD LAST_USERMASK " << na->last_usermask << endl;
+			if (!na->last_realhost.empty())
+				db_buffer << "MD LAST_REALHOST " << na->last_realhost << endl;
 			if (!na->last_realname.empty())
 				db_buffer << "MD LAST_REALNAME :" << na->last_realname << endl;
 			if (!na->last_quit.empty())

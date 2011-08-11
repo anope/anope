@@ -88,6 +88,7 @@ static void NickInfoUpdate(const SQLResult &res)
 		na->last_quit = res.Get(0, "last_quit");
 		na->last_realname = res.Get(0, "last_realname");
 		na->last_usermask = res.Get(0, "last_usermask");
+		na->last_realhost = res.Get(0, "last_realhost");
 		na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 		na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
 		na->ClearFlags();

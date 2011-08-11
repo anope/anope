@@ -10,15 +10,16 @@ Legend:
 [x] Fix the modules language system to work without needing its own functions..
 [x] Rewrite commands system
 [x] Rewrite access system
+[x] NS INFO: separate field for last seen realhost, shown to SRA only
 [ ] Customize email messages
 [ ] Configurable bot usermodes
+
 
 Future
 ------
 [ ] NS IDENTIFY changes
   [?] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
   [?] Last successful login time/ip? perhaps both of these should be a new nick setting
-[ ] NS INFO: seperate field for last seen realhost, shown to SRA only
 [ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
 [ ] Allow channel founders to change the fantasy trigger for their channel.
 [+] CIDR Akills, session exceptions, etc

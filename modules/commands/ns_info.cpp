@@ -73,11 +73,16 @@ class CommandNSInfo : public Command
 					source.Reply(_("   Is online from: %s"), na->last_usermask.c_str());
 				else
 					source.Reply(_("%s is currently online."), na->nick.c_str());
+
+				if (has_auspex && !na->last_realhost.empty())
+					source.Reply(_("   Is online from: %s"), na->last_realhost.c_str());
 			}
 			else
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
 					source.Reply(_("Last seen address: %s"), na->last_usermask.c_str());
+				if (has_auspex && !na->last_realhost.empty())
+					source.Reply(_("Last seen address: %s"), na->last_realhost.c_str());
 			}
 
 			source.Reply(_("  Time registered: %s"), do_strftime(na->time_registered).c_str());

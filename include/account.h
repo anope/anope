@@ -112,6 +112,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	Anope::string last_quit;		/* Last quit message */
 	Anope::string last_realname;	/* Last realname */
 	Anope::string last_usermask;	/* Last usermask */
+	Anope::string last_realhost;	/* Last uncloaked usermask, requires nickserv/auspex to see */
 	time_t time_registered;			/* When the nick was registered */
 	time_t last_seen;				/* When it was seen online for the last time */
 	NickCore *nc;					/* I'm an alias of this */

@@ -250,6 +250,7 @@ CREATE TABLE IF NOT EXISTS `anope_ns_alias` (
   `last_quit` text NOT NULL,
   `last_realname` text NOT NULL,
   `last_usermask` text NOT NULL,
+  `last_realhost` text NOT NULL,
   `time_registered` int(10) unsigned NOT NULL DEFAULT '0',
   `last_seen` int(10) unsigned NOT NULL DEFAULT '0',
   `flags` text NOT NULL,

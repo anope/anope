@@ -352,7 +352,9 @@ void User::Identify(NickAlias *na)
 	if (this->nick.equals_ci(na->nick))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
 		na->last_usermask = last_usermask;
+		na->last_realhost = last_realhost;
 		na->last_realname = this->realname;
 		na->last_seen = Anope::CurTime;
 	}
@@ -501,7 +503,9 @@ void User::UpdateHost()
 	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
+		Anope::string last_realhost = this->GetIdent() + "@" + this->host;
 		na->last_usermask = last_usermask;
+		na->last_realhost = last_realhost;
 	}
 }
 

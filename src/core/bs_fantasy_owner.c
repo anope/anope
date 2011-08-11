@@ -31,12 +31,6 @@ int AnopeInit(int argc, char **argv)
         (VERSION_STRING);
     moduleSetType(CORE);
 
-    /* No need to load of we don't support owner */
-    if (!ircd->owner) {
-        alog("Your ircd doesn't support the owner channelmode; bs_fantasy_owner won't be loaded");
-        return MOD_STOP;
-    }
-
     hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
     moduleAddEventHook(hook);
 
@@ -62,7 +56,7 @@ int do_fantasy(int argc, char **argv)
     User *u;
     ChannelInfo *ci;
 
-    if (argc < 3)
+    if (argc < 3 || !ircd->owner)
         return MOD_CONT;
 
     if (stricmp(argv[0], "deowner") == 0) {

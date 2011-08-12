@@ -84,10 +84,6 @@ void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
 static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &output)
 {
 	Anope::string input = services_dir + "/modules/" + name + ".so";
-
-	int source = open(input.c_str(), O_RDONLY);
-	if (source == -1)
-		return MOD_ERR_NOEXIST;
 	
 	struct stat s;
 	if (stat(input.c_str(), &s) == -1)
@@ -95,40 +91,46 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	else if (!S_ISREG(s.st_mode))
 		return MOD_ERR_NOEXIST;
 	
+	std::ifstream source(input.c_str(), std::ios_base::in | std::ios_base::binary);
+	if (!source.is_open())
+		return MOD_ERR_NOEXIST;
+	
 	char *tmp_output = strdup(output.c_str());
-	int target = mkstemp(tmp_output);
-	if (target == -1)
+	int target_fd = mkstemp(tmp_output);
+	if (target_fd == -1 || close(target_fd) == -1)
 	{
 		free(tmp_output);
-		close(source);
+		source.close();
 		return MOD_ERR_FILE_IO;
 	}
 	output = tmp_output;
 	free(tmp_output);
 
 	Log(LOG_DEBUG) << "Runtime module location: " << output;
-
-	char *buffer = new char[s.st_size];
-	bool err = false;
-	for (;;)
+	
+	std::ofstream target(output.c_str(), std::ios_base::in | std::ios_base::binary);
+	if (!target.is_open())
 	{
-		int read_len = read(source, buffer, s.st_size);
-		if (read_len <= 0)
-			break;
-		int writ_len = write(target, buffer, read_len);
-		if (writ_len < 0)
-		{
-			err = true;
-			break;
-		}
+		source.close();
+		return MOD_ERR_FILE_IO;
+	}
+
+	int want = s.st_size;
+	char *buffer = new char[s.st_size];
+	while (want > 0 && !source.fail() && !target.fail())
+	{
+		source.read(buffer, want);
+		int read_len = source.gcount();
+
+		target.write(buffer, read_len);
+		want -= read_len;
 	}
 	delete [] buffer;
 	
-	close(source);
-	if (close(target) == -1 || err == true)
-		return MOD_ERR_FILE_IO;
+	source.close();
+	target.close();
 
-	return MOD_ERR_OK;
+	return !source.fail() && !target.fail() ? MOD_ERR_OK : MOD_ERR_FILE_IO;
 }
 
 /* This code was found online at http://www.linuxjournal.com/article/3687#comment-26593

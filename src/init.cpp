@@ -403,6 +403,10 @@ void Init(int ac, char **av)
 	rand_init();
 	add_entropy_userkeys();
 
+#ifdef _WIN32
+	OnStartup();
+#endif
+
 	/* load modules */
 	ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
 

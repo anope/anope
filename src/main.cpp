@@ -402,6 +402,10 @@ int main(int ac, char **av, char **envp)
 
 	ModuleManager::CleanupRuntimeDirectory();
 
+#ifdef _WIN32
+	OnShutdown();
+#endif
+
 	if (restarting)
 	{
 		chdir(binary_dir.c_str());

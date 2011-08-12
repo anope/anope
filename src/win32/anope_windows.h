@@ -43,6 +43,10 @@
 #define vsnprintf _vsnprintf
 #define stat _stat
 #define S_ISREG(x) ((x) & _S_IFREG)
+#ifdef EINPROGRESS
+# undef EINPROGRESS
+#endif
+#define EINPROGRESS WSAEWOULDBLOCK
 
 #include "sigaction/sigaction.h"
 

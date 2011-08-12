@@ -26,7 +26,7 @@
 # define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
 # define dlclose(file) FreeLibrary(file) ? 0 : 1
 # define ano_modclearerr() SetLastError(0)
-# define ano_moderr() Anope::LastError().c_str()
+# define ano_moderr() (Anope::LastError().empty() ? NULL : Anope::LastError().c_str())
 #else
 	typedef void * ano_module_t;
 

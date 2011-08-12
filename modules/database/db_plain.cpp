@@ -311,11 +311,11 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 			XLineManager *xl = *it;
 			if (xl->Type() == type)
 			{
-				Anope::string mask = params[2];
-				Anope::string by = params[3];
-				time_t seton = params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0;
-				time_t expires = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
-				Anope::string reason = params[6];
+				Anope::string mask = params[2] + "@" + params[3];
+				Anope::string by = params[4];
+				time_t seton = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0;
+				time_t expires = params[6].is_pos_number_only() ? convertTo<time_t>(params[6]) : 0;
+				Anope::string reason = params[7];
 
 				XLine *x = xl->Add(mask, by, expires, reason);
 				if (x)

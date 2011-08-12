@@ -66,6 +66,7 @@ class IdentifyInterface : public LDAPInterface
 		enc_encrypt(ii->pass, na->nc->pass);
 
 		c->Execute(ii->source, ii->params);
+		ii->source.DoReply();
 
 		delete ii;
 	}
@@ -90,6 +91,7 @@ class IdentifyInterface : public LDAPInterface
 		u->Extend("m_ldap_authentication_error");
 
 		c->Execute(ii->source, ii->params);
+		ii->source.DoReply();
 
 		delete ii;
 	}

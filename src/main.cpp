@@ -127,8 +127,13 @@ class UplinkSocket : public ConnectionSocket
 				User *u = it->second;
 
 				if (u->server == Me)
+				{
 					/* Don't use quitmsg here, it may contain information you don't want people to see */
 					ircdproto->SendQuit(u, "Shutting down");
+					BotInfo *bi = findbot(u->nick);
+					if (bi != NULL)
+						bi->introduced = false;
+				}
 			}
 
 			ircdproto->SendSquit(Config->ServerName, quitmsg);

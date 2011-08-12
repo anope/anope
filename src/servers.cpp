@@ -82,6 +82,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 				BotInfo *bi = findbot(u->nick);
 				if (bi)
 				{
+					bi->introduced = true;
 					XLine x(bi->nick, "Reserved for services");
 					ircdproto->SendSQLine(NULL, &x);
 				}

@@ -32,6 +32,8 @@ void introduce_user(const Anope::string &user)
 		BotInfo *bi = findbot(u->nick);
 		if (bi)
 		{
+			bi->introduced = true;
+
 			XLine x(bi->nick, "Reserved for services");
 			ircdproto->SendSQLine(NULL, &x);
 

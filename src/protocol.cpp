@@ -331,6 +331,7 @@ bool IRCdMessage::OnKill(const Anope::string &source, const std::vector<Anope::s
 	/* Recover if someone kills us. */
 	if (u->server == Me && (bi = dynamic_cast<BotInfo *>(u)))
 	{
+		bi->introduced = false;
 		introduce_user(bi->nick);
 		bi->RejoinAll();
 	}

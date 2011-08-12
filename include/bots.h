@@ -41,6 +41,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	typedef Anope::insensitive_map<CommandInfo> command_map;
 	command_map commands; /* Commands, actual name to service name */
 	Anope::string botmodes;		/* Modes the bot should have as configured in service:modes */
+	bool introduced;		/* Whether or not this bot is introduced */
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.

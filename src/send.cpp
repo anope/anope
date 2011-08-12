@@ -39,6 +39,16 @@ void send_cmd(const Anope::string &source, const char *fmt, ...)
 		return;
 	}
 
+	if (!source.empty() && source.find(".") == Anope::string::npos)
+	{
+		BotInfo *bi = findbot(source);
+		if (bi != NULL && bi->introduced == false)
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << source << " " << buf << "\" with source not introduced";
+			return;
+		}
+	}
+
 	if (!source.empty())
 	{
 		UplinkSock->Write(":%s %s", source.c_str(), buf);

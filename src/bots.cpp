@@ -20,6 +20,7 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 
 	this->chancount = 0;
 	this->lastmsg = this->created = Anope::CurTime;
+	this->introduced = false;
 
 	BotListByNick[this->nick] = this;
 	if (!this->uid.empty())
@@ -28,14 +29,15 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
+		Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircd ? ircd->pseudoclient_mode : "");
+		if (!tmodes.empty())
+			this->SetModesInternal(tmodes.c_str());
+
 		ircdproto->SendClientIntroduction(this);
+		this->introduced = true;
 		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(NULL, &x);
 	}
-
-	Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircd ? ircd->pseudoclient_mode : "");
-	if (!tmodes.empty())
-		this->SetModesInternal(tmodes.c_str());
 
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
@@ -70,6 +72,7 @@ BotInfo::~BotInfo()
 	if (Me && Me->IsSynced())
 	{
 		ircdproto->SendQuit(this, "");
+		this->introduced = false;
 		XLine x(this->nick);
 		ircdproto->SendSQLineDel(&x);
 	}

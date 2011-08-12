@@ -140,11 +140,10 @@ class UnrealIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config->ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	void SendClientIntroduction(const User *u)
 	{
-		XLine x(u->nick, "Reserved for services");
-		ircdproto->SendSQLine(NULL, &x);
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), static_cast<long>(u->timestamp), u->GetIdent().c_str(), u->host.c_str(), Config->ServerName.c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
+		Anope::string modes = "+" + u->GetModes();
+		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), static_cast<long>(u->timestamp), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)

@@ -214,10 +214,9 @@ class BahamutIRCdProto : public IRCDProto
 			send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
-	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	void SendClientIntroduction(const User *u)
 	{
-		XLine x(u->nick, "Reserved for services");
-		ircdproto->SendSQLine(NULL, &x);
+		Anope::string modes = "+" + u->GetModes();
 		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
 	}
 

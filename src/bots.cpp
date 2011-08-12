@@ -13,7 +13,7 @@
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &modes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(modes)
 {
 	this->realname = nreal;
 	this->server = Me;
@@ -28,13 +28,14 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	// If we're synchronised with the uplink already, send the bot.
 	if (Me && Me->IsSynced())
 	{
-		ircdproto->SendClientIntroduction(this, ircd->pseudoclient_mode);
+		ircdproto->SendClientIntroduction(this);
 		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(NULL, &x);
 	}
 
-	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_PROTECTED));
-	this->SetModeInternal(ModeManager::FindUserModeByName(UMODE_GOD));
+	Anope::string tmodes = !this->botmodes.empty() ? ("+" + this->botmodes) : (ircd ? ircd->pseudoclient_mode : "");
+	if (!tmodes.empty())
+		this->SetModesInternal(tmodes.c_str());
 
 	if (Config)
 		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)

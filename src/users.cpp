@@ -705,6 +705,22 @@ void User::SetModesInternal(const char *umodes, ...)
 	}
 }
 
+Anope::string User::GetModes() const
+{
+	Anope::string ret;
+
+	for (size_t i = UMODE_BEGIN + 1; i < UMODE_END; ++i)
+		if (this->modes.HasFlag(static_cast<UserModeName>(i)))
+		{
+			UserMode *um = ModeManager::FindUserModeByName(static_cast<UserModeName>(i));
+			if (um == NULL)
+				continue;
+			ret += um->ModeChar;
+		}
+
+	return ret;
+}
+
 /** Find the channel container for Channel c that the user is on
  * This is preferred over using FindUser in Channel, as there are usually more users in a channel
  * than channels a user is in

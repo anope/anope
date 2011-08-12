@@ -271,6 +271,11 @@ class CoreExport User : public Extensible
 	 */
 	void SetModesInternal(const char *umodes, ...);
 
+	/** Get modes set for this user.
+	 * @return A string of modes set on the user
+	 */
+	Anope::string GetModes() const;
+
 	/** Find the channel container for Channel c that the user is on
 	 * This is preferred over using FindUser in Channel, as there are usually more users in a channel
 	 * than channels a user is in

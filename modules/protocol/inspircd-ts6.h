@@ -103,8 +103,9 @@ class InspIRCdTS6Proto : public IRCDProto
 		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", u->GetUID().c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	void SendClientIntroduction(const User *u)
 	{
+		Anope::string modes = "+" + u->GetModes();
 		send_cmd(Config->Numeric, "UID %s %ld %s %s %s %s 0.0.0.0 %ld %s :%s", u->GetUID().c_str(), static_cast<long>(u->timestamp), u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), static_cast<long>(u->my_signon), modes.c_str(), u->realname.c_str());
 	}
 

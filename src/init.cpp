@@ -27,7 +27,7 @@ void introduce_user(const Anope::string &user)
 	User *u = finduser(user);
 	if (u)
 	{
-		ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+		ircdproto->SendClientIntroduction(u);
 
 		BotInfo *bi = findbot(u->nick);
 		if (bi)

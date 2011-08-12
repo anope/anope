@@ -135,8 +135,9 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
 	}
 
-	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	void SendClientIntroduction(const User *u)
 	{
+		Anope::string modes = "+" + u->GetModes();
 		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(u->timestamp), u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), modes.c_str(), u->realname.c_str());
 		send_cmd(u->nick, "OPERTYPE Service");
 	}

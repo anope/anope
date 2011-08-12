@@ -11,8 +11,7 @@ Legend:
 [x] Rewrite commands system
 [x] Rewrite access system
 [x] NS INFO: separate field for last seen realhost, shown to SRA only
-[ ] Customize email messages
-[ ] Configurable bot usermodes
+[x] Configurable bot usermodes
 
 
 Future
@@ -34,3 +33,4 @@ Future
 [ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
 [ ] No nickname ownership?
 [ ] More commands need to be split up such as /bs bot, /ms set, /bs kick, /bs set, /os set? etc.
+[ ] Customize email messages

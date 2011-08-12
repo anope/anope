@@ -60,7 +60,7 @@ NickServRelease::NickServRelease(NickAlias *na, time_t delay) : User(na->nick, C
 
 	NickServReleases.insert(std::make_pair(this->nick, this));
 
-	ircdproto->SendClientIntroduction(this, "+");
+	ircdproto->SendClientIntroduction(this);
 }
 
 NickServRelease::~NickServRelease()

@@ -937,6 +937,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 	Anope::string user = values[1].GetValue();
 	Anope::string host = values[2].GetValue();
 	Anope::string gecos = values[3].GetValue();
+	Anope::string modes = values[4].GetValue();
 
 	ValueItem vi(nick);
 	if (!ValidateNotEmpty(config, "service", "nick", vi))
@@ -958,7 +959,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 	BotInfo *bi = findbot(nick);
 	if (bi != NULL)
 		return true;
-	bi = new BotInfo(nick, user, host, gecos);
+	bi = new BotInfo(nick, user, host, gecos, modes);
 	bi->SetFlag(BI_CONF);
 	return true;
 }
@@ -1257,9 +1258,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOpers, DoOper, DoneOpers},
 		{"service",
-			{"nick", "user", "host", "gecos", ""},
-			{"", "", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{"nick", "user", "host", "gecos", "modes", ""},
+			{"", "", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitServices, DoServices, DoneServices},
 		{"log",
 			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},

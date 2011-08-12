@@ -249,7 +249,7 @@ class CommandBSBot : public Command
 
 		if (!user.empty())
 		{
-			ircdproto->SendClientIntroduction(bi, ircd->pseudoclient_mode);
+			ircdproto->SendClientIntroduction(bi);
 			bi->RejoinAll();
 		}
 

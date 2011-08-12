@@ -40,6 +40,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	time_t lastmsg;			/* Last time we said something */
 	typedef Anope::insensitive_map<CommandInfo> command_map;
 	command_map commands; /* Commands, actual name to service name */
+	Anope::string botmodes;		/* Modes the bot should have as configured in service:modes */
 
 	/** Create a new bot.
 	 * @param nick The nickname to assign to the bot.
@@ -47,7 +48,7 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 * @param host The hostname to give the bot.
 	 * @param real The realname to give the bot.
 	 */
-	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "");
+	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "", const Anope::string &modes = "");
 
 	/** Destroy a bot, clearing up appropriately.
 	 */

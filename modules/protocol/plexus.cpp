@@ -168,10 +168,9 @@ class PlexusProto : public IRCDProto
 		plexus_cmd_svinfo();
 	}
 
-	void SendClientIntroduction(const User *u, const Anope::string &modes)
+	void SendClientIntroduction(const User *u)
 	{
-		XLine x(u->nick, "Reserved for services");
-		ircdproto->SendSQLine(NULL, &x);
+		Anope::string modes = "+" + u->GetModes();
 		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 255.255.255.255 %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->host.c_str(), u->realname.c_str());
 	}
 

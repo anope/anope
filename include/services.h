@@ -800,7 +800,7 @@ class CoreExport IRCDProto
 	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const User *u, const char *fmt, ...);
-	virtual void SendClientIntroduction(const User *u, const Anope::string &) = 0;
+	virtual void SendClientIntroduction(const User *u) = 0;
 	virtual void SendKick(const BotInfo *bi, const Channel *chan, const User *user, const char *fmt, ...);
 	virtual void SendNoticeChanops(const BotInfo *bi, const Channel *dest, const char *fmt, ...);
 	virtual void SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);

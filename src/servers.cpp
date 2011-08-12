@@ -55,6 +55,12 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			/* Load MLock from the database now that we know what modes exist */
 			for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 				it->second->LoadMLock();
+			for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+			{
+				BotInfo *bi = it->second;
+				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircd->pseudoclient_mode;
+				bi->SetModesInternal(modes.c_str());
+			}
 
 			ircdproto->SendBOB();
 	
@@ -71,7 +77,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 			{
 				User *u = it->second;
 
-				ircdproto->SendClientIntroduction(u, ircd->pseudoclient_mode);
+				ircdproto->SendClientIntroduction(u);
 
 				BotInfo *bi = findbot(u->nick);
 				if (bi)

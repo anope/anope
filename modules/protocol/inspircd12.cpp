@@ -309,10 +309,10 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	return true;
 }
 
-template<typename T> class InspIRCdExtBan : public T
+class InspIRCdExtBan : public ChannelModeList
 {
  public:
-	InspIRCdExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
 	bool Matches(User *u, const Entry *e)
 	{
@@ -440,13 +440,13 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 						switch (modebuf[t])
 						{
 							case 'b':
-								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeBan>(CMODE_BAN, 'b'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan(CMODE_BAN, 'b'));
 								continue;
 							case 'e':
-								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeList>(CMODE_EXCEPT, 'e'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan(CMODE_EXCEPT, 'e'));
 								continue;
 							case 'I':
-								ModeManager::AddChannelMode(new InspIRCdExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I'));
+								ModeManager::AddChannelMode(new InspIRCdExtBan(CMODE_INVITEOVERRIDE, 'I'));
 								continue;
 							/* InspIRCd sends q and a here if they have no prefixes */
 							case 'q':

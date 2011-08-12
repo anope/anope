@@ -610,7 +610,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_CLOAK, 'x'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
 		ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));
 		ModeManager::AddChannelMode(new ChannelModeList(CMODE_INVITEOVERRIDE, 'I'));
 	

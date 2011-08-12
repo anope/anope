@@ -404,7 +404,7 @@ class InspircdIRCdMessage : public IRCdMessage
 						switch (modebuf[t])
 						{
 							case 'b':
-								ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
+								ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
 								continue;
 							case 'e':
 								ModeManager::AddChannelMode(new ChannelModeList(CMODE_EXCEPT, 'e'));

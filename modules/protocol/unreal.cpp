@@ -355,10 +355,10 @@ class UnrealIRCdProto : public IRCDProto
 	}
 };
 
-template<typename T> class UnrealExtBan : public T
+class UnrealExtBan : public ChannelModeList
 {
  public:
-	UnrealExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+	UnrealExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
 	bool Matches(User *u, const Entry *e)
 	{
@@ -629,13 +629,13 @@ class Unreal32IRCdMessage : public IRCdMessage
 					switch (modebuf[t])
 					{
 						case 'b':
-							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeBan>(CMODE_BAN, 'b'));
+							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_BAN, 'b'));
 							continue;
 						case 'e':
-							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeList>(CMODE_EXCEPT, 'e'));
+							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_EXCEPT, 'e'));
 							continue;
 						case 'I':
-							ModeManager::AddChannelMode(new UnrealExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I'));
+							ModeManager::AddChannelMode(new UnrealExtBan(CMODE_INVITEOVERRIDE, 'I'));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelModeList(CMODE_END, modebuf[t]));

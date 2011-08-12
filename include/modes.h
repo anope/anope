@@ -289,14 +289,6 @@ class CoreExport ChannelModeStatus : public ChannelMode
 	virtual ~ChannelModeStatus();
 };
 
-/** Channel mode +b
- */
-class CoreExport ChannelModeBan : public ChannelModeList
-{
- public:
-	ChannelModeBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
-};
-
 /** Channel mode +k (key)
  */
 class CoreExport ChannelModeKey : public ChannelModeParam

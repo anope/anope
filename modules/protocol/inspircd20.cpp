@@ -320,10 +320,10 @@ bool event_endburst(const Anope::string &source, const std::vector<Anope::string
 	return true;
 }
 
-template<typename T> class InspIRCdExtBan : public T
+class InspIRCdExtBan : public ChannelModeList
 {
  public:
-	InspIRCdExtBan(ChannelModeName mName, char modeChar) : T(mName, modeChar) { }
+	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
 	bool Matches(User *u, const Entry *e)
 	{
@@ -461,9 +461,9 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("auditorium"))
 					cm = new ChannelMode(CMODE_AUDITORIUM, modechar[0]);
 				else if (modename.equals_cs("ban"))
-					cm = new InspIRCdExtBan<ChannelModeBan>(CMODE_BAN, modechar[0]);
+					cm = new InspIRCdExtBan(CMODE_BAN, modechar[0]);
 				else if (modename.equals_cs("banexception"))
-					cm = new InspIRCdExtBan<ChannelModeList>(CMODE_EXCEPT, 'e');
+					cm = new InspIRCdExtBan(CMODE_EXCEPT, 'e');
 				else if (modename.equals_cs("blockcaps"))
 					cm = new ChannelMode(CMODE_BLOCKCAPS, modechar[0]);
 				else if (modename.equals_cs("blockcolor"))
@@ -481,7 +481,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 				else if (modename.equals_cs("halfop"))
 					cm = new ChannelModeStatus(CMODE_HALFOP, modechar.length() > 1 ? modechar[1] : modechar[0], modechar.length() > 1 ? modechar[0] : 0);
 				else if (modename.equals_cs("invex"))
-					cm = new InspIRCdExtBan<ChannelModeList>(CMODE_INVITEOVERRIDE, 'I');
+					cm = new InspIRCdExtBan(CMODE_INVITEOVERRIDE, 'I');
 				else if (modename.equals_cs("inviteonly"))
 					cm = new ChannelMode(CMODE_INVITE, modechar[0]);
 				else if (modename.equals_cs("joinflood"))

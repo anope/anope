@@ -535,7 +535,7 @@ class ProtoBahamut : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'd'));
 
 		/* b/e/I */
-		ModeManager::AddChannelMode(new ChannelModeBan(CMODE_BAN, 'b'));
+		ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
 
 		/* v/h/o/a/q */
 		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));

@@ -33,7 +33,7 @@ class CommandBSSet : public Command
 
 		if (readonly)
 			source.Reply(_("Sorry, bot option setting is temporarily disabled."));
-		else if (u->HasCommand("botserv/botserv/set/private") && option.equals_ci("PRIVATE"))
+		else if (u->HasCommand("botserv/set/private") && option.equals_ci("PRIVATE"))
 		{
 			BotInfo *bi;
 

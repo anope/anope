@@ -34,14 +34,26 @@ class SGLineManager : public XLineManager
 
 	void Del(XLine *x)
 	{
-		ircdproto->SendAkillDel(x);
+		try
+		{
+			if (!ircd->szline)
+				throw SocketException("SZLine is not supported");
+			else if (x->GetUser() != "*")
+				throw SocketException("Can not ZLine a username");
+			x->GetIP();
+			ircdproto->SendSZLineDel(x);
+		}
+		catch (const SocketException &)
+		{
+			ircdproto->SendAkillDel(x);
+		}
 	}
 
 	void OnMatch(User *u, XLine *x)
 	{
 		if (u)
 			u->Kill(Config->OperServ, x->Reason);
-		ircdproto->SendAkill(u, x);
+		this->Send(u, x);
 	}
 
 	void OnExpire(XLine *x)
@@ -52,52 +64,19 @@ class SGLineManager : public XLineManager
 	
 	void Send(User *u, XLine *x)
 	{
-		ircdproto->SendAkill(u, x);
-	}
-};
-
-class SZLineManager : public XLineManager
-{
- public:
-	SZLineManager(Module *creator) : XLineManager(creator, "xlinemanager/szline", 'Z') { }
-
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-	{
-		XLine *x = new XLine(mask, creator, expires, reason);
-
-		this->AddXLine(x);
-
-		if (UplinkSock)
-			this->Send(NULL, x);
-
-		return x;
-	}
-
-	void Del(XLine *x)
-	{
-		ircdproto->SendSZLineDel(x);
-	}
-
-	void OnMatch(User *u, XLine *x)
-	{
-		if (u)
+		try
 		{
-			Anope::string reason = "Z-Lined: " + x->Reason;
-			u->Kill(Config->OperServ, reason);
+			if (!ircd->szline)
+				throw SocketException("SZLine is not supported");
+			else if (x->GetUser() != "*")
+				throw SocketException("Can not ZLine a username");
+			x->GetIP();
+			ircdproto->SendSZLine(u, x);
 		}
-
-		ircdproto->SendSZLine(u, x);
-	}
-
-	void OnExpire(XLine *x)
-	{
-		if (Config->WallSZLineExpire)
-			ircdproto->SendGlobops(OperServ, "SZLINE on \2%s\2 has expired", x->Mask.c_str());
-	}
-
-	void Send(User *u, XLine *x)
-	{
-		ircdproto->SendSZLine(u, x);
+		catch (const SocketException &)
+		{
+			ircdproto->SendAkill(u, x);
+		}
 	}
 };
 
@@ -274,13 +253,12 @@ class SNLineManager : public XLineManager
 class OperServCore : public Module
 {
 	SGLineManager sglines;
-	SZLineManager szlines;
 	SQLineManager sqlines;
 	SNLineManager snlines;
 
  public:
 	OperServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		sglines(this), szlines(this), sqlines(this), snlines(this)
+		sglines(this), sqlines(this), snlines(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -292,13 +270,11 @@ class OperServCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&sglines);
-		ModuleManager::RegisterService(&szlines);
 		ModuleManager::RegisterService(&sqlines);
 		ModuleManager::RegisterService(&snlines);
 		
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
 		XLineManager::RegisterXLineManager(&sglines);
-		XLineManager::RegisterXLineManager(&szlines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
 	}

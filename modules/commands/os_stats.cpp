@@ -34,7 +34,7 @@ static int stats_count_servers(Server *s)
 
 class CommandOSStats : public Command
 {
-	service_reference<XLineManager> akills, snlines, sqlines, szlines;
+	service_reference<XLineManager> akills, snlines, sqlines;
  private:
 	void DoStatsAkill(CommandSource &source)
 	{
@@ -99,26 +99,6 @@ class CommandOSStats : public Command
 			else
 				source.Reply(_("Default SQLINE expiry time: \002No expiration\002"));
 		}
-		if (ircd->szline && szlines)
-		{
-			/* SZLINEs */
-			source.Reply(_("Current number of SZLINEs: \002%d\002"), szlines->GetCount());
-			timeout = Config->SZLineExpiry + 59;
-			if (timeout >= 172800)
-				source.Reply(_("Default SZLINE expiry time: \002%d days\002"), timeout / 86400);
-			else if (timeout >= 86400)
-				source.Reply(_("Default SZLINE expiry time: \0021 day\002"));
-			else if (timeout >= 7200)
-				source.Reply(_("Default SZLINE expiry time: \002%d hours\002"), timeout / 3600);
-			else if (timeout >= 3600)
-				source.Reply(_("Default SZLINE expiry time: \0021 hour\002"));
-			else if (timeout >= 120)
-				source.Reply(_("Default SZLINE expiry time: \002%d minutes\002"), timeout / 60);
-			else if (timeout >= 60)
-				source.Reply(_("Default SZLINE expiry time: \0021 minute\002"));
-			else
-				source.Reply(_("Default SZLINE expiry time: \002No expiration\002"));
-		}
 		return;
 	}
 
@@ -158,7 +138,7 @@ class CommandOSStats : public Command
 
  public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
-		akills("xlinemanager/sgline"), snlines("xlinemanager/snline"), sqlines("xlinemanager/sqline"), szlines("xlinemanager/szline")
+		akills("xlinemanager/sgline"), snlines("xlinemanager/snline"), sqlines("xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
 		this->SetSyntax(_("[AKILL | ALL | RESET | UPLINK]"));

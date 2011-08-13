@@ -27,6 +27,7 @@ class CoreExport XLine
 	Anope::string GetNick() const;
 	Anope::string GetUser() const;
 	Anope::string GetHost() const;
+	sockaddrs GetIP() const;
 };
 
 class CoreExport XLineManager : public Service

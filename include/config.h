@@ -576,8 +576,6 @@ class CoreExport ServerConfig
 	time_t SNLineExpiry;
 	/* Default expiry time for SQLines */
 	time_t SQLineExpiry;
-	/* Default expiry time for SZLine */
-	time_t SZLineExpiry;
 	/* Actually akill the user when the akill is added */
 	bool AkillOnAdd;
 	/* Kill users on SNLine */
@@ -594,8 +592,6 @@ class CoreExport ServerConfig
 	bool WallSNLineExpire;
 	/* Send a WALLOPS/GLOBOPS when SQLines expire */
 	bool WallSQLineExpire;
-	/* Send a WALLOPS/GLOBOPS when SZLines expire */
-	bool WallSZLineExpire;
 	/* Send a WALLOPS/GLOBOPS when exceptions expire */
 	bool WallExceptionExpire;
 	/* Add the akillers nick to the akill reason */

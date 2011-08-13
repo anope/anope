@@ -59,6 +59,13 @@ Anope::string XLine::GetHost() const
 		return this->Mask.substr(host_t + 1);
 }
 
+sockaddrs XLine::GetIP() const
+{
+	sockaddrs addr;
+	addr.pton(this->GetHost().find(':') != Anope::string::npos ? AF_INET6 : AF_INET, this->GetHost());
+	return addr;
+}
+
 /** Constructor
  */
 XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, xname), type(t)

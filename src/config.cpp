@@ -141,7 +141,7 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 	}
 
 	this->WallOper = this->WallBadOS = this->WallAkillExpire = this->WallSNLineExpire = this->WallSQLineExpire =
-	this->WallSZLineExpire = this->WallExceptionExpire = false;
+	this->WallExceptionExpire = false;
 	if (!OSNotifications.empty())
 	{
 		spacesepstream notifications(OSNotifications);
@@ -158,8 +158,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 				this->WallSNLineExpire = true;
 			else if (notice.equals_ci("sqlineexpire"))
 				this->WallSQLineExpire = true;
-			else if (notice.equals_ci("szlineexpire"))
-				this->WallSZLineExpire = true;
 			else if (notice.equals_ci("exceptionexpire"))
 				this->WallExceptionExpire = true;
 		}
@@ -477,7 +475,7 @@ bool ValidateOperServ(ServerConfig *config, const Anope::string &tag, const Anop
 	{
 		if (value.equals_ci("description") && data.GetValue().empty())
 			throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when OperServ is enabled!");
-		else if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("szlineexpiry") || value.equals_ci("sqlineexpiry"))
+		else if (value.equals_ci("autokillexpiry") || value.equals_ci("chankillexpiry") || value.equals_ci("snlineexpiry") || value.equals_ci("sqlineexpiry"))
 			return ValidateNotZero(config, tag, value, data);
 		else if (value.equals_ci("maxsessionlimit") || value.equals_ci("exceptionexpiry"))
 			return ValidateLimitSessions(config, tag, value, data);
@@ -1211,7 +1209,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&conf->ChankillExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "snlineexpiry", "0", new ValueContainerTime(&conf->SNLineExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&conf->SQLineExpiry), DT_TIME, ValidateOperServ},
-		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&conf->SZLineExpiry), DT_TIME, ValidateOperServ},
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&conf->AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsnline", "no", new ValueContainerBool(&conf->KillonSNline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&conf->KillonSQline), DT_BOOLEAN, NoValidation},

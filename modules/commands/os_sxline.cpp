@@ -633,168 +633,14 @@ class CommandOSSQLine : public CommandOSSXLineBase
 	}
 };
 
-class CommandOSSZLine : public CommandOSSXLineBase
-{
-	XLineManager *xlm()
-	{
-		return this->szlines;
-	}
-
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
-	{
-		if (!this->xlm())
-			return;
-
-		User *u = source.u;
-		unsigned last_param = 2;
-		Anope::string expiry, mask;
-		time_t expires;
-
-		mask = params.size() > 1 ? params[1] : "";
-		if (!mask.empty() && mask[0] == '+')
-		{
-			expiry = mask;
-			mask = params.size() > 2 ? params[2] : "";
-			last_param = 3;
-		}
-
-		expires = !expiry.empty() ? dotime(expiry) : Config->SZLineExpiry;
-		/* If the expiry given does not contain a final letter, it's in days,
-		 * said the doc. Ah well.
-		 */
-		if (!expiry.empty() && isdigit(expiry[expiry.length() - 1]))
-			expires *= 86400;
-		/* Do not allow less than a minute expiry time */
-		if (expires && expires < 60)
-		{
-			source.Reply(BAD_EXPIRY_TIME);
-			return;
-		}
-		else if (expires > 0)
-			expires += Anope::CurTime;
-
-		if (params.size() <= last_param)
-		{
-			this->OnSyntaxError(source, "ADD");
-			return;
-		}
-
-		Anope::string reason = params[last_param];
-		if (last_param == 2 && params.size() > 3)
-			reason += " " + params[3];
-		if (!mask.empty() && !reason.empty())
-		{
-			std::pair<int, XLine *> canAdd = this->szlines->CanAdd(mask, expires);
-			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
-				source.Reply(_("You can only add IP masks to the SZLINE list."));
-			else if (mask.find_first_not_of("*?") == Anope::string::npos)
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			else if (canAdd.first == 1)
-				source.Reply(_("\002%s\002 already exists on the SZLINE list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-			else
-			{
-				User *user = finduser(mask);
-				if (user && user->ip())
-					mask = user->ip.addr();
-				unsigned int affected = 0;
-				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (it->second->ip() && Anope::Match(it->second->ip.addr(), mask))
-						++affected;
-				float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
-
-				if (percent > 95)
-				{
-					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-					Log(LOG_ADMIN, u, this) << "tried to SZLine " << percent << "% of the network (" << affected << " users)";
-					return;
-				}
-
-				XLine *x = this->szlines->Add(mask, u->nick, expires, reason);
-
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
-				if (MOD_RESULT == EVENT_STOP)
-				{
-					delete x;
-					return;
-				}
-
-				source.Reply(_("\002%s\002 added to the SZLINE list."), mask.c_str());
-				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
-				if (readonly)
-					source.Reply(READ_ONLY_MODE);
-			}
-
-		}
-		else
-			this->OnSyntaxError(source, "ADD");
-
-		return;
-	}
-
-	service_reference<XLineManager> szlines;
- public:
-	CommandOSSZLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/szline"), szlines("xlinemanager/szline")
-	{
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
-	{
-		this->SendSyntax(source);
-		source.Reply(" ");
-		source.Reply(_("Allows Services operators to manipulate the SZLINE list.  If\n"
-				"a user with an IP matching an SZLINE mask attempts to \n"
-				"connect, Services will not allow it to pursue his IRC\n"
-				"session (and this, whether the IP has a PTR RR or not).\n"
-				" \n"));
-		source.Reply(_("\002SZLINE ADD\002 adds the given (nick's) IP mask to the SZLINE\n"
-				"list for the given reason (which \002must\002 be given).\n"
-				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
-				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
-				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
-				"included, the default is days (so \037+30\037 by itself means 30 \n"
-				"days). To add an SZLINE which does not expire, use \037+0\037. If the\n"
-				"realname mask to be added starts with a \037+\037, an expiry time must\n"
-				"be given, even if it is the same as the default. The\n"
-				"current SZLINE default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"));
-		source.Reply(_(" \n"
-				"The \002SZLINE DEL\002 command removes the given mask from the\n"
-				"SZLINE list if it is present. If a list of entry numbers is \n"
-				"given, those entries are deleted. (See the example for LIST \n"
-				"below.)\n"
-				" \n"
-				"The \002SZLINE LIST\002 command displays the SZLINE list.\n"
-				"If a wildcard mask is given, only those entries matching the\n"
-				"mask are displayed. If a list of entry numbers is given,\n"
-				"only those entries are shown; for example:\n"
-				"   \002SZLINE LIST 2-5,7-9\002\n"
-				"      Lists SZLINE entries numbered 2 through 5 and 7 \n"
-				"      through 9.\n"
-				" \n"
-				"\002SZLINE VIEW\002 is a more verbose version of \002SZLINE LIST\002, and \n"
-				"will show who added an SZLINE, the date it was added, and when\n"
-				"it expires, as well as the IP mask and reason.\n"
-				" \n"
-				"\002SZLINE CLEAR\002 clears all entries of the SZLINE list."));
-		return true;
-	}
-};
-
 class OSSXLine : public Module
 {
 	CommandOSSNLine commandossnline;
 	CommandOSSQLine commandossqline;
-	CommandOSSZLine commandosszline;
 
  public:
 	OSSXLine(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandossnline(this), commandossqline(this), commandosszline(this)
+		commandossnline(this), commandossqline(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -802,8 +648,6 @@ class OSSXLine : public Module
 			ModuleManager::RegisterService(&commandossnline);
 		if (ircd && ircd->sqline)
 			ModuleManager::RegisterService(&commandossqline);
-		if (ircd && ircd->szline)
-			ModuleManager::RegisterService(&commandosszline);
 	}
 };
 

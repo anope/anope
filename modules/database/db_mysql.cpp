@@ -647,7 +647,7 @@ class DBMySQL : public Module
 		query = "TRUNCATE TABLE `anope_os_core`";
 		this->RunQuery(query);
 
-		query = "INSERT INTO `anope_os_core` (maxusercnt, maxusertime, akills_count, snlines_count, sqlines_count, szlines_count) VALUES(@maxusercnt, @maxusertime, @akills_count, @snlines_count, @sqlines_count, @szlines_count)";
+		query = "INSERT INTO `anope_os_core` (maxusercnt, maxusertime) VALUES(@maxusercnt, @maxusertime)";
 		query.setValue("maxusercnt", maxusercnt);
 		query.setValue("maxusertime", maxusertime);
 		this->RunQuery(query);

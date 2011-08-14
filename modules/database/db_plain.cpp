@@ -218,7 +218,7 @@ ChannelLevel ChannelLevels[] = {
 	{ CA_PROTECTME, "PROTECTME" },
 	{ CA_PROTECT, "PROTECT" },
 	{ CA_SET, "SET" },
-	{ CA_AUTOOWNER, "AUTOPROTECT" },
+	{ CA_AUTOOWNER, "AUTOOWNER" },
 	{ CA_OWNERME, "OWNERME" },
 	{ CA_OWNER, "OWNER" },
 	{ CA_FOUNDER, "FOUNDER" },

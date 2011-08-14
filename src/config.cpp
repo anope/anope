@@ -1264,7 +1264,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			InitServices, DoServices, DoneServices},
 		{"log",
 			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
-			{"", "", "7", "yes", "", "", "", "", "", "", "no", "no", ""},
+			{"", "", "7", "yes", "", "", "", "", "", "", "", "no", "no", ""},
 			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"command",

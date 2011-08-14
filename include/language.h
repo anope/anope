@@ -46,7 +46,6 @@
 #define NICK_SET_DISABLED		_("Sorry, nickname option setting is temporarily disabled.")
 #define NICK_SET_UNKNOWN_OPTION		_("Unknown SET option \002%s%s\002.")
 #define NICK_SET_DISPLAY_CHANGED	_("The new display is now \002%s\002.")
-#define NICK_INFO_OPTIONS		_("          Options: %s")
 #define NICK_LIST_SYNTAX		_("LIST \037pattern\037")
 #define LIST_HEADER			_("List of entries matching \002%s\002:")
 #define NICK_RECOVERED			_("User claiming your nick has been killed.\n" \

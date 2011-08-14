@@ -118,7 +118,7 @@ class CommandNSInfo : public Command
 				CheckOptStr(optbuf, NI_MSG, _("Message mode"), na->nc);
 				CheckOptStr(optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
 
-				source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
+				source.Reply(_("          Options: %s"), optbuf.empty() ? _("None") : optbuf.c_str());
 
 				if (na->nc->HasFlag(NI_SUSPENDED))
 				{

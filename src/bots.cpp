@@ -13,7 +13,7 @@
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &modes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(modes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
 {
 	this->realname = nreal;
 	this->server = Me;

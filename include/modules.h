@@ -753,6 +753,13 @@ class CoreExport Module : public Extensible
 	 */
 	virtual EventReturn OnCheckPriv(ChanAccess *access, ChannelAccess priv) { return EVENT_CONTINUE; }
 
+	/** Check whether an access group has a privilege
+	 * @param group The group
+	 * @param priv The privilege
+	 * @return MOD_ALLOW to allow, MOD_STOP to stop
+	 */
+	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, ChannelAccess priv) { return EVENT_CONTINUE; }
+
 	/** Called when a nick is dropped
 	 * @param u The user dropping the nick
 	 * @param na The nick
@@ -1037,7 +1044,7 @@ enum Implementation
 		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
-		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv,
+		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv, I_OnGroupCheckPriv,
 
 		/* BotServ */
 		I_OnBotJoin, I_OnBotKick, I_OnBotCreate, I_OnBotChange, I_OnBotDelete, I_OnBotAssign, I_OnBotUnAssign,

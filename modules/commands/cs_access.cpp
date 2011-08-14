@@ -588,8 +588,9 @@ class CommandCSAccess : public Command
 				"list specifies which users are allowed chanop status or\n"
 				"access to %s commands on the channel.  Different\n"
 				"user levels allow for access to different subsets of\n"
-				"privileges. Any nick not on the access list has\n"
-				"a user level of 0."), source.owner->nick.c_str());
+				"privileges. Any registered user not on the access list has\n"
+				"a user level of 0, and any unregistered user has a user level\n"
+				"of -1."), source.owner->nick.c_str());
 		source.Reply(" ");
 		source.Reply(_("The \002ACCESS ADD\002 command adds the given mask to the\n"
 				"access list with the given user level; if the mask is\n"
@@ -635,7 +636,6 @@ class CommandCSAccess : public Command
 				"   \002      3\002   Automatic voicing.\n"
 				"   \002      0\002   No special privileges; can be opped by other\n"
 				"                     ops (unless \002secure-ops\002 is set).\n"
-				"   \002     <0\002   May not be opped.\n"
 				" \n"
 				"These levels may be changed, or new ones added, using the\n"
 				"\002LEVELS\002 command; type \002%s%s HELP LEVELS\002 for\n"
@@ -886,7 +886,7 @@ class CSAccess : public Module
 		ModuleManager::RegisterService(&commandcsaccess);
 		ModuleManager::RegisterService(&commandcslevels);
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCreateChan };
+		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -918,6 +918,19 @@ class CSAccess : public Module
 	void OnCreateChan(ChannelInfo *ci)
 	{
 		reset_levels(ci);
+	}
+
+	EventReturn OnGroupCheckPriv(const AccessGroup *group, ChannelAccess priv)
+	{
+		if (group->ci == NULL)
+			return EVENT_CONTINUE;
+		/* Special case. Allows a level of < 0 to match anyone, and a level of 0 to match anyone identified. */
+		int16 level = group->ci->levels[priv];
+		if (level < 0)
+			return EVENT_ALLOW;
+		else if (level == 0 && group->nc)
+			return EVENT_ALLOW;
+		return EVENT_CONTINUE;
 	}
 };
 

@@ -48,8 +48,9 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>
 	 * @param user The ident to give the bot.
 	 * @param host The hostname to give the bot.
 	 * @param real The realname to give the bot.
+	 * @param bmodes The modes to give the bot.
 	 */
-	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "", const Anope::string &modes = "");
+	BotInfo(const Anope::string &nick, const Anope::string &user = "", const Anope::string &host = "", const Anope::string &real = "", const Anope::string &bmodes = "");
 
 	/** Destroy a bot, clearing up appropriately.
 	 */

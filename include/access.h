@@ -79,6 +79,7 @@ class CoreExport AccessGroup : public std::vector<ChanAccess *>
 {
  public:
  	ChannelInfo *ci;
+	NickCore *nc;
 	bool SuperAdmin, Founder;
 	AccessGroup();
 	bool HasPriv(ChannelAccess priv) const;

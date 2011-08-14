@@ -93,7 +93,7 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 
-			source.Reply(NICK_INFO_OPTIONS, optbuf.empty() ? _("None") : optbuf.c_str());
+			source.Reply(_("        Options: %s"), optbuf.empty() ? _("None") : optbuf.c_str());
 			source.Reply(_("      Mode lock: %s"), ci->GetMLockAsString(true).c_str());
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))

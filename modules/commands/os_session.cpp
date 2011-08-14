@@ -371,7 +371,7 @@ class CommandOSException : public Command
 		{
 			if (mask.find('!') != Anope::string::npos || mask.find('@') != Anope::string::npos)
 			{
-				source.Reply(_("Invalid hostmask. Only real hostmasks are valid as sessionservice->GetExceptions() are not matched against nicks or usernames."));
+				source.Reply(_("Invalid hostmask. Only real hostmasks are valid, as exceptions are not matched against nicks or usernames."));
 				return;
 			}
 
@@ -387,6 +387,7 @@ class CommandOSException : public Command
 					}
 					else
 						source.Reply(_("\002%s\002 already exists on the EXCEPTION list."), mask.c_str());
+					return;
 				}
 			}
 

@@ -89,7 +89,7 @@ class AkillListCallback : public NumberList
 					"  Num   Mask                              Reason"));
 		}
 
-		DoList(source, x, Number);
+		DoList(source, x, Number - 1);
 	}
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)
@@ -121,7 +121,7 @@ class AkillViewCallback : public AkillListCallback
 			source.Reply(_("Current AKILL list:"));
 		}
 
-		DoList(source, x, Number);
+		DoList(source, x, Number - 1);
 	}
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)

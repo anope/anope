@@ -401,7 +401,7 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 		if (EnforceMLock)
 		{
 			/* Reset modes on bots if we're supposed to */
-			if (bi)
+			if (this->ci && this->ci->bi && this->ci->bi == bi)
 			{
 				if (Config->BotModeList.HasFlag(cm->Name))
 					this->SetMode(bi, cm, bi->nick);

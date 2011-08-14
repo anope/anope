@@ -176,7 +176,7 @@ Log::~Log()
 	}
 }
 
-LogInfo::LogInfo(int logage, bool inhabit, bool rawio, bool ldebug) : LogAge(logage), Inhabit(inhabit), RawIO(rawio), Debug(ldebug)
+LogInfo::LogInfo(int logage, bool rawio, bool ldebug) : LogAge(logage), RawIO(rawio), Debug(ldebug)
 {
 }
 

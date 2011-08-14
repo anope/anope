@@ -38,32 +38,6 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 		XLine x(this->nick, "Reserved for services");
 		ircdproto->SendSQLine(NULL, &x);
 	}
-
-	if (Config)
-		for (unsigned i = 0; i < Config->LogInfos.size(); ++i)
-		{
-			LogInfo *l = Config->LogInfos[i];
-
-			if (ircd && !ircd->join2msg && !l->Inhabit)
-				continue;
-
-			for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
-			{
-				const Anope::string &target = *sit;
-
-				if (target[0] == '#')
-				{
-					Channel *c = findchan(target);
-					if (!c)
-						c = new Channel(target);
-					c->SetFlag(CH_LOGCHAN);
-					c->SetFlag(CH_PERSIST);
-
-					if (!c->FindUser(this))
-						this->Join(c, &Config->BotModeList);
-				}
-			}
-		}
 }
 
 BotInfo::~BotInfo()
@@ -160,6 +134,9 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 
 void BotInfo::Join(Channel *c, ChannelStatus *status)
 {
+	if (c->FindUser(this) != NULL)
+		return;
+
 	if (Config && ircdproto && Config->BSSmartJoin)
 	{
 		std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> bans = c->GetModeList(CMODE_BAN);
@@ -199,6 +176,9 @@ void BotInfo::Join(const Anope::string &chname, ChannelStatus *status)
 
 void BotInfo::Part(Channel *c, const Anope::string &reason)
 {
+	if (c->FindUser(this) == NULL)
+		return;
+
 	ircdproto->SendPart(this, c, "%s", !reason.empty() ? reason.c_str() : "");
 	c->DeleteUser(this);
 }

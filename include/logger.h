@@ -73,7 +73,6 @@ class CoreExport LogInfo
 	std::map<Anope::string, LogFile *> Logfiles;
 	std::list<Anope::string> Sources;
 	int LogAge;
-	bool Inhabit;
 	std::list<Anope::string> Admin;
 	std::list<Anope::string> Override;
 	std::list<Anope::string> Commands;
@@ -84,7 +83,7 @@ class CoreExport LogInfo
 	bool RawIO;
 	bool Debug;
 
-	LogInfo(int logage, bool inhabit, bool rawio, bool debug);
+	LogInfo(int logage, bool rawio, bool debug);
 
 	~LogInfo();
 

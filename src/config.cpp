@@ -778,40 +778,7 @@ static bool DoneModules(ServerConfig *config, const Anope::string &)
 
 bool InitLogs(ServerConfig *config, const Anope::string &)
 {
-	for (unsigned i = 0; i < config->LogInfos.size(); ++i)
-	{
-		LogInfo *l = config->LogInfos[i];
-
-		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
-		{
-			const Anope::string &target = *sit;
-
-			if (target[0] == '#')
-			{
-				Channel *c = findchan(target);
-				if (c && c->HasFlag(CH_LOGCHAN))
-				{
-					for (CUserList::const_iterator cit = c->users.begin(), cit_end = c->users.end(); cit != cit_end; ++cit)
-					{
-						UserContainer *uc = *cit;
-						BotInfo *bi = findbot(uc->user->nick);
-
-						if (bi)
-							bi->Part(c, "Reloading configuration");
-					}
-
-					c->UnsetFlag(CH_PERSIST);
-					c->UnsetFlag(CH_LOGCHAN);
-					if (c->users.empty())
-						delete c;
-				}
-			}
-		}
-
-		delete config->LogInfos[i];
-	}
 	config->LogInfos.clear();
-
 	return true;
 }
 
@@ -825,18 +792,17 @@ static bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::str
 	
 	Anope::string source = values[1].GetValue();
 	int logage = values[2].GetInteger();
-	bool inhabit = values[3].GetBool();
-	Anope::string admin = values[4].GetValue();
-	Anope::string override = values[5].GetValue();
-	Anope::string commands = values[6].GetValue();
-	Anope::string servers = values[7].GetValue();
-	Anope::string channels = values[8].GetValue();
-	Anope::string users = values[9].GetValue();
-	Anope::string normal = values[10].GetValue();
-	bool rawio = values[11].GetBool();
-	bool ldebug = values[12].GetBool();
+	Anope::string admin = values[3].GetValue();
+	Anope::string override = values[4].GetValue();
+	Anope::string commands = values[5].GetValue();
+	Anope::string servers = values[6].GetValue();
+	Anope::string channels = values[7].GetValue();
+	Anope::string users = values[8].GetValue();
+	Anope::string normal = values[9].GetValue();
+	bool rawio = values[10].GetBool();
+	bool ldebug = values[11].GetBool();
 
-	LogInfo *l = new LogInfo(logage, inhabit, rawio, ldebug);
+	LogInfo *l = new LogInfo(logage, rawio, ldebug);
 	l->Targets = BuildStringList(targets);
 	l->Sources = BuildStringList(source);
 	l->Admin = BuildStringList(admin);
@@ -855,36 +821,6 @@ static bool DoLogs(ServerConfig *config, const Anope::string &, const Anope::str
 static bool DoneLogs(ServerConfig *config, const Anope::string &)
 {
 	Log() << "Loaded " << config->LogInfos.size() << " log blocks";
-
-	for (unsigned i = 0; i < config->LogInfos.size(); ++i)
-	{
-		LogInfo *l = config->LogInfos[i];
-
-		if ((!ircd || !ircd->join2msg) && !l->Inhabit)
-			continue;
-
-		for (std::list<Anope::string>::const_iterator sit = l->Targets.begin(), sit_end = l->Targets.end(); sit != sit_end; ++sit)
-		{
-			const Anope::string &target = *sit;
-
-			if (target[0] == '#')
-			{
-				Channel *c = findchan(target);
-				if (!c)
-					c = new Channel(target);
-				c->SetFlag(CH_LOGCHAN);
-				c->SetFlag(CH_PERSIST);
-
-				for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-				{
-					BotInfo *bi = it->second;
-					if (!c->FindUser(bi))
-						bi->Join(c, NULL);
-				}
-			}
-		}
-	}
-
 	return true;
 }
 
@@ -948,6 +884,7 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 	Anope::string host = values[2].GetValue();
 	Anope::string gecos = values[3].GetValue();
 	Anope::string modes = values[4].GetValue();
+	Anope::string channels = values[5].GetValue();
 
 	ValueItem vi(nick);
 	if (!ValidateNotEmpty(config, "service", "nick", vi))
@@ -967,10 +904,58 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 
 	services.insert(nick);
 	BotInfo *bi = findbot(nick);
-	if (bi != NULL)
-		return true;
-	bi = new BotInfo(nick, user, host, gecos, modes);
+	if (bi == NULL)
+		bi = new BotInfo(nick, user, host, gecos, modes);
 	bi->SetFlag(BI_CONF);
+
+	Anope::string token;
+	commasepstream sep(channels);
+	std::vector<Anope::string> oldchannels = bi->botchannels;
+	bi->botchannels.clear();
+	while (sep.GetToken(token))
+	{
+		bi->botchannels.push_back(token);
+		size_t ch = token.find('#');
+		Anope::string chname, want_modes;
+		if (ch == Anope::string::npos)
+			chname = token;
+		else
+		{
+			want_modes = token.substr(0, ch);
+			chname = token.substr(ch);
+		}
+		bi->Join(chname);
+		Channel *c = findchan(chname);
+		if (!c)
+			continue; // Can't happen
+
+		/* Remove all existing modes */
+		for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)
+		{
+			ChannelMode *cm = ModeManager::ChannelModes[i];
+			if (cm && cm->Type == MODE_STATUS)
+				c->RemoveMode(bi, cm, bi->nick);
+		}
+		/* Set the new modes */
+		for (unsigned j = 0; j < want_modes.length(); ++j)
+		{
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+			if (cm && cm->Type == MODE_STATUS)
+				c->SetMode(bi, cm, bi->nick);
+		}
+	}
+	for (unsigned i = 0; i < oldchannels.size(); ++i)
+	{
+		size_t ch = oldchannels[i].find('#');
+		Anope::string chname = oldchannels[i].substr(ch != Anope::string::npos ? ch : 0);
+		if (std::find(bi->botchannels.begin(), bi->botchannels.end(), chname) == bi->botchannels.end())
+		{
+			Channel *c = findchan(chname);
+			if (c)
+				bi->Part(c);
+		}
+	}
+
 	return true;
 }
 
@@ -1267,14 +1252,14 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOpers, DoOper, DoneOpers},
 		{"service",
-			{"nick", "user", "host", "gecos", "modes", ""},
-			{"", "", "", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{"nick", "user", "host", "gecos", "modes", "channels", ""},
+			{"", "", "", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitServices, DoServices, DoneServices},
 		{"log",
-			{"target", "source", "logage", "inhabitlogchannel", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
-			{"", "", "7", "yes", "", "", "", "", "", "", "", "no", "no", ""},
-			{DT_STRING, DT_STRING, DT_INTEGER, DT_BOOLEAN, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
+			{"target", "source", "logage", "admin", "override", "commands", "servers", "channels", "users", "other", "rawio", "debug", ""},
+			{"", "", "7", "", "", "", "", "", "", "", "no", "no", ""},
+			{DT_STRING, DT_STRING, DT_INTEGER, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_BOOLEAN, DT_BOOLEAN},
 			InitLogs, DoLogs, DoneLogs},
 		{"command",
 			{"service", "name", "command", "permission", ""},

@@ -52,7 +52,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		/* Check to be sure this isn't a juped server */
 		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
-			/* Load MLock from the database now that we know what modes exist */
+			/* Now do mode related stuff as we know what modes exist .. */
 			for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 				it->second->LoadMLock();
 			for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
@@ -60,6 +60,22 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 				BotInfo *bi = it->second;
 				Anope::string modes = !bi->botmodes.empty() ? ("+" + bi->botmodes) : ircd->pseudoclient_mode;
 				bi->SetModesInternal(modes.c_str());
+				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
+				{
+					size_t h = bi->botchannels[i].find('#');
+					Anope::string chname = bi->botchannels[i].substr(h != Anope::string::npos ? h : 0);
+					Channel *c = findchan(chname);
+					if (c && c->FindUser(bi))
+					{
+						Anope::string want_modes = bi->botchannels[i].substr(0, h);
+						for (unsigned j = 0; j < want_modes.length(); ++j)
+						{
+							ChannelMode *cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+							if (cm && cm->Type == MODE_STATUS)
+								c->SetModeInternal(cm, bi->nick);
+						}
+					}
+				}
 			}
 
 			ircdproto->SendBOB();

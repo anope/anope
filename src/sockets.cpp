@@ -319,7 +319,8 @@ void SocketIO::Bind(Socket *s, const Anope::string &ip, int port)
   */
 void SocketIO::Connect(ConnectionSocket *s, const Anope::string &target, int port)
 {
-	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, target, port);
+	DNSRecord req = DNSManager::BlockingQuery(target, s->IsIPv6() ? DNS_QUERY_AAAA : DNS_QUERY_A);
+	s->conaddr.pton(s->IsIPv6() ? AF_INET6 : AF_INET, req.result, port);
 	int c = connect(s->GetFD(), &s->conaddr.sa, s->conaddr.size());
 	if (c == -1)
 	{

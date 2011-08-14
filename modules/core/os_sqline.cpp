@@ -116,7 +116,7 @@ class SQLineViewCallback : public SQLineListCallback
 			source.Reply(_("Current SQLINE list:"));
 		}
 
-		DoList(source, x, Number);
+		DoList(source, x, Number - 1);
 	}
 
 	static void DoList(CommandSource &source, XLine *x, unsigned Number)

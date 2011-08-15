@@ -86,7 +86,7 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 		AccessProvider *provider = taccess->provider;
 
 		ChanAccess *newaccess = provider->Create();
-		newaccess->ci = taccess->ci;
+		newaccess->ci = this;
 		newaccess->mask = taccess->mask;
 		newaccess->creator = taccess->creator;
 		newaccess->last_seen = taccess->last_seen;

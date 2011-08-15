@@ -19,7 +19,7 @@ public:
 	CommandCSClone(Module *creator) : Command(creator, "chanserv/clone", 2, 3)
 	{
 		this->SetDesc(_("Copy all settings from one channel to another"));
-		this->SetSyntax(_("\037channel\037 \037target\037"));
+		this->SetSyntax(_("\037channel\037 \037target\037 [\037what\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -111,16 +111,23 @@ public:
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
-			/*target_ci->ClearAccess();
 			for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			{
-				ChanAccess *access = ci->GetAccess(i);
-				target_ci->AddAccess(access->GetMask(), access->level, access->creator, access->last_seen);
+				ChanAccess *taccess = ci->GetAccess(i);
+				AccessProvider *provider = taccess->provider;
+
+				ChanAccess *newaccess = provider->Create();
+				newaccess->ci = target_ci;
+				newaccess->mask = taccess->mask;
+				newaccess->creator = taccess->creator;
+				newaccess->last_seen = taccess->last_seen;
+				newaccess->created = taccess->created;
+				newaccess->Unserialize(taccess->Serialize());
+
+				target_ci->AddAccess(newaccess);
 			}
 
 			source.Reply(_("All access entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
-			XXX
-			*/
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -163,9 +170,9 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Copies all settings, access, akicks, etc from channel to the\n"
-				"target channel. If access, akick, or badwords is specified then only\n"
-				"the respective settings are transferred. You must have founder level\n"
-				"access to \037channel\037 and \037target\037."));
+				"target channel. If \037what\037 is access, akick, or badwords is\n"
+				"specified then only the respective settings are transferred.\n"
+				"You must be the founder of \037channel\037 and \037target\037."));
 		return true;
 	}
 };

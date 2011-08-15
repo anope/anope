@@ -1,4 +1,4 @@
-/* cs_seen: provides a !seen command by tracking all users
+/* cs_seen: provides a seen command by tracking all users
  *
  * (C) 2003-2011 Anope Team
  * Contact us at team@anope.org
@@ -37,20 +37,29 @@ class ModuleConfigClass
 };
 ModuleConfigClass ModuleConfig;
 
-typedef std::map<Anope::string, SeenInfo *, std::less<ci::string> > database_map;
+typedef Anope::insensitive_map<SeenInfo *> database_map;
 database_map database;
 
-SeenInfo *FindInfo(const Anope::string &nick)
+static SeenInfo *FindInfo(const Anope::string &nick)
 {
 	database_map::iterator iter = database.find(nick);
 	if (iter != database.end())
-	{
 		return iter->second;
-	}
-	else
-	{
-		return NULL;
-	}
+	return NULL;
+}
+
+static bool ShouldHide(const Anope::string &channel, User *u)
+{
+	Channel *targetchan = findchan(channel);
+	ChannelInfo *targetchan_ci = targetchan ? targetchan->ci : cs_findchan(channel);
+
+	if (targetchan && targetchan->HasMode(CMODE_SECRET))
+		return true;
+	else if (targetchan_ci && targetchan_ci->HasFlag(CI_PRIVATE))
+		return true;
+	else if (u && u->HasMode(UMODE_PRIV))
+		return true;
+	return false;
 }
 
 class CommandOSSeen : public Command
@@ -58,9 +67,11 @@ class CommandOSSeen : public Command
  public:
 	CommandOSSeen(Module *creator) : Command(creator, "operserv/seen", 1, 2)
 	{
-		this->SetDesc(_("Statistics and maintenance for the BotServ !seen command"));
-		this->SetSyntax(_("{\037STATS\037 | \037CLEAR\037} \037time\037"));
+		this->SetDesc(_("Statistics and maintenance for seen data"));
+		this->SetSyntax(_("\037STATS\037"));
+		this->SetSyntax(_("\037CLEAR\037 \037time\037"));
 	}
+
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (params[0].equals_ci("STATS"))
@@ -103,22 +114,21 @@ class CommandOSSeen : public Command
 			Log(LOG_ADMIN, source.u, this) << "CLEAR and removed " << counter << " nicks that were added after " << do_strftime(time, NULL, true);
 			source.Reply(_("Database cleared, removed %lu nicks that were added after %s"), counter, do_strftime(time, source.u->Account(), true).c_str());
 		}
-		return;
+		else
+			this->SendSyntax(source);
 	}
+
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		if (subcommand.empty())
-			source.Reply(_("Syntax: \002SEEN {\037STATS\037 | \037CLEAR\037} \037time\037\002"));
-		else if (subcommand.equals_ci("STATS"))
-			source.Reply(_("Syntax: \002SEEN STATS\002\n"
-					 "Prints out some statistic information about stored nicks and memory usage."));
-		else if (subcommand.equals_ci("CLEAR"))
-			source.Reply(_("Syntax: \002SEEN CLEAR time\002\n"
-					"This command can clean the database after a botflood attack by removing all\n"
-					"entries from the database that were added within \002time\002.\n"
-					"Example: SEEN CLEAR 30m will remove all entries that were added within the last 30 minutes."));
-		else
-			return false;
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("The \002STATS\002 command prints out statistics about stored nicks and memory usage."));
+		source.Reply(_("The \002CLEAR\002 command lets you clean the database by removing all entries from the\n"
+				"entries from the database that were added within \037time\037.\n"
+				" \n"
+				"Example:\n"
+				"%s CLEAR 30m\n"
+				"will remove all entries that were added within the last 30 minutes."), source.command.c_str());
 		return true;
 	}
 };
@@ -129,63 +139,46 @@ class CommandSeen : public Command
 	CommandSeen(Module *creator) : Command(creator, "chanserv/seen", 1, 2)
 	{
 		this->SetFlag(CFLAG_STRIP_CHANNEL);
+		this->SetDesc(_("Tells you about the last time a user was seen"));
+		this->SetSyntax(_("\037nick\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		const Anope::string &target = params[0];
-		Anope::string onlinestatus;
-		User *u = source.u, *u2 = NULL;
-		ChannelInfo *ci = (source.c && source.c->ci) ? source.c->ci : NULL;
-		if (ci)
-		{
-			if (!ci->AccessFor(u).HasPriv(CA_FANTASIA))
-			{
-				source.Reply(_(ACCESS_DENIED));
-				return;
-			}
-
-			if (!ci->bi)
-			{
-				source.Reply(_(BOT_NOT_ASSIGNED));
-				return;
-			}
-
-			if (!ci->c || !ci->c->FindUser(ci->bi))
-			{
-				source.Reply(_(BOT_NOT_ON_CHANNEL), ci->name.c_str());
-				return;
-			}
-
-			if (target.equals_ci(ci->bi->nick))
-			{
-				source.Reply(_("You found me, %s"), u->nick.c_str());
-				return;
-			}
-		}
+		User *u = source.u;
 
 		if (target.length() > Config->NickLen)
 		{
 			source.Reply(_("Nick too long, max length is %u chars"), Config->NickLen);
 			return;
 		}
+
+		if (findbot(target) != NULL)
+		{
+			source.Reply(_("%s is a client on services."), target.c_str());
+			return;
+		}
+
 		if (target.equals_ci(u->nick))
 		{
 			source.Reply(_("You might see yourself in the mirror, %s."), u->nick.c_str());
 			return;
 		}
+
 		SeenInfo *info = FindInfo(target);
 		if (!info)
 		{
 			source.Reply(_("Sorry, I have not seen %s."), target.c_str());
 			return;
 		}
-		if ((u2 = finduser(target.c_str())))
+
+		User *u2 = finduser(target);
+		Anope::string onlinestatus;
+		if (u2)
 			onlinestatus = ".";
 		else
-		{
-			onlinestatus = Anope::printf(translate(u->Account(), _(" but %s mysteriously dematerialized.")), target.c_str());
-		}
+			onlinestatus = Anope::printf(_(" but %s mysteriously dematerialized."), target.c_str());
 
 		Anope::string timebuf = duration(Anope::CurTime - info->last, u->Account());
 		Anope::string timebuf2 = do_strftime(info->last, u->Account(), true);
@@ -197,10 +190,11 @@ class CommandSeen : public Command
 		}
 		else if (info->type == NICK_TO)
 		{
-			if ((u2 = finduser(info->nick2)))
-				onlinestatus = Anope::printf(translate(u->Account(), _(". %s is still online.")), u2->nick.c_str());
+			u2 = finduser(info->nick2);
+			if (u2)
+				onlinestatus = Anope::printf( _(". %s is still online."), u2->nick.c_str());
 			else
-				onlinestatus = Anope::printf(translate(u->Account(), _(", but %s mysteriously dematerialized")), info->nick2.c_str());
+				onlinestatus = Anope::printf(_(", but %s mysteriously dematerialized"), info->nick2.c_str());
 
 			source.Reply(_("%s (%s) was last seen changing nick to %s %s ago%s"),
 				target.c_str(), info->vhost.c_str(), info->nick2.c_str(), timebuf.c_str(), onlinestatus.c_str());
@@ -212,31 +206,21 @@ class CommandSeen : public Command
 		}
 		else if (info->type == JOIN)
 		{
-			Channel *targetchan = findchan(info->channel);
-			if (!(targetchan && ci && ci->c == targetchan) && ((targetchan && targetchan->HasMode(CMODE_SECRET)) || (u2 && u2->HasMode(UMODE_PRIV))))
-			{
+			if (ShouldHide(info->channel, u2))
 				source.Reply(_("%s (%s) was last seen joining a secret channel %s ago%s"),
 					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 			else
-			{
 				source.Reply(_("%s (%s) was last seen joining %s %s ago%s"),
 					target.c_str(), info->vhost.c_str(), info->channel.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 		}
 		else if (info->type == PART)
 		{
-			Channel *targetchan = findchan(info->channel);
-			if (!(targetchan && ci && ci->c == targetchan) && ((targetchan && targetchan->HasMode(CMODE_SECRET)) || (u2 && u2->HasMode(UMODE_PRIV))))
-			{
+			if (ShouldHide(info->channel, u2))
 				source.Reply(_("%s (%s) was last seen parting a secret channel %s ago%s"),
 					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 			else
-			{
 				source.Reply(_("%s (%s) was last seen parting %s %s ago%s"),
 					target.c_str(), info->vhost.c_str(), info->channel.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 		}
 		else if (info->type == QUIT)
 		{
@@ -245,23 +229,25 @@ class CommandSeen : public Command
 		}
 		else if (info->type == KICK)
 		{
-			Channel *targetchan = findchan(info->channel);
-			if (!(targetchan && ci && ci->c == targetchan) && ((targetchan && targetchan->HasMode(CMODE_SECRET)) || (u2 && u2->HasMode(UMODE_PRIV))))
-			{
+			if (ShouldHide(info->channel, u2))
 				source.Reply(_("%s (%s) was kicked from a secret channel %s ago%s"),
 					target.c_str(), info->vhost.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 			else
-			{
 				source.Reply(_("%s (%s) was kicked from %s (\"%s\") %s ago%s"),
 					target.c_str(), info->vhost.c_str(), info->channel.c_str(), info->message.c_str(), timebuf.c_str(), onlinestatus.c_str());
-			}
 		}
-		return;
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Checks for the last time \037nick\037 was seen joining, leaving,\n"
+				"or changing nick on the network and tells you when and, depending\n"
+				"on channel or user settings, where it was."));
+		return true;
 	}
 };
-
-
 
 class DataBasePurger : public CallBack
 {
@@ -270,23 +256,20 @@ class DataBasePurger : public CallBack
 
 	void Tick(time_t)
 	{
-		if (noexpire || readonly)
-			return;
-
-		database_map::iterator buf;
-		size_t counter = 0;
+		size_t previous_size = database.size();
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
 		{
-			buf = it;
+			database_map::iterator cur = it;
 			++it;
-			if ((Anope::CurTime - buf->second->last) > ModuleConfig.purgetime)
+
+			if ((Anope::CurTime - cur->second->last) > ModuleConfig.purgetime)
 			{
-				Log(LOG_DEBUG) << buf->first << " was last seen " << do_strftime(buf->second->last) << ", purging entry";
-				database.erase(buf);
-				counter++;
+				Log(LOG_DEBUG) << cur->first << " was last seen " << do_strftime(cur->second->last) << ", purging entry";
+				delete cur->second;
+				database.erase(cur);
 			}
 		}
-		Log(LOG_NORMAL) << "cs_seen: Purged Database, checked " << database.size() << " nicks and removed " << counter << " old entries.";
+		Log(LOG_NORMAL) << "cs_seen: Purged Database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 };
 
@@ -298,6 +281,8 @@ class CSSeen : public Module
  public:
 	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandseen(this), commandosseen(this), purger(this)
 	{
+		this->SetAuthor("Anope");
+
 		Implementation eventlist[] =  { I_OnReload,
 						I_OnUserConnect,
 						I_OnUserNickChange,
@@ -308,9 +293,10 @@ class CSSeen : public Module
 						I_OnDatabaseRead,
 						I_OnDatabaseWrite };
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
-		this->SetAuthor("Anope");
+
 		ModuleManager::RegisterService(&commandseen);
 		ModuleManager::RegisterService(&commandosseen);
+
 		OnReload();
 	}
 	void OnReload()
@@ -414,9 +400,9 @@ class CSSeen : public Module
 	}
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))
 	{
-		std::stringstream buf;
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end; ++it)
 		{
+			std::stringstream buf;
 			buf << "SEEN " << it->first.c_str() << " " << it->second->vhost << " " << it->second->last << " ";
 			switch (it->second->type)
 			{
@@ -436,7 +422,6 @@ class CSSeen : public Module
 					buf << "KICK " << it->second->nick2 << " " << it->second->channel << " :" << it->second->message; break;
 			}
 			Write(buf.str());
-			buf.str("");
 		}
 	}
 };

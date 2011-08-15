@@ -170,8 +170,8 @@ public:
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Copies all settings, access, akicks, etc from channel to the\n"
-				"target channel. If \037what\037 is access, akick, or badwords is\n"
-				"specified then only the respective settings are transferred.\n"
+				"target channel. If \037what\037 is access, akick, or badwords\n"
+				"then only the respective settings are transferred.\n"
 				"You must be the founder of \037channel\037 and \037target\037."));
 		return true;
 	}

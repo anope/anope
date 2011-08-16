@@ -47,7 +47,7 @@ class CommandNSSendPass : public Command
 				}
 			}
 			else
-				source.Reply(_("SENDPASS command unavailable because encryption is in use."));
+				source.Reply(_("%s command unavailable because encryption is in use."), source.command.c_str());
 		}
 
 		return;
@@ -89,18 +89,16 @@ class NSSendPass : public Module
 
 static bool SendPassMail(User *u, NickAlias *na, BotInfo *bi, const Anope::string &pass)
 {
-	char subject[BUFSIZE], message[BUFSIZE];
+	Anope::string subject = translate(na->nc, Config->MailSendpassSubject.c_str());
+	Anope::string message = translate(na->nc, Config->MailSendpassMessage.c_str());
 
-	snprintf(subject, sizeof(subject), translate(na->nc, _("Nickname password (%s)")), na->nick.c_str());
-	snprintf(message, sizeof(message), translate(na->nc, _(
-	"Hi,\n"
-	" \n"
-	"You have requested to receive the password of nickname %s by e-mail.\n"
-	"The password is %s. For security purposes, you should change it as soon as you receive this mail.\n"
-	" \n"
-	"If you don't know why this mail was sent to you, please ignore it silently.\n"
-	" \n"
-	"%s administrators.")), na->nick.c_str(), pass.c_str(), Config->NetworkName.c_str());
+	subject = subject.replace_all_cs("%n", na->nick);
+	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%p", pass);
+
+	message = message.replace_all_cs("%n", na->nick);
+	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%p", pass);
 
 	return Mail(u, na->nc, bi, subject, message);
 }

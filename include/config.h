@@ -439,6 +439,12 @@ class CoreExport ServerConfig
 	time_t MailDelay;
 	/* Don't quote the To: address */
 	bool DontQuoteAddresses;
+	/* Mail messages to send */
+	Anope::string MailRegistrationSubject, MailRegistrationMessage;
+	Anope::string MailResetSubject, MailResetMessage;
+	Anope::string MailSendpassSubject, MailSendpassMessage;
+	Anope::string MailEmailchangeSubject, MailEmailchangeMessage;
+	Anope::string MailMemoSubject, MailMemoMessage;
 
 	/* Nameserver to use for resolving hostnames */
 	Anope::string NameServer;

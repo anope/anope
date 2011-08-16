@@ -514,11 +514,11 @@ bool ValidateMail(ServerConfig *config, const Anope::string &tag, const Anope::s
 {
 	if (config->UseMail)
 	{
-		if (value.equals_ci("sendmailpath") || value.equals_ci("sendfrom"))
-		{
-			if (data.GetValue().empty())
-				throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
-		}
+		Anope::string check[] = { "sendmailpath", "sendfrom", "registration_subject", "registration_message", "sendpass_subject", "sendpass_message", "emailchange_subject", "emailchange_message", "memo_subject", "memo_message", "" };
+		for (int i = 0; !check[i].empty(); ++i)
+			if (value.equals_ci(check[i]))
+				if (data.GetValue().empty())
+					throw ConfigException("The value for <" + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
 	}
 	return true;
 }
@@ -1158,6 +1158,16 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"mail", "restrict", "no", new ValueContainerBool(&conf->RestrictMail), DT_BOOLEAN, NoValidation},
 		{"mail", "delay", "0", new ValueContainerTime(&conf->MailDelay), DT_TIME, NoValidation},
 		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&conf->DontQuoteAddresses), DT_BOOLEAN, NoValidation},
+		{"mail", "registration_subject", "", new ValueContainerString(&conf->MailRegistrationSubject), DT_STRING, ValidateMail},
+		{"mail", "registration_message", "", new ValueContainerString(&conf->MailRegistrationMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
+		{"mail", "reset_subject", "", new ValueContainerString(&conf->MailResetSubject), DT_STRING, ValidateMail},
+		{"mail", "reset_message", "", new ValueContainerString(&conf->MailResetMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
+		{"mail", "sendpass_subject", "", new ValueContainerString(&conf->MailSendpassSubject), DT_STRING, ValidateMail},
+		{"mail", "sendpass_message", "", new ValueContainerString(&conf->MailSendpassMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
+		{"mail", "emailchange_subject", "", new ValueContainerString(&conf->MailEmailchangeSubject), DT_STRING, ValidateMail},
+		{"mail", "emailchange_message", "", new ValueContainerString(&conf->MailEmailchangeMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
+		{"mail", "memo_subject", "", new ValueContainerString(&conf->MailMemoSubject), DT_STRING, ValidateMail},
+		{"mail", "memo_message", "", new ValueContainerString(&conf->MailMemoMessage), DT_STRING | DT_ALLOW_NEWLINE, ValidateMail},
 		{"dns", "nameserver", "127.0.0.1", new ValueContainerString(&conf->NameServer), DT_STRING, NoValidation},
 		{"dns", "timeout", "5", new ValueContainerTime(&conf->DNSTimeout), DT_TIME, NoValidation},
 		{"chanserv", "name", "", new ValueContainerString(&conf->ChanServ), DT_STRING, NoValidation},
@@ -1514,7 +1524,17 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 			char ch = line[c];
 			if (in_quote)
 			{
-				if (ch == '"')
+				/* Strip leading white spaces from multi line comments */
+				if (c == 0)
+				{
+					while (c < len && isspace(line[c]))
+						++c;
+					ch = line[c];
+				}
+				/* Allow \" in quotes */
+				if (ch == '\\' && c + 1 < len && line[c + 1] == '"')
+					wordbuffer += line[++c];
+				else if (ch == '"')
 					in_quote = in_word = false;
 				else
 					wordbuffer += ch;

@@ -339,15 +339,16 @@ static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 		na->nc->Extend("ns_register_passcode", new ExtensibleItemRegular<Anope::string>(code));
 	}
 
-	Anope::string subject = Anope::printf(_("Nickname Registration (%s)"), na->nick.c_str());
-	Anope::string message = Anope::printf(_("Hi,\n"
-	" \n"
-	"You have requested to register the nickname %s on %s.\n"
-	"Please type \" %s%s confirm %s \" to complete registration.\n"
-	" \n"
-	"If you don't know why this mail was sent to you, please ignore it silently.\n"
-	" \n"
-	"%s administrators."),  na->nick.c_str(), Config->NetworkName.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
+	Anope::string subject = translate(na->nc, Config->MailRegistrationSubject.c_str());
+	Anope::string message = translate(na->nc, Config->MailRegistrationMessage.c_str());
+
+	subject = subject.replace_all_cs("%n", na->nick);
+	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%c", code);
+
+	message = message.replace_all_cs("%n", na->nick);
+	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%c", code);
 
 	return Mail(u, na->nc, bi, subject, message);
 }

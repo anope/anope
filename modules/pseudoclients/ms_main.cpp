@@ -18,16 +18,20 @@ static BotInfo *MemoServ;
 
 static bool SendMemoMail(NickCore *nc, MemoInfo *mi, Memo *m)
 {
-	Anope::string message = Anope::printf(translate(nc, _(
-	"Hi %s\n"
-	" \n"
-	"You've just received a new memo from %s. This is memo number %d.\n"
-	" \n"
-	"Memo text:\n"
-	" \n"
-	"%s")), nc->display.c_str(), m->sender.c_str(), mi->GetIndex(m), m->text.c_str());
+	Anope::string subject = translate(nc, Config->MailMemoSubject.c_str());
+	Anope::string message = translate(nc, Config->MailMemoMessage.c_str());
 
-	return Mail(nc, translate(nc, _("New memo")), message);
+	subject = subject.replace_all_cs("%n", nc->display);
+	subject = subject.replace_all_cs("%s", m->sender);
+	subject = subject.replace_all_cs("%d", mi->GetIndex(m));
+	subject = subject.replace_all_cs("%t", m->text);
+
+	message = message.replace_all_cs("%n", nc->display);
+	message = message.replace_all_cs("%s", m->sender);
+	message = message.replace_all_cs("%d", mi->GetIndex(m));
+	message = message.replace_all_cs("%t", m->text);
+
+	return Mail(nc, subject, message);
 }
 
 class MyMemoServService : public MemoServService

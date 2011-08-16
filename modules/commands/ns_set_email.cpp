@@ -28,15 +28,16 @@ static bool SendConfirmMail(User *u, BotInfo *bi)
 		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
 	u->Account()->Extend("ns_set_email_passcode", new ExtensibleItemRegular<Anope::string>(code));
 
-	Anope::string subject = _("Email confirmation");
-	Anope::string message = Anope::printf(_("Hi,\n"
-	" \n"
-	"You have requested to change your email address to %s.\n"
-	"Please type \" %s%s confirm %s \" to confirm this change.\n"
-	" \n"
-	"If you don't know why this mail was sent to you, please ignore it silently.\n"
-	" \n"
-	"%s administrators."), u->Account()->email.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), code.c_str(), Config->NetworkName.c_str());
+	Anope::string subject = Config->MailEmailchangeSubject;
+	Anope::string message = Config->MailEmailchangeMessage;
+
+	subject = subject.replace_all_cs("%e", u->Account()->email);
+	subject = subject.replace_all_cs("%N", Config->NetworkName);
+	subject = subject.replace_all_cs("%c", code);
+
+	message = message.replace_all_cs("%e", u->Account()->email);
+	message = message.replace_all_cs("%N", Config->NetworkName);
+	message = message.replace_all_cs("%c", code);
 
 	return Mail(u, u->Account(), bi, subject, message);
 }

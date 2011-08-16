@@ -269,7 +269,7 @@ class DataBasePurger : public CallBack
 				database.erase(cur);
 			}
 		}
-		Log(LOG_NORMAL) << "cs_seen: Purged Database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
+		Log(LOG_DEBUG) << "cs_seen: Purged Database, checked " << previous_size << " nicks and removed " << (previous_size - database.size()) << " old entries.";
 	}
 };
 

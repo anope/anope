@@ -83,7 +83,7 @@ class AccessChanAccess : public ChanAccess
 
 	bool Matches(User *u, NickCore *nc)
 	{
-		if (u && (Anope::Match(u->nick, this->mask) || Anope::Match(u->GetMask(), this->mask)))
+		if (u && this->mask.find_first_of("!@?*") != Anope::string::npos && (Anope::Match(u->nick, this->mask) || Anope::Match(u->GetMask(), this->mask)))
 			return true;
 		else if (nc && Anope::Match(nc->display, this->mask))
 			return true;

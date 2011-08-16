@@ -95,9 +95,17 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Changes the language Services uses when sending messages to\n"
-				"you (for example, when responding to a command you send).\n"
+				"the given user (for example, when responding to a command they send).\n"
 				"\037language\037 should be chosen from the following list of\n"
 				"supported languages:"));
+		source.Reply("         en (English)");
+		for (unsigned j = 0; j < languages.size(); ++j)
+		{
+			const Anope::string &langname = anope_gettext(languages[j].c_str(), _("English"));
+			if (langname == "English")
+				continue;
+			source.Reply("         %s (%s)", languages[j].c_str(), langname.c_str());
+		}
 		return true;
 	}
 };

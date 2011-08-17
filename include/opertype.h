@@ -104,12 +104,12 @@ class CoreExport OperType
 	/** Gets the icommands for this opertype
 	 * @return A list of commands
 	 */
-	const std::list<Anope::string> &GetCommands() const;
+	const std::list<Anope::string> GetCommands() const;
 
 	/** Gets the privileges for this opertype
 	 * @return A list of privileges
 	 */
-	const std::list<Anope::string> &GetPrivs() const;
+	const std::list<Anope::string> GetPrivs() const;
 };
 
 #endif // OPERTYPE_H

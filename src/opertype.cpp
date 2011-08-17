@@ -94,13 +94,29 @@ void OperType::Inherits(OperType *ot)
 	this->inheritances.insert(ot);
 }
 
-const std::list<Anope::string> &OperType::GetCommands() const
+const std::list<Anope::string> OperType::GetCommands() const
 {
-	return this->commands;
+	std::list<Anope::string> cmd_list = this->commands;
+	for (std::set<OperType *>::const_iterator it = this->inheritances.begin(), it_end = this->inheritances.end(); it != it_end; ++it)
+	{
+		OperType *ot = *it;
+		std::list<Anope::string> cmds = ot->GetPrivs();
+		for (std::list<Anope::string>::const_iterator it2 = cmds.begin(), it2_end = cmds.end(); it2 != it2_end; ++it2)
+			cmd_list.push_back(*it2);
+	}
+	return cmd_list;
 }
 
-const std::list<Anope::string> &OperType::GetPrivs() const
+const std::list<Anope::string> OperType::GetPrivs() const
 {
-	return this->privs;
+	std::list<Anope::string> priv_list = this->privs;
+	for (std::set<OperType *>::const_iterator it = this->inheritances.begin(), it_end = this->inheritances.end(); it != it_end; ++it)
+	{
+		OperType *ot = *it;
+		std::list<Anope::string> priv = ot->GetPrivs();
+		for (std::list<Anope::string>::const_iterator it2 = priv.begin(), it2_end = priv.end(); it2 != it2_end; ++it2)
+			priv_list.push_back(*it2);
+	}
+	return priv_list;
 }
 

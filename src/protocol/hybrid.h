@@ -38,7 +38,9 @@
 #define CMODE_t 0x00000020     /* Only chanops can change the topic */
 #define CMODE_k 0x00000040     /* Key/password for the channel. */
 #define CMODE_l 0x00000080     /* Limit the number of users in a channel */
-#define CMODE_a 0x00000400     /* Anonymous ops, chanops are hidden */
+/* #define CMODE_a 0x00000400    */ /* Anonymous ops, chanops are hidden */
+#define CMODE_O 0x00000800     /* Oper only channel, as of hybrid7.3 */
+#define CMODE_S 0x00001000     /* SSL only channel, as of hybrid7.3 */
 
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t

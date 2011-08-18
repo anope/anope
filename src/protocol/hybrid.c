@@ -17,7 +17,7 @@
 #include "version.h"
 
 IRCDVar myIrcd[] = {
-    {"HybridIRCd 7.*",          /* ircd name */
+    {"HybridIRCd 7.3+",          /* ircd name */
      "+o",                      /* nickserv mode */
      "+o",                      /* chanserv mode */
      "+o",                      /* memoserv mode */
@@ -38,7 +38,7 @@ IRCDVar myIrcd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-ailmnpst",               /* Modes to Remove */
+     "-ilmnpstOS",               /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      0,                         /* SVSNICK */
      0,                         /* Vhost  */
@@ -360,11 +360,11 @@ CBMode myCbmodes[128] = {
     {0},                        /* L */
     {0},                        /* M */
     {0},                        /* N */
-    {0},                        /* O */
+    {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},   /* O */
     {0},                        /* P */
     {0},                        /* Q */
-    {0},
-    {0},                        /* S */
+    {0},                        /* R */
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
     {0},                        /* V */
@@ -373,7 +373,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* Y */
     {0},                        /* Z */
     {0}, {0}, {0}, {0}, {0}, {0},
-    {CMODE_a, 0, NULL, NULL},
+    {0},                        /* a */
     {0},                        /* b */
     {0},                        /* c */
     {0},                        /* d */
@@ -403,7 +403,8 @@ CBMode myCbmodes[128] = {
 };
 
 CBModeInfo myCbmodeinfos[] = {
-    {'a', CMODE_a, 0, NULL, NULL},
+    {'O', CMODE_O, 0, NULL, NULL},
+    {'S', CMODE_S, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
@@ -1606,7 +1607,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion(VERSION_STRING);
     moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("Hybrid IRCd 7.0");
+    pmodule_ircd_version("Hybrid IRCd 7.3+");
     pmodule_ircd_cap(myIrcdcap);
     pmodule_ircd_var(myIrcd);
     pmodule_ircd_cbmodeinfos(myCbmodeinfos);

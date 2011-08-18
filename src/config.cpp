@@ -372,19 +372,29 @@ bool ValidatePort(ServerConfig *, const Anope::string &tag, const Anope::string 
 	return true;
 }
 
-bool ValidateGuestPrefix(ServerConfig *conf, const Anope::string &tag, const Anope::string &value, ValueItem &data)
-{
-	ValidateNotEmpty(conf, tag, value, data);
-	if (data.GetValue().length() > 21)
-		throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
-	return true;
-}
-
 bool ValidateBantype(ServerConfig *, const Anope::string &, const Anope::string &, ValueItem &data)
 {
 	int bantype = data.GetInteger();
 	if (bantype < 0 || bantype > 3)
 		throw ConfigException("The value for <chanserv:defbantype> must be between 0 and 3!");
+	return true;
+}
+
+bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
+{
+	if (!config->NickServ.empty())
+	{
+		if (value.equals_ci("releasetimeout") || value.equals_ci("accessmax") || value.equals_ci("listmax"))
+			return ValidateNotZero(config, tag, value, data);
+		else if (value.equals_ci("enforceruser") || value.equals_ci("enforcerhost"))
+			return ValidateNotEmpty(config, tag, value, data);
+		else if (value.equals_ci("guestnickprefix"))
+		{
+			ValidateNotEmpty(config, tag, value, data);
+			if (data.GetValue().length() > 21)
+				throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
+		}
+	}
 	return true;
 }
 
@@ -1144,14 +1154,14 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"nickserv", "suspendexpire", "0", new ValueContainerTime(&conf->NSSuspendExpire), DT_TIME, NoValidation},
 		{"nickserv", "unconfirmedexpire", "0", new ValueContainerTime(&conf->NSUnconfirmedExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerUInt(&conf->NSMaxAliases), DT_UINTEGER, NoValidation},
-		{"nickserv", "accessmax", "0", new ValueContainerUInt(&conf->NSAccessMax), DT_UINTEGER, ValidateNotZero},
-		{"nickserv", "enforceruser", "", new ValueContainerString(&conf->NSEnforcerUser), DT_STRING, ValidateNotEmpty},
-		{"nickserv", "enforcerhost", "", new ValueContainerString(&conf->NSEnforcerHost), DT_STRING, ValidateNotEmpty},
-		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&conf->NSReleaseTimeout), DT_TIME, ValidateNotZero},
+		{"nickserv", "accessmax", "0", new ValueContainerUInt(&conf->NSAccessMax), DT_UINTEGER, ValidateNickServ},
+		{"nickserv", "enforceruser", "", new ValueContainerString(&conf->NSEnforcerUser), DT_STRING, ValidateNickServ},
+		{"nickserv", "enforcerhost", "", new ValueContainerString(&conf->NSEnforcerHost), DT_STRING, ValidateNickServ},
+		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&conf->NSReleaseTimeout), DT_TIME, ValidateNickServ},
 		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&conf->NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&conf->NSNoGroupChange), DT_BOOLEAN, NoValidation},
-		{"nickserv", "listmax", "0", new ValueContainerUInt(&conf->NSListMax), DT_UINTEGER, ValidateNotZero},
-		{"nickserv", "guestnickprefix", "", new ValueContainerString(&conf->NSGuestNickPrefix), DT_STRING, ValidateGuestPrefix},
+		{"nickserv", "listmax", "0", new ValueContainerUInt(&conf->NSListMax), DT_UINTEGER, ValidateNickServ},
+		{"nickserv", "guestnickprefix", "", new ValueContainerString(&conf->NSGuestNickPrefix), DT_STRING, ValidateNickServ},
 		{"nickserv", "secureadmins", "no", new ValueContainerBool(&conf->NSSecureAdmins), DT_BOOLEAN, NoValidation},
 		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&conf->NSStrictPrivileges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "modeonid", "no", new ValueContainerBool(&conf->NSModeOnID), DT_BOOLEAN, NoValidation},
@@ -1299,7 +1309,7 @@ ConfigItems::~ConfigItems()
 void ServerConfig::Read()
 {
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", "nickserv", ""};
+	static const Anope::string Once[] = {"serverinfo", "networkinfo", "options", ""};
 
 	this->LoadConf(services_conf);
 

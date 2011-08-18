@@ -330,7 +330,7 @@ class InspircdIRCdMessage : public IRCdMessage
 					if (na->nc->HasFlag(NI_UNCONFIRMED))
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
-				else
+				else if (nickserv)
 					nickserv->Validate(user);
 			}
 		}

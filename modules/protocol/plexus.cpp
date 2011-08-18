@@ -288,7 +288,7 @@ class PlexusIRCdMessage : public IRCdMessage
 		if (ip == "0")
 			ip.clear();
 		User *user = do_nick("", params[0], params[4], params[9], source, params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip, params[5], params[7], params[3]);
-		if (user && user->server->IsSynced())
+		if (nickserv && user && user->server->IsSynced())
 			nickserv->Validate(user);
 
 		return true;
@@ -663,12 +663,13 @@ class ProtoPlexus : public Module
 
 	void OnServerSync(Server *s)
 	{
-		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-		{
-			User *u = it->second;
-			if (u->server == s && !u->IsIdentified())
-				nickserv->Validate(u);
-		}
+		if (nickserv)
+			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			{
+				User *u = it->second;
+				if (u->server == s && !u->IsIdentified())
+					nickserv->Validate(u);
+			}
 	}
 };
 

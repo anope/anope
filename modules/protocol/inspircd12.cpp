@@ -287,7 +287,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 	 	std::string data = params[2].c_str();
 		size_t pos1 = data.find(' ') + 1;
 		size_t pos2 = data.find(' ', pos1);
-		if (u && ((pos2 - pos1) == 32)) // fingerprints should always be 32 bytes in size
+		if ((pos2 - pos1) >= 32) // inspircd supports md5 and sha1 fingerprint hashes -> size 32 or 40 bytes.
 		{
 			u->fingerprint = data.substr(pos1, pos2 - pos1);
 			FOREACH_MOD(I_OnFingerprint, OnFingerprint(u));

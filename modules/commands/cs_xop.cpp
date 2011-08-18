@@ -37,6 +37,7 @@ static struct XOPAccess
 			CA_OWNERME,
 			CA_PROTECT,
 			CA_INFO,
+			CA_ASSIGN,
 			CA_SIZE
 		}
 	},
@@ -45,7 +46,6 @@ static struct XOPAccess
 			CA_AUTOPROTECT,
 			CA_AKICK,
 			CA_BADWORDS,
-			CA_ASSIGN,
 			CA_MEMO,
 			CA_ACCESS_CHANGE,
 			CA_PROTECTME,

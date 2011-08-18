@@ -166,7 +166,7 @@ class DBMySQL : public Module
 			/* HostServ */
 			I_OnSetVhost, I_OnDeleteVhost
 		};
-		ModuleManager::Attach(i, this, 40);
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
 	EventReturn OnLoadDatabase()

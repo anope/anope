@@ -127,7 +127,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->OperServ, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
+		send_cmd(source ? source->nick : Config->ServerName, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)

@@ -132,7 +132,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(source->nick, "G %s %s", dest->name.c_str(), buf.c_str());
+		send_cmd(source ? source->nick : Config->ServerName, "G %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
@@ -341,7 +341,9 @@ class UnrealIRCdProto : public IRCDProto
 		 * so we will join and part us now
 		 */
 		BotInfo *bi = c->ci->WhoSends();
-		if (c->FindUser(bi) == NULL)
+		if (bi == NULL)
+			;
+		else if (c->FindUser(bi) == NULL)
 		{
 			bi->Join(c);
 			bi->Part(c);

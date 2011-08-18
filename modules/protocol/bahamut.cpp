@@ -79,9 +79,9 @@ class BahamutIRCdProto : public IRCDProto
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (Capab.HasFlag(CAPAB_TSMODE))
-			send_cmd(source->nick, "MODE %s %ld %s", dest->name.c_str(), static_cast<long>(dest->creation_time), buf.c_str());
+			send_cmd(source ? source->nick : Config->ServerName, "MODE %s %ld %s", dest->name.c_str(), static_cast<long>(dest->creation_time), buf.c_str());
 		else
-			send_cmd(source->nick, "MODE %s %s", dest->name.c_str(), buf.c_str());
+			send_cmd(source ? source->nick : Config->ServerName, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)

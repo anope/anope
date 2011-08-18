@@ -184,10 +184,7 @@ class PlexusProto : public IRCDProto
 
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
-		if (bi)
-			send_cmd(bi->GetUID(), "MODE %s %s", dest->name.c_str(), buf.c_str());
-		else
-			send_cmd(Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)

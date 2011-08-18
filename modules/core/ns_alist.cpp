@@ -87,7 +87,7 @@ class CommandNSAList : public Command
 			source.Reply(_(NICK_X_NOT_REGISTERED), nick.c_str());
 		else if (na->HasFlag(NS_FORBIDDEN))
 			source.Reply(_(NICK_X_FORBIDDEN), na->nick.c_str());
-		else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER)
+		else if (min_level < ACCESS_INVALID || min_level > ACCESS_FOUNDER)
 			source.Reply(_(CHAN_ACCESS_LEVEL_RANGE), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{

@@ -64,10 +64,8 @@
 #define CHAN_ACCESS_LEVEL_RANGE		_("Access level must be between %d and %d inclusive.")
 #define CHAN_ACCESS_LIST_HEADER		_("Access list for %s:\n" \
 						"  Num   Lev  Mask")
-#define CHAN_ACCESS_VIEW_XOP_FORMAT	_("  %3d   %s   %s\n" \
-						"    by %s, last seen %s")
 #define CHAN_ACCESS_VIEW_AXS_FORMAT	_("  %3d  %4d  %s\n" \
-						"    by %s, last seen %s")
+						"   by %s on %s, last seen %s")
 #define CHAN_AKICK_VIEW_FORMAT		_("%3d %s (by %s on %s)\n" \
 						"    %s")
 #define CHAN_INFO_HEADER		_("Information for channel \002%s\002:")

@@ -213,10 +213,10 @@ class AccessViewCallback : public AccessListCallback
 			if (access->last_seen == 0)
 				timebuf = "Never";
 			else
-				timebuf = do_strftime(access->last_seen);
+				timebuf = do_strftime(access->last_seen, NULL, true);
 		}
 
-		source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, AccessChanAccess::DetermineLevel(access), access->mask.c_str(), access->creator.c_str(), timebuf.c_str());
+		source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, AccessChanAccess::DetermineLevel(access), access->mask.c_str(), access->creator.c_str(), do_strftime(access->created, NULL, true).c_str(), timebuf.c_str());
 	}
 };
 

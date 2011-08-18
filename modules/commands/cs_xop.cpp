@@ -38,6 +38,7 @@ static struct XOPAccess
 			CA_PROTECT,
 			CA_INFO,
 			CA_ASSIGN,
+			CA_TOPIC,
 			CA_SIZE
 		}
 	},
@@ -55,7 +56,6 @@ static struct XOPAccess
 	},
 	{ XOP_AOP, "AOP",
 		{
-			CA_TOPIC,
 			CA_MODE,
 			CA_GETKEY,
 			CA_INVITE,

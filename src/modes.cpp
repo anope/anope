@@ -222,8 +222,9 @@ ChannelModeParam::~ChannelModeParam()
  * @param mName The mode name
  * @param modeChar The mode char
  * @param mSymbol The symbol for the mode, eg @ % +
+ * @param mLevel A level for the mode, which is usually determined by the PREFIX capab
  */
-ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol) : ChannelMode(mName, modeChar), Symbol(mSymbol)
+ChannelModeStatus::ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol, unsigned short mLevel) : ChannelMode(mName, modeChar), Symbol(mSymbol), Level(mLevel)
 {
 	this->Type = MODE_STATUS;
 }

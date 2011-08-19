@@ -15,25 +15,29 @@
 
 class CommandCSMode : public Command
 {
-	bool CanSet(User *u, ChannelInfo *ci, ChannelModeName mode)
+	bool CanSet(User *u, ChannelInfo *ci, ChannelMode *cm)
 	{
-		switch (mode)
-		{
-			case CMODE_OWNER:
-				return ci->AccessFor(u).HasPriv(CA_OWNER);
-			case CMODE_PROTECT:
-				return ci->AccessFor(u).HasPriv(CA_PROTECT);
-			case CMODE_OP:	
-				return ci->AccessFor(u).HasPriv(CA_OPDEOP);
-			case CMODE_HALFOP:
-				return ci->AccessFor(u).HasPriv(CA_HALFOP);
-			case CMODE_VOICE:
-				return ci->AccessFor(u).HasPriv(CA_VOICE);
-			default:
-				break;
-		}
+		if (!u || !ci || !cm || cm->Type != MODE_STATUS)
+			return false;
 
-		return false;
+		const ChannelAccess accesses[] = { CA_VOICE, CA_HALFOP, CA_OPDEOP, CA_PROTECT, CA_OWNER, CA_SIZE };
+		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
+		ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+		AccessGroup access = ci->AccessFor(u);
+		unsigned short u_level = 0;
+
+		for (int i = 0; accesses[i] != CA_SIZE; ++i)
+			if (access.HasPriv(accesses[i]))
+			{
+				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
+				if (cm2 == NULL || cm2->Type != MODE_STATUS)
+					continue;
+				ChannelModeStatus *cms2 = debug_cast<ChannelModeStatus *>(cm2);
+				if (cms2->Level > u_level)
+					u_level = cms2->Level;
+			}
+
+		return u_level >= cms->Level;
 	}
 
 	void DoLock(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -222,7 +226,7 @@ class CommandCSMode : public Command
 							if (!sep.GetToken(param))
 								break;
 
-							if (!this->CanSet(u, ci, cm->Name))
+							if (!this->CanSet(u, ci, cm))
 							{
 								source.Reply(_("You do not have access to set mode %c."), cm->ModeChar);
 								break;
@@ -256,15 +260,19 @@ class CommandCSMode : public Command
 							else
 							{
 								User *target = finduser(param);
-								if (target != NULL)
+								if (target == NULL)
 								{
-									AccessGroup targ_access = ci->AccessFor(target);
-									if (targ_access > u_access)
-									{
-										source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
-										break;
-									}
+									source.Reply(NICK_X_NOT_IN_USE, param.c_str());
+									break;
 								}
+
+								AccessGroup targ_access = ci->AccessFor(target);
+								if (targ_access > u_access)
+								{
+									source.Reply(_("You do not have the access to change %s's modes."), target->nick.c_str());
+									break;
+								}
+
 								if (adding)
 									ci->c->SetMode(NULL, cm, param);
 								else

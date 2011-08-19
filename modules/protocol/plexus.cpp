@@ -631,11 +631,11 @@ class ProtoPlexus : public Module
 		ModeManager::AddChannelMode(new ChannelModeParam(CMODE_LIMIT, 'l'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 2));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&', 3));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~', 4));
 
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, 'B'));

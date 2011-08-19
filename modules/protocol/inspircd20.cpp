@@ -688,6 +688,25 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 					Anope::string maxmodes(capab.begin() + 9, capab.end());
 					ircd->maxmodes = maxmodes.is_pos_number_only() ? convertTo<unsigned>(maxmodes) : 3;
 				}
+				else if (capab.find("PREFIX=") != Anope::string::npos)
+				{
+					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
+					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
+					unsigned short level = modes.length() - 1;
+
+					for (size_t t = 0, end = modes.length(); t < end; ++t)
+					{
+						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[t]);
+						if (cm == NULL || cm->Type != MODE_STATUS)
+						{
+							Log() << "CAPAB PREFIX gave unknown channel status mode " << modes[t];
+							continue;
+						}
+
+						ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
+						cms->Level = level--;
+					}
+				}
 			}
 		}
 		else if (params[0].equals_cs("END"))

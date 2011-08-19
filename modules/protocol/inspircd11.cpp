@@ -524,26 +524,29 @@ class InspircdIRCdMessage : public IRCdMessage
 				{
 					Anope::string modes(capab.begin() + 8, capab.begin() + capab.find(')'));
 					Anope::string chars(capab.begin() + capab.find(')') + 1, capab.end());
+					unsigned short level = modes.length() - 1;
 
 					for (size_t t = 0, end = modes.length(); t < end; ++t)
 					{
 						switch (modes[t])
 						{
 							case 'q':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~'));
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '~', level--));
 								continue;
 							case 'a':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&'));
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '&', level--));
 								continue;
 							case 'o':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', level--));
 								continue;
 							case 'h':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', level--));
 								continue;
 							case 'v':
-								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', level--));
 								continue;
+							default:
+								ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_END, modes[t], chars[t], level--));
 						}
 					}
 				}

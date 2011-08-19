@@ -537,8 +537,8 @@ class ProtoBahamut : public Module
 		ModeManager::AddChannelMode(new ChannelModeList(CMODE_BAN, 'b'));
 
 		/* v/h/o/a/q */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 1));
 
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_BLOCKCOLOR, 'c'));

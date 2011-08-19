@@ -276,13 +276,18 @@ class CoreExport ChannelModeStatus : public ChannelMode
  public:
 	/* The symbol, eg @ % + */
 	char Symbol;
+	/* The "level" of the mode, used to compare with other modes.
+	 * Used so we know op > halfop > voice etc.
+	 */
+	unsigned short Level;
 
 	/** Default constructor
 	 * @param mName The mode name
 	 * @param modeChar The mode char
-	 * @param mSymbol The symbol for the mode, eg @ % +
+	 * @param mSymbol The symbol for the mode, eg @ % 
+	 * @param mLevel A level for the mode, which is usually determined by the PREFIX capab
 	 */
-	ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol);
+	ChannelModeStatus(ChannelModeName mName, char modeChar, char mSymbol, unsigned short mLevel = 0);
 
 	/** Default destructor
 	 */

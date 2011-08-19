@@ -1065,12 +1065,12 @@ class ProtoUnreal : public Module
 
 	void AddModes()
 	{
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_VOICE, 'v', '+', 0));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_HALFOP, 'h', '%', 1));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OP, 'o', '@', 2));
 		/* Unreal sends +q as * and +a as ~ */
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '~'));
-		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '*'));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_PROTECT, 'a', '~', 3));
+		ModeManager::AddChannelMode(new ChannelModeStatus(CMODE_OWNER, 'q', '*', 4));
 
 		/* Add user modes */
 		ModeManager::AddUserMode(new UserMode(UMODE_SERV_ADMIN, 'A'));

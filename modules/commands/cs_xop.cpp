@@ -316,7 +316,7 @@ class XOPBase : public Command
 		ChanAccess *highest = access.Highest();
 		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
 
-		if ((!access.HasPriv(CA_FOUNDER) && !access.HasPriv(CA_ACCESS_CHANGE) && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
+		if ((!access.Founder && !access.HasPriv(CA_ACCESS_CHANGE) && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -394,7 +394,7 @@ class XOPBase : public Command
 		AccessGroup access = ci->AccessFor(u);
 		ChanAccess *highest = access.Highest();
 		bool override = false;
-		if (!mask.equals_ci(u->Account()->display) && !access.HasPriv(CA_ACCESS_CHANGE) && (!highest || level >= XOPChanAccess::DetermineLevel(highest)))
+		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv(CA_ACCESS_CHANGE) && !access.Founder) || ((!highest || level <= XOPChanAccess::DetermineLevel(highest)) && !access.Founder))
 		{
 			if (u->HasPriv("chanserv/access/modify"))
 				override = true;

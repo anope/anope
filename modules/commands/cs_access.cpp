@@ -390,12 +390,12 @@ class CommandCSAccess : public Command
 				if (mask.equals_ci(access->mask))
 				{
 					int access_level = AccessChanAccess::DetermineLevel(access);
-					if (!access->mask.equals_ci(u->Account()->display) && u_level <= access_level && !u->HasPriv("chanserv/access/modify"))
+					if (!access->mask.equals_ci(u->Account()->display) && !u_access.Founder && u_level <= access_level && !u->HasPriv("chanserv/access/modify"))
 						source.Reply(ACCESS_DENIED);
 					else
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
-						bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) && !access->mask.equals_ci(u->Account()->display);
+						bool override = !u_access.Founder && !u_access.HasPriv(CA_ACCESS_CHANGE) && !access->mask.equals_ci(u->Account()->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));

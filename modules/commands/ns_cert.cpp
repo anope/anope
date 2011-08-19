@@ -198,6 +198,7 @@ class NSCert : public Module
 
 		u->Identify(na);
 		u->SendMessage(bi, _("SSL Fingerprint accepted. You are now identified."));
+		Log(u) << "automatically identified for account " << na->nc->display << " using a valid SSL fingerprint";
 		return;
 	}
 
@@ -210,7 +211,7 @@ class NSCert : public Module
 		if (!ircd || !ircd->certfp)
 			throw ModuleException("Your IRCd does not support ssl client certificates");
 
-		Implementation i[] = { I_OnUserNickChange, I_OnFingerprint };
+		Implementation i[] = { I_OnFingerprint };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		ModuleManager::RegisterService(&commandnscert);
@@ -219,12 +220,6 @@ class NSCert : public Module
 	void OnFingerprint(User *u)
 	{
 		DoAutoIdentify(u);
-	}
-
-	void OnUserNickChange(User *u, const Anope::string &oldnick)
-	{
-		if (!u->fingerprint.empty())
-			DoAutoIdentify(u);
 	}
 };
 

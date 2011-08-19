@@ -37,6 +37,7 @@ class MyNickServService : public NickServService
 		if (!u->IsIdentified() && !u->fingerprint.empty() && na->nc->FindCert(u->fingerprint))
 		{
 			u->SendMessage(NickServ, _("SSL Fingerprint accepted, you are now identified."));
+			Log(u) << "automatically identified for account " << na->nc->display << " using a valid SSL fingerprint.";
 			u->Identify(na);
 			return;
 		}

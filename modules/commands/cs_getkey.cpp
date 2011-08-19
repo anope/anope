@@ -35,7 +35,7 @@ class CommandCSGetKey : public Command
 		}
 
 
-		if (!ci->AccessFor(u).HasPriv(CA_GETKEY) && !u->HasCommand("chanserv/chanserv/getkey"))
+		if (!ci->AccessFor(u).HasPriv(CA_GETKEY) && !u->HasCommand("chanserv/getkey"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

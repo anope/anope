@@ -311,7 +311,7 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!ci->AccessFor(u).HasPriv(CA_MODE) && !u->HasCommand("chanserv/chanserv/mode"))
+		else if (!ci->AccessFor(u).HasPriv(CA_MODE) && !u->HasCommand("chanserv/mode"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

@@ -43,13 +43,13 @@ class CommandCSDrop : public Command
 
 		ci = cs_findchan(chan);
 
-		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/chanserv/drop"))
+		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
 		{
 			source.Reply(CHAN_X_SUSPENDED, chan.c_str());
 			return;
 		}
 
-		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv(CA_FOUNDER)) && !u->HasCommand("chanserv/chanserv/drop"))
+		if ((ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv(CA_FOUNDER)) && !u->HasCommand("chanserv/drop"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

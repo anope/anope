@@ -126,7 +126,7 @@ class CommandBSSet : public Command
 				else
 					this->OnSyntaxError(source, "GREET");
 			}
-			else if (u->HasCommand("botserv/botserv/set/nobot") && option.equals_ci("NOBOT"))
+			else if (u->HasCommand("botserv/set/nobot") && option.equals_ci("NOBOT"))
 			{
 				if (value.equals_ci("ON"))
 				{

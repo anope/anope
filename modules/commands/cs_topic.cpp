@@ -37,7 +37,7 @@ class CommandCSTopic : public Command
 
 		if (!ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, ci->name.c_str());
-		else if (!ci->AccessFor(u).HasPriv(CA_TOPIC) && !u->HasCommand("chanserv/chanserv/topic"))
+		else if (!ci->AccessFor(u).HasPriv(CA_TOPIC) && !u->HasCommand("chanserv/topic"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

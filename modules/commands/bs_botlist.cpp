@@ -40,7 +40,7 @@ class CommandBSBotList : public Command
 			}
 		}
 
-		if (u->HasCommand("botserv/botserv/botlist") && count < BotListByNick.size())
+		if (u->HasCommand("botserv/botlist") && count < BotListByNick.size())
 		{
 			source.Reply(_("Bots reserved to IRC operators:"));
 

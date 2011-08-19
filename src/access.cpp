@@ -126,7 +126,7 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 	for (size_t i = CA_SIZE; i > 0; --i)
 		if (this->HasPriv(static_cast<ChannelAccess>(i - 1)) && !other.HasPriv(static_cast<ChannelAccess>(i - 1)))
 			return true;
-	return true;
+	return false;
 }
 
 bool AccessGroup::operator<(const AccessGroup &other) const

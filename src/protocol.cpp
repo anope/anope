@@ -581,7 +581,7 @@ bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string
 bool IRCdMessage::OnError(const Anope::string &, const std::vector<Anope::string> &params)
 {
 	if (!params.empty())
-		Log(LOG_DEBUG) << params[0];
+		Log() << params[0];
 	
 	return true;
 }

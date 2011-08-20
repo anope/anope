@@ -1396,7 +1396,7 @@ static void Write(const Anope::string &data)
 {
 	SQLQuery query("INSERT INTO `anope_extra` (data) VALUES(@data)");
 	query.setValue("data", data);
-	me->RunQuery(data);
+	me->RunQuery(query);
 }
 
 static void WriteNickMetadata(const Anope::string &key, const Anope::string &data)

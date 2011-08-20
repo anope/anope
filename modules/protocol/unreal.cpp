@@ -259,13 +259,13 @@ class UnrealIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd("", "BD - Z * %s %s", x->Mask.c_str(), Config->OperServ.c_str());
+		send_cmd("", "BD - Z * %s %s", x->GetHost().c_str(), Config->OperServ.c_str());
 	}
 
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
-		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + 172800), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + 172800), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SGLINE */

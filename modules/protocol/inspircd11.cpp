@@ -239,13 +239,13 @@ class InspIRCdProto : public IRCDProto
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd(Config->OperServ, "ZLINE %s", x->Mask.c_str());
+		send_cmd(Config->OperServ, "ZLINE %s", x->GetHost().c_str());
 	}
 
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
-		send_cmd(Config->ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		send_cmd(Config->ServerName, "ADDLINE Z %s %s %ld 0 :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)

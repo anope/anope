@@ -320,6 +320,9 @@ class CommandCSAccess : public Command
 
 		bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) || level >= u_level;
 
+		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+			mask += "!*@*";
+
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
 			ChanAccess *access = ci->GetAccess(i - 1);
@@ -341,9 +344,6 @@ class CommandCSAccess : public Command
 			source.Reply(_("Sorry, you can only have %d access entries on a channel."), Config->CSAccessMax);
 			return;
 		}
-
-		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
-			mask += "!*@*";
 
 		service_reference<AccessProvider> provider("access/access");
 		if (!provider)

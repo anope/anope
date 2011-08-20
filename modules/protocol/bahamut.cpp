@@ -117,18 +117,18 @@ class BahamutIRCdProto : public IRCDProto
 	void SendSZLineDel(const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd("", "UNSZLINE 0 %s", x->Mask.c_str());
+		send_cmd("", "UNSZLINE 0 %s", x->GetHost().c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd("", "RAKILL %s *", x->Mask.c_str());
+		send_cmd("", "RAKILL %s *", x->GetHost().c_str());
 	}
 
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd("", "SZLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		send_cmd("", "SZLINE %s :%s", x->GetHost().c_str(), x->Reason.c_str());
 		/* this is how we are supposed to deal with it */
-		send_cmd("", "AKILL %s * %d %s %ld :%s", x->Mask.c_str(), 172800, x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		send_cmd("", "AKILL %s * %d %s %ld :%s", x->GetHost().c_str(), 172800, x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	/* SVSNOOP */

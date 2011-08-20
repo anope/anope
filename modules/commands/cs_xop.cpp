@@ -322,6 +322,9 @@ class XOPBase : public Command
 			return;
 		}
 
+		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
+			mask += "!*@*";
+
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{
 			ChanAccess *a = ci->GetAccess(i);
@@ -344,9 +347,6 @@ class XOPBase : public Command
 			source.Reply(_("Sorry, you can only have %d %s entries on a channel."), Config->CSAccessMax, source.command.c_str());
 			return;
 		}
-
-		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
-			mask += "!*@*";
 
 		service_reference<AccessProvider> provider("access/xop");
 		if (!provider)

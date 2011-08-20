@@ -1,5 +1,4 @@
 #include "module.h"
-#include "../extra/async_commands.h"
 #include "../extra/sql.h"
 
 class SQLCache : public Timer
@@ -136,7 +135,6 @@ static void NickCoreUpdate(const SQLResult &res)
 class MySQLLiveModule : public Module
 {
 	service_reference<SQLProvider> SQL;
-	service_reference<AsynchCommandsService> ACS;
 
 	SQLCache chan_cache, nick_cache, core_cache;
 
@@ -151,16 +149,9 @@ class MySQLLiveModule : public Module
 		return res;
 	}
 
-	CommandMutex *CurrentCommand()
-	{
-		if (this->ACS)
-			return this->ACS->CurrentCommand();
-		return NULL;
-	}
-
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, DATABASE), SQL("mysql/main"), ACS("asynch_commands")
+		Module(modname, creator, DATABASE), SQL("mysql/main")
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
@@ -182,27 +173,8 @@ class MySQLLiveModule : public Module
 		{
 			SQLQuery query("SELECT * FROM `anope_cs_info` WHERE `name` = @name");
 			query.setValue("name", chname);
-			CommandMutex *current_command = this->CurrentCommand();
-			if (current_command)
-			{
-				current_command->Unlock();
-				try
-				{
-					SQLResult res = this->RunQuery(query);
-					current_command->Lock();
-					ChanInfoUpdate(res);
-				}
-				catch (const SQLException &)
-				{
-					current_command->Lock();
-					throw;
-				}
-			}
-			else
-			{
-				SQLResult res = this->RunQuery(query);
-				ChanInfoUpdate(res);
-			}
+			SQLResult res = this->RunQuery(query);
+			ChanInfoUpdate(res);
 		}
 		catch (const SQLException &ex)
 		{
@@ -219,27 +191,8 @@ class MySQLLiveModule : public Module
 		{
 			SQLQuery query("SELECT * FROM `anope_ns_alias` WHERE `nick` = @nick");
 			query.setValue("nick", nick);
-			CommandMutex *current_command = this->CurrentCommand();
-			if (current_command)
-			{
-				current_command->Unlock();
-				try
-				{
-					SQLResult res = this->RunQuery(query);
-					current_command->Lock();
-					NickInfoUpdate(res);
-				}
-				catch (const SQLException &)
-				{
-					current_command->Lock();
-					throw;
-				}
-			}
-			else
-			{
-				SQLResult res = this->RunQuery(query);
-				NickInfoUpdate(res);
-			}
+			SQLResult res = this->RunQuery(query);
+			NickInfoUpdate(res);
 		}
 		catch (const SQLException &ex)
 		{
@@ -256,27 +209,8 @@ class MySQLLiveModule : public Module
 		{
 			SQLQuery query("SELECT * FROM `anope_ns_core` WHERE `display` = @display");
 			query.setValue("display", nick);
-			CommandMutex *current_command = this->CurrentCommand();
-			if (current_command)
-			{
-				current_command->Unlock();
-				try
-				{
-					SQLResult res = this->RunQuery(query);
-					current_command->Lock();
-					NickCoreUpdate(res);
-				}
-				catch (const SQLException &)
-				{
-					current_command->Lock();
-					throw;
-				}
-			}
-			else
-			{
-				SQLResult res = this->RunQuery(query);
-				NickCoreUpdate(res);
-			}
+			SQLResult res = this->RunQuery(query);
+			NickCoreUpdate(res);
 		}
 		catch (const SQLException &ex)
 		{

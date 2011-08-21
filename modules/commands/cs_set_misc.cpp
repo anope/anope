@@ -15,9 +15,9 @@
 class CommandCSSetMisc : public Command
 {
  public:
-	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
+	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 1)
 	{
-		this->SetSyntax(_("\037channel\037 \037parameters\037"));
+		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -26,6 +26,11 @@ class CommandCSSetMisc : public Command
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
+			return;
+		}
+		else if (source.permission.empty() && !ci->AccessFor(source.u).HasPriv(CA_SET))
+		{
+			source.Reply(ACCESS_DENIED);
 			return;
 		}
 

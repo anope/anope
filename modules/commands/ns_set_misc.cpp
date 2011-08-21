@@ -16,9 +16,9 @@
 class CommandNSSetMisc : public Command
 {
  public:
-	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 1) : Command(creator, cname, min, min + 1)
+	CommandNSSetMisc(Module *creator, const Anope::string &cname = "nickserv/set/misc", size_t min = 0) : Command(creator, cname, min, min + 1)
 	{
-		this->SetSyntax(_("\037parameter\037"));
+		this->SetSyntax(_("[\037parameter\037]"));
 	}
 
 	void Run(CommandSource &source, const Anope::string &user, const Anope::string &param)
@@ -45,22 +45,22 @@ class CommandNSSetMisc : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		this->Run(source, source.u->Account()->display, params[0]);
+		this->Run(source, source.u->Account()->display, !params.empty() ? params[0] : "");
 	}
 };
 
 class CommandNSSASetMisc : public CommandNSSetMisc
 {
  public:
-	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 2)
+	CommandNSSASetMisc(Module *creator) : CommandNSSetMisc(creator, "nickserv/saset/misc", 1)
 	{
 		this->ClearSyntax();
-		this->SetSyntax(_("\037nickname\037 \037parameter\037"));
+		this->SetSyntax(_("\037nickname\037 [\037parameter\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		this->Run(source, params[0], params[1]);
+		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
 };
 

@@ -205,6 +205,9 @@ class CommandOSAKill : public Command
 					return;
 				}
 
+				if (Config->AddAkiller)
+					reason = "[" + u->nick + "] " + reason;
+
 				XLine *x = akills->Add(mask, u->nick, expires, reason);
 
 				EventReturn MOD_RESULT;

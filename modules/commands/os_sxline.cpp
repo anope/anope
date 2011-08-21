@@ -404,6 +404,9 @@ class CommandOSSNLine : public CommandOSSXLineBase
 					return;
 				}
 
+				if (Config->AddAkiller)
+					reason = "[" + u->nick + "] " + reason;
+
 				XLine *x = this->xlm()->Add(mask, u->nick, expires, reason);
 
 				EventReturn MOD_RESULT;

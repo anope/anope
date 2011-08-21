@@ -22,11 +22,7 @@ class SGLineManager : public XLineManager
 
 	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
 	{
-		Anope::string realreason = reason;
-		if (!creator.empty() && Config->AddAkiller)
-			realreason = "[" + creator + "] " + reason;
-
-		XLine *x = new XLine(mask, creator, expires, realreason);
+		XLine *x = new XLine(mask, creator, expires, reason);
 
 		this->AddXLine(x);
 

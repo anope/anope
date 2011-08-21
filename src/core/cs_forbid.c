@@ -89,8 +89,10 @@ int do_forbid(User * u)
     }
     if (readonly)
         notice_lang(s_ChanServ, u, READ_ONLY_MODE);
-    if ((ci = cs_findchan(chan)) != NULL)
+    if ((ci = cs_findchan(chan)) != NULL) {
         delchan(ci);
+        send_event(EVENT_CHAN_DROP, 1, chan);
+    }
     ci = makechan(chan);
     if (ci) {
         ci->flags |= CI_VERBOTEN;

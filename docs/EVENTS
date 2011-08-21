@@ -183,9 +183,9 @@ Anope Internal Events
 
     EVENT_BOT_BAN
         A BotServ bot has banned a user, e.g. kickers.
-	av[0]  The nick of the user banned.
-	av[1]  The Channel the user was banned from.
-	av[2]  The mask that was banned.
+        av[0]  The nick of the user banned.
+        av[1]  The Channel the user was banned from.
+        av[2]  The mask that was banned.
 
     EVENT_BOT_CHANGE
         The properties of a BotServ bot have been changed.
@@ -214,10 +214,10 @@ Anope Internal Events
 
     EVENT_BOT_FANTASY_NO_ACCESS
         A fantasy command of the bot has been triggered by someone without
-		access to BotServ FANTASY commands on the channel. This will NOT
-		trigger if someone with access has triggered a fantasy command; use
-		EVENT_BOT_FANTASY for those. Hook to both events to catch both event
-		triggers.
+        access to BotServ FANTASY commands on the channel. This will NOT
+        trigger if someone with access has triggered a fantasy command; use
+        EVENT_BOT_FANTASY for those. Hook to both events to catch both event
+        triggers.
         av[0]  The fantasy command that has been triggered without leading '!'.
         av[1]  The nickname of the user that has triggered the fantasy
                command.
@@ -234,9 +234,9 @@ Anope Internal Events
 
     EVENT_BOT_KICK
         A BotServ bot has kicked a user from a channel.
-	av[0]  The name of the user that has been kicked.
-	av[1]  The name of the channel the user was kicked from.
-	av[2]  The reason for the kick.
+        av[0]  The name of the user that has been kicked.
+        av[1]  The name of the channel the user was kicked from.
+        av[2]  The reason for the kick.
 
     EVENT_BOT_UNASSIGN
         A BotServ bot is being unassigned from a channel. This event is being

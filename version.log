@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="7"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3079"
+VERSION_BUILD="3080"
 
 # $Log$ # Changes since 1.8.6 Release
+#Revision 3080 - Send DROP event when forbidding nicks and channels, if applicable.
 #Revision 3079 - Bug #1318 - #1320 - Added support for Hybrid's +S and +O channel modes, and removed support for +a
 #Revision 3078 - Fixed loading bs_fantasy_owner on startup when using InspIRCd 2.0
 #Revision 3077 - Bug #1287 - Fixed chan_set_correct_modes to not deop the first user from syncing servers

@@ -95,6 +95,7 @@ int do_forbid(User * u)
             return MOD_CONT;
         }
         delnick(na);
+        send_event(EVENT_NICK_DROPPED, 1, nick);
     }
     na = makenick(nick);
     if (na) {

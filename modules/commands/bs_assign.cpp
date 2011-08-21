@@ -91,7 +91,7 @@ class CommandBSUnassign : public Command
 	CommandBSUnassign(Module *creator) : Command(creator, "botserv/unassign", 1, 1)
 	{
 		this->SetDesc(_("Unassigns a bot from a channel"));
-		this->SetSyntax(_("\037channel\037 \037nick\037"));
+		this->SetSyntax(_("\037channel\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)

@@ -207,6 +207,11 @@ ChanAccess *ChannelInfo::GetAccess(unsigned index)
 
 AccessGroup ChannelInfo::AccessFor(User *u)
 {
+	AccessGroup group;
+
+	if (u == NULL)
+		return group;
+
 	NickCore *nc = u->Account();
 	if (nc == NULL && u->IsRecognized())
 	{
@@ -214,8 +219,6 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 		if (na != NULL)
 			nc = na->nc;
 	}
-
-	AccessGroup group;
 
 	group.SuperAdmin = u->SuperAdmin;
 	group.Founder = IsFounder(u, this);

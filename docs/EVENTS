@@ -344,6 +344,18 @@ Anope Internal Events
         A user's nick has just been forbidden.
         av[0]  The nickname that has just been forbidden.
 
+    EVENT_CORE_DROPPED
+        A NickCore will be dropped. Usually send when the last alias is dopped.
+        This is send BEFORE the event that confirms deletion of the alias.
+        Note that this event is send before the core data is removed.
+        av[0]  The display nickname of the core that is being dropped.
+
+    EVENT_CORE_NEWDISPLAY
+        The display nick of a NickCore is being changed.
+        This is send BEFORE the actual change is made in the database.
+        av[0]  The old display nickname of the core.
+        av[1]  The new display nickname of the core.
+
     EVENT_NICK_GHOSTED
         A user has just been ghosted.
         av[0]  EVENT_START or EVENT_STOP. EVENT_START when the user is about

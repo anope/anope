@@ -1422,6 +1422,7 @@ void change_core_display(NickCore * nc, char *newdisplay)
     /* Log ... */
     alog("%s: changing %s nickname group display to %s", s_NickServ,
          nc->display, newdisplay);
+    send_event(EVENT_CORE_NEWDISPLAY, 2, nc->display, newdisplay);
 
 #ifdef USE_RDB
     /* Reflect this change in the database right away. This
@@ -1464,6 +1465,11 @@ static int delcore(NickCore * nc)
     static char clause[128];
     char *q_display;
 #endif
+
+    /* Inform everyone we will be deleted.. 
+     * Some modules may link to the core and should be told when we
+     * are no longer around.. ~ Viper */
+    send_event(EVENT_CORE_DROPPED, 1, nc->display);
     /* (Hopefully complete) cleanup */
     cs_remove_nick(nc);
     os_remove_nick(nc);

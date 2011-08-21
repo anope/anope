@@ -45,6 +45,8 @@
 #define EVENT_NICK_DROPPED "nick_dropped"
 #define EVENT_NICK_FORBIDDEN "nick_forbidden"
 #define EVENT_NICK_EXPIRE "nick_expire"
+#define EVENT_CORE_DROPPED "nickcore_dropped"
+#define EVENT_CORE_NEWDISPLAY "nickcore_newdisplay"
 #define EVENT_CHANGE_NICK "change_nick"
 #define EVENT_USER_LOGOFF "user_logoff"
 #define EVENT_NICK_GHOSTED "nick_ghosted"

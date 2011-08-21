@@ -9,7 +9,7 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 	/* Used to skip the (optional) HTTP header,  which we really don't care about */
 	bool in_query;
  public:
-	MyXMLRPCClientSocket(XMLRPCListenSocket *ls, int fd, const sockaddrs &addr) : XMLRPCClientSocket(ls, fd, addr), in_query(false)
+	MyXMLRPCClientSocket(XMLRPCListenSocket *ls, int fd, const sockaddrs &addr) : Socket(fd, ls->IsIPv6()), XMLRPCClientSocket(ls, addr), in_query(false)
 	{
 	}
 
@@ -245,9 +245,9 @@ class ModuleXMLRPC : public Module
 			Socket *s = it->second;
 			++it;
 
-			if (s->Type == SOCKTYPE_CLIENT)
+			ClientSocket *cs = dynamic_cast<ClientSocket *>(s);
+			if (cs != NULL)
 			{
-				ClientSocket *cs = debug_cast<ClientSocket *>(s);
 				for (unsigned i = 0; i < listen_sockets.size(); ++i)
 					if (cs->LS == listen_sockets[i])
 					{

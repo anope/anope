@@ -81,7 +81,7 @@ class UpdateTimer : public Timer
 	}
 };
 
-ConnectionSocket *UplinkSock = NULL;
+UplinkSocket *UplinkSock = NULL;
 int CurrentUplink = 0;
 
 static void Connect();
@@ -105,77 +105,72 @@ class ReconnectTimer : public Timer
 	}
 };
 
-class UplinkSocket : public ConnectionSocket
+UplinkSocket::UplinkSocket() : Socket(-1, Config->Uplinks[CurrentUplink]->ipv6), ConnectionSocket(), BufferedSocket()
 {
- public:
-	UplinkSocket() : ConnectionSocket(Config->Uplinks[CurrentUplink]->ipv6)
-	{
-		UplinkSock = this;
-	}
+	UplinkSock = this;
+}
 
-	~UplinkSocket()
+UplinkSocket::~UplinkSocket()
+{
+	if (ircdproto && Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
 	{
-		if (ircdproto && Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
+		FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
+
+		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 		{
-			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
+			User *u = it->second;
 
-			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			if (u->server == Me)
 			{
-				User *u = it->second;
-
-				if (u->server == Me)
-				{
-					/* Don't use quitmsg here, it may contain information you don't want people to see */
-					ircdproto->SendQuit(u, "Shutting down");
-					BotInfo *bi = findbot(u->nick);
-					if (bi != NULL)
-						bi->introduced = false;
-				}
+				/* Don't use quitmsg here, it may contain information you don't want people to see */
+				ircdproto->SendQuit(u, "Shutting down");
+				BotInfo *bi = findbot(u->nick);
+				if (bi != NULL)
+					bi->introduced = false;
 			}
-
-			ircdproto->SendSquit(Config->ServerName, quitmsg);
-
-			this->ProcessWrite(); // Write out the last bit
 		}
 
-		for (unsigned i = Me->GetLinks().size(); i > 0; --i)
-			if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
-				Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
+		ircdproto->SendSquit(Config->ServerName, quitmsg);
 
-		UplinkSock = NULL;
-
-		Me->SetFlag(SERVER_SYNCING);
-
-		if (!quitting)
-		{
-			int Retry = Config->RetryWait;
-			if (Retry <= 0)
-				Retry = 60;
-
-			Log() << "Retrying in " << Retry << " seconds";
-			new ReconnectTimer(Retry);
-		}
+		this->ProcessWrite(); // Write out the last bit
 	}
 
-	bool Read(const Anope::string &buf)
+	for (unsigned i = Me->GetLinks().size(); i > 0; --i)
+		if (!Me->GetLinks()[i - 1]->HasFlag(SERVER_JUPED))
+			Me->GetLinks()[i - 1]->Delete(Me->GetName() + " " + Me->GetLinks()[i - 1]->GetName());
+
+	UplinkSock = NULL;
+
+	Me->SetFlag(SERVER_SYNCING);
+
+	if (!quitting)
 	{
-		process(buf);
-		return true;
-	}
+		int Retry = Config->RetryWait;
+		if (Retry <= 0)
+			Retry = 60;
 
-	void OnConnect()
-	{
-		Log() << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
-		ircdproto->SendConnect();
-		FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+		Log() << "Retrying in " << Retry << " seconds";
+		new ReconnectTimer(Retry);
 	}
+}
 
-	void OnError(const Anope::string &error)
-	{
-		Log() << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
-		this->SetFlag(SF_DEAD);
-	}
-};
+bool UplinkSocket::Read(const Anope::string &buf)
+{
+	process(buf);
+	return true;
+}
+
+void UplinkSocket::OnConnect()
+{
+	Log() << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
+	ircdproto->SendConnect();
+	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
+}
+
+void UplinkSocket::OnError(const Anope::string &error)
+{
+	Log() << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
+}
 
 static void Connect()
 {

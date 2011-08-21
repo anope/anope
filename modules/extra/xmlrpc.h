@@ -3,13 +3,13 @@ class XMLRPCClientSocket;
 class XMLRPCListenSocket;
 class XMLRPCServiceInterface;
 
-class XMLRPCClientSocket : public ClientSocket
+class XMLRPCClientSocket : public ClientSocket, public BufferedSocket
 {
  protected:
 	Anope::string query;
 
  public:
-	XMLRPCClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr) : ClientSocket(ls, fd, addr) { }
+	XMLRPCClientSocket(ListenSocket *ls, const sockaddrs &addr) : ClientSocket(ls, addr), BufferedSocket() { }
 
 	virtual ~XMLRPCClientSocket() { }
 

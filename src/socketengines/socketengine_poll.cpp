@@ -50,10 +50,7 @@ void SocketEngine::Shutdown()
 void SocketEngine::AddSocket(Socket *s)
 {
 	if (SocketCount == max)
-	{
-		Log() << "Unable to add fd " << s->GetFD() << " to socketengine poll, engine is full";
-		return;
-	}
+		throw SocketException("Unable to add fd " + stringify(s->GetFD()) + " to poll: " + Anope::LastError());
 
 	pollfd *ev = &events[SocketCount];
 	ev->fd = s->GetFD();
@@ -70,10 +67,7 @@ void SocketEngine::DelSocket(Socket *s)
 {
 	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
 	if (pos == socket_positions.end())
-	{
-		Log() << "Unable to delete unknown fd " << s->GetFD() << " from socketengine poll";
-		return;
-	}
+		throw SocketException("Unable to remove fd " + stringify(s->GetFD()) + " from poll");
 
 	if (pos->second != SocketCount - 1)
 	{
@@ -100,10 +94,7 @@ void SocketEngine::MarkWritable(Socket *s)
 
 	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
 	if (pos == socket_positions.end())
-	{
-		Log() << "Unable to mark unknown fd " << s->GetFD() << " as writable";
-		return;
-	}
+		throw SocketException("Unable to mark fd " + stringify(s->GetFD()) + " as writable in poll");
 
 	pollfd *ev = &events[pos->second];
 	ev->events |= POLLOUT;
@@ -118,10 +109,7 @@ void SocketEngine::ClearWritable(Socket *s)
 
 	std::map<int, int>::iterator pos = socket_positions.find(s->GetFD());
 	if (pos == socket_positions.end())
-	{
-		Log() << "Unable to mark unknown fd " << s->GetFD() << " as writable";
-		return;
-	}
+		throw SocketException("Unable clear mark fd " + stringify(s->GetFD()) + " as writable in poll");
 
 	pollfd *ev = &events[pos->second];
 	ev->events &= ~POLLOUT;
@@ -149,16 +137,23 @@ void SocketEngine::Process()
 		if (ev->revents != 0)
 			++processed;
 
-		Socket *s = Sockets[ev->fd];
+		std::map<int, Socket *>::iterator it = Sockets.find(ev->fd);
+		if (it == Sockets.end())
+			continue;
+		Socket *s = it->second;
 
 		if (s->HasFlag(SF_DEAD))
 			continue;
+
 		if (ev->revents & (POLLERR | POLLRDHUP))
 		{
 			s->ProcessError();
 			s->SetFlag(SF_DEAD);
 			continue;
 		}
+
+		if (!s->Process())
+			continue;
 
 		if ((ev->revents & POLLIN) && !s->ProcessRead())
 			s->SetFlag(SF_DEAD);
@@ -170,7 +165,10 @@ void SocketEngine::Process()
 	for (int i = 0; i < SocketCount; ++i)
 	{
 		pollfd *ev = &events[i];
-		Socket *s = Sockets[ev->fd];
+		std::map<int, Socket *>::iterator it = Sockets.find(ev->fd);
+		if (it == Sockets.end())
+			continue;
+		Socket *s = it->second;
 
 		if (s->HasFlag(SF_DEAD))
 			delete s;

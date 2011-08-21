@@ -106,22 +106,17 @@ class SocketException : public CoreException
 	virtual ~SocketException() throw() { }
 };
 
-enum SocketType
-{
-	SOCKTYPE_BASE,
-	SOCKTYPE_BUFFERED,
-	SOCKTYPE_CONNECTION,
-	SOCKTYPE_CLIENT,
-	SOCKTYPE_LISTEN
-};
-
 enum SocketFlag
 {
 	SF_DEAD,
-	SF_WRITABLE
+	SF_WRITABLE,
+	SF_CONNECTING,
+	SF_CONNECTED,
+	SF_ACCEPTING,
+	SF_ACCEPTED
 };
 
-static const Anope::string SocketFlagStrings[] = { "SF_DEAD", "SF_WRITABLE", "" };
+static const Anope::string SocketFlagStrings[] = { "SF_DEAD", "SF_WRITABLE", "SF_CONNECTING", "SF_CONNECTED", "SF_ACCEPTING", "SF_ACCEPTED", "" };
 
 class Socket;
 class ClientSocket;
@@ -140,11 +135,12 @@ class CoreExport SocketIO
 	virtual int Recv(Socket *s, char *buf, size_t sz);
 
 	/** Write something to the socket
- 	 * @param s The socket
-	 * @param buf What to write
-	 * @return Number of bytes written
+	 * @param s The socket
+	 * @param buf The data to write
+	 * @param size The length of the data
 	 */
-	virtual int Send(Socket *s, const Anope::string &buf);
+	virtual int Send(Socket *s, const char *buf, size_t sz);
+	int Send(Socket *s, const Anope::string &buf);
 
 	/** Accept a connection from a socket
 	 * @param s The socket
@@ -152,11 +148,11 @@ class CoreExport SocketIO
 	 */
 	virtual ClientSocket *Accept(ListenSocket *s);
 
-	/** Check if a connection has been accepted
-	 * @param s The client socket
-	 * @return -1 on error, 0 to wait, 1 on success
+	/** Finished accepting a connection from a socket
+	 * @param s The socket
+	 * @return SF_ACCEPTED if accepted, SF_ACCEPTING if still in process, SF_DEAD on error
 	 */
-	virtual int Accepted(ClientSocket *cs);
+	virtual SocketFlag FinishAccept(ClientSocket *cs);
 
 	/** Bind a socket
 	 * @param s The socket
@@ -172,18 +168,18 @@ class CoreExport SocketIO
 	 */
 	virtual void Connect(ConnectionSocket *s, const Anope::string &target, int port);
 
-	/** Check if this socket is connected
+	/** Called to potentially finish a pending connection
 	 * @param s The socket
-	 * @return -1 for error, 0 for wait, 1 for connected
+	 * @return SF_CONNECTED on success, SF_CONNECTING if still pending, and SF_DEAD on error.
 	 */
-	virtual int Connected(ConnectionSocket *s);
+	virtual SocketFlag FinishConnect(ConnectionSocket *s);
 
 	/** Called when the socket is destructing
 	 */
 	virtual void Destroy() { }
 };
 
-class CoreExport Socket : public Flags<SocketFlag, 2>
+class CoreExport Socket : public Flags<SocketFlag>
 {
  protected:
 	/* Socket FD */
@@ -198,19 +194,16 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	/* I/O functions used for this socket */
  	SocketIO *IO;
 
-	/* Type this socket is */
-	SocketType Type;
-
-	/** Empty constructor, used for things such as the pipe socket
+	/** Empty constructor, should not be called.
 	 */
 	Socket();
 
 	/** Default constructor
-	 * @param sock The socket to use, 0 if we need to create our own
+	 * @param sock The socket to use, -1 if we need to create our own
 	 * @param ipv6 true if using ipv6
 	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
- 	Socket(int sock, bool ipv6, int type = SOCK_STREAM);
+ 	Socket(int sock, bool ipv6 = false, int type = SOCK_STREAM);
 
 	/** Default destructor
 	 */
@@ -242,6 +235,11 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	 */
 	void Bind(const Anope::string &ip, int port = 0);
 
+	/** Called when there either is a read or write event.
+	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
+	 */
+	virtual bool Process();
+
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
@@ -258,7 +256,7 @@ class CoreExport Socket : public Flags<SocketFlag, 2>
 	virtual void ProcessError();
 };
 
-class CoreExport BufferedSocket : public Socket
+class CoreExport BufferedSocket : public virtual Socket
 {
  protected:
 	/* Things to be written to the socket */
@@ -269,16 +267,9 @@ class CoreExport BufferedSocket : public Socket
 	int RecvLen;
 
  public:
-	/** Blank constructor
+	/** Constructor
 	 */
 	BufferedSocket();
-
-	/** Constructor
-	 * @param fd FD to use
-	 * @param ipv6 true for ipv6
-	 * @param type socket type, defaults to SOCK_STREAM
-	 */
-	BufferedSocket(int fd, bool ipv6, int type = SOCK_STREAM);
 
 	/** Default destructor
 	 */
@@ -317,6 +308,52 @@ class CoreExport BufferedSocket : public Socket
 	int WriteBufferLen() const;
 };
 
+class CoreExport BinarySocket : public virtual Socket
+{
+	struct DataBlock
+	{
+		char *buf;
+		size_t len;
+
+		DataBlock(const char *b, size_t l);
+		~DataBlock();
+	};
+
+	std::deque<DataBlock *> WriteBuffer;
+
+ public:
+	/** Constructor
+	 */
+	BinarySocket();
+
+	/** Default destructor
+	 */
+	virtual ~BinarySocket();
+
+	/** Called when there is something to be received for this socket
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessRead();
+
+	/** Called when the socket is ready to be written to
+	 * @return true on success, false to drop this socket
+	 */
+	bool ProcessWrite();
+
+	/** Write data to the socket
+	 * @param buffer The data to write
+	 * @param l The length of the data
+	 */
+	void Write(const char *buffer, size_t l);
+
+	/** Called with data from the socket
+	 * @param buffer The data
+	 * @param l The length of buffer
+	 * @return true to continue reading, false to drop the socket
+	 */
+	virtual bool Read(const char *buffer, size_t l);
+};
+
 class CoreExport ListenSocket : public Socket
 {
  public:
@@ -341,22 +378,18 @@ class CoreExport ListenSocket : public Socket
  	 * @param addr The sockaddr for where the connection came from
 	 * @return The new socket
 	 */
-	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr);
+	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
 };
 
-class CoreExport ConnectionSocket : public BufferedSocket
+class CoreExport ConnectionSocket : public virtual Socket
 {
  public:
 	/* Sockaddrs for connection ip/port */
 	sockaddrs conaddr;
-	/* True if connected */
-	bool connected;
 
 	/** Constructor
-	 * @param ipv6 true to use IPv6
-	 * @param type The socket type, defaults to SOCK_STREAM
 	 */
-	ConnectionSocket(bool ipv6 = false, int type = SOCK_STREAM);
+	ConnectionSocket();
 
 	/** Connect the socket
 	 * @param TargetHost The target host to connect to
@@ -364,15 +397,11 @@ class CoreExport ConnectionSocket : public BufferedSocket
 	 */
 	void Connect(const Anope::string &TargetHost, int Port);
 
-	/** Called when there is something to be received for this socket
-	 * @return true on success, false to drop this socket
+	/** Called when there either is a read or write event.
+	 * Used to determine whether or not this socket is connected yet.
+	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool ProcessRead();
-
-	/** Called when the socket is ready to be written to
-	 * @return true on success, false to drop this socket
-	 */
-	bool ProcessWrite();
+	bool Process();
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
@@ -389,7 +418,7 @@ class CoreExport ConnectionSocket : public BufferedSocket
 	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport ClientSocket : public BufferedSocket
+class CoreExport ClientSocket : public virtual Socket
 {
  public:
 	/* Listen socket this connection came from */
@@ -399,23 +428,31 @@ class CoreExport ClientSocket : public BufferedSocket
 
 	/** Constructor
 	 * @param ls Listen socket this connection is from
-	 * @param fd New FD for this socket
 	 * @param addr Address the connection came from
 	 */
-	ClientSocket(ListenSocket *ls, int fd, const sockaddrs &addr);
+	ClientSocket(ListenSocket *ls, const sockaddrs &addr);
 
-	/** Called when there is something to be received for this socket
+	/** Called when there either is a read or write event.
+	 * Used to determine whether or not this socket is connected yet.
+	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
+	 */
+	bool Process();
+
+	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead();
+	void ProcessError();
 
-	/** Called when the socket is ready to be written to
-	 * @return true on success, false to drop this socket
+	/** Called when a client has been accepted() successfully.
 	 */
-	bool ProcessWrite();
+	virtual void OnAccept();
+
+	/** Called when there was an error accepting the client
+	 */
+	virtual void OnError(const Anope::string &error);
 };
 
-class CoreExport Pipe : public BufferedSocket
+class CoreExport Pipe : public Socket
 {
  public:
  	/** The FD of the write pipe (if this isn't evenfd)
@@ -427,13 +464,13 @@ class CoreExport Pipe : public BufferedSocket
 	 */
 	Pipe();
 
+	/** Destructor
+	 */
+	~Pipe();
+
 	/** Called when data is to be read
 	 */
 	bool ProcessRead();
-
-	/** Function that calls OnNotify
-	 */
-	bool Read(const Anope::string &);
 
 	/** Called when this pipe needs to be woken up
 	 */

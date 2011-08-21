@@ -96,19 +96,27 @@ void SocketEngine::Process()
 		{
 			Socket *s = it->second;
 
-			if (FD_ISSET(s->GetFD(), &efdset) || FD_ISSET(s->GetFD(), &rfdset) || FD_ISSET(s->GetFD(), &wfdset))
+			bool has_read = FD_ISSET(s->GetFD(), &rfdset), has_write = FD_ISSET(s->GetFD(), &wfdset), has_error = FD_ISSET(s->GetFD(), &efdset);
+			if (has_read || has_write || has_error)
 				++processed;
+
 			if (s->HasFlag(SF_DEAD))
 				continue;
-			if (FD_ISSET(s->GetFD(), &efdset))
+
+			if (has_error)
 			{
 				s->ProcessError();
 				s->SetFlag(SF_DEAD);
 				continue;
 			}
-			if (FD_ISSET(s->GetFD(), &rfdset) && !s->ProcessRead())
+
+			if (!s->Process())
+				continue;
+
+			if (has_read && !s->ProcessRead())
 				s->SetFlag(SF_DEAD);
-			if (FD_ISSET(s->GetFD(), &wfdset) && !s->ProcessWrite())
+
+			if (has_write && !s->ProcessWrite())
 				s->SetFlag(SF_DEAD);
 		}
 

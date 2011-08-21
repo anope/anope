@@ -106,7 +106,16 @@ E bool restarting;
 E Anope::string quitmsg;
 E time_t start_time;
 
-E ConnectionSocket *UplinkSock;
+class UplinkSocket : public ConnectionSocket, public BufferedSocket
+{
+ public:
+	UplinkSocket();
+	~UplinkSocket();
+	bool Read(const Anope::string &);
+	void OnConnect();
+	void OnError(const Anope::string &);
+};
+E UplinkSocket *UplinkSock;
 E int CurrentUplink;
 
 E void save_databases();

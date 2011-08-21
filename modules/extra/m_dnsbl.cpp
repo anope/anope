@@ -56,20 +56,19 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
-		XLine *x = NULL;
 		BotInfo *operserv = findbot(Config->OperServ);
-		if (this->add_to_akill && akills && (x = akills->Add(Anope::string("*@") + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason)))
+		Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
+		if (this->add_to_akill && akills)
 		{
-			Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
+			XLine *x = akills->Add("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
 			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
 			if (!Config->AkillOnAdd)
-				ircdproto->SendAkill(user, x);
+				akills->Send(NULL, x);
 		}
 		else
 		{
-			Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name << "(" << reason << ")";
-			XLine xline(Anope::string("*@") + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
-			ircdproto->SendAkill(user, &xline);
+			XLine xline("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
+			ircdproto->SendAkill(NULL, &xline);
 		}
 	}
 };

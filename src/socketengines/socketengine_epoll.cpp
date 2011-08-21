@@ -11,18 +11,12 @@ void SocketEngine::Init()
 	max = ulimit(4, 0);
 
 	if (max <= 0)
-	{
-		Log() << "Can't determine maximum number of open sockets";
-		throw CoreException("Can't determine maximum number of open sockets");
-	}
+		throw SocketException("Can't determine maximum number of open sockets");
 
 	EngineHandle = epoll_create(max / 4);
 
 	if (EngineHandle == -1)
-	{
-		Log() << "Could not initialize epoll socket engine: " << Anope::LastError();
-		throw CoreException(Anope::string("Could not initialize epoll socket engine: ") + Anope::LastError());
-	}
+		throw SocketException("Could not initialize epoll socket engine: " + Anope::LastError());
 
 	events = new epoll_event[max];
 	memset(events, 0, sizeof(epoll_event) * max);
@@ -53,10 +47,7 @@ void SocketEngine::AddSocket(Socket *s)
 	ev.data.fd = s->GetFD();
 
 	if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
-	{
-		Log() << "Unable to add fd " << ev.data.fd << " to socketengine epoll: " << Anope::LastError();
-		return;
-	}
+		throw SocketException("Unable to add fd " + stringify(ev.data.fd) + " to epoll: " + Anope::LastError());
 
 	Sockets.insert(std::make_pair(ev.data.fd, s));
 }
@@ -70,10 +61,7 @@ void SocketEngine::DelSocket(Socket *s)
 	ev.data.fd = s->GetFD();
 
 	if (epoll_ctl(EngineHandle, EPOLL_CTL_DEL, ev.data.fd, &ev) == -1)
-	{
-		Log() << "Unable to delete fd " << ev.data.fd << " from socketengine epoll: " << Anope::LastError();
-		return;
-	}
+		throw SocketException("Unable to remove fd " + stringify(ev.data.fd) + " from epoll: " + Anope::LastError());
 
 	Sockets.erase(ev.data.fd);
 }
@@ -91,9 +79,9 @@ void SocketEngine::MarkWritable(Socket *s)
 	ev.data.fd = s->GetFD();
 
 	if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-		Log() << "Unable to mark fd " << ev.data.fd << " as writable in socketengine epoll: " << Anope::LastError();
-	else
-		s->SetFlag(SF_WRITABLE);
+		throw SocketException("Unable to mark fd " + stringify(ev.data.fd) + " as writable in epoll: " + Anope::LastError());
+
+	s->SetFlag(SF_WRITABLE);
 }
 
 void SocketEngine::ClearWritable(Socket *s)
@@ -109,9 +97,9 @@ void SocketEngine::ClearWritable(Socket *s)
 	ev.data.fd = s->GetFD();
 
 	if (epoll_ctl(EngineHandle, EPOLL_CTL_MOD, ev.data.fd, &ev) == -1)
-		Log() << "Unable to mark fd " << ev.data.fd << " as unwritable in socketengine epoll: " << Anope::LastError();
-	else
-		s->UnsetFlag(SF_WRITABLE);
+		throw SocketException("Unable clear mark fd " + stringify(ev.data.fd) + " as writable in epoll: " + Anope::LastError());
+
+	s->UnsetFlag(SF_WRITABLE);
 }
 
 void SocketEngine::Process()
@@ -130,16 +118,24 @@ void SocketEngine::Process()
 	for (int i = 0; i < total; ++i)
 	{
 		epoll_event *ev = &events[i];
-		Socket *s = Sockets[ev->data.fd];
+
+		std::map<int, Socket *>::iterator it = Sockets.find(ev->data.fd);
+		if (it == Sockets.end())
+			continue;
+		Socket *s = it->second;
 
 		if (s->HasFlag(SF_DEAD))
 			continue;
+
 		if (ev->events & (EPOLLHUP | EPOLLERR))
 		{
 			s->ProcessError();
 			s->SetFlag(SF_DEAD);
 			continue;
 		}
+
+		if (!s->Process())
+			continue;
 
 		if ((ev->events & EPOLLIN) && !s->ProcessRead())
 			s->SetFlag(SF_DEAD);
@@ -151,7 +147,10 @@ void SocketEngine::Process()
 	for (int i = 0; i < total; ++i)
 	{
 		epoll_event *ev = &events[i];
-		Socket *s = Sockets[ev->data.fd];
+		std::map<int, Socket *>::iterator it = Sockets.find(ev->data.fd);
+		if (it == Sockets.end())
+			continue;
+		Socket *s = it->second;
 
 		if (s->HasFlag(SF_DEAD))
 			delete s;

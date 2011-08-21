@@ -5,8 +5,6 @@ Pipe::Pipe() : Socket(eventfd(0, EFD_NONBLOCK))
 {
 	if (this->Sock < 0)
 		throw CoreException("Could not create pipe: " + Anope::LastError());
-
-	SocketEngine::AddSocket(this);
 }
 
 Pipe::~Pipe()

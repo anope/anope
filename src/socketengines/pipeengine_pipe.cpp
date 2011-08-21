@@ -1,6 +1,6 @@
 #include "services.h"
 
-Pipe::Pipe() : Socket(-1)
+Pipe::Pipe() : Socket(-1), WritePipe(-1)
 {
 	int fds[2];
 	if (pipe(fds))

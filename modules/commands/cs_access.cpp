@@ -307,7 +307,7 @@ class CommandCSAccess : public Command
 		AccessGroup u_access = ci->AccessFor(u);
 		ChanAccess *highest = u_access.Highest();
 		int u_level = (highest ? AccessChanAccess::DetermineLevel(highest) : 0);
-		if (level >= u_level && !u_access.Founder)
+		if (level >= u_level && !u_access.Founder && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -318,7 +318,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) || level >= u_level;
+		bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) || (level >= u_level && !u_access.Founder);
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
 			mask += "!*@*";

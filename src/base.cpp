@@ -23,10 +23,3 @@ void Base::DelReference(dynamic_reference_base *r)
 	this->References.erase(r);
 }
 
-void Base::operator delete(void *ptr)
-{
-	Base *b = static_cast<Base *>(ptr);
-	FOREACH_MOD(I_OnDeleteObject, OnDeleteObject(b));
-	::operator delete(b);
-}
-

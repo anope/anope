@@ -1019,11 +1019,6 @@ class CoreExport Module : public Extensible
 	 * @param msg The message
 	 */
 	virtual void OnPrivmsg(User *u, Channel *c, Anope::string &msg) { }
-
-	/** Called when any object is deleted
-	 * @param b The object
-	 */
-	virtual void OnDeleteObject(Base *b) { }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -1077,7 +1072,7 @@ enum Implementation
 		I_OnServerQuit, I_OnTopicUpdated,
 		I_OnEncrypt, I_OnDecrypt,
 		I_OnChannelModeSet, I_OnChannelModeUnset, I_OnUserModeSet, I_OnUserModeUnset, I_OnChannelModeAdd, I_OnUserModeAdd,
-		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg, I_OnDeleteObject,
+		I_OnMLock, I_OnUnMLock, I_OnServerSync, I_OnUplinkSync, I_OnBotPrivmsg, I_OnPrivmsg,
 	I_END
 };
 

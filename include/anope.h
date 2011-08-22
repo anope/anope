@@ -460,7 +460,6 @@ class CoreExport Base
 	virtual ~Base();
 	void AddReference(dynamic_reference_base *r);
 	void DelReference(dynamic_reference_base *r);
-	static void operator delete(void *ptr);
 };
 
 class dynamic_reference_base : public Base

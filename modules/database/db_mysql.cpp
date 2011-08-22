@@ -270,7 +270,7 @@ class DBMySQL : public Module
 
 			EventReturn MOD_RESULT;
 			std::vector<Anope::string> Params = MakeVector(r.Get(i, "value"));
-			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, na->nick, Params));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(na, r.Get(i, "name"), Params));
 		}
 
 		query = "SELECT * FROM `anope_hs_core`";
@@ -320,7 +320,7 @@ class DBMySQL : public Module
 
 			EventReturn MOD_RESULT;
 			std::vector<Anope::string> Params = MakeVector(r.Get(i, "value"));
-			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, bi->nick, Params));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(bi, r.Get(i, "name"), Params));
 		}
 
 		query = "SELECT * FROM `anope_cs_info`";
@@ -500,7 +500,7 @@ class DBMySQL : public Module
 
 			EventReturn MOD_RESULT;
 			std::vector<Anope::string> Params = MakeVector(r.Get(i, "value"));
-			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, ci->name, Params));
+			FOREACH_RESULT(I_OnDatabaseReadMetadata, OnDatabaseReadMetadata(ci, r.Get(i, "name"), Params));
 		}
 
 		query = "SELECT * FROM `anope_cs_mlock`";

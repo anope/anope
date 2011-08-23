@@ -19,7 +19,7 @@ enum QueryType
 
 /** Flags that can be AND'd into DNSPacket::flags to receive certain values
  */
-enum QueryFlags
+enum
 {
 	DNS_QUERYFLAGS_QR = 0x8000,
 	DNS_QUERYFLAGS_OPCODE = 0x7800,
@@ -48,16 +48,45 @@ enum DNSError
 	DNS_ERROR_INVALIDTYPE
 };
 
-class DNSRequestTimeout; // Forward declarations
-struct DNSRecord;
 class Module;
+struct DNSQuery;
+class DNSPacket;
+
+struct Question
+{
+	Anope::string name;
+	QueryType type;
+	unsigned short qclass;
+
+	Question();
+	Question(const Anope::string &, QueryType, unsigned short = 1);
+};
+
+struct ResourceRecord : public Question
+{
+	unsigned int ttl;
+	Anope::string rdata;
+	time_t created;
+
+	ResourceRecord(const Anope::string &, QueryType, unsigned short = 1);
+	ResourceRecord(const Question &);
+};
+
+struct DNSQuery
+{
+	std::vector<Question> questions;
+	std::vector<ResourceRecord> answers, authorities, additional;
+	DNSError error;
+
+	DNSQuery();
+	DNSQuery(const Question &q);
+	DNSQuery(const DNSPacket &p);
+};
 
 /** The request
  */
-class CoreExport DNSRequest
+class CoreExport DNSRequest : public Timer, public Question
 {
-	/* Timeout timer for this request */
-	DNSRequestTimeout *timeout;
 	/* Use result cache if available */
 	bool use_cache;
 
@@ -67,81 +96,50 @@ class CoreExport DNSRequest
  	/* Creator of this request */
 	Module *creator;
 
-	/* Address we're looking up */
-	Anope::string address;
-	/* QueryType, A, AAAA, PTR etc */
-	QueryType QT;
-
 	DNSRequest(const Anope::string &addr, QueryType qt, bool cache = false, Module *c = NULL);
 
 	virtual ~DNSRequest();
 
 	void Process();
 
-	virtual void OnLookupComplete(const DNSRecord *r) = 0;
+	virtual void OnLookupComplete(const DNSQuery *r) = 0;
 
-	virtual void OnError(const DNSRecord *r);
+	virtual void OnError(const DNSQuery *r);
+	
+	void Tick(time_t);
 };
 
-/** A full packet sent to the nameserver, may contain multiple queries
+/** A full packet sent or recieved to/from the nameserver, may contain multiple queries
  */
-struct DNSPacket
+class DNSPacket : public DNSQuery
 {
+	static const int DNS_POINTER = 0xC0;
+	static const int DNS_LABEL = 0x3F;
+
+	void PackName(unsigned char *output, unsigned short output_size, unsigned short &pos, const Anope::string &name);
+	Anope::string UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos);
+	
+	Question UnpackQuestion(const unsigned char *input, unsigned short input_size, unsigned short &pos);
+	ResourceRecord UnpackResourceRecord(const unsigned char *input, unsigned short input_size, unsigned short &poss);
+ public:
+	static const int HEADER_LENGTH = 12;
+
 	/* Our 16-bit id for this header */
 	unsigned short id;
 	/* Flags on the query */
 	unsigned short flags;
-	/* Number of queries */
-	unsigned short qdcount;
-	/* Number of resource records in answer */
-	unsigned short ancount;
-	/* Number of NS resource records in authority records section */
-	unsigned short nscount;
-	/* Number of resource records in the additional records section */
-	unsigned short arcount;
-	/* How many of the bytes of the payload are in use */
-	unsigned short payload_count;
-	/* The queries, at most can be 512 bytes */
-	unsigned char payload[512];
 
-	inline DNSPacket();
-
-	bool AddQuestion(const Anope::string &address, QueryType qt);
-
-	inline void FillPacket(const unsigned char *input, const size_t length);
-
-	inline void FillBuffer(unsigned char *buffer);
-};
-
-struct CoreExport DNSRecord
-{
-	/* Name of the initial lookup */
-	Anope::string name;
-	/* Result of the lookup */
-	Anope::string result;
-	/* Type of query this was */
-	QueryType type;
-	/* Error, if there was one */
-	DNSError error;
-	/* Record class, should always be 1 */
-	unsigned short record_class;
-	/* Time to live */
-	time_t ttl;
-	/* Record length */
-	unsigned short rdlength;
-
-	/* When this record was created in our cache */
-	time_t created;
-
-	inline DNSRecord(const Anope::string &n);
-	operator bool() const;
+	DNSPacket();
+	void Fill(const unsigned char *input, const unsigned short len);
+	unsigned short Pack(unsigned char *output, unsigned short output_size);
 };
 
 /** DNS manager, manages the connection and all requests
  */
 class CoreExport DNSManager : public Timer, public Socket
 {
-	std::multimap<Anope::string, DNSRecord *> cache;
+	typedef std::multimap<Anope::string, ResourceRecord, std::less<ci::string> > cache_map;
+	cache_map cache;
 	sockaddrs addrs;
  public:
 	std::deque<DNSPacket *> packets;
@@ -157,35 +155,34 @@ class CoreExport DNSManager : public Timer, public Socket
 
 	bool ProcessWrite();
 
-	void AddCache(DNSRecord *rr);
+	/** Add a record to the dns cache
+	 * @param r The record
+	 */
+	void AddCache(DNSQuery &r);
+
+	/** Check the DNS cache to see if request can be handled by a cached result
+	 * @return true if a cached result was found.
+	 */
 	bool CheckCache(DNSRequest *request);
+
+	/** Tick this timer, used to clear the DNS cache.
+	 */
 	void Tick(time_t now);
 
+	/** Cleanup all pending DNS queries for a module
+	 * @param mod The module
+	 */
 	void Cleanup(Module *mod);
 
 	/** Does a BLOCKING DNS query and returns the first IP.
 	 * Only use this if you know what you are doing. Unless you specifically
 	 * need a blocking query use the DNSRequest system
 	 */
-	static DNSRecord BlockingQuery(const Anope::string &mask, QueryType qt);
-};
-
-/** A DNS timeout, one is made for every DNS request to detect timeouts
- */
-class DNSRequestTimeout : public Timer
-{
-	DNSRequest *request;
- public:
- 	bool done;
-
-	DNSRequestTimeout(DNSRequest *r, time_t timeout);
-
-	~DNSRequestTimeout();
-
-	void Tick(time_t);
+	static DNSQuery BlockingQuery(const Anope::string &mask, QueryType qt);
 };
 
 extern DNSManager *DNSEngine;
 
 #endif // DNS_H
+
 

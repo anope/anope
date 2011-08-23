@@ -183,8 +183,8 @@ static void Connect()
 	if (!Config->LocalHost.empty())
 		UplinkSock->Bind(Config->LocalHost);
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
-	DNSRecord req = DNSManager::BlockingQuery(u->host, u->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
-	UplinkSock->Connect(req.result, u->port);
+	DNSQuery rep = DNSManager::BlockingQuery(u->host, u->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
+	UplinkSock->Connect(!rep.answers.empty() ? rep.answers.front().rdata : u->host, u->port);
 }
 
 /*************************************************************************/

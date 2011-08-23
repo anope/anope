@@ -28,16 +28,21 @@ class DNSBLResolver : public DNSRequest
  public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const DNSRecord *record)
+	void OnLookupComplete(const DNSQuery *record)
 	{
 		if (!user || user->GetExt("m_dnsbl_akilled"))
+			return;
+
+		const ResourceRecord &ans_record = record->answers[0];
+		// Replies should be in 127.0.0.0/24
+		if (ans_record.rdata.find("127.0.0.") != 0)
 			return;
 
 		Anope::string record_reason;
 		if (!this->blacklist.replies.empty())
 		{
 			sockaddrs sresult;
-			sresult.pton(AF_INET, record->result);
+			sresult.pton(AF_INET, ans_record.rdata);
 			int result = (sresult.sa4.sin_addr.s_addr & 0xFF000000) >> 24;
 
 			if (!this->blacklist.replies.count(result))
@@ -155,8 +160,6 @@ class ModuleDNSBL : public Module
 				Log() << "m_dnsbl: " << ex.GetReason();
 			}
 		}
-
-		return;
 	}
 };
 

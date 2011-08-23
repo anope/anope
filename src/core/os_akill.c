@@ -85,7 +85,7 @@ int do_akill(User * u)
     if (!stricmp(cmd, "ADD")) {
         int deleted = 0;
         char *expiry, *mask, *reason;
-        time_t expires;
+        time_t expires, now = time(NULL);
 
         mask = strtok(NULL, " ");
         if (mask && *mask == '+') {
@@ -155,7 +155,7 @@ int do_akill(User * u)
                 if (!expires) {
                     strcpy(buf, "does not expire");
                 } else {
-                    int wall_expiry = expires - time(NULL);
+                    int wall_expiry = expires - now;
                     char *s = NULL;
 
                     if (wall_expiry >= 86400) {

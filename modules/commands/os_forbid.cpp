@@ -108,6 +108,13 @@ class CommandOSForbid : public Command
 			Anope::string reason = !expiry.empty() && params.size() > 4 ? params[4] : (params.size() > 3 ? params[3] : "");
 
 			time_t expiryt = 0;
+
+			if (Config->ForceForbidReason && reason.empty())
+			{
+				this->OnSyntaxError(source, "");
+				return;
+			}
+
 			if (!expiry.empty())
 			{
 				expiryt = dotime(expiry);

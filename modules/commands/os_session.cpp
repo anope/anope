@@ -726,6 +726,7 @@ class OSSession : public Module
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 
 		ModuleManager::RegisterService(&commandossession);
 		ModuleManager::RegisterService(&commandosexception);

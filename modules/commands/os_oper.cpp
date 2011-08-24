@@ -47,7 +47,7 @@ class CommandOSOper : public Command
 				else
 				{
 					delete na->nc->o;
-					na->nc->o = new Oper(na->nc->display, "", "", ot);
+					na->nc->o = new Oper(na->nc->display, ot);
 
 					Log(LOG_ADMIN, source.u, this) << "ADD " << na->nick << " as type " << ot->GetName();
 					source.Reply("%s (%s) added to the \2%s\2 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
@@ -209,7 +209,7 @@ class OSOper : public Module
 			OperType *ot = OperType::Find(params[2]);
 			if (ot == NULL)
 				return EVENT_CONTINUE;
-			nc->o = new Oper(nc->display, "", "", ot);
+			nc->o = new Oper(nc->display, ot);
 			Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
 		}
 		return EVENT_CONTINUE;

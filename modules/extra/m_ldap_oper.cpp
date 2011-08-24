@@ -46,7 +46,7 @@ class IdentifyInterface : public LDAPInterface
 					my_opers.erase(o);
 					delete o;
 				}
-				o = new Oper(u->nick, "", "", ot);
+				o = new Oper(u->nick, ot);
 				my_opers.insert(o);
 				u->Account()->o = o;
 				Log() << "m_ldap_oper: Tied " << u->nick << " (" << u->Account()->display << ") to opertype " << ot->GetName();

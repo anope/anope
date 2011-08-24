@@ -15,13 +15,15 @@ class OperType;
 struct CoreExport Oper
 {
 	Anope::string name;
+	OperType *ot;
 	Anope::string password;
 	Anope::string certfp;
-	OperType *ot;
 	bool config;
 
-	Oper(const Anope::string &n, const Anope::string &p, const Anope::string &c, OperType *o) :
-		name(n), password(p), certfp(c), ot(o), config(false) { }
+	std::vector<Anope::string> hosts;
+	Anope::string vhost;
+
+	Oper(const Anope::string &n, OperType *o) : name(n), ot(o) { }
 	
 	/** Find an oper block by name
 	 * @param name The name

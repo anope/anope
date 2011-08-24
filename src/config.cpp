@@ -656,6 +656,8 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 	Anope::string type = values[1].GetValue();
 	Anope::string password = values[2].GetValue();
 	Anope::string certfp = values[3].GetValue();
+	Anope::string host = values[4].GetValue();
+	Anope::string vhost = values[5].GetValue();
 
 	ValueItem vi(name);
 	if (!ValidateNotEmpty(config, "oper", "name", vi))
@@ -672,8 +674,12 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 	if (ot == NULL)
 		throw ConfigException("Oper block for " + name + " has invalid oper type " + type);
 	
-	Oper *o = new Oper(name, password, certfp, ot);
+	Oper *o = new Oper(name, ot);
 	o->config = true;
+	o->password = password;
+	o->certfp = certfp;
+	o->hosts = BuildStringVector(host);
+	o->vhost = vhost;
 	config->Opers.push_back(o);
 
 	return true;
@@ -1257,9 +1263,9 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOperTypes, DoOperType, DoneOperTypes},
 		{"oper",
-			{"name", "type", "password", "certfp", ""},
-			{"", "", "", "", ""},
-			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
+			{"name", "type", "password", "certfp", "host", "vhost", ""},
+			{"", "", "", "", "", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitOpers, DoOper, DoneOpers},
 		{"service",
 			{"nick", "user", "host", "gecos", "modes", "channels", ""},

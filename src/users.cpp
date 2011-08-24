@@ -367,12 +367,22 @@ void User::Identify(NickAlias *na)
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));
 
-	if (na->nc->o != NULL && na->nc->o->ot != NULL && !na->nc->o->ot->modes.empty())
+	if (this->IsServicesOper())
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		this->SetModes(bi, "%s", na->nc->o->ot->modes.c_str());
-		if (bi != NULL)
-			this->SendMessage(bi, "Changing your usermodes to \002%s\002", na->nc->o->ot->modes.c_str());
+		if (!this->nc->o->ot->modes.empty())
+		{
+			this->SetModes(bi, "%s", this->nc->o->ot->modes.c_str());
+			if (bi != NULL)
+				this->SendMessage(bi, "Changing your usermodes to \002%s\002", this->nc->o->ot->modes.c_str());
+		}
+		if (ircd->vhost && !this->nc->o->vhost.empty())
+		{
+			if (bi != NULL)
+				this->SendMessage(bi, "Changing your vhost to \002%s\002", this->nc->o->vhost.c_str());
+ 			this->SetDisplayedHost(this->nc->o->vhost);
+			ircdproto->SendVhost(this, "", this->nc->o->vhost);
+		}
 	}
 }
 
@@ -458,6 +468,16 @@ bool User::IsServicesOper()
 	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
 		// Certfp mismatch
 		return false;
+	else if (!this->nc->o->hosts.empty())
+	{
+		bool match = false;
+		Anope::string match_host = this->GetIdent() + "@" + this->host;
+		for (unsigned i = 0; i < this->nc->o->hosts.size(); ++i)
+			if (Anope::Match(match_host, this->nc->o->hosts[i]))
+				match = true;
+		if (match == false)
+			return false;
+	}
 	
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_IsServicesOper, IsServicesOper(this));

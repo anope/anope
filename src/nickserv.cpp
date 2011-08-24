@@ -16,9 +16,11 @@ nickalias_map NickAliasList;
 nickcore_map NickCoreList;
 
 typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
+typedef std::map<Anope::string, NickServHeld *> nickservheld_map;
 typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
 
 static nickservcollides_map NickServCollides;
+static nickservheld_map NickServHelds;
 static nickservreleases_map NickServReleases;
 
 NickServCollide::NickServCollide(User *user, time_t delay) : Timer(delay), u(user), nick(u->nick)
@@ -46,6 +48,26 @@ void NickServCollide::Tick(time_t ctime)
 		return;
 
 	u->Collide(na);
+}
+
+NickServHeld::NickServHeld(NickAlias *n, long l) : Timer(l), na(n), nick(na->nick)
+{
+	nickservheld_map::iterator nit = NickServHelds.find(na->nick);
+	if (nit != NickServHelds.end())
+		delete nit->second;
+
+	NickServHelds[na->nick] = this;
+}
+
+NickServHeld::~NickServHeld()
+{
+	NickServHelds.erase(this->nick);
+}
+
+void NickServHeld::Tick(time_t)
+{
+	if (na)
+		na->UnsetFlag(NS_HELD);
 }
 
 NickServRelease::NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, ts6_uid_retrieve()), Timer(delay), nick(na->nick)

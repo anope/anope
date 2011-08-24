@@ -272,6 +272,20 @@ class CoreExport NickServCollide : public Timer
 	void Tick(time_t t);
 };
 
+/** Timers for removing HELD status from nicks.
+ */
+class NickServHeld : public Timer
+{
+	dynamic_reference<NickAlias> na;
+	Anope::string nick;
+ public:
+ 	NickServHeld(NickAlias *n, long t);
+
+	~NickServHeld();
+
+	void Tick(time_t);
+};
+
 /** Timers for releasing nicks to be available for use
  */
 class CoreExport NickServRelease : public User, public Timer

@@ -94,11 +94,11 @@ void NickAlias::OnCancel(User *)
 		this->SetFlag(NS_HELD);
 		this->UnsetFlag(NS_COLLIDED);
 
+		new NickServHeld(this, Config->NSReleaseTimeout);
+
 		if (ircd->svshold)
 			ircdproto->SendSVSHold(this->nick);
 		else
-		{
 			new NickServRelease(this, Config->NSReleaseTimeout);
-		}
 	}
 }

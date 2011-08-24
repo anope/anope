@@ -15,7 +15,7 @@
 class CommandCSSetMisc : public Command
 {
  public:
-	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 1)
+	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}

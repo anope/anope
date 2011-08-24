@@ -1,3 +1,4 @@
+
 /* NickServ core functions
  *
  * (C) 2003-2011 Anope Team
@@ -15,6 +16,25 @@
 
 class CommandNSRecover : public Command
 {
+ private:
+	void DoRecover(CommandSource &source, User *u, NickAlias *na, const Anope::string &nick)
+	{
+		u->SendMessage(source.owner, FORCENICKCHANGE_NOW);
+
+		if (u->Account() == na->nc)
+		{
+			ircdproto->SendAccountLogout(u, u->Account());
+			u->RemoveMode(source.owner, UMODE_REGISTERED);
+			ircdproto->SendUnregisteredNick(u);
+		}
+
+		u->Collide(na);
+
+		/* Convert Config->NSReleaseTimeout seconds to string format */
+		Anope::string relstr = duration(Config->NSReleaseTimeout);
+		source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
+	}
+
  public:
 	CommandNSRecover(Module *creator) : Command(creator, "nickserv/recover", 1, 2)
 	{
@@ -49,13 +69,7 @@ class CommandNSRecover : public Command
 
 			if (MOD_RESULT == EVENT_ALLOW)
 			{
-				u2->SendMessage(source.owner, FORCENICKCHANGE_NOW);
-				u2->Collide(na);
-
-				/* Convert Config->NSReleaseTimeout seconds to string format */
-				Anope::string relstr = duration(Config->NSReleaseTimeout);
-
-				source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
+				this->DoRecover(source, u2, na, nick);
 			}
 			else
 			{
@@ -69,13 +83,7 @@ class CommandNSRecover : public Command
 			if (u->Account() == na->nc || (!na->nc->HasFlag(NI_SECURE) && is_on_access(u, na->nc)) ||
 					(!u->fingerprint.empty() && na->nc->FindCert(u->fingerprint)))
 			{
-				u2->SendMessage(source.owner, FORCENICKCHANGE_NOW);
-				u2->Collide(na);
-
-				/* Convert Config->NSReleaseTimeout seconds to string format */
-				Anope::string relstr = duration(Config->NSReleaseTimeout);
-
-				source.Reply(NICK_RECOVERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), nick.c_str(), relstr.c_str());
+				this->DoRecover(source, u2, na, nick);
 			}
 			else
 				source.Reply(ACCESS_DENIED);

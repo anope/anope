@@ -36,8 +36,6 @@ enum ChannelInfoFlag
 	CI_NO_EXPIRE,
 	/* Channel memo limit may not be changed */
 	CI_MEMO_HARDMAX,
-	/* Send notice to channel on use of OP/DEOP */
-	CI_OPNOTICE,
 	/* Stricter control of channel founder status */
 	CI_SECUREFOUNDER,
 	/* Sign kicks with the user who did the kick */
@@ -58,7 +56,7 @@ enum ChannelInfoFlag
 
 const Anope::string ChannelInfoFlagStrings[] = {
 	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
-	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "OPNOTICE", "SECUREFOUNDER",
+	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "SECUREFOUNDER",
 	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", ""
 };
 

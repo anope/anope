@@ -15,7 +15,7 @@
 
 class CommandModeBase : public Command
 {
-	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself, ChannelInfoFlag notice)
+	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself)
 	{
 		User *u = source.u;
 		User *u2 = finduser(nick);
@@ -48,8 +48,6 @@ class CommandModeBase : public Command
 				c->RemoveMode(NULL, cm, u2->nick);
 
 			Log(LOG_COMMAND, u, com, ci) << "for " << u2->nick;
-			if (notice && ci->HasFlag(notice))
-				ircdproto->SendMessage(ci->WhoSends(), c->name, "%s command used for %s by %s", com->name.c_str(), u2->nick.c_str(), u->nick.c_str());
 		}
 	}
 
@@ -97,7 +95,7 @@ class CommandCSOp : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME, CI_OPNOTICE);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -126,7 +124,7 @@ class CommandCSDeOp : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME, CI_OPNOTICE);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

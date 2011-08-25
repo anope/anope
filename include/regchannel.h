@@ -101,15 +101,15 @@ struct ModeLock
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
-	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
-
 	NickCore *founder;							/* Channel founder */
 	std::vector<ChanAccess *> access;                                       /* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
-	ModeList mode_locks;
 
  public:
+	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
+	ModeList mode_locks;
+
  	/** Default constructor
 	 * @param chname The channel name
 	 */

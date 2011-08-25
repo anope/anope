@@ -54,6 +54,9 @@ class CommandCSRegister : public Command
 			if (!chdesc.empty())
 				ci->desc = chdesc;
 
+			for (ChannelInfo::ModeList::iterator it = ci->mode_locks.begin(), it_end = ci->mode_locks.end(); it != it_end; ++it)
+				it->second.setter = u->nick;
+
 			if (c && !c->topic.empty())
 			{
 				ci->last_topic = c->topic;

@@ -99,7 +99,7 @@ class CommandHSRequest : public Command
 			return;
 		}
 
-		if (!isValidHost(host, 3))
+		if (!IsValidHost(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;

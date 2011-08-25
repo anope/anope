@@ -541,6 +541,13 @@ class CoreExport ServerConfig
 	/* Who can use memos reciepts */
 	unsigned MSMemoReceipt;
 
+	/* Valid chars allowed in vhosts */
+	Anope::string VhostChars;
+	/* Allow undotted vhosts? */
+	bool VhostUndotted;
+	/* Chars disallowed at the beginning or end of vhosts */
+	Anope::string VhostDisallowBE;
+
 	/* Core BotServ modules */
 	Anope::string BotCoreModules;
 	/* Default BotServ flags */

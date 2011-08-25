@@ -56,22 +56,16 @@ class CommandHSSet : public Command
 
 		if (!user.empty())
 		{
-			if (user.length() > Config->UserLen)
-			{
-				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
-				return;
-			}
-			else if (!ircd->vident)
+			if (!ircd->vident)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
-				if (!isvalidchar(*s))
-				{
-					source.Reply(HOST_SET_IDENT_ERROR);
-					return;
-				}
+			else if (!IsValidIdent(user))
+			{
+				source.Reply(HOST_SET_IDENT_ERROR);
+				return;
+			}
 		}
 
 		if (host.length() > Config->HostLen)
@@ -80,7 +74,7 @@ class CommandHSSet : public Command
 			return;
 		}
 
-		if (!isValidHost(host, 3))
+		if (!IsValidHost(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;
@@ -163,22 +157,16 @@ class CommandHSSetAll : public Command
 
 		if (!user.empty())
 		{
-			if (user.length() > Config->UserLen)
-			{
-				source.Reply(HOST_SET_IDENTTOOLONG, Config->UserLen);
-				return;
-			}
-			else if (!ircd->vident)
+			if (!ircd->vident)
 			{
 				source.Reply(HOST_NO_VIDENT);
 				return;
 			}
-			for (Anope::string::iterator s = user.begin(), s_end = user.end(); s != s_end; ++s)
-				if (!isvalidchar(*s))
-				{
-					source.Reply(HOST_SET_IDENT_ERROR);
-					return;
-				}
+			else if (!IsValidIdent(user))
+			{
+				source.Reply(HOST_SET_IDENT_ERROR);
+				return;
+			}
 		}
 
 		if (host.length() > Config->HostLen)
@@ -187,7 +175,7 @@ class CommandHSSetAll : public Command
 			return;
 		}
 
-		if (!isValidHost(host, 3))
+		if (!IsValidHost(host))
 		{
 			source.Reply(HOST_SET_ERROR);
 			return;

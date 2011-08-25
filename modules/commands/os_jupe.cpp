@@ -29,7 +29,7 @@ class CommandOSJupe : public Command
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 		Server *server = Server::Find(jserver);
 
-		if (!isValidHost(jserver, 3))
+		if (!IsValidHost(jserver) || jserver.find('.') == Anope::string::npos)
 			source.Reply(_("Please use a valid server name when juping"));
 		else if (server && (server == Me || server == Me->GetLinks().front()))
 			source.Reply(_("You can not jupe your services server or your uplink server."));

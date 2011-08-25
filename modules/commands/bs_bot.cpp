@@ -69,8 +69,8 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		/* Check the host is valid re RFC 2812 */
-		if (!isValidHost(host, 3))
+		/* Check the host is valid */
+		if (!IsValidHost(host))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return;
@@ -186,7 +186,7 @@ class CommandBSBot : public Command
 			return;
 		}
 
-		if (!host.empty() && !isValidHost(host, 3))
+		if (!host.empty() && !IsValidHost(host))
 		{
 			source.Reply(_("Bot Hosts may only contain valid host characters."));
 			return;

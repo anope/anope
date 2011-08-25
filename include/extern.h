@@ -159,10 +159,8 @@ E time_t dotime(const Anope::string &s);
 E Anope::string duration(const time_t &seconds, NickCore *nc = NULL);
 E Anope::string expire_left(NickCore *nc, time_t expires);
 E Anope::string do_strftime(const time_t &t, NickCore *nc = NULL, bool short_output = false);
-E bool doValidHost(const Anope::string &host, int type);
-
-E bool isValidHost(const Anope::string &host, int type);
-E bool isvalidchar(char c);
+E bool IsValidIdent(const Anope::string &ident);
+E bool IsValidHost(const Anope::string &host);
 
 E Anope::string myStrGetToken(const Anope::string &str, char dilim, int token_number);
 E Anope::string myStrGetTokenRemainder(const Anope::string &str, char dilim, int token_number);

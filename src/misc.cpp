@@ -296,113 +296,50 @@ Anope::string expire_left(NickCore *nc, time_t expires)
 
 /*************************************************************************/
 
-/**
- * Validate the host
- * shortname  =  ( letter / digit ) *( letter / digit / "-" ) *( letter / digit )
- * hostname   =  shortname *( "." shortname )
- * ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
- * @param host = string to check
- * @param type = format, 1 = ip4addr, 2 = hostname
- * @return 1 if a host is valid, 0 if it isnt.
+/** Checks if a username is valid
+ * @param ident The username
+ * @return true if the ident is valid
  */
-bool doValidHost(const Anope::string &host, int type)
+bool IsValidIdent(const Anope::string &ident)
 {
-	if (type != 1 && type != 2)
+	if (ident.empty() || ident.length() > Config->UserLen)
 		return false;
-	if (host.empty())
-		return false;
-
-	size_t len = host.length();
-
-	if (len > Config->HostLen)
-		return false;
-
-	size_t idx, sec_len = 0, dots = 1;
-	switch (type)
+	for (unsigned i = 0; i < ident.length(); ++i)
 	{
-		case 1:
-			for (idx = 0; idx < len; ++idx)
-			{
-				if (isdigit(host[idx]))
-				{
-					if (sec_len < 3)
-						++sec_len;
-					else
-						return false;
-				}
-				else
-				{
-					if (!idx)
-						return false; /* cant start with a non-digit */
-					if (host[idx] != '.')
-						return false; /* only . is a valid non-digit */
-					if (sec_len > 3)
-						return false; /* sections cant be more than 3 digits */
-					sec_len = 0;
-					++dots;
-				}
-			}
-			if (dots != 4)
-				return false;
-			break;
-		case 2:
-			dots = 0;
-			for (idx = 0; idx < len; ++idx)
-			{
-				if (!isalnum(host[idx]))
-				{
-					if (!idx)
-						return false;
-					if (host[idx] != '.' && host[idx] != '-')
-						return false;
-					if (host[idx] == '.')
-						++dots;
-				}
-			}
-			if (host[len - 1] == '.')
-				return false;
-			/**
-			 * Ultimate3 dosnt like a non-dotted hosts at all, nor does unreal,
-			 * so just dont allow them.
-			 */
-			if (!dots)
-				return false;
+		const char &c = ident[i];
+		if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-')
+			;
+		else
+			return false;
 	}
+	
 	return true;
 }
 
-/*************************************************************************/
-
-/**
- * Front end to doValidHost
- * @param host = string to check
- * @param type = format, 1 = ip4addr, 2 = hostname
- * @return 1 if a host is valid, 0 if it isnt.
+/** Checks if a host is valid
+ * @param host The host
+ * @param true if the host is valid
  */
-bool isValidHost(const Anope::string &host, int type)
+bool IsValidHost(const Anope::string &host)
 {
-	bool status = false;
-	if (type == 3)
+	if (host.empty() || host.length() > Config->HostLen)
+		return false;
+	
+	if (Config->VhostDisallowBE.find_first_of(host[0]) != Anope::string::npos)
+		return false;
+	else if (Config->VhostDisallowBE.find_first_of(host[host.length() - 1]) != Anope::string::npos)
+		return false;
+	
+	int dots = 0;
+	for (unsigned i = 0; i < host.length(); ++i)
 	{
-		status = doValidHost(host, 1);
-		if (!status)
-			status = doValidHost(host, 2);
+		if (host[i] == '.')
+			++dots;
+		if (Config->VhostChars.find_first_of(host[i]) == Anope::string::npos)
+			return false;
 	}
-	else
-		status = doValidHost(host, type);
-	return status;
-}
 
-/*************************************************************************/
-
-/**
- * Valid character check
- * @param c Character to check
- * @return 1 if a host is valid, 0 if it isnt.
- */
-bool isvalidchar(char c)
-{
-	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '.' || c == '-';
+	return Config->VhostUndotted || dots > 0;
 }
 
 /*************************************************************************/

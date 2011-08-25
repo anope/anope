@@ -606,15 +606,19 @@ class DBPlain : public Module
 			}
 			else if (key.equals_ci("MLOCK"))
 			{
-				std::vector<Anope::string> mlocks;
-				ci->GetExtRegular("db_mlock", mlocks);
+				bool set = params[0] == "1" ? true : false;
+				Anope::string mode_name = params[1];
+				Anope::string setter = params[2];
+				time_t created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
+				Anope::string param = params.size() > 4 ? params[4] : "";
 
-				Anope::string mlock_string = params[0] + " " + params[1] + " " + params[2] + " " + params[3];
-				if (params.size() > 4)
-					mlock_string += " " +  params[4];
-
-				mlocks.push_back(mlock_string);
-				ci->Extend("db_mlock", new ExtensibleItemRegular<std::vector<Anope::string> >(mlocks));
+				for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
+					if (ChannelModeNameStrings[i] == mode_name)
+					{
+						ChannelModeName n = static_cast<ChannelModeName>(i);
+						ci->mode_locks.insert(std::make_pair(n, ModeLock(set, n, param, setter, created)));
+						break;
+					}
 			}
 			else if (key.equals_ci("MI"))
 			{

@@ -66,7 +66,6 @@ class CommandCSRegister : public Command
 			else
 				ci->last_topic_setter = source.owner->nick;
 
-			ci->bi = NULL;
 			Log(LOG_COMMAND, u, this, ci);
 			source.Reply(_("Channel \002%s\002 registered under your nickname: %s"), chan.c_str(), u->nick.c_str());
 

@@ -512,14 +512,19 @@ class DBMySQL : public Module
 				continue;
 			}
 
-			std::vector<Anope::string> mlocks;
-			ci->GetExtRegular("db_mlock", mlocks);
+			Anope::string mode_name = r.Get(i, "mode");
+			bool set = r.Get(i, "status") == "1" ? true : false;
+			Anope::string setter = r.Get(i, "setter");
+			time_t mcreated = r.Get(i, "created").is_pos_number_only() ? convertTo<time_t>(r.Get(i, "created")) : Anope::CurTime;
+			Anope::string param = r.Get(i, "param");
 
-			Anope::string modestring = r.Get(i, "status") + " " + r.Get(i, "mode") + " " + r.Get(i, "setter") + " " + r.Get(i, "created") + " " + r.Get(i, "param");
-
-			mlocks.push_back(modestring);
-
-			ci->Extend("db_mlock", new ExtensibleItemRegular<std::vector<Anope::string> >(mlocks));
+			for (size_t j = CMODE_BEGIN + 1; j < CMODE_END; ++j)
+				if (ChannelModeNameStrings[j] == mode_name)
+				{
+					ChannelModeName n = static_cast<ChannelModeName>(j);
+					ci->mode_locks.insert(std::make_pair(n, ModeLock(set, n, param, setter, mcreated)));
+					break;
+				}
 		}
 
 		query = "SELECT * FROM `anope_ms_info`";

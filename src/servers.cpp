@@ -53,8 +53,6 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 		if (Me == this->UplinkServer && !this->HasFlag(SERVER_JUPED))
 		{
 			/* Now do mode related stuff as we know what modes exist .. */
-			for (registered_channel_map::iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
-				it->second->LoadMLock();
 			for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 			{
 				BotInfo *bi = it->second;

@@ -449,45 +449,6 @@ void ChannelInfo::ClearBadWords()
 		EraseBadWord(0);
 }
 
-/** Loads MLocked modes from extensible. This is used from database loading because Anope doesn't know what modes exist
- * until after it connects to the IRCd.
- */
-void ChannelInfo::LoadMLock()
-{
-	if (!this->GetExt("db_mlock"))
-		return;
-
-	this->ClearMLock();
-
-	// Force +r
-	ChannelMode *chm = ModeManager::FindChannelModeByName(CMODE_REGISTERED);
-	if (chm)
-		this->SetMLock(chm, true);
-
-	std::vector<Anope::string> mlock;
-	this->GetExtRegular("db_mlock", mlock);
-	for (unsigned i = 0; i < mlock.size(); ++i)
-	{
-		std::vector<Anope::string> mlockv = BuildStringVector(mlock[i]);
-
-		bool set = mlockv[0] == "1";
-		ChannelMode *cm = ModeManager::FindChannelModeByString(mlockv[1]);
-		const Anope::string &setter = mlockv[2];
-		time_t created = Anope::CurTime;
-		try
-		{
-			created = convertTo<time_t>(mlockv[3]);
-		}
-		catch (const ConvertException &) { }
-		const Anope::string &param = mlockv.size() > 4 ? mlockv[4] : "";
-
-		if (cm != NULL)
-			this->SetMLock(cm, set, param, setter, created);
-	}
-
-	this->Shrink("db_mlock");
-}
-
 /** Check if a mode is mlocked
  * @param mode The mode
  * @param status True to check mlock on, false for mlock off

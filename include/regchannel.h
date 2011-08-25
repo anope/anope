@@ -276,11 +276,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 */
 	void ClearBadWords();
 
-	/** Loads MLocked modes from extensible. This is used from database loading because Anope doesn't know what modes exist
-	 * until after it connects to the IRCd.
-	 */
-	void LoadMLock();
-
 	/** Check if a mode is mlocked
 	 * @param mode The mode
 	 * @param An optional param

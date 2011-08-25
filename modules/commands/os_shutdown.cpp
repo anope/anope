@@ -108,9 +108,6 @@ class OSShutdown : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosquit);
-		ModuleManager::RegisterService(&commandosrestart);
-		ModuleManager::RegisterService(&commandosshutdown);
 	}
 };
 

@@ -87,7 +87,6 @@ class NSStatus : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsstatus);
 	}
 };
 

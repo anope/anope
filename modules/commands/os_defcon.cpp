@@ -342,7 +342,6 @@ class OSDefcon : public Module
 		Implementation i[] = { I_OnReload, I_OnChannelModeSet, I_OnChannelModeUnset, I_OnPreCommand, I_OnUserConnect, I_OnChannelModeAdd, I_OnChannelCreate };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&commandosdefcon);
 
 		try
 		{

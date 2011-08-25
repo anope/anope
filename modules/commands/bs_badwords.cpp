@@ -324,7 +324,6 @@ class BSBadwords : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbsbadwords);
 	}
 };
 

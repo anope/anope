@@ -302,7 +302,6 @@ class BSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbsset);
 	}
 };
 

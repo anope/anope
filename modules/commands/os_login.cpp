@@ -70,7 +70,6 @@ class OSLogin : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoslogin);
 
 		ModuleManager::Attach(I_IsServicesOper, this);
 	}

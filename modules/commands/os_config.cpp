@@ -210,7 +210,6 @@ class OSConfig : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosconfig);
 	}
 };
 

@@ -44,7 +44,7 @@ enum ChannelAccess
 
 class ChanAccess;
 
-class CoreExport AccessProvider : public Service
+class CoreExport AccessProvider : public Service<AccessProvider>
 {
  public:
 	AccessProvider(Module *o, const Anope::string &n);

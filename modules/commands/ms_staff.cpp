@@ -64,7 +64,6 @@ class MSStaff : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsstaff);
 	}
 };
 

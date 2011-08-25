@@ -172,8 +172,6 @@ class MemoServCore : public Module
 
 		Implementation i[] = { I_OnNickIdentify, I_OnJoinChannel, I_OnUserAway, I_OnNickUpdate, I_OnPreHelp, I_OnPostHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		ModuleManager::RegisterService(&this->mymemoserv);
 	}
 
 	void OnNickIdentify(User *u)

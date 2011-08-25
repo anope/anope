@@ -74,7 +74,6 @@ class CSSetNoexpire : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssasetnoexpire);
 	}
 };
 

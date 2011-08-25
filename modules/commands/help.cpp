@@ -123,7 +123,6 @@ class Help : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhelp);
 	}
 };
 

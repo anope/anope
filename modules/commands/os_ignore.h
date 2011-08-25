@@ -18,12 +18,12 @@ struct IgnoreData
 	time_t time; /* When do we stop ignoring them? */
 };
 
-class IgnoreService : public Service
+class IgnoreService : public Service<IgnoreService>
 {
  protected:
 	std::list<IgnoreData> ignores;
 
-	IgnoreService(Module *c, const Anope::string &n) : Service(c, n) { }
+	IgnoreService(Module *c, const Anope::string &n) : Service<IgnoreService>(c, n) { }
 	
  public:
 	virtual void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) = 0;

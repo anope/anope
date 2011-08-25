@@ -149,9 +149,6 @@ class NSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsset);
-		ModuleManager::RegisterService(&commandnssetdisplay);
-		ModuleManager::RegisterService(&commandnssetpassword);
 	}
 };
 

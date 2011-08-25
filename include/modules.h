@@ -1076,16 +1076,10 @@ enum Implementation
 	I_END
 };
 
-class Service;
-
 /** Used to manage modules.
  */
 class CoreExport ModuleManager
 {
- private:
-	/** A map of service providers
-	 */
-	static std::map<Anope::string, Service *> ServiceProviders;
  public:
 	/** Event handler hooks.
 	 * This needs to be public to be used by FOREACH_MOD and friends.
@@ -1197,29 +1191,6 @@ class CoreExport ModuleManager
 	 */
 	static void UnloadAll();
 
-	/** Register a service
-	 * @param s The service
-	 * @return true if it was successfully registeed, else false (service name colision)
-	 */
-	static bool RegisterService(Service *s);
-
-	/** Unregister a service
-	 * @param s The service
-	 * @return true if it was unregistered successfully
-	 */
-	static bool UnregisterService(Service *s);
-
-	/** Get a service
-	 * @param name The service name
-	 * @return The services, or NULL
-	 */
-	static Service *GetService(const Anope::string &name);
-
-	/** Get the existing service key names
-	 * @return The keys
-	 */
-	static std::vector<Anope::string> GetServiceKeys();
-
  private:
 	/** Call the module_delete function to safely delete the module
 	 * @param m the module to delete
@@ -1254,7 +1225,7 @@ class service_reference : public dynamic_reference<T>
 	Anope::string name;
 
  public:
-	service_reference(const Anope::string &n) : dynamic_reference<T>(static_cast<T *>(ModuleManager::GetService(n))), name(n)
+	service_reference(const Anope::string &n) : dynamic_reference<T>(NULL), name(n)
 	{
 	}
 
@@ -1267,7 +1238,7 @@ class service_reference : public dynamic_reference<T>
 		}
 		if (!this->ref)
 		{
-			this->ref = static_cast<T *>(ModuleManager::GetService(this->name));
+			this->ref = Service<T>::FindService(this->name);
 			if (this->ref)
 				this->ref->AddReference(this);
 		}

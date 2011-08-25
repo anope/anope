@@ -557,7 +557,6 @@ class CSAKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsakick);
 	}
 };
 

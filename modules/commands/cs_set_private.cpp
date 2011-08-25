@@ -85,8 +85,6 @@ class CSSetPrivate : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetprivate);
-		ModuleManager::RegisterService(&commandcssasetprivate);
 	}
 };
 

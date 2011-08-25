@@ -134,8 +134,6 @@ class DBMySQL : public Module
 		};
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&commandsqlsync);
-
 		if (CurrentUplink)
 			OnServerConnect();
 	}

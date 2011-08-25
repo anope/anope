@@ -63,7 +63,6 @@ class NSUpdate : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsupdate);
 	}
 };
 

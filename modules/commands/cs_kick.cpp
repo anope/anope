@@ -84,7 +84,6 @@ class CSKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcskick);
 	}
 };
 

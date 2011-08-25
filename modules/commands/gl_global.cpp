@@ -57,7 +57,6 @@ class GLGlobal : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandglglobal);
 	}
 };
 

@@ -108,8 +108,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 				this->CSDefFlags.SetFlag(CI_SIGNKICK);
 			else if (option.equals_ci("signkicklevel"))
 				this->CSDefFlags.SetFlag(CI_SIGNKICK_LEVEL);
-			else if (option.equals_ci("opnotice"))
-				this->CSDefFlags.SetFlag(CI_OPNOTICE);
 			else if (option.equals_ci("peace"))
 				this->CSDefFlags.SetFlag(CI_PEACE);
 			else if (option.equals_ci("persist"))

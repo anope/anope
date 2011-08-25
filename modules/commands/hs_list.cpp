@@ -130,7 +130,6 @@ class HSList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhslist);
 	}
 };
 

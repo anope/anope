@@ -427,8 +427,6 @@ class CSFlags : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&accessprovider);
-		ModuleManager::RegisterService(&commandcsflags);
 
 		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, 1);

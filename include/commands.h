@@ -62,7 +62,7 @@ struct CoreExport CommandSource
 
 /** Every services command is a class, inheriting from Command.
  */
-class CoreExport Command : public Service, public Flags<CommandFlag>
+class CoreExport Command : public Service<Command>, public Flags<CommandFlag>
 {
 	Anope::string desc;
 	std::vector<Anope::string> syntax;

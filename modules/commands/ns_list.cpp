@@ -162,7 +162,6 @@ class NSList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnslist);
 	}
 };
 

@@ -82,7 +82,6 @@ class MSCheck : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmscheck);
 	}
 };
 

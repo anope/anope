@@ -141,8 +141,6 @@ class NSSetHide : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssethide);
-		ModuleManager::RegisterService(&commandnssasethide);
 	}
 };
 

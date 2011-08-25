@@ -150,8 +150,6 @@ class BSControl : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbssay);
-		ModuleManager::RegisterService(&commandbsact);
 	}
 };
 

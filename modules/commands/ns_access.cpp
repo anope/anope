@@ -188,7 +188,6 @@ class NSAccess : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsaccess);
 	}
 };
 

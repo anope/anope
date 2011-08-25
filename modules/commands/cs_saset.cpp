@@ -67,7 +67,6 @@ class CSSASet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssaset);
 	}
 };
 

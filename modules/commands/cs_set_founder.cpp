@@ -97,8 +97,6 @@ class CSSetFounder : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetfounder);
-		ModuleManager::RegisterService(&commandcssasetfounder);
 	}
 };
 

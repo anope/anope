@@ -19,10 +19,10 @@ struct ForbidData
 	ForbidType type;
 };
 
-class ForbidService : public Service
+class ForbidService : public Service<ForbidService>
 {
  public:
-	ForbidService(Module *m) : Service(m, "forbid") { }
+	ForbidService(Module *m) : Service<ForbidService>(m, "forbid") { }
 
 	virtual void AddForbid(ForbidData *d) = 0;
 

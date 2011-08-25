@@ -65,7 +65,6 @@ class OSKill : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoskill);
 	}
 };
 

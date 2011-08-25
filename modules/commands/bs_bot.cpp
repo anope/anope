@@ -407,7 +407,6 @@ class BSBot : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbsbot);
 	}
 };
 

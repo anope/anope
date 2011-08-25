@@ -291,12 +291,10 @@ class OSIgnore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosignore);
 
 		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&this->osignoreservice);
 	}
 
 	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)

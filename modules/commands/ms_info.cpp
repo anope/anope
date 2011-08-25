@@ -212,7 +212,6 @@ class MSInfo : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsinfo);
 	}
 };
 

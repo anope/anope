@@ -306,10 +306,6 @@ class HSRequest : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhsrequest);
-		ModuleManager::RegisterService(&commandhsactive);
-		ModuleManager::RegisterService(&commandhsreject);
-		ModuleManager::RegisterService(&commandhswaiting);
 
 		Implementation i[] = { I_OnDelNick, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

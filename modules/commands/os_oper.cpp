@@ -178,7 +178,6 @@ class OSOper : public Module
 		Implementation i[] = { I_OnDatabaseWrite, I_OnDatabaseRead };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&commandosoper);
 	}
 
 	void OnDatabaseWrite(void (*Write)(const Anope::string &))

@@ -376,14 +376,10 @@ class OSNews : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoslogonnews);
-		ModuleManager::RegisterService(&commandosopernews);
-		ModuleManager::RegisterService(&commandosrandomnews);
 
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&this->newsservice);
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)

@@ -73,7 +73,6 @@ class HSGroup : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhsgroup);
 	}
 };
 

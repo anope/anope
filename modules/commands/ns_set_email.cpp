@@ -156,8 +156,6 @@ class NSSetEmail : public Module
 
 		ModuleManager::Attach(I_OnPreCommand, this);
 
-		ModuleManager::RegisterService(&commandnssetemail);
-		ModuleManager::RegisterService(&commandnssasetemail);
 	}
 
 	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)

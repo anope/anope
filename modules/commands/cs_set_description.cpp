@@ -81,8 +81,6 @@ class CSSetDescription : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetdescription);
-		ModuleManager::RegisterService(&commandcssasetdescription);
 	}
 };
 

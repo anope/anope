@@ -106,8 +106,6 @@ class NSSetMessage : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetmessage);
-		ModuleManager::RegisterService(&commandnssasetmessage);
 	}
 };
 

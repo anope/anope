@@ -160,8 +160,6 @@ class BSAssign : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbsassign);
-		ModuleManager::RegisterService(&commandbsunassign);
 	}
 };
 

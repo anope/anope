@@ -111,8 +111,6 @@ class CSSetSuccessor : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetsuccessor);
-		ModuleManager::RegisterService(&commandcssasetsuccessor);
 	}
 };
 

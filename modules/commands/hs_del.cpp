@@ -99,8 +99,6 @@ class HSDel : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhsdel);
-		ModuleManager::RegisterService(&commandhsdelall);
 	}
 };
 

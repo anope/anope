@@ -122,8 +122,6 @@ class CSUpDown : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsup);
-		ModuleManager::RegisterService(&commandcsdown);
 	}
 };
 

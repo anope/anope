@@ -87,7 +87,6 @@ class CSUnban : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsunban);
 	}
 };
 

@@ -99,7 +99,6 @@ class MSRSend : public Module
 		if (!Config->MSMemoReceipt)
 			throw ModuleException("Invalid value for memoreceipt");
 
-		ModuleManager::RegisterService(&commandmsrsend);
 	}
 };
 

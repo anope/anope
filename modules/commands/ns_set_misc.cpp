@@ -78,8 +78,6 @@ class NSSetMisc : public Module
 		Implementation i[] = { I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&this->commandnssetmisc);
-		ModuleManager::RegisterService(&this->commandnssasetmisc);
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)

@@ -19,7 +19,7 @@ enum
 	ACCESS_FOUNDER = 10001
 };
 
-AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, n)
+AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service<AccessProvider>(o, n)
 {
 }
 

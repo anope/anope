@@ -347,17 +347,42 @@ template<typename T, size_t Size = 32> class Flags
 
 class Module;
 
-class CoreExport Service : public Base
+template<typename T> class CoreExport Service : public Base
 {
+	static Anope::map<T *> services;
  public:
+ 	static T* FindService(const Anope::string &n)
+	{
+		typename Anope::map<T *>::iterator it = Service<T>::services.find(n);
+		if (it != Service<T>::services.end())
+			return it->second;
+		return NULL;
+	}
+
+	static std::vector<Anope::string> GetServiceKeys()
+	{
+		std::vector<Anope::string> keys;
+		for (typename Anope::map<T *>::iterator it = Service<T>::services.begin(), it_end = Service<T>::services.end(); it != it_end; ++it)
+			keys.push_back(it->first);
+		return keys;
+	}
+
 	Module *owner;
 	Anope::string name;
 
-	Service(Module *o, const Anope::string &n);
+	Service(Module *o, const Anope::string &n) : owner(o), name(n)
+	{
+		if (Service<T>::services.find(n) != Service<T>::services.end())
+			throw ModuleException("Service with name " + n + " already exists");
+		Service<T>::services[n] = static_cast<T *>(this);
+	}
 
-	virtual ~Service();
+	virtual ~Service()
+	{
+		Service<T>::services.erase(this->name);
+	}
 };
-
+template<typename T> Anope::map<T *> Service<T>::services;
 
 #include "sockets.h"
 #include "socketengine.h"

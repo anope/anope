@@ -171,7 +171,6 @@ class NSInfo : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsinfo);
 	}
 };
 

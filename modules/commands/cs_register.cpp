@@ -182,7 +182,6 @@ class CSRegister : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsregister);
 		ModuleManager::Attach(I_OnDelChan, this);
 	}
 

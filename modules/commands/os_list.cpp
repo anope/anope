@@ -179,8 +179,6 @@ class OSList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoschanlist);
-		ModuleManager::RegisterService(&commandosuserlist);
 	}
 };
 

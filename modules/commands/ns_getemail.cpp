@@ -75,7 +75,6 @@ class NSGetEMail : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsgetemail);
 	}
 };
 

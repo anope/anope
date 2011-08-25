@@ -23,10 +23,10 @@ struct NewsItem
 	time_t time;
 };
 
-class NewsService : public Service
+class NewsService : public Service<NewsService>
 {
  public:
-	NewsService(Module *m) : Service(m, "news") { }
+	NewsService(Module *m) : Service<NewsService>(m, "news") { }
 	
 	virtual void AddNewsItem(NewsItem *n) = 0;
 	

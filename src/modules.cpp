@@ -65,12 +65,3 @@ std::vector<Message *> Anope::FindMessage(const Anope::string &name)
 	return messages;
 }
 
-Service::Service(Module *o, const Anope::string &n) : owner(o), name(n)
-{
-}
-
-Service::~Service()
-{
-	ModuleManager::UnregisterService(this);
-}
-

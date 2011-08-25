@@ -216,8 +216,6 @@ class HSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhsset);
-		ModuleManager::RegisterService(&commandhssetall);
 	}
 };
 

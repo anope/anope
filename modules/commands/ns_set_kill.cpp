@@ -141,8 +141,6 @@ class NSSetKill : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetkill);
-		ModuleManager::RegisterService(&commandnssasetkill);
 	}
 };
 

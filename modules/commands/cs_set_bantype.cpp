@@ -90,8 +90,6 @@ class CSSetBanType : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetbantype);
-		ModuleManager::RegisterService(&commandcssasetbantype);
 	}
 };
 

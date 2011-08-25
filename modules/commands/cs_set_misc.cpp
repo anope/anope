@@ -67,8 +67,6 @@ class CSSetMisc : public Module
 		Implementation i[] = { I_OnChanInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&this->commandcssetmisc);
-		ModuleManager::RegisterService(&this->commandcssasetmisc);
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, bool ShowHidden)

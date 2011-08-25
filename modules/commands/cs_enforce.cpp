@@ -208,7 +208,6 @@ class CSEnforce : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsenforce);
 	}
 };
 

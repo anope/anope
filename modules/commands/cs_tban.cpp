@@ -109,7 +109,6 @@ class CSTBan : public Module
 
 		me = this;
 
-		ModuleManager::RegisterService(&commandcstban);
 	}
 };
 

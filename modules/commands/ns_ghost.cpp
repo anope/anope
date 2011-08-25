@@ -115,7 +115,6 @@ class NSGhost : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsghost);
 	}
 };
 

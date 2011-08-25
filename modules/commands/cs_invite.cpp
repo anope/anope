@@ -95,7 +95,6 @@ class CSInvite : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsinvite);
 	}
 };
 

@@ -77,7 +77,6 @@ class CSTopic : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcstopic);
 	}
 };
 

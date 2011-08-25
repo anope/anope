@@ -100,8 +100,6 @@ class NSSetGreet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetgreet);
-		ModuleManager::RegisterService(&commandnssasetgreet);
 	}
 };
 

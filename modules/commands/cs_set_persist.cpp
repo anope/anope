@@ -172,8 +172,6 @@ class CSSetPersist : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetpeace);
-		ModuleManager::RegisterService(&commandcssasetpeace);
 	}
 };
 

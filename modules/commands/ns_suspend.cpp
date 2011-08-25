@@ -152,8 +152,6 @@ class NSSuspend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssuspend);
-		ModuleManager::RegisterService(&commandnsunsuspend);
 	}
 };
 

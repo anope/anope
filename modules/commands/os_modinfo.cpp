@@ -31,13 +31,14 @@ class CommandOSModInfo : public Command
 		{
 			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
 
-			std::vector<Anope::string> services = ModuleManager::GetServiceKeys();
-			for (unsigned i = 0; i < services.size(); ++i)
+			std::vector<Anope::string> servicekeys = Service<Command>::GetServiceKeys();
+			for (unsigned i = 0; i < servicekeys.size(); ++i)
 			{
-				Service *s = ModuleManager::GetService(services[i]);
-				if (!s || s->owner != m)
+				Command *c = Service<Command>::FindService(servicekeys[i]);
+				if (!c || c->owner != m)
 					continue;
-				source.Reply(_("   Providing service: \002%s\002"), s->name.c_str());
+
+				source.Reply(_("   Providing service: \002%s\002"), c->name.c_str());
 
 				for (botinfo_map::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 				{
@@ -47,9 +48,9 @@ class CommandOSModInfo : public Command
 					{
 						const Anope::string &c_name = cit->first;
 						const CommandInfo &info = cit->second;
-						if (info.name != s->name)
+						if (info.name != c->name)
 							continue;
-						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), s->name.c_str());
+						source.Reply(_("   Command \002%s\002 on \002%s\002 is linked to \002%s\002"), c_name.c_str(), bi->nick.c_str(), c->name.c_str());
 					}
 				}
 			}
@@ -237,8 +238,6 @@ class OSModInfo : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosmodinfo);
-		ModuleManager::RegisterService(&commandosmodlist);
 	}
 };
 

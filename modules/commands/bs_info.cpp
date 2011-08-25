@@ -237,7 +237,6 @@ class BSInfo : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbsinfo);
 	}
 };
 

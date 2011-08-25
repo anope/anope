@@ -30,7 +30,7 @@ class CoreExport XLine
 	sockaddrs GetIP() const;
 };
 
-class CoreExport XLineManager : public Service
+class CoreExport XLineManager : public Service<XLineManager>
 {
 	char type;
  protected:

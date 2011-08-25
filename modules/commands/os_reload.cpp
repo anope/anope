@@ -65,7 +65,6 @@ class OSReload : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosreload);
 	}
 };
 

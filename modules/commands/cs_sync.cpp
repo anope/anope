@@ -59,7 +59,6 @@ class CSSync : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssync);
 	}
 };
 

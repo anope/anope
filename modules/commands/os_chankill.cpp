@@ -113,7 +113,6 @@ class OSChanKill : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoschankill);
 	}
 };
 

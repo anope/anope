@@ -104,7 +104,6 @@ class MSIgnore : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsignore);
 	}
 };
 

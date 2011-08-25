@@ -103,7 +103,6 @@ class NSRelease : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsrelease);
 	}
 };
 

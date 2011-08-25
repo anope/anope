@@ -149,7 +149,6 @@ class SSLModule : public Module
 		SSL_CTX_set_verify(client_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 		SSL_CTX_set_verify(server_ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, SSLModule::AlwaysAccept);
 
-		ModuleManager::RegisterService(&this->service);
 
 		ModuleManager::Attach(I_OnPreServerConnect, this);
 	}

@@ -76,7 +76,6 @@ class OSKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandoskick);
 	}
 };
 

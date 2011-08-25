@@ -78,7 +78,6 @@ class CommandCSInfo : public Command
 			Anope::string optbuf;
 
 			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, u->Account());
-			CheckOptStr(optbuf, CI_OPNOTICE, _("OP Notice"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, u->Account());
 			CheckOptStr(optbuf, CI_RESTRICTED, _("Restricted Access"), ci, u->Account());
@@ -135,7 +134,6 @@ class CSInfo : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsinfo);
 	}
 };
 

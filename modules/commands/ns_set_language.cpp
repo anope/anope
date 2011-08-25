@@ -121,8 +121,6 @@ class NSSetLanguage : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetlanguage);
-		ModuleManager::RegisterService(&commandnssasetlanguage);
 	}
 };
 

@@ -110,7 +110,6 @@ class CSAppendTopic : public Module
 	{
 		this->SetAuthor("SGR");
 
-		ModuleManager::RegisterService(&commandcsappendtopic);
 	}
 };
 

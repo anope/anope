@@ -214,7 +214,6 @@ class NSCert : public Module
 		Implementation i[] = { I_OnFingerprint };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&commandnscert);
 	}
 
 	void OnFingerprint(User *u)

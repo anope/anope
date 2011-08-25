@@ -86,8 +86,6 @@ class CSSetKeepTopic : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetkeeptopic);
-		ModuleManager::RegisterService(&commandcssasetkeeptopic);
 	}
 };
 

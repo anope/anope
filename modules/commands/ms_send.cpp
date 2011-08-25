@@ -63,7 +63,6 @@ class MSSend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmssend);
 	}
 };
 

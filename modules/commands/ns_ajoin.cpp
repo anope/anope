@@ -120,7 +120,6 @@ class NSAJoin : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsajoin);
 
 		Implementation i[] = { I_OnNickIdentify, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

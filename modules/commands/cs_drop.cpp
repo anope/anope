@@ -93,7 +93,6 @@ class CSDrop : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsdrop);
 	}
 };
 

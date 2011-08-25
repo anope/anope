@@ -83,8 +83,6 @@ class CSSetRestricted : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetrestricted);
-		ModuleManager::RegisterService(&commandcssasetrestricted);
 	}
 };
 

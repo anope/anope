@@ -106,8 +106,6 @@ class NSSetPrivate : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetprivate);
-		ModuleManager::RegisterService(&commandnssasetprivate);
 	}
 };
 

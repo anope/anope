@@ -108,10 +108,10 @@ class SQLInterface
 
 /** Class providing the SQL service, modules call this to execute queries
  */
-class SQLProvider : public Service
+class SQLProvider : public Service<SQLProvider>
 {
  public:
-	SQLProvider(Module *c, const Anope::string &n) : Service(c, n) { }
+	SQLProvider(Module *c, const Anope::string &n) : Service<SQLProvider>(c, n) { }
 
 	virtual void Run(SQLInterface *i, const SQLQuery &query) = 0;
 

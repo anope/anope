@@ -85,7 +85,6 @@ class OSSVSNick : public Module
 		if (!ircd || !ircd->svsnick)
 			throw ModuleException("Your IRCd does not support SVSNICK");
 
-		ModuleManager::RegisterService(&commandossvsnick);
 	}
 };
 

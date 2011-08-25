@@ -320,8 +320,11 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!this->xlm())
+		if (!this->xlm() ||! ircd->snline)
+		{
+			source.Reply(_("Your IRCd does not support SNLINE"));
 			return;
+		}
 
 		User *u = source.u;
 		unsigned last_param = 2;
@@ -491,8 +494,11 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!this->xlm())
+		if (!this->xlm() ||! ircd->sqline)
+		{
+			source.Reply(_("Your IRCd does not support SQLINE"));
 			return;
+		}
 
 		User *u = source.u;
 		unsigned last_param = 2;
@@ -643,11 +649,6 @@ class OSSXLine : public Module
 		commandossnline(this), commandossqline(this)
 	{
 		this->SetAuthor("Anope");
-
-		if (ircd && ircd->snline)
-			ModuleManager::RegisterService(&commandossnline);
-		if (ircd && ircd->sqline)
-			ModuleManager::RegisterService(&commandossqline);
 	}
 };
 

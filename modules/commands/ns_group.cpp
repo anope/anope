@@ -296,9 +296,6 @@ class NSGroup : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsgroup);
-		ModuleManager::RegisterService(&commandnsungroup);
-		ModuleManager::RegisterService(&commandnsglist);
 	}
 };
 

@@ -68,7 +68,7 @@ sockaddrs XLine::GetIP() const
 
 /** Constructor
  */
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, xname), type(t)
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service<XLineManager>(creator, xname), type(t)
 {
 }
 

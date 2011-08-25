@@ -739,7 +739,6 @@ class BSKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandbskick);
 
 		ModuleManager::Attach(I_OnPrivmsg, this);
 	}

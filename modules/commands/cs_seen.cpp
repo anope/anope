@@ -294,8 +294,6 @@ class CSSeen : public Module
 						I_OnDatabaseWrite };
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 
-		ModuleManager::RegisterService(&commandseen);
-		ModuleManager::RegisterService(&commandosseen);
 
 		OnReload();
 	}

@@ -57,8 +57,6 @@ class GlobalCore : public Module
 		if (Global == NULL)
 			throw ModuleException("No bot named " + Config->Global);
 
-		ModuleManager::RegisterService(&this->myglobalservice);
-
 		Implementation i[] = { I_OnRestart, I_OnShutdown, I_OnNewServer, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}

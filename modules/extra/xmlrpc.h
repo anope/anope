@@ -55,10 +55,10 @@ class XMLRPCEvent
 	virtual void Run(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request) = 0;
 };
 
-class XMLRPCServiceInterface : public Service
+class XMLRPCServiceInterface : public Service<XMLRPCServiceInterface>
 {
  public:
-	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service(creator, sname) { }
+	XMLRPCServiceInterface(Module *creator, const Anope::string &sname) : Service<XMLRPCServiceInterface>(creator, sname) { }
 
 	virtual void Register(XMLRPCEvent *event) = 0;
 

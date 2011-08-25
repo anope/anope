@@ -728,10 +728,7 @@ class OSSession : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 
-		ModuleManager::RegisterService(&commandossession);
-		ModuleManager::RegisterService(&commandosexception);
 
-		ModuleManager::RegisterService(&this->ss);
 	}
 
 	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)

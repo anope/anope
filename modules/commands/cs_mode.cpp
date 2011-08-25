@@ -365,7 +365,6 @@ class CSMode : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsmode);
 	}
 };
 

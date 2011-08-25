@@ -69,7 +69,6 @@ class NSSASetNoexpire : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssasetnoexpire);
 	}
 };
 

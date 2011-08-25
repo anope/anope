@@ -96,8 +96,6 @@ class CSSetSignKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetsignkick);
-		ModuleManager::RegisterService(&commandcssasetsignkick);
 	}
 };
 

@@ -99,8 +99,6 @@ class NSSetAutoOp : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssetautoop);
-		ModuleManager::RegisterService(&commandnssasetautoop);
 	}
 };
 

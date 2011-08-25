@@ -882,9 +882,6 @@ class CSAccess : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&accessprovider);
-		ModuleManager::RegisterService(&commandcsaccess);
-		ModuleManager::RegisterService(&commandcslevels);
 
 		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

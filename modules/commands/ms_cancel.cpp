@@ -70,7 +70,6 @@ class MSCancel : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmscancel);
 	}
 };
 

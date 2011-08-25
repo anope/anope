@@ -83,7 +83,6 @@ class NSSendPass : public Module
 		if (enc_decrypt(tmp_pass, tmp_pass) == -1)
 			throw ModuleException("Incompatible with the encryption module being used");
 
-		ModuleManager::RegisterService(&commandnssendpass);
 	}
 };
 

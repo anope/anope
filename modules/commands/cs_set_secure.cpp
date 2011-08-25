@@ -86,8 +86,6 @@ class CSSetSecure : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssetsecure);
-		ModuleManager::RegisterService(&commandcssasetsecure);
 	}
 };
 

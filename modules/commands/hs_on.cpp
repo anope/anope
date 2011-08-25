@@ -70,7 +70,6 @@ class HSOn : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandhson);
 	}
 };
 

@@ -164,9 +164,6 @@ class NSSASet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnssaset);
-		ModuleManager::RegisterService(&commandnssasetdisplay);
-		ModuleManager::RegisterService(&commandnssasetpassword);
 	}
 };
 

@@ -161,7 +161,6 @@ class MSList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmslist);
 	}
 };
 

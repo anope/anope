@@ -254,7 +254,6 @@ class OSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosset);
 	}
 };
 

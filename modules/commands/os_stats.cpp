@@ -197,7 +197,6 @@ class OSStats : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosstats);
 	}
 };
 

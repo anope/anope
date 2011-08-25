@@ -328,12 +328,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 			me->Notify();
 		}
 	}
-
-	void SetExitState()
-	{
-		ModuleManager::UnregisterService(this);
-		Thread::SetExitState();
-	}
 };
 
 class ModuleLDAP : public Module, public Pipe
@@ -407,7 +401,6 @@ class ModuleLDAP : public Module, public Pipe
 				{
 					LDAPService *ss = new LDAPService(this, connname, server, port, admin_binddn, admin_password);
 					this->LDAPServices.insert(std::make_pair(connname, ss));
-					ModuleManager::RegisterService(ss);
 
 					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully connected to server " << connname << " (" << server << ")";
 				}

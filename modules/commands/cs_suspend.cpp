@@ -150,8 +150,6 @@ class CSSuspend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcssuspend);
-		ModuleManager::RegisterService(&commandcsunsuspend);
 	}
 };
 

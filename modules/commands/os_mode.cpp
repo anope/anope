@@ -101,8 +101,6 @@ class OSMode : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosmode);
-		ModuleManager::RegisterService(&commandosumode);
 	}
 };
 

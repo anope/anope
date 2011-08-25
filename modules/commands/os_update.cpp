@@ -49,7 +49,6 @@ class OSUpdate : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosupdate);
 	}
 };
 

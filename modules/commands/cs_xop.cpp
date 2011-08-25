@@ -868,12 +868,6 @@ class CSXOP : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&accessprovider);
-		ModuleManager::RegisterService(&commandcssop);
-		ModuleManager::RegisterService(&commandcsaop);
-		ModuleManager::RegisterService(&commandcsqop);
-		ModuleManager::RegisterService(&commandcsvop);
-		ModuleManager::RegisterService(&commandcshop);
 	}
 };
 

@@ -76,7 +76,6 @@ class CSClearUsers : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsclearusers);
 	}
 };
 

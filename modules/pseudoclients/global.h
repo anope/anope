@@ -1,10 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-class GlobalService : public Service
+class GlobalService : public Service<GlobalService>
 {
  public:
-	GlobalService(Module *m) : Service(m, "Global") { }
+	GlobalService(Module *m) : Service<GlobalService>(m, "Global") { }
 
 	/** Send out a global message to all users
 	 * @param sender Our client which should send the global

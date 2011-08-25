@@ -90,7 +90,6 @@ class NSLogout : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnslogout);
 	}
 };
 

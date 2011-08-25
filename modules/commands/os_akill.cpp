@@ -460,7 +460,6 @@ class OSAKill : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosakill);
 	}
 };
 

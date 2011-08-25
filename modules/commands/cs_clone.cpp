@@ -186,7 +186,6 @@ class CSClone : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsclone);
 	}
 };
 

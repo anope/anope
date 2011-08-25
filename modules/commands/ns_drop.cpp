@@ -123,7 +123,6 @@ class NSDrop : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsdrop);
 	}
 };
 

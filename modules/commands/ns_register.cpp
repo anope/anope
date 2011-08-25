@@ -315,9 +315,6 @@ class NSRegister : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsregister);
-		ModuleManager::RegisterService(&commandnsconfirm);
-		ModuleManager::RegisterService(&commandnsrsend);
 	}
 };
 

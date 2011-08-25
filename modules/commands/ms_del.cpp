@@ -156,7 +156,6 @@ class MSDel : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsdel);
 	}
 };
 

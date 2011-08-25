@@ -87,7 +87,6 @@ class OSNOOP : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosnoop);
 	}
 };
 

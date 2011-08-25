@@ -95,7 +95,6 @@ class NSAList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsalist);
 	}
 };
 

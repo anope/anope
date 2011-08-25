@@ -129,7 +129,6 @@ class CSList : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcslist);
 	}
 };
 

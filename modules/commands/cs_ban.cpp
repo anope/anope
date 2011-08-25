@@ -102,7 +102,6 @@ class CSBan : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsban);
 	}
 };
 

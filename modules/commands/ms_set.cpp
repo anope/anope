@@ -305,7 +305,6 @@ class MSSet : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsset);
 	}
 };
 

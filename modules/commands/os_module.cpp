@@ -196,9 +196,6 @@ class OSModule : public Module
 		this->SetAuthor("Anope");
 		this->SetPermanent(true);
 
-		ModuleManager::RegisterService(&commandosmodload);
-		ModuleManager::RegisterService(&commandosmodreload);
-		ModuleManager::RegisterService(&commandosmodunload);
 	}
 };
 

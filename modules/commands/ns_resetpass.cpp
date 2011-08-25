@@ -69,7 +69,6 @@ class NSResetPass : public Module
 		if (!Config->UseMail)
 			throw ModuleException("Not using mail.");
 
-		ModuleManager::RegisterService(&commandnsresetpass);
 
 		ModuleManager::Attach(I_OnPreCommand, this);
 	}

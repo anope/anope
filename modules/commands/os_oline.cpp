@@ -76,7 +76,6 @@ class OSOLine : public Module
 		if (!ircd || !ircd->omode)
 			throw ModuleException("Your IRCd does not support OMODE.");
 
-		ModuleManager::RegisterService(&commandosoline);
 	}
 };
 

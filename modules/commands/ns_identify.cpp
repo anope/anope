@@ -86,7 +86,6 @@ class NSIdentify : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsidentify);
 	}
 };
 

@@ -189,7 +189,6 @@ class MSRead : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandmsread);
 	}
 };
 

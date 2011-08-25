@@ -133,7 +133,6 @@ class NSRecover : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandnsrecover);
 	}
 };
 

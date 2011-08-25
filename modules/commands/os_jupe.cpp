@@ -72,7 +72,6 @@ class OSJupe : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandosjupe);
 	}
 };
 

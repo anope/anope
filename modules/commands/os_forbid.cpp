@@ -217,9 +217,7 @@ class OSForbid : public Module
 		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand, I_OnDatabaseWrite, I_OnDatabaseRead };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		
-		ModuleManager::RegisterService(&this->forbidService);
 
-		ModuleManager::RegisterService(&commandosforbid);
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)

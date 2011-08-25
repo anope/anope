@@ -269,10 +269,6 @@ class OperServCore : public Module
 		Implementation i[] = { I_OnBotPrivmsg, I_OnServerQuit, I_OnUserModeSet, I_OnUserModeUnset, I_OnUserConnect, I_OnUserNickChange, I_OnPreHelp };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		ModuleManager::RegisterService(&sglines);
-		ModuleManager::RegisterService(&sqlines);
-		ModuleManager::RegisterService(&snlines);
-		
 		/* Yes, these are in this order for a reason. Most violent->least violent. */
 		XLineManager::RegisterXLineManager(&sglines);
 		XLineManager::RegisterXLineManager(&sqlines);

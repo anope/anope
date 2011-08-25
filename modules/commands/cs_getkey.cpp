@@ -73,7 +73,6 @@ class CSGetKey : public Module
 	{
 		this->SetAuthor("Anope");
 
-		ModuleManager::RegisterService(&commandcsgetkey);
 	}
 };
 

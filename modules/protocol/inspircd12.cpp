@@ -318,10 +318,7 @@ class InspIRCdExtBan : public ChannelModeList
 	{
 		const Anope::string &mask = e->mask;
 
-		if (mask.find("A:") == 0 || mask.find("B:") == 0 || mask.find("c:") == 0 || mask.find("C:") == 0 ||
-			mask.find("m:") == 0 || mask.find("N:") == 0 || mask.find("p:") == 0 || mask.find("Q:") == 0 ||
-			mask.find("N:") == 0 || mask.find("p:") == 0 || mask.find("Q:") == 0 || mask.find("S:") == 0 ||
-			mask.find("T:") == 0)
+		if (mask.find("m:") == 0 || mask.find("N:") == 0)
 		{
 			Anope::string real_mask = mask.substr(2);
 

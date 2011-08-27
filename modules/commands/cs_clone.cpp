@@ -93,7 +93,7 @@ public:
 					target_ci->c->SetMode(NULL, CMODE_PERM);
 	
 				if (target_ci->bi && target_ci->c->FindUser(target_ci->bi) == NULL)
-					target_ci->bi->Join(target_ci->c);
+					target_ci->bi->Join(target_ci->c, &Config->BotModeList);
 			}
 
 			if (target_ci->c && !target_ci->c->topic.empty())

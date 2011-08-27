@@ -52,7 +52,7 @@ static void WriteBotMetadata(const Anope::string &key, const Anope::string &data
 class CommandSQLSync : public Command
 {
  public:
-	CommandSQLSync(Module *creator) : Command(creator, "SQLSYNC", 0, 0)
+	CommandSQLSync(Module *creator) : Command(creator, "operserv/sqlsync", 0, 0)
 	{
 		this->SetDesc(_("Import your databases to SQL"));
 		this->SetSyntax("");
@@ -1028,9 +1028,9 @@ class DBMySQL : public Module
 
 	void OnLevelChange(User *u, ChannelInfo *ci, int pos, int what)
 	{
-		SQLQuery query("UPDATE `anope_cs_levels` SET `level` = @level WHERE `channel` = @channel AND `position` = @pos ON DUPLICATE KEY UPDATE level=VALUES(level), position=VALUES(position)");
 		if (pos >= 0)
 		{
+			SQLQuery query("UPDATE `anope_cs_levels` SET `level` = @level WHERE `channel` = @channel AND `position` = @pos");
 			query.setValue("level", what);
 			query.setValue("channel", ci->name);
 			query.setValue("pos", pos);
@@ -1038,6 +1038,7 @@ class DBMySQL : public Module
 		}
 		else
 		{
+			SQLQuery query("INSERT INTO `anope_cs_levels` (level, channel, position) VALUES(@level, @channel, @pos) ON DUPLICATE KEY UPDATE level=VALUES(level), channel=VALUES(channel), position=VALUES(position)");
 			query.setValue("channel", ci->name);
 			for (int i = 0; i < CA_SIZE; ++i)
 			{
@@ -1089,9 +1090,6 @@ class DBMySQL : public Module
 		query.setValue("repeattimes", ci->repeattimes);
 		this->RunQuery(query);
 
-		query = "DELETE from `anope_cs_mlock` WHERE `channel` = @name";
-		query.setValue("name", ci->name);
-		this->RunQuery(query);
 		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = ci->GetMLock().begin(), it_end = ci->GetMLock().end(); it != it_end; ++it)
 		{
 			const ModeLock &ml = it->second;
@@ -1099,7 +1097,7 @@ class DBMySQL : public Module
 
 			if (cm != NULL)
 			{
-				query = "INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES(@channel, @mode, @status, @setter, @created, @param)";
+				query = "INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES(@channel, @mode, @status, @setter, @created, @param) ON DUPLICATE KEY UPDATE channel=VALUES(channel), mode=VALUES(mode), status=VALUES(status), setter=VALUES(setter), created=VALUES(created), param=VALUES(param)";
 				query.setValue("channel", ci->name);
 				query.setValue("mode", cm->NameAsString());
 				query.setValue("status", ml.set ? 1 : 0);
@@ -1145,7 +1143,7 @@ class DBMySQL : public Module
 		ChannelMode *cm = ModeManager::FindChannelModeByName(lock->name);
 		if (cm != NULL)
 		{
-			SQLQuery query("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES(@channel, @mode, @status, @setter, @created, @param)");
+			SQLQuery query("INSERT INTO `anope_cs_mlock` (channel, mode, status, setter, created, param) VALUES(@channel, @mode, @status, @setter, @created, @param) ON DUPLICATE KEY UPDATE channel=VALUES(channel), mode=VALUES(mode), status=VALUES(status), setter=VALUES(setter), created=VALUES(created), param=VALUES(param)");
 			query.setValue("channel", ci->name);
 			query.setValue("mode", cm->NameAsString());
 			query.setValue("status", lock->set ? 1 : 0);
@@ -1173,7 +1171,7 @@ class DBMySQL : public Module
 
 	void OnBotCreate(BotInfo *bi)
 	{
-		SQLQuery query("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(@nick, @user, @host, @rname, @flags, @created, @chancuont) ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
+		SQLQuery query("INSERT INTO `anope_bs_core` (nick, user, host, rname, flags, created, chancount) VALUES(@nick, @user, @host, @rname, @flags, @created, @chancount) ON DUPLICATE KEY UPDATE nick=VALUES(nick), user=VALUES(user), host=VALUES(host), rname=VALUES(rname), flags=VALUES(flags), created=VALUES(created), chancount=VALUES(chancount)");
 		query.setValue("nick", bi->nick);
 		query.setValue("user", bi->GetIdent());
 		query.setValue("host", bi->host);
@@ -1537,8 +1535,7 @@ static void SaveDatabases()
 			me->OnAkickAdd(ci, ak);
 		}
 
-		for (int k = 0; k < CA_SIZE; ++k)
-			me->OnLevelChange(NULL, ci, -1, -1);
+		me->OnLevelChange(NULL, ci, -1, -1);
 
 		for (unsigned j = 0, end = ci->memos.memos.size(); j < end; ++j)
 		{

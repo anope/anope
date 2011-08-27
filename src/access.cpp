@@ -121,8 +121,12 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 {
 	if (this->SuperAdmin)
 		return true;
+	else if (other.SuperAdmin)
+		return false;
 	else if (this->Founder && !other.Founder)
 		return true;
+	else if (!this->Founder && other.Founder)
+		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
 		if (this->HasPriv(static_cast<ChannelAccess>(i - 1)) && !other.HasPriv(static_cast<ChannelAccess>(i - 1)))
 			return true;
@@ -132,9 +136,13 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 bool AccessGroup::operator<(const AccessGroup &other) const
 {
 	if (other.SuperAdmin)
+		return true;
+	else if (this->SuperAdmin)
 		return false;
 	else if (other.Founder && !this->Founder)
 		return true;
+	else if (this->Founder && !other.Founder)
+		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
 		if (!this->HasPriv(static_cast<ChannelAccess>(i - 1)) && other.HasPriv(static_cast<ChannelAccess>(i - 1)))
 			return true;
@@ -145,8 +153,12 @@ bool AccessGroup::operator>=(const AccessGroup &other) const
 {
 	if (this->SuperAdmin)
 		return true;
+	else if (other.SuperAdmin)
+		return false;
 	else if (this->Founder)
 		return true;
+	else if (other.Founder)
+		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
 	{
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
@@ -163,8 +175,12 @@ bool AccessGroup::operator<=(const AccessGroup &other) const
 {
 	if (other.SuperAdmin)
 		return true;
+	else if (this->SuperAdmin)
+		return false;
 	else if (other.Founder)
 		return true;
+	else if (this->Founder)
+		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
 	{
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),

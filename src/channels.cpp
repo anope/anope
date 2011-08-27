@@ -329,7 +329,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	if (!ci)
 		return;
 
-	ModeLock *ml = ci->GetMLock(cm->Name, param);
+	ModeLock *ml = ci->GetMLock(cm->Name, cm->Type == MODE_PARAM ? "" : param);
 	if (ml)
 	{
 		if (ml->set && cm->Type == MODE_PARAM)

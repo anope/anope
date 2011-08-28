@@ -27,11 +27,15 @@ class SocketEnginePoll : public SocketEngineBase
 	{
 		SocketCount = 0;
 
+#ifndef _WIN32
 		rlimit fd_limit;
 		if (getrlimit(RLIMIT_NOFILE, &fd_limit) == -1)
 			throw CoreException(Anope::LastError());
 
 		max = fd_limit.rlim_cur;
+#else
+		max = 1024;
+#endif
 
 		events = new pollfd[max];
 	}

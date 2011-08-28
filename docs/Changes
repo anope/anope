@@ -1,3 +1,21 @@
+Anope Version 1.9.4-p1
+---------------------
+F Fixed using /ns logout on other users
+F Fixed number list position when requesting /os akill list and /os sqline list
+F Fixed server matching to be case insensitive
+F Fixed a crash in /ns set
+F Fixed parsing TMODE on ratbox
+F Fixed parsing JOIN on ratbox and plexus
+F Fixed nickserv help output
+F Fixed appending !*@* to some access list entries
+F Fixed setting -P on channels with only a service bot in it
+F Fixed freebsd build of poll engine
+F Fixed the chanserv/access/modify permission to work on non-xop channels
+F Fixed the mail delay error message to show the correct time
+F Fixed sending account data for unconfirmed nicks on InspIRCd
+F Fixed deleting bots sometimes causing crashes/other weird behaviors
+F Fixed /ms ignore syntax errors
+
 Anope Version 1.9.4
 --------------------
 A Automatically set channel founder to the user with the highest access if there is no successor

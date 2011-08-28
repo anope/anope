@@ -96,8 +96,12 @@ else(WIN32)
     target_link_libraries(${PROGRAM_NAME} ${GETTEXT_LIBRARIES})
   endif(GETTEXT_LIBRARIES)
 endif(WIN32)
-# Building the Anope executable requires the language files to be compiled first as well as the version.h header to be generated
-add_dependencies(${PROGRAM_NAME} language headers)
+# Building the Anope executable requires the version.h header to be generated
+add_dependencies(${PROGRAM_NAME} headers)
+# Also require the language files if we have gettext
+if(GETTEXT_FOUND)
+  add_dependencies(${PROGRAM_NAME} language)
+endif(GETTEXT_FOUND)
 
 # Get the filename of the Anope executable as it is in on this system
 get_target_property(SERVICES_BINARY ${PROGRAM_NAME} LOCATION)

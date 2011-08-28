@@ -7,7 +7,7 @@ Anope Mutli Language Support
 
 1) Building Anope with gettext support
 
-    To build Anope with gettext support gettext and its devlopmental libraries must be installed on the system.
+    To build Anope with gettext support, gettext and its development libraries must be installed on the system.
     Anope does not require locales to be installed or enabled on the system, but does require the locales-all
     package on Debian and Debian based systems.
 
@@ -32,8 +32,15 @@ Anope Mutli Language Support
 3) Using langages with modules
 
     Module authors can easially add the ability to have their modules translated by adding _() around the strings they
-    need translated (messages to the user, etc). See a few of the modules in /modules/extras (cs_appendtopic, hs_request)
-    for examples of this. If you want to translate a module someone has made, first generate a .pot file if there is none.
-    Run `xgettext -s -d modulename -o modulename.pot --from-code=utf-8 modulename.cpp`. Then, run msginit on the .pot file
-    with `msginit -l language -o modulename.language.po -i modulename.pot`. Translate the new .po file, then place it in
-    the lang folder and rerun ./Config; make && make install.
+    want translated (messages to the user, etc).
+
+    If you want to translate a module someone has made, first generate a .pot file if there isn't one already using
+    xgettext -s -d modulename -o modulename.pot --from-code=utf-8 modulename.cpp`
+    The .pot file is a template of all of the language strings extracted from the source file.
+
+    Next, run msginit on the .pot file with
+    `msginit -l language -o modulename.language.po -i modulename.pot`.
+    Translate the new .po file and rerun ./Config; make && make install.
+
+    All .po and .pot files should be placed in modules/language/third. Additionally an update script is provided there
+    that will create .pot files and merge any changes to it with existing .po files.

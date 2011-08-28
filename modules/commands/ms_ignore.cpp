@@ -43,7 +43,7 @@ class CommandMSIgnore : public Command
 		ChannelInfo *ci = cs_findchan(channel);
 		if (!mi)
 			source.Reply(ischan ? CHAN_X_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), channel.c_str());
-		else if (ischan && !ci->AccessFor(u).HasPriv(CA_MEMO))
+		else if (ischan && !ci->AccessFor(u).HasPriv("MEMO"))
 			source.Reply(ACCESS_DENIED);
 		else if (command.equals_ci("ADD") && !param.empty())
 		{

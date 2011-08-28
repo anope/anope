@@ -1091,31 +1091,31 @@ void chan_set_correct_modes(User *user, Channel *c, int give_modes)
 
 	if (give_modes && (!user->Account() || user->Account()->HasFlag(NI_AUTOOP)))
 	{
-		if (owner && u_access.HasPriv(CA_AUTOOWNER))
+		if (owner && u_access.HasPriv("AUTOOWNER"))
 			c->SetMode(NULL, CMODE_OWNER, user->nick);
-		else if (admin && u_access.HasPriv(CA_AUTOPROTECT))
+		else if (admin && u_access.HasPriv("AUTOPROTECT"))
 			c->SetMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && u_access.HasPriv(CA_AUTOOP))
+		if (op && u_access.HasPriv("AUTOOP"))
 			c->SetMode(NULL, CMODE_OP, user->nick);
-		else if (halfop && u_access.HasPriv(CA_AUTOHALFOP))
+		else if (halfop && u_access.HasPriv("AUTOHALFOP"))
 			c->SetMode(NULL, CMODE_HALFOP, user->nick);
-		else if (voice && u_access.HasPriv(CA_AUTOVOICE))
+		else if (voice && u_access.HasPriv("AUTOVOICE"))
 			c->SetMode(NULL, CMODE_VOICE, user->nick);
 	}
 	/* If this channel has secureops or the channel is syncing and they are not ulined, check to remove modes */
 	if ((ci->HasFlag(CI_SECUREOPS) || (c->HasFlag(CH_SYNCING) && user->server->IsSynced())) && !user->server->IsULined())
 	{
-		if (owner && !u_access.HasPriv(CA_AUTOOWNER) && !u_access.HasPriv(CA_OWNERME))
+		if (owner && !u_access.HasPriv("AUTOOWNER") && !u_access.HasPriv("OWNERME"))
 			c->RemoveMode(NULL, CMODE_OWNER, user->nick);
 
-		if (admin && !u_access.HasPriv(CA_AUTOPROTECT) && !u_access.HasPriv(CA_PROTECTME))
+		if (admin && !u_access.HasPriv("AUTOPROTECT") && !u_access.HasPriv("PROTECTME"))
 			c->RemoveMode(NULL, CMODE_PROTECT, user->nick);
 
-		if (op && c->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv(CA_AUTOOP) && !u_access.HasPriv(CA_OPDEOPME))
+		if (op && c->HasUserStatus(user, CMODE_OP) && !u_access.HasPriv("AUTOOP") && !u_access.HasPriv("OPDEOPME"))
 			c->RemoveMode(NULL, CMODE_OP, user->nick);
 
-		if (halfop && !u_access.HasPriv(CA_AUTOHALFOP) && !u_access.HasPriv(CA_HALFOPME))
+		if (halfop && !u_access.HasPriv("AUTOHALFOP") && !u_access.HasPriv("HALFOPME"))
 			c->RemoveMode(NULL, CMODE_HALFOP, user->nick);
 	}
 

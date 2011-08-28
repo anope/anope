@@ -42,7 +42,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv(CA_INVITE))
+		if (!ci->AccessFor(u).HasPriv("INVITE"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

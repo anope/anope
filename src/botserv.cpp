@@ -71,7 +71,7 @@ void bot_raw_ban(User *requester, ChannelInfo *ci, User *u, const Anope::string 
 	ci->c->SetMode(NULL, CMODE_BAN, mask);
 
 	/* Check if we need to do a signkick or not -GD */
-	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv(CA_SIGNKICK)))
+	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv("SIGNKICK")))
 		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
 		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());
@@ -100,7 +100,7 @@ void bot_raw_kick(User *requester, ChannelInfo *ci, User *u, const Anope::string
 	if (ci->HasFlag(CI_PEACE) && requester != u && u_access >= req_access)
 		return;
 
-	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv(CA_SIGNKICK)))
+	if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !req_access.HasPriv("SIGNKICK")))
 		ci->c->Kick(ci->bi, u, "%s (%s)", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str(), requester->nick.c_str());
 	else
 		ci->c->Kick(ci->bi, u, "%s", !reason.empty() ? reason.c_str() : ci->bi->nick.c_str());

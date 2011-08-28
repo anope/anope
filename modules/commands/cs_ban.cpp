@@ -46,7 +46,7 @@ class CommandCSBan : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
 		else if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
-		else if (!ci->AccessFor(u).HasPriv(CA_BAN))
+		else if (!ci->AccessFor(u).HasPriv("BAN"))
 			source.Reply(ACCESS_DENIED);
 		else if (!is_same && ci->HasFlag(CI_PEACE) && u2_access >= u_access)
 			source.Reply(ACCESS_DENIED);
@@ -72,7 +72,7 @@ class CommandCSBan : public Command
 			if (!c->FindUser(u2))
 				return;
 
-			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !ci->AccessFor(u).HasPriv(CA_SIGNKICK)))
+			if (ci->HasFlag(CI_SIGNKICK) || (ci->HasFlag(CI_SIGNKICK_LEVEL) && !ci->AccessFor(u).HasPriv("SIGNKICK")))
 				c->Kick(ci->WhoSends(), u2, "%s (%s)", reason.c_str(), u->nick.c_str());
 			else
 				c->Kick(ci->WhoSends(), u2, "%s", reason.c_str());

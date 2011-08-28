@@ -49,9 +49,6 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 	this->memos.memomax = Config->MSMaxMemos;
 	this->last_used = this->time_registered = Anope::CurTime;
 
-	for (int i = 0; i < CA_SIZE; ++i)
-		this->levels[i] = 0;
-
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = 0;
 
@@ -779,5 +776,30 @@ void ChannelInfo::RestoreTopic()
 	{
 		this->c->ChangeTopic(!this->last_topic_setter.empty() ? this->last_topic_setter : this->WhoSends()->nick, this->last_topic, this->last_topic_time ? this->last_topic_time : Anope::CurTime);
 	}
+}
+
+int16 ChannelInfo::GetLevel(const Anope::string &priv)
+{
+	if (PrivilegeManager::FindPrivilege(priv) == NULL)
+		throw CoreException("Unknown privilege " + priv);
+	
+	if (this->levels.count(priv) == 0)
+		this->levels[priv] = 0;
+	return this->levels[priv];
+}
+
+void ChannelInfo::SetLevel(const Anope::string &priv, int16 level)
+{
+	this->levels[priv] = level;
+}
+
+void ChannelInfo::RemoveLevel(const Anope::string &priv)
+{
+	this->levels.erase(priv);
+}
+
+void ChannelInfo::ClearLevels()
+{
+	this->levels.clear();
 }
 

@@ -482,7 +482,7 @@ class DBMySQL : public Module
 				continue;
 			}
 
-			ci->levels[atoi(r.Get(i, "position").c_str())] = atoi(r.Get(i, "level").c_str());
+			ci->SetLevel(r.Get(i, "name"), atoi(r.Get(i, "level").c_str()));
 		}
 
 		query = "SELECT * FROM `anope_cs_info_metadata`";
@@ -792,7 +792,7 @@ class DBMySQL : public Module
 			ChannelInfo *ci = cs_findchan(params[0]);
 			if (!ci)
 				return;
-			if (!ci->AccessFor(u).HasPriv(CA_SET) && !u->HasPriv("botserv/administration"))
+			if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
 				return;
 			if (params[1].equals_ci("BADWORDS") || params[1].equals_ci("BOLDS") || params[1].equals_ci("CAPS") || params[1].equals_ci("COLORS") || params[1].equals_ci("FLOOD") || params[1].equals_ci("REPEAT") || params[1].equals_ci("REVERSES") || params[1].equals_ci("UNDERLINES"))
 			{
@@ -843,7 +843,7 @@ class DBMySQL : public Module
 		else if (command->name == "botserv/set" && params.size() > 1)
 		{
 			ChannelInfo *ci = cs_findchan(params[0]);
-			if (ci && !ci->AccessFor(u).HasPriv(CA_SET) && !u->HasPriv("botserv/administration"))
+			if (ci && !ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
 				return;
 			BotInfo *bi = NULL;
 			if (!ci)
@@ -880,7 +880,7 @@ class DBMySQL : public Module
 			else
 			{
 				ci = cs_findchan(target);
-				if (!ci || !ci->AccessFor(u).HasPriv(CA_MEMO))
+				if (!ci || !ci->AccessFor(u).HasPriv("MEMO"))
 					return;
 			}
 
@@ -1029,26 +1029,26 @@ class DBMySQL : public Module
 		this->RunQuery(query);
 	}
 
-	void OnLevelChange(User *u, ChannelInfo *ci, int pos, int what)
+	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16 what)
 	{
-		if (pos >= 0)
+		SQLQuery query("UPDATE `anope_cs_levels` SET `level` = @level WHERE `channel` = @channel AND `name` = @name ON DUPLICATE KEY UPDATE level=VALUES(level), name=VALUES(name)");
+		query.setValue("channel", ci->name);
+		if (priv == "ALL")
 		{
-			SQLQuery query("UPDATE `anope_cs_levels` SET `level` = @level WHERE `channel` = @channel AND `position` = @pos");
-			query.setValue("level", what);
-			query.setValue("channel", ci->name);
-			query.setValue("pos", pos);
-			this->RunQuery(query);
+			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+			for (unsigned i = 0; i < privs.size(); ++i)
+			{
+				const Privilege &p = privs[i];
+				query.setValue("level", ci->GetLevel(p.name));
+				query.setValue("name", p.name);
+				this->RunQuery(query);
+			}
 		}
 		else
 		{
-			SQLQuery query("INSERT INTO `anope_cs_levels` (level, channel, position) VALUES(@level, @channel, @pos) ON DUPLICATE KEY UPDATE level=VALUES(level), channel=VALUES(channel), position=VALUES(position)");
-			query.setValue("channel", ci->name);
-			for (int i = 0; i < CA_SIZE; ++i)
-			{
-				query.setValue("level", ci->levels[i]);
-				query.setValue("pos", i);
-				this->RunQuery(query);
-			}
+			query.setValue("level", what);
+			query.setValue("name", name);
+			this->RunQuery(query);
 		}
 	}
 
@@ -1538,7 +1538,11 @@ static void SaveDatabases()
 			me->OnAkickAdd(ci, ak);
 		}
 
+<<<<<<< HEAD
 		me->OnLevelChange(NULL, ci, -1, -1);
+=======
+		me->OnLevelChange(NULL, ci, "ALL", -1);
+>>>>>>> 348a3db... Allow modules to add their own channel levels
 
 		for (unsigned j = 0, end = ci->memos.memos.size(); j < end; ++j)
 		{

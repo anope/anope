@@ -19,57 +19,13 @@ enum
 	ACCESS_FOUNDER = 10001
 };
 
-static struct AccessLevels
-{
-	ChannelAccess priv;
-	int default_level;
-	Anope::string config_name;
-	Anope::string name;
-	Anope::string desc;
-} defaultLevels[] = {
-	{ CA_ACCESS_CHANGE, 10, "level_change", "ACC-CHANGE", _("Allowed to modify the access list") },
-	{ CA_ACCESS_LIST, 1, "level_list", "ACC-LIST", _("Allowed to view the access list") },
-	{ CA_AKICK, 10, "level_akick", "AKICK", _("Allowed to use AKICK command") },
-	{ CA_ASSIGN, ACCESS_FOUNDER, "level_assign", "ASSIGN", _("Allowed to assign/unassign a bot") },
-	{ CA_AUTOHALFOP, 4, "level_autohalfop", "AUTOHALFOP", _("Automatic mode +h") },
-	{ CA_AUTOOP, 5, "level_autoop", "AUTOOP", _("Automatic channel operator status") },
-	{ CA_AUTOOWNER,	10000, "level_autoowner", "AUTOOWNER", _("Automatic mode +q") },
-	{ CA_AUTOPROTECT, 10, "level_autoprotect", "AUTOPROTECT", _("Automatic mode +a") },
-	{ CA_AUTOVOICE, 3, "level_autovoice", "AUTOVOICE", _("Automatic mode +v") },
-	{ CA_BADWORDS, 10, "level_badwords", "BADWORDS", _("Allowed to modify channel badwords list") },
-	{ CA_BAN, 4, "level_ban", "BAN", _("Allowed to use ban users") },
-	{ CA_FANTASIA, 3, "level_fantasia", "FANTASIA", _("Allowed to use fantaisist commands") },
-	{ CA_FOUNDER, ACCESS_FOUNDER, "level_founder", "FOUNDER", _("Allowed to issue commands restricted to channel founders") },
-	{ CA_GETKEY, 5, "level_getkey", "GETKEY", _("Allowed to use GETKEY command") },
-	{ CA_GREET, 5, "level_greet", "GREET", _("Greet message displayed") },
-	{ CA_HALFOP, 5, "level_halfop", "HALFOP", _("Allowed to (de)halfop users") },
-	{ CA_HALFOPME, 4, "level_halfopme", "HALFOPME", _("Allowed to (de)halfop him/herself") },
-	{ CA_INFO, 10000, "level_info", "INFO", _("Allowed to use INFO command with ALL option") },
-	{ CA_INVITE, 5, "level_invite", "INVITE", _("Allowed to use the INVITE command") },
-	{ CA_KICK, 4, "level_kick", "KICK", _("Allowed to use the KICK command") },
-	{ CA_MEMO, 10, "level_memo", "MEMO", _("Allowed to read channel memos") },
-	{ CA_MODE, 5, "level_mode", "MODE", _("Allowed to change channel modes") },
-	{ CA_NOKICK, 1, "level_nokick", "NOKICK", _("Never kicked by the bot's kickers") },
-	{ CA_OPDEOP, 5, "level_opdeop", "OPDEOP", _("Allowed to (de)op users") },
-	{ CA_OPDEOPME, 5, "level_opdeopme", "OPDEOPME", _("Allowed to (de)op him/herself") },
-	{ CA_OWNER, ACCESS_FOUNDER, "level_owner", "OWNER", _("Allowed to use (de)owner users") },
-	{ CA_OWNERME, 10000, "level_ownerme", "OWNERME", _("Allowed to (de)owner him/herself") },
-	{ CA_PROTECT, 10000, "level_protect", "PROTECT", _("Allowed to (de)protect users") },
-	{ CA_PROTECTME, 10, "level_protectme", "PROTECTME", _("Allowed to (de)protect him/herself"), },
-	{ CA_SAY, 5, "level_say", "SAY", _("Allowed to use SAY and ACT commands") },
-	{ CA_SIGNKICK, ACCESS_FOUNDER, "level_signkick", "SIGNKICK", _("No signed kick when SIGNKICK LEVEL is used") },
-	{ CA_SET, 10000, "level_set", "SET", _("Allowed to set channel settings") },
-	{ CA_TOPIC, 5, "level_topic", "TOPIC", _("Allowed to change channel topics") },
-	{ CA_UNBAN, 4, "level_unban", "UNBAN", _("Allowed to unban users") },
-	{ CA_VOICE, 4, "level_voice", "VOICE", _("Allowed to (de)voice users") },
-	{ CA_VOICEME, 3, "level_voiceme", "VOICEME", _("Allowed to (de)voice him/herself") },
-	{ CA_SIZE, -1, "", "", "" }
-};
+static std::map<Anope::string, int16> defaultLevels;
 
 static void reset_levels(ChannelInfo *ci)
 {
-	for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
-		ci->levels[defaultLevels[i].priv] = defaultLevels[i].default_level;
+	ci->ClearLevels();
+	for (std::map<Anope::string, int16>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
+		ci->SetLevel(it->first, it->second);
 }
 
 class AccessChanAccess : public ChanAccess
@@ -90,12 +46,9 @@ class AccessChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(const Anope::string &name)
 	{
-		for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
-			if (defaultLevels[i].priv == priv)
-				return this->ci->levels[priv] != ACCESS_INVALID && DetermineLevel(this) >= this->ci->levels[priv];
-		return false;
+		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}
 
 	Anope::string Serialize()
@@ -118,11 +71,18 @@ class AccessChanAccess : public ChanAccess
 		else
 		{
 			int highest = 1;
-			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
-				if (access->ci->levels[defaultLevels[i].priv] > highest && access->HasPriv(defaultLevels[i].priv))
-					highest = access->ci->levels[defaultLevels[i].priv];
+			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+
+			for (unsigned i = 0; i < privs.size(); ++i)
+			{
+				const Privilege &p = privs[i];
+				if (access->ci->GetLevel(p.name) > highest && access->HasPriv(p.name))
+					highest = access->ci->GetLevel(p.name);
+			}
+
 			if (highest >= ACCESS_FOUNDER)
 				highest = ACCESS_FOUNDER - 1;
+
 			return highest;
 		}
 	}
@@ -232,7 +192,7 @@ class AccessDelCallback : public NumberList
  public:
 	AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false)
 	{
-		if (!ci->AccessFor(source.u).HasPriv(CA_ACCESS_CHANGE) && source.u->HasPriv("chanserv/access/modify"))
+		if (!ci->AccessFor(source.u).HasPriv("ACCESS_CHANGE") && source.u->HasPriv("chanserv/access/modify"))
 			this->override = true;
 	}
 
@@ -318,7 +278,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE) || (level >= u_level && !u_access.Founder);
+		bool override = !ci->AccessFor(u).HasPriv("ACCESS_CHANGE") || (level >= u_level && !u_access.Founder);
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
 			mask += "!*@*";
@@ -395,7 +355,7 @@ class CommandCSAccess : public Command
 					else
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
-						bool override = !u_access.Founder && !u_access.HasPriv(CA_ACCESS_CHANGE) && !access->mask.equals_ci(u->Account()->display);
+						bool override = !u_access.Founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(u->Account()->display);
 						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
@@ -544,9 +504,9 @@ class CommandCSAccess : public Command
 		bool has_access = false;
 		if (u->HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->AccessFor(u).HasPriv(CA_ACCESS_LIST))
+		else if (is_list && ci->AccessFor(u).HasPriv("ACCESS_LIST"))
 			has_access = true;
-		else if (ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
+		else if (ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
 			has_access = true;
 		else if (is_del)
 		{
@@ -676,30 +636,23 @@ class CommandCSLevels : public Command
 			source.Reply(_("Level must be between %d and %d inclusive."), ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
 		else
 		{
-			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+			Privilege *p = PrivilegeManager::FindPrivilege(what);
+			if (p == NULL)
+				source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+			else
 			{
-				AccessLevels &l = defaultLevels[i];
+				ci->SetLevel(p->name, level);
+				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, level));
 
-				if (what.equals_ci(l.name))
-				{
-					ci->levels[l.priv] = level;
-					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, level));
+				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << p->name << " to " << level;
 
-					bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << l.name << " to " << level;
-
-					if (level == ACCESS_FOUNDER)
-						source.Reply(_("Level for %s on channel %s changed to founder only."), l.name.c_str(), ci->name.c_str());
-					else
-						source.Reply(_("Level for \002%s\002 on channel %s changed to \002%d\002."), l.name.c_str(), ci->name.c_str(), level);
-					return;
-				}
+				if (level == ACCESS_FOUNDER)
+					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
+				else
+					source.Reply(_("Level for \002%s\002 on channel %s changed to \002%d\002."), p->name.c_str(), ci->name.c_str(), level);
 			}
-
-			source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 		}
-
-		return;
 	}
 
 	void DoDisable(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -710,22 +663,20 @@ class CommandCSLevels : public Command
 
 		/* Don't allow disabling of the founder level. It would be hard to change it back if you dont have access to use this command */
 		if (!what.equals_ci("FOUNDER"))
-			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+		{
+			Privilege *p = PrivilegeManager::FindPrivilege(what);
+			if (p != NULL)
 			{
-				AccessLevels &l = defaultLevels[i];
+				ci->SetLevel(p->name, ACCESS_INVALID);
+				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, ACCESS_INVALID));
 
-				if (what.equals_ci(l.name))
-				{
-					ci->levels[l.priv] = ACCESS_INVALID;
-					FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, i, l.priv));
+				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << p->name;
 
-					bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << l.name;
-
-					source.Reply(_("\002%s\002 disabled on channel %s."), l.name.c_str(), ci->name.c_str());
-					return;
-				}
+				source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
+				return;
 			}
+		}
 
 		source.Reply(_("Setting \002%s\002 not known.  Type \002%s%s HELP LEVELS \002 for a list of valid settings."), what.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
 
@@ -736,30 +687,29 @@ class CommandCSLevels : public Command
 	{
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
+		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 		if (!levelinfo_maxwidth)
-			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+			for (unsigned i = 0; i < privs.size(); ++i)
 			{
-				AccessLevels &l = defaultLevels[i];
+				const Privilege &p = privs[i];
 
-				int len = l.name.length();
+				int len = p.name.length();
 				if (len > levelinfo_maxwidth)
 					levelinfo_maxwidth = len;
 			}
 
-		for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+		for (unsigned i = 0; i < privs.size(); ++i)
 		{
-			AccessLevels &l = defaultLevels[i];
-			int j = ci->levels[l.priv];
+			const Privilege &p = privs[i];
+			int16 j = ci->GetLevel(p.name);
 
 			if (j == ACCESS_INVALID)
-				source.Reply(_("    %-*s  (disabled)"), levelinfo_maxwidth, l.name.c_str());
+				source.Reply(_("    %-*s  (disabled)"), levelinfo_maxwidth, p.name.c_str());
 			else if (j == ACCESS_FOUNDER)
-				source.Reply(_("    %-*s  (founder only)"), levelinfo_maxwidth, l.name.c_str());
+				source.Reply(_("    %-*s  (founder only)"), levelinfo_maxwidth, p.name.c_str());
 			else
-				source.Reply(_("    %-*s  %d"), levelinfo_maxwidth, l.name.c_str(), j);
+				source.Reply(_("    %-*s  %d"), levelinfo_maxwidth, p.name.c_str(), j);
 		}
-
-		return;
 	}
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
@@ -767,9 +717,9 @@ class CommandCSLevels : public Command
 		User *u = source.u;
 
 		reset_levels(ci);
-		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, -1, 0));
+		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, "ALL", 0));
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
+		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
@@ -806,7 +756,7 @@ class CommandCSLevels : public Command
 		 */
 		if (cmd.equals_ci("SET") ? s.empty() : (cmd.substr(0, 3).equals_ci("DIS") ? (what.empty() || !s.empty()) : !what.empty()))
 			this->OnSyntaxError(source, cmd);
-		else if (!ci->AccessFor(u).HasPriv(CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
+		else if (!ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasPriv("chanserv/access/modify"))
 			source.Reply(ACCESS_DENIED);
 		else if (cmd.equals_ci("SET"))
 			this->DoSet(source, ci, params);
@@ -827,19 +777,20 @@ class CommandCSLevels : public Command
 		if (subcommand.equals_ci("DESC"))
 		{
 			source.Reply(_("The following feature/function names are understood."));
+			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 			if (!levelinfo_maxwidth)
-				for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+				for (unsigned i = 0; i < privs.size(); ++i)
 				{
-					AccessLevels &l = defaultLevels[i];
+					const Privilege &p = privs[i];
 
-					int len = l.name.length();
+					int len = p.name.length();
 					if (len > levelinfo_maxwidth)
 						levelinfo_maxwidth = len;
 				}
-			for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+			for (unsigned i = 0; i < privs.size(); ++i)
 			{
-				AccessLevels &l = defaultLevels[i];
-				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, l.name.c_str(), translate(source.u, l.desc.c_str()));
+				const Privilege &p = privs[i];
+				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, p.name.c_str(), translate(source.u, p.desc.c_str()));
 			}
 		}
 		else
@@ -883,33 +834,41 @@ class CSAccess : public Module
 		this->SetAuthor("Anope");
 
 
-		Implementation i[] = { I_OnReload, I_OnChanRegistered, I_OnCreateChan, I_OnGroupCheckPriv };
+		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		this->OnReload();
+		try
+		{
+			this->OnReload();
+		}
+		catch (const ConfigException &ex)
+		{
+			throw ModuleException(ex.GetReason());
+		}
 	}
 
 	void OnReload()
 	{
+		std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+		std::map<Anope::string, int16> tLevels;
 		ConfigReader config;
 
-		for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
+		for (unsigned i = 0; i < privs.size(); ++i)
 		{
-			AccessLevels &l = defaultLevels[i];
+			Privilege &p = privs[i];
 
-			const Anope::string &value = config.ReadValue("chanserv", l.config_name, "", 0);
-			if (value.equals_ci("founder"))
-				l.default_level = ACCESS_FOUNDER;
+			const Anope::string &value = config.ReadValue("chanserv", "level_" + p.name.lower(), "", 0);
+			if (value.empty())
+				throw ConfigException("The value for <chanserv:level_" + p.name.lower() + "> must not be empty!");
+			else if (value.equals_ci("founder"))
+				tLevels[p.name] = ACCESS_FOUNDER;
 			else if (value.equals_ci("disabled"))
-				l.default_level = ACCESS_INVALID;
+				tLevels[p.name] = ACCESS_INVALID;
 			else
-				l.default_level = config.ReadInteger("chanserv", l.config_name, 0, false);
+				tLevels[p.name] = config.ReadInteger("chanserv", "level_" + p.name.lower(), 0, false);
 		}
-	}
 
-	void OnChanRegistered(ChannelInfo *ci)
-	{
-		reset_levels(ci);
+		defaultLevels = tLevels;
 	}
 
 	void OnCreateChan(ChannelInfo *ci)
@@ -917,12 +876,12 @@ class CSAccess : public Module
 		reset_levels(ci);
 	}
 
-	EventReturn OnGroupCheckPriv(const AccessGroup *group, ChannelAccess priv)
+	EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv)
 	{
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;
 		/* Special case. Allows a level of < 0 to match anyone, and a level of 0 to match anyone identified. */
-		int16 level = group->ci->levels[priv];
+		int16 level = group->ci->GetLevel(priv);
 		if (level < 0)
 			return EVENT_ALLOW;
 		else if (level == 0 && group->nc)

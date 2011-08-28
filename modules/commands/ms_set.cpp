@@ -91,7 +91,7 @@ class CommandMSSet : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
 				return;
 			}
-			else if (!is_servadmin && !ci->AccessFor(u).HasPriv(CA_MEMO))
+			else if (!is_servadmin && !ci->AccessFor(u).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

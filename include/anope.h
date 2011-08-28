@@ -259,6 +259,28 @@ namespace Anope
 		}
 
 		/**
+		 * Get the string in lowercase.
+		 */
+		inline string lower()
+		{
+			Anope::string new_string = *this;
+			for (size_type i = 0; i < new_string.length(); ++i)
+				new_string[i] = tolower(new_string[i]);
+			return new_string;
+		}
+
+		/**
+		 * Get the string in uppercase.
+		 */
+		inline string upper()
+		{
+			Anope::string new_string = *this;
+			for (size_type i = 0; i < new_string.length(); ++i)
+				new_string[i] = toupper(new_string[i]);
+			return new_string;
+		}
+
+		/**
 		 * Get a substring of the string.
 		 */
 		inline string substr(size_type pos = 0, size_type n = npos) const { return string(this->_string.substr(pos, n)); }

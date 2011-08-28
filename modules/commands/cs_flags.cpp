@@ -13,51 +13,7 @@
 
 #include "module.h"
 
-static struct FlagLevels
-{
-	ChannelAccess priv;
-	char default_char;
-	Anope::string config_name;
-	Anope::string desc;
-} flagLevels[] = {
-	{ CA_ACCESS_CHANGE, 'f', "flag_change", _("Allowed to modify the access list") },
-	{ CA_ACCESS_LIST, 'l', "flag_list", _("Allowed to view the access list") },
-	{ CA_AKICK, 'K', "flag_akick", _("Allowed to use AKICK command") },
-	{ CA_ASSIGN, 's', "flag_assign", _("Allowed to assign/unassign a bot") },
-	{ CA_AUTOHALFOP, 'H', "flag_autohalfop", _("Automatic mode +h") },
-	{ CA_AUTOOP, 'O', "flag_autoop", _("Automatic channel operator status") },
-	{ CA_AUTOOWNER,	'Q', "flag_autoowner", _("Automatic mode +q") },
-	{ CA_AUTOPROTECT, 'A', "flag_autoprotect", _("Automatic mode +a") },
-	{ CA_AUTOVOICE, 'V', "flag_autovoice", _("Automatic mode +v") },
-	{ CA_BADWORDS, 'k', "flag_badwords", _("Allowed to modify channel badwords list") },
-	{ CA_BAN, 'b', "flag_ban", _("Allowed to use ban users") },
-	{ CA_FANTASIA, 'c', "flag_fantasia", _("Allowed to use fantasy commands") },
-	{ CA_FOUNDER, 'F', "flag_founder", _("Allowed to issue commands restricted to channel founders") },
-	{ CA_GETKEY, 'G', "flag_getkey", _("Allowed to use GETKEY command") },
-	{ CA_GREET, 'g', "flag_greet", _("Greet message displayed") },
-	{ CA_HALFOP, 'h', "flag_halfop", _("Allowed to (de)halfop users") },
-	{ CA_HALFOPME, 'h', "flag_halfopme", _("Allowed to (de)halfop him/herself") },
-	{ CA_INFO, 'I', "flag_info", _("Allowed to use INFO command with ALL option") },
-	{ CA_INVITE, 'i', "flag_invite", _("Allowed to use the INVITE command") },
-	{ CA_KICK, 'k', "flag_kick", _("Allowed to use the KICK command") },
-	{ CA_MEMO, 'm', "flag_memo", _("Allowed to read channel memos") },
-	{ CA_MODE, 's', "flag_mode", _("Allowed to change channel modes") },
-	{ CA_NOKICK, 'N', "flag_nokick", _("Prevents users being kicked by Services") },
-	{ CA_OPDEOP, 'o', "flag_opdeop", _("Allowed to (de)op users") },
-	{ CA_OPDEOPME, 'o', "flag_opdeopme", _("Allowed to (de)op him/herself") },
-	{ CA_OWNER, 'q', "flag_owner", _("Allowed to use (de)owner users") },
-	{ CA_OWNERME, 'q', "flag_ownerme", _("Allowed to (de)owner him/herself") },
-	{ CA_PROTECT, 'a', "flag_protect", _("Allowed to (de)protect users") },
-	{ CA_PROTECTME, 'a', "flag_protectme", _("Allowed to (de)protect him/herself"), },
-	{ CA_SAY, 'B', "flag_say", _("Allowed to use SAY and ACT commands") },
-	{ CA_SET, 's', "flag_set", _("Allowed to set channel settings") },
-	{ CA_SIGNKICK, 'K', "flag_signkick", _("Prevents kicks from being signed") },
-	{ CA_TOPIC, 't', "flag_topic", _("Allowed to change channel topics") },
-	{ CA_UNBAN, 'u', "flag_unban", _("Allowed to unban users") },
-	{ CA_VOICE, 'v', "flag_voice", _("Allowed to (de)voice users") },
-	{ CA_VOICEME, 'v', "flag_voiceme", _("Allowed to (de)voice him/herself") },
-	{ CA_SIZE, -1, "", "" }
-};
+static std::map<Anope::string, char> defaultFlags;
 
 class FlagsChanAccess : public ChanAccess
 {
@@ -77,12 +33,11 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(const Anope::string &priv)
 	{
-		for (int i = 0; flagLevels[i].priv != CA_SIZE; ++i)
-			if (flagLevels[i].priv == priv)
-				return this->flags.count(flagLevels[i].default_char);
-
+		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
+		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
+			return true;
 		return false;
 	}
 
@@ -104,13 +59,9 @@ class FlagsChanAccess : public ChanAccess
 		
 		std::set<char> buffer;
 
-		for (int i = 0; flagLevels[i].priv != CA_SIZE; ++i)
-		{
-			FlagLevels &l = flagLevels[i];
-
-			if (access->HasPriv(l.priv))
-				buffer.insert(l.default_char);
-		}
+		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+			if (access->HasPriv(it->first))
+				buffer.insert(it->second);
 
 		return Anope::string(buffer.begin(), buffer.end());
 	}
@@ -186,10 +137,9 @@ class CommandCSFlags : public Command
 				case '*':
 					if (add == -1)
 						break;
-					for (int j = 0; flagLevels[j].priv != CA_SIZE; ++j)
+					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
-						FlagLevels &l = flagLevels[j];
-						if (!u_access.HasPriv(l.priv))
+						if (!u_access.HasPriv(it->first))
 						{
 							if (u->HasPriv("chanserv/access/modify"))
 								override = true;
@@ -197,20 +147,19 @@ class CommandCSFlags : public Command
 								continue;
 						}
 						if (add == 1)
-							current_flags.insert(l.default_char);
+							current_flags.insert(it->second);
 						else if (add == 0)
-							current_flags.erase(l.default_char);
+							current_flags.erase(it->second);
 					}
 					break;
 				default:
 					if (add == -1)
 						break;
-					for (int j = 0; flagLevels[j].priv != CA_SIZE; ++j)
+					for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
 					{
-						FlagLevels &l = flagLevels[j];
-						if (f != l.default_char)
+						if (f != it->second)
 							continue;
-						else if (!u_access.HasPriv(l.priv))
+						else if (!u_access.HasPriv(it->first))
 						{
 							if (u->HasPriv("chanserv/access/modify"))
 								override = true;
@@ -361,9 +310,9 @@ class CommandCSFlags : public Command
 		bool has_access = false;
 		if (u->HasPriv("chanserv/access/modify"))
 			has_access = true;
-		else if (is_list && ci->AccessFor(u).HasPriv(CA_ACCESS_LIST))
+		else if (is_list && ci->AccessFor(u).HasPriv("ACCESS_LIST"))
 			has_access = true;
-		else if (ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
+		else if (ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
 			has_access = true;
 
 		if (!has_access)
@@ -403,13 +352,17 @@ class CommandCSFlags : public Command
 		source.Reply(" ");
 		source.Reply(_("The available flags are:"));
 
-		std::multimap<char, FlagLevels *, std::less<ci::string> > levels;
-		for (int i = 0; flagLevels[i].priv != CA_SIZE; ++i)
-			levels.insert(std::make_pair(flagLevels[i].default_char, &flagLevels[i]));
-		for (std::multimap<char, FlagLevels *, std::less<ci::string> >::iterator it = levels.begin(), it_end = levels.end(); it != it_end; ++it)
+		typedef std::multimap<char, Anope::string, std::less<ci::string> > reverse_map;
+		reverse_map reverse;
+		for (std::map<Anope::string, char>::iterator it = defaultFlags.begin(), it_end = defaultFlags.end(); it != it_end; ++it)
+			reverse.insert(std::make_pair(it->second, it->first));
+
+		for (reverse_map::iterator it = reverse.begin(), it_end = reverse.end(); it != it_end; ++it)
 		{
-			FlagLevels *l = it->second;
-			source.Reply("  %c - %s", l->default_char, translate(source.u->Account(), l->desc.c_str()));
+			Privilege *p = PrivilegeManager::FindPrivilege(it->second);
+			if (p == NULL)
+				continue;
+			source.Reply("  %c - %s", it->first, translate(source.u->Account(), p->desc.c_str()));
 		}
 
 		return true;
@@ -437,15 +390,15 @@ class CSFlags : public Module
 	void OnReload()
 	{
 		ConfigReader config;
+		std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
-		for (int i = 0; flagLevels[i].priv != CA_SIZE; ++i)
+		for (unsigned i = 0; i < privs.size(); ++i)
 		{
-			FlagLevels &l = flagLevels[i];
-
-			const Anope::string &value = config.ReadValue("chanserv", l.config_name, "", 0);
+			Privilege &p = privs[i];
+			const Anope::string &value = config.ReadValue("chanserv", "flag_" + p.name, "", 0);
 			if (value.empty())
 				continue;
-			l.default_char = value[0];
+			defaultFlags[p.name] = value[0];
 		}
 	}
 };

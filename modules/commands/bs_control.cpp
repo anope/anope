@@ -35,7 +35,7 @@ class CommandBSSay : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv(CA_SAY))
+		if (!ci->AccessFor(u).HasPriv("SAY"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -98,7 +98,7 @@ class CommandBSAct : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv(CA_SAY))
+		if (!ci->AccessFor(u).HasPriv("SAY"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

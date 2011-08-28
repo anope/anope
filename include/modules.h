@@ -662,10 +662,10 @@ class CoreExport Module : public Extensible
 	/** Called when a level for a channel is changed
 	 * @param u The user changing the level
 	 * @param ci The channel the level was changed on
-	 * @param pos The level position, can be -1 for resetting levels
+	 * @param priv The privilege changed
 	 * @param what The new level
 	 */
-	virtual void OnLevelChange(User *u, ChannelInfo *ci, int pos, int what) { }
+	virtual void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16 what) { }
 
 	/** Called when a channel is dropped
 	 * @param chname The channel name
@@ -751,14 +751,14 @@ class CoreExport Module : public Extensible
 	 * @param priv The privilege being checked for
 	 * @return EVENT_ALLOW for yes, EVENT_STOP to stop all processing
 	 */
-	virtual EventReturn OnCheckPriv(ChanAccess *access, ChannelAccess priv) { return EVENT_CONTINUE; }
+	virtual EventReturn OnCheckPriv(ChanAccess *access, const Anope::string &priv) { return EVENT_CONTINUE; }
 
 	/** Check whether an access group has a privilege
 	 * @param group The group
 	 * @param priv The privilege
 	 * @return MOD_ALLOW to allow, MOD_STOP to stop
 	 */
-	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, ChannelAccess priv) { return EVENT_CONTINUE; }
+	virtual EventReturn OnGroupCheckPriv(const AccessGroup *group, const Anope::string &priv) { return EVENT_CONTINUE; }
 
 	/** Called when a nick is dropped
 	 * @param u The user dropping the nick

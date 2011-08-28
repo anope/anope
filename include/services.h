@@ -98,6 +98,8 @@ extern int strncasecmp(const char *, const char *, size_t);
 #undef toupper
 #define tolower tolower_
 #define toupper toupper_
+extern int toupper(char);
+extern int tolower(char);
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.

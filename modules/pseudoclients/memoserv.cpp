@@ -102,7 +102,7 @@ class MyMemoServService : public MemoServService
 				{
 					UserContainer *cu = *it;
 
-					if (ci->AccessFor(cu->user).HasPriv(CA_MEMO))
+					if (ci->AccessFor(cu->user).HasPriv("MEMO"))
 					{
 						if (cu->user->Account() && cu->user->Account()->HasFlag(NI_MEMO_RECEIVE))
 							cu->user->SendMessage(MemoServ, MEMO_NEW_X_MEMO_ARRIVED, ci->name.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->MemoServ.c_str(), ci->name.c_str(), mi->memos.size());
@@ -181,7 +181,7 @@ class MemoServCore : public Module
 
 	void OnJoinChannel(User *u, Channel *c)
 	{
-		if (c->ci && c->ci->AccessFor(u).HasPriv(CA_MEMO) && c->ci->memos.memos.size() > 0)
+		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos.size() > 0)
 		{
 			if (c->ci->memos.memos.size() == 1)
 				u->SendMessage(MemoServ, _("There is \002%d\002 memo on channel %s."), c->ci->memos.memos.size(), c->ci->name.c_str());

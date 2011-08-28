@@ -49,7 +49,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
- 		if (ci->botflags.HasFlag(BS_NOBOT) || (!ci->AccessFor(u).HasPriv(CA_ASSIGN) && !u->HasPriv("botserv/administration")))
+ 		if (ci->botflags.HasFlag(BS_NOBOT) || (!ci->AccessFor(u).HasPriv("ASSIGN") && !u->HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -67,7 +67,7 @@ class CommandBSAssign : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_ASSIGN);
+		bool override = !ci->AccessFor(u).HasPriv("ASSIGN");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << bi->nick;
 
 		bi->Assign(u, ci);
@@ -111,7 +111,7 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv(CA_ASSIGN))
+		if (!u->HasPriv("botserv/administration") && !ci->AccessFor(u).HasPriv("ASSIGN"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -129,7 +129,7 @@ class CommandBSUnassign : public Command
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_ASSIGN);
+		bool override = !ci->AccessFor(u).HasPriv("ASSIGN");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << ci->bi->nick;
 
 		ci->bi->UnAssign(u, ci);

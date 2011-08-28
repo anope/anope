@@ -60,7 +60,7 @@ class BadwordsDelCallback : public NumberList
  public:
 	BadwordsDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0), override(false)
 	{
-		if (!ci->AccessFor(source.u).HasPriv(CA_BADWORDS) && source.u->HasPriv("botserv/administration"))
+		if (!ci->AccessFor(source.u).HasPriv("BADWORDS") && source.u->HasPriv("botserv/administration"))
 			this->override = true;
 	}
 
@@ -90,7 +90,7 @@ class CommandBSBadwords : public Command
  private:
 	void DoList(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
 	{
-		bool override = !ci->AccessFor(source.u).HasPriv(CA_BADWORDS);
+		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "LIST";
 
 		if (!ci->GetBadWordCount())
@@ -167,7 +167,7 @@ class CommandBSBadwords : public Command
 			}
 		}
 
-		bool override = !ci->AccessFor(source.u).HasPriv(CA_BADWORDS);
+		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "ADD " << realword;
 		ci->AddBadWord(realword, type);
 
@@ -203,7 +203,7 @@ class CommandBSBadwords : public Command
 				return;
 			}
 
-			bool override = !ci->AccessFor(source.u).HasPriv(CA_BADWORDS);
+			bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "DEL " << badword->word;
 
 			source.Reply(_("\002%s\002 deleted from %s bad words list."), badword->word.c_str(), ci->name.c_str());
@@ -216,7 +216,7 @@ class CommandBSBadwords : public Command
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
-		bool override = !ci->AccessFor(source.u).HasPriv(CA_BADWORDS);
+		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "CLEAR";
 
 		ci->ClearBadWords();
@@ -254,7 +254,7 @@ class CommandBSBadwords : public Command
 		}
 
 
-		if (!ci->AccessFor(u).HasPriv(CA_BADWORDS) && (!need_args || !u->HasPriv("botserv/administration")))
+		if (!ci->AccessFor(u).HasPriv("BADWORDS") && (!need_args || !u->HasPriv("botserv/administration")))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

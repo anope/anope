@@ -152,8 +152,6 @@ E bool OnError(const Anope::string &, const std::vector<Anope::string> &);
 /**** misc.c ****/
 
 E bool IsFile(const Anope::string &filename);
-E int toupper(char);
-E int tolower(char);
 
 E time_t dotime(const Anope::string &s);
 E Anope::string duration(const time_t &seconds, NickCore *nc = NULL);

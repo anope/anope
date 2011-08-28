@@ -36,7 +36,7 @@ public:
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv(CA_SET))
+		if (!ci->AccessFor(u).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

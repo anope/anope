@@ -179,52 +179,6 @@ static void ReadDatabase(Module *m = NULL)
 	db.close();
 }
 
-struct ChannelLevel
-{
-	ChannelAccess Level;
-	Anope::string Name;
-};
-
-ChannelLevel ChannelLevels[] = {
-	{ CA_ACCESS_LIST, "ACCESS_LIST" },
-	{ CA_NOKICK, "NOKICK" },
-	{ CA_FANTASIA, "FANTASIA" },
-	{ CA_GREET, "GREET" },
-	{ CA_AUTOVOICE, "AUTOVOICE" },
-	{ CA_VOICEME, "VOICEME" },
-	{ CA_VOICE, "VOICE" },
-	{ CA_INFO, "INFO" },
-	{ CA_SAY, "SAY" },
-	{ CA_AUTOHALFOP, "AUTOHALFOP" },
-	{ CA_HALFOPME, "HALFOPME" },
-	{ CA_HALFOP, "HALFOP" },
-	{ CA_KICK, "KICK" },
-	{ CA_SIGNKICK, "SIGNKICK" },
-	{ CA_BAN, "BAN" },
-	{ CA_TOPIC, "TOPIC" },
-	{ CA_MODE, "MODE" },
-	{ CA_GETKEY, "GETKEY" },
-	{ CA_INVITE, "INVITE" },
-	{ CA_UNBAN, "UNBAN" },
-	{ CA_AUTOOP, "AUTOOP" },
-	{ CA_OPDEOPME, "OPDEOPME" },
-	{ CA_OPDEOP, "OPDEOP" },
-	{ CA_AUTOPROTECT, "AUTOPROTECT" },
-	{ CA_AKICK, "AKICK" },
-	{ CA_BADWORDS, "BADWORDS" },
-	{ CA_ASSIGN, "ASSIGN" },
-	{ CA_MEMO, "MEMO" },
-	{ CA_ACCESS_CHANGE, "ACCESS_CHANGE" },
-	{ CA_PROTECTME, "PROTECTME" },
-	{ CA_PROTECT, "PROTECT" },
-	{ CA_SET, "SET" },
-	{ CA_AUTOOWNER, "AUTOOWNER" },
-	{ CA_OWNERME, "OWNERME" },
-	{ CA_OWNER, "OWNER" },
-	{ CA_FOUNDER, "FOUNDER" },
-	{ CA_SIZE, "" }
-};
-
 static Anope::string ToString(const std::vector<Anope::string> &strings)
 {
 	Anope::string ret;
@@ -532,9 +486,12 @@ class DBPlain : public Module
 			else if (key.equals_ci("LEVELS"))
 			{
 				for (unsigned j = 0, end = params.size(); j < end; j += 2)
-					for (int i = 0; ChannelLevels[i].Level != CA_SIZE; ++i)
-						if (params[j].equals_ci(ChannelLevels[i].Name))
-							ci->levels[ChannelLevels[i].Level] = params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+				{
+					Privilege *p = PrivilegeManager::FindPrivilege(params[j]);
+					if (p == NULL)
+						continue;
+					ci->SetLevel(p->name, params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0);
+				}
 			}
 			else if (key.equals_ci("FLAGS"))
 				ci->FromString(params);
@@ -555,7 +512,7 @@ class DBPlain : public Module
 			{
 				service_reference<AccessProvider> provider("access/access");
 				if (!provider)
-					throw DatabaseException("Access entry for nonexistant provider " + params[0]);
+					throw DatabaseException("Old access entry for nonexistant provider");
 
 				ChanAccess *access = provider->Create();
 				access->ci = ci;
@@ -799,8 +756,12 @@ class DBPlain : public Module
 			if (!ci->last_topic.empty())
 				db_buffer << "MD TOPIC " << ci->last_topic_setter << " " << ci->last_topic_time << " :" << ci->last_topic << endl;
 			db_buffer << "MD LEVELS";
-			for (int j = 0; ChannelLevels[j].Level != CA_SIZE; ++j)
-				db_buffer << " " << ChannelLevels[j].Name << " " << ci->levels[ChannelLevels[j].Level];
+			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+			for (unsigned i = 0; i < privs.size(); ++i)
+			{
+				const Privilege &p = privs[i];
+				db_buffer << p.name << " " << ci->GetLevel(p.name);
+			}
 			db_buffer << endl;
 			if (ci->FlagCount())
 				db_buffer << "MD FLAGS " << ToString(ci->ToString()) << endl;

@@ -9,15 +9,15 @@
 
 static struct ModeInfo
 {
-	ChannelAccess priv;
+	Anope::string priv;
 	ChannelModeName name;
 } modeInfo[] = {
-	{ CA_AUTOOWNER, CMODE_OWNER },
-	{ CA_AUTOPROTECT, CMODE_PROTECT },
-	{ CA_AUTOOP, CMODE_OP },
-	{ CA_AUTOHALFOP, CMODE_HALFOP },
-	{ CA_AUTOVOICE, CMODE_VOICE },
-	{ CA_SIZE, CMODE_END }
+	{ "AUTOOWNER", CMODE_OWNER },
+	{ "AUTOPROTECT", CMODE_PROTECT },
+	{ "AUTOOP", CMODE_OP },
+	{ "AUTOHALFOP", CMODE_HALFOP },
+	{ "AUTOVOICE", CMODE_VOICE },
+	{ "", CMODE_END }
 };
 
 class StatusUpdate : public Module
@@ -40,7 +40,7 @@ class StatusUpdate : public Module
 
 				if (access->Matches(user, user->Account()))
 				{
-					for (int i = 0; modeInfo[i].priv != CA_SIZE; ++i)
+					for (int i = 0; !modeInfo[i].priv.empty(); ++i)
 						if (!access->HasPriv(modeInfo[i].priv))
 							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
 					chan_set_correct_modes(user, ci->c, 1);
@@ -57,7 +57,7 @@ class StatusUpdate : public Module
 
 				if (access->Matches(user, user->Account()))
 				{
-					for (int i = 0; modeInfo[i].priv != CA_SIZE; ++i)
+					for (int i = 0; !modeInfo[i].priv.empty(); ++i)
 						if (access->HasPriv(modeInfo[i].priv))
 							ci->c->RemoveMode(NULL, modeInfo[i].name, user->nick);
 				}

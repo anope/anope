@@ -15,7 +15,7 @@
 
 class CommandModeBase : public Command
 {
-	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself)
+	void do_mode(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
 	{
 		User *u = source.u;
 		User *u2 = finduser(nick);
@@ -62,7 +62,7 @@ class CommandModeBase : public Command
 	 * @param level The acecss level required to set this mode on someone else
 	 * @param levelself The access level required to set this mode on yourself
 	 */
-	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, ChannelAccess level, ChannelAccess levelself)
+	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
 	{
 		User *u = source.u;
 
@@ -94,7 +94,7 @@ class CommandCSOp : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OPDEOP, CA_OPDEOPME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "OPDEOP", "OPDEOPME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -123,7 +123,7 @@ class CommandCSDeOp : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OPDEOP, CA_OPDEOPME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "OPDEOP", "OPDEOPME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -152,7 +152,7 @@ class CommandCSVoice : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_VOICE, CA_VOICEME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "VOICE", "VOICEME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -182,7 +182,7 @@ class CommandCSDeVoice : public CommandModeBase
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_VOICE, CA_VOICEME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "VOICE", "VOICEME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -215,7 +215,7 @@ class CommandCSHalfOp : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_HALFOP, CA_HALFOPME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "HALFOP", "HALFOPME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -247,7 +247,7 @@ class CommandCSDeHalfOp : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_HALFOP, CA_HALFOPME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "HALFOP", "HALFOPME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -280,7 +280,7 @@ class CommandCSProtect : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_PROTECT, CA_PROTECTME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "PROTECT", "PROTECTME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -312,7 +312,7 @@ class CommandCSDeProtect : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_PROTECT, CA_PROTECTME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "PROTECT", "PROTECTME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -343,7 +343,7 @@ class CommandCSOwner : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, CA_OWNER, CA_OWNERME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "OWNER", "OWNERME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -374,7 +374,7 @@ class CommandCSDeOwner : public CommandModeBase
 		if (!cm)
 			return;
 
-		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, CA_OWNER, CA_OWNERME);
+		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "OWNER", "OWNERME");
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

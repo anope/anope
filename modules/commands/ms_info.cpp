@@ -50,7 +50,7 @@ class CommandMSInfo : public Command
 				source.Reply(CHAN_X_NOT_REGISTERED, nname.c_str());
 				return;
 			}
-			else if (!ci->AccessFor(u).HasPriv(CA_MEMO))
+			else if (!ci->AccessFor(u).HasPriv("MEMO"))
 			{
 				source.Reply(ACCESS_DENIED);
 				return;

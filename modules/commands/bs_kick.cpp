@@ -41,13 +41,13 @@ class CommandBSKick : public Command
 			this->OnSyntaxError(source, "");
 		else if (!value.equals_ci("ON") && !value.equals_ci("OFF"))
 			this->OnSyntaxError(source, "");
-		else if (!ci->AccessFor(u).HasPriv(CA_SET) && !u->HasPriv("botserv/administration"))
+		else if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
 			source.Reply(ACCESS_DENIED);
 		else if (!ci->bi)
 			source.Reply(BOT_NOT_ASSIGNED);
 		else
 		{
-			bool override = !ci->AccessFor(u).HasPriv(CA_SET);
+			bool override = !ci->AccessFor(u).HasPriv("SET");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << option << " " << value;
 
 			if (option.equals_ci("BADWORDS"))
@@ -767,7 +767,7 @@ class BSKick : public Module
 			return;
 
 		bool Allow = true;
-		if (ci->AccessFor(u).HasPriv(CA_NOKICK))
+		if (ci->AccessFor(u).HasPriv("NOKICK"))
 			Allow = false;
 		else if (ci->botflags.HasFlag(BS_DONTKICKOPS) && (c->HasUserStatus(u, CMODE_HALFOP) || c->HasUserStatus(u, CMODE_OP) || c->HasUserStatus(u, CMODE_PROTECT) || c->HasUserStatus(u, CMODE_OWNER)))
 			Allow = false;
@@ -992,7 +992,7 @@ class BSKick : public Module
 						Channel *chan = (*it)->chan;
 						++it;
 
-						if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv(CA_NOKICK))
+						if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
 						{
 							check_ban(chan->ci, u, TTB_AMSGS);
 							bot_kick(chan->ci, u, _("Don't use AMSGs!"));

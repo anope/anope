@@ -103,6 +103,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	std::vector<ChanAccess *> access;                                       /* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
+	std::map<Anope::string, int16> levels;
 
  public:
 	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
@@ -134,7 +135,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	time_t last_topic_time;			/* Time */
 
 	int16 bantype;
-	int16 levels[CA_SIZE];
 
 	MemoInfo memos;
 
@@ -345,6 +345,28 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * and after uplink sync
 	 */
 	void RestoreTopic();
+
+	/** Get the level for a privilege
+	 * @param priv The privilege name
+	 * @return the level
+	 * @throws CoreException if priv is not a valid privilege
+	 */
+	int16 GetLevel(const Anope::string &priv);
+
+	/** Set the level for a privilege
+	 * @param priv The privilege priv
+	 * @param level The new level
+	 */
+	void SetLevel(const Anope::string &priv, int16 level);
+
+	/** Remove a privilege from the channel
+	 * @param priv The privilege
+	 */
+	void RemoveLevel(const Anope::string &priv);
+
+	/** Clear all privileges from the channel
+	 */
+	void ClearLevels();
 };
 
 /** A timer used to keep the BotServ bot/ChanServ in the channel

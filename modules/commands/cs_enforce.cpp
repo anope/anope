@@ -129,7 +129,7 @@ class CommandCSEnforce : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!c->ci->AccessFor(u).HasPriv(CA_AKICK))
+		else if (!c->ci->AccessFor(u).HasPriv("AKICK"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

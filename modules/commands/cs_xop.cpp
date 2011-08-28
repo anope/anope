@@ -27,63 +27,63 @@ static struct XOPAccess
 {
 	XOPType type;
 	Anope::string name;
-	ChannelAccess access[CA_SIZE];
+	Anope::string access[10];
 } xopAccess[] = {
 	{ XOP_QOP, "QOP",
 		{
-			CA_SIGNKICK,
-			CA_SET,
-			CA_AUTOOWNER,
-			CA_OWNERME,
-			CA_PROTECT,
-			CA_INFO,
-			CA_ASSIGN,
-			CA_TOPIC,
-			CA_SIZE
+			"SIGNKICK",
+			"SET",
+			"AUTOOWNER",
+			"OWNERME",
+			"PROTECT",
+			"INFO",
+			"ASSIGN",
+			"TOPIC",
+			""
 		}
 	},
 	{ XOP_SOP, "SOP",
 		{
-			CA_AUTOPROTECT,
-			CA_AKICK,
-			CA_BADWORDS,
-			CA_MEMO,
-			CA_ACCESS_CHANGE,
-			CA_PROTECTME,
-			CA_OPDEOP,
-			CA_SIZE
+			"AUTOPROTECT",
+			"AKICK",
+			"BADWORDS",
+			"MEMO",
+			"ACCESS_CHANGE",
+			"PROTECTME",
+			"OPDEOP",
+			""
 		}
 	},
 	{ XOP_AOP, "AOP",
 		{
-			CA_MODE,
-			CA_GETKEY,
-			CA_INVITE,
-			CA_UNBAN,
-			CA_AUTOOP,
-			CA_OPDEOPME,
-			CA_HALFOP,
-			CA_SAY,
-			CA_NOKICK,
-			CA_SIZE
+			"MODE",
+			"GETKEY",
+			"INVITE",
+			"UNBAN",
+			"AUTOOP",
+			"OPDEOPME",
+			"HALFOP",
+			"SAY",
+			"NOKICK",
+			""
 		}
 	},
 	{ XOP_HOP, "HOP",
 		{
-			CA_AUTOHALFOP,
-			CA_HALFOPME,
-			CA_KICK,
-			CA_BAN,
-			CA_FANTASIA,
-			CA_SIZE
+			"AUTOHALFOP",
+			"HALFOPME",
+			"KICK",
+			"BAN",
+			"FANTASIA",
+			""
 		}
 	},
 	{ XOP_VOP, "VOP",
 		{
-			CA_AUTOVOICE,
-			CA_VOICEME,
-			CA_ACCESS_LIST,
-			CA_SIZE
+			"AUTOVOICE",
+			"VOICEME",
+			"ACCESS_LIST",
+			""
 		}
 	},
 	{ XOP_UNKNOWN, "", { }
@@ -108,7 +108,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(const Anope::string &priv)
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -117,7 +117,7 @@ class XOPChanAccess : public ChanAccess
 			if (this->type > x.type)
 				continue;
 
-			for (int j = 0; x.access[j] != CA_SIZE; ++j)
+			for (int j = 0; !x.access[j].empty(); ++j)
 				if (x.access[j] == priv)
 					return true;
 		}
@@ -171,7 +171,7 @@ class XOPChanAccess : public ChanAccess
 			{
 				XOPAccess &x = xopAccess[i];
 
-				for (int j = 0; x.access[j] != CA_SIZE; ++j)
+				for (int j = 0; !x.access[j].empty(); ++j)
 					if (access->HasPriv(x.access[j]))
 						++count[x.type];
 			}
@@ -316,7 +316,7 @@ class XOPBase : public Command
 		ChanAccess *highest = access.Highest();
 		int u_level = (highest ? XOPChanAccess::DetermineLevel(highest) : 0);
 
-		if ((!access.Founder && !access.HasPriv(CA_ACCESS_CHANGE) && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
+		if ((!access.Founder && !access.HasPriv("ACCESS_CHANGE") && !u->HasPriv("chanserv/access/modify")) || (level <= u_level && !access.Founder))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -360,7 +360,7 @@ class XOPBase : public Command
 		acc->created = Anope::CurTime;
 		ci->AddAccess(acc);
 
-		bool override = (level >= u_level && !access.Founder) || !access.HasPriv(CA_ACCESS_CHANGE);
+		bool override = (level >= u_level && !access.Founder) || !access.HasPriv("ACCESS_CHANGE");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
@@ -394,7 +394,7 @@ class XOPBase : public Command
 		AccessGroup access = ci->AccessFor(u);
 		ChanAccess *highest = access.Highest();
 		bool override = false;
-		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv(CA_ACCESS_CHANGE) && !access.Founder) || ((!highest || level <= XOPChanAccess::DetermineLevel(highest)) && !access.Founder))
+		if ((!mask.equals_ci(u->Account()->display) && !access.HasPriv("ACCESS_CHANGE") && !access.Founder) || ((!highest || level <= XOPChanAccess::DetermineLevel(highest)) && !access.Founder))
 		{
 			if (u->HasPriv("chanserv/access/modify"))
 				override = true;
@@ -443,7 +443,7 @@ class XOPBase : public Command
 		AccessGroup access = ci->AccessFor(u);
 		bool override = false;
 
-		if (!access.HasPriv(CA_ACCESS_LIST))
+		if (!access.HasPriv("ACCESS_LIST"))
 		{
 			if (u->HasCommand("chanserv/access/list"))
 				override = true;
@@ -512,13 +512,13 @@ class XOPBase : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv(CA_FOUNDER) && !u->HasPriv("chanserv/access/modify"))
+		if (!ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasPriv("chanserv/access/modify"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
 		}
 
-		bool override = !ci->AccessFor(u).HasPriv(CA_FOUNDER);
+		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)

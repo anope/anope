@@ -28,7 +28,7 @@ class CommandCSSetMisc : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
-		else if (source.permission.empty() && !ci->AccessFor(source.u).HasPriv(CA_SET))
+		else if (source.permission.empty() && !ci->AccessFor(source.u).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

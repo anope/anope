@@ -140,9 +140,9 @@ CREATE TABLE IF NOT EXISTS `anope_cs_info_metadata` (
 
 CREATE TABLE IF NOT EXISTS `anope_cs_levels` (
   `channel` varchar(255) NOT NULL DEFAULT '',
-  `position` int(11) NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
   `level` int(11) NOT NULL DEFAULT '0',
-  UNIQUE KEY `channel` (`channel`,`position`)
+  UNIQUE KEY `channel` (`channel`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------

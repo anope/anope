@@ -32,7 +32,7 @@ class CommandCSSetBanType : public Command
 			return;
 		}
 
-		if (source.permission.empty() && !ci->AccessFor(u).HasPriv(CA_SET))
+		if (source.permission.empty() && !ci->AccessFor(u).HasPriv("SET"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;

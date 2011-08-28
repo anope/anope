@@ -81,7 +81,7 @@ class BotServCore : public Module
 			if (bi == NULL || !bi->commands.count(command))
 				return;
 
-			if (c->ci->AccessFor(u).HasPriv(CA_FANTASIA))
+			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
 			{
 
 				this->fantasy_channel = c;
@@ -133,7 +133,7 @@ class BotServCore : public Module
 			 * to has synced, or we'll get greet-floods when the net
 			 * recovers from a netsplit. -GD
 			 */
-			if (c->FindUser(c->ci->bi) && c->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && c->ci->AccessFor(user).HasPriv(CA_GREET) && user->server->IsSynced())
+			if (c->FindUser(c->ci->bi) && c->ci->botflags.HasFlag(BS_GREET) && user->Account() && !user->Account()->greet.empty() && c->ci->AccessFor(user).HasPriv("GREET") && user->server->IsSynced())
 			{
 				ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s", user->Account()->display.c_str(), user->Account()->greet.c_str());
 				c->ci->bi->lastmsg = Anope::CurTime;

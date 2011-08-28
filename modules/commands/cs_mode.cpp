@@ -20,13 +20,13 @@ class CommandCSMode : public Command
 		if (!u || !ci || !cm || cm->Type != MODE_STATUS)
 			return false;
 
-		const ChannelAccess accesses[] = { CA_VOICE, CA_HALFOP, CA_OPDEOP, CA_PROTECT, CA_OWNER, CA_SIZE };
+		const Anope::string accesses[] = { "VOICE", "HALFOP", "OPDEOP", "PROTECT", "OWNER", "" };
 		const ChannelModeName modes[] = { CMODE_VOICE, CMODE_HALFOP, CMODE_OP, CMODE_PROTECT, CMODE_OWNER };
 		ChannelModeStatus *cms = debug_cast<ChannelModeStatus *>(cm);
 		AccessGroup access = ci->AccessFor(u);
 		unsigned short u_level = 0;
 
-		for (int i = 0; accesses[i] != CA_SIZE; ++i)
+		for (int i = 0; !accesses[i].empty(); ++i)
 			if (access.HasPriv(accesses[i]))
 			{
 				ChannelMode *cm2 = ModeManager::FindChannelModeByName(modes[i]);
@@ -319,7 +319,7 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!ci->AccessFor(u).HasPriv(CA_MODE) && !u->HasCommand("chanserv/mode"))
+		else if (!ci->AccessFor(u).HasPriv("MODE") && !u->HasCommand("chanserv/mode"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

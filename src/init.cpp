@@ -21,7 +21,11 @@ void introduce_user(const Anope::string &user)
 	time_t now = Anope::CurTime;
 	static time_t lasttime = now - 4;
 	if (lasttime >= now - 3)
-		throw FatalException("introduce_user loop detected");
+	{
+		quitmsg = "introduce_user loop detected";
+		quitting = true;
+		return;
+	}
 	lasttime = now;
 
 	User *u = finduser(user);

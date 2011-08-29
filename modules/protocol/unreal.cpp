@@ -1138,6 +1138,14 @@ class ProtoUnreal : public Module
 		ModuleManager::Attach(I_OnUserNickChange, this);
 	}
 
+	~ProtoUnreal()
+	{
+		pmodule_ircd_var(NULL);
+		pmodule_ircd_proto(NULL);
+		pmodule_ircd_message(NULL);
+	}
+
+
 	void OnUserNickChange(User *u, const Anope::string &)
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));

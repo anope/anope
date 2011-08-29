@@ -111,7 +111,10 @@ class CommandOSModReLoad : public Command
 		else
 		{
 			if (fatal)
-				throw FatalException("Unable to reload module " + mname);
+			{
+				quitmsg = "Unable to reload module " + mname;
+				quitting = true;
+			}
 			else
 				source.Reply(_("Unable to load module \002%s\002"), mname.c_str());
 		}

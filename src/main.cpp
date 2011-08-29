@@ -68,9 +68,6 @@ time_t Anope::CurTime = time(NULL);
 
 /******** Local variables! ********/
 
-/* Set to 1 after we've set everything up */
-static bool started = false;
-
 /*************************************************************************/
 
 class UpdateTimer : public Timer
@@ -118,7 +115,7 @@ class UplinkSocket : public ConnectionSocket
 
 	~UplinkSocket()
 	{
-		if (Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
+		if (ircdproto && Me && !Me->GetLinks().empty() && Me->GetLinks()[0]->IsSynced())
 		{
 			FOREACH_MOD(I_OnServerDisconnect, OnServerDisconnect());
 
@@ -353,8 +350,6 @@ int main(int ac, char **av, char **envp)
 		quitting = true;
 		return_code = -1;
 	}
-
-	started = true;
 
 	/* Set up timers */
 	time_t last_check = Anope::CurTime;

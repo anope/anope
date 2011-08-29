@@ -658,6 +658,13 @@ class ProtoPlexus : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
+	~ProtoPlexus()
+	{
+		pmodule_ircd_var(NULL);
+		pmodule_ircd_proto(NULL);
+		pmodule_ircd_message(NULL);
+	}
+
 	void OnServerSync(Server *s)
 	{
 		if (nickserv)

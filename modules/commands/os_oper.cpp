@@ -37,6 +37,8 @@ class CommandOSOper : public Command
 			NickAlias *na = findnick(oper);
 			if (na == NULL)
 				source.Reply(NICK_X_NOT_REGISTERED, oper.c_str());
+			else if (na->nc->o)
+				source.Reply(_("Nick \2%s\2 is already an operator."), na->nick.c_str());
 			else
 			{
 				OperType *ot = OperType::Find(type);
@@ -44,8 +46,7 @@ class CommandOSOper : public Command
 					source.Reply(_("Oper type \2%s\2 has not been configured."), type.c_str());
 				else
 				{
-					if (na->nc->o)
-						delete na->nc->o;
+					delete na->nc->o;
 					na->nc->o = new Oper(na->nc->display, "", "", ot);
 
 					Log(LOG_ADMIN, source.u, this) << "ADD " << na->nick << " as type " << ot->GetName();
@@ -82,9 +83,8 @@ class CommandOSOper : public Command
 					continue;
 
 				source.Reply(_("%-8s %s"), nc->o->name.c_str(), nc->o->ot->GetName().c_str());
-				for (std::list<NickAlias *>::const_iterator it2 = nc->aliases.begin(), it2_end = nc->aliases.end(); it2 != it2_end; ++it2)
-					if (Oper::Find((*it2)->nick) != NULL)
-						source.Reply(_("   This oper is configured in the configuration file as %s"), (*it2)->nick.c_str());
+				if (nc->o->config)
+					source.Reply(_("   This oper is configured in the configuration file."));
 				for (std::list<User *>::iterator uit = nc->Users.begin(); uit != nc->Users.end(); ++uit)
 				{
 					User *u = *uit;

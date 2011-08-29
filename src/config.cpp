@@ -642,7 +642,8 @@ static bool DoneOperTypes(ServerConfig *, const Anope::string &)
 static bool InitOpers(ServerConfig *config, const Anope::string &)
 {
 	for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
-		it->second->o = NULL;
+		if (it->second->o && it->second->o->config)
+			it->second->o = NULL;
 
 	for (unsigned i = 0; i < config->Opers.size(); ++i)
 		delete config->Opers[i];
@@ -674,6 +675,7 @@ static bool DoOper(ServerConfig *config, const Anope::string &, const Anope::str
 		throw ConfigException("Oper block for " + name + " has invalid oper type " + type);
 	
 	Oper *o = new Oper(name, password, certfp, ot);
+	o->config = true;
 	config->Opers.push_back(o);
 
 	return true;

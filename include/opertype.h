@@ -18,9 +18,10 @@ struct CoreExport Oper
 	Anope::string password;
 	Anope::string certfp;
 	OperType *ot;
+	bool config;
 
 	Oper(const Anope::string &n, const Anope::string &p, const Anope::string &c, OperType *o) :
-		name(n), password(p), certfp(c), ot(o) { }
+		name(n), password(p), certfp(c), ot(o), config(false) { }
 	
 	/** Find an oper block by name
 	 * @param name The name

@@ -52,8 +52,9 @@ class MemoListCallback : public NumberList
 {
 	CommandSource &source;
 	MemoInfo *mi;
+	ChannelInfo *ci;
  public:
-	MemoListCallback(CommandSource &_source, MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi)
+	MemoListCallback(CommandSource &_source, MemoInfo *_mi, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), mi(_mi), ci(_ci)
 	{
 	}
 
@@ -62,7 +63,7 @@ class MemoListCallback : public NumberList
 		if (!Number || Number > mi->memos.size())
 			return;
 
-		MemoListCallback::DoRead(source, mi, NULL, Number - 1);
+		MemoListCallback::DoRead(source, mi, ci, Number - 1);
 	}
 
 	static void DoRead(CommandSource &source, MemoInfo *mi, ChannelInfo *ci, unsigned index)
@@ -155,7 +156,7 @@ class CommandMSRead : public Command
 			}
 			else /* number[s] */
 			{
-				MemoListCallback list(source, mi, numstr);
+				MemoListCallback list(source, mi, ci, numstr);
 				list.Process();
 			}
 		}

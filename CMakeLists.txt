@@ -341,6 +341,7 @@ check_function_exists(umask HAVE_UMASK)
 check_function_exists(eventfd HAVE_EVENTFD)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
+check_function_exists(kqueue HAVE_KQUEUE)
 
 # Check for the existance of the following types
 check_type_size(uint8_t UINT8_T)

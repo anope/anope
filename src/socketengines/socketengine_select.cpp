@@ -92,21 +92,22 @@ void SocketEngine::Process()
 	else if (sresult)
 	{
 		int processed = 0;
-		for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end && processed != sresult; ++it)
+		for (std::map<int, Socket *>::const_iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end && processed != sresult;)
 		{
 			Socket *s = it->second;
+			++it;
 
 			bool has_read = FD_ISSET(s->GetFD(), &rfdset), has_write = FD_ISSET(s->GetFD(), &wfdset), has_error = FD_ISSET(s->GetFD(), &efdset);
 			if (has_read || has_write || has_error)
 				++processed;
 
-			if (s->HasFlag(SF_DEAD))
-				continue;
-
 			if (has_error)
 			{
+				socklen_t sz = sizeof(errno);
+				getsockopt(s->GetFD(), SOL_SOCKET, SO_ERROR, &errno, &sz);
 				s->ProcessError();
 				s->SetFlag(SF_DEAD);
+				delete s;
 				continue;
 			}
 
@@ -118,12 +119,6 @@ void SocketEngine::Process()
 
 			if (has_write && !s->ProcessWrite())
 				s->SetFlag(SF_DEAD);
-		}
-
-		for (std::map<int, Socket *>::iterator it = Sockets.begin(), it_end = Sockets.end(); it != it_end; )
-		{
-			Socket *s = it->second;
-			++it;
 
 			if (s->HasFlag(SF_DEAD))
 				delete s;

@@ -124,13 +124,13 @@ void SocketEngine::Process()
 			continue;
 		Socket *s = it->second;
 
-		if (s->HasFlag(SF_DEAD))
-			continue;
-
 		if (ev->events & (EPOLLHUP | EPOLLERR))
 		{
+			socklen_t sz = sizeof(errno);
+			getsockopt(s->GetFD(), SOL_SOCKET, SO_ERROR, &errno, &sz);
 			s->ProcessError();
 			s->SetFlag(SF_DEAD);
+			delete s;
 			continue;
 		}
 
@@ -142,15 +142,6 @@ void SocketEngine::Process()
 
 		if ((ev->events & EPOLLOUT) && !s->ProcessWrite())
 			s->SetFlag(SF_DEAD);
-	}
-
-	for (int i = 0; i < total; ++i)
-	{
-		epoll_event *ev = &events[i];
-		std::map<int, Socket *>::iterator it = Sockets.find(ev->data.fd);
-		if (it == Sockets.end())
-			continue;
-		Socket *s = it->second;
 
 		if (s->HasFlag(SF_DEAD))
 			delete s;

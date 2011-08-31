@@ -374,12 +374,22 @@ template<typename T> class CoreExport Service : public Base
 
 	Service(Module *o, const Anope::string &n) : owner(o), name(n)
 	{
-		if (Service<T>::services.find(n) != Service<T>::services.end())
-			throw ModuleException("Service with name " + n + " already exists");
-		Service<T>::services[n] = static_cast<T *>(this);
+		this->Register();
 	}
 
 	virtual ~Service()
+	{
+		this->Unregister();
+	}
+
+	void Register()
+	{
+		if (Service<T>::services.find(this->name) != Service<T>::services.end())
+			throw ModuleException("Service with name " + this->name + " already exists");
+		Service<T>::services[this->name] = static_cast<T *>(this);
+	}
+
+	void Unregister()
 	{
 		Service<T>::services.erase(this->name);
 	}

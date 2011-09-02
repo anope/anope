@@ -75,7 +75,7 @@ class MyForbidService : public ForbidService
 
 class CommandOSForbid : public Command
 {
-	service_reference<ForbidService> fs;
+	service_reference<ForbidService, Base> fs;
  public:
 	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("forbid")
 	{

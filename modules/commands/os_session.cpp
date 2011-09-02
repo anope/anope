@@ -14,7 +14,7 @@
 #include "module.h"
 #include "os_session.h"
 
-static service_reference<SessionService> sessionservice("session");
+static service_reference<SessionService, Base> sessionservice("session");
 
 class MySessionService : public SessionService
 {
@@ -634,7 +634,7 @@ class OSSession : public Module
 	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
-	service_reference<XLineManager> akills;
+	service_reference<XLineManager, Base> akills;
 
 	void AddSession(User *u, bool exempt)
 	{

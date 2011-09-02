@@ -243,7 +243,7 @@ class CommandOSDefcon : public Command
 
 class OSDefcon : public Module
 {
-	service_reference<SessionService> session_service;
+	service_reference<SessionService, Base> session_service;
 	service_reference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
 

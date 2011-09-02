@@ -76,7 +76,7 @@ class IdentifyInterface : public LDAPInterface
 
 class LDAPOper : public Module
 {
-	service_reference<LDAPProvider> ldap;
+	service_reference<LDAPProvider, Base> ldap;
 	IdentifyInterface iinterface;
 
 	Anope::string binddn;

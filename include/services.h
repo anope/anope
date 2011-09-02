@@ -396,6 +396,8 @@ template<typename T> class CoreExport Service : public Base
 };
 template<typename T> Anope::map<T *> Service<T>::services;
 
+template class Service<Base>;
+
 #include "sockets.h"
 #include "socketengine.h"
 #include "extensible.h"

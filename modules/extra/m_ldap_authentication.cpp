@@ -165,7 +165,7 @@ class OnRegisterInterface : public LDAPInterface
 
 class NSIdentifyLDAP : public Module
 {
-	service_reference<LDAPProvider> ldap;
+	service_reference<LDAPProvider, Base> ldap;
 	IdentifyInterface iinterface;
 	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;

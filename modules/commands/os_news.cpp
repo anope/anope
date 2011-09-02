@@ -106,7 +106,7 @@ static const char **findmsgs(NewsType type)
 
 class NewsBase : public Command
 {
-	service_reference<NewsService> ns;
+	service_reference<NewsService, Base> ns;
 
  protected:
 	void DoList(CommandSource &source, NewsType type, const char **msgs)

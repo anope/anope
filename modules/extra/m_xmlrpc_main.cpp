@@ -255,7 +255,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 class ModuleXMLRPCMain : public Module
 {
-	service_reference<XMLRPCServiceInterface> xmlrpc;
+	service_reference<XMLRPCServiceInterface, Base> xmlrpc;
 
 	MyXMLRPCEvent stats;
 

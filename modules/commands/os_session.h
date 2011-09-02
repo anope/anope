@@ -1,13 +1,13 @@
 #ifndef OS_SESSION_H
 #define OS_SESSION_H
 
-class SessionService : public Service<SessionService>
+class SessionService : public Service<Base>
 {
  public:
 	typedef Anope::map<Session *> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
-	SessionService(Module *m) : Service<SessionService>(m, "session") { }
+	SessionService(Module *m) : Service<Base>(m, "session") { }
 
 	virtual void AddException(Exception *e) = 0;
 

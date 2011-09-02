@@ -88,10 +88,10 @@ class DBMySQL : public Module
  private:
 	CommandSQLSync commandsqlsync;
 	MySQLInterface sqlinterface;
-	service_reference<SQLProvider> SQL;
+	service_reference<SQLProvider, Base> SQL;
 
  public:
-	service_reference<SessionService> SessionInterface;
+	service_reference<SessionService, Base> SessionInterface;
 	time_t lastwarn;
 	bool ro;
 

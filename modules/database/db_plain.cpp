@@ -15,7 +15,7 @@
 
 Anope::string DatabaseFile;
 std::stringstream db_buffer;
-service_reference<SessionService> SessionInterface("session");
+service_reference<SessionService, Base> SessionInterface("session");
 
 /** Enum used for what METADATA type we are reading
  */

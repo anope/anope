@@ -134,7 +134,7 @@ static void NickCoreUpdate(const SQLResult &res)
 
 class MySQLLiveModule : public Module
 {
-	service_reference<SQLProvider> SQL;
+	service_reference<SQLProvider, Base> SQL;
 
 	SQLCache chan_cache, nick_cache, core_cache;
 

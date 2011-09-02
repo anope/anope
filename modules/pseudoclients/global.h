@@ -1,10 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-class GlobalService : public Service<GlobalService>
+class GlobalService : public Service<Base>
 {
  public:
-	GlobalService(Module *m) : Service<GlobalService>(m, "Global") { }
+	GlobalService(Module *m) : Service<Base>(m, "Global") { }
 
 	/** Send out a global message to all users
 	 * @param sender Our client which should send the global
@@ -14,7 +14,7 @@ class GlobalService : public Service<GlobalService>
 	virtual void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) = 0;
 };
 
-static service_reference<GlobalService> global("Global");
+static service_reference<GlobalService, Base> global("Global");
 
 #endif // GLOBAL_H
 

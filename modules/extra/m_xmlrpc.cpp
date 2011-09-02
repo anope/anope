@@ -220,7 +220,7 @@ class ModuleXMLRPC;
 static ModuleXMLRPC *me;
 class ModuleXMLRPC : public Module
 {
-	service_reference<SSLService> sslref;
+	service_reference<SSLService, Base> sslref;
 
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;

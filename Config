@@ -152,14 +152,48 @@ while [ $# -ge 1 ] ; do
 done
 
 ###########################################################################
+# Check for CMake and (optionally) install it
+###########################################################################
 
 which cmake > /dev/null
 if [ $? -ne 0 ] ; then
 	clear
-	echo "Anope requires CMake 2.4 or newer to be configured, which can"
-	echo "be downloaded at http://www.cmake.org/. If you have installed"
-	echo "CMake already, ensure it is in your PATH environment variable."
-	exit 0
+	if exists "cmake-bin" ; then :
+	else
+		echo "Anope requires CMake 2.4 or newer, which can be downloaded at http://cmake.org"
+		echo "If you have installed CMake already, ensure it is in your PATH environment variable."
+
+		if [ `uname` = "Linux" ] ; then
+
+			echo ""
+			echo "Config can attempt to install CMake for you now, which"
+			echo "will take approximately 50 MB of disk space."
+			echo "Would you like to install CMake now?"
+			echo2 "[y] "
+			read YN
+			if [ "$YN" = "n" ] ; then
+				exit 0
+			fi
+
+			echo "Downloading CMake... this may take a minute or two."
+			wget -q http://anope.org/cmake/linux-i386.php -O cmake-bin.tar.gz
+			if [ $? -ne 0 ] ; then
+				rm -f cmake-bin.tar.gz
+				echo "Unable to download CMake"
+				exit 0
+			fi
+			mkdir -p cmake-bin
+			tar zxf cmake-bin.tar.gz -C cmake-bin
+			rm -f cmake-bin.tar.gz
+			echo "Done!"
+		else
+			exit 0
+		fi
+	fi
+
+	CMAKE_BIN=`find cmake-bin -name cmake`
+	CMAKE_BIN="`pwd`/`dirname $CMAKE_BIN`"
+	PATH="$PATH:$CMAKE_BIN"
 fi
 
 ###########################################################################

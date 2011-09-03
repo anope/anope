@@ -102,7 +102,14 @@ class BotServCore : public Module
 		if (this->fantasy_channel != NULL)
 		{
 			if (!command->HasFlag(CFLAG_STRIP_CHANNEL))
+			{
 				params.insert(params.begin(), this->fantasy_channel->name);
+				if (command->MaxParams && params.size() > command->MaxParams)
+				{
+					params[params.size() - 2] += " " + params[params.size() - 1];
+					params.erase(params.end() - 1);
+				}
+			}
 			source.c = this->fantasy_channel;
 			source.service = this->fantasy_channel->ci->WhoSends();
 		}

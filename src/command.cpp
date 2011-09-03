@@ -27,13 +27,12 @@ void CommandSource::Reply(const char *message, ...)
 
 void CommandSource::Reply(const Anope::string &message)
 {
-	sepstream sep(message, '\n');
+	const char *translated_message = translate(this->u, message.c_str());
+
+	sepstream sep(translated_message, '\n');
 	Anope::string tok;
 	while (sep.GetToken(tok))
-	{
-		const char *translated_message = translate(this->u, tok.c_str());
-		this->reply.push_back(translated_message);
-	}
+		this->reply.push_back(tok);
 }
 
 void CommandSource::DoReply()

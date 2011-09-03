@@ -233,20 +233,21 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 
 void User::SendMessage(BotInfo *source, Anope::string msg)
 {
+	const char *translated_message = translate(this, msg.c_str());
+
 	/* Send privmsg instead of notice if:
 	* - UsePrivmsg is enabled
 	* - The user is not registered and NSDefMsg is enabled
 	* - The user is registered and has set /ns set msg on
 	*/
-	sepstream sep(msg, '\n');
+	sepstream sep(translated_message, '\n');
 	Anope::string tok;
 	while (sep.GetToken(tok))
 	{
-		const char *translated_message = translate(this, tok.c_str());
 		if (Config->UsePrivmsg && ((!this->nc && Config->NSDefFlags.HasFlag(NI_MSG)) || (this->nc && this->nc->HasFlag(NI_MSG))))
-			ircdproto->SendPrivmsg(source, this->nick, "%s", translated_message);
+			ircdproto->SendPrivmsg(source, this->nick, "%s", tok.c_str());
 		else
-			ircdproto->SendNotice(source, this->nick, "%s", translated_message);
+			ircdproto->SendNotice(source, this->nick, "%s", tok.c_str());
 	}
 }
 

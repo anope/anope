@@ -22,12 +22,15 @@ class CommandCSSync : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
 
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (ci->c == NULL)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
+		else if (!ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
+			source.Reply(ACCESS_DENIED);
 		else
 		{
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)

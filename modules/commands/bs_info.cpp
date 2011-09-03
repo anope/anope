@@ -173,13 +173,6 @@ class CommandBSInfo : public Command
 			else
 				source.Reply(_("     AMSG kicker    : %s"), DISABLED);
 
-			if (ci->botflags.HasFlag(BS_MSG_PRIVMSG))
-				source.Reply(_("      Fantasy reply : %s"), "PRIVMSG");
-			else if (ci->botflags.HasFlag(BS_MSG_NOTICE))
-				source.Reply(_("      Fantasy reply : %s"), "NOTICE");
-			else if (ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
-				source.Reply(_("      Fantasy reply : %s"), "NOTICEOPS");
-			
 			end = buf;
 			*end = 0;
 			if (ci->botflags.HasFlag(BS_DONTKICKOPS))

@@ -253,16 +253,12 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnPreCommand, OnPreCommand(source, c, params));
 	if (MOD_RESULT == EVENT_STOP)
-	{
-		source.DoReply();
 		return;
-	}
 
 
 	if (params.size() < c->MinParams)
 	{
 		c->OnSyntaxError(source, !params.empty() ? params[params.size() - 1] : "");
-		source.DoReply();
 		return;
 	}
 
@@ -271,7 +267,6 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	{
 		u->SendMessage(this, ACCESS_DENIED);
 		Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
-		source.DoReply();
 		return;
 	}
 
@@ -280,8 +275,6 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (user_reference)
 	{
 		FOREACH_MOD(I_OnPostCommand, OnPostCommand(source, c, params));
-		if (user_reference)
-			source.DoReply();
 	}
 }
 

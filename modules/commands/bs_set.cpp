@@ -143,39 +143,6 @@ class CommandBSSet : public Command
 				else
 					this->OnSyntaxError(source, "NOBOT");
 			}
-			else if (option.equals_ci("MSG"))
-			{
-				if (value.equals_ci("OFF"))
-				{
-					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
-					source.Reply(_("Fantasy replies will no longer be sent to %s."), ci->name.c_str());
-				}
-				else if (value.equals_ci("PRIVMSG"))
-				{
-					ci->botflags.SetFlag(BS_MSG_PRIVMSG);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
-					source.Reply(_("Fantasy replies will be sent via PRIVMSG to %s."), ci->name.c_str());
-				}
-				else if (value.equals_ci("NOTICE"))
-				{
-					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
-					ci->botflags.SetFlag(BS_MSG_NOTICE);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICEOPS);
-					source.Reply(_("Fantasy replies will be sent via NOTICE to %s."), ci->name.c_str());
-				}
-				else if (value.equals_ci("NOTICEOPS"))
-				{
-					ci->botflags.UnsetFlag(BS_MSG_PRIVMSG);
-					ci->botflags.UnsetFlag(BS_MSG_NOTICE);
-					ci->botflags.SetFlag(BS_MSG_NOTICEOPS);
-					source.Reply(_("Fantasy replies will be sent via NOTICE to channel ops on %s."), ci->name.c_str());
-				}
-				else
-					this->OnSyntaxError(source, "MSG");
-			}
 			else
 				this->OnSyntaxError(source, "");
 		}
@@ -195,7 +162,6 @@ class CommandBSSet : public Command
 					"    DONTKICKVOICES   To protect voices against bot kicks\n"
 					"    GREET            Enable greet messages\n"
 					"    FANTASY          Enable fantaisist commands\n"
-					"    MSG              Configure how fantasy commands should be replied to\n"
 					" \n"
 					"Type \002%s%s HELP SET \037option\037\002 for more information\n"
 					"on a specific option.\n"
@@ -254,15 +220,6 @@ class CommandBSSet : public Command
 			source.Reply(_("Syntax: \002SET \037bot-nick\037 PRIVATE {\037ON|OFF\037}\002\n"
 					"This option prevents a bot from being assigned to a\n"
 					"channel by users that aren't IRC operators."));
-		else if (subcommand.equals_ci("MSG"))
-			source.Reply(_("Syntax: \002SET \037channel\037 MSG {\037OFF|PRIVMSG|NOTICE|NOTICEOPS\037}\002\n"
-					" \n"
-					"Configures how fantasy commands should be returned to the channel. Off disables\n"
-					"fantasy from replying to the channel. Privmsg, notice, and noticeops message the\n"
-					"channel, notice the channel, and notice the channel ops respectively.\n"
-					" \n"
-					"Note that replies over one line will not use this setting to prevent spam, and will\n"
-					"go directly to the user who executed it."));
 		else
 			return false;
 
@@ -283,8 +240,6 @@ class CommandBSSet : public Command
 			this->SendSyntax(source, "\037channel\037 FANTASY {\037ON|OFF\037}");
 		else if (subcommand.equals_ci("GREET"))
 			this->SendSyntax(source, "\037channel\037 GREET {\037ON|OFF\037}");
-		else if (subcommand.equals_ci("MSG"))
-			this->SendSyntax(source, "\037channel\037 MSG {\037PRIVMSG|NOTICE|NOTICEOPS|OFF\037}");
 		else if (subcommand.equals_ci("NOBOT"))
 			this->SendSyntax(source, "\037channel\037 NOBOT {\037ON|OFF\037}");
 		else

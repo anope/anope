@@ -670,12 +670,6 @@ enum BotServFlag
 	BS_KICK_ITALICS,
 	/* BotServ kicks for amsgs */
 	BS_KICK_AMSGS,
-	/* Send fantasy replies back to the channel via PRIVMSG */
-	BS_MSG_PRIVMSG,
-	/* Send fantasy replies back to the channel via NOTICE */
-	BS_MSG_NOTICE,
-	/* Send fantasy replies back to the channel via NOTICE to ops */
-	BS_MSG_NOTICEOPS,
 	BS_END
 };
 

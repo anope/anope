@@ -32,26 +32,9 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(translated_message, '\n');
 	Anope::string tok;
 	while (sep.GetToken(tok))
-		this->reply.push_back(tok);
-}
-
-void CommandSource::DoReply()
-{
-	for (std::list<Anope::string>::iterator it = this->reply.begin(), it_end = this->reply.end(); it != it_end; ++it)
 	{
-		const Anope::string &message = *it;
-
-		// Send to the user if the reply is more than one line
-		if (!this->c || !this->c->ci || this->reply.size() > 1)
-			u->SendMessage(this->service, message);
-		else if (this->c->ci->botflags.HasFlag(BS_MSG_PRIVMSG))
-			ircdproto->SendPrivmsg(this->service, this->c->name, message.c_str());
-		else if (this->c->ci->botflags.HasFlag(BS_MSG_NOTICE))
-			ircdproto->SendNotice(this->service, this->c->name, message.c_str());
-		else if (this->c->ci->botflags.HasFlag(BS_MSG_NOTICEOPS))
-			ircdproto->SendNoticeChanops(this->service, this->c, message.c_str());
-		else
-			u->SendMessage(this->service, message);
+		const char *translated_message = translate(this->u, tok.c_str());
+		u->SendMessage(this->service, translated_message);
 	}
 }
 

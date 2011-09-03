@@ -52,12 +52,8 @@ struct CoreExport CommandSource
 	/* The permission of the command being executed */
 	Anope::string permission;
 
-	std::list<Anope::string> reply;
-
 	void Reply(const char *message, ...);
 	void Reply(const Anope::string &message);
-
-	void DoReply();
 };
 
 /** Every services command is a class, inheriting from Command.

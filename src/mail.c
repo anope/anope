@@ -237,7 +237,7 @@ void MailEnd(MailInfo * mail)
 	}
 
 	fclose(mail->readpipe);
-        exit(EXIT_SUCCESS);
+        _exit(EXIT_SUCCESS);
     }
     else if (pid < 0)
 #endif

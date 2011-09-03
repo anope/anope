@@ -156,7 +156,7 @@ void BotInfo::Join(Channel *c, ChannelStatus *status)
 
 		/* Should we be invited? */
 		if (c->HasMode(CMODE_INVITE) || (limit && c->users.size() >= limit))
-			ircdproto->SendNoticeChanops(this, c, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
+			ircdproto->SendNotice(this, "@" + c->name, "%s invited %s into the channel.", this->nick.c_str(), this->nick.c_str());
 
 		ModeManager::ProcessModes();
 	}
@@ -229,7 +229,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
 		u->SendMessage(this, NICK_IDENTIFY_REQUIRED);
-		Log(LOG_COMMAND, "denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
+		Log(LOG_NORMAL, "denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
 		return;
 	}
 

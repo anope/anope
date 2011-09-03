@@ -561,6 +561,20 @@ class DBPlain : public Module
 					ak->SetFlag(AK_ISNICK);
 	
 			}
+			else if (key.equals_ci("LOG"))
+			{
+				LogSetting l;
+
+				l.service_name = params[0];
+				l.command_service = params[1];
+				l.command_name = params[2];
+				l.method = params[3];
+				l.creator = params[4];
+				l.created = params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : Anope::CurTime;
+				l.extra = params.size() > 6 ? params[6] : "";
+
+				ci->log_settings.push_back(l);
+			}
 			else if (key.equals_ci("MLOCK"))
 			{
 				bool set = params[0] == "1" ? true : false;
@@ -784,6 +798,12 @@ class DBPlain : public Module
 				if (!ci->GetAkick(k)->reason.empty())
 					db_buffer << ci->GetAkick(k)->reason;
 				db_buffer << endl;
+			}
+			for (unsigned k = 0, end = ci->log_settings.size(); k < end; ++k)
+			{
+				LogSetting &l = ci->log_settings[k];
+
+				db_buffer << "MD LOG " << l.service_name << " " << l.command_service << " " << l.command_name << " " << l.method << " " << l.creator << " " << l.created << " " << l.extra << endl;
 			}
 			{
 				std::vector<Anope::string> mlocks;

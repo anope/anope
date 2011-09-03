@@ -89,7 +89,11 @@ void PrivilegeManager::Init()
 	AddPrivilege(Privilege("ASSIGN", _("Allowed to assign/unassign a bot")));
 	AddPrivilege(Privilege("MEMO", _("Allowed to read channel memos")));
 	AddPrivilege(Privilege("ACCESS_CHANGE", _("Allowed to modify the access list")));
+	AddPrivilege(Privilege("PROTECT", _("Allowed to (de)protect users")));
 	AddPrivilege(Privilege("PROTECTME", _("Allowed to (de)protect him/herself")));
+	AddPrivilege(Privilege("SET", _("Allowed to set channel settings")));
+	AddPrivilege(Privilege("OWNERME", _("Allowed to (de)owner him/herself")));
+	AddPrivilege(Privilege("OWNER", _("Allowed to (de)owner users")));
 }
 
 std::vector<Privilege> &PrivilegeManager::GetPrivileges()

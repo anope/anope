@@ -96,6 +96,19 @@ struct ModeLock
 	ModeLock(bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime) : set(s), name(n), param(p), setter(se), created(c) { }
 };
 
+struct LogSetting
+{
+	/* Our service name of the command */
+	Anope::string service_name;
+	/* The name of the client the command is on */
+	Anope::string command_service;
+	/* Name of the command to the user, can have spaces */
+	Anope::string command_name;
+	Anope::string method, extra;
+	Anope::string creator;
+	time_t created;
+};
+
 class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
 {
  private:
@@ -108,6 +121,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
  public:
 	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
 	ModeList mode_locks;
+	std::vector<LogSetting> log_settings;
 
  	/** Default constructor
 	 * @param chname The channel name

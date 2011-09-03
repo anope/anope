@@ -35,6 +35,11 @@ class CoreExport Log
 {
  public:
 	BotInfo *bi;
+	User *u;
+	Command *c;
+	Channel *chan;
+	ChannelInfo *ci;
+	Server *s;
 	LogType Type;
 	Anope::string Category;
 	std::list<Anope::string> Sources;
@@ -58,6 +63,8 @@ class CoreExport Log
 	Log(BotInfo *b, const Anope::string &category = "");
 
 	~Log();
+
+	Anope::string BuildPrefix() const;
 
 	template<typename T> Log &operator<<(T val)
 	{

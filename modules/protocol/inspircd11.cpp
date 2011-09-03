@@ -150,11 +150,6 @@ class InspIRCdProto : public IRCDProto
 			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), user->nick.c_str());
 	}
 
-	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
-	{
-		send_cmd(Config->ServerName, "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
-	}
-
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server)
 	{

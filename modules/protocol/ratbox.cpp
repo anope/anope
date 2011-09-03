@@ -200,11 +200,6 @@ class RatboxProto : public IRCDProto
 			send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
 	}
 
-	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
-	{
-		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
-	}
-
 	/* INVITE */
 	void SendInvite(BotInfo *source, const Anope::string &chan, const Anope::string &nick)
 	{

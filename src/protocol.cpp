@@ -119,16 +119,6 @@ void IRCDProto::SendKick(const BotInfo *bi, const Channel *chan, const User *use
 	SendKickInternal(bi, chan, user, buf);
 }
 
-void IRCDProto::SendNoticeChanops(const BotInfo *bi, const Channel *dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	va_start(args, fmt);
-	vsnprintf(buf, BUFSIZE - 1, fmt, args);
-	va_end(args);
-	SendNoticeChanopsInternal(bi, dest, buf);
-}
-
 void IRCDProto::SendMessage(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
 {
 	va_list args;

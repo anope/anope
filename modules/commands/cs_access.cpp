@@ -319,7 +319,7 @@ class CommandCSAccess : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " (level: " << level << ") as level " << u_level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " as level " << level;
 		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 
 		return;

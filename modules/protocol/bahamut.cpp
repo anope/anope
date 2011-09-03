@@ -201,11 +201,6 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd("", "BURST 0");
 	}
 
-	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
-	{
-		send_cmd("", "NOTICE @%s :%s", dest->name.c_str(), buf.c_str());
-	}
-
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())

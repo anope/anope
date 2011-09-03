@@ -154,13 +154,6 @@ class UnrealIRCdProto : public IRCDProto
 			send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
 	}
 
-	void SendNoticeChanopsInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
-	{
-		if (buf.empty())
-			return;
-		send_cmd(source->nick, "B @%s :%s", dest->name.c_str(), buf.c_str());
-	}
-
 	/* SERVER name hop descript */
 	/* Unreal 3.2 actually sends some info about itself in the descript area */
 	void SendServer(const Server *server)

@@ -63,7 +63,7 @@ Anope::string LogFile::GetName() const
 	return this->filename;
 }
 
-Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), Type(type), Category(category)
+Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(type), Category(category)
 {
 	if (!bi)
 		bi = Config ? findbot(Config->Global) : NULL;
@@ -71,7 +71,7 @@ Log::Log(LogType type, const Anope::string &category, BotInfo *b) : bi(b), Type(
 		this->Sources.push_back(bi->nick);
 }
 
-Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
+Log::Log(LogType type, User *_u, Command *_c, ChannelInfo *_ci) : u(_u), c(_c), chan(NULL), ci(_ci), s(NULL), Type(type)
 {
 	if (!u || !c)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -92,22 +92,11 @@ Log::Log(LogType type, User *u, Command *c, ChannelInfo *ci) : Type(type)
 	this->Sources.push_back(c->name);
 	if (ci)
 		this->Sources.push_back(ci->name);
-
-	if (type == LOG_ADMIN)
-		buf << "ADMIN: ";
-	else if (type == LOG_OVERRIDE)
-		buf << "OVERRIDE: ";
-	else
-		buf << "COMMAND: ";
-	Anope::string cname = sl != Anope::string::npos ? c->name.substr(sl + 1) : c->name;
-	buf << u->GetMask() << " used " << cname << " ";
-	if (ci)
-		buf << "on " << ci->name << " ";
 }
 
-Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
+Log::Log(User *_u, Channel *ch, const Anope::string &category) : u(_u), c(NULL), chan(ch), ci(chan ? chan->ci : NULL), s(NULL), Type(LOG_CHANNEL)
 {
-	if (!c)
+	if (!chan)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
 	this->bi = Config ? findbot(Config->ChanServ) : NULL;
@@ -116,16 +105,10 @@ Log::Log(User *u, Channel *c, const Anope::string &category) : Type(LOG_CHANNEL)
 		this->Sources.push_back(this->bi->nick);
 	if (u)
 		this->Sources.push_back(u->nick);
-	this->Sources.push_back(c->name);
-
-	buf << "CHANNEL: ";
-	if (u)
-		buf << u->GetMask() << " " << this->Category << " " << c->name << " ";
-	else
-		buf << this->Category << " " << c->name << " ";
+	this->Sources.push_back(chan->name);
 }
 
-Log::Log(User *u, const Anope::string &category) : bi(NULL), Type(LOG_USER), Category(category)
+Log::Log(User *_u, const Anope::string &category) : bi(NULL), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
@@ -134,11 +117,9 @@ Log::Log(User *u, const Anope::string &category) : bi(NULL), Type(LOG_USER), Cat
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
-
-	buf << "USERS: " << u->GetMask() << " ";
 }
 
-Log::Log(Server *s, const Anope::string &category) : bi(NULL), Type(LOG_SERVER), Category(category)
+Log::Log(Server *serv, const Anope::string &category) : bi(NULL), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
@@ -149,11 +130,9 @@ Log::Log(Server *s, const Anope::string &category) : bi(NULL), Type(LOG_SERVER),
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(s->GetName());
-	
-	buf << "SERVER: " << s->GetName() << " (" << s->GetDescription() << ") ";
 }
 
-Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_NORMAL), Category(category)
+Log::Log(BotInfo *b, const Anope::string &category) : bi(b), u(NULL), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_NORMAL), Category(category)
 {
 	if (!this->bi)
 		this->bi = Config ? findbot(Config->Global) : NULL;
@@ -164,16 +143,79 @@ Log::Log(BotInfo *b, const Anope::string &category) : bi(b), Type(LOG_NORMAL), C
 Log::~Log()
 {
 	if (nofork && debug && this->Type >= LOG_NORMAL && this->Type <= LOG_DEBUG + debug - 1)
-		std::cout << GetTimeStamp() << " Debug: " << this->buf.str() << std::endl;
+		std::cout << GetTimeStamp() << " Debug: " << this->BuildPrefix() << this->buf.str() << std::endl;
 	else if (nofork && this->Type <= LOG_TERMINAL)
-		std::cout << GetTimeStamp() << " " << this->buf.str() << std::endl;
+		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << this->buf.str() << std::endl;
 	else if (this->Type == LOG_TERMINAL)
-		std::cout << this->buf.str() << std::endl;
+		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
 	for (unsigned i = 0; Config && i < Config->LogInfos.size(); ++i)
 	{
 		LogInfo *l = Config->LogInfos[i];
 		l->ProcessMessage(this);
 	}
+	FOREACH_MOD(I_OnLog, OnLog(this));
+}
+
+Anope::string Log::BuildPrefix() const
+{
+	Anope::string buffer;
+
+	switch (this->Type)
+	{
+		case LOG_ADMIN:
+		{
+			buffer += "ADMIN: ";
+			size_t sl = this->c->name.find('/');
+			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
+			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->ci)
+				buffer += "on " + this->ci->name + " ";
+			break;
+		}
+		case LOG_OVERRIDE:
+		{
+			buffer += "OVERRIDE: ";
+			size_t sl = this->c->name.find('/');
+			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
+			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->ci)
+				buffer += "on " + this->ci->name + " ";
+			break;
+		}
+		case LOG_COMMAND:
+		{
+			buffer += "COMMAND: ";
+			size_t sl = this->c->name.find('/');
+			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
+			buffer += this->u->GetMask() + " used " + cname + " ";
+			if (this->ci)
+				buffer += "on " + this->ci->name + " ";
+			break;
+		}
+		case LOG_CHANNEL:
+		{
+			buffer += "CHANNEL: ";
+			if (this->u)
+				buffer += this->u->GetMask() + " " + this->Category + " " + this->chan->name + " ";
+			else
+				buffer += this->Category + " " + this->chan->name + " ";
+			break;
+		}
+		case LOG_USER:
+		{
+			buffer += "USERS: " + this->u->GetMask() + " ";
+			break;
+		}
+		case LOG_SERVER:
+		{
+			buffer += "SERVER: " + this->s->GetName() + " (" + this->s->GetDescription() + ") ";
+			break;
+		}
+		default:
+			break;
+	}
+
+	return buffer;
 }
 
 LogInfo::LogInfo(int logage, bool rawio, bool ldebug) : LogAge(logage), RawIO(rawio), Debug(ldebug)
@@ -291,6 +333,7 @@ void LogInfo::ProcessMessage(const Log *l)
 	for (std::list<Anope::string>::iterator it = this->Targets.begin(), it_end = this->Targets.end(); it != it_end; ++it)
 	{
 		const Anope::string &target = *it;
+		Anope::string buffer = l->BuildPrefix() + l->buf.str();
 
 		if (target[0] == '#')
 		{
@@ -299,14 +342,14 @@ void LogInfo::ProcessMessage(const Log *l)
 				Channel *c = findchan(target);
 				if (!c || !l->bi)
 					continue;
-				ircdproto->SendPrivmsg(l->bi, c->name, "%s", l->buf.str().c_str());
+				ircdproto->SendPrivmsg(l->bi, c->name, "%s", buffer.c_str());
 			}
 		}
 		else if (target == "globops")
 		{
 			if (UplinkSock && l->bi && l->Type <= LOG_NORMAL && Me && Me->IsSynced())
 			{
-				ircdproto->SendGlobops(l->bi, "%s", l->buf.str().c_str());
+				ircdproto->SendGlobops(l->bi, "%s", buffer.c_str());
 			}
 		}
 		else
@@ -364,7 +407,7 @@ void LogInfo::ProcessMessage(const Log *l)
 			}
 
 			if (log)
-				log->stream << GetTimeStamp() << " " << l->buf.str() << std::endl;
+				log->stream << GetTimeStamp() << " " << buffer << std::endl;
 		}
 	}
 }

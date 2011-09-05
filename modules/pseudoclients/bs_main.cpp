@@ -157,7 +157,7 @@ class BotServCore : public Module
 		if (c->HasFlag(CH_INHABIT))
 			return;
 
-		if (c->ci && c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
+		if (c->ci && c->ci->bi && u != c->ci->bi && c->users.size() - 1 <= Config->BSMinUsers && c->FindUser(c->ci->bi))
 		{
 			bool persist = c->HasFlag(CH_PERSIST);
 			c->SetFlag(CH_PERSIST);

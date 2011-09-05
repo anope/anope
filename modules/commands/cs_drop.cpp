@@ -34,14 +34,12 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		ChannelInfo *ci = cs_findchan(params[0]);
+		ChannelInfo *ci = cs_findchan(chan);
 		if (ci == NULL)
 		{
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 			return;
 		}
-
-		ci = cs_findchan(chan);
 
 		if (ci->HasFlag(CI_SUSPENDED) && !u->HasCommand("chanserv/drop"))
 		{

@@ -19,12 +19,12 @@ enum
 	ACCESS_FOUNDER = 10001
 };
 
-static std::map<Anope::string, int16> defaultLevels;
+static std::map<Anope::string, int16, std::less<ci::string> > defaultLevels;
 
 static void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
-	for (std::map<Anope::string, int16>::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
+	for (std::map<Anope::string, int16, std::less<ci::string> >::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
 		ci->SetLevel(it->first, it->second);
 }
 
@@ -849,26 +849,27 @@ class CSAccess : public Module
 
 	void OnReload()
 	{
-		std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-		std::map<Anope::string, int16> tLevels;
+		defaultLevels.clear();
 		ConfigReader config;
 
-		for (unsigned i = 0; i < privs.size(); ++i)
+		for (int i = 0; i < config.Enumerate("privilege"); ++i)
 		{
-			Privilege &p = privs[i];
+			const Anope::string &pname = config.ReadValue("privilege", "name", "", i);
 
-			const Anope::string &value = config.ReadValue("chanserv", "level_" + p.name.lower(), "", 0);
+			Privilege *p = PrivilegeManager::FindPrivilege(pname);
+			if (p == NULL)
+				continue;
+
+			const Anope::string &value = config.ReadValue("privilege", "level", "", i);
 			if (value.empty())
-				throw ConfigException("The value for <chanserv:level_" + p.name.lower() + "> must not be empty!");
+				continue;
 			else if (value.equals_ci("founder"))
-				tLevels[p.name] = ACCESS_FOUNDER;
+				defaultLevels[p->name] = ACCESS_FOUNDER;
 			else if (value.equals_ci("disabled"))
-				tLevels[p.name] = ACCESS_INVALID;
+				defaultLevels[p->name] = ACCESS_INVALID;
 			else
-				tLevels[p.name] = config.ReadInteger("chanserv", "level_" + p.name.lower(), 0, false);
+				defaultLevels[p->name] = config.ReadInteger("privilege", "level", i, false);
 		}
-
-		defaultLevels = tLevels;
 	}
 
 	void OnCreateChan(ChannelInfo *ci)

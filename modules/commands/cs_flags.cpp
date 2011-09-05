@@ -390,15 +390,21 @@ class CSFlags : public Module
 	void OnReload()
 	{
 		ConfigReader config;
-		std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+		defaultFlags.clear();
 
-		for (unsigned i = 0; i < privs.size(); ++i)
+		for (int i = 0; i < config.Enumerate("privilege"); ++i)
 		{
-			Privilege &p = privs[i];
-			const Anope::string &value = config.ReadValue("chanserv", "flag_" + p.name, "", 0);
+			const Anope::string &pname = config.ReadValue("privilege", "name", "", i);
+
+			Privilege *p = PrivilegeManager::FindPrivilege(pname);
+			if (p == NULL)
+				continue;
+
+			const Anope::string &value = config.ReadValue("privilege", "flag", "", i);
 			if (value.empty())
 				continue;
-			defaultFlags[p.name] = value[0];
+
+			defaultFlags[p->name] = value[0];
 		}
 	}
 };

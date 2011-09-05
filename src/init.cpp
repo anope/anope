@@ -355,7 +355,6 @@ void Init(int ac, char **av)
 
 	/* Initialize the socket engine */
 	SocketEngine::Init();
-	PrivilegeManager::Init();
 
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);

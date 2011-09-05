@@ -56,49 +56,14 @@ Privilege *PrivilegeManager::FindPrivilege(const Anope::string &name)
 	return NULL;
 }
 
-void PrivilegeManager::Init()
-{
-	AddPrivilege(Privilege("ACCESS_LIST", _("Allowed to view the access list")));
-	AddPrivilege(Privilege("NOKICK", _("Prevents users being kicked by Services")));
-	AddPrivilege(Privilege("FANTASIA", _("Allowed to use fantasy commands")));
-	AddPrivilege(Privilege("FOUNDER", _("Allowed to issue commands restricted to channel founders")));
-	AddPrivilege(Privilege("GREET", _("Greet message displayed")));
-	AddPrivilege(Privilege("AUTOVOICE", _("Automatic mode +v")));
-	AddPrivilege(Privilege("VOICEME", _("Allowed to (de)voice him/herself")));
-	AddPrivilege(Privilege("VOICE", _("Allowed to (de)voice users")));
-	AddPrivilege(Privilege("INFO", _("Allowed to use INFO command with ALL option")));
-	AddPrivilege(Privilege("SAY", _("Allowed to use SAY and ACT commands")));
-	AddPrivilege(Privilege("AUTOHALFOP", _("Automatic mode +h")));
-	AddPrivilege(Privilege("HALFOPME", _("Allowed to (de)halfop him/herself")));
-	AddPrivilege(Privilege("HALFOP", _("Allowed to (de)halfop users")));
-	AddPrivilege(Privilege("KICK", _("Allowed to use the KICK command")));
-	AddPrivilege(Privilege("SIGNKICK", _("No signed kick when SIGNKICK LEVEL is used")));
-	AddPrivilege(Privilege("BAN", _("Allowed to use ban users")));
-	AddPrivilege(Privilege("TOPIC", _("Allowed to change channel topics")));
-	AddPrivilege(Privilege("MODE", _("Allowed to change channel modes")));
-	AddPrivilege(Privilege("GETKEY", _("Allowed to use GETKEY command")));
-	AddPrivilege(Privilege("INVITE", _("Allowed to use the INVITE command")));
-	AddPrivilege(Privilege("UNBAN", _("Allowed to unban users")));
-	AddPrivilege(Privilege("AUTOOP", _("Automatic channel operator status")));
-	AddPrivilege(Privilege("AUTOOWNER", _("Automatic mode +q")));
-	AddPrivilege(Privilege("OPDEOPME", _("Allowed to (de)op him/herself")));
-	AddPrivilege(Privilege("OPDEOP", _("Allowed to (de)op users")));
-	AddPrivilege(Privilege("AUTOPROTECT", _("Automatic mode +a")));
-	AddPrivilege(Privilege("AKICK", _("Allowed to use AKICK command")));
-	AddPrivilege(Privilege("BADWORDS", _("Allowed to modify channel badwords list")));
-	AddPrivilege(Privilege("ASSIGN", _("Allowed to assign/unassign a bot")));
-	AddPrivilege(Privilege("MEMO", _("Allowed to read channel memos")));
-	AddPrivilege(Privilege("ACCESS_CHANGE", _("Allowed to modify the access list")));
-	AddPrivilege(Privilege("PROTECT", _("Allowed to (de)protect users")));
-	AddPrivilege(Privilege("PROTECTME", _("Allowed to (de)protect him/herself")));
-	AddPrivilege(Privilege("SET", _("Allowed to set channel settings")));
-	AddPrivilege(Privilege("OWNERME", _("Allowed to (de)owner him/herself")));
-	AddPrivilege(Privilege("OWNER", _("Allowed to (de)owner users")));
-}
-
 std::vector<Privilege> &PrivilegeManager::GetPrivileges()
 {
 	return privs;
+}
+
+void PrivilegeManager::ClearPrivileges()
+{
+	privs.clear();
 }
 
 AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service<AccessProvider>(o, n)

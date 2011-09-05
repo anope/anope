@@ -17,8 +17,8 @@ class PrivilegeManager
 	static void AddPrivilege(Privilege p, int pos = -1, int def = 0);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
-	static void Init();
 	static std::vector<Privilege> &GetPrivileges();
+	static void ClearPrivileges();
 };
 
 class ChanAccess;

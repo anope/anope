@@ -872,6 +872,35 @@ static bool DoneCommands(ServerConfig *config, const Anope::string &)
 	return true;
 }
 
+static bool InitPrivileges(ServerConfig *config, const Anope::string &)
+{
+	PrivilegeManager::ClearPrivileges();
+	return true;
+}
+
+static bool DoPrivileges(ServerConfig *config, const Anope::string &, const Anope::string *, ValueList &values, int *)
+{
+	Anope::string name = values[0].GetValue();
+	Anope::string desc = values[1].GetValue();
+
+	ValueItem vi(name);
+	if (!ValidateNotEmpty(config, "privilege", "name", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	vi = ValueItem(desc);
+	if (!ValidateNotEmpty(config, "privilege", "desc", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
+
+	PrivilegeManager::AddPrivilege(Privilege(name, desc));
+	return true;
+}
+
+static bool DonePrivileges(ServerConfig *config, const Anope::string &)
+{
+	Log(LOG_DEBUG) << "Loaded " << PrivilegeManager::GetPrivileges().size() << " privileges";
+	return true;
+}
+
 /*************************************************************************/
 
 static std::set<Anope::string> services;
@@ -1283,6 +1312,11 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 			{"", "", "", "", ""},
 			{DT_STRING, DT_STRING, DT_STRING, DT_STRING},
 			InitCommands, DoCommands, DoneCommands},
+		{"privilege",
+			{"name", "desc", ""},
+			{"", "", ""},
+			{DT_STRING, DT_STRING, DT_STRING},
+			InitPrivileges, DoPrivileges, DonePrivileges},
 		{"",
 			{""},
 			{""},

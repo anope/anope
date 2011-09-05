@@ -67,8 +67,6 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		static const int version = LDAP_VERSION3;
 		if (ldap_set_option(this->con, LDAP_OPT_PROTOCOL_VERSION, &version) != LDAP_OPT_SUCCESS)
 			throw LDAPException("Unable to set protocol version for " + this->name + ": " + Anope::LastError());
-
-		threadEngine.Start(this);
 	}
 
 	~LDAPService()
@@ -400,6 +398,7 @@ class ModuleLDAP : public Module, public Pipe
 				try
 				{
 					LDAPService *ss = new LDAPService(this, connname, server, port, admin_binddn, admin_password);
+					ss->Start();
 					this->LDAPServices.insert(std::make_pair(connname, ss));
 
 					Log(LOG_NORMAL, "ldap") << "LDAP: Successfully connected to server " << connname << " (" << server << ")";

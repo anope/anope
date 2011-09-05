@@ -1,7 +1,22 @@
 #include "services.h"
 
-/* Threadengine attributes used by this thread engine */
-static pthread_attr_t threadengine_attr;
+static inline pthread_attr_t *get_engine_attr()
+{
+	/* Threadengine attributes used by this thread engine */
+	static pthread_attr_t attr;
+	static bool inited = false;
+
+	if (inited == false)
+	{
+		if (pthread_attr_init(&attr))
+			throw CoreException("Error calling pthread_attr_init");
+		if (pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE))
+			throw CoreException("Unable to mark threads as joinable");
+		inited = true;
+	}
+
+	return &attr;
+}
 
 /** Entry point used for the threads
  * @param parameter A Thread* cast to a void*
@@ -12,23 +27,6 @@ static void *entry_point(void *parameter)
 	thread->Run();
 	thread->SetExitState();
 	pthread_exit(0);
-}
-
-/** Threadengines constructor
- */
-ThreadEngine::ThreadEngine()
-{
-	if (pthread_attr_init(&threadengine_attr))
-		throw CoreException("ThreadEngine: Error calling pthread_attr_init");
-	if (pthread_attr_setdetachstate(&threadengine_attr, PTHREAD_CREATE_JOINABLE))
-		throw CoreException("ThreadEngine: Unable to mark threads as joinable");
-}
-
-/** Threadengines destructor
- */
-ThreadEngine::~ThreadEngine()
-{
-	pthread_attr_destroy(&threadengine_attr);
 }
 
 /** Join to the thread, sets the exit state to true
@@ -47,15 +45,14 @@ void Thread::Exit()
 	pthread_exit(0);
 }
 
-/** Start a new thread
- * @param thread A pointer to a newley allocated thread
+/** Launch the thread
  */
-void ThreadEngine::Start(Thread *thread)
+void Thread::Start()
 {
-	if (pthread_create(&thread->Handle, &threadengine_attr, entry_point, thread))
+	if (pthread_create(&this->Handle, get_engine_attr(), entry_point, this))
 	{
-		delete thread;
-		throw CoreException(Anope::string("Unable to create thread: ") + Anope::LastError());
+		this->SetFlag(SF_DEAD);
+		throw CoreException("Unable to create thread: " + Anope::LastError());
 	}
 }
 

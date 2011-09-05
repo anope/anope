@@ -12,36 +12,9 @@ typedef pthread_mutex_t MutexHandle;
 typedef pthread_cond_t CondHandle;
 #endif
 
-class ThreadEngine;
 class Thread;
 
-extern CoreExport ThreadEngine threadEngine;
-
-class CoreExport ThreadEngine
-{
- public:
-	/* Vector of threads */
-	std::vector<Thread *> threads;
-
-	/** Threadengines constructor
-	 */
-	ThreadEngine();
-
-	/** Threadengines destructor
-	 */
-	~ThreadEngine();
-
-	/** Start a new thread
-	 * @param thread A pointer to a newley allocated thread
-	 */
-	void Start(Thread *thread);
-
-	/** Check for finished threads
-	 */
-	void Process();
-};
-
-class CoreExport Thread : public Extensible
+class CoreExport Thread : public Pipe, public Extensible
 {
  private:
 	/* Set to true to tell the thread to finish and we are waiting for it */
@@ -71,14 +44,22 @@ class CoreExport Thread : public Extensible
 	 */
 	void Exit();
 
+	/** Launch the thread
+	 */
+	void Start();
+
 	/** Returns the exit state of the thread
 	 * @return true if we want to exit
 	 */
 	bool GetExitState() const;
 
-	/** Called to run the thread, should be overloaded
+	/** Called when this thread should be joined to
 	 */
-	virtual void Run();
+	void OnNotify();
+
+	/** Called when the thread is run.
+	 */
+	virtual void Run() = 0;
 };
 
 class CoreExport Mutex

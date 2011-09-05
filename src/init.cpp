@@ -182,7 +182,7 @@ class SignalReload : public Signal
  public:
 	SignalReload(int sig) : Signal(sig) { }
 
-	void OnSignal()
+	void OnNotify()
 	{
 		Log() << "Received SIGHUP: Saving databases & rehashing configuration";
 
@@ -208,7 +208,7 @@ class SignalExit : public Signal
  public:
 	SignalExit(int sig) : Signal(sig) { }
 
-	void OnSignal()
+	void OnNotify()
 	{
 #ifndef _WIN32
 		Log() << "Received " << strsignal(this->signal) << " signal (" << this->signal << "), exiting.";
@@ -228,7 +228,7 @@ class SignalNothing : public Signal
  public:
 	SignalNothing(int sig) : Signal(sig) { }
 
-	void OnSignal() { }
+	void OnNotify() { }
 };
 
 void Init(int ac, char **av)
@@ -397,9 +397,10 @@ void Init(int ac, char **av)
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
 
-	static SignalReload sig_hup(SIGHUP);
-	static SignalExit sig_term(SIGTERM), sig_int(SIGINT);
-	static SignalNothing sig_pipe(SIGPIPE);
+	new SignalReload(SIGHUP);
+	new SignalExit(SIGTERM);
+	new SignalExit(SIGINT);
+	new SignalNothing(SIGPIPE);
 
 	/* Initialize multi-language support */
 	Log(LOG_DEBUG) << "Loading Languages...";

@@ -375,6 +375,16 @@ class StackerInfo
 class CoreExport ModeManager
 {
  protected:
+	class ModePipe : public Pipe
+	{
+	 public:
+	 	/** Called when there are modes to be set
+		 */
+		void OnNotify();
+	};
+
+	static ModePipe *mpipe;
+
 	/* List of pairs of user/channels and their stacker info */
 	static std::list<std::pair<Base *, StackerInfo *> > StackerObjects;
 

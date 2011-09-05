@@ -51,7 +51,8 @@ bool Mail(User *u, NickCore *nc, BotInfo *service, const Anope::string &subject,
 	else
 	{
 		u->lastmail = nc->lastmail = Anope::CurTime;
-		threadEngine.Start(new MailThread(nc->display, nc->email, subject, message));
+		Thread *t = new MailThread(nc->display, nc->email, subject, message);
+		t->Start();
 		return true;
 	}
 
@@ -64,7 +65,8 @@ bool Mail(NickCore *nc, const Anope::string &subject, const Anope::string &messa
 		return false;
 
 	nc->lastmail = Anope::CurTime;
-	threadEngine.Start(new MailThread(nc->display, nc->email, subject, message));
+	Thread *t = new MailThread(nc->display, nc->email, subject, message);
+	t->Start();
 
 	return true;
 }

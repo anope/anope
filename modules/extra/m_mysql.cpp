@@ -164,7 +164,7 @@ class ModuleSQL : public Module, public Pipe
 		ModuleManager::Attach(i, this,  2);
 
 		DThread = new DispatcherThread();
-		threadEngine.Start(DThread);
+		DThread->Start();
 
 		OnReload();
 	}

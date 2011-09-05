@@ -9,6 +9,7 @@
 #include "services.h"
 #include "modules.h"
 
+ModeManager::ModePipe *ModeManager::mpipe = NULL;
 /* List of pairs of user/channels and their stacker info */
 std::list<std::pair<Base *, StackerInfo *> > ModeManager::StackerObjects;
 
@@ -345,6 +346,16 @@ void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
 	list->push_back(std::make_pair(mode, Param));
 }
 
+/** Called when there are modes to be set
+ */
+void ModeManager::ModePipe::OnNotify()
+{
+	if (!Me || !Me->IsSynced())
+		return;
+	
+	ModeManager::ProcessModes();
+}
+
 /** Get the stacker info for an item, if one doesnt exist it is created
  * @param Item The user/channel etc
  * @return The stacker info
@@ -360,6 +371,11 @@ StackerInfo *ModeManager::GetInfo(Base *Item)
 
 	StackerInfo *s = new StackerInfo();
 	StackerObjects.push_back(std::make_pair(Item, s));
+
+	if (mpipe == NULL)
+		mpipe = new ModePipe();
+	mpipe->Notify();
+
 	return s;
 }
 

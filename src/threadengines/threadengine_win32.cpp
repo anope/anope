@@ -11,18 +11,6 @@ static DWORD WINAPI entry_point(void *parameter)
 	return 0;
 }
 
-/** Threadengines constructor
- */
-ThreadEngine::ThreadEngine()
-{
-}
-
-/** Threadengines destructor
- */
-ThreadEngine::~ThreadEngine()
-{
-}
-
 /** Join to the thread, sets the exit state to true
  */
 void Thread::Join()
@@ -39,17 +27,16 @@ void Thread::Exit()
 	ExitThread(0);
 }
 
-/** Start a new thread
- * @param thread A pointer to a newley allocated thread
+/** Launch the thread
  */
-void ThreadEngine::Start(Thread *thread)
+void Thread::Start()
 {
-	thread->Handle = CreateThread(NULL, 0, entry_point, thread, 0, NULL);
+	this->Handle = CreateThread(NULL, 0, entry_point, this, 0, NULL);
 
-	if (!thread->Handle)
+	if (!this->Handle)
 	{
-		delete thread;
-		throw CoreException(Anope::string("Unable to create thread: ") + Anope::LastError());
+		this->SetFlag(SF_DEAD);
+		throw CoreException("Unable to create thread: " + Anope::LastError());
 	}
 }
 

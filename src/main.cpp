@@ -207,21 +207,10 @@ void Signal::SignalHandler(int signal)
 {
 	for (unsigned i = 0, j = SignalHandlers.size(); i < j; ++i)
 		if (SignalHandlers[i]->signal == signal)
-			SignalHandlers[i]->called = true;
+			SignalHandlers[i]->Notify();
 }
 
-void Signal::Process()
-{
-	for (unsigned i = 0, j = SignalHandlers.size(); i < j; ++i)
-		if (SignalHandlers[i]->called == true)
-		{
-			Signal *s = SignalHandlers[i];
-			s->called = false;
-			s->OnSignal();
-		}
-}
-
-Signal::Signal(int s) : called(false), signal(s)
+Signal::Signal(int s) : Pipe(), signal(s)
 {
 	memset(&this->old, 0, sizeof(this->old));
 
@@ -243,7 +232,6 @@ Signal::~Signal()
 	
 	sigaction(this->signal, &this->old, NULL);
 }
-
 
 /*************************************************************************/
 
@@ -355,22 +343,12 @@ int main(int ac, char **av, char **envp)
 	{
 		Log(LOG_DEBUG_2) << "Top of main loop";
 
-		/* Process signals */
-		Signal::Process();
-
 		/* Process timers */
 		if (Anope::CurTime - last_check >= Config->TimeoutCheck)
 		{
 			TimerManager::TickTimers(Anope::CurTime);
 			last_check = Anope::CurTime;
 		}
-
-		/* Free up any finished threads */
-		threadEngine.Process();
-
-		/* Process any modes that need to be (un)set */
-		if (Me->IsSynced())
-			ModeManager::ProcessModes();
 
 		/* Process the socket engine */
 		SocketEngine::Process();

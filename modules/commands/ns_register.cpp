@@ -299,7 +299,7 @@ class CommandNSResend : public Command
 	void OnServHelp(CommandSource &source)
 	{
 		if (Config->NSEmailReg)
-			source.Reply("    %-14s %s", this->name.c_str(),_("Resend the registration passcode"));
+			Command::OnServHelp(source);
 	}
 };
 

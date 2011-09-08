@@ -642,7 +642,7 @@ class BanDataPurger : public CallBack
 			{
 				for (std::map<Anope::string, BanData>::iterator it2 = bandata.begin(), it2_end = bandata.end(); it2 != it2_end;)
 				{
-					const Anope::string &user = it->first;
+					const Anope::string &user = it2->first;
 					BanData *bd = &it2->second;
 					++it2;
 

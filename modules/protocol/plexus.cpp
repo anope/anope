@@ -27,7 +27,7 @@ IRCDVar myIrcd[] = {
 	 0,				/* Join 2 Message */
 	 1,				/* Chan SQlines */
 	 0,				/* Quit on Kill */
-	 0,				/* vidents */
+	 1,				/* vidents */
 	 1,				/* svshold */
 	 1,				/* time stamp on mode */
 	 1,				/* UMODE */
@@ -157,6 +157,22 @@ class PlexusProto : public IRCDProto
 	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 	{
 		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->GetUID().c_str(), static_cast<long>(u->timestamp), newnick.c_str(), static_cast<long>(when));
+	}
+
+	void SendVhostDel(User *u)
+	{
+		BotInfo *bi = findbot(Config->HostServ);
+		if (u->HasMode(UMODE_CLOAK))
+			u->RemoveMode(bi, UMODE_CLOAK);
+		else
+			this->SendVhost(u, u->GetIdent(), u->chost);
+	}
+
+	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
+	{
+		if (!ident.empty())
+			send_cmd(Config->Numeric, "ENCAP * CHGIDENT %s %s", u->nick.c_str(), ident.c_str());
+		send_cmd(Config->Numeric, "ENCAP * CHGHOST %s %s", u->nick.c_str(), host.c_str());
 	}
 
 	void SendConnect()

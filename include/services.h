@@ -676,14 +676,6 @@ enum
 #include "account.h"
 #include "commands.h"
 #include "bots.h"
-
-struct LevelInfo
-{
-	int what;
-	Anope::string name;
-	const char *desc;
-};
-
 #include "channels.h"
 
 /** Channelban type flags

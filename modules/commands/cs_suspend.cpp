@@ -47,7 +47,7 @@ class CommandCSSuspend : public Command
 		ci->SetFlag(CI_SUSPENDED);
 		ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(u->nick));
 		if (!reason.empty())
-			ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(u->nick));
+			ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(reason));
 
 		if (ci->c)
 		{

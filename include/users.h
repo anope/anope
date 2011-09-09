@@ -194,7 +194,7 @@ class CoreExport User : public Extensible
 	 * @param CheckSecure Only returns true if the user has secure off
 	 * @return true or false
 	 */
-	virtual bool IsRecognized(bool CheckSecure = false);
+	virtual bool IsRecognized(bool CheckSecure = true);
 
 	/** Check if the user is a services oper
 	 * @return true if they are an oper

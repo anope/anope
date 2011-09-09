@@ -29,7 +29,7 @@ class XMLRPCUser : public User
 		return na;
 	}
 
-	bool IsRecognized(bool CheckSecure = false)
+	bool IsRecognized(bool CheckSecure = true)
 	{
 		return na;
 	}

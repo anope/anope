@@ -178,7 +178,7 @@ void User::SetRealname(const Anope::string &srealname)
 	this->realname = srealname;
 	NickAlias *na = findnick(this->nick);
 
-	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
+	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 		na->last_realname = srealname;
 
 	Log(this, "realname") << "changed realname to " << srealname;
@@ -501,7 +501,7 @@ void User::UpdateHost()
 	if (na)
 		OnAccess = is_on_access(this, na->nc);
 
-	if (na && (this->IsIdentified(true) || this->IsRecognized(true)))
+	if (na && (this->IsIdentified(true) || this->IsRecognized()))
 	{
 		Anope::string last_usermask = this->GetIdent() + "@" + this->GetDisplayedHost();
 		Anope::string last_realhost = this->GetIdent() + "@" + this->host;

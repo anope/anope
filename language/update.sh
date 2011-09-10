@@ -14,7 +14,7 @@ cd -
 
 for f in *.po
 do
-	msgmerge -E -v -s -U $f `echo $f | cut -d'.' -f1`.pot
+	msgmerge -v -s -U $f `echo $f | cut -d'.' -f1`.pot
 done
 
 rm -f *~

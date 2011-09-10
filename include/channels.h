@@ -33,7 +33,7 @@ enum ChannelFlag
 	CH_SYNCING
 };
 
-const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "CH_LOGCHAN", "" };
+const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "" };
 
 class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 {

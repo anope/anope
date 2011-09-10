@@ -1538,11 +1538,7 @@ static void SaveDatabases()
 			me->OnAkickAdd(ci, ak);
 		}
 
-<<<<<<< HEAD
-		me->OnLevelChange(NULL, ci, -1, -1);
-=======
 		me->OnLevelChange(NULL, ci, "ALL", -1);
->>>>>>> 348a3db... Allow modules to add their own channel levels
 
 		for (unsigned j = 0, end = ci->memos.memos.size(); j < end; ++j)
 		{

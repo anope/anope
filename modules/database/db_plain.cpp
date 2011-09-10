@@ -580,14 +580,14 @@ class DBPlain : public Module
 				bool set = params[0] == "1" ? true : false;
 				Anope::string mode_name = params[1];
 				Anope::string setter = params[2];
-				time_t created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
+				time_t mcreated = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : Anope::CurTime;
 				Anope::string param = params.size() > 4 ? params[4] : "";
 
 				for (size_t i = CMODE_BEGIN + 1; i < CMODE_END; ++i)
 					if (ChannelModeNameStrings[i] == mode_name)
 					{
 						ChannelModeName n = static_cast<ChannelModeName>(i);
-						ci->mode_locks.insert(std::make_pair(n, ModeLock(set, n, param, setter, created)));
+						ci->mode_locks.insert(std::make_pair(n, ModeLock(set, n, param, setter, mcreated)));
 						break;
 					}
 			}

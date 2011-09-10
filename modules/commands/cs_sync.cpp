@@ -29,7 +29,7 @@ class CommandCSSync : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, params[0].c_str());
 		else if (ci->c == NULL)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!ci->AccessFor(u).HasPriv(CA_ACCESS_CHANGE))
+		else if (!ci->AccessFor(u).HasPriv("ACCESS_CHANGE"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{

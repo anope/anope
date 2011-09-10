@@ -32,10 +32,7 @@ void CommandSource::Reply(const Anope::string &message)
 	sepstream sep(translated_message, '\n');
 	Anope::string tok;
 	while (sep.GetToken(tok))
-	{
-		const char *translated_message = translate(this->u, tok.c_str());
-		u->SendMessage(this->service, translated_message);
-	}
+		u->SendMessage(this->service, tok);
 }
 
 Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params) : Service<Command>(o, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), module(owner)

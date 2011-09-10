@@ -37,7 +37,7 @@ enum ChannelFlag
 
 const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "CH_LOGCHAN", "" };
 
-class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
+class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 4>
 {
  public:
 	typedef std::multimap<ChannelModeName, Anope::string> ModeList;

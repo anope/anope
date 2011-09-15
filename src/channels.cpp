@@ -18,7 +18,7 @@ channel_map ChannelList;
  * @param name The channel name
  * @param ts The time the channel was created
  */
-Channel::Channel(const Anope::string &nname, time_t ts) : Flags<ChannelFlag, 3>(ChannelFlagString)
+Channel::Channel(const Anope::string &nname, time_t ts) : Flags<ChannelFlag, 4>(ChannelFlagString)
 {
 	if (nname.empty())
 		throw CoreException("A channel without a name ?");

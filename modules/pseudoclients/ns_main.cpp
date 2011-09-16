@@ -51,7 +51,7 @@ class MyNickServService : public NickServService
 			return;
 		}
 
-		if (u->IsRecognized() || !na->nc->HasFlag(NI_KILL_IMMED))
+		if (u->IsRecognized(false) || !na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			if (na->nc->HasFlag(NI_SECURE))
 				u->SendMessage(NickServ, NICK_IS_SECURE, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
@@ -59,7 +59,7 @@ class MyNickServService : public NickServService
 				u->SendMessage(NickServ, NICK_IS_REGISTERED, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		}
 
-		if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized())
+		if (na->nc->HasFlag(NI_KILLPROTECT) && !u->IsRecognized(false))
 		{
 			if (na->nc->HasFlag(NI_KILL_IMMED))
 			{
@@ -97,7 +97,7 @@ class ExpireCallback : public CallBack
 			++it;
 
 			User *u = finduser(na->nick);
-			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified(true) : u->IsRecognized(true)))
+			if (u && (na->nc->HasFlag(NI_SECURE) ? u->IsIdentified(true) : u->IsRecognized()))
 				na->last_seen = Anope::CurTime;
 
 			bool expire = false;

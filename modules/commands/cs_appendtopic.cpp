@@ -87,7 +87,7 @@ class CommandCSAppendTopic : public Command
 	{
 		source.Reply(_("Syntax: APPENDTOPIC channel text"));
 		source.Reply(" ");
-		source.Reply(("This command allows users to append text to a currently set\n"
+		source.Reply(_("This command allows users to append text to a currently set\n"
 			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
 			"the new, updated topic is locked."));
 

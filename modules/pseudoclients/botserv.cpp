@@ -75,6 +75,15 @@ class BotServCore : public Module
 				rest = realbuf.substr(space + 1);
 			}
 
+			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
+			{
+				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, c->ci, rest));
+			}
+			else
+			{
+				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, c->ci, rest));
+			}
+
 			BotInfo *bi = findbot(Config->ChanServ);
 			if (bi == NULL)
 				bi = findbot(Config->BotServ);
@@ -83,16 +92,9 @@ class BotServCore : public Module
 
 			if (c->ci->AccessFor(u).HasPriv("FANTASIA"))
 			{
-
 				this->fantasy_channel = c;
 				bi->OnMessage(u, realbuf);
 				this->fantasy_channel = NULL;
-	
-				FOREACH_MOD(I_OnBotFantasy, OnBotFantasy(command, u, c->ci, rest));
-			}
-			else
-			{
-				FOREACH_MOD(I_OnBotNoFantasyAccess, OnBotNoFantasyAccess(command, u, c->ci, rest));
 			}
 		}
 	}

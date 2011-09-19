@@ -229,7 +229,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (!c->HasFlag(CFLAG_ALLOW_UNREGISTERED) && !u->IsIdentified())
 	{
 		u->SendMessage(this, NICK_IDENTIFY_REQUIRED);
-		Log(LOG_NORMAL, "denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
+		Log(LOG_NORMAL, "access_denied", this) << "Access denied for unregistered user " << u->GetMask() << " with command " << c->name;
 		return;
 	}
 
@@ -266,7 +266,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	if (!info.permission.empty() && !u->HasCommand(info.permission))
 	{
 		u->SendMessage(this, ACCESS_DENIED);
-		Log(LOG_COMMAND, "denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
+		Log(LOG_NORMAL, "access_denied", this) << "Access denied for user " << u->GetMask() << " with command " << c->name;
 		return;
 	}
 

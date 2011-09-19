@@ -164,6 +164,8 @@ Anope::string Log::BuildPrefix() const
 	{
 		case LOG_ADMIN:
 		{
+			if (!this->c)
+				break;
 			buffer += "ADMIN: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
@@ -174,6 +176,8 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_OVERRIDE:
 		{
+			if (!this->c)
+				break;
 			buffer += "OVERRIDE: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;
@@ -184,6 +188,8 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_COMMAND:
 		{
+			if (!this->c)
+				break;
 			buffer += "COMMAND: ";
 			size_t sl = this->c->name.find('/');
 			Anope::string cname = sl != Anope::string::npos ? this->c->name.substr(sl + 1) : this->c->name;

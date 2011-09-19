@@ -64,7 +64,7 @@ void Channel::Reset()
 	{
 		UserContainer *uc = *it;
 
-		Flags<ChannelModeName, CMODE_END * 2> flags = *debug_cast<Flags<ChannelModeName, CMODE_END * 2> *>(uc->Status);
+		ChannelStatus flags = *uc->Status;
 		uc->Status->ClearFlags();
 
 		if (findbot(uc->user->nick))

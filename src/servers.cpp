@@ -61,7 +61,9 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 				for (unsigned i = 0; i < bi->botchannels.size(); ++i)
 				{
 					size_t h = bi->botchannels[i].find('#');
-					Anope::string chname = bi->botchannels[i].substr(h != Anope::string::npos ? h : 0);
+					if (h == Anope::string::npos)
+						continue;
+					Anope::string chname = bi->botchannels[i].substr(h);
 					Channel *c = findchan(chname);
 					if (c && c->FindUser(bi))
 					{

@@ -350,9 +350,6 @@ void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
  */
 void ModeManager::ModePipe::OnNotify()
 {
-	if (!Me || !Me->IsSynced())
-		return;
-	
 	ModeManager::ProcessModes();
 }
 
@@ -371,11 +368,6 @@ StackerInfo *ModeManager::GetInfo(Base *Item)
 
 	StackerInfo *s = new StackerInfo();
 	StackerObjects.push_back(std::make_pair(Item, s));
-
-	if (mpipe == NULL)
-		mpipe = new ModePipe();
-	mpipe->Notify();
-
 	return s;
 }
 
@@ -474,6 +466,10 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
 		s->bi = debug_cast<Channel *>(Object)->ci->WhoSends();
 	else if (Type == ST_USER)
 		s->bi = NULL;
+
+	if (mpipe == NULL)
+		mpipe = new ModePipe();
+	mpipe->Notify();
 }
 
 /** Add a user mode to Anope

@@ -981,12 +981,23 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 	{
 		size_t ch = oldchannels[i].find('#');
 		Anope::string chname = oldchannels[i].substr(ch != Anope::string::npos ? ch : 0);
-		if (std::find(bi->botchannels.begin(), bi->botchannels.end(), chname) == bi->botchannels.end())
+
+		bool found = false;
+		for (unsigned j = 0; j < bi->botchannels.size(); ++j)
 		{
-			Channel *c = findchan(chname);
-			if (c)
-				bi->Part(c);
+			ch = bi->botchannels[j].find('#');
+			Anope::string ochname = bi->botchannels[j].substr(ch != Anope::string::npos ? ch : 0);
+
+			if (chname.equals_ci(ochname))
+				found = true;
 		}
+
+		if (found)
+			continue;
+
+		Channel *c = findchan(chname);
+		if (c)
+			bi->Part(c);
 	}
 
 	return true;

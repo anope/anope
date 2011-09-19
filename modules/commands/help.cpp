@@ -25,7 +25,10 @@ class CommandHelp : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		FOREACH_MOD(I_OnPreHelp, OnPreHelp(source, params));
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnPreHelp, OnPreHelp(source, params));
+		if (MOD_RESULT == EVENT_STOP)
+			return;
 	
 		User *u = source.u;
 		BotInfo *bi = source.owner;

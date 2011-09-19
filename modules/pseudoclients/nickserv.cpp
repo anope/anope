@@ -267,16 +267,17 @@ class NickServCore : public Module
 			u->RemoveMode(NickServ, Name);
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->NickServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 allows you to \"register\" a nickname and\n"
 			"prevent others from using it. The following\n"
 			"commands allow for registration and maintenance of\n"
 			"nicknames; to use them, type \002%s%s \037command\037\002.\n"
 			"For more information on a specific command, type\n"
 			"\002%s%s %s \037command\037\002.\n "), Config->NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), source.command.c_str());
+		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)

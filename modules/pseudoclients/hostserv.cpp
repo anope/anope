@@ -73,11 +73,12 @@ class HostServCore : public Module
 		this->OnNickIdentify(u);
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->HostServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:\n"), Config->HostServ.c_str());
+		return EVENT_CONTINUE;
 	}
 };
 

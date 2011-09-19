@@ -317,8 +317,9 @@ class CoreExport Module : public Extensible
 	/** Called when someone uses the generic/help command
 	 * @param source Command source
 	 * @param params Params
+	 * @return EVENT_STOP to stop processing
 	 */
-	virtual void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) { }
+	virtual EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
 
 	/** Called when someone uses the generic/help command
 	 * @param source Command source

@@ -201,16 +201,17 @@ class MemoServCore : public Module
 		this->mymemoserv.Check(u);
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->MemoServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 is a utility allowing IRC users to send short\n"
 			"messages to other IRC users, whether they are online at\n"
 			"the time or not, or to channels(*). Both the sender's\n"
 			"nickname and the target nickname or channel must be\n"
 			"registered in order to send a memo.\n"
 			"%s's commands include:"), Config->MemoServ.c_str(), Config->MemoServ.c_str());
+		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)

@@ -327,11 +327,12 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->OperServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:"), Config->OperServ.c_str());
+		return EVENT_CONTINUE;
 	}
 };
 

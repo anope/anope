@@ -108,10 +108,10 @@ class ChanServCore : public Module
 		}
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->ChanServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 allows you to register and control various\n"
 			"aspects of channels. %s can often prevent\n"
 			"malicious users from \"taking over\" channels by limiting\n"
@@ -120,6 +120,7 @@ class ChanServCore : public Module
 			"\002%s%s \037command\037\002. For more information on a\n"
 			"specific command, type \002%s%s HELP \037command\037\002.\n "),
 			Config->ChanServ.c_str(), Config->ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->ChanServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->ChanServ.c_str(), Config->ChanServ.c_str(), source.command.c_str());
+		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)

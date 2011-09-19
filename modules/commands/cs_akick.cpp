@@ -461,7 +461,7 @@ class CommandCSAKick : public Command
 		this->SetSyntax(_("\037channel\037 ADD {\037nick\037 | \037mask\037} [\037reason\037]"));
 		this->SetSyntax(_("\037channel\037 DEL {\037nick\037 | \037mask\037 | \037entry-num\037 | \037list\037}"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | \037entry-num\037 | \037list\037]"));
-		this->SetSyntax(_("\002AKICK \037channel\037 VIEW [\037mask\037 | \037entry-num\037 | \037list\037]"));
+		this->SetSyntax(_("\037channel\037 VIEW [\037mask\037 | \037entry-num\037 | \037list\037]"));
 		this->SetSyntax(_("\037channel\037 ENFORCE"));
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}

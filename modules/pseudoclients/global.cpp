@@ -79,11 +79,12 @@ class GlobalCore : public Module
 			notice_server(Config->Global, s, "%s", Config->GlobalOnCycleUP.c_str());
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->Global)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("%s commands:\n"), Config->Global.c_str());
+		return EVENT_CONTINUE;
 	}
 };
 

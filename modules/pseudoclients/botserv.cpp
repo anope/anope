@@ -169,10 +169,10 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (!params.empty() || source.owner->nick != Config->BotServ)
-			return;
+			return EVENT_CONTINUE;
 		source.Reply(_("\002%s\002 allows you to have a bot on your own channel.\n"
 			"It has been created for users that can't host or\n"
 			"configure a bot, or for use on networks that don't\n"
@@ -182,6 +182,7 @@ class BotServCore : public Module
 			"\002%s%s %s \037command\037\002.\n "),
 			Config->BotServ.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(),
 			Config->UseStrictPrivMsgString.c_str(), Config->BotServ.c_str(), source.command.c_str());
+		return EVENT_CONTINUE;
 	}
 
 	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)

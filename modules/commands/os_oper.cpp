@@ -108,7 +108,8 @@ class CommandOSOper : public Command
 				{
 					source.Reply(_("Available commands for \2%s\2:"), ot->GetName().c_str());
 					Anope::string buf;
-					for (std::list<Anope::string>::const_iterator it = ot->GetCommands().begin(), it_end = ot->GetCommands().end(); it != it_end; ++it)
+					std::list<Anope::string> cmds = ot->GetCommands();
+					for (std::list<Anope::string>::const_iterator it = cmds.begin(), it_end = cmds.end(); it != it_end; ++it)
 					{
 						buf += *it + " ";
 						if (buf.length() > 400)
@@ -129,7 +130,8 @@ class CommandOSOper : public Command
 				{
 					source.Reply(_("Available privileges for \2%s\2:"), ot->GetName().c_str());
 					Anope::string buf;
-					for (std::list<Anope::string>::const_iterator it = ot->GetPrivs().begin(), it_end = ot->GetPrivs().end(); it != it_end; ++it)
+					std::list<Anope::string> privs = ot->GetPrivs();
+					for (std::list<Anope::string>::const_iterator it = privs.begin(), it_end = privs.end(); it != it_end; ++it)
 					{
 						buf += *it + " ";
 						if (buf.length() > 400)

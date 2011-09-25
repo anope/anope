@@ -14,6 +14,19 @@
 #include "version.h"
 #include "modules.h"
 
+ExtensibleItem::ExtensibleItem()
+{
+}
+
+ExtensibleItem::~ExtensibleItem()
+{
+}
+
+void ExtensibleItem::OnDelete()
+{
+	delete this;
+}
+
 struct arc4_stream
 {
 	uint8 i;

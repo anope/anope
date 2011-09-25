@@ -30,7 +30,7 @@ class DNSBLResolver : public DNSRequest
 
 	void OnLookupComplete(const DNSQuery *record)
 	{
-		if (!user || user->GetExt("m_dnsbl_akilled"))
+		if (!user || user->HasExt("m_dnsbl_akilled"))
 			return;
 
 		const ResourceRecord &ans_record = record->answers[0];
@@ -50,7 +50,7 @@ class DNSBLResolver : public DNSRequest
 			record_reason = this->blacklist.replies[result];
 		}
 
-		user->Extend("m_dnsbl_akilled");
+		user->Extend("m_dnsbl_akilled", NULL);
 
 		Anope::string reason = this->blacklist.reason;
 		reason = reason.replace_all_cs("%n", user->nick);

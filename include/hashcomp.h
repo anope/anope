@@ -316,30 +316,6 @@ namespace std
 	};
 }
 
-/* Define operators for using >> and << with irc::string to an ostream on an istream. */
-/* This was endless fun. No. Really. */
-/* It was also the first core change Ommeh made, if anyone cares */
-
-/** Operator >> for irc::string
- */
-inline std::istream &operator>>(std::istream &is, irc::string &str)
-{
-	std::string tmp;
-	is >> tmp;
-	str = tmp.c_str();
-	return is;
-}
-
-/** Operator >> for ci::string
- */
-inline std::istream &operator>>(std::istream &is, ci::string &str)
-{
-	std::string tmp;
-	is >> tmp;
-	str = tmp.c_str();
-	return is;
-}
-
 /* Define operators for + and == with irc::string to std::string for easy assignment
  * and comparison
  *

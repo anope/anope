@@ -13,66 +13,113 @@
 
 #include "module.h"
 
+struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, ExtensibleItem, Serializable<AJoinList>
+{
+	NickCore *nc;
+
+	AJoinList(NickCore *n) : nc(n) { }
+
+	serialized_data serialize()
+	{
+		serialized_data sd;
+
+		sd["nc"] << this->nc->display;
+		Anope::string channels;
+		for (unsigned i = 0; i < this->size(); ++i)
+			channels += this->at(i).first + "," + this->at(i).second;
+		sd["channels"] << channels;
+
+		return sd;
+	}
+
+	static void unserialize(serialized_data &sd)
+	{
+		NickCore *nc = findcore(sd["nc"].astr());
+		if (nc == NULL)
+			return;
+
+		AJoinList *aj = new AJoinList(nc);
+		nc->Extend("ns_ajoin_channels", aj);
+
+		Anope::string token;
+		spacesepstream ssep(sd["channels"].astr());
+		while (ssep.GetToken(token))
+		{
+			size_t c = token.find(',');
+			Anope::string chan, key;
+			if (c == Anope::string::npos)
+				chan = token;
+			else
+			{
+				chan = token.substr(0, c);
+				key = token.substr(c + 1);
+			}
+
+			aj->push_back(std::make_pair(chan, key));
+		}
+	}
+};
+
 class CommandNSAJoin : public Command
 {
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		std::vector<std::pair<Anope::string, Anope::string> > channels;
-		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
+		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
 
-		if (channels.empty())
+		if (channels == NULL || channels->empty())
 			source.Reply(_("Your auto join list is empty."));
 		else
 		{
 			source.Reply(_("Your auto join list:\n"
 					"  Num   Channel      Key"));
-			for (unsigned i = 0; i < channels.size(); ++i)
-				source.Reply(" %3d    %-12s %s", i + 1, channels[i].first.c_str(), channels[i].second.c_str());
+			for (unsigned i = 0; i < channels->size(); ++i)
+				source.Reply(" %3d    %-12s %s", i + 1, channels->at(i).first.c_str(), channels->at(i).second.c_str());
 		}
 	}
 
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		std::vector<std::pair<Anope::string, Anope::string> > channels;
-		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
+		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		if (channels == NULL)
+		{
+			channels = new AJoinList(source.u->Account());
+			source.u->Account()->Extend("ns_ajoin_channels", channels);
+		}
 
-		unsigned i;
-		for (i = 0; i < channels.size(); ++i)
-			if (channels[i].first.equals_ci(params[1]))
-				break;
+		unsigned i = 0;
+		if (channels != NULL)
+			for (; i < channels->size(); ++i)
+				if (channels->at(i).first.equals_ci(params[1]))
+					break;
 
-		if (channels.size() >= Config->AJoinMax)
+		if (channels->size() >= Config->AJoinMax)
 			source.Reply(_("Your auto join list is full."));
-		else if (i != channels.size())
+		else if (i != channels->size())
 			source.Reply(_("%s is already on your auto join list."), params[1].c_str());
 		else if (ircdproto->IsChannelValid(params[1]) == false)
  			source.Reply(CHAN_X_INVALID, params[1].c_str());
 		else
 		{
-			channels.push_back(std::make_pair(params[1], params.size() > 2 ? params[2] : ""));
+			channels->push_back(std::make_pair(params[1], params.size() > 2 ? params[2] : ""));
 			source.Reply(_("Added %s to your auto join list."), params[1].c_str());
-			source.u->Account()->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
-				std::pair<Anope::string, Anope::string> > >(channels));
 		}
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		std::vector<std::pair<Anope::string, Anope::string> > channels;
-		source.u->Account()->GetExtRegular("ns_ajoin_channels", channels);
+		AJoinList *channels = source.u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
 
-		unsigned i;
-		for (i = 0; i < channels.size(); ++i)
-			if (channels[i].first.equals_ci(params[1]))
-				break;
+		unsigned i = 0;
+		if (channels != NULL)
+			for (; i < channels->size(); ++i)
+				if (channels->at(i).first.equals_ci(params[1]))
+					break;
 		
-		if (i == channels.size())
+		if (channels == NULL || i == channels->size())
 			source.Reply(_("%s was not found on your auto join list."), params[1].c_str());
 		else
 		{
-			channels.erase(channels.begin() + i);
-			source.u->Account()->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
-				std::pair<Anope::string, Anope::string> > >(channels));
+			channels->erase(channels->begin() + i);
 			source.Reply(_("%s was removed from your auto join list."), params[1].c_str());
 		}
 	}
@@ -120,25 +167,28 @@ class NSAJoin : public Module
 	{
 		this->SetAuthor("Anope");
 
-
-		Implementation i[] = { I_OnNickIdentify, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
+		Implementation i[] = { I_OnNickIdentify };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		Serializable<AJoinList>::Alloc.Register("AJoinList");
 	}
 
 	void OnNickIdentify(User *u)
 	{
-		std::vector<std::pair<Anope::string, Anope::string> > channels;
-		u->Account()->GetExtRegular("ns_ajoin_channels", channels);
+		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
 
-		for (unsigned i = 0; i < channels.size(); ++i)
+		if (channels == NULL)
+			return;
+
+		for (unsigned i = 0; i < channels->size(); ++i)
 		{
-			Channel *c = findchan(channels[i].first);
-			ChannelInfo *ci = c != NULL ? c->ci : cs_findchan(channels[i].first);
+			Channel *c = findchan(channels->at(i).first);
+			ChannelInfo *ci = c != NULL ? c->ci : cs_findchan(channels->at(i).first);
 			if (c == NULL && ci != NULL)
 				c = ci->c;
 
 			bool need_invite = false;
-			Anope::string key = channels[i].second;
+			Anope::string key = channels->at(i).second;
 			
 			if (ci != NULL)
 			{
@@ -192,53 +242,11 @@ class NSAJoin : public Module
 				BotInfo *bi = findbot(Config->NickServ);
 				if (!bi || !ci->AccessFor(u).HasPriv("INVITE"))
 					continue;
-				ircdproto->SendInvite(bi, channels[i].first, u->nick);
+				ircdproto->SendInvite(bi, channels->at(i).first, u->nick);
 			}
 
-			ircdproto->SendSVSJoin(Config->NickServ, u->nick, channels[i].first, key);
+			ircdproto->SendSVSJoin(Config->NickServ, u->nick, channels->at(i).first, key);
 		}
-	}
-
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc)
-	{
-		std::vector<std::pair<Anope::string, Anope::string> > channels;
-		nc->GetExtRegular("ns_ajoin_channels", channels);
-
-		Anope::string chans;
-		for (unsigned i = 0; i < channels.size(); ++i)
-			chans += " " + channels[i].first + "," + channels[i].second;
-
-		if (!chans.empty())
-		{
-			chans.erase(chans.begin());
-			WriteMetadata("NS_AJOIN", chans);
-		}
-	}
-
-	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
-	{
-		if (key == "NS_AJOIN")
-		{
-			std::vector<std::pair<Anope::string, Anope::string> > channels;
-			nc->GetExtRegular("ns_ajoin_channels", channels);
-
-			for (unsigned i = 0; i < params.size(); ++i)
-			{
-				Anope::string chan, chankey;
-				commasepstream sep(params[i]);
-				sep.GetToken(chan);
-				sep.GetToken(chankey);
-
-				channels.push_back(std::make_pair(chan, chankey));
-			}
-
-			nc->Extend("ns_ajoin_channels", new ExtensibleItemRegular<std::vector<
-				std::pair<Anope::string, Anope::string> > >(channels));
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
 	}
 };
 

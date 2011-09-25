@@ -227,21 +227,6 @@ class ModuleException : public CoreException
 	virtual ~ModuleException() throw() { }
 };
 
-class DatabaseException : public CoreException
-{
- public:
-	/** This constructor can be used to specify an error message before throwing.
-	 * @param mmessage The exception
-	 */
-	DatabaseException(const Anope::string &message) : CoreException(message, "A database module") { }
-
-	/** Destructor
-	 * @throws Nothing
-	 */
-	virtual ~DatabaseException() throw() { }
-};
-
-
 /** Debug cast to be used instead of dynamic_cast, this uses dynamic_cast
  * for debug builds and static_cast on releass builds to speed up the program
  * because dynamic_cast relies on RTTI.
@@ -313,7 +298,29 @@ template<typename T, size_t Size = 32> class Flags
 		Flag_Values.reset();
 	}
 
-	std::vector<Anope::string> ToString()
+	Anope::string ToString()
+	{
+		std::vector<Anope::string> v = ToVector();
+		Anope::string flag_buf;
+		for (unsigned i = 0; i < v.size(); ++i)
+			flag_buf += v[i] + " ";
+		flag_buf.trim();
+		return flag_buf;
+	}
+
+	void FromString(const Anope::string &str)
+	{
+		spacesepstream sep(str);
+		Anope::string buf;
+		std::vector<Anope::string> v;
+
+		while (sep.GetToken(buf))
+			v.push_back(buf);
+
+		FromVector(v);
+	}
+
+	std::vector<Anope::string> ToVector()
 	{
 		std::vector<Anope::string> ret;
 		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
@@ -322,7 +329,7 @@ template<typename T, size_t Size = 32> class Flags
 		return ret;
 	}
 
-	void FromString(const std::vector<Anope::string> &strings)
+	void FromVector(const std::vector<Anope::string> &strings)
 	{
 		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
 			for (unsigned j = 0; j < strings.size(); ++j)
@@ -478,6 +485,7 @@ class Entry;
 #include "threadengine.h"
 #include "opertype.h"
 #include "modes.h"
+#include "serialize.h"
 
 /*************************************************************************/
 
@@ -527,10 +535,14 @@ const Anope::string MemoFlagStrings[] = {
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
-class CoreExport Memo : public Flags<MemoFlag>
+class CoreExport Memo : public Flags<MemoFlag>, public Serializable<Memo>
 {
  public:
-	Memo();
+ 	Memo();
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
+
+	Anope::string owner;
 	time_t time;	/* When it was sent */
 	Anope::string sender;
 	Anope::string text;
@@ -555,15 +567,7 @@ struct Session
 	unsigned hits;			/* Number of subsequent kills for a host */
 };
 
-struct Exception
-{
-	Anope::string mask;		/* Hosts to which this exception applies */
-	unsigned limit;			/* Session limit for exception */
-	Anope::string who;		/* Nick of person who added the exception */
-	Anope::string reason;		/* Reason for exception's addition */
-	time_t time;			/* When this exception was added */
-	time_t expires;			/* Time when it expires. 0 == no expiry */
-};
+struct Exception;
 
 /*************************************************************************/
 
@@ -611,28 +615,7 @@ class CoreExport HostInfo
 	/** Retrieve when the vhost was crated
 	 * @return the time it was created
 	 */
-	const time_t GetTime() const;
-};
-
-/** Flags for badwords
- */
-enum BadWordType
-{
-	/* Always kicks if the word is said */
-	BW_ANY,
-	/* User must way the entire word */
-	BW_SINGLE,
-	/* The word has to start with the badword */
-	BW_START,
-	/* The word has to end with the badword */
-	BW_END
-};
-
-/* Structure used to contain bad words. */
-struct BadWord
-{
-	Anope::string word;
-	BadWordType type;
+	time_t GetTime() const;
 };
 
 /* BotServ SET flags */

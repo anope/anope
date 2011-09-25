@@ -32,13 +32,6 @@ class CommandOSModLoad : public Command
 		{
 			ircdproto->SendGlobops(source.owner, "%s loaded module %s", u->nick.c_str(), mname.c_str());
 			source.Reply(_("Module \002%s\002 loaded"), mname.c_str());
-
-			/* If a user is loading this module, then the core databases have already been loaded
-			 * so trigger the event manually
-			 */
-			Module *m = ModuleManager::FindModule(mname);
-			if (m)
-				m->OnPostLoadDatabases();
 		}
 		else if (status == MOD_ERR_EXISTS)
 			source.Reply(_("Module \002%s\002 is already loaded."), mname.c_str());
@@ -100,13 +93,6 @@ class CommandOSModReLoad : public Command
 		{
 			ircdproto->SendGlobops(source.owner, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
 			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
-
-			/* If a user is loading this module, then the core databases have already been loaded
-			 * so trigger the event manually
-			 */
-			m = ModuleManager::FindModule(mname);
-			if (m)
-				m->OnPostLoadDatabases();
 		}
 		else
 		{

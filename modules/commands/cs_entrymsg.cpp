@@ -13,34 +13,70 @@
 
 #include "module.h"
 
-struct EntryMsg
+struct EntryMsg : Serializable<EntryMsg>
 {
-	static unsigned MaxEntries;
+	ChannelInfo *ci;
+	Anope::string creator;
+	Anope::string message;
+	time_t when;
 
-	EntryMsg(const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
+	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
 	{
+	
+		this->ci = c;
 		this->creator = cname;
 		this->message = cmessage;
 		this->when = ct;
 	}
 
-	Anope::string creator;
-	Anope::string message;
-	time_t when;
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["ci"] << this->ci->name;
+		data["creator"] << this->creator;
+		data["message"] << this->message;
+		data["when"].setType(Serialize::DT_INT) << this->when;
+
+		return data;
+	}
+
+	static void unserialize(serialized_data &data);
 };
-unsigned EntryMsg::MaxEntries = 0;
+
+static unsigned MaxEntries = 0;
+
+struct EntryMessageList : std::vector<EntryMsg>, ExtensibleItem
+{
+};
+
+void EntryMsg::unserialize(serialized_data &data)
+{
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (!ci)
+		return;
+
+	EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+	if (messages == NULL)
+	{
+		messages = new EntryMessageList();
+		ci->Extend("cs_entrymsg", messages);
+	}
+
+	messages->push_back(EntryMsg(ci, data["creator"].astr(), data["message"].astr()));
+}
 
 class CommandEntryMessage : public Command
 {
  private:
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
-		std::vector<EntryMsg> messages;
-		if (ci->GetExtRegular("cs_entrymsg", messages))
+		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		if (messages == NULL)
 		{
 			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
-			for (unsigned i = 0; i < messages.size(); ++i)
-				source.Reply(CHAN_LIST_ENTRY, i + 1, messages[i].message.c_str(), messages[i].creator.c_str(), do_strftime(messages[i].when).c_str());
+			for (unsigned i = 0; i < messages->size(); ++i)
+				source.Reply(CHAN_LIST_ENTRY, i + 1, (*messages)[i].message.c_str(), (*messages)[i].creator.c_str(), do_strftime((*messages)[i].when).c_str());
 			source.Reply(_("End of entry message list."));
 		}
 		else
@@ -49,35 +85,36 @@ class CommandEntryMessage : public Command
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		std::vector<EntryMsg> messages;
-		ci->GetExtRegular("cs_entrymsg", messages);
+		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
+		if (messages == NULL)
+		{
+			messages = new EntryMessageList();
+			ci->Extend("cs_entrymsg", messages);
+		}
 
-		if (EntryMsg::MaxEntries && messages.size() >= EntryMsg::MaxEntries)
+		if (MaxEntries && messages->size() >= MaxEntries)
 			source.Reply(_("The entry message list for \2%s\2 is full."), ci->name.c_str());
 		else
 		{
-			messages.push_back(EntryMsg(source.u->nick, message));
-			ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
+			messages->push_back(EntryMsg(ci, source.u->nick, message));
 			source.Reply(_("Entry message added to \2%s\2"), ci->name.c_str());
 		}
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const Anope::string &message)
 	{
-		std::vector<EntryMsg> messages;
+		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (!message.is_pos_number_only())
 			source.Reply(("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
-		else if (ci->GetExtRegular("cs_entrymsg", messages))
+		else if (messages != NULL)
 		{
 			try
 			{
 				unsigned i = convertTo<unsigned>(message);
-				if (i > 0 && i <= messages.size())
+				if (i > 0 && i <= messages->size())
 				{
-					messages.erase(messages.begin() + i - 1);
-					if (!messages.empty())
-						ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
-					else
+					messages->erase(messages->begin() + i - 1);
+					if (messages->empty())
 						ci->Shrink("cs_entrymsg");
 					source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
 				}
@@ -165,58 +202,27 @@ class CSEntryMessage : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnJoinChannel, I_OnReload, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata }; 
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-			
-
 		this->OnReload();
+
+		Serializable<EntryMsg>::Alloc.Register("EntryMsg");
 	}
 
 	void OnJoinChannel(User *u, Channel *c)
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{
-			std::vector<EntryMsg> messages;
+			EntryMessageList *messages = c->ci->GetExt<EntryMessageList *>("cs_entrymsg");
 
-			if (c->ci->GetExtRegular("cs_entrymsg", messages))
-				for (unsigned i = 0; i < messages.size(); ++i)
-					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), messages[i].message.c_str());
+			if (messages != NULL)
+				for (unsigned i = 0; i < messages->size(); ++i)
+					u->SendMessage(c->ci->WhoSends(), "[%s] %s", c->ci->name.c_str(), (*messages)[i].message.c_str());
 		}
 	}
 		
 	void OnReload()
 	{
 		ConfigReader config;
-		EntryMsg::MaxEntries = config.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);
-	}
-
-	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
-	{
-		if (key.find("CS_ENTRYMSG_") == 0 && params.size() > 2)
-		{
-			Anope::string creator = params[0];
-			time_t t = params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : Anope::CurTime;
-			Anope::string message = params[2];
-			for (unsigned j = 3; j < params.size(); ++j)
-				message += " " + params[j];
-
-			std::vector<EntryMsg> messages;
-			ci->GetExtRegular("cs_entrymsg", messages);
-			messages.push_back(EntryMsg(creator, message, t));
-			ci->Extend("cs_entrymsg", new ExtensibleItemRegular<std::vector<EntryMsg> >(messages));
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci)
-	{
-		std::vector<EntryMsg> messages;
-		if (ci->GetExtRegular("cs_entrymsg", messages))
-			for (unsigned i = 0; i < messages.size(); ++i)
-				WriteMetadata("CS_ENTRYMSG_" + stringify(i), messages[i].creator + " " + stringify(messages[i].when) + " " + messages[i].message);
+		MaxEntries = config.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);
 	}
 };
 

@@ -342,11 +342,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) { }
 
-	/** Called after the core has finished loading the databases, but before
-	 * we connect to the server
-	 */
-	virtual void OnPostLoadDatabases() { }
-
 	/** Called when the databases are saved
 	 * @return EVENT_CONTINUE to let other modules continue saving, EVENT_STOP to stop
 	 */
@@ -485,73 +480,6 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnServerDisconnect() { }
 
-	/** Called when the flatfile dbs are being written
-	 * @param Write A callback to the function used to insert a line into the database
-	 */
-	virtual void OnDatabaseWrite(void (*Write)(const Anope::string &)) { }
-
-	/** Called when a line is read from the database
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseRead(const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
-	/** Called when nickcore metadata is read from the database
-	 * @param nc The nickcore
-	 * @param key The metadata key
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
-	/** Called when nickcore metadata is read from the database
-	 * @param na The nickalias
-	 * @param key The metadata key
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
-	/** Called when botinfo metadata is read from the database
-	 * @param bi The botinfo
-	 * @param key The metadata key
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseReadMetadata(BotInfo *bi, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
-	/** Called when chaninfo metadata is read from the database
-	 * @param ci The chaninfo
-	 * @param key The metadata key
-	 * @param params The params from the database
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to stop processing
-	 */
-	virtual EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params) { return EVENT_CONTINUE; }
-
-	/** Called when we are writing metadata for a nickcore
-	 * @param WriteMetata A callback function used to insert the metadata
-	 * @param nc The nickcore
-	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc) { }
-
-	/** Called when we are wrting metadata for a nickalias
-	 * @param WriteMetata A callback function used to insert the metadata
-	 * @param na The nick alias
-	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickAlias *na) { }
-
-	/** Called when we are writing metadata for a botinfo
-	 * @param WriteMetata A callback function used to insert the metadata
-	 * @param bi The botinfo
-	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), BotInfo *bi) { }
-
-	/** Called when are are writing metadata for a channelinfo
-	 * @param WriteMetata A callback function used to insert the metadata
-	 * @param bi The channelinfo
-	 */
-	virtual void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci) { }
-
 	/** Called when services restart
 	*/
 	virtual void OnRestart() { }
@@ -672,11 +600,6 @@ class CoreExport Module : public Extensible
 	 * @param chname The channel name
 	 */
 	virtual void OnChanDrop(const Anope::string &chname) { }
-
-	/** Called when a channel is forbidden
-	 * @param ci The channel
-	 */
-	virtual void OnChanForbidden(ChannelInfo *ci) { }
 
 	/** Called when a channel is registered
 	 * @param ci The channel
@@ -979,10 +902,10 @@ class CoreExport Module : public Extensible
 
 	/** Called when a mode is about to be unlocked
 	 * @param ci The channel the mode is being unlocked from
-	 * @param mode The mode being unlocked
+	 * @param lock The mode lock
 	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to deny the mlock.
 	 */
-	virtual EventReturn OnUnMLock(ChannelInfo *ci, ChannelMode *mode, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) { return EVENT_CONTINUE; }
 
 	/** Called after a module is loaded
 	 * @param u The user loading the module, can be NULL
@@ -1042,7 +965,7 @@ enum Implementation
 		I_OnNickUpdate,
 
 		/* ChanServ */
-		I_OnChanForbidden, I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
+		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
 		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
 		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv, I_OnGroupCheckPriv,
@@ -1066,8 +989,7 @@ enum Implementation
 		I_OnAddXLine, I_OnDelXLine, I_IsServicesOper,
 
 		/* Database */
-		I_OnPostLoadDatabases, I_OnSaveDatabase, I_OnLoadDatabase,
-		I_OnDatabaseWrite, I_OnDatabaseRead, I_OnDatabaseReadMetadata, I_OnDatabaseWriteMetadata,
+		I_OnSaveDatabase, I_OnLoadDatabase,
 
 		/* Modules */
 		I_OnModuleLoad, I_OnModuleUnload,
@@ -1233,6 +1155,11 @@ class service_reference : public dynamic_reference<T>
  public:
 	service_reference(const Anope::string &n) : dynamic_reference<T>(NULL), name(n)
 	{
+	}
+
+	inline void operator=(const Anope::string &n)
+	{
+		this->name = n;
 	}
 
 	operator bool()

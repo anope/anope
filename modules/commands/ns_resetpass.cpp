@@ -56,6 +56,12 @@ class CommandNSResetPass : public Command
 	}
 };
 
+struct ResetInfo : ExtensibleItem
+{
+	Anope::string code;
+	time_t time;
+};
+
 class NSResetPass : public Module
 {
 	CommandNSResetPass commandnsresetpass;
@@ -80,28 +86,25 @@ class NSResetPass : public Module
 			User *u = source.u;
 			NickAlias *na = findnick(params[0]);
 
-			time_t t;
-			Anope::string c;
-			if (na && na->nc->GetExtRegular("ns_resetpass_code", c) && na->nc->GetExtRegular("ns_resetpass_time", t))
+			ResetInfo *ri = na ? na->nc->GetExt<ResetInfo *>("ns_resetpass") : NULL;
+			if (na && ri)
 			{
 				const Anope::string &passcode = params[1];
-				if (t < Anope::CurTime - 3600)
+				if (ri->time < Anope::CurTime - 3600)
 				{
-					na->nc->Shrink("ns_resetpass_code");
-					na->nc->Shrink("ns_resetpass_time");
+					na->nc->Shrink("ns_resetpass");
 					source.Reply(_("Your password reset request has expired."));
 				}
-				else if (passcode.equals_cs(c))
+				else if (passcode.equals_cs(ri->code))
 				{
-					na->nc->Shrink("ns_resetpass_code");
-					na->nc->Shrink("ns_resetpass_time");
+					na->nc->Shrink("ns_resetpass");
 
 					Log(LOG_COMMAND, u, &commandnsresetpass) << "confirmed RESETPASS to forcefully identify to " << na->nick;
 
 					na->nc->UnsetFlag(NI_UNCONFIRMED);
 					u->Identify(na);
 
-					source.Reply(_("You are now identified for your nick. Change your passwor now."));
+					source.Reply(_("You are now identified for your nick. Change your password now."));
 
 				}
 				else
@@ -142,8 +145,10 @@ static bool SendResetEmail(User *u, NickAlias *na, BotInfo *bi)
 	message = message.replace_all_cs("%N", Config->NetworkName);
 	message = message.replace_all_cs("%c", passcode);
 
-	na->nc->Extend("ns_resetpass_code", new ExtensibleItemRegular<Anope::string>(passcode));
-	na->nc->Extend("ns_resetpass_time", new ExtensibleItemRegular<time_t>(Anope::CurTime));
+	ResetInfo *ri = new ResetInfo;
+	ri->code = passcode;
+	ri->time = Anope::CurTime;
+	na->nc->Extend("ns_resetpass", ri);
 
 	return Mail(u, na->nc, bi, subject, message);
 }

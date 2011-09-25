@@ -19,26 +19,55 @@ enum TypeInfo
 	NEW, NICK_TO, NICK_FROM, JOIN, PART, QUIT, KICK
 };
 
-struct SeenInfo
+struct SeenInfo;
+typedef Anope::insensitive_map<SeenInfo *> database_map;
+database_map database;
+
+struct SeenInfo : Serializable<SeenInfo>
 {
+	Anope::string nick;
 	Anope::string vhost;
 	TypeInfo type;
 	Anope::string nick2;    // for nickchanges and kicks
 	Anope::string channel;  // for join/part/kick
 	Anope::string message;  // for part/kick/quit
 	time_t last;            // the time when the user was last seen
+
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["nick"] << nick;
+		data["vhost"] << vhost;
+		data["type"] << type;
+		data["nick2"] << nick2;
+		data["channel"] << channel;
+		data["message"] << message;
+		data["last"].setType(Serialize::DT_INT) << last;
+
+		return data;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		SeenInfo *s = new SeenInfo();
+
+		data["nick"] >> s->nick;
+		data["vhost"] >> s->vhost;
+		unsigned int n;
+		data["type"] >> n;
+		s->type = static_cast<TypeInfo>(n);
+		data["nick2"] >> s->nick2;
+		data["channel"] >> s->channel;
+		data["message"] >> s->message;
+		data["last"] >> s->last;
+
+		database[s->nick] = s;
+	}
 };
 
-class ModuleConfigClass
-{
- public:
-	time_t purgetime;
-	time_t expiretimeout;
-};
-ModuleConfigClass ModuleConfig;
-
-typedef Anope::insensitive_map<SeenInfo *> database_map;
-database_map database;
+static time_t purgetime;
+static time_t expiretimeout;
 
 static SeenInfo *FindInfo(const Anope::string &nick)
 {
@@ -262,7 +291,7 @@ class DataBasePurger : public CallBack
 			database_map::iterator cur = it;
 			++it;
 
-			if ((Anope::CurTime - cur->second->last) > ModuleConfig.purgetime)
+			if ((Anope::CurTime - cur->second->last) > purgetime)
 			{
 				Log(LOG_DEBUG) << cur->first << " was last seen " << do_strftime(cur->second->last) << ", purging entry";
 				delete cur->second;
@@ -289,48 +318,55 @@ class CSSeen : public Module
 						I_OnUserQuit,
 						I_OnJoinChannel,
 						I_OnPartChannel,
-						I_OnUserKicked,
-						I_OnDatabaseRead,
-						I_OnDatabaseWrite };
+						I_OnUserKicked };
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 
-
 		OnReload();
+
+		Serializable<SeenInfo>::Alloc.Register("SeenInfo");
 	}
+
 	void OnReload()
 	{
 		ConfigReader config;
-		ModuleConfig.purgetime = dotime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
-		ModuleConfig.expiretimeout = dotime(config.ReadValue("cs_seen", "expiretimeout", "1d", 0));
+		purgetime = dotime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
+		expiretimeout = dotime(config.ReadValue("cs_seen", "expiretimeout", "1d", 0));
 
-		if (purger.GetSecs() != ModuleConfig.expiretimeout)
-			purger.SetSecs(ModuleConfig.expiretimeout);
+		if (purger.GetSecs() != expiretimeout)
+			purger.SetSecs(expiretimeout);
 	}
+
 	void OnUserConnect(User *u)
 	{
 		UpdateUser(u, NEW, u->nick, "", "", "");
 	}
+
 	void OnUserNickChange(User *u, const Anope::string &oldnick)
 	{
 		UpdateUser(u, NICK_TO, oldnick, u->nick, "", "");
 		UpdateUser(u, NICK_FROM, u->nick, oldnick, "", "");
 	}
+
 	void OnUserQuit(User *u, const Anope::string &msg)
 	{
 		UpdateUser(u, QUIT, u->nick, "", "", msg);
 	}
+
 	void OnJoinChannel(User *u, Channel *c)
 	{
 		UpdateUser(u, JOIN, u->nick, "", c->name, "");
 	}
+
 	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg)
 	{
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
+
 	void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &msg)
 	{
 		UpdateUser(target, KICK, target->nick, source, c->name, msg);
 	}
+
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
 		SeenInfo *info = FindInfo(nick);
@@ -339,88 +375,13 @@ class CSSeen : public Module
 			info = new SeenInfo;
 			database.insert(std::pair<Anope::string, SeenInfo *>(nick, info));
 		}
+		info->nick = nick;
 		info->vhost = u->GetVIdent() + "@" + u->GetDisplayedHost();
 		info->type = Type;
 		info->last = Anope::CurTime;
 		info->nick2 = nick2;
 		info->channel = channel;
 		info->message = message;
-	}
-
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params[0].equals_ci("SEEN") && (params.size() >= 5))
-		{
-			SeenInfo *info = new SeenInfo;
-			database.insert(std::pair<Anope::string, SeenInfo *>(params[1], info));
-			info->vhost = params[2];
-			info->last = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0 ;
-			if (params[4].equals_ci("NEW"))
-			{
-				info->type = NEW;
-			}
-			else if (params[4].equals_ci("NICK_TO") && params.size() == 6)
-			{
-				info->type = NICK_TO;
-				info->nick2 = params[5];
-			}
-			else if (params[4].equals_ci("NICK_FROM") && params.size() == 6)
-			{
-				info->type = NICK_FROM;
-				info->nick2 = params[5];
-			}
-			else if (params[4].equals_ci("JOIN") && params.size() == 6)
-			{
-				info->type = JOIN;
-				info->channel = params[5];
-			}
-			else if (params[4].equals_ci("PART") && params.size() == 7)
-			{
-				info->type = PART;
-				info->channel = params[5];
-				info->message = params[6];
-			}
-			else if (params[4].equals_ci("QUIT") && params.size() == 6)
-			{
-				info->type = QUIT;
-				info->message = params[5];
-			}
-			else if (params[4].equals_ci("KICK") && params.size() == 8)
-			{
-				info->type = KICK;
-				info->nick2 = params[5];
-				info->channel = params[6];
-				info->message = params[7];
-			}
-			return EVENT_STOP;
-		}
-		return EVENT_CONTINUE;
-	}
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
-	{
-		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end; ++it)
-		{
-			std::stringstream buf;
-			buf << "SEEN " << it->first.c_str() << " " << it->second->vhost << " " << it->second->last << " ";
-			switch (it->second->type)
-			{
-				case NEW:
-					buf << "NEW"; break;
-				case NICK_TO:
-					buf << "NICK_TO " << it->second->nick2; break;
-				case NICK_FROM:
-					buf << "NICK_FROM " << it->second->nick2; break;
-				case JOIN:
-					buf << "JOIN " << it->second->channel; break;
-				case PART:
-					buf << "PART " << it->second->channel << " :" << it->second->message; break;
-				case QUIT:
-					buf << "QUIT :" << it->second->message; break;
-				case KICK:
-					buf << "KICK " << it->second->nick2 << " " << it->second->channel << " :" << it->second->message; break;
-			}
-			Write(buf.str());
-		}
 	}
 };
 

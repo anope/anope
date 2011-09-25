@@ -15,7 +15,7 @@
 
 static std::map<Anope::string, char> defaultFlags;
 
-class FlagsChanAccess : public ChanAccess
+class FlagsChanAccess : public ChanAccess, public Serializable<FlagsChanAccess>
 {
  public:
 	std::set<char> flags;
@@ -64,6 +64,41 @@ class FlagsChanAccess : public ChanAccess
 				buffer.insert(it->second);
 
 		return Anope::string(buffer.begin(), buffer.end());
+	}
+
+	Anope::string serialize_name() { return "FlagsChanAccess"; }
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["provider"] << this->provider->name;
+		data["ci"] << this->ci->name;
+		data["mask"] << this->mask;
+		data["creator"] << this->creator;
+		data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
+		data["created"].setType(Serialize::DT_INT) << this->created;
+		data["flags"] << this->Serialize();
+
+		return data;
+	}
+
+	static void unserialize(SerializableBase::serialized_data &data)
+	{
+		service_reference<AccessProvider> aprovider(data["provider"].astr());
+		ChannelInfo *ci = cs_findchan(data["ci"].astr());
+		if (!aprovider || !ci)
+			return;
+
+		FlagsChanAccess *access = new FlagsChanAccess(aprovider);
+		access->provider = aprovider;
+		access->ci = ci;
+		data["mask"] >> access->mask;
+		data["creator"] >> access->creator;
+		data["last_seen"] >> access->last_seen;
+		data["created"] >> access->created;
+		access->Unserialize(data["flags"].astr());
+
+		ci->AddAccess(access);
 	}
 };
 
@@ -385,6 +420,8 @@ class CSFlags : public Module
 		ModuleManager::Attach(i, this, 1);
 
 		this->OnReload();
+
+		Serializable<FlagsChanAccess>::Alloc.Register("FlagsChanAccess");
 	}
 
 	void OnReload()

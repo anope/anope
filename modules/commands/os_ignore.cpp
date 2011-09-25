@@ -17,7 +17,7 @@
 class OSIgnoreService : public IgnoreService
 {
  public:
-	OSIgnoreService(Module *o, const Anope::string &n) : IgnoreService(o, n) { }
+	OSIgnoreService(Module *o) : IgnoreService(o) { }
 
 	void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime)
 	{
@@ -124,7 +124,7 @@ class OSIgnoreService : public IgnoreService
 		}
 
 		/* Check whether the entry has timed out */
-		if (ign != ign_end)// && (*ign)->time && (*ign)->time <= Anope::CurTime)
+		if (ign != ign_end)
 		{
 			IgnoreData &id = *ign;
 
@@ -146,7 +146,6 @@ class CommandOSIgnore : public Command
  private:
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		service_reference<IgnoreService, Base> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -181,7 +180,6 @@ class CommandOSIgnore : public Command
 
 	void DoList(CommandSource &source)
 	{
-		service_reference<IgnoreService, Base> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -205,7 +203,6 @@ class CommandOSIgnore : public Command
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		service_reference<IgnoreService, Base> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -222,7 +219,6 @@ class CommandOSIgnore : public Command
 
 	void DoClear(CommandSource &source)
 	{
-		service_reference<IgnoreService, Base> ignore_service("ignore");
 		if (!ignore_service)
 			return;
 
@@ -287,53 +283,15 @@ class OSIgnore : public Module
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		osignoreservice(this, "ignore"), commandosignore(this)
+		osignoreservice(this), commandosignore(this)
 	{
 		this->SetAuthor("Anope");
 
 
-		Implementation i[] = { I_OnDatabaseRead, I_OnDatabaseWrite, I_OnBotPrivmsg };
+		Implementation i[] = { I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-	}
-
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params.size() >= 4 && params[0].equals_ci("OS") && params[1].equals_ci("IGNORE"))
-		{
-			service_reference<IgnoreService, Base> ignore_service("ignore");
-			if (ignore_service)
-			{
-				const Anope::string &mask = params[2];
-				time_t time = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
-				const Anope::string &creator = params.size() > 4 ? params[4] : "";
-				const Anope::string &reason = params.size() > 5 ? params[5] : "";
-				ignore_service->AddIgnore(mask, creator, reason, time - Anope::CurTime);
-
-				return EVENT_STOP;
-			}
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
-	{
-		for (std::list<IgnoreData>::iterator ign = this->osignoreservice.GetIgnores().begin(), ign_end = this->osignoreservice.GetIgnores().end(); ign != ign_end; )
-		{
-			if (ign->time && ign->time <= Anope::CurTime)
-			{
-				Log(LOG_DEBUG) << "[os_ignore] Expiring ignore entry " << ign->mask;
-				ign = this->osignoreservice.GetIgnores().erase(ign);
-			}
-			else
-			{
-				std::stringstream buf;
-				buf << "OS IGNORE " << ign->mask << " " << ign->time << " " << ign->creator << " :" << ign->reason;
-				Write(buf.str());
-				++ign;
-			}
-		}
+		Serializable<IgnoreData>::Alloc.Register("Ignore");
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)

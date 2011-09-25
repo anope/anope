@@ -32,7 +32,7 @@ class CommandOSLogin : public Command
 			source.Reply(_("No oper block for your nick."));
 		else if (o->password.empty())
 			source.Reply(_("Your oper block doesn't require logging in."));
-		else if (source.u->GetExt("os_login_password_correct"))
+		else if (source.u->HasExt("os_login_password_correct"))
 			source.Reply(_("You are already identified."));
 		else if (o->password != password)
 		{
@@ -42,7 +42,7 @@ class CommandOSLogin : public Command
 		else
 		{
 			Log(LOG_ADMIN, source.u, this) << "and successfully identified to " << source.owner->nick;
-			source.u->Extend("os_login_password_correct");
+			source.u->Extend("os_login_password_correct", NULL);
 			source.Reply(_("Password accepted."));
 		}
 
@@ -84,7 +84,7 @@ class OSLogin : public Module
 	{
 		if (!u->Account()->o->password.empty())
 		{
-			if (u->GetExt("os_login_password_correct"))
+			if (u->HasExt("os_login_password_correct"))
 				return EVENT_ALLOW;
 			return EVENT_STOP;
 		}

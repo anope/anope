@@ -45,6 +45,57 @@ NickCore::~NickCore()
 	}
 }
 
+SerializableBase::serialized_data NickCore::serialize()
+{
+	serialized_data data;	
+
+	data["display"].setKey().setMax(Config->NickLen) << this->display;
+	data["pass"] << this->pass;
+	data["email"] << this->email;
+	data["greet"] << this->greet;
+	data["language"] << this->language;
+	for (unsigned i = 0; i < this->access.size(); ++i)
+		data["access"] << this->access[i] << " ";
+	for (unsigned i = 0; i < this->cert.size(); ++i)
+		data["cert"] << this->cert[i] << " ";
+	data["memomax"] << this->memos.memomax;
+	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
+		data["memoignores"] << this->memos.ignores[i] << " ";
+	
+	return data;
+}
+
+void NickCore::unserialize(serialized_data &data)
+{
+	NickCore *nc = new NickCore(data["display"].astr());
+	data["pass"] >> nc->pass;
+	data["email"] >> nc->email;
+	data["greet"] >> nc->greet;
+	data["language"] >> nc->language;
+	{
+		Anope::string buf;
+		data["access"] >> buf;
+		spacesepstream sep(buf);
+		while (sep.GetToken(buf))
+			nc->access.push_back(buf);
+	}
+	{
+		Anope::string buf;
+		data["cert"] >> buf;
+		spacesepstream sep(buf);
+		while (sep.GetToken(buf))
+			nc->access.push_back(buf);
+	}
+	data["memomax"] >> nc->memos.memomax;
+	{
+		Anope::string buf;
+		data["memoignores"] >> buf;
+		spacesepstream sep(buf);
+		while (sep.GetToken(buf))
+			nc->memos.ignores.push_back(buf);
+	}
+}
+
 bool NickCore::IsServicesOper() const
 {
 	return this->o != NULL;

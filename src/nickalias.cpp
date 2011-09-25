@@ -102,3 +102,47 @@ void NickAlias::OnCancel(User *)
 			new NickServRelease(this, Config->NSReleaseTimeout);
 	}
 }
+
+SerializableBase::serialized_data NickAlias::serialize()
+{
+	serialized_data data;	
+
+	data["nick"].setKey().setMax(Config->NickLen) << this->nick;
+	data["last_quit"] << this->last_quit;
+	data["last_realname"] << this->last_realname;
+	data["last_usermask"] << this->last_usermask;
+	data["last_realhost"] << this->last_realhost;
+	data["time_registered"].setType(Serialize::DT_INT) << this->time_registered;
+	data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
+	data["nc"] << this->nc->display;
+
+	if (this->hostinfo.HasVhost())
+	{
+		data["vhost_ident"] << this->hostinfo.GetIdent();
+		data["vhost_host"] << this->hostinfo.GetHost();
+		data["vhost_creator"] << this->hostinfo.GetCreator();
+		data["vhost_time"] << this->hostinfo.GetTime();
+	}
+
+	return data;
+}
+
+void NickAlias::unserialize(SerializableBase::serialized_data &data)
+{
+	NickCore *core = findcore(data["nc"].astr());
+	if (core == NULL)
+		return;
+
+	NickAlias *na = new NickAlias(data["nick"].astr(), core);
+	data["last_quit"] >> na->last_quit;
+	data["last_realname"] >> na->last_realname;
+	data["last_usermask"] >> na->last_usermask;
+	data["last_realhost"] >> na->last_realhost;
+	data["time_registered"] >> na->time_registered;
+	data["last_seen"] >> na->last_seen;
+
+	time_t vhost_time;
+	data["vhost_time"] >> vhost_time;
+	na->hostinfo.SetVhost(data["vhost_ident"].astr(), data["vhost_host"].astr(), data["vhost_creator"].astr(), vhost_time);
+}
+

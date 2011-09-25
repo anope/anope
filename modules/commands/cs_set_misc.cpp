@@ -12,6 +12,37 @@
 
 #include "module.h"
 
+struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
+{
+	ChannelInfo *ci;
+	Anope::string name;
+	Anope::string data;
+
+	MiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : ci(c), name(n), data(d)
+	{
+	}
+
+	serialized_data serialize()
+	{
+		serialized_data sdata;
+
+		sdata["ci"] << this->ci->name;
+		sdata["name"] << this->name;
+		sdata["data"] << this->data;
+
+		return sdata;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		ChannelInfo *ci = cs_findchan(data["ci"].astr());
+		if (ci == NULL)
+			return;
+
+		ci->Extend(data["name"].astr(), new MiscData(ci, data["name"].astr(), data["data"].astr()));
+	}
+};
+
 class CommandCSSetMisc : public Command
 {
  public:
@@ -34,10 +65,11 @@ class CommandCSSetMisc : public Command
 			return;
 		}
 
-		ci->Shrink("cs_set_misc:" + source.command.replace_all_cs(" ", "_"));
+		Anope::string key = "cs_set_misc:" + source.command.replace_all_cs(" ", "_");
+		ci->Shrink(key);
 		if (params.size() > 1)
 		{
-			ci->Extend("cs_set_misc:" + source.command.replace_all_cs(" ", "_"), new ExtensibleItemRegular<Anope::string>(params[1]));
+			ci->Extend(key, new MiscData(ci, key, params[1]));
 			source.Reply(CHAN_SETTING_CHANGED, source.command.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
@@ -64,9 +96,10 @@ class CSSetMisc : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnChanInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
+		Implementation i[] = { I_OnChanInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
+		Serializable<MiscData>::Alloc.Register("CSMisc");
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, bool ShowHidden)
@@ -79,34 +112,10 @@ class CSSetMisc : public Module
 			if (list[i].find("cs_set_misc:") != 0)
 				continue;
 			
-			Anope::string value;
-			if (ci->GetExtRegular(list[i], value))
-				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), value.c_str());
+			MiscData *data = ci->GetExt<MiscData *>(list[i]);
+			if (data != NULL)
+				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), data->data.c_str());
 		}
-	}
-
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), ChannelInfo *ci)
-	{
-		std::deque<Anope::string> list;
-		ci->GetExtList(list);
-
-		for (unsigned i = 0; i < list.size(); ++i)
-		{
-			if (list[i].find("cs_set_misc:") != 0)
-				continue;
-
-			Anope::string value;
-			if (ci->GetExtRegular(list[i], value))
-				WriteMetadata(list[i], ":" + value);
-		}
-	}
-
-	EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, const std::vector<Anope::string> &params)
-	{
-		if (key.find("cs_set_misc:") == 0)
-			ci->Extend(key, new ExtensibleItemRegular<Anope::string>(params[0]));
-
-		return EVENT_CONTINUE;
 	}
 };
 

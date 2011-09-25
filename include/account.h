@@ -93,9 +93,7 @@ const Anope::string NickCoreFlagStrings[] = {
 	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", ""
 };
 
-class NickCore;
-
-class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>
+class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable<NickAlias>
 {
  public:
  	/** Default constructor
@@ -118,6 +116,9 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	NickCore *nc;					/* I'm an alias of this */
 	HostInfo hostinfo;
 
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
+
 	/** Release a nick
 	 * See the comment in users.cpp
 	 */
@@ -131,7 +132,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	void OnCancel(User *u);
 };
 
-class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>
+class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable<NickCore>
 {
  public:
 	/** Default constructor
@@ -153,13 +154,16 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	std::vector<Anope::string> access; /* Access list, vector of strings */
 	std::vector<Anope::string> cert; /* ssl certificate list, vector of strings */
 	MemoInfo memos;
-	uint16 channelcount; /* Number of channels currently registered */
 
 	Oper *o;
 
 	/* Unsaved data */
+	uint16 channelcount; /* Number of channels currently registered */
 	time_t lastmail;				/* Last time this nick record got a mail */
 	std::list<NickAlias *> aliases;	/* List of aliases */
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
 
 	/** Checks whether this account is a services oper or not.
 	 * @return True if this account is a services oper, false otherwise.

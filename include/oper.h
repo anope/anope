@@ -11,14 +11,17 @@
 
 class XLineManager;
 
-class CoreExport XLine
+class CoreExport XLine : public Serializable<XLine>
 {
+ protected:
+	XLine();
  public:
 	Anope::string Mask;
 	Anope::string By;
 	time_t Created;
 	time_t Expires;
 	Anope::string Reason;
+	Anope::string Manager;
 
 	XLine(const Anope::string &mask, const Anope::string &reason = "");
 
@@ -28,6 +31,9 @@ class CoreExport XLine
 	Anope::string GetUser() const;
 	Anope::string GetHost() const;
 	sockaddrs GetIP() const;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &data);
 };
 
 class CoreExport XLineManager : public Service<XLineManager>

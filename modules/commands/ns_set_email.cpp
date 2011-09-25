@@ -26,7 +26,7 @@ static bool SendConfirmMail(User *u, BotInfo *bi)
 	Anope::string code;
 	for (idx = 0; idx < 9; ++idx)
 		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
-	u->Account()->Extend("ns_set_email_passcode", new ExtensibleItemRegular<Anope::string>(code));
+	u->Account()->Extend("ns_set_email_passcode", new ExtensibleString(code));
 
 	Anope::string subject = Config->MailEmailchangeSubject;
 	Anope::string message = Config->MailEmailchangeMessage;
@@ -80,7 +80,7 @@ class CommandNSSetEmail : public Command
 
 		if (!param.empty() && Config->NSConfirmEmailChanges && !u->IsServicesOper())
 		{
-			u->Account()->Extend("ns_set_email", new ExtensibleItemRegular<Anope::string>(param));
+			u->Account()->Extend("ns_set_email", new ExtensibleString(param));
 			Anope::string old = u->Account()->email;
 			u->Account()->email = param;
 			if (SendConfirmMail(u, source.owner))
@@ -163,12 +163,12 @@ class NSSetEmail : public Module
 		User *u = source.u;
 		if (command->name == "nickserv/confirm" && !params.empty() && u->IsIdentified())
 		{
-			Anope::string new_email, passcode;
-			if (u->Account()->GetExtRegular("ns_set_email", new_email) && u->Account()->GetExtRegular("ns_set_email_passcode", passcode))
+			Anope::string *new_email = u->Account()->GetExt<Anope::string *>("ns_set_email"), *passcode = u->Account()->GetExt<Anope::string *>("ns_set_email_passcode");
+			if (new_email && passcode)
 			{
-				if (params[0] == passcode)
+				if (params[0] == *passcode)
 				{
-					u->Account()->email = new_email;
+					u->Account()->email = *new_email;
 					Log(LOG_COMMAND, u, command) << "to confirm their email address change to " << u->Account()->email;
 					source.Reply(_("Your email address has been changed to \002%s\002."), u->Account()->email.c_str());
 					u->Account()->Shrink("ns_set_email");

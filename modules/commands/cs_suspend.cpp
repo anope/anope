@@ -45,9 +45,9 @@ class CommandCSSuspend : public Command
 		}
 
 		ci->SetFlag(CI_SUSPENDED);
-		ci->Extend("suspend_by", new ExtensibleItemRegular<Anope::string>(u->nick));
+		ci->Extend("suspend_by", new ExtensibleString(u->nick));
 		if (!reason.empty())
-			ci->Extend("suspend_reason", new ExtensibleItemRegular<Anope::string>(reason));
+			ci->Extend("suspend_reason", new ExtensibleString(reason));
 
 		if (ci->c)
 		{
@@ -113,10 +113,9 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		Anope::string by, reason;
-		ci->GetExtRegular("suspend_by", by);
-		ci->GetExtRegular("suspend_reason", reason);
-		Log(LOG_ADMIN, u, this, ci) << " which was suspended by " << by << " for: " << (!reason.empty() ? reason : "No reason");
+		Anope::string *by = ci->GetExt<Anope::string *>("suspend_by"), *reason = ci->GetExt<Anope::string *>("suspend_reason");
+		if (by != NULL)
+			Log(LOG_ADMIN, u, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
 
 		ci->UnsetFlag(CI_SUSPENDED);
 		ci->Shrink("suspend_by");

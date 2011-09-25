@@ -41,6 +41,9 @@ class CoreExport ChanAccess
 	time_t last_seen;
 	time_t created;
 
+	virtual Anope::string serialize_name() = 0;
+	virtual SerializableBase::serialized_data serialize() = 0;
+
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 	virtual bool Matches(User *u, NickCore *nc) = 0;

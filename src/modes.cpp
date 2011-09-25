@@ -54,7 +54,7 @@ void SetDefaultMLock(ServerConfig *config)
 
 				if (cm->Type != MODE_LIST) // Only MODE_LIST can have duplicates
 					def_mode_locks.erase(cm->Name);
-				def_mode_locks.insert(std::make_pair(cm->Name, ModeLock(adding == 1, cm->Name, param)));
+				def_mode_locks.insert(std::make_pair(cm->Name, ModeLock(NULL, adding == 1, cm->Name, param)));
 			}
 		}
 	}

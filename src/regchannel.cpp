@@ -12,6 +12,124 @@
 #include "services.h"
 #include "modules.h"
 
+SerializableBase::serialized_data BadWord::serialize()
+{
+	serialized_data data;
+
+	data["word"] << this->word;
+	data["type"].setType(Serialize::DT_INT) << this->type;
+
+	return data;
+}
+
+void BadWord::unserialize(SerializableBase::serialized_data &data)
+{
+	BadWord *bw = new BadWord();
+	data["word"] >> bw->word;
+	unsigned int n;
+	data["type"] >> n;
+	bw->type = static_cast<BadWordType>(n);
+}
+
+SerializableBase::serialized_data AutoKick::serialize()
+{
+	serialized_data data;	
+
+	if (this->HasFlag(AK_ISNICK) && this->nc)
+		data["nc"] << this->nc->display;
+	else
+		data["mask"] << this->mask;
+	data["reason"] << this->reason;
+	data["creator"] << this->creator;
+	data["addtime"].setType(Serialize::DT_INT) << this->addtime;
+	data["last_used"].setType(Serialize::DT_INT) << this->last_used;
+
+	return data;
+}
+
+void AutoKick::unserialize(SerializableBase::serialized_data &data)
+{
+	AutoKick *ak = new AutoKick();
+
+	data["mask"] >> ak->mask;
+	ak->nc = findcore(data["nc"].astr());
+	data["reason"] >> ak->reason;
+	data["creator"] >> ak->creator;
+	data["addtime"] >> ak->addtime;
+	data["last_used"] >> ak->last_used;
+}
+
+SerializableBase::serialized_data ModeLock::serialize()
+{
+	serialized_data data;	
+
+	if (this->ci == NULL)
+		return data;
+
+	data["ci"] << this->ci->name;
+	data["set"] << this->set;
+	data["name"] << ChannelModeNameStrings[this->name];
+	data["param"] << this->param;
+	data["setter"] << this->setter;
+	data["created"].setType(Serialize::DT_INT) << this->created;
+
+	return data;
+}
+
+void ModeLock::unserialize(SerializableBase::serialized_data &data)
+{
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (ci == NULL)
+		return;
+
+	ModeLock ml;
+
+	ml.ci = ci;
+
+	data["set"] >> ml.set;
+	Anope::string n;
+	data["name"] >> n;
+	for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
+		if (n == ChannelModeNameStrings[i])
+		{
+			ml.name = static_cast<ChannelModeName>(i);
+			break;
+		}
+	data["param"] >> ml.param;
+	data["setter"] >> ml.setter;
+	data["created"] >> ml.created;
+
+	ci->mode_locks.insert(std::make_pair(ml.name, ml));
+}
+
+SerializableBase::serialized_data LogSetting::serialize()
+{
+	serialized_data data;	
+
+	data["service_name"] << service_name;
+	data["command_service"] << command_service;
+	data["command_name"] << command_name;
+	data["method"] << method;
+	data["extra"] << extra;
+	data["creator"] << creator;
+	data["created"].setType(Serialize::DT_INT) << created;
+
+	return data;
+}
+
+void LogSetting::unserialize(serialized_data &data)
+{
+	LogSetting ls;
+
+	data["service_name"] >> ls.service_name;
+	data["command_service"] >> ls.command_service;
+	data["command_name"] >> ls.command_name;
+	data["method"] >> ls.method;
+	data["extra"] >> ls.extra;
+	data["creator"] >> ls.creator;
+	data["created"] >> ls.created;
+}
+
 /** Default constructor
  * @param chname The channel name
  */
@@ -141,6 +259,83 @@ ChannelInfo::~ChannelInfo()
 	if (this->founder)
 		--this->founder->channelcount;
 }
+
+SerializableBase::serialized_data ChannelInfo::serialize()
+{
+	serialized_data data;	
+
+	data["name"].setKey().setMax(255) << this->name;
+	if (this->founder)
+		data["founder"] << this->founder->display;
+	if (this->successor)
+		data["successor"] << this->successor->display;
+	data["description"] << this->desc;
+	data["time_registered"].setType(Serialize::DT_INT) << this->time_registered;
+	data["last_used"].setType(Serialize::DT_INT) << this->last_used;
+	data["last_topic"] << this->last_topic;
+	data["last_topic_setter"] << this->last_topic_setter;
+	data["last_topic_time"].setType(Serialize::DT_INT) << this->last_topic_time;
+	data["bantype"].setType(Serialize::DT_INT) << this->bantype;
+	data["botflags"] << this->botflags.ToString();
+	{
+		Anope::string levels_buffer;
+		for (std::map<Anope::string, int16>::iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
+			levels_buffer += it->first + " " + stringify(it->second) + " ";
+		data["levels"] << levels_buffer;
+	}
+	if (this->bi)
+		data["bi"] << this->bi->nick;
+	for (int i = 0; i < TTB_SIZE; ++i)
+		data["ttb"] << this->ttb[i] << " ";
+	data["capsmin"].setType(Serialize::DT_INT) << this->capsmin;
+	data["capspercent"].setType(Serialize::DT_INT) << this->capspercent;
+	data["floodlines"].setType(Serialize::DT_INT) << this->floodlines;
+	data["floodsecs"].setType(Serialize::DT_INT) << this->floodsecs;
+	data["repeattimes"].setType(Serialize::DT_INT) << this->repeattimes;
+	data["memomax"] << this->memos.memomax;
+	for (unsigned i = 0; i < this->memos.ignores.size(); ++i)
+		data["memoignores"] << this->memos.ignores[i] << " ";
+
+	return data;
+}
+
+void ChannelInfo::unserialize(SerializableBase::serialized_data &data)
+{
+	ChannelInfo *ci = new ChannelInfo(data["name"].astr());
+	if (data.count("founder") > 0)
+		ci->founder = findcore(data["founder"].astr());
+	if (data.count("successor") > 0)
+		ci->successor = findcore(data["successor"].astr());
+	data["description"] >> ci->desc;
+	data["time_registered"] >> ci->time_registered;
+	data["last_used"] >> ci->last_used;
+	data["last_topic"] >> ci->last_topic;
+	data["last_topic_setter"] >> ci->last_topic_setter;
+	data["last_topic_time"] >> ci->last_topic_time;
+	data["bantype"] >> ci->bantype;
+	ci->botflags.FromString(data["botflags"].astr());
+	{
+		std::vector<Anope::string> v = BuildStringVector(data["levels"].astr());
+		for (unsigned i = 0; i + 1 < v.size(); i += 2)
+			ci->levels[v[i]] = convertTo<int16>(v[i + 1]);
+	}
+	if (data.count("bi") > 0)
+		ci->bi = findbot(data["bi"].astr());
+	data["capsmin"] >> ci->capsmin;
+	data["capspercent"] >> ci->capspercent;
+	data["floodlines"] >> ci->floodlines;
+	data["floodsecs"] >> ci->floodsecs;
+	data["repeattimes"] >> ci->repeattimes;
+	data["memomax"] >> ci->memos.memomax;
+	{
+		Anope::string buf;
+		data["memoignores"] >> buf;
+		spacesepstream sep(buf);
+		while (sep.GetToken(buf))
+			ci->memos.ignores.push_back(buf);
+	}
+}
+
 
 /** Change the founder of the channek
  * @params nc The new founder
@@ -338,6 +533,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &
 {
 	AutoKick *autokick = new AutoKick();
 	autokick->mask = mask;
+	autokick->nc = NULL;
 	autokick->reason = reason;
 	autokick->creator = user;
 	autokick->addtime = t;
@@ -484,7 +680,7 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 {
 	if (setter.empty())
 		setter = this->founder ? this->founder->display : "Unknown";
-	std::pair<ChannelModeName, ModeLock> ml = std::make_pair(mode->Name, ModeLock(status, mode->Name, param, setter, created));
+	std::pair<ChannelModeName, ModeLock> ml = std::make_pair(mode->Name, ModeLock(this, status, mode->Name, param, setter, created));
 
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnMLock, OnMLock(this, &ml.second));
@@ -525,13 +721,20 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
  */
 bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 {
-	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, mode, param));
-	if (MOD_RESULT == EVENT_STOP)
-		return false;
-
 	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
-		return this->mode_locks.erase(mode->Name) > 0;
+	{
+		std::multimap<ChannelModeName, ModeLock>::iterator it = this->mode_locks.find(mode->Name), it_end = this->mode_locks.upper_bound(mode->Name), it_next = it;
+		if (it != this->mode_locks.end())
+			for (; it != it_end; it = it_next)
+			{
+				++it_next;
+				EventReturn MOD_RESULT;
+				FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));
+				if (MOD_RESULT != EVENT_STOP)
+					this->mode_locks.erase(it);
+			}
+		return true;
+	}
 	else
 	{
 		// For list or status modes, we must check the parameter
@@ -544,6 +747,10 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 				const ModeLock &ml = it->second;
 				if (ml.param == param)
 				{
+					EventReturn MOD_RESULT;
+					FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));
+					if (MOD_RESULT == EVENT_STOP)
+						return false;
 					this->mode_locks.erase(it);
 					return true;
 				}

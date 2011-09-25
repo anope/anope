@@ -49,7 +49,7 @@ class IdentifyInterface : public LDAPInterface
 		User *u = ii->user;
 		Command *c = ii->command;
 
-		u->Extend("m_ldap_authentication_authenticated");
+		u->Extend("m_ldap_authentication_authenticated", NULL);
 
 		NickAlias *na = findnick(ii->account);
 		if (na == NULL)
@@ -87,7 +87,7 @@ class IdentifyInterface : public LDAPInterface
 		User *u = ii->user;
 		Command *c = ii->command;
 
-		u->Extend("m_ldap_authentication_error");
+		u->Extend("m_ldap_authentication_error", NULL);
 
 		c->Execute(ii->source, ii->params);
 
@@ -218,12 +218,12 @@ class NSIdentifyLDAP : public Module
 			return EVENT_CONTINUE;
 
 		User *u = source->u;
-		if (u->GetExt("m_ldap_authentication_authenticated"))
+		if (u->HasExt("m_ldap_authentication_authenticated"))
 		{
 			u->Shrink("m_ldap_authentication_authenticated");
 			return EVENT_ALLOW;
 		}
-		else if (u->GetExt("m_ldap_authentication_error"))
+		else if (u->HasExt("m_ldap_authentication_error"))
 		{
 			u->Shrink("m_ldap_authentication_error");
 			return EVENT_CONTINUE;

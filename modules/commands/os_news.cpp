@@ -377,9 +377,10 @@ class OSNews : public Module
 		this->SetAuthor("Anope");
 
 
-		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect, I_OnDatabaseRead, I_OnDatabaseWrite };
+		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
+		Serializable<NewsItem>::Alloc.Register("NewsItem");
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)
@@ -395,51 +396,6 @@ class OSNews : public Module
 
 		DisplayNews(user, NEWS_LOGON);
 		DisplayNews(user, NEWS_RANDOM);
-	}
-
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params[0].equals_ci("OS") && params.size() >= 7 && params[1].equals_ci("NEWS"))
-		{
-			NewsItem *n = new NewsItem();
-			// params[2] was news number
-			n->time = params[3].is_number_only() ? convertTo<time_t>(params[3]) : 0;
-			n->who = params[4];
-			if (params[5].equals_ci("LOGON"))
-				n->type = NEWS_LOGON;
-			else if (params[5].equals_ci("RANDOM"))
-				n->type = NEWS_RANDOM;
-			else if (params[5].equals_ci("OPER"))
-				n->type = NEWS_OPER;
-			n->text = params[6];
-
-			this->newsservice.AddNewsItem(n);
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
-	{
-		for (unsigned i = 0; i < 3; ++i)
-		{
-			std::vector<NewsItem *> &list = this->newsservice.GetNewsList(static_cast<NewsType>(i));
-			for (std::vector<NewsItem *>::iterator it = list.begin(); it != list.end(); ++it)
-			{
-				NewsItem *n = *it;
-				Anope::string ntype;
-				if (n->type == NEWS_LOGON)
-					ntype = "LOGON";
-				else if (n->type == NEWS_RANDOM)
-					ntype = "RANDOM";
-				else if (n->type == NEWS_OPER)
-					ntype = "OPER";
-				Anope::string buf = "OS NEWS 0 " + stringify(n->time) + " " + n->who + " " + ntype + " :" + n->text;
-				Write(buf);
-			}
-		}
 	}
 };
 

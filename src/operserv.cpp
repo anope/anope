@@ -16,6 +16,10 @@
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
 
+XLine::XLine()
+{
+}
+
 XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask), Created(0), Expires(0), Reason(reason)
 {
 }
@@ -64,6 +68,37 @@ sockaddrs XLine::GetIP() const
 	sockaddrs addr;
 	addr.pton(this->GetHost().find(':') != Anope::string::npos ? AF_INET6 : AF_INET, this->GetHost());
 	return addr;
+}
+
+SerializableBase::serialized_data XLine::serialize()
+{
+	serialized_data data;	
+
+	data["mask"] << this->Mask;
+	data["by"] << this->By;
+	data["created"] << this->Created;
+	data["expires"] << this->Expires;
+	data["reason"] << this->Reason;
+	data["manager"] << this->Manager;
+
+	return data;
+}
+
+void XLine::unserialize(SerializableBase::serialized_data &data)
+{
+	service_reference<XLineManager> xlm(data["manager"].astr());
+	if (!xlm)
+		return;
+
+	XLine *xl = new XLine();
+
+	data["mask"] >> xl->Mask;
+	data["by"] >> xl->By;
+	data["created"] >> xl->Created;
+	data["expires"] >> xl->Expires;
+	data["reason"] >> xl->Reason;
+
+	xlm->AddXLine(xl);
 }
 
 /** Constructor
@@ -159,6 +194,7 @@ const std::vector<XLine *> &XLineManager::GetList() const
  */
 void XLineManager::AddXLine(XLine *x)
 {
+	x->Manager = this->name;
 	this->XLines.push_back(x);
 }
 
@@ -199,8 +235,9 @@ XLine *XLineManager::GetEntry(unsigned index)
  */
 void XLineManager::Clear()
 {
-	while (!this->XLines.empty())
-		this->DelXLine(this->XLines.front());
+	for (unsigned i = 0; i < this->XLines.size(); ++i)
+		delete this->XLines[i];
+	this->XLines.clear();
 }
 
 /** Add an entry to this XLine Manager

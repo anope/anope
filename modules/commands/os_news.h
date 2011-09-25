@@ -15,12 +15,15 @@ struct NewsMessages
 	const char *msgs[10];
 };
 
-struct NewsItem
+struct NewsItem : Serializable<NewsItem>
 {
 	NewsType type;
 	Anope::string text;
 	Anope::string who;
 	time_t time;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &data);
 };
 
 class NewsService : public Service<Base>
@@ -34,6 +37,37 @@ class NewsService : public Service<Base>
 	
 	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
 };
+
+static service_reference<NewsService, Base> news_service("news");
+
+SerializableBase::serialized_data NewsItem::serialize()
+{
+	serialized_data data;
+		
+	data["type"] << this->type;
+	data["text"] << this->text;
+	data["who"] << this->who;
+	data["time"] << this->time;
+
+	return data;
+}
+
+void NewsItem::unserialize(SerializableBase::serialized_data &data)
+{
+	if (!news_service)
+		return;
+
+	NewsItem *ni = new NewsItem();
+
+	unsigned int t;
+	data["type"] >> t;
+	ni->type = static_cast<NewsType>(t);
+	data["text"] >> ni->text;
+	data["who"] >> ni->who;
+	data["time"] >> ni->time;
+
+	news_service->AddNewsItem(ni);
+}
 
 #endif // OS_NEWS
 

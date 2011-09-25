@@ -85,6 +85,7 @@ class MyMemoServService : public MemoServService
 
 		Memo *m = new Memo();
 		mi->memos.push_back(m);
+		m->owner = target;
 		m->sender = source;
 		m->time = Anope::CurTime;
 		m->text = message;

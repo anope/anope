@@ -72,7 +72,7 @@ const Anope::string &HostInfo::GetCreator() const
 /** Retrieve when the vhost was crated
  * @return the time it was created
  */
-const time_t HostInfo::GetTime() const
+time_t HostInfo::GetTime() const
 {
 	return Time;
 }

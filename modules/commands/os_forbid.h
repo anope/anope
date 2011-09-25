@@ -9,7 +9,7 @@ enum ForbidType
 	FT_EMAIL
 };
 
-struct ForbidData
+struct ForbidData : Serializable<ForbidData>
 {
 	Anope::string mask;
 	Anope::string creator;
@@ -17,6 +17,9 @@ struct ForbidData
 	time_t created;
 	time_t expires;
 	ForbidType type;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &data);
 };
 
 class ForbidService : public Service<Base>
@@ -32,6 +35,41 @@ class ForbidService : public Service<Base>
 
 	virtual const std::vector<ForbidData *> &GetForbids() = 0;
 };
+
+static service_reference<ForbidService, Base> forbid_service("forbid");
+
+SerializableBase::serialized_data ForbidData::serialize()
+{
+	serialized_data data;
+	
+	data["mask"] << this->mask;
+	data["creator"] << this->creator;
+	data["reason"] << this->reason;
+	data["created"] << this->created;
+	data["expires"] << this->expires;
+	data["type"] << this->type;
+
+	return data;
+}
+
+void ForbidData::unserialize(SerializableBase::serialized_data &data)
+{
+	if (!forbid_service)
+		return;
+
+	ForbidData *fb = new ForbidData;
+
+	data["mask"] >> fb->mask;
+	data["creator"] >> fb->creator;
+	data["reason"] >> fb->reason;
+	data["created"] >> fb->created;
+	data["expires"] >> fb->expires;
+	unsigned int t;
+	data["type"] >> t;
+	fb->type = static_cast<ForbidType>(t);
+
+	forbid_service->AddForbid(fb);
+}
 
 #endif
 

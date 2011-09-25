@@ -268,8 +268,7 @@ class InspIRCdProto : public IRCDProto
 
 		Anope::string svidbuf = stringify(u->timestamp);
 
-		u->Account()->Shrink("authenticationtoken");
-		u->Account()->Extend("authenticationtoken", new ExtensibleItemRegular<Anope::string>(svidbuf));
+		u->Account()->Extend("authenticationtoken", new ExtensibleString(svidbuf));
 	}
 
 };
@@ -321,8 +320,8 @@ class InspircdIRCdMessage : public IRCdMessage
 				user->SetCloakedHost(params[3]);
 
 				NickAlias *na = findnick(user->nick);
-				Anope::string svidbuf;
-				if (na && na->nc->GetExtRegular("authenticationtoken", svidbuf) && svidbuf == params[0])
+				Anope::string *svidbuf = na ? na->nc->GetExt<Anope::string *>("authenticationtoken") : NULL;
+				if (na && svidbuf && *svidbuf == params[0])
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED))

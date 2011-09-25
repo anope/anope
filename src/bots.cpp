@@ -64,6 +64,29 @@ BotInfo::~BotInfo()
 		BotListByUID.erase(this->uid);
 }
 
+SerializableBase::serialized_data BotInfo::serialize()
+{
+	SerializableBase::serialized_data data;
+
+	data["nick"] << this->nick;
+	data["user"] << this->ident;
+	data["host"] << this->host;
+	data["realname"] << this->realname;
+	data["created"] << this->created;
+	data["chancount"] << this->chancount;
+
+	return data;
+}
+
+void BotInfo::unserialize(SerializableBase::serialized_data &data)
+{
+	BotInfo *bi = findbot(data["nick"].astr());
+	if (bi == NULL)
+		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
+	data["created"] >> bi->created;
+	data["chancount"] >> bi->chancount;
+}
+
 void BotInfo::GenerateUID()
 {
 	if (!this->uid.empty())

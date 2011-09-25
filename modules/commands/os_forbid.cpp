@@ -214,10 +214,11 @@ class OSForbid : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand, I_OnDatabaseWrite, I_OnDatabaseRead };
+		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		
 
+		Serializable<ForbidData>::Alloc.Register("Forbid");
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)
@@ -297,48 +298,6 @@ class OSForbid : public Module
 				source.Reply("Your email address is not allowed, choose a different one.");
 				return EVENT_STOP;
 			}
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
-	{
-		std::vector<ForbidData *> forbids = this->forbidService.GetForbids();
-		for (unsigned i = 0; i < forbids.size(); ++i)
-		{
-			ForbidData *f = forbids[i];
-			Anope::string ftype;
-			if (f->type == FT_NICK)
-				ftype = "NICK";
-			else if (f->type == FT_CHAN)
-				ftype = "CHAN";
-			else if (f->type == FT_EMAIL)
-				ftype = "EMAIL";
-			Write("FORBID " + f->mask + " " + f->creator + " " + stringify(f->created) + " " + stringify(f->expires) + " " + ftype + " " + f->reason);
-		}
-	}
-
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params.size() > 5 && params[0] == "FORBID")
-		{
-			ForbidData *f = new ForbidData();
-			f->mask = params[1];
-			f->creator = params[2];
-			f->created = convertTo<time_t>(params[3]);
-			f->expires = convertTo<time_t>(params[4]);
-			if (params[5] == "NICK")	
-				f->type = FT_NICK;
-			else if (params[5] == "CHAN")
-				f->type = FT_CHAN;
-			else if (params[5] == "EMAIL")
-				f->type = FT_EMAIL;
-			else
-				f->type = FT_NONE;
-			f->reason = params.size() > 6 ? params[6] : "";
-			
-			this->forbidService.AddForbid(f);
 		}
 
 		return EVENT_CONTINUE;

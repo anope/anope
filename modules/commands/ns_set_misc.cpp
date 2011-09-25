@@ -13,6 +13,38 @@
 
 #include "module.h"
 
+struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
+{
+	NickCore *nc;
+	Anope::string name;
+	Anope::string data;
+
+	MiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : nc(ncore), name(n), data(d)
+	{
+	}
+
+	serialized_data serialize()
+	{
+		serialized_data sdata;
+
+		sdata["nc"] << this->nc->display;
+		sdata["name"] << this->name;
+		sdata["data"] << this->data;
+
+		return sdata;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		NickCore *nc = findcore(data["nc"].astr());
+		if (nc == NULL)
+			return;
+
+		nc->Extend(data["name"].astr(), new MiscData(nc, data["name"].astr(), data["data"].astr()));
+	}
+};
+
+
 class CommandNSSetMisc : public Command
 {
  public:
@@ -31,10 +63,11 @@ class CommandNSSetMisc : public Command
 		}
 		NickCore *nc = na->nc;
 
-		nc->Shrink("ns_set_misc:" + source.command.replace_all_cs(" ", "_"));
+		Anope::string key = "ns_set_misc:" + source.command.replace_all_cs(" ", "_");
+		nc->Shrink(key);
 		if (!param.empty())
 		{
-			nc->Extend("ns_set_misc:" + source.command.replace_all_cs(" ", "_"), new ExtensibleItemRegular<Anope::string>(param));
+			nc->Extend(key, new MiscData(nc, key, param));
 			source.Reply(CHAN_SETTING_CHANGED, source.command.c_str(), nc->display.c_str(), param.c_str());
 		}
 		else
@@ -75,9 +108,10 @@ class NSSetMisc : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnNickInfo, I_OnDatabaseWriteMetadata, I_OnDatabaseReadMetadata };
+		Implementation i[] = { I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
+		Serializable<MiscData>::Alloc.Register("NSMisc");
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)
@@ -90,34 +124,10 @@ class NSSetMisc : public Module
 			if (list[i].find("ns_set_misc:") != 0)
 				continue;
 
-			Anope::string value;
-			if (na->nc->GetExtRegular(list[i], value))
-				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), value.c_str());
+			MiscData *data = na->nc->GetExt<MiscData *>(list[i]);
+			if (data)
+				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), data->data.c_str());
 		}
-	}
-
-	void OnDatabaseWriteMetadata(void (*WriteMetadata)(const Anope::string &, const Anope::string &), NickCore *nc)
-	{
-		std::deque<Anope::string> list;
-		nc->GetExtList(list);
-
-		for (unsigned i = 0; i < list.size(); ++i)
-		{
-			if (list[i].find("ns_set_misc:") != 0)
-				continue;
-
-			Anope::string value;
-			if (nc->GetExtRegular(list[i], value))
-				WriteMetadata(list[i], ":" + value);
-		}
-	}
-
-	EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const std::vector<Anope::string> &params)
-	{
-		if (key.find("ns_set_misc:") == 0)
-			nc->Extend(key, new ExtensibleItemRegular<Anope::string>(params[0]));
-
-		return EVENT_CONTINUE;
 	}
 };
 

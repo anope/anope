@@ -82,8 +82,6 @@ class MySQLResult : public SQLResult
 
 	MySQLResult(const SQLQuery &q, const Anope::string &fq, const Anope::string &err) : SQLResult(q, fq, err), res(NULL)
 	{
-		if (this->finished_query.empty())
-			this->finished_query = q.query;
 	}
 
 	~MySQLResult()
@@ -124,6 +122,8 @@ class MySQLService : public SQLProvider
 	void Run(SQLInterface *i, const SQLQuery &query);
 
 	SQLResult RunQuery(const SQLQuery &query);
+
+	SQLQuery CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data);
 
 	void Connect();
 
@@ -211,7 +211,7 @@ class ModuleSQL : public Module, public Pipe
 
 		for (i = 0, num = config.Enumerate("mysql"); i < num; ++i)
 		{
-			Anope::string connname = config.ReadValue("mysql", "name", "main", i);
+			Anope::string connname = config.ReadValue("mysql", "name", "mysql/main", i);
 
 			if (this->MySQLServices.find(connname) == this->MySQLServices.end())
 			{
@@ -284,7 +284,7 @@ class ModuleSQL : public Module, public Pipe
 };
 
 MySQLService::MySQLService(Module *o, const Anope::string &n, const Anope::string &d, const Anope::string &s, const Anope::string &u, const Anope::string &p, int po)
-: SQLProvider(o, "mysql/" + n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
+: SQLProvider(o, n), database(d), server(s), user(u), password(p), port(po), sql(NULL)
 {
 	Connect();
 }
@@ -323,16 +323,7 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 {
 	this->Lock.Lock();
 
-	Anope::string real_query;
-	try
-	{
-		real_query = this->BuildQuery(query);
-	}
-	catch (const SQLException &ex)
-	{
-		this->Lock.Unlock();
-		return MySQLResult(query, real_query, ex.GetReason());
-	}
+	Anope::string real_query = this->BuildQuery(query);
 
 	if (this->CheckConnection() && !mysql_real_query(this->sql, real_query.c_str(), real_query.length()))
 	{
@@ -347,6 +338,40 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 		this->Lock.Unlock();
 		return MySQLResult(query, real_query, error);
 	}
+}
+
+SQLQuery MySQLService::CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data)
+{
+	Anope::string query_text = "CREATE TABLE `" + table + "` (", key_buf;
+	for (SerializableBase::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	{
+		query_text += "`" + it->first + "` ";
+		if (it->second.getType() == Serialize::DT_INT)
+			query_text += "int(11)";
+		else if (it->second.getMax() > 0)
+			query_text += "varchar(" + stringify(it->second.getMax()) + ")";
+		else
+			query_text += "text";
+		query_text += ",";
+
+		if (it->second.getKey())
+		{
+			if (key_buf.empty())
+				key_buf = "UNIQUE KEY `ukey` (";
+			key_buf += "`" + it->first + "`,";
+		}
+	}
+	if (!key_buf.empty())
+	{
+		key_buf.erase(key_buf.end() - 1);
+		key_buf += ")";
+		query_text += " " + key_buf;
+	}
+	else
+		query_text.erase(query_text.end() - 1);
+	query_text += ")";
+
+	return SQLQuery(query_text);
 }
 
 void MySQLService::Connect()
@@ -392,7 +417,7 @@ Anope::string MySQLService::BuildQuery(const SQLQuery &q)
 	Anope::string real_query = q.query;
 
 	for (std::map<Anope::string, Anope::string>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
-		real_query = real_query.replace_all_cs("@" + it->first, "'" + this->Escape(it->second) + "'");
+		real_query = real_query.replace_all_cs("@" + it->first + "@", "'" + this->Escape(it->second) + "'");
 
 	return real_query;
 }

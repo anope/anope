@@ -28,7 +28,7 @@ static void reset_levels(ChannelInfo *ci)
 		ci->SetLevel(it->first, it->second);
 }
 
-class AccessChanAccess : public ChanAccess
+class AccessChanAccess : public ChanAccess, public Serializable<AccessChanAccess>
 {
  public:
 	int level;
@@ -85,6 +85,41 @@ class AccessChanAccess : public ChanAccess
 
 			return highest;
 		}
+	}
+
+	Anope::string serialize_name() { return "AccessChanAccess"; }
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["provider"] << this->provider->name;
+		data["ci"] << this->ci->name;
+		data["mask"] << this->mask;
+		data["creator"] << this->creator;
+		data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
+		data["created"].setType(Serialize::DT_INT) << this->created;
+		data["level"].setType(Serialize::DT_INT) << this->level;
+
+		return data;
+	}
+
+	static void unserialize(SerializableBase::serialized_data &data)
+	{
+		service_reference<AccessProvider> aprovider(data["provider"].astr());
+		ChannelInfo *ci = cs_findchan(data["ci"].astr());
+		if (!aprovider || !ci)
+			return;
+
+		AccessChanAccess *access = new AccessChanAccess(aprovider);
+		access->provider = aprovider;
+		access->ci = ci;
+		data["mask"] >> access->mask;
+		data["creator"] >> access->creator;
+		data["last_seen"] >> access->last_seen;
+		data["created"] >> access->created;
+		data["level"] >> access->level;
+
+		ci->AddAccess(access);
 	}
 };
 
@@ -459,9 +494,9 @@ class CommandCSAccess : public Command
 			source.Reply(ACCESS_DENIED);
 		else
 		{
-			ci->ClearAccess();
-
 			FOREACH_MOD(I_OnAccessClear, OnAccessClear(ci, u));
+
+			ci->ClearAccess();
 
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
@@ -833,6 +868,7 @@ class CSAccess : public Module
 	{
 		this->SetAuthor("Anope");
 
+		Serializable<AccessChanAccess>::Alloc.Register("AccessChanAccess");
 
 		Implementation i[] = { I_OnReload, I_OnCreateChan, I_OnGroupCheckPriv };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

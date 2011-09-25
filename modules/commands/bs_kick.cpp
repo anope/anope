@@ -577,26 +577,60 @@ class CommandBSKick : public Command
 	}
 };
 
-struct BanData
+struct BanData : public ExtensibleItem
 {
-	Anope::string mask;
-	time_t last_use;
-	int16 ttb[TTB_SIZE];
-
-	BanData()
+	struct Data
 	{
-		this->Clear();
+		Anope::string mask;
+		time_t last_use;
+		int16 ttb[TTB_SIZE];
+
+		Data()
+		{
+			this->Clear();
+		}
+
+		void Clear()
+		{
+			last_use = 0;
+			for (int i = 0; i < TTB_SIZE; ++i)
+				this->ttb[i] = 0;
+		}
+	};
+
+ private:
+ 	typedef std::map<Anope::string, Data, std::less<ci::string> > data_type;
+	data_type data_map;
+
+ public:
+	Data &get(const Anope::string &key)
+	{
+		return this->data_map[key];
 	}
 
-	void Clear()
+	bool empty() const
 	{
-		last_use = 0;
-		for (int i = 0; i < TTB_SIZE; ++i)
-			this->ttb[i] = 0;
+		return this->data_map.empty();
+	}
+
+	void purge()
+	{
+		for (data_type::iterator it = data_map.begin(), it_end = data_map.end(); it != it_end;)
+		{
+			const Anope::string &user = it->first;
+			Data &bd = it->second;
+			++it;
+
+			if (Anope::CurTime - bd.last_use > Config->BSKeepData)
+			{
+				data_map.erase(user);
+				continue;
+			}
+		}
 	}
 };
 
-struct UserData
+struct UserData : public ExtensibleItem
 {
 	UserData()
 	{
@@ -621,6 +655,11 @@ struct UserData
 	Anope::string lastline;
 	Anope::string lasttarget;
 	int16 times;
+
+	void OnDelete()
+	{
+		delete this;
+	}
 };
 
 
@@ -637,23 +676,11 @@ class BanDataPurger : public CallBack
 		{
 			Channel *c = it->second;
 			
-			std::map<Anope::string, BanData> bandata;
-			if (c->GetExtRegular("bs_main_bandata", bandata))
+			BanData *bd = c->GetExt<BanData *>("bs_main_bandata");
+			if (bd != NULL)
 			{
-				for (std::map<Anope::string, BanData>::iterator it2 = bandata.begin(), it2_end = bandata.end(); it2 != it2_end;)
-				{
-					const Anope::string &user = it2->first;
-					BanData *bd = &it2->second;
-					++it2;
-
-					if (Anope::CurTime - bd->last_use > Config->BSKeepData)
-					{
-						bandata.erase(user);
-						continue;
-					}
-				}
-
-				if (bandata.empty())
+				bd->purge();
+				if (bd->empty())
 					c->Shrink("bs_main_bandata");
 			}
 		}
@@ -665,30 +692,32 @@ class BSKick : public Module
 	CommandBSKick commandbskick;
 	BanDataPurger purger;
 
-	BanData *GetBanData(User *u, Channel *c)
+	BanData::Data &GetBanData(User *u, Channel *c)
 	{
-		std::map<Anope::string, BanData> bandatamap;
-		if (!c->GetExtRegular("bs_main_bandata", bandatamap));
-			c->Extend("bs_main_bandata", new ExtensibleItemRegular<std::map<Anope::string, BanData> >(bandatamap));
-		c->GetExtRegular("bs_main_bandata", bandatamap);
+		BanData *bd = c->GetExt<BanData *>("bs_main_bandata");
+		if (bd == NULL)
+		{
+			bd = new BanData();
+			c->Extend("bs_main_bandata", bd);
+		}
 
-		BanData *bd = &bandatamap[u->GetMask()];
-		if (bd->last_use && Anope::CurTime - bd->last_use > Config->BSKeepData)
-			bd->Clear();
-		bd->last_use = Anope::CurTime;
-		return bd;
+		return bd->get(u->GetMask());
 	}
 
 	UserData *GetUserData(User *u, Channel *c)
 	{
-		UserData *ud = NULL;
 		UserContainer *uc = c->FindUser(u);
-		if (uc != NULL && !uc->GetExtPointer("bs_main_userdata", ud))
+		if (uc == NULL)
+			return NULL;
+
+		UserData *ud = uc->GetExt<UserData *>("bs_main_userdata");
+		if (ud == NULL)
 		{
 			ud = new UserData();
-			uc->Extend("bs_main_userdata", new ExtensibleItemPointer<UserData>(ud));
+			uc->Extend("bs_main_userdata", ud);
 		}
-               return ud;
+
+		return ud;
        }
 
 	void check_ban(ChannelInfo *ci, User *u, int ttbtype)
@@ -697,17 +726,17 @@ class BSKick : public Module
 		if (u->server->IsULined())
 			return;
 
-		BanData *bd = this->GetBanData(u, ci->c);
+		BanData::Data &bd = this->GetBanData(u, ci->c);
 
-		++bd->ttb[ttbtype];
-		if (ci->ttb[ttbtype] && bd->ttb[ttbtype] >= ci->ttb[ttbtype])
+		++bd.ttb[ttbtype];
+		if (ci->ttb[ttbtype] && bd.ttb[ttbtype] >= ci->ttb[ttbtype])
 		{
-			/* Should not use == here because bd->ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
+			/* Should not use == here because bd.ttb[ttbtype] could possibly be > ci->ttb[ttbtype]
 			 * if the TTB was changed after it was not set (0) before and the user had already been
 			 * kicked a few times. Bug #1056 - Adam */
 			Anope::string mask;
 
-			bd->ttb[ttbtype] = 0;
+			bd.ttb[ttbtype] = 0;
 
 			get_idealban(ci, u, mask);
 

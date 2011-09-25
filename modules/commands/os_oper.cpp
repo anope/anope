@@ -13,6 +13,34 @@
 
 #include "module.h"
 
+struct MyOper : Oper, Serializable<MyOper>
+{
+	MyOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
+
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["name"] << this->name;
+		data["type"] << this->ot->GetName();
+
+		return data;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		OperType *ot = OperType::Find(data["type"].astr());
+		if (ot == NULL)
+			return;
+		NickCore *nc = findcore(data["name"].astr());
+		if (nc == NULL)
+			return;
+
+		nc->o = new MyOper(nc->display, ot);
+		Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
+	}
+};
+
 class CommandOSOper : public Command
 {
  public:
@@ -46,8 +74,7 @@ class CommandOSOper : public Command
 					source.Reply(_("Oper type \2%s\2 has not been configured."), type.c_str());
 				else
 				{
-					delete na->nc->o;
-					na->nc->o = new Oper(na->nc->display, ot);
+					na->nc->o = new MyOper(na->nc->display, ot);
 
 					Log(LOG_ADMIN, source.u, this) << "ADD " << na->nick << " as type " << ot->GetName();
 					source.Reply("%s (%s) added to the \2%s\2 list.", na->nick.c_str(), na->nc->display.c_str(), ot->GetName().c_str());
@@ -177,43 +204,18 @@ class OSOper : public Module
 	{
 		this->SetAuthor("Anope");
 
-		Implementation i[] = { I_OnDatabaseWrite, I_OnDatabaseRead };
-		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
+		Serializable<MyOper>::Alloc.Register("Oper");
 	}
 
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
+	~OSOper()
 	{
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			NickCore *nc = it->second;
-			if (!nc->o)
-				continue;
-			bool found = false;
-			for (std::list<NickAlias *>::const_iterator it2 = nc->aliases.begin(), it2_end = nc->aliases.end(); it2 != it2_end; ++it2)
-				if (Oper::Find((*it2)->nick) != NULL)
-					found = true;
-			if (found == false)
-			{
-				Write("OPER " + nc->display + " :" + nc->o->ot->GetName());
-			}
-		}
-	}
 
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params[0] == "OPER" && params.size() > 2)
-		{
-			NickCore *nc = findcore(params[1]);
-			if (!nc || nc->o)
-				return EVENT_CONTINUE;
-			OperType *ot = OperType::Find(params[2]);
-			if (ot == NULL)
-				return EVENT_CONTINUE;
-			nc->o = new Oper(nc->display, ot);
-			Log(LOG_NORMAL, "operserv/oper") << "Tied oper " << nc->display << " to type " << ot->GetName();
+			if (nc->o && !nc->o->config)
+				delete nc->o;
 		}
-		return EVENT_CONTINUE;
 	}
 };
 

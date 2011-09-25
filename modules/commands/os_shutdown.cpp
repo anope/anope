@@ -55,8 +55,8 @@ class CommandOSRestart : public Command
 	{
 		User *u = source.u;
 		quitmsg = "RESTART command received from " + u->nick;
-		save_databases();
 		quitting = restarting = true;
+		save_databases();
 		return;
 	}
 
@@ -82,8 +82,8 @@ class CommandOSShutdown : public Command
 	{
 		User *u = source.u;
 		quitmsg = source.command + " command received from " + u->nick;
-		save_databases();
 		quitting = true;
+		save_databases();
 		return;
 	}
 

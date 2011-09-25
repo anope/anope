@@ -60,6 +60,30 @@ const Anope::string ChannelInfoFlagStrings[] = {
 	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", ""
 };
 
+/** Flags for badwords
+ */
+enum BadWordType
+{
+	/* Always kicks if the word is said */
+	BW_ANY,
+	/* User must way the entire word */
+	BW_SINGLE,
+	/* The word has to start with the badword */
+	BW_START,
+	/* The word has to end with the badword */
+	BW_END
+};
+
+/* Structure used to contain bad words. */
+struct BadWord : Serializable<BadWord>
+{
+	Anope::string word;
+	BadWordType type;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
+};
+
 /** Flags for auto kick
  */
 enum AutoKickFlag
@@ -71,7 +95,7 @@ enum AutoKickFlag
 const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
 
 /* AutoKick data. */
-class AutoKick : public Flags<AutoKickFlag>
+class AutoKick : public Flags<AutoKickFlag>, public Serializable<AutoKick>
 {
  public:
  	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
@@ -83,20 +107,29 @@ class AutoKick : public Flags<AutoKickFlag>
 	Anope::string creator;
 	time_t addtime;
 	time_t last_used;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
 };
 
-struct ModeLock
+struct ModeLock : Serializable<ModeLock>
 {
+	ModeLock() { }
+ public:
+	ChannelInfo *ci;
 	bool set;
 	ChannelModeName name;
 	Anope::string param;
 	Anope::string setter;
 	time_t created;
 
-	ModeLock(bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime) : set(s), name(n), param(p), setter(se), created(c) { }
+	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime) : ci(ch), set(s), name(n), param(p), setter(se), created(c) { }
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
 };
 
-struct LogSetting
+struct LogSetting : Serializable<LogSetting>
 {
 	/* Our service name of the command */
 	Anope::string service_name;
@@ -107,9 +140,12 @@ struct LogSetting
 	Anope::string method, extra;
 	Anope::string creator;
 	time_t created;
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
 };
 
-class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>
+class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>, public Serializable<ChannelInfo>
 {
  private:
 	NickCore *founder;							/* Channel founder */
@@ -162,6 +198,9 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16 capsmin, capspercent;		/* For CAPS kicker */
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
 	int16 repeattimes;				/* For REPEAT kicker */
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
 
 	/** Change the founder of the channek
 	 * @params nc The new founder

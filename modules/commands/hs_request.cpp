@@ -21,18 +21,42 @@
 static bool HSRequestMemoUser = false;
 static bool HSRequestMemoOper = false;
 
-void my_add_host_request(const Anope::string &nick, const Anope::string &vIdent, const Anope::string &vhost, const Anope::string &creator, time_t tmp_time);
 void req_send_memos(CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
 
-struct HostRequest
+struct HostRequest : ExtensibleItem, Serializable<HostRequest>
 {
+	Anope::string nick;
 	Anope::string ident;
 	Anope::string host;
 	time_t time;
-};
 
-typedef std::map<Anope::string, HostRequest *, std::less<ci::string> > RequestMap;
-RequestMap Requests;
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["nick"] << this->nick;
+		data["ident"] << this->ident;
+		data["host"] << this->host;
+		data["time"].setType(Serialize::DT_INT) << this->time;
+
+		return data;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		NickAlias *na = findnick(data["nick"].astr());
+		if (na == NULL)
+			return;
+
+		HostRequest *req = new HostRequest;
+		req->nick = na->nick;
+		data["ident"] >> req->ident;
+		data["host"] >> req->host;
+		data["time"] >> req->time;
+
+		na->Extend("hs_request", req);
+	}
+};
 
 class CommandHSRequest : public Command
 {
@@ -53,6 +77,12 @@ class CommandHSRequest : public Command
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
+
+		NickAlias *na = findnick(u->nick);
+		if (na == NULL)
+			na = findnick(u->Account()->display);
+		if (!na)
+			return;
 
 		Anope::string rawhostmask = params[0];
 		
@@ -111,7 +141,14 @@ class CommandHSRequest : public Command
 			u->lastmemosend = Anope::CurTime;
 			return;
 		}
-		my_add_host_request(u->nick, user, host, u->nick, Anope::CurTime);
+
+
+		HostRequest *req = new HostRequest;
+		req->nick = u->nick;
+		req->ident = user;
+		req->host = host;
+		req->time = Anope::CurTime;
+		na->Extend("hs_request", req);
 
 		source.Reply(_("Your vHost has been requested"));
 		req_send_memos(source, user, host);
@@ -147,29 +184,21 @@ class CommandHSActivate : public Command
 		const Anope::string &nick = params[0];
 
 		NickAlias *na = findnick(nick);
-		if (na)
+		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
+		if (req)
 		{
-			RequestMap::iterator it = Requests.find(na->nick);
-			if (it != Requests.end())
-			{
-				na->hostinfo.SetVhost(it->second->ident, it->second->host, u->nick, it->second->time);
-				FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
+			na->hostinfo.SetVhost(req->ident, req->host, u->nick, req->time);
+			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
-				if (HSRequestMemoUser && memoserv)
-					memoserv->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
+			if (HSRequestMemoUser && memoserv)
+				memoserv->Send(Config->HostServ, na->nick, _("[auto memo] Your requested vHost has been approved."), true);
 
-				source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
-				Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!it->second->ident.empty() ? it->second->ident + "@" : "") << it->second->host;
-				delete it->second;
-				Requests.erase(it);
-			}
-			else
-				source.Reply(_("No request for nick %s found."), nick.c_str());
+			source.Reply(_("vHost for %s has been activated"), na->nick.c_str());
+			Log(LOG_COMMAND, u, this, NULL) << "for " << na->nick << " for vhost " << (!req->ident.empty() ? req->ident + "@" : "") << req->host;
+			na->Shrink("hs_request");
 		}
 		else
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-
-		return;
+			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -199,11 +228,11 @@ class CommandHSReject : public Command
 		const Anope::string &nick = params[0];
 		const Anope::string &reason = params.size() > 1 ? params[1] : "";
 
-		RequestMap::iterator it = Requests.find(nick);
-		if (it != Requests.end())
+		NickAlias *na = findnick(nick);
+		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
+		if (req)
 		{
-			delete it->second;
-			Requests.erase(it);
+			na->Shrink("hs_request");
 
 			if (HSRequestMemoUser && memoserv)
 			{
@@ -246,9 +275,13 @@ class HSListBase : public Command
 		int from = 0, to = 0;
 		unsigned display_counter = 0;
 
-		for (RequestMap::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
-			HostRequest *hr = it->second;
+			NickAlias *na = it->second;
+			HostRequest *hr = na->GetExt<HostRequest *>("hs_request");
+			if (!hr)
+				continue;
+
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config->NSListMax)
 			{
 				++display_counter;
@@ -260,8 +293,6 @@ class HSListBase : public Command
 			++counter;
 		}
 		source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
-
-		return;
 	}
  public:
 	HSListBase(Module *creator, const Anope::string &cmd, int min, int max) : Command(creator, cmd, min, max)
@@ -306,8 +337,7 @@ class HSRequest : public Module
 	{
 		this->SetAuthor("Anope");
 
-
-		Implementation i[] = { I_OnDelNick, I_OnDatabaseRead, I_OnDatabaseWrite, I_OnReload };
+		Implementation i[] = { I_OnReload };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
 		this->OnReload();
@@ -315,47 +345,8 @@ class HSRequest : public Module
 
 	~HSRequest()
 	{
-		/* Clean up all open host requests */
-		while (!Requests.empty())
-		{
-			delete Requests.begin()->second;
-			Requests.erase(Requests.begin());
-		}
-	}
-
-	void OnDelNick(NickAlias *na)
-	{
-		RequestMap::iterator it = Requests.find(na->nick);
-
-		if (it != Requests.end())
-		{
-			delete it->second;
-			Requests.erase(it);
-		}
-	}
-
-	EventReturn OnDatabaseRead(const std::vector<Anope::string> &params)
-	{
-		if (params[0].equals_ci("HS_REQUEST") && params.size() >= 5)
-		{
-			Anope::string vident = params[2].equals_ci("(null)") ? "" : params[2];
-			my_add_host_request(params[1], vident, params[3], params[1], params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0);
-
-			return EVENT_STOP;
-		}
-
-		return EVENT_CONTINUE;
-	}
-
-	void OnDatabaseWrite(void (*Write)(const Anope::string &))
-	{
-		for (RequestMap::iterator it = Requests.begin(), it_end = Requests.end(); it != it_end; ++it)
-		{
-			HostRequest *hr = it->second;
-			std::stringstream buf;
-			buf << "HS_REQUEST " << it->first << " " << (hr->ident.empty() ? "(null)" : hr->ident) << " " << hr->host << " " << hr->time;
-			Write(buf.str());
-		}
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+			it->second->Shrink("hs_request");
 	}
 
 	void OnReload()
@@ -391,30 +382,6 @@ void req_send_memos(CommandSource &source, const Anope::string &vIdent, const An
 
 			memoserv->Send(Config->HostServ, na->nick, message, true);
 		}
-}
-
-void my_add_host_request(const Anope::string &nick, const Anope::string &vIdent, const Anope::string &vhost, const Anope::string &creator, time_t tmp_time)
-{
-	HostRequest *hr = new HostRequest;
-	hr->ident = vIdent;
-	hr->host = vhost;
-	hr->time = tmp_time;
-	RequestMap::iterator it = Requests.find(nick);
-	if (it != Requests.end())
-	{
-		delete it->second;
-		Requests.erase(it);
-	}
-	Requests.insert(std::make_pair(nick, hr));
-}
-
-void my_load_config()
-{
-	ConfigReader config;
-	HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);
-	HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
-
-	Log(LOG_DEBUG) << "[hs_request] Set config vars: MemoUser=" << HSRequestMemoUser << " MemoOper=" <<  HSRequestMemoOper;
 }
 
 MODULE_INIT(HSRequest)

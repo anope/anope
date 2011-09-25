@@ -273,6 +273,19 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&sglines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
+
+		Serializable<XLine>::Alloc.Register("XLine");
+	}
+
+	~OperServCore()
+	{
+		this->sglines.Clear();
+		this->sqlines.Clear();
+		this->snlines.Clear();
+
+		XLineManager::UnregisterXLineManager(&sglines);
+		XLineManager::UnregisterXLineManager(&sqlines);
+		XLineManager::UnregisterXLineManager(&snlines);
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)

@@ -11,8 +11,40 @@
 
 #include "services.h"
 #include "modules.h"
+#include "memoserv.h"
 
 Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
+
+SerializableBase::serialized_data Memo::serialize()
+{
+	serialized_data data;	
+
+	data["owner"] << this->owner;
+	data["time"] << this->time;
+	data["sender"] << this->sender;
+	data["text"] << this->text;
+
+	return data;
+}
+
+void Memo::unserialize(SerializableBase::serialized_data &data)
+{
+	if (!memoserv)
+		return;
+	
+	bool ischan;
+	MemoInfo *mi = memoserv->GetMemoInfo(data["owner"].astr(), ischan);
+	if (!mi)
+		return;
+
+	Memo *m = new Memo();
+	data["owner"] >> m->owner;
+	data["time"] >> m->time;
+	data["sender"] >> m->sender;
+	data["text"] >> m->text;
+
+	mi->memos.push_back(m);
+}
 
 unsigned MemoInfo::GetIndex(Memo *m) const
 {

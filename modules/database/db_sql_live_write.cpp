@@ -32,19 +32,25 @@ class SQLCache : public Timer
 	}
 };
 
-static void ChanInfoUpdate(const SQLResult &res)
+static void ChanInfoUpdate(const Anope::string &name, const SQLResult &res)
 {
+	ChannelInfo *ci = cs_findchan(name);
+	if (res.Rows() == 0)
+	{
+		delete ci;
+		return;
+	}
+
 	try
 	{
-		ChannelInfo *ci = cs_findchan(res.Get(0, "name"));
 		if (!ci)
-			ci = new ChannelInfo(res.Get(0, "name"));
+			ci = new ChannelInfo(name);
 		ci->SetFounder(findcore(res.Get(0, "founder")));
 		ci->successor = findcore(res.Get(0, "successor"));
 		ci->desc = res.Get(0, "descr");
 		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 		ci->ClearFlags();
-		ci->FromString(BuildStringVector(res.Get(0, "flags")));
+		ci->FromString(res.Get(0, "flags"));
 		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
 		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
 
@@ -68,21 +74,27 @@ static void ChanInfoUpdate(const SQLResult &res)
 	}
 	catch (const SQLException &ex)
 	{
-		Log(LOG_DEBUG) << ex.GetReason();
+		Log() << ex.GetReason();
 	}
 	catch (const ConvertException &) { }
 }
 
-static void NickInfoUpdate(const SQLResult &res)
+static void NickInfoUpdate(const Anope::string &name, const SQLResult &res)
 {
+	NickAlias *na = findnick(name);
+	if (res.Rows() == 0)
+	{
+		delete na;
+		return;
+	}
+
 	try
 	{
 		NickCore *nc = findcore(res.Get(0, "display"));
 		if (!nc)
 			return;
-		NickAlias *na = findnick(res.Get(0, "nick"));
 		if (!na)
-			na = new NickAlias(res.Get(0, "nick"), nc);
+			na = new NickAlias(name, nc);
 
 		na->last_quit = res.Get(0, "last_quit");
 		na->last_realname = res.Get(0, "last_realname");
@@ -91,7 +103,7 @@ static void NickInfoUpdate(const SQLResult &res)
 		na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 		na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
 		na->ClearFlags();
-		na->FromString(BuildStringVector(res.Get(0, "flags")));
+		na->FromString(res.Get(0, "flags"));
 
 		if (na->nc != nc)
 		{
@@ -105,29 +117,35 @@ static void NickInfoUpdate(const SQLResult &res)
 	}
 	catch (const SQLException &ex)
 	{
-		Log(LOG_DEBUG) << ex.GetReason();
+		Log() << ex.GetReason();
 	}
 	catch (const ConvertException &) { }
 }
 
-static void NickCoreUpdate(const SQLResult &res)
+static void NickCoreUpdate(const Anope::string &name, const SQLResult &res)
 {
+	NickCore *nc = findcore(name);
+	if (res.Rows() == 0)
+	{
+		delete nc;
+		return;
+	}
+
 	try
 	{
-		NickCore *nc = findcore(res.Get(0, "display"));
 		if (!nc)
-			nc = new NickCore(res.Get(0, "display"));
+			nc = new NickCore(name);
 
 		nc->pass = res.Get(0, "pass");
 		nc->email = res.Get(0, "email");
 		nc->greet = res.Get(0, "greet");
 		nc->ClearFlags();
-		nc->FromString(BuildStringVector(res.Get(0, "flags")));
+		nc->FromString(res.Get(0, "flags"));
 		nc->language = res.Get(0, "language");
 	}
 	catch (const SQLException &ex)
 	{
-		Log(LOG_DEBUG) << ex.GetReason();
+		Log() << ex.GetReason();
 	}
 	catch (const ConvertException &) { }
 }
@@ -141,7 +159,7 @@ class MySQLLiveModule : public Module
 	SQLResult RunQuery(const SQLQuery &query)
 	{
 		if (!this->SQL)
-			throw SQLException("Unable to locate SQL reference, is m_mysql loaded and configured correctly?");
+			throw SQLException("Unable to locate SQL reference, is db_sql loaded and configured correctly?");
 
 		SQLResult res = SQL->RunQuery(query);
 		if (!res.GetError().empty())
@@ -151,10 +169,17 @@ class MySQLLiveModule : public Module
 
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, DATABASE), SQL("mysql/main")
+		Module(modname, creator, DATABASE), SQL("")
 	{
-		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
+		Implementation i[] = { I_OnReload, I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+	}
+
+	void OnReload()
+	{
+		ConfigReader config;
+		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
+		this->SQL = engine;
 	}
 
 	void OnShutdown()
@@ -171,10 +196,10 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_cs_info` WHERE `name` = @name");
+			SQLQuery query("SELECT * FROM `ChannelInfo` WHERE `name` = @name@");
 			query.setValue("name", chname);
 			SQLResult res = this->RunQuery(query);
-			ChanInfoUpdate(res);
+			ChanInfoUpdate(chname, res);
 		}
 		catch (const SQLException &ex)
 		{
@@ -189,10 +214,10 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_ns_alias` WHERE `nick` = @nick");
+			SQLQuery query("SELECT * FROM `NickAlias` WHERE `nick` = @nick@");
 			query.setValue("nick", nick);
 			SQLResult res = this->RunQuery(query);
-			NickInfoUpdate(res);
+			NickInfoUpdate(nick, res);
 		}
 		catch (const SQLException &ex)
 		{
@@ -207,10 +232,10 @@ class MySQLLiveModule : public Module
 
 		try
 		{
-			SQLQuery query("SELECT * FROM `anope_ns_core` WHERE `display` = @display");
+			SQLQuery query("SELECT * FROM `NickCore` WHERE `display` = @display@");
 			query.setValue("display", nick);
 			SQLResult res = this->RunQuery(query);
-			NickCoreUpdate(res);
+			NickCoreUpdate(nick, res);
 		}
 		catch (const SQLException &ex)
 		{

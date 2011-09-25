@@ -10,12 +10,15 @@
  */
 
 
-struct IgnoreData
+struct IgnoreData : Serializable<IgnoreData>
 {
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
 	time_t time; /* When do we stop ignoring them? */
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &data);
 };
 
 class IgnoreService : public Service<Base>
@@ -23,7 +26,7 @@ class IgnoreService : public Service<Base>
  protected:
 	std::list<IgnoreData> ignores;
 
-	IgnoreService(Module *c, const Anope::string &n) : Service<Base>(c, n) { }
+	IgnoreService(Module *c) : Service<Base>(c, "ignore") { }
 	
  public:
 	virtual void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) = 0;
@@ -36,4 +39,29 @@ class IgnoreService : public Service<Base>
 
 	inline std::list<IgnoreData> &GetIgnores() { return this->ignores; }
 };
+
+static service_reference<IgnoreService, Base> ignore_service("ignore");
+
+SerializableBase::serialized_data IgnoreData::serialize()
+{
+	serialized_data data;
+
+	data["mask"] << this->mask;
+	data["creator"] << this->creator;
+	data["reason"] << this->reason;
+	data["time"] << this->time;
+		
+	return data;
+}
+
+void IgnoreData::unserialize(SerializableBase::serialized_data &data)
+{
+	if (!ignore_service)
+		return;
+
+	time_t t;
+	data["time"] >> t;
+
+	ignore_service->AddIgnore(data["mask"].astr(), data["creator"].astr(), data["reason"].astr(), t);
+}
 

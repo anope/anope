@@ -241,6 +241,8 @@ void Init(int ac, char **av)
 #endif
 	if (set_group() < 0)
 		throw FatalException("set_group() fail");
+	
+	RegisterTypes();
 
 	/* Parse command line arguments */
 	ParseCommandLineArguments(ac, av);
@@ -442,8 +444,6 @@ void Init(int ac, char **av)
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_OnLoadDatabase, OnLoadDatabase());
 	Log() << "Databases loaded";
-
-	FOREACH_MOD(I_OnPostLoadDatabases, OnPostLoadDatabases());
 }
 
 /*************************************************************************/

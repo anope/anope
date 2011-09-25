@@ -46,8 +46,8 @@ class CommandNSConfirm : public Command
 		}
 		else if (u->Account())
 		{
-			Anope::string code;
-			if (u->Account()->GetExtRegular<Anope::string>("ns_register_passcode", code) && code == passcode)
+			Anope::string *code = u->Account()->GetExt<Anope::string *>("ns_register_passcode");
+			if (code != NULL && *code == passcode)
 			{
 				u->Account()->Shrink("ns_register_passcode");
 				Log(LOG_COMMAND, u, this) << "to confirm their email";
@@ -320,8 +320,9 @@ class NSRegister : public Module
 
 static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 {
-	Anope::string code;
-	if (na->nc->GetExtRegular<Anope::string>("ns_register_passcode", code) == false)
+	Anope::string *code = na->nc->GetExt<Anope::string *>("ns_register_passcode");
+	Anope::string codebuf;
+	if (code == NULL)
 	{
 		int chars[] = {
 			' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -332,20 +333,22 @@ static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 		};
 		int idx, min = 1, max = 62;
 		for (idx = 0; idx < 9; ++idx)
-			code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
-		na->nc->Extend("ns_register_passcode", new ExtensibleItemRegular<Anope::string>(code));
+			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+		na->nc->Extend("ns_register_passcode", new ExtensibleString(codebuf));
 	}
+	else
+		codebuf = *code;
 
 	Anope::string subject = translate(na->nc, Config->MailRegistrationSubject.c_str());
 	Anope::string message = translate(na->nc, Config->MailRegistrationMessage.c_str());
 
 	subject = subject.replace_all_cs("%n", na->nick);
 	subject = subject.replace_all_cs("%N", Config->NetworkName);
-	subject = subject.replace_all_cs("%c", code);
+	subject = subject.replace_all_cs("%c", codebuf);
 
 	message = message.replace_all_cs("%n", na->nick);
 	message = message.replace_all_cs("%N", Config->NetworkName);
-	message = message.replace_all_cs("%c", code);
+	message = message.replace_all_cs("%c", codebuf);
 
 	return Mail(u, na->nc, bi, subject, message);
 }

@@ -90,7 +90,7 @@ static struct XOPAccess
 	}
 };
 
-class XOPChanAccess : public ChanAccess
+class XOPChanAccess : public ChanAccess, public Serializable<XOPChanAccess>
 {
  public:
 	XOPType type;
@@ -187,6 +187,41 @@ class XOPChanAccess : public ChanAccess
 
 			return max;
 		}
+	}
+
+	Anope::string serialize_name() { return "XOPChanAccess"; }
+	serialized_data serialize()
+	{
+		serialized_data data;
+
+		data["provider"] << this->provider->name;
+		data["ci"] << this->ci->name;
+		data["mask"] << this->mask;
+		data["creator"] << this->creator;
+		data["last_seen"] << this->last_seen;
+		data["created"] << this->created;
+		data["type"] << this->Serialize();
+
+		return data;
+	}
+
+	static void unserialize(SerializableBase::serialized_data &data)
+	{
+		service_reference<AccessProvider> aprovider(data["provider"].astr());
+		ChannelInfo *ci = cs_findchan(data["ci"].astr());
+		if (!aprovider || !ci)
+			return;
+
+		XOPChanAccess *access = new XOPChanAccess(aprovider);
+		access->provider = aprovider;
+		access->ci = ci;
+		data["mask"] >> access->mask;
+		data["creator"] >> access->creator;
+		data["last_seen"] >> access->last_seen;
+		data["created"] >> access->created;
+		access->Unserialize(data["type"].astr());
+
+		ci->AddAccess(access);
 	}
 };
 
@@ -868,6 +903,7 @@ class CSXOP : public Module
 	{
 		this->SetAuthor("Anope");
 
+		Serializable<XOPChanAccess>::Alloc.Register("XOPChanAccess");
 	}
 };
 

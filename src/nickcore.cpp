@@ -54,6 +54,7 @@ SerializableBase::serialized_data NickCore::serialize()
 	data["email"] << this->email;
 	data["greet"] << this->greet;
 	data["language"] << this->language;
+	data["flags"] << this->ToString();
 	for (unsigned i = 0; i < this->access.size(); ++i)
 		data["access"] << this->access[i] << " ";
 	for (unsigned i = 0; i < this->cert.size(); ++i)
@@ -72,6 +73,7 @@ void NickCore::unserialize(serialized_data &data)
 	data["email"] >> nc->email;
 	data["greet"] >> nc->greet;
 	data["language"] >> nc->language;
+	nc->FromString(data["flags"].astr());
 	{
 		Anope::string buf;
 		data["access"] >> buf;

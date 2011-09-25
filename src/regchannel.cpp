@@ -43,6 +43,7 @@ SerializableBase::serialized_data AutoKick::serialize()
 	data["creator"] << this->creator;
 	data["addtime"].setType(Serialize::DT_INT) << this->addtime;
 	data["last_used"].setType(Serialize::DT_INT) << this->last_used;
+	data["flags"] << this->ToString();
 
 	return data;
 }
@@ -57,6 +58,7 @@ void AutoKick::unserialize(SerializableBase::serialized_data &data)
 	data["creator"] >> ak->creator;
 	data["addtime"] >> ak->addtime;
 	data["last_used"] >> ak->last_used;
+	ak->FromString(data["flags"].astr());
 }
 
 SerializableBase::serialized_data ModeLock::serialize()
@@ -276,6 +278,7 @@ SerializableBase::serialized_data ChannelInfo::serialize()
 	data["last_topic_setter"] << this->last_topic_setter;
 	data["last_topic_time"].setType(Serialize::DT_INT) << this->last_topic_time;
 	data["bantype"].setType(Serialize::DT_INT) << this->bantype;
+	data["flags"] << this->ToString();
 	data["botflags"] << this->botflags.ToString();
 	{
 		Anope::string levels_buffer;
@@ -313,6 +316,7 @@ void ChannelInfo::unserialize(SerializableBase::serialized_data &data)
 	data["last_topic_setter"] >> ci->last_topic_setter;
 	data["last_topic_time"] >> ci->last_topic_time;
 	data["bantype"] >> ci->bantype;
+	ci->FromString(data["flags"].astr());
 	ci->botflags.FromString(data["botflags"].astr());
 	{
 		std::vector<Anope::string> v = BuildStringVector(data["levels"].astr());

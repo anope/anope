@@ -115,6 +115,7 @@ SerializableBase::serialized_data NickAlias::serialize()
 	data["time_registered"].setType(Serialize::DT_INT) << this->time_registered;
 	data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
 	data["nc"] << this->nc->display;
+	data["flags"] << this->ToString();
 
 	if (this->hostinfo.HasVhost())
 	{
@@ -140,6 +141,7 @@ void NickAlias::unserialize(SerializableBase::serialized_data &data)
 	data["last_realhost"] >> na->last_realhost;
 	data["time_registered"] >> na->time_registered;
 	data["last_seen"] >> na->last_seen;
+	na->FromString(data["flags"].astr());
 
 	time_t vhost_time;
 	data["vhost_time"] >> vhost_time;

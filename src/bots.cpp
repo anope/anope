@@ -74,6 +74,7 @@ SerializableBase::serialized_data BotInfo::serialize()
 	data["realname"] << this->realname;
 	data["created"] << this->created;
 	data["chancount"] << this->chancount;
+	data["flags"] << this->ToString();
 
 	return data;
 }
@@ -85,6 +86,7 @@ void BotInfo::unserialize(SerializableBase::serialized_data &data)
 		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
 	data["created"] >> bi->created;
 	data["chancount"] >> bi->chancount;
+	bi->FromString(data["flags"].astr());
 }
 
 void BotInfo::GenerateUID()

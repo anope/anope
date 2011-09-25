@@ -50,7 +50,7 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 Privilege *PrivilegeManager::FindPrivilege(const Anope::string &name)
 {
 	for (unsigned i = privs.size(); i > 0; --i)
-		if (privs[i - 1].name == name)
+		if (privs[i - 1].name.equals_ci(name))
 			return &privs[i - 1];
 	return NULL;
 }

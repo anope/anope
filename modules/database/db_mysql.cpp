@@ -652,24 +652,32 @@ class DBMySQL : public Module
 		query.setValue("maxusertime", maxusertime);
 		this->RunQuery(query);
 
+		query = "TRUNCATE TABLE `anope_ns_core_metadata`";
+		this->RunQuery(query);
 		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 		{
 			CurCore = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteCoreMetadata, CurCore));
 		}
 
+		query = "TRUNCATE TABLE `anope_ns_alias_metadata`";
+		this->RunQuery(query);
 		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			CurNick = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteNickMetadata, CurNick));
 		}
 
+		query = "TRUNCATE TABLE `anope_cs_info_metadata`";
+		this->RunQuery(query);
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
 			CurChannel = it->second;
 			FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteChannelMetadata, CurChannel));
 		}
 
+		query = "TRUNCATE TABLE `anope_bs_info_metadata`";
+		this->RunQuery(query);
 		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			if (it->second->HasFlag(BI_CONF))

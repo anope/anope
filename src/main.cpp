@@ -143,13 +143,15 @@ UplinkSocket::~UplinkSocket()
 
 	Me->SetFlag(SERVER_SYNCING);
 
-	if (!quitting)
+	if (AtTerm())
+		quitting = true;
+	else if (!quitting)
 	{
 		int Retry = Config->RetryWait;
 		if (Retry <= 0)
 			Retry = 60;
 
-		Log() << "Retrying in " << Retry << " seconds";
+		Log() << "Disconnected, retrying in " << Retry << " seconds";
 		new ReconnectTimer(Retry);
 	}
 }
@@ -162,14 +164,14 @@ bool UplinkSocket::Read(const Anope::string &buf)
 
 void UplinkSocket::OnConnect()
 {
-	Log() << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
+	Log(LOG_TERMINAL) << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
 	ircdproto->SendConnect();
 	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 }
 
 void UplinkSocket::OnError(const Anope::string &error)
 {
-	Log() << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
+	Log(LOG_TERMINAL) << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
 }
 
 static void Connect()
@@ -184,7 +186,9 @@ static void Connect()
 		UplinkSock->Bind(Config->LocalHost);
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 	DNSQuery rep = DNSManager::BlockingQuery(u->host, u->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
-	UplinkSock->Connect(!rep.answers.empty() ? rep.answers.front().rdata : u->host, u->port);
+	Anope::string reply_ip = !rep.answers.empty() ? rep.answers.front().rdata : u->host;
+	Log(LOG_TERMINAL) << "Attempting to connect to " << u->host << " (" << reply_ip << "), port " << u->port;
+	UplinkSock->Connect(reply_ip, u->port);
 }
 
 /*************************************************************************/

@@ -144,8 +144,6 @@ void SocketEngine::Process()
 
 		if (ev->revents & (POLLERR | POLLRDHUP))
 		{
-			socklen_t sz = sizeof(errno);
-			getsockopt(s->GetFD(), SOL_SOCKET, SO_ERROR, &errno, &sz);
 			s->ProcessError();
 			s->SetFlag(SF_DEAD);
 			delete s;

@@ -231,10 +231,35 @@ class SignalNothing : public Signal
 	void OnNotify() { }
 };
 
+bool AtTerm()
+{
+	return isatty(fileno(stdout)) && isatty(fileno(stdin)) && isatty(fileno(stderr));
+}
+
+void Fork()
+{
+#ifndef _WIN32
+	int i = fork();
+	if (i < 0)
+		Log(LOG_TERMINAL) << "Unable to fork, " << Anope::LastError();
+	else if (i != 0)
+		exit(0);
+	
+	if (isatty(fileno(stdout)))
+		fclose(stdout);
+	if (isatty(fileno(stdin))) 
+		fclose(stdin);
+	if (isatty(fileno(stderr)))
+		fclose(stderr);
+
+	setpgid(0, 0);
+#else
+	FreeConsole();
+#endif
+}
+
 void Init(int ac, char **av)
 {
-	int started_from_term = isatty(0) && isatty(1) && isatty(2);
-
 	/* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
 	umask(DEFUMASK);
@@ -361,36 +386,9 @@ void Init(int ac, char **av)
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 
-#ifndef _WIN32
-	if (!nofork)
-	{
-		int i;
-		if ((i = fork()) < 0)
-			throw FatalException("Unable to fork");
-		else if (i != 0)
-		{
-			Log(LOG_TERMINAL) << "PID " << i;
-			exit(0);
-		}
-
-		if (started_from_term)
-		{
-			close(0);
-			close(1);
-			close(2);
-		}
-		if (setpgid(0, 0) < 0)
-			throw FatalException("Unable to setpgid()");
-	}
-#else
+#ifdef _WIN32
 	if (!SupportedWindowsVersion())
 		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
-	if (!nofork)
-	{
-		Log(LOG_TERMINAL) << "PID " << GetCurrentProcessId();
-		Log() << "Launching Anope into the background";
-		FreeConsole();
-	}
 #endif
 
 	/* Write our PID to the PID file. */
@@ -417,7 +415,8 @@ void Init(int ac, char **av)
 #endif
 
 	/* load modules */
-	ModuleManager::LoadModuleList(Config->ModulesAutoLoad);
+	for (std::list<Anope::string>::iterator it = Config->ModulesAutoLoad.begin(), it_end = Config->ModulesAutoLoad.end(); it != it_end; ++it)
+		ModuleManager::LoadModule(*it, NULL);
 
 	Module *protocol = ModuleManager::FindFirstOf(PROTOCOL);
 	if (protocol == NULL)

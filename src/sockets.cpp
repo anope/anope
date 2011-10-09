@@ -372,7 +372,7 @@ SocketFlag SocketIO::FinishConnect(ConnectionSocket *s)
 	else
 	{
 		errno = optval;
-		s->ProcessError();
+		s->OnError(optval ? Anope::LastError() : "");
 		return SF_DEAD;
 	}
 }

@@ -1018,11 +1018,6 @@ class CoreExport ModuleManager
 	 */
 	static void CleanupRuntimeDirectory();
 
-	/** Load up a list of modules.
-	 * @param module_list The list of modules to load
-	 **/
-	static void LoadModuleList(std::list<Anope::string> &ModList);
-
 	/** Loads a given module.
 	 * @param m the module to load
 	 * @param u the user who loaded it, NULL for auto-load

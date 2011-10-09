@@ -65,12 +65,6 @@ void ModuleManager::CleanupRuntimeDirectory()
 #endif
 }
 
-void ModuleManager::LoadModuleList(std::list<Anope::string> &ModuleList)
-{
-	for (std::list<Anope::string>::iterator it = ModuleList.begin(), it_end = ModuleList.end(); it != it_end; ++it)
-		ModuleManager::LoadModule(*it, NULL);
-}
-
 /**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from

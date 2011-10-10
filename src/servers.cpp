@@ -320,7 +320,7 @@ void Server::Sync(bool SyncLinks)
 				c->ci->RestoreTopic();
 		}
 
-		if (!nofork)
+		if (!nofork && AtTerm())
 		{
 			Log(LOG_TERMINAL) << "Successfully linked, launching into background...";
 			Fork();

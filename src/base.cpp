@@ -2,7 +2,7 @@
 #include "modules.h"
 
 std::vector<SerializableBase *> serialized_types;
-std::list<SerializableBase *> serialized_items;
+std::list<SerializableBase *> *serialized_items;
 
 void RegisterTypes()
 {

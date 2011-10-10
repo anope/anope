@@ -158,16 +158,17 @@ class DBFlatFile : public Module
 			return EVENT_CONTINUE;
 		}
 
-		for (std::list<SerializableBase *>::iterator it = serialized_items.begin(), it_end = serialized_items.end(); it != it_end; ++it)
-		{
-			SerializableBase *base = *it;
-			SerializableBase::serialized_data data = base->serialize();
-
-			db << "OBJECT " << base->serialize_name() << "\n";
-			for (SerializableBase::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
-				db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
-			db << "END\n";
-		}
+		if (serialized_items != NULL)
+			for (std::list<SerializableBase *>::iterator it = serialized_items->begin(), it_end = serialized_items->end(); it != it_end; ++it)
+			{
+				SerializableBase *base = *it;
+				SerializableBase::serialized_data data = base->serialize();
+	
+				db << "OBJECT " << base->serialize_name() << "\n";
+				for (SerializableBase::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
+					db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
+				db << "END\n";
+			}
 
 		db.close();
 

@@ -379,7 +379,6 @@ int main(int ac, char **av, char **envp)
 		ModuleManager::UnloadModule(m, NULL);
 
 	ModuleManager::CleanupRuntimeDirectory();
-	serialized_items.clear();
 
 #ifdef _WIN32
 	OnShutdown();

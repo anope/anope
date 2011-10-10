@@ -113,8 +113,11 @@ class DBSQL : public Module
 			return EVENT_CONTINUE;
 		}
 
+		if (serialized_items == NULL)
+			return EVENT_CONTINUE;
+
 		std::map<Anope::string, SerializableBase::serialized_data> table_layout;
-		for (std::list<SerializableBase *>::iterator it = serialized_items.begin(), it_end = serialized_items.end(); it != it_end; ++it)
+		for (std::list<SerializableBase *>::iterator it = serialized_items->begin(), it_end = serialized_items->end(); it != it_end; ++it)
 		{
 			SerializableBase *base = *it;
 			SerializableBase::serialized_data data = base->serialize();

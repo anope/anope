@@ -60,7 +60,7 @@ namespace Serialize
 class SerializableBase;
 
 extern std::vector<SerializableBase *> serialized_types;
-extern std::list<SerializableBase *> serialized_items;
+extern std::list<SerializableBase *> *serialized_items;
 extern void RegisterTypes();
 
 class SerializableBase
@@ -83,11 +83,6 @@ template<typename Type> class Serializable : public SerializableBase
 	 public:
 	 	SerializableAllocator()
 		{
-		}
-
-		~SerializableAllocator()
-		{
-			Unregister();
 		}
 
 		void Register(const Anope::string &n, int pos = -1)
@@ -127,20 +122,21 @@ template<typename Type> class Serializable : public SerializableBase
  protected:
 	Serializable()
 	{
-		serialized_items.push_front(this);
-		this->s_iter = serialized_items.begin();
+		if (serialized_items == NULL)
+			serialized_items = new std::list<SerializableBase *>();
+		serialized_items->push_front(this);
+		this->s_iter = serialized_items->begin();
 	}
 
 	Serializable(const Serializable &)
 	{
-		serialized_items.push_front(this);
-		this->s_iter = serialized_items.begin();
+		serialized_items->push_front(this);
+		this->s_iter = serialized_items->begin();
 	}
 
 	~Serializable()
 	{
-		if (!serialized_items.empty())
-			serialized_items.erase(this->s_iter);
+		serialized_items->erase(this->s_iter);
 	}
 
  public:

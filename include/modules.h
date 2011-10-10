@@ -455,9 +455,9 @@ class CoreExport Module : public Extensible
 
 	/** Called before a channel expires
 	 * @param ci The channel
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 * @param expire Set to true to allow the chan to expire
 	 */
-	virtual EventReturn OnPreChanExpire(ChannelInfo *ci) { return EVENT_CONTINUE; }
+	virtual void OnPreChanExpire(ChannelInfo *ci, bool &expire) { }
 
 	/** Called before a channel expires
 	 * @param ci The channel

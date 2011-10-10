@@ -13,10 +13,51 @@
 
 #include "module.h"
 
-class ChanServCore : public Module
+class ExpireCallback : public CallBack
 {
  public:
-	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE)
+	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
+
+	void Tick(time_t)
+	{
+		if (!Config->CSExpire || noexpire || readonly)
+			return;
+
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
+		{
+			ChannelInfo *ci = it->second;
+			++it;
+
+			bool expire = false;
+
+			if (!ci->c && Config->CSExpire && Anope::CurTime - ci->last_used >= Config->CSExpire)
+				expire = true;
+
+			if (ci->HasFlag(CI_NO_EXPIRE))
+				expire = false;
+
+			FOREACH_MOD(I_OnPreChanExpire, OnPreChanExpire(ci, expire));
+
+			if (expire)
+			{
+				Anope::string extra;
+				if (ci->HasFlag(CI_SUSPENDED))
+					extra = "suspended ";
+
+				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
+				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
+				delete ci;
+			}
+		}
+	}
+};
+
+class ChanServCore : public Module
+{
+	ExpireCallback expires;
+
+ public:
+	ChanServCore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), expires(this)
 	{
 		this->SetAuthor("Anope");
 

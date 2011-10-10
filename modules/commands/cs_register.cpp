@@ -124,60 +124,14 @@ class CommandCSRegister : public Command
 	}
 };
 
-class ExpireCallback : public CallBack
-{
- public:
-	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
-
-	void Tick(time_t)
-	{
-		if (!Config->CSExpire || noexpire || readonly)
-			return;
-
-		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; )
-		{
-			ChannelInfo *ci = it->second;
-			++it;
-
-			bool expire = false;
-			if (ci->HasFlag(CI_SUSPENDED))
-			{
-				if (Config->CSSuspendExpire && Anope::CurTime - ci->last_used >= Config->CSSuspendExpire)
-					expire = true;
-			}
-			else if (!ci->c && Config->CSExpire && Anope::CurTime - ci->last_used >= Config->CSExpire)
-				expire = true;
-
-			if (ci->HasFlag(CI_NO_EXPIRE))
-				expire = false;
-
-			if (expire)
-			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreChanExpire, OnPreChanExpire(ci));
-				if (MOD_RESULT == EVENT_STOP)
-					continue;
-
-				Anope::string extra;
-				if (ci->HasFlag(CI_SUSPENDED))
-					extra = "suspended ";
-
-				Log(LOG_NORMAL, "chanserv/expire") << "Expiring " << extra  << "channel " << ci->name << " (founder: " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << ")";
-				FOREACH_MOD(I_OnChanExpire, OnChanExpire(ci));
-				delete ci;
-			}
-		}
-	}
-};
 
 class CSRegister : public Module
 {
 	CommandCSRegister commandcsregister;
-	ExpireCallback ecb;
 
  public:
 	CSRegister(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcsregister(this), ecb(this)
+		commandcsregister(this)
 	{
 		this->SetAuthor("Anope");
 

@@ -39,7 +39,7 @@ struct NickSuspend : ExtensibleItem, Serializable<NickSuspend>
 		sd["nick"] >> ns->nick;
 		sd["when"] >> ns->when;
 
-		na->Extend("ns_suspend_expire", ns);
+		na->nc->Extend("ns_suspend_expire", ns);
 	}
 };
 
@@ -71,6 +71,7 @@ class CommandNSSuspend : public Command
 		{
 			reason = expiry + " " + reason;
 			reason.trim();
+			expiry.clear();
 		}
 		else
 			expiry_secs = dotime(expiry);
@@ -117,7 +118,7 @@ class CommandNSSuspend : public Command
 			ns->nick = na->nick;
 			ns->when = Anope::CurTime + expiry_secs;
 
-			na->Extend("ns_suspend_expire", ns);
+			na->nc->Extend("ns_suspend_expire", ns);
 		}
 
 		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
@@ -174,6 +175,7 @@ class CommandNSUnSuspend : public Command
 		}
 
 		na->nc->UnsetFlag(NI_SUSPENDED);
+		na->nc->Shrink("ns_suspend_expire");
 
 		Log(LOG_ADMIN, u, this) << "for " << na->nick;
 		source.Reply(_("Nick %s is now released."), nick.c_str());
@@ -211,7 +213,7 @@ class NSSuspend : public Module
 
 	~NSSuspend()
 	{
-		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+		for (nickcore_map::const_iterator it = NickCoreList.begin(), it_end = NickCoreList.end(); it != it_end; ++it)
 			it->second->Shrink("ns_suspend_expire");
 	}
 
@@ -222,11 +224,12 @@ class NSSuspend : public Module
 
 		expire = false;
 
-		NickSuspend *ns = na->GetExt<NickSuspend *>("ns_suspend_expire");
+		NickSuspend *ns = na->nc->GetExt<NickSuspend *>("ns_suspend_expire");
 		if (ns != NULL && ns->when < Anope::CurTime)
 		{
 			na->last_seen = Anope::CurTime;
 			na->nc->UnsetFlag(NI_SUSPENDED);
+			na->nc->Shrink("ns_suspend_expire");
 
 			Log(LOG_NORMAL, "expire", findbot(Config->NickServ)) << "Expiring suspend for " << na->nick;
 		}

@@ -490,9 +490,9 @@ class CoreExport Module : public Extensible
 
 	/** Called before a nick expires
 	 * @param na The nick
-	 * @return EVENT_CONTINUE to let other modules decide, EVENT_STOP to halt the command and not process it
+	 * @param expire Set to true to allow the nick to expire
 	 */
-	virtual EventReturn OnPreNickExpire(NickAlias *na) { return EVENT_CONTINUE; }
+	virtual void OnPreNickExpire(NickAlias *na, bool &expire) { }
 
 	/** Called when a nick drops
 	 * @param na The nick

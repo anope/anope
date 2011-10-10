@@ -399,7 +399,7 @@ class XOPBase : public Command
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
-		source.Reply(("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
+		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
 	}
 
 	void DoDel(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, XOPType level)

@@ -13,13 +13,43 @@
 
 #include "module.h"
 
+struct NickSuspend : ExtensibleItem, Serializable<NickSuspend>
+{
+	Anope::string nick;
+	time_t when;
+
+	serialized_data serialize()
+	{
+		serialized_data sd;
+
+		sd["nick"] << this->nick;
+		sd["when"] << this->when;
+
+		return sd;
+	}
+
+	static void unserialize(serialized_data &sd)
+	{
+		NickAlias *na = findnick(sd["nick"].astr());
+		if (na == NULL)
+			return;
+
+		NickSuspend *ns = new NickSuspend();
+		
+		sd["nick"] >> ns->nick;
+		sd["when"] >> ns->when;
+
+		na->Extend("ns_suspend_expire", ns);
+	}
+};
+
 class CommandNSSuspend : public Command
 {
  public:
-	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 2)
+	CommandNSSuspend(Module *creator) : Command(creator, "nickserv/suspend", 2, 3)
 	{
 		this->SetDesc(_("Suspend a given nick"));
-		this->SetSyntax(_("\037nickname\037 \037reason\037"));
+		this->SetSyntax(_("\037nickname\037 [+\037expiry\037] \037reason\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -27,13 +57,23 @@ class CommandNSSuspend : public Command
 		User *u = source.u;
 
 		const Anope::string &nick = params[0];
-		const Anope::string &reason = params[1];
+		Anope::string expiry = params[1];
+		Anope::string reason = params.size() > 2 ? params[2] : "";
+		time_t expiry_secs = Config->NSSuspendExpire;
 
 		if (readonly)
 		{
 			source.Reply(READ_ONLY_MODE);
 			return;
 		}
+
+		if (expiry[0] != '+')
+		{
+			reason = expiry + " " + reason;
+			reason.trim();
+		}
+		else
+			expiry_secs = dotime(expiry);
 
 		NickAlias *na = findnick(nick);
 		if (!na)
@@ -71,7 +111,16 @@ class CommandNSSuspend : public Command
 			}
 		}
 
-		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << ")";
+		if (expiry_secs > 0)
+		{
+			NickSuspend *ns = new NickSuspend();
+			ns->nick = na->nick;
+			ns->when = Anope::CurTime + expiry_secs;
+
+			na->Extend("ns_suspend_expire", ns);
+		}
+
+		Log(LOG_ADMIN, u, this) << "for " << nick << " (" << (!reason.empty() ? reason : "No reason") << "), expires in " << (expiry_secs ? do_strftime(Anope::CurTime + expiry_secs) : "never");
 		source.Reply(_("Nick %s is now suspended."), nick.c_str());
 
 		FOREACH_MOD(I_OnNickSuspended, OnNickSuspend(na));
@@ -84,7 +133,9 @@ class CommandNSSuspend : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Suspends a registered nickname, which prevents from being used\n"
-				"while keeping all the data for that nick."));
+				"while keeping all the data for that nick. If an expiry is given\n"
+				"the nick will be unsuspended after that period of time, else the\n"
+				"default expiry from the configuration is used."));
 		return true;
 	}
 };
@@ -152,6 +203,33 @@ class NSSuspend : public Module
 	{
 		this->SetAuthor("Anope");
 
+		Implementation i[] = { I_OnPreNickExpire };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		Serializable<NickSuspend>::Alloc.Register("NickSuspend");
+	}
+
+	~NSSuspend()
+	{
+		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
+			it->second->Shrink("ns_suspend_expire");
+	}
+
+	void OnPreNickExpire(NickAlias *na, bool &expire)
+	{
+		if (!na->nc->HasFlag(NI_SUSPENDED))
+			return;
+
+		expire = false;
+
+		NickSuspend *ns = na->GetExt<NickSuspend *>("ns_suspend_expire");
+		if (ns != NULL && ns->when < Anope::CurTime)
+		{
+			na->last_seen = Anope::CurTime;
+			na->nc->UnsetFlag(NI_SUSPENDED);
+
+			Log(LOG_NORMAL, "expire", findbot(Config->NickServ)) << "Expiring suspend for " << na->nick;
+		}
 	}
 };
 

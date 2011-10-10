@@ -105,22 +105,15 @@ class ExpireCallback : public CallBack
 			if (na->nc->HasFlag(NI_UNCONFIRMED))
 				if (Config->NSUnconfirmedExpire && Anope::CurTime - na->time_registered >= Config->NSUnconfirmedExpire)
 					expire = true;
-			if (na->nc->HasFlag(NI_SUSPENDED))
-			{
-				if (Config->NSSuspendExpire && Anope::CurTime - na->last_seen >= Config->NSSuspendExpire)
-					expire = true;
-			}
-			else if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire)
+			if (Config->NSExpire && Anope::CurTime - na->last_seen >= Config->NSExpire)
 				expire = true;
 			if (na->HasFlag(NS_NO_EXPIRE))
 				expire = false;
+
+			FOREACH_MOD(I_OnPreNickExpire, OnPreNickExpire(na, expire));
 		
 			if (expire)
 			{
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnPreNickExpire, OnPreNickExpire(na));
-				if (MOD_RESULT == EVENT_STOP)
-					continue;
 				Anope::string extra;
 				if (na->nc->HasFlag(NI_SUSPENDED))
 					extra = "suspended ";

@@ -163,7 +163,7 @@ ChanAccess *AccessGroup::Highest() const
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
 		for (unsigned j = this->size(); j > 0; --j)
-			if (this->at(j - 1)->HasPriv(privs[ - 1].name))
+			if (this->at(j - 1)->HasPriv(privs[i - 1].name))
 				return this->at(j - 1);
 	return NULL;
 }

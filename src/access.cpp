@@ -34,8 +34,6 @@ void PrivilegeManager::AddPrivilege(Privilege p, int pos, int def)
 	if (pos < 0 || static_cast<size_t>(pos) > privs.size())
 		pos = privs.size();
 	privs.insert(privs.begin() + pos, p);
-	for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
-		cit->second->SetLevel(p.name, def);
 }
 
 void PrivilegeManager::RemovePrivilege(Privilege &p)

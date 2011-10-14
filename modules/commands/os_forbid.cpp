@@ -101,11 +101,16 @@ class CommandOSForbid : public Command
 		else if (subcommand.equals_ci("EMAIL"))
 			type = FT_EMAIL;
 
-		if (command.equals_ci("ADD") && params.size() > 2 && type != FT_NONE)
+		if (command.equals_ci("ADD") && params.size() > 3 && type != FT_NONE)
 		{
 			const Anope::string &expiry = params[2][0] == '+' ? params[2] : "";
-			const Anope::string &entry = params.size() > 3 && !expiry.empty() ? params[3] : params[2];
-			Anope::string reason = !expiry.empty() && params.size() > 4 ? params[4] : (params.size() > 3 ? params[3] : "");
+			const Anope::string &entry = !expiry.empty() ? params[3] : params[2];
+			Anope::string reason;
+			if (expiry.empty())
+				reason = params[3] + " ";
+			if (params.size() > 4)
+				reason += params[4];
+			reason.trim();
 
 			time_t expiryt = 0;
 

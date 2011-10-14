@@ -141,6 +141,8 @@ class NSSetKill : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (Config->NoNicknameOwnership)
+			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };
 

@@ -226,12 +226,15 @@ class PlexusProto : public IRCDProto
 		send_cmd(source->GetUID(), "INVITE %s %s", u ? u->GetUID().c_str() : nick.c_str(), chan.c_str());
 	}
 
-	void SendAccountLogin(const User *u, const NickCore *account)
+	void SendLogin(User *u)
 	{
-		send_cmd(Config->Numeric, "ENCAP * SU %s %s", u->GetUID().c_str(), account->display.c_str());
+		if (!u->Account())
+			return;
+
+		send_cmd(Config->Numeric, "ENCAP * SU %s %s", u->GetUID().c_str(), u->Account()->display.c_str());
 	}
 
-	void SendAccountLogout(const User *u, const NickCore *account)
+	void SendLogout(User *u)
 	{
 		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
 	}
@@ -558,7 +561,7 @@ bool event_encap(const Anope::string &source, const std::vector<Anope::string> &
 		if (u && nc)
 		{
 			u->Login(nc);
-			if (user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			if (!Config->NoNicknameOwnership && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 	}

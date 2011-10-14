@@ -53,9 +53,10 @@ class CommandNSConfirm : public Command
 				Log(LOG_COMMAND, u, this) << "to confirm their email";
 				source.Reply(_("Your email address of \002%s\002 has been confirmed."), u->Account()->email.c_str());
 				u->Account()->UnsetFlag(NI_UNCONFIRMED);
-				ircdproto->SendAccountLogin(u, u->Account());
+
+				ircdproto->SendLogin(u);
 				NickAlias *na = findnick(u->nick);
-				if (na && na->nc == u->Account())
+				if (!Config->NoNicknameOwnership && na != NULL && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 			}
 			else
@@ -199,8 +200,11 @@ class CommandNSRegister : public Command
 				}
 			}
 			else
-				ircdproto->SendAccountLogin(u, u->Account());
-			ircdproto->SetAutoIdentificationToken(u);
+			{
+				ircdproto->SendLogin(u);
+				if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
+			}
 
 			u->lastnickreg = Anope::CurTime;
 		}

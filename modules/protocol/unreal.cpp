@@ -318,17 +318,19 @@ class UnrealIRCdProto : public IRCDProto
 		return true;
 	}
 
-	void SetAutoIdentificationToken(User *u)
+	void SendLogin(User *u)
 	{
 		if (!u->Account())
 			return;
 
-		ircdproto->SendMode(findbot(Config->NickServ), u, "+d %d", u->timestamp);
+		BotInfo *ns = findbot(Config->NickServ);
+		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
 	}
 
-	void SendUnregisteredNick(const User *u)
+	void SendLogout(User *u)
 	{
-		ircdproto->SendMode(findbot(Config->NickServ), u, "+d 1");
+		BotInfo *ns = findbot(Config->NickServ);
+		ircdproto->SendMode(ns, u, "+d 1");
 	}
 
 	void SendChannel(Channel *c)
@@ -532,7 +534,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
+					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else if (nickserv)
@@ -554,7 +556,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 				if (na && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
+					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else if (nickserv)

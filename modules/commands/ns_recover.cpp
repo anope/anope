@@ -23,9 +23,8 @@ class CommandNSRecover : public Command
 
 		if (u->Account() == na->nc)
 		{
-			ircdproto->SendAccountLogout(u, u->Account());
-			u->RemoveMode(source.owner, UMODE_REGISTERED);
-			ircdproto->SendUnregisteredNick(u);
+			ircdproto->SendLogout(u);
+			u->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 
 		u->Collide(na);
@@ -133,6 +132,8 @@ class NSRecover : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (Config->NoNicknameOwnership)
+			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };
 

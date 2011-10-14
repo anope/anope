@@ -423,6 +423,8 @@ class CoreExport ServerConfig
 	int RetryWait;
 	/* If services should hide unprivileged commands */
 	bool HidePrivilegedCommands;
+	/* If set, nicks cant be owned/everything is entirely account based */
+	bool NoNicknameOwnership;
 
 	/* A vector of our logfile options */
 	std::vector<LogInfo *> LogInfos;

@@ -239,12 +239,15 @@ class InspIRCdTS6Proto : public IRCDProto
 			send_cmd(source ? source->GetUID() : Config->Numeric, "SNONOTICE A :%s", buf.c_str());
 	}
 
-	void SendAccountLogin(const User *u, const NickCore *account)
+	void SendLogin(User *u)
 	{
-		send_cmd(Config->Numeric, "METADATA %s accountname :%s", u->GetUID().c_str(), account->display.c_str());
+		if (!u->Account() || u->Account()->HasFlag(NI_UNCONFIRMED))
+			return;
+
+		send_cmd(Config->Numeric, "METADATA %s accountname :%s", u->GetUID().c_str(), u->Account()->display.c_str());
 	}
 
-	void SendAccountLogout(const User *u, const NickCore *account)
+	void SendLogout(User *u)
 	{
 		send_cmd(Config->Numeric, "METADATA %s accountname :", u->GetUID().c_str());
 	}

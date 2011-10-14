@@ -51,6 +51,9 @@ class MyNickServService : public NickServService
 			return;
 		}
 
+		if (Config->NoNicknameOwnership)
+			return;
+
 		if (u->IsRecognized(false) || !na->nc->HasFlag(NI_KILL_IMMED))
 		{
 			if (na->nc->HasFlag(NI_SECURE))
@@ -149,9 +152,8 @@ class NickServCore : public Module
 		User *u = finduser(na->nick);
 		if (u && u->Account() == na->nc)
 		{
+			ircdproto->SendLogout(u);
 			u->RemoveMode(NickServ, UMODE_REGISTERED);
-			ircdproto->SendAccountLogout(u, u->Account());
-			ircdproto->SendUnregisteredNick(u);
 			u->Logout();
 		}
 	}
@@ -166,9 +168,8 @@ class NickServCore : public Module
 		for (std::list<User *>::iterator it = nc->Users.begin(); it != nc->Users.end();)
 		{
 			User *user = *it++;
-			ircdproto->SendAccountLogout(user, user->Account());
+			ircdproto->SendLogout(user);
 			user->RemoveMode(NickServ, UMODE_REGISTERED);
-			ircdproto->SendUnregisteredNick(user);
 			user->Logout();
 			FOREACH_MOD(I_OnNickLogout, OnNickLogout(user));
 		}
@@ -182,9 +183,12 @@ class NickServCore : public Module
 
 	void OnNickIdentify(User *u)
 	{
-		NickAlias *this_na = findnick(u->nick);
-		if (this_na && this_na->nc == u->Account() && u->Account()->HasFlag(NI_UNCONFIRMED) == false)
-			u->SetMode(NickServ, UMODE_REGISTERED);
+		if (!Config->NoNicknameOwnership)
+		{
+			NickAlias *this_na = findnick(u->nick);
+			if (this_na && this_na->nc == u->Account() && u->Account()->HasFlag(NI_UNCONFIRMED) == false)
+				u->SetMode(NickServ, UMODE_REGISTERED);
+		}
 
 		if (Config->NSModeOnID)
 			for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
@@ -208,7 +212,7 @@ class NickServCore : public Module
 		if (u->Account()->HasFlag(NI_UNCONFIRMED))
 		{
 			u->SendMessage(NickServ, _("Your email address is not confirmed. To confirm it, follow the instructions that were emailed to you when you registered."));
-			this_na = findnick(u->Account()->display);
+			NickAlias *this_na = findnick(u->Account()->display);
 			time_t time_registered = Anope::CurTime - this_na->time_registered;
 			if (Config->NSUnconfirmedExpire > time_registered)
 				u->SendMessage(NickServ, _("Your account will expire, if not confirmed, in %s"), duration(Config->NSUnconfirmedExpire - time_registered).c_str());
@@ -238,18 +242,16 @@ class NickServCore : public Module
 		/* If the new nick isnt registerd or its registerd and not yours */
 		if (!na || na->nc != u->Account())
 		{
+			ircdproto->SendLogout(u);
 			u->RemoveMode(NickServ, UMODE_REGISTERED);
-			ircdproto->SendUnregisteredNick(u);
 
 			this->mynickserv.Validate(u);
 		}
 		else
 		{
-			if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
-			{
-				u->SetMode(NickServ, UMODE_REGISTERED);
-				ircdproto->SetAutoIdentificationToken(u);
-			}
+			ircdproto->SendLogin(u);
+			if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 			Log(NickServ) << u->GetMask() << " automatically identified for group " << u->Account()->display;
 		}
 	}

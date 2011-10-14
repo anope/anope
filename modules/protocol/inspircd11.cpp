@@ -261,16 +261,18 @@ class InspIRCdProto : public IRCDProto
 		send_cmd("", "ENDBURST");
 	}
 
-	void SetAutoIdentificationToken(User *u)
+	void SendLogin(User *u)
 	{
 		if (!u->Account())
 			return;
 
 		Anope::string svidbuf = stringify(u->timestamp);
-
 		u->Account()->Extend("authenticationtoken", new ExtensibleString(svidbuf));
 	}
 
+	void SendLogout(User *u)
+	{
+	}
 };
 
 class ChannelModeFlood : public ChannelModeParam
@@ -324,7 +326,7 @@ class InspircdIRCdMessage : public IRCdMessage
 				if (na && svidbuf && *svidbuf == params[0])
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED))
+					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else if (nickserv)

@@ -836,7 +836,6 @@ class CoreExport IRCDProto
 	virtual void SendSZLineDel(const XLine *) { }
 	virtual void SendSZLine(User *u, const XLine *) { }
 	virtual void SendSGLine(User *, const XLine *) { }
-	virtual void SendUnregisteredNick(const User *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
@@ -846,23 +845,8 @@ class CoreExport IRCDProto
 	virtual bool IsNickValid(const Anope::string &) { return true; }
 	virtual bool IsChannelValid(const Anope::string &);
 	virtual void SendNumeric(const Anope::string &source, int numeric, const Anope::string &dest, const char *fmt, ...);
-
-	/** Sends a message logging a user into an account, where ircds support such a feature.
-	 * @param u The user logging in
-	 * @param account The account the user is logging into
-	 */
-	virtual void SendAccountLogin(const User *u, const NickCore *account) { }
-
-	/** Sends a message logging a user out of an account, where ircds support such a feature.
-	 * @param u The user logging out
-	 * @param account The account the user is logging out of
-	 */
-	virtual void SendAccountLogout(const User *u, const NickCore *account) { }
-
-	/** Set a users auto identification token
-	 * @param u The user
-	 */
-	virtual void SetAutoIdentificationToken(User *u) { }
+	virtual void SendLogin(User *u) = 0;
+	virtual void SendLogout(User *u) = 0;
 
 	/** Send a channel creation message to the uplink.
 	 * On most TS6 IRCds this is a SJOIN with no nick

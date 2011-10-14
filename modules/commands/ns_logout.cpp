@@ -51,10 +51,8 @@ class CommandNSLogout : public Command
 			else
 				source.Reply(_("Your nick has been logged out."));
 
-			ircdproto->SendAccountLogout(u2, u2->Account());
-			u2->RemoveMode(source.owner, UMODE_REGISTERED);
-			ircdproto->SendUnregisteredNick(u2);
-
+			ircdproto->SendLogout(u2);
+			u2->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
 			u2->Logout();
 
 			/* Send out an event */

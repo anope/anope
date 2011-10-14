@@ -218,13 +218,6 @@ class BahamutIRCdProto : public IRCDProto
 		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
 	}
 
-	/* SVSMODE +d */
-	/* nc_change was = 1, and there is no na->status */
-	void SendUnregisteredNick(const User *u)
-	{
-		ircdproto->SendMode(findbot(Config->NickServ), u, "+d 1");
-	}
-
 	/* SERVER */
 	void SendServer(const Server *server)
 	{
@@ -240,20 +233,24 @@ class BahamutIRCdProto : public IRCDProto
 		bahamut_cmd_burst();
 	}
 
-	void SetAutoIdentificationToken(User *u)
-	{
-		if (!u->Account())
-			return;
-
-		ircdproto->SendMode(findbot(Config->NickServ), u, "+d %d", u->timestamp);
-	}
-
 	void SendChannel(Channel *c)
 	{
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
 		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+	}
+
+	void SendLogin(User *u)
+	{
+		BotInfo *ns = findbot(Config->NickServ);
+		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
+	}
+
+	void SendLogout(User *u)
+	{
+		BotInfo *ns = findbot(Config->NickServ);
+		ircdproto->SendMode(ns, u, "+d 1");
 	}
 };
 
@@ -303,7 +300,7 @@ class BahamutIRCdMessage : public IRCdMessage
 				if (user->timestamp == convertTo<time_t>(params[7]) && (na = findnick(user->nick)))
 				{
 					user->Login(na->nc);
-					if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
+					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 						user->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				}
 				else

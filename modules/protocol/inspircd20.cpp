@@ -280,7 +280,7 @@ bool event_metadata(const Anope::string &source, const std::vector<Anope::string
 			u->Login(nc);
 
 			NickAlias *user_na = findnick(u->nick);
-			if (nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
+			if (!Config->NoNicknameOwnership && nickserv && user_na && user_na->nc == nc && user_na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 		}
 	}

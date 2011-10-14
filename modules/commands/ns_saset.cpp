@@ -55,46 +55,6 @@ class CommandNSSASet : public Command
 	}
 };
 
-class CommandNSSASetDisplay : public Command
-{
- public:
-	CommandNSSASetDisplay(Module *creator) : Command(creator, "nickserv/saset/display", 2, 2)
-	{
-		this->SetDesc(_("Set the display of the group in Services"));
-		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
-	}
-
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
-	{
-		NickAlias *setter_na = findnick(params[0]);
-		if (setter_na == NULL)
-		{
-			source.Reply(NICK_X_NOT_REGISTERED, params[0].c_str());
-			return;
-		}
-		NickCore *nc = setter_na->nc;
-
-		NickAlias *na = findnick(params[1]);
-		if (!na || na->nc != nc)
-		{
-			source.Reply(_("The new display for \002%s\002 MUST be a nickname of the nickname group!"), nc->display.c_str());
-			return;
-		}
-
-		change_core_display(nc, params[1]);
-		source.Reply(NICK_SET_DISPLAY_CHANGED, nc->display.c_str());
-		return;
-	}
-
-	bool OnHelp(CommandSource &source, const Anope::string &)
-	{
-		this->SendSyntax(source);
-		source.Reply(_("Changes the display used to refer to the nickname group in \n"
-				"Services. The new display MUST be a nick of the group."));
-		return true;
-	}
-};
-
 class CommandNSSASetPassword : public Command
 {
  public:
@@ -155,12 +115,11 @@ class CommandNSSASetPassword : public Command
 class NSSASet : public Module
 {
 	CommandNSSASet commandnssaset;
-	CommandNSSASetDisplay commandnssasetdisplay;
 	CommandNSSASetPassword commandnssasetpassword;
 
  public:
 	NSSASet(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandnssaset(this), commandnssasetdisplay(this), commandnssasetpassword(this)
+		commandnssaset(this), commandnssasetpassword(this)
 	{
 		this->SetAuthor("Anope");
 

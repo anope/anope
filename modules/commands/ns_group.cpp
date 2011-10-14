@@ -109,10 +109,10 @@ class CommandNSGroup : public Command
 				na->time_registered = na->last_seen = Anope::CurTime;
 
 				u->Login(na->nc);
+				ircdproto->SendLogin(u);
+				if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+					u->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 				FOREACH_MOD(I_OnNickGroup, OnNickGroup(u, target));
-				if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
-					ircdproto->SendAccountLogin(u, u->Account());
-				ircdproto->SetAutoIdentificationToken(u);
 
 				Log(LOG_COMMAND, u, this) << "makes " << u->nick << " join group of " << target->nick << " (" << target->nc->display << ") (email: " << (!target->nc->email.empty() ? target->nc->email : "none") << ")";
 				source.Reply(_("You are now in the group of \002%s\002."), target->nick.c_str());
@@ -296,6 +296,8 @@ class NSGroup : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (Config->NoNicknameOwnership)
+			throw ModuleException(modname + " can not be used with options:nonicknameownership enabled");
 	}
 };
 

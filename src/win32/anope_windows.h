@@ -42,6 +42,8 @@
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
 #define stat _stat
+#define getcwd(x, y) GetCurrentDirectory(y, x)
+#define getpid GetCurrentProcessId
 #define S_ISREG(x) ((x) & _S_IFREG)
 #ifdef EINPROGRESS
 # undef EINPROGRESS

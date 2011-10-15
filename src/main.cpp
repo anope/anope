@@ -45,8 +45,9 @@ bool nofork = false;		/* -nofork */
 bool nothird = false;		/* -nothrid */
 bool noexpire = false;		/* -noexpire */
 bool protocoldebug = false;	/* -protocoldebug */
-
 Anope::string binary_dir; /* Used to store base path for Anope */
+static int return_code = 0;
+
 #ifdef _WIN32
 # include <process.h>
 # define execve _execve
@@ -144,7 +145,10 @@ UplinkSocket::~UplinkSocket()
 	Me->SetFlag(SERVER_SYNCING);
 
 	if (AtTerm())
+	{
 		quitting = true;
+		return_code = -1;
+	}
 	else if (!quitting)
 	{
 		int Retry = Config->RetryWait;
@@ -282,29 +286,25 @@ Anope::string GetFullProgDir(const Anope::string &argv0)
 
 int main(int ac, char **av, char **envp)
 {
-	int return_code = 0;
-
 	char cwd[PATH_MAX] = "";
-#ifdef _WIN32
-	GetCurrentDirectory(PATH_MAX, cwd);
-#else
 	getcwd(cwd, PATH_MAX);
-#endif
 	orig_cwd = cwd;
 
 #ifndef _WIN32
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
-		fprintf(stderr, "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
-		fprintf(stderr, "    require root privileges to run, and it is discouraged that you run Anope\n");
-		fprintf(stderr, "    as the root superuser.\n");
+		std::cout << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+		std::cout << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+		std::cout << "         as the root superuser." << std::endl;
+		sleep(3);
 	}
 #endif
 
 	binary_dir = GetFullProgDir(av[0]);
 	if (binary_dir[binary_dir.length() - 1] == '.')
 		binary_dir = binary_dir.substr(0, binary_dir.length() - 2);
+
 #ifdef _WIN32
 	Anope::string::size_type n = binary_dir.rfind('\\');
 	services_dir = binary_dir.substr(0, n) + "\\data";

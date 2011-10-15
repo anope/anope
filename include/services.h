@@ -40,6 +40,7 @@
 
 #include <sys/stat.h> /* for umask() on some systems */
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <typeinfo>
 

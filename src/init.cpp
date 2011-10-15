@@ -158,16 +158,10 @@ static void remove_pidfile()
 
 static void write_pidfile()
 {
-	FILE *pidfile;
-
-	pidfile = fopen(Config->PIDFilename.c_str(), "w");
+	FILE *pidfile = fopen(Config->PIDFilename.c_str(), "w");
 	if (pidfile)
 	{
-#ifdef _WIN32
-		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
-#else
 		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
-#endif
 		fclose(pidfile);
 		atexit(remove_pidfile);
 	}
@@ -239,11 +233,7 @@ bool AtTerm()
 void Fork()
 {
 #ifndef _WIN32
-	int i = fork();
-	if (i < 0)
-		Log(LOG_TERMINAL) << "Unable to fork, " << Anope::LastError();
-	else if (i != 0)
-		exit(0);
+	kill(getppid(), SIGUSR2);
 	
 	if (isatty(fileno(stdout)))
 		fclose(stdout);
@@ -257,6 +247,32 @@ void Fork()
 	FreeConsole();
 #endif
 }
+
+#ifndef _WIN32
+class SignalForkExit : public Signal
+{
+ public:
+	SignalForkExit() : Signal(SIGUSR2) { }
+
+	void OnNotify()
+	{
+		exit(0);
+	}
+};
+
+class SignalSigChld : public Signal
+{
+ public:
+	SignalSigChld() : Signal(SIGCHLD) { }
+
+	void OnNotify()
+	{
+		int status = 0;
+		wait(&status);
+		exit(status);
+	}
+};
+#endif
 
 void Init(int ac, char **av)
 {
@@ -356,6 +372,9 @@ void Init(int ac, char **av)
 		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::LastError());
 	}
 
+	/* Initialize the socket engine */
+	SocketEngine::Init();
+
 	init_core_messages();
 
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
@@ -380,16 +399,33 @@ void Init(int ac, char **av)
 		throw FatalException("Configuration file failed to validate");
 	}
 
-	/* Initialize the socket engine */
-	SocketEngine::Init();
-
 	/* Create me */
 	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
 
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
 		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
+#else
+	if (!nofork)
+	{
+		int i = fork();
+		if (i > 0)
+		{
+			new SignalForkExit();
+			new SignalSigChld();
+			while (!quitting)
+			{
+				Log(LOG_DEBUG_3) << "Top of fork() process loop";
+				SocketEngine::Process();
+			}
+			/* Should not be reached */
+			exit(-1);
+		}
+		else if (i == -1)
+			Log() << "Error, unable to fork: " << Anope::LastError();
+	}
 #endif
+
 
 	/* Write our PID to the PID file. */
 	write_pidfile();

@@ -267,9 +267,11 @@ class SignalSigChld : public Signal
 
 	void OnNotify()
 	{
-		int status = 0;
+		int status = 0, ret = -1;
 		wait(&status);
-		exit(status);
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
+		exit(ret);
 	}
 };
 #endif

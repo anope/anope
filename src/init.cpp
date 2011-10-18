@@ -401,9 +401,6 @@ void Init(int ac, char **av)
 		throw FatalException("Configuration file failed to validate");
 	}
 
-	/* Create me */
-	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
-
 #ifdef _WIN32
 	if (!SupportedWindowsVersion())
 		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
@@ -428,9 +425,13 @@ void Init(int ac, char **av)
 	}
 #endif
 
-
 	/* Write our PID to the PID file. */
 	write_pidfile();
+
+	/* Create me */
+	Me = new Server(NULL, Config->ServerName, 0, Config->ServerDesc, Config->Numeric);
+	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+		it->second->server = Me;
 
 	/* Announce ourselves to the logfile. */
 	Log() << "Anope " << Anope::Version() << " starting up" << (debug || readonly ? " (options:" : "") << (debug ? " debug" : "") << (readonly ? " readonly" : "") << (debug || readonly ? ")" : "");
@@ -453,6 +454,7 @@ void Init(int ac, char **av)
 #endif
 
 	/* load modules */
+	Log() << "Loading modules...";
 	for (std::list<Anope::string>::iterator it = Config->ModulesAutoLoad.begin(), it_end = Config->ModulesAutoLoad.end(); it != it_end; ++it)
 		ModuleManager::LoadModule(*it, NULL);
 
@@ -462,18 +464,6 @@ void Init(int ac, char **av)
 	else if (ModuleManager::FindFirstOf(ENCRYPTION) == NULL)
 		throw FatalException("You must load at least one encryption module");
 
-	if (ircd->ts6 && Config->Numeric.empty())
-	{
-		Anope::string numeric = ts6_sid_retrieve();
-		Me->SetSID(numeric);
-		Config->Numeric = numeric;
-	}
-	for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-	{
-		it->second->GenerateUID();
-		it->second->server = Me;
-	}
-	
 	Log() << "Using IRCd protocol " << protocol->name;
 
 	/* Load up databases */

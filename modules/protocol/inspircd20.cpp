@@ -771,6 +771,16 @@ class ProtoInspIRCd : public Module
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		if (Config->Numeric.empty())
+		{
+			Anope::string numeric = ts6_sid_retrieve();
+			Me->SetSID(numeric);
+			Config->Numeric = numeric;
+		}
+
+		for (botinfo_map::iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
+			it->second->GenerateUID();
 	}
 
 	~ProtoInspIRCd()

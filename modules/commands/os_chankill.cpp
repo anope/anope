@@ -77,14 +77,14 @@ class CommandOSChanKill : public Command
 				{
 					UserContainer *uc = *it++;
 
-					if (uc->user->HasMode(UMODE_OPER))
+					if (uc->user->server == Me || uc->user->HasMode(UMODE_OPER))
 						continue;
 
 					akills->Add("*@" + uc->user->host, u->nick, expires, realreason);
 					akills->Check(uc->user);
 				}
 
-				Log(LOG_ADMIN, u, this) << "(" << realreason << ")";
+				Log(LOG_ADMIN, u, this) << "on " << c->name << " (" << realreason << ")";
 			}
 			else
 				source.Reply(CHAN_X_NOT_IN_USE, channel.c_str());

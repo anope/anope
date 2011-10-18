@@ -767,7 +767,7 @@ class DBPlain : public Module
 				db_buffer << "MD FLAGS " << ci->ToString() << endl;
 			if (ci->HasFlag(CI_SUSPENDED))
 			{
-				Anope::string *by = ci->GetExt<Anope::string *>("suspend_by"), *reason = ci->GetExt<Anope::string *>("suspend_reason");
+				Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
 				if (by && reason)
 					db_buffer << "MD SUSPEND " << *by << " :" << *reason << endl;
 			}

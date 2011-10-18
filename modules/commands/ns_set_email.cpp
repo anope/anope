@@ -163,7 +163,7 @@ class NSSetEmail : public Module
 		User *u = source.u;
 		if (command->name == "nickserv/confirm" && !params.empty() && u->IsIdentified())
 		{
-			Anope::string *new_email = u->Account()->GetExt<Anope::string *>("ns_set_email"), *passcode = u->Account()->GetExt<Anope::string *>("ns_set_email_passcode");
+			Anope::string *new_email = u->Account()->GetExt<ExtensibleString *>("ns_set_email"), *passcode = u->Account()->GetExt<ExtensibleString *>("ns_set_email_passcode");
 			if (new_email && passcode)
 			{
 				if (params[0] == *passcode)

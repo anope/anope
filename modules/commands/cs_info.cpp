@@ -100,7 +100,7 @@ class CommandCSInfo : public Command
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
 		{
-			Anope::string *by = ci->GetExt<Anope::string *>("suspend_by"), *reason = ci->GetExt<Anope::string *>("suspend_reason");
+			Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
 			if (by != NULL)
 				source.Reply(_("      Suspended: [%s] %s"), by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
 		}

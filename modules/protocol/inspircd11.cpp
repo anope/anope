@@ -322,7 +322,7 @@ class InspircdIRCdMessage : public IRCdMessage
 				user->SetCloakedHost(params[3]);
 
 				NickAlias *na = findnick(user->nick);
-				Anope::string *svidbuf = na ? na->nc->GetExt<Anope::string *>("authenticationtoken") : NULL;
+				Anope::string *svidbuf = na ? na->nc->GetExt<ExtensibleString *>("authenticationtoken") : NULL;
 				if (na && svidbuf && *svidbuf == params[0])
 				{
 					user->Login(na->nc);

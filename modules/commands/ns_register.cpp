@@ -46,7 +46,7 @@ class CommandNSConfirm : public Command
 		}
 		else if (u->Account())
 		{
-			Anope::string *code = u->Account()->GetExt<Anope::string *>("ns_register_passcode");
+			Anope::string *code = u->Account()->GetExt<ExtensibleString *>("ns_register_passcode");
 			if (code != NULL && *code == passcode)
 			{
 				u->Account()->Shrink("ns_register_passcode");
@@ -324,7 +324,7 @@ class NSRegister : public Module
 
 static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 {
-	Anope::string *code = na->nc->GetExt<Anope::string *>("ns_register_passcode");
+	Anope::string *code = na->nc->GetExt<ExtensibleString *>("ns_register_passcode");
 	Anope::string codebuf;
 	if (code == NULL)
 	{

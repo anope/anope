@@ -167,7 +167,7 @@ class CommandCSUnSuspend : public Command
 			return;
 		}
 
-		Anope::string *by = ci->GetExt<Anope::string *>("suspend_by"), *reason = ci->GetExt<Anope::string *>("suspend_reason");
+		Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
 		if (by != NULL)
 			Log(LOG_ADMIN, u, this, ci) << " which was suspended by " << *by << " for: " << (reason && !reason->empty() ? *reason : "No reason");
 

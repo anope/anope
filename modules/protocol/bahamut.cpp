@@ -345,7 +345,7 @@ class BahamutIRCdMessage : public IRCdMessage
 	{
 		Channel *c = findchan(params[1]);
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
-		bool keep_their_modes = false;
+		bool keep_their_modes = true;
 
 		if (!c)
 		{

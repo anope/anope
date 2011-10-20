@@ -31,9 +31,15 @@ class CommandCSClearUsers : public Command
 		Anope::string modebuf;
 
 		if (!c)
+		{
 			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			return;
+		}
 		else if (!c->ci)
+		{
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
+			return;
+		}
 		else if (!c->ci->AccessFor(u).HasPriv("FOUNDER"))
 		{
 			source.Reply(ACCESS_DENIED);

@@ -405,7 +405,7 @@ void Init(int ac, char **av)
 	if (!SupportedWindowsVersion())
 		throw FatalException(GetWindowsVersion() + " is not a supported version of Windows");
 #else
-	if (!nofork)
+	if (!nofork && AtTerm())
 	{
 		int i = fork();
 		if (i > 0)

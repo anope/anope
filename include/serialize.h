@@ -26,7 +26,11 @@ namespace Serialize
 			is >> val;
 			return *this;
 		}
-		std::istream &operator>>(Anope::string &val) { return *this >> val.str(); }
+		std::istream &operator>>(Anope::string &val)
+		{
+			val = this->str();
+			return *this;
+		}
 		stringstream &setType(DataType t)
 		{
 			this->type = t;

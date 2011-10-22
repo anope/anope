@@ -104,6 +104,7 @@ E bool noexpire;
 E bool protocoldebug;
 
 E bool quitting;
+E int return_code;
 E bool restarting;
 E Anope::string quitmsg;
 E time_t start_time;

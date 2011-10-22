@@ -46,7 +46,6 @@ bool nothird = false;		/* -nothrid */
 bool noexpire = false;		/* -noexpire */
 bool protocoldebug = false;	/* -protocoldebug */
 Anope::string binary_dir; /* Used to store base path for Anope */
-static int return_code = 0;
 
 #ifdef _WIN32
 # include <process.h>
@@ -55,6 +54,7 @@ static int return_code = 0;
 
 /* Set to 1 if we are to quit */
 bool quitting = false;
+int return_code = 0;
 
 /* Set to true if we are restarting */
 bool restarting = false;

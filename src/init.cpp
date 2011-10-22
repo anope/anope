@@ -256,7 +256,8 @@ class SignalForkExit : public Signal
 
 	void OnNotify()
 	{
-		exit(0);
+		quitting = true;
+		return_code = 0;
 	}
 };
 
@@ -267,11 +268,12 @@ class SignalSigChld : public Signal
 
 	void OnNotify()
 	{
-		int status = 0, ret = -1;
+		quitting = true;
+		return_code = -1;
+		int status = 0;
 		wait(&status);
 		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-		exit(ret);
+			return_code = WEXITSTATUS(status);
 	}
 };
 #endif
@@ -407,21 +409,26 @@ void Init(int ac, char **av)
 #else
 	if (!nofork && AtTerm())
 	{
+		SignalForkExit *sfe = new SignalForkExit();
+		SignalSigChld *ssc = new SignalSigChld();
 		int i = fork();
 		if (i > 0)
 		{
-			new SignalForkExit();
-			new SignalSigChld();
 			while (!quitting)
 			{
 				Log(LOG_DEBUG_3) << "Top of fork() process loop";
 				SocketEngine::Process();
 			}
-			/* Should not be reached */
-			exit(-1);
+			SocketEngine::Shutdown();
+			exit(return_code);
 		}
 		else if (i == -1)
+		{
 			Log() << "Error, unable to fork: " << Anope::LastError();
+			/* On a successful fork, the parents socket engine shutdown will eat these */
+			delete sfe;
+			delete ssc;
+		}
 	}
 #endif
 

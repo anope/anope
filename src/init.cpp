@@ -419,13 +419,12 @@ void Init(int ac, char **av)
 				Log(LOG_DEBUG_3) << "Top of fork() process loop";
 				SocketEngine::Process();
 			}
-			SocketEngine::Shutdown();
 			exit(return_code);
 		}
 		else if (i == -1)
 		{
 			Log() << "Error, unable to fork: " << Anope::LastError();
-			/* On a successful fork, the parents socket engine shutdown will eat these */
+			nofork = true;
 			delete sfe;
 			delete ssc;
 		}

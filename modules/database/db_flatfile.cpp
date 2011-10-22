@@ -84,7 +84,7 @@ class DBFlatFile : public Module
 	void OnReload()
 	{
 		ConfigReader config;
-		DatabaseFile = config.ReadValue("flatfile", "database", "anope.db", 0);
+		DatabaseFile = config.ReadValue("db_flatfile", "database", "anope.db", 0);
 	}
 
 	EventReturn OnLoadDatabase()

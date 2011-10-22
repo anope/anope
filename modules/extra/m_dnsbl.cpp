@@ -63,17 +63,16 @@ class DNSBLResolver : public DNSRequest
 
 		BotInfo *operserv = findbot(Config->OperServ);
 		Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
+		XLine *x = new XLine("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
-			XLine *x = akills->Add("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
-			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
-			if (!Config->AkillOnAdd)
-				akills->Send(NULL, x);
+			akills->AddXLine(x);
+			akills->Send(NULL, x);
 		}
 		else
 		{
-			XLine xline("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason);
-			ircdproto->SendAkill(NULL, &xline);
+			ircdproto->SendAkill(NULL, x);
+			delete x;
 		}
 	}
 };

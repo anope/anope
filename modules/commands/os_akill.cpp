@@ -208,7 +208,14 @@ class CommandOSAKill : public Command
 				if (Config->AddAkiller)
 					reason = "[" + u->nick + "] " + reason;
 
-				XLine *x = akills->Add(mask, u->nick, expires, reason);
+				Anope::string id;
+				if (Config->AkillIds)
+				{
+					id = XLineManager::GenerateUID();
+					reason = reason + " (ID: " + id + ")";
+				}
+
+				XLine *x = new XLine(mask, u->nick, expires, reason, id);
 
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
@@ -218,9 +225,13 @@ class CommandOSAKill : public Command
 					return;
 				}
 
+				akills->AddXLine(x);
+				if (Config->AkillOnAdd)
+					akills->Send(NULL, x);
+
 				source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
 
-				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 				if (readonly)
 					source.Reply(READ_ONLY_MODE);
@@ -266,8 +277,9 @@ class CommandOSAKill : public Command
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
 
+			source.Reply(_("\002%s\002 deleted from the AKILL list."), x->Mask.c_str());
 			AkillDelCallback::DoDel(source, x);
-			source.Reply(_("\002%s\002 deleted from the AKILL list."), mask.c_str());
+
 		}
 
 		if (readonly)
@@ -299,7 +311,7 @@ class CommandOSAKill : public Command
 			{
 				XLine *x = akills->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -344,7 +356,7 @@ class CommandOSAKill : public Command
 			{
 				XLine *x = akills->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -377,9 +389,9 @@ class CommandOSAKill : public Command
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
-		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
-		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
-		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
+		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
+		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
 		this->SetSyntax(_("CLEAR"));
 	}
 

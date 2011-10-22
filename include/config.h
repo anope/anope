@@ -611,6 +611,8 @@ class CoreExport ServerConfig
 	bool WallExceptionExpire;
 	/* Add the akillers nick to the akill reason */
 	bool AddAkiller;
+	/* Add akill ids to akill reason */
+	bool AkillIds;
 
 	/* Limit sessions */
 	bool LimitSessions;

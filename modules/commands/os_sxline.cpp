@@ -205,7 +205,7 @@ class CommandOSSXLineBase : public Command
 			{
 				XLine *x = this->xlm()->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -249,7 +249,7 @@ class CommandOSSXLineBase : public Command
 			{
 				XLine *x = this->xlm()->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
 				{
 					if (!SentHeader)
 					{
@@ -278,14 +278,9 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
  public:
-	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 3)
+	CommandOSSXLineBase(Module *creator, const Anope::string &cmd) : Command(creator, cmd, 1, 4)
 	{
 		this->SetDesc(Anope::printf(_("Manipulate the %s list"), cmd.c_str()));
-		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
-		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037}"));
-		this->SetSyntax(_("LIST [\037mask\037 | \037list\037]"));
-		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
-		this->SetSyntax(_("CLEAR"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -410,7 +405,14 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				if (Config->AddAkiller)
 					reason = "[" + u->nick + "] " + reason;
 
-				XLine *x = this->xlm()->Add(mask, u->nick, expires, reason);
+				Anope::string id;
+				if (Config->AkillIds)
+				{
+					id = XLineManager::GenerateUID();
+					reason = reason + " (ID: " + id + ")";
+				}
+
+				XLine *x = new XLine(mask, u->nick, expires, reason, id);
 
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
@@ -418,6 +420,21 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				{
 					delete x;
 					return;
+				}
+
+				this->xlm()->AddXLine(x);
+				if (Config->KillonSNline && !ircd->sglineenforce)
+				{
+					Anope::string rreason = "G-Lined: " + reason;
+
+					for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+					{
+						User *user = it->second;
+						++it;
+
+						if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
+							user->Kill(Config->ServerName, rreason);
+					}
 				}
 
 				source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), this->name.c_str());
@@ -438,6 +455,11 @@ class CommandOSSNLine : public CommandOSSXLineBase
  public:
  	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("xlinemanager/snline")
 	{
+		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
+		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
+		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
+		this->SetSyntax(_("CLEAR"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -494,7 +516,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
 	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!this->xlm() ||! ircd->sqline)
+		if (!this->xlm() || !ircd->sqline)
 		{
 			source.Reply(_("Your IRCd does not support SQLINE"));
 			return;
@@ -563,7 +585,10 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					return;
 				}
 
-				XLine *x = this->sqlines->Add(mask, u->nick, expires, reason);
+				Anope::string id = XLineManager::GenerateUID();
+				reason = reason + " (ID: " + id + ")";
+
+				XLine *x = new XLine(mask, u->nick, expires, reason, id);
 
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
@@ -572,6 +597,44 @@ class CommandOSSQLine : public CommandOSSXLineBase
 					delete x;
 					return;
 				}
+
+				this->xlm()->AddXLine(x);
+				if (Config->KillonSQline)
+				{
+					Anope::string rreason = "Q-Lined: " + reason;
+
+					if (mask[0] == '#')
+					{
+						for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+						{
+							Channel *c = cit->second;
+
+							if (!Anope::Match(c->name, mask))
+								continue;
+							for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+							{
+								UserContainer *uc = *it;
+								++it;
+
+								if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
+									continue;
+								c->Kick(NULL, uc->user, "%s", reason.c_str());
+							}
+						}
+					}
+					else
+					{
+						for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+						{
+							User *user = it->second;
+							++it;
+
+							if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
+								user->Kill(Config->ServerName, rreason);
+						}
+					}
+				}
+				this->xlm()->Send(NULL, x);
 
 				source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
 				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
@@ -591,6 +654,11 @@ class CommandOSSQLine : public CommandOSSXLineBase
  public:
 	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("xlinemanager/sqline")
 	{
+		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
+		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
+		this->SetSyntax(_("LIST [\037mask\037 | \037list\037 | \037id\037]"));
+		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037 | \037id\037]"));
+		this->SetSyntax(_("CLEAR"));
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

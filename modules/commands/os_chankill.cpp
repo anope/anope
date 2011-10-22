@@ -80,7 +80,8 @@ class CommandOSChanKill : public Command
 					if (uc->user->server == Me || uc->user->HasMode(UMODE_OPER))
 						continue;
 
-					akills->Add("*@" + uc->user->host, u->nick, expires, realreason);
+					XLine *x = new XLine("*@" + uc->user->host, u->nick, expires, realreason, XLineManager::GenerateUID());
+					akills->AddXLine(x);
 					akills->Check(uc->user);
 				}
 

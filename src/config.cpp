@@ -1265,6 +1265,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "maxsessionkill", "0", new ValueContainerUInt(&conf->MaxSessionKill), DT_UINTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&conf->SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&conf->AddAkiller), DT_BOOLEAN, NoValidation},
+		{"operserv", "akillids", "no", new ValueContainerBool(&conf->AkillIds), DT_BOOLEAN, NoValidation},
 		{"operserv", "opersonly", "no", new ValueContainerBool(&conf->OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"global", "name", "", new ValueContainerString(&conf->Global), DT_STRING, NoValidation},
 		{"global", "globaloncycle", "no", new ValueContainerBool(&conf->GlobalOnCycle), DT_BOOLEAN, NoValidation},

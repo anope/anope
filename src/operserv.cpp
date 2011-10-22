@@ -15,17 +15,20 @@
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
+std::map<Anope::string, XLine *, std::less<ci::string> > XLineManager::XLinesByUID;
 
 XLine::XLine()
 {
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &reason) : Mask(mask), Created(0), Expires(0), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
 {
+	manager = NULL;
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
 {
+	manager = NULL;
 }
 
 Anope::string XLine::GetNick() const
@@ -79,7 +82,9 @@ SerializableBase::serialized_data XLine::serialize()
 	data["created"] << this->Created;
 	data["expires"] << this->Expires;
 	data["reason"] << this->Reason;
-	data["manager"] << this->Manager;
+	data["uid"] << this->UID;
+	if (this->manager)
+		data["manager"] << this->manager->name;
 
 	return data;
 }
@@ -97,38 +102,18 @@ void XLine::unserialize(SerializableBase::serialized_data &data)
 	data["created"] >> xl->Created;
 	data["expires"] >> xl->Expires;
 	data["reason"] >> xl->Reason;
+	data["uid"] >> xl->UID;
+	xl->manager = xlm;
 
 	xlm->AddXLine(xl);
 }
 
-/** Constructor
+/** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
+ * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
+ * clients and one handing them free olines, you would want the akilling one first. This way if a client
+ * matches an entry on both of the XLineManagers, they would be akilled.
+ * @param xlm THe XLineManager
  */
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service<XLineManager>(creator, xname), type(t)
-{
-}
-
-/** Destructor
- * Clears all XLines in this XLineManager
- */
-XLineManager::~XLineManager()
-{
-	this->Clear();
-}
-
-/** The type of xline provided by this service
- * @return The type
- */
-const char &XLineManager::Type()
-{
-	return this->type;
-}
-
- /** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
-  * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
-  * clients and one handing them free olines, you would want the akilling one first. This way if a client
-  * matches an entry on both of the XLineManagers, they would be akilled.
-  * @param xlm THe XLineManager
-  */
 void XLineManager::RegisterXLineManager(XLineManager *xlm)
 {
 	XLineManagers.push_back(xlm);
@@ -173,6 +158,43 @@ std::pair<XLineManager *, XLine *> XLineManager::CheckAll(User *u)
 	return ret;
 }
 
+Anope::string XLineManager::GenerateUID()
+{
+	Anope::string id;
+	for (int i = 0; i < 10; ++i)
+	{
+		char c;
+		do
+			c = getrandom8();
+		while (!isupper(c) && !isdigit(c));
+		id += c;
+	}
+
+	return id;
+}
+
+/** Constructor
+ */
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service<XLineManager>(creator, xname), type(t)
+{
+}
+
+/** Destructor
+ * Clears all XLines in this XLineManager
+ */
+XLineManager::~XLineManager()
+{
+	this->Clear();
+}
+
+/** The type of xline provided by this service
+ * @return The type
+ */
+const char &XLineManager::Type()
+{
+	return this->type;
+}
+
 /** Get the number of XLines in this XLineManager
  * @return The number of XLines
  */
@@ -194,7 +216,9 @@ const std::vector<XLine *> &XLineManager::GetList() const
  */
 void XLineManager::AddXLine(XLine *x)
 {
-	x->Manager = this->name;
+	x->manager = this;
+	if (!x->UID.empty())
+		XLinesByUID[x->UID] = x;
 	this->XLines.push_back(x);
 }
 
@@ -206,9 +230,12 @@ bool XLineManager::DelXLine(XLine *x)
 {
 	std::vector<XLine *>::iterator it = std::find(this->XLines.begin(), this->XLines.end(), x);
 
+	if (!x->UID.empty())
+		XLinesByUID.erase(x->UID);
+
 	if (it != this->XLines.end())
 	{
-		this->Del(x);
+		this->SendDel(x);
 
 		delete x;
 		this->XLines.erase(it);
@@ -236,27 +263,12 @@ XLine *XLineManager::GetEntry(unsigned index)
 void XLineManager::Clear()
 {
 	for (unsigned i = 0; i < this->XLines.size(); ++i)
+	{
+		if (!this->XLines[i]->UID.empty())
+			XLinesByUID.erase(this->XLines[i]->UID);
 		delete this->XLines[i];
+	}
 	this->XLines.clear();
-}
-
-/** Add an entry to this XLine Manager
- * @param mask The mask of the XLine
- * @param creator The creator of the XLine
- * @param expires When this should expire
- * @param reaosn The reason
- * @return A pointer to the XLine
- */
-XLine *XLineManager::Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-{
-	return NULL;
-}
-
-/** Delete an XLine, eg, remove it from the IRCd.
- * @param x The xline
- */
-void XLineManager::Del(XLine *x)
-{
 }
 
 /** Checks if a mask can/should be added to the XLineManager
@@ -315,6 +327,9 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
  */
 XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
+	std::map<Anope::string, XLine *, std::less<ci::string> >::iterator it = XLinesByUID.find(mask);
+	if (it != XLinesByUID.end() && (it->second->manager == NULL || it->second->manager == this))
+		return it->second;
 	for (unsigned i = 0, end = this->XLines.size(); i < end; ++i)
 	{
 		XLine *x = this->XLines[i];
@@ -339,9 +354,7 @@ XLine *XLineManager::Check(User *u)
 		if (x->Expires && x->Expires < Anope::CurTime)
 		{
 			this->OnExpire(x);
-			this->Del(x);
-			delete x;
-			this->XLines.erase(XLines.begin() + i - 1);
+			this->DelXLine(x);
 			continue;
 		}
 

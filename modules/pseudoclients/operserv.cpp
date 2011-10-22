@@ -20,35 +20,6 @@ class SGLineManager : public XLineManager
  public:
 	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
 
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-	{
-		XLine *x = new XLine(mask, creator, expires, reason);
-
-		this->AddXLine(x);
-
-		if (UplinkSock && Config->AkillOnAdd)
-			this->Send(NULL, x);
-
-		return x;
-	}
-
-	void Del(XLine *x)
-	{
-		try
-		{
-			if (!ircd->szline)
-				throw SocketException("SZLine is not supported");
-			else if (x->GetUser() != "*")
-				throw SocketException("Can not ZLine a username");
-			x->GetIP();
-			ircdproto->SendSZLineDel(x);
-		}
-		catch (const SocketException &)
-		{
-			ircdproto->SendAkillDel(x);
-		}
-	}
-
 	void OnMatch(User *u, XLine *x)
 	{
 		if (u)
@@ -78,65 +49,29 @@ class SGLineManager : public XLineManager
 			ircdproto->SendAkill(u, x);
 		}
 	}
+
+	void SendDel(XLine *x)
+	{
+		try
+		{
+			if (!ircd->szline)
+				throw SocketException("SZLine is not supported");
+			else if (x->GetUser() != "*")
+				throw SocketException("Can not ZLine a username");
+			x->GetIP();
+			ircdproto->SendSZLineDel(x);
+		}
+		catch (const SocketException &)
+		{
+			ircdproto->SendAkillDel(x);
+		}
+	}
 };
 
 class SQLineManager : public XLineManager
 {
  public:
 	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q') { }
-
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-	{
-		XLine *x = new XLine(mask, creator, expires, reason);
-
-		this->AddXLine(x);
-
-		if (Config->KillonSQline)
-		{
-			Anope::string rreason = "Q-Lined: " + reason;
-
-			if (mask[0] == '#')
-			{
-				for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
-				{
-					Channel *c = cit->second;
-
-					if (!Anope::Match(c->name, mask))
-						continue;
-					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
-					{
-						UserContainer *uc = *it;
-						++it;
-
-						if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
-							continue;
-						c->Kick(NULL, uc->user, "%s", reason.c_str());
-					}
-				}
-			}
-			else
-			{
-				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-				{
-					User *user = it->second;
-					++it;
-
-					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
-						user->Kill(Config->ServerName, rreason);
-				}
-			}
-		}
-
-		if (UplinkSock)
-			this->Send(NULL, x);
-
-		return x;
-	}
-
-	void Del(XLine *x)
-	{
-		ircdproto->SendSQLineDel(x);
-	}
 
 	void OnMatch(User *u, XLine *x)
 	{
@@ -160,6 +95,11 @@ class SQLineManager : public XLineManager
 		ircdproto->SendSQLine(u, x);
 	}
 
+	void SendDel(XLine *x)
+	{
+		ircdproto->SendSQLineDel(x);
+	}
+
 	bool CheckChannel(Channel *c)
 	{
 		if (ircd->chansqline)
@@ -174,34 +114,6 @@ class SNLineManager : public XLineManager
 {
  public:
 	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
-
-	XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason)
-	{
-		XLine *x = new XLine(mask, creator, expires, reason);
-
-		this->AddXLine(x);
-
-		if (Config->KillonSNline && !ircd->sglineenforce)
-		{
-			Anope::string rreason = "G-Lined: " + reason;
-
-			for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-			{
-				User *user = it->second;
-				++it;
-
-				if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
-					user->Kill(Config->ServerName, rreason);
-			}
-		}
-
-		return x;
-	}
-
-	void Del(XLine *x)
-	{
-		ircdproto->SendSGLineDel(x);
-	}
 
 	void OnMatch(User *u, XLine *x)
 	{
@@ -224,18 +136,21 @@ class SNLineManager : public XLineManager
 		ircdproto->SendSGLine(u, x);
 	}
 
+	void SendDel(XLine *x)
+	{
+		ircdproto->SendSGLineDel(x);
+	}
+
 	XLine *Check(User *u)
 	{
-		for (unsigned i = this->XLines.size(); i > 0; --i)
+		for (unsigned i = this->GetList().size(); i > 0; --i)
 		{
-			XLine *x = this->XLines[i - 1];
+			XLine *x = this->GetList()[i - 1];
 
 			if (x->Expires && x->Expires < Anope::CurTime)
 			{
 				this->OnExpire(x);
-				this->Del(x);
-				delete x;
-				this->XLines.erase(XLines.begin() + i - 1);
+				this->DelXLine(x);
 				continue;
 			}
 

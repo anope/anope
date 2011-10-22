@@ -548,9 +548,9 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 				time_t expires = params[6].is_pos_number_only() ? convertTo<time_t>(params[6]) : 0;
 				Anope::string reason = params[7];
 
-				XLine *x = xl->Add(mask, by, expires, reason);
-				if (x)
-					x->Created = seton;
+				XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+				x->Created = seton;
+				xl->AddXLine(x);
 				break;
 			}
 		}

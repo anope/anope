@@ -86,20 +86,19 @@ class ProxyConnect : public ConnectionSocket
 		reason = reason.replace_all_cs("%p", stringify(this->conaddr.port()));
 
 		Log(findbot(Config->OperServ)) << "PROXYSCAN: Open " << this->GetType() << " proxy found on " << this->conaddr.addr() << ":" << this->conaddr.port() << " (" << reason << ")";
+		XLine *x = new XLine("*@" + this->conaddr.addr(), Config->OperServ, Anope::CurTime + this->proxy.duration, reason, XLineManager::GenerateUID());
 		if (add_to_akill && akills)
 		{
-			XLine *x = akills->Add("*@" + this->conaddr.addr(), Config->OperServ, Anope::CurTime + this->proxy.duration, reason);
-			/* If AkillOnAdd is disabled send it anyway, noone wants bots around... */
-			if (!Config->AkillOnAdd)
-				akills->Send(NULL, x);
+			akills->AddXLine(x);
+			akills->Send(NULL, x);
 		}
 		else
 		{
-			XLine xline("*@" + this->conaddr.addr(), Config->OperServ, Anope::CurTime + this->proxy.duration, reason);
 			if (ircd->szline)
-				ircdproto->SendSZLine(NULL, &xline);
+				ircdproto->SendSZLine(NULL, x);
 			else
-				ircdproto->SendAkill(NULL, &xline);
+				ircdproto->SendAkill(NULL, x);
+			delete x;
 		}
 	}
 };

@@ -21,11 +21,12 @@ class CoreExport XLine : public Serializable<XLine>
 	time_t Created;
 	time_t Expires;
 	Anope::string Reason;
-	Anope::string Manager;
+	XLineManager *manager;
+	Anope::string UID;
 
-	XLine(const Anope::string &mask, const Anope::string &reason = "");
+	XLine(const Anope::string &mask, const Anope::string &reason = "", const Anope::string &uid = "");
 
-	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason);
+	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid);
 
 	Anope::string GetNick() const;
 	Anope::string GetUser() const;
@@ -39,25 +40,12 @@ class CoreExport XLine : public Serializable<XLine>
 class CoreExport XLineManager : public Service<XLineManager>
 {
 	char type;
- protected:
 	/* List of XLines in this XLineManager */
 	std::vector<XLine *> XLines;
+	static std::map<Anope::string, XLine *, std::less<ci::string> > XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
-
-	/** Constructor
-	 */
-	XLineManager(Module *creator, const Anope::string &name, char t);
-
-	/** Destructor
-	 */
-	virtual ~XLineManager();
-
-	/** The type of xline provided by this service
-	 * @return The type
-	 */
-	const char &Type();
 
 	/** Register a XLineManager, places it in XLineManagers for use in XLineManager::CheckAll
 	 * It is important XLineManagers are registered in the proper order. Eg, if you had one akilling
@@ -77,6 +65,24 @@ class CoreExport XLineManager : public Service<XLineManager>
 	 * @return A pair of the XLineManager the user was found in and the XLine they matched, both may be NULL for no match
 	 */
 	static std::pair<XLineManager *, XLine *> CheckAll(User *u);
+
+	/** Generate a unique ID for this XLine
+	 * @return A unique ID
+	 */
+	static Anope::string GenerateUID();
+
+	/** Constructor
+	 */
+	XLineManager(Module *creator, const Anope::string &name, char t);
+
+	/** Destructor
+	 */
+	virtual ~XLineManager();
+
+	/** The type of xline provided by this service
+	 * @return The type
+	 */
+	const char &Type();
 
 	/** Get the number of XLines in this XLineManager
 	 * @return The number of XLines
@@ -109,22 +115,6 @@ class CoreExport XLineManager : public Service<XLineManager>
 	 */
 	void Clear();
 
-	/** Add an entry to this XLine Manager
-	 * @param mask The mask of the XLine
-	 * @param creator The creator of the XLine
-	 * @param expires When this should expire
-	 * @param reaosn The reason
-	 * @return A pointer to the XLine
-	 */
-	virtual XLine *Add(const Anope::string &mask, const Anope::string &creator, time_t expires, const Anope::string &reason);
-
- private:
-	/** Delete an XLine, eg, remove it from the IRCd.
-	 * @param x The xline
-	 */
-	virtual void Del(XLine *x);
-
- public:
 	/** Checks if a mask can/should be added to the XLineManager
 	 * @param mask The mask
 	 * @param expires When the mask would expire
@@ -164,6 +154,11 @@ class CoreExport XLineManager : public Service<XLineManager>
 	 * @param x The xline
 	 */
 	virtual void Send(User *u, XLine *x) = 0;
+
+	/** Called to remove an XLine from the IRCd
+	 * @param x The XLine
+	 */
+	virtual void SendDel(XLine *x) = 0;
 };
 
 #endif // OPER_H

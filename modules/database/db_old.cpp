@@ -920,9 +920,9 @@ static void LoadOper()
 		if (!akill)
 			continue;
 
-		XLine *x = akill->Add(user + "@" + host, by, expires, reason);
-		if (x)
-			x->Created = seton;
+		XLine *x = new XLine(user + "@" + host, by, expires, reason, XLineManager::GenerateUID());
+		x->Created = seton;
+		akill->AddXLine(x);
 	}
 
 	read_int16(&capacity, f); // SNLines
@@ -940,9 +940,9 @@ static void LoadOper()
 		if (!snline)
 			continue;
 
-		XLine *x = snline->Add(mask, by, expires, reason);
-		if (x)
-			x->Created = seton;
+		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		x->Created = seton;
+		snline->AddXLine(x);
 	}
 
 	read_int16(&capacity, f); // SQLines
@@ -960,9 +960,9 @@ static void LoadOper()
 		if (!sqline)
 			continue;
 
-		XLine *x = sqline->Add(mask, by, expires, reason);
-		if (x)
-			x->Created = seton;
+		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		x->Created = seton;
+		sqline->AddXLine(x);
 	}
 
 	read_int16(&capacity, f); // SZLines
@@ -980,9 +980,9 @@ static void LoadOper()
 		if (!szline)
 			continue;
 
-		XLine *x = szline->Add(mask, by, expires, reason);
-		if (x)	
-			x->Created = seton;
+		XLine *x = new XLine(mask, by, expires, reason, XLineManager::GenerateUID());
+		x->Created = seton;
+		szline->AddXLine(x);
 	}
 
 	close_db(f);

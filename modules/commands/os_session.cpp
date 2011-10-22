@@ -679,7 +679,9 @@ class OSSession : public Module
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
 				{
 					const Anope::string &akillmask = "*@" + u->host;
-					akills->Add(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded");
+					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
+					akills->AddXLine(x);
+					akills->Send(NULL, x);
 					if (bi)
 						ircdproto->SendGlobops(bi, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
 				}

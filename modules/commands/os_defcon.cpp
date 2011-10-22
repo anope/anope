@@ -424,9 +424,9 @@ class OSDefcon : public Module
 			if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 			{
 				Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-				XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
-				if (x)
-					x->By = Config->OperServ;
+				XLine *x = new XLine("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
+				x->By = Config->OperServ;
+				akills->AddXLine(x);
 			}
 
 			if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
@@ -518,10 +518,16 @@ class OSDefcon : public Module
 		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
 		{
 			Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-			XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason);
-			if (x)
-				x->By = Config->OperServ;
+			XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, DConfig.akillreason, XLineManager::GenerateUID());
+			x.By = Config->OperServ;
+			akills->Send(NULL, &x);
 		}
+		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
+		{
+			u->Kill(Config->OperServ, DConfig.akillreason);
+			return;
+		}
+
 		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
 		{
 			u->Kill(Config->OperServ, DConfig.akillreason);
@@ -530,20 +536,6 @@ class OSDefcon : public Module
 
 		if (!DConfig.sessionlimit)
 			return;
-
-		if (DConfig.Check(DEFCON_AKILL_NEW_CLIENTS) && akills)
-		{
-			Log(findbot(Config->OperServ), "operserv/defcon") << "DEFCON: adding akill for *@" << u->host;
-			XLine *x = akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + DConfig.akillexpire, !DConfig.akillreason.empty() ? DConfig.akillreason : "DEFCON AKILL");
-			if (x)
-				x->By = Config->OperServ;
-		}
-
-		if (DConfig.Check(DEFCON_NO_NEW_CLIENTS) || DConfig.Check(DEFCON_AKILL_NEW_CLIENTS))
-		{
-			u->Kill(Config->OperServ, DConfig.akillreason);
-			return;
-		}
 
 		Session *session = session_service->FindSession(u->host);
 		Exception *exception = session_service->FindException(u);
@@ -561,7 +553,8 @@ class OSDefcon : public Module
 				++session->hits;
 				if (akills && Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
-					akills->Add("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded");
+					XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
+					akills->Send(NULL, &x);
 					ircdproto->SendGlobops(findbot(Config->OperServ), "[DEFCON] Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
 				}
 			}

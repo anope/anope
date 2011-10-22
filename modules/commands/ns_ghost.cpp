@@ -34,6 +34,8 @@ class CommandNSGhost : public Command
 
 		if (!user)
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+		else if (user->server == Me)
+			source.Reply(_("\2%s\2 is a services enforcer."), user->nick.c_str());
 		else if (!na)
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))

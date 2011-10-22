@@ -53,6 +53,8 @@ class CommandNSRecover : public Command
 		User *u2;
 		if (!(u2 = finduser(nick)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
+		else if (u2->server == Me)
+			source.Reply(_("\2%s\2 has already been recovered."), u2->nick.c_str());
 		else if (!(na = findnick(u2->nick)))
 			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
 		else if (na->nc->HasFlag(NI_SUSPENDED))

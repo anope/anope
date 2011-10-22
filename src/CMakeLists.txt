@@ -11,12 +11,12 @@ if(WIN32)
 else(WIN32)
   append_to_list(SRC_SRCS threadengines/threadengine_pthread.cpp)
   # If we have eventfd, use it
-  if(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
+  if(HAVE_EVENTFD)
     append_to_list(SRC_SRCS socketengines/pipeengine_eventfd.cpp)
   # Else fall back to pipe
-  else(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
+  else(HAVE_EVENTFD)
     append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
-  endif(HAVE_EVENTFD AND HAVE_SYS_EVENTFD_H)
+  endif(HAVE_EVENTFD)
 endif(WIN32)
 
 if(HAVE_EPOLL)

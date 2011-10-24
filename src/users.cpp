@@ -15,8 +15,8 @@
 Anope::insensitive_map<User *> UserListByNick;
 Anope::map<User *> UserListByUID;
 
-int32 opcnt = 0;
-uint32 usercnt = 0, maxusercnt = 0;
+int32_t opcnt = 0;
+uint32_t usercnt = 0, maxusercnt = 0;
 time_t maxusertime;
 
 /*************************************************************************/
@@ -478,7 +478,7 @@ bool User::IsServicesOper()
 		if (match == false)
 			return false;
 	}
-	
+
 	EventReturn MOD_RESULT;
 	FOREACH_RESULT(I_IsServicesOper, IsServicesOper(this));
 	if (MOD_RESULT == EVENT_STOP)
@@ -843,7 +843,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		if (user->server && user->server->IsULined())
 			exempt = true;
 		FOREACH_MOD(I_OnUserConnect, OnUserConnect(user, exempt));
-		
+
 		return user;
 	}
 	else

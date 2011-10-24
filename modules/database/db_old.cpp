@@ -295,7 +295,7 @@ void close_db(dbFILE *f)
 	delete f;
 }
 
-static int read_int16(int16 *ret, dbFILE *f)
+static int read_int16(int16_t *ret, dbFILE *f)
 {
 	int c1, c2;
 
@@ -309,7 +309,7 @@ static int read_int16(int16 *ret, dbFILE *f)
 	return 0;
 }
 
-static int read_uint16(uint16 *ret, dbFILE *f)
+static int read_uint16(uint16_t *ret, dbFILE *f)
 {
 	int c1, c2;
 
@@ -326,7 +326,7 @@ static int read_uint16(uint16 *ret, dbFILE *f)
 static int read_string(Anope::string &str, dbFILE *f)
 {
 	str.clear();
-	uint16 len;
+	uint16_t len;
 
 	if (read_uint16(&len, f) < 0)
 		return -1;
@@ -343,7 +343,7 @@ static int read_string(Anope::string &str, dbFILE *f)
 	return 0;
 }
 
-static int read_uint32(uint32 *ret, dbFILE *f)
+static int read_uint32(uint32_t *ret, dbFILE *f)
 {
 	int c1, c2, c3, c4;
 
@@ -359,7 +359,7 @@ static int read_uint32(uint32 *ret, dbFILE *f)
 	return 0;
 }
 
-int read_int32(int32 *ret, dbFILE *f)
+int read_int32(int32_t *ret, dbFILE *f)
 {
 	int c1, c2, c3, c4;
 
@@ -402,7 +402,7 @@ static void LoadNicks()
 			READ(read_string(buffer, f));
 			nc->greet = buffer;
 
-			uint32 uint;
+			uint32_t uint;
 			READ(read_uint32(&uint, f));
 			//nc->icq = uint;
 
@@ -445,7 +445,7 @@ static void LoadNicks()
 			if (uint & OLD_NI_NOEXPIRE)
 				nc->Extend("noexpire", NULL);
 
-			uint16 u16;
+			uint16_t u16;
 			READ(read_uint16(&u16, f));
 			switch (u16)
 			{
@@ -494,22 +494,22 @@ static void LoadNicks()
 			}
 
 			READ(read_uint16(&u16, f));
-			for (uint16 j = 0; j < u16; ++j)
+			for (uint16_t j = 0; j < u16; ++j)
 			{
 				READ(read_string(buffer, f));
 				nc->access.push_back(buffer);
 			}
 
-			int16 i16;
+			int16_t i16;
 			READ(read_int16(&i16, f));
 			READ(read_int16(&nc->memos.memomax, f));
-			for (int16 j = 0; j < i16; ++j)
+			for (int16_t j = 0; j < i16; ++j)
 			{
 				Memo *m = new Memo;
 				READ(read_uint32(&uint, f));
-				uint16 flags;
+				uint16_t flags;
 				READ(read_uint16(&flags, f));
-				int32 tmp32;
+				int32_t tmp32;
 				READ(read_int32(&tmp32, f));
 				m->time = tmp32;
 				char sbuf[32];
@@ -523,7 +523,7 @@ static void LoadNicks()
 
 			Log(LOG_DEBUG) << "Loaded NickCore " << nc->display;
 		}
-	
+
 	for (int i = 0; i < 1024; ++i)
 		for (int c; (c = getc_db(f)) == 1;)
 		{
@@ -535,13 +535,13 @@ static void LoadNicks()
 			READ(read_string(last_realname, f));
 			READ(read_string(last_quit, f));
 
-			int32 tmp32;
+			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
 			time_registered = tmp32;
 			READ(read_int32(&tmp32, f));
 			last_seen = tmp32;
 
-			uint16 tmpu16;
+			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
 			Anope::string core;
 			READ(read_string(core, f));
@@ -563,7 +563,7 @@ static void LoadNicks()
 
 			Log(LOG_DEBUG) << "Loaded NickAlias " << na->nick;
 		}
-	
+
 	close_db(f); /* End of section Ia */
 }
 
@@ -576,7 +576,7 @@ static void LoadVHosts()
 	for (int c; (c = getc_db(f)) == 1;)
 	{
 		Anope::string nick, ident, host, creator;
-		int32 vtime;
+		int32_t vtime;
 
 		READ(read_string(nick, f));
 		READ(read_string(ident, f));
@@ -595,7 +595,7 @@ static void LoadVHosts()
 
 		Log() << "Loaded vhost for " << na->nick;
 	}
-	
+
 	close_db(f);
 }
 
@@ -608,8 +608,8 @@ static void LoadBots()
 	for (int c; (c = getc_db(f)) == 1;)
 	{
 		Anope::string nick, user, host, real;
-		int16 flags, chancount;
-		int32 created;
+		int16_t flags, chancount;
+		int32_t created;
 
 		READ(read_string(nick, f));
 		READ(read_string(user, f));
@@ -659,7 +659,7 @@ static void LoadChannels()
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
 
-			int32 tmp32;
+			int32_t tmp32;
 			READ(read_int32(&tmp32, f));
 			ci->time_registered = tmp32;
 
@@ -674,7 +674,7 @@ static void LoadChannels()
 			READ(read_int32(&tmp32, f));
 			ci->last_topic_time = tmp32;
 
-			uint32 tmpu32;
+			uint32_t tmpu32;
 			READ(read_uint32(&tmpu32, f));
 			// Temporary flags cleanup
 			tmpu32 &= ~0x80000000;
@@ -708,26 +708,26 @@ static void LoadChannels()
 			READ(read_string(buffer, f));
 			READ(read_string(buffer, f));
 
-			int16 tmp16;
+			int16_t tmp16;
 			READ(read_int16(&tmp16, f));
 			ci->bantype = tmp16;
 
 			READ(read_int16(&tmp16, f));
 			if (tmp16 > 36)
 				tmp16 = 36;
-			for (int16 j = 0; j < tmp16; ++j)
+			for (int16_t j = 0; j < tmp16; ++j)
 			{
-				int16 level;
+				int16_t level;
 				READ(read_int16(&level, f));
 
 				ci->SetLevel(GetLevelName(j), level);
 			}
 
-			uint16 tmpu16;
+			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
-			for (uint16 j = 0; j < tmpu16; ++j)
+			for (uint16_t j = 0; j < tmpu16; ++j)
 			{
-				uint16 in_use;
+				uint16_t in_use;
 				READ(read_uint16(&in_use, f));
 				if (in_use)
 				{
@@ -738,7 +738,7 @@ static void LoadChannels()
 					ChanAccess *access = provider->Create();
 					access->ci = ci;
 
-					int16 level;
+					int16_t level;
 					READ(read_int16(&level, f));
 					access->Unserialize(stringify(level));
 
@@ -756,9 +756,9 @@ static void LoadChannels()
 			}
 
 			READ(read_uint16(&tmpu16, f));
-			for (uint16 j = 0; j < tmpu16; ++j)
+			for (uint16_t j = 0; j < tmpu16; ++j)
 			{
-				uint16 flags;
+				uint16_t flags;
 				READ(read_uint16(&flags, f));
 				if (flags & 0x0001)
 				{
@@ -781,7 +781,7 @@ static void LoadChannels()
 
 			READ(read_int16(&tmp16, f));
 			READ(read_int16(&ci->memos.memomax, f));
-			for (int16 j = 0; j < tmp16; ++j)
+			for (int16_t j = 0; j < tmp16; ++j)
 			{
 				READ(read_uint32(&tmpu32, f));
 				READ(read_uint16(&tmpu16, f));
@@ -829,9 +829,9 @@ static void LoadChannels()
 				ci->botflags.SetFlag(BS_KICK_REPEAT);
 
 			READ(read_int16(&tmp16, f));
-			for (int16 j = 0; j < tmp16; ++j)
+			for (int16_t j = 0; j < tmp16; ++j)
 			{
-				int16 ttb;
+				int16_t ttb;
 				READ(read_int16(&ttb, f));
 				if (j < TTB_SIZE)
 					ci->ttb[j] = ttb;
@@ -849,14 +849,14 @@ static void LoadChannels()
 			ci->repeattimes = tmp16;
 
 			READ(read_uint16(&tmpu16, f));
-			for (uint16 j = 0; j < tmpu16; ++j)
+			for (uint16_t j = 0; j < tmpu16; ++j)
 			{
-				uint16 in_use;
+				uint16_t in_use;
 				READ(read_uint16(&in_use, f));
 				if (in_use)
 				{
 					READ(read_string(buffer, f));
-					uint16 type;
+					uint16_t type;
 					READ(read_uint16(&type, f));
 
 					BadWordType bwtype = BW_ANY;
@@ -873,7 +873,7 @@ static void LoadChannels()
 
 			Log(LOG_DEBUG) << "Loaded channel " << ci->name;
 		}
-	
+
 	close_db(f);
 }
 
@@ -882,7 +882,7 @@ static void LoadOper()
 	dbFILE *f = open_db_read("OperServ", "oper.db", 13);
 	if (f == NULL)
 		return;
-	
+
 	XLineManager *akill, *sqline, *snline, *szline;
 	akill = sqline = snline = szline = NULL;
 
@@ -899,16 +899,16 @@ static void LoadOper()
 			szline = xl;
 	}
 
-	int32 tmp32;
+	int32_t tmp32;
 	READ(read_int32(&tmp32, f));
 	READ(read_int32(&tmp32, f));
 
-	int16 capacity;
+	int16_t capacity;
 	read_int16(&capacity, f); // AKill count
-	for (int16 i = 0; i < capacity; ++i)
+	for (int16_t i = 0; i < capacity; ++i)
 	{
 		Anope::string user, host, by, reason;
-		int32 seton, expires;
+		int32_t seton, expires;
 
 		READ(read_string(user, f));
 		READ(read_string(host, f));
@@ -926,10 +926,10 @@ static void LoadOper()
 	}
 
 	read_int16(&capacity, f); // SNLines
-	for (int16 i = 0; i < capacity; ++i)
+	for (int16_t i = 0; i < capacity; ++i)
 	{
 		Anope::string mask, by, reason;
-		int32 seton, expires;
+		int32_t seton, expires;
 
 		READ(read_string(mask, f));
 		READ(read_string(by, f));
@@ -946,10 +946,10 @@ static void LoadOper()
 	}
 
 	read_int16(&capacity, f); // SQLines
-	for (int16 i = 0; i < capacity; ++i)
+	for (int16_t i = 0; i < capacity; ++i)
 	{
 		Anope::string mask, by, reason;
-		int32 seton, expires;
+		int32_t seton, expires;
 
 		READ(read_string(mask, f));
 		READ(read_string(by, f));
@@ -966,10 +966,10 @@ static void LoadOper()
 	}
 
 	read_int16(&capacity, f); // SZLines
-	for (int16 i = 0; i < capacity; ++i)
+	for (int16_t i = 0; i < capacity; ++i)
 	{
 		Anope::string mask, by, reason;
-		int32 seton, expires;
+		int32_t seton, expires;
 
 		READ(read_string(mask, f));
 		READ(read_string(by, f));

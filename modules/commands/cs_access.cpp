@@ -19,12 +19,12 @@ enum
 	ACCESS_FOUNDER = 10001
 };
 
-static std::map<Anope::string, int16, std::less<ci::string> > defaultLevels;
+static std::map<Anope::string, int16_t, std::less<ci::string> > defaultLevels;
 
 static void reset_levels(ChannelInfo *ci)
 {
 	ci->ClearLevels();
-	for (std::map<Anope::string, int16, std::less<ci::string> >::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
+	for (std::map<Anope::string, int16_t, std::less<ci::string> >::iterator it = defaultLevels.begin(), it_end = defaultLevels.end(); it != it_end; ++it)
 		ci->SetLevel(it->first, it->second);
 }
 
@@ -286,7 +286,7 @@ class CommandCSAccess : public Command
 
 		Anope::string mask = params[2];
 		int level = ACCESS_INVALID;
-		
+
 		try
 		{
 			level = convertTo<int>(params[3]);
@@ -736,7 +736,7 @@ class CommandCSLevels : public Command
 		for (unsigned i = 0; i < privs.size(); ++i)
 		{
 			const Privilege &p = privs[i];
-			int16 j = ci->GetLevel(p.name);
+			int16_t j = ci->GetLevel(p.name);
 
 			if (j == ACCESS_INVALID)
 				source.Reply(_("    %-*s  (disabled)"), levelinfo_maxwidth, p.name.c_str());
@@ -918,7 +918,7 @@ class CSAccess : public Module
 		if (group->ci == NULL)
 			return EVENT_CONTINUE;
 		/* Special case. Allows a level of < 0 to match anyone, and a level of 0 to match anyone identified. */
-		int16 level = group->ci->GetLevel(priv);
+		int16_t level = group->ci->GetLevel(priv);
 		if (level < 0)
 			return EVENT_ALLOW;
 		else if (level == 0 && group->nc)

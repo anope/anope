@@ -303,7 +303,7 @@ class DBMySQL : public Module
 			this->OnAccessDel(ci, NULL, ci->GetAccess(i));
 	}
 
-	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16 what)
+	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what)
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 	}

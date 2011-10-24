@@ -29,9 +29,9 @@ void ExtensibleItem::OnDelete()
 
 struct arc4_stream
 {
-	uint8 i;
-	uint8 j;
-	uint8 s[256];
+	uint8_t i;
+	uint8_t j;
+	uint8_t s[256];
 } rs;
 
 /*************************************************************************/
@@ -325,7 +325,7 @@ bool IsValidIdent(const Anope::string &ident)
 		else
 			return false;
 	}
-	
+
 	return true;
 }
 
@@ -337,12 +337,12 @@ bool IsValidHost(const Anope::string &host)
 {
 	if (host.empty() || host.length() > Config->HostLen)
 		return false;
-	
+
 	if (Config->VhostDisallowBE.find_first_of(host[0]) != Anope::string::npos)
 		return false;
 	else if (Config->VhostDisallowBE.find_first_of(host[host.length() - 1]) != Anope::string::npos)
 		return false;
-	
+
 	int dots = 0;
 	for (unsigned i = 0; i < host.length(); ++i)
 	{
@@ -459,7 +459,7 @@ static void arc4_addrandom(void *dat, int datlen)
 	for (int n = 0; n < 256; ++n)
 	{
 		++rs.i;
-		uint8 si = rs.s[rs.i];
+		uint8_t si = rs.s[rs.i];
 		rs.j = rs.j + si + (static_cast<unsigned char *>(dat))[n % datlen];
 		rs.s[rs.i] = rs.s[rs.j];
 		rs.s[rs.j] = si;
@@ -545,9 +545,9 @@ unsigned char getrandom8()
  * Get the random numbers 16 byte deep
  * @return char
  */
-uint16 getrandom16()
+uint16_t getrandom16()
 {
-	uint16 val = getrandom8() << 8;
+	uint16_t val = getrandom8() << 8;
 	val |= getrandom8();
 	return val;
 }
@@ -558,9 +558,9 @@ uint16 getrandom16()
  * Get the random numbers 32 byte deep
  * @return char
  */
-uint32 getrandom32()
+uint32_t getrandom32()
 {
-	uint32 val = getrandom8() << 24;
+	uint32_t val = getrandom8() << 24;
 	val |= getrandom8() << 16;
 	val |= getrandom8() << 8;
 	val |= getrandom8();

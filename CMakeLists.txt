@@ -248,7 +248,7 @@ else(MSVC)
   if(UNIX)
     set(CXXFLAGS "${CXXFLAGS} -ansi -pedantic")
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set(CXXFLAGS "${CXXFLAGS} -fno-leading-underscore")
+      set(CXXFLAGS "${CXXFLAGS} -Wno-long-long -fno-leading-underscore")
     endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # If we aren't on a *nix system, we are using MinGW
   else(UNIX)
@@ -329,7 +329,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINF
 endif(CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "RELWITHDEBINFO")
 
 # Check for the existance of the following include files
-check_include_file(sys/types.h HAVE_SYS_TYPES_H)
+check_include_file(cstdint HAVE_CSTDINT)
+check_include_file(stdint.h HAVE_STDINT_H)
 check_include_file(strings.h HAVE_STRINGS_H)
 
 # Check for the existance of the following functions
@@ -340,16 +341,6 @@ check_function_exists(umask HAVE_UMASK)
 check_function_exists(epoll_wait HAVE_EPOLL)
 check_function_exists(poll HAVE_POLL)
 check_function_exists(kqueue HAVE_KQUEUE)
-
-# Check for the existance of the following types
-check_type_size(uint8_t UINT8_T)
-check_type_size(u_int8_t U_INT8_T)
-check_type_size(int16_t INT16_T)
-check_type_size(uint16_t UINT16_T)
-check_type_size(u_int16_t U_INT16_T)
-check_type_size(int32_t INT32_T)
-check_type_size(uint32_t UINT32_T)
-check_type_size(u_int32_t U_INT32_T)
 
 # Check if eventfd works
 try_run(EVENTFD_TEST_RUN_RESULT EVENTFD_TEST_COMPILE_RESULT ${CMAKE_CURRENT_BINARY_DIR} ${Anope_SOURCE_DIR}/cmake/eventfd_test.cpp)

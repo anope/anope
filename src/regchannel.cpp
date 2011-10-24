@@ -33,7 +33,7 @@ void BadWord::unserialize(SerializableBase::serialized_data &data)
 
 SerializableBase::serialized_data AutoKick::serialize()
 {
-	serialized_data data;	
+	serialized_data data;
 
 	if (this->HasFlag(AK_ISNICK) && this->nc)
 		data["nc"] << this->nc->display;
@@ -63,7 +63,7 @@ void AutoKick::unserialize(SerializableBase::serialized_data &data)
 
 SerializableBase::serialized_data ModeLock::serialize()
 {
-	serialized_data data;	
+	serialized_data data;
 
 	if (this->ci == NULL)
 		return data;
@@ -106,7 +106,7 @@ void ModeLock::unserialize(SerializableBase::serialized_data &data)
 
 SerializableBase::serialized_data LogSetting::serialize()
 {
-	serialized_data data;	
+	serialized_data data;
 
 	data["service_name"] << service_name;
 	data["command_service"] << command_service;
@@ -196,7 +196,7 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = ci.ttb[i];
-	
+
 	for (unsigned i = 0; i < ci.GetAccessCount(); ++i)
 	{
 		ChanAccess *taccess = ci.GetAccess(i);
@@ -264,7 +264,7 @@ ChannelInfo::~ChannelInfo()
 
 SerializableBase::serialized_data ChannelInfo::serialize()
 {
-	serialized_data data;	
+	serialized_data data;
 
 	data["name"].setKey().setMax(255) << this->name;
 	if (this->founder)
@@ -282,7 +282,7 @@ SerializableBase::serialized_data ChannelInfo::serialize()
 	data["botflags"] << this->botflags.ToString();
 	{
 		Anope::string levels_buffer;
-		for (std::map<Anope::string, int16>::iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
+		for (std::map<Anope::string, int16_t>::iterator it = this->levels.begin(), it_end = this->levels.end(); it != it_end; ++it)
 			levels_buffer += it->first + " " + stringify(it->second) + " ";
 		data["levels"] << levels_buffer;
 	}
@@ -321,7 +321,7 @@ void ChannelInfo::unserialize(SerializableBase::serialized_data &data)
 	{
 		std::vector<Anope::string> v = BuildStringVector(data["levels"].astr());
 		for (unsigned i = 0; i + 1 < v.size(); i += 2)
-			ci->levels[v[i]] = convertTo<int16>(v[i + 1]);
+			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
 	}
 	if (data.count("bi") > 0)
 		ci->bi = findbot(data["bi"].astr());
@@ -418,16 +418,16 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 
 	group.SuperAdmin = u->SuperAdmin;
 	group.Founder = IsFounder(u, this);
-	group.ci = this;	
+	group.ci = this;
 	group.nc = nc;
 
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(u, nc))
 			group.push_back(this->access[i]);
-	
+
 	if (!group.empty())
 		this->last_used = Anope::CurTime;
-	
+
 	return group;
 }
 
@@ -712,7 +712,7 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 			}
 		}
 	}
-	
+
 	this->mode_locks.insert(ml);
 
 	return true;
@@ -960,7 +960,7 @@ void ChannelInfo::CheckTopic()
 {
 	if (!this->c)
 		return;
-	
+
 	/* We only compare the topics here, not the time or setter. This is because some (old) IRCds do not
 	 * allow us to set the topic as someone else, meaning we have to bump the TS and change the setter to us.
 	 * This desyncs what is really set with what we have stored, and we end up resetting the topic often when
@@ -989,17 +989,17 @@ void ChannelInfo::RestoreTopic()
 	}
 }
 
-int16 ChannelInfo::GetLevel(const Anope::string &priv)
+int16_t ChannelInfo::GetLevel(const Anope::string &priv)
 {
 	if (PrivilegeManager::FindPrivilege(priv) == NULL)
 		throw CoreException("Unknown privilege " + priv);
-	
+
 	if (this->levels.count(priv) == 0)
 		this->levels[priv] = 0;
 	return this->levels[priv];
 }
 
-void ChannelInfo::SetLevel(const Anope::string &priv, int16 level)
+void ChannelInfo::SetLevel(const Anope::string &priv, int16_t level)
 {
 	this->levels[priv] = level;
 }

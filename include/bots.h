@@ -35,7 +35,7 @@ static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Serializable<BotInfo>
 {
  public:
-	uint32 chancount;
+	uint32_t chancount;
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
 	typedef Anope::insensitive_map<CommandInfo> command_map;

@@ -152,7 +152,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	std::vector<ChanAccess *> access;                                       /* List of authorized users */
 	std::vector<AutoKick *> akick;						/* List of users to kickban */
 	std::vector<BadWord *> badwords;					/* List of badwords */
-	std::map<Anope::string, int16> levels;
+	std::map<Anope::string, int16_t> levels;
 
  public:
 	typedef std::multimap<ChannelModeName, ModeLock> ModeList;
@@ -184,7 +184,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	Anope::string last_topic_setter;	/* Setter */
 	time_t last_topic_time;			/* Time */
 
-	int16 bantype;
+	int16_t bantype;
 
 	MemoInfo memos;
 
@@ -193,11 +193,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	/* For BotServ */
 	BotInfo *bi;					/* Bot used on this channel */
 	Flags<BotServFlag> botflags;
-	int16 ttb[TTB_SIZE];				/* Times to ban for each kicker */
+	int16_t ttb[TTB_SIZE];			/* Times to ban for each kicker */
 
-	int16 capsmin, capspercent;		/* For CAPS kicker */
-	int16 floodlines, floodsecs;	/* For FLOOD kicker */
-	int16 repeattimes;				/* For REPEAT kicker */
+	int16_t capsmin, capspercent;	/* For CAPS kicker */
+	int16_t floodlines, floodsecs;	/* For FLOOD kicker */
+	int16_t repeattimes;			/* For REPEAT kicker */
 
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
@@ -377,7 +377,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	ModeLock *GetMLock(ChannelModeName mname, const Anope::string &param = "");
 
 	/** Get the current mode locks as a string
-	 * @param complete True to show mlock parameters aswell 
+	 * @param complete True to show mlock parameters aswell
 	 * @return A string of mode locks, eg: +nrt
 	 */
 	Anope::string GetMLockAsString(bool complete) const;
@@ -393,7 +393,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * the new topic in the ChannelInfo
 	 */
 	void CheckTopic();
-	
+
 	/** Restore the channel topic, used on channel creation when not syncing with the uplink
 	 * and after uplink sync
 	 */
@@ -404,13 +404,13 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	 * @return the level
 	 * @throws CoreException if priv is not a valid privilege
 	 */
-	int16 GetLevel(const Anope::string &priv);
+	int16_t GetLevel(const Anope::string &priv);
 
 	/** Set the level for a privilege
 	 * @param priv The privilege priv
 	 * @param level The new level
 	 */
-	void SetLevel(const Anope::string &priv, int16 level);
+	void SetLevel(const Anope::string &priv, int16_t level);
 
 	/** Remove a privilege from the channel
 	 * @param priv The privilege

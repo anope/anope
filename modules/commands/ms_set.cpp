@@ -75,7 +75,7 @@ class CommandMSSet : public Command
 		Anope::string p2 = params.size() > 2 ? params[2] : "";
 		Anope::string p3 = params.size() > 3 ? params[3] : "";
 		Anope::string user, chan;
-		int16 limit;
+		int16_t limit;
 		NickCore *nc = u->Account();
 		ChannelInfo *ci = NULL;
 		bool is_servadmin = u->HasPriv("memoserv/set-limit");
@@ -136,7 +136,7 @@ class CommandMSSet : public Command
 			limit = -1;
 			try
 			{
-				limit = convertTo<int16>(p1);
+				limit = convertTo<int16_t>(p1);
 			}
 			catch (const ConvertException &) { }
 		}
@@ -160,7 +160,7 @@ class CommandMSSet : public Command
 			limit = -1;
 			try
 			{
-				limit = convertTo<int16>(p1);
+				limit = convertTo<int16_t>(p1);
 			}
 			catch (const ConvertException &) { }
 			/* The first character is a digit, but we could still go negative

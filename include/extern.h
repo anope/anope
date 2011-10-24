@@ -171,8 +171,8 @@ E bool nickIsServices(const Anope::string &nick, bool bot);
 E void add_entropy_userkeys();
 E void rand_init();
 E unsigned char getrandom8();
-E uint16 getrandom16();
-E uint32 getrandom32();
+E uint16_t getrandom16();
+E uint32_t getrandom32();
 
 E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
 E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
@@ -208,14 +208,14 @@ E void notice_server(const Anope::string &source, const Server *s, const char *f
 
 /**** sockets.cpp ****/
 
-E int32 TotalRead;
-E int32 TotalWritten;
+E int32_t TotalRead;
+E int32_t TotalWritten;
 E SocketIO normalSocketIO;
 
 /**** users.c ****/
 
-E int32 opcnt;
-E uint32 maxusercnt, usercnt;
+E int32_t opcnt;
+E uint32_t maxusercnt, usercnt;
 E time_t maxusertime;
 
 E User *finduser(const Anope::string &nick);

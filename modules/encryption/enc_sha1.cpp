@@ -18,27 +18,27 @@ A million repetitions of "a"
 
 struct SHA1_CTX
 {
-	uint32 state[5];
-	uint32 count[2];
+	uint32_t state[5];
+	uint32_t count[2];
 	unsigned char buffer[64];
 };
 
-void SHA1Transform(uint32 state[5], const unsigned char buffer[64]);
+void SHA1Transform(uint32_t state[5], const unsigned char buffer[64]);
 void SHA1Init(SHA1_CTX *context);
-void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32 len);
+void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32_t len);
 void SHA1Final(unsigned char digest[20], SHA1_CTX *context);
 
-inline static uint32 rol(uint32 value, uint32 bits) { return (value << bits) | (value >> (32 - bits)); }
+inline static uint32_t rol(uint32_t value, uint32_t bits) { return (value << bits) | (value >> (32 - bits)); }
 
 union CHAR64LONG16
 {
 	unsigned char c[64];
-	uint32 l[16];
+	uint32_t l[16];
 };
 
 /* blk0() and blk() perform the initial expand. */
 /* I got the idea of expanding during the round function from SSLeay */
-inline static uint32 blk0(CHAR64LONG16 *block, uint32 i)
+inline static uint32_t blk0(CHAR64LONG16 *block, uint32_t i)
 {
 #ifdef LITTLE_ENDIAN
 	return block->l[i] = (rol(block->l[i], 24) & 0xFF00FF00) | (rol(block->l[i], 8) & 0x00FF00FF);
@@ -46,20 +46,20 @@ inline static uint32 blk0(CHAR64LONG16 *block, uint32 i)
 	return block->l[i];
 #endif
 }
-inline static uint32 blk(CHAR64LONG16 *block, uint32 i) { return block->l[i & 15] = rol(block->l[(i + 13) & 15] ^ block->l[(i + 8) & 15] ^ block->l[(i + 2) & 15] ^ block->l[i & 15],1); }
+inline static uint32_t blk(CHAR64LONG16 *block, uint32_t i) { return block->l[i & 15] = rol(block->l[(i + 13) & 15] ^ block->l[(i + 8) & 15] ^ block->l[(i + 2) & 15] ^ block->l[i & 15],1); }
 
 /* (R0+R1), R2, R3, R4 are the different operations used in SHA1 */
-inline static void R0(CHAR64LONG16 *block, uint32 v, uint32 &w, uint32 x, uint32 y, uint32 &z, uint32 i) { z += ((w & (x ^ y)) ^ y) + blk0(block, i) + 0x5A827999 + rol(v, 5); w = rol(w, 30); }
-inline static void R1(CHAR64LONG16 *block, uint32 v, uint32 &w, uint32 x, uint32 y, uint32 &z, uint32 i) { z += ((w & (x ^ y)) ^ y) + blk(block, i) + 0x5A827999 + rol(v, 5); w = rol(w, 30); }
-inline static void R2(CHAR64LONG16 *block, uint32 v, uint32 &w, uint32 x, uint32 y, uint32 &z, uint32 i) { z += (w ^ x ^ y) + blk(block, i) + 0x6ED9EBA1 + rol(v, 5); w = rol(w, 30); }
-inline static void R3(CHAR64LONG16 *block, uint32 v, uint32 &w, uint32 x, uint32 y, uint32 &z, uint32 i) { z += (((w | x) & y) | (w & x)) + blk(block, i) + 0x8F1BBCDC + rol(v, 5); w = rol(w, 30); }
-inline static void R4(CHAR64LONG16 *block, uint32 v, uint32 &w, uint32 x, uint32 y, uint32 &z, uint32 i) { z += (w ^ x ^ y) + blk(block, i) + 0xCA62C1D6 + rol(v, 5); w = rol(w, 30); }
+inline static void R0(CHAR64LONG16 *block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, uint32_t i) { z += ((w & (x ^ y)) ^ y) + blk0(block, i) + 0x5A827999 + rol(v, 5); w = rol(w, 30); }
+inline static void R1(CHAR64LONG16 *block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, uint32_t i) { z += ((w & (x ^ y)) ^ y) + blk(block, i) + 0x5A827999 + rol(v, 5); w = rol(w, 30); }
+inline static void R2(CHAR64LONG16 *block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, uint32_t i) { z += (w ^ x ^ y) + blk(block, i) + 0x6ED9EBA1 + rol(v, 5); w = rol(w, 30); }
+inline static void R3(CHAR64LONG16 *block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, uint32_t i) { z += (((w | x) & y) | (w & x)) + blk(block, i) + 0x8F1BBCDC + rol(v, 5); w = rol(w, 30); }
+inline static void R4(CHAR64LONG16 *block, uint32_t v, uint32_t &w, uint32_t x, uint32_t y, uint32_t &z, uint32_t i) { z += (w ^ x ^ y) + blk(block, i) + 0xCA62C1D6 + rol(v, 5); w = rol(w, 30); }
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
-void SHA1Transform(uint32 state[5], const unsigned char buffer[64])
+void SHA1Transform(uint32_t state[5], const unsigned char buffer[64])
 {
-	uint32 a, b, c, d, e;
+	uint32_t a, b, c, d, e;
 	static unsigned char workspace[64];
 	CHAR64LONG16 *block = reinterpret_cast<CHAR64LONG16 *>(workspace);
 	memcpy(block, buffer, 64);
@@ -115,9 +115,9 @@ void SHA1Init(SHA1_CTX *context)
 
 /* Run your data through this. */
 
-void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32 len)
+void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32_t len)
 {
-	uint32 i, j;
+	uint32_t i, j;
 
 	j = (context->count[0] >> 3) & 63;
 	if ((context->count[0] += len << 3) < (len << 3))
@@ -140,7 +140,7 @@ void SHA1Update(SHA1_CTX *context, const unsigned char *data, uint32 len)
 
 void SHA1Final(unsigned char digest[21], SHA1_CTX *context)
 {
-	uint32 i;
+	uint32_t i;
 	unsigned char finalcount[8];
 
 	for (i = 0; i < 8; ++i)

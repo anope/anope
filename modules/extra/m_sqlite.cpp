@@ -147,15 +147,15 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 	int err = sqlite3_prepare_v2(this->sql, real_query.c_str(), real_query.length(), &stmt, NULL);
 	if (err != SQLITE_OK)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
-	
+
 	std::vector<Anope::string> columns;
 	int cols = sqlite3_column_count(stmt);
 	columns.resize(cols);
 	for (int i = 0; i < cols; ++i)
 		columns[i] = sqlite3_column_name(stmt, i);
-	
+
 	SQLiteResult result(query, real_query);
-	
+
 	do
 	{
 		err = sqlite3_step(stmt);
@@ -175,7 +175,7 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 
 	if (err != SQLITE_DONE)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
-	
+
 	return result;
 }
 

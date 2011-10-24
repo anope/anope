@@ -158,7 +158,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	Oper *o;
 
 	/* Unsaved data */
-	uint16 channelcount; /* Number of channels currently registered */
+	uint16_t channelcount; /* Number of channels currently registered */
 	time_t lastmail;				/* Last time this nick record got a mail */
 	std::list<NickAlias *> aliases;	/* List of aliases */
 

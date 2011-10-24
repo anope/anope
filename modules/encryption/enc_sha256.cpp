@@ -65,41 +65,41 @@ class SHA256Context
 	unsigned tot_len;
 	unsigned len;
 	unsigned char block[2 * SHA256_BLOCK_SIZE];
-	uint32 h[8];
+	uint32_t h[8];
 };
 
-inline static uint32 SHFR(uint32 x, uint32 n) { return x >> n; }
-inline static uint32 ROTR(uint32 x, uint32 n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
-inline static uint32 ROTL(uint32 x, uint32 n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
-inline static uint32 CH(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (~x & z); }
-inline static uint32 MAJ(uint32 x, uint32 y, uint32 z) { return (x & y) ^ (x & z) ^ (y & z); }
+inline static uint32_t SHFR(uint32_t x, uint32_t n) { return x >> n; }
+inline static uint32_t ROTR(uint32_t x, uint32_t n) { return (x >> n) | (x << ((sizeof(x) << 3) - n)); }
+inline static uint32_t ROTL(uint32_t x, uint32_t n) { return (x << n) | (x >> ((sizeof(x) << 3) - n)); }
+inline static uint32_t CH(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (~x & z); }
+inline static uint32_t MAJ(uint32_t x, uint32_t y, uint32_t z) { return (x & y) ^ (x & z) ^ (y & z); }
 
-inline static uint32 SHA256_F1(uint32 x) { return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22); }
-inline static uint32 SHA256_F2(uint32 x) { return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25); }
-inline static uint32 SHA256_F3(uint32 x) { return ROTR(x, 7) ^ ROTR(x, 18) ^ SHFR(x, 3); }
-inline static uint32 SHA256_F4(uint32 x) { return ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10); }
+inline static uint32_t SHA256_F1(uint32_t x) { return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22); }
+inline static uint32_t SHA256_F2(uint32_t x) { return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25); }
+inline static uint32_t SHA256_F3(uint32_t x) { return ROTR(x, 7) ^ ROTR(x, 18) ^ SHFR(x, 3); }
+inline static uint32_t SHA256_F4(uint32_t x) { return ROTR(x, 17) ^ ROTR(x, 19) ^ SHFR(x, 10); }
 
 inline static void UNPACK32(unsigned x, unsigned char *str)
 {
-	str[3] = static_cast<uint8>(x);
-	str[2] = static_cast<uint8>(x >> 8);
-	str[1] = static_cast<uint8>(x >> 16);
-	str[0] = static_cast<uint8>(x >> 24);
+	str[3] = static_cast<uint8_t>(x);
+	str[2] = static_cast<uint8_t>(x >> 8);
+	str[1] = static_cast<uint8_t>(x >> 16);
+	str[0] = static_cast<uint8_t>(x >> 24);
 }
 
-inline static void PACK32(unsigned char *str, uint32 &x)
+inline static void PACK32(unsigned char *str, uint32_t &x)
 {
-	x = static_cast<uint32>(str[3]) | static_cast<uint32>(str[2]) << 8 | static_cast<uint32>(str[1]) << 16 | static_cast<uint32>(str[0]) << 24;
+	x = static_cast<uint32_t>(str[3]) | static_cast<uint32_t>(str[2]) << 8 | static_cast<uint32_t>(str[1]) << 16 | static_cast<uint32_t>(str[0]) << 24;
 }
 
 /* Macros used for loops unrolling */
 
-inline static void SHA256_SCR(uint32 w[64], int i)
+inline static void SHA256_SCR(uint32_t w[64], int i)
 {
 	w[i] = SHA256_F4(w[i - 2]) + w[i - 7] + SHA256_F3(w[i - 15]) + w[i - 16];
 }
 
-uint32 sha256_k[64] =
+uint32_t sha256_k[64] =
 {
 	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 	0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -163,7 +163,7 @@ class ESHA256 : public Module
 
 	void SHA256Transform(SHA256Context *ctx, unsigned char *message, unsigned block_nb)
 	{
-		uint32 w[64], wv[8];
+		uint32_t w[64], wv[8];
 		unsigned char *sub_block;
 		for (unsigned i = 1; i <= block_nb; ++i)
 		{
@@ -178,8 +178,8 @@ class ESHA256 : public Module
 				wv[j] = ctx->h[j];
 			for (j = 0; j < 64; ++j)
 			{
-				uint32 t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
-				uint32 t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
+				uint32_t t1 = wv[7] + SHA256_F2(wv[4]) + CH(wv[4], wv[5], wv[6]) + sha256_k[j] + w[j];
+				uint32_t t2 = SHA256_F1(wv[0]) + MAJ(wv[0], wv[1], wv[2]);
 				wv[7] = wv[6];
 				wv[6] = wv[5];
 				wv[5] = wv[4];

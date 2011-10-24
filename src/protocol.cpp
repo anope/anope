@@ -515,15 +515,19 @@ bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string
 {
 	for (unsigned i = 0; i < params.size(); ++i)
 	{
-		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-		{
-			if (Capab_Info[j].Token.equals_ci(params[i]))
+		spacesepstream sep(params[i]);
+		Anope::string token;
+
+		while (sep.GetToken(token))
+			for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
 			{
-				Capab.SetFlag(Capab_Info[j].Flag);
-				Log(LOG_DEBUG) << "Capab: Enabling " << Capab_Info[j].Token;
-				break;
+				if (Capab_Info[j].Token.equals_ci(token))
+				{
+					Capab.SetFlag(Capab_Info[j].Flag);
+					Log(LOG_DEBUG) << "Capab: Enabling " << Capab_Info[j].Token;
+					break;
+				}
 			}
-		}
 	}
 
 	return true;

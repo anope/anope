@@ -594,7 +594,7 @@ class CoreExport Module : public Extensible
 	 * @param priv The privilege changed
 	 * @param what The new level
 	 */
-	virtual void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16 what) { }
+	virtual void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what) { }
 
 	/** Called when a channel is dropped
 	 * @param chname The channel name

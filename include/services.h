@@ -551,7 +551,7 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable<Memo>
 
 struct CoreExport MemoInfo
 {
-	int16 memomax;
+	int16_t memomax;
 	std::vector<Memo *> memos;
 	std::vector<Anope::string> ignores;
 

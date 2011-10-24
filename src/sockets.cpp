@@ -2,8 +2,8 @@
 
 std::map<int, Socket *> SocketEngine::Sockets;
 
-int32 TotalRead = 0;
-int32 TotalWritten = 0;
+int32_t TotalRead = 0;
+int32_t TotalWritten = 0;
 
 SocketIO normalSocketIO;
 
@@ -232,7 +232,7 @@ bool cidr::match(sockaddrs &other)
 		default:
 			throw SocketException("Invalid address type");
 	}
-	
+
 	if (memcmp(ip, their_ip, byte))
 		return false;
 
@@ -241,7 +241,7 @@ bool cidr::match(sockaddrs &other)
 	byte = this->cidr_len % 8;
 	if ((*ip & byte) != (*their_ip & byte))
 		return false;
-	
+
 	return true;
 }
 

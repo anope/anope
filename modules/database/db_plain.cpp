@@ -68,7 +68,7 @@ EventReturn OnDatabaseReadMetadata(NickCore *nc, const Anope::string &key, const
 		if (key.equals_ci("LANGUAGE"))
 			nc->language = params[0];
 		else if (key.equals_ci("MEMOMAX"))
-			nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
+			nc->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : -1;
 		else if (key.equals_ci("EMAIL"))
 			nc->email = params[0];
 		else if (key.equals_ci("GREET"))
@@ -134,9 +134,9 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 	try
 	{
 		if (key.equals_ci("BANTYPE"))
-			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : Config->CSDefBantype;
+			ci->bantype = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : Config->CSDefBantype;
 		else if (key.equals_ci("MEMOMAX"))
-			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16>(params[0]) : -1;
+			ci->memos.memomax = params[0].is_pos_number_only() ? convertTo<int16_t>(params[0]) : -1;
 		else if (key.equals_ci("FOUNDER"))
 			ci->SetFounder(findcore(params[0]));
 		else if (key.equals_ci("SUCCESSOR"))
@@ -148,7 +148,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 				Privilege *p = PrivilegeManager::FindPrivilege(params[j]);
 				if (p == NULL)
 					continue;
-				ci->SetLevel(p->name, params[j + 1].is_number_only() ? convertTo<int16>(params[j + 1]) : 0);
+				ci->SetLevel(p->name, params[j + 1].is_number_only() ? convertTo<int16_t>(params[j + 1]) : 0);
 			}
 		}
 		else if (key.equals_ci("FLAGS"))
@@ -217,7 +217,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 				ak = ci->AddAkick(params[3], params[2], params.size() > 6 ? params[6] : "", params[4].is_pos_number_only() ? convertTo<time_t>(params[4]) : 0, params[5].is_pos_number_only() ? convertTo<time_t>(params[5]) : 0);
 			if (Nick)
 				ak->SetFlag(AK_ISNICK);
-	
+
 		}
 		else if (key.equals_ci("LOG"))
 		{
@@ -276,37 +276,37 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 				for (unsigned j = 1, end = params.size(); j < end; j += 2)
 				{
 					if (params[j].equals_ci("BOLDS"))
-						ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[0] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("COLORS"))
-						ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[1] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REVERSES"))
-						ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[2] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("UNDERLINES"))
-						ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[3] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("BADWORDS"))
-						ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[4] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("CAPS"))
-						ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[5] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("FLOOD"))
-						ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[6] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("REPEAT"))
-						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[7] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("ITALICS"))
-						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[8] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 					else if (params[j].equals_ci("AMSGS"))
-						ci->ttb[9] = params[j + 1].is_pos_number_only() ? convertTo<int16>(params[j + 1]) : 0;
+						ci->ttb[9] = params[j + 1].is_pos_number_only() ? convertTo<int16_t>(params[j + 1]) : 0;
 				}
 			}
 			else if (params[0].equals_ci("CAPSMIN"))
-				ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->capsmin = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
 			else if (params[0].equals_ci("CAPSPERCENT"))
-				ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->capspercent = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
 			else if (params[0].equals_ci("FLOODLINES"))
-				ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->floodlines = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
 			else if (params[0].equals_ci("FLOODSECS"))
-				ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->floodsecs = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
 			else if (params[0].equals_ci("REPEATTIMES"))
-				ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16>(params[1]) : 0;
+				ci->repeattimes = params[1].is_pos_number_only() ? convertTo<int16_t>(params[1]) : 0;
 			else if (params[0].equals_ci("BADWORD"))
 			{
 				BadWordType Type;
@@ -505,7 +505,7 @@ static void LoadBotInfo(const std::vector<Anope::string> &params)
 		bi = new BotInfo(params[0], params[1], params[2]);
 
 	bi->created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
-	bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32>(params[4]) : 0;
+	bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32_t>(params[4]) : 0;
 	bi->realname = params[5];
 
 	Log(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
@@ -531,7 +531,7 @@ static void LoadOperInfo(const std::vector<Anope::string> &params)
 {
 	if (params[0].equals_ci("STATS"))
 	{
-		maxusercnt = params[1].is_pos_number_only() ? convertTo<uint32>(params[1]) : 0;
+		maxusercnt = params[1].is_pos_number_only() ? convertTo<uint32_t>(params[1]) : 0;
 		maxusertime = params[2].is_pos_number_only() ? convertTo<time_t>(params[2]) : 0;
 	}
 	else if (params[0].equals_ci("SXLINE"))

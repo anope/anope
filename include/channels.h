@@ -43,7 +43,7 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 	/** A map of channel modes with their parameters set on this channel
 	 */
 	ModeList modes;
-	
+
  public:
 	/** Default constructor
 	 * @param name The channel name
@@ -68,9 +68,9 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 
 	time_t server_modetime;		/* Time of last server MODE */
 	time_t chanserv_modetime;	/* Time of last check_modes() */
-	int16 server_modecount;		/* Number of server MODEs this second */
-	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
-	int16 bouncy_modes;			/* Did we fail to set modes here? */
+	int16_t server_modecount;	/* Number of server MODEs this second */
+	int16_t chanserv_modecount;	/* Number of check_mode()'s this sec */
+	int16_t bouncy_modes;		/* Did we fail to set modes here? */
 
 	/** Call if we need to unset all modes and clear all user status (internally).
 	 * Only useful if we get a SJOIN with a TS older than what we have here

@@ -63,11 +63,11 @@ static void ChanInfoUpdate(const Anope::string &name, const SQLResult &res)
 				bi->Assign(NULL, ci);
 		}
 
-		ci->capsmin = convertTo<int16>(res.Get(0, "capsmin"));
-		ci->capspercent = convertTo<int16>(res.Get(0, "capspercent"));
-		ci->floodlines = convertTo<int16>(res.Get(0, "floodlines"));
-		ci->floodsecs = convertTo<int16>(res.Get(0, "floodsecs"));
-		ci->repeattimes = convertTo<int16>(res.Get(0, "repeattimes"));
+		ci->capsmin = convertTo<int16_t>(res.Get(0, "capsmin"));
+		ci->capspercent = convertTo<int16_t>(res.Get(0, "capspercent"));
+		ci->floodlines = convertTo<int16_t>(res.Get(0, "floodlines"));
+		ci->floodsecs = convertTo<int16_t>(res.Get(0, "floodsecs"));
+		ci->repeattimes = convertTo<int16_t>(res.Get(0, "repeattimes"));
 
 		if (ci->c)
 			check_modes(ci->c);

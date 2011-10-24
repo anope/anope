@@ -58,7 +58,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_BADWORDS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_BADWORDS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_BADWORDS] < 0)
 								throw ConvertException();
 						}
@@ -96,7 +96,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_BOLDS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_BOLDS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_BOLDS] < 0)
 								throw ConvertException();
 						}
@@ -132,7 +132,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_CAPS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_CAPS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_CAPS] < 0)
 								throw ConvertException();
 						}
@@ -149,7 +149,7 @@ class CommandBSKick : public Command
 					ci->capsmin = 10;
 					try
 					{
-						ci->capsmin = convertTo<int16>(min);
+						ci->capsmin = convertTo<int16_t>(min);
 					}
 					catch (const ConvertException &) { }
 					if (ci->capsmin < 1)
@@ -158,7 +158,7 @@ class CommandBSKick : public Command
 					ci->capspercent = 25;
 					try
 					{
-						ci->capspercent = convertTo<int16>(percent);
+						ci->capspercent = convertTo<int16_t>(percent);
 					}
 					catch (const ConvertException &) { }
 					if (ci->capspercent < 1 || ci->capspercent > 100)
@@ -187,7 +187,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_COLORS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_COLORS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_COLORS] < 1)
 								throw ConvertException();
 						}
@@ -224,7 +224,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_FLOOD] = convertTo<int16>(ttb);
+							ci->ttb[TTB_FLOOD] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_FLOOD] < 1)
 								throw ConvertException();
 						}
@@ -241,7 +241,7 @@ class CommandBSKick : public Command
 					ci->floodlines = 6;
 					try
 					{
-						ci->floodlines = convertTo<int16>(lines);
+						ci->floodlines = convertTo<int16_t>(lines);
 					}
 					catch (const ConvertException &) { }
 					if (ci->floodlines < 2)
@@ -250,7 +250,7 @@ class CommandBSKick : public Command
 					ci->floodsecs = 10;
 					try
 					{
-						ci->floodsecs = convertTo<int16>(secs);
+						ci->floodsecs = convertTo<int16_t>(secs);
 					}
 					catch (const ConvertException &) { }
 					if (ci->floodsecs < 1)
@@ -280,7 +280,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_REPEAT] = convertTo<int16>(ttb);
+							ci->ttb[TTB_REPEAT] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_REPEAT] < 0)
 								throw ConvertException();
 						}
@@ -297,7 +297,7 @@ class CommandBSKick : public Command
 					ci->repeattimes = 3;
 					try
 					{
-						ci->repeattimes = convertTo<int16>(times);
+						ci->repeattimes = convertTo<int16_t>(times);
 					}
 					catch (const ConvertException &) { }
 					if (ci->repeattimes < 2)
@@ -326,7 +326,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_REVERSES] = convertTo<int16>(ttb);
+							ci->ttb[TTB_REVERSES] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_REVERSES] < 0)
 								throw ConvertException();
 						}
@@ -359,7 +359,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_UNDERLINES] = convertTo<int16>(ttb);
+							ci->ttb[TTB_UNDERLINES] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_REVERSES] < 0)
 								throw ConvertException();
 						}
@@ -393,7 +393,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_ITALICS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_ITALICS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_ITALICS] < 0)
 								throw ConvertException();
 						}
@@ -427,7 +427,7 @@ class CommandBSKick : public Command
 					{
 						try
 						{
-							ci->ttb[TTB_AMSGS] = convertTo<int16>(ttb);
+							ci->ttb[TTB_AMSGS] = convertTo<int16_t>(ttb);
 							if (ci->ttb[TTB_AMSGS] < 0)
 								throw ConvertException();
 						}
@@ -583,7 +583,7 @@ struct BanData : public ExtensibleItem
 	{
 		Anope::string mask;
 		time_t last_use;
-		int16 ttb[TTB_SIZE];
+		int16_t ttb[TTB_SIZE];
 
 		Data()
 		{
@@ -648,13 +648,13 @@ struct UserData : public ExtensibleItem
 	time_t last_use;
 
 	/* for flood kicker */
-	int16 lines;
+	int16_t lines;
 	time_t last_start;
 
 	/* for repeat kicker */
 	Anope::string lastline;
 	Anope::string lasttarget;
-	int16 times;
+	int16_t times;
 
 	void OnDelete()
 	{
@@ -675,7 +675,7 @@ class BanDataPurger : public CallBack
 		for (channel_map::iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{
 			Channel *c = it->second;
-			
+
 			BanData *bd = c->GetExt<BanData *>("bs_main_bandata");
 			if (bd != NULL)
 			{
@@ -863,7 +863,7 @@ class BSKick : public Module
 			if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= ci->capsmin)
 			{
 				int i = 0, l = 0;
-	
+
 				for (unsigned j = 0, end = realbuf.length(); j < end; ++j)
 				{
 					if (isupper(realbuf[j]))
@@ -884,7 +884,7 @@ class BSKick : public Module
 					return;
 				}
 			}
-			
+
 			/* Bad words kicker */
 			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
 			{
@@ -962,7 +962,7 @@ class BSKick : public Module
 				}
 
 				UserData *ud = NULL;
-				
+
 				/* Flood kicker */
 				if (ci->botflags.HasFlag(BS_KICK_FLOOD))
 				{

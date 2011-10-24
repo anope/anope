@@ -40,7 +40,7 @@ class CommandCSSetBanType : public Command
 
 		try
 		{
-			int16 new_type = convertTo<int16>(params[1]);
+			int16_t new_type = convertTo<int16_t>(params[1]);
 			if (new_type < 0 || new_type > 3)
 				throw ConvertException("Invalid range");
 			ci->bantype = new_type;

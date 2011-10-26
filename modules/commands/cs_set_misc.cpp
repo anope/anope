@@ -12,13 +12,13 @@
 
 #include "module.h"
 
-struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
+struct CSMiscData : Anope::string, ExtensibleItem, Serializable<CSMiscData>
 {
 	ChannelInfo *ci;
 	Anope::string name;
 	Anope::string data;
 
-	MiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : ci(c), name(n), data(d)
+	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : ci(c), name(n), data(d)
 	{
 	}
 
@@ -39,14 +39,22 @@ struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
 		if (ci == NULL)
 			return;
 
-		ci->Extend(data["name"].astr(), new MiscData(ci, data["name"].astr(), data["data"].astr()));
+		ci->Extend(data["name"].astr(), new CSMiscData(ci, data["name"].astr(), data["data"].astr()));
 	}
 };
+
+static Anope::string GetAttribute(const Anope::string &command)
+{
+	size_t sp = command.rfind(' ');
+	if (sp != Anope::string::npos)
+		return command.substr(sp + 1);
+	return command;
+}
 
 class CommandCSSetMisc : public Command
 {
  public:
-	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 1)
+	CommandCSSetMisc(Module *creator, const Anope::string &cname = "chanserv/set/misc") : Command(creator, cname, 1, 2)
 	{
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
@@ -65,15 +73,16 @@ class CommandCSSetMisc : public Command
 			return;
 		}
 
-		Anope::string key = "cs_set_misc:" + source.command.replace_all_cs(" ", "_");
+		Anope::string scommand = GetAttribute(source.command);
+		Anope::string key = "cs_set_misc:" + scommand;
 		ci->Shrink(key);
 		if (params.size() > 1)
 		{
-			ci->Extend(key, new MiscData(ci, key, params[1]));
-			source.Reply(CHAN_SETTING_CHANGED, source.command.c_str(), ci->name.c_str(), params[1].c_str());
+			ci->Extend(key, new CSMiscData(ci, key, params[1]));
+			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), ci->name.c_str(), params[1].c_str());
 		}
 		else
-			source.Reply(CHAN_SETTING_UNSET, source.command.c_str(), ci->name.c_str());
+			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), ci->name.c_str());
 	}
 };
 
@@ -99,7 +108,7 @@ class CSSetMisc : public Module
 		Implementation i[] = { I_OnChanInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		Serializable<MiscData>::Alloc.Register("CSMisc");
+		Serializable<CSMiscData>::Alloc.Register("CSMisc");
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, bool ShowHidden)
@@ -112,7 +121,7 @@ class CSSetMisc : public Module
 			if (list[i].find("cs_set_misc:") != 0)
 				continue;
 			
-			MiscData *data = ci->GetExt<MiscData *>(list[i]);
+			CSMiscData *data = ci->GetExt<CSMiscData *>(list[i]);
 			if (data != NULL)
 				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), data->data.c_str());
 		}

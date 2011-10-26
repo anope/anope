@@ -13,13 +13,13 @@
 
 #include "module.h"
 
-struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
+struct NSMiscData : Anope::string, ExtensibleItem, Serializable<NSMiscData>
 {
 	NickCore *nc;
 	Anope::string name;
 	Anope::string data;
 
-	MiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : nc(ncore), name(n), data(d)
+	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : nc(ncore), name(n), data(d)
 	{
 	}
 
@@ -40,10 +40,17 @@ struct MiscData : Anope::string, ExtensibleItem, Serializable<MiscData>
 		if (nc == NULL)
 			return;
 
-		nc->Extend(data["name"].astr(), new MiscData(nc, data["name"].astr(), data["data"].astr()));
+		nc->Extend(data["name"].astr(), new NSMiscData(nc, data["name"].astr(), data["data"].astr()));
 	}
 };
 
+static Anope::string GetAttribute(const Anope::string &command)
+{
+	size_t sp = command.rfind(' ');
+	if (sp != Anope::string::npos)
+		return command.substr(sp + 1);
+	return command;
+}
 
 class CommandNSSetMisc : public Command
 {
@@ -63,15 +70,16 @@ class CommandNSSetMisc : public Command
 		}
 		NickCore *nc = na->nc;
 
-		Anope::string key = "ns_set_misc:" + source.command.replace_all_cs(" ", "_");
+		Anope::string scommand = GetAttribute(source.command);
+		Anope::string key = "ns_set_misc:" + scommand;
 		nc->Shrink(key);
 		if (!param.empty())
 		{
-			nc->Extend(key, new MiscData(nc, key, param));
-			source.Reply(CHAN_SETTING_CHANGED, source.command.c_str(), nc->display.c_str(), param.c_str());
+			nc->Extend(key, new NSMiscData(nc, key, param));
+			source.Reply(CHAN_SETTING_CHANGED, scommand.c_str(), nc->display.c_str(), param.c_str());
 		}
 		else
-			source.Reply(CHAN_SETTING_UNSET, source.command.c_str(), nc->display.c_str());
+			source.Reply(CHAN_SETTING_UNSET, scommand.c_str(), nc->display.c_str());
 
 		return;
 	}
@@ -111,7 +119,7 @@ class NSSetMisc : public Module
 		Implementation i[] = { I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 
-		Serializable<MiscData>::Alloc.Register("NSMisc");
+		Serializable<NSMiscData>::Alloc.Register("NSMisc");
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)
@@ -124,7 +132,7 @@ class NSSetMisc : public Module
 			if (list[i].find("ns_set_misc:") != 0)
 				continue;
 
-			MiscData *data = na->nc->GetExt<MiscData *>(list[i]);
+			NSMiscData *data = na->nc->GetExt<NSMiscData *>(list[i]);
 			if (data)
 				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), data->data.c_str());
 		}

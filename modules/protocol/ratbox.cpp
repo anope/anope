@@ -126,7 +126,7 @@ class RatboxProto : public IRCDProto
 		send_cmd(Config->Numeric, "UNRESV * %s", x->Mask.c_str());
 	}
 
-	void SendJoin(User *user, Channel *c, ChannelStatus *status)
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
 		/* Note that we must send our modes with the SJOIN and
 		 * can not add them to the mode stacker because ratbox

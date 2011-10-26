@@ -157,13 +157,19 @@ class InspIRCdProto : public IRCDProto
 	}
 
 	/* JOIN */
-	void SendJoin(User *user, Channel *c, ChannelStatus *status)
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
 		send_cmd(user->nick, "JOIN %s %ld", c->name.c_str(), static_cast<long>(c->creation_time));
 		if (status)
 		{
+			/* First save the channel status incase uc->Status == status */
 			ChannelStatus cs = *status;
-			status->ClearFlags();
+			/* If the user is internally on the channel with flags, kill them so that
+			 * the stacker will allow this.
+			 */
+			UserContainer *uc = c->FindUser(user);
+			if (uc != NULL)
+				uc->Status->ClearFlags();
 
 			BotInfo *setter = findbot(user->nick);
 			for (unsigned i = 0; i < ModeManager::ChannelModes.size(); ++i)

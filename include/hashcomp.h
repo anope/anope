@@ -33,34 +33,6 @@ namespace Anope
 	class string;
 }
 
-#ifndef _WIN32
-# if defined(__GNUC__) && __GNUC__ >= 4
-/* GCC4+ has deprecated hash_map and uses tr1. But of course, uses a different include to MSVC. */
-#  include <tr1/unordered_map>
-#  define unordered_map_namespace std::tr1
-# else /* GCC ver < 4 */
-#  include <ext/hash_map>
-/* Oddball linux namespace for hash_map */
-#  define unordered_map_namespace __gnu_cxx
-#  define unordered_map hash_map
-# endif
-#else
-# if _MSC_VER >= 1600
-/* MSVC 2010+ has tr1. Though MSVC and GCC use different includes! */
-#  include <unordered_map>
-#  define unordered_map_namespace std::tr1
-# else
-#  include <hash_map>
-#  define unordered_map_namespace
-template<typename Key, typename Type, typename Compare, typename Unused = void>
-class unordered_map : public stdext::hash_map<Key, Type, Compare>
-{
- public:
-	unordered_map() : hash_map() { }
-};
-# endif
-#endif
-
 /*******************************************************
  * This file contains classes and templates that deal
  * with the comparison and hashing of 'irc strings'.
@@ -167,23 +139,6 @@ namespace irc
 	/** This typedef declares irc::string based upon irc_char_traits.
 	 */
 	typedef std::basic_string<char, irc_char_traits, std::allocator<char> > string;
-
-	/** Used to hash irc::strings for unordered_map
-	 */
-	struct CoreExport hash
-	{
-		/* VS 2008 specific code */
-		enum { bucket_size = 4, min_buckets = 8 };
-		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
-		/* End VS 2008 specific code */
-
-		/** Hash an irc::string for unordered_map
-		 * @param s The string
-		 * @return A hash value for the string
-		 */
-		size_t operator()(const irc::string &s) const;
-		size_t operator()(const Anope::string &s) const;
-	};
 }
 
 /** The ci namespace contains a number of helper classes.
@@ -238,55 +193,10 @@ namespace ci
 	/** This typedef declares ci::string based upon ci_char_traits.
 	 */
 	typedef std::basic_string<char, ci_char_traits, std::allocator<char> > string;
-
-	/** Used to hash ci::strings for unordered_map
-	 */
-	struct CoreExport hash
-	{
-		/* VS 2008 specific code */
-		enum { bucket_size = 4, min_buckets = 8 };
-		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
-		/* End VS 2008 specific code */
-
-		/** Hash a ci::string for unordered_map
-		 * @param s The string
-		 * @return A hash value for the string
-		 */
-		size_t operator()(const ci::string &s) const;
-		size_t operator()(const Anope::string &s) const;
-	};
 }
 
 namespace std
 {
-	/** An overload for std::equal_to<ci::string> that uses Anope::string, passed for the fourth temmplate
-	 * argument for unordered_map
-	 */
-	template<> struct CoreExport equal_to<ci::string>
-	{
-	 public:
-		/** Compare two Anope::strings as ci::strings
-		 * @paarm s1 The first string
-		 * @param s2 The second string
-		 * @return true if they are equal
-		 */
-		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
-	};
-
-	/** An overload for std::equal_to<irc::string> that uses Anope::string, passed for the fourth template
-	 * argument for unorderd_map
-	 */
-	template<> struct CoreExport equal_to<irc::string>
-	{
-	 public:
-		/** Compare two Anope::strings as irc::strings
-		 * @param s1 The first string
-		 * @param s2 The second string
-		 * @return true if they are equal
-		 */
-		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
-	};
-
 	/** An overload for std::less<ci::string> that uses Anope::string, passed for the third template argument
 	 * to std::map and std::multimap
 	 */

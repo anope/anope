@@ -72,7 +72,7 @@ class CommandEntryMessage : public Command
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
-		if (messages == NULL)
+		if (messages != NULL)
 		{
 			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
 			for (unsigned i = 0; i < messages->size(); ++i)

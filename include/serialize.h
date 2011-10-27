@@ -70,8 +70,9 @@ extern void RegisterTypes();
 class SerializableBase
 {
  public:
- 	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
+	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
 
+	virtual ~SerializableBase() { }
 	virtual Anope::string serialize_name() = 0;
 	virtual serialized_data serialize() = 0;
 	virtual void alloc(serialized_data &) = 0;

@@ -105,6 +105,7 @@ class LDAPInterface
 	Module *owner;
 
 	LDAPInterface(Module *m) : owner(m) { }
+	virtual ~LDAPInterface() { }
 
 	virtual void OnResult(const LDAPResult &r) { }
 

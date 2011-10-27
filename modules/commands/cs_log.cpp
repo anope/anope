@@ -113,6 +113,7 @@ public:
 			}
 
 			LogSetting log;
+			log.ci = ci;
 			log.service_name = bi->commands[command_name].name;
 			log.command_service = bi->nick;
 			log.command_name = command_name;

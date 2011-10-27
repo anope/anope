@@ -77,6 +77,7 @@ enum BadWordType
 /* Structure used to contain bad words. */
 struct BadWord : Serializable<BadWord>
 {
+	ChannelInfo *ci;
 	Anope::string word;
 	BadWordType type;
 
@@ -99,6 +100,7 @@ class AutoKick : public Flags<AutoKickFlag>, public Serializable<AutoKick>
 {
  public:
  	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
+	ChannelInfo *ci;
 	/* Only one of these can be in use */
 	Anope::string mask;
 	NickCore *nc;
@@ -131,6 +133,7 @@ struct ModeLock : Serializable<ModeLock>
 
 struct LogSetting : Serializable<LogSetting>
 {
+	ChannelInfo *ci;
 	/* Our service name of the command */
 	Anope::string service_name;
 	/* The name of the client the command is on */

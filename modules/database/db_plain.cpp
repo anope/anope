@@ -223,6 +223,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		{
 			LogSetting l;
 
+			l.ci = ci;
 			l.service_name = params[0];
 			l.command_service = params[1];
 			l.command_name = params[2];

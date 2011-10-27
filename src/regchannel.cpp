@@ -16,6 +16,7 @@ SerializableBase::serialized_data BadWord::serialize()
 {
 	serialized_data data;
 
+	data["ci"] << this->ci->name;
 	data["word"] << this->word;
 	data["type"].setType(Serialize::DT_INT) << this->type;
 
@@ -24,17 +25,21 @@ SerializableBase::serialized_data BadWord::serialize()
 
 void BadWord::unserialize(SerializableBase::serialized_data &data)
 {
-	BadWord *bw = new BadWord();
-	data["word"] >> bw->word;
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (!ci)
+		return;
+	
 	unsigned int n;
 	data["type"] >> n;
-	bw->type = static_cast<BadWordType>(n);
+
+	ci->AddBadWord(data["word"].astr(), static_cast<BadWordType>(n));
 }
 
 SerializableBase::serialized_data AutoKick::serialize()
 {
 	serialized_data data;
 
+	data["ci"] << this->ci->name;
 	if (this->HasFlag(AK_ISNICK) && this->nc)
 		data["nc"] << this->nc->display;
 	else
@@ -50,15 +55,19 @@ SerializableBase::serialized_data AutoKick::serialize()
 
 void AutoKick::unserialize(SerializableBase::serialized_data &data)
 {
-	AutoKick *ak = new AutoKick();
-
-	data["mask"] >> ak->mask;
-	ak->nc = findcore(data["nc"].astr());
-	data["reason"] >> ak->reason;
-	data["creator"] >> ak->creator;
-	data["addtime"] >> ak->addtime;
-	data["last_used"] >> ak->last_used;
-	ak->FromString(data["flags"].astr());
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (ci == NULL)
+		return;
+	
+	time_t addtime, lastused;
+	data["addtime"] >> addtime;
+	data["last_used"] >> lastused;
+	
+	NickCore *nc = findcore(data["nc"].astr());
+	if (nc)	
+		ci->AddAkick(data["creator"].astr(), nc, data["reason"].astr(), addtime, lastused);
+	else
+		ci->AddAkick(data["creator"].astr(), data["mask"].astr(), data["reason"].astr(), addtime, lastused);
 }
 
 SerializableBase::serialized_data ModeLock::serialize()
@@ -108,6 +117,7 @@ SerializableBase::serialized_data LogSetting::serialize()
 {
 	serialized_data data;
 
+	data["ci"] << ci->name;
 	data["service_name"] << service_name;
 	data["command_service"] << command_service;
 	data["command_name"] << command_name;
@@ -123,6 +133,11 @@ void LogSetting::unserialize(serialized_data &data)
 {
 	LogSetting ls;
 
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (ci == NULL)
+		return;
+
+	ls.ci = ci;
 	data["service_name"] >> ls.service_name;
 	data["command_service"] >> ls.command_service;
 	data["command_name"] >> ls.command_name;
@@ -130,6 +145,8 @@ void LogSetting::unserialize(serialized_data &data)
 	data["extra"] >> ls.extra;
 	data["creator"] >> ls.creator;
 	data["created"] >> ls.created;
+
+	ci->log_settings.push_back(ls);
 }
 
 /** Default constructor
@@ -513,6 +530,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 		return NULL;
 
 	AutoKick *autokick = new AutoKick();
+	autokick->ci = this;
 	autokick->SetFlag(AK_ISNICK);
 	autokick->nc = akicknc;
 	autokick->reason = reason;
@@ -536,6 +554,7 @@ AutoKick *ChannelInfo::AddAkick(const Anope::string &user, NickCore *akicknc, co
 AutoKick *ChannelInfo::AddAkick(const Anope::string &user, const Anope::string &mask, const Anope::string &reason, time_t t, time_t lu)
 {
 	AutoKick *autokick = new AutoKick();
+	autokick->ci = this;
 	autokick->mask = mask;
 	autokick->nc = NULL;
 	autokick->reason = reason;
@@ -596,6 +615,7 @@ void ChannelInfo::ClearAkick()
 BadWord *ChannelInfo::AddBadWord(const Anope::string &word, BadWordType type)
 {
 	BadWord *bw = new BadWord;
+	bw->ci = this;
 	bw->word = word;
 	bw->type = type;
 

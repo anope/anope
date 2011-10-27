@@ -249,6 +249,8 @@ void Fork()
 }
 
 #ifndef _WIN32
+static bool in_parent = false;
+
 class SignalForkExit : public Signal
 {
  public:
@@ -256,6 +258,9 @@ class SignalForkExit : public Signal
 
 	void OnNotify()
 	{
+		if (!in_parent)
+			return;
+		
 		quitting = true;
 		return_code = 0;
 	}
@@ -268,6 +273,9 @@ class SignalSigChld : public Signal
 
 	void OnNotify()
 	{
+		if (!in_parent)
+			return;
+
 		quitting = true;
 		return_code = -1;
 		int status = 0;
@@ -414,6 +422,7 @@ void Init(int ac, char **av)
 		int i = fork();
 		if (i > 0)
 		{
+			in_parent = true;
 			while (!quitting)
 			{
 				Log(LOG_DEBUG_3) << "Top of fork() process loop";

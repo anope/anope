@@ -595,6 +595,7 @@ class DBPlain : public Module
 		OnReload();
 
 		LastDay = 0;
+		Serializable<Exception>::Alloc.Register("Exception");
 	}
 
 	~DBPlain()

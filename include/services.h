@@ -332,6 +332,8 @@ template<typename T, size_t Size = 32> class Flags
 
 	void FromVector(const std::vector<Anope::string> &strings)
 	{
+		this->ClearFlags();
+
 		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
 			for (unsigned j = 0; j < strings.size(); ++j)
 				if (this->Flag_Strings[i] == strings[j])

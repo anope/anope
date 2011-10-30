@@ -249,33 +249,15 @@ void Fork()
 }
 
 #ifndef _WIN32
-static bool in_parent = false;
-
-class SignalForkExit : public Signal
+static void parent_signal_handler(int signal)
 {
- public:
-	SignalForkExit() : Signal(SIGUSR2) { }
-
-	void OnNotify()
+	if (signal == SIGUSR2)
 	{
-		if (!in_parent)
-			return;
-		
 		quitting = true;
 		return_code = 0;
 	}
-};
-
-class SignalSigChld : public Signal
-{
- public:
-	SignalSigChld() : Signal(SIGCHLD) { }
-
-	void OnNotify()
+	else if (signal == SIGCHLD)
 	{
-		if (!in_parent)
-			return;
-
 		quitting = true;
 		return_code = -1;
 		int status = 0;
@@ -283,7 +265,7 @@ class SignalSigChld : public Signal
 		if (WIFEXITED(status))
 			return_code = WEXITSTATUS(status);
 	}
-};
+}
 #endif
 
 void Init(int ac, char **av)
@@ -384,11 +366,6 @@ void Init(int ac, char **av)
 		throw FatalException("Unable to chdir to " + services_dir + ": " + Anope::LastError());
 	}
 
-	/* Initialize the socket engine */
-	SocketEngine::Init();
-
-	init_core_messages();
-
 	Log(LOG_TERMINAL) << "Anope " << Anope::Version() << ", " << Anope::VersionBuildString();
 #ifdef _WIN32
 	Log(LOG_TERMINAL) << "Using configuration file " << services_dir << "\\" << services_conf.GetName();
@@ -417,28 +394,45 @@ void Init(int ac, char **av)
 #else
 	if (!nofork && AtTerm())
 	{
-		SignalForkExit *sfe = new SignalForkExit();
-		SignalSigChld *ssc = new SignalSigChld();
+		/* Install these before fork() - it is possible for the child to
+		 * connect and kill() the parent before it is able to install the
+		 * handler.
+		 */
+		struct sigaction sa, old_sigusr2, old_sigchld;
+
+		sa.sa_flags = 0;
+		sigemptyset(&sa.sa_mask);
+		sa.sa_handler = parent_signal_handler;
+
+		sigaction(SIGUSR2, &sa, &old_sigusr2);
+		sigaction(SIGCHLD, &sa, &old_sigchld);
+
 		int i = fork();
 		if (i > 0)
 		{
-			in_parent = true;
-			while (!quitting)
-			{
-				Log(LOG_DEBUG_3) << "Top of fork() process loop";
-				SocketEngine::Process();
-			}
+			sigset_t mask;
+
+			sigemptyset(&mask);
+			sigsuspend(&mask);
+
 			exit(return_code);
 		}
 		else if (i == -1)
 		{
 			Log() << "Error, unable to fork: " << Anope::LastError();
 			nofork = true;
-			delete sfe;
-			delete ssc;
 		}
+
+		/* Child doesn't need these */
+		sigaction(SIGUSR2, &old_sigusr2, NULL);
+		sigaction(SIGCHLD, &old_sigchld, NULL);
 	}
 #endif
+
+	/* Initialize the socket engine */
+	SocketEngine::Init();
+
+	init_core_messages();
 
 	/* Write our PID to the PID file. */
 	write_pidfile();

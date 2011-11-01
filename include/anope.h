@@ -484,7 +484,7 @@ class CoreExport Base
 	void DelReference(dynamic_reference_base *r);
 };
 
-class dynamic_reference_base : public Base
+class dynamic_reference_base
 {
  protected:
 	bool invalid;
@@ -501,6 +501,12 @@ class dynamic_reference : public dynamic_reference_base
 	T *ref;
  public:
 	dynamic_reference(T *obj) : ref(obj)
+	{
+		if (ref)
+			ref->AddReference(this);
+	}
+
+	dynamic_reference(const dynamic_reference<T> &obj) : ref(obj.ref)
 	{
 		if (ref)
 			ref->AddReference(this);

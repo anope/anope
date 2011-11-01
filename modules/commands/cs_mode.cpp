@@ -68,11 +68,17 @@ class CommandCSMode : public Command
 						if (adding == -1)
 							break;
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-						if (!cm || !cm->CanSet(u))
+						if (!cm)
 						{
 							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
+						else if (!cm->CanSet(u))
+						{
+							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
+							break;
+						}
+
 						Anope::string mode_param;
 						if (((cm->Type == MODE_STATUS || cm->Type == MODE_LIST) && !sep.GetToken(mode_param)) || (cm->Type == MODE_PARAM && adding && !sep.GetToken(mode_param)))
 							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);

@@ -144,6 +144,11 @@ template<typename Type> class Serializable : public SerializableBase
 		serialized_items->erase(this->s_iter);
 	}
 
+	Serializable &operator=(const Serializable &)
+	{
+		return *this;
+	}
+
  public:
 	Anope::string serialize_name()
 	{

@@ -972,7 +972,9 @@ static bool DoServices(ServerConfig *config, const Anope::string &, const Anope:
 		/* Set the new modes */
 		for (unsigned j = 0; j < want_modes.length(); ++j)
 		{
-			ChannelMode *cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+			ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+			if (cm == NULL)
+				cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
 			if (cm && cm->Type == MODE_STATUS)
 				c->SetMode(bi, cm, bi->nick);
 		}

@@ -70,7 +70,9 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 						Anope::string want_modes = bi->botchannels[i].substr(0, h);
 						for (unsigned j = 0; j < want_modes.length(); ++j)
 						{
-							ChannelMode *cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
+							ChannelMode *cm = ModeManager::FindChannelModeByChar(want_modes[j]);
+							if (cm == NULL)
+								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
 							if (cm && cm->Type == MODE_STATUS)
 								c->SetModeInternal(cm, bi->nick);
 						}

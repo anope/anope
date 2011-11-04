@@ -46,6 +46,8 @@ class SQLiteService : public SQLProvider
 
 	SQLQuery CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data);
 
+	SQLQuery GetTables();
+
 	Anope::string BuildQuery(const SQLQuery &q);
 };
 
@@ -211,6 +213,11 @@ SQLQuery SQLiteService::CreateTable(const Anope::string &table, const Serializab
 	query_text += ")";
 
 	return SQLQuery(query_text);
+}
+
+SQLQuery SQLiteService::GetTables()
+{
+	return SQLQuery("SELECT name FROM sqlite_master WHERE type='table'");
 }
 
 Anope::string SQLiteService::Escape(const Anope::string &query)

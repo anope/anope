@@ -125,6 +125,8 @@ class MySQLService : public SQLProvider
 
 	SQLQuery CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data);
 
+	SQLQuery GetTables();
+
 	void Connect();
 
 	bool CheckConnection();
@@ -372,6 +374,11 @@ SQLQuery MySQLService::CreateTable(const Anope::string &table, const Serializabl
 	query_text += ")";
 
 	return SQLQuery(query_text);
+}
+
+SQLQuery MySQLService::GetTables()
+{
+	return SQLQuery("SHOW TABLES");
 }
 
 void MySQLService::Connect()

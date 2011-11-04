@@ -118,5 +118,7 @@ class SQLProvider : public Service<Base>
 	virtual SQLResult RunQuery(const SQLQuery &query) = 0;
 
 	virtual SQLQuery CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data) = 0;
+
+	virtual SQLQuery GetTables() = 0;
 };
 

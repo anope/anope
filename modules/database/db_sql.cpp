@@ -49,12 +49,25 @@ class DBSQL : public Module
 		this->RunBackground(query);
 	}
 
-	void AlterTable(const Anope::string &table, const SerializableBase::serialized_data &oldd, const SerializableBase::serialized_data &newd)
+	void DropAll()
+	{
+		SQLResult r = this->sql->RunQuery(this->sql->GetTables());
+		for (int i = 0; i < r.Rows(); ++i)
+		{
+			const std::map<Anope::string, Anope::string> &map = r.Row(i);
+			for (std::map<Anope::string, Anope::string>::const_iterator it = map.begin(); it != map.end(); ++it)
+				this->DropTable(it->second);
+		}
+	}
+
+	void AlterTable(const Anope::string &table, std::set<Anope::string> &data, const SerializableBase::serialized_data &newd)
 	{
 		for (SerializableBase::serialized_data::const_iterator it = newd.begin(), it_end = newd.end(); it != it_end; ++it)
 		{
-			if (oldd.count(it->first) > 0)
+			if (data.count(it->first) > 0)
 				continue;
+
+			data.insert(it->first);
 
 			Anope::string query_text = "ALTER TABLE `" + table + "` ADD `" + it->first + "` ";
 			if (it->second.getType() == Serialize::DT_INT)
@@ -116,7 +129,9 @@ class DBSQL : public Module
 		if (serialized_items == NULL)
 			return EVENT_CONTINUE;
 
-		std::map<Anope::string, SerializableBase::serialized_data> table_layout;
+		this->DropAll();
+
+		std::map<Anope::string, std::set<Anope::string> > table_layout;
 		for (std::list<SerializableBase *>::iterator it = serialized_items->begin(), it_end = serialized_items->end(); it != it_end; ++it)
 		{
 			SerializableBase *base = *it;
@@ -125,14 +140,16 @@ class DBSQL : public Module
 			if (data.empty())
 				continue;
 
-			if (table_layout.count(base->serialize_name()) == 0)
+			std::set<Anope::string> &layout = table_layout[base->serialize_name()];
+			if (layout.empty())
 			{
-				this->DropTable(base->serialize_name());
 				this->RunBackground(this->sql->CreateTable(base->serialize_name(), data));
+
+				for (SerializableBase::serialized_data::iterator it2 = data.begin(), it2_end = data.end(); it2 != it2_end; ++it2)
+					layout.insert(it2->first);
 			}
 			else
-				this->AlterTable(base->serialize_name(), table_layout[base->serialize_name()], data);
-			table_layout[base->serialize_name()] = data;
+				this->AlterTable(base->serialize_name(), layout, data);
 
 			this->Insert(base->serialize_name(), data);
 		}

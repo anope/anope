@@ -3,17 +3,6 @@ Legend:
 	? = unsure
 	+ = in progress
 
-1.9.5
------
-[+] More LDAP
-[x] Rewrite silly forbid system
-[x] Fix the modules language system to work without needing its own functions..
-[x] Rewrite commands system
-[x] Rewrite access system
-[x] NS INFO: separate field for last seen realhost, shown to SRA only
-[x] Configurable bot usermodes
-
-
 Future
 ------
 [ ] NS IDENTIFY changes

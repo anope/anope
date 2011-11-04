@@ -1,5 +1,21 @@
 Anope Version 1.9.6
 --------------------
+A Added ability to configure emails sent by services
+A Added chanserv/up and chanserv/down
+A Added m_proxyscan
+A Added more configurability for what vhosts are valid
+A Added chanserv/log
+A Added ability to configure ChanServ privileges
+A Added a new database format
+A Added SQLite support
+A Added more verbose messages on startup
+A Added ability for chanserv/suspend and nickserv/suspend to take an expiry time
+A Added no nickname ownership config option
+A Added m_rewrite
+A Added akill IDs
+F Fixed crash in clearusers
+F Fixed crash in /os oper info
+F Fixed eventfd Config check to work properly on OpenVZ
 
 Anope Version 1.9.5
 --------------------

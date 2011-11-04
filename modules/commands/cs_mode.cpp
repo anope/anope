@@ -88,6 +88,7 @@ class CommandCSMode : public Command
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
 							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+							Log(LOG_COMMAND, u, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 						}
 				}
 			}
@@ -117,11 +118,17 @@ class CommandCSMode : public Command
 						if (adding == -1)
 							break;
 						ChannelMode *cm = ModeManager::FindChannelModeByChar(modes[i]);
-						if (!cm || !cm->CanSet(u))
+						if (!cm)
 						{
 							source.Reply(_("Unknown mode character %c ignored."), modes[i]);
 							break;
 						}
+						else if (!cm->CanSet(u))
+						{
+							source.Reply(_("You may not (un)lock mode %c."), modes[i]);
+							break;
+						}
+
 						Anope::string mode_param;
 						if (!cm->Type == MODE_REGULAR && !sep.GetToken(mode_param))
 							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
@@ -132,6 +139,7 @@ class CommandCSMode : public Command
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
 								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
+								Log(LOG_COMMAND, u, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 							}
 							else
 								source.Reply(_("%c is not locked on %s."), cm->ModeChar, ci->name.c_str());

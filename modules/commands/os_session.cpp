@@ -258,7 +258,7 @@ class CommandOSSession : public Command
 		else
 		{
 			Exception *exception = session_service->FindException(param);
-			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception ? exception-> limit : Config->DefSessionLimit);
+			source.Reply(_("The host \002%s\002 currently has \002%d\002 sessions with a limit of \002%d\002."), param.c_str(), session->count, exception && exception->limit > Config->DefSessionLimit ? exception->limit : Config->DefSessionLimit);
 		}
 
 		return;

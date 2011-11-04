@@ -276,7 +276,7 @@ Anope::string expire_left(NickCore *nc, time_t expires)
 	if (!expires)
 		return translate(nc, NO_EXPIRE);
 	else if (expires <= Anope::CurTime)
-		return translate(nc, _("expires at next database update"));
+		return translate(nc, _("expires momentarily"));
 	else
 	{
 		char buf[256];

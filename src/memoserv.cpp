@@ -20,9 +20,10 @@ SerializableBase::serialized_data Memo::serialize()
 	serialized_data data;	
 
 	data["owner"] << this->owner;
-	data["time"] << this->time;
+	data["time"].setType(Serialize::DT_INT) << this->time;
 	data["sender"] << this->sender;
 	data["text"] << this->text;
+	data["flags"] << this->ToString();
 
 	return data;
 }
@@ -42,6 +43,7 @@ void Memo::unserialize(SerializableBase::serialized_data &data)
 	data["time"] >> m->time;
 	data["sender"] >> m->sender;
 	data["text"] >> m->text;
+	m->FromString(data["flags"].astr());
 
 	mi->memos.push_back(m);
 }

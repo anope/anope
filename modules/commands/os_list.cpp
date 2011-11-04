@@ -137,8 +137,8 @@ class CommandOSUserList : public Command
 
 				if (!pattern.empty())
 				{
-					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost();
-					if (!Anope::Match(mask, pattern))
+					Anope::string mask = u2->nick + "!" + u2->GetIdent() + "@" + u2->GetDisplayedHost(), mask2 = u2->nick + "!" + u2->GetIdent() + "@" + u2->host, mask3 = u2->nick + "!" + u2->GetIdent() + "@" + (u2->ip() ? u2->ip.addr() : u2->host);
+					if (!Anope::Match(mask, pattern) && !Anope::Match(mask2, pattern) && !Anope::Match(mask3, pattern))
 						continue;
 					if (!Modes.empty())
 						for (std::list<UserModeName>::iterator mit = Modes.begin(), mit_end = Modes.end(); mit != mit_end; ++mit)

@@ -112,6 +112,7 @@ class CoreExport XLineManager : public Service<XLineManager>
 	XLine *GetEntry(unsigned index);
 
 	/** Clear the XLine vector
+	 * Note: This does not remove the XLines from the IRCd
 	 */
 	void Clear();
 

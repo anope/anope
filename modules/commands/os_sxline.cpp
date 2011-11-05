@@ -272,7 +272,13 @@ class CommandOSSXLineBase : public Command
 	{
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, this->xlm()));
-		this->xlm()->Clear();
+
+		for (unsigned i = this->xlm()->GetCount(); i > 0; --i)
+		{
+			XLine *x = this->xlm()->GetEntry(i - 1);
+			this->xlm()->DelXLine(x);
+		}
+
 		source.Reply(_("The %s list has been cleared."), this->name.c_str());
 
 		return;

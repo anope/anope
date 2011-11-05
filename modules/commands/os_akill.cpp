@@ -379,7 +379,13 @@ class CommandOSAKill : public Command
 	{
 		User *u = source.u;
 		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, akills));
-		akills->Clear();
+
+		for (unsigned i = akills->GetCount(); i > 0; --i)
+		{
+			XLine *x = akills->GetEntry(i - 1);
+			akills->DelXLine(x);
+		}
+
 		source.Reply(_("The AKILL list has been cleared."));
 
 		return;

@@ -158,7 +158,11 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SQLINE */
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd(Config->Numeric, "ADDLINE Q %s %s %ld 0 :%s", x->Mask.c_str(), Config->OperServ.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = x->Expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->Expires)
+			timeleft = 172800;
+		send_cmd(Config->Numeric, "ADDLINE Q %s %s %ld %ld :%s", x->Mask.c_str(), Config->OperServ.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
 	}
 
 	/* SQUIT */
@@ -210,7 +214,11 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
-		send_cmd(Config->Numeric, "ADDLINE Z %s %s %ld 0 :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = x->Expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->Expires)
+			timeleft = 172800;
+		send_cmd(Config->Numeric, "ADDLINE Z %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(Anope::CurTime), x->Reason.c_str());
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)

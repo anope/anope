@@ -267,7 +267,11 @@ class UnrealIRCdProto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
-		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + 172800), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = x->Expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->Expires)
+			timeleft = 172800;
+		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
 	}
 
 	/* SGLINE */

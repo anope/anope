@@ -144,8 +144,12 @@ class RatboxProto : public IRCDProto
 
 	void SendAkill(User *, const XLine *x)
 	{
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = x->Expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->Expires)
+			timeleft = 172800;
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(x->Expires - Anope::CurTime), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(timeleft), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)

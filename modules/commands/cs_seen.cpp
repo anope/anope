@@ -23,7 +23,7 @@ struct SeenInfo;
 typedef Anope::insensitive_map<SeenInfo *> database_map;
 database_map database;
 
-struct SeenInfo : Serializable<SeenInfo>
+struct SeenInfo : Serializable
 {
 	Anope::string nick;
 	Anope::string vhost;
@@ -32,6 +32,10 @@ struct SeenInfo : Serializable<SeenInfo>
 	Anope::string channel;  // for join/part/kick
 	Anope::string message;  // for part/kick/quit
 	time_t last;            // the time when the user was last seen
+
+	SeenInfo() : Serializable("SeenInfo")
+	{
+	}
 
 	serialized_data serialize()
 	{
@@ -304,11 +308,12 @@ class DataBasePurger : public CallBack
 
 class CSSeen : public Module
 {
+	SerializeType seeninfo_type;
 	CommandSeen commandseen;
 	CommandOSSeen commandosseen;
 	DataBasePurger purger;
  public:
-	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandseen(this), commandosseen(this), purger(this)
+	CSSeen(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), seeninfo_type("SeenInfo", SeenInfo::unserialize), commandseen(this), commandosseen(this), purger(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -322,8 +327,6 @@ class CSSeen : public Module
 		ModuleManager::Attach(eventlist, this, sizeof(eventlist)/sizeof(Implementation));
 
 		OnReload();
-
-		Serializable<SeenInfo>::Alloc.Register("SeenInfo");
 	}
 
 	void OnReload()

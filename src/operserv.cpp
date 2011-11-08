@@ -15,18 +15,18 @@
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
-std::map<Anope::string, XLine *, std::less<ci::string> > XLineManager::XLinesByUID;
+std::map<Anope::string, XLine *, ci::less> XLineManager::XLinesByUID;
 
-XLine::XLine()
+XLine::XLine() : Serializable("XLine")
 {
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
 {
 	manager = NULL;
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
 {
 	manager = NULL;
 }
@@ -73,7 +73,7 @@ sockaddrs XLine::GetIP() const
 	return addr;
 }
 
-SerializableBase::serialized_data XLine::serialize()
+Serializable::serialized_data XLine::serialize()
 {
 	serialized_data data;	
 
@@ -89,7 +89,7 @@ SerializableBase::serialized_data XLine::serialize()
 	return data;
 }
 
-void XLine::unserialize(SerializableBase::serialized_data &data)
+void XLine::unserialize(serialized_data &data)
 {
 	service_reference<XLineManager> xlm(data["manager"].astr());
 	if (!xlm)
@@ -327,7 +327,7 @@ std::pair<int, XLine *> XLineManager::CanAdd(const Anope::string &mask, time_t e
  */
 XLine *XLineManager::HasEntry(const Anope::string &mask)
 {
-	std::map<Anope::string, XLine *, std::less<ci::string> >::iterator it = XLinesByUID.find(mask);
+	std::map<Anope::string, XLine *, ci::less>::iterator it = XLinesByUID.find(mask);
 	if (it != XLinesByUID.end() && (it->second->manager == NULL || it->second->manager == this))
 		return it->second;
 	for (unsigned i = 0, end = this->XLines.size(); i < end; ++i)

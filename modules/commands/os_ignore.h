@@ -10,13 +10,14 @@
  */
 
 
-struct IgnoreData : Serializable<IgnoreData>
+struct IgnoreData : Serializable
 {
 	Anope::string mask;
 	Anope::string creator;
 	Anope::string reason;
 	time_t time; /* When do we stop ignoring them? */
 
+	IgnoreData() : Serializable("IgnoreData") { }
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };
@@ -42,7 +43,7 @@ class IgnoreService : public Service<Base>
 
 static service_reference<IgnoreService, Base> ignore_service("ignore");
 
-SerializableBase::serialized_data IgnoreData::serialize()
+Serializable::serialized_data IgnoreData::serialize()
 {
 	serialized_data data;
 
@@ -54,7 +55,7 @@ SerializableBase::serialized_data IgnoreData::serialize()
 	return data;
 }
 
-void IgnoreData::unserialize(SerializableBase::serialized_data &data)
+void IgnoreData::unserialize(serialized_data &data)
 {
 	if (!ignore_service)
 		return;

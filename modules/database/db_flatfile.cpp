@@ -21,14 +21,6 @@ class DBFlatFile : public Module
 	/* Backup file names */
 	std::list<Anope::string> Backups;
 
-	SerializableBase *find(const Anope::string &sname)
-	{
-		for (unsigned i = 0; i < serialized_types.size(); ++i)
-			if (serialized_types[i]->serialize_name() == sname)
-				return serialized_types[i];
-		return NULL;
-	}
-
  public:
 	DBFlatFile(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE)
 	{
@@ -75,7 +67,7 @@ class DBFlatFile : public Module
 
 			if (Config->KeepBackups > 0 && Backups.size() > static_cast<unsigned>(Config->KeepBackups))
 			{
-				DeleteFile(Backups.front().c_str());
+				unlink(Backups.front().c_str());
 				Backups.pop_front();
 			}
 		}
@@ -98,9 +90,9 @@ class DBFlatFile : public Module
 			return EVENT_CONTINUE;
 		}
 
-		SerializableBase *sb = NULL;
-		SerializableBase::serialized_data data;
-		std::multimap<SerializableBase *, SerializableBase::serialized_data> objects;
+		SerializeType *st = NULL;
+		Serializable::serialized_data data;
+		std::multimap<SerializeType *, Serializable::serialized_data> objects;
 		for (Anope::string buf, token; std::getline(db, buf.str());)
 		{
 			spacesepstream sep(buf);
@@ -110,29 +102,30 @@ class DBFlatFile : public Module
 
 			if (token == "OBJECT" && sep.GetToken(token))
 			{
-				sb = this->find(token);
+				st = SerializeType::Find(token);
 				data.clear();
 			}
-			else if (token == "DATA" && sb != NULL && sep.GetToken(token))
+			else if (token == "DATA" && st != NULL && sep.GetToken(token))
 				data[token] << sep.GetRemaining();
-			else if (token == "END" && sb != NULL)
+			else if (token == "END" && st != NULL)
 			{
-				objects.insert(std::make_pair(sb, data));
+				objects.insert(std::make_pair(st, data));
 
-				sb = NULL;
+				st = NULL;
 				data.clear();
 			}
 		}
 
-		for (unsigned i = 0; i < serialized_types.size(); ++i)
+		const std::vector<Anope::string> type_order = SerializeType::GetTypeOrder();
+		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
-			SerializableBase *stype = serialized_types[i];
+			SerializeType *stype = SerializeType::Find(type_order[i]);
 
-			std::multimap<SerializableBase *, SerializableBase::serialized_data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
+			std::multimap<SerializeType *, Serializable::serialized_data>::iterator it = objects.find(stype), it_end = objects.upper_bound(stype);
 			if (it == objects.end())
 				continue;
 			for (; it != it_end; ++it)
-				it->first->alloc(it->second);
+				it->first->Create(it->second);
 		}
 
 		db.close();
@@ -158,17 +151,17 @@ class DBFlatFile : public Module
 			return EVENT_CONTINUE;
 		}
 
-		if (serialized_items != NULL)
-			for (std::list<SerializableBase *>::iterator it = serialized_items->begin(), it_end = serialized_items->end(); it != it_end; ++it)
-			{
-				SerializableBase *base = *it;
-				SerializableBase::serialized_data data = base->serialize();
+		const std::list<Serializable *> &items = Serializable::GetItems();
+		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
+		{
+			Serializable *base = *it;
+			Serializable::serialized_data data = base->serialize();
 	
-				db << "OBJECT " << base->serialize_name() << "\n";
-				for (SerializableBase::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
-					db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
-				db << "END\n";
-			}
+			db << "OBJECT " << base->GetSerializeName() << "\n";
+			for (Serializable::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
+				db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
+			db << "END\n";
+		}
 
 		db.close();
 
@@ -181,7 +174,7 @@ class DBFlatFile : public Module
 				rename(tmp_db.c_str(), DatabaseFile.c_str());
 		}
 		else
-			DeleteFile(tmp_db.c_str());
+			unlink(tmp_db.c_str());
 
 		return EVENT_CONTINUE;
 	}

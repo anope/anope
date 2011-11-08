@@ -71,12 +71,46 @@ AccessProvider::~AccessProvider()
 {
 }
 
-ChanAccess::ChanAccess(AccessProvider *p) : provider(p)
+ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
 {
 }
 
 ChanAccess::~ChanAccess()
 {
+}
+
+Serializable::serialized_data ChanAccess::serialize()
+{
+	serialized_data data;
+
+	data["provider"] << this->provider->name;
+	data["ci"] << this->ci->name;
+	data["mask"] << this->mask;
+	data["creator"] << this->creator;
+	data["last_seen"].setType(Serialize::DT_INT) << this->last_seen;
+	data["created"].setType(Serialize::DT_INT) << this->created;
+	data["data"] << this->Serialize();
+
+	return data;
+}
+
+void ChanAccess::unserialize(serialized_data &data)
+{
+	service_reference<AccessProvider> aprovider(data["provider"].astr());
+	ChannelInfo *ci = cs_findchan(data["ci"].astr());
+	if (!aprovider || !ci)
+		return;
+
+	ChanAccess *access = aprovider->Create();
+	access->provider = aprovider;
+	access->ci = ci;
+	data["mask"] >> access->mask;
+	data["creator"] >> access->creator;
+	data["last_seen"] >> access->last_seen;
+	data["created"] >> access->created;
+	access->Unserialize(data["data"].astr());
+
+	ci->AddAccess(access);
 }
 
 bool ChanAccess::operator>(ChanAccess &other)

@@ -60,9 +60,9 @@ class DBSQL : public Module
 		}
 	}
 
-	void AlterTable(const Anope::string &table, std::set<Anope::string> &data, const SerializableBase::serialized_data &newd)
+	void AlterTable(const Anope::string &table, std::set<Anope::string> &data, const Serializable::serialized_data &newd)
 	{
-		for (SerializableBase::serialized_data::const_iterator it = newd.begin(), it_end = newd.end(); it != it_end; ++it)
+		for (Serializable::serialized_data::const_iterator it = newd.begin(), it_end = newd.end(); it != it_end; ++it)
 		{
 			if (data.count(it->first) > 0)
 				continue;
@@ -81,20 +81,20 @@ class DBSQL : public Module
 		}
 	}
 
-	void Insert(const Anope::string &table, const SerializableBase::serialized_data &data)
+	void Insert(const Anope::string &table, const Serializable::serialized_data &data)
 	{
 		Anope::string query_text = "INSERT INTO `" + table + "` (";
-		for (SerializableBase::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			query_text += "`" + it->first + "`,";
 		query_text.erase(query_text.end() - 1);
 		query_text += ") VALUES (";
-		for (SerializableBase::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			query_text += "@" + it->first + "@,";
 		query_text.erase(query_text.end() - 1);
 		query_text += ")";
 
 		SQLQuery query(query_text);
-		for (SerializableBase::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 			query.setValue(it->first, it->second.astr());
 
 		this->RunBackground(query);
@@ -126,32 +126,33 @@ class DBSQL : public Module
 			return EVENT_CONTINUE;
 		}
 
-		if (serialized_items == NULL)
+		const std::list<Serializable *> &items = Serializable::GetItems();
+		if (items.empty())
 			return EVENT_CONTINUE;
 
 		this->DropAll();
 
 		std::map<Anope::string, std::set<Anope::string> > table_layout;
-		for (std::list<SerializableBase *>::iterator it = serialized_items->begin(), it_end = serialized_items->end(); it != it_end; ++it)
+		for (std::list<Serializable *>::const_iterator it = items.begin(), it_end = items.end(); it != it_end; ++it)
 		{
-			SerializableBase *base = *it;
-			SerializableBase::serialized_data data = base->serialize();
+			Serializable *base = *it;
+			Serializable::serialized_data data = base->serialize();
 
 			if (data.empty())
 				continue;
 
-			std::set<Anope::string> &layout = table_layout[base->serialize_name()];
+			std::set<Anope::string> &layout = table_layout[base->GetSerializeName()];
 			if (layout.empty())
 			{
-				this->RunBackground(this->sql->CreateTable(base->serialize_name(), data));
+				this->RunBackground(this->sql->CreateTable(base->GetSerializeName(), data));
 
-				for (SerializableBase::serialized_data::iterator it2 = data.begin(), it2_end = data.end(); it2 != it2_end; ++it2)
+				for (Serializable::serialized_data::iterator it2 = data.begin(), it2_end = data.end(); it2 != it2_end; ++it2)
 					layout.insert(it2->first);
 			}
 			else
-				this->AlterTable(base->serialize_name(), layout, data);
+				this->AlterTable(base->GetSerializeName(), layout, data);
 
-			this->Insert(base->serialize_name(), data);
+			this->Insert(base->GetSerializeName(), data);
 		}
 		return EVENT_CONTINUE;
 	}
@@ -164,20 +165,21 @@ class DBSQL : public Module
 			return EVENT_CONTINUE;
 		}
 
-		for (std::vector<SerializableBase *>::iterator it = serialized_types.begin(), it_end = serialized_types.end(); it != it_end; ++it)
+		const std::vector<Anope::string> type_order = SerializeType::GetTypeOrder();
+		for (unsigned i = 0; i < type_order.size(); ++i)
 		{
-			SerializableBase *sb = *it;
+			SerializeType *sb = SerializeType::Find(type_order[i]);
 
-			SQLQuery query("SELECT * FROM `" + sb->serialize_name() + "`");
+			SQLQuery query("SELECT * FROM `" + sb->GetName() + "`");
 			SQLResult res = this->sql->RunQuery(query);
 			for (int i = 0; i < res.Rows(); ++i)
 			{
-				SerializableBase::serialized_data data;
+				Serializable::serialized_data data;
 				const std::map<Anope::string, Anope::string> &row = res.Row(i);
 				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
 					data[rit->first] << rit->second;
 
-				sb->alloc(data);
+				sb->Create(data);
 			}
 		}
 

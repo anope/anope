@@ -3,7 +3,7 @@
 
 class SQLCache : public Timer
 {
-	typedef std::map<Anope::string, time_t, std::less<ci::string> > cache_map;
+	typedef std::map<Anope::string, time_t, ci::less> cache_map;
 	cache_map cache;
  public:
 

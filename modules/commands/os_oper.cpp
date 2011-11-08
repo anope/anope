@@ -13,9 +13,9 @@
 
 #include "module.h"
 
-struct MyOper : Oper, Serializable<MyOper>
+struct MyOper : Oper, Serializable
 {
-	MyOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
+	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
 
 	serialized_data serialize()
 	{
@@ -196,15 +196,14 @@ class CommandOSOper : public Command
 
 class OSOper : public Module
 {
+	SerializeType myoper_type;
 	CommandOSOper commandosoper;
 
  public:
 	OSOper(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandosoper(this)
+		myoper_type("Oper", MyOper::unserialize), commandosoper(this)
 	{
 		this->SetAuthor("Anope");
-
-		Serializable<MyOper>::Alloc.Register("Oper");
 	}
 
 	~OSOper()

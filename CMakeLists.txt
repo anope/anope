@@ -238,7 +238,7 @@ if(MSVC)
   string(REPLACE "/GX " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   string(REPLACE "/W3 " "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
   # Set the compile flags to have warnings on the max setting (but disable a few annoying ones), exception handling turned on, the proper defines
-  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4251 /wd4706 /wd4800 /wd4996 /EHs")
+  set(CXXFLAGS "${CXXFLAGS} /W4 /wd4100 /wd4251 /wd4706 /wd4800 /wd4996 /wd4250 /EHs")
   add_definitions(-DMSVCPP -D_CRT_SECURE_NO_WARNINGS)
 # Otherwise, we're not using Visual Studio
 else(MSVC)

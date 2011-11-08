@@ -11,7 +11,7 @@
 
 class XLineManager;
 
-class CoreExport XLine : public Serializable<XLine>
+class CoreExport XLine : public Serializable
 {
  protected:
 	XLine();
@@ -42,7 +42,7 @@ class CoreExport XLineManager : public Service<XLineManager>
 	char type;
 	/* List of XLines in this XLineManager */
 	std::vector<XLine *> XLines;
-	static std::map<Anope::string, XLine *, std::less<ci::string> > XLinesByUID;
+	static std::map<Anope::string, XLine *, ci::less> XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;

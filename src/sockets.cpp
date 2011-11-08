@@ -285,11 +285,7 @@ ClientSocket *SocketIO::Accept(ListenSocket *s)
 	socklen_t size = sizeof(conaddr);
 	int newsock = accept(s->GetFD(), &conaddr.sa, &size);
 
-#ifndef INVALID_SOCKET
-	static const int INVALID_SOCKET = -1;
-#endif
-
-	if (newsock >= 0 && newsock != INVALID_SOCKET)
+	if (newsock >= 0)
 	{
 		ClientSocket *ns = s->OnAccept(newsock, conaddr);
 		ns->SetFlag(SF_ACCEPTED);
@@ -406,7 +402,7 @@ Socket::Socket(int sock, bool ipv6, int type) : Flags<SocketFlag>(SocketFlagStri
 Socket::~Socket()
 {
 	SocketEngine::DelSocket(this);
-	CloseSocket(this->Sock);
+	close(this->Sock);
 	this->IO->Destroy();
 }
 
@@ -431,13 +427,8 @@ bool Socket::IsIPv6() const
  */
 bool Socket::SetBlocking()
 {
-#ifdef _WIN32
-	unsigned long opt = 0;
-	return !ioctlsocket(this->GetFD(), FIONBIO, &opt);
-#else
 	int flags = fcntl(this->GetFD(), F_GETFL, 0);
 	return !fcntl(this->GetFD(), F_SETFL, flags & ~O_NONBLOCK);
-#endif
 }
 
 /** Mark a socket as non-blocking
@@ -445,13 +436,8 @@ bool Socket::SetBlocking()
  */
 bool Socket::SetNonBlocking()
 {
-#ifdef _WIN32
-	unsigned long opt = 1;
-	return !ioctlsocket(this->GetFD(), FIONBIO, &opt);
-#else
 	int flags = fcntl(this->GetFD(), F_GETFL, 0);
 	return !fcntl(this->GetFD(), F_SETFL, flags | O_NONBLOCK);
-#endif
 }
 
 /** Bind the socket to an ip and port
@@ -503,10 +489,8 @@ ListenSocket::ListenSocket(const Anope::string &bindip, int port, bool ipv6) : S
 {
 	this->SetNonBlocking();
 
-#ifndef _WIN32
-	int op = 1;
+	const char op = 1;
 	setsockopt(this->GetFD(), SOL_SOCKET, SO_REUSEADDR, &op, sizeof(op));
-#endif
 
 	this->bindaddr.pton(IPv6 ? AF_INET6 : AF_INET, bindip, port);
 	this->IO->Bind(this, bindip, port);

@@ -4,7 +4,7 @@
 /** Default constructor
  * @param display The display nick
  */
-NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_END>(NickCoreFlagStrings)
+NickCore::NickCore(const Anope::string &coredisplay) : Flags<NickCoreFlag, NI_END>(NickCoreFlagStrings), Serializable("NickCore")
 {
 	if (coredisplay.empty())
 		throw CoreException("Empty display passed to NickCore constructor");
@@ -45,7 +45,7 @@ NickCore::~NickCore()
 	}
 }
 
-SerializableBase::serialized_data NickCore::serialize()
+Serializable::serialized_data NickCore::serialize()
 {
 	serialized_data data;	
 

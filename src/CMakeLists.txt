@@ -1,23 +1,23 @@
 # Find all the *.cpp files within the current source directory, and sort the list
 file(GLOB SRC_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")
 
-# If using Windows, add the windows.cpp, the win32 threading engine, and the socket engine to the list
 if(WIN32)
+  append_to_list(SRC_SRCS win32/dir/dir.cpp)
+  append_to_list(SRC_SRCS win32/socket.cpp)
   append_to_list(SRC_SRCS win32/windows.cpp)
+  append_to_list(SRC_SRCS win32/dl/dl.cpp)
+  append_to_list(SRC_SRCS win32/pipe/pipe.cpp)
+  append_to_list(SRC_SRCS win32/pthread/pthread.cpp)
   append_to_list(SRC_SRCS win32/sigaction/sigaction.cpp)
-  append_to_list(SRC_SRCS threadengines/threadengine_win32.cpp)
-  append_to_list(SRC_SRCS socketengines/pipeengine_win32.cpp)
-# If not using Windows, add the pthread threading engine to the list
-else(WIN32)
-  append_to_list(SRC_SRCS threadengines/threadengine_pthread.cpp)
-  # If we have eventfd, use it
-  if(HAVE_EVENTFD)
-    append_to_list(SRC_SRCS socketengines/pipeengine_eventfd.cpp)
-  # Else fall back to pipe
-  else(HAVE_EVENTFD)
-    append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
-  endif(HAVE_EVENTFD)
 endif(WIN32)
+
+# If we have eventfd, use it
+if(HAVE_EVENTFD)
+  append_to_list(SRC_SRCS socketengines/pipeengine_eventfd.cpp)
+# Else fall back to pipe
+else(HAVE_EVENTFD)
+  append_to_list(SRC_SRCS socketengines/pipeengine_pipe.cpp)
+endif(HAVE_EVENTFD)
 
 if(HAVE_EPOLL)
   append_to_list(SRC_SRCS socketengines/socketengine_epoll.cpp)

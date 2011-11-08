@@ -188,8 +188,6 @@ class OperServCore : public Module
 		XLineManager::RegisterXLineManager(&sglines);
 		XLineManager::RegisterXLineManager(&sqlines);
 		XLineManager::RegisterXLineManager(&snlines);
-
-		Serializable<XLine>::Alloc.Register("XLine");
 	}
 
 	~OperServCore()

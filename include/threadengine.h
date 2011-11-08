@@ -1,17 +1,6 @@
 #ifndef THREADENGINE_H
 #define THREADENGINE_H
 
-#ifdef _WIN32
-typedef HANDLE ThreadHandle;
-typedef CRITICAL_SECTION MutexHandle;
-typedef HANDLE CondHandle;
-#else
-# include <pthread.h>
-typedef pthread_t ThreadHandle;
-typedef pthread_mutex_t MutexHandle;
-typedef pthread_cond_t CondHandle;
-#endif
-
 class Thread;
 
 class CoreExport Thread : public Pipe, public Extensible
@@ -22,7 +11,7 @@ class CoreExport Thread : public Pipe, public Extensible
 
  public:
 	/* Handle for this thread */
-	ThreadHandle Handle;
+	pthread_t Handle;
 
 	/** Threads constructor
 	 */
@@ -66,7 +55,7 @@ class CoreExport Mutex
 {
  protected:
 	/* A mutex, used to keep threads in sync */
-	MutexHandle mutex;
+	pthread_mutex_t mutex;
 
  public:
 	/** Constructor
@@ -96,7 +85,7 @@ class CoreExport Condition : public Mutex
 {
  private:
 	/* A condition */
-	CondHandle cond;
+	pthread_cond_t cond;
 
  public:
 	/** Constructor

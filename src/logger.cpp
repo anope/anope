@@ -380,7 +380,7 @@ void LogInfo::ProcessMessage(const Log *l)
 						Anope::string oldlog = CreateLogName(target, Anope::CurTime - 86400 * this->LogAge);
 						if (IsFile(oldlog))
 						{
-							DeleteFile(oldlog.c_str());
+							unlink(oldlog.c_str());
 							Log(LOG_DEBUG) << "Deleted old logfile " << oldlog;
 						}
 					}

@@ -10,7 +10,7 @@
 #include "anope.h"
 #include "hashcomp.h"
 
-class ExtensibleItem
+class CoreExport ExtensibleItem
 {
  public:
  	ExtensibleItem();

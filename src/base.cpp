@@ -1,20 +1,17 @@
 #include "services.h"
 #include "modules.h"
+#include "oper.h"
 
-std::vector<SerializableBase *> serialized_types;
-std::list<SerializableBase *> *serialized_items;
+std::vector<Anope::string> SerializeType::type_order;
+Anope::map<SerializeType *> SerializeType::types;
+std::list<Serializable *> Serializable::serizliable_items;
 
 void RegisterTypes()
 {
-	Serializable<NickCore>::Alloc.Register("NickCore");
-	Serializable<NickAlias>::Alloc.Register("NickAlias");
-	Serializable<BotInfo>::Alloc.Register("BotInfo");
-	Serializable<ChannelInfo>::Alloc.Register("ChannelInfo");
-	Serializable<LogSetting>::Alloc.Register("LogSetting");
-	Serializable<ModeLock>::Alloc.Register("ModeLock");
-	Serializable<AutoKick>::Alloc.Register("AutoKick");
-	Serializable<BadWord>::Alloc.Register("BadWord");
-	Serializable<Memo>::Alloc.Register("Memo");
+	static SerializeType nc("NickCore", NickCore::unserialize), na("NickAlias", NickAlias::unserialize), bi("BotInfo", BotInfo::unserialize),
+		ci("ChannelInfo", ChannelInfo::unserialize), access("ChanAccess", ChanAccess::unserialize), logsetting("LogSetting", LogSetting::unserialize),
+		modelock("ModeLock", ModeLock::unserialize), akick("AutoKick", AutoKick::unserialize), badword("BadWord", BadWord::unserialize),
+		memo("Memo", Memo::unserialize), xline("XLine", XLine::unserialize);
 }
 
 Base::Base()

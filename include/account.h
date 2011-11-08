@@ -93,7 +93,7 @@ const Anope::string NickCoreFlagStrings[] = {
 	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", ""
 };
 
-class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable<NickAlias>
+class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
 {
  public:
  	/** Default constructor
@@ -132,7 +132,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	void OnCancel(User *u);
 };
 
-class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable<NickCore>
+class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
 {
  public:
 	/** Default constructor

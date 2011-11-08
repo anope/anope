@@ -628,6 +628,7 @@ class CommandOSException : public Command
 
 class OSSession : public Module
 {
+	SerializeType exception_type;
 	MySessionService ss;
 	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
@@ -720,15 +721,13 @@ class OSSession : public Module
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		ss(this), commandossession(this), commandosexception(this), akills("xlinemanager/sgline")
+		exception_type("Exception", Exception::unserialize), ss(this), commandossession(this), commandosexception(this), akills("xlinemanager/sgline")
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserLogoff };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
-
-		Serializable<Exception>::Alloc.Register("Exception");
 	}
 
 	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)

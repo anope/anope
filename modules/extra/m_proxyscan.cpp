@@ -9,7 +9,7 @@
 
 struct ProxyCheck
 {
-	std::set<Anope::string, std::less<ci::string> > types;
+	std::set<Anope::string, ci::less> types;
 	std::vector<unsigned short> ports;
 	time_t duration;
 	Anope::string reason;
@@ -361,7 +361,7 @@ class ModuleProxyScan : public Module
 		{
 			ProxyCheck &p = this->proxyscans[i - 1];
 
-			for (std::set<Anope::string, std::less<ci::string> >::iterator it = p.types.begin(), it_end = p.types.end(); it != it_end; ++it)
+			for (std::set<Anope::string, ci::less>::iterator it = p.types.begin(), it_end = p.types.end(); it != it_end; ++it)
 			{
 				for (unsigned k = 0; k < p.ports.size(); ++k)
 				{

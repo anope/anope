@@ -12,13 +12,13 @@
 
 #include "module.h"
 
-struct CSMiscData : Anope::string, ExtensibleItem, Serializable<CSMiscData>
+struct CSMiscData : Anope::string, ExtensibleItem, Serializable
 {
 	ChannelInfo *ci;
 	Anope::string name;
 	Anope::string data;
 
-	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : ci(c), name(n), data(d)
+	CSMiscData(ChannelInfo *c, const Anope::string &n, const Anope::string &d) : Serializable("CSMiscData"), ci(c), name(n), data(d)
 	{
 	}
 
@@ -96,19 +96,18 @@ class CommandCSSASetMisc : public CommandCSSetMisc
 
 class CSSetMisc : public Module
 {
+	SerializeType csmiscdata_type;
 	CommandCSSetMisc commandcssetmisc;
 	CommandCSSASetMisc commandcssasetmisc;
 
  public:
 	CSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssetmisc(this), commandcssasetmisc(this)
+		csmiscdata_type("CSMiscData", CSMiscData::unserialize), commandcssetmisc(this), commandcssasetmisc(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnChanInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<CSMiscData>::Alloc.Register("CSMisc");
 	}
 
 	void OnChanInfo(CommandSource &source, ChannelInfo *ci, bool ShowHidden)

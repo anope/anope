@@ -16,12 +16,6 @@
 
 #define NET_BUFSIZE 65535
 
-#ifdef _WIN32
-# define CloseSocket closesocket
-#else
-# define CloseSocket close
-#endif
-
 /** A sockaddr union used to combine IPv4 and IPv6 sockaddrs
  */
 union CoreExport sockaddrs

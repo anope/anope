@@ -278,20 +278,19 @@ class CommandOSIgnore : public Command
 
 class OSIgnore : public Module
 {
+	SerializeType ignoredata_type;
 	OSIgnoreService osignoreservice;
 	CommandOSIgnore commandosignore;
 
  public:
 	OSIgnore(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		osignoreservice(this), commandosignore(this)
+		ignoredata_type("IgnoreData", IgnoreData::unserialize), osignoreservice(this), commandosignore(this)
 	{
 		this->SetAuthor("Anope");
 
 
 		Implementation i[] = { I_OnBotPrivmsg };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<IgnoreData>::Alloc.Register("Ignore");
 	}
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)

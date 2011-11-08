@@ -596,7 +596,6 @@ class DBPlain : public Module
 		OnReload();
 
 		LastDay = 0;
-		Serializable<Exception>::Alloc.Register("Exception");
 	}
 
 	~DBPlain()
@@ -637,7 +636,7 @@ class DBPlain : public Module
 			unsigned KeepBackups = Config->KeepBackups;
 			if (KeepBackups && Backups.size() > KeepBackups)
 			{
-				DeleteFile(Backups.front().c_str());
+				unlink(Backups.front().c_str());
 				Backups.pop_front();
 			}
 		}
@@ -655,7 +654,6 @@ class DBPlain : public Module
 
 		/* No need to ever reload this again, although this should never be trigged again */
 		ModuleManager::Detach(I_OnLoadDatabase, this);
-		//ModuleManager::Detach(I_OnDatabaseReadMetadata, this);
 
 		return EVENT_STOP;
 	}

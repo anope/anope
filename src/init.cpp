@@ -161,7 +161,11 @@ static void write_pidfile()
 	FILE *pidfile = fopen(Config->PIDFilename.c_str(), "w");
 	if (pidfile)
 	{
+#ifdef _WIN32
+		fprintf(pidfile, "%d\n", static_cast<int>(GetCurrentProcessId()));
+#else
 		fprintf(pidfile, "%d\n", static_cast<int>(getpid()));
+#endif
 		fclose(pidfile);
 		atexit(remove_pidfile);
 	}
@@ -457,10 +461,6 @@ void Init(int ac, char **av)
 	/* Initialize random number generator */
 	rand_init();
 	add_entropy_userkeys();
-
-#ifdef _WIN32
-	OnStartup();
-#endif
 
 	/* load modules */
 	Log() << "Loading modules...";

@@ -14,11 +14,11 @@ namespace Serialize
 	 private:
 		DataType type;
 		bool key;
-		unsigned max;
+		unsigned _max;
 
 	 public:
-		stringstream() : std::stringstream(), type(DT_TEXT), key(false), max(0) { }
-		stringstream(const stringstream &ss) : std::stringstream(ss.str()), type(DT_TEXT), key(false), max(0) { }
+		stringstream() : std::stringstream(), type(DT_TEXT), key(false), _max(0) { }
+		stringstream(const stringstream &ss) : std::stringstream(ss.str()), type(DT_TEXT), key(false), _max(0) { }
 		Anope::string astr() const { return this->str(); }
 		template<typename T> std::istream &operator>>(T &val)
 		{
@@ -51,97 +51,47 @@ namespace Serialize
 		}
 		stringstream &setMax(unsigned m)
 		{
-			this->max = m;
+			this->_max = m;
 			return *this;
 		}
 		unsigned getMax() const
 		{
-			return this->max;
+			return this->_max;
 		}
 	};
 }
 
-class SerializableBase;
-
-extern std::vector<SerializableBase *> serialized_types;
-extern std::list<SerializableBase *> *serialized_items;
 extern void RegisterTypes();
 
-class SerializableBase
+class CoreExport Serializable
 {
- public:
-	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
-
-	virtual ~SerializableBase() { }
-	virtual Anope::string serialize_name() = 0;
-	virtual serialized_data serialize() = 0;
-	virtual void alloc(serialized_data &) = 0;
-};
-
-template<typename Type> class Serializable : public SerializableBase
-{
- public:
-	static class SerializableAllocator : public SerializableBase
-	{
-		Anope::string name;
-
-	 public:
-	 	SerializableAllocator()
-		{
-		}
-
-		void Register(const Anope::string &n, int pos = -1)
-		{
-			this->name = n;
-			serialized_types.insert(serialized_types.begin() + (pos < 0 ? serialized_types.size() : pos), this);
-		}
-
-		void Unregister()
-		{
-			std::vector<SerializableBase *>::iterator it = std::find(serialized_types.begin(), serialized_types.end(), this);
-			if (it != serialized_types.end())
-				serialized_types.erase(it);
-		}
-
-		Anope::string serialize_name()
-		{
-			if (this->name.empty())
-				throw CoreException();
-			return this->name;
-		}
-
-		serialized_data serialize()
-		{
-			throw CoreException();
-		}
-
-	 	void alloc(serialized_data &data)
-		{
-			Type::unserialize(data);
-		}
-	} Alloc;
-
  private:
-	std::list<SerializableBase *>::iterator s_iter;
+	static std::list<Serializable *> serizliable_items;
 
- protected:
+	Anope::string serizliable_name;
+	std::list<Serializable *>::iterator s_iter;
+
 	Serializable()
 	{
-		if (serialized_items == NULL)
-			serialized_items = new std::list<SerializableBase *>();
-		serialized_items->push_front(this);
-		this->s_iter = serialized_items->begin();
+		throw CoreException();
+	}
+
+ protected:
+	Serializable(const Anope::string &n) : serizliable_name(n)
+	{
+		serizliable_items.push_front(this);
+		this->s_iter = serizliable_items.begin();
 	}
 
 	Serializable(const Serializable &)
 	{
-		serialized_items->push_front(this);
-		this->s_iter = serialized_items->begin();
+		serizliable_items.push_front(this);
+		this->s_iter = serizliable_items.begin();
 	}
 
-	~Serializable()
+	virtual ~Serializable()
 	{
-		serialized_items->erase(this->s_iter);
+		serizliable_items.erase(this->s_iter);
 	}
 
 	Serializable &operator=(const Serializable &)
@@ -150,17 +100,68 @@ template<typename Type> class Serializable : public SerializableBase
 	}
 
  public:
-	Anope::string serialize_name()
+	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
+
+	const Anope::string &GetSerializeName()
 	{
-		return Alloc.serialize_name();
+		return this->serizliable_name;
 	}
 
-	void alloc(serialized_data &)
+	virtual serialized_data serialize() = 0;
+
+	static const std::list<Serializable *> &GetItems()
 	{
-		throw CoreException();
+		return serizliable_items;
 	}
 };
 
-template<typename T> typename Serializable<T>::SerializableAllocator Serializable<T>::Alloc;
+class CoreExport SerializeType
+{
+	typedef void (*unserialize_func)(Serializable::serialized_data &);
+
+	static std::vector<Anope::string> type_order;
+	static Anope::map<SerializeType *> types;
+
+	Anope::string name;
+	unserialize_func unserialize;
+
+ public:
+	SerializeType(const Anope::string &n, unserialize_func f) : name(n), unserialize(f)
+	{
+		type_order.push_back(this->name);
+		types[this->name] = this;
+	}
+
+	~SerializeType()
+	{
+		std::vector<Anope::string>::iterator it = std::find(type_order.begin(), type_order.end(), this->name);
+		if (it != type_order.end())
+			type_order.erase(it);
+		types.erase(this->name);
+	}
+
+	const Anope::string &GetName()
+	{
+		return this->name;
+	}
+
+	void Create(Serializable::serialized_data &data)
+	{
+		this->unserialize(data);
+	}
+
+	static SerializeType *Find(const Anope::string &name)
+	{
+		Anope::map<SerializeType *>::iterator it = types.find(name);
+		if (it != types.end())
+			return it->second;
+		return NULL;
+	}
+
+	static const std::vector<Anope::string> &GetTypeOrder()
+	{
+		return type_order;
+	}
+};
 
 #endif // SERIALIZE_H

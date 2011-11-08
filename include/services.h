@@ -20,18 +20,15 @@
 
 #define BUFSIZE 1024
 
-/* Some SUN fixs */
-#ifdef __sun
-# ifndef INADDR_NONE
-#  define INADDR_NONE (-1)
-# endif
-#endif
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdexcept>
 #include <string.h>
+
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
 
 #include <signal.h>
 #include <time.h>
@@ -40,9 +37,9 @@
 
 #include <sys/stat.h> /* for umask() on some systems */
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <fcntl.h>
 #include <typeinfo>
+#include <ctype.h>
 
 #if GETTEXT_FOUND
 # include <libintl.h>
@@ -57,11 +54,12 @@
 # include <arpa/inet.h>
 # include <sys/socket.h>
 # include <sys/time.h>
+# include <sys/wait.h>
 # include <dirent.h>
+# include <pthread.h>
 # define DllExport
 # define CoreExport
 # define MARK_DEPRECATED __attribute((deprecated))
-# define DeleteFile unlink
 #else
 # include "anope_windows.h"
 #endif
@@ -72,35 +70,6 @@
 #else
 # define FORMAT(type, fmt, start)
 #endif
-
-#if HAVE_STRINGS_H
-# include <strings.h>
-#endif
-
-#ifdef _AIX
-/* Some AIX boxes seem to have bogus includes that don't have these
- * prototypes. */
-extern int strcasecmp(const char *, const char *);
-extern int strncasecmp(const char *, const char *, size_t);
-# undef FD_ZERO
-# define FD_ZERO(p) memset((p), 0, sizeof(*(p)))
-#endif /* _AIX */
-
-/* Alias stricmp/strnicmp to strcasecmp/strncasecmp if we have the latter
- * but not the former. */
-#if !HAVE_STRICMP && HAVE_STRCASECMP
-# define stricmp strcasecmp
-# define strnicmp strncasecmp
-#endif
-
-/* We have our own versions of toupper()/tolower(). */
-#include <ctype.h>
-#undef tolower
-#undef toupper
-#define tolower tolower_
-#define toupper toupper_
-extern int toupper(char);
-extern int tolower(char);
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.
@@ -115,12 +84,6 @@ extern int tolower(char);
 	} \
 	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
 	{ \
-		switch (nReason) \
-		{ \
-			case DLL_PROCESS_ATTACH: \
-			case DLL_PROCESS_DETACH: \
-				break; \
-		} \
 		return TRUE; \
 	} \
 	extern "C" DllExport void AnopeFini(x *); \
@@ -343,7 +306,7 @@ template<typename T, size_t Size = 32> class Flags
 
 class Module;
 
-template<typename T> class CoreExport Service : public Base
+template<typename T> class Service : public Base
 {
 	static Anope::map<T *> services;
  public:
@@ -538,7 +501,7 @@ const Anope::string MemoFlagStrings[] = {
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
-class CoreExport Memo : public Flags<MemoFlag>, public Serializable<Memo>
+class CoreExport Memo : public Flags<MemoFlag>, public Serializable
 {
  public:
  	Memo();

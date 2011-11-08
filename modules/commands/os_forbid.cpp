@@ -210,20 +210,18 @@ class CommandOSForbid : public Command
 
 class OSForbid : public Module
 {
+	SerializeType forbiddata_type;
 	MyForbidService forbidService;
 	CommandOSForbid commandosforbid;
 
  public:
 	OSForbid(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		forbidService(this), commandosforbid(this)
+		forbiddata_type("ForbidData", ForbidData::unserialize), forbidService(this), commandosforbid(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnUserConnect, I_OnUserNickChange, I_OnJoinChannel, I_OnPreCommand };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-		
-
-		Serializable<ForbidData>::Alloc.Register("Forbid");
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)

@@ -32,7 +32,7 @@ enum BotFlag
 
 static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF", "" };
 
-class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Serializable<BotInfo>
+class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Serializable
 {
  public:
 	uint32_t chancount;

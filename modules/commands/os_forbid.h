@@ -9,7 +9,7 @@ enum ForbidType
 	FT_EMAIL
 };
 
-struct ForbidData : Serializable<ForbidData>
+struct ForbidData : Serializable
 {
 	Anope::string mask;
 	Anope::string creator;
@@ -17,6 +17,10 @@ struct ForbidData : Serializable<ForbidData>
 	time_t created;
 	time_t expires;
 	ForbidType type;
+
+	ForbidData() : Serializable("ForbidData")
+	{
+	}
 
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
@@ -38,7 +42,7 @@ class ForbidService : public Service<Base>
 
 static service_reference<ForbidService, Base> forbid_service("forbid");
 
-SerializableBase::serialized_data ForbidData::serialize()
+Serializable::serialized_data ForbidData::serialize()
 {
 	serialized_data data;
 	
@@ -52,7 +56,7 @@ SerializableBase::serialized_data ForbidData::serialize()
 	return data;
 }
 
-void ForbidData::unserialize(SerializableBase::serialized_data &data)
+void ForbidData::unserialize(serialized_data &data)
 {
 	if (!forbid_service)
 		return;

@@ -13,14 +13,14 @@
 
 #include "module.h"
 
-struct EntryMsg : Serializable<EntryMsg>
+struct EntryMsg : Serializable
 {
 	ChannelInfo *ci;
 	Anope::string creator;
 	Anope::string message;
 	time_t when;
 
-	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
+	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
 	{
 	
 		this->ci = c;
@@ -195,16 +195,15 @@ class CommandEntryMessage : public Command
 
 class CSEntryMessage : public Module
 {
+	SerializeType entrymsg_type;
 	CommandEntryMessage commandentrymsg;
 
  public:
-	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandentrymsg(this)
+	CSEntryMessage(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), entrymsg_type("EntryMsg", EntryMsg::unserialize), commandentrymsg(this)
 	{
 		this->SetAuthor("Anope");
 
 		this->OnReload();
-
-		Serializable<EntryMsg>::Alloc.Register("EntryMsg");
 	}
 
 	void OnJoinChannel(User *u, Channel *c)

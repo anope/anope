@@ -27,10 +27,9 @@
 #include "timers.h"
 #include "modules.h"
 
-// getrlimit.
-#ifndef _WIN32
-# include <sys/time.h>
-# include <sys/resource.h>
+#ifdef _WIN32
+# include <process.h>
+# define execve _execve
 #endif
 
 /******** Global variables! ********/
@@ -46,11 +45,6 @@ bool nothird = false;		/* -nothrid */
 bool noexpire = false;		/* -noexpire */
 bool protocoldebug = false;	/* -protocoldebug */
 Anope::string binary_dir; /* Used to store base path for Anope */
-
-#ifdef _WIN32
-# include <process.h>
-# define execve _execve
-#endif
 
 /* Set to 1 if we are to quit */
 bool quitting = false;
@@ -315,6 +309,10 @@ int main(int ac, char **av, char **envp)
 
 	/* Clean out the module runtime directory prior to running, just in case files were left behind during a previous run */
 	ModuleManager::CleanupRuntimeDirectory();
+
+#ifdef _WIN32
+	OnStartup();
+#endif
 
 	try
 	{

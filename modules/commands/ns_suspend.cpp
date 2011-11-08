@@ -13,10 +13,14 @@
 
 #include "module.h"
 
-struct NickSuspend : ExtensibleItem, Serializable<NickSuspend>
+struct NickSuspend : ExtensibleItem, Serializable
 {
 	Anope::string nick;
 	time_t when;
+
+	NickSuspend() : Serializable("NickSuspend")
+	{
+	}
 
 	serialized_data serialize()
 	{
@@ -196,19 +200,18 @@ class CommandNSUnSuspend : public Command
 
 class NSSuspend : public Module
 {
+	SerializeType nicksuspend_type;
 	CommandNSSuspend commandnssuspend;
 	CommandNSUnSuspend commandnsunsuspend;
 
  public:
 	NSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandnssuspend(this), commandnsunsuspend(this)
+		nicksuspend_type("NickSuspend", NickSuspend::unserialize), commandnssuspend(this), commandnsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnPreNickExpire };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<NickSuspend>::Alloc.Register("NickSuspend");
 	}
 
 	~NSSuspend()

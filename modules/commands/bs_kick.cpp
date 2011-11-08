@@ -599,7 +599,7 @@ struct BanData : public ExtensibleItem
 	};
 
  private:
- 	typedef std::map<Anope::string, Data, std::less<ci::string> > data_type;
+ 	typedef std::map<Anope::string, Data, ci::less> data_type;
 	data_type data_map;
 
  public:

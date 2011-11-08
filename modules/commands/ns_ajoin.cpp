@@ -13,11 +13,11 @@
 
 #include "module.h"
 
-struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, ExtensibleItem, Serializable<AJoinList>
+struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, ExtensibleItem, Serializable
 {
 	NickCore *nc;
 
-	AJoinList(NickCore *n) : nc(n) { }
+	AJoinList(NickCore *n) : Serializable("AJoinList"), nc(n) { }
 
 	serialized_data serialize()
 	{
@@ -159,18 +159,17 @@ class CommandNSAJoin : public Command
 
 class NSAJoin : public Module
 {
+	SerializeType ajoinlist_type;
 	CommandNSAJoin commandnsajoin;
 
  public:
 	NSAJoin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandnsajoin(this)
+		ajoinlist_type("AJoinList", AJoinList::unserialize), commandnsajoin(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnNickIdentify };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<AJoinList>::Alloc.Register("AJoinList");
 	}
 
 	void OnNickIdentify(User *u)

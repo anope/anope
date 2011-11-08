@@ -21,7 +21,7 @@ class Message;
 namespace Anope
 {
 	template<typename T> class map : public std::map<string, T> { };
-	template<typename T> class insensitive_map : public std::map<string, T, std::less<ci::string> > { };
+	template<typename T> class insensitive_map : public std::map<string, T, ci::less> { };
 
 	/**
 	 * A wrapper string class around all the other string classes, this class will
@@ -265,7 +265,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = tolower(new_string[i]);
+				new_string[i] = static_cast<char>(tolower(new_string[i]));
 			return new_string;
 		}
 
@@ -276,7 +276,7 @@ namespace Anope
 		{
 			Anope::string new_string = *this;
 			for (size_type i = 0; i < new_string.length(); ++i)
-				new_string[i] = toupper(new_string[i]);
+				new_string[i] = static_cast<char>(toupper(new_string[i]));
 			return new_string;
 		}
 

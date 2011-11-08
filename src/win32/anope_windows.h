@@ -12,13 +12,13 @@
  #ifndef WINDOWS_H
  #define WINDOWS_H
  #ifdef _WIN32
- 
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
 #include <sys/timeb.h>
 #include <direct.h>
-#include <io.h>
+
 #ifdef MODULE_COMPILE
 # define CoreExport __declspec(dllimport)
 # define DllExport __declspec(dllexport)
@@ -26,30 +26,33 @@
 # define CoreExport __declspec(dllexport)
 # define DllExport __declspec(dllimport)
 #endif
-/* We have our own inet_pton and inet_ntop (Windows XP doesn't have its own) */
-#define inet_pton inet_pton_
-#define inet_ntop inet_ntop_
-#define setenv(x, y, z) SetEnvironmentVariable(x, y)
-#define unsetenv(x) SetEnvironmentVariable(x, NULL)
+
 #define MARK_DEPRECATED
+
 #if GETTEXT_FOUND
 /* Undefine some functions libintl defines */
 # undef snprintf
 # undef vsnprintf
 # undef printf
 #endif
+
 #define snprintf _snprintf
 /* VS2008 hates having this define before its own */
 #define vsnprintf _vsnprintf
+
 #define stat _stat
-#define getcwd(x, y) GetCurrentDirectory(y, x)
-#define getpid GetCurrentProcessId
 #define S_ISREG(x) ((x) & _S_IFREG)
+
 #ifdef EINPROGRESS
 # undef EINPROGRESS
 #endif
 #define EINPROGRESS WSAEWOULDBLOCK
 
+#include "socket.h"
+#include "dir/dir.h"
+#include "dl/dl.h"
+#include "pipe/pipe.h"
+#include "pthread/pthread.h"
 #include "sigaction/sigaction.h"
 
 namespace Anope
@@ -60,12 +63,13 @@ namespace Anope
 extern CoreExport void OnStartup();
 extern CoreExport void OnShutdown();
 extern CoreExport USHORT WindowsGetLanguage(const char *lang);
-extern CoreExport int inet_pton(int af, const char *src, void *dst);
-extern CoreExport const char *inet_ntop(int af, const void *src, char *dst, size_t size);
 extern CoreExport int gettimeofday(timeval *tv, void *);
 extern CoreExport Anope::string GetWindowsVersion();
 extern CoreExport bool SupportedWindowsVersion();
+extern int setenv(const char *name, const char *value, int overwrite);
+extern int unsetenv(const char *name);
 extern int mkstemp(char *input);
- 
- #endif // _WIN32
- #endif // WINDOWS_H
+extern void getcwd(char *buf, size_t sz);
+
+#endif // _WIN32
+#endif // WINDOWS_H

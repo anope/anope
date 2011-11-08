@@ -15,13 +15,14 @@ struct NewsMessages
 	const char *msgs[10];
 };
 
-struct NewsItem : Serializable<NewsItem>
+struct NewsItem : Serializable
 {
 	NewsType type;
 	Anope::string text;
 	Anope::string who;
 	time_t time;
 
+	NewsItem() : Serializable("NewsItem") { }
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };
@@ -40,7 +41,7 @@ class NewsService : public Service<Base>
 
 static service_reference<NewsService, Base> news_service("news");
 
-SerializableBase::serialized_data NewsItem::serialize()
+Serializable::serialized_data NewsItem::serialize()
 {
 	serialized_data data;
 		
@@ -52,7 +53,7 @@ SerializableBase::serialized_data NewsItem::serialize()
 	return data;
 }
 
-void NewsItem::unserialize(SerializableBase::serialized_data &data)
+void NewsItem::unserialize(serialized_data &data)
 {
 	if (!news_service)
 		return;

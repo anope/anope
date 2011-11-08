@@ -17,52 +17,24 @@ void ModuleManager::CleanupRuntimeDirectory()
 
 	Log(LOG_DEBUG) << "Cleaning out Module run time directory (" << dirbuf << ") - this may take a moment please wait";
 
-#ifndef _WIN32
 	DIR *dirp = opendir(dirbuf.c_str());
 	if (!dirp)
 	{
 		Log(LOG_DEBUG) << "Cannot open directory (" << dirbuf << ")";
 		return;
 	}
-	struct dirent *dp;
-	while ((dp = readdir(dirp)))
+	
+	for (dirent *dp; (dp = readdir(dirp));)
 	{
 		if (!dp->d_ino)
 			continue;
 		if (Anope::string(dp->d_name).equals_cs(".") || Anope::string(dp->d_name).equals_cs(".."))
 			continue;
 		Anope::string filebuf = dirbuf + "/" + dp->d_name;
-		DeleteFile(filebuf.c_str());
+		unlink(filebuf.c_str());
 	}
+
 	closedir(dirp);
-#else
-	Anope::string szDir = dirbuf + "/*";
-
-	WIN32_FIND_DATA FileData;
-	HANDLE hList = FindFirstFile(szDir.c_str(), &FileData);
-	if (hList != INVALID_HANDLE_VALUE)
-	{
-		bool fFinished = false;
-		while (!fFinished)
-		{
-			if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			{
-				Anope::string filebuf = dirbuf + "/" + FileData.cFileName;
-				if (!DeleteFile(filebuf.c_str()))
-					Log(LOG_DEBUG) << "Error deleting file " << filebuf << " - GetLastError() reports " << Anope::LastError();
-			}
-			if (!FindNextFile(hList, &FileData))
-			{
-				if (GetLastError() == ERROR_NO_MORE_FILES)
-					fFinished = true;
-			}
-		}
-	}
-	else
-		Log(LOG_DEBUG) << "Invalid File Handle. GetLastError() reports "<<  static_cast<int>(GetLastError());
-
-	FindClose(hList);
-#endif
 }
 
 /**
@@ -131,11 +103,11 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
  * This function will take a pointer from either dlsym or GetProcAddress and cast it in
  * a way that won't cause C++ warnings/errors to come up.
  */
-template <class TYPE> TYPE function_cast(ano_module_t symbol)
+template <class TYPE> TYPE function_cast(void *symbol)
 {
 	union
 	{
-		ano_module_t symbol;
+		void *symbol;
 		TYPE function;
 	} cast;
 	cast.symbol = symbol;
@@ -160,19 +132,18 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	if (ret != MOD_ERR_OK)
 		return ret;
 
-	ano_modclearerr();
-
-	ano_module_t handle = dlopen(pbuf.c_str(), RTLD_LAZY);
-	const char *err = ano_moderr();
+	dlerror();
+	void *handle = dlopen(pbuf.c_str(), RTLD_LAZY);
+	const char *err = dlerror();
 	if (!handle && err && *err)
 	{
 		Log() << err;
 		return MOD_ERR_NOLOAD;
 	}
 
-	ano_modclearerr();
+	dlerror();
 	Module *(*func)(const Anope::string &, const Anope::string &) = function_cast<Module *(*)(const Anope::string &, const Anope::string &)>(dlsym(handle, "AnopeInit"));
-	err = ano_moderr();
+	err = dlerror();
 	if (!func && err && *err)
 	{
 		Log() << "No init function found, not an Anope module";
@@ -305,15 +276,15 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 	if (!m || !m->handle)
 		return MOD_ERR_PARAMS;
 
-	ano_module_t handle = m->handle;
+	void *handle = m->handle;
 	Anope::string filename = m->filename;
 
 	Log(LOG_DEBUG) << "Unloading module " << m->name;
 
-	ano_modclearerr();
+	dlerror();
 	void (*destroy_func)(Module *m) = function_cast<void (*)(Module *)>(dlsym(m->handle, "AnopeFini"));
-	const char *err = ano_moderr();
-	if (!destroy_func || err)
+	const char *err = dlerror();
+	if (!destroy_func || (err && *err))
 	{
 		Log() << "No destroy function found for " << m->name << ", chancing delete...";
 		delete m; /* we just have to chance they haven't overwrote the delete operator then... */
@@ -322,10 +293,10 @@ ModuleReturn ModuleManager::DeleteModule(Module *m)
 		destroy_func(m); /* Let the module delete it self, just in case */
 
 	if (dlclose(handle))
-		Log() << ano_moderr();
+		Log() << dlerror();
 
 	if (!filename.empty())
-		DeleteFile(filename.c_str());
+		unlink(filename.c_str());
 	
 	return MOD_ERR_OK;
 }

@@ -139,6 +139,16 @@ namespace irc
 	/** This typedef declares irc::string based upon irc_char_traits.
 	 */
 	typedef std::basic_string<char, irc_char_traits, std::allocator<char> > string;
+
+	struct CoreExport less
+	{
+		/** Compare two Anope::strings as irc::strings and find which one is less
+		 * @param s1 The first string
+		 * @param s2 The second string
+		 * @return true if s1 < s2, else false
+		 */
+		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
+	};
 }
 
 /** The ci namespace contains a number of helper classes.
@@ -193,31 +203,10 @@ namespace ci
 	/** This typedef declares ci::string based upon ci_char_traits.
 	 */
 	typedef std::basic_string<char, ci_char_traits, std::allocator<char> > string;
-}
 
-namespace std
-{
-	/** An overload for std::less<ci::string> that uses Anope::string, passed for the third template argument
-	 * to std::map and std::multimap
-	 */
-	template<> struct CoreExport less<ci::string>
+	struct CoreExport less
 	{
-	 public:
 		/** Compare two Anope::strings as ci::strings and find which one is less
-		 * @param s1 The first string
-		 * @param s2 The second string
-		 * @return true if s1 < s2, else false
-		 */
-		bool operator()(const Anope::string &s1, const Anope::string &s2) const;
-	};
-
-	/** An overload for std;:less<irc::string> that uses Anope::string, passed for the third tempalte argument
-	 * to std::map and std::multimap
-	 */
-	template<> struct CoreExport less<irc::string>
-	{
-	 public:
-		/** Compare two Anope::strings as irc::strings and find which one is less
 		 * @param s1 The first string
 		 * @param s2 The second string
 		 * @return true if s1 < s2, else false

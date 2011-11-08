@@ -113,7 +113,7 @@ const char *ci::ci_char_traits::find(const char *s1, int n, char c)
  * @param s2 The second string
  * @return true if s1 < s2, else false
  */
-bool std::less<ci::string>::operator()(const Anope::string &s1, const Anope::string &s2) const
+bool ci::less::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
 	return s1.ci_str().compare(s2.ci_str()) < 0;
 }
@@ -123,7 +123,7 @@ bool std::less<ci::string>::operator()(const Anope::string &s1, const Anope::str
  * @param s2 The second string
  * @return true if s1 < s2, else false
  */
-bool std::less<irc::string>::operator()(const Anope::string &s1, const Anope::string &s2) const
+bool irc::less::operator()(const Anope::string &s1, const Anope::string &s2) const
 {
 	return s1.irc_str().compare(s2.irc_str()) < 0;
 }

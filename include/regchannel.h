@@ -75,12 +75,13 @@ enum BadWordType
 };
 
 /* Structure used to contain bad words. */
-struct BadWord : Serializable<BadWord>
+struct CoreExport BadWord : Serializable
 {
 	ChannelInfo *ci;
 	Anope::string word;
 	BadWordType type;
 
+	BadWord();
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
@@ -96,10 +97,10 @@ enum AutoKickFlag
 const Anope::string AutoKickFlagString[] = { "AK_ISNICK", "" };
 
 /* AutoKick data. */
-class AutoKick : public Flags<AutoKickFlag>, public Serializable<AutoKick>
+class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 {
  public:
- 	AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString) { }
+ 	AutoKick();
 	ChannelInfo *ci;
 	/* Only one of these can be in use */
 	Anope::string mask;
@@ -114,9 +115,9 @@ class AutoKick : public Flags<AutoKickFlag>, public Serializable<AutoKick>
 	static void unserialize(serialized_data &);
 };
 
-struct ModeLock : Serializable<ModeLock>
+struct CoreExport ModeLock : Serializable
 {
-	ModeLock() { }
+	ModeLock();
  public:
 	ChannelInfo *ci;
 	bool set;
@@ -125,13 +126,13 @@ struct ModeLock : Serializable<ModeLock>
 	Anope::string setter;
 	time_t created;
 
-	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime) : ci(ch), set(s), name(n), param(p), setter(se), created(c) { }
+	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
 
-struct LogSetting : Serializable<LogSetting>
+struct CoreExport LogSetting : Serializable
 {
 	ChannelInfo *ci;
 	/* Our service name of the command */
@@ -144,11 +145,12 @@ struct LogSetting : Serializable<LogSetting>
 	Anope::string creator;
 	time_t created;
 
+	LogSetting();
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
 
-class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>, public Serializable<ChannelInfo>
+class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, CI_END>, public Serializable
 {
  private:
 	NickCore *founder;							/* Channel founder */

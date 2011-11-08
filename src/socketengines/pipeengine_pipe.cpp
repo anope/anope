@@ -10,7 +10,7 @@ Pipe::Pipe() : Socket(-1), WritePipe(-1)
 	flags = fcntl(fds[1], F_GETFL, 0);
 	fcntl(fds[1], F_SETFL, flags | O_NONBLOCK);
 
-	this->~Socket();
+	this->~Pipe();
 
 	this->Sock = fds[0];
 	this->WritePipe = fds[1];
@@ -20,13 +20,14 @@ Pipe::Pipe() : Socket(-1), WritePipe(-1)
 
 Pipe::~Pipe()
 {
-	CloseSocket(this->WritePipe);
+	if (this->WritePipe >= 0)
+		close(this->WritePipe);
 }
 
 bool Pipe::ProcessRead()
 {
 	char dummy[512];
-	while (read(this->GetFD(), &dummy, 512) == 512);
+	while (read(this->GetFD(), dummy, 512) == 512);
 	this->OnNotify();
 	return true;
 }
@@ -40,4 +41,3 @@ void Pipe::Notify()
 void Pipe::OnNotify()
 {
 }
-

@@ -13,13 +13,13 @@
 
 #include "module.h"
 
-struct NSMiscData : Anope::string, ExtensibleItem, Serializable<NSMiscData>
+struct NSMiscData : Anope::string, ExtensibleItem, Serializable
 {
 	NickCore *nc;
 	Anope::string name;
 	Anope::string data;
 
-	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : nc(ncore), name(n), data(d)
+	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscdata"), nc(ncore), name(n), data(d)
 	{
 	}
 
@@ -107,19 +107,18 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 
 class NSSetMisc : public Module
 {
+	SerializeType nsmiscdata_type;
 	CommandNSSetMisc commandnssetmisc;
 	CommandNSSASetMisc commandnssasetmisc;
 
  public:
 	NSSetMisc(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandnssetmisc(this), commandnssasetmisc(this)
+		nsmiscdata_type("NSMiscData", NSMiscData::unserialize), commandnssetmisc(this), commandnssasetmisc(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnNickInfo };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<NSMiscData>::Alloc.Register("NSMisc");
 	}
 
 	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)

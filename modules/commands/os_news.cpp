@@ -318,6 +318,7 @@ class CommandOSRandomNews : public NewsBase
 
 class OSNews : public Module
 {
+	SerializeType newsitem_type;
 	MyNewsService newsservice;
 
 	CommandOSLogonNews commandoslogonnews;
@@ -372,15 +373,12 @@ class OSNews : public Module
 
  public:
 	OSNews(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
+		newsitem_type("NewsItem", NewsItem::unserialize), newsservice(this), commandoslogonnews(this), commandosopernews(this), commandosrandomnews(this)
 	{
 		this->SetAuthor("Anope");
 
-
 		Implementation i[] = { I_OnUserModeSet, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<NewsItem>::Alloc.Register("NewsItem");
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)

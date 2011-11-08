@@ -52,7 +52,7 @@ class Module;
 struct DNSQuery;
 class DNSPacket;
 
-struct Question
+struct CoreExport Question
 {
 	Anope::string name;
 	QueryType type;
@@ -62,7 +62,7 @@ struct Question
 	Question(const Anope::string &, QueryType, unsigned short = 1);
 };
 
-struct ResourceRecord : public Question
+struct CoreExport ResourceRecord : public Question
 {
 	unsigned int ttl;
 	Anope::string rdata;
@@ -72,7 +72,7 @@ struct ResourceRecord : public Question
 	ResourceRecord(const Question &);
 };
 
-struct DNSQuery
+struct CoreExport DNSQuery
 {
 	std::vector<Question> questions;
 	std::vector<ResourceRecord> answers, authorities, additional;
@@ -134,11 +134,11 @@ class DNSPacket : public DNSQuery
 	unsigned short Pack(unsigned char *output, unsigned short output_size);
 };
 
-/** DNS manager, manages the connection and all requests
+/** DNS manager, manages all requests
  */
 class CoreExport DNSManager : public Timer, public Socket
 {
-	typedef std::multimap<Anope::string, ResourceRecord, std::less<ci::string> > cache_map;
+	typedef std::multimap<Anope::string, ResourceRecord, ci::less> cache_map;
 	cache_map cache;
 	sockaddrs addrs;
  public:

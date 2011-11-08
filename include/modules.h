@@ -18,27 +18,6 @@
 #include "timers.h"
 #include "hashcomp.h"
 
-/* Cross OS compatibility macros */
-#ifdef _WIN32
-	typedef HMODULE ano_module_t;
-
-# define dlopen(file, unused) LoadLibrary(file)
-# define dlsym(file, symbol) (HMODULE)GetProcAddress(file, symbol)
-# define dlclose(file) FreeLibrary(file) ? 0 : 1
-# define ano_modclearerr() SetLastError(0)
-# define ano_moderr() (Anope::LastError().empty() ? NULL : Anope::LastError().c_str())
-#else
-	typedef void * ano_module_t;
-
-/* We call dlerror() here because it clears the module error after being
- * called. This previously read 'errno = 0', but that didn't work on
- * all POSIX-compliant architectures. This way the error is guaranteed
- * to be cleared, POSIX-wise. -GD
- */
-# define ano_modclearerr() dlerror()
-# define ano_moderr() dlerror()
-#endif
-
 /** Possible return types from events.
  */
 enum EventReturn
@@ -215,7 +194,7 @@ class CoreExport Module : public Extensible
 
 	/** Handle for this module, obtained from dlopen()
 	 */
-	ano_module_t handle;
+	void *handle;
 
 	/** Time this module was created
 	 */

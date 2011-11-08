@@ -23,12 +23,16 @@ static bool HSRequestMemoOper = false;
 
 void req_send_memos(CommandSource &source, const Anope::string &vIdent, const Anope::string &vHost);
 
-struct HostRequest : ExtensibleItem, Serializable<HostRequest>
+struct HostRequest : ExtensibleItem, Serializable
 {
 	Anope::string nick;
 	Anope::string ident;
 	Anope::string host;
 	time_t time;
+
+	HostRequest() : Serializable("HostRequest")
+	{
+	}
 
 	serialized_data serialize()
 	{
@@ -326,6 +330,7 @@ class CommandHSWaiting : public HSListBase
 
 class HSRequest : public Module
 {
+	SerializeType request_type;
 	CommandHSRequest commandhsrequest;
 	CommandHSActivate commandhsactive;
 	CommandHSReject commandhsreject;
@@ -333,7 +338,7 @@ class HSRequest : public Module
 
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
+		request_type("HSRequest", HostRequest::unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
 		this->SetAuthor("Anope");
 

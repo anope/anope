@@ -13,10 +13,14 @@
 
 #include "module.h"
 
-struct ChanSuspend : ExtensibleItem, Serializable<ChanSuspend>
+struct ChanSuspend : ExtensibleItem, Serializable
 {
 	Anope::string chan;
 	time_t when;
+
+	ChanSuspend() : Serializable("ChanSuspend")
+	{
+	}
 
 	serialized_data serialize()
 	{
@@ -195,19 +199,18 @@ class CommandCSUnSuspend : public Command
 
 class CSSuspend : public Module
 {
+	SerializeType chansuspend_type;
 	CommandCSSuspend commandcssuspend;
 	CommandCSUnSuspend commandcsunsuspend;
 
  public:
 	CSSuspend(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcssuspend(this), commandcsunsuspend(this)
+		chansuspend_type("ChanSuspend", ChanSuspend::unserialize), commandcssuspend(this), commandcsunsuspend(this)
 	{
 		this->SetAuthor("Anope");
 
 		Implementation i[] = { I_OnPreChanExpire };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
-
-		Serializable<ChanSuspend>::Alloc.Register("ChanSuspend");
 	}
 
 	~CSSuspend()

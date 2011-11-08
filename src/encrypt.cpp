@@ -35,7 +35,7 @@ bool enc_decrypt(const Anope::string &src, Anope::string &dest)
 	if (pos == Anope::string::npos)
 	{
 		Log() << "Error: enc_decrypt() called with invalid password string (" << src << ")";
-		return -1;
+		return false;
 	}
 	Anope::string hashm(src.begin(), src.begin() + pos);
 

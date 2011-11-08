@@ -13,9 +13,9 @@
 #include "modules.h"
 #include "memoserv.h"
 
-Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
+Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings), Serializable("Memo") { }
 
-SerializableBase::serialized_data Memo::serialize()
+Serializable::serialized_data Memo::serialize()
 {
 	serialized_data data;	
 
@@ -28,7 +28,7 @@ SerializableBase::serialized_data Memo::serialize()
 	return data;
 }
 
-void Memo::unserialize(SerializableBase::serialized_data &data)
+void Memo::unserialize(serialized_data &data)
 {
 	if (!memoserv)
 		return;

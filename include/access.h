@@ -1,7 +1,7 @@
 #ifndef ACCESS_H
 #define ACCESS_H
 
-struct Privilege
+struct CoreExport Privilege
 {
 	Anope::string name;
 	Anope::string desc;
@@ -10,7 +10,7 @@ struct Privilege
 	bool operator==(const Privilege &other);
 };
 
-class PrivilegeManager
+class CoreExport PrivilegeManager
 {
 	static std::vector<Privilege> privs;
  public:
@@ -31,7 +31,7 @@ class CoreExport AccessProvider : public Service<AccessProvider>
 	virtual ChanAccess *Create() = 0;
 };
 
-class CoreExport ChanAccess
+class CoreExport ChanAccess : public Serializable
 {
  public:
 	AccessProvider *provider;
@@ -41,11 +41,12 @@ class CoreExport ChanAccess
 	time_t last_seen;
 	time_t created;
 
-	virtual Anope::string serialize_name() = 0;
-	virtual SerializableBase::serialized_data serialize() = 0;
-
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
+
+	serialized_data serialize();
+	static void unserialize(serialized_data &);
+
 	virtual bool Matches(User *u, NickCore *nc) = 0;
 	virtual bool HasPriv(const Anope::string &name) = 0;	
 	virtual Anope::string Serialize() = 0;

@@ -123,7 +123,7 @@ class MySQLService : public SQLProvider
 
 	SQLResult RunQuery(const SQLQuery &query);
 
-	SQLQuery CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data);
+	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data);
 
 	SQLQuery GetTables();
 
@@ -342,10 +342,10 @@ SQLResult MySQLService::RunQuery(const SQLQuery &query)
 	}
 }
 
-SQLQuery MySQLService::CreateTable(const Anope::string &table, const SerializableBase::serialized_data &data)
+SQLQuery MySQLService::CreateTable(const Anope::string &table, const Serializable::serialized_data &data)
 {
 	Anope::string query_text = "CREATE TABLE `" + table + "` (", key_buf;
-	for (SerializableBase::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+	for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
 	{
 		query_text += "`" + it->first + "` ";
 		if (it->second.getType() == Serialize::DT_INT)

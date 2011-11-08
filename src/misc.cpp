@@ -49,35 +49,6 @@ bool IsFile(const Anope::string &filename)
 	return false;
 }
 
-/**
- * toupper:  Like the ANSI functions, but make sure we return an
- *           int instead of a (signed) char.
- * @param c Char
- * @return int
- */
-int toupper(char c)
-{
-	if (islower(c))
-		return static_cast<int>(c) - ('a' - 'A');
-	else
-		return static_cast<int>(c);
-}
-
-/*************************************************************************/
-
-/**
- * tolower:  Like the ANSI functions, but make sure we return an
- *           int instead of a (signed) char.
- * @param c Char
- * @return int
- */
-int tolower(char c)
-{
-	if (isupper(c))
-		return static_cast<int>(c) + ('a' - 'A');
-	else
-		return static_cast<int>(c);
-}
 
 /*************************************************************************/
 

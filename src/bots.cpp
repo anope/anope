@@ -13,7 +13,7 @@
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;
 
-BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), botmodes(bmodes)
+BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const Anope::string &nhost, const Anope::string &nreal, const Anope::string &bmodes) : User(nnick, nuser, nhost, ts6_uid_retrieve()), Flags<BotFlag, BI_END>(BotFlagString), Serializable("BotInfo"), botmodes(bmodes)
 {
 	this->realname = nreal;
 	this->server = Me;
@@ -64,9 +64,9 @@ BotInfo::~BotInfo()
 		BotListByUID.erase(this->uid);
 }
 
-SerializableBase::serialized_data BotInfo::serialize()
+Serializable::serialized_data BotInfo::serialize()
 {
-	SerializableBase::serialized_data data;
+	serialized_data data;
 
 	data["nick"] << this->nick;
 	data["user"] << this->ident;
@@ -79,7 +79,7 @@ SerializableBase::serialized_data BotInfo::serialize()
 	return data;
 }
 
-void BotInfo::unserialize(SerializableBase::serialized_data &data)
+void BotInfo::unserialize(serialized_data &data)
 {
 	BotInfo *bi = findbot(data["nick"].astr());
 	if (bi == NULL)

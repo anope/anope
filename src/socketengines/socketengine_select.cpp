@@ -1,5 +1,10 @@
 #include "module.h"
 
+#ifdef _AIX
+# undef FD_ZERO
+# define FD_ZERO(p) memset((p), 0, sizeof(*(p)))
+#endif /* _AIX */
+
 static int MaxFD;
 static unsigned FDCount;
 static fd_set ReadFDs;
@@ -77,7 +82,7 @@ void SocketEngine::Process()
 	 */
 	if (FDCount == 0)
 	{
-		sleep(Config->ReadTimeout);
+		sleep(tval.tv_sec);
 		return;
 	}
 #endif

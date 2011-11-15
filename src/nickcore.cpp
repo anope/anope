@@ -86,7 +86,7 @@ void NickCore::unserialize(serialized_data &data)
 		data["cert"] >> buf;
 		spacesepstream sep(buf);
 		while (sep.GetToken(buf))
-			nc->access.push_back(buf);
+			nc->cert.push_back(buf);
 	}
 	data["memomax"] >> nc->memos.memomax;
 	{

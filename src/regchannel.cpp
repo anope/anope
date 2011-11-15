@@ -1032,7 +1032,10 @@ void ChannelInfo::RestoreTopic()
 int16_t ChannelInfo::GetLevel(const Anope::string &priv)
 {
 	if (PrivilegeManager::FindPrivilege(priv) == NULL)
-		throw CoreException("Unknown privilege " + priv);
+	{
+		Log(LOG_DEBUG) << "Unknown privilege " + priv;
+		return ACCESS_INVALID;
+	}
 
 	if (this->levels.count(priv) == 0)
 		this->levels[priv] = 0;

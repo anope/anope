@@ -465,6 +465,19 @@ class ChannelModeFlood : public ChannelModeParam
 	}
 };
 
+class ChannelModeUnrealSSL : public ChannelMode
+{
+ public:
+	ChannelModeUnrealSSL(ChannelModeName n, char c) : ChannelMode(n, c)
+	{
+	}
+
+	bool CanSet(User *u) const
+	{
+		return false;
+	}
+};
+
 class Unreal32IRCdMessage : public IRCdMessage
 {
  public:
@@ -756,6 +769,9 @@ class Unreal32IRCdMessage : public IRCdMessage
 							continue;
 						case 'G':
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_FILTER, 'G'));
+							continue;
+						case 'Z':
+							ModeManager::AddChannelMode(new ChannelModeUnrealSSL(CMODE_END, 'Z'));
 							continue;
 						default:
 							ModeManager::AddChannelMode(new ChannelMode(CMODE_END, modebuf[t]));

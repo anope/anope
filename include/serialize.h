@@ -66,7 +66,7 @@ extern void RegisterTypes();
 class CoreExport Serializable
 {
  private:
-	static std::list<Serializable *> serizliable_items;
+	static std::list<Serializable *> *serizliable_items;
 
 	Anope::string serizliable_name;
 	std::list<Serializable *>::iterator s_iter;
@@ -79,19 +79,21 @@ class CoreExport Serializable
  protected:
 	Serializable(const Anope::string &n) : serizliable_name(n)
 	{
-		serizliable_items.push_front(this);
-		this->s_iter = serizliable_items.begin();
+		if (serizliable_items == NULL)
+			serizliable_items = new std::list<Serializable *>();
+		serizliable_items->push_front(this);
+		this->s_iter = serizliable_items->begin();
 	}
 
 	Serializable(const Serializable &)
 	{
-		serizliable_items.push_front(this);
-		this->s_iter = serizliable_items.begin();
+		serizliable_items->push_front(this);
+		this->s_iter = serizliable_items->begin();
 	}
 
 	virtual ~Serializable()
 	{
-		serizliable_items.erase(this->s_iter);
+		serizliable_items->erase(this->s_iter);
 	}
 
 	Serializable &operator=(const Serializable &)
@@ -111,7 +113,7 @@ class CoreExport Serializable
 
 	static const std::list<Serializable *> &GetItems()
 	{
-		return serizliable_items;
+		return *serizliable_items;
 	}
 };
 

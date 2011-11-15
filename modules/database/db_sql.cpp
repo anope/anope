@@ -172,10 +172,10 @@ class DBSQL : public Module
 
 			SQLQuery query("SELECT * FROM `" + sb->GetName() + "`");
 			SQLResult res = this->sql->RunQuery(query);
-			for (int i = 0; i < res.Rows(); ++i)
+			for (int j = 0; j < res.Rows(); ++j)
 			{
 				Serializable::serialized_data data;
-				const std::map<Anope::string, Anope::string> &row = res.Row(i);
+				const std::map<Anope::string, Anope::string> &row = res.Row(j);
 				for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
 					data[rit->first] << rit->second;
 

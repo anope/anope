@@ -4,7 +4,7 @@
 
 std::vector<Anope::string> SerializeType::type_order;
 Anope::map<SerializeType *> SerializeType::types;
-std::list<Serializable *> Serializable::serizliable_items;
+std::list<Serializable *> *Serializable::serizliable_items;
 
 void RegisterTypes()
 {

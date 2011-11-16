@@ -178,7 +178,7 @@ static void _common_unban(ChannelInfo * ci, char *nick, boolean full)
     for (ban = ci->c->bans->entries; ban; ban = next) {
         next = ban->next;
         if ((full && entry_match(ban, u->nick, u->username, u->host, ip)) ||
-            entry_match(ban, u->nick, u->username, u->vhost, 0) ||
+            entry_match(ban, u->nick, u->vident, u->vhost, 0) ||
             entry_match(ban, u->nick, u->username, u->chost, 0)) {
             anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
             if (ircdcap->tsmode)

@@ -2425,7 +2425,7 @@ static Entry *_elist_match_user(EList * list, User * u, boolean full)
     if (full)
         res = elist_match(list, u->nick, u->username, u->host, ip);
     if (!res)
-        res = elist_match(list, u->nick, u->username, u->vhost, 0);
+        res = elist_match(list, u->nick, u->vident, u->vhost, 0);
     if (!res)
         res = elist_match(list, u->nick, u->username, u->chost, 0);
 

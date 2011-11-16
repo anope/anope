@@ -1,6 +1,12 @@
 #ifndef ACCESS_H
 #define ACCESS_H
 
+enum
+{
+	ACCESS_INVALID = -10000,
+	ACCESS_FOUNDER = 10001
+};
+
 struct CoreExport Privilege
 {
 	Anope::string name;

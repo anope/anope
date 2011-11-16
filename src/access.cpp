@@ -12,12 +12,6 @@
 #include "services.h"
 #include "modules.h"
 
-enum
-{
-	ACCESS_INVALID = -10000,
-	ACCESS_FOUNDER = 10001
-};
-
 Privilege::Privilege(const Anope::string &n, const Anope::string &d) : name(n), desc(d)
 {
 }

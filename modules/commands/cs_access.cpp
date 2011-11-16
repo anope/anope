@@ -13,12 +13,6 @@
 
 #include "module.h"
 
-enum
-{
-	ACCESS_INVALID = -10000,
-	ACCESS_FOUNDER = 10001
-};
-
 static std::map<Anope::string, int16_t, ci::less> defaultLevels;
 
 static void reset_levels(ChannelInfo *ci)

@@ -660,7 +660,7 @@ static BanData *get_ban_data(Channel * c, User * u)
     if (!c || !u)
         return NULL;
 
-    snprintf(mask, sizeof(mask), "%s@%s", u->username,
+    snprintf(mask, sizeof(mask), "%s@%s", common_get_vident(u),
              common_get_vhost(u));
 
     for (bd = c->bd; bd; bd = next) {

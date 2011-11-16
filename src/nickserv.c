@@ -1292,8 +1292,8 @@ int is_on_access(User * u, NickCore * nc)
     sprintf(buf, "%s@%s", u->username, u->host);
     if (ircd->vhost) {
         if (u->vhost) {
-            buf2 = scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
-            sprintf(buf2, "%s@%s", u->username, u->vhost);
+            buf2 = scalloc(strlen(u->vident) + strlen(u->vhost) + 2, 1);
+            sprintf(buf2, "%s@%s", u->vident, u->vhost);
         }
         if (u->chost)
         {

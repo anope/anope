@@ -33,8 +33,13 @@ struct SeenInfo : Serializable
 	Anope::string message;  // for part/kick/quit
 	time_t last;            // the time when the user was last seen
 
-	SeenInfo() : Serializable("SeenInfo")
+	SeenInfo()
 	{
+	}
+
+	Anope::string serialize_name() const
+	{
+		return "SeenInfo";
 	}
 
 	serialized_data serialize()

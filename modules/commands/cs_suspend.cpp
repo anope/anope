@@ -18,8 +18,13 @@ struct ChanSuspend : ExtensibleItem, Serializable
 	Anope::string chan;
 	time_t when;
 
-	ChanSuspend() : Serializable("ChanSuspend")
+	ChanSuspend()
 	{
+	}
+
+	Anope::string serialize_name() const
+	{
+		return "ChanSuspend";
 	}
 
 	serialized_data serialize()

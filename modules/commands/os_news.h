@@ -22,7 +22,7 @@ struct NewsItem : Serializable
 	Anope::string who;
 	time_t time;
 
-	NewsItem() : Serializable("NewsItem") { }
+	Anope::string serialize_name() const { return "NewsItem"; }
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };

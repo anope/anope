@@ -15,7 +15,12 @@
 
 struct MyOper : Oper, Serializable
 {
-	MyOper(const Anope::string &n, OperType *o) : Oper(n, o), Serializable("Oper") { }
+	MyOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
+
+	Anope::string serialize_name() const
+	{
+		return "Oper";
+	}
 
 	serialized_data serialize()
 	{

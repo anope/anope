@@ -19,8 +19,13 @@ struct NSMiscData : Anope::string, ExtensibleItem, Serializable
 	Anope::string name;
 	Anope::string data;
 
-	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : Serializable("NSMiscdata"), nc(ncore), name(n), data(d)
+	NSMiscData(NickCore *ncore, const Anope::string &n, const Anope::string &d) : nc(ncore), name(n), data(d)
 	{
+	}
+
+	Anope::string serialize_name() const
+	{
+		return "NSMiscData";
 	}
 
 	serialized_data serialize()

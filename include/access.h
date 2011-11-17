@@ -50,6 +50,7 @@ class CoreExport ChanAccess : public Serializable
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 

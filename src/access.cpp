@@ -65,12 +65,17 @@ AccessProvider::~AccessProvider()
 {
 }
 
-ChanAccess::ChanAccess(AccessProvider *p) : Serializable("ChanAccess"), provider(p)
+ChanAccess::ChanAccess(AccessProvider *p) : provider(p)
 {
 }
 
 ChanAccess::~ChanAccess()
 {
+}
+
+Anope::string ChanAccess::serialize_name() const
+{
+	return "ChanAccess";
 }
 
 Serializable::serialized_data ChanAccess::serialize()

@@ -81,7 +81,7 @@ struct CoreExport BadWord : Serializable
 	Anope::string word;
 	BadWordType type;
 
-	BadWord();
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
@@ -111,13 +111,13 @@ class CoreExport AutoKick : public Flags<AutoKickFlag>, public Serializable
 	time_t addtime;
 	time_t last_used;
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
 
 struct CoreExport ModeLock : Serializable
 {
-	ModeLock();
  public:
 	ChannelInfo *ci;
 	bool set;
@@ -128,6 +128,7 @@ struct CoreExport ModeLock : Serializable
 
 	ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se = "", time_t c = Anope::CurTime);
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
@@ -145,7 +146,7 @@ struct CoreExport LogSetting : Serializable
 	Anope::string creator;
 	time_t created;
 
-	LogSetting();
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 };
@@ -204,6 +205,7 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	int16_t floodlines, floodsecs;	/* For FLOOD kicker */
 	int16_t repeattimes;			/* For REPEAT kicker */
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 

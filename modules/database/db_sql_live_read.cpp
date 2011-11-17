@@ -158,20 +158,20 @@ class DBMySQL : public Module
 		{
 			NickAlias *na = findnick(source.u->nick);
 			if (!na)
-				this->Insert(na->nc->GetSerializeName(), na->nc->serialize());
+				this->Insert(na->nc->serialize_name(), na->nc->serialize());
 
 		}
 		else if (command->name.find("nickserv/saset/") == 0)
 		{
 			NickAlias *na = findnick(params[1]);
 			if (!na)
-				this->Insert(na->nc->GetSerializeName(), na->nc->serialize());
+				this->Insert(na->nc->serialize_name(), na->nc->serialize());
 		}
 		else if (command->name.find("chanserv/set") == 0 || command->name.find("chanserv/saset") == 0)
 		{
 			ChannelInfo *ci = params.size() > 0 ? cs_findchan(params[0]) : NULL;
 			if (!ci)
-				this->Insert(ci->GetSerializeName(), ci->serialize());
+				this->Insert(ci->serialize_name(), ci->serialize());
 		}
 		else if (command->name == "botserv/kick" && params.size() > 2)
 		{
@@ -180,7 +180,7 @@ class DBMySQL : public Module
 				return;
 			if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
 				return;
-			this->Insert(ci->GetSerializeName(), ci->serialize());
+			this->Insert(ci->serialize_name(), ci->serialize());
 		}
 		else if (command->name == "botserv/set" && params.size() > 1)
 		{
@@ -189,9 +189,9 @@ class DBMySQL : public Module
 			if (!ci)
 				bi = findbot(params[0]);
 			if (bi && params[1].equals_ci("PRIVATE") && u->HasPriv("botserv/set/private"))
-				this->Insert(bi->GetSerializeName(), bi->serialize());
+				this->Insert(bi->serialize_name(), bi->serialize());
 			else if (ci && !ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
-				this->Insert(ci->GetSerializeName(), ci->serialize());
+				this->Insert(ci->serialize_name(), ci->serialize());
 		}
 		else if (command->name == "memoserv/ignore" && params.size() > 0)
 		{
@@ -200,40 +200,40 @@ class DBMySQL : public Module
 			{
 				NickCore *nc = u->Account();
 				if (nc)
-					this->Insert(nc->GetSerializeName(), nc->serialize());
+					this->Insert(nc->serialize_name(), nc->serialize());
 			}
 			else
 			{
 				ChannelInfo *ci = cs_findchan(target);
 				if (ci && ci->AccessFor(u).HasPriv("MEMO"))
-					this->Insert(ci->GetSerializeName(), ci->serialize());
+					this->Insert(ci->serialize_name(), ci->serialize());
 			}
 		}
 	}
 
 	void OnNickAddAccess(NickCore *nc, const Anope::string &entry)
 	{
-		this->Insert(nc->GetSerializeName(), nc->serialize());
+		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
 	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry)
 	{
-		this->Insert(nc->GetSerializeName(), nc->serialize());
+		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
 	void OnNickClearAccess(NickCore *nc)
 	{
-		this->Insert(nc->GetSerializeName(), nc->serialize());
+		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
 	void OnDelCore(NickCore *nc)
 	{
-		this->Delete(nc->GetSerializeName(), nc->serialize());
+		this->Delete(nc->serialize_name(), nc->serialize());
 	}
 
 	void OnNickForbidden(NickAlias *na)
 	{
-		this->Insert(na->GetSerializeName(), na->serialize());
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 
 	void OnNickGroup(User *u, NickAlias *)
@@ -243,12 +243,12 @@ class DBMySQL : public Module
 
 	void InsertAlias(NickAlias *na)
 	{
-		this->Insert(na->GetSerializeName(), na->serialize());
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 
 	void InsertCore(NickCore *nc)
 	{
-		this->Insert(nc->GetSerializeName(), nc->serialize());
+		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
 	void OnNickRegister(NickAlias *na)
@@ -260,41 +260,41 @@ class DBMySQL : public Module
 	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
 	{
 		Serializable::serialized_data data = nc->serialize();
-		this->Delete(nc->GetSerializeName(), data);
+		this->Delete(nc->serialize_name(), data);
 		data.erase("display");
 		data["display"] << newdisplay;
-		this->Insert(nc->GetSerializeName(), data);
+		this->Insert(nc->serialize_name(), data);
 
 		for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 		{
 			NickAlias *na = *it;
 			data = na->serialize();
 
-			this->Delete(na->GetSerializeName(), data);
+			this->Delete(na->serialize_name(), data);
 			data.erase("nc");
 			data["nc"] << newdisplay;
-			this->Insert(na->GetSerializeName(), data);
+			this->Insert(na->serialize_name(), data);
 		}
 	}
 
 	void OnNickSuspend(NickAlias *na)
 	{
-		this->Insert(na->GetSerializeName(), na->serialize());
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 
 	void OnDelNick(NickAlias *na)
 	{
-		this->Delete(na->GetSerializeName(), na->serialize());
+		this->Delete(na->serialize_name(), na->serialize());
 	}
 
 	void OnAccessAdd(ChannelInfo *ci, User *, ChanAccess *access)
 	{
-		this->Insert(access->GetSerializeName(), access->serialize());
+		this->Insert(access->serialize_name(), access->serialize());
 	}
 
 	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
 	{
-		this->Delete(access->GetSerializeName(), access->serialize());
+		this->Delete(access->serialize_name(), access->serialize());
 	}
 
 	void OnAccessClear(ChannelInfo *ci, User *u)
@@ -305,49 +305,49 @@ class DBMySQL : public Module
 
 	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what)
 	{
-		this->Insert(ci->GetSerializeName(), ci->serialize());
+		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
 	void OnDelChan(ChannelInfo *ci)
 	{
-		this->Delete(ci->GetSerializeName(), ci->serialize());
+		this->Delete(ci->serialize_name(), ci->serialize());
 	}
 
 	void OnChanRegistered(ChannelInfo *ci)
 	{
-		this->Insert(ci->GetSerializeName(), ci->serialize());
+		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
 	void OnChanSuspend(ChannelInfo *ci)
 	{
-		this->Insert(ci->GetSerializeName(), ci->serialize());
+		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
 	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
 	{
-		this->Insert(ak->GetSerializeName(), ak->serialize());
+		this->Insert(ak->serialize_name(), ak->serialize());
 	}
 
 	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
 	{
-		this->Delete(ak->GetSerializeName(), ak->serialize());
+		this->Delete(ak->serialize_name(), ak->serialize());
 	}
 
 	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock)
 	{
-		this->Insert(lock->GetSerializeName(), lock->serialize());
+		this->Insert(lock->serialize_name(), lock->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock)
 	{
-		this->Delete(lock->GetSerializeName(), lock->serialize());
+		this->Delete(lock->serialize_name(), lock->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	void OnBotCreate(BotInfo *bi)
 	{
-		this->Insert(bi->GetSerializeName(), bi->serialize());
+		this->Insert(bi->serialize_name(), bi->serialize());
 	}
 
 	void OnBotChange(BotInfo *bi)
@@ -357,76 +357,76 @@ class DBMySQL : public Module
 
 	void OnBotDelete(BotInfo *bi)
 	{
-		this->Delete(bi->GetSerializeName(), bi->serialize());
+		this->Delete(bi->serialize_name(), bi->serialize());
 	}
 
 	EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi)
 	{
-		this->Insert(ci->GetSerializeName(), ci->serialize());
+		this->Insert(ci->serialize_name(), ci->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci)
 	{
-		this->Insert(ci->GetSerializeName(), ci->serialize());
+		this->Insert(ci->serialize_name(), ci->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
 	{
-		this->Insert(bw->GetSerializeName(), bw->serialize());
+		this->Insert(bw->serialize_name(), bw->serialize());
 	}
 
 	void OnBadWordDel(ChannelInfo *ci, BadWord *bw)
 	{
-		this->Delete(bw->GetSerializeName(), bw->serialize());
+		this->Delete(bw->serialize_name(), bw->serialize());
 	}
 
 	void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m)
 	{
-		this->Insert(m->GetSerializeName(), m->serialize());
+		this->Insert(m->serialize_name(), m->serialize());
 	}
 
 	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
 	{
-		this->Delete(m->GetSerializeName(), m->serialize());
+		this->Delete(m->serialize_name(), m->serialize());
 	}
 
 	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m)
 	{
-		this->Delete(m->GetSerializeName(), m->serialize());
+		this->Delete(m->serialize_name(), m->serialize());
 	}
 
 	EventReturn OnExceptionAdd(Exception *ex)
 	{
-		this->Insert(ex->GetSerializeName(), ex->serialize());
+		this->Insert(ex->serialize_name(), ex->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	void OnExceptionDel(User *, Exception *ex)
 	{
-		this->Delete(ex->GetSerializeName(), ex->serialize());
+		this->Delete(ex->serialize_name(), ex->serialize());
 	}
 
 	EventReturn OnAddXLine(XLine *x, XLineManager *xlm)
 	{
-		this->Insert(x->GetSerializeName(), x->serialize());
+		this->Insert(x->serialize_name(), x->serialize());
 		return EVENT_CONTINUE;
 	}
 
 	void OnDelXLine(User *, XLine *x, XLineManager *xlm)
 	{
-		this->Delete(x->GetSerializeName(), x->serialize());
+		this->Delete(x->serialize_name(), x->serialize());
 	}
 
 	void OnDeleteVhost(NickAlias *na)
 	{
-		this->Insert(na->GetSerializeName(), na->serialize());
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 
 	void OnSetVhost(NickAlias *na)
 	{
-		this->Insert(na->GetSerializeName(), na->serialize());
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 };
 

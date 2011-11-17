@@ -12,8 +12,9 @@
 #include "services.h"
 #include "modules.h"
 
-BadWord::BadWord() : Serializable("BadWord")
+Anope::string BadWord::serialize_name() const
 {
+	return "BadWord";
 }
 
 Serializable::serialized_data BadWord::serialize()
@@ -39,8 +40,13 @@ void BadWord::unserialize(serialized_data &data)
 	ci->AddBadWord(data["word"].astr(), static_cast<BadWordType>(n));
 }
 
-AutoKick::AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString), Serializable("AutoKick")
+AutoKick::AutoKick() : Flags<AutoKickFlag>(AutoKickFlagString)
 {
+}
+
+Anope::string AutoKick::serialize_name() const
+{
+	return "AutoKick";
 }
 
 Serializable::serialized_data AutoKick::serialize()
@@ -78,12 +84,13 @@ void AutoKick::unserialize(serialized_data &data)
 		ci->AddAkick(data["creator"].astr(), data["mask"].astr(), data["reason"].astr(), addtime, lastused);
 }
 
-ModeLock::ModeLock() : Serializable("ModeLock")
+ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : ci(ch), set(s), name(n), param(p), setter(se), created(c)
 {
 }
 
-ModeLock::ModeLock(ChannelInfo *ch, bool s, ChannelModeName n, const Anope::string &p, const Anope::string &se, time_t c) : Serializable("ModeLock"), ci(ch), set(s), name(n), param(p), setter(se), created(c)
+Anope::string ModeLock::serialize_name() const
 {
+	return "ModeLock";
 }
 
 Serializable::serialized_data ModeLock::serialize()
@@ -109,28 +116,32 @@ void ModeLock::unserialize(serialized_data &data)
 	if (ci == NULL)
 		return;
 
-	ModeLock ml;
+	ChannelModeName name = CMODE_END;
 
-	ml.ci = ci;
-
-	data["set"] >> ml.set;
-	Anope::string n;
-	data["name"] >> n;
 	for (unsigned i = 0; !ChannelModeNameStrings[i].empty(); ++i)
-		if (n == ChannelModeNameStrings[i])
+		if (ChannelModeNameStrings[i] == data["name"].astr())
 		{
-			ml.name = static_cast<ChannelModeName>(i);
+			name = static_cast<ChannelModeName>(i);
 			break;
 		}
+	if (name == CMODE_END)
+		return;
+
+	bool set;
+	data["set"] >> set;
+
+	time_t created;
+	data["created"] >> created;
+
+	ModeLock ml(ci, set, name, "", data["setter"].astr(), created);
 	data["param"] >> ml.param;
-	data["setter"] >> ml.setter;
-	data["created"] >> ml.created;
 
 	ci->mode_locks.insert(std::make_pair(ml.name, ml));
 }
 
-LogSetting::LogSetting() : Serializable("LogSetting")
+Anope::string LogSetting::serialize_name() const
 {
+	return "LogSetting";
 }
 
 Serializable::serialized_data LogSetting::serialize()
@@ -172,7 +183,7 @@ void LogSetting::unserialize(serialized_data &data)
 /** Default constructor
  * @param chname The channel name
  */
-ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"), botflags(BotServFlagStrings)
+ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
 {
 	if (chname.empty())
 		throw CoreException("Empty channel passed to ChannelInfo constructor");
@@ -188,8 +199,6 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 	this->bi = NULL;
 
 	this->name = chname;
-
-	this->mode_locks = def_mode_locks;
 
 	size_t t;
 	/* Set default channel flags */
@@ -217,7 +226,7 @@ ChannelInfo::ChannelInfo(const Anope::string &chname) : Flags<ChannelInfoFlag, C
 /** Copy constructor
  * @param ci The ChannelInfo to copy settings to
  */
-ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), Serializable("ChannelInfo"), botflags(BotServFlagStrings)
+ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(ChannelInfoFlagStrings), botflags(BotServFlagStrings)
 {
 	*this = ci;
 
@@ -297,6 +306,11 @@ ChannelInfo::~ChannelInfo()
 
 	if (this->founder)
 		--this->founder->channelcount;
+}
+
+Anope::string ChannelInfo::serialize_name() const
+{
+	return "ChannelInfo";
 }
 
 Serializable::serialized_data ChannelInfo::serialize()

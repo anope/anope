@@ -10,10 +10,7 @@ struct Exception : Serializable
 	time_t time;			/* When this exception was added */
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
-	Exception() : Serializable("Exception")
-	{
-	}
-
+	Anope::string serialize_name() const { return "Exception"; }
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };

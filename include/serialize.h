@@ -68,16 +68,10 @@ class CoreExport Serializable
  private:
 	static std::list<Serializable *> *serizliable_items;
 
-	Anope::string serizliable_name;
 	std::list<Serializable *>::iterator s_iter;
 
-	Serializable()
-	{
-		throw CoreException();
-	}
-
  protected:
-	Serializable(const Anope::string &n) : serizliable_name(n)
+	Serializable()
 	{
 		if (serizliable_items == NULL)
 			serizliable_items = new std::list<Serializable *>();
@@ -104,11 +98,7 @@ class CoreExport Serializable
  public:
 	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
 
-	const Anope::string &GetSerializeName()
-	{
-		return this->serizliable_name;
-	}
-
+	virtual Anope::string serialize_name() const = 0;
 	virtual serialized_data serialize() = 0;
 
 	static const std::list<Serializable *> &GetItems()

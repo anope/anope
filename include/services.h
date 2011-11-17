@@ -505,6 +505,8 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable
 {
  public:
  	Memo();
+
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 

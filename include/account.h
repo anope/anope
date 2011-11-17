@@ -116,6 +116,7 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	NickCore *nc;					/* I'm an alias of this */
 	HostInfo hostinfo;
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 
@@ -162,6 +163,7 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 	time_t lastmail;				/* Last time this nick record got a mail */
 	std::list<NickAlias *> aliases;	/* List of aliases */
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 

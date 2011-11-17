@@ -17,7 +17,12 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 {
 	NickCore *nc;
 
-	AJoinList(NickCore *n) : Serializable("AJoinList"), nc(n) { }
+	AJoinList(NickCore *n) : nc(n) { }
+
+	Anope::string serialize_name() const
+	{
+		return "AJoinList";
+	}
 
 	serialized_data serialize()
 	{

@@ -20,13 +20,18 @@ struct EntryMsg : Serializable
 	Anope::string message;
 	time_t when;
 
-	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime) : Serializable("EntryMsg")
+	EntryMsg(ChannelInfo *c, const Anope::string &cname, const Anope::string &cmessage, time_t ct = Anope::CurTime)
 	{
 	
 		this->ci = c;
 		this->creator = cname;
 		this->message = cmessage;
 		this->when = ct;
+	}
+
+	Anope::string serialize_name() const
+	{
+		return "EntryMsg";
 	}
 
 	serialized_data serialize()

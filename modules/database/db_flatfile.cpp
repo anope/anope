@@ -157,7 +157,7 @@ class DBFlatFile : public Module
 			Serializable *base = *it;
 			Serializable::serialized_data data = base->serialize();
 	
-			db << "OBJECT " << base->GetSerializeName() << "\n";
+			db << "OBJECT " << base->serialize_name() << "\n";
 			for (Serializable::serialized_data::iterator dit = data.begin(), dit_end = data.end(); dit != dit_end; ++dit)
 				db << "DATA " << dit->first << " " << dit->second.astr() << "\n";
 			db << "END\n";

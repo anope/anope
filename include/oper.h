@@ -13,8 +13,6 @@ class XLineManager;
 
 class CoreExport XLine : public Serializable
 {
- protected:
-	XLine();
  public:
 	Anope::string Mask;
 	Anope::string By;
@@ -33,6 +31,7 @@ class CoreExport XLine : public Serializable
 	Anope::string GetHost() const;
 	sockaddrs GetIP() const;
 
+	Anope::string serialize_name() const;
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };

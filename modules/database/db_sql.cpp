@@ -141,18 +141,18 @@ class DBSQL : public Module
 			if (data.empty())
 				continue;
 
-			std::set<Anope::string> &layout = table_layout[base->GetSerializeName()];
+			std::set<Anope::string> &layout = table_layout[base->serialize_name()];
 			if (layout.empty())
 			{
-				this->RunBackground(this->sql->CreateTable(base->GetSerializeName(), data));
+				this->RunBackground(this->sql->CreateTable(base->serialize_name(), data));
 
 				for (Serializable::serialized_data::iterator it2 = data.begin(), it2_end = data.end(); it2 != it2_end; ++it2)
 					layout.insert(it2->first);
 			}
 			else
-				this->AlterTable(base->GetSerializeName(), layout, data);
+				this->AlterTable(base->serialize_name(), layout, data);
 
-			this->Insert(base->GetSerializeName(), data);
+			this->Insert(base->serialize_name(), data);
 		}
 		return EVENT_CONTINUE;
 	}

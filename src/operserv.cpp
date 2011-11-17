@@ -17,16 +17,12 @@
 std::list<XLineManager *> XLineManager::XLineManagers;
 std::map<Anope::string, XLine *, ci::less> XLineManager::XLinesByUID;
 
-XLine::XLine() : Serializable("XLine")
-{
-}
-
-XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &reason, const Anope::string &uid) : Mask(mask), Created(0), Expires(0), Reason(reason), UID(uid)
 {
 	manager = NULL;
 }
 
-XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Serializable("XLine"), Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
+XLine::XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid) : Mask(mask), By(by), Created(Anope::CurTime), Expires(expires), Reason(reason), UID(uid)
 {
 	manager = NULL;
 }
@@ -73,6 +69,11 @@ sockaddrs XLine::GetIP() const
 	return addr;
 }
 
+Anope::string XLine::serialize_name() const
+{
+	return "XLine";
+}
+
 Serializable::serialized_data XLine::serialize()
 {
 	serialized_data data;	
@@ -95,14 +96,10 @@ void XLine::unserialize(serialized_data &data)
 	if (!xlm)
 		return;
 
-	XLine *xl = new XLine();
-
-	data["mask"] >> xl->Mask;
-	data["by"] >> xl->By;
+	time_t expires;
+	data["expires"] >> expires;
+	XLine *xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["expires"].astr(), data["uid"].astr());
 	data["created"] >> xl->Created;
-	data["expires"] >> xl->Expires;
-	data["reason"] >> xl->Reason;
-	data["uid"] >> xl->UID;
 	xl->manager = xlm;
 
 	xlm->AddXLine(xl);

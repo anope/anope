@@ -18,8 +18,13 @@ struct NickSuspend : ExtensibleItem, Serializable
 	Anope::string nick;
 	time_t when;
 
-	NickSuspend() : Serializable("NickSuspend")
+	NickSuspend()
 	{
+	}
+
+	Anope::string serialize_name() const
+	{
+		return "NickSuspend";
 	}
 
 	serialized_data serialize()

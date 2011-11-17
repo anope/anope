@@ -13,7 +13,12 @@
 #include "modules.h"
 #include "memoserv.h"
 
-Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings), Serializable("Memo") { }
+Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
+
+Anope::string Memo::serialize_name() const
+{
+	return "Memo";
+}
 
 Serializable::serialized_data Memo::serialize()
 {

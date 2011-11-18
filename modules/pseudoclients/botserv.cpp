@@ -60,10 +60,11 @@ class BotServCore : public Module
 			return;
 
 		/* Fantaisist commands */
-		if (c->ci->botflags.HasFlag(BS_FANTASY) && realbuf[0] == Config->BSFantasyCharacter[0] && !was_action)
+		if (c->ci->botflags.HasFlag(BS_FANTASY) && (Config->BSFantasyCharacter.empty() || realbuf.find_first_of(Config->BSFantasyCharacter) == 0) && !was_action)
 		{
 			/* Strip off the fantasy character */
-			realbuf.erase(realbuf.begin());
+			if (!Config->BSFantasyCharacter.empty())
+				realbuf.erase(realbuf.begin());
 
 			size_t space = realbuf.find(' ');
 			Anope::string command, rest;
@@ -191,9 +192,11 @@ class BotServCore : public Module
 			return;
 		source.Reply(_(" \n"
 			"Bot will join a channel whenever there is at least\n"
-			"\002%d\002 user(s) on it. Additionally, all %s commands\n"
-			"can be used if fantasy is enabled by prefixing the command\n"
-			"name with a %c."), Config->BSMinUsers, Config->ChanServ.c_str(), Config->BSFantasyCharacter[0]);
+			"\002%d\002 user(s) on it."), Config->BSMinUsers);
+		if (!Config->BSFantasyCharacter.empty())
+			source.Reply(_("Additionally, all %s commands\n"
+				"can be used if fantasy is enabled by prefixing the command\n"
+				"name with one of the following characters: %s."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 	}
 
 	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)

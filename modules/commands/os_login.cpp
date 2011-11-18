@@ -60,16 +60,53 @@ class CommandOSLogin : public Command
 	}
 };
 
+class CommandOSLogout : public Command
+{
+ public:
+	CommandOSLogout(Module *creator) : Command(creator, "operserv/logout", 0, 0)
+	{
+		this->SetDesc(Anope::printf(_("Logout from to %s"), Config->OperServ.c_str()));
+		this->SetSyntax("");
+	}
+
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		Oper *o = source.u->Account()->o;
+		if (o == NULL)
+			source.Reply(_("No oper block for your nick."));
+		else if (o->password.empty())
+			source.Reply(_("Your oper block doesn't require logging in."));
+		else if (!source.u->HasExt("os_login_password_correct"))
+			source.Reply(_("You are not identified."));
+		else
+		{
+			Log(LOG_ADMIN, source.u, this);
+			source.u->Shrink("os_login_password_correct");
+			source.Reply(_("You have been logged out."));
+		}
+	}
+
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	{
+		this->SendSyntax(source);
+		source.Reply(" ");
+		source.Reply(_("Logs you out from %s so you lose Services Operator privileges.\n"
+				"This command is only useful if your oper block is configured\n"
+				"with a password."), source.owner->nick.c_str());
+		return true;
+	}
+};
+
 class OSLogin : public Module
 {
 	CommandOSLogin commandoslogin;
+	CommandOSLogout commandoslogout;
 
  public:
 	OSLogin(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandoslogin(this)
+		commandoslogin(this), commandoslogout(this)
 	{
 		this->SetAuthor("Anope");
-
 
 		ModuleManager::Attach(I_IsServicesOper, this);
 	}

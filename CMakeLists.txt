@@ -360,6 +360,10 @@ endif(CXXFLAGS)
 if(LDFLAGS)
   strip_string(${LDFLAGS} LDFLAGS)
 endif(LDFLAGS)
+# Strip the leading and trailing spaces from the link libraries
+if(LINK_LIBS)
+  strip_string(${LINK_LIBS} LINK_LIBS)
+endif(LINK_LIBS)
 
 # Search for the following programs
 find_program(GREP grep)

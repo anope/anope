@@ -94,6 +94,8 @@ if(WIN32)
 else(WIN32)
   if(GETTEXT_LIBRARIES)
     target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS} ${GETTEXT_LIBRARIES})
+  else(GETTEXT_LIBRARIES)
+    target_link_libraries(${PROGRAM_NAME} ${LINK_LIBS})
   endif(GETTEXT_LIBRARIES)
 endif(WIN32)
 # Building the Anope executable requires the version.h header to be generated

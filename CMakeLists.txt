@@ -261,7 +261,7 @@ endif(MSVC)
 
 # If CMake has found that the given system requires a special library for dl* calls, include it with the linker flags
 if(CMAKE_DL_LIBS)
-  set(LDFLAGS "${LDFLAGS} -l${CMAKE_DL_LIBS}")
+  set(LINK_LIBS "${LINK_LIBS} ${CMAKE_DL_LIBS}")
 endif(CMAKE_DL_LIBS)
 
 # Under MinGW, the -shared flag isn't properly set in the module-specific linker flags, add it from the C flags for shared libraries
@@ -297,12 +297,12 @@ if(NOT MSVC)
     # Check if socket is within the socket library (if the library exists), and add it to the linker flags if needed
     check_library_exists(socket socket "" HAVE_SOCKET_LIB)
     if(HAVE_SOCKET_LIB)
-      set(LDFLAGS "${LDFLAGS} -lsocket")
+      set(LINK_LIBS "${LINK_LIBS} socket")
     endif(HAVE_SOCKET_LIB)
     # Check if inet_addr is within the nsl library (if the library exists), and add it to the linker flags if needed
     check_library_exists(nsl inet_addr "" HAVE_NSL_LIB)
     if(HAVE_NSL_LIB)
-      set(LDFLAGS "${LDFLAGS} -lnsl")
+      set(LINK_LIBS "${LINK_LIBS} nsl")
     endif(HAVE_NSL_LIB)
     # Check if pthread_create is within the pthread library (if the library exists), and add it to the linker flags if needed
     check_library_exists(pthread pthread_create "" HAVE_PTHREAD)

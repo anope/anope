@@ -16,35 +16,6 @@
 class CommandNSAccess : public Command
 {
  private:
-	void DoServAdminList(CommandSource &source, const std::vector<Anope::string> &params, NickCore *nc)
-	{
-		Anope::string mask = params.size() > 2 ? params[2] : "";
-		unsigned i, end;
-
-		if (nc->access.empty())
-		{
-			source.Reply(_("Access list for \002%s\002 is empty."), nc->display.c_str());
-			return;
-		}
-
-		if (nc->HasFlag(NI_SUSPENDED))
-		{
-			source.Reply(NICK_X_SUSPENDED, nc->display.c_str());
-			return;
-		}
-
-		source.Reply(_("Access list for \002%s\002:"), params[1].c_str());
-		for (i = 0, end = nc->access.size(); i < end; ++i)
-		{
-			Anope::string access = nc->GetAccess(i);
-			if (!mask.empty() && !Anope::Match(access, mask))
-				continue;
-			source.Reply("    %s", access.c_str());
-		}
-
-		return;
-	}
-
 	void DoAdd(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
 
@@ -62,12 +33,12 @@ class CommandNSAccess : public Command
 
 		if (nc->FindAccess(mask))
 		{
-			source.Reply(_("Mask \002%s\002 already present on your access list."), mask.c_str());
+			source.Reply(_("Mask \002%s\002 already present on %s's access list."), mask.c_str(), nc->display.c_str());
 			return;
 		}
 
 		nc->AddAccess(mask);
-		source.Reply(_("\002%s\002 added to your access list."), mask.c_str());
+		source.Reply(_("\002%s\002 added to %s's access list."), mask.c_str(), nc->display.c_str());
 
 		return;
 	}
@@ -82,11 +53,11 @@ class CommandNSAccess : public Command
 
 		if (!nc->FindAccess(mask))
 		{
-			source.Reply(_("\002%s\002 not found on your access list."), mask.c_str());
+			source.Reply(_("\002%s\002 not found on %s's access list."), mask.c_str(), nc->display.c_str());
 			return;
 		}
 
-		source.Reply(_("\002%s\002 deleted from your access list."), mask.c_str());
+		source.Reply(_("\002%s\002 deleted from %s's access list."), mask.c_str(), nc->display.c_str());
 		nc->EraseAccess(mask);
 
 		return;
@@ -94,16 +65,15 @@ class CommandNSAccess : public Command
 
 	void DoList(CommandSource &source, NickCore *nc, const Anope::string &mask)
 	{
-		User *u = source.u;
 		unsigned i, end;
 
 		if (nc->access.empty())
 		{
-			source.Reply(_("Your access list is empty."), u->nick.c_str());
+			source.Reply(_("%s's access list is empty."), nc->display.c_str());
 			return;
 		}
 
-		source.Reply(_("Access list:"));
+		source.Reply(_("Access list for %s:"), nc->display.c_str());
 		for (i = 0, end = nc->access.size(); i < end; ++i)
 		{
 			Anope::string access = nc->GetAccess(i);
@@ -118,34 +88,63 @@ class CommandNSAccess : public Command
 	CommandNSAccess(Module *creator) : Command(creator, "nickserv/access", 1, 3)
 	{
 		this->SetDesc(_("Modify the list of authorized addresses"));
-		this->SetSyntax(_("ADD \037mask\037"));
-		this->SetSyntax(_("DEL \037mask\037"));
-		this->SetSyntax(_("LIST"));
+		this->SetSyntax(_("ADD [\037user\037] \037mask\037"));
+		this->SetSyntax(_("DEL [\037user\037] \037mask\037"));
+		this->SetSyntax(_("LIST [\037user\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
-		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+		Anope::string nick, mask;
 
-		NickAlias *na;
-		if (cmd.equals_ci("LIST") && u->IsServicesOper() && !mask.empty() && (na = findnick(params[1])))
-			return this->DoServAdminList(source, params, na->nc);
+		if (cmd.equals_ci("LIST"))
+			nick = params.size() > 1 ? params[1] : "";
+		else
+		{
+			nick = params.size() == 3 ? params[1] : "";
+			mask = params.size() > 1 ? params[params.size() - 1] : "";
+		}
 
-		if (!mask.empty() && mask.find('@') == Anope::string::npos)
+		NickCore *nc;
+		if (!nick.empty())
+		{
+			NickAlias *na = findnick(nick);
+			if (na == NULL)
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+				return;
+			}
+			else if (na->nc != u->Account() && !u->HasPriv("nickserv/access"))
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+			else if (Config->NSSecureAdmins && u->Account() != na->nc && na->nc->IsServicesOper())
+			{
+				source.Reply(ACCESS_DENIED);
+				return;
+			}
+
+			nc = na->nc;
+		}
+		else
+			nc = u->Account();
+
+		if (!mask.empty() && (mask.find('@') == Anope::string::npos || mask.find('!') != Anope::string::npos))
 		{
 			source.Reply(BAD_USERHOST_MASK);
 			source.Reply(MORE_INFO, Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str(), this->name.c_str());
 		}
-		else if (u->Account()->HasFlag(NI_SUSPENDED))
+		else if (nc->HasFlag(NI_SUSPENDED))
 			source.Reply(NICK_X_SUSPENDED, u->Account()->display.c_str());
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, u->Account(), mask);
+			return this->DoAdd(source, nc, mask);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, u->Account(), mask);
+			return this->DoDel(source, nc, mask);
 		else if (cmd.equals_ci("LIST"))
-			return this->DoList(source, u->Account(), mask);
+			return this->DoList(source, nc, mask);
 		else
 			this->OnSyntaxError(source, "");
 
@@ -161,7 +160,8 @@ class CommandNSAccess : public Command
 					"recognized by %s as allowed to use the nick.  If\n"
 					"you want to use the nick from a different address, you\n"
 					"need to send an \002IDENTIFY\002 command to make %s\n"
-					"recognize you.\n"
+					"recognize you. Services operators may provide a nick\n"
+					"to modify other users' access lists.\n"
 					" \n"
 					"Examples:\n"
 					" \n"

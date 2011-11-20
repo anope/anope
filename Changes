@@ -11,6 +11,7 @@ Anope Version 1.8 - GIT
 08/10  F Fixed loading bs_fantasy_owner on InspIRCd 2.0 on startup       [  #00]
 08/21  F Send DROP event when forbidding nicks and channels.             [  #00]
 11/16  F Fixed ident being used instead of vident in some comparisons.   [  #00]
+11/20  F Fixed ignore not matching against users' real host or IP.       [  #00]
 
 Anope Version 1.8.6
 -------------------

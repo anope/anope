@@ -126,7 +126,7 @@ IgnoreData *get_ignore(const char *nick)
         if (is_oper(u))
             return NULL;
         for (ign = ignore; ign; ign = ign->next)
-            if (match_usermask(ign->mask, u))
+            if (match_usermask_full(ign->mask, u, true))
                 break;
     } else {
         /* We didn't get a user.. generate a valid mask. */ 

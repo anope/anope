@@ -14,15 +14,14 @@ void CommandSource::Reply(const char *message, ...)
 	va_list args;
 	char buf[4096]; // Messages can be really big.
 
-	if (message)
-	{
-		va_start(args, message);
-		vsnprintf(buf, sizeof(buf), message, args);
+	const char *translated_message = translate(this->u, message);
 
-		this->Reply(Anope::string(buf));
+	va_start(args, message);
+	vsnprintf(buf, sizeof(buf), translated_message, args);
 
-		va_end(args);
-	}
+	this->Reply(Anope::string(buf));
+
+	va_end(args);
 }
 
 void CommandSource::Reply(const Anope::string &message)

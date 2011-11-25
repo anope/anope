@@ -58,7 +58,7 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 	{
 		if (nick.empty() || vhost.empty())
 			return;
-		send_cmd(Config->OperServ, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
+		UplinkSocket::Message(Config->OperServ) << "CHGHOST " << nick << " " << vhost;
 	}
 	else
 	{
@@ -71,7 +71,7 @@ void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	if (!params.empty())
-		send_cmd(params[0], "IDLE %s %ld 0", source.c_str(), static_cast<long>(Anope::CurTime));
+		UplinkSocket::Message(params[0]) << "IDLE " << source << " " << Anope::CurTime << " 0";
 	return true;
 }
 
@@ -87,12 +87,12 @@ class InspIRCdProto : public IRCDProto
 {
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd(Config->OperServ, "GLINE %s", x->Mask.c_str());
+		UplinkSocket::Message(Config->OperServ) << "GLINE " << x->Mask;
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", c->name.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic_setter.c_str(), c->topic.c_str());
+		UplinkSocket::Message(whosets->nick) << "FTOPIC " << c->name << " " << c->topic_time << " " << c->topic_setter <<" :" << c->topic;
 	}
 
 	void SendVhostDel(User *u)
@@ -112,54 +112,54 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(Config->ServerName, "ADDLINE G %s %s %ld %ld :%s", x->Mask.c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
+		UplinkSocket::Message(Config->ServerName) << "ADDLINE G " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->ServerName, "KILL %s :%s", user->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->nick : Config->ServerName) << "KILL " << user->nick << " :" << buf;
 	}
 
 	void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf)
 	{
-		send_cmd(source, "PUSH %s ::%s %03d %s %s", dest.c_str(), source.c_str(), numeric, dest.c_str(), buf.c_str());
+		UplinkSocket::Message(source) << "PUSH " << dest << " ::" << source << " " << numeric << " " << dest << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->ServerName, "FMODE %s %u %s", dest->name.c_str(), static_cast<unsigned>(dest->creation_time), buf.c_str());
+		UplinkSocket::Message(source ? source->nick : Config->ServerName) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->nick : Config->ServerName, "MODE %s %s", u->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(bi ? bi->nick : Config->ServerName) << "MODE " << u->nick << " " << buf;
 	}
 
 	void SendClientIntroduction(const User *u)
 	{
 		Anope::string modes = "+" + u->GetModes();
-		send_cmd(Config->ServerName, "NICK %ld %s %s %s %s %s 0.0.0.0 :%s", static_cast<long>(u->timestamp), u->nick.c_str(), u->host.c_str(), u->host.c_str(), u->GetIdent().c_str(), modes.c_str(), u->realname.c_str());
-		send_cmd(u->nick, "OPERTYPE Service");
+		UplinkSocket::Message(Config->ServerName) << "NICK " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " " << modes << " 0.0.0.0 :" << u->realname;
+		UplinkSocket::Message(u->nick) << "OPERTYPE Service";
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
+			UplinkSocket::Message(source->nick) << "KICK " << chan->name << " " << user->nick << " :" << buf;
 		else
-			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), user->nick.c_str());
+			UplinkSocket::Message(source->nick) << "KICK " << chan->name << " " << user->nick << " :" << user->nick;
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server)
 	{
-		send_cmd(Config->ServerName, "SERVER %s %s %d :%s", server->GetName().c_str(), currentpass.c_str(), server->GetHops(), server->GetDescription().c_str());
+		UplinkSocket::Message(Config->ServerName) << "SERVER " << server->GetName() << " " << currentpass << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(user->nick, "JOIN %s %ld", c->name.c_str(), static_cast<long>(c->creation_time));
+		UplinkSocket::Message(user->nick) << "JOIN " << c->name << " " << c->creation_time;
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -181,7 +181,7 @@ class InspIRCdProto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd(Config->OperServ, "QLINE %s", x->Mask.c_str());
+		UplinkSocket::Message(Config->OperServ) << "QLINE " << x->Mask;
 	}
 
 	/* SQLINE */
@@ -191,13 +191,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(Config->ServerName, "ADDLINE Q %s %s %ld %ld :%s", x->Mask.c_str(), Config->OperServ.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
-	}
-
-	/* SQUIT */
-	void SendSquit(const Anope::string &servname, const Anope::string &message)
-	{
-		send_cmd(Config->ServerName, "SQUIT %s :%s", servname.c_str(), message.c_str());
+		UplinkSocket::Message(Config->ServerName) << "ADDLINE Q " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 
 	/* Functions that use serval cmd functions */
@@ -214,9 +208,9 @@ class InspIRCdProto : public IRCDProto
 	{
 		inspircd_cmd_pass(Config->Uplinks[CurrentUplink]->password);
 		SendServer(Me);
-		send_cmd("", "BURST");
+		UplinkSocket::Message() << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		send_cmd(Config->ServerName, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
+		UplinkSocket::Message(Config->ServerName) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << ircd->name << " - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
 	}
 
 	/* CHGIDENT */
@@ -226,7 +220,7 @@ class InspIRCdProto : public IRCDProto
 		{
 			if (nick.empty() || vIdent.empty())
 				return;
-			send_cmd(Config->OperServ, "CHGIDENT %s %s", nick.c_str(), vIdent.c_str());
+			UplinkSocket::Message(Config->OperServ) << "CHGIDENT " << nick << " " << vIdent;
 		}
 		else
 			Log() << "CHGIDENT not loaded!";
@@ -235,19 +229,19 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config->OperServ, "SVSHOLD %s %ds :Being held for registered user", nick.c_str(), static_cast<int>(Config->NSReleaseTimeout));
+		UplinkSocket::Message(Config->OperServ) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << "s :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config->OperServ, "SVSHOLD %s", nick.c_str());
+		UplinkSocket::Message(Config->OperServ) << "SVSHOLD " << nick;
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd(Config->OperServ, "ZLINE %s", x->GetHost().c_str());
+		UplinkSocket::Message(Config->OperServ) << "ZLINE " << x->GetHost();
 	}
 
 	/* SZLINE */
@@ -257,22 +251,22 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd(Config->ServerName, "ADDLINE Z %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime), static_cast<long>(timeleft), x->Reason.c_str());
+		UplinkSocket::Message(Config->ServerName) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &)
 	{
-		send_cmd(source, "SVSJOIN %s %s", nick.c_str(), chan.c_str());
+		UplinkSocket::Message(source) << "SVSJOIN " << nick << " " << chan;
 	}
 
 	void SendBOB()
 	{
-		send_cmd("", "BURST %ld", static_cast<long>(Anope::CurTime));
+		UplinkSocket::Message() << "BURST " << Anope::CurTime;
 	}
 
 	void SendEOB()
 	{
-		send_cmd("", "ENDBURST");
+		UplinkSocket::Message() << "ENDBURST";
 	}
 
 	void SendLogin(User *u)
@@ -574,21 +568,21 @@ class InspircdIRCdMessage : public IRCdMessage
 		{
 			if (!has_globopsmod)
 			{
-				send_cmd("", "ERROR :m_globops is not loaded. This is required by Anope");
+				UplinkSocket::Message() << "ERROR :m_globops is not loaded. This is required by Anope";
 				quitmsg = "ERROR: Remote server does not have the m_globops module loaded, and this is required.";
 				quitting = true;
 				return false;
 			}
 			if (!has_servicesmod)
 			{
-				send_cmd("", "ERROR :m_services is not loaded. This is required by Anope");
+				UplinkSocket::Message() << "ERROR :m_services is not loaded. This is required by Anope";
 				quitmsg = "ERROR: Remote server does not have the m_services module loaded, and this is required.";
 				quitting = true;
 				return false;
 			}
 			if (!has_hidechansmod)
 			{
-				send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
+				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
 				quitmsg = "ERROR: Remote server deos not have the m_hidechans module loaded, and this is required.";
 				quitting = true;
 				return false;

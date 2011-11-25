@@ -352,6 +352,19 @@ bool Server::IsULined() const
 	return false;
 }
 
+
+/** Send a message to alll users on this server
+ * @param source The source of the message
+ * @param message The message
+ */
+void Server::Notice(BotInfo *source, const Anope::string &message)
+{
+	if (Config->NSDefFlags.HasFlag(NI_MSG))
+		ircdproto->SendGlobalPrivmsg(source, this, message);
+	else
+		ircdproto->SendGlobalNotice(source, this, message);
+}
+
 /** Find a server
  * @param name The name or SID/numeric
  * @param s The server list to search for this server on, defaults to our Uplink

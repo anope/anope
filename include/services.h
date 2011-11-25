@@ -792,7 +792,7 @@ class CoreExport IRCDProto
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
 	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);
 	virtual void SendSQLine(User *, const XLine *x) { }
-	virtual void SendSquit(const Anope::string &servname, const Anope::string &message);
+	virtual void SendSquit(Server *, const Anope::string &message);
 	virtual void SendSVSO(const Anope::string &, const Anope::string &, const Anope::string &) { }
 	virtual void SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick);
 	virtual void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when);

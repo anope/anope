@@ -152,6 +152,12 @@ class CoreExport Server : public Flags<ServerFlag>
 	 */
 	bool IsULined() const;
 
+	/** Send a message to alll users on this server
+	 * @param source The source of the message
+	 * @param message The message
+	 */
+	void Notice(BotInfo *source, const Anope::string &message);
+
 	/** Find a server
 	 * @param name The name or SID/numeric
 	 * @param s The server list to search for this server on, defaults to our Uplink

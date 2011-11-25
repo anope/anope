@@ -44,88 +44,44 @@ IRCDVar myIrcd[] = {
 	{NULL}
 };
 
-/*
- * SVINFO
- *	  parv[0] = sender prefix
- *	  parv[1] = TS_CURRENT for the server
- *	  parv[2] = TS_MIN for the server
- *	  parv[3] = server is standalone or connected to non-TS only
- *	  parv[4] = server's idea of UTC time
- */
-static inline void plexus_cmd_svinfo()
-{
-	send_cmd("", "SVINFO 6 5 0 :%ld", static_cast<long>(Anope::CurTime));
-}
-
-/* CAPAB
- * QS     - Can handle quit storm removal
- * EX     - Can do channel +e exemptions
- * CHW    - Can do channel wall @#
- * LL     - Can do lazy links
- * IE     - Can do invite exceptions
- * EOB    - Can do EOB message
- * KLN    - Can do KLINE message
- * GLN    - Can do GLINE message
- * HUB    - This server is a HUB
- * AOPS   - Can do anon ops (+a)
- * UID    - Can do UIDs
- * ZIP    - Can do ZIPlinks
- * ENC    - Can do ENCrypted links
- * KNOCK  - Supports KNOCK
- * TBURST - Supports TBURST
- * PARA   - Supports invite broadcasting for +p
- * ENCAP  - Supports encapsulization of protocol messages
- * SVS    - Supports services protocol extensions
- */
-static inline void plexus_cmd_capab()
-{
-	send_cmd("", "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
-}
-
-/* PASS */
-void plexus_cmd_pass(const Anope::string &pass)
-{
-	send_cmd("", "PASS %s TS 6 :%s", pass.c_str(), Config->Numeric.c_str());
-}
-
 class PlexusProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		send_cmd(source ? source->GetUID() : Config->Numeric, "OPERWALL :%s", buf.c_str());
+		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "OPERWALL :" << buf;
 	}
 
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd(Config->Numeric, "RESV * %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "RESV * " << x->Mask << " :" << x->Reason;
 	}
 
 	void SendSGLineDel(const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNXLINE * %s", x->Mask.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd(Config->Numeric, "UNRESV * %s", x->Mask.c_str());
+		UplinkSocket::Message(Me->GetSID()) <<  "UNRESV * " << x->Mask;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(Config->Numeric, "SJOIN %ld %s +%s :%s", static_cast<long>(c->creation_time), c->name.c_str(), c->GetModes(true, true).c_str(), user->GetUID().c_str());
+		UplinkSocket::Message(Me->GetSID()) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -151,25 +107,25 @@ class PlexusProto : public IRCDProto
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(timeleft), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->GetUID() : Config->Numeric, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "KILL " << user->GetUID() << " :" << buf;
 	}
 
 	void SendServer(const Server *server)
 	{
 		if (server == Me)
-			send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 		else
-			send_cmd(Config->Numeric, "SID %s %d %s :%s", server->GetName().c_str(), 2, server->GetSID().c_str(), server->GetDescription().c_str());
+			UplinkSocket::Message(Me->GetSID()) << "SID " << server->GetName() << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 	{
-		send_cmd(Config->Numeric, "ENCAP %s SVSNICK %s %ld %s %ld", u->server->GetName().c_str(), u->GetUID().c_str(), static_cast<long>(u->timestamp), newnick.c_str(), static_cast<long>(when));
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
 	}
 
 	void SendVhostDel(User *u)
@@ -184,56 +140,84 @@ class PlexusProto : public IRCDProto
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host)
 	{
 		if (!ident.empty())
-			send_cmd(Config->Numeric, "ENCAP * CHGIDENT %s %s", u->nick.c_str(), ident.c_str());
-		send_cmd(Config->Numeric, "ENCAP * CHGHOST %s %s", u->nick.c_str(), host.c_str());
+			UplinkSocket::Message(Me->GetSID()) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
 	}
 
 	void SendConnect()
 	{
-		plexus_cmd_pass(Config->Uplinks[CurrentUplink]->password);
-		plexus_cmd_capab();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		/* CAPAB
+		 * QS     - Can handle quit storm removal
+		 * EX     - Can do channel +e exemptions
+		 * CHW    - Can do channel wall @#
+		 * LL     - Can do lazy links
+		 * IE     - Can do invite exceptions
+		 * EOB    - Can do EOB message
+		 * KLN    - Can do KLINE message
+		 * GLN    - Can do GLINE message
+		 * HUB    - This server is a HUB
+		 * AOPS   - Can do anon ops (+a)
+		 * UID    - Can do UIDs
+		 * ZIP    - Can do ZIPlinks
+		 * ENC    - Can do ENCrypted links
+		 * KNOCK  - Supports KNOCK
+		 * TBURST - Supports TBURST
+		 * PARA   - Supports invite broadcasting for +p
+		 * ENCAP  - Supports encapsulization of protocol messages
+		 * SVS    - Supports services protocol extensions
+		 */
+		UplinkSocket::Message() << "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS";
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
-		plexus_cmd_svinfo();
+		/*
+		 * SVINFO
+		 *	  parv[0] = sender prefix
+		 *	  parv[1] = TS_CURRENT for the server
+		 *	  parv[2] = TS_MIN for the server
+		 *	  parv[3] = server is standalone or connected to non-TS only
+		 *	  parv[4] = server's idea of UTC time
+		 */
+		UplinkSocket::Message() << "SVINFO 6 5 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(const User *u)
 	{
 		Anope::string modes = "+" + u->GetModes();
-		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 255.255.255.255 %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->host.c_str(), u->realname.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
 	}
 
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(bi->GetUID(), "PART %s :%s", chan->name.c_str(), buf.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name << " :" << buf;
 		else
-			send_cmd(bi->GetUID(), "PART %s", chan->name.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "MODE " << dest->name << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "ENCAP * SVSMODE %s %ld %s", u->GetUID().c_str(), static_cast<long>(u->timestamp), buf.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
 	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
 		else
-			send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
+			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID();
 	}
 
 	/* INVITE */
 	void SendInvite(BotInfo *source, const Anope::string &chan, const Anope::string &nick)
 	{
 		User *u = finduser(nick);
-		send_cmd(source->GetUID(), "INVITE %s %s", u ? u->GetUID().c_str() : nick.c_str(), chan.c_str());
+		UplinkSocket::Message(source->GetUID()) << "INVITE " << (u ? u->GetUID() : nick) << " " <<  chan;
 	}
 
 	void SendLogin(User *u)
@@ -241,17 +225,17 @@ class PlexusProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		send_cmd(Config->Numeric, "ENCAP * SU %s %s", u->GetUID().c_str(), u->Account()->display.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
 	}
 
 	void SendLogout(User *u)
 	{
-		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID();
 	}
 
 	void SendTopic(BotInfo *bi, Channel *c)
 	{
-		send_cmd(bi->GetUID(), "ENCAP * TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
+		UplinkSocket::Message(bi->GetUID()) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
 	}
 
 	void SendChannel(Channel *c)
@@ -259,7 +243,7 @@ class PlexusProto : public IRCDProto
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
-		send_cmd(Config->Numeric, "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << "%s :";
 	}
 };
 

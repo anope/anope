@@ -53,38 +53,17 @@ IRCDVar myIrcd[] = {
 static bool has_servicesmod = false;
 static bool has_svsholdmod = false;
 
-/* CHGHOST */
-void inspircd_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
-{
-	if (!has_chghostmod)
-	{
-		Log() << "CHGHOST not loaded!";
-		return;
-	}
-
-	User *u = finduser(nick);
-	send_cmd(u ? u->GetUID() : Config->Numeric, "CHGHOST %s %s", nick.c_str(), vhost.c_str());
-}
-
-bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	BotInfo *bi = findbot(params[0]);
-
-	send_cmd(bi ? bi->GetUID() : params[0], "IDLE %s %ld %ld", source.c_str(), static_cast<long>(start_time), bi ? (static_cast<long>(Anope::CurTime - bi->lastmsg)) : 0);
-	return true;
-}
-
 class InspIRCdProto : public InspIRCdTS6Proto
 {
 	void SendConnect()
 	{
-		send_cmd("", "CAPAB START 1202");
-		send_cmd("", "CAPAB CAPABILITIES :PROTOCOL=1202");
-		send_cmd("", "CAPAB END");
+		UplinkSocket::Message() << "CAPAB START 1202";
+		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202";
+		UplinkSocket::Message() << "CAPAB END";
 		SendServer(Me);
-		send_cmd(Config->Numeric, "BURST");
+		UplinkSocket::Message(Config->Numeric) << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		send_cmd(Config->Numeric, "VERSION :Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
+		UplinkSocket::Message(Config->Numeric) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << ircd->name <<" - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
 	}
 };
 
@@ -153,27 +132,6 @@ bool event_fmode(const Anope::string &source, const std::vector<Anope::string> &
 	newparams.push_back(modes);
 
 	return ircdmessage->OnMode(source, newparams);
-}
-
-bool event_time(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	if (params.size() < 2)
-		return true;
-
-	send_cmd(Config->Numeric, "TIME %s %s %ld", source.c_str(), params[1].c_str(), static_cast<long>(Anope::CurTime));
-	return true;
-}
-
-bool event_rsquit(const Anope::string &source, const std::vector<Anope::string> &params)
-{
-	/* On InspIRCd we must send a SQUIT when we recieve RSQUIT for a server we have juped */
-	Server *s = Server::Find(params[0]);
-	if (s && s->HasFlag(SERVER_JUPED))
-		send_cmd(Config->Numeric, "SQUIT %s :%s", s->GetSID().c_str(), params.size() > 1 ? params[1].c_str() : "");
-
-	ircdmessage->OnSQuit(source, params);
-
-	return true;
 }
 
 bool event_setname(const Anope::string &source, const std::vector<Anope::string> &params)
@@ -429,7 +387,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 		{
 			if (params.size() < 2 || (Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0) < 1202)
 			{
-				send_cmd("", "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START");
+				UplinkSocket::Message() << "ERROR :Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				quitmsg = "Protocol mismatch, no or invalid protocol version given in CAPAB START";
 				quitting = true;
 				return false;
@@ -713,14 +671,14 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 		{
 			if (!has_servicesmod)
 			{
-				send_cmd("", "ERROR :m_services_account.so is not loaded. This is required by Anope");
+				UplinkSocket::Message() << "ERROR :m_services_account.so is not loaded. This is required by Anope";
 				quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 				quitting = true;
 				return false;
 			}
 			if (!ModeManager::FindUserModeByName(UMODE_PRIV))
 			{
-				send_cmd("", "ERROR :m_hidechans.so is not loaded. This is required by Anope");
+				UplinkSocket::Message() << "ERROR :m_hidechans.so is not loaded. This is required by Anope";
 				quitmsg = "ERROR: Remote server does not have the m_hidechans module loaded, and this is required.";
 				quitting = true;
 				return false;

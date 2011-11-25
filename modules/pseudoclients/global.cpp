@@ -19,7 +19,7 @@ class MyGlobalService : public GlobalService
 	void ServerGlobal(Server *s, const Anope::string &message)
 	{
 		if (s != Me && !s->HasFlag(SERVER_JUPED))
-			notice_server(Config->Global, s, "%s", message.c_str());
+			s->Notice(findbot(Config->Global), message);
 		for (unsigned i = 0, j = s->GetLinks().size(); i < j; ++i)
 			this->ServerGlobal(s->GetLinks()[i], message);
 	}
@@ -76,7 +76,7 @@ class GlobalCore : public Module
 	void OnNewServer(Server *s)
 	{
 		if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
-			notice_server(Config->Global, s, "%s", Config->GlobalOnCycleUP.c_str());
+			s->Notice(findbot(Config->Global), Config->GlobalOnCycleUP);
 	}
 
 	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)

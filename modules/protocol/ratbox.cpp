@@ -44,86 +44,39 @@ IRCDVar myIrcd[] = {
 	{NULL}
 };
 
-/*
- * SVINFO
- *	  parv[0] = sender prefix
- *	  parv[1] = TS_CURRENT for the server
- *	  parv[2] = TS_MIN for the server
- *	  parv[3] = server is standalone or connected to non-TS only
- *	  parv[4] = server's idea of UTC time
- */
-void ratbox_cmd_svinfo()
-{
-	send_cmd("", "SVINFO 6 3 0 :%ld", static_cast<long>(Anope::CurTime));
-}
-
-void ratbox_cmd_svsinfo()
-{
-}
-
-/* CAPAB */
-/*
-  QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions
-  CHW    - Can do channel wall @#
-  LL     - Can do lazy links
-  IE     - Can do invite exceptions
-  EOB    - Can do EOB message
-  KLN    - Can do KLINE message
-  GLN    - Can do GLINE message
-  HUB    - This server is a HUB
-  UID    - Can do UIDs
-  ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links
-  KNOCK  -  supports KNOCK
-  TBURST - supports TBURST
-  PARA   - supports invite broadcasting for +p
-  ENCAP  - ?
-*/
-void ratbox_cmd_capab()
-{
-	send_cmd("", "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP TS6");
-}
-
-/* PASS */
-void ratbox_cmd_pass(const Anope::string &pass)
-{
-	send_cmd("", "PASS %s TS 6 :%s", pass.c_str(), Config->Numeric.c_str());
-}
-
 class RatboxProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 	{
-		send_cmd(source ? source->GetUID() : Config->Numeric, "OPERWALL :%s", buf.c_str());
+		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "OPERWALL :" << buf;
 	}
 
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd(Config->Numeric, "RESV * %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "RESV * " << x->Mask << " :" << x->Reason;
 	}
 
 	void SendSGLineDel(const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNXLINE * %s", x->Mask.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "XLINE * %s 0 :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "UNKLINE * %s %s", x->GetUser().c_str(), x->GetHost().c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd(Config->Numeric, "UNRESV * %s", x->Mask.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "UNRESV * " << x->Mask;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
@@ -132,7 +85,7 @@ class RatboxProto : public IRCDProto
 		 * can not add them to the mode stacker because ratbox
 		 * does not allow *any* client to op itself
 		 */
-		send_cmd("", "SJOIN %ld %s +%s :%s%s", static_cast<long>(c->creation_time), c->name.c_str(), c->GetModes(true, true).c_str(), status != NULL ? status->BuildModePrefixList().c_str() : "", user->GetUID().c_str());
+		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << (status != NULL ? status->BuildModePrefixList() : "") << user->GetUID();
 		/* And update our internal status for this user since this is not going through our mode handling system */
 		if (status != NULL)
 		{
@@ -149,66 +102,92 @@ class RatboxProto : public IRCDProto
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
 		BotInfo *bi = findbot(Config->OperServ);
-		send_cmd(bi ? bi->GetUID() : Config->OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(timeleft), x->GetUser().c_str(), x->GetHost().c_str(), x->Reason.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->GetUID() : Config->Numeric, "KILL %s :%s", user->GetUID().c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "KILL " << user->GetUID() << " :" << buf;
 	}
 
 	/* SERVER name hop descript */
 	void SendServer(const Server *server)
 	{
-		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
 	void SendConnect()
 	{
-		ratbox_cmd_pass(Config->Uplinks[CurrentUplink]->password);
-		ratbox_cmd_capab();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " TS 6 :" << Me->GetSID();
+		/*
+		  QS     - Can handle quit storm removal
+		  EX     - Can do channel +e exemptions
+		  CHW    - Can do channel wall @#
+		  LL     - Can do lazy links
+		  IE     - Can do invite exceptions
+		  EOB    - Can do EOB message
+		  KLN    - Can do KLINE message
+		  GLN    - Can do GLINE message
+		  HUB    - This server is a HUB
+		  UID    - Can do UIDs
+		  ZIP    - Can do ZIPlinks
+		  ENC    - Can do ENCrypted links
+		  KNOCK  -  supports KNOCK
+		  TBURST - supports TBURST
+		  PARA   - supports invite broadcasting for +p
+		  ENCAP  - ?
+		*/
+		UplinkSocket::Message() << "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP TS6";
 		/* Make myself known to myself in the serverlist */
 		SendServer(Me);
-		ratbox_cmd_svinfo();
+		/*
+		 * SVINFO
+		 *	  parv[0] = sender prefix
+		 *	  parv[1] = TS_CURRENT for the server
+		 *	  parv[2] = TS_MIN for the server
+		 *	  parv[3] = server is standalone or connected to non-TS only
+		 *	  parv[4] = server's idea of UTC time
+		 */
+		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
 	}
 
 	void SendClientIntroduction(const User *u)
 	{
 		Anope::string modes = "+" + u->GetModes();
-		send_cmd(Config->Numeric, "UID %s 1 %ld %s %s %s 0 %s :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->GetUID().c_str(), u->realname.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
 	}
 
 	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(bi->GetUID(), "PART %s :%s", chan->name.c_str(), buf.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name << " :" << buf;
 		else
-			send_cmd(bi->GetUID(), "PART %s", chan->name.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "MODE %s %s", dest->name.c_str(), buf.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "MODE " << dest->name << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->GetUID() : Config->Numeric, "SVSMODE %s %s", u->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "SVSMODE " << u->nick << " " << buf;
 	}
 
 	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(bi->GetUID(), "KICK %s %s :%s", chan->name.c_str(), user->GetUID().c_str(), buf.c_str());
+			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
 		else
-			send_cmd(bi->GetUID(), "KICK %s %s", chan->name.c_str(), user->GetUID().c_str());
+			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID();
 	}
 
 	/* INVITE */
 	void SendInvite(BotInfo *source, const Anope::string &chan, const Anope::string &nick)
 	{
 		User *u = finduser(nick);
-		send_cmd(source->GetUID(), "INVITE %s %s", u ? u->GetUID().c_str() : nick.c_str(), chan.c_str());
+		UplinkSocket::Message(source->GetUID()) << "INVITE " << (u ? u->GetUID() : nick) << " " << chan;
 	}
 
 	void SendLogin(User *u)
@@ -216,12 +195,12 @@ class RatboxProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		send_cmd(Config->Numeric, "ENCAP * SU %s %s", u->GetUID().c_str(), u->Account()->display.c_str());
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
 	}
 
 	void SendLogout(User *u)
 	{
-		send_cmd(Config->Numeric, "ENCAP * SU %s", u->GetUID().c_str());
+		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID();
 	}
 
 	void SendChannel(Channel *c)
@@ -229,7 +208,7 @@ class RatboxProto : public IRCDProto
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
-		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
 	bool IsNickValid(const Anope::string &nick)
@@ -250,7 +229,7 @@ class RatboxProto : public IRCDProto
 			status.SetFlag(CMODE_OP);
 			bi->Join(c, &status);
 		}
-		send_cmd(bi->GetUID(), "TOPIC %s :%s", c->name.c_str(), c->topic.c_str());
+		UplinkSocket::Message(bi->GetUID()) << "TOPIC " << c->name << " :" << c->topic;
 		if (needjoin)
 			bi->Part(c);
 	}

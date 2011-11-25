@@ -30,47 +30,49 @@ void IRCDProto::SendMessageInternal(const BotInfo *bi, const Anope::string &dest
 
 void IRCDProto::SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :%s", dest.c_str(), msg.c_str());
+	UplinkSocket::Message(bi->nick) << "NOTICE " << dest << " :" << msg;
 }
 
 void IRCDProto::SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s :%s", dest.c_str(), buf.c_str());
+	UplinkSocket::Message(bi->nick) << "PRIVMSG " << dest << " :" << buf;
 }
 
 void IRCDProto::SendQuitInternal(const User *u, const Anope::string &buf)
 {
 	if (!buf.empty())
-		send_cmd(ircd->ts6 ? u->GetUID() : u->nick, "QUIT :%s", buf.c_str());
+		UplinkSocket::Message(u->nick) << "QUIT :" << buf;
 	else
-		send_cmd(ircd->ts6 ? u->GetUID() : u->nick, "QUIT");
+		UplinkSocket::Message(u->nick) << "QUIT";
 }
 
 void IRCDProto::SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
 {
 	if (!buf.empty())
-		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s :%s", chan->name.c_str(), buf.c_str());
+		UplinkSocket::Message(bi->nick) << "PART " << chan->name << " :" << buf;
 	else
-		send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PART %s", chan->name.c_str());
+		UplinkSocket::Message(bi->nick) << "PART " << chan->name;
 }
 
 void IRCDProto::SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
 {
-	if (source)
-		send_cmd(ircd->ts6 ? source->GetUID() : source->nick, "GLOBOPS :%s", buf.c_str());
-	else
-		send_cmd(Config->ServerName, "GLOBOPS :%s", buf.c_str());
+	UplinkSocket::Message(source ? source->nick : Config->ServerName) << "GLOBOPS :" << buf;
 }
 
 void IRCDProto::SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf)
 {
 	Anope::string s = normalizeBuffer(buf);
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s :\1%s\1", dest.c_str(), s.c_str());
+	this->SendNoticeInternal(bi, dest, "\1" + s + "\1");
 }
 
 void IRCDProto::SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf)
 {
-	send_cmd(source, "%03d %s %s", numeric, dest.c_str(), buf.c_str());
+	Anope::string n = stringify(numeric);
+	if (numeric < 10)
+		n = "0" + n;
+	if (numeric < 100)
+		n = "0" + n;
+	UplinkSocket::Message(source) << n << " " << dest << " " << buf;
 }
 
 void IRCDProto::SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...)
@@ -162,12 +164,12 @@ void IRCDProto::SendPrivmsg(const BotInfo *bi, const Anope::string &dest, const 
 
 void IRCDProto::SendGlobalNotice(const BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
+	UplinkSocket::Message(bi->nick) << "NOTICE " << ircd->globaltldprefix << dest->GetName() << " :" << msg;
 }
 
 void IRCDProto::SendGlobalPrivmsg(const BotInfo *bi, const Server *dest, const Anope::string &msg)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest->GetName().c_str(), msg.c_str());
+	UplinkSocket::Message(bi->nick) << "PRIVMSG " << ircd->globaltldprefix << dest->GetName() << " :" << msg;
 }
 
 void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
@@ -183,9 +185,9 @@ void IRCDProto::SendQuit(const User *u, const char *fmt, ...)
 void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PING %s", who.c_str());
+		UplinkSocket::Message(Config->ServerName) << "PING " << who;
 	else
-		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PING %s %s", servname.c_str(), who.c_str());
+		UplinkSocket::Message(Config->ServerName) << "PING " << servname << " " << who;
 }
 
 /**
@@ -197,14 +199,14 @@ void IRCDProto::SendPing(const Anope::string &servname, const Anope::string &who
 void IRCDProto::SendPong(const Anope::string &servname, const Anope::string &who)
 {
 	if (servname.empty())
-		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PONG %s", who.c_str());
+		UplinkSocket::Message(Config->ServerName) << "PONG " << who;
 	else
-		send_cmd(ircd->ts6 ? Config->Numeric : Config->ServerName, "PONG %s %s", servname.c_str(), who.c_str());
+		UplinkSocket::Message(Config->ServerName) << "PONG " << servname << " " << who;
 }
 
 void IRCDProto::SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "INVITE %s %s", nick.c_str(), chan.c_str());
+	UplinkSocket::Message(bi->nick) << "INVITE " << nick << " " << chan;
 }
 
 void IRCDProto::SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...)
@@ -232,19 +234,19 @@ void IRCDProto::SendGlobops(const BotInfo *source, const char *fmt, ...)
 	SendGlobopsInternal(source, buf);
 }
 
-void IRCDProto::SendSquit(const Anope::string &servname, const Anope::string &message)
+void IRCDProto::SendSquit(Server *s, const Anope::string &message)
 {
-	send_cmd("", "SQUIT %s :%s", servname.c_str(), message.c_str());
+	UplinkSocket::Message() << "SQUIT " << s->GetName() << " :" << message;
 }
 
 void IRCDProto::SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick)
 {
-	send_cmd(ircd->ts6 ? bi->GetUID() : bi->nick, "NICK %s %ld", newnick.c_str(), static_cast<long>(Anope::CurTime));
+	UplinkSocket::Message(bi->nick) << "NICK " << newnick << " " << Anope::CurTime;
 }
 
 void IRCDProto::SendForceNickChange(const User *u, const Anope::string &newnick, time_t when)
 {
-	send_cmd("", "SVSNICK %s %s :%ld", u->nick.c_str(), newnick.c_str(), static_cast<long>(when));
+	UplinkSocket::Message() << "SVSNICK " << u->nick << " " << newnick << " " << when;
 }
 
 void IRCDProto::SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...)
@@ -480,7 +482,7 @@ bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::
 	{
 		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
 		/* need to fix */
-		ircdproto->SendSquit(s->GetName(), buf);
+		ircdproto->SendSquit(s, buf);
 	}
 
 	s->Delete(buf);

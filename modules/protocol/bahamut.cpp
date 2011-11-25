@@ -44,127 +44,102 @@ IRCDVar myIrcd[] = {
 	{NULL}
 };
 
-void bahamut_cmd_burst()
-{
-	send_cmd("", "BURST");
-}
-
-/*
- * SVINFO
- *	   parv[0] = sender prefix
- *	   parv[1] = TS_CURRENT for the server
- *	   parv[2] = TS_MIN for the server
- *	   parv[3] = server is standalone or connected to non-TS only
- *	   parv[4] = server's idea of UTC time
- */
-void bahamut_cmd_svinfo()
-{
-	send_cmd("", "SVINFO 3 1 0 :%ld", static_cast<long>(Anope::CurTime));
-}
-
-/* PASS */
-void bahamut_cmd_pass(const Anope::string &pass)
-{
-	send_cmd("", "PASS %s :TS", pass.c_str());
-}
-
-/* CAPAB */
-void bahamut_cmd_capab()
-{
-	send_cmd("", "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
-}
 
 class BahamutIRCdProto : public IRCDProto
 {
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
 		if (Capab.HasFlag(CAPAB_TSMODE))
-			send_cmd(source ? source->nick : Config->ServerName, "MODE %s %ld %s", dest->name.c_str(), static_cast<long>(dest->creation_time), buf.c_str());
+			UplinkSocket::Message(source ? source->nick : Config->ServerName) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
 		else
-			send_cmd(source ? source->nick : Config->ServerName, "MODE %s %s", dest->name.c_str(), buf.c_str());
+			UplinkSocket::Message(source ? source->nick : Config->ServerName) << "MODE " << dest->name << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->nick : Config->ServerName, "SVSMODE %s %ld %s", u->nick.c_str(), static_cast<long>(u->timestamp), buf.c_str());
+		UplinkSocket::Message(bi ? bi->nick : Config->ServerName) << "SVSMODE " << u->nick << " " << u->timestamp << " " << buf;
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd(Config->ServerName, "SVSHOLD %s %u :Being held for registered user", nick.c_str(), static_cast<unsigned>(Config->NSReleaseTimeout));
+		UplinkSocket::Message(Config->ServerName) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd(Config->ServerName, "SVSHOLD %s 0", nick.c_str());
+		UplinkSocket::Message(Config->ServerName) << "SVSHOLD " << nick << " 0";
 	}
 
 	/* SQLINE */
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd("", "SQLINE %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message() << "SQLINE " << x->Mask << " :" << x->Reason;
 	}
 
 	/* UNSLINE */
 	void SendSGLineDel(const XLine *x)
 	{
-		send_cmd("", "UNSGLINE 0 :%s", x->Mask.c_str());
+		UplinkSocket::Message() << "UNSGLINE 0 :" << x->Mask;
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
 		/* this will likely fail so its only here for legacy */
-		send_cmd("", "UNSZLINE 0 %s", x->GetHost().c_str());
+		UplinkSocket::Message() << "UNSZLINE 0 " << x->GetHost();
 		/* this is how we are supposed to deal with it */
-		send_cmd("", "RAKILL %s *", x->GetHost().c_str());
+		UplinkSocket::Message() << "RAKILL " << x->GetHost() << " *";
 	}
 
 	/* SZLINE */
 	void SendSZLine(User *, const XLine *x)
 	{
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = x->Expires - Anope::CurTime;
+		if (timeleft > 172800 || !x->Expires)
+			timeleft = 172800;
 		/* this will likely fail so its only here for legacy */
-		send_cmd("", "SZLINE %s :%s", x->GetHost().c_str(), x->Reason.c_str());
+		UplinkSocket::Message() << "SZLINE " << x->GetHost() << " :" << x->Reason;
 		/* this is how we are supposed to deal with it */
-		send_cmd("", "AKILL %s * %d %s %ld :%s", x->GetHost().c_str(), 172800, x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " * " << timeleft << " " << x->By << " " << Anope::CurTime << " :" << x->Reason;
 	}
 
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set)
 	{
-		send_cmd("", "SVSNOOP %s %s", server->GetName().c_str(), set ? "+" : "-");
+		UplinkSocket::Message() << "SVSNOOP " << server->GetName() << " " << (set ? "+" : "-");
 	}
 
 	/* SGLINE */
 	void SendSGLine(User *, const XLine *x)
 	{
-		send_cmd("", "SGLINE %d :%s:%s", static_cast<int>(x->Mask.length()), x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message() << "SGLINE " << x->Mask.length() << " :" << x->Mask << ":" << x->Reason;
 	}
 
 	/* RAKILL */
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd("", "RAKILL %s %s", x->GetHost().c_str(), x->GetUser().c_str());
+		UplinkSocket::Message() << "RAKILL " << x->GetHost() << " " << x->GetUser();
 	}
 
 	/* TOPIC */
 	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time), c->topic.c_str());
+		UplinkSocket::Message(whosets->nick) << "TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time << " :" << c->topic;
 	}
 
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd("", "UNSQLINE %s", x->Mask.c_str());
+		UplinkSocket::Message() << "UNSQLINE " << x->Mask;
 	}
 
 	/* JOIN - SJOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(c->creation_time), c->name.c_str());
+		UplinkSocket::Message(user->nick) << "SJOIN " << c->creation_time << " " << c->name;
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -189,7 +164,7 @@ class BahamutIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd("", "AKILL %s %s %d %s %ld :%s", x->GetHost().c_str(), x->GetUser().c_str(), static_cast<int>(timeleft), x->By.c_str(), static_cast<long>(Anope::CurTime), x->Reason.c_str());
+		UplinkSocket::Message() << "AKILL " << x->GetHost() << " " << x->GetUser() << " " << timeleft << " " << x->By << " " << Anope::CurTime << " :" << x->Reason;
 	}
 
 	/*
@@ -197,46 +172,54 @@ class BahamutIRCdProto : public IRCDProto
 	*/
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : "", "SVSKILL %s :%s", user->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->nick : "") << "SVSKILL " << user->nick << " :" << buf;
 	}
 
 	void SendBOB()
 	{
-		send_cmd("", "BURST");
+		UplinkSocket::Message() << "BURST";
 	}
 
 	void SendEOB()
 	{
-		send_cmd("", "BURST 0");
+		UplinkSocket::Message() << "BURST 0";
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(source->nick, "KICK %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
+			UplinkSocket::Message(source->nick) << "KICK " << chan->name << " " << user->nick << " :" << buf;
 		else
-			send_cmd(source->nick, "KICK %s %s", chan->name.c_str(), user->nick.c_str());
+			UplinkSocket::Message(source->nick) << "KICK " << chan->name << " " << user->nick;
 	}
 
 	void SendClientIntroduction(const User *u)
 	{
 		Anope::string modes = "+" + u->GetModes();
-		send_cmd("", "NICK %s 1 %ld %s %s %s %s 0 0 :%s", u->nick.c_str(), static_cast<long>(u->timestamp), modes.c_str(), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), u->realname.c_str());
+		UplinkSocket::Message() << "NICK " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 0 :" << u->realname;
 	}
 
 	/* SERVER */
 	void SendServer(const Server *server)
 	{
-		send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
 	void SendConnect()
 	{
-		bahamut_cmd_pass(Config->Uplinks[CurrentUplink]->password);
-		bahamut_cmd_capab();
+		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " :TS";
+		UplinkSocket::Message() << "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3";
 		SendServer(Me);
-		bahamut_cmd_svinfo();
-		bahamut_cmd_burst();
+		/*
+		 * SVINFO
+		 *	   parv[0] = sender prefix
+		 *	   parv[1] = TS_CURRENT for the server
+		 *	   parv[2] = TS_MIN for the server
+		 *	   parv[3] = server is standalone or connected to non-TS only
+		 *	   parv[4] = server's idea of UTC time
+		 */
+		UplinkSocket::Message() << "SVINFO 3 1 0 :" << Anope::CurTime;
+		this->SendBOB();
 	}
 
 	void SendChannel(Channel *c)
@@ -244,7 +227,7 @@ class BahamutIRCdProto : public IRCDProto
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
-		send_cmd("", "SJOIN %ld %s %s :", static_cast<long>(c->creation_time), c->name.c_str(), modes.c_str());
+		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
 	void SendLogin(User *u)

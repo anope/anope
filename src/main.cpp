@@ -125,7 +125,7 @@ UplinkSocket::~UplinkSocket()
 			}
 		}
 
-		ircdproto->SendSquit(Config->ServerName, quitmsg);
+		ircdproto->SendSquit(Me, quitmsg);
 
 		this->ProcessWrite(); // Write out the last bit
 	}
@@ -170,6 +170,58 @@ void UplinkSocket::OnConnect()
 void UplinkSocket::OnError(const Anope::string &error)
 {
 	Log(LOG_TERMINAL) << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
+}
+
+UplinkSocket::Message::Message()
+{
+}
+
+UplinkSocket::Message::Message(const Anope::string &s) : source(s)
+{
+}
+
+UplinkSocket::Message::~Message()
+{
+	if (!UplinkSock)
+	{
+		if (!this->source.empty())
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->source << " " << this->buffer.str() << "\" with UplinkSock NULL";
+		else
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
+		return;
+	}
+
+	if (this->source == Me->GetName())
+	{
+		if (ircd->ts6)
+			this->source = Me->GetSID();
+	}
+	else if (!this->source.empty() && this->source != Me->GetSID())
+	{
+		BotInfo *bi = findbot(this->source);
+		if (bi != NULL)
+		{
+			if (bi->introduced == false)
+			{
+				Log(LOG_DEBUG) << "Attempted to send \"" << this->source << " " << this->buffer.str() << "\" with source not introduced";
+				return;
+			}
+
+			if (ircd->ts6)
+				this->source = bi->GetUID();
+		}
+	}
+
+	if (!this->source.empty())
+	{
+		UplinkSock->Write(":" + this->source + " " + this->buffer.str());
+		Log(LOG_RAWIO) << "Sent: :" << this->source << " " << this->buffer.str();
+	}
+	else
+	{
+		UplinkSock->Write(this->buffer.str());
+		Log(LOG_RAWIO) << "Sent: " << this->buffer.str();
+	}
 }
 
 static void Connect()

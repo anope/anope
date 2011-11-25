@@ -44,67 +44,22 @@ IRCDVar myIrcd[] = {
 	{NULL}
 };
 
-/* PROTOCTL */
-/*
-   NICKv2 = Nick Version 2
-   VHP    = Sends hidden host
-   UMODE2 = sends UMODE2 on user modes
-   NICKIP = Sends IP on NICK
-   TOKEN  = Use tokens to talk
-   SJ3    = Supports SJOIN
-   NOQUIT = No Quit
-   TKLEXT = Extended TKL we don't use it but best to have it
-   SJB64  = Base64 encoded time stamps
-   VL     = Version Info
-   NS     = Config->Numeric Server
-
-*/
-void unreal_cmd_capab()
-{
-	if (!Config->Numeric.empty())
-		send_cmd("", "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT VL");
-	else
-		send_cmd("", "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT");
-}
-
-/* PASS */
-void unreal_cmd_pass(const Anope::string &pass)
-{
-	send_cmd("", "PASS :%s", pass.c_str());
-}
-
-/* CHGHOST */
-void unreal_cmd_chghost(const Anope::string &nick, const Anope::string &vhost)
-{
-	if (nick.empty() || vhost.empty())
-		return;
-	send_cmd(Config->ServerName, "AL %s %s", nick.c_str(), vhost.c_str());
-}
-
-/* CHGIDENT */
-void unreal_cmd_chgident(const Anope::string &nick, const Anope::string &vIdent)
-{
-	if (nick.empty() || vIdent.empty())
-		return;
-	send_cmd(Config->ServerName, "AZ %s %s", nick.c_str(), vIdent.c_str());
-}
-
 class UnrealIRCdProto : public IRCDProto
 {
 	/* SVSNOOP */
 	void SendSVSNOOP(const Server *server, bool set)
 	{
-		send_cmd("", "f %s %s", server->GetName().c_str(), set ? "+" : "-");
+		UplinkSocket::Message() << "f " << server->GetName() << " " << (set ? "+" : "-");
 	}
 
 	void SendAkillDel(const XLine *x)
 	{
-		send_cmd("", "BD - G %s %s %s", x->GetUser().c_str(), x->GetHost().c_str(), Config->OperServ.c_str());
+		UplinkSocket::Message() << "BD - G " << x->GetUser() << " " << x->GetHost() << " " << Config->OperServ;
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		send_cmd(whosets->nick, ") %s %s %lu :%s", c->name.c_str(), c->topic_setter.c_str(), static_cast<unsigned long>(c->topic_time + 1), c->topic.c_str());
+		UplinkSocket::Message(whosets->nick) << ") " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u)
@@ -122,36 +77,36 @@ class UnrealIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800)
 			timeleft = 172800;
-		send_cmd("", "BD + G %s %s %s %ld %ld :%s", x->GetUser().c_str(), x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
+		UplinkSocket::Message() << "BD + G " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->Reason;
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->ServerName, "h %s :%s", user->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->nick : Config->ServerName) << "h " << user->nick << " :" << buf;
 	}
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		send_cmd(source ? source->nick : Config->ServerName, "G %s %s", dest->name.c_str(), buf.c_str());
+		UplinkSocket::Message(source ? source->nick : Config->ServerName) << "G " << dest->name << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
 	{
-		send_cmd(bi ? bi->nick : Config->ServerName, "v %s %s", u->nick.c_str(), buf.c_str());
+		UplinkSocket::Message(bi ? bi->nick : Config->ServerName) << "v " << u->nick <<" " << buf;
 	}
 
 	void SendClientIntroduction(const User *u)
 	{
 		Anope::string modes = "+" + u->GetModes();
-		send_cmd("", "& %s 1 %ld %s %s %s 0 %s %s * :%s", u->nick.c_str(), static_cast<long>(u->timestamp), u->GetIdent().c_str(), u->host.c_str(), u->server->GetName().c_str(), modes.c_str(), u->host.c_str(), u->realname.c_str());
+		UplinkSocket::Message() << "& " << u->nick << " 1 " << u->timestamp << " " << u->GetIdent() << " " << u->host << " " << u->server->GetName() << " 0 " << modes << " " << u->host << " * :" << u->realname;
 	}
 
 	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf)
 	{
 		if (!buf.empty())
-			send_cmd(source->nick, "H %s %s :%s", chan->name.c_str(), user->nick.c_str(), buf.c_str());
+			UplinkSocket::Message(source->nick) << "H " << chan->name << " " << user->nick << " :" << buf;
 		else
-			send_cmd(source->nick, "H %s %s", chan->name.c_str(), user->nick.c_str());
+			UplinkSocket::Message(source->nick) << "H " << chan->name << " " << user->nick;
 	}
 
 	/* SERVER name hop descript */
@@ -159,15 +114,15 @@ class UnrealIRCdProto : public IRCDProto
 	void SendServer(const Server *server)
 	{
 		if (!Config->Numeric.empty())
-			send_cmd("", "SERVER %s %d :U0-*-%s %s", server->GetName().c_str(), server->GetHops(), Config->Numeric.c_str(), server->GetDescription().c_str());
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :U0-*-" << Config->Numeric << " " << server->GetDescription();
 		else
-			send_cmd("", "SERVER %s %d :%s", server->GetName().c_str(), server->GetHops(), server->GetDescription().c_str());
+			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
 	{
-		send_cmd(Config->ServerName, "~ %ld %s :%s", static_cast<long>(c->creation_time), c->name.c_str(), user->nick.c_str());
+		UplinkSocket::Message(Config->ServerName) << "~ " << c->creation_time << " " << c->name << " :" << user->nick;
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -190,7 +145,7 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSQLineDel(const XLine *x)
 	{
-		send_cmd("", "d %s", x->Mask.c_str());
+		UplinkSocket::Message() << "d " << x->Mask;
 	}
 
 	/* SQLINE */
@@ -200,7 +155,7 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSQLine(User *, const XLine *x)
 	{
-		send_cmd("", "c %s :%s", x->Mask.c_str(), x->Reason.c_str());
+		UplinkSocket::Message() << "c " << x->Mask << " :" << x->Reason;
 	}
 
 	/*
@@ -211,13 +166,13 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSO(const Anope::string &source, const Anope::string &nick, const Anope::string &flag)
 	{
-		send_cmd(source, "BB %s %s", nick.c_str(), flag.c_str());
+		UplinkSocket::Message(source) << "BB " << nick << " " << flag;
 	}
 
 	/* NICK <newnick>  */
 	void SendChangeBotNick(const BotInfo *oldnick, const Anope::string &newnick)
 	{
-		send_cmd(oldnick->nick, "& %s %ld", newnick.c_str(), static_cast<long>(Anope::CurTime));
+		UplinkSocket::Message(oldnick->nick) << "& " << newnick << " " << Anope::CurTime;
 	}
 
 	/* Functions that use serval cmd functions */
@@ -225,28 +180,44 @@ class UnrealIRCdProto : public IRCDProto
 	void SendVhost(User *u, const Anope::string &vIdent, const Anope::string &vhost)
 	{
 		if (!vIdent.empty())
-			unreal_cmd_chgident(u->nick, vIdent);
+			UplinkSocket::Message(Config->ServerName) << "AZ " << u->nick << " " << vIdent;
 		if (!vhost.empty())
-			unreal_cmd_chghost(u->nick, vhost);
+			UplinkSocket::Message(Config->ServerName) << "AL " << u->nick << " " << vhost;
 	}
 
 	void SendConnect()
 	{
-		unreal_cmd_capab();
-		unreal_cmd_pass(Config->Uplinks[CurrentUplink]->password);
+		/*
+		   NICKv2 = Nick Version 2
+		   VHP    = Sends hidden host
+		   UMODE2 = sends UMODE2 on user modes
+		   NICKIP = Sends IP on NICK
+		   TOKEN  = Use tokens to talk
+		   SJ3    = Supports SJOIN
+		   NOQUIT = No Quit
+		   TKLEXT = Extended TKL we don't use it but best to have it
+		   SJB64  = Base64 encoded time stamps
+		   VL     = Version Info
+		   NS     = Config->Numeric Server
+		*/
+		if (!Config->Numeric.empty())
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT VL";
+		else
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT";
+		UplinkSocket::Message() << "PASS :" << Config->Uplinks[CurrentUplink]->password;
 		SendServer(Me);
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const Anope::string &nick)
 	{
-		send_cmd("", "BD + Q H %s %s %ld %ld :Being held for registered user", nick.c_str(), Config->ServerName.c_str(), static_cast<long>(Anope::CurTime + Config->NSReleaseTimeout), static_cast<long>(Anope::CurTime));
+		UplinkSocket::Message() << "BD + Q H " << nick << " " << Config->ServerName << " " << Anope::CurTime + Config->NSReleaseTimeout << " " << Anope::CurTime << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const Anope::string &nick)
 	{
-		send_cmd("", "BD - Q * %s %s", nick.c_str(), Config->ServerName.c_str());
+		UplinkSocket::Message() << "BD - Q * " << nick << " " << Config->ServerName;
 	}
 
 	/* UNSGLINE */
@@ -255,13 +226,13 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSGLineDel(const XLine *x)
 	{
-		send_cmd("", "BR - :%s", x->Mask.c_str());
+		UplinkSocket::Message() << "BR - :" << x->Mask;
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x)
 	{
-		send_cmd("", "BD - Z * %s %s", x->GetHost().c_str(), Config->OperServ.c_str());
+		UplinkSocket::Message() << "BD - Z * " << x->GetHost() << " " << Config->OperServ;
 	}
 
 	/* SZLINE */
@@ -271,7 +242,7 @@ class UnrealIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		send_cmd("", "BD + Z * %s %s %ld %ld :%s", x->GetHost().c_str(), x->By.c_str(), static_cast<long>(Anope::CurTime + timeleft), static_cast<long>(x->Created), x->Reason.c_str());
+		UplinkSocket::Message() << "BD + Z * " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->Reason;
 	}
 
 	/* SGLINE */
@@ -282,7 +253,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		Anope::string edited_reason = x->Reason;
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
-		send_cmd("", "BR + %s :%s", edited_reason.c_str(), x->Mask.c_str());
+		UplinkSocket::Message() << "BR + " << edited_reason << " :" << x->Mask;
 	}
 
 	/* svsjoin
@@ -297,19 +268,19 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &param)
 	{
 		if (!param.empty())
-			send_cmd(source, "BX %s %s :%s", nick.c_str(), chan.c_str(), param.c_str());
+			UplinkSocket::Message(source) << "BX " << nick << " " << chan << " :" << param;
 		else
-			send_cmd(source, "BX %s :%s", nick.c_str(), chan.c_str());
+			UplinkSocket::Message(source) << "BX " << nick << " :" << chan;
 	}
 
 	void SendSWhois(const Anope::string &source, const Anope::string &who, const Anope::string &mask)
 	{
-		send_cmd(source, "BA %s :%s", who.c_str(), mask.c_str());
+		UplinkSocket::Message(source) << "BA " << who << " :" << mask;
 	}
 
 	void SendEOB()
 	{
-		send_cmd(Config->ServerName, "ES");
+		UplinkSocket::Message(Config->ServerName) << "ES";
 	}
 
 	bool IsNickValid(const Anope::string &nick)
@@ -938,7 +909,7 @@ bool event_pong(const Anope::string &source, const std::vector<Anope::string> &p
  */
 bool event_netinfo(const Anope::string &source, const std::vector<Anope::string> &params)
 {
-	send_cmd("", "AO %ld %ld %d %s 0 0 0 :%s", static_cast<long>(maxusercnt), static_cast<long>(Anope::CurTime), Anope::string(params[2]).is_number_only() ? convertTo<int>(params[2]) : 0, params[3].c_str(), params[7].c_str());
+	UplinkSocket::Message() << "AO " << maxusercnt << " " << Anope::CurTime << " " << convertTo<int>(params[2]) << " " << params[3] << " 0 0 0 :" << params[7];
 	return true;
 }
 

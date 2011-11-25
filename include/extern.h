@@ -117,6 +117,21 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	bool Read(const Anope::string &);
 	void OnConnect();
 	void OnError(const Anope::string &);
+	
+	class CoreExport Message
+	{
+		Anope::string source;
+		std::stringstream buffer;
+	 public:
+	 	Message();
+	 	Message(const Anope::string &);
+	 	~Message();
+		template<typename T> Message &operator<<(const T &val)
+		{
+			this->buffer << val;
+			return *this;
+		}
+	};
 };
 E UplinkSocket *UplinkSock;
 E int CurrentUplink;
@@ -199,12 +214,6 @@ E bool is_on_access(const User *u, const NickCore *nc);
 /**** process.c ****/
 
 E void process(const Anope::string &buf);
-
-/**** send.c ****/
-
-E void send_cmd(const Anope::string &source, const char *fmt, ...) FORMAT(printf, 2, 3);
-
-E void notice_server(const Anope::string &source, const Server *s, const char *fmt, ...) FORMAT(printf, 3, 4);
 
 /**** sockets.cpp ****/
 

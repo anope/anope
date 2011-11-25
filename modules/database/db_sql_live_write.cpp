@@ -47,18 +47,18 @@ static void ChanInfoUpdate(const Anope::string &name, const SQLResult &res)
 			ci = new ChannelInfo(name);
 		ci->SetFounder(findcore(res.Get(0, "founder")));
 		ci->successor = findcore(res.Get(0, "successor"));
-		ci->desc = res.Get(0, "descr");
+		ci->desc = res.Get(0, "description");
 		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
 		ci->ClearFlags();
 		ci->FromString(res.Get(0, "flags"));
 		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
 		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
 
-		if (res.Get(0, "botnick").equals_cs(ci->bi ? ci->bi->nick : "") == false)
+		if (res.Get(0, "bi").equals_cs(ci->bi ? ci->bi->nick : "") == false)
 		{
 			if (ci->bi)
 				ci->bi->UnAssign(NULL, ci);
-			BotInfo *bi = findbot(res.Get(0, "botnick"));
+			BotInfo *bi = findbot(res.Get(0, "bi"));
 			if (bi)
 				bi->Assign(NULL, ci);
 		}
@@ -90,7 +90,7 @@ static void NickInfoUpdate(const Anope::string &name, const SQLResult &res)
 
 	try
 	{
-		NickCore *nc = findcore(res.Get(0, "display"));
+		NickCore *nc = findcore(res.Get(0, "nick"));
 		if (!nc)
 			return;
 		if (!na)

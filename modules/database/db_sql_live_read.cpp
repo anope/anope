@@ -163,7 +163,7 @@ class DBMySQL : public Module
 		}
 		else if (command->name.find("nickserv/saset/") == 0)
 		{
-			NickAlias *na = findnick(params[1]);
+			NickAlias *na = findnick(params[0]);
 			if (!na)
 				this->Insert(na->nc->serialize_name(), na->nc->serialize());
 		}

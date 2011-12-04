@@ -85,6 +85,8 @@ foreach(MODULE_FOLDER ${MODULES_FOLDERS})
           if(WIN32)
             target_link_libraries(${SO} ${PROGRAM_NAME} wsock32 Ws2_32 ${WIN32_MEMORY} ${TEMP_DEPENDENCIES})
             set_target_properties(${PROGRAM_NAME} PROPERTIES VERSION "${VERSION_DOTTED}")
+          else(WIN32)
+            target_link_libraries(${SO} ${PROGRAM_NAME} ${TEMP_DEPENDENCIES})
           endif(WIN32)
           # Set the module to be installed to the module directory under the data directory
           install(TARGETS ${SO}

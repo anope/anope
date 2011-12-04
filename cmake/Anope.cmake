@@ -479,7 +479,7 @@ macro(calculate_libraries SRC SKIP SRC_LDFLAGS EXTRA_DEPENDS)
     endforeach(LIBRARY_PATH)
     # Iterate through libraries and add them to the linker flags
     foreach(LIBRARY ${LIBRARIES})
-      set(THIS_LDFLAGS "${THIS_LDFLAGS} -l${LIBRARY}")
+      append_to_list(EXTRA_DEPENDENCIES "${LIBRARY}")
     endforeach(LIBRARY)
     set(${SRC_LDFLAGS} "${THIS_LDFLAGS}")
     set(${EXTRA_DEPENDS} "${EXTRA_DEPENDENCIES}")

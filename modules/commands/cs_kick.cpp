@@ -33,13 +33,20 @@ class CommandCSKick : public Command
 		Channel *c = findchan(params[0]);
 		User *u2 = finduser(target);
 
+		if (!c)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			return;
+		}
+		else if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			return;
+		}
+
 		AccessGroup u_access = ci->AccessFor(u);
 
-		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
-		else if (!ci->AccessFor(u).HasPriv("KICK"))
+		if (!u_access.HasPriv("KICK"))
 			source.Reply(ACCESS_DENIED);
 		else if (u2)
 		{

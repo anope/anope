@@ -34,13 +34,20 @@ class CommandCSKick : public Command
 		bool is_same = target.equals_ci(u->nick);
 		User *u2 = is_same ? u : finduser(target);
 
+		if (!c)
+		{
+			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
+			return;
+		}
+		else if (!ci)
+		{
+			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
+			return;
+		}
+
 		AccessGroup u_access = ci->AccessFor(u), u2_access = ci->AccessFor(u2);
 
-		if (!c)
-			source.Reply(CHAN_X_NOT_IN_USE, chan.c_str());
-		else if (!ci)
-			source.Reply(CHAN_X_NOT_REGISTERED, chan.c_str());
-		else if (!u2)
+		if (!u2)
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 		else if (!ci->AccessFor(u).HasPriv(CA_KICK))
 			source.Reply(ACCESS_DENIED);

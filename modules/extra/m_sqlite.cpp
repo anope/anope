@@ -175,6 +175,8 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 	}
 	while (err == SQLITE_ROW);
 
+	sqlite3_finalize(stmt);
+
 	if (err != SQLITE_DONE)
 		return SQLiteResult(query, real_query, sqlite3_errmsg(this->sql));
 

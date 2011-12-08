@@ -473,9 +473,9 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE numero
 NICK_SET_LANGUAGE_UNKNOWN
-	Numero de lenguage %d desconocido. Tipea %R%s HELP SET LANGUAGE para una lista de lenguages.
+	Numero de lenguaje %d desconocido. Tipea %R%s HELP SET LANGUAGE para una lista de lenguajes.
 NICK_SET_LANGUAGE_CHANGED
-	Lenguage cambiado a Español.
+	Lenguaje cambiado a Español.
 
 # SET URL responses
 NICK_SET_URL_CHANGED

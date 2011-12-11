@@ -220,15 +220,14 @@ void User::SendMessage(BotInfo *source, const char *fmt, ...)
 	va_list args;
 	char buf[BUFSIZE] = "";
 
-	if (fmt)
-	{
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+	const char *translated_message = translate(this, fmt);
 
-		this->SendMessage(source, Anope::string(buf));
+	va_start(args, fmt);
+	vsnprintf(buf, BUFSIZE - 1, translated_message, args);
 
-		va_end(args);
-	}
+	this->SendMessage(source, Anope::string(buf));
+
+	va_end(args);
 }
 
 void User::SendMessage(BotInfo *source, Anope::string msg)

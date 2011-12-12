@@ -228,8 +228,8 @@ AccessGroup ChannelInfo::AccessFor(User *u)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(u, nc))
 			group.push_back(this->access[i]);
-	
-	if (!group.empty())
+
+	if (group.Founder || !group.empty())
 		this->last_used = Anope::CurTime;
 	
 	return group;
@@ -246,6 +246,9 @@ AccessGroup ChannelInfo::AccessFor(NickCore *nc)
 	for (unsigned i = 0, end = this->access.size(); i < end; ++i)
 		if (this->access[i]->Matches(NULL, nc))
 			group.push_back(this->access[i]);
+	
+	if (group.Founder || !group.empty())
+		this->last_used = Anope::CurTime;
 
 	return group;
 }

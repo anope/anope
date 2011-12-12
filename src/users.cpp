@@ -464,6 +464,8 @@ bool User::IsServicesOper()
 	if (!this->nc || !this->nc->o)
 		// No opertype.
 		return false;
+	else if (this->nc->o->require_oper && !this->HasMode(UMODE_OPER))
+		return false;
 	else if (!this->nc->o->certfp.empty() && this->fingerprint != this->nc->o->certfp)
 		// Certfp mismatch
 		return false;

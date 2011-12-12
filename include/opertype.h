@@ -16,6 +16,7 @@ struct CoreExport Oper
 {
 	Anope::string name;
 	OperType *ot;
+	bool require_oper;
 	Anope::string password;
 	Anope::string certfp;
 	bool config;

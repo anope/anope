@@ -5,6 +5,7 @@ Anope Version 1.8 - GIT
 08/21  A Added internal event when a nickcore is dropped.                [  #00]
 08/21  A Added internal event when a nickcore gets a new display nick.   [  #00]
 08/18  R Removed support for Hybrid's (old) channel mode +a              [#1318]
+12/15  C Added API support for SVSJOIN and SVSPART on UltimateIRCd 3.    [  #00]
 05/30  F Fixed removing vhosts on InspIRCd when m_cloaking is unloaded   [#1273]
 07/23  F Fixed a potential crash in the badwords kicker                  [  #00]
 08/09  F Fixed deopping the first user to join a channel during a burst  [#1287]

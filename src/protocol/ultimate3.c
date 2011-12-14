@@ -1553,14 +1553,28 @@ int anope_event_sqline(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+/*
+ * svsjoin
+ *
+ * parv[0] - sender
+ * parv[1] - nick to make join
+ * parv[2] - channel(s) to join
+ */
 void ultimate3_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
 
+/*
+ * svspart
+ *
+ * parv[0] - sender
+ * parv[1] - nick to make part
+ * parv[2] - channel(s) to part
+ */
 void ultimate3_cmd_svspart(char *source, char *nick, char *chan)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(source, "SVSPART %s %s", nick, chan);
 }
 
 void ultimate3_cmd_swhois(char *source, char *who, char *mask)

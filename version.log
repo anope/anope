@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="7"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3087"
+VERSION_BUILD="3088"
 
 # $Log$ # Changes since 1.8.6 Release
+#Revision 3088 - Implemented API support for the SVSJOIN and SVSPART commands on UltimateIRCd 3.
 #Revision 3087 - Fixed some typos in the spanish language file
 #Revision 3086 - Fixed ignore not matching against users' real host or IP (introduced in rev. 3049).
 #Revision 3085 - Use vident instead of ident in combination with the vhost for botserv kick(ban)s and nickserv access list checking.

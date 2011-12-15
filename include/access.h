@@ -55,14 +55,14 @@ class CoreExport ChanAccess : public Serializable
 	static void unserialize(serialized_data &);
 
 	virtual bool Matches(User *u, NickCore *nc) = 0;
-	virtual bool HasPriv(const Anope::string &name) = 0;	
+	virtual bool HasPriv(const Anope::string &name) const = 0;
 	virtual Anope::string Serialize() = 0;
 	virtual void Unserialize(const Anope::string &data) = 0;
 
-	bool operator>(ChanAccess &other);
-	bool operator<(ChanAccess &other);
-	bool operator>=(ChanAccess &other);
-	bool operator<=(ChanAccess &other);
+	bool operator>(const ChanAccess &other) const;
+	bool operator<(const ChanAccess &other) const;
+	bool operator>=(const ChanAccess &other) const;
+	bool operator<=(const ChanAccess &other) const;
 };
 
 class CoreExport AccessGroup : public std::vector<ChanAccess *>

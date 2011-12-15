@@ -33,7 +33,7 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(const Anope::string &priv)
+	bool HasPriv(const Anope::string &priv) const
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
 		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)

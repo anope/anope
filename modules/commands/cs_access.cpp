@@ -40,7 +40,7 @@ class AccessChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(const Anope::string &name)
+	bool HasPriv(const Anope::string &name) const
 	{
 		return this->ci->GetLevel(name) != ACCESS_INVALID && this->level >= this->ci->GetLevel(name);
 	}

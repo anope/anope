@@ -108,7 +108,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(const Anope::string &priv)
+	bool HasPriv(const Anope::string &priv) const
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{

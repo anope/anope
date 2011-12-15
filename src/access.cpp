@@ -112,25 +112,7 @@ void ChanAccess::unserialize(serialized_data &data)
 	ci->AddAccess(access);
 }
 
-bool ChanAccess::operator>(ChanAccess &other)
-{
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-		if (this->HasPriv(privs[i - 1].name) && !other.HasPriv(privs[i - 1].name))
-			return true;
-	return false;
-}
-
-bool ChanAccess::operator<(ChanAccess &other)
-{
-	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-	for (unsigned i = privs.size(); i > 0; --i)
-		if (!this->HasPriv(privs[i - 1].name) && other.HasPriv(privs[i - 1].name))
-			return true;
-	return false;
-}
-
-bool ChanAccess::operator>=(ChanAccess &other)
+bool ChanAccess::operator>(const ChanAccess &other) const
 {
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
@@ -138,14 +120,18 @@ bool ChanAccess::operator>=(ChanAccess &other)
 		bool this_p = this->HasPriv(privs[i - 1].name),
 			other_p = other.HasPriv(privs[i - 1].name);
 
-		if ((this_p && !other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
 			return true;
+		else
+			return false;
 	}
 
 	return false;
 }
 
-bool ChanAccess::operator<=(ChanAccess &other)
+bool ChanAccess::operator<(const ChanAccess &other) const
 {
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
@@ -153,11 +139,53 @@ bool ChanAccess::operator<=(ChanAccess &other)
 		bool this_p = this->HasPriv(privs[i - 1].name),
 			other_p = other.HasPriv(privs[i - 1].name);
 
-		if ((!this_p && other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
+			return true;
+		else
+			return false;
+	}	
+
+	return false;
+}
+
+bool ChanAccess::operator>=(const ChanAccess &other) const
+{
+	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	for (unsigned i = privs.size(); i > 0; --i)
+	{
+		bool this_p = this->HasPriv(privs[i - 1].name),
+			other_p = other.HasPriv(privs[i - 1].name);
+
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
+			return false;
+		else
 			return true;
 	}
 
-	return false;
+	return true;
+}
+
+bool ChanAccess::operator<=(const ChanAccess &other) const
+{
+	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
+	for (unsigned i = privs.size(); i > 0; --i)
+	{
+		bool this_p = this->HasPriv(privs[i - 1].name),
+			other_p = other.HasPriv(privs[i - 1].name);
+
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
+			return false;
+		else
+			return true;
+	}
+
+	return true;
 }
 
 AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
@@ -211,8 +239,18 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
-		if (this->HasPriv(privs[i - 1].name) && !other.HasPriv(privs[i - 1].name))
+	{
+		bool this_p = this->HasPriv(privs[i - 1].name),
+			other_p = other.HasPriv(privs[i - 1].name);
+
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
 			return true;
+		else
+			return false;
+	}
+
 	return false;
 }
 
@@ -228,8 +266,18 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 		return false;
 	const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 	for (unsigned i = privs.size(); i > 0; --i)
-		if (!this->HasPriv(privs[i - 1].name) && other.HasPriv(privs[i - 1].name))
+	{
+		bool this_p = this->HasPriv(privs[i - 1].name),
+			other_p = other.HasPriv(privs[i - 1].name);
+
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
 			return true;
+		else
+			return false;
+	}
+
 	return false;
 }
 
@@ -249,11 +297,15 @@ bool AccessGroup::operator>=(const AccessGroup &other) const
 		bool this_p = this->HasPriv(privs[i - 1].name),
 			other_p = other.HasPriv(privs[i - 1].name);
 
-		if ((this_p && !other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (other_p && !this_p)
+			return false;
+		else
 			return true;
 	}
 
-	return false;
+	return true;
 }
 
 bool AccessGroup::operator<=(const AccessGroup &other) const
@@ -272,10 +324,14 @@ bool AccessGroup::operator<=(const AccessGroup &other) const
 		bool this_p = this->HasPriv(privs[i - 1].name),
 			other_p = other.HasPriv(privs[i - 1].name);
 
-		if ((!this_p && other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
+			return false;
+		else
 			return true;
 	}
 
-	return false;
+	return true;
 }
 

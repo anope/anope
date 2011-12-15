@@ -35,48 +35,76 @@ ChanAccess::~ChanAccess()
 {
 }
 
-bool ChanAccess::operator>(ChanAccess &other)
-{
-	for (size_t i = CA_SIZE; i > 0; --i)
-		if (this->HasPriv(static_cast<ChannelAccess>(i - 1)) && !other.HasPriv(static_cast<ChannelAccess>(i - 1)))
-			return true;
-	return false;
-}
-
-bool ChanAccess::operator<(ChanAccess &other)
-{
-	for (size_t i = CA_SIZE; i > 0; --i)
-		if (!this->HasPriv(static_cast<ChannelAccess>(i - 1)) && other.HasPriv(static_cast<ChannelAccess>(i - 1)))
-			return true;
-	return false;
-}
-
-bool ChanAccess::operator>=(ChanAccess &other)
+bool ChanAccess::operator>(const ChanAccess &other) const
 {
 	for (size_t i = CA_SIZE; i > 0; --i)
 	{
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
 			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
 
-		if ((this_p && !other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
 			return true;
+		else
+			return false;
 	}
 
 	return false;
 }
 
-bool ChanAccess::operator<=(ChanAccess &other)
+bool ChanAccess::operator<(const ChanAccess &other) const
 {
 	for (size_t i = CA_SIZE; i > 0; --i)
 	{
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
 			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
 
-		if ((!this_p && other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
 			return true;
+		else
+			return false;
 	}
 
 	return false;
+}
+
+bool ChanAccess::operator>=(const ChanAccess &other) const
+{
+	for (size_t i = CA_SIZE; i > 0; --i)
+	{
+		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
+			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
+
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
+			return false;
+		else
+			return true;
+	}
+
+	return true;
+}
+
+bool ChanAccess::operator<=(const ChanAccess &other) const
+{
+	for (size_t i = CA_SIZE; i > 0; --i)
+	{
+		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
+			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
+
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
+			return false;
+		else
+			return true;
+	}
+
+	return true;
 }
 
 AccessGroup::AccessGroup() : std::vector<ChanAccess *>()
@@ -128,8 +156,18 @@ bool AccessGroup::operator>(const AccessGroup &other) const
 	else if (!this->Founder && other.Founder)
 		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
-		if (this->HasPriv(static_cast<ChannelAccess>(i - 1)) && !other.HasPriv(static_cast<ChannelAccess>(i - 1)))
+	{
+		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
+			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
+
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
 			return true;
+		else
+			return false;
+	}
+
 	return false;
 }
 
@@ -144,8 +182,18 @@ bool AccessGroup::operator<(const AccessGroup &other) const
 	else if (this->Founder && !other.Founder)
 		return false;
 	for (size_t i = CA_SIZE; i > 0; --i)
-		if (!this->HasPriv(static_cast<ChannelAccess>(i - 1)) && other.HasPriv(static_cast<ChannelAccess>(i - 1)))
+	{
+		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
+			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
+
+		if (!this_p && !other_p)
+			continue;
+		else if (!this_p && other_p)
 			return true;
+		else
+			return false;
+	}
+
 	return false;
 }
 
@@ -164,11 +212,15 @@ bool AccessGroup::operator>=(const AccessGroup &other) const
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
 			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
 
-		if ((this_p && !other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (other_p && !this_p)
+			return false;
+		else
 			return true;
 	}
 
-	return false;
+	return true;
 }
 
 bool AccessGroup::operator<=(const AccessGroup &other) const
@@ -186,10 +238,14 @@ bool AccessGroup::operator<=(const AccessGroup &other) const
 		bool this_p = this->HasPriv(static_cast<ChannelAccess>(i - 1)),
 			other_p = other.HasPriv(static_cast<ChannelAccess>(i - 1));
 
-		if ((!this_p && other_p) || (this_p && other_p))
+		if (!this_p && !other_p)
+			continue;
+		else if (this_p && !other_p)
+			return false;
+		else
 			return true;
 	}
 
-	return false;
+	return true;
 }
 

@@ -108,7 +108,7 @@ class XOPChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(ChannelAccess priv) const
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{

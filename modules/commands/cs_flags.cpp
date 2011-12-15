@@ -77,7 +77,7 @@ class FlagsChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(ChannelAccess priv) const
 	{
 		for (int i = 0; flagLevels[i].priv != CA_SIZE; ++i)
 			if (flagLevels[i].priv == priv)

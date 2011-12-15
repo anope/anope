@@ -90,7 +90,7 @@ class AccessChanAccess : public ChanAccess
 		return false;
 	}
 
-	bool HasPriv(ChannelAccess priv)
+	bool HasPriv(ChannelAccess priv) const
 	{
 		for (int i = 0; defaultLevels[i].priv != CA_SIZE; ++i)
 			if (defaultLevels[i].priv == priv)
@@ -108,11 +108,11 @@ class AccessChanAccess : public ChanAccess
 		this->level = convertTo<int>(data);
 	}
 
-	static int DetermineLevel(ChanAccess *access)
+	static int DetermineLevel(const ChanAccess *access)
 	{
 		if (access->provider->name == "access/access")
 		{
-			AccessChanAccess *aaccess = debug_cast<AccessChanAccess *>(access);
+			const AccessChanAccess *aaccess = debug_cast<const AccessChanAccess *>(access);
 			return aaccess->level;
 		}
 		else

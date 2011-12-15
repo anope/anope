@@ -12,22 +12,29 @@
 #include "services.h"
 #include "modules.h"
 
-Privilege::Privilege(const Anope::string &n, const Anope::string &d) : name(n), desc(d)
+Privilege::Privilege(const Anope::string &n, const Anope::string &d, int r) : name(n), desc(d), rank(r)
 {
 }
 
-bool Privilege::operator==(const Privilege &other)
+bool Privilege::operator==(const Privilege &other) const
 {
 	return this->name == other.name;
 }
 
 std::vector<Privilege> PrivilegeManager::privs;
 
-void PrivilegeManager::AddPrivilege(Privilege p, int pos, int def)
+void PrivilegeManager::AddPrivilege(Privilege p)
 {
-	if (pos < 0 || static_cast<size_t>(pos) > privs.size())
-		pos = privs.size();
-	privs.insert(privs.begin() + pos, p);
+	unsigned i;
+	for (i = 0; i < privs.size(); ++i)
+	{
+		Privilege &priv = privs[i];
+
+		if (priv.rank > p.rank)
+			break;
+	}
+	
+	privs.insert(privs.begin() + i, p);
 }
 
 void PrivilegeManager::RemovePrivilege(Privilege &p)
@@ -35,6 +42,7 @@ void PrivilegeManager::RemovePrivilege(Privilege &p)
 	std::vector<Privilege>::iterator it = std::find(privs.begin(), privs.end(), p);
 	if (it != privs.end())
 		privs.erase(it);
+
 	for (registered_channel_map::const_iterator cit = RegisteredChannelList.begin(), cit_end = RegisteredChannelList.end(); cit != cit_end; ++cit)
 		cit->second->RemoveLevel(p.name);
 }

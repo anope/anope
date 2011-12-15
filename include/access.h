@@ -11,16 +11,17 @@ struct CoreExport Privilege
 {
 	Anope::string name;
 	Anope::string desc;
+	int rank;
 
-	Privilege(const Anope::string &n, const Anope::string &d);
-	bool operator==(const Privilege &other);
+	Privilege(const Anope::string &n, const Anope::string &d, int r);
+	bool operator==(const Privilege &other) const;
 };
 
 class CoreExport PrivilegeManager
 {
 	static std::vector<Privilege> privs;
  public:
-	static void AddPrivilege(Privilege p, int pos = -1, int def = 0);
+	static void AddPrivilege(Privilege p);
 	static void RemovePrivilege(Privilege &p);
 	static Privilege *FindPrivilege(const Anope::string &name);
 	static std::vector<Privilege> &GetPrivileges();

@@ -208,6 +208,9 @@ class CSEntryMessage : public Module
 	{
 		this->SetAuthor("Anope");
 
+		Implementation i[] = { I_OnReload, I_OnJoinChannel };
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
 		this->OnReload();
 	}
 

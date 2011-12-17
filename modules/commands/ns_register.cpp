@@ -275,7 +275,7 @@ class CommandNSResend : public Command
 		{
 			if (Anope::CurTime < u->Account()->lastmail + Config->NSResendDelay)
 				source.Reply(_("Cannot send mail now; please retry a little later."));
-			else if (!SendRegmail(u, na, source.owner))
+			else if (SendRegmail(u, na, source.owner))
 			{
 				na->nc->lastmail = Anope::CurTime;
 				source.Reply(_("Your passcode has been re-sent to %s."), na->nc->email.c_str());

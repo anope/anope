@@ -62,8 +62,8 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
 		BotInfo *operserv = findbot(Config->OperServ);
-		Log(operserv) << "DNSBL: " << user->GetMask() << " appears in " << this->blacklist.name;
-		XLine *x = new XLine("*@" + user->host, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
+		Log(operserv) << "DNSBL: " << user->GetMask() << " (" << user->ip.addr() << ") appears in " << this->blacklist.name;
+		XLine *x = new XLine("*@" + user->ip.addr(), Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
 			akills->AddXLine(x);

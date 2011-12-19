@@ -216,8 +216,8 @@ class SignalExit : public Signal
 		quitmsg = Anope::string("Services terminating via signal ") + stringify(this->signal);
 #endif
 
-		save_databases();
 		quitting = true;
+		save_databases();
 	}
 };
 

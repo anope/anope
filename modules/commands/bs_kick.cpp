@@ -768,7 +768,6 @@ class BSKick : public Module
 	{
 		this->SetAuthor("Anope");
 
-
 		ModuleManager::Attach(I_OnPrivmsg, this);
 	}
 
@@ -776,8 +775,10 @@ class BSKick : public Module
 	{
 		for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 		{
-			cit->second->Shrink("bs_main_userdata");
-			cit->second->Shrink("bs_main_bandata");
+			Channel *c = cit->second;
+			for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; ++it)
+				(*it)->Shrink("bs_main_userdata");
+			c->Shrink("bs_main_bandata");
 		}
 	}
 
@@ -803,236 +804,236 @@ class BSKick : public Module
 		else if (ci->botflags.HasFlag(BS_DONTKICKVOICES) && c->HasUserStatus(u, CMODE_VOICE))
 			Allow = false;
 
-		if (Allow)
+		if (!Allow)
+			return;
+
+		Anope::string realbuf = msg;
+
+		/* If it's a /me, cut the CTCP part because the ACTION will cause
+		 * problems with the caps or badwords kicker
+		 */
+		if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
 		{
-			Anope::string realbuf = msg;
+			realbuf.erase(0, 8);
+			realbuf.erase(realbuf.length() - 1);
+		}
 
-			/* If it's a /me, cut the CTCP part because the ACTION will cause
-			 * problems with the caps or badwords kicker
+		if (realbuf.empty())
+			return;
+
+		/* Bolds kicker */
+		if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_BOLDS);
+			bot_kick(ci, u, _("Don't use bolds on this channel!"));
+			return;
+		}
+
+		/* Color kicker */
+		if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find(3) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_COLORS);
+			bot_kick(ci, u, _("Don't use colors on this channel!"));
+			return;
+		}
+
+		/* Reverses kicker */
+		if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find(22) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_REVERSES);
+			bot_kick(ci, u, _("Don't use reverses on this channel!"));
+			return;
+		}
+
+		/* Italics kicker */
+		if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_ITALICS);
+			bot_kick(ci, u, _("Don't use italics on this channel!"));
+			return;
+		}
+
+		/* Underlines kicker */
+		if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
+		{
+			check_ban(ci, u, TTB_UNDERLINES);
+			bot_kick(ci, u, _("Don't use underlines on this channel!"));
+			return;
+		}
+
+		/* Caps kicker */
+		if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= ci->capsmin)
+		{
+			int i = 0, l = 0;
+
+			for (unsigned j = 0, end = realbuf.length(); j < end; ++j)
+			{
+				if (isupper(realbuf[j]))
+					++i;
+				else if (islower(realbuf[j]))
+					++l;
+			}
+
+			/* i counts uppercase chars, l counts lowercase chars. Only
+			 * alphabetic chars (so islower || isupper) qualify for the
+			 * percentage of caps to kick for; the rest is ignored. -GD
 			 */
-			if (realbuf.substr(0, 8).equals_ci("\1ACTION ") && realbuf[realbuf.length() - 1] == '\1')
-			{
-				realbuf.erase(0, 8);
-				realbuf.erase(realbuf.length() - 1);
-			}
 
-			if (realbuf.empty())
-				return;
-
-			/* Bolds kicker */
-			if (ci->botflags.HasFlag(BS_KICK_BOLDS) && realbuf.find(2) != Anope::string::npos)
+			if ((i || l) && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
 			{
-				check_ban(ci, u, TTB_BOLDS);
-				bot_kick(ci, u, _("Don't use bolds on this channel!"));
+				check_ban(ci, u, TTB_CAPS);
+				bot_kick(ci, u, _("Turn caps lock OFF!"));
 				return;
 			}
+		}
 
-			/* Color kicker */
-			if (ci->botflags.HasFlag(BS_KICK_COLORS) && realbuf.find(3) != Anope::string::npos)
+		/* Bad words kicker */
+		if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
+		{
+			bool mustkick = false;
+
+			/* Normalize the buffer */
+			Anope::string nbuf = normalizeBuffer(realbuf);
+
+			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
-				check_ban(ci, u, TTB_COLORS);
-				bot_kick(ci, u, _("Don't use colors on this channel!"));
-				return;
-			}
+				BadWord *bw = ci->GetBadWord(i);
 
-			/* Reverses kicker */
-			if (ci->botflags.HasFlag(BS_KICK_REVERSES) && realbuf.find(22) != Anope::string::npos)
-			{
-				check_ban(ci, u, TTB_REVERSES);
-				bot_kick(ci, u, _("Don't use reverses on this channel!"));
-				return;
-			}
-
-			/* Italics kicker */
-			if (ci->botflags.HasFlag(BS_KICK_ITALICS) && realbuf.find(29) != Anope::string::npos)
-			{
-				check_ban(ci, u, TTB_ITALICS);
-				bot_kick(ci, u, _("Don't use italics on this channel!"));
-				return;
-			}
-
-			/* Underlines kicker */
-			if (ci->botflags.HasFlag(BS_KICK_UNDERLINES) && realbuf.find(31) != Anope::string::npos)
-			{
-				check_ban(ci, u, TTB_UNDERLINES);
-				bot_kick(ci, u, _("Don't use underlines on this channel!"));
-				return;
-			}
-
-			/* Caps kicker */
-			if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= ci->capsmin)
-			{
-				int i = 0, l = 0;
-
-				for (unsigned j = 0, end = realbuf.length(); j < end; ++j)
+				if (bw->type == BW_ANY && ((Config->BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
+					mustkick = true;
+				else if (bw->type == BW_SINGLE)
 				{
-					if (isupper(realbuf[j]))
-						++i;
-					else if (islower(realbuf[j]))
-						++l;
+					size_t len = bw->word.length();
+
+					if ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf)))
+						mustkick = true;
+					else if (nbuf.find(' ') == len && ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf))))
+						mustkick = true;
+					else
+					{
+						if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config->BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
+							mustkick = true;
+						else
+						{
+							Anope::string wordbuf = " " + bw->word + " ";
+
+							if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+								mustkick = true;
+						}
+					}
+				}
+				else if (bw->type == BW_START)
+				{
+					size_t len = bw->word.length();
+
+					if ((Config->BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
+						mustkick = true;
+					else
+					{
+						Anope::string wordbuf = " " + bw->word;
+
+						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+							mustkick = true;
+					}
+				}
+				else if (bw->type == BW_END)
+				{
+					size_t len = bw->word.length();
+
+					if ((Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
+						mustkick = true;
+					else
+					{
+						Anope::string wordbuf = bw->word + " ";
+
+						if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
+							mustkick = true;
+					}
 				}
 
-				/* i counts uppercase chars, l counts lowercase chars. Only
-				 * alphabetic chars (so islower || isupper) qualify for the
-				 * percentage of caps to kick for; the rest is ignored. -GD
-				 */
-
-				if ((i || l) && i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent)
+				if (mustkick)
 				{
-					check_ban(ci, u, TTB_CAPS);
-					bot_kick(ci, u, _("Turn caps lock OFF!"));
+					check_ban(ci, u, TTB_BADWORDS);
+					if (Config->BSGentleBWReason)
+						bot_kick(ci, u, _("Watch your language!"));
+					else
+						bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());
+
+					return;
+				}
+			} /* for */
+		} /* if badwords */
+
+		UserData *ud = NULL;
+
+		/* Flood kicker */
+		if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+		{
+			ud = GetUserData(u, c);
+			if (ud)
+			{
+				if (Anope::CurTime - ud->last_start > ci->floodsecs)
+				{
+					ud->last_start = Anope::CurTime;
+					ud->lines = 0;
+				}
+
+				++ud->lines;
+				if (ud->lines >= ci->floodlines)
+				{
+					check_ban(ci, u, TTB_FLOOD);
+					bot_kick(ci, u, _("Stop flooding!"));
 					return;
 				}
 			}
+		}
 
-			/* Bad words kicker */
-			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
+		/* Repeat kicker */
+		if (ci->botflags.HasFlag(BS_KICK_REPEAT))
+		{
+			if (!ud)
+				ud = GetUserData(u, c);
+			if (ud)
 			{
-				bool mustkick = false;
 
-				/* Normalize the buffer */
-				Anope::string nbuf = normalizeBuffer(realbuf);
-
-				for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
+				if (!ud->lastline.empty() && !ud->lastline.equals_ci(realbuf))
 				{
-					BadWord *bw = ci->GetBadWord(i);
-
-					if (bw->type == BW_ANY && ((Config->BSCaseSensitive && nbuf.find(bw->word) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) != Anope::string::npos)))
-						mustkick = true;
-					else if (bw->type == BW_SINGLE)
-					{
-						size_t len = bw->word.length();
-
-						if ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf)))
-							mustkick = true;
-						else if (nbuf.find(' ') == len && ((Config->BSCaseSensitive && bw->word.equals_cs(nbuf)) || (!Config->BSCaseSensitive && bw->word.equals_ci(nbuf))))
-							mustkick = true;
-						else
-						{
-							if (nbuf.rfind(' ') == nbuf.length() - len - 1 && ((Config->BSCaseSensitive && nbuf.find(bw->word) == nbuf.length() - len) || (!Config->BSCaseSensitive && nbuf.find_ci(bw->word) == nbuf.length() - len)))
-								mustkick = true;
-							else
-							{
-								Anope::string wordbuf = " " + bw->word + " ";
-
-								if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
-									mustkick = true;
-							}
-						}
-					}
-					else if (bw->type == BW_START)
-					{
-						size_t len = bw->word.length();
-
-						if ((Config->BSCaseSensitive && nbuf.substr(0, len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(0, len).equals_ci(bw->word)))
-							mustkick = true;
-						else
-						{
-							Anope::string wordbuf = " " + bw->word;
-
-							if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
-								mustkick = true;
-						}
-					}
-					else if (bw->type == BW_END)
-					{
-						size_t len = bw->word.length();
-
-						if ((Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_cs(bw->word)) || (!Config->BSCaseSensitive && nbuf.substr(nbuf.length() - len).equals_ci(bw->word)))
-							mustkick = true;
-						else
-						{
-							Anope::string wordbuf = bw->word + " ";
-
-							if ((Config->BSCaseSensitive && nbuf.find(wordbuf) != Anope::string::npos) || (!Config->BSCaseSensitive && nbuf.find_ci(wordbuf) != Anope::string::npos))
-								mustkick = true;
-						}
-					}
-
-					if (mustkick)
-					{
-						check_ban(ci, u, TTB_BADWORDS);
-						if (Config->BSGentleBWReason)
-							bot_kick(ci, u, _("Watch your language!"));
-						else
-							bot_kick(ci, u, _("Don't use the word \"%s\" on this channel!"), bw->word.c_str());
-
-						return;
-					}
+					ud->lastline = realbuf;
+					ud->times = 0;
+				}
+				else
+				{
+					if (ud->lastline.empty())
+						ud->lastline = realbuf;
+					++ud->times;
 				}
 
-				UserData *ud = NULL;
-
-				/* Flood kicker */
-				if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+				if (ud->times >= ci->repeattimes)
 				{
-					ud = GetUserData(u, c);
-					if (ud)
-					{
-						if (Anope::CurTime - ud->last_start > ci->floodsecs)
-						{
-							ud->last_start = Anope::CurTime;
-							ud->lines = 0;
-						}
-
-						++ud->lines;
-						if (ud->lines >= ci->floodlines)
-						{
-							check_ban(ci, u, TTB_FLOOD);
-							bot_kick(ci, u, _("Stop flooding!"));
-							return;
-						}
-					}
+					check_ban(ci, u, TTB_REPEAT);
+					bot_kick(ci, u, _("Stop repeating yourself!"));
+					return;
 				}
-
-				/* Repeat kicker */
-				if (ci->botflags.HasFlag(BS_KICK_REPEAT))
-				{
-					if (!ud)
-						ud = GetUserData(u, c);
-					if (ud)
-					{
-
-						if (!ud->lastline.empty() && !ud->lastline.equals_ci(realbuf))
-						{
-							ud->lastline = realbuf;
-							ud->times = 0;
-						}
-						else
-						{
-							if (ud->lastline.empty())
-								ud->lastline = realbuf;
-							++ud->times;
-						}
-
-						if (ud->times >= ci->repeattimes)
-						{
-							check_ban(ci, u, TTB_REPEAT);
-							bot_kick(ci, u, _("Stop repeating yourself!"));
-							return;
-						}
-					}
-				}
-
-				if (ud && ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
-				{
-					for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
-					{
-						Channel *chan = (*it)->chan;
-						++it;
-
-						if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
-						{
-							check_ban(chan->ci, u, TTB_AMSGS);
-							bot_kick(chan->ci, u, _("Don't use AMSGs!"));
-						}
-					}
-				}
-
-				if (ud)
-					ud->lasttarget = ci->name;
 			}
 		}
+
+		if (ud && ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
+		{
+			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
+			{
+				Channel *chan = (*it)->chan;
+				++it;
+
+				if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+				{
+					check_ban(chan->ci, u, TTB_AMSGS);
+					bot_kick(chan->ci, u, _("Don't use AMSGs!"));
+				}
+			}
+		}
+
+		if (ud)
+			ud->lasttarget = ci->name;
 	}
 };
 

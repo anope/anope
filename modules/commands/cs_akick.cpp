@@ -46,115 +46,6 @@ static void split_usermask(const Anope::string &mask, Anope::string &nick, Anope
 	}
 }
 
-class AkickListCallback : public NumberList
-{
- protected:
-	CommandSource &source;
-	ChannelInfo *ci;
-	bool SentHeader;
- public:
-	AkickListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), ci(_ci), SentHeader(false)
-	{
-	}
-
-	~AkickListCallback()
-	{
-		if (!SentHeader)
-			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-	}
-
-	virtual void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAkickCount())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-		}
-
-		DoList(source, ci, Number - 1, ci->GetAkick(Number - 1));
-	}
-
-	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned index, AutoKick *akick)
-	{
-		source.Reply(_("  %3d %s (%s)"), index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->reason.empty() ? akick->reason.c_str() : NO_REASON);
-	}
-};
-
-class AkickViewCallback : public AkickListCallback
-{
- public:
-	AkickViewCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : AkickListCallback(_source, _ci, numlist)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAkickCount())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-		}
-
-		DoList(source, ci, Number - 1, ci->GetAkick(Number - 1));
-	}
-
-	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned index, AutoKick *akick)
-	{
-		Anope::string timebuf;
-
-		if (akick->addtime)
-			timebuf = do_strftime(akick->addtime);
-		else
-			timebuf = UNKNOWN;
-
-		source.Reply(CHAN_AKICK_VIEW_FORMAT, index + 1, akick->HasFlag(AK_ISNICK) ? akick->nc->display.c_str() : akick->mask.c_str(), !akick->creator.empty() ? akick->creator.c_str() : UNKNOWN, timebuf.c_str(), !akick->reason.empty() ? akick->reason.c_str() : _(NO_REASON));
-
-		if (akick->last_used)
-			source.Reply(_("    Last used %s"), do_strftime(akick->last_used).c_str());
-	}
-};
-
-class AkickDelCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	Command *c;
-	unsigned Deleted;
- public:
-	AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0)
-	{
-	}
-
-	~AkickDelCallback()
-	{
-		User *u = source.u;
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, c, ci) << "DEL on " << Deleted << " users";
-
-		if (!Deleted)
-			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-		else if (Deleted == 1)
-			source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
-		else
-			source.Reply(_("Deleted %d entries from %s autokick list."), Deleted, ci->name.c_str());
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAkickCount())
-			return;
-
-		++Deleted;
-		ci->EraseAkick(Number - 1);
-	}
-};
-
 class CommandCSAKick : public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -287,8 +178,41 @@ class CommandCSAKick : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickDelCallback list(source, ci, this, mask);
-			list.Process();
+			class AkickDelCallback : public NumberList
+			{
+				CommandSource &source;
+				ChannelInfo *ci;
+				Command *c;
+				unsigned Deleted;
+			 public:
+				AkickDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &list) : NumberList(list, true), source(_source), ci(_ci), c(_c), Deleted(0)
+				{
+				}
+
+				~AkickDelCallback()
+				{
+					bool override = !ci->AccessFor(source.u).HasPriv("AKICK");
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "DEL on " << Deleted << " users";
+
+					if (!Deleted)
+						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+					else if (Deleted == 1)
+						source.Reply(_("Deleted 1 entry from %s autokick list."), ci->name.c_str());
+					else
+						source.Reply(_("Deleted %d entries from %s autokick list."), Deleted, ci->name.c_str());
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > ci->GetAkickCount())
+						return;
+
+					++Deleted;
+					ci->EraseAkick(Number - 1);
+				}
+			}
+			delcallback(source, ci, this, mask);
+			delcallback.Process();
 		}
 		else
 		{
@@ -318,30 +242,54 @@ class CommandCSAKick : public Command
 		}
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void ProcessList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
-		User *u = source.u;
-
 		const Anope::string &mask = params.size() > 2 ? params[2] : "";
-
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "LIST";
-
-		if (!ci->GetAkickCount())
-		{
-			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
-			return;
-		}
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AkickListCallback list(source, ci, mask);
-			list.Process();
+			class AkickListCallback : public NumberList
+			{
+				ListFormatter &list;
+				ChannelInfo *ci;
+
+			 public:
+				AkickListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
+				{
+				}
+
+				void HandleNumber(unsigned number)
+				{
+					if (!number || number > ci->GetAkickCount())
+						return;
+	
+					AutoKick *akick = ci->GetAkick(number - 1);
+
+					Anope::string timebuf, lastused;
+					if (akick->addtime)
+						timebuf = do_strftime(akick->addtime, NULL, false);
+					else
+						timebuf = UNKNOWN;
+					if (akick->last_used)
+						lastused = do_strftime(akick->last_used, NULL, false);
+					else
+						lastused = UNKNOWN;
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(number);
+					entry["Mask"] = akick->mask;
+					entry["Creator"] = akick->creator;
+					entry["Created"] = timebuf;
+					entry["Last used"] = lastused;
+					entry["Reason"] = akick->reason;
+					this->list.addEntry(entry);
+				}
+			}
+			nl_list(list, ci, mask);
+			nl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
 			{
 				AutoKick *akick = ci->GetAkick(i);
@@ -354,68 +302,67 @@ class CommandCSAKick : public Command
 						continue;
 				}
 
-				if (!SentHeader)
-				{
-					SentHeader = true;
-					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-				}
+				Anope::string timebuf, lastused;
+				if (akick->addtime)
+					timebuf = do_strftime(akick->addtime);
+				else
+					timebuf = UNKNOWN;
+				if (akick->last_used)
+					lastused = do_strftime(akick->last_used);
+				else
+					lastused = UNKNOWN;
 
-				AkickListCallback::DoList(source, ci, i, akick);
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Mask"] = akick->mask;
+				entry["Creator"] = akick->creator;
+				entry["Created"] = timebuf;
+				entry["Last used"] = lastused;
+				entry["Reason"] = akick->reason;
+				list.addEntry(entry);
 			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
 		}
+
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
+		else
+		{
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("Autokick list for %s:"), ci->name.c_str());
+	
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of autokick list"));
+		}
+	}
+
+	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		if (!ci->GetAkickCount())
+		{
+			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
+			return;
+		}
+
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
+		this->ProcessList(source, ci, params, list);
 	}
 
 	void DoView(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		User *u = source.u;
-
-		const Anope::string &mask = params.size() > 2 ? params[2] : "";
-
-		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "VIEW";
-
 		if (!ci->GetAkickCount())
 		{
 			source.Reply(_("%s autokick list is empty."), ci->name.c_str());
 			return;
 		}
 
-		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			AkickViewCallback list(source, ci, mask);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = ci->GetAkickCount(); i < end; ++i)
-			{
-				AutoKick *akick = ci->GetAkick(i);
-
-				if (!mask.empty())
-				{
-					if (!akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->mask, mask))
-						continue;
-					if (akick->HasFlag(AK_ISNICK) && !Anope::Match(akick->nc->display, mask))
-						continue;
-				}
-
-				if (!SentHeader)
-				{
-					SentHeader = true;
-					source.Reply(_("Autokick list for %s:"), ci->name.c_str());
-				}
-
-				AkickViewCallback::DoList(source, ci, i, akick);
-			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
-		}
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Last used").addColumn("Reason");
+		this->ProcessList(source, ci, params, list);
 	}
 
 	void DoEnforce(CommandSource &source, ChannelInfo *ci)

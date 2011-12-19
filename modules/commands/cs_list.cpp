@@ -71,7 +71,10 @@ class CommandCSList : public Command
 
 		Anope::string spattern = "#" + pattern;
 
-		source.Reply(LIST_HEADER, pattern.c_str());
+		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
+
+		ListFormatter list;
+		list.addColumn("Name").addColumn("Description");
 
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
 		{
@@ -88,21 +91,27 @@ class CommandCSList : public Command
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config->CSListMax)
 				{
-					char noexpire_char = ' ';
+					bool isnoexpire = false;
 					if (is_servadmin && (ci->HasFlag(CI_NO_EXPIRE)))
-						noexpire_char = '!';
+						isnoexpire = true;
 
-					Anope::string buf;
+					ListFormatter::ListEntry entry;
+					entry["Name"] = (isnoexpire ? "!" : "") + ci->name;
 					if (ci->HasFlag(CI_SUSPENDED))
-						buf = Anope::printf("%-20s  [Suspended]", ci->name.c_str());
+						entry["Description"] = "[Suspended]";
 					else
-						buf = Anope::printf("%-20s  %s", ci->name.c_str(), !ci->desc.empty() ? ci->desc.c_str() : "");
-
-					source.Reply("  %c%s", noexpire_char, buf.c_str());
+						entry["Description"] = ci->desc;
+					list.addEntry(entry);
 				}
 				++count;
 			}
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nchans > Config->CSListMax ? Config->CSListMax : nchans, nchans);
 		return;

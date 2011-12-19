@@ -168,13 +168,25 @@ class CommandOSConfig : public Command
 				if (ok == false)
 					continue;
 
-				source.Reply(_("%s settings:"), bname.c_str());
+				ListFormatter lflist;
+				lflist.addColumn("Name").addColumn("Value");
 				for (unsigned i = 0; i < list.size(); ++i)
 				{
 					const Anope::string &first = list[i].first, second = list[i].second;
 
-					source.Reply(_("  Name: %-15s Value: %s"), first.c_str(), second.c_str());
+					ListFormatter::ListEntry entry;
+					entry["Name"] = first;
+					entry["Value"] = second;
+					lflist.addEntry(entry);
 				}
+
+				std::vector<Anope::string> replies;
+				lflist.Process(replies);
+
+				source.Reply(_("%s settings:"), bname.c_str());
+
+				for (unsigned i = 0; i < replies.size(); ++i)
+					source.Reply(replies[i]);
 			}
 
 			source.Reply(_("End of configuration."));

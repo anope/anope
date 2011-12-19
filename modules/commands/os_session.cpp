@@ -149,72 +149,6 @@ class ExceptionDelCallback : public NumberList
 	}
 };
 
-class ExceptionListCallback : public NumberList
-{
- protected:
-	CommandSource &source;
-	bool SentHeader;
- public:
-	ExceptionListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
-	{
-	}
-
-	virtual void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > session_service->GetExceptions().size())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current Session Limit Exception list:"));
-			source.Reply(_("Num  Limit  Host"));
-		}
-
-		DoList(source, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, unsigned index)
-	{
-		if (index >= session_service->GetExceptions().size())
-			return;
-
-		source.Reply(_("%3d  %4d   %s"), index + 1, session_service->GetExceptions()[index]->limit, session_service->GetExceptions()[index]->mask.c_str());
-	}
-};
-
-class ExceptionViewCallback : public ExceptionListCallback
-{
- public:
-	ExceptionViewCallback(CommandSource &_source, const Anope::string &numlist) : ExceptionListCallback(_source, numlist)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > session_service->GetExceptions().size())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current Session Limit Exception list:"));
-		}
-
-		DoList(source, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, unsigned index)
-	{
-		if (index >= session_service->GetExceptions().size())
-			return;
-
-		Anope::string expirebuf = expire_left(source.u->Account(), session_service->GetExceptions()[index]->expires);
-
-		source.Reply(_("%3d.  %s  (by %s on %s; %s)\n " "    Limit: %-4d  - %s"), index + 1, session_service->GetExceptions()[index]->mask.c_str(), !session_service->GetExceptions()[index]->who.empty() ? session_service->GetExceptions()[index]->who.c_str() : "<unknown>", do_strftime((session_service->GetExceptions()[index]->time ? session_service->GetExceptions()[index]->time : Anope::CurTime)).c_str(), expirebuf.c_str(), session_service->GetExceptions()[index]->limit, session_service->GetExceptions()[index]->reason.c_str());
-	}
-};
-
 class CommandOSSession : public Command
 {
  private:
@@ -233,16 +167,30 @@ class CommandOSSession : public Command
 			source.Reply(_("Invalid threshold value. It must be a valid integer greater than 1."));
 		else
 		{
-			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
-			source.Reply(_("Sessions  Host"));
+			ListFormatter list;
+			list.addColumn("Session").addColumn("Host");
 
 			for (SessionService::SessionMap::iterator it = session_service->GetSessions().begin(), it_end = session_service->GetSessions().end(); it != it_end; ++it)
 			{
 				Session *session = it->second;
 
 				if (session->count >= mincount)
-					source.Reply(_("%6d    %s"), session->count, session->host.c_str());
+				{
+					ListFormatter::ListEntry entry;
+					entry["Session"] = stringify(session->count);
+					entry["Host"] = session->host;
+					list.addEntry(entry);
+				}
 			}
+
+			source.Reply(_("Hosts with at least \002%d\002 sessions:"), mincount);
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+	
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 
 		return;
@@ -485,69 +433,93 @@ class CommandOSException : public Command
 		return;
 	}
 
-	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+
+		if (session_service->GetExceptions().empty())
+		{
+			source.Reply(_("The session exception list is empty."));
+			return;
+		}
 
 		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			ExceptionListCallback list(source, mask);
-			list.Process();
+			class ExceptionListCallback : public NumberList
+			{
+				ListFormatter &list;
+			 public:
+				ExceptionListCallback(ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), list(_list)
+				{
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > session_service->GetExceptions().size())
+						return;
+
+					Exception *e = session_service->GetExceptions()[Number - 1];
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(Number);
+					entry["Mask"] = e->mask;
+					entry["By"] = e->who;
+					entry["Created"] = do_strftime(e->time);
+					entry["Limit"] = stringify(e->limit);
+					entry["Reason"] = e->reason;
+					this->list.addEntry(entry);
+				}
+			}
+			nl_list(list, mask);
+			nl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = session_service->GetExceptions().size(); i < end; ++i)
-				if (mask.empty() || Anope::Match(session_service->GetExceptions()[i]->mask, mask))
+			{
+				Exception *e = session_service->GetExceptions()[i];
+				if (mask.empty() || Anope::Match(e->mask, mask))
 				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current Session Limit Exception list:"));
-						source.Reply(_("Num  Limit  Host"));
-					}
-
-					ExceptionListCallback::DoList(source, i);
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(i + 1);
+					entry["Mask"] = e->mask;
+					entry["By"] = e->who;
+					entry["Created"] = do_strftime(e->time);
+					entry["Limit"] = stringify(e->limit);
+					entry["Reason"] = e->reason;
+					list.addEntry(entry);
 				}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on session-limit exception list."));
+			}
 		}
 
-		return;
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on session-limit exception list."));
+		else
+		{
+			source.Reply(_("Current Session Limit Exception list:"));
+		
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+		}
+	}
+
+	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Limit").addColumn("Mask");
+
+		this->ProcessList(source, params, list);
 	}
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		Anope::string mask = params.size() > 1 ? params[1] : "";
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("By").addColumn("Created").addColumn("Limit").addColumn("Reason");
 
-		if (!mask.empty() && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			ExceptionViewCallback list(source, mask);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = session_service->GetExceptions().size(); i < end; ++i)
-				if (mask.empty() || Anope::Match(session_service->GetExceptions()[i]->mask, mask))
-				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current Session Limit Exception list:"));
-					}
-
-					ExceptionViewCallback::DoList(source, i);
-				}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on session-limit exception list."));
-		}
-
-		return;
+		this->ProcessList(source, params, list);
 	}
 
  public:

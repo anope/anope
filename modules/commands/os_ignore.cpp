@@ -188,17 +188,28 @@ class CommandOSIgnore : public Command
 			source.Reply(_("Ignore list is empty."));
 		else
 		{
-			source.Reply(_("Services ignore list:\n"
-					"  Mask        Creator      Reason      Expires"));
+			ListFormatter list;
+			list.addColumn("Mask").addColumn("Creator").addColumn("Reason").addColumn("Expires");
 			for (std::list<IgnoreData>::const_iterator ign = ignores.begin(), ign_end = ignores.end(); ign != ign_end; ++ign)
 			{
 				const IgnoreData &ignore = *ign;
 
-				source.Reply("  %-11s %-11s  %-11s %s", ignore.mask.c_str(), ignore.creator.c_str(), ignore.reason.c_str(), do_strftime(ignore.time).c_str());
+				ListFormatter::ListEntry entry;
+				entry["Mask"] = ignore.mask;
+				entry["Creator"] = ignore.creator;
+				entry["Reason"] = ignore.reason;
+				entry["Expires"] = do_strftime(ignore.time);
+				list.addEntry(entry);
 			}
-		}
 
-		return;
+			source.Reply(_("Services ignore list:"));
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+		}
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -266,7 +277,7 @@ class CommandOSIgnore : public Command
 				"Valid units are: \037s\037 for seconds, \037m\037 for minutes, \n"
 				"\037h\037 for hours and \037d\037 for days. \n"
 				"Combinations of these units are not permitted.\n"
-				"To make Services permanently ignore the	user, type 0 as time.\n"
+				"To make Services permanently ignore the user, type 0 as time.\n"
 				"When adding a \037mask\037, it should be in the format user@host\n"
 				"or nick!user@host, everything else will be considered a nick.\n"
 				"Wildcards are permitted.\n"

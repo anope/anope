@@ -168,8 +168,8 @@ class CommandOSForbid : public Command
 				source.Reply(_("Forbid list is empty."));
 			else
 			{
-				source.Reply(_("Forbid list:"));
-				source.Reply(_("Mask       Type  Reason"));
+				ListFormatter list;
+				list.addColumn("Mask").addColumn("Type").addColumn("Reason");
 
 				for (unsigned i = 0; i < forbids.size(); ++i)
 				{
@@ -185,9 +185,22 @@ class CommandOSForbid : public Command
 					else
 						continue;
 
-					source.Reply("%-10s %-5s %s", d->mask.c_str(), ftype.c_str(), d->reason.c_str());
-					source.Reply(_("By %s, expires on %s"), d->creator.c_str(), d->expires ? do_strftime(d->expires).c_str() : "never");
+					ListFormatter::ListEntry entry;
+					entry["Mask"] = d->mask;
+					entry["Type"] = ftype;
+					entry["Creator"] = d->creator;
+					entry["Expires"] = d->expires ? do_strftime(d->expires).c_str() : "never";
+					entry["Reason"] = d->reason;
+					list.addEntry(entry);
 				}
+
+				source.Reply(_("Forbid list:"));
+
+				std::vector<Anope::string> replies;
+				list.Process(replies);
+
+				for (unsigned i = 0; i < replies.size(); ++i)
+					source.Reply(replies[i]);
 
 				source.Reply(_("End of forbid list."));
 			}

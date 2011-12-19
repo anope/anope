@@ -15,14 +15,14 @@
 
 class CommandCSInfo : public Command
 {
-	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const Anope::string &str, ChannelInfo *ci, const NickCore *nc)
+	void CheckOptStr(Anope::string &buf, ChannelInfoFlag opt, const char *str, ChannelInfo *ci, NickCore *nc)
 	{
 		if (ci->HasFlag(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
 
-			buf += str;
+			buf += translate(nc, str);
 		}
 	}
 
@@ -53,30 +53,33 @@ class CommandCSInfo : public Command
 		if (has_auspex || ci->AccessFor(u).HasPriv("INFO"))
 			show_all = true;
 
+		InfoFormatter info(u);
+
 		source.Reply(CHAN_INFO_HEADER, chan.c_str());
 		if (ci->GetFounder())
-			source.Reply(_("        Founder: %s"), ci->GetFounder()->display.c_str());
+			info["Founder"] = ci->GetFounder()->display;
 
 		if (show_all && ci->successor)
-			source.Reply(_("      Successor: %s"), ci->successor->display.c_str());
+			info["Successor"] = ci->successor->display;
 
 		if (!ci->desc.empty())
-			source.Reply(_("    Description: %s"), ci->desc.c_str());
-		source.Reply(_("     Registered: %s"), do_strftime(ci->time_registered).c_str());
-		source.Reply(_("      Last used: %s"), do_strftime(ci->last_used).c_str());
+			info["Description"] = ci->desc;
+
+		info["Registered"] = do_strftime(ci->time_registered);
+		info["Last used"] = do_strftime(ci->last_used);
 
 		ModeLock *secret = ci->GetMLock(CMODE_SECRET);
 		if (!ci->last_topic.empty() && (show_all || ((!secret || secret->set == false) && (!ci->c || !ci->c->HasMode(CMODE_SECRET)))))
 		{
-			source.Reply(_("     Last topic: %s"), ci->last_topic.c_str());
-			source.Reply(_("   Topic set by: %s"), ci->last_topic_setter.c_str());
+			info["Last topic"] = ci->last_topic;
+			info["Topic set by"] = ci->last_topic_setter;
 		}
 
 		if (show_all)
 		{
-			source.Reply(_("       Ban type: %d"), ci->bantype);
-			Anope::string optbuf;
+			info["Ban type"] = stringify(ci->bantype);
 
+			Anope::string optbuf;
 			CheckOptStr(optbuf, CI_KEEPTOPIC, _("Topic Retention"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PEACE, _("Peace"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PRIVATE, _("Private"), ci, u->Account());
@@ -92,20 +95,26 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
 
-			source.Reply(_("        Options: %s"), optbuf.empty() ? _("None") : optbuf.c_str());
-			source.Reply(_("      Mode lock: %s"), ci->GetMLockAsString(true).c_str());
+			info["Options"] = optbuf.empty() ? _("None") : optbuf;
+			info["Mode lock"] = ci->GetMLockAsString(true);
 
 			if (!ci->HasFlag(CI_NO_EXPIRE))
-				source.Reply(_("      Expires on: %s"), do_strftime(ci->last_used + Config->CSExpire).c_str());
+				info["Expires on"] = do_strftime(ci->last_used + Config->CSExpire);
 		}
 		if (ci->HasFlag(CI_SUSPENDED))
 		{
 			Anope::string *by = ci->GetExt<ExtensibleString *>("suspend_by"), *reason = ci->GetExt<ExtensibleString *>("suspend_reason");
 			if (by != NULL)
-				source.Reply(_("      Suspended: [%s] %s"), by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
+				info["Suspended"] = Anope::printf("[%s] %s", by->c_str(), (reason && !reason->empty() ? reason->c_str() : NO_REASON));
 		}
 
-		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, show_all));
+		FOREACH_MOD(I_OnChanInfo, OnChanInfo(source, ci, info, show_all));
+
+		std::vector<Anope::string> replies;
+		info.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 
 		return;
 	}

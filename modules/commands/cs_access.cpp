@@ -95,148 +95,6 @@ class AccessAccessProvider : public AccessProvider
 	}
 };
 
-class AccessListCallback : public NumberList
-{
- protected:
-	CommandSource &source;
-	ChannelInfo *ci;
-	bool SentHeader;
- public:
-	AccessListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), source(_source), ci(_ci), SentHeader(false)
-	{
-	}
-
-	~AccessListCallback()
-	{
-		if (SentHeader)
-			source.Reply(_("End of access list."));
-		else
-			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
-	}
-
-	virtual void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAccessCount())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-		}
-
-		DoList(source, ci, Number - 1, ci->GetAccess(Number - 1));
-	}
-
-	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned Number, ChanAccess *access)
-	{
-		source.Reply(_("  %3d  %4d  %s"), Number + 1, AccessChanAccess::DetermineLevel(access), access->mask.c_str());
-	}
-};
-
-class AccessViewCallback : public AccessListCallback
-{
- public:
-	AccessViewCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist) : AccessListCallback(_source, _ci, numlist)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAccessCount())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-		}
-
-		DoList(source, ci, Number - 1, ci->GetAccess(Number - 1));
-	}
-
-	static void DoList(CommandSource &source, ChannelInfo *ci, unsigned Number, ChanAccess *access)
-	{
-		Anope::string timebuf;
-		if (ci->c)
-			for (CUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
-				if (access->Matches((*cit)->user, (*cit)->user->Account()))
-					timebuf = "Now";
-		if (timebuf.empty())
-		{
-			if (access->last_seen == 0)
-				timebuf = "Never";
-			else
-				timebuf = do_strftime(access->last_seen, NULL, true);
-		}
-
-		source.Reply(CHAN_ACCESS_VIEW_AXS_FORMAT, Number + 1, AccessChanAccess::DetermineLevel(access), access->mask.c_str(), access->creator.c_str(), do_strftime(access->created, NULL, true).c_str(), timebuf.c_str());
-	}
-};
-
-class AccessDelCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	Command *c;
-	unsigned Deleted;
-	Anope::string Nicks;
-	bool Denied;
-	bool override;
- public:
-	AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false)
-	{
-		if (!ci->AccessFor(source.u).HasPriv("ACCESS_CHANGE") && source.u->HasPriv("chanserv/access/modify"))
-			this->override = true;
-	}
-
-	~AccessDelCallback()
-	{
-		if (Denied && !Deleted)
-			source.Reply(ACCESS_DENIED);
-		else if (!Deleted)
-			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
-		else
-		{
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
-
-			if (Deleted == 1)
-				source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
-			else
-				source.Reply(_("Deleted %d entries from %s access list."), Deleted, ci->name.c_str());
-		}
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAccessCount())
-			return;
-
-		User *u = source.u;
-
-		ChanAccess *access = ci->GetAccess(Number - 1);
-
-		AccessGroup u_access = ci->AccessFor(u);
-		ChanAccess *u_highest = u_access.Highest();
-
-		if (u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0 <= AccessChanAccess::DetermineLevel(access) && !u->HasPriv("chanserv/access/modify"))
-		{
-			Denied = true;
-			return;
-		}
-
-		++Deleted;
-		if (!Nicks.empty())
-			Nicks += ", " + access->mask;
-		else
-			Nicks = access->mask;
-
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
-
-		ci->EraseAccess(Number - 1);
-	}
-};
-
 class CommandCSAccess : public Command
 {
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
@@ -329,8 +187,70 @@ class CommandCSAccess : public Command
 			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessDelCallback list(source, ci, this, mask);
-			list.Process();
+			class AccessDelCallback : public NumberList
+			{
+				CommandSource &source;
+				ChannelInfo *ci;
+				Command *c;
+				unsigned Deleted;
+				Anope::string Nicks;
+				bool Denied;
+				bool override;
+			 public:
+				AccessDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), Denied(false), override(false)
+				{
+					if (!ci->AccessFor(source.u).HasPriv("ACCESS_CHANGE") && source.u->HasPriv("chanserv/access/modify"))
+						this->override = true;
+				}
+
+				~AccessDelCallback()
+				{
+					if (Denied && !Deleted)
+						source.Reply(ACCESS_DENIED);
+					else if (!Deleted)
+						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+					else
+					{
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
+
+						if (Deleted == 1)
+							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
+						else
+							source.Reply(_("Deleted %d entries from %s access list."), Deleted, ci->name.c_str());
+					}
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > ci->GetAccessCount())
+						return;
+
+					User *user = source.u;
+
+					ChanAccess *access = ci->GetAccess(Number - 1);
+
+					AccessGroup u_access = ci->AccessFor(user);
+					ChanAccess *u_highest = u_access.Highest();
+
+					if (u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0 <= AccessChanAccess::DetermineLevel(access) && !u_access.Founder && !user->HasPriv("chanserv/access/modify"))
+					{
+						Denied = true;
+						return;
+					}
+
+					++Deleted;
+					if (!Nicks.empty())
+						Nicks += ", " + access->mask;
+					else
+						Nicks = access->mask;
+
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, user, access));
+
+					ci->EraseAccess(Number - 1);
+				}
+			}
+			delcallback(source, ci, this, mask);
+			delcallback.Process();
 		}
 		else
 		{
@@ -365,7 +285,7 @@ class CommandCSAccess : public Command
 		return;
 	}
 
-	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	void ProcessList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
@@ -373,13 +293,50 @@ class CommandCSAccess : public Command
 			source.Reply(_("%s access list is empty."), ci->name.c_str());
 		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			AccessListCallback list(source, ci, nick);
-			list.Process();
+			class AccessListCallback : public NumberList
+			{
+				ListFormatter &list;
+				ChannelInfo *ci;
+
+			 public:
+				AccessListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
+				{
+				}
+
+				void HandleNumber(unsigned number)
+				{
+					if (!number || number > ci->GetAccessCount())
+						return;
+
+					ChanAccess *access = ci->GetAccess(number - 1);
+
+					Anope::string timebuf;
+					if (ci->c)
+						for (CUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+							if (access->Matches((*cit)->user, (*cit)->user->Account()))
+								timebuf = "Now";
+					if (timebuf.empty())
+					{
+						if (access->last_seen == 0)
+							timebuf = "Never";
+						else
+							timebuf = do_strftime(access->last_seen, NULL, true);
+					}
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(number);
+					entry["Level"] = stringify(AccessChanAccess::DetermineLevel(access));
+					entry["Mask"] = access->mask;
+					entry["By"] = access->creator;
+					entry["Last seen"] = timebuf;
+					this->list.addEntry(entry);
+				}
+			}
+			nl_list(list, ci, nick);
+			nl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				ChanAccess *access = ci->GetAccess(i);
@@ -387,62 +344,71 @@ class CommandCSAccess : public Command
 				if (!nick.empty() && !Anope::Match(access->mask, nick))
 					continue;
 
-				if (!SentHeader)
+				Anope::string timebuf;
+				if (ci->c)
+					for (CUserList::const_iterator cit = ci->c->users.begin(), cit_end = ci->c->users.end(); cit != cit_end; ++cit)
+						if (access->Matches((*cit)->user, (*cit)->user->Account()))
+							timebuf = "Now";
+				if (timebuf.empty())
 				{
-					SentHeader = true;
-					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
+					if (access->last_seen == 0)
+						timebuf = "Never";
+					else
+						timebuf = do_strftime(access->last_seen, NULL, true);
 				}
 
-				AccessListCallback::DoList(source, ci, i, access);
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Level"] = stringify(AccessChanAccess::DetermineLevel(access));
+				entry["Mask"] = access->mask;
+				entry["By"] = access->creator;
+				entry["Last seen"] = timebuf;
+				list.addEntry(entry);
 			}
+		}
 
-			if (SentHeader)
-				source.Reply(_("End of access list."));
-			else
-				source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+		else
+		{
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("Access list for %s:"), ci->name.c_str());
+	
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of access list"));
 		}
 
 		return;
 	}
 
+	void DoList(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
+	{
+		if (!ci->GetAccessCount())
+		{
+			source.Reply(_("%s access list is empty."), ci->name.c_str());
+			return;
+		}
+
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Level").addColumn("Mask");
+		this->ProcessList(source, ci, params, list);
+	}
+
 	void DoView(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
-		const Anope::string &nick = params.size() > 2 ? params[2] : "";
-
 		if (!ci->GetAccessCount())
+		{
 			source.Reply(_("%s access list is empty."), ci->name.c_str());
-		else if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			AccessViewCallback list(source, ci, nick);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
-			{
-				ChanAccess *access = ci->GetAccess(i);
-
-				if (!nick.empty() && !Anope::Match(access->mask, nick))
-					continue;
-
-				if (!SentHeader)
-				{
-					SentHeader = true;
-					source.Reply(CHAN_ACCESS_LIST_HEADER, ci->name.c_str());
-				}
-
-				AccessViewCallback::DoList(source, ci, i, access);
-			}
-
-			if (SentHeader)
-				source.Reply(_("End of access list."));
-			else
-				source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+			return;
 		}
 
-		return;
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Level").addColumn("Mask").addColumn("By").addColumn("Last seen");
+		this->ProcessList(source, ci, params, list);
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
@@ -600,8 +566,6 @@ class CommandCSAccess : public Command
 
 class CommandCSLevels : public Command
 {
-	int levelinfo_maxwidth;
-
 	void DoSet(CommandSource &source, ChannelInfo *ci, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
@@ -681,29 +645,34 @@ class CommandCSLevels : public Command
 	{
 		source.Reply(_("Access level settings for channel %s:"), ci->name.c_str());
 
-		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-		if (!levelinfo_maxwidth)
-			for (unsigned i = 0; i < privs.size(); ++i)
-			{
-				const Privilege &p = privs[i];
+		ListFormatter list;
+		list.addColumn("Name").addColumn("Level");
 
-				int len = p.name.length();
-				if (len > levelinfo_maxwidth)
-					levelinfo_maxwidth = len;
-			}
+		const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 
 		for (unsigned i = 0; i < privs.size(); ++i)
 		{
 			const Privilege &p = privs[i];
 			int16_t j = ci->GetLevel(p.name);
 
+			ListFormatter::ListEntry entry;
+			entry["Name"] = p.name;
+
 			if (j == ACCESS_INVALID)
-				source.Reply(_("    %-*s  (disabled)"), levelinfo_maxwidth, p.name.c_str());
+				entry["Level"] = "(disabled)";
 			else if (j == ACCESS_FOUNDER)
-				source.Reply(_("    %-*s  (founder only)"), levelinfo_maxwidth, p.name.c_str());
+				entry["Level"] = "(founder only)";
 			else
-				source.Reply(_("    %-*s  %d"), levelinfo_maxwidth, p.name.c_str(), j);
+				entry["Level"] = stringify(j);
+
+			list.addEntry(entry);
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	void DoReset(CommandSource &source, ChannelInfo *ci)
@@ -721,7 +690,7 @@ class CommandCSLevels : public Command
 	}
 
  public:
-	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4), levelinfo_maxwidth(0)
+	CommandCSLevels(Module *creator) : Command(creator, "chanserv/levels", 2, 4)
 	{
 		this->SetDesc(_("Redefine the meanings of access levels"));
 		this->SetSyntax(_("\037channel\037 SET \037type\037 \037level\037"));
@@ -771,21 +740,25 @@ class CommandCSLevels : public Command
 		if (subcommand.equals_ci("DESC"))
 		{
 			source.Reply(_("The following feature/function names are understood."));
-			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
-			if (!levelinfo_maxwidth)
-				for (unsigned i = 0; i < privs.size(); ++i)
-				{
-					const Privilege &p = privs[i];
 
-					int len = p.name.length();
-					if (len > levelinfo_maxwidth)
-						levelinfo_maxwidth = len;
-				}
+			ListFormatter list;
+			list.addColumn("Name").addColumn("Description");
+
+			const std::vector<Privilege> &privs = PrivilegeManager::GetPrivileges();
 			for (unsigned i = 0; i < privs.size(); ++i)
 			{
 				const Privilege &p = privs[i];
-				source.Reply(_("    %-*s  %s"), levelinfo_maxwidth, p.name.c_str(), translate(source.u, p.desc.c_str()));
+				ListFormatter::ListEntry entry;
+				entry["Name"] = p.name;
+				entry["Description"] = translate(source.u, p.desc.c_str());
+				list.addEntry(entry);
 			}
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 		else
 		{

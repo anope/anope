@@ -30,7 +30,6 @@ class CommandNSList : public Command
 		const NickCore *mync;
 		unsigned nnicks;
 		bool is_servadmin = u->IsServicesOper();
-		char noexpire_char = ' ';
 		int count = 0, from = 0, to = 0;
 		bool suspended, nsnoexpire, unconfirmed;
 
@@ -40,7 +39,6 @@ class CommandNSList : public Command
 		{
 			Anope::string n1 = myStrGetToken(pattern.substr(1), '-', 0), /* Read FROM out */
 					n2 = myStrGetToken(pattern, '-', 1);
-
 			try
 			{
 				from = convertTo<int>(n1);
@@ -73,8 +71,10 @@ class CommandNSList : public Command
 		}
 
 		mync = u->Account();
+		ListFormatter list;
 
-		source.Reply(LIST_HEADER, pattern.c_str());
+		list.addColumn("Nick").addColumn("Last usermask");
+
 		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			NickAlias *na = it->second;
@@ -83,7 +83,7 @@ class CommandNSList : public Command
 			if (na->nc->HasFlag(NI_PRIVATE) && !is_servadmin && na->nc != mync)
 				continue;
 			else if (nsnoexpire && !na->HasFlag(NS_NO_EXPIRE))
-					continue;
+				continue;
 			else if (suspended && !na->nc->HasFlag(NI_SUSPENDED))
 				continue;
 			else if (unconfirmed && !na->nc->HasFlag(NI_UNCONFIRMED))
@@ -97,24 +97,33 @@ class CommandNSList : public Command
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
 				{
+					bool isnoexpire = false;
 					if (is_servadmin && na->HasFlag(NS_NO_EXPIRE))
-						noexpire_char = '!';
-					else
-						noexpire_char = ' ';
+						isnoexpire = true;
+
+					ListFormatter::ListEntry entry;
+					entry["Nick"] = (isnoexpire ? "!" : "") + na->nick;
 					if (na->nc->HasFlag(NI_HIDE_MASK) && !is_servadmin && na->nc != mync)
-						buf = Anope::printf("%-20s  [Hostname Hidden]", na->nick.c_str());
+						entry["Last usermask"] = "[Hostname hidden]";
 					else if (na->nc->HasFlag(NI_SUSPENDED))
-						buf = Anope::printf("%-20s  [Suspended]", na->nick.c_str());
+						entry["Last usermask"] = "[Suspended]";
 					else if (na->nc->HasFlag(NI_UNCONFIRMED))
-						buf = Anope::printf("%-20s  [Unconfirmed]", na->nick.c_str());
+						entry["Last usermask"] = "[Unconfirmed]";
 					else
-						buf = Anope::printf("%-20s  %s", na->nick.c_str(), na->last_usermask.c_str());
-					source.Reply("   %c%s", noexpire_char, buf.c_str());
+						entry["Last usermask"] = na->last_usermask;
+					list.addEntry(entry);
 				}
 				++count;
 			}
 		}
 			
+		source.Reply(_("List of entries matching \002%s\002:"), pattern.c_str());
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 
 		source.Reply(_("End of list - %d/%d matches shown."), nnicks > Config->NSListMax ? Config->NSListMax : nnicks, nnicks);
 		return;

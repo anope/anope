@@ -26,7 +26,6 @@ class CommandHSList : public Command
 	{
 		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
-		unsigned display_counter = 0;
 
 		/**
 		 * Do a check for a range here, then in the next loop
@@ -56,6 +55,10 @@ class CommandHSList : public Command
 			}
 		}
 
+		unsigned display_counter = 0;
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Nick").addColumn("Vhost").addColumn("Creator").addColumn("Created");
+
 		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
 			NickAlias *na = it->second;
@@ -68,10 +71,17 @@ class CommandHSList : public Command
 				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key)) && display_counter < Config->NSListMax)
 				{
 					++display_counter;
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(display_counter);
+					entry["Nick"] = na->nick;
 					if (!na->hostinfo.GetIdent().empty())
-						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						entry["Vhost"] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
 					else
-						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						entry["Vhost"] = na->hostinfo.GetHost();
+					entry["Creator"] = na->hostinfo.GetCreator();
+					entry["Created"] = do_strftime(na->hostinfo.GetTime());
+					list.addEntry(entry);
 				}
 			}
 			else
@@ -83,14 +93,27 @@ class CommandHSList : public Command
 				if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config->NSListMax)
 				{
 					++display_counter;
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(display_counter);
+					entry["Nick"] = na->nick;
 					if (!na->hostinfo.GetIdent().empty())
-						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						entry["Vhost"] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
 					else
-						source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, na->nick.c_str(), na->hostinfo.GetHost().c_str(), na->hostinfo.GetCreator().c_str(), do_strftime(na->hostinfo.GetTime()).c_str());
+						entry["Vhost"] = na->hostinfo.GetHost();
+					entry["Creator"] = na->hostinfo.GetCreator();
+					entry["Created"] = do_strftime(na->hostinfo.GetTime());
+					list.addEntry(entry);
 				}
 			}
 			++counter;
 		}
+
+		if (!display_counter)
+		{
+			source.Reply(_("No records to display."));
+			return;
+		}
+
 		if (!key.empty())
 			source.Reply(_("Displayed records matching key \002%s\002 (Count: \002%d\002)"), key.c_str(), display_counter);
 		else
@@ -100,7 +123,12 @@ class CommandHSList : public Command
 			else
 				source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
 		}
-		return;
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

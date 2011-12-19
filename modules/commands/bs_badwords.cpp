@@ -13,42 +13,6 @@
 
 #include "module.h"
 
-class BadwordsListCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	bool SentHeader;
- public:
-	BadwordsListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &list) : NumberList(list, false), source(_source), ci(_ci), SentHeader(false)
-	{
-	}
-
-	~BadwordsListCallback()
-	{
-		if (!SentHeader)
-			source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetBadWordCount())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Bad words list for %s:\n"
-				"  Num   Word                           Type"), ci->name.c_str());
-		}
-
-		DoList(source, Number - 1, ci->GetBadWord(Number - 1));
-	}
-
-	static void DoList(CommandSource &source, unsigned Number, BadWord *bw)
-	{
-		source.Reply(_("  %3d   %-30s %s"), Number + 1, bw->word.c_str(), bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : "")));
-	}
-};
 
 class BadwordsDelCallback : public NumberList
 {
@@ -92,18 +56,44 @@ class CommandBSBadwords : public Command
 	{
 		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "LIST";
+		ListFormatter list;
+
+		list.addColumn("Number").addColumn("Word").addColumn("Type");
 
 		if (!ci->GetBadWordCount())
+		{
 			source.Reply(_("%s bad words list is empty."), ci->name.c_str());
+			return;
+		}
 		else if (!word.empty() && word.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			BadwordsListCallback list(source, ci, word);
-			list.Process();
+			class BadwordsListCallback : public NumberList
+			{
+				ListFormatter &list;
+				ChannelInfo *ci;
+			 public:
+				BadwordsListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist) : NumberList(numlist, false), list(_list), ci(_ci)
+				{
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > ci->GetBadWordCount())
+						return;
+
+					BadWord *bw = ci->GetBadWord(Number - 1);
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(Number);
+					entry["Word"] = bw->word;
+					entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
+					this->list.addEntry(entry);
+				}
+			}
+			nl_list(list, ci, word);
+			nl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = ci->GetBadWordCount(); i < end; ++i)
 			{
 				BadWord *bw = ci->GetBadWord(i);
@@ -111,22 +101,28 @@ class CommandBSBadwords : public Command
 				if (!word.empty() && !Anope::Match(bw->word, word))
 					continue;
 
-				if (!SentHeader)
-				{
-					SentHeader = true;
-					source.Reply(_("Bad words list for %s:\n"
-						"  Num   Word                           Type"), ci->name.c_str());
-
-				}
-
-				BadwordsListCallback::DoList(source, i, bw);
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Word"] = bw->word;
+				entry["Type"] = bw->type == BW_SINGLE ? "(SINGLE)" : (bw->type == BW_START ? "(START)" : (bw->type == BW_END ? "(END)" : ""));
+				list.addEntry(entry);
 			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on %s bad words list."), ci->name.c_str());
 		}
 
-		return;
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on %s badword list."), ci->name.c_str());
+		else
+		{
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("Badword list for %s:"), ci->name.c_str());
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of badword list."));
+		}
 	}
 
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &word)

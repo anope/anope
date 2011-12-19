@@ -131,6 +131,121 @@ bool NumberList::InvalidRange(const Anope::string &)
 	return true;
 }
 
+ListFormatter &ListFormatter::addColumn(const Anope::string &name)
+{
+	this->columns.push_back(name);
+	return *this;
+}
+
+void ListFormatter::addEntry(const ListEntry &entry)
+{
+	this->entries.push_back(entry);
+}
+
+bool ListFormatter::isEmpty() const
+{
+	return this->entries.empty();
+}
+
+void ListFormatter::Process(std::vector<Anope::string> &buffer)
+{
+	buffer.clear();
+
+	std::map<Anope::string, size_t> lenghts;
+	std::set<Anope::string> breaks;
+	for (unsigned i = 0; i < this->columns.size(); ++i)
+		lenghts[this->columns[i]] = this->columns[i].length();
+	for (unsigned i = 0; i < this->entries.size(); ++i)
+	{
+		ListEntry &e = this->entries[i];
+		for (unsigned j = 0; j < this->columns.size(); ++j)
+			if (e[this->columns[j]].length() > lenghts[this->columns[j]])
+				lenghts[this->columns[j]] = e[this->columns[j]].length();
+	}
+	unsigned length = 0;
+	for (std::map<Anope::string, size_t>::iterator it = lenghts.begin(), it_end = lenghts.end(); it != it_end; ++it)
+	{
+		/* Break lines at 80 chars */
+		if (length > 80)
+		{
+			breaks.insert(it->first);
+			length = 0;
+		}
+		else
+			length += it->second;
+	}
+
+	/* Only put a list header if more than 1 column */
+	if (this->columns.size() > 1)
+	{
+		Anope::string s;
+		for (unsigned i = 0; i < this->columns.size(); ++i)
+		{
+			if (breaks.count(this->columns[i]))
+			{
+				buffer.push_back(s);
+				s = "  ";
+			}
+			else if (!s.empty())
+				s += "  ";
+			s += this->columns[i];
+			if (i + 1  != this->columns.size())
+				for (unsigned j = this->columns[i].length(); j < lenghts[this->columns[i]]; ++j)
+					s += " ";
+		}
+		buffer.push_back(s);
+	}
+
+	for (unsigned i = 0; i < this->entries.size(); ++i)
+	{
+		ListEntry &e = this->entries[i];
+
+		Anope::string s;
+		for (unsigned j = 0; j < this->columns.size(); ++j)
+		{
+			if (breaks.count(this->columns[j]))
+			{
+				buffer.push_back(s);
+				s = "  ";
+			}
+			else if (!s.empty())
+				s += "  ";
+			s += e[this->columns[j]];
+			if (j + 1 != this->columns.size())
+				for (unsigned k = e[this->columns[j]].length(); k < lenghts[this->columns[j]]; ++k)
+					s += " ";
+		}
+		buffer.push_back(s);
+	}
+}
+
+InfoFormatter::InfoFormatter(User *u) : user(u), longest(0)
+{
+}
+
+void InfoFormatter::Process(std::vector<Anope::string> &buffer)
+{
+	buffer.clear();
+
+	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = this->replies.begin(), it_end = this->replies.end(); it != it_end; ++it)
+	{
+		Anope::string s;
+		for (unsigned i = it->first.length(); i < this->longest; ++i)
+			s += " ";
+		s += Anope::string(translate(this->user, it->first.c_str())) + ": " + it->second;
+
+		buffer.push_back(s);
+	}
+}
+
+Anope::string& InfoFormatter::operator[](const Anope::string &key)
+{
+	if (key.length() > this->longest)
+		this->longest = key.length();
+	this->replies.push_back(std::make_pair(key, ""));
+	return this->replies.back().second;
+}
+
 /**
  * dotime:  Return the number of seconds corresponding to the given time
  *          string.  If the given string does not represent a valid time,

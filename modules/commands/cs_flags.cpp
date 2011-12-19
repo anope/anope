@@ -221,45 +221,60 @@ class CommandCSFlags : public Command
 		const Anope::string &arg = params.size() > 2 ? params[2] : "";
 
 		if (!ci->GetAccessCount())
-			source.Reply(_("%s access list is empty."), ci->name.c_str());
-		else
 		{
-			unsigned total = 0;
+			source.Reply(_("%s access list is empty."), ci->name.c_str());
+			return;
+		}
 
-			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
+		ListFormatter list;
+
+		list.addColumn("Number").addColumn("Mask").addColumn("Flags").addColumn("Creator").addColumn("Created");
+
+		unsigned count = 0;
+		for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
+		{
+			ChanAccess *access = ci->GetAccess(i);
+			const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
+
+			if (!arg.empty())
 			{
-				ChanAccess *access = ci->GetAccess(i);
-				const Anope::string &flags = FlagsChanAccess::DetermineFlags(access);
-
-				if (!arg.empty())
+				if (arg[0] == '+')
 				{
-					if (arg[0] == '+')
-					{
-						bool pass = true;
-						for (size_t j = 1; j < arg.length(); ++j)
-							if (flags.find(arg[j]) == Anope::string::npos)
-								pass = false;
-						if (pass == false)
-							continue;
-					}
-					else if (!Anope::Match(access->mask, arg))
+					bool pass = true;
+					for (size_t j = 1; j < arg.length(); ++j)
+						if (flags.find(arg[j]) == Anope::string::npos)
+							pass = false;
+					if (pass == false)
 						continue;
 				}
-
-				if (++total == 1)
-				{
-					source.Reply(_("Flags list for %s"), ci->name.c_str());
-				}
-
-				source.Reply(_("  %3d  %-10s +%-10s [last modified on %s by %s]"), i + 1, access->mask.c_str(), FlagsChanAccess::DetermineFlags(access).c_str(), do_strftime(access->created, source.u->Account(), true).c_str(), access->creator.c_str());
+				else if (!Anope::Match(access->mask, arg))
+					continue;
 			}
 
-			if (total == 0)
-				source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
-			else if (total == ci->GetAccessCount())
+			ListFormatter::ListEntry entry;
+			++count;
+			entry["Number"] = stringify(i + 1);
+			entry["Mask"] = access->mask;
+			entry["Flags"] = FlagsChanAccess::DetermineFlags(access);
+			entry["Creator"] = access->creator;
+			entry["Created"] = do_strftime(access->created, source.u->Account(), true);
+			list.addEntry(entry);
+		}
+
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+		else
+		{
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("Flags list for %s"), ci->name.c_str());
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+			if (count == ci->GetAccessCount())
 				source.Reply(_("End of access list."));
 			else
-				source.Reply(_("End of access list - %d/%d entries shown."), total, ci->GetAccessCount());
+				source.Reply(_("End of access list - %d/%d entries shown."), count, ci->GetAccessCount());
 		}
 	}
 

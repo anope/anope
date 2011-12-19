@@ -156,7 +156,9 @@ class CommandCSMode : public Command
 			}
 			else
 			{
-				source.Reply(_("Mode locks for %s:"), ci->name.c_str());
+				ListFormatter list;
+				list.addColumn("Mode").addColumn("Param").addColumn("Creator").addColumn("Created");
+
 				for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = mlocks.begin(), it_end = mlocks.end(); it != it_end; ++it)
 				{
 					const ModeLock &ml = it->second;
@@ -164,11 +166,21 @@ class CommandCSMode : public Command
 					if (!cm)
 						continue;
 
-					Anope::string modeparam = ml.param;
-					if (!modeparam.empty())
-						modeparam = " " + modeparam;
-					source.Reply(_("%c%c%s, by %s on %s"), ml.set ? '+' : '-', cm->ModeChar, modeparam.c_str(), ml.setter.c_str(), do_strftime(ml.created).c_str());
+					ListFormatter::ListEntry entry;
+					entry["Mode"] = Anope::printf("%c%c", ml.set ? '+' : '-', cm->ModeChar);
+					entry["Param"] = ml.param;
+					entry["Creator"] = ml.setter;
+					entry["Created"] = do_strftime(ml.created, source.u->Account(), false);
+					list.addEntry(entry);
 				}
+
+				source.Reply(_("Mode locks for %s:"), ci->name.c_str());
+
+				std::vector<Anope::string> replies;
+				list.Process(replies);
+
+				for (unsigned i = 0; i < replies.size(); ++i)
+					source.Reply(replies[i]);
 			}
 		}
 		else

@@ -33,42 +33,50 @@ class CommandNSAList : public Command
 		NickAlias *na = findnick(nick);
 
 		if (!na)
-			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
-		else
 		{
-			int chan_count = 0;
+			source.Reply(NICK_X_NOT_REGISTERED, nick.c_str());
+			return;
+		}
+		
+		ListFormatter list;
+		int chan_count = 0;
 
-			source.Reply(_("Channels that \002%s\002 has access on:\n"
-					"  Num  Channel              Access"), na->nick.c_str());
+		list.addColumn("Number").addColumn("Channel").addColumn("Access");
 
-			for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		source.Reply(_("Channels that \002%s\002 has access on:"), na->nick.c_str());
+
+		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+		{
+			ChannelInfo *ci = it->second;
+			ListFormatter::ListEntry entry;
+
+			if (ci->GetFounder() && ci->GetFounder() == na->nc)
 			{
-				ChannelInfo *ci = it->second;
-
-				if (ci->GetFounder() && ci->GetFounder() == na->nc)
-				{
-					source.Reply(_("  %3d %c%-20s Founder"), ++chan_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str());
-					continue;
-				}
-
-				AccessGroup access = ci->AccessFor(na->nc);
-				if (access.empty())
-					continue;
-				
 				++chan_count;
-
-				if (access.size() > 1)
-				{
-					source.Reply(_("  %3d You match %d access entries on %c%s, they are"), chan_count, access.size(), ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str());
-					for (unsigned i = 0; i < access.size(); ++i)
-						source.Reply(_("  %3d %-8s"), i + 1, access[i]->Serialize().c_str());
-				}
-				else
-					source.Reply(_("  %3d %c%-20s %-8s"), chan_count, ci->HasFlag(CI_NO_EXPIRE) ? '!' : ' ', ci->name.c_str(), access[0]->Serialize().c_str());
+				entry["Number"] = stringify(chan_count);
+				entry["Channel"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
+				entry["Access"] = "Founder";
+				list.addEntry(entry);
+				continue;
 			}
 
-			source.Reply(_("End of list - %d channels shown."), chan_count);
+			AccessGroup access = ci->AccessFor(na->nc);
+			if (access.empty())
+				continue;
+				
+			++chan_count;
+
+			entry["Number"] = stringify(chan_count);
+			entry["Channel"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
+			for (unsigned i = 0; i < access.size(); ++i)
+				entry["Access"] = entry["Access"] + ", " + access[i]->Serialize();
+			entry["Access"] = entry["Access"].substr(3);
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

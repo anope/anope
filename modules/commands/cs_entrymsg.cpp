@@ -77,15 +77,34 @@ class CommandEntryMessage : public Command
 	void DoList(CommandSource &source, ChannelInfo *ci)
 	{
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
-		if (messages != NULL)
+		if (messages == NULL)
 		{
-			source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
-			for (unsigned i = 0; i < messages->size(); ++i)
-				source.Reply(CHAN_LIST_ENTRY, i + 1, (*messages)[i].message.c_str(), (*messages)[i].creator.c_str(), do_strftime((*messages)[i].when).c_str());
-			source.Reply(_("End of entry message list."));
-		}
-		else
 			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());
+			return;
+		}
+
+		source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
+
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Message");
+		for (unsigned i = 0; i < messages->size(); ++i)
+		{
+			EntryMsg &msg = messages->at(i);
+
+			ListFormatter::ListEntry entry;
+			entry["Number"] = stringify(i + 1);
+			entry["Creator"] = msg.creator;
+			entry["Created"] = do_strftime(msg.when);
+			entry["Message"] = msg.message;
+			list.addEntry(entry);
+		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
+		source.Reply(_("End of entry message list."));
 	}
 		
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &message)

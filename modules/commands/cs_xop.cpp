@@ -203,43 +203,6 @@ class XOPAccessProvider : public AccessProvider
 	}
 };
 
-class XOPListCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	XOPType type;
-	Command *c;
-	bool SentHeader;
- public:
-	XOPListCallback(CommandSource &_source, ChannelInfo *_ci, const Anope::string &numlist, XOPType _type, Command *_c) : NumberList(numlist, false), source(_source), ci(_ci), type(_type), c(_c), SentHeader(false)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAccessCount())
-			return;
-
-		ChanAccess *access = ci->GetAccess(Number - 1);
-
-		if (this->type != XOPChanAccess::DetermineLevel(access))
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("%s list for %s:\n  Num  Nick"), source.command.c_str(), ci->name.c_str());
-		}
-
-		DoList(source, access, Number - 1, this->type);
-	}
-
-	static void DoList(CommandSource &source, ChanAccess *access, unsigned index, XOPType type)
-	{
-		source.Reply(_("  %3d  %s"), index, access->mask.c_str());
-	}
-};
-
 class XOPDelCallback : public NumberList
 {
 	CommandSource &source;
@@ -462,15 +425,41 @@ class XOPBase : public Command
 			return;
 		}
 
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask");
+
 		if (!nick.empty() && nick.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPListCallback list(source, ci, nick, level, this);
-			list.Process();
+			class XOPListCallback : public NumberList
+			{
+				ListFormatter &list;
+				ChannelInfo *ci;
+				XOPType type;
+			 public:
+				XOPListCallback(ListFormatter &_list, ChannelInfo *_ci, const Anope::string &numlist, XOPType _type) : NumberList(numlist, false), list(_list), ci(_ci), type(_type)
+				{
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > ci->GetAccessCount())
+						return;
+
+					ChanAccess *a = ci->GetAccess(Number - 1);
+
+					if (this->type != XOPChanAccess::DetermineLevel(a))
+						return;
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(Number);
+					entry["Mask"] = a->mask;
+					this->list.addEntry(entry);
+				}
+			} nl_list(list, ci, nick, level);
+			nl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = ci->GetAccessCount(); i < end; ++i)
 			{
 				ChanAccess *a = ci->GetAccess(i);
@@ -480,20 +469,24 @@ class XOPBase : public Command
 				else if (!nick.empty() && !Anope::Match(a->mask, nick))
 					continue;
 
-				if (!SentHeader)
-				{
-					SentHeader = true;
-					source.Reply(_("%s list for %s:\n  Num  Nick"), source.command.c_str(), ci->name.c_str());
-				}
-
-				XOPListCallback::DoList(source, a, i + 1, level);
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Mask"] = a->mask;
+				list.addEntry(entry);
 			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 		}
 
-		return;
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
+		else
+		{
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("%s list for %s"), source.command.c_str(), ci->name.c_str());
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+		}
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci, XOPType level)

@@ -35,10 +35,12 @@ class CommandOSChanList : public Command
 			Modes.push_back(CMODE_PRIVATE);
 		}
 
+		ListFormatter list;
+		list.addColumn("Name").addColumn("Users").addColumn("Modes").addColumn("Topic");
+
 		if (!pattern.empty() && (u2 = finduser(pattern)))
 		{
-			source.Reply(_("\002%s\002 channel list:\n"
-					"Name                 Users Modes   Topic"), u2->nick.c_str());
+			source.Reply(_("\002%s\002 channel list:"), u2->nick.c_str());
 
 			for (UChannelList::iterator uit = u2->chans.begin(), uit_end = u2->chans.end(); uit != uit_end; ++uit)
 			{
@@ -49,13 +51,17 @@ class CommandOSChanList : public Command
 						if (!cc->chan->HasMode(*it))
 							continue;
 
-				source.Reply(_("%-20s  %4d +%-6s %s"), cc->chan->name.c_str(), cc->chan->users.size(), cc->chan->GetModes(true, true).c_str(), !cc->chan->topic.empty() ? cc->chan->topic.c_str() : "");
+				ListFormatter::ListEntry entry;
+				entry["Name"] = cc->chan->name;
+				entry["Users"] = stringify(cc->chan->users.size());
+				entry["Modes"] = cc->chan->GetModes(true, true);
+				entry["Topic"] = cc->chan->topic;
+				list.addEntry(entry);
 			}
 		}
 		else
 		{
-			source.Reply(_("Channel list:\n"
-					"Name                 Users Modes   Topic"));
+			source.Reply(_("Channel list:"));
 
 			for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
 			{
@@ -68,12 +74,22 @@ class CommandOSChanList : public Command
 						if (!c->HasMode(*it))
 							continue;
 
-				source.Reply(_("%-20s  %4d +%-6s %s"), c->name.c_str(), c->users.size(), c->GetModes(true, true).c_str(), !c->topic.empty() ? c->topic.c_str() : "");
+				ListFormatter::ListEntry entry;
+				entry["Name"] = c->name;
+				entry["Users"] = stringify(c->users.size());
+				entry["Modes"] = c->GetModes(true, true);
+				entry["Topic"] = c->topic;
+				list.addEntry(entry);
 			}
 		}
 
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+
 		source.Reply(_("End of channel list."));
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
@@ -109,10 +125,12 @@ class CommandOSUserList : public Command
 		if (!opt.empty() && opt.equals_ci("INVISIBLE"))
 			Modes.push_back(UMODE_INVIS);
 
+		ListFormatter list;
+		list.addColumn("Name").addColumn("Mask");
+
 		if (!pattern.empty() && (c = findchan(pattern)))
 		{
-			source.Reply(_("\002%s\002 users list:\n"
-					"Nick                 Mask"), pattern.c_str());
+			source.Reply(_("\002%s\002 users list:"), pattern.c_str());
 
 			for (CUserList::iterator cuit = c->users.begin(), cuit_end = c->users.end(); cuit != cuit_end; ++cuit)
 			{
@@ -123,13 +141,15 @@ class CommandOSUserList : public Command
 						if (!uc->user->HasMode(*it))
 							continue;
 
-				source.Reply(_("%-20s %s@%s"), uc->user->nick.c_str(), uc->user->GetIdent().c_str(), uc->user->GetDisplayedHost().c_str());
+				ListFormatter::ListEntry entry;
+				entry["Name"] = uc->user->nick;
+				entry["Mask"] = uc->user->GetIdent() + "@" + uc->user->GetDisplayedHost();
+				list.addEntry(entry);
 			}
 		}
 		else
 		{
-			source.Reply(_("Users list:\n"
-					"Nick                 Mask"));
+			source.Reply(_("Users list:"));
 
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 			{
@@ -145,9 +165,19 @@ class CommandOSUserList : public Command
 							if (!u2->HasMode(*mit))
 								continue;
 				}
-				source.Reply(_("%-20s %s@%s"), u2->nick.c_str(), u2->GetIdent().c_str(), u2->GetDisplayedHost().c_str());
+
+				ListFormatter::ListEntry entry;
+				entry["Name"] = u2->nick;
+				entry["Mask"] = u2->GetIdent() + "@" + u2->GetDisplayedHost();
+				list.addEntry(entry);
 			}
 		}
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 
 		source.Reply(_("End of users list."));
 		return;

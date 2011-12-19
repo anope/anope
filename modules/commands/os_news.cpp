@@ -116,10 +116,28 @@ class NewsBase : public Command
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
 		{
-			source.Reply(msgs[MSG_LIST_HEADER]);
+			ListFormatter lflist;
+			lflist.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Text");
+
 			for (unsigned i = 0, end = list.size(); i < end; ++i)
-				source.Reply(_("%5d (%s by %s)\n""    %s"), i + 1, do_strftime(list[i]->time).c_str(), !list[i]->who.empty() ? list[i]->who.c_str() : "<unknown>", list[i]->text.c_str());
-			source.Reply(END_OF_ANY_LIST, "News");
+			{
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Creator"] = list[i]->who;
+				entry["Created"] = do_strftime(list[i]->time);
+				entry["Text"] = list[i]->text;
+				lflist.addEntry(entry);
+			}
+
+			source.Reply(msgs[MSG_LIST_HEADER]);
+
+			std::vector<Anope::string> replies;
+			lflist.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of \2news\2 list."));
 		}
 
 		return;

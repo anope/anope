@@ -915,4 +915,29 @@ class CoreExport NumberList
 	virtual bool InvalidRange(const Anope::string &list);
 };
 
+class CoreExport ListFormatter
+{
+ public:
+ 	typedef std::map<Anope::string, Anope::string> ListEntry;
+ private:
+	std::vector<Anope::string> columns;
+	std::vector<ListEntry> entries;
+ public:
+	ListFormatter &addColumn(const Anope::string &name);
+	void addEntry(const ListEntry &entry);
+	bool isEmpty() const;
+	void Process(std::vector<Anope::string> &);
+};
+
+class CoreExport InfoFormatter
+{
+	User *user;
+	std::vector<std::pair<Anope::string, Anope::string> > replies;
+	unsigned longest;
+ public:
+	InfoFormatter(User *u);
+	void Process(std::vector<Anope::string> &);
+	Anope::string &operator[](const Anope::string &key);
+};
+
 #endif /* SERVICES_H */

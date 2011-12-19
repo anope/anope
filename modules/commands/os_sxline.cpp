@@ -54,82 +54,6 @@ class SXLineDelCallback : public NumberList
 	}
 };
 
-class SXLineListCallback : public NumberList
-{
- protected:
-	XLineManager *xlm;
-	Command *command;
-	CommandSource &source;
-	bool SentHeader;
- public:
-	SXLineListCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), command(c), source(_source), SentHeader(false)
-	{
-	}
-
-	~SXLineListCallback()
-	{
-		if (!SentHeader)
-			source.Reply(_("No matching entries on the %s list."), this->command->name.c_str());
-	}
-
-	virtual void HandleNumber(unsigned Number)
-	{
-		if (!Number)
-			return;
-
-		XLine *x = this->xlm->GetEntry(Number - 1);
-
-		if (!x)
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current %s list:\n  Num   Mask                              Reason"), this->command->name.c_str());
-		}
-
-		DoList(source, x, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, XLine *x, unsigned Number)
-	{
-		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
-	}
-};
-
-class SXLineViewCallback : public SXLineListCallback
-{
- public:
-	SXLineViewCallback(XLineManager *x, Command *c, CommandSource &_source, const Anope::string &numlist) : SXLineListCallback(x, c, _source, numlist)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number)
-			return;
-
-		XLine *x = this->xlm->GetEntry(Number - 1);
-
-		if (!x)
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current %s list:"), this->command->name.c_str());
-		}
-
-		DoList(source, x, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, XLine *x, unsigned Number)
-	{
-		Anope::string expirebuf = expire_left(source.u->Account(), x->Expires);
-		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expirebuf.c_str(), x->Reason.c_str());
-	}
-};
-
 class CommandOSSXLineBase : public Command
 {
  private:
@@ -143,7 +67,7 @@ class CommandOSSXLineBase : public Command
 
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), this->name.c_str());
+			source.Reply(_("%s list is empty."), source.command.c_str());
 			return;
 		}
 
@@ -166,14 +90,14 @@ class CommandOSSXLineBase : public Command
 
 			if (!x)
 			{
-				source.Reply(_("\002%s\002 not found on the %s list."), mask.c_str(), this->name.c_str());
+				source.Reply(_("\002%s\002 not found on the %s list."), mask.c_str(), source.command.c_str());
 				return;
 			}
 
 			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, this->xlm()));
 
 			SXLineDelCallback::DoDel(this->xlm(), source, x);
-			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), this->name.c_str());
+			source.Reply(_("\002%s\002 deleted from the %s list."), mask.c_str(), source.command.c_str());
 		}
 
 		if (readonly)
@@ -182,11 +106,11 @@ class CommandOSSXLineBase : public Command
 		return;
 	}
 
-	void OnList(CommandSource &source, const std::vector<Anope::string> &params)
+	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
 	{
 		if (!this->xlm() || this->xlm()->GetList().empty())
 		{
-			source.Reply(_("%s list is empty."), this->name.c_str());
+			source.Reply(_("%s list is empty."), source.command.c_str());
 			return;
 		}
 
@@ -194,78 +118,85 @@ class CommandOSSXLineBase : public Command
 
 		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			SXLineListCallback list(this->xlm(), this, source, mask);
-			list.Process();
+			class SXLineListCallback : public NumberList
+			{
+				XLineManager *xlm;
+				ListFormatter &list;
+			 public:
+				SXLineListCallback(XLineManager *x, ListFormatter &_list, const Anope::string &numlist) : NumberList(numlist, false), xlm(x), list(_list)
+				{
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number)
+						return;
+
+					XLine *x = this->xlm->GetEntry(Number - 1);
+
+					if (!x)
+						return;
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(Number);
+					entry["Mask"] = x->Mask;
+					entry["By"] = x->By;
+					entry["Created"] = do_strftime(x->Created);
+					entry["Expires"] = expire_left(NULL, x->Expires);
+					entry["Reason"] = x->Reason;
+					list.addEntry(entry);
+				}
+			}
+			sl_list(this->xlm(), list, mask);
+			sl_list.Process();
 		}
 		else
 		{
-			bool SentHeader = false;
-
 			for (unsigned i = 0, end = this->xlm()->GetCount(); i < end; ++i)
 			{
 				XLine *x = this->xlm()->GetEntry(i);
 
 				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
 				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current %s list:\n  Num   Mask                              Reason"), this->name.c_str());
-					}
-
-					SXLineListCallback::DoList(source, x, i);
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(i + 1);
+					entry["Mask"] = x->Mask;
+					entry["By"] = x->By;
+					entry["Created"] = do_strftime(x->Created);
+					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
+					entry["Reason"] = x->Reason;
+					list.addEntry(entry);
 				}
 			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on the %s list."), this->name.c_str());
-			else
-				source.Reply(END_OF_ANY_LIST, this->name.c_str());
 		}
 
-		return;
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on the %s list."), source.command.c_str());
+		else
+		{
+			source.Reply(_("Current %s list:"), source.command.c_str());
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+		}
+	}
+
+	void OnList(CommandSource &source, const std::vector<Anope::string> &params)
+	{
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
+
+		this->ProcessList(source, params, list);
 	}
 
 	void OnView(CommandSource &source, const std::vector<Anope::string> &params)
 	{
-		if (!this->xlm () || this->xlm()->GetList().empty())
-		{
-			source.Reply(_("%s list is empty."), this->name.c_str());
-			return;
-		}
-
-		const Anope::string &mask = params.size() > 1 ? params[1] : "";
-
-		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			SXLineViewCallback list(this->xlm(), this, source, mask);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = this->xlm()->GetCount(); i < end; ++i)
-			{
-				XLine *x = this->xlm()->GetEntry(i);
-
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
-				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current %s list:"), this->name.c_str());
-					}
-
-					SXLineViewCallback::DoList(source, x, i);
-				}
-			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on the %s list."), this->name.c_str());
-		}
-
-		return;
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("By").addColumn("Created").addColumn("Expires").addColumn("Reason");
+		this->ProcessList(source, params, list);
 	}
 
 	void OnClear(CommandSource &source)
@@ -279,7 +210,7 @@ class CommandOSSXLineBase : public Command
 			this->xlm()->DelXLine(x);
 		}
 
-		source.Reply(_("The %s list has been cleared."), this->name.c_str());
+		source.Reply(_("The %s list has been cleared."), source.command.c_str());
 
 		return;
 	}
@@ -382,7 +313,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 			if (mask.find_first_not_of("*?") == Anope::string::npos)
 				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
 			else if (canAdd.first == 1)
-				source.Reply(_("\002%s\002 already exists on the %s list."), canAdd.second->Mask.c_str(), this->name.c_str());
+				source.Reply(_("\002%s\002 already exists on the %s list."), canAdd.second->Mask.c_str(), source.command.c_str());
 			else if (canAdd.first == 2)
 				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
 			else if (canAdd.first == 3)
@@ -404,7 +335,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				if (percent > 95)
 				{
 					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-					Log(LOG_ADMIN, u, this) << "tried to " << this->name << " " << percent << "% of the network (" << affected << " users)";
+					Log(LOG_ADMIN, u, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
 					return;
 				}
 
@@ -443,7 +374,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 					}
 				}
 
-				source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), this->name.c_str());
+				source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
 				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
 
 				if (readonly)

@@ -75,10 +75,24 @@ class CommandNSAJoin : public Command
 			source.Reply(_("Your auto join list is empty."));
 		else
 		{
-			source.Reply(_("Your auto join list:\n"
-					"  Num   Channel      Key"));
+			ListFormatter list;
+			list.addColumn("Number").addColumn("Channel").addColumn("Key");
 			for (unsigned i = 0; i < channels->size(); ++i)
-				source.Reply(" %3d    %-12s %s", i + 1, channels->at(i).first.c_str(), channels->at(i).second.c_str());
+			{
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(i + 1);
+				entry["Channel"] = channels->at(i).first;
+				entry["Key"] = channels->at(i).second;
+				list.addEntry(entry);
+			}
+
+			source.Reply(_("Your auto join list:"));
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 	}
 

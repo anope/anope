@@ -126,7 +126,7 @@ class NSSetMisc : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, bool ShowHidden)
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden)
 	{
 		std::deque<Anope::string> list;
 		na->nc->GetExtList(list);
@@ -138,7 +138,7 @@ class NSSetMisc : public Module
 
 			NSMiscData *data = na->nc->GetExt<NSMiscData *>(list[i]);
 			if (data)
-				source.Reply("      %s: %s", list[i].substr(12).replace_all_cs("_", " ").c_str(), data->data.c_str());
+				info[list[i].substr(12).replace_all_cs("_", " ")] = data->data;
 		}
 	}
 };

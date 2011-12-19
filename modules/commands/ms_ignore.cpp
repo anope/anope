@@ -73,9 +73,22 @@ class CommandMSIgnore : public Command
 				source.Reply(_("Your memo ignore list is empty."));
 			else
 			{
-				source.Reply(_("Ignore list:"));
+				ListFormatter list;
+				list.addColumn("Mask");
 				for (unsigned i = 0; i < mi->ignores.size(); ++i)
-					source.Reply("    %s", mi->ignores[i].c_str());
+				{
+					ListFormatter::ListEntry entry;
+					entry["Mask"] = mi->ignores[i];
+					list.addEntry(entry);
+				}
+
+				source.Reply(_("Ignore list:"));
+
+				std::vector<Anope::string> replies;
+				list.Process(replies);
+
+				for (unsigned i = 0; i < replies.size(); ++i)
+					source.Reply(replies[i]);
 			}
 		}
 		else

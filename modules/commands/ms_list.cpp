@@ -13,39 +13,6 @@
 
 #include "module.h"
 
-class MemoListCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	const MemoInfo *mi;
-	bool SentHeader;
- public:
-	MemoListCallback(CommandSource &_source, ChannelInfo *_ci, const MemoInfo *_mi, const Anope::string &list) : NumberList(list, false), source(_source), ci(_ci), mi(_mi), SentHeader(false)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > mi->memos.size())
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Memos for %s:"), ci ? ci->name.c_str() : source.u->nick.c_str());
-			source.Reply(_(" Num  Sender            Date/Time"));
-		}
-
-		DoList(source, mi, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, const MemoInfo *mi, unsigned index)
-	{
-		Memo *m = mi->memos[index];
-		source.Reply(_("%c%3d  %-16s  %s"), (m->HasFlag(MF_UNREAD)) ? '*' : ' ', index + 1, m->sender.c_str(), do_strftime(m->time).c_str());
-	}
-};
-
 class CommandMSList : public Command
 {
  public:
@@ -62,7 +29,6 @@ class CommandMSList : public Command
 		Anope::string param = !params.empty() ? params[0] : "", chan;
 		ChannelInfo *ci = NULL;
 		const MemoInfo *mi;
-		int i, end;
 
 		if (!param.empty() && param[0] == '#')
 		{
@@ -83,6 +49,7 @@ class CommandMSList : public Command
 		}
 		else
 			mi = &u->Account()->memos;
+
 		if (!param.empty() && !isdigit(param[0]) && !param.equals_ci("NEW"))
 			this->OnSyntaxError(source, param);
 		else if (!mi->memos.size())
@@ -94,15 +61,44 @@ class CommandMSList : public Command
 		}
 		else
 		{
+			ListFormatter list;
+
+			list.addColumn("Number").addColumn("Sender").addColumn("Date/Time");
+
 			if (!param.empty() && isdigit(param[0]))
 			{
-				MemoListCallback list(source, ci, mi, param);
-				list.Process();
+				class MemoListCallback : public NumberList
+				{
+					ListFormatter &list;
+					CommandSource &source;
+					const MemoInfo *mi;
+				 public:
+					MemoListCallback(ListFormatter &_list, CommandSource &_source, const MemoInfo *_mi, const Anope::string &numlist) : NumberList(numlist, false), list(_list), source(_source), mi(_mi)
+					{
+					}
+
+					void HandleNumber(unsigned Number)
+					{
+						if (!Number || Number > mi->memos.size())
+							return;
+
+						Memo *m = mi->memos[Number];
+
+						ListFormatter::ListEntry entry;
+						entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(Number + 1);
+						entry["Sender"] = m->sender;
+						entry["Date/Time"] = do_strftime(m->time);
+						this->list.addEntry(entry);
+					}
+				}
+				mlc(list, source, mi, param);
+				mlc.Process();
 			}
 			else
 			{
 				if (!param.empty())
 				{
+					unsigned i, end;
 					for (i = 0, end = mi->memos.size(); i < end; ++i)
 						if (mi->memos[i]->HasFlag(MF_UNREAD))
 							break;
@@ -116,23 +112,27 @@ class CommandMSList : public Command
 					}
 				}
 
-				bool SentHeader = false;
-
-				for (i = 0, end = mi->memos.size(); i < end; ++i)
+				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
 				{
 					if (!param.empty() && !mi->memos[i]->HasFlag(MF_UNREAD))
 						continue;
 
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("New memo for %s."), ci ? ci->name.c_str() : u->nick.c_str());
-						source.Reply(_(" Num  Sender            Date/Time"));
-					}
+					Memo *m = mi->memos[i];
 
-					MemoListCallback::DoList(source, mi, i);
+					ListFormatter::ListEntry entry;
+					entry["Number"] = (m->HasFlag(MF_UNREAD) ? "* " : "  ") + stringify(i + 1);
+					entry["Sender"] = m->sender;
+					entry["Date/Time"] = do_strftime(m->time);
+					list.addEntry(entry);
 				}
 			}
+
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			source.Reply(_("Memos for %s."), ci ? ci->name.c_str() : u->nick.c_str());
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 		return;
 	}

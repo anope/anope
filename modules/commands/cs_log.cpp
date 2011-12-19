@@ -21,7 +21,7 @@ public:
 	{
 		this->SetDesc(_("Configures channel logging settings"));
 		this->SetSyntax(_("\037channel\037"));
-		this->SetSyntax(_("\037channel\037 \037command\037 [\037method\037]"));
+		this->SetSyntax(_("\037channel\037 \037command\037 \037method\037 [\037status\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -40,13 +40,29 @@ public:
 				source.Reply(_("There currently are no logging configurations for %s."), ci->name.c_str());
 			else
 			{
-				source.Reply(_("Log list for %s:"), ci->name.c_str());
+				ListFormatter list;
+				list.addColumn("Number").addColumn("Service").addColumn("Command").addColumn("Method").addColumn("");
+
 				for (unsigned i = 0; i < ci->log_settings.size(); ++i)
 				{
 					LogSetting &log = ci->log_settings[i];
 
-					source.Reply("%d: %s %s, %s %s", i + 1, log.command_service.c_str(), log.command_name.c_str(), log.method.c_str(), log.extra.c_str());
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(i + 1);
+					entry["Service"] = log.command_service;
+					entry["Command"] = log.command_name;
+					entry["Method"] = log.method;
+					entry[""] = log.extra;
+					list.addEntry(entry);
 				}
+
+				source.Reply(_("Log list for %s:"), ci->name.c_str());
+
+				std::vector<Anope::string> replies;
+				list.Process(replies);
+
+				for (unsigned i = 0; i < replies.size(); ++i)
+					source.Reply(replies[i]);
 			}
 		}
 		else if (params.size() > 2)

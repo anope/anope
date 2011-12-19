@@ -26,50 +26,47 @@ class CommandBSBotList : public Command
 	{
 		User *u = source.u;
 		unsigned count = 0;
+		ListFormatter list;
+
+		list.addColumn("Nick").addColumn("Mask");
 
 		for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
 		{
 			BotInfo *bi = it->second;
 
-			if (!bi->HasFlag(BI_PRIVATE))
+			if (u->HasCommand("botserv/botlist") || !bi->HasFlag(BI_PRIVATE))
 			{
-				if (!count)
-					source.Reply(_("Bot list:"));
 				++count;
-				source.Reply("   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
+				ListFormatter::ListEntry entry;
+				entry["Nick"] = (bi->HasFlag(BI_PRIVATE) ? "* " : "") + bi->nick;
+				entry["Mask"] = bi->GetIdent() + "@" + bi->host;
+				list.addEntry(entry);
 			}
 		}
 
-		if (u->HasCommand("botserv/botlist") && count < BotListByNick.size())
-		{
-			source.Reply(_("Bots reserved to IRC operators:"));
-
-			for (Anope::insensitive_map<BotInfo *>::const_iterator it = BotListByNick.begin(), it_end = BotListByNick.end(); it != it_end; ++it)
-			{
-				BotInfo *bi = it->second;
-
-				if (bi->HasFlag(BI_PRIVATE))
-				{
-					source.Reply("   %-15s  (%s@%s)", bi->nick.c_str(), bi->GetIdent().c_str(), bi->host.c_str());
-					++count;
-				}
-			}
-		}
+		std::vector<Anope::string> replies;
+		list.Process(replies);
 
 		if (!count)
 			source.Reply(_("There are no bots available at this time.\n"
 					"Ask a Services Operator to create one!"));
 		else
-			source.Reply(_("%d bots available."), count);
+		{
+			source.Reply(_("Bot list:"));
 
-		return;
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("%d bots available."), count);
+		}
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Lists all available bots on this network."));
+		source.Reply(_("Lists all available bots on this network. Bots prefixed"
+				"by a * are reserved for IRC operators."));
 		return true;
 	}
 };

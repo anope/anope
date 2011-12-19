@@ -250,16 +250,27 @@ class CommandNSGList : public Command
 			source.Reply(nick.empty() ? NICK_NOT_REGISTERED : _(NICK_X_NOT_REGISTERED), nick.c_str());
 		else
 		{
-			source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
+			ListFormatter list;
+			list.addColumn("Nick").addColumn("Expires");
 			for (std::list<NickAlias *>::const_iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				NickAlias *na2 = *it;
 
-				source.Reply(na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire ? _("   %s (does not expire)") : _("   %s (expires in %s)"), na2->nick.c_str(), do_strftime(na2->last_seen + Config->NSExpire).c_str());
+				ListFormatter::ListEntry entry;
+				entry["Nick"] = na2->nick;
+				entry["Expires"] = (na2->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire) ? "Does not expire" : ("expires in " + do_strftime(na2->last_seen + Config->NSExpire));
+				list.addEntry(entry);
 			}
+
+			source.Reply(!nick.empty() ? _("List of nicknames in the group of \002%s\002:") : _("List of nicknames in your group:"), nc->display.c_str());
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+	
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
 			source.Reply(_("%d nicknames in the group."), nc->aliases.size());
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

@@ -30,12 +30,23 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		source.Reply(_("Certificate list for \002%s\002:"), nc->display.c_str());
+		ListFormatter list;
+		list.addColumn("Certificate");
+
 		for (unsigned i = 0, end = nc->cert.size(); i < end; ++i)
 		{
 			Anope::string fingerprint = nc->GetCert(i);
-			source.Reply("    %s", fingerprint.c_str());
+			ListFormatter::ListEntry entry;
+			entry["Certificate"] = fingerprint;
+			list.addEntry(entry);
 		}
+
+		source.Reply(_("Certificate list for \002%s\002:"), nc->display.c_str());
+
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 
 		return;
 	}
@@ -111,14 +122,21 @@ class CommandNSCert : public Command
 			return;
 		}
 
-		source.Reply(_("Cert list:"));
+		ListFormatter list;
+		list.addColumn("Certificate");
+
 		for (unsigned i = 0, end = nc->cert.size(); i < end; ++i)
 		{
-			Anope::string fingerprint = nc->GetCert(i);
-			source.Reply("    %s", fingerprint.c_str());
+			ListFormatter::ListEntry entry;
+			entry["Certificate"] = nc->GetCert(i);
+			list.addEntry(entry);
 		}
 
-		return;
+		source.Reply(_("Certificate list:"));
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
 	}
 
  public:

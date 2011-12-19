@@ -16,15 +16,14 @@
 class CommandNSInfo : public Command
 {
  private:
-	// cannot be const, as it is modified
-	void CheckOptStr(Anope::string &buf, NickCoreFlag opt, const Anope::string &str, NickCore *nc, bool reverse_logic = false)
+	template<typename T, unsigned END> void CheckOptStr(User *u, Anope::string &buf, T opt, const char *str, Flags<T, END> *nc, bool reverse_logic = false)
 	{
 		if (reverse_logic ? !nc->HasFlag(opt) : nc->HasFlag(opt))
 		{
 			if (!buf.empty())
 				buf += ", ";
 
-			buf += str;
+			buf += translate(u, str);
 		}
 	}
  public:
@@ -64,87 +63,86 @@ class CommandNSInfo : public Command
 
 			source.Reply(_("%s is %s"), na->nick.c_str(), na->last_realname.c_str());
 
+			if (na->nc->HasFlag(NI_UNCONFIRMED))
+				source.Reply(_("%s nickname is unconfirmed."), na->nick.c_str());
+
 			if (na->nc->IsServicesOper() && (show_hidden || !na->nc->HasFlag(NI_HIDE_STATUS)))
 				source.Reply(_("%s is a services operator of type %s."), na->nick.c_str(), na->nc->o->ot->GetName().c_str());
 
+			InfoFormatter info(u);
+
 			if (nick_online)
 			{
+				if (show_hidden && !na->last_realhost.empty())
+					info[_("Online from")] = na->last_realhost;
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					source.Reply(_("   Is online from: %s"), na->last_usermask.c_str());
+					info[_("Online from")] = na->last_usermask;
 				else
 					source.Reply(_("%s is currently online."), na->nick.c_str());
-
-				if (has_auspex && !na->last_realhost.empty())
-					source.Reply(_("   Is online from: %s"), na->last_realhost.c_str());
 			}
 			else
 			{
 				if (show_hidden || !na->nc->HasFlag(NI_HIDE_MASK))
-					source.Reply(_("Last seen address: %s"), na->last_usermask.c_str());
-				if (has_auspex && !na->last_realhost.empty())
-					source.Reply(_("Last seen address: %s"), na->last_realhost.c_str());
+					info[_("Last seen address")] = na->last_usermask;
+				if (show_hidden && !na->last_realhost.empty())
+					info[_("Last seen address")] = na->last_realhost;
 			}
 
-			source.Reply(_("  Time registered: %s"), do_strftime(na->time_registered).c_str());
+			info[_("Time registered")] = do_strftime(na->time_registered);
 
 			if (!nick_online)
-			{
-				source.Reply(_("   Last seen time: %s"), do_strftime(na->last_seen).c_str());
-			}
+				info[_("Last seen")] = do_strftime(na->last_seen);
 
 			if (!na->last_quit.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_QUIT)))
-				source.Reply(_("Last quit message: %s"), na->last_quit.c_str());
+				info[_("Last quit message")] = na->last_quit;
 
 			if (!na->nc->email.empty() && (show_hidden || !na->nc->HasFlag(NI_HIDE_EMAIL)))
-				source.Reply(_("   E-mail address: %s"), na->nc->email.c_str());
+				info[_("Email address")] = na->nc->email;
 
 			if (show_hidden)
 			{
 				if (na->hostinfo.HasVhost())
 				{
 					if (ircd->vident && !na->hostinfo.GetIdent().empty())
-						source.Reply(_("            vhost: %s@%s"), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+						info[_("VHost")] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
 					else
-						source.Reply(_("            vhost: %s"), na->hostinfo.GetHost().c_str());
+						info[_("VHost")] = na->hostinfo.GetHost();
 				}
+
 				if (!na->nc->greet.empty())
-					source.Reply(_("    Greet message: %s"), na->nc->greet.c_str());
+					info[_("Greet")] = na->nc->greet;
 
 				Anope::string optbuf;
 
-				CheckOptStr(optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
-				CheckOptStr(optbuf, NI_SECURE, _("Security"), na->nc);
-				CheckOptStr(optbuf, NI_PRIVATE, _("Private"), na->nc);
-				CheckOptStr(optbuf, NI_MSG, _("Message mode"), na->nc);
-				CheckOptStr(optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_KILLPROTECT, _("Protection"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_SECURE, _("Security"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_PRIVATE, _("Private"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_MSG, _("Message mode"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
+				CheckOptStr<NickNameFlag, NS_END>(u, optbuf, NS_NO_EXPIRE, _("No expire"), na);
 
-				source.Reply(_("          Options: %s"), optbuf.empty() ? _("None") : optbuf.c_str());
-
-				if (na->nc->HasFlag(NI_SUSPENDED))
-				{
-					if (!na->last_quit.empty())
-						source.Reply(_("This nickname is currently suspended, reason: %s"), na->last_quit.c_str());
-					else
-						source.Reply(_("This nickname is currently suspended"));
-				}
+				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;
 
 				if (na->nc->HasFlag(NI_UNCONFIRMED) == false)
 				{
 					if (na->HasFlag(NS_NO_EXPIRE) || !Config->NSExpire)
-						source.Reply(_("This nickname will not expire."));
+						;
 					else
-						source.Reply(_("Expires on: %s"), do_strftime(na->last_seen + Config->NSExpire).c_str());
+						info[_("Expires")] = do_strftime(na->last_seen + Config->NSExpire);
 				}
 				else
-					source.Reply(_("Expires on: %s"), do_strftime(na->time_registered + Config->NSUnconfirmedExpire).c_str());
+					info[_("Expires")] = do_strftime(na->time_registered + Config->NSUnconfirmedExpire);
 			}
 
-			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, show_hidden));
+			FOREACH_MOD(I_OnNickInfo, OnNickInfo(source, na, info, show_hidden));
 
-			if (na->nc->HasFlag(NI_UNCONFIRMED))
-				source.Reply(_("This nickname is unconfirmed."));
+			std::vector<Anope::string> replies;
+			info.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

@@ -271,14 +271,16 @@ class CommandHSReject : public Command
 	}
 };
 
-class HSListBase : public Command
+class CommandHSWaiting : public Command
 {
- protected:
 	void DoList(CommandSource &source)
 	{
 		int counter = 1;
 		int from = 0, to = 0;
 		unsigned display_counter = 0;
+		ListFormatter list;
+
+		list.addColumn("Number").addColumn("Nick").addColumn("Vhost").addColumn("Created");
 
 		for (nickalias_map::const_iterator it = NickAliasList.begin(), it_end = NickAliasList.end(); it != it_end; ++it)
 		{
@@ -290,25 +292,30 @@ class HSListBase : public Command
 			if (((counter >= from && counter <= to) || (!from && !to)) && display_counter < Config->NSListMax)
 			{
 				++display_counter;
+
+				ListFormatter::ListEntry entry;
+				entry["Number"] = stringify(counter);
+				entry["Nick"] = it->first;
 				if (!hr->ident.empty())
-					source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002@\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->ident.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
+					entry["Vhost"] = hr->ident + "@" + hr->host;
 				else
-					source.Reply(_("#%d Nick:\002%s\002, vhost:\002%s\002 (%s - %s)"), counter, it->first.c_str(), hr->host.c_str(), it->first.c_str(), do_strftime(hr->time).c_str());
+					entry["Vhost"] = hr->host;
+				entry["Created"] = do_strftime(hr->time);
+				list.addEntry(entry);
 			}
 			++counter;
 		}
 		source.Reply(_("Displayed all records (Count: \002%d\002)"), display_counter);
-	}
- public:
-	HSListBase(Module *creator, const Anope::string &cmd, int min, int max) : Command(creator, cmd, min, max)
-	{
-	}
-};
 
-class CommandHSWaiting : public HSListBase
-{
+		std::vector<Anope::string> replies;
+		list.Process(replies);
+
+		for (unsigned i = 0; i < replies.size(); ++i)
+			source.Reply(replies[i]);
+	}
+
  public:
-	CommandHSWaiting(Module *creator) : HSListBase(creator, "hostserv/waiting", 0, 0)
+	CommandHSWaiting(Module *creator) : Command(creator, "hostserv/waiting", 0, 0)
 	{
 		this->SetDesc(_("Retrieves the vhost requests"));
 		this->SetSyntax("");
@@ -339,7 +346,7 @@ class HSRequest : public Module
 
  public:
 	HSRequest(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		request_type("HSRequest", HostRequest::unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
+		request_type("HostRequest", HostRequest::unserialize), commandhsrequest(this), commandhsactive(this), commandhsreject(this), commandhswaiting(this)
 	{
 		this->SetAuthor("Anope");
 

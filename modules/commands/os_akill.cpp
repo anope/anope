@@ -54,82 +54,6 @@ class AkillDelCallback : public NumberList
 	}
 };
 
-class AkillListCallback : public NumberList
-{
- protected:
-	CommandSource &source;
-	bool SentHeader;
- public:
-	AkillListCallback(CommandSource &_source, const Anope::string &numlist) : NumberList(numlist, false), source(_source), SentHeader(false)
-	{
-	}
-
-	~AkillListCallback()
-	{
-		if (!SentHeader)
-			source.Reply(_("No matching entries on the AKILL list."));
-		else
-			source.Reply(END_OF_ANY_LIST, "Akill");
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number)
-			return;
-
-		XLine *x = akills->GetEntry(Number - 1);
-
-		if (!x)
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current AKILL list:\n"
-					"  Num   Mask                              Reason"));
-		}
-
-		DoList(source, x, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, XLine *x, unsigned Number)
-	{
-		source.Reply(OPER_LIST_FORMAT, Number + 1, x->Mask.c_str(), x->Reason.c_str());
-	}
-};
-
-class AkillViewCallback : public AkillListCallback
-{
- public:
-	AkillViewCallback(CommandSource &_source, const Anope::string &numlist) : AkillListCallback(_source, numlist)
-	{
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number)
-			return;
-
-		XLine *x = akills->GetEntry(Number - 1);
-
-		if (!x)
-			return;
-
-		if (!SentHeader)
-		{
-			SentHeader = true;
-			source.Reply(_("Current AKILL list:"));
-		}
-
-		DoList(source, x, Number - 1);
-	}
-
-	static void DoList(CommandSource &source, XLine *x, unsigned Number)
-	{
-		source.Reply(OPER_VIEW_FORMAT, Number + 1, x->Mask.c_str(), x->By.c_str(), do_strftime(x->Created).c_str(), expire_left(source.u->Account(), x->Expires).c_str(), x->Reason.c_str());
-	}
-};
-
 class CommandOSAKill : public Command
 {
  private:
@@ -288,6 +212,79 @@ class CommandOSAKill : public Command
 		return;
 	}
 
+	void ProcessList(CommandSource &source, const std::vector<Anope::string> &params, ListFormatter &list)
+	{
+		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+
+		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
+		{
+			class ListCallback : public NumberList
+			{
+				ListFormatter &list;
+			 public:
+				ListCallback(ListFormatter &_list, const Anope::string &numstr) : NumberList(numstr, false), list(_list)
+				{
+				}
+
+				void HandleNumber(unsigned number)
+				{
+					if (!number)
+						return;
+
+					XLine *x = akills->GetEntry(number - 1);
+
+					if (!x)
+						return;
+
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(number);
+					entry["Mask"] = x->Mask;
+					entry["Creator"] = x->By;
+					entry["Created"] = do_strftime(x->Created);
+					entry["Expires"] = expire_left(NULL, x->Expires);
+					entry["Reason"] = x->Reason;
+					this->list.addEntry(entry);
+				}
+			}
+			nl_list(list, mask);
+			nl_list.Process();
+		}
+		else
+		{
+			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
+			{
+				XLine *x = akills->GetEntry(i);
+
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
+				{
+					ListFormatter::ListEntry entry;
+					entry["Number"] = stringify(i + 1);
+					entry["Mask"] = x->Mask;
+					entry["Creator"] = x->By;
+					entry["Created"] = do_strftime(x->Created);
+					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
+					entry["Reason"] = x->Reason;
+					list.addEntry(entry);
+				}
+			}
+		}
+
+		if (list.isEmpty())
+			source.Reply(_("No matching entries on the AKILL list."));
+		else
+		{
+			source.Reply(_("Current akill list:"));
+		
+			std::vector<Anope::string> replies;
+			list.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
+
+			source.Reply(_("End of \2akill\2 list."));
+		}
+	}
+
 	void DoList(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		if (akills->GetList().empty())
@@ -296,41 +293,10 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("Reason");
 
-		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			AkillListCallback list(source, mask);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
-			{
-				XLine *x = akills->GetEntry(i);
-
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
-				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current AKILL list:\n"
-								"  Num   Mask                              Reason"));
-					}
-
-					AkillListCallback::DoList(source, x, i);
-				}
-			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on the AKILL list."));
-			else
-				source.Reply(END_OF_ANY_LIST, "Akill");
-		}
-
-		return;
+		this->ProcessList(source, params, list);
 	}
 
 	void DoView(CommandSource &source, const std::vector<Anope::string> &params)
@@ -341,38 +307,10 @@ class CommandOSAKill : public Command
 			return;
 		}
 
-		const Anope::string &mask = params.size() > 1 ? params[1] : "";
+		ListFormatter list;
+		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Reason");
 
-		if (!mask.empty() && isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
-		{
-			AkillViewCallback list(source, mask);
-			list.Process();
-		}
-		else
-		{
-			bool SentHeader = false;
-
-			for (unsigned i = 0, end = akills->GetCount(); i < end; ++i)
-			{
-				XLine *x = akills->GetEntry(i);
-
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
-				{
-					if (!SentHeader)
-					{
-						SentHeader = true;
-						source.Reply(_("Current AKILL list:"));
-					}
-
-					AkillViewCallback::DoList(source, x, i);
-				}
-			}
-
-			if (!SentHeader)
-				source.Reply(_("No matching entries on the AKILL list."));
-		}
-
-		return;
+		this->ProcessList(source, params, list);
 	}
 
 	void DoClear(CommandSource &source)
@@ -387,8 +325,6 @@ class CommandOSAKill : public Command
 		}
 
 		source.Reply(_("The AKILL list has been cleared."));
-
-		return;
 	}
  public:
 	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 4)

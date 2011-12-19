@@ -30,7 +30,6 @@
 #define NO_REASON			_("No reason")
 #define UNKNOWN				_("<unknown>")
 #define NO_EXPIRE			_("does not expire")
-#define END_OF_ANY_LIST			_("End of \002%s\002 list.")
 #define LIST_INCORRECT_RANGE		_("Incorrect range specified. The correct syntax is \002#\037from\037-\037to\037\002.")
 #define UNKNOWN_OPTION			_("Unknown option \002%s\002.\n" \
 						"Type %s%s HELP %s for more information.")
@@ -47,7 +46,6 @@
 #define NICK_SET_UNKNOWN_OPTION		_("Unknown SET option \002%s%s\002.")
 #define NICK_SET_DISPLAY_CHANGED	_("The new display is now \002%s\002.")
 #define NICK_LIST_SYNTAX		_("LIST \037pattern\037")
-#define LIST_HEADER			_("List of entries matching \002%s\002:")
 #define NICK_RECOVERED			_("User claiming your nick has been killed.\n" \
 						"\002%s%s RELEASE %s\002 to get it back before %s timeout.")
 #define NICK_REQUESTED			_("This nick has already been requested, please check your e-mail address for the pass code")
@@ -62,16 +60,8 @@
 #define CHAN_SETTING_UNSET		_("%s for %s unset.")
 #define CHAN_SET_MLOCK_DEPRECATED	_("MLOCK is deprecated. Use \002%s%s HELP MODE\002 instead.")
 #define CHAN_ACCESS_LEVEL_RANGE		_("Access level must be between %d and %d inclusive.")
-#define CHAN_ACCESS_LIST_HEADER		_("Access list for %s:\n" \
-						"  Num   Lev  Mask")
-#define CHAN_ACCESS_VIEW_AXS_FORMAT	_("  %3d  %4d  %s\n" \
-						"   by %s on %s, last seen %s")
-#define CHAN_AKICK_VIEW_FORMAT		_("%3d %s (by %s on %s)\n" \
-						"    %s")
 #define CHAN_INFO_HEADER		_("Information for channel \002%s\002:")
 #define CHAN_EXCEPTED			_("\002%s\002 matches an except on %s and cannot be banned until the except have been removed.")
-#define CHAN_LIST_ENTRY			_("%3d    %s\n" \
-						"  Added by %s on %s")
 #define MEMO_NEW_X_MEMO_ARRIVED		_("There is a new memo on channel %s.\n" \
 						"Type \002%s%s READ %s %d\002 to read it.")
 #define MEMO_NEW_MEMO_ARRIVED		_("You have a new memo from %s.\n" \
@@ -88,9 +78,6 @@
 #define BOT_ASSIGN_READONLY		_("Sorry, bot assignment is temporarily disabled.")
 #define ENABLED				_("Enabled")
 #define DISABLED			_("Disabled")
-#define OPER_LIST_FORMAT		_("  %3d   %-32s  %s")
-#define OPER_VIEW_FORMAT		_("%3d  %s (by %s on %s; %s)\n" \
-						"      %s")
 #define HOST_SET_ERROR			_("A vhost must be in the format of a valid hostmask.")
 #define HOST_SET_IDENT_ERROR		_("A vhost ident must be in the format of a valid ident")
 #define HOST_SET_TOOLONG		_("Error! The vhost is too long, please use a host shorter than %d characters.")

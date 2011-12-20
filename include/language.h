@@ -76,8 +76,6 @@
 #define BOT_NOT_ASSIGNED		_("You must assign a bot to the channel before using this command.")
 #define BOT_NOT_ON_CHANNEL		_("Bot is not on channel \002%s\002.")
 #define BOT_ASSIGN_READONLY		_("Sorry, bot assignment is temporarily disabled.")
-#define ENABLED				_("Enabled")
-#define DISABLED			_("Disabled")
 #define HOST_SET_ERROR			_("A vhost must be in the format of a valid hostmask.")
 #define HOST_SET_IDENT_ERROR		_("A vhost ident must be in the format of a valid ident")
 #define HOST_SET_TOOLONG		_("Error! The vhost is too long, please use a host shorter than %d characters.")

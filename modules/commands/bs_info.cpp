@@ -17,7 +17,7 @@
 class CommandBSInfo : public Command
 {
  private:
-	void send_bot_channels(CommandSource &source, BotInfo *bi)
+	void send_bot_channels(std::vector<Anope::string> &buffers, BotInfo *bi)
 	{
 		Anope::string buf;
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
@@ -26,19 +26,28 @@ class CommandBSInfo : public Command
 
 			if (ci->bi == bi)
 			{
-				if (buf.length() + ci->name.length() > 300)
+				buf += " " + ci->name + " ";
+				if (buf.length() > 300)
 				{
-					source.Reply("%s", buf.c_str());
+					buffers.push_back(buf);
 					buf.clear();
 				}
-				buf += " " + ci->name + " ";
 			}
 		}
-
 		if (!buf.empty())
-			source.Reply("%s", buf.c_str());
-		return;
+			buffers.push_back(buf);
 	}
+
+	void CheckOptStr(Anope::string &buf, BotServFlag flag, const char *option, Flags<BotServFlag> &flags, NickCore *nc)
+	{
+		if (flags.HasFlag(flag))
+		{
+			if (!buf.empty())
+				buf += ", ";
+			buf += translate(nc, option);
+		}
+	}
+
  public:
 	CommandBSInfo(Module *creator) : Command(creator, "botserv/info", 1, 1)
 	{
@@ -50,23 +59,34 @@ class CommandBSInfo : public Command
 	{
 		const Anope::string &query = params[0];
 
-		bool need_comma = false;
-		char buf[BUFSIZE], *end;
-
 		User *u = source.u;
 		BotInfo *bi = findbot(query);
 		ChannelInfo *ci;
+		InfoFormatter info(u);
+
 		if (bi)
 		{
 			source.Reply(_("Information for bot \002%s\002:"), bi->nick.c_str());
-			source.Reply(_("       Mask : %s@%s"), bi->GetIdent().c_str(), bi->host.c_str());
-			source.Reply(_("  Real name : %s"), bi->realname.c_str());
-			source.Reply(_("    Created : %s"), do_strftime(bi->created).c_str());
-			source.Reply(_("    Options : %s"), bi->HasFlag(BI_PRIVATE) ? _("Private") : _("None"));
-			source.Reply(_("    Used on : %d channel(s)"), bi->chancount);
+			info[_("Mask")] = bi->GetIdent() + "@" + bi->host;
+			info[_("Real name")] = bi->realname;
+			info[_("Created")] = do_strftime(bi->created);
+			info[_("Options")] = bi->HasFlag(BI_PRIVATE) ? _("Private") : _("None");
+			info[_("Used on")] = stringify(bi->chancount) + " channel(s)";
+
+			std::vector<Anope::string> replies;
+			info.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 
 			if (u->HasPriv("botserv/administration"))
-				this->send_bot_channels(source, bi);
+			{
+				std::vector<Anope::string> buf;
+				this->send_bot_channels(buf, bi);
+				for (unsigned i = 0; i < buf.size(); ++i)
+					source.Reply(buf[i]);
+			}
+
 		}
 		else if ((ci = cs_findchan(query)))
 		{
@@ -77,134 +97,128 @@ class CommandBSInfo : public Command
 			}
 
 			source.Reply(CHAN_INFO_HEADER, ci->name.c_str());
-			if (ci->bi)
-				source.Reply(_("           Bot nick : %s"), ci->bi->nick.c_str());
-			else
-				source.Reply(_("           Bot nick : not assigned yet."));
+			info[_("Bot nick")] = ci->bi ? ci->bi->nick : "not assigned yet";
+
+			Anope::string enabled = translate(u, _("Enabled"));
+			Anope::string disabled = translate(u, _("Disabled"));
 
 			if (ci->botflags.HasFlag(BS_KICK_BADWORDS))
 			{
 				if (ci->ttb[TTB_BADWORDS])
-					source.Reply(_("   Bad words kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_BADWORDS]);
+					info[_("Bad words kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), ci->ttb[TTB_BADWORDS]);
 				else
-					source.Reply(_("   Bad words kicker : %s"), ENABLED);
+					info[_("Bad words kicker")] = enabled;
 			}
 			else
-				source.Reply(_("   Bad words kicker : %s"), DISABLED);
+				info[_("Bad words kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_BOLDS))
 			{
 				if (ci->ttb[TTB_BOLDS])
-					source.Reply(_("       Bolds kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_BOLDS]);
+					info[_("Bolds kicker")] = Anope::printf("%s (%d kick(s) to ban)", enabled.c_str(), ci->ttb[TTB_BOLDS]);
 				else
-					source.Reply(_("       Bolds kicker : %s"), ENABLED);
+					info[_("Bolds kicker")] = enabled;
 			}
 			else
-				source.Reply(_("       Bolds kicker : %s"), DISABLED);
+				info[_("Bolds kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_CAPS))
 			{
 				if (ci->ttb[TTB_CAPS])
-					source.Reply(_("        Caps kicker : %s (%d kick(s) to ban; minimum %d/%d%%)"), ENABLED, ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
+					info[_("Caps kicker")] = Anope::printf(_("%s (%d kick(s) to ban; minimum %d/%d%%"), enabled.c_str(), ci->ttb[TTB_CAPS], ci->capsmin, ci->capspercent);
 				else
-					source.Reply(_("        Caps kicker : %s (minimum %d/%d%%)"), ENABLED, ci->capsmin, ci->capspercent);
+					info[_("Caps kicker")] = Anope::printf(_("%s (minimum %d/%d%%)"), enabled.c_str(), ci->capsmin, ci->capspercent);
 			}
 			else
-				source.Reply(_("        Caps kicker : %s"), DISABLED);
+				info[_("Caps kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_COLORS))
 			{
 				if (ci->ttb[TTB_COLORS])
-					source.Reply(_("      Colors kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_COLORS]);
+					info[_("Colors kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_COLORS]);
 				else
-					source.Reply(_("      Colors kicker : %s"), ENABLED);
+					info[_("Colors kicker")] = enabled;
 			}
 			else
-				source.Reply(_("      Colors kicker : %s"), DISABLED);
+				info[_("Colors kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_FLOOD))
 			{
 				if (ci->ttb[TTB_FLOOD])
-					source.Reply(_("       Flood kicker : %s (%d kick(s) to ban; %d lines in %ds)"), ENABLED, ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
+					info[_("Flood kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d lines in %ds"), enabled.c_str(), ci->ttb[TTB_FLOOD], ci->floodlines, ci->floodsecs);
 				else
-					source.Reply(_("       Flood kicker : %s (%d lines in %ds)"), ENABLED, ci->floodlines, ci->floodsecs);
+					info[_("Flood kicker")] = Anope::printf(_("%s (%d lines in %ds)"), enabled.c_str(), ci->floodlines, ci->floodsecs);
 			}
 			else
-				source.Reply(_("       Flood kicker : %s"), DISABLED);
+				info[_("Flood kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_REPEAT))
 			{
 				if (ci->ttb[TTB_REPEAT])
-					source.Reply(_("      Repeat kicker : %s (%d kick(s) to ban; %d times)"), ENABLED, ci->ttb[TTB_REPEAT], ci->repeattimes);
+					info[_("Repeat kicker")] = Anope::printf(_("%s (%d kick(s) to ban; %d times)"), enabled.c_str(), ci->ttb[TTB_REPEAT], ci->repeattimes);
 				else
-					source.Reply(_("      Repeat kicker : %s (%d times)"), ENABLED, ci->repeattimes);
+					info[_("Repeat kicker")] = Anope::printf(_("%s (%d times)"), enabled.c_str(), ci->repeattimes);
 			}
 			else
-				source.Reply(_("      Repeat kicker : %s"), DISABLED);
+				info[_("Repeat kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_REVERSES))
 			{
 				if (ci->ttb[TTB_REVERSES])
-					source.Reply(_("    Reverses kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_REVERSES]);
+					info[_("Reverses kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_REVERSES]);
 				else
-					source.Reply(_("    Reverses kicker : %s"), ENABLED);
+					info[_("Reverses kicker")] = enabled;
 			}
 			else
-				source.Reply(_("    Reverses kicker : %s"), DISABLED);
+				info[_("Reverses kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_UNDERLINES))
 			{
 				if (ci->ttb[TTB_UNDERLINES])
-					source.Reply(_("  Underlines kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_UNDERLINES]);
+					info[_("Underlines kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_UNDERLINES]);
 				else
-					source.Reply(_("  Underlines kicker : %s"), ENABLED);
+					info[_("Underlines kicker")] = enabled;
 			}
 			else
-				source.Reply(_("  Underlines kicker : %s"), DISABLED);
+				info[_("Underlines kicker")] = disabled;
+
                         if (ci->botflags.HasFlag(BS_KICK_ITALICS))
 			{
 				if (ci->ttb[TTB_ITALICS])
-					source.Reply(_("     Italics kicker : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_ITALICS]);
+					info[_("Italics kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_ITALICS]);
 				else
-					source.Reply(_("     Italics kicker : %s"), ENABLED);
+					info[_("Italics kicker")] = enabled;
 			}
 			else
-				source.Reply(_("     Italics kicker : %s"), DISABLED);
+				info[_("Italics kicker")] = disabled;
+
 			if (ci->botflags.HasFlag(BS_KICK_AMSGS))
 			{
 				if (ci->ttb[TTB_AMSGS])
-					source.Reply(_("     AMSG kicker    : %s (%d kick(s) to ban)"), ENABLED, ci->ttb[TTB_AMSGS]);
+					info[_("AMSG kicker")] = Anope::printf(_("%s (%d kick(s) to ban)"), enabled.c_str(), ci->ttb[TTB_AMSGS]);
 				else
-					source.Reply(_("     AMSG kicker    : %s"), ENABLED);
+					info[_("AMSG kicker")] = enabled;
 			}
 			else
-				source.Reply(_("     AMSG kicker    : %s"), DISABLED);
+				info[_("AMSG kicker")] = disabled;
 
-			end = buf;
-			*end = 0;
-			if (ci->botflags.HasFlag(BS_DONTKICKOPS))
-			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s",  _("Ops protection"));
-				need_comma = true;
-			}
-			if (ci->botflags.HasFlag(BS_DONTKICKVOICES))
-			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "",  _("Voices protection"));
-				need_comma = true;
-			}
-			if (ci->botflags.HasFlag(BS_FANTASY))
-			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("Fantasy"));
-				need_comma = true;
-			}
-			if (ci->botflags.HasFlag(BS_GREET))
-			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("Greet"));
-				need_comma = true;
-			}
-			if (ci->botflags.HasFlag(BS_NOBOT))
-			{
-				end += snprintf(end, sizeof(buf) - (end - buf), "%s%s", need_comma ? ", " : "", _("No bot"));
-				need_comma = true;
-			}
-			source.Reply(_("            Options : %s"), *buf ? buf : _("None"));
+			Anope::string flags;
+			CheckOptStr(flags, BS_DONTKICKOPS, _("Ops protection"), ci->botflags, u->Account());
+			CheckOptStr(flags, BS_DONTKICKVOICES, _("Voices protection"), ci->botflags, u->Account());
+			CheckOptStr(flags, BS_FANTASY, _("Fantasy"), ci->botflags, u->Account());
+			CheckOptStr(flags, BS_GREET, _("Greet"), ci->botflags, u->Account());
+			CheckOptStr(flags, BS_NOBOT, _("No bot"), ci->botflags, u->Account());
+
+			info[_("Options")] = flags.empty() ? _("None") : flags;
+
+			std::vector<Anope::string> replies;
+			info.Process(replies);
+
+			for (unsigned i = 0; i < replies.size(); ++i)
+				source.Reply(replies[i]);
 		}
 		else
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());
-		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)

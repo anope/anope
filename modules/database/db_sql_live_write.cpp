@@ -1,178 +1,117 @@
 #include "module.h"
 #include "../extra/sql.h"
+#include "../commands/os_session.h"
 
-class SQLCache : public Timer
+class MySQLInterface : public SQLInterface
 {
-	typedef std::map<Anope::string, time_t, ci::less> cache_map;
-	cache_map cache;
  public:
+	MySQLInterface(Module *o) : SQLInterface(o) { }
 
-	SQLCache() : Timer(300, Anope::CurTime, true) { }
-
-	bool Check(const Anope::string &item)
+	void OnResult(const SQLResult &r)
 	{
-		cache_map::iterator it = this->cache.find(item);
-		if (it != this->cache.end() && Anope::CurTime - it->second < 5)
-			return true;
-
-		this->cache[item] = Anope::CurTime;
-		return false;
+		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
 	}
 
-	void Tick(time_t)
+	void OnError(const SQLResult &r)
 	{
-		for (cache_map::iterator it = this->cache.begin(), next_it; it != this->cache.end(); it = next_it)
-		{
-			next_it = it;
-			++next_it;
-
-			if (Anope::CurTime - it->second > 5)
-				this->cache.erase(it);
-		}
+		if (!r.GetQuery().query.empty())
+			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
+		else
+			Log(LOG_DEBUG) << "Error executing query: " << r.GetError();
 	}
 };
 
-static void ChanInfoUpdate(const Anope::string &name, const SQLResult &res)
+class DBMySQL : public Module
 {
-	ChannelInfo *ci = cs_findchan(name);
-	if (res.Rows() == 0)
-	{
-		delete ci;
-		return;
-	}
-
-	try
-	{
-		if (!ci)
-			ci = new ChannelInfo(name);
-		ci->SetFounder(findcore(res.Get(0, "founder")));
-		ci->successor = findcore(res.Get(0, "successor"));
-		ci->desc = res.Get(0, "description");
-		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-		ci->ClearFlags();
-		ci->FromString(res.Get(0, "flags"));
-		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
-		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
-
-		if (res.Get(0, "bi").equals_cs(ci->bi ? ci->bi->nick : "") == false)
-		{
-			if (ci->bi)
-				ci->bi->UnAssign(NULL, ci);
-			BotInfo *bi = findbot(res.Get(0, "bi"));
-			if (bi)
-				bi->Assign(NULL, ci);
-		}
-
-		ci->capsmin = convertTo<int16_t>(res.Get(0, "capsmin"));
-		ci->capspercent = convertTo<int16_t>(res.Get(0, "capspercent"));
-		ci->floodlines = convertTo<int16_t>(res.Get(0, "floodlines"));
-		ci->floodsecs = convertTo<int16_t>(res.Get(0, "floodsecs"));
-		ci->repeattimes = convertTo<int16_t>(res.Get(0, "repeattimes"));
-
-		if (ci->c)
-			check_modes(ci->c);
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
-static void NickInfoUpdate(const Anope::string &name, const SQLResult &res)
-{
-	NickAlias *na = findnick(name);
-	if (res.Rows() == 0)
-	{
-		delete na;
-		return;
-	}
-
-	try
-	{
-		NickCore *nc = findcore(res.Get(0, "nick"));
-		if (!nc)
-			return;
-		if (!na)
-			na = new NickAlias(name, nc);
-
-		na->last_quit = res.Get(0, "last_quit");
-		na->last_realname = res.Get(0, "last_realname");
-		na->last_usermask = res.Get(0, "last_usermask");
-		na->last_realhost = res.Get(0, "last_realhost");
-		na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-		na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
-		na->ClearFlags();
-		na->FromString(res.Get(0, "flags"));
-
-		if (na->nc != nc)
-		{
-			std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
-			if (it != na->nc->aliases.end())
-				na->nc->aliases.erase(it);
-
-			na->nc = nc;
-			na->nc->aliases.push_back(na);
-		}
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
-static void NickCoreUpdate(const Anope::string &name, const SQLResult &res)
-{
-	NickCore *nc = findcore(name);
-	if (res.Rows() == 0)
-	{
-		delete nc;
-		return;
-	}
-
-	try
-	{
-		if (!nc)
-			nc = new NickCore(name);
-
-		nc->pass = res.Get(0, "pass");
-		nc->email = res.Get(0, "email");
-		nc->greet = res.Get(0, "greet");
-		nc->ClearFlags();
-		nc->FromString(res.Get(0, "flags"));
-		nc->language = res.Get(0, "language");
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
-class MySQLLiveModule : public Module
-{
+ private:
+	MySQLInterface sqlinterface;
 	service_reference<SQLProvider, Base> SQL;
+ 	std::set<Anope::string> tables;
 
-	SQLCache chan_cache, nick_cache, core_cache;
-
-	SQLResult RunQuery(const SQLQuery &query)
+	void RunQuery(const SQLQuery &query)
 	{
-		if (!this->SQL)
-			throw SQLException("Unable to locate SQL reference, is db_sql loaded and configured correctly?");
+		if (SQL)
+		{
+			if (readonly && this->ro)
+			{
+				readonly = this->ro = false;
+				BotInfo *bi = findbot(Config->OperServ);
+				if (bi)
+					ircdproto->SendGlobops(bi, "Found SQL again, going out of readonly mode...");
+			}
 
-		SQLResult res = SQL->RunQuery(query);
-		if (!res.GetError().empty())
-			throw SQLException(res.GetError());
-		return res;
+			SQL->Run(&sqlinterface, query);
+		}
+		else
+		{
+			if (Anope::CurTime - Config->UpdateTimeout > lastwarn)
+			{
+				BotInfo *bi = findbot(Config->OperServ);
+				if (bi)
+					ircdproto->SendGlobops(bi, "Unable to locate SQL reference, going to readonly...");
+				readonly = this->ro = true;
+				this->lastwarn = Anope::CurTime;
+			}
+		}
+	}
+
+	void Insert(const Anope::string &table, const Serializable::serialized_data &data)
+	{
+		if (tables.count(table) == 0 && SQL)
+		{
+			this->RunQuery(this->SQL->CreateTable(table, data));
+			tables.insert(table);
+		}
+
+		Anope::string query_text = "INSERT INTO `" + table + "` (";
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query_text += "`" + it->first + "`,";
+		query_text.erase(query_text.end() - 1);
+		query_text += ") VALUES (";
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query_text += "@" + it->first + "@,";
+		query_text.erase(query_text.end() - 1);
+		query_text += ") ON DUPLICATE KEY UPDATE ";
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query_text += it->first + "=VALUES(" + it->first + "),";
+		query_text.erase(query_text.end() - 1);
+
+		SQLQuery query(query_text);
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query.setValue(it->first, it->second.astr());
+
+		this->RunQuery(query);
+	}
+
+	void Delete(const Anope::string &table, const Serializable::serialized_data &data)
+	{
+		Anope::string query_text = "DELETE FROM `" + table + "` WHERE ";
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query_text += "`" + it->first + "` = @" + it->first + "@";
+
+		SQLQuery query(query_text);
+		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
+			query.setValue(it->first, it->second.astr());
+
+		this->RunQuery(query);
 	}
 
  public:
-	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, DATABASE), SQL("")
+	time_t lastwarn;
+	bool ro;
+
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("")
 	{
-		Implementation i[] = { I_OnReload, I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
+		this->lastwarn = 0;
+		this->ro = false;
+
+		Implementation i[] = { I_OnReload, I_OnServerConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
+
+		OnReload();
+
+		if (CurrentUplink)
+			OnServerConnect();
 	}
 
 	void OnReload()
@@ -182,66 +121,314 @@ class MySQLLiveModule : public Module
 		this->SQL = engine;
 	}
 
-	void OnShutdown()
+	void OnServerConnect()
 	{
-		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore };
-		for (size_t j = 0; j < 3; ++j)
-			ModuleManager::Detach(i[j], this);
+		Implementation i[] = {
+			/* Misc */
+			I_OnPostCommand,
+			/* NickServ */
+			I_OnNickAddAccess, I_OnNickEraseAccess, I_OnNickClearAccess,
+			I_OnDelCore, I_OnNickForbidden, I_OnNickGroup,
+			I_OnNickRegister, I_OnChangeCoreDisplay,
+			I_OnNickSuspended, I_OnDelNick,
+			/* ChanServ */
+			I_OnAccessAdd, I_OnAccessDel, I_OnAccessClear, I_OnLevelChange,
+			I_OnDelChan, I_OnChanRegistered, I_OnChanSuspend,
+			I_OnAkickAdd, I_OnAkickDel, I_OnMLock, I_OnUnMLock,
+			/* BotServ */
+			I_OnBotCreate, I_OnBotChange, I_OnBotDelete,
+			I_OnBotAssign, I_OnBotUnAssign,
+			I_OnBadWordAdd, I_OnBadWordDel,
+			/* MemoServ */
+			I_OnMemoSend, I_OnMemoDel,
+			/* OperServ */
+			I_OnExceptionAdd, I_OnExceptionDel,
+			I_OnAddXLine, I_OnDelXLine,
+			/* HostServ */
+			I_OnSetVhost, I_OnDeleteVhost
+		};
+		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnFindChan(const Anope::string &chname)
+	void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
 	{
-		if (chan_cache.Check(chname))
-			return;
+		User *u = source.u;
 
-		try
+		if (command->name.find("nickserv/set/") == 0)
 		{
-			SQLQuery query("SELECT * FROM `ChannelInfo` WHERE `name` = @name@");
-			query.setValue("name", chname);
-			SQLResult res = this->RunQuery(query);
-			ChanInfoUpdate(chname, res);
+			NickAlias *na = findnick(source.u->nick);
+			if (!na)
+				this->Insert(na->nc->serialize_name(), na->nc->serialize());
+
 		}
-		catch (const SQLException &ex)
+		else if (command->name.find("nickserv/saset/") == 0)
 		{
-			Log(LOG_DEBUG) << "OnFindChan: " << ex.GetReason();
+			NickAlias *na = findnick(params[0]);
+			if (!na)
+				this->Insert(na->nc->serialize_name(), na->nc->serialize());
+		}
+		else if (command->name.find("chanserv/set") == 0 || command->name.find("chanserv/saset") == 0)
+		{
+			ChannelInfo *ci = params.size() > 0 ? cs_findchan(params[0]) : NULL;
+			if (!ci)
+				this->Insert(ci->serialize_name(), ci->serialize());
+		}
+		else if (command->name == "botserv/kick" && params.size() > 2)
+		{
+			ChannelInfo *ci = cs_findchan(params[0]);
+			if (!ci)
+				return;
+			if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
+				return;
+			this->Insert(ci->serialize_name(), ci->serialize());
+		}
+		else if (command->name == "botserv/set" && params.size() > 1)
+		{
+			ChannelInfo *ci = cs_findchan(params[0]);
+			BotInfo *bi = NULL;
+			if (!ci)
+				bi = findbot(params[0]);
+			if (bi && params[1].equals_ci("PRIVATE") && u->HasPriv("botserv/set/private"))
+				this->Insert(bi->serialize_name(), bi->serialize());
+			else if (ci && !ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("botserv/administration"))
+				this->Insert(ci->serialize_name(), ci->serialize());
+		}
+		else if (command->name == "memoserv/ignore" && params.size() > 0)
+		{
+			Anope::string target = params[0];
+			if (target[0] != '#')
+			{
+				NickCore *nc = u->Account();
+				if (nc)
+					this->Insert(nc->serialize_name(), nc->serialize());
+			}
+			else
+			{
+				ChannelInfo *ci = cs_findchan(target);
+				if (ci && ci->AccessFor(u).HasPriv("MEMO"))
+					this->Insert(ci->serialize_name(), ci->serialize());
+			}
 		}
 	}
 
-	void OnFindNick(const Anope::string &nick)
+	void OnNickAddAccess(NickCore *nc, const Anope::string &entry)
 	{
-		if (nick_cache.Check(nick))
-			return;
+		this->Insert(nc->serialize_name(), nc->serialize());
+	}
 
-		try
+	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry)
+	{
+		this->Insert(nc->serialize_name(), nc->serialize());
+	}
+
+	void OnNickClearAccess(NickCore *nc)
+	{
+		this->Insert(nc->serialize_name(), nc->serialize());
+	}
+
+	void OnDelCore(NickCore *nc)
+	{
+		this->Delete(nc->serialize_name(), nc->serialize());
+	}
+
+	void OnNickForbidden(NickAlias *na)
+	{
+		this->Insert(na->serialize_name(), na->serialize());
+	}
+
+	void OnNickGroup(User *u, NickAlias *)
+	{
+		OnNickRegister(findnick(u->nick));
+	}
+
+	void InsertAlias(NickAlias *na)
+	{
+		this->Insert(na->serialize_name(), na->serialize());
+	}
+
+	void InsertCore(NickCore *nc)
+	{
+		this->Insert(nc->serialize_name(), nc->serialize());
+	}
+
+	void OnNickRegister(NickAlias *na)
+	{
+		this->InsertCore(na->nc);
+		this->InsertAlias(na);
+	}
+
+	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
+	{
+		Serializable::serialized_data data = nc->serialize();
+		this->Delete(nc->serialize_name(), data);
+		data.erase("display");
+		data["display"] << newdisplay;
+		this->Insert(nc->serialize_name(), data);
+
+		for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 		{
-			SQLQuery query("SELECT * FROM `NickAlias` WHERE `nick` = @nick@");
-			query.setValue("nick", nick);
-			SQLResult res = this->RunQuery(query);
-			NickInfoUpdate(nick, res);
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << "OnFindNick: " << ex.GetReason();
+			NickAlias *na = *it;
+			data = na->serialize();
+
+			this->Delete(na->serialize_name(), data);
+			data.erase("nc");
+			data["nc"] << newdisplay;
+			this->Insert(na->serialize_name(), data);
 		}
 	}
 
-	void OnFindCore(const Anope::string &nick)
+	void OnNickSuspend(NickAlias *na)
 	{
-		if (core_cache.Check(nick))
-			return;
+		this->Insert(na->serialize_name(), na->serialize());
+	}
 
-		try
-		{
-			SQLQuery query("SELECT * FROM `NickCore` WHERE `display` = @display@");
-			query.setValue("display", nick);
-			SQLResult res = this->RunQuery(query);
-			NickCoreUpdate(nick, res);
-		}
-		catch (const SQLException &ex)
-		{
-			Log(LOG_DEBUG) << "OnFindCore: " << ex.GetReason();
-		}
+	void OnDelNick(NickAlias *na)
+	{
+		this->Delete(na->serialize_name(), na->serialize());
+	}
+
+	void OnAccessAdd(ChannelInfo *ci, User *, ChanAccess *access)
+	{
+		this->Insert(access->serialize_name(), access->serialize());
+	}
+
+	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
+	{
+		this->Delete(access->serialize_name(), access->serialize());
+	}
+
+	void OnAccessClear(ChannelInfo *ci, User *u)
+	{
+		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
+			this->OnAccessDel(ci, NULL, ci->GetAccess(i));
+	}
+
+	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what)
+	{
+		this->Insert(ci->serialize_name(), ci->serialize());
+	}
+
+	void OnDelChan(ChannelInfo *ci)
+	{
+		this->Delete(ci->serialize_name(), ci->serialize());
+	}
+
+	void OnChanRegistered(ChannelInfo *ci)
+	{
+		this->Insert(ci->serialize_name(), ci->serialize());
+	}
+
+	void OnChanSuspend(ChannelInfo *ci)
+	{
+		this->Insert(ci->serialize_name(), ci->serialize());
+	}
+
+	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
+	{
+		this->Insert(ak->serialize_name(), ak->serialize());
+	}
+
+	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
+	{
+		this->Delete(ak->serialize_name(), ak->serialize());
+	}
+
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock)
+	{
+		this->Insert(lock->serialize_name(), lock->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock)
+	{
+		this->Delete(lock->serialize_name(), lock->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	void OnBotCreate(BotInfo *bi)
+	{
+		this->Insert(bi->serialize_name(), bi->serialize());
+	}
+
+	void OnBotChange(BotInfo *bi)
+	{
+		OnBotCreate(bi);
+	}
+
+	void OnBotDelete(BotInfo *bi)
+	{
+		this->Delete(bi->serialize_name(), bi->serialize());
+	}
+
+	EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi)
+	{
+		this->Insert(ci->serialize_name(), ci->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci)
+	{
+		this->Insert(ci->serialize_name(), ci->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
+	{
+		this->Insert(bw->serialize_name(), bw->serialize());
+	}
+
+	void OnBadWordDel(ChannelInfo *ci, BadWord *bw)
+	{
+		this->Delete(bw->serialize_name(), bw->serialize());
+	}
+
+	void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m)
+	{
+		this->Insert(m->serialize_name(), m->serialize());
+	}
+
+	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
+	{
+		this->Delete(m->serialize_name(), m->serialize());
+	}
+
+	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m)
+	{
+		this->Delete(m->serialize_name(), m->serialize());
+	}
+
+	EventReturn OnExceptionAdd(Exception *ex)
+	{
+		this->Insert(ex->serialize_name(), ex->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	void OnExceptionDel(User *, Exception *ex)
+	{
+		this->Delete(ex->serialize_name(), ex->serialize());
+	}
+
+	EventReturn OnAddXLine(XLine *x, XLineManager *xlm)
+	{
+		this->Insert(x->serialize_name(), x->serialize());
+		return EVENT_CONTINUE;
+	}
+
+	void OnDelXLine(User *, XLine *x, XLineManager *xlm)
+	{
+		this->Delete(x->serialize_name(), x->serialize());
+	}
+
+	void OnDeleteVhost(NickAlias *na)
+	{
+		this->Insert(na->serialize_name(), na->serialize());
+	}
+
+	void OnSetVhost(NickAlias *na)
+	{
+		this->Insert(na->serialize_name(), na->serialize());
 	}
 };
 
-MODULE_INIT(MySQLLiveModule)
+MODULE_INIT(DBMySQL)
+

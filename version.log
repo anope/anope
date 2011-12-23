@@ -6,9 +6,14 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="8"
-VERSION_PATCH="7"
-VERSION_EXTRA=""
-VERSION_BUILD="3089"
+VERSION_PATCH="8"
+VERSION_EXTRA="-git"
+VERSION_BUILD="3090"
+
+# Changes since 1.8.7 Release
+
+
+
 
 # Leading up to 1.8.7 Release
 #Revision 3088 - Implemented API support for the SVSJOIN and SVSPART commands on UltimateIRCd 3.

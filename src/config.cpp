@@ -1257,7 +1257,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"botserv", "smartjoin", "no", new ValueContainerBool(&conf->BSSmartJoin), DT_BOOLEAN, NoValidation},
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&conf->BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&conf->BSCaseSensitive), DT_BOOLEAN, NoValidation},
-		{"botserv", "fantasycharacter", "!", new ValueContainerString(&conf->BSFantasyCharacter), DT_STRING, NoValidation},
+		{"botserv", "fantasycharacter", "!", new ValueContainerString(&conf->BSFantasyCharacter), DT_STRING | DT_ALLOW_EMPTY, NoValidation},
 		{"operserv", "name", "", new ValueContainerString(&conf->OperServ), DT_STRING, NoValidation},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&conf->SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&conf->AutokillExpiry), DT_TIME, ValidateOperServ},
@@ -1389,16 +1389,21 @@ void ServerConfig::Read()
 			for (int valuenum = 0; !configitems.MultiValues[Index].items[valuenum].empty(); ++valuenum)
 			{
 				int dt = configitems.MultiValues[Index].datatype[valuenum];
-				bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
+				bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD, allow_empty = dt & DT_ALLOW_EMPTY;
 				dt &= ~DT_ALLOW_NEWLINE;
 				dt &= ~DT_ALLOW_WILD;
 				dt &= ~DT_NORELOAD;
+				dt &= ~DT_ALLOW_EMPTY;
 
 				ConfigDataHash &hash = (noreload && Config ? Config->config_data : this->config_data);
 				Anope::string item;
 				bool has_value = ConfValue(hash, configitems.MultiValues[Index].tag, configitems.MultiValues[Index].items[valuenum], configitems.MultiValues[Index].items_default[valuenum], tagnum, item, allow_newlines);
 				if (defines.count(item) > 0)
 					item = defines[item];
+
+				if (has_value && item.empty() && !allow_empty)
+					throw ConfigException("Item without value: " + configitems.MultiValues[Index].tag + ":" + configitems.MultiValues[Index].items[valuenum]);
+
 				switch (dt)
 				{
 					case DT_NOSPACES:
@@ -1479,15 +1484,20 @@ void ServerConfig::Read()
 	{
 		Anope::string item;
 		int dt = configitems.Values[Index].datatype;
-		bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
+		bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD, allow_empty = dt & DT_ALLOW_EMPTY;
 		dt &= ~DT_ALLOW_NEWLINE;
 		dt &= ~DT_ALLOW_WILD;
 		dt &= ~DT_NORELOAD;
+		dt &= ~DT_ALLOW_EMPTY;
 
 		ConfigDataHash &hash = (noreload && Config ? Config->config_data : this->config_data);
-		ConfValue(hash, configitems.Values[Index].tag, configitems.Values[Index].value, configitems.Values[Index].default_value, 0, item, allow_newlines);
+		bool has_value = ConfValue(hash, configitems.Values[Index].tag, configitems.Values[Index].value, configitems.Values[Index].default_value, 0, item, allow_newlines);
 		if (defines.count(item) > 0)
 			item = defines[item];
+
+		if (has_value && item.empty() && !allow_empty)
+			throw ConfigException("Item without value: " + configitems.Values[Index].tag + ":" + configitems.Values[Index].value);
+
 		ValueItem vi(item);
 
 		if (!configitems.Values[Index].validation_function(this, configitems.Values[Index].tag, configitems.Values[Index].value, vi))
@@ -1704,11 +1714,6 @@ void ServerConfig::LoadConf(ConfigurationFile &file)
 				in_word = false;
 				if (!itemname.empty())
 				{
-					if (wordbuffer.empty())
-					{
-						file.Close();
-						throw ConfigException("Item without value: " + file.GetName() + ":" + stringify(linenumber));
-					}
 					Log(LOG_DEBUG) << "ln " << linenumber << " EOL: s='" << section << "' '" << itemname << "' set to '" << wordbuffer << "'";
 					sectiondata.push_back(KeyVal(itemname, wordbuffer));
 					wordbuffer.clear();

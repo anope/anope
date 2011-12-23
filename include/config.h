@@ -41,7 +41,8 @@ enum ConfigDataType
 	DT_TIME, // Time value
 	DT_NORELOAD = 32, // Item can't be reloaded after startup
 	DT_ALLOW_WILD = 64, // Allow wildcards/CIDR in DT_IPADDRESS
-	DT_ALLOW_NEWLINE = 128 // New line characters allowed in DT_STRING
+	DT_ALLOW_NEWLINE = 128, // New line characters allowed in DT_STRING
+	DT_ALLOW_EMPTY = 256 // Allow empty value
 };
 
 /** Holds a config value, either string, integer or boolean.

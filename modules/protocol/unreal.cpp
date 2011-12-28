@@ -197,13 +197,14 @@ class UnrealIRCdProto : public IRCDProto
 		   NOQUIT = No Quit
 		   TKLEXT = Extended TKL we don't use it but best to have it
 		   SJB64  = Base64 encoded time stamps
+		   ESVID  = Allows storing account names as services stamp
 		   VL     = Version Info
 		   NS     = Config->Numeric Server
 		*/
 		if (!Config->Numeric.empty())
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT VL";
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID VL";
 		else
-			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT";
+			UplinkSocket::Message() << "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT ESVID";
 		UplinkSocket::Message() << "PASS :" << Config->Uplinks[CurrentUplink]->password;
 		SendServer(Me);
 	}
@@ -305,7 +306,10 @@ class UnrealIRCdProto : public IRCDProto
 			return;
 
 		BotInfo *ns = findbot(Config->NickServ);
-		ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
+		if (Capab.count("ESVID") > 0)
+			ircdproto->SendMode(ns, u, "+d %s", u->Account()->display.c_str());
+		else
+			ircdproto->SendMode(ns, u, "+d %d", u->timestamp);
 	}
 
 	void SendLogout(User *u)
@@ -523,9 +527,19 @@ class Unreal32IRCdMessage : public IRCdMessage
 			User *user = do_nick(source, params[0], params[3], params[4], params[5], params[10], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, ip.addr(), vhost, "", params[7]);
 			if (user)
 			{
-				NickAlias *na = findnick(user->nick);
+				NickAlias *na = NULL;
 
-				if (na && user->timestamp == convertTo<time_t>(params[6]))
+				if (params[6].is_pos_number_only())
+				{
+					if (convertTo<time_t>(params[6]) == user->timestamp)
+						na = findnick(user->nick);
+				}
+				else if (params[6] != "*")
+				{
+					na = findnick(params[6]);
+				}
+
+				if (na)
 				{
 					user->Login(na->nc);
 					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
@@ -545,9 +559,19 @@ class Unreal32IRCdMessage : public IRCdMessage
 			User *user = do_nick(source, params[0], params[3], params[4], params[5], params[9], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, "", vhost, "", params[7]);
 			if (user)
 			{
-				NickAlias *na = findnick(user->nick);
+				NickAlias *na = NULL;
 
-				if (na && user->timestamp == convertTo<time_t>(params[6]))
+				if (params[6].is_pos_number_only())
+				{
+					if (convertTo<time_t>(params[6]) == user->timestamp)
+						na = findnick(user->nick);
+				}
+				else if (params[6] != "*")
+				{
+					na = findnick(params[6]);
+				}
+
+				if (na)
 				{
 					user->Login(na->nc);
 					if (!Config->NoNicknameOwnership && na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)

@@ -529,12 +529,14 @@ class Unreal32IRCdMessage : public IRCdMessage
 			{
 				NickAlias *na = NULL;
 
-				if (params[6].is_pos_number_only())
+				if (params[6] == "0")
+					;
+				else if (params[6].is_pos_number_only())
 				{
 					if (convertTo<time_t>(params[6]) == user->timestamp)
 						na = findnick(user->nick);
 				}
-				else if (params[6] != "*")
+				else
 				{
 					na = findnick(params[6]);
 				}
@@ -561,12 +563,14 @@ class Unreal32IRCdMessage : public IRCdMessage
 			{
 				NickAlias *na = NULL;
 
-				if (params[6].is_pos_number_only())
+				if (params[6] == "0")
+					;
+				else if (params[6].is_pos_number_only())
 				{
 					if (convertTo<time_t>(params[6]) == user->timestamp)
 						na = findnick(user->nick);
 				}
-				else if (params[6] != "*")
+				else
 				{
 					na = findnick(params[6]);
 				}

@@ -921,7 +921,7 @@ class ProtoInspIRCd : public Module
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 
-		Capab.SetFlag(CAPAB_NOQUIT);
+		Capab.insert("NOQUIT");
 
 		this->AddModes();
 

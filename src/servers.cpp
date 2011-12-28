@@ -16,18 +16,7 @@
 /* Anope */
 Server *Me = NULL;
 
-CapabInfo Capab_Info[] = {
-	{"NOQUIT", CAPAB_NOQUIT},
-	{"TSMODE", CAPAB_TSMODE},
-	{"UNCONNECT", CAPAB_UNCONNECT},
-	{"QS", CAPAB_QS},
-	{"", CAPAB_END}
-};
-
-const Anope::string CapabFlags[] = {
-	"NOQUIT", "TSMODE", "UNCONNECT", "QS", ""
-};
-Flags<CapabType, CAPAB_END> Capab(CapabFlags);
+std::set<Anope::string> Capab;
 
 /** Constructor
  * @param uplink The uplink this server is from, is only NULL when creating Me
@@ -125,7 +114,7 @@ Server::~Server()
 {
 	Log(this, "quit") << "quit from " << (this->UplinkServer ? this->UplinkServer->GetName() : "no uplink") << " for " << this->QReason;
 
-	if (Capab.HasFlag(CAPAB_NOQUIT) || Capab.HasFlag(CAPAB_QS))
+	if (Capab.count("NOQUIT") > 0 || Capab.count("QS") > 0)
 	{
 		for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
 		{

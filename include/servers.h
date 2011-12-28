@@ -9,29 +9,7 @@ extern CoreExport void do_server(const Anope::string &source, const Anope::strin
 extern CoreExport const Anope::string ts6_uid_retrieve();
 extern CoreExport const Anope::string ts6_sid_retrieve();
 
-/* Types of capab
- */
-enum CapabType
-{
-	CAPAB_BEGIN,
-
-	CAPAB_NOQUIT,
-	CAPAB_TSMODE,
-	CAPAB_UNCONNECT,
-	CAPAB_QS,
-
-	CAPAB_END
-};
-
-/* CAPAB stuffs */
-struct CapabInfo
-{
-	Anope::string Token;
-	CapabType Flag;
-};
-
-extern CoreExport Flags<CapabType, CAPAB_END> Capab;
-extern CoreExport CapabInfo Capab_Info[];
+extern CoreExport std::set<Anope::string> Capab;
 
 /** Flags set on servers
  */

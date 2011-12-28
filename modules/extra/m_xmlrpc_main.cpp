@@ -135,9 +135,10 @@ class MyXMLRPCEvent : public XMLRPCEvent
 		request->reply("uplinkname", Me->GetLinks().front()->GetName());
 		{
 			Anope::string buf;
-			for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-				if (Capab.HasFlag(Capab_Info[j].Flag))
-					buf += " " + Capab_Info[j].Token;
+			for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
+				buf += " " + *it;
+			if (!buf.empty())
+				buf.erase(buf.begin());
 			request->reply("uplinkcapab", buf);
 		}
 		request->reply("usercount", stringify(usercnt));

@@ -478,7 +478,7 @@ bool IRCdMessage::OnSQuit(const Anope::string &source, const std::vector<Anope::
 
 	Anope::string buf = s->GetName() + " " + s->GetUplink()->GetName();
 
-	if (s->GetUplink() == Me && Capab.HasFlag(CAPAB_UNCONNECT))
+	if (s->GetUplink() == Me && Capab.count("UNCONNECT") > 0)
 	{
 		Log(LOG_DEBUG) << "Sending UNCONNECT SQUIT for " << s->GetName();
 		/* need to fix */
@@ -516,22 +516,7 @@ bool IRCdMessage::OnWhois(const Anope::string &source, const std::vector<Anope::
 bool IRCdMessage::OnCapab(const Anope::string &, const std::vector<Anope::string> &params)
 {
 	for (unsigned i = 0; i < params.size(); ++i)
-	{
-		spacesepstream sep(params[i]);
-		Anope::string token;
-
-		while (sep.GetToken(token))
-			for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-			{
-				if (Capab_Info[j].Token.equals_ci(token))
-				{
-					Capab.SetFlag(Capab_Info[j].Flag);
-					Log(LOG_DEBUG) << "Capab: Enabling " << Capab_Info[j].Token;
-					break;
-				}
-			}
-	}
-
+		Capab.insert(params[i]);
 	return true;
 }
 

@@ -712,7 +712,7 @@ class ProtoInspIRCd : public Module
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 
-		Capab.SetFlag(CAPAB_NOQUIT);
+		Capab.insert("NOQUIT");
 
 		Implementation i[] = { I_OnUserNickChange, I_OnServerSync };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));

@@ -122,11 +122,8 @@ class CommandOSStats : public Command
 	void DoStatsUplink(CommandSource &source)
 	{
 		Anope::string buf;
-
-		for (unsigned j = 0; !Capab_Info[j].Token.empty(); ++j)
-			if (Capab.HasFlag(Capab_Info[j].Flag))
-				buf += " " + Capab_Info[j].Token;
-
+		for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
+			buf += *it;
 		if (!buf.empty())
 			buf.erase(buf.begin());
 

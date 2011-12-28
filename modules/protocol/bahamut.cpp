@@ -49,7 +49,7 @@ class BahamutIRCdProto : public IRCDProto
 {
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf)
 	{
-		if (Capab.HasFlag(CAPAB_TSMODE))
+		if (Capab.count("TSMODE") > 0)
 			UplinkSocket::Message(source ? source->nick : Config->ServerName) << "MODE " << dest->name << " " << dest->creation_time << " " << buf;
 		else
 			UplinkSocket::Message(source ? source->nick : Config->ServerName) << "MODE " << dest->name << " " << buf;

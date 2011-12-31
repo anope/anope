@@ -70,7 +70,8 @@ class CommandNSAList : public Command
 			entry["Channel"] = (ci->HasFlag(CI_NO_EXPIRE) ? "!" : "") + ci->name;
 			for (unsigned i = 0; i < access.size(); ++i)
 				entry["Access"] = entry["Access"] + ", " + access[i]->Serialize();
-			entry["Access"] = entry["Access"].substr(3);
+			entry["Access"] = entry["Access"].substr(2);
+			list.addEntry(entry);
 		}
 
 		std::vector<Anope::string> replies;

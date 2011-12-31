@@ -55,7 +55,7 @@ class CoreExport ChanAccess : public Serializable
 	serialized_data serialize();
 	static void unserialize(serialized_data &);
 
-	virtual bool Matches(User *u, NickCore *nc) = 0;
+	virtual bool Matches(User *u, NickCore *nc);
 	virtual bool HasPriv(const Anope::string &name) const = 0;
 	virtual Anope::string Serialize() = 0;
 	virtual void Unserialize(const Anope::string &data) = 0;

@@ -52,7 +52,7 @@ class CommandOSSVSNick : public Command
 		/* Check for a nick in use or a forbidden/suspended nick */
 		if (!(u2 = finduser(nick)))
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
-		else if (finduser(newnick))
+		else if (!nick.equals_ci(newnick) && finduser(newnick))
 			source.Reply(_("Nick \002%s\002 is currently in use."), newnick.c_str());
 		else
 		{

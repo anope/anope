@@ -64,7 +64,7 @@ class CoreExport ChanAccess
 
 	ChanAccess(AccessProvider *p);
 	virtual ~ChanAccess();
-	virtual bool Matches(User *u, NickCore *nc) = 0;
+	virtual bool Matches(User *u, NickCore *nc);
 	virtual bool HasPriv(ChannelAccess priv) const = 0;
 	virtual Anope::string Serialize() = 0;
 	virtual void Unserialize(const Anope::string &data) = 0;

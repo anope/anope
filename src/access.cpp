@@ -35,6 +35,22 @@ ChanAccess::~ChanAccess()
 {
 }
 
+bool ChanAccess::Matches(User *u, NickCore *nc)
+{
+	if (u && Anope::Match(u->nick, this->mask))
+		return true;
+	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
+		return true;
+	else if (nc)
+		for (std::list<NickAlias *>::iterator it = nc->aliases.begin(); it != nc->aliases.end(); ++it)
+		{
+			NickAlias *na = *it;
+			if (Anope::Match(na->nick, this->mask))
+				return true;
+		}
+	return false;
+}
+
 bool ChanAccess::operator>(const ChanAccess &other) const
 {
 	for (size_t i = CA_SIZE; i > 0; --i)

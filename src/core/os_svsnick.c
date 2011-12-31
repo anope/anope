@@ -110,7 +110,7 @@ int do_svsnick(User * u)
     /* Check for a nick in use or a forbidden/suspended nick */
     if (!finduser(nick)) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (finduser(newnick)) {
+    } else if (stricmp(nick, newnick) && finduser(newnick)) {
         notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick);
     } else if ((na = findnick(newnick)) && (na->status & NS_VERBOTEN)) {
         notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick);

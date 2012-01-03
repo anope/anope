@@ -1,6 +1,6 @@
 /* Modular support
  *
- * (C) 2008-2011 Anope Team
+ * (C) 2008-2012 Anope Team
  * Contact us at team@anope.org
  *
  * Please read COPYING and README for further details.

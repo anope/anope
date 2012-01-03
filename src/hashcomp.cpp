@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002-2011 InspIRCd Development Team
- * Copyright (C) 2008-2011 Anope Team <team@anope.org>
+ * Copyright (C) 2008-2012 Anope Team <team@anope.org>
  *
  * Please read COPYING and README for further details.
  *

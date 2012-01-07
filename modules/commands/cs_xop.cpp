@@ -194,57 +194,6 @@ class XOPAccessProvider : public AccessProvider
 	}
 };
 
-class XOPDelCallback : public NumberList
-{
-	CommandSource &source;
-	ChannelInfo *ci;
-	Command *c;
-	unsigned Deleted;
-	Anope::string Nicks;
-	bool override;
-	XOPType type;
- public:
-	XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, XOPType _type, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override), type(_type)
-	{
-	}
-
-	~XOPDelCallback()
-	{
-		if (!Deleted)
-			 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
-		else
-		{
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "deleted access of users " << Nicks;
-
-			if (Deleted == 1)
-				source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
-			else
-				source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), source.command.c_str());
-		}
-	}
-
-	void HandleNumber(unsigned Number)
-	{
-		if (!Number || Number > ci->GetAccessCount())
-			return;
-
-		ChanAccess *access = ci->GetAccess(Number - 1);
-
-		if (this->type != XOPChanAccess::DetermineLevel(access))
-			return;
-
-		++Deleted;
-		if (!Nicks.empty())
-			Nicks += ", " + access->mask;
-		else
-			Nicks = access->mask;
-
-		FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source.u, access));
-
-		ci->EraseAccess(Number - 1);
-	}
-};
-
 class XOPBase : public Command
 {
  private:
@@ -362,8 +311,58 @@ class XOPBase : public Command
 		/* Special case: is it a number/list?  Only do search if it isn't. */
 		if (isdigit(mask[0]) && mask.find_first_not_of("1234567890,-") == Anope::string::npos)
 		{
-			XOPDelCallback list(source, ci, this, override, level, mask);
-			list.Process();
+			class XOPDelCallback : public NumberList
+			{
+				CommandSource &source;
+				ChannelInfo *ci;
+				Command *c;
+				unsigned Deleted;
+				Anope::string Nicks;
+				bool override;
+				XOPType type;
+			 public:
+				XOPDelCallback(CommandSource &_source, ChannelInfo *_ci, Command *_c, bool _override, XOPType _type, const Anope::string &numlist) : NumberList(numlist, true), source(_source), ci(_ci), c(_c), Deleted(0), override(_override), type(_type)
+				{
+				}
+
+				~XOPDelCallback()
+				{
+					if (!Deleted)
+						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
+					else
+					{
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "deleted access of users " << Nicks;
+
+						if (Deleted == 1)
+							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
+						else
+							source.Reply(_("Deleted %d entries from %s %s list."), Deleted, ci->name.c_str(), source.command.c_str());
+					}
+				}
+
+				void HandleNumber(unsigned Number)
+				{
+					if (!Number || Number > ci->GetAccessCount())
+						return;
+
+					ChanAccess *caccess = ci->GetAccess(Number - 1);
+
+					if (this->type != XOPChanAccess::DetermineLevel(caccess))
+						return;
+
+					++Deleted;
+					if (!Nicks.empty())
+						Nicks += ", " + caccess->mask;
+					else
+						Nicks = caccess->mask;
+
+					FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, source.u, caccess));
+
+					ci->EraseAccess(Number - 1);
+				}
+			}
+			delcallback(source, ci, this, override, level, mask);
+			delcallback.Process();
 		}
 		else
 		{

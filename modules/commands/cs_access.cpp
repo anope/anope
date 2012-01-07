@@ -223,7 +223,7 @@ class CommandCSAccess : public Command
 					AccessGroup u_access = ci->AccessFor(user);
 					ChanAccess *u_highest = u_access.Highest();
 
-					if (u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0 <= AccessChanAccess::DetermineLevel(access) && !u_access.Founder && !user->HasPriv("chanserv/access/modify"))
+					if ((u_highest ? AccessChanAccess::DetermineLevel(u_highest) : 0) <= AccessChanAccess::DetermineLevel(access) && !u_access.Founder && !this->override && !access->mask.equals_ci(user->Account()->display))
 					{
 						Denied = true;
 						return;

@@ -162,7 +162,7 @@ class CommandCSAccess : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << " as level " << level;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask << " with level " << level;
 		source.Reply(_("\002%s\002 added to %s access list at level \002%d\002."), access->mask.c_str(), ci->name.c_str(), level);
 
 		return;
@@ -202,7 +202,7 @@ class CommandCSAccess : public Command
 						source.Reply(_("No matching entries on %s access list."), ci->name.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "for user" << (Deleted == 1 ? " " : "s ") << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Nicks;
 
 						if (Deleted == 1)
 							source.Reply(_("Deleted 1 entry from %s access list."), ci->name.c_str());
@@ -261,7 +261,7 @@ class CommandCSAccess : public Command
 					{
 						source.Reply(_("\002%s\002 deleted from %s access list."), access->mask.c_str(), ci->name.c_str());
 						bool override = !u_access.Founder && !u_access.HasPriv("ACCESS_CHANGE") && !access->mask.equals_ci(u->Account()->display);
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << access->mask;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << access->mask;
 
 						FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, access));
 						ci->EraseAccess(access);
@@ -417,7 +417,7 @@ class CommandCSAccess : public Command
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
 			bool override = !IsFounder(u, ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
 		}
 
 		return;
@@ -594,7 +594,7 @@ class CommandCSLevels : public Command
 				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, level));
 
 				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "SET " << p->name << " to " << level;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to set " << p->name << " to level " << level;
 
 				if (level == ACCESS_FOUNDER)
 					source.Reply(_("Level for %s on channel %s changed to founder only."), p->name.c_str(), ci->name.c_str());
@@ -620,7 +620,7 @@ class CommandCSLevels : public Command
 				FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, p->name, ACCESS_INVALID));
 
 				bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DISABLE " << p->name;
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to disable " << p->name;
 
 				source.Reply(_("\002%s\002 disabled on channel %s."), p->name.c_str(), ci->name.c_str());
 				return;
@@ -674,7 +674,7 @@ class CommandCSLevels : public Command
 		FOREACH_MOD(I_OnLevelChange, OnLevelChange(u, ci, "ALL", 0));
 
 		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "RESET";
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to reset all levels";
 
 		source.Reply(_("Access levels for \002%s\002 reset to defaults."), ci->name.c_str());
 		return;

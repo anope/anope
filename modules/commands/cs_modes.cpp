@@ -59,7 +59,7 @@ class CommandModeBase : public Command
 	 * @param chan The channel its being set on
 	 * @param nick The nick the modes being set on
 	 * @param set Is the mode being set or removed
-	 * @param level The acecss level required to set this mode on someone else
+	 * @param level The access level required to set this mode on someone else
 	 * @param levelself The access level required to set this mode on yourself
 	 */
 	void do_util(CommandSource &source, Command *com, ChannelMode *cm, const Anope::string &chan, const Anope::string &nick, bool set, const Anope::string &level, const Anope::string &levelself)
@@ -78,7 +78,7 @@ class CommandModeBase : public Command
  public:
 	CommandModeBase(Module *creator, const Anope::string &cname) : Command(creator, cname, 0, 2)
 	{
-		this->SetSyntax(_("[\037#channel\037] [\037nick\037]"));
+		this->SetSyntax(_("[\037channel\037] [\037nick\037]"));
 	}
 };
 
@@ -105,7 +105,7 @@ class CommandCSOp : public CommandModeBase
 				"it will op you. If channel is not given, it will op you\n"
 				"on every channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
+				"By default, limited to AOPs or those with level 5 access\n"
 				"and above on the channel."));
 		return true;
 	}
@@ -134,7 +134,7 @@ class CommandCSDeOp : public CommandModeBase
 				"it will deop you. If channel is not given, it will deop\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
+				"By default, limited to AOPs or those with level 5 access\n"
 				"and above on the channel.");
 		return true;
 	}
@@ -163,8 +163,8 @@ class CommandCSVoice : public CommandModeBase
 				"it will voice you. If channel is not given, it will voice you\n"
 				"on every channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
-				"and above on the channel, or to VOPs or those with level 3 \n"
+				"By default, limited to AOPs or those with level 5 access\n"
+				"and above on the channel, or to VOPs or those with level 3\n"
 				"and above for self voicing."));
 		return true;
 	}
@@ -193,8 +193,8 @@ class CommandCSDeVoice : public CommandModeBase
 				"it will devoice you. If channel is not given, it will devoice\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
-				"and above on the channel, or to VOPs or those with level 3 \n"
+				"By default, limited to AOPs or those with level 5 access\n"
+				"and above on the channel, or to VOPs or those with level 3\n"
 				"and above for self devoicing."));
 		return true;
 	}
@@ -226,8 +226,9 @@ class CommandCSHalfOp : public CommandModeBase
 				"it will halfop you. If channel is not given, it will halfop\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to AOPs and those with level 5 access \n"
-				"and above on the channel, or to HOPs or those with level 4 \n"));
+				"By default, limited to AOPs and those with level 5 access\n"
+				"and above on the channel, or to HOPs or those with level 4\n"
+				"and above for self halfopping."));
 		return true;
 	}
 };
@@ -258,8 +259,8 @@ class CommandCSDeHalfOp : public CommandModeBase
 				"it will dehalfop you. If channel is not given, it will dehalfop\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to AOPs and those with level 5 access \n"
-				"and above on the channel, or to HOPs or those with level 4 \n"
+				"By default, limited to AOPs and those with level 5 access\n"
+				"and above on the channel, or to HOPs or those with level 4\n"
 				"and above for self dehalfopping."));
 		return true;
 	}
@@ -291,7 +292,7 @@ class CommandCSProtect : public CommandModeBase
 				"it will protect you. If channel is not given, it will protect\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to the founder, or to SOPs or those with \n"
+				"By default, limited to the founder, or to SOPs or those with\n"
 				"level 10 and above on the channel for self protecting."));
 		return true;
 	}
@@ -323,7 +324,8 @@ class CommandCSDeProtect : public CommandModeBase
 				"it will deprotect you. If channel is not given, it will deprotect\n"
 				"you on every channel.\n"
 				" \n"
-				"By default, limited to the founder, or to SOPs or those with \n"));
+				"By default, limited to the founder, or to SOPs or those with\n"
+				"level 10 and above on the channel for self deprotecting."));
 		return true;
 	}
 };

@@ -40,7 +40,7 @@ class CommandCSClearUsers : public Command
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
 			return;
 		}
-		else if (!c->ci->AccessFor(u).HasPriv("FOUNDER"))
+		else if (!c->ci->AccessFor(u).HasPriv("FOUNDER") && !u->HasCommand("chanserv/clearusers"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -55,7 +55,10 @@ class CommandCSClearUsers : public Command
 			c->Kick(NULL, uc->user, "%s", buf.c_str());
 		}
 
-		source.Reply(_("All users have been kicked from \2%s\2."), chan.c_str());
+		bool override = !c->ci->AccessFor(u).HasPriv("FOUNDER");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci);
+
+		source.Reply(_("All users have been kicked from \002%s\002."), chan.c_str());
 
 		return;
 	}
@@ -64,7 +67,7 @@ class CommandCSClearUsers : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s to clear (kick) all users certain settings on a channel."
+		source.Reply(_("Tells %s to clear (kick) all users on a channel."
 				" \n"
 				"By default, limited to those with founder access on the\n"
 				"channel."), source.owner->nick.c_str());

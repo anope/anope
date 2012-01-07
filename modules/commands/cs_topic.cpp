@@ -48,7 +48,7 @@ class CommandCSTopic : public Command
 				ci->SetFlag(CI_TOPICLOCK);
 	
 			bool override = !ci->AccessFor(u).HasPriv("TOPIC");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change the topic to " << (!topic.empty() ? topic : "No topic");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << (!topic.empty() ? "to change the topic to: " : "to unset the topic") << (!topic.empty() ? topic : "");
 		}
 		return;
 	}

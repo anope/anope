@@ -174,6 +174,7 @@ class CommandCSFlags : public Command
 			{
 				FOREACH_MOD(I_OnAccessDel, OnAccessDel(ci, u, current));
 				ci->EraseAccess(current);
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << mask;
 				source.Reply(_("\002%s\002 removed from the %s access list."), mask.c_str(), ci->name.c_str());
 			}
 			else
@@ -201,7 +202,7 @@ class CommandCSFlags : public Command
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, access));
 
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "MODIFY " << mask << " with flags " << access->Serialize();
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to modify " << mask << "'s flags to " << access->Serialize();
 		source.Reply(_("Access for \002%s\002 on %s set to +\002%s\002"), access->mask.c_str(), ci->name.c_str(), access->Serialize().c_str());
 
 		return;
@@ -284,7 +285,7 @@ class CommandCSFlags : public Command
 			source.Reply(_("Channel %s access list has been cleared."), ci->name.c_str());
 
 			bool override = !IsFounder(u, ci);
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
 		}
 
 		return;

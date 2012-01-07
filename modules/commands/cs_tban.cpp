@@ -55,9 +55,9 @@ static bool CanBanUser(CommandSource &source, Channel *c, User *u2)
 class CommandCSTBan : public Command
 {
  public:
-	CommandCSTBan(Module *m) : Command(m, "TBAN", 3, 3)
+	CommandCSTBan(Module *creator) : Command(creator, "chanserv/tban", 3, 3)
 	{
-		this->SetDesc(_("Bans the user for a given length of time"));
+		this->SetDesc(_("Bans the user for a given length of time in seconds"));
 		this->SetSyntax(_("\037channel\037 \037nick\037 \037time\037"));
 	}
 
@@ -80,7 +80,8 @@ class CommandCSTBan : public Command
 				get_idealban(c->ci, u2, mask);
 				c->SetMode(NULL, CMODE_BAN, mask);
 				new TempBan(dotime(time), c, mask);
-				source.Reply(_("%s banned from %s, will auto-expire in %s"), mask.c_str(), c->name.c_str(), time.c_str());
+
+				source.Reply(_("%s banned from %s, will auto-expire in %s second(s)."), mask.c_str(), c->name.c_str(), time.c_str());
 			}
 
 		return;
@@ -90,8 +91,11 @@ class CommandCSTBan : public Command
 	{
 		this->OnSyntaxError(source, "");
 		source.Reply(" ");
-		source.Reply(_("Bans the given user from a channel for a specified length of\n"
-			"time. If the ban is removed before by hand, it will NOT be replaced."));
+		source.Reply(_("Bans the user for a given length of time in seconds.\n"
+				" \n"
+				"Bans the given user from a channel for a specified length of\n"
+				"time in seconds. If the ban is removed before by hand, it\n"
+				"will NOT be replaced."));
 
 		return true;
 	}
@@ -102,13 +106,10 @@ class CSTBan : public Module
 	CommandCSTBan commandcstban;
 
  public:
-	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandcstban(this)
+	CSTBan(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), commandcstban(this)
 	{
 		this->SetAuthor("Anope");
-
 		me = this;
-
 	}
 };
 

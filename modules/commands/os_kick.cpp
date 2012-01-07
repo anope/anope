@@ -48,7 +48,7 @@ class CommandOSKick : public Command
 		}
 
 		c->Kick(source.owner, u2, "%s (%s)", u->nick.c_str(), s.c_str());
-		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name;
+		Log(LOG_ADMIN, u, this) << "on " << u2->nick << " in " << c->name << " (" << s << ")";
 		return;
 	}
 

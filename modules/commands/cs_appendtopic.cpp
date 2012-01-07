@@ -45,6 +45,7 @@ class CommandCSAppendTopic : public Command
 	CommandCSAppendTopic(Module *creator) : Command(creator, "chanserv/appendtopic", 2, 2)
 	{
 		this->SetDesc(_("Add text to a channels topic"));
+		this->SetSyntax(_("\037channel\037 \037text\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -58,7 +59,7 @@ class CommandCSAppendTopic : public Command
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
 		else if (!c->ci)
 			source.Reply(CHAN_X_NOT_REGISTERED, c->name.c_str());
-		else if (!c->ci->AccessFor(u).HasPriv("TOPIC"))
+		else if (!c->ci->AccessFor(u).HasPriv("TOPIC") && !u->HasCommand("chanserv/topic"))
 			source.Reply(ACCESS_DENIED);
 		else
 		{
@@ -77,26 +78,21 @@ class CommandCSAppendTopic : public Command
 			if (has_topiclock)
 				c->ci->SetFlag(CI_TOPICLOCK);
 
-			bool override = c->ci->AccessFor(u).HasPriv("TOPIC");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci) << "changed topic to " << topic;
+			bool override = !c->ci->AccessFor(u).HasPriv("TOPIC");
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, c->ci) << "to append: " << topic;
 		}
 		return;
 	}
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
 	{
-		source.Reply(_("Syntax: APPENDTOPIC channel text"));
+		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("This command allows users to append text to a currently set\n"
 			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
 			"the new, updated topic is locked."));
 
 		return true;
-	}
-
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
-	{
-		source.Reply(_("Syntax: APPENDTOPIC channel text"));
 	}
 };
 

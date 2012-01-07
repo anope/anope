@@ -152,7 +152,7 @@ class CommandCSAKick : public Command
 			akick = ci->AddAkick(u->nick, mask, reason);
 
 		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask << ": " << reason;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask << (reason == "" ? "" : ": ") << reason;
 
 		FOREACH_MOD(I_OnAkickAdd, OnAkickAdd(u, ci, akick));
 
@@ -192,7 +192,7 @@ class CommandCSAKick : public Command
 				~AkickDelCallback()
 				{
 					bool override = !ci->AccessFor(source.u).HasPriv("AKICK");
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "DEL on " << Deleted << " users";
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Deleted << (Deleted == 1 ? " entry" : " entries");
 
 					if (!Deleted)
 						source.Reply(_("No matching entries on %s autokick list."), ci->name.c_str());
@@ -234,7 +234,7 @@ class CommandCSAKick : public Command
 			}
 
 			bool override = !ci->AccessFor(u).HasPriv("AKICK");
-			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << mask;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << mask;
 
 			ci->EraseAkick(i);
 
@@ -395,7 +395,7 @@ class CommandCSAKick : public Command
 	{
 		User *u = source.u;
 		bool override = !ci->AccessFor(u).HasPriv("AKICK");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the akick list";
 
 		ci->ClearAkick();
 		source.Reply(_("Channel %s akick list has been cleared."), ci->name.c_str());

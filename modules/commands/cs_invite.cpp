@@ -18,8 +18,8 @@ class CommandCSInvite : public Command
  public:
 	CommandCSInvite(Module *creator) : Command(creator, "chanserv/invite", 1, 3)
 	{
-		this->SetDesc(_("Invites you into a channel"));
-		this->SetSyntax(_("\037channel\037"));
+		this->SetDesc(_("Invites you or an optionally specified nick into a channel"));
+		this->SetSyntax(_("\037channel\037 [\037nick\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -42,7 +42,7 @@ class CommandCSInvite : public Command
 			return;
 		}
 
-		if (!ci->AccessFor(u).HasPriv("INVITE"))
+		if (!ci->AccessFor(u).HasPriv("INVITE") && !u->HasCommand("chanserv/invite"))
 		{
 			source.Reply(ACCESS_DENIED);
 			return;
@@ -60,15 +60,27 @@ class CommandCSInvite : public Command
 			}
 		}
 
-		// XXX need a check for override...
-		Log(LOG_COMMAND, u, this, ci) << "for " << u2->nick;
-
 		if (c->FindUser(u2))
-			source.Reply(_("You are already in \002%s\002! "), c->name.c_str());
+		{
+			if (u2 == u)
+				source.Reply(_("You are already in \002%s\002!"), c->name.c_str());
+			else
+				source.Reply(_("\002%s\002 is already in \002%s\002!"), u2->nick.c_str(), c->name.c_str());
+		}
 		else
 		{
+			bool override = !ci->AccessFor(u).HasPriv("INVITE");
+
 			ircdproto->SendInvite(ci->WhoSends(), chan, u2->nick);
-			source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
+			if (u2 != u)
+			{
+				source.Reply(_("\002%s\002 has been invited to \002%s\002."), u2->nick.c_str(), c->name.c_str());
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "for " << u2->nick;
+			}
+			else
+			{
+				Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
+			}
 			u2->SendMessage(ci->WhoSends(), _("You have been invited to \002%s\002."), c->name.c_str());
 		}
 		return;
@@ -78,7 +90,8 @@ class CommandCSInvite : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Tells %s to invite you into the given channel.\n"
+		source.Reply(_("Tells %s to invite you or an optionally specified\n"
+				"nick into the given channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
 				"on the channel."), source.owner->nick.c_str());

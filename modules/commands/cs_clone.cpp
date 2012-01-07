@@ -53,12 +53,6 @@ public:
 			return;
 		}
 
-		if (Config->CSMaxReg && u->Account()->channelcount >= Config->CSMaxReg && !u->HasPriv("chanserv/no-register-limit"))
-		{
-			source.Reply(u->Account()->channelcount > Config->CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : _(CHAN_REACHED_CHANNEL_LIMIT), Config->CSMaxReg);
-			return;
-		}
-
 		if (what.equals_ci("ALL"))
 			what.clear();
 
@@ -107,7 +101,7 @@ public:
 
 			FOREACH_MOD(I_OnChanRegistered, OnChanRegistered(target_ci));
 
-			source.Reply(_("All settings from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All settings from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("ACCESS"))
 		{
@@ -127,7 +121,7 @@ public:
 				target_ci->AddAccess(newaccess);
 			}
 
-			source.Reply(_("All access entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All access entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("AKICK"))
 		{
@@ -141,7 +135,7 @@ public:
 					target_ci->AddAkick(akick->creator, akick->mask, akick->reason, akick->addtime, akick->last_used);
 			}
 
-			source.Reply(_("All akick entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All akick entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else if (what.equals_ci("BADWORDS"))
 		{
@@ -152,7 +146,7 @@ public:
 				target_ci->AddBadWord(bw->word, bw->type);
 			}
 
-			source.Reply(_("All badword entries from \002%s\002 have been transferred to \002%s\002"), channel.c_str(), target.c_str());
+			source.Reply(_("All badword entries from \002%s\002 have been cloned to \002%s\002"), channel.c_str(), target.c_str());
 		}
 		else
 		{
@@ -160,7 +154,7 @@ public:
 			return;
 		}
 
-		Log(LOG_COMMAND, u, this, ci) << "to clone it to " << target_ci->name;
+		Log(LOG_COMMAND, u, this, ci) << "to clone " << (what.empty() ? "everything from it" : what) << " to " << target_ci->name;
 
 		return;
 	}
@@ -169,9 +163,9 @@ public:
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Copies all settings, access, akicks, etc from channel to the\n"
-				"target channel. If \037what\037 is access, akick, or badwords\n"
-				"then only the respective settings are transferred.\n"
+		source.Reply(_("Copies all settings, access, akicks, etc from \002channel\002 to the\n"
+				"\002target\002 channel. If \037what\037 is \002ACCESS\002, \002AKICK\002, or \002BADWORDS\002\n"
+				"then only the respective settings are cloned.\n"
 				"You must be the founder of \037channel\037 and \037target\037."));
 		return true;
 	}

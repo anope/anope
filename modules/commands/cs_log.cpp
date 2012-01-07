@@ -32,7 +32,7 @@ public:
 		ChannelInfo *ci = cs_findchan(channel);
 		if (ci == NULL)
 			source.Reply(CHAN_X_NOT_REGISTERED, channel.c_str());
-		else if (!ci->AccessFor(u).HasPriv("SET"))
+		else if (!ci->AccessFor(u).HasPriv("SET") && !u->HasPriv("chanserv/set"))
 			source.Reply(ACCESS_DENIED);
 		else if (params.size() == 1)
 		{
@@ -108,6 +108,8 @@ public:
 					return;
 				}
 
+			bool override = !ci->AccessFor(u).HasPriv("SET");
+
 			for (unsigned i = ci->log_settings.size(); i > 0; --i)
 			{
 				LogSetting &log = ci->log_settings[i - 1];
@@ -117,12 +119,14 @@ public:
 					if (log.extra == extra)
 					{
 						ci->log_settings.erase(ci->log_settings.begin() + i - 1);
-						source.Reply(_("Logging for command %s on %s with method %s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : extra.c_str());
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to remove logging for " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
+						source.Reply(_("Logging for command %s on %s with log method %s%s%s has been removed."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					else
 					{
 						log.extra = extra;
-						source.Reply(_("Logging changed for command %s on %s, using log method %s %s"), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.c_str());
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to change logging for " << command << " to method " << method << (extra == "" ? "" : " ") << extra;
+						source.Reply(_("Logging changed for command %s on %s, now using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 					}
 					return;
 				}
@@ -139,9 +143,9 @@ public:
 			log.creator = u->nick;
 
 			ci->log_settings.push_back(log);
-			Log(LOG_COMMAND, u, this, ci) << command << " " << method << " " << extra;
+			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to log " << command << " with method " << method << (extra == "" ? "" : " ") << extra;
 
-			source.Reply(_("Logging is now active for command %s on %s, using log method %s %s"), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.c_str());
+			source.Reply(_("Logging is now active for command %s on %s, using log method %s%s%s."), command_name.c_str(), bi->nick.c_str(), method.c_str(), extra.empty() ? "" : " ", extra.empty() ? "" : extra.c_str());
 		}
 		else
 			this->OnSyntaxError(source, "");

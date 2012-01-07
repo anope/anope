@@ -79,11 +79,11 @@ class CommandEntryMessage : public Command
 		EntryMessageList *messages = ci->GetExt<EntryMessageList *>("cs_entrymsg");
 		if (messages == NULL)
 		{
-			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());
+			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
 			return;
 		}
 
-		source.Reply(_("Entry message list for \2%s\2:"), ci->name.c_str());
+		source.Reply(_("Entry message list for \002%s\002:"), ci->name.c_str());
 
 		ListFormatter list;
 		list.addColumn("Number").addColumn("Creator").addColumn("Created").addColumn("Message");
@@ -117,11 +117,11 @@ class CommandEntryMessage : public Command
 		}
 
 		if (MaxEntries && messages->size() >= MaxEntries)
-			source.Reply(_("The entry message list for \2%s\2 is full."), ci->name.c_str());
+			source.Reply(_("The entry message list for \002%s\002 is full."), ci->name.c_str());
 		else
 		{
 			messages->push_back(EntryMsg(ci, source.u->nick, message));
-			source.Reply(_("Entry message added to \2%s\2"), ci->name.c_str());
+			source.Reply(_("Entry message added to \002%s\002"), ci->name.c_str());
 		}
 	}
 
@@ -140,24 +140,24 @@ class CommandEntryMessage : public Command
 					messages->erase(messages->begin() + i - 1);
 					if (messages->empty())
 						ci->Shrink("cs_entrymsg");
-					source.Reply(_("Entry message \2%i\2 for \2%s\2 deleted."), i, ci->name.c_str());
+					source.Reply(_("Entry message \002%i\002 for \002%s\002 deleted."), i, ci->name.c_str());
 				}
 				else
 					throw ConvertException();
 			}
 			catch (const ConvertException &)
 			{
-				source.Reply(_("Entry message \2%s\2 not found on channel \2%s\2."), message.c_str(), ci->name.c_str());
+				source.Reply(_("Entry message \002%s\002 not found on channel \002%s\002."), message.c_str(), ci->name.c_str());
 			}
 		}
 		else
-			source.Reply(_("Entry message list for \2%s\2 is empty."), ci->name.c_str());
+			source.Reply(_("Entry message list for \002%s\002 is empty."), ci->name.c_str());
 	}
 
 	void DoClear(CommandSource &source, ChannelInfo *ci)
 	{
 		ci->Shrink("cs_entrymsg");
-		source.Reply(_("Entry messages for \2%s\2 have been cleared."), ci->name.c_str());
+		source.Reply(_("Entry messages for \002%s\002 have been cleared."), ci->name.c_str());
 	}
 
  public:
@@ -178,7 +178,7 @@ class CommandEntryMessage : public Command
 			return;
 		}
 
-		if (IsFounder(u, ci) || u->HasCommand("chanserv/entrymsg"))
+		if (IsFounder(u, ci) || u->HasCommand("chanserv/set"))
 		{
 			bool success = true;
 			if (params[1].equals_ci("LIST"))
@@ -200,7 +200,7 @@ class CommandEntryMessage : public Command
 				this->OnSyntaxError(source, "");
 			}
 			if (success)
-				Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << params[1];
+				Log(IsFounder(u, ci) ? LOG_COMMAND : LOG_OVERRIDE, u, this, ci) << " to " << params[1] << " a message";
 		}
 		else
 			source.Reply(ACCESS_DENIED);

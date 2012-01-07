@@ -57,7 +57,7 @@ class CommandCSSetSuccessor : public Command
 			}
 			if (na->nc == ci->GetFounder())
 			{
-				source.Reply(_("%s cannot be the successor on channel %s they are the founder."), na->nick.c_str(), ci->name.c_str());
+				source.Reply(_("%s cannot be the successor on channel %s as they are the founder."), na->nick.c_str(), ci->name.c_str());
 				return;
 			}
 			nc = na->nc;
@@ -65,12 +65,12 @@ class CommandCSSetSuccessor : public Command
 		else
 			nc = NULL;
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "none") << " to " << (nc ? nc->display : "none");
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the successor from " << (ci->successor ? ci->successor->display : "(none)") << " to " << (nc ? nc->display : "(none)");
 
 		ci->successor = nc;
 
 		if (nc)
-			source.Reply(_("Successor for %s changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());
+			source.Reply(_("Successor for \002%s\002 changed to \002%s\002."), ci->name.c_str(), nc->display.c_str());
 		else
 			source.Reply(_("Successor for \002%s\002 unset."), ci->name.c_str());
 

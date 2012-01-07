@@ -20,6 +20,7 @@ class CommandCSKick : public Command
 	{
 		this->SetDesc(_("Kicks a selected nick from a channel"));
 		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -110,9 +111,8 @@ class CommandCSKick : public Command
 		source.Reply(" ");
 		source.Reply(_("Kicks a selected nick on a channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
-				"and above on the channel. Channel founders may include wildcards\n"
-				"in \037nick\037."));
+				"By default, limited to AOPs or those with level 5 access\n"
+				"and above on the channel. Channel founders may use masks too."));
 		return true;
 	}
 };

@@ -264,7 +264,7 @@ class XOPBase : public Command
 		ci->AddAccess(acc);
 
 		bool override = (level >= u_level && !access.Founder) || !access.HasPriv("ACCESS_CHANGE");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "ADD " << mask;
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to add " << mask;
 
 		FOREACH_MOD(I_OnAccessAdd, OnAccessAdd(ci, u, acc));
 		source.Reply(_("\002%s\002 added to %s %s list."), acc->mask.c_str(), ci->name.c_str(), source.command.c_str());
@@ -331,7 +331,7 @@ class XOPBase : public Command
 						 source.Reply(_("No matching entries on %s %s list."), ci->name.c_str(), source.command.c_str());
 					else
 					{
-						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "deleted access of users " << Nicks;
+						Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, c, ci) << "to delete " << Nicks;
 
 						if (Deleted == 1)
 							source.Reply(_("Deleted one entry from %s %s list."), ci->name.c_str(), source.command.c_str());
@@ -372,7 +372,7 @@ class XOPBase : public Command
 
 				if (a->mask.equals_ci(mask) && XOPChanAccess::DetermineLevel(a) == level)
 				{
-					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "DEL " << a->mask;
+					Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << a->mask;
 
 					source.Reply(_("\002%s\002 deleted from %s %s list."), a->mask.c_str(), ci->name.c_str(), source.command.c_str());
 
@@ -406,8 +406,6 @@ class XOPBase : public Command
 				return;
 			}
 		}
-
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci);
 
 		if (!ci->GetAccessCount())
 		{
@@ -502,7 +500,7 @@ class XOPBase : public Command
 		}
 
 		bool override = !ci->AccessFor(u).HasPriv("FOUNDER");
-		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "CLEAR";
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to clear the access list";
 
 		for (unsigned i = ci->GetAccessCount(); i > 0; --i)
 		{
@@ -578,7 +576,7 @@ class CommandCSQOP : public XOPBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002QOP\002 (AutoOwner) \002list\002 for a channel. The QOP \n"
+		source.Reply(_("Maintains the \002QOP\002 (AutoOwner) \002list\002 for a channel. The QOP\n"
 				"list gives users the right to be auto-owner on your channel,\n"
 				"which gives them almost (or potentially, total) access.\n"
 				" \n"
@@ -605,9 +603,9 @@ class CommandCSQOP : public XOPBase
 				"QOP list may use the \002QOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See \n"
+				"in that case you need to use the access list. See\n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
 				"the access list and xOP list systems."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
@@ -632,7 +630,7 @@ class CommandCSAOP : public XOPBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002AOP\002 (AutoOP) \002list\002 for a channel. The AOP \n"
+		source.Reply(_("Maintains the \002AOP\002 (AutoOP) \002list\002 for a channel. The AOP\n"
 				"list gives users the right to be auto-opped on your channel,\n"
 				"to unban or invite themselves if needed, to have their\n"
 				"greet message showed on join, and so on.\n"
@@ -661,9 +659,9 @@ class CommandCSAOP : public XOPBase
 				"AOP list may use the \002AOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See \n"
+				"in that case you need to use the access list. See\n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
 				"the access list and xOP list systems."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), 
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
@@ -688,8 +686,8 @@ class CommandCSHOP : public XOPBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002HOP\002 (HalfOP) \002list\002 for a channel. The HOP \n"
-				"list gives users the right to be auto-halfopped on your \n"
+		source.Reply(_("Maintains the \002HOP\002 (HalfOP) \002list\002 for a channel. The HOP\n"
+				"list gives users the right to be auto-halfopped on your\n"
 				"channel.\n"
 				" \n"
 				"The \002HOP ADD\002 command adds the given nickname to the\n"
@@ -710,14 +708,14 @@ class CommandCSHOP : public XOPBase
 				"The \002HOP CLEAR\002 command clears all entries of the\n"
 				"HOP list.\n"));
 		source.Reply(_(" \n"
-				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are \n"
-				"limited to AOPs or above, while the \002HOP CLEAR\002 command \n"
+				"The \002HOP ADD\002, \002HOP DEL\002 and \002HOP LIST\002 commands are\n"
+				"limited to AOPs or above, while the \002HOP CLEAR\002 command\n"
 				"can only be used by the channel founder.\n"
 				" \n"));
 		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See \n"
+				"in that case you need to use the access list. See\n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
 				"the access list and xOP list systems."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
@@ -742,9 +740,9 @@ class CommandCSSOP : public XOPBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002SOP\002 (SuperOP) \002list\002 for a channel. The SOP \n"
+		source.Reply(_("Maintains the \002SOP\002 (SuperOP) \002list\002 for a channel. The SOP\n"
 				"list gives users all rights given by the AOP list, and adds\n"
-				"those needed to use the AutoKick and the BadWords lists, \n"
+				"those needed to use the AutoKick and the BadWords lists,\n"
 				"to send and read channel memos, and so on.\n"
 				" \n"
 				"The \002SOP ADD\002 command adds the given nickname to the\n"
@@ -764,16 +762,15 @@ class CommandCSSOP : public XOPBase
 				"      \n"
 				"The \002SOP CLEAR\002 command clears all entries of the\n"
 				"SOP list.\n"));
-		source.Reply(_(
-				" \n"
-				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are \n"
+		source.Reply(_(" \n"
+				"The \002SOP ADD\002, \002SOP DEL\002 and \002SOP CLEAR\002 commands are\n"
 				"limited to the channel founder. However, any user on the\n"
 				"AOP list may use the \002SOP LIST\002 command.\n"
 				" \n"));
 		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See \n"
+				"in that case you need to use the access list. See\n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
 				"the access list and xOP list systems."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
@@ -798,8 +795,8 @@ class CommandCSVOP : public XOPBase
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("Maintains the \002VOP\002 (VOicePeople) \002list\002 for a channel.  \n"
-				"The VOP list allows users to be auto-voiced and to voice \n"
+		source.Reply(_("Maintains the \002VOP\002 (VOicePeople) \002list\002 for a channel.\n"
+				"The VOP list allows users to be auto-voiced and to voice\n"
 				"themselves if they aren't.\n"
 				" \n"
 				"The \002VOP ADD\002 command adds the given nickname to the\n"
@@ -819,16 +816,15 @@ class CommandCSVOP : public XOPBase
 				"      \n"
 				"The \002VOP CLEAR\002 command clears all entries of the\n"
 				"VOP list.\n"));
-		source.Reply(_(
-				" \n"
-				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are \n"
-				"limited to AOPs or above, while the \002VOP CLEAR\002 command \n"
+		source.Reply(_(" \n"
+				"The \002VOP ADD\002, \002VOP DEL\002 and \002VOP LIST\002 commands are\n"
+				"limited to AOPs or above, while the \002VOP CLEAR\002 command\n"
 				"can only be used by the channel founder.\n"
 				" \n"));
 		source.Reply(_("This command may have been disabled for your channel, and\n"
-				"in that case you need to use the access list. See \n"
+				"in that case you need to use the access list. See\n"
 				"\002%s%s HELP ACCESS\002 for information about the access list,\n"
-				"and \002%s%s HELP SET XOP\002 to know how to toggle between \n"
+				"and \002%s%s HELP SET XOP\002 to know how to toggle between\n"
 				"the access list and xOP list systems."),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(),
 				Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());

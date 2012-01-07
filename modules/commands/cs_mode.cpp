@@ -46,6 +46,8 @@ class CommandCSMode : public Command
 		const Anope::string &subcommand = params[2];
 		const Anope::string &param = params.size() > 3 ? params[3] : "";
 
+		bool override = !ci->AccessFor(u).HasPriv("MODE");
+
 		if (subcommand.equals_ci("ADD") && !param.empty())
 		{
 			spacesepstream sep(param);
@@ -88,7 +90,7 @@ class CommandCSMode : public Command
 							if (!mode_param.empty())
 								mode_param = " " + mode_param;
 							source.Reply(_("%c%c%s locked on %s"), adding ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-							Log(LOG_COMMAND, u, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+							Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to lock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 						}
 				}
 			}
@@ -139,7 +141,7 @@ class CommandCSMode : public Command
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
 								source.Reply(_("%c%c%s has been unlocked from %s."), adding == 1 ? '+' : '-', cm->ModeChar, mode_param.c_str(), ci->name.c_str());
-								Log(LOG_COMMAND, u, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
+								Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 							}
 							else
 								source.Reply(_("%c is not locked on %s."), cm->ModeChar, ci->name.c_str());
@@ -194,7 +196,8 @@ class CommandCSMode : public Command
 		spacesepstream sep(params.size() > 3 ? params[3] : "");
 		Anope::string modes = params[2], param;
 
-		Log(LOG_COMMAND, u, this, ci) << "to set " << params[2];
+		bool override = !ci->AccessFor(u).HasPriv("MODE");
+		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to set " << params[2];
 
 		int adding = -1;
 		for (size_t i = 0; i < modes.length(); ++i)
@@ -345,7 +348,7 @@ class CommandCSMode : public Command
 
 		if (!ci || !ci->c)
 			source.Reply(CHAN_X_NOT_IN_USE, params[0].c_str());
-		else if (!ci->AccessFor(u).HasPriv("MODE") && !u->HasCommand("chanserv/mode"))
+		else if (!ci->AccessFor(u).HasPriv("MODE") && !u->HasPriv("chanserv/set"))
 			source.Reply(ACCESS_DENIED);
 		else if (subcommand.equals_ci("LOCK"))
 			this->DoLock(source, ci, params);

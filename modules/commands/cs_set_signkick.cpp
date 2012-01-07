@@ -67,11 +67,11 @@ class CommandCSSetSignKick : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables signed kicks for a\n"
 				"channel.  When \002SIGNKICK\002 is set, kicks issued with\n"
-				"KICK command will have the nick that used the\n"
+				"the \002KICK\002 command will have the nick that used the\n"
 				"command in their reason.\n"
 				" \n"
-				"If you use \002LEVEL\002, those who have a level that is superior \n"
-				"or equal to the SIGNKICK level on the channel won't have their \n"
+				"If you use \002LEVEL\002, those who have a level that is superior\n"
+				"or equal to the SIGNKICK level on the channel won't have their\n"
 				"kicks signed."));
 		return true;
 	}

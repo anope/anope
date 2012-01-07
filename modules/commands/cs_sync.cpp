@@ -36,7 +36,7 @@ class CommandCSSync : public Command
 			for (CUserList::iterator it = ci->c->users.begin(), it_end = ci->c->users.end(); it != it_end; ++it)
 				chan_set_correct_modes((*it)->user, ci->c, 1);
 
-			source.Reply(_("All user modes on \2%s\2 have been synced."), ci->name.c_str());
+			source.Reply(_("All user modes on \002%s\002 have been synced."), ci->name.c_str());
 		}
 	}
 

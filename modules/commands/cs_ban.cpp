@@ -19,8 +19,8 @@ class CommandCSBan : public Command
 	CommandCSBan(Module *creator) : Command(creator, "chanserv/ban", 2, 3)
 	{
 		this->SetDesc(_("Bans a selected nick on a channel"));
-		this->SetSyntax(_("\037#channel\037 \037nick\037 [\037reason\037]"));
-		this->SetSyntax(_("\037#channel\037 \037mask\037 [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 \037nick\037 [\037reason\037]"));
+		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
@@ -127,7 +127,7 @@ class CommandCSBan : public Command
 		source.Reply(" ");
 		source.Reply(_("Bans a selected nick on a channel.\n"
 				" \n"
-				"By default, limited to AOPs or those with level 5 access \n"
+				"By default, limited to AOPs or those with level 5 access\n"
 				"and above on the channel. Channel founders may ban masks."));
 		return true;
 	}

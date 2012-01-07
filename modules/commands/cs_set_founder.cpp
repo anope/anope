@@ -59,11 +59,11 @@ class CommandCSSetFounder : public Command
 			return;
 		}
 
-		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder to " << nc->display;
+		Log(!source.permission.empty() ? LOG_ADMIN : LOG_COMMAND, u, this, ci) << "to change the founder from " << (ci->GetFounder() ? ci->GetFounder()->display : "(none)") << " to " << nc->display;
 
 		ci->SetFounder(nc);
 
-		source.Reply(_("Founder of %s changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
+		source.Reply(_("Founder of \002%s\002 changed to \002%s\002."), ci->name.c_str(), na->nick.c_str());
 
 		return;
 	}

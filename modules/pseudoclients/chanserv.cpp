@@ -175,9 +175,9 @@ class ChanServCore : public Module
 				"for that period of time) will be automatically dropped."), Config->CSExpire / 86400);
 		if (source.u->IsServicesOper())
 			source.Reply(_(" \n"
-				"Services Operators can also drop any channel without needing\n"
-				"to identify via password, and may view the access, akick,\n"
-				"and level setting lists for any channel."));
+				"Services Operators can also, depending on their access drop\n"
+				"any channel, view (and modify) the access, levels and akick\n"
+				"lists and settings for any channel."));
 	}
 };
 

@@ -69,7 +69,7 @@ class CommandCSUnban : public Command
 		this->SendSyntax(source);
 		source.Reply(" ");
 		source.Reply(_("Tells %s to remove all bans preventing you or the given\n"
-				"user from entering the given channel.  \n"
+				"user from entering the given channel.\n"
 				" \n"
 				"By default, limited to AOPs or those with level 5 and above\n"
 				"on the channel."), source.owner->nick.c_str());

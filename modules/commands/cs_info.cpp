@@ -125,8 +125,8 @@ class CommandCSInfo : public Command
 		source.Reply(" ");
 		source.Reply(_("Lists information about the named registered channel,\n"
 				"including its founder, time of registration, last time\n"
-				"used, description, and mode lock, if any. If \002ALL\002 is \n"
-				"specified, the entry message and successor will also \n"
+				"used, description, and mode lock, if any. If \002ALL\002 is\n"
+				"specified, the entry message and successor will also\n"
 				"be displayed."));
 		return true;
 	}

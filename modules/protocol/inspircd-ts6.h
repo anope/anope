@@ -57,7 +57,7 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendTopic(BotInfo *whosets, Channel *c)
 	{
-		UplinkSocket::Message(whosets->GetUID()) << "FTOPIC " << c->name << " " << c->topic_time + 1 << " " << c->topic_setter << " :" << c->topic;
+		UplinkSocket::Message(whosets->GetUID()) << "FTOPIC " << c->name << " " << Anope::CurTime << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u)

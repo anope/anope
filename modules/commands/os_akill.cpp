@@ -98,10 +98,11 @@ class CommandOSAKill : public Command
 			reason += " " + params[3];
 		if (!mask.empty() && !reason.empty())
 		{
+			User *targ = NULL;
 			std::pair<int, XLine *> canAdd = akills->CanAdd(mask, expires);
 			if (mask.find('!') != Anope::string::npos)
 				source.Reply(_("\002Reminder\002: AKILL masks cannot contain nicknames; make sure you have \002not\002 included a nick portion in your mask."));
-			else if (mask.find('@') == Anope::string::npos)
+			else if (mask.find('@') == Anope::string::npos && !(targ = finduser(mask)))
 				source.Reply(BAD_USERHOST_MASK);
 			else if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
 				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
@@ -113,9 +114,8 @@ class CommandOSAKill : public Command
 				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
 			else
 			{
-				User *user = finduser(mask);
-				if (user)
-					mask = "*@" + user->host;
+				if (targ)
+					mask = "*@" + targ->host;
 				unsigned int affected = 0;
 				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
 					if (Anope::Match(it->second->GetIdent() + "@" + it->second->host, mask))

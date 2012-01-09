@@ -98,7 +98,7 @@ void XLine::unserialize(serialized_data &data)
 
 	time_t expires;
 	data["expires"] >> expires;
-	XLine *xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["expires"].astr(), data["uid"].astr());
+	XLine *xl = new XLine(data["mask"].astr(), data["by"].astr(), expires, data["reason"].astr(), data["uid"].astr());
 	data["created"] >> xl->Created;
 	xl->manager = xlm;
 

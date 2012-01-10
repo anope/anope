@@ -391,6 +391,13 @@ class UnrealExtBan : public ChannelModeList
 			if (u->HasMode(UMODE_REGISTERED) && mask.equals_ci(u->nick))
 				return true;
 		}
+		else if (mask.find("~a:") == 0)
+		{
+			Anope::string real_mask = mask.substr(3);
+
+			if (u->Account() && Anope::Match(u->Account()->display, real_mask))
+				return true;
+		}
 	
 		return false;
 	}

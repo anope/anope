@@ -429,6 +429,7 @@ bool IRCdMessage::OnPrivmsg(const Anope::string &source, const std::vector<Anope
 					Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
 					ircdproto->SendCTCP(bi, u->nick, "VERSION Anope-%s %s :%s - (%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 				}
+				return true;
 			}
 			
 			bi->OnMessage(u, message);

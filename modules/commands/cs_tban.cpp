@@ -40,7 +40,7 @@ class CommandCSTBan : public Command
  public:
 	CommandCSTBan(Module *creator) : Command(creator, "chanserv/tban", 3, 3)
 	{
-		this->SetDesc(_("Bans the user for a given length of time in seconds"));
+		this->SetDesc(_("Bans the user for a given length of time"));
 		this->SetSyntax(_("\037channel\037 \037nick\037 \037time\037"));
 	}
 
@@ -82,10 +82,10 @@ class CommandCSTBan : public Command
 	{
 		this->OnSyntaxError(source, "");
 		source.Reply(" ");
-		source.Reply(_("Bans the user for a given length of time in seconds.\n"
+		source.Reply(_("Bans the user for a given length of time.\n"
 				" \n"
 				"Bans the given user from a channel for a specified length of\n"
-				"time in seconds. If the ban is removed before by hand, it\n"
+				"time. If the ban is removed before by hand, it\n"
 				"will NOT be replaced."));
 
 		return true;

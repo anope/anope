@@ -122,9 +122,9 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 		{
 			int i = inet_pton(type, address.c_str(), &sa4.sin_addr);
 			if (i == 0)
-				throw SocketException("Invalid host");
+				throw SocketException("Invalid IP");
 			else if (i <= -1)
-				throw SocketException("Invalid host: "  + Anope::LastError());
+				throw SocketException("Invalid IP: "  + Anope::LastError());
 			sa4.sin_family = type;
 			sa4.sin_port = htons(pport);
 			return;
@@ -133,9 +133,9 @@ void sockaddrs::pton(int type, const Anope::string &address, int pport)
 		{
 			int i = inet_pton(type, address.c_str(), &sa6.sin6_addr);
 			if (i == 0)
-				throw SocketException("Invalid host");
+				throw SocketException("Invalid IP");
 			else if (i <= -1)
-				throw SocketException("Invalid host: " + Anope::LastError());
+				throw SocketException("Invalid IP: " + Anope::LastError());
 			sa6.sin6_family = type;
 			sa6.sin6_port = htons(pport);
 			return;
@@ -173,11 +173,9 @@ void sockaddrs::ntop(int type, const void *src)
 
 cidr::cidr(const Anope::string &ip)
 {
-	if (ip.find_first_not_of("01234567890:./") != Anope::string::npos)
-		throw SocketException("Invalid IP");
-
 	bool ipv6 = ip.find(':') != Anope::string::npos;
 	size_t sl = ip.find_last_of('/');
+
 	if (sl == Anope::string::npos)
 	{
 		this->cidr_ip = ip;

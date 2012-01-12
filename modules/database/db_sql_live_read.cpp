@@ -171,6 +171,8 @@ class MySQLLiveModule : public Module
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
 		Module(modname, creator, DATABASE), SQL("")
 	{
+		this->OnReload();
+
 		Implementation i[] = { I_OnReload, I_OnFindChan, I_OnFindNick, I_OnFindCore, I_OnShutdown };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}

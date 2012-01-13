@@ -122,7 +122,8 @@ void ChanAccess::unserialize(serialized_data &data)
 
 bool ChanAccess::Matches(User *u, NickCore *nc)
 {
-	if (u && Anope::Match(u->nick, this->mask))
+	bool is_mask = this->mask.find_first_of("!@?*") != Anope::string::npos;
+	if (u && is_mask && Anope::Match(u->nick, this->mask))
 		return true;
 	else if (u && Anope::Match(u->GetDisplayedMask(), this->mask))
 		return true;

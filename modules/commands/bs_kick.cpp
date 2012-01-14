@@ -454,7 +454,7 @@ class CommandBSKick : public Command
 				}
 			}
 			else
-				source.Reply(UNKNOWN_OPTION, Config->UseStrictPrivMsgString.c_str(), option.c_str(), this->name.c_str());
+				this->OnSyntaxError(source, "");
 		}
 		return;
 	}

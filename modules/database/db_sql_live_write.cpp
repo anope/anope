@@ -85,9 +85,15 @@ class DBMySQL : public Module
 
 	void Delete(const Anope::string &table, const Serializable::serialized_data &data)
 	{
-		Anope::string query_text = "DELETE FROM `" + table + "` WHERE ";
+		Anope::string query_text = "DELETE FROM `" + table + "` WHERE ", arg_text;
 		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += "`" + it->first + "` = @" + it->first + "@";
+		{
+			if (!arg_text.empty())
+				arg_text += " AND ";
+			arg_text += "`" + it->first + "` = @" + it->first + "@";
+		}
+
+		query_text += arg_text;
 
 		SQLQuery query(query_text);
 		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)

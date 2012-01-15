@@ -139,7 +139,24 @@ void NickAlias::unserialize(serialized_data &data)
 	if (core == NULL)
 		return;
 
-	NickAlias *na = new NickAlias(data["nick"].astr(), core);
+	NickAlias *na = findnick(data["nick"].astr());
+	if (na == NULL)
+		na = new NickAlias(data["nick"].astr(), core);
+	else if (na->nc != core)
+	{
+		std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
+		if (it != na->nc->aliases.end())
+			na->nc->aliases.erase(it);
+
+		if (na->nc->aliases.empty())
+			delete na->nc;
+		else if (na->nick.equals_ci(na->nc->display))
+			change_core_display(na->nc);
+
+		na->nc = core;
+		na->nc->aliases.push_back(na);
+	}
+
 	data["last_quit"] >> na->last_quit;
 	data["last_realname"] >> na->last_realname;
 	data["last_usermask"] >> na->last_usermask;

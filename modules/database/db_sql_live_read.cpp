@@ -32,124 +32,6 @@ class SQLCache : public Timer
 	}
 };
 
-static void ChanInfoUpdate(const Anope::string &name, const SQLResult &res)
-{
-	ChannelInfo *ci = cs_findchan(name);
-	if (res.Rows() == 0)
-	{
-		delete ci;
-		return;
-	}
-
-	try
-	{
-		if (!ci)
-			ci = new ChannelInfo(name);
-		ci->SetFounder(findcore(res.Get(0, "founder")));
-		ci->successor = findcore(res.Get(0, "successor"));
-		ci->desc = res.Get(0, "description");
-		ci->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-		ci->ClearFlags();
-		ci->FromString(res.Get(0, "flags"));
-		ci->bantype = convertTo<int>(res.Get(0, "bantype"));
-		ci->memos.memomax = convertTo<unsigned>(res.Get(0, "memomax"));
-
-		if (res.Get(0, "bi").equals_cs(ci->bi ? ci->bi->nick : "") == false)
-		{
-			if (ci->bi)
-				ci->bi->UnAssign(NULL, ci);
-			BotInfo *bi = findbot(res.Get(0, "bi"));
-			if (bi)
-				bi->Assign(NULL, ci);
-		}
-
-		ci->capsmin = convertTo<int16_t>(res.Get(0, "capsmin"));
-		ci->capspercent = convertTo<int16_t>(res.Get(0, "capspercent"));
-		ci->floodlines = convertTo<int16_t>(res.Get(0, "floodlines"));
-		ci->floodsecs = convertTo<int16_t>(res.Get(0, "floodsecs"));
-		ci->repeattimes = convertTo<int16_t>(res.Get(0, "repeattimes"));
-
-		if (ci->c)
-			check_modes(ci->c);
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
-static void NickInfoUpdate(const Anope::string &name, const SQLResult &res)
-{
-	NickAlias *na = findnick(name);
-	if (res.Rows() == 0)
-	{
-		delete na;
-		return;
-	}
-
-	try
-	{
-		NickCore *nc = findcore(res.Get(0, "nick"));
-		if (!nc)
-			return;
-		if (!na)
-			na = new NickAlias(name, nc);
-
-		na->last_quit = res.Get(0, "last_quit");
-		na->last_realname = res.Get(0, "last_realname");
-		na->last_usermask = res.Get(0, "last_usermask");
-		na->last_realhost = res.Get(0, "last_realhost");
-		na->time_registered = convertTo<time_t>(res.Get(0, "time_registered"));
-		na->last_seen = convertTo<time_t>(res.Get(0, "last_seen"));
-		na->ClearFlags();
-		na->FromString(res.Get(0, "flags"));
-
-		if (na->nc != nc)
-		{
-			std::list<NickAlias *>::iterator it = std::find(na->nc->aliases.begin(), na->nc->aliases.end(), na);
-			if (it != na->nc->aliases.end())
-				na->nc->aliases.erase(it);
-
-			na->nc = nc;
-			na->nc->aliases.push_back(na);
-		}
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
-static void NickCoreUpdate(const Anope::string &name, const SQLResult &res)
-{
-	NickCore *nc = findcore(name);
-	if (res.Rows() == 0)
-	{
-		delete nc;
-		return;
-	}
-
-	try
-	{
-		if (!nc)
-			nc = new NickCore(name);
-
-		nc->pass = res.Get(0, "pass");
-		nc->email = res.Get(0, "email");
-		nc->greet = res.Get(0, "greet");
-		nc->ClearFlags();
-		nc->FromString(res.Get(0, "flags"));
-		nc->language = res.Get(0, "language");
-	}
-	catch (const SQLException &ex)
-	{
-		Log() << ex.GetReason();
-	}
-	catch (const ConvertException &) { }
-}
-
 class MySQLLiveModule : public Module
 {
 	service_reference<SQLProvider, Base> SQL;
@@ -201,7 +83,23 @@ class MySQLLiveModule : public Module
 			SQLQuery query("SELECT * FROM `ChannelInfo` WHERE `name` = @name@");
 			query.setValue("name", chname);
 			SQLResult res = this->RunQuery(query);
-			ChanInfoUpdate(chname, res);
+
+			if (res.Rows() == 0)
+			{
+				delete cs_findchan(chname);
+				return;
+			}
+			
+			SerializeType *sb = SerializeType::Find("ChannelInfo");
+			if (sb == NULL)
+				return;
+
+			Serializable::serialized_data data;
+			const std::map<Anope::string, Anope::string> &row = res.Row(0);
+			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+				data[rit->first] << rit->second;
+
+			sb->Create(data);
 		}
 		catch (const SQLException &ex)
 		{
@@ -219,7 +117,23 @@ class MySQLLiveModule : public Module
 			SQLQuery query("SELECT * FROM `NickAlias` WHERE `nick` = @nick@");
 			query.setValue("nick", nick);
 			SQLResult res = this->RunQuery(query);
-			NickInfoUpdate(nick, res);
+
+			if (res.Rows() == 0)
+			{
+				delete findnick(nick);
+				return;
+			}
+
+			SerializeType *sb = SerializeType::Find("NickAlias");
+			if (sb == NULL)
+				return;
+
+			Serializable::serialized_data data;
+			const std::map<Anope::string, Anope::string> &row = res.Row(0);
+			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+				data[rit->first] << rit->second;
+
+			sb->Create(data);
 		}
 		catch (const SQLException &ex)
 		{
@@ -237,7 +151,23 @@ class MySQLLiveModule : public Module
 			SQLQuery query("SELECT * FROM `NickCore` WHERE `display` = @display@");
 			query.setValue("display", nick);
 			SQLResult res = this->RunQuery(query);
-			NickCoreUpdate(nick, res);
+
+			if (res.Rows() == 0)
+			{
+				delete findcore(nick);
+				return;
+			}
+
+			SerializeType *sb = SerializeType::Find("NickCore");
+			if (sb == NULL)
+				return;
+
+			Serializable::serialized_data data;
+			const std::map<Anope::string, Anope::string> &row = res.Row(0);
+			for (std::map<Anope::string, Anope::string>::const_iterator rit = row.begin(), rit_end = row.end(); rit != rit_end; ++rit)
+				data[rit->first] << rit->second;
+
+			sb->Create(data);
 		}
 		catch (const SQLException &ex)
 		{

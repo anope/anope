@@ -355,11 +355,24 @@ Serializable::serialized_data ChannelInfo::serialize()
 
 void ChannelInfo::unserialize(serialized_data &data)
 {
-	ChannelInfo *ci = new ChannelInfo(data["name"].astr());
+	ChannelInfo *ci = cs_findchan(data["name"].astr());
+	if (ci == NULL)
+		new ChannelInfo(data["name"].astr());
+
 	if (data.count("founder") > 0)
+	{
+		if (ci->founder)
+			ci->founder->channelcount--;
 		ci->founder = findcore(data["founder"].astr());
+		if (ci->founder)
+			ci->founder->channelcount++;
+	}
 	if (data.count("successor") > 0)
+	{
 		ci->successor = findcore(data["successor"].astr());
+		if (ci->founder && ci->founder == ci->successor)
+			ci->successor = NULL;
+	}
 	data["description"] >> ci->desc;
 	data["time_registered"] >> ci->time_registered;
 	data["last_used"] >> ci->last_used;
@@ -375,7 +388,13 @@ void ChannelInfo::unserialize(serialized_data &data)
 			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
 	}
 	if (data.count("bi") > 0)
+	{
+		if (ci->bi)
+			ci->bi->chancount--;
 		ci->bi = findbot(data["bi"].astr());
+		if (ci->bi)
+			ci->bi->chancount++;
+	}
 	data["capsmin"] >> ci->capsmin;
 	data["capspercent"] >> ci->capspercent;
 	data["floodlines"] >> ci->floodlines;
@@ -386,6 +405,7 @@ void ChannelInfo::unserialize(serialized_data &data)
 		Anope::string buf;
 		data["memoignores"] >> buf;
 		spacesepstream sep(buf);
+		ci->memos.ignores.clear();
 		while (sep.GetToken(buf))
 			ci->memos.ignores.push_back(buf);
 	}

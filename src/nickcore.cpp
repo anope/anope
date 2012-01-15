@@ -73,7 +73,9 @@ Serializable::serialized_data NickCore::serialize()
 
 void NickCore::unserialize(serialized_data &data)
 {
-	NickCore *nc = new NickCore(data["display"].astr());
+	NickCore *nc = findcore(data["display"].astr());
+	if (nc == NULL)
+		nc = new NickCore(data["display"].astr());
 	data["pass"] >> nc->pass;
 	data["email"] >> nc->email;
 	data["greet"] >> nc->greet;
@@ -83,6 +85,7 @@ void NickCore::unserialize(serialized_data &data)
 		Anope::string buf;
 		data["access"] >> buf;
 		spacesepstream sep(buf);
+		nc->access.clear();
 		while (sep.GetToken(buf))
 			nc->access.push_back(buf);
 	}
@@ -90,6 +93,7 @@ void NickCore::unserialize(serialized_data &data)
 		Anope::string buf;
 		data["cert"] >> buf;
 		spacesepstream sep(buf);
+		nc->cert.clear();
 		while (sep.GetToken(buf))
 			nc->cert.push_back(buf);
 	}
@@ -98,6 +102,7 @@ void NickCore::unserialize(serialized_data &data)
 		Anope::string buf;
 		data["memoignores"] >> buf;
 		spacesepstream sep(buf);
+		nc->memos.ignores.clear();
 		while (sep.GetToken(buf))
 			nc->memos.ignores.push_back(buf);
 	}

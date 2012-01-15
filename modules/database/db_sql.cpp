@@ -183,7 +183,7 @@ class DBSQL : public Module
 			}
 		}
 
-		return EVENT_CONTINUE;
+		return EVENT_STOP;
 	}
 };
 

@@ -357,7 +357,7 @@ void ChannelInfo::unserialize(serialized_data &data)
 {
 	ChannelInfo *ci = cs_findchan(data["name"].astr());
 	if (ci == NULL)
-		new ChannelInfo(data["name"].astr());
+		ci = new ChannelInfo(data["name"].astr());
 
 	if (data.count("founder") > 0)
 	{

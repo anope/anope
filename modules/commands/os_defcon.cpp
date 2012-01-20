@@ -482,7 +482,7 @@ class OSDefcon : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->name == "chanserv/mode" && params[1].equals_ci("LOCK"))
+		else if (command->name == "chanserv/mode" && params.size() > 1 && params[1].equals_ci("LOCK"))
 		{
 			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{

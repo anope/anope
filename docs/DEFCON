@@ -31,10 +31,11 @@ Anope DefCon
 
     The DefCon system is part of Anope's core,
 
-    The DefCon system has to be configured on your services.conf file to
-    be enabled. The defcon module will not unload unless all non-optional
-    directives are set. Look for the defcon block
-    section on your services.conf file for more information.
+    The DefCon system has to be configured on your operserv.conf file to
+    be enabled. Defcon will be disabled if "defaultlevel" in the defcon
+    block is left commented, or set to 0. Look for the defcon block
+    on your operserv.conf file for more information on enabling and
+    configuring it.
 
     Make sure you restart Anope after changing the DefCon configuration
     directives.
@@ -45,7 +46,7 @@ Anope DefCon
 
     No new channel registrations 
     No New Nick Registrations 
-    No MLOCK changes 
+    No Mode Lock changes
     Force Chan Mode 
     Use Reduced Session Limit 
     KILL any new clients trying to connect 
@@ -55,7 +56,7 @@ Anope DefCon
     No new memos sent to block MemoServ attacks
     
     Information regarding how to enable this for specific defcon levels can
-    be found in services.conf
+    be found in operserv.conf
 
 4) Usage
 
@@ -70,21 +71,17 @@ Anope DefCon
 
     /msg OperServ DEFCON 4
 
-    *** Global -- from OperServ: dengel Changed the DEFCON level to 4
-
     -OperServ- Services are now at DEFCON 4
     -OperServ- * No new channel registrations
     -OperServ- * No new nick registrations
-    -OperServ- * No MLOCK changes
+    -OperServ- * No mode lock changes
     -OperServ- * Use the reduced session limit of 5
 
-    -Global- The Defcon Level is now at Level: 4
+    -Global- The Defcon Level is now at: 4
 
     Restore normal readiness:
 
     /msg OperServ DEFCON 5
-
-    *** Global -- from OperServ: dengel Changed the DEFCON level to 5
 
     -OperServ- Services are now at DEFCON 5
 

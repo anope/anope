@@ -145,7 +145,7 @@ class CommandOSDefcon : public Command
 		if (DConfig.Check(DEFCON_NO_NEW_NICKS))
 			source.Reply(_("* No new nick registrations"));
 		if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
-			source.Reply(_("* No MLOCK changes"));
+			source.Reply(_("* No mode lock changes"));
 		if (DConfig.Check(DEFCON_FORCE_CHAN_MODES) && !DConfig.chanmodes.empty())
 			source.Reply(_("* Force Chan Modes (%s) to be set on all channels"), DConfig.chanmodes.c_str());
 		if (DConfig.Check(DEFCON_REDUCE_SESSION))
@@ -482,7 +482,7 @@ class OSDefcon : public Module
 				return EVENT_STOP;
 			}
 		}
-		else if (command->name == "chanserv/set/mlock")
+		else if (command->name == "chanserv/mode" && params[1].equals_ci("LOCK"))
 		{
 			if (DConfig.Check(DEFCON_NO_MLOCK_CHANGE))
 			{

@@ -305,12 +305,12 @@ class CommandBSKick : public Command
 
 					ci->botflags.SetFlag(BS_KICK_REPEAT);
 					if (ci->ttb[TTB_REPEAT])
-						source.Reply(_("Bot will now kick \002repeats\002 (users that say %d times\n"
-								"the same thing), and will place a ban after %d \n"
+						source.Reply(_("Bot will now kick \002repeats\002 (users that say the\n"
+								"same thing %d times), and will place a ban after %d \n"
 								"kicks for the same user."), ci->repeattimes, ci->ttb[TTB_REPEAT]);
 					else
-						source.Reply(_("Bot will now kick \002repeats\002 (users that say %d times\n"
-							"the same thing)."), ci->repeattimes);
+						source.Reply(_("Bot will now kick \002repeats\002 (users that say the\n"
+							"same thing %d times)."), ci->repeattimes);
 				}
 				else
 				{

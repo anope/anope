@@ -622,11 +622,13 @@ struct BanData : public ExtensibleItem
 			++it;
 
 			if (Anope::CurTime - bd.last_use > Config->BSKeepData)
-			{
 				data_map.erase(user);
-				continue;
-			}
 		}
+	}
+
+	void OnDelete()
+	{
+		delete this;
 	}
 };
 
@@ -652,9 +654,10 @@ struct UserData : public ExtensibleItem
 	time_t last_start;
 
 	/* for repeat kicker */
-	Anope::string lastline;
 	Anope::string lasttarget;
 	int16_t times;
+
+	Anope::string lastline;
 
 	void OnDelete()
 	{
@@ -751,7 +754,7 @@ class BSKick : public Module
 		va_list args;
 		char buf[1024];
 
-		if (!ci || !ci->bi || !ci->c || !u || u->server->IsULined())
+		if (!ci || !ci->bi || !ci->c || !u || u->server->IsULined() || !ci->c->FindUser(u))
 			return;
 
 		Anope::string fmt = translate(u, message);
@@ -862,7 +865,7 @@ class BSKick : public Module
 		}
 
 		/* Caps kicker */
-		if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= ci->capsmin)
+		if (ci->botflags.HasFlag(BS_KICK_CAPS) && realbuf.length() >= static_cast<unsigned>(ci->capsmin))
 		{
 			int i = 0, l = 0;
 
@@ -964,13 +967,12 @@ class BSKick : public Module
 			} /* for */
 		} /* if badwords */
 
-		UserData *ud = NULL;
+		UserData *ud = GetUserData(u, c);
 
-		/* Flood kicker */
-		if (ci->botflags.HasFlag(BS_KICK_FLOOD))
+		if (ud)
 		{
-			ud = GetUserData(u, c);
-			if (ud)
+			/* Flood kicker */
+			if (ci->botflags.HasFlag(BS_KICK_FLOOD))
 			{
 				if (Anope::CurTime - ud->last_start > ci->floodsecs)
 				{
@@ -986,27 +988,14 @@ class BSKick : public Module
 					return;
 				}
 			}
-		}
 
-		/* Repeat kicker */
-		if (ci->botflags.HasFlag(BS_KICK_REPEAT))
-		{
-			if (!ud)
-				ud = GetUserData(u, c);
-			if (ud)
+			/* Repeat kicker */
+			if (ci->botflags.HasFlag(BS_KICK_REPEAT))
 			{
-
-				if (!ud->lastline.empty() && !ud->lastline.equals_ci(realbuf))
-				{
-					ud->lastline = realbuf;
+				if (!ud->lastline.equals_ci(realbuf))
 					ud->times = 0;
-				}
 				else
-				{
-					if (ud->lastline.empty())
-						ud->lastline = realbuf;
 					++ud->times;
-				}
 
 				if (ud->times >= ci->repeattimes)
 				{
@@ -1015,25 +1004,25 @@ class BSKick : public Module
 					return;
 				}
 			}
-		}
 
-		if (ud && ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
-		{
-			for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
+			if (ud->lastline.equals_ci(realbuf) && !ud->lasttarget.empty() && !ud->lasttarget.equals_ci(ci->name))
 			{
-				Channel *chan = (*it)->chan;
-				++it;
-
-				if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+				for (UChannelList::iterator it = u->chans.begin(); it != u->chans.end();)
 				{
-					check_ban(chan->ci, u, TTB_AMSGS);
-					bot_kick(chan->ci, u, _("Don't use AMSGs!"));
+					Channel *chan = (*it)->chan;
+					++it;
+
+					if (chan->ci != NULL && chan->ci->botflags.HasFlag(BS_KICK_AMSGS) && !chan->ci->AccessFor(u).HasPriv("NOKICK"))
+					{
+						check_ban(chan->ci, u, TTB_AMSGS);
+						bot_kick(chan->ci, u, _("Don't use AMSGs!"));
+					}
 				}
 			}
-		}
 
-		if (ud)
 			ud->lasttarget = ci->name;
+			ud->lastline = realbuf;
+		}
 	}
 };
 

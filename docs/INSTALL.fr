@@ -1,0 +1,209 @@
+Installation et instructions d'anope
+------------------------------------
+
+1) Instalation d'anope
+2) Mise à jour d'anope
+3) Configuration de l'ircd
+4) Mise en route de anope
+5) Mise en place d'un fichier crontab
+
+Note: Vous devrez également lire les fichiers README et FAQ !
+
+1) Installation de anope
+
+      Note importante: il n'est pas recommandé d'utiliser (et même d'installer)
+                     Anope en tant que root.
+                     Utilisez un utilisateur non privilégié,
+
+
+La première chose que vous devez faire est d'obtenir le package Anope (si ce n'est déjà fait).
+
+Vous pouvez le trouver ici  http://www.anope.org/
+
+
+
+Anope peut être installer de deux façons.
+
+ 1.  La méthode recommandée est d'utiliser CMake.
+     Vous pouvez vérifier si CMake est déjà installé sur votre système en utilisant la
+
+     commande:  cmake --version ( sur votre vps ou dedier etre loggué en root )
+
+
+     Si c'est installé, vous aurez une ligne qui dit quelque chose qui ressemble à
+
+     «version 2.6 cmake-patch 1".
+
+     Si la version est inférieure à 2,4 ou si vous obtenez une erreur disant que la commande n'a pas été trouvé,
+     vous ne serez pas en mesure d'utiliser CMake,
+
+     sauf si vous installez vous-même dans votre répertoire home. CMake
+     vous pouvez le téléchargé ici >  http://www.cmake.org/cmake/resources/software.html
+
+
+     Si vous n'arrivez pas à installer (soit en raison du manque d'espace
+     ou de restrictions par votre fournisseur d'hébergement),
+     vous pouvez encore utiliser le script de configuration fournis.
+     Cette option n'est pas recommandée et finira par être retiré, mais il est fourni pour la compatibilité de ces
+     manque de CMake.
+
+
+
+    Ensuite, décompressez le package dans votre répertoire home, et allez dans le répértoire
+    qui viens d'être crée.
+
+    Maintenant, tapez ./Config pour lancer le script de configuration. Il va vous poser
+    quelques questions, et compiler Anope sur votre système.
+
+    Si vous ne savez pas repondre à une question, utilisez la valeur par défaut.
+
+
+    Vous pouvez maintenant taper make pour compiler Anope. S'il ya des erreurs dans la
+    Makefile, * essayez d'utiliser * gmake au lieu. Si cela ne fonctionne toujours pas, vous (ou
+    votre fournisseur ) doit installer GNU make. Vous pouvez
+    le Trouvez sur ftp://prep.ai.mit.edu/pub/gnu/.
+
+    Maintenant, tapez make install (ou gmake install; voir ci-dessus). Cela permet d'installer
+    tous les fichiers nécessaires dans les chemins que vous avez spécifié dans la configuration 
+    script, et les permissions du fichier de configuration. Vous devez vous assurer que les données
+    répertoire ne sont pas accessible par d'autres utilisateurs, que des utilisateurs malveillants peuvent
+    causer des problèmes sur votre réseau, si les mots de passe ne sont pas cryptés, ou de lire
+    les mémos de tout utilisateur.
+
+    Si vous voyez des erreurs lors de ce processus, s'il vous plaît nous envoyer un mail avec le * complet *
+    sortie d'erreur, et n'oubliez pas de mentionner votre OS, compilateur et bibliothèque C + +
+    versions.
+
+    Maintenant, allez dans le répertoire de données (par défaut, cd ~/services/data). ouvrer exemple.conf
+    avec votre éditeur de texte favori. Il contient toute la configuration
+    directives. Anope va l'utiliser au démarrage. Lisez attentivement les instructions contenues dans
+    le fichier. l'utilisation des valeurs par defauld n'est pas recomment et anope ne risque pas de fonctionner
+
+
+    Si vous avez besoin d'aide, vous devez vous abonner à la mailing list et par courrier Anope
+    pour se faire aider par d'autres utilisateurs. Voir le fichier README pour plus de
+    informations.
+
+2) Mise à jour Anope
+
+    Si vous avez un fichier .Diff et que vous voulez patcher les ancienne sources Anope avec,
+    effectuer les opérations suivantes:
+
+        * Copiez le fichier .Diff dans le répertoire racine des sources Anope.
+        * Type de patch-p1 <file.diff
+
+   Notez que la mise à jour anope avec un fichier patch n'est pas recommandé. 
+   Vous devez télécharger une nouvelle source propre, car cela vous donnera les meilleurs résultats..
+
+    Pour mettre à jour Anope, suivez simplement les instructions d'installation décrites dans
+    l'article 1. Il y a cependant quelques règles spécifiques:
+
+        * IMPORTANT: Sauvegardez vos anciennes bases de données!
+        * Si vous mettez à jour vers une nouvelle version majeure, toujours redémarrer avec un 
+          fichier de configuration neuve example.conf.
+
+
+
+3) Mise en place du IRCd
+
+    Ce Services agit comme un serveur IRC avec des pseudo-clients sur elle. Pour les relier à
+    votre réseau, vous aurez besoin d'ajouter quelques lignes dans le ircd.conf de leur plate-forme
+    serveur (comme indiqué dans la directive de configuration RemoteServer).
+
+    Pour les échantillons ci-dessous, nous allons prendre services.localhost.net que le nom de la
+    Services (comme indiqué dans la directive de configuration ServerName). Notez que
+    présente des échantillons sont faites pour être aussi générique que possible, mais il pourrait y avoir
+    de petites variations, en fonction de votre IRCd. Pour IRCd aide spécifique aux
+    de configuration, lire près de la fin de cette section.
+
+    Tout d'abord, les lignes C / N, qui permettent aux services de crée un lien. Ils ont également besoin d'un
+    Y: ligne fonctionne correctement.
+
+        Y: 27:180:0:0:4000000
+        C: 127.0.0.1: mypass: services.localhost.net: 30
+        N: 127.0.0.1: mypass: services.localhost.net: 30
+
+    "mot de pass" est le même mot de passe que vous avez mentionné dans le RemoteServer
+    directive de configuration. 127.0.0.1 est l'adresse IP à partir de laquelle les services se connecterons
+    à partir de (reliant en localhost est le moyen le plus efficace pour exécuter les services).
+
+    Ensuite, vous avez à mettre en place un U:ligne, qui permettra aux services de changer
+    modes de canal, de sujets, et bien plus encore, sans être op sur le canal.
+
+        U: services.localhost.net: *: *
+
+    REMARQUE: si vous avez plus d'un serveur dans votre réseau, cette ligne doit
+          être ajouté sur tous les autres serveurs, où cela ne risque pas de fonctionner correctement.
+
+    Enfin, vous aurez besoin d'ajouter un H:ligne, pour permttre la commande OperServ JUPE
+    de fonctionner correctement.
+
+        H:*::Services.LocalHost.Net
+
+    Ne pas oublier de /rehash votre IRCd pour appliquer les modifications.
+
+   Une nouvelle tendance dans la configuration ircd  hybride, Unreal et Bahamut, qui utilisent une approche plus
+    «Lisibles» sous forme de configuration. Pour ceux, utiliser quelque chose comme:
+
+        link services.localhost.net
+        {
+            username        *;
+            hostname        localhost;
+            bind-ip         *;
+            port            6667;
+            hub             *;
+            password-connect "mypass";
+            password-receive "mypass";
+            class           servers;
+        };
+
+    Notez que ce bloc de fichiers de configuration de style est diffèrent 
+    sur le IRCd. Consultez le fabricant de lien interactif (le lien est ci-dessous) pour plus
+    détails sur la configuration exacte utilisée par votre IRCd.
+
+    Si vous êtes incapable d'obtenir un lien avec votre IRCd après la lecture de cet article,
+    vous pouvez essayer le fabricant lien interactif, qui est situé au:
+
+        http://anope.org/ilm.php
+
+4) A partir Anope
+
+    Allez dans le répertoire où les fichiers binaires ont été installés (par défaut, ce n'est
+    ~/ Services/ bin). Tapez. /Services à lancer Anope.
+
+    S'il ya des erreurs de syntaxe dans le fichier de configuration, ils seront
+    affiche sur l'écran. Corrigez-les jusqu'à ce qu'il n'y à plus d'erreur.
+    Un démarrage réussi ne générera pas de message.
+
+    Donner aux services au moins une minute pour se connecté à votre réseau, comme certains
+    IRCds sur certains OS peut être très lent pour le processus de liaison. Si rien n'arrive après environ une minute,
+    il y a probablement un problème de configuration. Essayez
+    de lancer Anope en mode debug  ./services-debug-nofork pour voir toutes les erreurs qu'il
+    rencontres, et d'essayer de les corriger.
+
+    Si vous avez besoin d'aide pour résoudre des erreurs, n'hésitez pas à vous abonner à la Anope
+    liste de diffusion et de poser là. Voir le fichier README pour plus de détails.
+
+5) Mettre en place un crontab
+
+    Une entrée crontab vous permettra de vérifier périodiquement que Anope est
+    toujours en cours, et redémarrez-le s'il n'est pas.
+
+    D'abord renommer le script example.chk qui est dans le chemin de Anope (par défaut,
+    cela est ~/services/data) pour services.chk et le modifier. Vous aurez besoin de
+    modifier la partie configuration du fichier. Assurez-vous ensuite que le fichier est
+    marqué comme exécutable en tapant chmod + x services.chk, et essayer de lancer le
+    script pour voir si cela fonctionne (Anope ne doit pas être en marche lorsque vous faites cela ;))
+
+    Lorsque cela est fait, vous devrez ajouter l'entrée crontab. Type de crontab-e. 
+    Cela va ouvrir l'éditeur de texte par défaut avec le fichier crontab. Entrez le chemin
+    suivant (avec le chemin correct):
+
+        * / 5 * * * * /home/ircd/services/data/services.chk> /dev/nul 2> & 1
+
+    Le * / 5 au commencement signifie "vérifier toutes les 5 minutes". Vous pouvez remplacer
+    le 5 avec un autre numéro si vous voulez (mais moins de 60). Consulter
+    pages de manuel de votre système pour plus de détails sur la syntaxe de la crontab
+    fichier. Intéressant pages de manuel sont crontab (5), crontab (1) et cron (8).
+
+    Sauvegarder et quitter, et il est installé.

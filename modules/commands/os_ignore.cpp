@@ -92,7 +92,7 @@ class OSIgnoreService : public IgnoreService
 			for (; ign != ign_end; ++ign)
 			{
 				Entry ignore_mask(CMODE_BEGIN, ign->mask);
-				if (ignore_mask.Matches(u))
+				if (ignore_mask.Matches(u, true))
 					break;
 			}
 		}
@@ -183,7 +183,21 @@ class CommandOSIgnore : public Command
 		if (!ignore_service)
 			return;
 
-		const std::list<IgnoreData> &ignores = ignore_service->GetIgnores();
+		std::list<IgnoreData> &ignores = ignore_service->GetIgnores();
+
+		for (std::list<IgnoreData>::iterator it = ignores.begin(), next_it; it != ignores.end(); it = next_it)
+		{
+			IgnoreData &id = *it;
+			next_it = it;
+			++next_it;
+
+			if (id.time && id.time <= Anope::CurTime)
+			{
+				Log(LOG_DEBUG) << "Expiring ignore entry " << id.mask;
+				ignores.erase(it);
+			}
+		}
+
 		if (ignores.empty())
 			source.Reply(_("Ignore list is empty."));
 		else
@@ -306,7 +320,7 @@ class OSIgnore : public Module
 
 	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
 	{
-		if (this->osignoreservice.Find(u->nick))
+		if (!u->HasMode(UMODE_OPER) && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;
 
 		return EVENT_CONTINUE;

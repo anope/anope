@@ -25,6 +25,9 @@ class CommandMSSendAll : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!memoserv)
+			return;
+
 		User *u = source.u;
 		const Anope::string &text = params[0];
 

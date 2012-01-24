@@ -25,6 +25,9 @@ class CommandMSIgnore : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!memoserv)
+			return;
+
 		User *u = source.u;
 
 		Anope::string channel = params[0];

@@ -25,6 +25,9 @@ class CommandMSStaff : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!memoserv)
+			return;
+
 		const Anope::string &text = params[0];
 
 		if (readonly)

@@ -25,6 +25,9 @@ class CommandMSSend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
 	{
+		if (!memoserv)
+			return;
+
 		const Anope::string &nick = params[0];
 		const Anope::string &text = params[1];
 

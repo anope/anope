@@ -308,7 +308,7 @@ class CommandOSAKill : public Command
 		}
 
 		ListFormatter list;
-		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Reason");
+		list.addColumn("Number").addColumn("Mask").addColumn("Creator").addColumn("Created").addColumn("Expires").addColumn("Reason");
 
 		this->ProcessList(source, params, list);
 	}

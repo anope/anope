@@ -1108,6 +1108,7 @@ class ProtoUnreal : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_CO_ADMIN, 'C'));
 		ModeManager::AddUserMode(new UserMode(UMODE_FILTER, 'G'));
 		ModeManager::AddUserMode(new UserMode(UMODE_HIDEOPER, 'H'));
+		ModeManager::AddUserMode(new UserMode(UMODE_HIDEIDLE, 'I'));
 		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
 		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
 		ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'S'));

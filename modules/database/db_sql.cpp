@@ -32,7 +32,7 @@ class SQLSQLInterface : public SQLInterface
 
 class DBSQL : public Module
 {
-	service_reference<SQLProvider, Base> sql;
+	service_reference<SQLProvider> sql;
 	SQLSQLInterface sqlinterface;
 
 	void RunBackground(const SQLQuery &q)
@@ -101,7 +101,7 @@ class DBSQL : public Module
 	}
 	
  public:
-	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql(""), sqlinterface(this)
+	DBSQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sql("", ""), sqlinterface(this)
 	{
 		this->SetAuthor("Anope");
 
@@ -115,7 +115,7 @@ class DBSQL : public Module
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
-		this->sql = engine;
+		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
 	EventReturn OnSaveDatabase()

@@ -76,7 +76,7 @@ class IdentifyInterface : public LDAPInterface
 
 class LDAPOper : public Module
 {
-	service_reference<LDAPProvider, Base> ldap;
+	service_reference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
 
 	Anope::string binddn;
@@ -85,7 +85,7 @@ class LDAPOper : public Module
 	Anope::string filter;
  public:
 	LDAPOper(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, SUPPORTED), ldap("ldap/main"), iinterface(this)
+		Module(modname, creator, SUPPORTED), ldap("LDAPProvider", "ldap/main"), iinterface(this)
 	{
 		this->SetAuthor("Anope");
 

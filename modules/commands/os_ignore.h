@@ -22,12 +22,12 @@ struct IgnoreData : Serializable
 	static void unserialize(serialized_data &data);
 };
 
-class IgnoreService : public Service<Base>
+class IgnoreService : public Service
 {
  protected:
 	std::list<IgnoreData> ignores;
 
-	IgnoreService(Module *c) : Service<Base>(c, "ignore") { }
+	IgnoreService(Module *c) : Service(c, "IgnoreService", "ignore") { }
 	
  public:
 	virtual void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) = 0;
@@ -41,7 +41,7 @@ class IgnoreService : public Service<Base>
 	inline std::list<IgnoreData> &GetIgnores() { return this->ignores; }
 };
 
-static service_reference<IgnoreService, Base> ignore_service("ignore");
+static service_reference<IgnoreService> ignore_service("IgnoreService", "ignore");
 
 Serializable::serialized_data IgnoreData::serialize()
 {

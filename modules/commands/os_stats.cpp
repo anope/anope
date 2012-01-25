@@ -135,7 +135,7 @@ class CommandOSStats : public Command
 
  public:
 	CommandOSStats(Module *creator) : Command(creator, "operserv/stats", 0, 1),
-		akills("xlinemanager/sgline"), snlines("xlinemanager/snline"), sqlines("xlinemanager/sqline")
+		akills("XLineManager", "xlinemanager/sgline"), snlines("XLineManager", "xlinemanager/snline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetDesc(_("Show status of Services and network"));
 		this->SetSyntax(_("[AKILL | ALL | RESET | UPLINK]"));

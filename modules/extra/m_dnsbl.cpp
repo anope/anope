@@ -7,7 +7,7 @@
 
 #include "module.h"
 
-static service_reference<XLineManager> akills("xlinemanager/sgline");
+static service_reference<XLineManager> akills("XLineManager", "xlinemanager/sgline");
 
 struct Blacklist
 {

@@ -163,7 +163,7 @@ class OnRegisterInterface : public LDAPInterface
 
 class NSIdentifyLDAP : public Module
 {
-	service_reference<LDAPProvider, Base> ldap;
+	service_reference<LDAPProvider> ldap;
 	IdentifyInterface iinterface;
 	OnIdentifyInterface oninterface;
 	OnRegisterInterface orinterface;
@@ -176,7 +176,7 @@ class NSIdentifyLDAP : public Module
 	Anope::string disable_reason;
  public:
 	NSIdentifyLDAP(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, SUPPORTED), ldap("ldap/main"), iinterface(this), oninterface(this), orinterface(this)
+		Module(modname, creator, SUPPORTED), ldap("LDAPProvider", "ldap/main"), iinterface(this), oninterface(this), orinterface(this)
 	{
 		this->SetAuthor("Anope");
 

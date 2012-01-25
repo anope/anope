@@ -220,12 +220,12 @@ class ModuleXMLRPC;
 static ModuleXMLRPC *me;
 class ModuleXMLRPC : public Module
 {
-	service_reference<SSLService, Base> sslref;
+	service_reference<SSLService> sslref;
 
  public:
 	MyXMLRPCServiceInterface xmlrpcinterface;
 
-	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("ssl"), xmlrpcinterface(this, "xmlrpc")
+	ModuleXMLRPC(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), sslref("SSLService", "ssl"), xmlrpcinterface(this, "xmlrpc")
 	{
 		me = this;
 

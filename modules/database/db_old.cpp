@@ -723,6 +723,7 @@ static void LoadChannels()
 				ci->SetLevel(GetLevelName(j), level);
 			}
 
+			service_reference<AccessProvider> provider("AccessProvider", "access/access");
 			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
 			for (uint16_t j = 0; j < tmpu16; ++j)
@@ -731,27 +732,29 @@ static void LoadChannels()
 				READ(read_uint16(&in_use, f));
 				if (in_use)
 				{
-					service_reference<AccessProvider> provider("access/access");
-					if (!provider)
-						break;
-
-					ChanAccess *access = provider->Create();
-					access->ci = ci;
+					ChanAccess *access = provider ? provider->Create() : NULL;
+					if (access)
+						access->ci = ci;
 
 					int16_t level;
 					READ(read_int16(&level, f));
-					access->Unserialize(stringify(level));
+					if (access)
+						access->Unserialize(stringify(level));
 
 					Anope::string mask;
 					READ(read_string(mask, f));
-					access->mask = mask;
+					if (access)
+						access->mask = mask;
 
 					READ(read_int32(&tmp32, f));
-					access->last_seen = tmp32;
-					access->creator = "Unknown";
-					access->created = Anope::CurTime;
+					if (access)
+					{
+						access->last_seen = tmp32;
+						access->creator = "Unknown";
+						access->created = Anope::CurTime;
 
-					ci->AddAccess(access);
+						ci->AddAccess(access);
+					}
 				}
 			}
 

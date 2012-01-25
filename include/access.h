@@ -30,7 +30,7 @@ class CoreExport PrivilegeManager
 
 class ChanAccess;
 
-class CoreExport AccessProvider : public Service<AccessProvider>
+class CoreExport AccessProvider : public Service
 {
  public:
 	AccessProvider(Module *o, const Anope::string &n);

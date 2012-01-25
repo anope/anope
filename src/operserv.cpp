@@ -92,7 +92,7 @@ Serializable::serialized_data XLine::serialize()
 
 void XLine::unserialize(serialized_data &data)
 {
-	service_reference<XLineManager> xlm(data["manager"].astr());
+	service_reference<XLineManager> xlm("XLineManager", data["manager"].astr());
 	if (!xlm)
 		return;
 
@@ -172,7 +172,7 @@ Anope::string XLineManager::GenerateUID()
 
 /** Constructor
  */
-XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service<XLineManager>(creator, xname), type(t)
+XLineManager::XLineManager(Module *creator, const Anope::string &xname, char t) : Service(creator, "XLineManager", xname), type(t)
 {
 }
 

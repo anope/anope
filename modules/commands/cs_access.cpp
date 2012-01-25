@@ -148,7 +148,7 @@ class CommandCSAccess : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("access/access");
+		service_reference<AccessProvider> provider("AccessProvider", "access/access");
 		if (!provider)
 			return;
 		AccessChanAccess *access = debug_cast<AccessChanAccess *>(provider->Create());

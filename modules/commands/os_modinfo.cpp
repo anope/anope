@@ -31,10 +31,10 @@ class CommandOSModInfo : public Command
 		{
 			source.Reply(_("Module: \002%s\002 Version: \002%s\002 Author: \002%s\002 loaded: \002%s\002"), m->name.c_str(), !m->version.empty() ? m->version.c_str() : "?", !m->author.empty() ? m->author.c_str() : "?", do_strftime(m->created).c_str());
 
-			std::vector<Anope::string> servicekeys = Service<Command>::GetServiceKeys();
+			std::vector<Anope::string> servicekeys = Service::GetServiceKeys("Command");
 			for (unsigned i = 0; i < servicekeys.size(); ++i)
 			{
-				Command *c = Service<Command>::FindService(servicekeys[i]);
+				service_reference<Command> c("Command", servicekeys[i]);
 				if (!c || c->owner != m)
 					continue;
 

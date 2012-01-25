@@ -34,14 +34,14 @@ class MyForbidService : public ForbidService
 		delete d;
 	}
 
-	ForbidData *FindForbid(const Anope::string &mask, ForbidType type)
+	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype)
 	{
 		const std::vector<ForbidData *> &forbids = this->GetForbids();
 		for (unsigned i = forbids.size(); i > 0; --i)
 		{
 			ForbidData *d = this->forbidData[i - 1];
 
-			if ((type == FT_NONE || type == d->type) && Anope::Match(mask, d->mask))
+			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask))
 				return d;
 		}
 		return NULL;
@@ -55,15 +55,15 @@ class MyForbidService : public ForbidService
 
 			if (d->expires && Anope::CurTime >= d->expires)
 			{
-				Anope::string type = "none";
+				Anope::string ftype = "none";
 				if (d->type == FT_NICK)
-					type = "nick";
+					ftype = "nick";
 				else if (d->type == FT_CHAN)
-					type = "chan";
+					ftype = "chan";
 				else if (d->type == FT_EMAIL)
-					type = "email";
+					ftype = "email";
 
-				Log(LOG_NORMAL, Config->OperServ + "/forbid") << "Expiring forbid for " << d->mask << " type " << type;
+				Log(LOG_NORMAL, Config->OperServ + "/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
 				this->forbidData.erase(this->forbidData.begin() + i - 1);
 				delete d;
 			}
@@ -75,9 +75,9 @@ class MyForbidService : public ForbidService
 
 class CommandOSForbid : public Command
 {
-	service_reference<ForbidService, Base> fs;
+	service_reference<ForbidService> fs;
  public:
-	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("forbid")
+	CommandOSForbid(Module *creator) : Command(creator, "operserv/forbid", 1, 5), fs("ForbidService", "forbid")
 	{
 		this->SetDesc(_("Forbid usage of nicknames, channels, and emails"));
 		this->SetSyntax(_("ADD {NICK|CHAN|EMAIL} [+\037expiry\037] \037entry\037\002 [\037reason\037]"));
@@ -93,15 +93,15 @@ class CommandOSForbid : public Command
 		const Anope::string &command = params[0];
 		const Anope::string &subcommand = params.size() > 1 ? params[1] : "";
 
-		ForbidType type = FT_NONE;
+		ForbidType ftype = FT_NONE;
 		if (subcommand.equals_ci("NICK"))
-			type = FT_NICK;
+			ftype = FT_NICK;
 		else if (subcommand.equals_ci("CHAN"))
-			type = FT_CHAN;
+			ftype = FT_CHAN;
 		else if (subcommand.equals_ci("EMAIL"))
-			type = FT_EMAIL;
+			ftype = FT_EMAIL;
 
-		if (command.equals_ci("ADD") && params.size() > 3 && type != FT_NONE)
+		if (command.equals_ci("ADD") && params.size() > 3 && ftype != FT_NONE)
 		{
 			const Anope::string &expiry = params[2][0] == '+' ? params[2] : "";
 			const Anope::string &entry = !expiry.empty() ? params[3] : params[2];
@@ -127,7 +127,7 @@ class CommandOSForbid : public Command
 					expiryt += Anope::CurTime;
 			}
 
-			ForbidData *d = this->fs->FindForbid(entry, type);
+			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			bool created = false;
 			if (d == NULL)
 			{
@@ -140,18 +140,18 @@ class CommandOSForbid : public Command
 			d->reason = reason;
 			d->created = Anope::CurTime;
 			d->expires = expiryt;
-			d->type = type;
+			d->type = ftype;
 			if (created)
 				this->fs->AddForbid(d);
 
 			Log(LOG_ADMIN, source.u, this) << "to add a forbid on " << entry << " of type " << subcommand;
-			source.Reply(_("Added a%s forbid on %s to expire on %s"), type == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? do_strftime(d->expires).c_str() : "never");
+			source.Reply(_("Added a%s forbid on %s to expire on %s"), ftype == FT_CHAN ? "n" : "", entry.c_str(), d->expires ? do_strftime(d->expires).c_str() : "never");
 		}
-		else if (command.equals_ci("DEL") && params.size() > 2 && type != FT_NONE)
+		else if (command.equals_ci("DEL") && params.size() > 2 && ftype != FT_NONE)
 		{
 			const Anope::string &entry = params[2];
 
-			ForbidData *d = this->fs->FindForbid(entry, type);
+			ForbidData *d = this->fs->FindForbid(entry, ftype);
 			if (d != NULL)
 			{
 				Log(LOG_ADMIN, source.u, this) << "to remove forbid " << d->mask << " of type " << subcommand;
@@ -175,19 +175,19 @@ class CommandOSForbid : public Command
 				{
 					ForbidData *d = forbids[i];
 
-					Anope::string ftype;
+					Anope::string stype;
 					if (d->type == FT_NICK)
-						ftype = "NICK";
+						stype = "NICK";
 					else if (d->type == FT_CHAN)
-						ftype = "CHAN";
+						stype = "CHAN";
 					else if (d->type == FT_EMAIL)
-						ftype = "EMAIL";
+						stype = "EMAIL";
 					else
 						continue;
 
 					ListFormatter::ListEntry entry;
 					entry["Mask"] = d->mask;
-					entry["Type"] = ftype;
+					entry["Type"] = stype;
 					entry["Creator"] = d->creator;
 					entry["Expires"] = d->expires ? do_strftime(d->expires).c_str() : "never";
 					entry["Reason"] = d->reason;

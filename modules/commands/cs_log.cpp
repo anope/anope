@@ -88,7 +88,7 @@ public:
 				return;
 			}
 
-			service_reference<Command> c_service(bi->commands[command_name].name);
+			service_reference<Command> c_service("Command", bi->commands[command_name].name);
 			if (!c_service)
 			{
 				source.Reply(_("%s is not a valid command."), command.c_str());

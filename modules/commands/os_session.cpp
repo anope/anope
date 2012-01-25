@@ -605,7 +605,7 @@ class OSSession : public Module
 	ExpireTimer expiretimer;
 	CommandOSSession commandossession;
 	CommandOSException commandosexception;
-	service_reference<XLineManager, Base> akills;
+	service_reference<XLineManager> akills;
 
 	void AddSession(User *u, bool exempt)
 	{
@@ -693,7 +693,7 @@ class OSSession : public Module
 
  public:
 	OSSession(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		exception_type("Exception", Exception::unserialize), ss(this), commandossession(this), commandosexception(this), akills("xlinemanager/sgline")
+		exception_type("Exception", Exception::unserialize), ss(this), commandossession(this), commandosexception(this), akills("XLineManager", "xlinemanager/sgline")
 	{
 		this->SetAuthor("Anope");
 

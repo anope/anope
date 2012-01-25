@@ -214,8 +214,8 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 
 			static struct timeval tv = { 1, 0 };
 			LDAPMessage *result;
-			int type = ldap_result(this->con, LDAP_RES_ANY, 1, &tv, &result);
-			if (type <= 0 || this->GetExitState())
+			int rtype = ldap_result(this->con, LDAP_RES_ANY, 1, &tv, &result);
+			if (rtype <= 0 || this->GetExitState())
 				continue;
 
 			int cur_id = ldap_msgid(result);

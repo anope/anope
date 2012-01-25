@@ -243,7 +243,7 @@ class CommandOSDefcon : public Command
 
 class OSDefcon : public Module
 {
-	service_reference<SessionService, Base> session_service;
+	service_reference<SessionService> session_service;
 	service_reference<XLineManager> akills;
 	CommandOSDefcon commandosdefcon;
 
@@ -335,7 +335,7 @@ class OSDefcon : public Module
 	}
 
  public:
-	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), session_service("session"), akills("xlinemanager/sgline"), commandosdefcon(this)
+	OSDefcon(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE), session_service("SessionService", "session"), akills("XLineManager", "xlinemanager/sgline"), commandosdefcon(this)
 	{
 		this->SetAuthor("Anope");
 

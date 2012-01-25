@@ -112,10 +112,10 @@ class LDAPInterface
 	virtual void OnError(const LDAPResult &err) { }
 };
 
-class LDAPProvider : public Service<Base>
+class LDAPProvider : public Service
 {
  public:
-	LDAPProvider(Module *c, const Anope::string &n) : Service<Base>(c, n) { }
+	LDAPProvider(Module *c, const Anope::string &n) : Service(c, "LDAPProvider", n) { }
 
 	/** Attempt to bind to the LDAP server as an admin
 	 * @param i The LDAPInterface the result is sent to

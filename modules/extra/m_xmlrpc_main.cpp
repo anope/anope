@@ -256,12 +256,12 @@ class MyXMLRPCEvent : public XMLRPCEvent
 
 class ModuleXMLRPCMain : public Module
 {
-	service_reference<XMLRPCServiceInterface, Base> xmlrpc;
+	service_reference<XMLRPCServiceInterface> xmlrpc;
 
 	MyXMLRPCEvent stats;
 
  public:
-	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), xmlrpc("xmlrpc")
+	ModuleXMLRPCMain(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, SUPPORTED), xmlrpc("XMLRPCServiceInterface", "xmlrpc")
 	{
 		if (!xmlrpc)
 			throw ModuleException("Unable to find xmlrpc reference, is m_xmlrpc loaded?");

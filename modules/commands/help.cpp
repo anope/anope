@@ -45,7 +45,7 @@ class CommandHelp : public Command
 				if (cmd != it->first && bi->commands.count(cmd))
 					continue;
 
-				service_reference<Command> c(info.name);
+				service_reference<Command> c("Command", info.name);
 				if (!c)
 					continue;
 				if (!Config->HidePrivilegedCommands || info.permission.empty() || u->HasCommand(info.permission))
@@ -71,7 +71,7 @@ class CommandHelp : public Command
 
 				CommandInfo &info = it->second;
 
-				service_reference<Command> c(info.name);
+				service_reference<Command> c("Command", info.name);
 				if (!c)
 					continue;
 

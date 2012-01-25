@@ -65,7 +65,7 @@ class CommandOSOper : public Command
 		if (subcommand.equals_ci("ADD") && params.size() > 2)
 		{
 			const Anope::string &oper = params[1];
-			const Anope::string &type = params[2];
+			const Anope::string &otype = params[2];
 
 			NickAlias *na = findnick(oper);
 			if (na == NULL)
@@ -74,9 +74,9 @@ class CommandOSOper : public Command
 				source.Reply(_("Nick \2%s\2 is already an operator."), na->nick.c_str());
 			else
 			{
-				OperType *ot = OperType::Find(type);
+				OperType *ot = OperType::Find(otype);
 				if (ot == NULL)
-					source.Reply(_("Oper type \2%s\2 has not been configured."), type.c_str());
+					source.Reply(_("Oper type \2%s\2 has not been configured."), otype.c_str());
 				else
 				{
 					na->nc->o = new MyOper(na->nc->display, ot);

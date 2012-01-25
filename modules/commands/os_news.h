@@ -27,10 +27,10 @@ struct NewsItem : Serializable
 	static void unserialize(serialized_data &data);
 };
 
-class NewsService : public Service<Base>
+class NewsService : public Service
 {
  public:
-	NewsService(Module *m) : Service<Base>(m, "news") { }
+	NewsService(Module *m) : Service(m, "NewsService", "news") { }
 	
 	virtual void AddNewsItem(NewsItem *n) = 0;
 	
@@ -39,7 +39,7 @@ class NewsService : public Service<Base>
 	virtual std::vector<NewsItem *> &GetNewsList(NewsType t) = 0;
 };
 
-static service_reference<NewsService, Base> news_service("news");
+static service_reference<NewsService> news_service("NewsService", "news");
 
 Serializable::serialized_data NewsItem::serialize()
 {

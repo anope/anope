@@ -1123,13 +1123,14 @@ class CallBack : public Timer
 	}
 };
 
-template<typename T, typename U = T>
+template<typename T>
 class service_reference : public dynamic_reference<T>
 {
+	Anope::string type;
 	Anope::string name;
 
  public:
-	service_reference(const Anope::string &n) : dynamic_reference<T>(NULL), name(n)
+	service_reference(const Anope::string &t, const Anope::string &n) : dynamic_reference<T>(NULL), type(t), name(n)
 	{
 	}
 
@@ -1147,7 +1148,7 @@ class service_reference : public dynamic_reference<T>
 		}
 		if (!this->ref)
 		{
-			this->ref = static_cast<T *>(Service<U>::FindService(this->name));
+			this->ref = static_cast<T *>(Service::FindService(this->type, this->name));
 			if (this->ref)
 				this->ref->AddReference(this);
 		}

@@ -34,7 +34,7 @@ class SQLCache : public Timer
 
 class MySQLLiveModule : public Module
 {
-	service_reference<SQLProvider, Base> SQL;
+	service_reference<SQLProvider> SQL;
 
 	SQLCache chan_cache, nick_cache, core_cache;
 
@@ -51,7 +51,7 @@ class MySQLLiveModule : public Module
 
  public:
 	MySQLLiveModule(const Anope::string &modname, const Anope::string &creator) :
-		Module(modname, creator, DATABASE), SQL("")
+		Module(modname, creator, DATABASE), SQL("", "")
 	{
 		this->OnReload();
 
@@ -63,7 +63,7 @@ class MySQLLiveModule : public Module
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
-		this->SQL = engine;
+		this->SQL = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
 	void OnShutdown()

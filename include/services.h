@@ -306,30 +306,38 @@ template<typename T, size_t Size = 32> class Flags
 
 class Module;
 
-template<typename T> class Service : public Base
+class CoreExport Service : public Base
 {
-	static Anope::map<T *> services;
+	static Anope::map<Anope::map<Service *> > services;
  public:
- 	static T* FindService(const Anope::string &n)
+ 	static Service *FindService(const Anope::string &t, const Anope::string &n)
 	{
-		typename Anope::map<T *>::iterator it = Service<T>::services.find(n);
-		if (it != Service<T>::services.end())
-			return it->second;
+		Anope::map<Anope::map<Service *> >::iterator it = services.find(t);
+		if (it != services.end())
+		{
+			Anope::map<Service *>::iterator it2 = it->second.find(n);
+			if (it2 != it->second.end())
+				return it2->second;
+		}
+
 		return NULL;
 	}
 
-	static std::vector<Anope::string> GetServiceKeys()
+	static std::vector<Anope::string> GetServiceKeys(const Anope::string &t)
 	{
 		std::vector<Anope::string> keys;
-		for (typename Anope::map<T *>::iterator it = Service<T>::services.begin(), it_end = Service<T>::services.end(); it != it_end; ++it)
-			keys.push_back(it->first);
+		Anope::map<Anope::map<Service *> >::iterator it = services.find(t);
+		if (it != services.end())
+			for (Anope::map<Service *>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+				keys.push_back(it2->first);
 		return keys;
 	}
 
 	Module *owner;
+	Anope::string type;
 	Anope::string name;
 
-	Service(Module *o, const Anope::string &n) : owner(o), name(n)
+	Service(Module *o, const Anope::string &t, const Anope::string &n) : owner(o), type(t), name(n)
 	{
 		this->Register();
 	}
@@ -341,19 +349,20 @@ template<typename T> class Service : public Base
 
 	void Register()
 	{
-		if (Service<T>::services.find(this->name) != Service<T>::services.end())
-			throw ModuleException("Service with name " + this->name + " already exists");
-		Service<T>::services[this->name] = static_cast<T *>(this);
+		Anope::map<Service *> &smap = services[this->type];
+		if (smap.find(this->name) != smap.end())
+			throw ModuleException("Service " + this->type + " with name " + this->name + " already exists");
+		smap[this->name] = this;
 	}
 
 	void Unregister()
 	{
-		Service<T>::services.erase(this->name);
+		Anope::map<Service *> &smap = services[this->type];
+		smap.erase(this->name);
+		if (smap.empty())
+			services.erase(this->type);
 	}
 };
-template<typename T> Anope::map<T *> Service<T>::services;
-
-template class Service<Base>;
 
 #include "sockets.h"
 #include "socketengine.h"

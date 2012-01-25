@@ -168,7 +168,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("ACCESS")) // Older access system, from Anope 1.9.4.
 		{
-			service_reference<AccessProvider> provider("access/access");
+			service_reference<AccessProvider> provider("AccessProvider", "access/access");
 			if (!provider)
 				throw DatabaseException("Old access entry for nonexistant provider");
 
@@ -184,7 +184,7 @@ EventReturn OnDatabaseReadMetadata(ChannelInfo *ci, const Anope::string &key, co
 		}
 		else if (key.equals_ci("ACCESS2"))
 		{
-			service_reference<AccessProvider> provider(params[0]);
+			service_reference<AccessProvider> provider("AccessProvider", params[0]);
 			if (!provider)
 				throw DatabaseException("Access entry for nonexistant provider " + params[0]);
 

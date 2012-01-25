@@ -23,10 +23,10 @@ struct ForbidData : Serializable
 	static void unserialize(serialized_data &data);
 };
 
-class ForbidService : public Service<Base>
+class ForbidService : public Service
 {
  public:
-	ForbidService(Module *m) : Service<Base>(m, "forbid") { }
+	ForbidService(Module *m) : Service(m, "ForbidService", "forbid") { }
 
 	virtual void AddForbid(ForbidData *d) = 0;
 
@@ -37,7 +37,7 @@ class ForbidService : public Service<Base>
 	virtual const std::vector<ForbidData *> &GetForbids() = 0;
 };
 
-static service_reference<ForbidService, Base> forbid_service("forbid");
+static service_reference<ForbidService> forbid_service("ForbidService", "forbid");
 
 Serializable::serialized_data ForbidData::serialize()
 {

@@ -128,7 +128,7 @@ class CommandBSBadwords : public Command
 	void DoAdd(CommandSource &source, ChannelInfo *ci, const Anope::string &word)
 	{
 		size_t pos = word.rfind(' ');
-		BadWordType type = BW_ANY;
+		BadWordType bwtype = BW_ANY;
 		Anope::string realword = word;
 
 		if (pos != Anope::string::npos)
@@ -137,11 +137,11 @@ class CommandBSBadwords : public Command
 			if (!opt.empty())
 			{
 				if (opt.equals_ci("SINGLE"))
-					type = BW_SINGLE;
+					bwtype = BW_SINGLE;
 				else if (opt.equals_ci("START"))
-					type = BW_START;
+					bwtype = BW_START;
 				else if (opt.equals_ci("END"))
-					type = BW_END;
+					bwtype = BW_END;
 			}
 			realword = word.substr(0, pos);
 		}
@@ -165,7 +165,7 @@ class CommandBSBadwords : public Command
 
 		bool override = !ci->AccessFor(source.u).HasPriv("BADWORDS");
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, source.u, this, ci) << "ADD " << realword;
-		ci->AddBadWord(realword, type);
+		ci->AddBadWord(realword, bwtype);
 
 		source.Reply(_("\002%s\002 added to %s bad words list."), realword.c_str(), ci->name.c_str());
 

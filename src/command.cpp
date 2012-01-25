@@ -34,7 +34,7 @@ void CommandSource::Reply(const Anope::string &message)
 		u->SendMessage(this->service, tok);
 }
 
-Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params) : Service<Command>(o, sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), module(owner)
+Command::Command(Module *o, const Anope::string &sname, size_t min_params, size_t max_params) : Service(o, "Command", sname), Flags<CommandFlag>(CommandFlagStrings), MaxParams(max_params), MinParams(min_params), module(owner)
 {
 }
 

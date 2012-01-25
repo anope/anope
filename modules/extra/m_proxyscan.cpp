@@ -102,7 +102,7 @@ class ProxyConnect : public ConnectionSocket
 		}
 	}
 };
-service_reference<XLineManager> ProxyConnect::akills("xlinemanager/sgline");
+service_reference<XLineManager> ProxyConnect::akills("XLineManager", "xlinemanager/sgline");
 std::set<ProxyConnect *> ProxyConnect::proxies;
 
 class HTTPProxyConnect : public ProxyConnect, public BufferedSocket

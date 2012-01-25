@@ -244,7 +244,7 @@ void BotInfo::OnMessage(User *u, const Anope::string &message)
 	}
 
 	CommandInfo &info = it->second;
-	service_reference<Command> c(info.name);
+	service_reference<Command> c("Command", info.name);
 	if (!c)
 	{
 		if (has_help)

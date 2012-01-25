@@ -36,7 +36,7 @@ class CoreExport XLine : public Serializable
 	static void unserialize(serialized_data &data);
 };
 
-class CoreExport XLineManager : public Service<XLineManager>
+class CoreExport XLineManager : public Service
 {
 	char type;
 	/* List of XLines in this XLineManager */

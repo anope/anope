@@ -43,7 +43,7 @@ class CommandCSSet : public Command
 			CommandInfo &info = it->second;
 			if (c_name.find_ci(this_name + " ") == 0)
 			{
-				service_reference<Command> command(info.name);
+				service_reference<Command> command("Command", info.name);
 				if (command)
 				{
 					source.command = it->first;

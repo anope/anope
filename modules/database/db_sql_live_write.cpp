@@ -25,7 +25,7 @@ class DBMySQL : public Module
 {
  private:
 	MySQLInterface sqlinterface;
-	service_reference<SQLProvider, Base> SQL;
+	service_reference<SQLProvider> SQL;
  	std::set<Anope::string> tables;
 
 	void RunQuery(const SQLQuery &query)
@@ -106,7 +106,7 @@ class DBMySQL : public Module
 	time_t lastwarn;
 	bool ro;
 
-	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("")
+	DBMySQL(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, DATABASE), sqlinterface(this), SQL("", "")
 	{
 		this->lastwarn = 0;
 		this->ro = false;
@@ -124,7 +124,7 @@ class DBMySQL : public Module
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
-		this->SQL = engine;
+		this->SQL = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
 	void OnServerConnect()

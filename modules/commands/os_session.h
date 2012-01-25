@@ -16,13 +16,13 @@ struct Exception : Serializable
 };
 
 
-class SessionService : public Service<Base>
+class SessionService : public Service
 {
  public:
 	typedef Anope::map<Session *> SessionMap;
 	typedef std::vector<Exception *> ExceptionVector;
 
-	SessionService(Module *m) : Service<Base>(m, "session") { }
+	SessionService(Module *m) : Service(m, "SessionService", "session") { }
 
 	virtual void AddException(Exception *e) = 0;
 
@@ -43,7 +43,7 @@ class SessionService : public Service<Base>
 	virtual SessionMap &GetSessions() = 0;
 };
 
-static service_reference<SessionService, Base> session_service("session");
+static service_reference<SessionService> session_service("SessionService", "session");
 
 Serializable::serialized_data Exception::serialize()
 {

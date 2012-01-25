@@ -1,7 +1,7 @@
 #ifndef MEMOSERV_H
 #define MEMOSERV_H
 
-class MemoServService : public Service<Base>
+class MemoServService : public Service
 {
  public:
 	enum MemoResult
@@ -12,7 +12,7 @@ class MemoServService : public Service<Base>
 		MEMO_TARGET_FULL
 	};
 
-	MemoServService(Module *m) : Service<Base>(m, "MemoServ") { }
+	MemoServService(Module *m) : Service(m, "MemoServService", "MemoServ") { }
 
 	/** Retrieve the memo info for a nick or channel
 	 * @param target Target
@@ -35,7 +35,7 @@ class MemoServService : public Service<Base>
 	virtual void Check(User *u) = 0;
 };
 
-static service_reference<MemoServService, Base> memoserv("MemoServ");
+static service_reference<MemoServService> memoserv("MemoServService", "MemoServ");
 
 #endif // MEMOSERV_H
 

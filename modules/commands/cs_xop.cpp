@@ -251,7 +251,7 @@ class XOPBase : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("access/xop");
+		service_reference<AccessProvider> provider("AccessProvider", "access/xop");
 		if (!provider)
 			return;
 		XOPChanAccess *acc = debug_cast<XOPChanAccess *>(provider->Create());

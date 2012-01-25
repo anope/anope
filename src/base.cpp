@@ -6,6 +6,8 @@ std::vector<Anope::string> SerializeType::type_order;
 Anope::map<SerializeType *> SerializeType::types;
 std::list<Serializable *> *Serializable::serizliable_items;
 
+Anope::map<Anope::map<Service *> > Service::services;
+
 void RegisterTypes()
 {
 	static SerializeType nc("NickCore", NickCore::unserialize), na("NickAlias", NickAlias::unserialize), bi("BotInfo", BotInfo::unserialize),

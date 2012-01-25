@@ -390,7 +390,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 
 	service_reference<XLineManager> snlines;
  public:
- 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("xlinemanager/snline")
+ 	CommandOSSNLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/snline"), snlines("XLineManager", "xlinemanager/snline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037:\037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));
@@ -589,7 +589,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 
  	service_reference<XLineManager> sqlines;
  public:
-	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("xlinemanager/sqline")
+	CommandOSSQLine(Module *creator) : CommandOSSXLineBase(creator, "operserv/sqline"), sqlines("XLineManager", "xlinemanager/sqline")
 	{
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
 		this->SetSyntax(_("DEL {\037mask\037 | \037entry-num\037 | \037list\037 | \037id\037}"));

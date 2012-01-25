@@ -106,12 +106,12 @@ static const char **findmsgs(NewsType type)
 
 class NewsBase : public Command
 {
-	service_reference<NewsService, Base> ns;
+	service_reference<NewsService> ns;
 
  protected:
-	void DoList(CommandSource &source, NewsType type, const char **msgs)
+	void DoList(CommandSource &source, NewsType ntype, const char **msgs)
 	{
-		std::vector<NewsItem *> &list = this->ns->GetNewsList(type);
+		std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
 		if (list.empty())
 			source.Reply(msgs[MSG_LIST_NONE]);
 		else
@@ -143,7 +143,7 @@ class NewsBase : public Command
 		return;
 	}
 
-	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
+	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
 	{
 		const Anope::string text = params.size() > 1 ? params[1] : "";
 
@@ -155,7 +155,7 @@ class NewsBase : public Command
 				source.Reply(READ_ONLY_MODE);
 
 			NewsItem *news = new NewsItem();
-			news->type = type;
+			news->type = ntype;
 			news->text = text;
 			news->time = Anope::CurTime;
 			news->who = source.u->nick;
@@ -168,7 +168,7 @@ class NewsBase : public Command
 		return;
 	}
 
-	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType type, const char **msgs)
+	void DoDel(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype, const char **msgs)
 	{
 		const Anope::string &text = params.size() > 1 ? params[1] : "";
 
@@ -176,7 +176,7 @@ class NewsBase : public Command
 			this->OnSyntaxError(source, "DEL");
 		else
 		{
-			std::vector<NewsItem *> &list = this->ns->GetNewsList(type);
+			std::vector<NewsItem *> &list = this->ns->GetNewsList(ntype);
 			if (list.empty())
 				source.Reply(msgs[MSG_LIST_NONE]);
 			else
@@ -211,30 +211,30 @@ class NewsBase : public Command
 		return;
 	}
 
-	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType type)
+	void DoNews(CommandSource &source, const std::vector<Anope::string> &params, NewsType ntype)
 	{
 		if (!this->ns)
 			return;
 
 		const Anope::string &cmd = params[0];
 
-		const char **msgs = findmsgs(type);
+		const char **msgs = findmsgs(ntype);
 		if (!msgs)
 			throw CoreException("news: Invalid type to do_news()");
 
 		if (cmd.equals_ci("LIST"))
-			return this->DoList(source, type, msgs);
+			return this->DoList(source, ntype, msgs);
 		else if (cmd.equals_ci("ADD"))
-			return this->DoAdd(source, params, type, msgs);
+			return this->DoAdd(source, params, ntype, msgs);
 		else if (cmd.equals_ci("DEL"))
-			return this->DoDel(source, params, type, msgs);
+			return this->DoDel(source, params, ntype, msgs);
 		else
 			this->OnSyntaxError(source, "");
 
 		return;
 	}
  public:
-	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("news")
+	NewsBase(Module *creator, const Anope::string &newstype) : Command(creator, newstype, 1, 2), ns("NewsService", "news")
 	{
 		this->SetSyntax(_("ADD \037text\037"));
 		this->SetSyntax(_("DEL {\037num\037 | ALL}"));

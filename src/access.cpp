@@ -65,7 +65,7 @@ void PrivilegeManager::ClearPrivileges()
 	privs.clear();
 }
 
-AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service<AccessProvider>(o, n)
+AccessProvider::AccessProvider(Module *o, const Anope::string &n) : Service(o, "AccessProvider", n)
 {
 }
 
@@ -103,7 +103,7 @@ Serializable::serialized_data ChanAccess::serialize()
 
 void ChanAccess::unserialize(serialized_data &data)
 {
-	service_reference<AccessProvider> aprovider(data["provider"].astr());
+	service_reference<AccessProvider> aprovider("AccessProvider", data["provider"].astr());
 	ChannelInfo *ci = cs_findchan(data["ci"].astr());
 	if (!aprovider || !ci)
 		return;

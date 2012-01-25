@@ -184,7 +184,7 @@ class CommandCSFlags : public Command
 			return;
 		}
 
-		service_reference<AccessProvider> provider("access/flags");
+		service_reference<AccessProvider> provider("AccessProvider", "access/flags");
 		if (!provider)
 			return;
 		FlagsChanAccess *access = debug_cast<FlagsChanAccess *>(provider->Create());

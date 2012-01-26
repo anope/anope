@@ -70,6 +70,8 @@ class MSSendAll : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (!memoserv)
+			throw ModuleException("No MemoServ!");
 	}
 };
 

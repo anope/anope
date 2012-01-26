@@ -99,9 +99,10 @@ class MSRSend : public Module
 	{
 		this->SetAuthor("Anope");
 
-		if (!Config->MSMemoReceipt)
+		if (!memoserv)
+			throw ModuleException("No MemoServ!");
+		else if (!Config->MSMemoReceipt)
 			throw ModuleException("Invalid value for memoreceipt");
-
 	}
 };
 

@@ -67,6 +67,8 @@ class MSStaff : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (!memoserv)
+			throw ModuleException("No MemoServ!");
 	}
 };
 

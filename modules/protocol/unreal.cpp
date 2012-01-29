@@ -533,7 +533,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 			{
 				NickAlias *na = findnick(user->nick);
 
-				if (na && user->timestamp == convertTo<time_t>(params[6]))
+				if (na && params[6].is_pos_number_only() && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)
@@ -555,7 +555,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 			{
 				NickAlias *na = findnick(user->nick);
 
-				if (na && user->timestamp == convertTo<time_t>(params[6]))
+				if (na && params[6].is_pos_number_only() && user->timestamp == convertTo<time_t>(params[6]))
 				{
 					user->Login(na->nc);
 					if (na->nc->HasFlag(NI_UNCONFIRMED) == false && nickserv)

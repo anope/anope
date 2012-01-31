@@ -30,7 +30,7 @@ class CommandNSConfirm : public Command
 		User *u = source.u;
 		const Anope::string &passcode = params[0];
 
-		if (u->Account() && u->HasPriv("nickserv/confirm"))
+		if (u->Account() && !u->Account()->HasFlag(NI_UNCONFIRMED) && u->HasPriv("nickserv/confirm"))
 		{
 			NickAlias *na = findnick(passcode);
 			if (na == NULL)

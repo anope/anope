@@ -291,6 +291,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 								attrs.push_back(vals[j]->bv_val);
 							attributes[attr] = attrs;
 
+							ldap_value_free_len(vals);
 							ldap_memfree(attr);
 						}
 						if (ber != NULL)

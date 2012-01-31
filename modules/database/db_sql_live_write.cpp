@@ -163,20 +163,20 @@ class DBMySQL : public Module
 		if (command->name.find("nickserv/set/") == 0)
 		{
 			NickAlias *na = findnick(source.u->nick);
-			if (!na)
+			if (na)
 				this->Insert(na->nc->serialize_name(), na->nc->serialize());
 
 		}
 		else if (command->name.find("nickserv/saset/") == 0)
 		{
 			NickAlias *na = findnick(params[0]);
-			if (!na)
+			if (na)
 				this->Insert(na->nc->serialize_name(), na->nc->serialize());
 		}
 		else if (command->name.find("chanserv/set") == 0 || command->name.find("chanserv/saset") == 0)
 		{
 			ChannelInfo *ci = params.size() > 0 ? cs_findchan(params[0]) : NULL;
-			if (!ci)
+			if (ci)
 				this->Insert(ci->serialize_name(), ci->serialize());
 		}
 		else if (command->name == "botserv/kick" && params.size() > 2)

@@ -1,3 +1,168 @@
+Revision 378ae4c - Fri, 3 Feb 2012 15:18:06 -0500 - Regenerate language files
+Revision ce2a0f7 - Tue, 31 Jan 2012 16:19:47 -0500 - Fixed a memory leak in m_ldap
+Revision be5ba49 - Tue, 31 Jan 2012 15:44:04 -0500 - Not sure what I was thinking here
+Revision b4f27da - Tue, 31 Jan 2012 15:35:51 -0500 - Bug #1365 - Fixed nickserv/confirm syntax for services opers
+Revision d09a302 - Thu, 26 Jan 2012 17:04:59 -0500 - Also refuse to load memoserv modules if memoserv isn't loaded
+Revision 0f90927 - Wed, 25 Jan 2012 16:13:38 -0500 - Added two common warning messages on Windows to ignore
+Revision 52eaa7d - Wed, 25 Jan 2012 15:48:07 -0500 - Windows
+Revision e88e37c - Tue, 24 Jan 2012 18:28:37 -0500 - Add some checks in ms_* to make sure memoserv really exists
+Revision f10f49d - Tue, 24 Jan 2012 16:42:21 -0500 - Added missing expires column in /os akill view
+Revision d06cdaa - Tue, 24 Jan 2012 16:35:54 -0500 - Fixed os_ignore to check against users real IPs, not to match against opers, and check for expired ignores on /os ignore list
+Revision fc20bd7 - Tue, 24 Jan 2012 16:03:44 -0500 - Add tracking for Unreal's usermode +I
+Revision b3d9412 - Sun, 22 Jan 2012 17:49:23 +0100 - added a french INSTALL file, thanks to MacLeod for translating
+Revision 98feb1b - Sat, 21 Jan 2012 00:50:48 -0500 - Cleaned up bs_kick and fixed amsg kicker
+Revision 94c302b - Fri, 20 Jan 2012 20:50:36 +0000 - Fixed param check from last commit
+Revision cdb6bb8 - Fri, 20 Jan 2012 17:50:09 +0000 - Updated DEFCON and fixed Defcons disabling of the removed mlock command
+Revision a851f84 - Fri, 20 Jan 2012 15:03:49 +0000 - Corrected some incorrect English
+Revision a270a13 - Sun, 15 Jan 2012 02:59:09 -0500 - Fixed crash from last commit
+Revision 964d63c - Sun, 15 Jan 2012 01:47:31 -0500 - Improve on db_sql_live_read
+Revision f38faed - Sat, 14 Jan 2012 15:58:51 +0000 - Fixed an incorrect crash-causing response when an invalid option is specified in botservs kickers
+Revision c462a69 - Fri, 13 Jan 2012 15:37:17 -0500 - Only match users nicks against access list entries if the entry is a mask... accidentally removed from an earlier fix for #1368
+Revision 14a2c9c - Wed, 11 Jan 2012 19:04:40 -0500 - Fixed loading db_sql_live_read's configuration values on startup
+Revision a52ed70 - Tue, 10 Jan 2012 17:58:56 -0500 - Don't ever attempt to process CTCPs as regular messages
+Revision 7c03e60 - Tue, 10 Jan 2012 17:53:48 -0500 - Removed this "valid" ip check in cidr::cidr, is wrong for IPv6 and ::pton checks this anyway using inet_pton. Also fixed a comment Robby broke in chanserv.conf
+Revision 1e9d88a - Tue, 10 Jan 2012 17:06:08 -0500 - Add support for Unreals extban ~a:
+Revision 815e140 - Sun, 8 Jan 2012 19:42:48 -0500 - Fixed loading akill reasons
+Revision f824557 - Sun, 8 Jan 2012 18:14:07 -0500 - Fixed topic lock on inspircd
+Revision 830c5ca - Sat, 7 Jan 2012 16:21:31 -0500 - Cleanup of cs_tban
+Revision 9e71394 - Sat, 7 Jan 2012 04:10:30 -0500 - Cleaned up a lot of log messages, help replies, fixed cs_tban, and other small fixes
+Revision dd64eac - Sat, 7 Jan 2012 03:44:43 -0500 - Fixed users not being able to delete their own access with /cs access when using numbers, and clean up cs_xop slightly
+Revision 4204ece - Mon, 2 Jan 2012 21:28:24 -0500 - Updated Copyright to 2012
+Revision 60a5cc1 - Sat, 31 Dec 2011 03:04:44 -0500 - Bug #1369 - Fixed os_svsnick to allow changing the case of a users' nick
+Revision 20aa4e8 - Sat, 31 Dec 2011 01:33:32 -0500 - Bug #1368 - check all members of a users gruop against the access list
+Revision f1b05ac - Wed, 28 Dec 2011 12:49:04 -0500 - Fixed this back now unreal sends 0 for non logged in users
+Revision a4bf770 - Wed, 28 Dec 2011 04:31:44 -0500 - Added ESVID support to unreal32 Also fixes a crash due to unreal's ESVID change when users connect.
+Revision 150831c - Tue, 27 Dec 2011 23:11:14 -0500 - Made capab management a bit simplier
+Revision 1a4157b - Fri, 23 Dec 2011 12:29:30 -0500 - Add DT_ALLOW_EMPTY config flag, allow fantasychars to be empty
+Revision 3bcb285 - Thu, 22 Dec 2011 03:46:35 -0500 - Somehow these two modules got mixed up..
+Revision 704dbe2 - Tue, 20 Dec 2011 18:38:37 -0500 - Updated /bs info output and note db_sql can truncate entire databases
+Revision bbddf50 - Mon, 19 Dec 2011 17:13:38 -0500 - Fixed botserv kickers
+Revision e5851ad - Mon, 19 Dec 2011 16:07:28 -0500 - Fixed saving databases with MySQL when shut down by SIGINT
+Revision 03119f2 - Mon, 19 Dec 2011 15:41:14 -0500 - Made m_dnsbl ban IPs not hostnames
+Revision 45fc3ce - Mon, 19 Dec 2011 15:37:15 -0500 - Fixed formatting of many lists and INFO outputs
+Revision d320c73 - Sat, 17 Dec 2011 10:30:13 +0000 - Fixed entry messages not displaying.
+Revision ca8ce89 - Sat, 17 Dec 2011 02:06:53 +0000 - Fixed a slight error in email registration/resend and some minor typos.
+Revision c88a751 - Thu, 15 Dec 2011 02:29:13 -0500 - Add privilege ranks to determine how powerful privileges are
+Revision 9ea030d - Thu, 15 Dec 2011 01:14:13 -0500 - Fixed access comparators
+Revision ad14c81 - Mon, 12 Dec 2011 15:37:08 -0500 - Update channel last used times when founders use the channel, too
+Revision 255a8da - Mon, 12 Dec 2011 15:26:59 -0500 - Added oper:require_oper configuration option
+Revision 4211dcf - Sun, 11 Dec 2011 17:03:33 -0500 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 3c5337f - Sun, 11 Dec 2011 17:01:56 -0500 - Fixed translating messages with varargs sent directly to users, too
+Revision d2f788c - Sun, 11 Dec 2011 05:17:19 +0000 - Added K to vhost_chars...
+Revision fa54d5a - Thu, 8 Dec 2011 17:29:17 -0500 - Fixed a memory leak in m_sqlite
+Revision aeefe16 - Mon, 5 Dec 2011 11:52:40 -0500 - Bug #1364 - fixed crash in /cs kick
+Revision c80e784 - Sat, 3 Dec 2011 19:17:41 -0500 - Attempt to fix issue with modules having their link libraries in the wrong order.
+Revision 620c08b - Fri, 25 Nov 2011 23:12:23 +0000 - Fixed some more errors in sql live-write, hopefully the last.
+Revision 23a9270 - Fri, 25 Nov 2011 23:10:26 +0000 - Fixed a crash in ns saset when using mysql-write module
+Revision cef3eb7 - Fri, 25 Nov 2011 00:44:31 -0500 - Remove send_cmd and replace it with a stringstream
+Revision 12d0a73 - Mon, 21 Nov 2011 16:24:45 -0500 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
+Revision 0dd85f7 - Mon, 21 Nov 2011 16:17:17 -0500 - Fixed not translating messages using varargs
+Revision 51d6e8e - Sun, 20 Nov 2011 18:41:46 -0500 - CMake handles strings and lists differently, so this should hopefully finally fix the linking issue.
+Revision 3f14882 - Sun, 20 Nov 2011 18:34:13 -0500 - Apparently pstdint.h was NOT included way back with commit 377a7a9 to use something similar to stdint.h
+Revision 5a17b06 - Sun, 20 Nov 2011 18:32:47 -0500 - Really fix linking in libraries (even if gettext isn't found on *nix), and a minor nitpick about the leading spaces on LINK_LIBS.
+Revision bf8e4ac - Sun, 20 Nov 2011 16:09:59 -0500 - Attempt to fix where link libraries are set when compiling to fix failed builds on systems that require -ldl.
+Revision 781ed11 - Sun, 20 Nov 2011 15:31:01 -0500 - Allow services operators to modify other users access list
+Revision 6f8f749 - Fri, 18 Nov 2011 16:20:17 -0500 - Allow kicking and banning by mask
+Revision c43cdf4 - Fri, 18 Nov 2011 11:22:01 -0500 - Added operserv/logout
+Revision 8374211 - Fri, 18 Nov 2011 00:36:54 -0500 - Allow having multiple fantasy characters
+Revision 69dfc72 - Thu, 17 Nov 2011 12:46:18 -0500 - Fixed storing mode locks
+Revision 5281282 - Wed, 16 Nov 2011 16:22:58 -0500 - Fixed compile error
+Revision 503eb42 - Tue, 15 Nov 2011 16:30:31 -0500 - Made looking up a level for a nonexistant privilege debugg log a warning, not abort
+Revision 38d90c7 - Tue, 15 Nov 2011 16:27:32 -0500 - Fixed loading ssl certs for users
+Revision 1356498 - Tue, 15 Nov 2011 16:22:02 -0500 - Prevent locking mode Z on unrealircd
+Revision 9ed203c - Tue, 15 Nov 2011 16:16:38 -0500 - Fixed crash on shutdown & a compiler warning
+Revision b5ff856 - Tue, 8 Nov 2011 17:29:16 -0500 - Windows
+Revision 97b9055 - Sat, 5 Nov 2011 15:05:15 -0400 - Remove xlines from the IRCd aswell as from our list when the clear command is used, and fixed adding timed Zlines to inspircd
+Revision 5f0b933 - Sat, 5 Nov 2011 00:11:49 -0400 - Set proper expirys on ZLines if the IRCd supports it
+Revision b3194a1 - Fri, 4 Nov 2011 19:39:27 -0400 - Updated Changes
+Revision d01f4ea - Fri, 4 Nov 2011 18:04:12 -0400 - Allow /os userlist to match host and ip too
+Revision a42cafb - Fri, 4 Nov 2011 17:55:14 -0400 - Store flags for memos, fixed the expiring very soon message, fixed /os session view when a session exception is added at a lower limit than th default
+Revision 066e5b3 - Fri, 4 Nov 2011 02:28:21 -0400 - Delete all tables before flushing not just ones we know about
+Revision 09dba47 - Thu, 3 Nov 2011 18:59:51 -0400 - Added an assignment operator for Serializable because some STL containers use it which causes iterators to become invalidated
+Revision ca33ac6 - Thu, 3 Nov 2011 02:28:29 -0400 - Bug #1354 - Allow mode chars to be used for channel prefixs in services.conf
+Revision 302989b - Tue, 1 Nov 2011 01:11:26 -0400 - Clarify the message when users try to lock modes they don't have access to lock
+Revision 22b7d9f - Tue, 1 Nov 2011 00:15:28 -0400 - Added a copy constructor to dynamic_reference to allow references to reference other references correctly
+Revision 9dd71c4 - Sat, 29 Oct 2011 21:16:50 -0400 - Fixed the signal/fork/wait mess hopefully once and for all. fork() did not copy kqueue descriptors on freebsd which caused problems
+Revision 655c1cc - Thu, 27 Oct 2011 18:21:49 -0400 - Fix a few warnings that only showed up with gcc 3.4.6 here (sadly, there is one on every file about anonymous variadic macros that I can't get rid of).
+Revision d9333e0 - Thu, 27 Oct 2011 18:01:56 -0400 - Clear flags before rebuilding them from the databases. Fixes bug #1351 where default flags would always be set when unserializing objects.
+Revision 39ac438 - Thu, 27 Oct 2011 15:09:31 -0400 - Ignore sigchld/usr2 sent to the child process after fork
+Revision 0761a4a - Thu, 27 Oct 2011 14:46:20 -0400 - Bug #1350 + other related fixes
+Revision 66ca256 - Thu, 27 Oct 2011 13:50:32 -0400 - Fixed loading exceptions in db_plain
+Revision 961bb6e - Thu, 27 Oct 2011 00:13:00 +0100 - Fixed some typos/errors in the example configs comments.
+Revision b14f5ea - Wed, 26 Oct 2011 16:52:00 -0400 - Fixed accidentally clearing botmodes when joins are sent
+Revision bf66336 - Wed, 26 Oct 2011 15:29:45 -0400 - Bug #1347, fixed incorrect param parsing in cs_set_misc
+Revision c79a575 - Wed, 26 Oct 2011 15:17:05 -0400 - Bug #1348 - Fixed /cs entrymsg list
+Revision 8334128 - Wed, 26 Oct 2011 14:31:58 -0400 - Removed the old unordered_map code
+Revision 7c62de1 - Mon, 24 Oct 2011 16:37:29 -0400 - Merge branch '1.9' of anope.git.sf.net:/gitroot/anope/anope into 1.9
+Revision 377a7a9 - Mon, 24 Oct 2011 16:32:29 -0400 - Fixed bug #1349 (m_sqlite compiles without error under FreeBSD), as well as use C99's stdint.h (or cstdint if available) to get (u)intX_t types instead of our stupid typedefs.  pstdint.h included in case there is no cstdint or stdint.h available.
+Revision ccf29c0 - Mon, 24 Oct 2011 13:19:51 -0400 - Fixed the capab parser to parse capab tokens prefixed with :. Fixes not detecting quitstorm support on ratbox
+Revision d0513d6 - Sat, 22 Oct 2011 16:11:26 -0400 - A few minor fixups
+Revision f4a0bdd - Sat, 22 Oct 2011 12:45:55 -0400 - Added our own eventfd test for openvz machines which have eventfd but can not be used
+Revision 3e2ac36 - Sat, 22 Oct 2011 11:35:31 -0400 - Bug #1343 - don't allow recovering and ghosting enforcers
+Revision c8b3809 - Sat, 22 Oct 2011 11:21:21 -0400 - Added akill ids
+Revision ad2ef75 - Sat, 22 Oct 2011 11:20:50 -0400 - Fixed a race condition with installing signal handlers and forking
+Revision 6ce9010 - Fri, 21 Oct 2011 18:01:51 -0400 - Fixed extracting multiple words from our serializable stringstream
+Revision d0afc8c - Fri, 21 Oct 2011 00:21:34 -0400 - Added m_rewrite
+Revision 230b3bc - Thu, 20 Oct 2011 13:38:37 -0400 - Only fork if we are at term
+Revision 1cfb630 - Thu, 20 Oct 2011 11:54:56 -0400 - Fixed a crash in clearusers
+Revision d16f962 - Wed, 19 Oct 2011 12:59:16 -0400 - Bug #1342 - fixed tracking chmodes in bahamuts sjoin
+Revision fc16746 - Tue, 18 Oct 2011 12:18:18 -0400 - Prevent chankill from akilling my clients
+Revision eb5b5f9 - Tue, 18 Oct 2011 12:06:51 -0400 - Fixed compile errors on release build
+Revision faea452 - Tue, 18 Oct 2011 01:48:05 -0400 - Reorder some stuff in Init & the ts6 proto mods to fix weirdness from bots being introduced by 3rd party modules
+Revision 2c614d5 - Sat, 15 Oct 2011 02:08:52 -0400 - Fixed up anoperc to work with the newer startup method
+Revision 89b4be6 - Sat, 15 Oct 2011 00:54:32 -0400 - Fixed crash on /os oper del
+Revision 28ca0e1 - Fri, 14 Oct 2011 22:07:13 -0400 - Fork earlier in startup to prevent it messing up threads, if there are any
+Revision 2504af7 - Fri, 14 Oct 2011 12:53:28 -0400 - Fixed os_forbid adds reason if no expiry is given
+Revision ddc3c2f - Fri, 14 Oct 2011 12:20:07 -0400 - Added options:nonicknameownership config option
+Revision 53275c3 - Tue, 11 Oct 2011 02:50:37 -0400 - Don't add new levels to existing channels default, screws with stuff when the config is reloaded
+Revision f3f6727 - Tue, 11 Oct 2011 00:09:26 -0400 - Bug #1337
+Revision 4681e3a - Mon, 10 Oct 2011 17:19:06 -0400 - Allow chanserv/suspend to take an expiry time
+Revision 80f4f31 - Mon, 10 Oct 2011 15:04:23 -0400 - Put serialized_items on the heap to prevent weird crashes on shutdown from the list being destructed before members in it
+Revision 9f3d735 - Mon, 10 Oct 2011 14:16:59 -0400 - Allow nickserv/suspend to take an expiry time
+Revision 0e012f7 - Sun, 9 Oct 2011 21:29:34 -0400 - Check for being at terminal before forking
+Revision 9f85033 - Sun, 9 Oct 2011 02:52:13 -0400 - Give more verbose messages on startup
+Revision af273e3 - Sun, 25 Sep 2011 15:34:56 -0400 - Store flags for objects, also fixes bug #1333
+Revision 1f3e96f - Sun, 25 Sep 2011 14:42:09 -0400 - Made channel privileges case insensitive
+Revision e7ba639 - Sun, 25 Sep 2011 14:38:21 -0400 - Remove opnotice from example configs
+Revision 1f2399d - Sun, 25 Sep 2011 04:19:15 -0400 - Added a new database format and sqlite support. Also moved db-convert to a module.
+Revision 43201ea - Mon, 19 Sep 2011 18:35:40 -0400 - Fixed /os reload doing weird things to service channels, and allow setting modes by clients on burst
+Revision 7dce64e - Mon, 19 Sep 2011 13:14:20 -0400 - Fixed missing _ in cs_appendtopic
+Revision 1184eb5 - Mon, 19 Sep 2011 13:12:52 -0400 - Allow OnPreHelp to stop processing
+Revision 4c2a492 - Mon, 19 Sep 2011 12:36:52 -0400 - Call fantasy events even if the commands for them don't exist
+Revision be77a7e - Mon, 19 Sep 2011 12:29:54 -0400 - Bug #1334 - fixed crash on /os oper info
+Revision 934723f - Mon, 19 Sep 2011 12:14:02 -0400 - LOG_COMMAND must now always give a valid command
+Revision f07295c - Fri, 16 Sep 2011 14:07:33 -0400 - Bug #1332 - Fixed ValidateUser to not require secure off to disable nickserv kill
+Revision 26c1d67 - Sat, 10 Sep 2011 16:27:10 -0400 - Fixed compile errors & warnings from 1.9.6 to 1.9 merge
+Revision 3d5889c - Sat, 10 Sep 2011 16:08:58 -0400 - Updated channel flag names to remove LOGCHAN
+Revision 213c1c4 - Sat, 10 Sep 2011 02:42:18 -0400 - Changed msgmerge to not use -E.. it will escape all of some languages and mess up poedit etc. Keep it in xgettext for the bold/underline characters.
+Revision 63cb8ca - Sat, 10 Sep 2011 02:06:31 -0400 - Moved signal/thread/mode checking to use signal pipes
+Revision dc5d1fa - Sat, 10 Sep 2011 02:06:31 -0400 - Made ChanServ privileges configurable
+Revision 563d158 - Sat, 10 Sep 2011 02:06:31 -0400 - Allow Config to install cmake
+Revision 1478b5b - Sat, 10 Sep 2011 02:06:29 -0400 - Added chanserv/log
+Revision 19e0b87 - Sat, 10 Sep 2011 02:05:56 -0400 - Removed /bs set msg
+Revision 17ea4ed - Sat, 10 Sep 2011 02:05:03 -0400 - Fixed service_reference to work correctly with external classes
+Revision feaef7c - Sat, 10 Sep 2011 02:05:03 -0400 - Allow services to register or unregister themselves
+Revision c6d3fbd - Sat, 10 Sep 2011 02:05:02 -0400 - Added kqueue
+Revision 700a585 - Sat, 10 Sep 2011 02:05:00 -0400 - Allow modules to add their own channel levels
+Revision 62752db - Sat, 10 Sep 2011 01:58:39 -0400 - Rewrote mlock saving/loading code to not use this silly extensible hack
+Revision f025d1b - Sat, 10 Sep 2011 01:58:38 -0400 - Made service_reference type safe
+Revision 8c4417c - Sat, 10 Sep 2011 01:58:38 -0400 - Removed opnotice
+Revision d4db2b8 - Sat, 10 Sep 2011 01:58:38 -0400 - Made the IsValidHost checks configurable
+Revision bb8e04c - Sat, 10 Sep 2011 01:58:35 -0400 - Added oper:host and oper:vhost
+Revision b504791 - Sat, 10 Sep 2011 01:55:37 -0400 - Cleaned up the dns engine, and fixed sometimes parsing multiple answer queries incorrectly
+Revision d5749c1 - Sat, 10 Sep 2011 01:55:37 -0400 - Fixed eventfd pipeengine to not add the same socket twice
+Revision f54ab5e - Sat, 10 Sep 2011 01:55:29 -0400 - Squash merge of 1.9 to 1.9.6
+Revision 1e45019 - Sat, 10 Sep 2011 01:55:11 -0400 - Added m_proxyscan
+Revision 2eb708e - Sat, 10 Sep 2011 01:55:09 -0400 - Cleaned up some of the socket code, cleaned up the pipe engines, added support for binary sockets, and cleaned up the asynch connect/accept code
+Revision 4fcb371 - Sat, 10 Sep 2011 01:52:59 -0400 - Track what "level" channel status modes are, which allows us to have chanserv/mode determine if a status mode can be set by users better
+Revision 6401d93 - Sat, 10 Sep 2011 01:52:59 -0400 - Added chanserv/up and chanserv/down
+Revision 8a9a39c - Sat, 10 Sep 2011 01:52:59 -0400 - Renamed the core pseudoclient modules to match their names
+Revision 13e8b26 - Sat, 10 Sep 2011 01:52:59 -0400 - Made email messages sent by services configurable
+Revision 8a6d657 - Sat, 10 Sep 2011 01:52:46 -0400 - Removed log:inhabitlogchannel and replaced it with service:channels
+Revision 4a7ba7e - Sat, 10 Sep 2011 00:58:35 -0400 - Removed SZLine. Instead, have AKILL determine whether or not a ZLINE should be set.
+Revision 2b5d9f3 - Sat, 10 Sep 2011 00:54:29 -0400 - Bump for 1.9.6 git
+Revision 3a502f2 - Fri, 9 Sep 2011 23:28:58 -0400 - Anope 1.9.5 Release
+Revision b6dad37 - Fri, 9 Sep 2011 23:28:37 -0400 - Update version.log
 Revision 3cbad7f - Fri, 9 Sep 2011 23:27:15 -0400 - Regenerate language files
 Revision b80a0a8 - Fri, 9 Sep 2011 22:27:51 -0400 - Updated Greek language file
 Revision f844b0a - Fri, 9 Sep 2011 19:18:43 -0400 - Changed User::IsRecognized check to default to secure
@@ -782,7 +947,7 @@ Revision 0d2d7e9 - Sun, 20 Jun 2010 20:05:23 -0400 - Fixed Windows build
 Revision 63d7bee - Sun, 20 Jun 2010 18:51:03 -0400 - Merge branch '1.9' of ssh://anope.git.sf.net/gitroot/anope/anope into 1.9
 Revision 381c9c8 - Sun, 20 Jun 2010 18:42:58 -0400 - The first of a few "CBX OCDing over code style" commits, focusing on include/* and src/* but not src/core/* or src/modules/*.
 Revision e8a1570 - Sun, 20 Jun 2010 14:04:17 -0400 - Added m_helpchan to replace the cores helpchannel functionality
-Revision 968e4d0 - Sun, 20 Jun 2010 13:11:31 -0400 - Fixed the name of cs_forbid in chanserv:modules so it really loads
+Revision 968e4d0b - Sun, 20 Jun 2010 13:11:31 -0400 - Fixed the name of cs_forbid in chanserv:modules so it really loads
 Revision 7b7e2a6 - Sat, 19 Jun 2010 21:22:48 -0400 - Updated TODO
 Revision 448eadd - Sat, 19 Jun 2010 20:53:53 -0400 - Made db-converter add all of the core clients when converting a 1.8 database
 Revision 68b54f3 - Sat, 19 Jun 2010 13:39:12 -0400 - Made db-converter only write mlock params if there really is one, fixes some problems with converting mlock for certain databases

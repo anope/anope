@@ -206,6 +206,8 @@ class OperServCore : public Module
 		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
+			if (Config->WallBadOS)
+				ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
 			return EVENT_STOP;
 		}
 

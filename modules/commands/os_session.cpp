@@ -100,9 +100,7 @@ class ExpireTimer : public Timer
 
 			if (!e->expires || e->expires > Anope::CurTime)
 				continue;
-			BotInfo *bi = findbot(Config->OperServ);
-			if (Config->WallExceptionExpire && bi)
-				ircdproto->SendGlobops(bi, "Session exception for %s has expired.", e->mask.c_str());
+			Log(findbot(Config->OperServ), "expire/exception") << "Session exception for " << e->mask << "has expired.";
 			session_service->DelException(e);
 			delete e;
 		}
@@ -646,8 +644,6 @@ class OSSession : public Module
 						u->SendMessage(bi, "%s", Config->SessionLimitDetailsLoc.c_str());
 				}
 
-				u->Kill(Config->OperServ, "Session limit exceeded");
-
 				++session->hits;
 				if (Config->MaxSessionKill && session->hits >= Config->MaxSessionKill && akills)
 				{
@@ -655,8 +651,12 @@ class OSSession : public Module
 					XLine *x = new XLine(akillmask, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Session limit exceeded", XLineManager::GenerateUID());
 					akills->AddXLine(x);
 					akills->Send(NULL, x);
-					if (bi)
-						ircdproto->SendGlobops(bi, "Added a temporary AKILL for \2%s\2 due to excessive connections", akillmask.c_str());
+					Log(bi, "akill/session") << "Added a temporary AKILL for \2" << akillmask << "\2 due to excessive connections";
+				}
+				else
+				{
+					u->Kill(Config->OperServ, "Session limit exceeded");
+					u = NULL; /* No guarentee u still exists */
 				}
 			}
 		}

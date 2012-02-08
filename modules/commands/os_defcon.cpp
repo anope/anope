@@ -549,13 +549,17 @@ class OSDefcon : public Module
 				if (!Config->SessionLimitDetailsLoc.empty())
 					ircdproto->SendMessage(findbot(Config->OperServ), u->nick, "%s", Config->SessionLimitDetailsLoc.c_str());
 
-				u->Kill(Config->OperServ, "Defcon session limit exceeded");
 				++session->hits;
 				if (akills && Config->MaxSessionKill && session->hits >= Config->MaxSessionKill)
 				{
 					XLine x("*@" + u->host, Config->OperServ, Anope::CurTime + Config->SessionAutoKillExpiry, "Defcon session limit exceeded", XLineManager::GenerateUID());
 					akills->Send(NULL, &x);
-					ircdproto->SendGlobops(findbot(Config->OperServ), "[DEFCON] Added a temporary AKILL for \2*@%s\2 due to excessive connections", u->host.c_str());
+					Log(findbot(Config->OperServ), "akill/defcon") << "[DEFCON] Added a temporary AKILL for \2*@" << u->host << "\2 due to excessive connections";
+				}
+				else
+				{
+					u->Kill(Config->OperServ, "Defcon session limit exceeded");
+					u = NULL; /* No guarentee u still exists */
 				}
 			}
 		}

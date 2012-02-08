@@ -38,13 +38,13 @@ class CommandOSOLine : public Command
 			u2->SetMode(source.owner, UMODE_OPER);
 			u2->SendMessage(source.owner, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(source.owner, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			Log(LOG_ADMIN, u, this) << "for " << nick;
 		}
 		else if (u2 && flag[0] == '-')
 		{
 			ircdproto->SendSVSO(Config->OperServ, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
-			ircdproto->SendGlobops(source.owner, "\2%s\2 used OLINE for %s", u->nick.c_str(), nick.c_str());
+			Log(LOG_ADMIN, u, this) << "for " << nick;
 		}
 		else
 			this->OnSyntaxError(source, "");

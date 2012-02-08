@@ -57,7 +57,7 @@ class CommandOSSVSNick : public Command
 		else
 		{
 			source.Reply(_("The nick \002%s\002 is now being changed to \002%s\002."), nick.c_str(), newnick.c_str());
-			ircdproto->SendGlobops(source.owner, "%s used SVSNICK to change %s to %s", u->nick.c_str(), nick.c_str(), newnick.c_str());
+			Log(LOG_ADMIN, u, this) << "to change " << nick << " to " << newnick;
 			ircdproto->SendForceNickChange(u2, newnick, Anope::CurTime);
 		}
 		return;

@@ -19,7 +19,6 @@ ConfigurationFile services_conf("services.conf", false); // Services configurati
 ServerConfig *Config = NULL;
 
 static Anope::string UlineServers;
-static Anope::string OSNotifications;
 static Anope::string BSDefaults;
 static Anope::string CSDefaults;
 static Anope::string NSDefaults;
@@ -135,29 +134,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 				this->BSDefFlags.SetFlag(BS_GREET);
 			else if (option.equals_ci("fantasy"))
 				this->BSDefFlags.SetFlag(BS_FANTASY);
-		}
-	}
-
-	this->WallOper = this->WallBadOS = this->WallAkillExpire = this->WallSNLineExpire = this->WallSQLineExpire =
-	this->WallExceptionExpire = false;
-	if (!OSNotifications.empty())
-	{
-		spacesepstream notifications(OSNotifications);
-		Anope::string notice;
-		while (notifications.GetToken(notice))
-		{
-			if (notice.equals_ci("oper"))
-				this->WallOper = true;
-			else if (notice.equals_ci("bados"))
-				this->WallBadOS = true;
-			else if (notice.equals_ci("akillexpire"))
-				this->WallAkillExpire = true;
-			else if (notice.equals_ci("snlineexpire"))
-				this->WallSNLineExpire = true;
-			else if (notice.equals_ci("sqlineexpire"))
-				this->WallSQLineExpire = true;
-			else if (notice.equals_ci("exceptionexpire"))
-				this->WallExceptionExpire = true;
 		}
 	}
 
@@ -1267,7 +1243,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&conf->AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsnline", "no", new ValueContainerBool(&conf->KillonSNline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&conf->KillonSQline), DT_BOOLEAN, NoValidation},
-		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&conf->LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&conf->DefSessionLimit), DT_UINTEGER, NoValidation},
 		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&conf->MaxSessionLimit), DT_UINTEGER, ValidateOperServ},

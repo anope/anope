@@ -29,8 +29,7 @@ class SGLineManager : public XLineManager
 
 	void OnExpire(XLine *x)
 	{
-		if (Config->WallAkillExpire)
-			ircdproto->SendGlobops(OperServ, "AKILL on %s has expired", x->Mask.c_str());
+		Log(OperServ, "expire/akill") << "AKILL on \2" << x->Mask << "\2 has expired";
 	}
 	
 	void Send(User *u, XLine *x)
@@ -86,8 +85,7 @@ class SQLineManager : public XLineManager
 
 	void OnExpire(XLine *x)
 	{
-		if (Config->WallSQLineExpire)
-			ircdproto->SendGlobops(OperServ, "SQLINE on \2%s\2 has expired", x->Mask.c_str());
+		Log(OperServ, "expire/sqline") << "SQLINE on \2" << x->Mask << "\2 has expired";
 	}
 
 	void Send(User *u, XLine *x)
@@ -127,8 +125,7 @@ class SNLineManager : public XLineManager
 
 	void OnExpire(XLine *x)
 	{
-		if (Config->WallSNLineExpire)
-			ircdproto->SendGlobops(OperServ, "SNLINE on \2%s\2 has expired", x->Mask.c_str());
+		Log(OperServ, "expire/snline") << "SNLINE on \2" << x->Mask << "\2 has expired";
 	}
 
 	void Send(User *u, XLine *x)
@@ -206,8 +203,7 @@ class OperServCore : public Module
 		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
 		{
 			u->SendMessage(bi, ACCESS_DENIED);
-			if (Config->WallBadOS)
-				ircdproto->SendGlobops(OperServ, "Denied access to %s from %s!%s@%s (non-oper)", Config->OperServ.c_str(), u->nick.c_str(), u->GetIdent().c_str(), u->host.c_str());
+			Log(OperServ, "bados") << "Denied access to " << Config->OperServ << " from " << u->GetMask() << " (non-oper)";
 			return EVENT_STOP;
 		}
 
@@ -217,23 +213,19 @@ class OperServCore : public Module
 	void OnServerQuit(Server *server)
 	{
 		if (server->HasFlag(SERVER_JUPED))
-			ircdproto->SendGlobops(OperServ, "Received SQUIT for juped server %s", server->GetName().c_str());
+			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
 	void OnUserModeSet(User *u, UserModeName Name)
 	{
 		if (Name == UMODE_OPER)
-		{
-			if (Config->WallOper)
-				ircdproto->SendGlobops(OperServ, "\2%s\2 is now an IRC operator.", u->nick.c_str());
-			Log(OperServ) << u->nick << " is now an IRC operator";
-		}
+			Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
 	void OnUserModeUnset(User *u, UserModeName Name)
 	{
 		if (Name == UMODE_OPER)
-			Log(OperServ) << u->nick << " is no longer an IRC operator";
+			Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)

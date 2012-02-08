@@ -108,23 +108,25 @@ Log::Log(User *_u, Channel *ch, const Anope::string &category) : u(_u), c(NULL),
 	this->Sources.push_back(chan->name);
 }
 
-Log::Log(User *_u, const Anope::string &category) : bi(NULL), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
+Log::Log(User *_u, const Anope::string &category, BotInfo *_bi) : bi(_bi), u(_u), c(NULL), chan(NULL), ci(NULL), s(NULL), Type(LOG_USER), Category(category)
 {
 	if (!u)
 		throw CoreException("Invalid pointers passed to Log::Log");
 	
-	this->bi = Config ? findbot(Config->Global) : NULL;
+	if (!this->bi)
+		this->bi = Config ? findbot(Config->Global) : NULL;
 	if (this->bi)
 		this->Sources.push_back(this->bi->nick);
 	this->Sources.push_back(u->nick);
 }
 
-Log::Log(Server *serv, const Anope::string &category) : bi(NULL), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
+Log::Log(Server *serv, const Anope::string &category, BotInfo *_bi) : bi(_bi), u(NULL), c(NULL), chan(NULL), ci(NULL), s(serv), Type(LOG_SERVER), Category(category)
 {
 	if (!s)
 		throw CoreException("Invalid pointer passed to Log::Log");
 	
-	this->bi = Config ? findbot(Config->OperServ) : NULL;
+	if (!this->bi)
+		this->bi = Config ? findbot(Config->OperServ) : NULL;
 	if (!this->bi)
 		this->bi = Config ? findbot(Config->Global) : NULL;
 	if (this->bi)
@@ -167,7 +169,7 @@ Anope::string Log::BuildPrefix() const
 	{
 		case LOG_ADMIN:
 		{
-			if (!this->c)
+			if (!this->c || !this->u)
 				break;
 			buffer += "ADMIN: ";
 			size_t sl = this->c->name.find('/');
@@ -179,7 +181,7 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_OVERRIDE:
 		{
-			if (!this->c)
+			if (!this->c || !this->u)
 				break;
 			buffer += "OVERRIDE: ";
 			size_t sl = this->c->name.find('/');
@@ -191,7 +193,7 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_COMMAND:
 		{
-			if (!this->c)
+			if (!this->c || !this->u)
 				break;
 			buffer += "COMMAND: ";
 			size_t sl = this->c->name.find('/');
@@ -203,6 +205,8 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_CHANNEL:
 		{
+			if (!this->chan)
+				break;
 			buffer += "CHANNEL: ";
 			if (this->u)
 				buffer += this->u->GetMask() + " " + this->Category + " " + this->chan->name + " ";
@@ -212,12 +216,14 @@ Anope::string Log::BuildPrefix() const
 		}
 		case LOG_USER:
 		{
-			buffer += "USERS: " + this->u->GetMask() + " ";
+			if (this->u)
+				buffer += "USERS: " + this->u->GetMask() + " ";
 			break;
 		}
 		case LOG_SERVER:
 		{
-			buffer += "SERVER: " + this->s->GetName() + " (" + this->s->GetDescription() + ") ";
+			if (this->s)
+				buffer += "SERVER: " + this->s->GetName() + " (" + this->s->GetDescription() + ") ";
 			break;
 		}
 		default:

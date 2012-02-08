@@ -30,7 +30,7 @@ class CommandOSModLoad : public Command
 		ModuleReturn status = ModuleManager::LoadModule(mname, u);
 		if (status == MOD_ERR_OK)
 		{
-			ircdproto->SendGlobops(source.owner, "%s loaded module %s", u->nick.c_str(), mname.c_str());
+			Log(LOG_ADMIN, u, this) << "to load module " << mname;
 			source.Reply(_("Module \002%s\002 loaded"), mname.c_str());
 		}
 		else if (status == MOD_ERR_EXISTS)
@@ -91,7 +91,7 @@ class CommandOSModReLoad : public Command
 		status = ModuleManager::LoadModule(mname, u);
 		if (status == MOD_ERR_OK)
 		{
-			ircdproto->SendGlobops(source.owner, "%s reloaded module %s", u->nick.c_str(), mname.c_str());
+			Log(LOG_ADMIN, u, this) << "to reload module " << mname;
 			source.Reply(_("Module \002%s\002 reloaded"), mname.c_str());
 		}
 		else
@@ -150,8 +150,8 @@ class CommandOSModUnLoad : public Command
 
 		if (status == MOD_ERR_OK)
 		{
+			Log(LOG_ADMIN, u, this) << "to unload module " << mname;
 			source.Reply(_("Module \002%s\002 unloaded"), mname.c_str());
-			ircdproto->SendGlobops(source.owner, "%s unloaded module %s", u->nick.c_str(), mname.c_str());
 		}
 		else
 			source.Reply(_("Unable to remove module \002%s\002"), mname.c_str());

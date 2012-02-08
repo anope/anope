@@ -598,18 +598,6 @@ class CoreExport ServerConfig
 	bool KillonSNline;
 	/* Kill users on SQline */
 	bool KillonSQline;
-	/* Send a WALLOPS/GLOBOPS when a user opers */
-	bool WallOper;
-	/* Send a WALLOPS/GLOBOPS when a nonoper tries to use OperServ */
-	bool WallBadOS;
-	/* Send a WALLOPS/GLOBOPS when an akill expires */
-	bool WallAkillExpire;
-	/* Send a WALLOPS/GLOBOPS when SNLines expire */
-	bool WallSNLineExpire;
-	/* Send a WALLOPS/GLOBOPS when SQLines expire */
-	bool WallSQLineExpire;
-	/* Send a WALLOPS/GLOBOPS when exceptions expire */
-	bool WallExceptionExpire;
 	/* Add the akillers nick to the akill reason */
 	bool AddAkiller;
 	/* Add akill ids to akill reason */

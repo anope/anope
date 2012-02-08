@@ -55,12 +55,12 @@ class CoreExport Log
 	Log(User *u, Channel *c, const Anope::string &category = "");
 
 	/* LOG_USER */
-	explicit Log(User *u, const Anope::string &category = "");
+	explicit Log(User *u, const Anope::string &category = "", BotInfo *bi = NULL);
 
 	/* LOG_SERVER */
-	Log(Server *s, const Anope::string &category = "");
+	explicit Log(Server *s, const Anope::string &category = "", BotInfo *bi = NULL);
 
-	Log(BotInfo *b, const Anope::string &category = "");
+	explicit Log(BotInfo *b, const Anope::string &category = "");
 
 	~Log();
 

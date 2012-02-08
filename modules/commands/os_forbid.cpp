@@ -63,7 +63,7 @@ class MyForbidService : public ForbidService
 				else if (d->type == FT_EMAIL)
 					ftype = "email";
 
-				Log(LOG_NORMAL, Config->OperServ + "/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
+				Log(LOG_NORMAL, "expire/forbid") << "Expiring forbid for " << d->mask << " type " << ftype;
 				this->forbidData.erase(this->forbidData.begin() + i - 1);
 				delete d;
 			}

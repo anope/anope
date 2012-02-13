@@ -625,11 +625,6 @@ class CoreExport ServerConfig
 	/* List of modules to autoload */
 	std::list<Anope::string> ModulesAutoLoad;
 
-	/* User keys to use for generating random hashes for pass codes etc */
-	unsigned long UserKey1;
-	unsigned long UserKey2;
-	unsigned long UserKey3;
-
 	/* Numeric */
 	Anope::string Numeric;
 	/* Array of ulined servers */

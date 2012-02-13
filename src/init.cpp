@@ -459,8 +459,7 @@ void Init(int ac, char **av)
 	InitLanguages();
 
 	/* Initialize random number generator */
-	rand_init();
-	add_entropy_userkeys();
+	srand(time(NULL));
 
 	/* load modules */
 	Log() << "Loading modules...";

@@ -52,8 +52,11 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 		throw SocketException("DNS queue full");
 
 	do
-		this->id = getrandom16();
-	while (!this->id || DNSEngine->requests.count(this->id));
+	{
+		static unsigned short cur_id = 0;
+		this->id = cur_id++;
+	}
+	while (DNSEngine->requests.count(this->id));
 
 	DNSEngine->requests[this->id] = this;
 }
@@ -457,7 +460,7 @@ DNSManager::~DNSManager()
 		delete this->packets[i - 1];
 	this->packets.clear();
 
-	for (std::map<short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
+	for (std::map<unsigned short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end; ++it)
 	{	
 		DNSRequest *request = it->second;
 
@@ -504,7 +507,7 @@ bool DNSManager::ProcessRead()
 		return true;
 	}
 
-	std::map<short, DNSRequest *>::iterator it = DNSEngine->requests.find(recv_packet.id);
+	std::map<unsigned short, DNSRequest *>::iterator it = DNSEngine->requests.find(recv_packet.id);
 	if (it == DNSEngine->requests.end())
 	{
 		Log(LOG_DEBUG_2) << "Resolver: Received an answer for something we didn't request";
@@ -652,9 +655,9 @@ void DNSManager::Tick(time_t now)
 
 void DNSManager::Cleanup(Module *mod)
 {
-	for (std::map<short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
+	for (std::map<unsigned short, DNSRequest *>::iterator it = this->requests.begin(), it_end = this->requests.end(); it != it_end;)
 	{
-		short id = it->first;
+		unsigned short id = it->first;
 		DNSRequest *req = it->second;
 		++it;
 

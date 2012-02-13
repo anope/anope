@@ -128,7 +128,7 @@ class ESHA256 : public Module
 	void NewRandomIV()
 	{
 		for (int i = 0; i < 8; ++i)
-			iv[i] = getrandom32();
+			iv[i] = static_cast<uint32_t>(rand());
 	}
 
 	/* returns the IV as base64-encrypted string */

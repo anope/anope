@@ -321,7 +321,7 @@ void User::Collide(NickAlias *na)
 		int i = 0;
 		do
 		{
-			guestnick = Config->NSGuestNickPrefix + stringify(getrandom16());
+			guestnick = Config->NSGuestNickPrefix + stringify(static_cast<uint16_t>(rand()));
 		} while (finduser(guestnick) && i++ < 10);
 
 		if (i == 11)

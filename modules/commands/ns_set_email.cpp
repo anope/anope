@@ -25,7 +25,7 @@ static bool SendConfirmMail(User *u, BotInfo *bi)
 	int idx, min = 1, max = 62;
 	Anope::string code;
 	for (idx = 0; idx < 9; ++idx)
-		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+		code += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 	u->Account()->Extend("ns_set_email_passcode", new ExtensibleString(code));
 
 	Anope::string subject = Config->MailEmailchangeSubject;

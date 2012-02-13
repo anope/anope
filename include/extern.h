@@ -183,12 +183,6 @@ E Anope::string myStrGetTokenRemainder(const Anope::string &str, char dilim, int
 E int myNumToken(const Anope::string &str, char dilim);
 E bool nickIsServices(const Anope::string &nick, bool bot);
 
-E void add_entropy_userkeys();
-E void rand_init();
-E unsigned char getrandom8();
-E uint16_t getrandom16();
-E uint32_t getrandom32();
-
 E std::list<Anope::string> BuildStringList(const Anope::string &, char = ' ');
 E std::vector<Anope::string> BuildStringVector(const Anope::string &, char = ' ');
 

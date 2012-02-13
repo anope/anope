@@ -154,10 +154,6 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->SessionAutoKillExpiry = 1800; /* 30 minutes */
 	}
 
-	/* Check the user keys */
-	if (this->UserKey1 == this->UserKey2 || this->UserKey1 == this->UserKey3 || this->UserKey3 == this->UserKey2)
-		Log() << "Every UserKey must be different. It's for YOUR safety! Remember that!";
-
 	SetDefaultMLock(this);
 
 	if (IsFile(this->NameServer))
@@ -1132,9 +1128,6 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
-		{"options", "userkey1", "0", new ValueContainerLUInt(&conf->UserKey1), DT_LUINTEGER, NoValidation},
-		{"options", "userkey2", "0", new ValueContainerLUInt(&conf->UserKey2), DT_LUINTEGER, NoValidation},
-		{"options", "userkey3", "0", new ValueContainerLUInt(&conf->UserKey3), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&conf->NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"options", "strictpasswords", "no", new ValueContainerBool(&conf->StrictPasswords), DT_BOOLEAN, NoValidation},
 		{"options", "badpasslimit", "0", new ValueContainerUInt(&conf->BadPassLimit), DT_UINTEGER, NoValidation},

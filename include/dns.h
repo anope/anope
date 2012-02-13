@@ -143,7 +143,7 @@ class CoreExport DNSManager : public Timer, public Socket
 	sockaddrs addrs;
  public:
 	std::deque<DNSPacket *> packets;
-	std::map<short, DNSRequest *> requests;
+	std::map<unsigned short, DNSRequest *> requests;
 
 	static const int DNSPort = 53;
 

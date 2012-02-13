@@ -132,7 +132,7 @@ static bool SendResetEmail(User *u, NickAlias *na, BotInfo *bi)
 	Anope::string passcode;
 	int idx;
 	for (idx = 0; idx < 20; ++idx)
-		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+		passcode += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 
 	Anope::string subject = translate(na->nc, Config->MailResetSubject.c_str());
 	Anope::string message = translate(na->nc, Config->MailResetMessage.c_str());

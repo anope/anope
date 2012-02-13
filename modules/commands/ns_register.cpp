@@ -337,7 +337,7 @@ static bool SendRegmail(User *u, NickAlias *na, BotInfo *bi)
 		};
 		int idx, min = 1, max = 62;
 		for (idx = 0; idx < 9; ++idx)
-			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * getrandom16() / 65536.0) + min];
+			codebuf += chars[1 + static_cast<int>((static_cast<float>(max - min)) * static_cast<uint16_t>(rand()) / 65536.0) + min];
 		na->nc->Extend("ns_register_passcode", new ExtensibleString(codebuf));
 	}
 	else

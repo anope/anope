@@ -1,4 +1,23 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
 #include "services.h"
+#include "anope.h"
+#include "dns.h"
+#include "sockets.h"
+#include "socketengine.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 DNSManager *DNSEngine = NULL;
 
@@ -320,11 +339,10 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 
 		if (q.type == DNS_QUERY_PTR)
 		{
+			sockaddrs ip(q.name);
+
 			if (q.name.find(':') != Anope::string::npos)
 			{
-				sockaddrs ip;
-				ip.pton(AF_INET6, q.name);
-
 				static const char *const hex = "0123456789abcdef";
 				char reverse_ip[128];
 				unsigned reverse_ip_count = 0;
@@ -342,9 +360,6 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 			}
 			else
 			{
-				sockaddrs ip;
-				ip.pton(AF_INET, q.name);
-
 				unsigned long forward = ip.sa4.sin_addr.s_addr;
 				in_addr reverse;
 				reverse.s_addr = forward << 24 | (forward & 0xFF00) << 8 | (forward & 0xFF0000) >> 8 | forward >> 24;
@@ -399,8 +414,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					if (pos + 6 > output_size)
 						throw SocketException("Unable to pack packet");
 
-					sockaddrs addr;
-					addr.pton(AF_INET, rr.rdata);
+					sockaddrs addr(rr.rdata);
 
 					s = htons(4);
 					memcpy(&output[pos], &s, 2);
@@ -415,8 +429,7 @@ unsigned short DNSPacket::Pack(unsigned char *output, unsigned short output_size
 					if (pos + 18 > output_size)
 						throw SocketException("Unable to pack packet");
 
-					sockaddrs addr;
-					addr.pton(AF_INET6, rr.rdata);
+					sockaddrs addr(rr.rdata);
 
 					s = htons(16);
 					memcpy(&output[pos], &s, 2);

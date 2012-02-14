@@ -12,6 +12,8 @@
 #ifndef SOCKETENGINE_H
 #define SOCKETENGINE_H
 
+#include "services.h"
+
 class CoreExport SocketEngine
 {
  public:

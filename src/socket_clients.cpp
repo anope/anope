@@ -10,6 +10,11 @@
  */
 
 #include "services.h"
+#include "anope.h"
+#include "logger.h"
+#include "sockets.h"
+
+#include <errno.h>
 
 ConnectionSocket::ConnectionSocket() : Socket()
 {

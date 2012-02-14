@@ -9,9 +9,7 @@
 
 int pipe(int fds[2])
 {
-	sockaddrs localhost;
-
-	localhost.pton(AF_INET, "127.0.0.1");
+	sockaddrs localhost("127.0.0.1");
 
 	int cfd = socket(AF_INET, SOCK_STREAM, 0), lfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (cfd == -1 || lfd == -1)

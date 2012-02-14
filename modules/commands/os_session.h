@@ -1,6 +1,13 @@
 #ifndef OS_SESSION_H
 #define OS_SESSION_H
 
+struct Session
+{
+	Anope::string host;             /* Host of the session */
+	unsigned count;                 /* Number of clients with this host */
+	unsigned hits;                  /* Number of subsequent kills for a host */
+};
+
 struct Exception : Serializable
 {
 	Anope::string mask;		/* Hosts to which this exception applies */
@@ -14,7 +21,6 @@ struct Exception : Serializable
 	serialized_data serialize();
 	static void unserialize(serialized_data &data);
 };
-
 
 class SessionService : public Service
 {

@@ -6,7 +6,11 @@
  * Please read COPYING and README for further details.
  */
 
+
+#include "services.h"
 #include "modules.h"
+#include "extern.h"
+#include "dns.h"
 
 #ifdef GETTEXT_FOUND
 # include <libintl.h>
@@ -80,25 +84,25 @@ void Module::SetAuthor(const Anope::string &nauthor)
 	this->author = nauthor;
 }
 
-Version::Version(int vMajor, int vMinor, int vBuild) : Major(vMajor), Minor(vMinor), Build(vBuild)
+ModuleVersion::ModuleVersion(int vMajor, int vMinor, int vBuild) : Major(vMajor), Minor(vMinor), Build(vBuild)
 {
 }
 
-Version::~Version()
+ModuleVersion::~ModuleVersion()
 {
 }
 
-int Version::GetMajor() const
+int ModuleVersion::GetMajor() const
 {
 	return this->Major;
 }
 
-int Version::GetMinor() const
+int ModuleVersion::GetMinor() const
 {
 	return this->Minor;
 }
 
-int Version::GetBuild() const
+int ModuleVersion::GetBuild() const
 {
 	return this->Build;
 }

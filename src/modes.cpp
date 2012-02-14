@@ -8,8 +8,12 @@
 
 #include "services.h"
 #include "modules.h"
+#include "extern.h"
+#include "config.h"
+#include "sockets.h"
+#include "protocol.h"
+#include "channels.h"
 
-ModeManager::ModePipe *ModeManager::mpipe = NULL;
 /* List of pairs of user/channels and their stacker info */
 std::list<std::pair<Base *, StackerInfo *> > ModeManager::StackerObjects;
 
@@ -346,12 +350,14 @@ void StackerInfo::AddMode(Mode *mode, bool Set, const Anope::string &Param)
 	list->push_back(std::make_pair(mode, Param));
 }
 
-/** Called when there are modes to be set
- */
-void ModeManager::ModePipe::OnNotify()
+class ModePipe : public Pipe
 {
-	ModeManager::ProcessModes();
-}
+ public:
+	void OnNotify()
+	{
+		ModeManager::ProcessModes();
+	}
+};
 
 /** Get the stacker info for an item, if one doesnt exist it is created
  * @param Item The user/channel etc
@@ -467,9 +473,8 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
 	else if (Type == ST_USER)
 		s->bi = NULL;
 
-	if (mpipe == NULL)
-		mpipe = new ModePipe();
-	mpipe->Notify();
+	static ModePipe mpipe;
+	mpipe.Notify();
 }
 
 /** Add a user mode to Anope

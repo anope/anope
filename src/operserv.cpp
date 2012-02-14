@@ -9,9 +9,13 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
 #include "services.h"
 #include "modules.h"
 #include "oper.h"
+#include "users.h"
+#include "extern.h"
+#include "sockets.h"
 
 /* List of XLine managers we check users against in XLineManager::CheckAll */
 std::list<XLineManager *> XLineManager::XLineManagers;
@@ -60,13 +64,6 @@ Anope::string XLine::GetHost() const
 		return this->Mask;
 	else
 		return this->Mask.substr(host_t + 1);
-}
-
-sockaddrs XLine::GetIP() const
-{
-	sockaddrs addr;
-	addr.pton(this->GetHost().find(':') != Anope::string::npos ? AF_INET6 : AF_INET, this->GetHost());
-	return addr;
 }
 
 Anope::string XLine::serialize_name() const
@@ -361,12 +358,13 @@ XLine *XLineManager::Check(User *u)
 		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent(), x->GetUser()))
 			continue;
 
-		if (u->ip() && !x->GetHost().empty())
+		if (!x->GetHost().empty())
 		{
 			try
 			{
 				cidr cidr_ip(x->GetHost());
-				if (cidr_ip.match(u->ip))
+				sockaddrs ip(u->ip);
+				if (cidr_ip.match(ip))
 				{
 					OnMatch(u, x);
 					return x;

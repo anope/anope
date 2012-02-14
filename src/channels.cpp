@@ -10,7 +10,19 @@
  */
 
 #include "services.h"
+#include "channels.h"
+#include "regchannel.h"
+#include "logger.h"
 #include "modules.h"
+#include "users.h"
+#include "bots.h"
+#include "servers.h"
+#include "protocol.h"
+#include "users.h"
+#include "config.h"
+#include "access.h"
+#include "extern.h"
+#include "sockets.h"
 
 channel_map ChannelList;
 
@@ -91,7 +103,7 @@ void Channel::Sync()
 {
 	if (!this->HasMode(CMODE_PERM) && (this->users.empty() || (this->users.size() == 1 && this->ci && this->ci->bi == this->users.front()->user)))
 	{
-		new ChanServTimer(this);
+		this->Hold();
 	}
 	if (this->ci)
 	{
@@ -863,6 +875,56 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 	}
 }
 
+/** A timer used to keep the BotServ bot/ChanServ in the channel
+ * after kicking the last user in a channel
+ */
+class CoreExport ChanServTimer : public Timer
+{
+ private:
+	dynamic_reference<Channel> c;
+
+ public:
+ 	/** Default constructor
+	 * @param chan The channel
+	 */
+	ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
+	{
+		BotInfo *bi = findbot(Config->ChanServ);
+		if (!bi || !c)
+			return;
+		c->SetFlag(CH_INHABIT);
+		if (!c->ci || !c->ci->bi)
+			bi->Join(c);
+		else if (!c->FindUser(c->ci->bi))
+			c->ci->bi->Join(c);
+	}
+
+	/** Called when the delay is up
+	 * @param The current time
+	 */
+	void Tick(time_t)
+	{
+		if (!c)
+			return;
+
+		c->UnsetFlag(CH_INHABIT);
+
+		if (!c->ci || !c->ci->bi)
+		{
+			BotInfo *bi = findbot(Config->ChanServ);
+			if (bi)
+				bi->Part(c);
+		}
+		else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
+			c->ci->bi->Part(c);
+	}
+};
+
+void Channel::Hold()
+{
+	new ChanServTimer(this);
+}
+
 /*************************************************************************/
 
 Channel *findchan(const Anope::string &chan)
@@ -1198,9 +1260,7 @@ Entry::Entry(ChannelModeName mode, const Anope::string &_host) : Flags<EntryType
 		{
 			try
 			{
-				sockaddrs addr;
-				bool ipv6 = _realhost.substr(0, sl).find(':') != Anope::string::npos;
-				addr.pton(ipv6 ? AF_INET6 : AF_INET, _realhost.substr(0, sl));
+				sockaddrs addr(_realhost.substr(0, sl));
 				/* If we got here, _realhost is a valid IP */
 
 				Anope::string cidr_range = _realhost.substr(sl + 1);
@@ -1248,11 +1308,15 @@ bool Entry::Matches(User *u, bool full) const
 	{
 		try
 		{
-			cidr cidr_mask(this->host, this->cidr_len);
-			if (!u->ip() || !cidr_mask.match(u->ip))
-				ret = false;
+			if (full)
+			{
+				cidr cidr_mask(this->host, this->cidr_len);
+				sockaddrs addr(u->ip);
+				if (!cidr_mask.match(addr))
+					ret = false;
+			}
 			/* If we're not matching fully and their displayed host isnt their IP */
-			else if (!full && u->ip.addr() != u->GetDisplayedHost())
+			else if (u->ip != u->GetDisplayedHost())
 				ret = false;
 		}
 		catch (const SocketException &)
@@ -1267,7 +1331,7 @@ bool Entry::Matches(User *u, bool full) const
 		ret = false;
 	if (this->HasFlag(ENTRYTYPE_HOST) && !this->host.equals_ci(u->GetDisplayedHost()) && (!full ||
 		(!this->host.equals_ci(u->host) && !this->host.equals_ci(u->chost) && !this->host.equals_ci(u->vhost) &&
-		(!u->ip() || !this->host.equals_ci(u->ip.addr())))))
+		!this->host.equals_ci(u->ip))))
 		ret = false;
 	if (this->HasFlag(ENTRYTYPE_NICK_WILD) && !Anope::Match(u->nick, this->nick))
 		ret = false;
@@ -1276,7 +1340,7 @@ bool Entry::Matches(User *u, bool full) const
 		ret = false;
 	if (this->HasFlag(ENTRYTYPE_HOST_WILD) && !Anope::Match(u->GetDisplayedHost(), this->host) && (!full ||
 		(!Anope::Match(u->host, this->host) && !Anope::Match(u->chost, this->host) &&
-		!Anope::Match(u->vhost, this->host) && (!u->ip() || !Anope::Match(u->ip.addr(), this->host)))))
+		!Anope::Match(u->vhost, this->host) && !Anope::Match(u->ip, this->host))))
 		ret = false;
 	
 	ChannelMode *cm = ModeManager::FindChannelModeByName(this->modename);

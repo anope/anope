@@ -10,6 +10,8 @@
  */
 
 #include "services.h"
+#include "sockets.h"
+#include "socketengine.h"
 
 BufferedSocket::BufferedSocket()
 {

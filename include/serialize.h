@@ -1,5 +1,21 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ */
+
 #ifndef SERIALIZE_H
 #define SERIALIZE_H
+
+#include <sstream>
+
+#include "anope.h"
 
 namespace Serialize
 {
@@ -8,58 +24,34 @@ namespace Serialize
 		DT_TEXT,
 		DT_INT
 	};
-
-	class stringstream : public std::stringstream
-	{
-	 private:
-		DataType type;
-		bool key;
-		unsigned _max;
-
-	 public:
-		stringstream() : std::stringstream(), type(DT_TEXT), key(false), _max(0) { }
-		stringstream(const stringstream &ss) : std::stringstream(ss.str()), type(DT_TEXT), key(false), _max(0) { }
-		Anope::string astr() const { return this->str(); }
-		template<typename T> std::istream &operator>>(T &val)
-		{
-			std::istringstream is(this->str());
-			is >> val;
-			return *this;
-		}
-		std::istream &operator>>(Anope::string &val)
-		{
-			val = this->str();
-			return *this;
-		}
-		stringstream &setType(DataType t)
-		{
-			this->type = t;
-			return *this;
-		}
-		DataType getType() const
-		{
-			return this->type;
-		}
-		stringstream &setKey()
-		{
-			this->key = true;
-			return *this;
-		}
-		bool getKey() const
-		{
-			return this->key;
-		}
-		stringstream &setMax(unsigned m)
-		{
-			this->_max = m;
-			return *this;
-		}
-		unsigned getMax() const
-		{
-			return this->_max;
-		}
-	};
 }
+
+class stringstream : public std::stringstream
+{
+ private:
+	Serialize::DataType type;
+	bool key;
+	unsigned _max;
+
+ public:
+	stringstream();
+	stringstream(const stringstream &ss);
+	Anope::string astr() const;
+	template<typename T> std::istream &operator>>(T &val)
+	{
+		std::istringstream is(this->str());
+		is >> val;
+		return *this;
+	}
+	std::istream &operator>>(Anope::string &val);
+	stringstream &setType(Serialize::DataType t);
+	Serialize::DataType getType() const;
+	stringstream &setKey();
+	bool getKey() const;
+	stringstream &setMax(unsigned m);
+	unsigned getMax() const;
+};
+
 
 extern void RegisterTypes();
 
@@ -71,40 +63,20 @@ class CoreExport Serializable
 	std::list<Serializable *>::iterator s_iter;
 
  protected:
-	Serializable()
-	{
-		if (serizliable_items == NULL)
-			serizliable_items = new std::list<Serializable *>();
-		serizliable_items->push_front(this);
-		this->s_iter = serizliable_items->begin();
-	}
+	Serializable();
+	Serializable(const Serializable &);
 
-	Serializable(const Serializable &)
-	{
-		serizliable_items->push_front(this);
-		this->s_iter = serizliable_items->begin();
-	}
+	virtual ~Serializable();
 
-	virtual ~Serializable()
-	{
-		serizliable_items->erase(this->s_iter);
-	}
-
-	Serializable &operator=(const Serializable &)
-	{
-		return *this;
-	}
+	Serializable &operator=(const Serializable &);
 
  public:
-	typedef std::map<Anope::string, Serialize::stringstream> serialized_data;
+	typedef std::map<Anope::string, stringstream> serialized_data;
 
 	virtual Anope::string serialize_name() const = 0;
 	virtual serialized_data serialize() = 0;
 
-	static const std::list<Serializable *> &GetItems()
-	{
-		return *serizliable_items;
-	}
+	static const std::list<Serializable *> &GetItems();
 };
 
 class CoreExport SerializeType
@@ -118,42 +90,16 @@ class CoreExport SerializeType
 	unserialize_func unserialize;
 
  public:
-	SerializeType(const Anope::string &n, unserialize_func f) : name(n), unserialize(f)
-	{
-		type_order.push_back(this->name);
-		types[this->name] = this;
-	}
+	SerializeType(const Anope::string &n, unserialize_func f);
+	~SerializeType();
 
-	~SerializeType()
-	{
-		std::vector<Anope::string>::iterator it = std::find(type_order.begin(), type_order.end(), this->name);
-		if (it != type_order.end())
-			type_order.erase(it);
-		types.erase(this->name);
-	}
+	const Anope::string &GetName();
 
-	const Anope::string &GetName()
-	{
-		return this->name;
-	}
+	void Create(Serializable::serialized_data &data);
 
-	void Create(Serializable::serialized_data &data)
-	{
-		this->unserialize(data);
-	}
+	static SerializeType *Find(const Anope::string &name);
 
-	static SerializeType *Find(const Anope::string &name)
-	{
-		Anope::map<SerializeType *>::iterator it = types.find(name);
-		if (it != types.end())
-			return it->second;
-		return NULL;
-	}
-
-	static const std::vector<Anope::string> &GetTypeOrder()
-	{
-		return type_order;
-	}
+	static const std::vector<Anope::string> &GetTypeOrder();
 };
 
 #endif // SERIALIZE_H

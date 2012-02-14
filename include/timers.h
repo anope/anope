@@ -11,13 +11,9 @@
 #ifndef TIMERS_H
 #define TIMERS_H
 
-#include "services.h"
-#include <time.h>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
+#include "anope.h"
 
-class CoreExport Timer : public Extensible
+class CoreExport Timer
 {
  private:
 	/** The time this was created
@@ -88,7 +84,7 @@ class CoreExport Timer : public Extensible
  * This will ensure timers are not missed, as well as removing timers that have
  * expired and allowing the addition of new ones.
  */
-class CoreExport TimerManager : public Extensible
+class CoreExport TimerManager
 {
 	/** A list of timers
 	 */

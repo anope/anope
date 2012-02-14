@@ -1,10 +1,24 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ *
+ */
+
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
+#include "extensible.h"
+#include "serialize.h"
 #include "anope.h"
-
-class NickAlias;
-class NickCore;
+#include "memo.h"
+#include "base.h"
 
 typedef Anope::insensitive_map<NickAlias *> nickalias_map;
 typedef Anope::insensitive_map<NickCore *> nickcore_map;
@@ -93,8 +107,11 @@ const Anope::string NickCoreFlagStrings[] = {
 	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", ""
 };
 
-class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
+class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable
 {
+	Anope::string vhost_ident, vhost_host, vhost_creator;
+	time_t vhost_created;
+
  public:
  	/** Default constructor
 	 * @param nickname The nick
@@ -114,7 +131,6 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	time_t time_registered;			/* When the nick was registered */
 	time_t last_seen;				/* When it was seen online for the last time */
 	NickCore *nc;					/* I'm an alias of this */
-	HostInfo hostinfo;
 
 	Anope::string serialize_name() const;
 	serialized_data serialize();
@@ -131,9 +147,46 @@ class CoreExport NickAlias : public Extensible, public Flags<NickNameFlag, NS_EN
 	 * @param u The user
 	 */
 	void OnCancel(User *u);
+
+ 	/** Set a vhost for the user
+	 * @param ident The ident
+	 * @param host The host
+	 * @param creator Who created the vhost
+	 * @param time When the vhost was craated
+	 */
+	void SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created = Anope::CurTime);
+
+	/** Remove a users vhost
+	 **/
+	void RemoveVhost();
+
+	/** Check if the user has a vhost
+	 * @return true or false
+	 */
+	bool HasVhost() const;
+
+	/** Retrieve the vhost ident
+	 * @return the ident
+	 */
+	const Anope::string &GetVhostIdent() const;
+
+	/** Retrieve the vhost host
+	 * @return the host
+	 */
+	const Anope::string &GetVhostHost() const;
+
+	/** Retrieve the vhost creator
+	 * @return the creator
+	 */
+	const Anope::string &GetVhostCreator() const;
+
+	/** Retrieve when the vhost was created
+	 * @return the time it was created
+	 */
+	time_t GetVhostCreated() const;
 };
 
-class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
+class CoreExport NickCore : public Base, public Extensible, public Flags<NickCoreFlag, NI_END>, public Serializable
 {
  public:
 	/** Default constructor
@@ -254,65 +307,11 @@ class CoreExport NickCore : public Extensible, public Flags<NickCoreFlag, NI_END
 
 };
 
-/** Timer for colliding nicks to force people off of nicknames
- */
-class CoreExport NickServCollide : public Timer
-{
-	dynamic_reference<User> u;
-	Anope::string nick;
+extern void change_core_display(NickCore *nc);
+extern void change_core_display(NickCore *nc, const Anope::string &newdisplay);
 
- public:
-	/** Default constructor
-	 * @param nick The nick we're colliding
-	 * @param delay How long to delay before kicking the user off the nick
-	 */
-	NickServCollide(User *user, time_t delay);
-
-	/** Default destructor
-	 */
-	virtual ~NickServCollide();
-
-	/** Called when the delay is up
-	 * @param t The current time
-	 */
-	void Tick(time_t t);
-};
-
-/** Timers for removing HELD status from nicks.
- */
-class NickServHeld : public Timer
-{
-	dynamic_reference<NickAlias> na;
-	Anope::string nick;
- public:
- 	NickServHeld(NickAlias *n, long t);
-
-	~NickServHeld();
-
-	void Tick(time_t);
-};
-
-/** Timers for releasing nicks to be available for use
- */
-class CoreExport NickServRelease : public User, public Timer
-{
-	Anope::string nick;
-
- public:
-	/** Default constructor
-	 * @param na The nick
-	 * @param delay The delay before the nick is released
-	 */
-	NickServRelease(NickAlias *na, time_t delay);
-
-	/** Default destructor
-	 */
-	virtual ~NickServRelease();
-
-	/** Called when the delay is up
-	 * @param t The current time
-	 */
-	void Tick(time_t t);
-};
+extern NickAlias *findnick(const Anope::string &nick);
+extern NickCore *findcore(const Anope::string &nick);
+extern bool is_on_access(const User *u, const NickCore *nc);
 
 #endif // ACCOUNT_H

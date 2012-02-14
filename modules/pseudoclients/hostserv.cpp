@@ -33,37 +33,30 @@ class HostServCore : public Module
 
 	void OnNickIdentify(User *u)
 	{
-		HostInfo *ho = NULL;
 		NickAlias *na = findnick(u->nick);
-		if (na && na->hostinfo.HasVhost())
-			ho = &na->hostinfo;
-		else
-		{
+		if (!na || !na->HasVhost())
 			na = findnick(u->Account()->display);
-			if (na && na->hostinfo.HasVhost())
-				ho = &na->hostinfo;
-		}
-		if (ho == NULL)
+		if (!na)
 			return;
 
-		if (u->vhost.empty() || !u->vhost.equals_cs(na->hostinfo.GetHost()) || (!na->hostinfo.GetIdent().empty() && !u->GetVIdent().equals_cs(na->hostinfo.GetIdent())))
+		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))
 		{
-			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
+			ircdproto->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 			if (ircd->vhost)
 			{
-				u->vhost = na->hostinfo.GetHost();
+				u->vhost = na->GetVhostHost();
 				u->UpdateHost();
 			}
-			if (ircd->vident && !na->hostinfo.GetIdent().empty())
-				u->SetVIdent(na->hostinfo.GetIdent());
+			if (ircd->vident && !na->GetVhostIdent().empty())
+				u->SetVIdent(na->GetVhostIdent());
 
 			BotInfo *bi = findbot(Config->HostServ);
 			if (bi)
 			{
-				if (!na->hostinfo.GetIdent().empty())
-					u->SendMessage(bi, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+				if (!na->GetVhostIdent().empty())
+					u->SendMessage(bi, _("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 				else
-					u->SendMessage(bi, _("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
+					u->SendMessage(bi, _("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
 			}
 		}
 	}

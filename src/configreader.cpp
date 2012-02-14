@@ -24,6 +24,7 @@
  */
 
 #include "services.h"
+#include "config.h"
 
 ConfigReader::ConfigReader() : error(CONF_NO_ERROR)
 {

@@ -12,6 +12,13 @@
 #include "services.h"
 #include "modules.h"
 #include "oper.h"
+#include "servers.h"
+#include "bots.h"
+#include "regchannel.h"
+#include "protocol.h"
+#include "config.h"
+#include "channels.h"
+#include "extern.h"
 
 /* Anope */
 Server *Me = NULL;

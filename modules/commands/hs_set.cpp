@@ -82,7 +82,7 @@ class CommandHSSet : public Command
 
 		Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->hostinfo.SetVhost(user, host, u->nick);
+		na->SetVhost(user, host, u->nick);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!user.empty())
 			source.Reply(_("VHost for \002%s\002 set to \002%s\002@\002%s\002."), nick.c_str(), user.c_str(), host.c_str());
@@ -106,13 +106,13 @@ class CommandHSSetAll : public Command
 {
 	void Sync(NickAlias *na)
 	{
-		if (!na || !na->hostinfo.HasVhost())
+		if (!na || !na->HasVhost())
 			return;
 	
 		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
 		{
 			NickAlias *nick = *it;
-			nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
+			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}
 	}
 
@@ -183,7 +183,7 @@ class CommandHSSetAll : public Command
 
 		Log(LOG_ADMIN, u, this) << "to set the vhost of " << na->nick << " to " << (!user.empty() ? user + "@" : "") << host;
 
-		na->hostinfo.SetVhost(user, host, u->nick);
+		na->SetVhost(user, host, u->nick);
 		this->Sync(na);
 		FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 		if (!user.empty())

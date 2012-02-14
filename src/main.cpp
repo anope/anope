@@ -25,12 +25,18 @@
 
 #include "services.h"
 #include "timers.h"
-#include "modules.h"
+#include "extern.h"
+#include "uplink.h"
+#include "config.h"
+#include "protocol.h"
+#include "servers.h"
+#include "bots.h"
+#include "dns.h"
+#include "signals.h"
+#include "socketengine.h"
 
-#ifdef _WIN32
-# include <process.h>
-# define execve _execve
-#endif
+#include <unistd.h>
+#include <limits.h>
 
 /******** Global variables! ********/
 
@@ -229,7 +235,7 @@ static void Connect()
 	if (static_cast<unsigned>(++CurrentUplink) >= Config->Uplinks.size())
 		CurrentUplink = 0;
 
-	Uplink *u = Config->Uplinks[CurrentUplink];
+	ServerConfig::Uplink *u = Config->Uplinks[CurrentUplink];
 
 	new UplinkSocket();
 	if (!Config->LocalHost.empty())
@@ -340,9 +346,9 @@ int main(int ac, char **av, char **envp)
 	/* If we're root, issue a warning now */
 	if (!getuid() && !getgid())
 	{
-		std::cout << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
-		std::cout << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
-		std::cout << "         as the root superuser." << std::endl;
+		std::cerr << "WARNING: You are currently running Anope as the root superuser. Anope does not" << std::endl;
+		std::cerr << "         require root privileges to run, and it is discouraged that you run Anope" << std::endl;
+		std::cerr << "         as the root superuser." << std::endl;
 		sleep(3);
 	}
 #endif

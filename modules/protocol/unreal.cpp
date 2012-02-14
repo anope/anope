@@ -11,10 +11,7 @@
 
 /*************************************************************************/
 
-#include "services.h"
-#include "modules.h"
-#include "nickserv.h"
-#include "oper.h"
+#include "module.h"
 
 IRCDVar myIrcd[] = {
 	{"UnrealIRCd 3.2.x",	/* ircd name */

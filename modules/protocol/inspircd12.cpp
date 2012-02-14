@@ -11,10 +11,7 @@
 
 /*************************************************************************/
 
-#include "services.h"
-#include "modules.h"
-#include "nickserv.h"
-#include "oper.h"
+#include "module.h"
 
 /* inspircd-ts6.h uses these */
 static bool has_globopsmod = false;

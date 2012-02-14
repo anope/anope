@@ -1,14 +1,22 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ *
+ */
+
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <deque>
-
-#include "anope.h"
+#include "account.h"
+#include "regchannel.h"
+#include "users.h"
 
 /** A configuration key and value pair
  */
@@ -23,7 +31,6 @@ typedef std::vector<KeyVal> KeyValList;
 typedef std::multimap<Anope::string, KeyValList> ConfigDataHash;
 
 // Required forward definitions
-class ServerConfig;
 
 /** Types of data in the core config
  */
@@ -340,6 +347,29 @@ class CoreExport ServerConfig
 	void ValidateHostname(const Anope::string &, const Anope::string &, const Anope::string &) const;
 	void ValidateIP(const Anope::string &p, const Anope::string &, const Anope::string &, bool) const;
 	void ValidateNoSpaces(const Anope::string &, const Anope::string &, const Anope::string &) const;
+
+	struct Uplink
+	{
+		Anope::string host;
+		unsigned port;
+		Anope::string password;
+		bool ipv6;
+
+		Uplink(const Anope::string &_host, int _port, const Anope::string &_password, bool _ipv6) : host(_host), port(_port), password(_password), ipv6(_ipv6) { }
+		bool operator==(const Uplink &other) const
+		{
+			if (this->host != other.host)
+				return false;
+			if (this->port != other.port)
+				return false;
+			if (this->password != other.password)
+				return false;
+			if (this->ipv6 != other.ipv6)
+				return false;
+			return true;
+		}
+		inline bool operator!=(const Uplink &other) const { return !(*this == other); }
+	};
 
 	/** Below here is a list of variables which contain the config files values
 	 */
@@ -759,5 +789,8 @@ class CoreExport ConfigReader
 	 */
 	int EnumerateValues(const Anope::string &, int);
 };
+
+extern ConfigurationFile services_conf;
+extern ServerConfig *Config;
 
 #endif // CONFIG_H

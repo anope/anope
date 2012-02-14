@@ -13,6 +13,15 @@
 #include "services.h"
 #include "version.h"
 #include "modules.h"
+#include "extern.h"
+#include "lists.h"
+#include "config.h"
+#include "bots.h"
+#include "language.h"
+
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 ExtensibleItem::ExtensibleItem()
 {
@@ -758,9 +767,9 @@ const Anope::string Anope::LastError()
 #endif
 }
 
-Version Module::GetVersion() const
+ModuleVersion Module::GetVersion() const
 {
-	return Version(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+	return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
 }
 
 Anope::string Anope::Version()

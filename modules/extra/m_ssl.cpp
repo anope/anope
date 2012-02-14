@@ -102,7 +102,6 @@ class SSLModule : public Module
 
 		SSL_library_init();
 		SSL_load_error_strings();
-		SSLeay_add_ssl_algorithms();
 
 		client_ctx = SSL_CTX_new(SSLv23_client_method());
 		server_ctx = SSL_CTX_new(SSLv23_server_method());

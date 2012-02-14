@@ -11,10 +11,7 @@
 
 /*************************************************************************/
 
-#include "services.h"
-#include "modules.h"
-#include "oper.h"
-#include "nickserv.h"
+#include "module.h"
 
 IRCDVar myIrcd[] = {
 	{"Bahamut 1.8.x",	/* ircd name */

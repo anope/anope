@@ -8,7 +8,11 @@
 #ifndef BOTS_H
 #define BOTS_H
 
-class BotInfo;
+#include "users.h"
+#include "anope.h"
+#include "serialize.h"
+#include "commands.h"
+
 
 extern CoreExport Anope::insensitive_map<BotInfo *> BotListByNick;
 extern CoreExport Anope::map<BotInfo *> BotListByUID;
@@ -122,5 +126,10 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 */
 	CommandInfo *GetCommand(const Anope::string &cname);
 };
+
+extern BotInfo *findbot(const Anope::string &nick);
+
+extern void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
+extern void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
 
 #endif // BOTS_H

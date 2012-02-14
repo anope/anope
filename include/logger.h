@@ -1,5 +1,20 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ */
+
 #ifndef LOGGER_H
 #define LOGGER_H
+
+#include "anope.h"
+#include "defs.h"
 
 enum LogType
 {
@@ -29,7 +44,6 @@ struct LogFile
 	Anope::string GetName() const;
 };
 
-class Command;
 
 class CoreExport Log
 {

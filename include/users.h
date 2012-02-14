@@ -8,6 +8,10 @@
 #ifndef USERS_H
 #define USERS_H
 
+#include "anope.h"
+#include "modes.h"
+#include "extensible.h"
+
 extern CoreExport Anope::insensitive_map<User *> UserListByNick;
 extern CoreExport Anope::map<User *> UserListByUID;
 
@@ -30,8 +34,9 @@ struct ChannelContainer
 
 typedef std::list<ChannelContainer *> UChannelList;
 
+
 /* Online user and channel data. */
-class CoreExport User : public Extensible
+class CoreExport User : public Base, public Extensible
 {
  protected:
 	Anope::string vident;
@@ -50,7 +55,7 @@ class CoreExport User : public Extensible
 	Anope::string chost;		/* User's cloaked hostname */
 	Anope::string realname;		/* Realname */
 	Anope::string fingerprint;	/* SSL Fingerprint */
-	sockaddrs ip;			/* User's IP */
+	Anope::string ip;               /* User's IP */
 	Server *server;			/* Server user is connected to */
 	time_t timestamp;		/* Timestamp of the nick */
 	time_t my_signon;		/* When did _we_ see the user? */
@@ -295,5 +300,20 @@ class CoreExport User : public Extensible
 	 */
 	void Kill(const Anope::string &source, const Anope::string &reason);
 };
+
+extern int32_t opcnt;
+extern uint32_t maxusercnt, usercnt;
+extern time_t maxusertime;
+
+extern User *finduser(const Anope::string &nick);
+
+extern User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
+
+extern void do_umode(const Anope::string &user, const Anope::string &modes);
+extern void do_kill(User *user, const Anope::string &reason);
+
+extern bool matches_list(Channel *c, User *user, ChannelModeName mode);
+
+extern Anope::string create_mask(User *u);
 
 #endif // USERS_H

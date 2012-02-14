@@ -12,31 +12,18 @@
 #ifndef EXTERN_H
 #define EXTERN_H
 
+#include "modes.h"
+
 #define E extern CoreExport
 #define EI extern DllExport
 
-#include "hashcomp.h"
-
-/* IRC Variables */
-
-E IRCDVar *ircd;
-E IRCDProto *ircdproto;
-E IRCdMessage *ircdmessage;
 
 /**** actions.c ****/
 
 E bool bad_password(User *u);
 E void common_unban(ChannelInfo *ci, User *u, bool full = false);
 
-/**** botserv.c ****/
-
-E BotInfo *findbot(const Anope::string &nick);
-
-E void bot_raw_ban(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
-E void bot_raw_kick(User *requester, ChannelInfo *ci, const Anope::string &nick, const Anope::string &reason);
-
 /**** channels.c ****/
-
 
 E Channel *findchan(const Anope::string &chan);
 
@@ -49,25 +36,10 @@ E void do_part(const Anope::string &source, const Anope::string &channels, const
 
 E void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
-/**** chanserv.c ****/
-
-E void check_modes(Channel *c);
-
-E ChannelInfo *cs_findchan(const Anope::string &chan);
-E bool IsFounder(User *user, ChannelInfo *ci);
-E void update_cs_lastseen(User *user, ChannelInfo *ci);
-E int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
-
-/**** config.c ****/
-
-E ConfigurationFile services_conf;
-E ServerConfig *Config;
-
 /**** encrypt.c ****/
+
 E void enc_encrypt(const Anope::string &src, Anope::string &dest);
 E bool enc_decrypt(const Anope::string &src, Anope::string &dest);
-
-/**** hostserv.c  ****/
 
 /**** init.c ****/
 
@@ -78,12 +50,8 @@ E bool AtTerm();
 E void Fork();
 E void Init(int ac, char **av);
 
-/**** ircd.c ****/
-E void pmodule_ircd_proto(IRCDProto *);
-E void pmodule_ircd_var(IRCDVar *ircdvar);
-E void pmodule_ircd_message(IRCdMessage *message);
-
 /**** language.cpp ****/
+
 E std::vector<Anope::string> languages;
 E std::vector<Anope::string> domains;
 E void InitLanguages();
@@ -109,31 +77,6 @@ E bool restarting;
 E Anope::string quitmsg;
 E time_t start_time;
 
-class UplinkSocket : public ConnectionSocket, public BufferedSocket
-{
- public:
-	UplinkSocket();
-	~UplinkSocket();
-	bool Read(const Anope::string &);
-	void OnConnect();
-	void OnError(const Anope::string &);
-	
-	class CoreExport Message
-	{
-		Anope::string source;
-		std::stringstream buffer;
-	 public:
-	 	Message();
-	 	Message(const Anope::string &);
-	 	~Message();
-		template<typename T> Message &operator<<(const T &val)
-		{
-			this->buffer << val;
-			return *this;
-		}
-	};
-};
-E UplinkSocket *UplinkSock;
 E int CurrentUplink;
 
 E void save_databases();
@@ -191,45 +134,14 @@ E bool str_is_pure_wildcard(const Anope::string &str);
 E Anope::string normalizeBuffer(const Anope::string &);
 
 /**** modes.cpp ****/
+
 /* Number of generic modes we support */
 E unsigned GenericChannelModes, GenericUserModes;
 E std::multimap<ChannelModeName, ModeLock> def_mode_locks;
 E void SetDefaultMLock(ServerConfig *config);
 
-/**** nickserv.c ****/
-
-E void change_core_display(NickCore *nc);
-E void change_core_display(NickCore *nc, const Anope::string &newdisplay);
-
-E NickAlias *findnick(const Anope::string &nick);
-E NickCore *findcore(const Anope::string &nick);
-E bool is_on_access(const User *u, const NickCore *nc);
-
 /**** process.c ****/
 
 E void process(const Anope::string &buf);
-
-/**** sockets.cpp ****/
-
-E int32_t TotalRead;
-E int32_t TotalWritten;
-E SocketIO normalSocketIO;
-
-/**** users.c ****/
-
-E int32_t opcnt;
-E uint32_t maxusercnt, usercnt;
-E time_t maxusertime;
-
-E User *finduser(const Anope::string &nick);
-
-E User *do_nick(const Anope::string &source, const Anope::string &nick, const Anope::string &username, const Anope::string &host, const Anope::string &server, const Anope::string &realname, time_t ts, const Anope::string &ip, const Anope::string &vhost, const Anope::string &uid, const Anope::string &modes);
-
-E void do_umode(const Anope::string &user, const Anope::string &modes);
-E void do_kill(User *user, const Anope::string &reason);
-
-E bool matches_list(Channel *c, User *user, ChannelModeName mode);
-
-E Anope::string create_mask(User *u);
 
 #endif /* EXTERN_H */

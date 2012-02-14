@@ -591,7 +591,7 @@ static void LoadVHosts()
 			continue;
 		}
 
-		na->hostinfo.SetVhost(ident, host, creator, vtime);
+		na->SetVhost(ident, host, creator, vtime);
 
 		Log() << "Loaded vhost for " << na->nick;
 	}

@@ -9,6 +9,9 @@
 #ifndef MODES_H
 #define MODES_H
 
+#include "anope.h"
+#include "base.h"
+
 /** All of the valid user mode names
  */
 enum UserModeName
@@ -375,16 +378,6 @@ class StackerInfo
 class CoreExport ModeManager
 {
  protected:
-	class ModePipe : public Pipe
-	{
-	 public:
-	 	/** Called when there are modes to be set
-		 */
-		void OnNotify();
-	};
-
-	static ModePipe *mpipe;
-
 	/* List of pairs of user/channels and their stacker info */
 	static std::list<std::pair<Base *, StackerInfo *> > StackerObjects;
 
@@ -495,6 +488,50 @@ class CoreExport ModeManager
 	 * @param b The user/channel
 	 */
 	static void StackerDel(Base *b);
+};
+
+/** Entry flags
+ */
+enum EntryType
+{
+	ENTRYTYPE_NONE,
+	ENTRYTYPE_CIDR,
+	ENTRYTYPE_NICK_WILD,
+	ENTRYTYPE_NICK,
+	ENTRYTYPE_USER_WILD,
+	ENTRYTYPE_USER,
+	ENTRYTYPE_HOST_WILD,
+	ENTRYTYPE_HOST
+};
+
+/** Represents a mask set on a channel (b/e/I)
+ */
+class CoreExport Entry : public Flags<EntryType>
+{
+	ChannelModeName modename;
+
+ public:
+	unsigned char cidr_len;
+	Anope::string mask;
+	Anope::string nick, user, host;
+
+	/** Constructor
+	 * @param _host A full nick!ident@host/cidr mask
+ 	 * @param mode What mode this host is for - can be CMODE_BEGIN for unknown/no mode
+	 */
+	Entry(ChannelModeName mode, const Anope::string &_host);
+
+	/** Get the banned mask for this entry
+	 * @return The mask
+	 */
+	const Anope::string GetMask();
+
+	/** Check if this entry matches a user
+	 * @param u The user
+	 * @param full True to match against a users real host and IP
+	 * @return true on match
+	 */
+	bool Matches(User *u, bool full = false) const;
 };
 
 #endif // MODES_H

@@ -12,20 +12,43 @@
 #ifndef MODULES_H
 #define MODULES_H
 
-#include <time.h>
-#include "services.h"
-#include <stdio.h>
+#include "extensible.h"
+#include "base.h"
+#include "modes.h"
 #include "timers.h"
-#include "hashcomp.h"
+#include "logger.h"
 
-/** Possible return types from events.
+/** This definition is used as shorthand for the various classes
+ * and functions needed to make a module loadable by the OS.
+ * It defines the class factory and external AnopeInit and AnopeFini functions.
  */
-enum EventReturn
-{
-	EVENT_STOP,
-	EVENT_CONTINUE,
-	EVENT_ALLOW
-};
+#ifdef _WIN32
+# define MODULE_INIT(x) \
+	extern "C" DllExport Module *AnopeInit(const Anope::string &, const Anope::string &); \
+	extern "C" Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
+	{ \
+		return new x(modname, creator); \
+	} \
+	BOOLEAN WINAPI DllMain(HINSTANCE, DWORD nReason, LPVOID) \
+	{ \
+		return TRUE; \
+	} \
+	extern "C" DllExport void AnopeFini(x *); \
+	extern "C" void AnopeFini(x *m) \
+	{ \
+		delete m; \
+	}
+#else
+# define MODULE_INIT(x) \
+	extern "C" DllExport Module *AnopeInit(const Anope::string &modname, const Anope::string &creator) \
+	{ \
+		return new x(modname, creator); \
+	} \
+	extern "C" DllExport void AnopeFini(x *m) \
+	{ \
+		delete m; \
+	}
+#endif
 
 /**
  * This #define allows us to call a method in all
@@ -35,8 +58,8 @@ enum EventReturn
 #define FOREACH_MOD(y, x) \
 if (true) \
 { \
-	std::vector<Module*>::iterator safei; \
-	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
+	std::vector<Module *>::iterator safei; \
+	for (std::vector<Module *>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
 		safei = _i; \
 		++safei; \
@@ -62,9 +85,9 @@ else \
 #define FOREACH_RESULT(y, x) \
 if (true) \
 { \
-	std::vector<Module*>::iterator safei; \
+	std::vector<Module *>::iterator safei; \
 	MOD_RESULT = EVENT_CONTINUE; \
-	for (std::vector<Module*>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
+	for (std::vector<Module *>::iterator _i = ModuleManager::EventHandlers[y].begin(); _i != ModuleManager::EventHandlers[y].end(); ) \
 	{ \
 		safei = _i; \
 		++safei; \
@@ -86,24 +109,15 @@ if (true) \
 else \
 	static_cast<void>(0)
 
-#ifndef _WIN32
-# include <dlfcn.h>
-	/* Define these for systems without them */
-# ifndef RTLD_NOW
-#  define RTLD_NOW 0
-# endif
-# ifndef RTLD_LAZY
-#  define RTLD_LAZY RTLD_NOW
-# endif
-# ifndef RTLD_GLOBAL
-#  define RTLD_GLOBAL 0
-# endif
-# ifndef RTLD_LOCAL
-#  define RTLD_LOCAL 0
-# endif
-#endif
+/** Possible return types from events.
+ */
+enum EventReturn
+{
+	EVENT_STOP,
+	EVENT_CONTINUE,
+	EVENT_ALLOW
+};
 
-class Message;
 
 enum ModuleReturn
 {
@@ -127,10 +141,10 @@ enum ModType { MT_BEGIN, THIRD, SUPPORTED, CORE, DATABASE, ENCRYPTION, PROTOCOL,
 
 typedef std::multimap<Anope::string, Message *> message_map;
 extern CoreExport message_map MessageMap;
-class Module;
+
 extern CoreExport std::list<Module *> Modules;
 
-class Version
+class ModuleVersion
 {
  private:
 	int Major;
@@ -143,11 +157,11 @@ class Version
 	 * @param vMinor The minor version numbber
 	 * @param vBuild The build version numbber
 	 */
-	Version(int vMajor, int vMinor, int vBuild);
+	ModuleVersion(int vMajor, int vMinor, int vBuild);
 
 	/** Destructor
 	 */
-	virtual ~Version();
+	virtual ~ModuleVersion();
 
 	/** Get the major version of Anope this was built against
 	 * @return The major version
@@ -165,9 +179,6 @@ class Version
 	int GetBuild() const;
 };
 
-class CallBack;
-class XLineManager;
-struct CommandSource;
 
 /** Every module in Anope is actually a class.
  */
@@ -247,7 +258,7 @@ class CoreExport Module : public Extensible
 	 * compiled against
 	 * @return The version
 	 */
-	Version GetVersion() const;
+	ModuleVersion GetVersion() const;
 
 	/** Called when the ircd notifies that a user has been kicked from a channel.
 	 * @param c The channel the user has been kicked from.
@@ -1110,50 +1121,9 @@ class CallBack : public Timer
  private:
 	Module *m;
  public:
-	CallBack(Module *mod, long time_from_now, time_t now = Anope::CurTime, bool repeating = false) : Timer(time_from_now, now, repeating),  m(mod)
-	{
-		m->CallBacks.push_back(this);
-	}
+	CallBack(Module *mod, long time_from_now, time_t now = Anope::CurTime, bool repeating = false);
 
-	virtual ~CallBack()
-	{
-		std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
-		if (it != m->CallBacks.end())
-			m->CallBacks.erase(it);
-	}
-};
-
-template<typename T>
-class service_reference : public dynamic_reference<T>
-{
-	Anope::string type;
-	Anope::string name;
-
- public:
-	service_reference(const Anope::string &t, const Anope::string &n) : dynamic_reference<T>(NULL), type(t), name(n)
-	{
-	}
-
-	inline void operator=(const Anope::string &n)
-	{
-		this->name = n;
-	}
-
-	operator bool()
-	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		if (!this->ref)
-		{
-			this->ref = static_cast<T *>(Service::FindService(this->type, this->name));
-			if (this->ref)
-				this->ref->AddReference(this);
-		}
-		return this->ref;
-	}
+	virtual ~CallBack();
 };
 
 class CoreExport Message

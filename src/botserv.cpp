@@ -12,7 +12,14 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "modules.h"
+#include "anope.h"
+#include "protocol.h"
+#include "bots.h"
+#include "regchannel.h"
+#include "language.h"
+#include "extern.h"
+#include "access.h"
+#include "channels.h"
 
 BotInfo *findbot(const Anope::string &nick)
 {

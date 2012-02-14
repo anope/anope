@@ -9,10 +9,23 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
+#include "services.h"
 #include "modules.h"
 
 message_map MessageMap;
 std::list<Module *> Modules;
+
+CallBack::CallBack(Module *mod, long time_from_now, time_t now, bool repeating) : Timer(time_from_now, now, repeating),  m(mod)
+{
+}
+
+CallBack::~CallBack()
+{
+	std::list<CallBack *>::iterator it = std::find(m->CallBacks.begin(), m->CallBacks.end(), this);
+	if (it != m->CallBacks.end())
+		m->CallBacks.erase(it);
+}
 
 /** Message constructor, adds the message to Anope
  * @param n The message name

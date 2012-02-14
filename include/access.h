@@ -1,5 +1,23 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ *
+ */
+
 #ifndef ACCESS_H
 #define ACCESS_H
+
+#include "services.h"
+#include "anope.h"
+#include "serialize.h"
+#include "service.h"
 
 enum
 {
@@ -28,7 +46,6 @@ class CoreExport PrivilegeManager
 	static void ClearPrivileges();
 };
 
-class ChanAccess;
 
 class CoreExport AccessProvider : public Service
 {

@@ -6,8 +6,17 @@
  * Please read COPYING and README for further details.
  */
 
+#include "services.h"
 #include "modules.h"
-#include <algorithm> // std::find
+#include "extern.h"
+#include "users.h"
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <dlfcn.h>
 
 std::vector<Module *> ModuleManager::EventHandlers[I_END];
 
@@ -174,7 +183,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	m->filename = pbuf;
 	m->handle = handle;
 
-	Version v = m->GetVersion();
+	ModuleVersion v = m->GetVersion();
 	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
 	{
 		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionMajor() << "." << Anope::VersionMinor();

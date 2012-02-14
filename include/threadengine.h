@@ -1,7 +1,8 @@
 #ifndef THREADENGINE_H
 #define THREADENGINE_H
 
-class Thread;
+#include "sockets.h"
+#include "extensible.h"
 
 class CoreExport Thread : public Pipe, public Extensible
 {

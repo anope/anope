@@ -6,9 +6,16 @@
  */
 
 #include "services.h"
-#include "modules.h"
-#include "commands.h"
+#include "anope.h"
+#include "bots.h"
+#include "servers.h"
+#include "protocol.h"
 #include "oper.h"
+#include "regchannel.h"
+#include "channels.h"
+#include "config.h"
+#include "language.h"
+#include "extern.h"
 
 Anope::insensitive_map<BotInfo *> BotListByNick;
 Anope::map<BotInfo *> BotListByUID;

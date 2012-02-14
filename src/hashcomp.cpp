@@ -9,6 +9,8 @@
  */
 
 #include "services.h"
+#include "hashcomp.h"
+#include "anope.h"
 
 /*
  *

@@ -12,11 +12,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "services.h"
-
-class Module;
-class BotInfo;
-class Command;
+#include "service.h"
+#include "anope.h"
 
 enum CommandFlag
 {

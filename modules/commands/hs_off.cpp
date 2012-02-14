@@ -27,7 +27,7 @@ class CommandHSOff : public Command
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
 
-		if (!na || !na->hostinfo.HasVhost())
+		if (!na || !na->HasVhost())
 			source.Reply(HOST_NOT_ASSIGNED);
 		else
 		{

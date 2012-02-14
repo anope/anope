@@ -10,10 +10,21 @@
  */
 
 #include "services.h"
-#include "modules.h"
+#include "config.h"
+#include "extern.h"
+#include "users.h"
+#include "protocol.h"
+#include "bots.h"
 #include "oper.h"
+#include "signals.h"
+#include "socketengine.h"
+#include "servers.h"
 
-Uplink *uplink_server;
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+
+ServerConfig::Uplink *uplink_server;
 
 void introduce_user(const Anope::string &user)
 {

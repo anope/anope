@@ -9,6 +9,11 @@
 #ifndef CHANNELS_H
 #define CHANNELS_H
 
+#include "anope.h"
+#include "extensible.h"
+#include "modes.h"
+
+
 typedef Anope::insensitive_map<Channel *> channel_map;
 extern CoreExport channel_map ChannelList;
 
@@ -35,7 +40,7 @@ enum ChannelFlag
 
 const Anope::string ChannelFlagString[] = { "CH_INABIT", "CH_PERSIST", "CH_SYNCING", "" };
 
-class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
+class CoreExport Channel : public Base, public Extensible, public Flags<ChannelFlag, 3>
 {
  public:
 	typedef std::multimap<ChannelModeName, Anope::string> ModeList;
@@ -229,6 +234,21 @@ class CoreExport Channel : public Extensible, public Flags<ChannelFlag, 3>
 	 * @param ts The time when the new topic is being set
 	 */
 	void ChangeTopic(const Anope::string &user, const Anope::string &newtopic, time_t ts = Anope::CurTime);
+
+	/** Hold the channel open using ChanServ
+	 */
+	void Hold();
 };
+
+extern Channel *findchan(const Anope::string &chan);
+
+extern User *nc_on_chan(Channel *c, const NickCore *nc);
+
+extern void do_cmode(const Anope::string &source, const Anope::string &channel, const Anope::string &modes, const Anope::string &ts);
+extern void do_join(const Anope::string &source, const Anope::string &channels, const Anope::string &ts);
+extern void do_kick(const Anope::string &source, const Anope::string &channel, const Anope::string &users, const Anope::string &reason);
+extern void do_part(const Anope::string &source, const Anope::string &channels, const Anope::string &reason);
+
+extern void chan_set_correct_modes(User *user, Channel *c, int give_modes);
 
 #endif // CHANNELS_H

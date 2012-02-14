@@ -17,13 +17,13 @@ class CommandHSGroup : public Command
 {
 	void Sync(NickAlias *na)
 	{
-		if (!na || !na->hostinfo.HasVhost())
+		if (!na || !na->HasVhost())
 			return;
 	
 		for (std::list<NickAlias *>::iterator it = na->nc->aliases.begin(), it_end = na->nc->aliases.end(); it != it_end; ++it)
 		{
 			NickAlias *nick = *it;
-			nick->hostinfo.SetVhost(na->hostinfo.GetIdent(), na->hostinfo.GetHost(), na->hostinfo.GetCreator());
+			nick->SetVhost(na->GetVhostIdent(), na->GetVhostHost(), na->GetVhostCreator());
 		}
 	}
 
@@ -38,13 +38,13 @@ class CommandHSGroup : public Command
 	{
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
-		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
+		if (na && u->Account() == na->nc && na->HasVhost())
 		{
 			this->Sync(na);
-			if (!na->hostinfo.GetIdent().empty())
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			if (!na->GetVhostIdent().empty())
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002@\002%s\002"), u->Account()->display.c_str(), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 			else
-				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->hostinfo.GetHost().c_str());
+				source.Reply(_("All vhost's in the group \002%s\002 have been set to \002%s\002"), u->Account()->display.c_str(), na->GetVhostHost().c_str());
 		}
 		else
 			source.Reply(HOST_NOT_ASSIGNED);

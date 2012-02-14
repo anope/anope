@@ -10,6 +10,7 @@
  */
 
 #include "services.h"
+#include "anope.h"
 
 static const Anope::string Base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const char Pad64 = '=';

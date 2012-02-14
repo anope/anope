@@ -277,7 +277,7 @@ class OSForbid : public Module
 			if (!c->HasFlag(CH_INHABIT))
 			{
 				/* Join ChanServ and set a timer for this channel to part ChanServ later */
-				new ChanServTimer(c);
+				c->Hold();
 
 				/* Set +si to prevent rejoin */
 				c->SetMode(NULL, CMODE_NOEXTERNAL);

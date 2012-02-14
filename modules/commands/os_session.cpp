@@ -38,7 +38,7 @@ class MySessionService : public SessionService
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
 		{
 			Exception *e = *it;
-			if (Anope::Match(u->host, e->mask) || (u->ip() && Anope::Match(u->ip.addr(), e->mask)))
+			if (Anope::Match(u->host, e->mask) || Anope::Match(u->ip, e->mask))
 				return e;
 		}
 		return NULL;

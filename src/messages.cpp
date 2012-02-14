@@ -11,6 +11,12 @@
 
 #include "services.h"
 #include "modules.h"
+#include "users.h"
+#include "protocol.h"
+#include "config.h"
+#include "extern.h"
+#include "uplink.h"
+#include "opertype.h"
 
 bool OnStats(const Anope::string &source, const std::vector<Anope::string> &params)
 {

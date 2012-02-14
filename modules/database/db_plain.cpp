@@ -117,7 +117,7 @@ EventReturn OnDatabaseReadMetadata(NickAlias *na, const Anope::string &key, cons
 	else if (key.equals_ci("FLAGS"))
 		na->FromVector(params);
 	else if (key.equals_ci("VHOST"))
-		na->hostinfo.SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
+		na->SetVhost(params.size() > 3 ? params[3] : "", params[2], params[0], params[1].is_pos_number_only() ? convertTo<time_t>(params[1]) : 0);
 	return EVENT_CONTINUE;
 }
 
@@ -722,8 +722,8 @@ class DBPlain : public Module
 				db_buffer << "MD LAST_QUIT :" << na->last_quit << endl;
 			if (na->FlagCount())
 				db_buffer << "MD FLAGS " << na->ToString() << endl;
-			if (na->hostinfo.HasVhost())
-				db_buffer << "MD VHOST " << na->hostinfo.GetCreator() << " " << na->hostinfo.GetTime() << " " << na->hostinfo.GetHost() << " :" << na->hostinfo.GetIdent() << endl;
+			if (na->HasVhost())
+				db_buffer << "MD VHOST " << na->GetVhostCreator() << " " << na->GetVhostCreated() << " " << na->GetVhostHost() << " :" << na->GetVhostIdent() << endl;
 
 			//FOREACH_MOD(I_OnDatabaseWriteMetadata, OnDatabaseWriteMetadata(WriteMetadata, na));
 		}

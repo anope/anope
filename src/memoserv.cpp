@@ -9,9 +9,14 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
 #include "services.h"
 #include "modules.h"
+#include "service.h"
 #include "memoserv.h"
+#include "memo.h"
+#include "users.h"
+#include "account.h"
 
 Memo::Memo() : Flags<MemoFlag>(MemoFlagStrings) { }
 

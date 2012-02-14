@@ -1,10 +1,10 @@
 #include "services.h"
 #include "modules.h"
 #include "oper.h"
-
-std::vector<Anope::string> SerializeType::type_order;
-Anope::map<SerializeType *> SerializeType::types;
-std::list<Serializable *> *Serializable::serizliable_items;
+#include "account.h"
+#include "regchannel.h"
+#include "access.h"
+#include "bots.h"
 
 Anope::map<Anope::map<Service *> > Service::services;
 

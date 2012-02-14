@@ -11,6 +11,15 @@
 
 #include "services.h"
 #include "modules.h"
+#include "regchannel.h"
+#include "account.h"
+#include "access.h"
+#include "channels.h"
+#include "config.h"
+#include "bots.h"
+#include "extern.h"
+#include "language.h"
+#include "servers.h"
 
 Anope::string BadWord::serialize_name() const
 {
@@ -1024,7 +1033,7 @@ bool ChannelInfo::CheckKick(User *user)
 		}
 
 		/* Join ChanServ and set a timer for this channel to part ChanServ later */
-		new ChanServTimer(this->c);
+		this->c->Hold();
 	}
 
 	this->c->SetMode(NULL, CMODE_BAN, mask);

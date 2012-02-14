@@ -1,5 +1,23 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ *
+ *
+ */
+
 #ifndef DNS_H
 #define DNS_H
+
+#include "sockets.h"
+#include "timers.h"
+#include "extern.h"
+#include "config.h"
 
 /** Valid query types
  */
@@ -48,9 +66,6 @@ enum DNSError
 	DNS_ERROR_INVALIDTYPE
 };
 
-class Module;
-struct DNSQuery;
-class DNSPacket;
 
 struct CoreExport Question
 {

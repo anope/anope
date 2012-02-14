@@ -343,11 +343,12 @@ class ModuleProxyScan : public Module
 
 	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)
 	{
-		if (exempt || !user || !user->ip() || !Me->IsSynced() || !user->server->IsSynced())
+		if (exempt || !user || !Me->IsSynced() || !user->server->IsSynced())
 			return;
 
+		sockaddrs user_ip(user->ip);
 		/* At this time we only support IPv4 */
-		if (user->ip.sa.sa_family != AF_INET)
+		if (user_ip.sa.sa_family != AF_INET)
 			return;
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
@@ -374,7 +375,7 @@ class ModuleProxyScan : public Module
 							con = new SOCKS5ProxyConnect(p, p.ports[k]);
 						else
 							continue;
-						con->Connect(user->ip.addr(), p.ports[k]);
+						con->Connect(user->ip, p.ports[k]);
 					}
 					catch (const SocketException &ex)
 					{

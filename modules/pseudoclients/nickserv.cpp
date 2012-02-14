@@ -16,6 +16,60 @@
 
 static BotInfo *NickServ;
 
+class NickServCollide;
+class NickServRelease;
+
+typedef std::map<Anope::string, NickServCollide *> nickservcollides_map;
+typedef std::map<Anope::string, NickServRelease *> nickservreleases_map;
+
+static nickservcollides_map NickServCollides;
+static nickservreleases_map NickServReleases;
+
+/** Timer for colliding nicks to force people off of nicknames
+ */
+class CoreExport NickServCollide : public Timer
+{
+	dynamic_reference<User> u;
+	Anope::string nick;
+
+ public:
+	/** Default constructor
+	 * @param nick The nick we're colliding
+	 * @param delay How long to delay before kicking the user off the nick
+	 */
+	NickServCollide(User *user, time_t delay) : Timer(delay), u(user), nick(u->nick)
+	{
+		/* Erase the current collide and use the new one */
+		nickservcollides_map::iterator nit = NickServCollides.find(user->nick);
+		if (nit != NickServCollides.end())
+			delete nit->second;
+
+		NickServCollides.insert(std::make_pair(nick, this));
+	}
+
+	/** Default destructor
+	 */
+	virtual ~NickServCollide()
+	{
+		NickServCollides.erase(this->nick);
+	}
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t)
+	{
+		if (!u)
+			return;
+		/* If they identified or don't exist anymore, don't kill them. */
+		NickAlias *na = findnick(u->nick);
+		if (!na || u->Account() == na->nc || u->my_signon > this->GetSetTime())
+			return;
+
+		u->Collide(na);
+	}
+};
+
 class MyNickServService : public NickServService
 {
  public:

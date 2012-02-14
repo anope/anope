@@ -13,20 +13,9 @@
 #ifndef HASHCOMP_H
 #define HASHCOMP_H
 
-#ifdef _WIN32
-# ifdef MODULE_COMPILE
-#  define CoreExport __declspec(dllimport)
-#  define DllExport __declspec(dllexport)
-# else
-#  define CoreExport __declspec(dllexport)
-#  define DllExport __declspec(dllimport)
-# endif
-#else
-# define CoreExport
-# define DllExport
-#endif
-
 #include <string>
+
+#include "services.h"
 
 namespace Anope
 {

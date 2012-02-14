@@ -26,20 +26,20 @@ class CommandHSOn : public Command
 	{
 		User *u = source.u;
 		NickAlias *na = findnick(u->nick);
-		if (na && u->Account() == na->nc && na->hostinfo.HasVhost())
+		if (na && u->Account() == na->nc && na->HasVhost())
 		{
-			if (!na->hostinfo.GetIdent().empty())
-				source.Reply(_("Your vhost of \002%s\002@\002%s\002 is now activated."), na->hostinfo.GetIdent().c_str(), na->hostinfo.GetHost().c_str());
+			if (!na->GetVhostIdent().empty())
+				source.Reply(_("Your vhost of \002%s\002@\002%s\002 is now activated."), na->GetVhostIdent().c_str(), na->GetVhostHost().c_str());
 			else
-				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->hostinfo.GetHost().c_str());
-			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->hostinfo.GetIdent().empty() ? na->hostinfo.GetIdent() + "@" : "") << na->hostinfo.GetHost();
-			ircdproto->SendVhost(u, na->hostinfo.GetIdent(), na->hostinfo.GetHost());
+				source.Reply(_("Your vhost of \002%s\002 is now activated."), na->GetVhostHost().c_str());
+			Log(LOG_COMMAND, u, this) << "to enable their vhost of " << (!na->GetVhostIdent().empty() ? na->GetVhostIdent() + "@" : "") << na->GetVhostHost();
+			ircdproto->SendVhost(u, na->GetVhostIdent(), na->GetVhostHost());
 			if (ircd->vhost)
-				u->vhost = na->hostinfo.GetHost();
+				u->vhost = na->GetVhostHost();
 			if (ircd->vident)
 			{
-				if (!na->hostinfo.GetIdent().empty())
-					u->SetVIdent(na->hostinfo.GetIdent());
+				if (!na->GetVhostIdent().empty())
+					u->SetVIdent(na->GetVhostIdent());
 			}
 			u->UpdateHost();
 		}

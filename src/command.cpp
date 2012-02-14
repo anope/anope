@@ -6,8 +6,12 @@
  */
 
 #include "services.h"
-#include "modules.h"
 #include "commands.h"
+#include "extern.h"
+#include "users.h"
+#include "language.h"
+#include "config.h"
+#include "bots.h"
 
 void CommandSource::Reply(const char *message, ...)
 {

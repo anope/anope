@@ -43,7 +43,7 @@ class DNSBLResolver : public DNSRequest
 		{
 			sockaddrs sresult;
 			sresult.pton(AF_INET, ans_record.rdata);
-			int result = (sresult.sa4.sin_addr.s_addr & 0xFF000000) >> 24;
+			int result = sresult.sa4.sin_addr.s_addr >> 24;
 
 			if (!this->blacklist.replies.count(result))
 				return;
@@ -57,13 +57,13 @@ class DNSBLResolver : public DNSRequest
 		reason = reason.replace_all_cs("%u", user->GetIdent());
 		reason = reason.replace_all_cs("%g", user->realname);
 		reason = reason.replace_all_cs("%h", user->host);
-		reason = reason.replace_all_cs("%i", user->ip.addr());
+		reason = reason.replace_all_cs("%i", user->ip);
 		reason = reason.replace_all_cs("%r", record_reason);
 		reason = reason.replace_all_cs("%N", Config->NetworkName);
 
 		BotInfo *operserv = findbot(Config->OperServ);
-		Log(operserv) << "DNSBL: " << user->GetMask() << " (" << user->ip.addr() << ") appears in " << this->blacklist.name;
-		XLine *x = new XLine("*@" + user->ip.addr(), Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
+		Log(operserv) << "DNSBL: " << user->GetMask() << " (" << user->ip << ") appears in " << this->blacklist.name;
+		XLine *x = new XLine("*@" + user->ip, Config->OperServ, Anope::CurTime + this->blacklist.bantime, reason, XLineManager::GenerateUID());
 		if (this->add_to_akill && akills)
 		{
 			akills->AddXLine(x);
@@ -133,15 +133,15 @@ class ModuleDNSBL : public Module
 
 		if (!this->check_on_netburst && !user->server->IsSynced())
 			return;
+
 		/* At this time we only support IPv4 */
-		if (user->ip.sa.sa_family != AF_INET)
+		sockaddrs user_ip(user->ip);
+		if (user_ip.sa.sa_family != AF_INET)
 			return;
 
-		unsigned long ip = user->ip.sa4.sin_addr.s_addr;
-		unsigned long reverse_ip = ((ip & 0xFF) << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | ((ip & 0xFF000000) >> 24);
+		const unsigned long &ip = user_ip.sa4.sin_addr.s_addr;
+		unsigned long reverse_ip = (ip << 24) | ((ip & 0xFF00) << 8) | ((ip & 0xFF0000) >> 8) | (ip >> 24);
 
-		sockaddrs user_ip;
-		user_ip.sa4.sin_family = AF_INET;
 		user_ip.sa4.sin_addr.s_addr = reverse_ip;
 
 		for (unsigned i = 0; i < this->blacklists.size(); ++i)

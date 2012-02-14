@@ -9,7 +9,8 @@
 #ifndef OPER_H
 #define OPER_H
 
-class XLineManager;
+#include "serialize.h"
+#include "service.h"
 
 class CoreExport XLine : public Serializable
 {
@@ -29,7 +30,6 @@ class CoreExport XLine : public Serializable
 	Anope::string GetNick() const;
 	Anope::string GetUser() const;
 	Anope::string GetHost() const;
-	sockaddrs GetIP() const;
 
 	Anope::string serialize_name() const;
 	serialized_data serialize();

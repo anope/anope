@@ -12,7 +12,11 @@
 /*************************************************************************/
 
 #include "services.h"
-#include "modules.h"
+#include "anope.h"
+#include "regchannel.h"
+#include "users.h"
+#include "channels.h"
+#include "access.h"
 
 registered_channel_map RegisteredChannelList;
 
@@ -182,34 +186,5 @@ int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret)
 		default:
 			return 0;
 	}
-}
-
-ChanServTimer::ChanServTimer(Channel *chan) : Timer(Config->CSInhabit), c(chan)
-{
-	BotInfo *bi = findbot(Config->ChanServ);
-	if (!bi || !c)
-		return;
-	c->SetFlag(CH_INHABIT);
-	if (!c->ci || !c->ci->bi)
-		bi->Join(c);
-	else if (!c->FindUser(c->ci->bi))
-		c->ci->bi->Join(c);
-}
-
-void ChanServTimer::Tick(time_t)
-{
-	if (!c)
-		return;
-
-	c->UnsetFlag(CH_INHABIT);
-
-	if (!c->ci || !c->ci->bi)
-	{
-		BotInfo *bi = findbot(Config->ChanServ);
-		if (bi)
-			bi->Part(c);
-	}
-	else if (c->users.size() == 1 || c->users.size() < Config->BSMinUsers)
-		c->ci->bi->Part(c);
 }
 

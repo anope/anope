@@ -8,9 +8,8 @@
 #ifndef OPERTYPE_H
 #define OPERTYPE_H
 
-#include "hashcomp.h"
-
-class OperType;
+#include "services.h"
+#include "account.h"
 
 struct CoreExport Oper
 {

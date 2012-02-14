@@ -11,6 +11,7 @@
 
 #include "services.h"
 #include "modules.h"
+#include "extern.h"
 
 /** Main process routine
  * @param buffer A raw line from the uplink to do things with

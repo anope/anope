@@ -31,7 +31,7 @@ class CommandHSDel : public Command
 		{
 			Log(LOG_ADMIN, u, this) << "for user " << na->nick;
 			FOREACH_MOD(I_OnDeleteVhost, OnDeleteVhost(na));
-			na->hostinfo.RemoveVhost();
+			na->RemoveVhost();
 			source.Reply(_("Vhost for \002%s\002 removed."), nick.c_str());
 		}
 		else
@@ -69,7 +69,7 @@ class CommandHSDelAll : public Command
 			for (std::list<NickAlias *>::iterator it = nc->aliases.begin(), it_end = nc->aliases.end(); it != it_end; ++it)
 			{
 				na = *it;
-				na->hostinfo.RemoveVhost();
+				na->RemoveVhost();
 			}
 			Log(LOG_ADMIN, u, this) << "for all nicks in group " << nc->display;
 			source.Reply(_("vhosts for group \002%s\002 have been removed."), nc->display.c_str());

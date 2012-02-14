@@ -192,7 +192,7 @@ class CommandHSActivate : public Command
 		HostRequest *req = na ? na->GetExt<HostRequest *>("hs_request") : NULL;
 		if (req)
 		{
-			na->hostinfo.SetVhost(req->ident, req->host, u->nick, req->time);
+			na->SetVhost(req->ident, req->host, u->nick, req->time);
 			FOREACH_MOD(I_OnSetVhost, OnSetVhost(na));
 
 			if (HSRequestMemoUser && memoserv)

@@ -1,6 +1,9 @@
 #ifndef SERVERS_H
 #define SERVERS_H
 
+#include "services.h"
+#include "anope.h"
+
 /* Anope */
 extern CoreExport Server *Me;
 

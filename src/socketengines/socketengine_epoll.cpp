@@ -1,6 +1,23 @@
-#include "module.h"
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+#include "services.h"
+#include "anope.h"
+#include "sockets.h"
+#include "socketengine.h"
+#include "config.h"
+
 #include <sys/epoll.h>
 #include <ulimit.h>
+#include <errno.h>
 
 static long max;
 static int EngineHandle;

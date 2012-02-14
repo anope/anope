@@ -40,7 +40,7 @@ class SGLineManager : public XLineManager
 				throw SocketException("SZLine is not supported");
 			else if (x->GetUser() != "*")
 				throw SocketException("Can not ZLine a username");
-			x->GetIP();
+			sockaddrs(x->GetHost());
 			ircdproto->SendSZLine(u, x);
 		}
 		catch (const SocketException &)
@@ -57,7 +57,7 @@ class SGLineManager : public XLineManager
 				throw SocketException("SZLine is not supported");
 			else if (x->GetUser() != "*")
 				throw SocketException("Can not ZLine a username");
-			x->GetIP();
+			sockaddrs(x->GetHost());
 			ircdproto->SendSZLineDel(x);
 		}
 		catch (const SocketException &)

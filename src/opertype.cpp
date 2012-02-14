@@ -6,7 +6,9 @@
  */
 
 #include "services.h"
-
+#include "anope.h"
+#include "opertype.h"
+#include "config.h"
 
 Oper *Oper::Find(const Anope::string &name)
 {

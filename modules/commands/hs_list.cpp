@@ -63,24 +63,24 @@ class CommandHSList : public Command
 		{
 			NickAlias *na = it->second;
 
-			if (!na->hostinfo.HasVhost())
+			if (!na->HasVhost())
 				continue;
 
 			if (!key.empty() && key[0] != '#')
 			{
-				if ((Anope::Match(na->nick, key) || Anope::Match(na->hostinfo.GetHost(), key)) && display_counter < Config->NSListMax)
+				if ((Anope::Match(na->nick, key) || Anope::Match(na->GetVhostHost(), key)) && display_counter < Config->NSListMax)
 				{
 					++display_counter;
 
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->nick;
-					if (!na->hostinfo.GetIdent().empty())
-						entry["Vhost"] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
+					if (!na->GetVhostIdent().empty())
+						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
-						entry["Vhost"] = na->hostinfo.GetHost();
-					entry["Creator"] = na->hostinfo.GetCreator();
-					entry["Created"] = do_strftime(na->hostinfo.GetTime());
+						entry["Vhost"] = na->GetVhostHost();
+					entry["Creator"] = na->GetVhostCreator();
+					entry["Created"] = do_strftime(na->GetVhostCreated());
 					list.addEntry(entry);
 				}
 			}
@@ -96,12 +96,12 @@ class CommandHSList : public Command
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(display_counter);
 					entry["Nick"] = na->nick;
-					if (!na->hostinfo.GetIdent().empty())
-						entry["Vhost"] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
+					if (!na->GetVhostIdent().empty())
+						entry["Vhost"] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
-						entry["Vhost"] = na->hostinfo.GetHost();
-					entry["Creator"] = na->hostinfo.GetCreator();
-					entry["Created"] = do_strftime(na->hostinfo.GetTime());
+						entry["Vhost"] = na->GetVhostHost();
+					entry["Creator"] = na->GetVhostCreator();
+					entry["Created"] = do_strftime(na->GetVhostCreated());
 					list.addEntry(entry);
 				}
 			}

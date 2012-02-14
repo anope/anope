@@ -12,6 +12,17 @@
 #include "services.h"
 #include "modules.h"
 #include "commands.h"
+#include "channels.h"
+#include "users.h"
+#include "logger.h"
+#include "extern.h"
+#include "config.h"
+#include "bots.h"
+#include "servers.h"
+#include "uplink.h"
+#include "protocol.h"
+
+#include <sys/time.h>
 
 static Anope::string GetTimeStamp()
 {

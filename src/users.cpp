@@ -9,8 +9,18 @@
  * Based on the original code of Services by Andy Church.
  */
 
+
 #include "services.h"
 #include "modules.h"
+#include "users.h"
+#include "account.h"
+#include "protocol.h"
+#include "servers.h"
+#include "channels.h"
+#include "bots.h"
+#include "config.h"
+#include "opertype.h"
+#include "extern.h"
 
 Anope::insensitive_map<User *> UserListByNick;
 Anope::map<User *> UserListByUID;
@@ -814,6 +824,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 
 		/* Allocate User structure and fill it in. */
 		dynamic_reference<User> user = new User(nick, username, host, uid);
+		user->ip = ip;
 		user->server = serv;
 		user->realname = realname;
 		user->timestamp = ts;
@@ -822,23 +833,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		user->SetVIdent(username);
 		user->SetModesInternal(modes.c_str());
 
-		if (!ip.empty())
-		{
-			try
-			{
-				if (ip.find(':') != Anope::string::npos)
-					user->ip.pton(AF_INET6, ip);
-				else
-					user->ip.pton(AF_INET, ip);
-			}
-			catch (const SocketException &ex)
-			{
-				Log() << "Received an invalid IP for user " << user->nick << " (" << ip << ")";
-				Log() << ex.GetReason();
-			}
-		}
-
-		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << (user->ip() ? Anope::string("[") + user->ip.addr() + "] " : "") << "connected to the network (" << serv->GetName() << ")";
+		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << user->ip << "connected to the network (" << serv->GetName() << ")";
 
 		bool exempt = false;
 		if (user->server && user->server->IsULined())

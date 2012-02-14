@@ -9,8 +9,11 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#include "services.h"
-#include "modules.h"
+#include "service.h"
+#include "access.h"
+#include "regchannel.h"
+#include "users.h"
+#include "account.h"
 
 Privilege::Privilege(const Anope::string &n, const Anope::string &d, int r) : name(n), desc(d), rank(r)
 {

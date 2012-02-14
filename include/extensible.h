@@ -8,7 +8,6 @@
 #define EXTENSIBLE_H
 
 #include "anope.h"
-#include "hashcomp.h"
 
 class CoreExport ExtensibleItem
 {
@@ -24,7 +23,7 @@ class ExtensibleString : public Anope::string, public ExtensibleItem
 	ExtensibleString(const Anope::string &s) : Anope::string(s), ExtensibleItem() { }
 };
 
-class CoreExport Extensible : public Base
+class CoreExport Extensible
 {
  private:
  	typedef Anope::map<ExtensibleItem *> extensible_map;

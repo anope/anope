@@ -9,6 +9,13 @@
 #ifndef REGCHANNEL_H
 #define REGCHANNEL_H
 
+#include "botserv.h"
+#include "memo.h"
+#include "modes.h"
+#include "extensible.h"
+#include "logger.h"
+#include "modules.h"
+
 typedef Anope::insensitive_map<ChannelInfo *> registered_channel_map;
 extern CoreExport registered_channel_map RegisteredChannelList;
 
@@ -429,25 +436,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	void ClearLevels();
 };
 
-/** A timer used to keep the BotServ bot/ChanServ in the channel
- * after kicking the last user in a channel
- */
-class CoreExport ChanServTimer : public Timer
-{
- private:
-	dynamic_reference<Channel> c;
+extern void check_modes(Channel *c);
 
- public:
- 	/** Default constructor
-	 * @param chan The channel
-	 */
-	ChanServTimer(Channel *chan);
-
-	/** Called when the delay is up
-	 * @param The current time
-	 */
-	void Tick(time_t);
-};
-
+extern ChannelInfo *cs_findchan(const Anope::string &chan);
+extern bool IsFounder(User *user, ChannelInfo *ci);
+extern void update_cs_lastseen(User *user, ChannelInfo *ci);
+extern int get_idealban(ChannelInfo *ci, User *u, Anope::string &ret);
 
 #endif // REGCHANNEL_H

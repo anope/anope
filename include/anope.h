@@ -11,12 +11,7 @@
 #ifndef ANOPE_H
 #define ANOPE_H
 
-#include <string>
-#include <vector>
-#include <set>
 #include "hashcomp.h"
-
-class Message;
 
 namespace Anope
 {
@@ -353,7 +348,7 @@ namespace Anope
 	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
 	 */
-	extern CoreExport bool Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive = false);
+	extern CoreExport bool Match(const string &str, const string &mask, bool case_sensitive = false);
 
 	/** Find a message in the message table
 	 * @param name The name of the message were looking for
@@ -372,20 +367,20 @@ namespace Anope
 	 * @param src The data to be converted
 	 * @param dest The destination string
 	 */
-	extern CoreExport void Unhex(const Anope::string &src, Anope::string &dest);
-	extern CoreExport void Unhex(const Anope::string &src, char *dest);
+	extern CoreExport void Unhex(const string &src, string &dest);
+	extern CoreExport void Unhex(const string &src, char *dest);
 	
 	/** Base 64 encode a string
 	 * @param src The string to encode
 	 * @param target Where the encoded string is placed
 	 */
-	extern CoreExport void B64Encode(const Anope::string &src, Anope::string &target);
+	extern CoreExport void B64Encode(const string &src, string &target);
 	
 	/** Base 64 decode a string
 	 * @param src The base64 encoded string
 	 * @param target The plain text result
 	 */
-	extern CoreExport void B64Decode(const Anope::string &src, Anope::string &target);
+	extern CoreExport void B64Decode(const string &src, string &target);
 
 	/** Returns a sequence of data formatted as the format argument specifies.
 	 ** After the format parameter, the function expects at least as many
@@ -404,7 +399,7 @@ namespace Anope
 	/** Return the last error, uses errno/GetLastError() to determine this
 	 * @return An error message
 	 */
-	extern CoreExport const Anope::string LastError();
+	extern CoreExport const string LastError();
 }
 
 /** sepstream allows for splitting token seperated lists.
@@ -470,95 +465,250 @@ class spacesepstream : public sepstream
 	spacesepstream(const Anope::string &source) : sepstream(source, ' ') { }
 };
 
-/** The base class that most classes in Anope inherit from
+/** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
+ * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
+ * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not
+ * be loaded. If this happens, the error message returned by ModuleException::GetReason will be displayed to the user
+ * attempting to load the module, or dumped to the console if the ircd is currently loading for the first time.
  */
-class dynamic_reference_base;
-class CoreExport Base
-{
-	/* References to this base class */
-	std::set<dynamic_reference_base *> References;
- public:
-	Base();
-	virtual ~Base();
-	void AddReference(dynamic_reference_base *r);
-	void DelReference(dynamic_reference_base *r);
-};
-
-class dynamic_reference_base
+class CoreException : public std::exception
 {
  protected:
-	bool invalid;
+	/** Holds the error message to be displayed
+	 */
+	Anope::string err;
+	/** Source of the exception
+	 */
+	Anope::string source;
  public:
-	dynamic_reference_base() : invalid(false) { }
-	virtual ~dynamic_reference_base() { }
-	inline void Invalidate() { this->invalid = true; }
+	/** Default constructor, just uses the error mesage 'Core threw an exception'.
+	 */
+	CoreException() : err("Core threw an exception"), source("The core") { }
+	/** This constructor can be used to specify an error message before throwing.
+	 */
+	CoreException(const Anope::string &message) : err(message), source("The core") { }
+	/** This constructor can be used to specify an error message before throwing,
+	 * and to specify the source of the exception.
+	 */
+	CoreException(const Anope::string &message, const Anope::string &src) : err(message), source(src) { }
+	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
+	 * Actually no, it does nothing. Never mind.
+	 * @throws Nothing!
+	 */
+	virtual ~CoreException() throw() { }
+	/** Returns the reason for the exception.
+	 * The module should probably put something informative here as the user will see this upon failure.
+	 */
+	virtual const Anope::string &GetReason() const
+	{
+		return err;
+	}
+
+	virtual const Anope::string &GetSource() const
+	{
+		return source;
+	}
 };
 
-template<typename T>
-class dynamic_reference : public dynamic_reference_base
+class FatalException : public CoreException
+{
+ public:
+	FatalException(const Anope::string &reason = "") : CoreException(reason) { }
+
+	virtual ~FatalException() throw() { }
+};
+
+class ModuleException : public CoreException
+{
+ public:
+	/** Default constructor, just uses the error mesage 'Module threw an exception'.
+	 */
+	ModuleException() : CoreException("Module threw an exception", "A Module") { }
+
+	/** This constructor can be used to specify an error message before throwing.
+	 */
+	ModuleException(const Anope::string &message) : CoreException(message, "A Module") { }
+	/** This destructor solves world hunger, cancels the world debt, and causes the world to end.
+	 * Actually no, it does nothing. Never mind.
+	 * @throws Nothing!
+	 */
+	virtual ~ModuleException() throw() { }
+};
+
+class ConvertException : public CoreException
+{
+ public:
+	ConvertException(const Anope::string &reason = "") : CoreException(reason) { }
+
+	virtual ~ConvertException() throw() { }
+};
+
+/** Convert something to a string
+ */
+template<typename T> inline Anope::string stringify(const T &x)
+{
+	std::ostringstream stream;
+
+	if (!(stream << x))
+		throw ConvertException("Stringify fail");
+
+	return stream.str();
+}
+
+template<typename T> inline void convert(const Anope::string &s, T &x, Anope::string &leftover, bool failIfLeftoverChars = true)
+{
+	leftover.clear();
+	std::istringstream i(s.str());
+	char c;
+	bool res = i >> x;
+	if (!res)
+		throw ConvertException("Convert fail");
+	if (failIfLeftoverChars)
+	{
+		if (i.get(c))
+			throw ConvertException("Convert fail");
+	}
+	else
+	{
+		std::string left;
+		getline(i, left);
+		leftover = left;
+	}
+}
+
+template<typename T> inline void convert(const Anope::string &s, T &x, bool failIfLeftoverChars = true)
+{
+	Anope::string Unused;
+	convert(s, x, Unused, failIfLeftoverChars);
+}
+
+template<typename T> inline T convertTo(const Anope::string &s, Anope::string &leftover, bool failIfLeftoverChars = true)
+{
+	T x;
+	convert(s, x, leftover, failIfLeftoverChars);
+	return x;
+}
+
+template<typename T> inline T convertTo(const Anope::string &s, bool failIfLeftoverChars = true)
+{
+	T x;
+	convert(s, x, failIfLeftoverChars);
+	return x;
+}
+
+/** Debug cast to be used instead of dynamic_cast, this uses dynamic_cast
+ * for debug builds and static_cast on releass builds to speed up the program
+ * because dynamic_cast relies on RTTI.
+ */
+#ifdef DEBUG_BUILD
+# include <typeinfo>
+#endif
+template<typename T, typename O> inline T debug_cast(O ptr)
+{
+#ifdef DEBUG_BUILD
+	T ret = dynamic_cast<T>(ptr);
+	if (ptr != NULL && ret == NULL)
+		throw CoreException(Anope::string("debug_cast<") + typeid(T).name() + ">(" + typeid(O).name() + ") fail");
+	return ret;
+#else
+	return static_cast<T>(ptr);
+#endif
+}
+
+/*************************************************************************/
+
+/** Class with the ability to keep flags on items, they should extend from this
+ * where T is an enum.
+ */
+template<typename T, size_t Size = 32> class Flags
 {
  protected:
-	T *ref;
+	std::bitset<Size> Flag_Values;
+	const Anope::string *Flag_Strings;
+
  public:
-	dynamic_reference(T *obj) : ref(obj)
+	Flags() : Flag_Strings(NULL) { }
+ 	Flags(const Anope::string *flag_strings) : Flag_Strings(flag_strings) { }
+
+	/** Add a flag to this item
+	 * @param Value The flag
+	 */
+	void SetFlag(T Value)
 	{
-		if (ref)
-			ref->AddReference(this);
+		Flag_Values[Value] = true;
 	}
 
-	dynamic_reference(const dynamic_reference<T> &obj) : ref(obj.ref)
+	/** Remove a flag from this item
+	 * @param Value The flag
+	 */
+	void UnsetFlag(T Value)
 	{
-		if (ref)
-			ref->AddReference(this);
+		Flag_Values[Value] = false;
 	}
 
-	virtual ~dynamic_reference()
+	/** Check if this item has a flag
+	 * @param Value The flag
+	 * @return true or false
+	 */
+	bool HasFlag(T Value) const
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (this->operator bool())
-			ref->DelReference(this);
+		return Flag_Values.test(Value);
 	}
 
-	virtual operator bool()
+	/** Check how many flags are set
+	 * @return The number of flags set
+	 */
+	size_t FlagCount() const
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		return this->ref != NULL;
+		return Flag_Values.count();
 	}
 
-	virtual inline operator T*()
+	/** Unset all of the flags
+	 */
+	void ClearFlags()
 	{
-		if (this->operator bool())
-			return this->ref;
-		return NULL;
+		Flag_Values.reset();
 	}
 
-	virtual inline T *operator->()
+	Anope::string ToString()
 	{
-		if (this->operator bool())
-			return this->ref;
-		return NULL;
+		std::vector<Anope::string> v = ToVector();
+		Anope::string flag_buf;
+		for (unsigned i = 0; i < v.size(); ++i)
+			flag_buf += v[i] + " ";
+		flag_buf.trim();
+		return flag_buf;
 	}
 
-	virtual inline void operator=(T *newref)
+	void FromString(const Anope::string &str)
 	{
-		if (this->invalid)
-		{
-			this->invalid = false;
-			this->ref = NULL;
-		}
-		else if (this->operator bool())
-			this->ref->DelReference(this);
-		this->ref = newref;
-		if (this->operator bool())
-			this->ref->AddReference(this);
+		spacesepstream sep(str);
+		Anope::string buf;
+		std::vector<Anope::string> v;
+
+		while (sep.GetToken(buf))
+			v.push_back(buf);
+
+		FromVector(v);
+	}
+
+	std::vector<Anope::string> ToVector()
+	{
+		std::vector<Anope::string> ret;
+		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+			if (this->HasFlag(static_cast<T>(i)))
+				ret.push_back(this->Flag_Strings[i]);
+		return ret;
+	}
+
+	void FromVector(const std::vector<Anope::string> &strings)
+	{
+		this->ClearFlags();
+
+		for (unsigned i = 0; this->Flag_Strings && !this->Flag_Strings[i].empty(); ++i)
+			for (unsigned j = 0; j < strings.size(); ++j)
+				if (this->Flag_Strings[i] == strings[j])
+					this->SetFlag(static_cast<T>(i));
 	}
 };
 

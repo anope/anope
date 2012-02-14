@@ -12,6 +12,11 @@
 #include "services.h"
 #include "config.h"
 #include "module.h"
+#include "extern.h"
+#include "bots.h"
+#include "access.h"
+#include "opertype.h"
+#include "channels.h"
 
 /*************************************************************************/
 
@@ -510,7 +515,7 @@ bool InitUplinks(ServerConfig *config, const Anope::string &)
 {
 	if (!config->Uplinks.empty())
 	{
-		std::vector<Uplink *>::iterator curr_uplink = config->Uplinks.begin(), end_uplink = config->Uplinks.end();
+		std::vector<ServerConfig::Uplink *>::iterator curr_uplink = config->Uplinks.begin(), end_uplink = config->Uplinks.end();
 		for (; curr_uplink != end_uplink; ++curr_uplink)
 			delete *curr_uplink;
 	}
@@ -535,7 +540,7 @@ static bool DoUplink(ServerConfig *config, const Anope::string &, const Anope::s
 	if (!ValidateNotEmpty(config, "uplink", "password", vi_password))
 		throw ConfigException("One or more values in your configuration file failed to validate. Please see your log for more information.");
 	// If we get here, all the values are valid, we'll add it to the Uplinks list
-	config->Uplinks.push_back(new Uplink(host, port, password, ipv6));
+	config->Uplinks.push_back(new ServerConfig::Uplink(host, port, password, ipv6));
 	return true;
 }
 

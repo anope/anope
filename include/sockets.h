@@ -12,6 +12,8 @@
 #ifndef SOCKETS_H
 #define SOCKETS_H
 
+#include <netinet/in.h>
+
 #include "anope.h"
 
 #define NET_BUFSIZE 65535
@@ -26,7 +28,7 @@ union CoreExport sockaddrs
 
 	/** Construct the object, sets everything to 0
 	 */
-	sockaddrs();
+	sockaddrs(const Anope::string &address = "");
 
 	/** Memset the object to 0
 	 */
@@ -112,10 +114,6 @@ enum SocketFlag
 
 static const Anope::string SocketFlagStrings[] = { "SF_DEAD", "SF_WRITABLE", "SF_CONNECTING", "SF_CONNECTED", "SF_ACCEPTING", "SF_ACCEPTED", "" };
 
-class Socket;
-class ClientSocket;
-class ListenSocket;
-class ConnectionSocket;
 
 class CoreExport SocketIO
 {
@@ -474,5 +472,9 @@ class CoreExport Pipe : public Socket
 	 */
 	virtual void OnNotify();
 };
+
+extern uint32_t TotalRead;
+extern uint32_t TotalWritten;
+extern SocketIO normalSocketIO;
 
 #endif // SOCKET_H

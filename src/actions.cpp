@@ -10,6 +10,10 @@
  */
 
 #include "services.h"
+#include "users.h"
+#include "config.h"
+#include "regchannel.h"
+#include "channels.h"
 
 /*************************************************************************/
 

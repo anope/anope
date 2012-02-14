@@ -9,10 +9,7 @@
  * Based on the original code of Services by Andy Church.
  */
 
-#include "services.h"
-#include "modules.h"
-#include "nickserv.h"
-#include "oper.h"
+#include "module.h"
 
 static Anope::string TS6UPLINK;
 

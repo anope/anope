@@ -101,12 +101,12 @@ class CommandNSInfo : public Command
 
 			if (show_hidden)
 			{
-				if (na->hostinfo.HasVhost())
+				if (na->HasVhost())
 				{
-					if (ircd->vident && !na->hostinfo.GetIdent().empty())
-						info[_("VHost")] = na->hostinfo.GetIdent() + "@" + na->hostinfo.GetHost();
+					if (ircd->vident && !na->GetVhostIdent().empty())
+						info[_("VHost")] = na->GetVhostIdent() + "@" + na->GetVhostHost();
 					else
-						info[_("VHost")] = na->hostinfo.GetHost();
+						info[_("VHost")] = na->GetVhostHost();
 				}
 
 				if (!na->nc->greet.empty())

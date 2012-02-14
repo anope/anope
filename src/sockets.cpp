@@ -1,17 +1,38 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
 #include "services.h"
+#include "sockets.h"
+#include "socketengine.h"
+#include "logger.h"
+
+#include <arpa/inet.h>
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 std::map<int, Socket *> SocketEngine::Sockets;
 
-int32_t TotalRead = 0;
-int32_t TotalWritten = 0;
+uint32_t TotalRead = 0;
+uint32_t TotalWritten = 0;
 
 SocketIO normalSocketIO;
 
 /** Construct the object, sets everything to 0
  */
-sockaddrs::sockaddrs()
+sockaddrs::sockaddrs(const Anope::string &address)
 {
 	this->clear();
+	if (!address.empty())
+		this->pton(address.find(':') != Anope::string::npos ? AF_INET6 : AF_INET, address);
 }
 
 /** Memset the object to 0

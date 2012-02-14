@@ -1,5 +1,28 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
+
 #include "services.h"
+#include "account.h"
 #include "modules.h"
+#include "opertype.h"
+#include "protocol.h"
+#include "users.h"
+#include "servers.h"
+#include "config.h"
+
+class NickServHeld;
+
+typedef std::map<Anope::string, NickServHeld *> nickservheld_map;
+static nickservheld_map NickServHelds;
 
 /** Default constructor
  * @param nick The nick
@@ -83,6 +106,81 @@ void NickAlias::Release()
 	}
 }
 
+/** Timers for removing HELD status from nicks.
+ */
+class NickServHeld : public Timer
+{
+	dynamic_reference<NickAlias> na;
+	Anope::string nick;
+ public:
+	NickServHeld(NickAlias *n, long l) : Timer(l), na(n), nick(na->nick)
+	{
+		nickservheld_map::iterator nit = NickServHelds.find(na->nick);
+		if (nit != NickServHelds.end())
+			delete nit->second;
+
+		NickServHelds[na->nick] = this;
+	}
+
+	~NickServHeld()
+	{
+		NickServHelds.erase(this->nick);
+	}
+
+	void Tick(time_t)
+	{
+		if (na)
+			na->UnsetFlag(NS_HELD);
+	}
+};
+
+/** Timers for releasing nicks to be available for use
+ */
+class CoreExport NickServRelease : public User, public Timer
+{
+	static std::map<Anope::string, NickServRelease *> NickServReleases;
+	Anope::string nick;
+
+ public:
+	/** Default constructor
+	 * @param na The nick
+	 * @param delay The delay before the nick is released
+	 */
+	NickServRelease(NickAlias *na, time_t delay) : User(na->nick, Config->NSEnforcerUser, Config->NSEnforcerHost, ts6_uid_retrieve()), Timer(delay), nick(na->nick)
+	{
+		this->realname = "Services Enforcer";
+		this->server = Me;
+
+		/* Erase the current release timer and use the new one */
+		std::map<Anope::string, NickServRelease *>::iterator nit = NickServReleases.find(this->nick);
+		if (nit != NickServReleases.end())
+		{
+			ircdproto->SendQuit(nit->second, "");
+			delete nit->second;
+		}
+
+		NickServReleases.insert(std::make_pair(this->nick, this));
+
+		ircdproto->SendClientIntroduction(this);
+	}
+
+	/** Default destructor
+	 */
+	virtual ~NickServRelease()
+	{
+		NickServReleases.erase(this->nick);
+	}
+
+	/** Called when the delay is up
+	 * @param t The current time
+	 */
+	void Tick(time_t t)
+	{
+		ircdproto->SendQuit(this, "");
+	}
+};
+std::map<Anope::string, NickServRelease *> NickServRelease::NickServReleases;
+
 /** Called when a user gets off this nick
  * See the comment in users.cpp for User::Collide()
  * @param u The user
@@ -101,6 +199,47 @@ void NickAlias::OnCancel(User *)
 		else
 			new NickServRelease(this, Config->NSReleaseTimeout);
 	}
+}
+
+void NickAlias::SetVhost(const Anope::string &ident, const Anope::string &host, const Anope::string &creator, time_t created)
+{
+	this->vhost_ident = ident;
+	this->vhost_host = host;
+	this->vhost_creator = creator;
+	this->vhost_created = created;
+}
+
+void NickAlias::RemoveVhost()
+{
+	this->vhost_ident.clear();
+	this->vhost_host.clear();
+	this->vhost_creator.clear();
+	this->vhost_created = 0;
+}
+
+bool NickAlias::HasVhost() const
+{
+	return !this->vhost_host.empty();
+}
+
+const Anope::string &NickAlias::GetVhostIdent() const
+{
+	return this->vhost_ident;
+}
+
+const Anope::string &NickAlias::GetVhostHost() const
+{
+	return this->vhost_host;
+}
+
+const Anope::string &NickAlias::GetVhostCreator() const
+{
+	return this->vhost_creator;
+}
+
+time_t NickAlias::GetVhostCreated() const
+{
+	return this->vhost_created;
 }
 
 Anope::string NickAlias::serialize_name() const
@@ -122,12 +261,12 @@ Serializable::serialized_data NickAlias::serialize()
 	data["nc"] << this->nc->display;
 	data["flags"] << this->ToString();
 
-	if (this->hostinfo.HasVhost())
+	if (this->HasVhost())
 	{
-		data["vhost_ident"] << this->hostinfo.GetIdent();
-		data["vhost_host"] << this->hostinfo.GetHost();
-		data["vhost_creator"] << this->hostinfo.GetCreator();
-		data["vhost_time"] << this->hostinfo.GetTime();
+		data["vhost_ident"] << this->GetVhostIdent();
+		data["vhost_host"] << this->GetVhostHost();
+		data["vhost_creator"] << this->GetVhostCreator();
+		data["vhost_time"] << this->GetVhostCreated();
 	}
 
 	return data;
@@ -167,6 +306,6 @@ void NickAlias::unserialize(serialized_data &data)
 
 	time_t vhost_time;
 	data["vhost_time"] >> vhost_time;
-	na->hostinfo.SetVhost(data["vhost_ident"].astr(), data["vhost_host"].astr(), data["vhost_creator"].astr(), vhost_time);
+	na->SetVhost(data["vhost_ident"].astr(), data["vhost_host"].astr(), data["vhost_creator"].astr(), vhost_time);
 }
 

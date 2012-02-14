@@ -1,6 +1,23 @@
+/*
+ *
+ * (C) 2003-2012 Anope Team
+ * Contact us at team@anope.org
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church.
+ */
+
 #include "services.h"
 #include "modules.h"
 #include "commands.h"
+#include "config.h"
+#include "extern.h"
+
+#if GETTEXT_FOUND
+# include <libintl.h>
+#endif
 
 std::vector<Anope::string> languages;
 std::vector<Anope::string> domains;

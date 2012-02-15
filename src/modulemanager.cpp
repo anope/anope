@@ -186,22 +186,30 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	ModuleVersion v = m->GetVersion();
 	if (v.GetMajor() < Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() < Anope::VersionMinor()))
 	{
-		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionMajor() << "." << Anope::VersionMinor();
+		Log() << "Module " << modname << " is compiled against an older version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
 		DeleteModule(m);
 		return MOD_ERR_VERSION;
 	}
 	else if (v.GetMajor() > Anope::VersionMajor() || (v.GetMajor() == Anope::VersionMajor() && v.GetMinor() > Anope::VersionMinor()))
 	{
-		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionMajor() << "." << Anope::VersionMinor();
+		Log() << "Module " << modname << " is compiled against a newer version of Anope " << v.GetMajor() << "." << v.GetMinor() << ", this is " << Anope::VersionShort();
 		DeleteModule(m);
 		return MOD_ERR_VERSION;
 	}
-	else if (v.GetBuild() < Anope::VersionBuild())
-		Log() << "Module " << modname << " is compiled against an older revision of Anope " << v.GetBuild() << ", this is " << Anope::VersionBuild();
-	else if (v.GetBuild() > Anope::VersionBuild())
-		Log() << "Module " << modname << " is compiled against a newer revision of Anope " << v.GetBuild() << ", this is " << Anope::VersionBuild();
-	else if (v.GetBuild() == Anope::VersionBuild())
-		Log(LOG_DEBUG) << "Module " << modname << " compiled against current version of Anope " << v.GetBuild();
+	else if (v.GetPatch() < Anope::VersionPatch())
+	{
+		Log() << "Module " << modname << " is compiled against an older version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+		DeleteModule(m);
+		return MOD_ERR_VERSION;
+	}
+	else if (v.GetPatch() > Anope::VersionPatch())
+	{
+		Log() << "Module " << modname << " is compiled against a newer version of Anope, " << v.GetMajor() << "." << v.GetMinor() << "." << v.GetPatch() << ", this is " << Anope::VersionShort();
+		DeleteModule(m);
+		return MOD_ERR_VERSION;
+	}
+	else
+		Log(LOG_DEBUG) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
 	if (m->type == PROTOCOL && ModuleManager::FindFirstOf(PROTOCOL) != m)
 	{
@@ -251,7 +259,7 @@ Module *ModuleManager::FindFirstOf(ModType type)
 	return NULL;
 }
 
-void ModuleManager::RequireVersion(int major, int minor, int patch, int build)
+void ModuleManager::RequireVersion(int major, int minor, int patch)
 {
 	if (Anope::VersionMajor() > major)
 		return;
@@ -268,16 +276,11 @@ void ModuleManager::RequireVersion(int major, int minor, int patch, int build)
 			else if (Anope::VersionPatch() > patch)
 				return;
 			else if (Anope::VersionPatch() == patch)
-			{
-				if (build == -1)
-					return;
-				else if (Anope::VersionBuild() >= build)
-					return;
-			}
+				return;
 		}
 	}
 
-	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + "-" + build + " - this is " + Anope::Version());
+	throw ModuleException("This module requires version " + stringify(major) + "." + stringify(minor) + "." + stringify(patch) + " - this is " + Anope::VersionShort());
 }
 
 ModuleReturn ModuleManager::DeleteModule(Module *m)

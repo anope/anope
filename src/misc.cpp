@@ -769,12 +769,16 @@ const Anope::string Anope::LastError()
 
 ModuleVersion Module::GetVersion() const
 {
-	return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD);
+	return ModuleVersion(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 }
 
 Anope::string Anope::Version()
 {
-	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + stringify(VERSION_BUILD) + ")";
+#ifdef VERSION_GIT
+	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA + " (" + VERSION_GIT + ")";
+#else
+	return stringify(VERSION_MAJOR) + "." + stringify(VERSION_MINOR) + "." + stringify(VERSION_PATCH) + VERSION_EXTRA;
+#endif
 }
 
 Anope::string Anope::VersionShort()
@@ -790,7 +794,6 @@ Anope::string Anope::VersionBuildString()
 int Anope::VersionMajor() { return VERSION_MAJOR; }
 int Anope::VersionMinor() { return VERSION_MINOR; }
 int Anope::VersionPatch() { return VERSION_PATCH; }
-int Anope::VersionBuild() { return VERSION_BUILD; }
 
 /**
  * Normalize buffer stripping control characters and colors

@@ -149,15 +149,15 @@ class ModuleVersion
  private:
 	int Major;
 	int Minor;
-	int Build;
+	int Patch;
 
  public:
 	/** Constructor
 	 * @param vMajor The major version numbber
 	 * @param vMinor The minor version numbber
-	 * @param vBuild The build version numbber
+	 * @param vPatch The patch version numbber
 	 */
-	ModuleVersion(int vMajor, int vMinor, int vBuild);
+	ModuleVersion(int vMajor, int vMinor, int vPatch);
 
 	/** Destructor
 	 */
@@ -173,10 +173,10 @@ class ModuleVersion
 	 */
 	int GetMinor() const;
 
-	/** Get the build version this was built against
-	 * @return The build version
+	/** Get the patch version this was built against
+	 * @return The patch version
 	 */
-	int GetBuild() const;
+	int GetPatch() const;
 };
 
 
@@ -1041,9 +1041,8 @@ class CoreExport ModuleManager
 	 * @param major The major version
 	 * @param minor The minor vesion
 	 * @param patch The patch version
-	 * @param build The build version
 	 */
-	static void RequireVersion(int major, int minor, int patch, int build);
+	static void RequireVersion(int major, int minor, int patch);
 
 	/** Change the priority of one event in a module.
 	 * Each module event has a list of modules which are attached to that event type. If you wish to be called before or after other specific modules, you may use this

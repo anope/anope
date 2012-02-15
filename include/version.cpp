@@ -15,21 +15,54 @@
 #include <sstream>
 #include <list>
 
+static std::string get_git_hash(const std::string &git_dir)
+{
+	std::fstream fd;
+	std::string filebuf;
+
+	fd.open((git_dir + "/HEAD").c_str(), std::ios::in);
+	if (!fd.is_open())
+		return "";
+	if (!getline(fd, filebuf) || filebuf.find("ref: ") != 0)
+	{
+		fd.close();
+		return "";
+	}
+	
+	fd.close();
+
+	filebuf = filebuf.substr(5);
+	fd.open((git_dir + "/" + filebuf).c_str(), std::ios::in);
+	if (!fd.is_open())
+		return "";
+	if (!getline(fd, filebuf))
+	{
+		fd.close();
+		return "";
+	}
+	fd.close();
+
+	return "g" + filebuf.substr(0, 7);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 3)
 	{
-		std::cout << "Syntax: " << argv[0] << " <src/version.sh> <version.h>" << std::endl;
+		std::cerr << "Syntax: " << argv[0] << " <base> <version.h>" << std::endl;
 		return 1;
 	}
+
+	std::string version_sh = std::string(argv[1]) + "/src/version.sh";
+	std::string git_dir = std::string(argv[1]) + "/.git";
 
 	std::fstream fd;
 
 	fd.clear();
-	fd.open(argv[1], std::ios::in);
+	fd.open(version_sh.c_str(), std::ios::in);
 	if (!fd.is_open())
 	{
-		std::cout << "Error: Unable to open src/version.sh for reading: " << argv[1] << std::endl;
+		std::cerr << "Error: Unable to open src/version.sh for reading: " << version_sh << std::endl;
 		return 1;
 	}
 
@@ -41,7 +74,7 @@ int main(int argc, char *argv[])
 		{
 			size_t eq = filebuf.find('=');
 
-			std::string type = filebuf.substr(8, 5);
+			std::string type = filebuf.substr(0, eq);
 			std::string value = filebuf.substr(eq + 2, filebuf.length() - eq - 3);
 			versions.push_back(std::make_pair(type, value));
 		}
@@ -49,25 +82,19 @@ int main(int argc, char *argv[])
 
 	fd.close();
 
+	std::string git_version = get_git_hash(git_dir);
+	if (!git_version.empty())
+		versions.push_back(std::make_pair("VERSION_GIT", git_version));
+
 	fd.clear();
 	fd.open(argv[2], std::ios::in);
 
-	std::string version_build = "#define VERSION_BUILD	1";
 	std::string build = "#define BUILD	1";
-	std::string version_extra;
 	if (fd.is_open())
 	{
 		while (getline(fd, filebuf))
 		{
-			if (!filebuf.find("#define VERSION_BUILD"))
-				version_build = filebuf;
-			else if (!filebuf.find("#define VERSION_EXTRA"))
-			{
-				size_t q = filebuf.find('"');
-
-				version_extra = filebuf.substr(q + 1, filebuf.length() - q - 2);
-			}
-			else if (!filebuf.find("#define BUILD"))
+			if (!filebuf.find("#define BUILD"))
 			{
 				size_t tab = filebuf.find('	');
 
@@ -87,7 +114,7 @@ int main(int argc, char *argv[])
 
 	if (!fd.is_open())
 	{
-		std::cout << "Error: Unable to include/version.h for writing: " << argv[2] << std::endl;
+		std::cerr << "Error: Unable to include/version.h for writing: " << argv[2] << std::endl;
 		return 1;
 	}
 
@@ -95,13 +122,12 @@ int main(int argc, char *argv[])
 
 	for (std::list<std::pair<std::string, std::string> >::iterator it = versions.begin(), it_end = versions.end(); it != it_end; ++it)
 	{
-		if (it->first == "EXTRA")
-			fd << "#define VERSION_EXTRA \"" << (!version_extra.empty() ? version_extra : "") << (version_extra.find(it->second) == std::string::npos ? it->second  : "") << "\"" << std::endl;
+		if (it->first == "VERSION_EXTRA" || it->first == "VERSION_GIT")
+			fd << "#define " << it->first << " \"" << it->second << "\"" << std::endl;
 		else
-			fd << "#define VERSION_" << it->first << " " << it->second << std::endl;
+			fd << "#define " << it->first << " " << it->second << std::endl;
 	}
 
-	fd << version_build << std::endl;
 	fd << build << std::endl;
 
 	fd.close();

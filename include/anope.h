@@ -341,7 +341,6 @@ namespace Anope
 	extern CoreExport int VersionMajor();
 	extern CoreExport int VersionMinor();
 	extern CoreExport int VersionPatch();
-	extern CoreExport int VersionBuild();
 
 	/** Check whether two strings match.
 	 * @param str The string to check against the pattern (e.g. foobar)

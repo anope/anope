@@ -84,7 +84,7 @@ void Module::SetAuthor(const Anope::string &nauthor)
 	this->author = nauthor;
 }
 
-ModuleVersion::ModuleVersion(int vMajor, int vMinor, int vBuild) : Major(vMajor), Minor(vMinor), Build(vBuild)
+ModuleVersion::ModuleVersion(int vMajor, int vMinor, int vPatch) : Major(vMajor), Minor(vMinor), Patch(vPatch)
 {
 }
 
@@ -102,8 +102,8 @@ int ModuleVersion::GetMinor() const
 	return this->Minor;
 }
 
-int ModuleVersion::GetBuild() const
+int ModuleVersion::GetPatch() const
 {
-	return this->Build;
+	return this->Patch;
 }
 

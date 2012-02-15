@@ -371,7 +371,9 @@ void User::Identify(NickAlias *na)
 
 	this->Login(na->nc);
 	ircdproto->SendLogin(this);
-	if (!Config->NoNicknameOwnership && na->nc == this->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
+
+	NickAlias *this_na = findnick(this->nick);
+	if (!Config->NoNicknameOwnership && this_na && this_na->nc == na->nc && na->nc->HasFlag(NI_UNCONFIRMED) == false)
 		this->SetMode(findbot(Config->NickServ), UMODE_REGISTERED);
 
 	FOREACH_MOD(I_OnNickIdentify, OnNickIdentify(this));

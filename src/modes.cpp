@@ -473,8 +473,8 @@ void ModeManager::StackerAddInternal(BotInfo *bi, Base *Object, Mode *mode, bool
 	else if (Type == ST_USER)
 		s->bi = NULL;
 
-	static ModePipe mpipe;
-	mpipe.Notify();
+	static ModePipe *mpipe = new ModePipe();
+	mpipe->Notify();
 }
 
 /** Add a user mode to Anope

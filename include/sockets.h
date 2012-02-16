@@ -13,6 +13,8 @@
 #define SOCKETS_H
 
 #include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #include "anope.h"
 

@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#include <errno.h>
 
 static int kq_fd, max_fds;
 static struct kevent *change_events, *event_events;

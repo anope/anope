@@ -36,7 +36,6 @@
 #include "oper.h"
 #include "opertype.h"
 #include "protocol.h"
-#include "pstdint.h"
 #include "regchannel.h"
 #include "serialize.h"
 #include "servers.h"

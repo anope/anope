@@ -64,14 +64,14 @@ class NSMaxEmail : public Module
 		OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		this->NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
 		Log(LOG_DEBUG) << "[ns_maxemail] NSEmailMax set to " << NSEmailMax;
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
 		if (command->name == "nickserv/register")
 		{

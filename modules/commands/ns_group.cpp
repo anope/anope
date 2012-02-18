@@ -23,7 +23,7 @@ class CommandNSGroup : public Command
 		this->SetSyntax(_("\037target\037 \037password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -129,7 +129,7 @@ class CommandNSGroup : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -172,7 +172,7 @@ class CommandNSUngroup : public Command
 		this->SetSyntax(_("[\037nick\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -216,7 +216,7 @@ class CommandNSUngroup : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -237,7 +237,7 @@ class CommandNSGList : public Command
 		this->SetDesc(_("Lists all nicknames in your group"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -273,7 +273,7 @@ class CommandNSGList : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		User *u = source.u;
 		if (u->IsServicesOper())

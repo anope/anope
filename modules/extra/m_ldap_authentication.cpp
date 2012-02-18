@@ -32,7 +32,7 @@ class IdentifyInterface : public LDAPInterface
 		this->requests[id] = ii;
 	}
 
-	void OnResult(const LDAPResult &r)
+	void OnResult(const LDAPResult &r) anope_override
 	{
 		std::map<LDAPQuery, IdentifyInfo *>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
@@ -70,7 +70,7 @@ class IdentifyInterface : public LDAPInterface
 		delete ii;
 	}
 
-	void OnError(const LDAPResult &r)
+	void OnError(const LDAPResult &r) anope_override
 	{
 		std::map<LDAPQuery, IdentifyInfo *>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
@@ -107,7 +107,7 @@ class OnIdentifyInterface : public LDAPInterface
 		this->requests[id] = nick;
 	}
 
-	void OnResult(const LDAPResult &r)
+	void OnResult(const LDAPResult &r) anope_override
 	{
 		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
@@ -138,7 +138,7 @@ class OnIdentifyInterface : public LDAPInterface
 		}
 	}
 
-	void OnError(const LDAPResult &r)
+	void OnError(const LDAPResult &r) anope_override
 	{
 		this->requests.erase(r.id);
 		Log() << "m_ldap_authentication: " << r.error;
@@ -150,12 +150,12 @@ class OnRegisterInterface : public LDAPInterface
  public:
 	OnRegisterInterface(Module *m) : LDAPInterface(m) { }
 
-	void OnResult(const LDAPResult &r)
+	void OnResult(const LDAPResult &r) anope_override
 	{
 		Log() << "m_ldap_authentication: Successfully added newly created account to LDAP";
 	}
 
-	void OnError(const LDAPResult &r)
+	void OnError(const LDAPResult &r) anope_override
 	{
 		Log() << "m_ldap_authentication: Error adding newly created account to LDAP: " << r.getError();
 	}
@@ -187,7 +187,7 @@ class NSIdentifyLDAP : public Module
 		OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 
@@ -200,7 +200,7 @@ class NSIdentifyLDAP : public Module
 		this->disable_reason = config.ReadValue("m_ldap_authentication", "disable_reason", "", 0);
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
 		if (this->disable_register && !this->disable_reason.empty() && command->name == "nickserv/register")
 		{
@@ -211,7 +211,7 @@ class NSIdentifyLDAP : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
+	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
 	{
 
 		if (c == NULL || source == NULL || !this->ldap)
@@ -246,7 +246,7 @@ class NSIdentifyLDAP : public Module
 		return EVENT_STOP;
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		if (email_attribute.empty() || !this->ldap)
 			return;
@@ -262,7 +262,7 @@ class NSIdentifyLDAP : public Module
 		}
 	}
 
-	void OnNickRegister(NickAlias *na)
+	void OnNickRegister(NickAlias *na) anope_override
 	{
 		if (this->disable_register || !this->ldap)
 			return;

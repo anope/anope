@@ -1008,7 +1008,7 @@ class DBOld : public Module
 			throw ModuleException("Invalid hash method");
 	}
 
-	EventReturn OnLoadDatabase()
+	EventReturn OnLoadDatabase() anope_override
 	{
 		LoadNicks();
 		LoadVHosts();

@@ -37,12 +37,12 @@ struct SeenInfo : Serializable
 	{
 	}
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "SeenInfo";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data data;
 
@@ -110,7 +110,7 @@ class CommandOSSeen : public Command
 		this->SetSyntax(_("\037CLEAR\037 \037time\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0].equals_ci("STATS"))
 		{
@@ -156,7 +156,7 @@ class CommandOSSeen : public Command
 			this->SendSyntax(source);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -181,7 +181,7 @@ class CommandSeen : public Command
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &target = params[0];
 		User *u = source.u;
@@ -276,7 +276,7 @@ class CommandSeen : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -292,7 +292,7 @@ class DataBasePurger : public CallBack
  public:
 	DataBasePurger(Module *owner) : CallBack(owner, 300, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		size_t previous_size = database.size();
 		for (database_map::iterator it = database.begin(), it_end = database.end(); it != it_end;)
@@ -334,7 +334,7 @@ class CSSeen : public Module
 		OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		purgetime = dotime(config.ReadValue("cs_seen", "purgetime", "30d", 0));
@@ -344,37 +344,38 @@ class CSSeen : public Module
 			purger.SetSecs(expiretimeout);
 	}
 
-	void OnUserConnect(User *u)
+	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
 	{
 		UpdateUser(u, NEW, u->nick, "", "", "");
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick)
+	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		UpdateUser(u, NICK_TO, oldnick, u->nick, "", "");
 		UpdateUser(u, NICK_FROM, u->nick, oldnick, "", "");
 	}
 
-	void OnUserQuit(User *u, const Anope::string &msg)
+	void OnUserQuit(User *u, const Anope::string &msg) anope_override
 	{
 		UpdateUser(u, QUIT, u->nick, "", "", msg);
 	}
 
-	void OnJoinChannel(User *u, Channel *c)
+	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
 		UpdateUser(u, JOIN, u->nick, "", c->name, "");
 	}
 
-	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg)
+	void OnPartChannel(User *u, Channel *c, const Anope::string &channel, const Anope::string &msg) anope_override
 	{
 		UpdateUser(u, PART, u->nick, "", channel, msg);
 	}
 
-	void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &msg)
+	void OnUserKicked(Channel *c, User *target, const Anope::string &source, const Anope::string &msg) anope_override
 	{
 		UpdateUser(target, KICK, target->nick, source, c->name, msg);
 	}
 
+ private:
 	void UpdateUser(const User *u, const TypeInfo Type, const Anope::string &nick, const Anope::string &nick2, const Anope::string &channel, const Anope::string &message)
 	{
 		SeenInfo *info = FindInfo(nick);

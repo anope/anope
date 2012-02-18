@@ -31,7 +31,7 @@ class HostServCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		NickAlias *na = findnick(u->nick);
 		if (!na || !na->HasVhost())
@@ -61,12 +61,12 @@ class HostServCore : public Module
 		}
 	}
 
-	void OnNickUpdate(User *u)
+	void OnNickUpdate(User *u) anope_override
 	{
 		this->OnNickIdentify(u);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->HostServ)
 			return EVENT_CONTINUE;

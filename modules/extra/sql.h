@@ -101,9 +101,8 @@ class SQLInterface
 
 	SQLInterface(Module *m) : owner(m) { }
 
-	virtual void OnResult(const SQLResult &r) { }
-
-	virtual void OnError(const SQLResult &r) { }
+	virtual void OnResult(const SQLResult &r) = 0;
+	virtual void OnError(const SQLResult &r) = 0;
 };
 
 /** Class providing the SQL service, modules call this to execute queries

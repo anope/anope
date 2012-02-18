@@ -18,7 +18,7 @@ class ExpireCallback : public CallBack
  public:
 	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		if (!Config->CSExpire || noexpire || readonly)
 			return;
@@ -69,7 +69,7 @@ class ChanServCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		if (Config->CSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->ChanServ)
 		{
@@ -80,7 +80,7 @@ class ChanServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelCore(NickCore *nc)
+	void OnDelCore(NickCore *nc) anope_override
 	{
 		// XXX this is slightly inefficient
 		for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end;)
@@ -149,7 +149,7 @@ class ChanServCore : public Module
 		}
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->ChanServ)
 			return EVENT_CONTINUE;
@@ -164,7 +164,7 @@ class ChanServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->ChanServ)
 			return;

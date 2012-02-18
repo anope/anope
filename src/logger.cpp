@@ -23,6 +23,7 @@
 #include "protocol.h"
 
 #include <sys/time.h>
+#include <unistd.h>
 
 static Anope::string GetTimeStamp()
 {

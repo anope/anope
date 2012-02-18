@@ -34,7 +34,7 @@ class SXLineDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from the %s list."), Deleted, this->command->name.c_str());
 	}
 
-	void HandleNumber(unsigned Number)
+	void HandleNumber(unsigned Number) anope_override
 	{
 		if (!Number)
 			return;
@@ -127,7 +127,7 @@ class CommandOSSXLineBase : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number)
 						return;
@@ -220,7 +220,7 @@ class CommandOSSXLineBase : public Command
 		this->SetDesc(Anope::printf(_("Manipulate the %s list"), cmd.c_str()));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -250,7 +250,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		return this->snlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!this->xlm() ||! ircd->snline)
 		{
@@ -399,7 +399,7 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		this->SetSyntax(_("CLEAR"));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -451,7 +451,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		return this->sqlines;
 	}
 
-	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnAdd(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!this->xlm() || !ircd->sqline)
 		{
@@ -598,7 +598,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		this->SetSyntax(_("CLEAR"));
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

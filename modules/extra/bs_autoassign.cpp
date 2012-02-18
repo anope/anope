@@ -26,7 +26,7 @@ class BSAutoAssign : public Module
 		this->OnReload();
 	}
 
-	void OnChanRegistered(ChannelInfo *ci)
+	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
 		if (this->bot.empty())
 			return;
@@ -41,7 +41,7 @@ class BSAutoAssign : public Module
 		bi->Assign(NULL, ci);
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		this->bot = config.ReadValue("bs_autoassign", "bot", "", 0);

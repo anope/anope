@@ -119,13 +119,13 @@ class MySQLService : public SQLProvider
 
 	~MySQLService();
 
-	void Run(SQLInterface *i, const SQLQuery &query);
+	void Run(SQLInterface *i, const SQLQuery &query) anope_override;
 
-	SQLResult RunQuery(const SQLQuery &query);
+	SQLResult RunQuery(const SQLQuery &query) anope_override;
 
-	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data);
+	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data) anope_override;
 
-	SQLQuery GetTables();
+	SQLQuery GetTables() anope_override;
 
 	void Connect();
 
@@ -141,7 +141,7 @@ class DispatcherThread : public Thread, public Condition
  public:
 	DispatcherThread() : Thread() { }
 
-	void Run();
+	void Run() anope_override;
 };
 
 class ModuleSQL;
@@ -183,7 +183,7 @@ class ModuleSQL : public Module, public Pipe
 		delete DThread;
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		int i, num;
@@ -238,7 +238,7 @@ class ModuleSQL : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m)
+	void OnModuleUnload(User *, Module *m) anope_override
 	{
 		this->DThread->Lock();
 
@@ -263,7 +263,7 @@ class ModuleSQL : public Module, public Pipe
 		this->OnNotify();
 	}
 
-	void OnNotify()
+	void OnNotify() anope_override
 	{
 		this->DThread->Lock();
 		std::deque<QueryResult> finishedRequests = this->FinishedRequests;

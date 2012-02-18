@@ -20,7 +20,7 @@ class ENone : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
 	{
 		Anope::string buf = "plain:";
 		Anope::string cpass;
@@ -31,7 +31,7 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest)
+	EventReturn OnDecrypt(const Anope::string &hashm, const Anope::string &src, Anope::string &dest) anope_override
 	{
 		if (!hashm.equals_cs("plain"))
 			return EVENT_CONTINUE;
@@ -41,7 +41,7 @@ class ENone : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
+	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
 	{
 		NickAlias *na = findnick(account);
 		NickCore *nc = na ? na->nc : NULL;

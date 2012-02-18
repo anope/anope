@@ -17,12 +17,12 @@ struct MyOper : Oper, Serializable
 {
 	MyOper(const Anope::string &n, OperType *o) : Oper(n, o) { }
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "Oper";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data data;
 
@@ -58,7 +58,7 @@ class CommandOSOper : public Command
 		this->SetSyntax(_("LIST"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &subcommand = params[0];
 
@@ -188,7 +188,7 @@ class CommandOSOper : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

@@ -22,12 +22,12 @@ struct CSMiscData : Anope::string, ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "CSMiscData";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data sdata;
 
@@ -64,7 +64,7 @@ class CommandCSSetMisc : public Command
 		this->SetSyntax(_("\037channel\037 [\037parameters\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelInfo *ci = cs_findchan(params[0]);
 		if (ci == NULL)
@@ -115,7 +115,7 @@ class CSSetMisc : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden)
+	void OnChanInfo(CommandSource &source, ChannelInfo *ci, InfoFormatter &info, bool ShowHidden) anope_override
 	{
 		std::deque<Anope::string> list;
 		ci->GetExtList(list);

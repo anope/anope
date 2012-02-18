@@ -75,8 +75,8 @@ void SocketEngine::AddSocket(Socket *s)
 	ev->events = POLLIN;
 	ev->revents = 0;
 
-	Sockets.insert(std::make_pair(ev->fd, s));
-	socket_positions.insert(std::make_pair(ev->fd, SocketCount));
+	Sockets[ev->fd] = s;
+	socket_positions[ev->fd] = SocketCount;
 
 	++SocketCount;
 }

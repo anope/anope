@@ -23,12 +23,12 @@ struct NSMiscData : Anope::string, ExtensibleItem, Serializable
 	{
 	}
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "NSMiscData";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data sdata;
 
@@ -89,7 +89,7 @@ class CommandNSSetMisc : public Command
 		return;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, source.u->Account()->display, !params.empty() ? params[0] : "");
 	}
@@ -104,7 +104,7 @@ class CommandNSSASetMisc : public CommandNSSetMisc
 		this->SetSyntax(_("\037nickname\037 [\037parameter\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, params[0], params.size() > 1 ? params[1] : "");
 	}
@@ -126,7 +126,7 @@ class NSSetMisc : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden)
+	void OnNickInfo(CommandSource &source, NickAlias *na, InfoFormatter &info, bool ShowHidden) anope_override
 	{
 		std::deque<Anope::string> list;
 		na->nc->GetExtList(list);

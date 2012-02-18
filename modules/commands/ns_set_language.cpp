@@ -49,12 +49,12 @@ class CommandNSSetLanguage : public Command
 		return;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &param)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &param) anope_override
 	{
 		this->Run(source, source.u->Account()->display, param[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -85,12 +85,12 @@ class CommandNSSASetLanguage : public CommandNSSetLanguage
 		this->SetSyntax(_("\037nickname\037 \037language\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

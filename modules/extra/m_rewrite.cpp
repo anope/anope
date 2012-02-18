@@ -83,7 +83,7 @@ class ModuleRewrite : public Module
 		this->OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 
@@ -104,7 +104,7 @@ class ModuleRewrite : public Module
 		}
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		std::vector<Anope::string> tokens = BuildStringVector(message);
 		for (unsigned i = 0; i < this->rewrites.size(); ++i)

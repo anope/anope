@@ -42,7 +42,7 @@ class Signal : public Pipe
 	 * important. This is always called on the main thread, even on systems that
 	 * spawn threads for signals, like Windows.
 	 */
-	virtual void OnNotify() = 0;
+	virtual void OnNotify() anope_override = 0;
 };
 
 #endif

@@ -27,7 +27,7 @@ class MyGlobalService : public GlobalService
  public:
 	MyGlobalService(Module *m) : GlobalService(m) { }
 
-	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message)
+	void SendGlobal(BotInfo *sender, const Anope::string &source, const Anope::string &message) anope_override
 	{
 		if (Me->GetLinks().empty())
 			return;
@@ -61,25 +61,25 @@ class GlobalCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnRestart()
+	void OnRestart() anope_override
 	{
 		if (Config->GlobalOnCycle)
 			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
 	}
 	
-	void OnShutdown()
+	void OnShutdown() anope_override
 	{
 		if (Config->GlobalOnCycle)
 			global->SendGlobal(findbot(Config->Global), "", Config->GlobalOnCycleMessage);
 	}
 
-	void OnNewServer(Server *s)
+	void OnNewServer(Server *s) anope_override
 	{
 		if (Config->GlobalOnCycle && !Config->GlobalOnCycleUP.empty())
 			s->Notice(findbot(Config->Global), Config->GlobalOnCycleUP);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->Global)
 			return EVENT_CONTINUE;

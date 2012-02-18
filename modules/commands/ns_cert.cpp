@@ -148,7 +148,7 @@ class CommandNSCert : public Command
 		this->SetSyntax("LIST");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		const Anope::string &cmd = params[0];
@@ -172,7 +172,7 @@ class CommandNSCert : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -234,7 +234,7 @@ class NSCert : public Module
 
 	}
 
-	void OnFingerprint(User *u)
+	void OnFingerprint(User *u) anope_override
 	{
 		DoAutoIdentify(u);
 	}

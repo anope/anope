@@ -202,7 +202,7 @@ class CommandCSAKick : public Command
 						source.Reply(_("Deleted %d entries from %s autokick list."), Deleted, ci->name.c_str());
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number || Number > ci->GetAkickCount())
 						return;
@@ -258,7 +258,7 @@ class CommandCSAKick : public Command
 				{
 				}
 
-				void HandleNumber(unsigned number)
+				void HandleNumber(unsigned number) anope_override
 				{
 					if (!number || number > ci->GetAkickCount())
 						return;
@@ -413,7 +413,7 @@ class CommandCSAKick : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Anope::string chan = params[0];
 		Anope::string cmd = params[1];
@@ -452,7 +452,7 @@ class CommandCSAKick : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

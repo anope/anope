@@ -14,22 +14,22 @@ class XMLRPCUser : public User
 		this->server = Me;
 	}
 
-	void SendMessage(BotInfo *, Anope::string msg)
+	void SendMessage(BotInfo *, Anope::string msg) anope_override
 	{
 		this->out += msg + "\n";
 	}
 
-	NickCore *Account()
+	NickCore *Account() anope_override
 	{
 		return (na ? na->nc : NULL);
 	}
 
-	bool IsIdentified(bool CheckNick = false)
+	bool IsIdentified(bool CheckNick = false) anope_override
 	{
 		return na;
 	}
 
-	bool IsRecognized(bool CheckSecure = true)
+	bool IsRecognized(bool CheckSecure = true) anope_override
 	{
 		return na;
 	}
@@ -43,7 +43,7 @@ class XMLRPCUser : public User
 class MyXMLRPCEvent : public XMLRPCEvent
 {
  public:
-	void Run(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void Run(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request) anope_override
 	{
 		if (request->name == "command")
 			this->DoCommand(iface, source, request);
@@ -59,6 +59,7 @@ class MyXMLRPCEvent : public XMLRPCEvent
 			this->DoOperType(iface, source, request);
 	}
 
+ private:
 	void DoCommand(XMLRPCServiceInterface *iface, XMLRPCClientSocket *source, XMLRPCRequest *request)
 	{
 		Anope::string service = request->data.size() > 0 ? request->data[0] : "";

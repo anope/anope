@@ -7,12 +7,12 @@ class MySQLInterface : public SQLInterface
  public:
 	MySQLInterface(Module *o) : SQLInterface(o) { }
 
-	void OnResult(const SQLResult &r)
+	void OnResult(const SQLResult &r) anope_override
 	{
 		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
 	}
 
-	void OnError(const SQLResult &r)
+	void OnError(const SQLResult &r) anope_override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
@@ -120,14 +120,14 @@ class DBMySQL : public Module
 			OnServerConnect();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->SQL = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
-	void OnServerConnect()
+	void OnServerConnect() anope_override
 	{
 		Implementation i[] = {
 			/* Misc */
@@ -156,7 +156,7 @@ class DBMySQL : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params)
+	void OnPostCommand(CommandSource &source, Command *command, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -217,32 +217,32 @@ class DBMySQL : public Module
 		}
 	}
 
-	void OnNickAddAccess(NickCore *nc, const Anope::string &entry)
+	void OnNickAddAccess(NickCore *nc, const Anope::string &entry) anope_override
 	{
 		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
-	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry)
+	void OnNickEraseAccess(NickCore *nc, const Anope::string &entry) anope_override
 	{
 		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
-	void OnNickClearAccess(NickCore *nc)
+	void OnNickClearAccess(NickCore *nc) anope_override
 	{
 		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
-	void OnDelCore(NickCore *nc)
+	void OnDelCore(NickCore *nc) anope_override
 	{
 		this->Delete(nc->serialize_name(), nc->serialize());
 	}
 
-	void OnNickForbidden(NickAlias *na)
+	void OnNickForbidden(NickAlias *na) anope_override
 	{
 		this->Insert(na->serialize_name(), na->serialize());
 	}
 
-	void OnNickGroup(User *u, NickAlias *)
+	void OnNickGroup(User *u, NickAlias *) anope_override
 	{
 		OnNickRegister(findnick(u->nick));
 	}
@@ -257,13 +257,13 @@ class DBMySQL : public Module
 		this->Insert(nc->serialize_name(), nc->serialize());
 	}
 
-	void OnNickRegister(NickAlias *na)
+	void OnNickRegister(NickAlias *na) anope_override
 	{
 		this->InsertCore(na->nc);
 		this->InsertAlias(na);
 	}
 
-	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
+	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override
 	{
 		Serializable::serialized_data data = nc->serialize();
 		this->Delete(nc->serialize_name(), data);
@@ -283,154 +283,154 @@ class DBMySQL : public Module
 		}
 	}
 
-	void OnNickSuspend(NickAlias *na)
+	void OnNickSuspend(NickAlias *na) anope_override
 	{
 		this->Insert(na->serialize_name(), na->serialize());
 	}
 
-	void OnDelNick(NickAlias *na)
+	void OnDelNick(NickAlias *na) anope_override
 	{
 		this->Delete(na->serialize_name(), na->serialize());
 	}
 
-	void OnAccessAdd(ChannelInfo *ci, User *, ChanAccess *access)
+	void OnAccessAdd(ChannelInfo *ci, User *, ChanAccess *access) anope_override
 	{
 		this->Insert(access->serialize_name(), access->serialize());
 	}
 
-	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access)
+	void OnAccessDel(ChannelInfo *ci, User *u, ChanAccess *access) anope_override
 	{
 		this->Delete(access->serialize_name(), access->serialize());
 	}
 
-	void OnAccessClear(ChannelInfo *ci, User *u)
+	void OnAccessClear(ChannelInfo *ci, User *u) anope_override
 	{
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 			this->OnAccessDel(ci, NULL, ci->GetAccess(i));
 	}
 
-	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what)
+	void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what) anope_override
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
-	void OnDelChan(ChannelInfo *ci)
+	void OnDelChan(ChannelInfo *ci) anope_override
 	{
 		this->Delete(ci->serialize_name(), ci->serialize());
 	}
 
-	void OnChanRegistered(ChannelInfo *ci)
+	void OnChanRegistered(ChannelInfo *ci) anope_override
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
-	void OnChanSuspend(ChannelInfo *ci)
+	void OnChanSuspend(ChannelInfo *ci) anope_override
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 	}
 
-	void OnAkickAdd(ChannelInfo *ci, AutoKick *ak)
+	void OnAkickAdd(User *u, ChannelInfo *ci, AutoKick *ak) anope_override
 	{
 		this->Insert(ak->serialize_name(), ak->serialize());
 	}
 
-	void OnAkickDel(ChannelInfo *ci, AutoKick *ak)
+	void OnAkickDel(User *u, ChannelInfo *ci, AutoKick *ak) anope_override
 	{
 		this->Delete(ak->serialize_name(), ak->serialize());
 	}
 
-	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock)
+	EventReturn OnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		this->Insert(lock->serialize_name(), lock->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock)
+	EventReturn OnUnMLock(ChannelInfo *ci, ModeLock *lock) anope_override
 	{
 		this->Delete(lock->serialize_name(), lock->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	void OnBotCreate(BotInfo *bi)
+	void OnBotCreate(BotInfo *bi) anope_override
 	{
 		this->Insert(bi->serialize_name(), bi->serialize());
 	}
 
-	void OnBotChange(BotInfo *bi)
+	void OnBotChange(BotInfo *bi) anope_override
 	{
 		OnBotCreate(bi);
 	}
 
-	void OnBotDelete(BotInfo *bi)
+	void OnBotDelete(BotInfo *bi) anope_override
 	{
 		this->Delete(bi->serialize_name(), bi->serialize());
 	}
 
-	EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi)
+	EventReturn OnBotAssign(User *sender, ChannelInfo *ci, BotInfo *bi) anope_override
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci)
+	EventReturn OnBotUnAssign(User *sender, ChannelInfo *ci) anope_override
 	{
 		this->Insert(ci->serialize_name(), ci->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw)
+	void OnBadWordAdd(ChannelInfo *ci, BadWord *bw) anope_override
 	{
 		this->Insert(bw->serialize_name(), bw->serialize());
 	}
 
-	void OnBadWordDel(ChannelInfo *ci, BadWord *bw)
+	void OnBadWordDel(ChannelInfo *ci, BadWord *bw) anope_override
 	{
 		this->Delete(bw->serialize_name(), bw->serialize());
 	}
 
-	void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m)
+	void OnMemoSend(const Anope::string &source, const Anope::string &target, MemoInfo *mi, Memo *m) anope_override
 	{
 		this->Insert(m->serialize_name(), m->serialize());
 	}
 
-	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m)
+	void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m) anope_override
 	{
 		this->Delete(m->serialize_name(), m->serialize());
 	}
 
-	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m)
+	void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m) anope_override
 	{
 		this->Delete(m->serialize_name(), m->serialize());
 	}
 
-	EventReturn OnExceptionAdd(Exception *ex)
+	EventReturn OnExceptionAdd(Exception *ex) anope_override
 	{
 		this->Insert(ex->serialize_name(), ex->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	void OnExceptionDel(User *, Exception *ex)
+	void OnExceptionDel(User *, Exception *ex) anope_override
 	{
 		this->Delete(ex->serialize_name(), ex->serialize());
 	}
 
-	EventReturn OnAddXLine(XLine *x, XLineManager *xlm)
+	EventReturn OnAddXLine(User *u, XLine *x, XLineManager *xlm) anope_override
 	{
 		this->Insert(x->serialize_name(), x->serialize());
 		return EVENT_CONTINUE;
 	}
 
-	void OnDelXLine(User *, XLine *x, XLineManager *xlm)
+	void OnDelXLine(User *, XLine *x, XLineManager *xlm) anope_override
 	{
 		this->Delete(x->serialize_name(), x->serialize());
 	}
 
-	void OnDeleteVhost(NickAlias *na)
+	void OnDeleteVhost(NickAlias *na) anope_override
 	{
 		this->Insert(na->serialize_name(), na->serialize());
 	}
 
-	void OnSetVhost(NickAlias *na)
+	void OnSetVhost(NickAlias *na) anope_override
 	{
 		this->Insert(na->serialize_name(), na->serialize());
 	}

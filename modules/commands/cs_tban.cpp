@@ -28,7 +28,7 @@ class TempBan : public CallBack
  public:
 	TempBan(time_t seconds, Channel *c, const Anope::string &banmask) : CallBack(me, seconds), chan(c), mask(banmask) { }
 
-	void Tick(time_t ctime)
+	void Tick(time_t ctime) anope_override
 	{
 		if (chan && chan->ci)
 			chan->RemoveMode(NULL, CMODE_BAN, mask);
@@ -44,7 +44,7 @@ class CommandCSTBan : public Command
 		this->SetSyntax(_("\037channel\037 \037nick\037 \037time\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = findchan(params[0]);
 
@@ -78,7 +78,7 @@ class CommandCSTBan : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->OnSyntaxError(source, "");
 		source.Reply(" ");

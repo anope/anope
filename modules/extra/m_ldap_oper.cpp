@@ -19,7 +19,7 @@ class IdentifyInterface : public LDAPInterface
 		this->requests[id] = nick;
 	}
 
-	void OnResult(const LDAPResult &r)
+	void OnResult(const LDAPResult &r) anope_override
 	{
 		std::map<LDAPQuery, Anope::string>::iterator it = this->requests.find(r.id);
 		if (it == this->requests.end())
@@ -68,7 +68,7 @@ class IdentifyInterface : public LDAPInterface
 		}
 	}
 
-	void OnError(const LDAPResult &r)
+	void OnError(const LDAPResult &r) anope_override
 	{
 		this->requests.erase(r.id);
 	}
@@ -95,7 +95,7 @@ class LDAPOper : public Module
 		OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 
@@ -110,7 +110,7 @@ class LDAPOper : public Module
 		my_opers.clear();
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		try
 		{
@@ -130,7 +130,7 @@ class LDAPOper : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc)
+	void OnDelCore(NickCore *nc) anope_override
 	{
 		if (nc->o != NULL && my_opers.count(nc->o) > 0)
 		{

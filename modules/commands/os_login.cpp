@@ -23,7 +23,7 @@ class CommandOSLogin : public Command
 		this->SetSyntax(_("\037password\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &password = params[0];
 
@@ -49,7 +49,7 @@ class CommandOSLogin : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -69,7 +69,7 @@ class CommandOSLogout : public Command
 		this->SetSyntax("");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Oper *o = source.u->Account()->o;
 		if (o == NULL)
@@ -86,7 +86,7 @@ class CommandOSLogout : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -117,7 +117,7 @@ class OSLogin : public Module
 			it->second->Shrink("os_login_password_correct");
 	}
 
-	EventReturn IsServicesOper(User *u)
+	EventReturn IsServicesOper(User *u) anope_override
 	{
 		if (!u->Account()->o->password.empty())
 		{

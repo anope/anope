@@ -13,7 +13,7 @@ class XMLRPCClientSocket : public ClientSocket, public BufferedSocket
 
 	virtual ~XMLRPCClientSocket() { }
 
-	virtual bool Read(const Anope::string &message) = 0;
+	virtual bool Read(const Anope::string &message) anope_override = 0;
 
 	virtual bool GetData(Anope::string &tag, Anope::string &data) = 0;
 
@@ -33,7 +33,7 @@ class XMLRPCListenSocket : public ListenSocket
 
 	virtual ~XMLRPCListenSocket() { }
 	
-	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) = 0;
+	virtual ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override = 0;
 };
 
 class XMLRPCRequest

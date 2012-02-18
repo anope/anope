@@ -12,6 +12,7 @@
 
 #include "module.h"
 #include "../commands/os_session.h"
+#include <unistd.h>
 
 Anope::string DatabaseFile;
 std::stringstream db_buffer;
@@ -642,13 +643,13 @@ class DBPlain : public Module
 		}
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		DatabaseFile = config.ReadValue("db_plain", "database", "anope.db", 0);
 	}
 
-	EventReturn OnLoadDatabase()
+	EventReturn OnLoadDatabase() anope_override
 	{
 		ReadDatabase();
 
@@ -659,7 +660,7 @@ class DBPlain : public Module
 	}
 
 
-	EventReturn OnSaveDatabase()
+	EventReturn OnSaveDatabase() anope_override
 	{
 		BackupDatabase();
 

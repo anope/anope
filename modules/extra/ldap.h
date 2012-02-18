@@ -107,9 +107,8 @@ class LDAPInterface
 	LDAPInterface(Module *m) : owner(m) { }
 	virtual ~LDAPInterface() { }
 
-	virtual void OnResult(const LDAPResult &r) { }
-
-	virtual void OnError(const LDAPResult &err) { }
+	virtual void OnResult(const LDAPResult &r) = 0;
+	virtual void OnError(const LDAPResult &err) = 0;
 };
 
 class LDAPProvider : public Service

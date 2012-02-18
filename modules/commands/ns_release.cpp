@@ -23,7 +23,7 @@ class CommandNSRelease : public Command
 		this->SetSyntax(_("\037nickname\037 [\037password\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		const Anope::string &nick = params[0];
@@ -70,7 +70,7 @@ class CommandNSRelease : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		/* Convert Config->NSReleaseTimeout seconds to string format */
 		Anope::string relstr = duration(Config->NSReleaseTimeout);

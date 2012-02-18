@@ -272,12 +272,12 @@ class CoreExport BufferedSocket : public virtual Socket
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead();
+	bool ProcessRead() anope_override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite();
+	bool ProcessWrite() anope_override;
 
 	/** Called with a line received from the socket
 	 * @param buf The line
@@ -327,12 +327,12 @@ class CoreExport BinarySocket : public virtual Socket
 	/** Called when there is something to be received for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessRead();
+	bool ProcessRead() anope_override;
 
 	/** Called when the socket is ready to be written to
 	 * @return true on success, false to drop this socket
 	 */
-	bool ProcessWrite();
+	bool ProcessWrite() anope_override;
 
 	/** Write data to the socket
 	 * @param buffer The data to write
@@ -395,12 +395,12 @@ class CoreExport ConnectionSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process();
+	bool Process() anope_override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError();
+	void ProcessError() anope_override;
 
 	/** Called on a successful connect
 	 */
@@ -430,12 +430,12 @@ class CoreExport ClientSocket : public virtual Socket
 	 * Used to determine whether or not this socket is connected yet.
 	 * @return true to continue to call ProcessRead/ProcessWrite, false to not continue
 	 */
-	bool Process();
+	bool Process() anope_override;
 
 	/** Called when there is an error for this socket
 	 * @return true on success, false to drop this socket
 	 */
-	void ProcessError();
+	void ProcessError() anope_override;
 
 	/** Called when a client has been accepted() successfully.
 	 */
@@ -464,15 +464,15 @@ class CoreExport Pipe : public Socket
 
 	/** Called when data is to be read
 	 */
-	bool ProcessRead();
+	bool ProcessRead() anope_override;
 
 	/** Called when this pipe needs to be woken up
 	 */
 	void Notify();
 
-	/** Should be overloaded to do something useful
+	/** Overload to do something useful
 	 */
-	virtual void OnNotify();
+	virtual void OnNotify() = 0;
 };
 
 extern uint32_t TotalRead;

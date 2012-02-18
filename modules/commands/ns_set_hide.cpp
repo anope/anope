@@ -81,12 +81,12 @@ class CommandNSSetHide : public Command
 		return;
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, source.u->Account()->display, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -109,13 +109,13 @@ class CommandNSSASetHide : public CommandNSSetHide
 		this->SetSyntax("\037nickname\037 {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->ClearSyntax();
 		this->Run(source, params[0], params[1], params[2]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

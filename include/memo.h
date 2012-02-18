@@ -38,8 +38,8 @@ class CoreExport Memo : public Flags<MemoFlag>, public Serializable
  public:
  	Memo();
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
+	Anope::string serialize_name() const anope_override;
+	serialized_data serialize() anope_override;
 	static void unserialize(serialized_data &);
 
 	Anope::string owner;

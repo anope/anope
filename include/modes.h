@@ -304,7 +304,7 @@ class CoreExport ChannelModeKey : public ChannelModeParam
  public:
 	ChannelModeKey(char modeChar) : ChannelModeParam(CMODE_KEY, modeChar) { }
 
-	bool IsValid(const Anope::string &value) const;
+	bool IsValid(const Anope::string &value) const anope_override;
 };
 
 /** This class is used for channel mode +A (Admin only)
@@ -316,7 +316,7 @@ class CoreExport ChannelModeAdmin : public ChannelMode
 	ChannelModeAdmin(char modeChar) : ChannelMode(CMODE_ADMINONLY, modeChar) { }
 
 	/* Opers only */
-	bool CanSet(User *u) const;
+	bool CanSet(User *u) const anope_override;
 };
 
 /** This class is used for channel mode +O (Opers only)
@@ -328,7 +328,7 @@ class CoreExport ChannelModeOper : public ChannelMode
 	ChannelModeOper(char modeChar) : ChannelMode(CMODE_OPERONLY, modeChar) { }
 
 	/* Opers only */
-	bool CanSet(User *u) const;
+	bool CanSet(User *u) const anope_override;
 };
 
 /** This class is used for channel mode +r (registered channel)
@@ -340,7 +340,7 @@ class CoreExport ChannelModeRegistered : public ChannelMode
 	ChannelModeRegistered(char modeChar) : ChannelMode(CMODE_REGISTERED, modeChar) { }
 
 	/* No one mlocks +r */
-	bool CanSet(User *u) const;
+	bool CanSet(User *u) const anope_override;
 };
 
 enum StackerType

@@ -38,7 +38,7 @@ class BadwordsDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from %s bad words list."), Deleted, ci->name.c_str());
 	}
 
-	void HandleNumber(unsigned Number)
+	void HandleNumber(unsigned Number) anope_override
 	{
 		if (!Number || Number > ci->GetBadWordCount())
 			return;
@@ -76,7 +76,7 @@ class CommandBSBadwords : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number || Number > ci->GetBadWordCount())
 						return;
@@ -229,7 +229,7 @@ class CommandBSBadwords : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[1];
 		const Anope::string &word = params.size() > 2 ? params[2] : "";
@@ -274,7 +274,7 @@ class CommandBSBadwords : public Command
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

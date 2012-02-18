@@ -22,7 +22,7 @@ class CommandCSRegister : public Command
 		this->SetSyntax(_("\037channel\037 [\037description\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &chdesc = params.size() > 1 ? params[1] : "";
@@ -101,7 +101,7 @@ class CommandCSRegister : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -142,7 +142,7 @@ class CSRegister : public Module
 		ModuleManager::Attach(I_OnDelChan, this);
 	}
 
-	void OnDelChan(ChannelInfo *ci)
+	void OnDelChan(ChannelInfo *ci) anope_override
 	{
 		if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
 			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);

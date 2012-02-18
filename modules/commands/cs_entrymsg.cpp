@@ -29,12 +29,12 @@ struct EntryMsg : Serializable
 		this->when = ct;
 	}
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "EntryMsg";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data data;
 
@@ -167,7 +167,7 @@ class CommandEntryMessage : public Command
 		this->SetSyntax(_("\037channel\037 {ADD|DEL|LIST|CLEAR} [\037message\037|\037num\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -208,7 +208,7 @@ class CommandEntryMessage : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -233,7 +233,7 @@ class CSEntryMessage : public Module
 		this->OnReload();
 	}
 
-	void OnJoinChannel(User *u, Channel *c)
+	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
 		if (u && c && c->ci && u->server->IsSynced())
 		{
@@ -245,7 +245,7 @@ class CSEntryMessage : public Module
 		}
 	}
 		
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		MaxEntries = config.ReadInteger("cs_entrymsg", "maxentries", "5", 0, true);

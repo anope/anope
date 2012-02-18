@@ -23,7 +23,7 @@ class CommandHelp : public Command
 		this->SetFlag(CFLAG_ALLOW_UNREGISTERED);
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		EventReturn MOD_RESULT;
 		FOREACH_RESULT(I_OnPreHelp, OnPreHelp(source, params));

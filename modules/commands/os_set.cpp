@@ -172,7 +172,7 @@ class CommandOSSet : public Command
 		this->SetSyntax(_("\037option\037 \037setting\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &option = params[0];
 
@@ -192,7 +192,7 @@ class CommandOSSet : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		if (subcommand.empty())
 		{

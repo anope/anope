@@ -90,14 +90,14 @@ class CommandCSOp : public CommandModeBase
 		this->SetDesc(_("Gives Op status to a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "OPDEOP", "OPDEOPME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -119,14 +119,14 @@ class CommandCSDeOp : public CommandModeBase
 		this->SetDesc(_("Deops a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OP);
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "OPDEOP", "OPDEOPME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -148,14 +148,14 @@ class CommandCSVoice : public CommandModeBase
 		this->SetDesc(_("Voices a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "VOICE", "VOICEME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -178,14 +178,14 @@ class CommandCSDeVoice : public CommandModeBase
 		this->SetDesc(_("Devoices a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_VOICE);
 
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "VOICE", "VOICEME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -208,7 +208,7 @@ class CommandCSHalfOp : public CommandModeBase
 		this->SetDesc(_("Halfops a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
@@ -218,7 +218,7 @@ class CommandCSHalfOp : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "HALFOP", "HALFOPME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -241,7 +241,7 @@ class CommandCSDeHalfOp : public CommandModeBase
 		this->SetDesc(_("Dehalfops a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_HALFOP);
 
@@ -251,7 +251,7 @@ class CommandCSDeHalfOp : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "HALFOP", "HALFOPME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -274,7 +274,7 @@ class CommandCSProtect : public CommandModeBase
 		this->SetDesc(_("Protects a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
@@ -284,7 +284,7 @@ class CommandCSProtect : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "PROTECT", "PROTECTME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -306,7 +306,7 @@ class CommandCSDeProtect : public CommandModeBase
 		this->SetDesc(_("Deprotects a selected nick on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_PROTECT);
 
@@ -316,7 +316,7 @@ class CommandCSDeProtect : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "PROTECT", "PROTECTME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -338,7 +338,7 @@ class CommandCSOwner : public CommandModeBase
 		this->SetDesc(_("Gives you owner status on channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
@@ -348,7 +348,7 @@ class CommandCSOwner : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", true, "OWNER", "OWNERME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -369,7 +369,7 @@ class CommandCSDeOwner : public CommandModeBase
 		this->SetDesc(_("Removes your owner status on a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(CMODE_OWNER);
 
@@ -379,7 +379,7 @@ class CommandCSDeOwner : public CommandModeBase
 		return do_util(source, this, cm, !params.empty() ? params[0] : "", params.size() > 1 ? params[1] : "", false, "OWNER", "OWNERME");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

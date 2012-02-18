@@ -19,12 +19,12 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 
 	AJoinList(NickCore *n) : nc(n) { }
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "AJoinList";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data sd;
 
@@ -150,7 +150,7 @@ class CommandNSAJoin : public Command
 		this->SetSyntax(_("{ADD | DEL | LIST} [\037channel\037] [\037key\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0].equals_ci("LIST"))
 			this->DoList(source, params);
@@ -166,7 +166,7 @@ class CommandNSAJoin : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -191,7 +191,7 @@ class NSAJoin : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
 

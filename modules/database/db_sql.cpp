@@ -16,12 +16,12 @@ class SQLSQLInterface : public SQLInterface
  public:
 	SQLSQLInterface(Module *o) : SQLInterface(o) { }
 
-	void OnResult(const SQLResult &r)
+	void OnResult(const SQLResult &r) anope_override
 	{
 		Log(LOG_DEBUG) << "SQL successfully executed query: " << r.finished_query;
 	}
 
-	void OnError(const SQLResult &r)
+	void OnError(const SQLResult &r) anope_override
 	{
 		if (!r.GetQuery().query.empty())
 			Log(LOG_DEBUG) << "Error executing query " << r.finished_query << ": " << r.GetError();
@@ -111,14 +111,14 @@ class DBSQL : public Module
 		this->OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->sql = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
-	EventReturn OnSaveDatabase()
+	EventReturn OnSaveDatabase() anope_override
 	{
 		if (!this->sql)
 		{
@@ -157,7 +157,7 @@ class DBSQL : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnLoadDatabase()
+	EventReturn OnLoadDatabase() anope_override
 	{
 		if (!this->sql)
 		{

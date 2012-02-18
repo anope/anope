@@ -121,7 +121,7 @@ class CoreExport DNSRequest : public Timer, public Question
 
 	virtual void OnError(const DNSQuery *r);
 	
-	void Tick(time_t);
+	void Tick(time_t) anope_override;
 };
 
 /** A full packet sent or recieved to/from the nameserver, may contain multiple queries
@@ -182,7 +182,7 @@ class CoreExport DNSManager : public Timer, public Socket
 
 	/** Tick this timer, used to clear the DNS cache.
 	 */
-	void Tick(time_t now);
+	void Tick(time_t now) anope_override;
 
 	/** Cleanup all pending DNS queries for a module
 	 * @param mod The module

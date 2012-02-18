@@ -23,7 +23,7 @@ class CommandCSKick : public Command
 		this->SetSyntax(_("\037channel\037 \037mask\037 [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &target = params[1];
@@ -105,7 +105,7 @@ class CommandCSKick : public Command
 			source.Reply(NICK_X_NOT_IN_USE, target.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

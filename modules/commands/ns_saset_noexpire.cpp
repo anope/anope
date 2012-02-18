@@ -22,7 +22,7 @@ class CommandNSSASetNoexpire : public Command
 		this->SetSyntax(_("\037nickname\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		NickAlias *na = findnick(params[0]);
 		if (na == NULL)
@@ -49,7 +49,7 @@ class CommandNSSASetNoexpire : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

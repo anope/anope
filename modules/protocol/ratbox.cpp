@@ -43,40 +43,40 @@ IRCDVar myIrcd[] = {
 
 class RatboxProto : public IRCDProto
 {
-	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf)
+	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "OPERWALL :" << buf;
 	}
 
-	void SendSQLine(User *, const XLine *x)
+	void SendSQLine(User *, const XLine *x) anope_override
 	{
 		UplinkSocket::Message(Me->GetSID()) << "RESV * " << x->Mask << " :" << x->Reason;
 	}
 
-	void SendSGLineDel(const XLine *x)
+	void SendSGLineDel(const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNXLINE * " << x->Mask;
 	}
 
-	void SendSGLine(User *, const XLine *x)
+	void SendSGLine(User *, const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
 	}
 
-	void SendAkillDel(const XLine *x)
+	void SendAkillDel(const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
-	void SendSQLineDel(const XLine *x)
+	void SendSQLineDel(const XLine *x) anope_override
 	{
 		UplinkSocket::Message(Me->GetSID()) << "UNRESV * " << x->Mask;
 	}
 
-	void SendJoin(User *user, Channel *c, const ChannelStatus *status)
+	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
 		/* Note that we must send our modes with the SJOIN and
 		 * can not add them to the mode stacker because ratbox
@@ -92,7 +92,7 @@ class RatboxProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(User *, const XLine *x)
+	void SendAkill(User *, const XLine *x) anope_override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
@@ -102,18 +102,18 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf)
+	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "KILL " << user->GetUID() << " :" << buf;
 	}
 
 	/* SERVER name hop descript */
-	void SendServer(const Server *server)
+	void SendServer(const Server *server) anope_override
 	{
 		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 	}
 
-	void SendConnect()
+	void SendConnect() anope_override
 	{
 		UplinkSocket::Message() << "PASS " << Config->Uplinks[CurrentUplink]->password << " TS 6 :" << Me->GetSID();
 		/*
@@ -148,13 +148,13 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message() << "SVINFO 6 3 0 :" << Anope::CurTime;
 	}
 
-	void SendClientIntroduction(const User *u)
+	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
 		UplinkSocket::Message(Me->GetSID()) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
 	}
 
-	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf)
+	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf) anope_override
 	{
 		if (!buf.empty())
 			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name << " :" << buf;
@@ -162,17 +162,17 @@ class RatboxProto : public IRCDProto
 			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "MODE " << dest->name << " " << buf;
 	}
 
-	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf)
+	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
 		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "SVSMODE " << u->nick << " " << buf;
 	}
 
-	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf)
+	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf) anope_override
 	{
 		if (!buf.empty())
 			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
@@ -181,13 +181,13 @@ class RatboxProto : public IRCDProto
 	}
 
 	/* INVITE */
-	void SendInvite(BotInfo *source, const Anope::string &chan, const Anope::string &nick)
+	void SendInvite(const BotInfo *source, const Anope::string &chan, const Anope::string &nick) anope_override
 	{
 		User *u = finduser(nick);
 		UplinkSocket::Message(source->GetUID()) << "INVITE " << (u ? u->GetUID() : nick) << " " << chan;
 	}
 
-	void SendLogin(User *u)
+	void SendLogin(User *u) anope_override
 	{
 		if (!u->Account())
 			return;
@@ -195,12 +195,12 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
 	}
 
-	void SendLogout(User *u)
+	void SendLogout(User *u) anope_override
 	{
 		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID();
 	}
 
-	void SendChannel(Channel *c)
+	void SendChannel(Channel *c) anope_override
 	{
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
@@ -208,7 +208,7 @@ class RatboxProto : public IRCDProto
 		UplinkSocket::Message() << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 
-	bool IsNickValid(const Anope::string &nick)
+	bool IsNickValid(const Anope::string &nick) anope_override
 	{
 		/* TS6 Save extension -Certus */
 		if (isdigit(nick[0]))
@@ -217,7 +217,7 @@ class RatboxProto : public IRCDProto
 		return true;
 	}
 
-	void SendTopic(BotInfo *bi, Channel *c)
+	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
 		bool needjoin = c->FindUser(bi) == NULL;
 		if (needjoin)
@@ -239,7 +239,7 @@ class RatboxIRCdMessage : public IRCdMessage
 	 * params[0] = ts
 	 * params[1] = channel
 	 */
-	bool OnJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnJoin(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() < 2)
 			return IRCdMessage::OnJoin(source, params);
@@ -247,7 +247,7 @@ class RatboxIRCdMessage : public IRCdMessage
 		return true;
 	}
 
-	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnMode(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params.size() < 2)
 			return true;
@@ -260,7 +260,7 @@ class RatboxIRCdMessage : public IRCdMessage
 		return true;
 	}
 
-	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		/* Source is always the server */
 		User *user = do_nick("", params[0], params[4], params[5], source, params[8], Anope::string(params[2]).is_pos_number_only() ? convertTo<time_t>(params[2]) : 0, params[6], "*", params[7], params[3]);
@@ -281,14 +281,14 @@ class RatboxIRCdMessage : public IRCdMessage
 	  params[7] = UID
 	  params[8] = info
 	*/
-	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnNick(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		do_nick(source, params[0], "", "", "", "", Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0, "", "", "", "");
 
 		return true;
 	}
 
-	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnServer(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[1].equals_cs("1"))
 			do_server(source, params[0], Anope::string(params[1]).is_pos_number_only() ? convertTo<unsigned>(params[1]) : 0, params[2], TS6UPLINK);
@@ -298,7 +298,7 @@ class RatboxIRCdMessage : public IRCdMessage
 		return true;
 	}
 
-	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnTopic(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = findchan(params[0]);
 		if (!c)
@@ -318,7 +318,7 @@ class RatboxIRCdMessage : public IRCdMessage
 		return true;
 	}
 
-	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnSJoin(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		Channel *c = findchan(params[1]);
 		time_t ts = Anope::string(params[0]).is_pos_number_only() ? convertTo<time_t>(params[0]) : 0;
@@ -598,7 +598,7 @@ class ProtoRatbox : public Module
 	}
 
 
-	void OnServerSync(Server *s)
+	void OnServerSync(Server *s) anope_override
 	{
 		if (nickserv)
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)

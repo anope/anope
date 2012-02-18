@@ -21,19 +21,19 @@ class MySessionService : public SessionService
  public:
 	MySessionService(Module *m) : SessionService(m) { }
 
-	void AddException(Exception *e)
+	void AddException(Exception *e) anope_override
 	{
 		this->Exceptions.push_back(e);
 	}
 
-	void DelException(Exception *e)
+	void DelException(Exception *e) anope_override
 	{
 		ExceptionVector::iterator it = std::find(this->Exceptions.begin(), this->Exceptions.end(), e);
 		if (it != this->Exceptions.end())
 			this->Exceptions.erase(it);
 	}
 
-	Exception *FindException(User *u)
+	Exception *FindException(User *u) anope_override
 	{
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
 		{
@@ -44,7 +44,7 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	Exception *FindException(const Anope::string &host)
+	Exception *FindException(const Anope::string &host) anope_override
 	{
 		for (std::vector<Exception *>::const_iterator it = this->Exceptions.begin(), it_end = this->Exceptions.end(); it != it_end; ++it)
 		{
@@ -56,22 +56,22 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	ExceptionVector &GetExceptions()
+	ExceptionVector &GetExceptions() anope_override
 	{
 		return this->Exceptions;
 	}
 
-	void AddSession(Session *s)
+	void AddSession(Session *s) anope_override
 	{
 		this->Sessions[s->host] = s;
 	}
 
-	void DelSession(Session *s)
+	void DelSession(Session *s) anope_override
 	{
 		this->Sessions.erase(s->host);
 	}
 
-	Session *FindSession(const Anope::string &mask)
+	Session *FindSession(const Anope::string &mask) anope_override
 	{
 		SessionMap::iterator it = this->Sessions.find(mask);
 		if (it != this->Sessions.end())
@@ -79,7 +79,7 @@ class MySessionService : public SessionService
 		return NULL;
 	}
 
-	SessionMap &GetSessions()
+	SessionMap &GetSessions() anope_override
 	{
 		return this->Sessions;
 	}
@@ -90,7 +90,7 @@ class ExpireTimer : public Timer
  public:
 	ExpireTimer() : Timer(Config->ExpireTimeout, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		if (!session_service)
 			return;
@@ -127,7 +127,7 @@ class ExceptionDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from session-limit exception list."), Deleted);
 	}
 
-	virtual void HandleNumber(unsigned Number)
+	virtual void HandleNumber(unsigned Number) anope_override
 	{
 		if (!Number || Number > session_service->GetExceptions().size())
 			return;
@@ -217,7 +217,7 @@ class CommandOSSession : public Command
 		this->SetSyntax(_("VIEW \037host\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -237,7 +237,7 @@ class CommandOSSession : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -451,7 +451,7 @@ class CommandOSException : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number || Number > session_service->GetExceptions().size())
 						return;
@@ -531,7 +531,7 @@ class CommandOSException : public Command
 		this->SetSyntax(_("VIEW [\037mask\037 | \037list\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -557,7 +557,7 @@ class CommandOSException : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -702,13 +702,13 @@ class OSSession : public Module
 		ModuleManager::SetPriority(this, PRIORITY_FIRST);
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)
+	void OnUserConnect(dynamic_reference<User> &user, bool &exempt) anope_override
 	{
 		if (user && Config->LimitSessions)
 			this->AddSession(user, exempt);
 	}
 
-	void OnUserLogoff(User *u)
+	void OnUserLogoff(User *u) anope_override
 	{
 		if (Config->LimitSessions && (!u->server || !u->server->IsULined()))
 			this->DelSession(u);

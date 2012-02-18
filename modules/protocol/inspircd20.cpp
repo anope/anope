@@ -52,7 +52,7 @@ static bool has_svsholdmod = false;
 
 class InspIRCdProto : public InspIRCdTS6Proto
 {
-	void SendConnect()
+	void SendConnect() anope_override
 	{
 		UplinkSocket::Message() << "CAPAB START 1202";
 		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202";
@@ -280,7 +280,7 @@ class InspIRCdExtBan : public ChannelModeList
  public:
 	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
-	bool Matches(User *u, const Entry *e)
+	bool Matches(User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->mask;
 
@@ -364,7 +364,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
 	 * last: realname
 	 */
-	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		time_t ts = Anope::string(params[1]).is_pos_number_only() ? convertTo<time_t>(params[1]) : 0;
 
@@ -378,7 +378,7 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 		return true;
 	}
 
-	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0].equals_cs("START"))
 		{
@@ -745,12 +745,12 @@ class ProtoInspIRCd : public Module
 		pmodule_ircd_message(NULL);
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &)
+	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		u->RemoveModeInternal(ModeManager::FindUserModeByName(UMODE_REGISTERED));
 	}
 
-	void OnServerSync(Server *s)
+	void OnServerSync(Server *s) anope_override
 	{
 		if (nickserv)
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)

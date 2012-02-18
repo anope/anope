@@ -132,8 +132,8 @@ class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNa
 	time_t last_seen;				/* When it was seen online for the last time */
 	NickCore *nc;					/* I'm an alias of this */
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
+	Anope::string serialize_name() const anope_override;
+	serialized_data serialize() anope_override;
 	static void unserialize(serialized_data &);
 
 	/** Release a nick
@@ -216,8 +216,8 @@ class CoreExport NickCore : public Base, public Extensible, public Flags<NickCor
 	time_t lastmail;				/* Last time this nick record got a mail */
 	std::list<NickAlias *> aliases;	/* List of aliases */
 
-	Anope::string serialize_name() const;
-	serialized_data serialize();
+	Anope::string serialize_name() const anope_override;
+	serialized_data serialize() anope_override;
 	static void unserialize(serialized_data &);
 
 	/** Checks whether this account is a services oper or not.

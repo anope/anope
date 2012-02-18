@@ -22,7 +22,7 @@ class CommandNSDrop : public Command
 		this->SetDesc(_("Cancel the registration of a nickname"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		Anope::string nick = !params.empty() ? params[0] : "";
@@ -81,7 +81,7 @@ class CommandNSDrop : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		User *u = source.u;
 		if (u->Account() && u->HasPriv("nickserv/drop"))

@@ -23,7 +23,7 @@ class CommandBSKick : public Command
 		this->SetSyntax(_("\037channel\037 \037option\037 {\037ON|\037} [\037settings\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];
@@ -459,7 +459,7 @@ class CommandBSKick : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		if (subcommand.empty())
 		{
@@ -626,7 +626,7 @@ struct BanData : public ExtensibleItem
 		}
 	}
 
-	void OnDelete()
+	void OnDelete() anope_override
 	{
 		delete this;
 	}
@@ -659,7 +659,7 @@ struct UserData : public ExtensibleItem
 
 	Anope::string lastline;
 
-	void OnDelete()
+	void OnDelete() anope_override
 	{
 		delete this;
 	}
@@ -671,7 +671,7 @@ class BanDataPurger : public CallBack
  public:
 	BanDataPurger(Module *owner) : CallBack(owner, 300, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		Log(LOG_DEBUG) << "bs_main: Running bandata purger";
 
@@ -785,7 +785,7 @@ class BSKick : public Module
 		}
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg)
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
 	{
 		/* Now we can make kicker stuff. We try to order the checks
 		 * from the fastest one to the slowest one, since there's

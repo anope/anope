@@ -41,12 +41,12 @@ class CommandNSSetDisplay : public Command
 		source.Reply(NICK_SET_DISPLAY_CHANGED, user_na->nc->display.c_str());
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, source.u->Account()->display, params[0]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -65,12 +65,12 @@ class CommandNSSASetDisplay : public CommandNSSetDisplay
 		this->SetSyntax(_("\037nickname\037 \037new-display\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		this->Run(source, params[0], params[1]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

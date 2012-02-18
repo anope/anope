@@ -268,7 +268,7 @@ class InspIRCdExtBan : public ChannelModeList
  public:
 	InspIRCdExtBan(ChannelModeName mName, char modeChar) : ChannelModeList(mName, modeChar) { }
 
-	bool Matches(User *u, const Entry *e)
+	bool Matches(User *u, const Entry *e) anope_override
 	{
 		const Anope::string &mask = e->mask;
 
@@ -330,7 +330,7 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 	 * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
 	 * last: realname
 	 */
-	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnUID(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		time_t ts = convertTo<time_t>(params[1]);
 
@@ -344,7 +344,7 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 		return true;
 	}
 
-	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params)
+	bool OnCapab(const Anope::string &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (params[0].equals_cs("START"))
 		{
@@ -733,7 +733,7 @@ class ProtoInspIRCd : public Module
 	}
 
 
-	void OnUserNickChange(User *u, const Anope::string &)
+	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		/* InspIRCd 1.2 doesn't set -r on nick change, remove -r here. Note that if we have to set +r later
 		 * this will cancel out this -r, resulting in no mode changes.
@@ -741,7 +741,7 @@ class ProtoInspIRCd : public Module
 		u->RemoveMode(findbot(Config->NickServ), UMODE_REGISTERED);
 	}
 
-	void OnServerSync(Server *s)
+	void OnServerSync(Server *s) anope_override
 	{
 		if (nickserv)
 			for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)

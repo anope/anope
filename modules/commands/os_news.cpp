@@ -258,12 +258,12 @@ class CommandOSLogonNews : public NewsBase
 		this->SetDesc(_("Define messages to be shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoNews(source, params, NEWS_LOGON);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -287,12 +287,12 @@ class CommandOSOperNews : public NewsBase
 		this->SetDesc(_("Define messages to be shown to users who oper"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoNews(source, params, NEWS_OPER);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -316,12 +316,12 @@ class CommandOSRandomNews : public NewsBase
 		this->SetDesc(_("Define messages to be randomly shown to users at logon"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoNews(source, params, NEWS_RANDOM);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -399,13 +399,13 @@ class OSNews : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name)
+	void OnUserModeSet(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_OPER)
 			DisplayNews(u, NEWS_OPER);
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &)
+	void OnUserConnect(dynamic_reference<User> &user, bool &) anope_override
 	{
 		if (!user || !user->server->IsSynced())
 			return;

@@ -66,7 +66,7 @@ void SocketEngine::AddSocket(Socket *s)
 	if (epoll_ctl(EngineHandle, EPOLL_CTL_ADD, ev.data.fd, &ev) == -1)
 		throw SocketException("Unable to add fd " + stringify(ev.data.fd) + " to epoll: " + Anope::LastError());
 
-	Sockets.insert(std::make_pair(ev.data.fd, s));
+	Sockets[ev.data.fd] = s;
 }
 
 void SocketEngine::DelSocket(Socket *s)

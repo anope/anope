@@ -22,7 +22,7 @@ class CommandHSList : public Command
 		this->SetSyntax(_("\002[<key>|<#X-Y>]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &key = !params.empty() ? params[0] : "";
 		int from = 0, to = 0, counter = 1;
@@ -131,7 +131,7 @@ class CommandHSList : public Command
 			source.Reply(replies[i]);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

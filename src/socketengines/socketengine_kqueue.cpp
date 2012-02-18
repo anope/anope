@@ -75,7 +75,7 @@ void SocketEngine::AddSocket(Socket *s)
 	struct kevent *event = GetChangeEvent();
 	EV_SET(event, s->GetFD(), EVFILT_READ, EV_ADD, 0, 0, NULL);
 
-	Sockets.insert(std::make_pair(s->GetFD(), s));
+	Sockets[s->GetFD()] = s;
 }
 
 void SocketEngine::DelSocket(Socket *s)

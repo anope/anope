@@ -22,7 +22,7 @@ class CommandBSAssign : public Command
 		this->SetSyntax(_("\037channel\037 \037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &nick = params[1];
@@ -74,7 +74,7 @@ class CommandBSAssign : public Command
 		source.Reply(_("Bot \002%s\002 has been assigned to %s."), bi->nick.c_str(), ci->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -94,7 +94,7 @@ class CommandBSUnassign : public Command
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -136,7 +136,7 @@ class CommandBSUnassign : public Command
 		source.Reply(_("There is no bot assigned to %s anymore."), ci->name.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

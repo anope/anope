@@ -22,7 +22,7 @@ class CommandOSQuit : public Command
 		this->SetSyntax("");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		quitmsg = "QUIT command received from " + u->nick;
@@ -30,7 +30,7 @@ class CommandOSQuit : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -51,7 +51,7 @@ class CommandOSRestart : public Command
 		this->SetSyntax("");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		quitmsg = "RESTART command received from " + u->nick;
@@ -60,7 +60,7 @@ class CommandOSRestart : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(_("Causes Services to save all databases and then restart\n"
@@ -78,7 +78,7 @@ class CommandOSShutdown : public Command
 		this->SetSyntax("");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		quitmsg = source.command + " command received from " + u->nick;
@@ -87,7 +87,7 @@ class CommandOSShutdown : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

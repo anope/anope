@@ -39,7 +39,7 @@ class MyMemoServService : public MemoServService
  public:
 	MyMemoServService(Module *m) : MemoServService(m) { }
 
- 	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan)
+ 	MemoInfo *GetMemoInfo(const Anope::string &target, bool &ischan) anope_override
 	{
 		if (!target.empty() && target[0] == '#')
 		{
@@ -59,7 +59,7 @@ class MyMemoServService : public MemoServService
 		return NULL;
 	}
 
-	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force)
+	MemoResult Send(const Anope::string &source, const Anope::string &target, const Anope::string &message, bool force) anope_override
 	{
 		bool ischan;
 		MemoInfo *mi = this->GetMemoInfo(target, ischan);
@@ -175,12 +175,12 @@ class MemoServCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		this->mymemoserv.Check(u);
 	}
 
-	void OnJoinChannel(User *u, Channel *c)
+	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
 		if (c->ci && c->ci->AccessFor(u).HasPriv("MEMO") && c->ci->memos.memos.size() > 0)
 		{
@@ -191,18 +191,18 @@ class MemoServCore : public Module
 		}
 	}
 
-	void OnUserAway(User *u, const Anope::string &message)
+	void OnUserAway(User *u, const Anope::string &message) anope_override
 	{
 		if (message.empty())
 			this->mymemoserv.Check(u);
 	}
 
-	void OnNickUpdate(User *u)
+	void OnNickUpdate(User *u) anope_override
 	{
 		this->mymemoserv.Check(u);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->MemoServ)
 			return EVENT_CONTINUE;
@@ -215,7 +215,7 @@ class MemoServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->MemoServ)
 			return;

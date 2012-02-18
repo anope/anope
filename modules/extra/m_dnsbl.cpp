@@ -28,7 +28,7 @@ class DNSBLResolver : public DNSRequest
  public:
 	DNSBLResolver(Module *c, User *u, const Blacklist &b, const Anope::string &host, bool add_akill) : DNSRequest(host, DNS_QUERY_A, true, c), user(u), blacklist(b), add_to_akill(add_akill) { }
 
-	void OnLookupComplete(const DNSQuery *record)
+	void OnLookupComplete(const DNSQuery *record) anope_override
 	{
 		if (!user || user->HasExt("m_dnsbl_akilled"))
 			return;
@@ -95,7 +95,7 @@ class ModuleDNSBL : public Module
 		OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 
@@ -126,7 +126,7 @@ class ModuleDNSBL : public Module
 		}
 	}
 
-	void OnUserConnect(dynamic_reference<User> &user, bool &exempt)
+	void OnUserConnect(dynamic_reference<User> &user, bool &exempt) anope_override
 	{
 		if (exempt || !user || (!this->check_on_connect && !Me->IsSynced()))
 			return;

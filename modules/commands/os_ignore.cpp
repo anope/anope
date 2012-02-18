@@ -19,7 +19,7 @@ class OSIgnoreService : public IgnoreService
  public:
 	OSIgnoreService(Module *o) : IgnoreService(o) { }
 
-	void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime)
+	void AddIgnore(const Anope::string &mask, const Anope::string &creator, const Anope::string &reason, time_t delta = Anope::CurTime) anope_override
 	{
 		/* If it s an existing user, we ignore the hostmask. */
 		Anope::string realmask = mask;
@@ -67,7 +67,7 @@ class OSIgnoreService : public IgnoreService
 		}
 	}
 
-	bool DelIgnore(const Anope::string &mask)
+	bool DelIgnore(const Anope::string &mask) anope_override
 	{
 		for (std::list<IgnoreData>::iterator it = this->ignores.begin(), it_end = this->ignores.end(); it != it_end; ++it)
 		{
@@ -82,7 +82,7 @@ class OSIgnoreService : public IgnoreService
 		return false;
 	}
 
-	IgnoreData *Find(const Anope::string &mask)
+	IgnoreData *Find(const Anope::string &mask) anope_override
 	{
 		User *u = finduser(mask);
 		std::list<IgnoreData>::iterator ign = this->ignores.begin(), ign_end = this->ignores.end();
@@ -263,7 +263,7 @@ class CommandOSIgnore : public Command
 		this->SetSyntax(_("CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -281,7 +281,7 @@ class CommandOSIgnore : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -318,7 +318,7 @@ class OSIgnore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		if (!u->HasMode(UMODE_OPER) && this->osignoreservice.Find(u->nick))
 			return EVENT_STOP;

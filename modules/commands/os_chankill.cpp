@@ -24,7 +24,7 @@ class CommandOSChanKill : public Command
 		this->SetSyntax(_("[+\037expiry\037] \037channel\037 \037reason\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!akills)
 			return;
@@ -93,7 +93,7 @@ class CommandOSChanKill : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

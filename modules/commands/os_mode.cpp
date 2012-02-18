@@ -22,7 +22,7 @@ class CommandOSMode : public Command
 		this->SetSyntax(_("\037channel\037 \037modes\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		const Anope::string &target = params[0];
@@ -41,7 +41,7 @@ class CommandOSMode : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -60,7 +60,7 @@ class CommandOSUMode : public Command
 		this->SetSyntax(_("\037user\037 \037modes\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		const Anope::string &target = params[0];
@@ -80,7 +80,7 @@ class CommandOSUMode : public Command
 		}
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

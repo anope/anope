@@ -40,11 +40,11 @@ class SQLiteService : public SQLProvider
 
 	~SQLiteService();
 
-	void Run(SQLInterface *i, const SQLQuery &query);
+	void Run(SQLInterface *i, const SQLQuery &query) anope_override;
 
 	SQLResult RunQuery(const SQLQuery &query);
 
-	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data);
+	SQLQuery CreateTable(const Anope::string &table, const Serializable::serialized_data &data) anope_override;
 
 	SQLQuery GetTables();
 
@@ -71,7 +71,7 @@ class ModuleSQLite : public Module
 		SQLiteServices.clear();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		int i, num;
@@ -158,22 +158,17 @@ SQLResult SQLiteService::RunQuery(const SQLQuery &query)
 
 	SQLiteResult result(query, real_query);
 
-	do
+	while ((err = sqlite3_step(stmt)) == SQLITE_ROW)
 	{
-		err = sqlite3_step(stmt);
-		if (err == SQLITE_ROW)
+		std::map<Anope::string, Anope::string> items;
+		for (int i = 0; i < cols; ++i)
 		{
-			std::map<Anope::string, Anope::string> items;
-			for (int i = 0; i < cols; ++i)
-			{
-				const char *data = reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
-				if (data && *data)
-					items[columns[i]] = data;
-			}
-			result.addRow(items);
+			const char *data = reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+			if (data && *data)
+				items[columns[i]] = data;
 		}
+		result.addRow(items);
 	}
-	while (err == SQLITE_ROW);
 
 	sqlite3_finalize(stmt);
 

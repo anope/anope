@@ -57,7 +57,7 @@ class CoreExport NickServCollide : public Timer
 	/** Called when the delay is up
 	 * @param t The current time
 	 */
-	void Tick(time_t t)
+	void Tick(time_t t) anope_override
 	{
 		if (!u)
 			return;
@@ -75,7 +75,7 @@ class MyNickServService : public NickServService
  public:
 	MyNickServService(Module *m) : NickServService(m) { }
 
-	void Validate(User *u)
+	void Validate(User *u) anope_override
 	{
 		NickAlias *na = findnick(u->nick);
 		if (!na)
@@ -143,7 +143,7 @@ class ExpireCallback : public CallBack
  public:
 	ExpireCallback(Module *owner) : CallBack(owner, Config->ExpireTimeout, Anope::CurTime, true) { }
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		if (noexpire || readonly)
 			return;
@@ -201,7 +201,7 @@ class NickServCore : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnDelNick(NickAlias *na)
+	void OnDelNick(NickAlias *na) anope_override
 	{
 		User *u = finduser(na->nick);
 		if (u && u->Account() == na->nc)
@@ -212,7 +212,7 @@ class NickServCore : public Module
 		}
 	}
 
-	void OnDelCore(NickCore *nc)
+	void OnDelCore(NickCore *nc) anope_override
 	{
 		Log(NickServ, "nick") << "deleting nickname group " << nc->display;
 
@@ -230,12 +230,12 @@ class NickServCore : public Module
 		nc->Users.clear();
 	}
 
-	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay)
+	void OnChangeCoreDisplay(NickCore *nc, const Anope::string &newdisplay) anope_override
 	{
 		Log(LOG_NORMAL, "nick", NickServ) << "Changing " << nc->display << " nickname group display to " << newdisplay;
 	}
 
-	void OnNickIdentify(User *u)
+	void OnNickIdentify(User *u) anope_override
 	{
 		if (!Config->NoNicknameOwnership)
 		{
@@ -273,13 +273,13 @@ class NickServCore : public Module
 		}
 	}
 
-	void OnNickGroup(User *u, NickAlias *target)
+	void OnNickGroup(User *u, NickAlias *target) anope_override
 	{
 		if (target->nc->HasFlag(NI_UNCONFIRMED) == false)
 			u->SetMode(NickServ, UMODE_REGISTERED);
 	}
 
-	void OnNickUpdate(User *u)
+	void OnNickUpdate(User *u) anope_override
 	{
 		for (UChannelList::iterator it = u->chans.begin(), it_end = u->chans.end(); it != it_end; ++it)
 		{
@@ -290,7 +290,7 @@ class NickServCore : public Module
 		}
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick)
+	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		NickAlias *na = findnick(u->nick);
 		/* If the new nick isnt registerd or its registerd and not yours */
@@ -310,13 +310,13 @@ class NickServCore : public Module
 		}
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name)
+	void OnUserModeSet(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_REGISTERED && !u->IsIdentified())
 			u->RemoveMode(NickServ, Name);
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->NickServ)
 			return EVENT_CONTINUE;
@@ -329,7 +329,7 @@ class NickServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->NickServ)
 			return;

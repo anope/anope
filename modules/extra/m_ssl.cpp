@@ -23,7 +23,7 @@ class MySSLService : public SSLService
 	/** Initialize a socket to use SSL
 	 * @param s The socket
 	 */
-	void Init(Socket *s);
+	void Init(Socket *s) anope_override;
 };
 
 class SSLSocketIO : public SocketIO
@@ -42,43 +42,43 @@ class SSLSocketIO : public SocketIO
 	 * @param sz How much to read
 	 * @return Number of bytes received
 	 */
-	int Recv(Socket *s, char *buf, size_t sz);
+	int Recv(Socket *s, char *buf, size_t sz) anope_override;
 
 	/** Write something to the socket
 	 * @param s The socket
 	 * @param buf The data to write
 	 * @param size The length of the data
 	 */
-	int Send(Socket *s, const char *buf, size_t sz);
+	int Send(Socket *s, const char *buf, size_t sz) anope_override;
 
 	/** Accept a connection from a socket
 	 * @param s The socket
 	 * @return The new socket
 	 */
-	ClientSocket *Accept(ListenSocket *s);
+	ClientSocket *Accept(ListenSocket *s) anope_override;
 
 	/** Finished accepting a connection from a socket
 	 * @param s The socket
 	 * @return SF_ACCEPTED if accepted, SF_ACCEPTING if still in process, SF_DEAD on error
 	 */
-	SocketFlag FinishAccept(ClientSocket *cs);
+	SocketFlag FinishAccept(ClientSocket *cs) anope_override;
 
 	/** Connect the socket
 	 * @param s THe socket
 	 * @param target IP to connect to
 	 * @param port to connect to
 	 */
-	void Connect(ConnectionSocket *s, const Anope::string &target, int port);
+	void Connect(ConnectionSocket *s, const Anope::string &target, int port) anope_override;
 
 	/** Called to potentially finish a pending connection
 	 * @param s The socket
 	 * @return SF_CONNECTED on success, SF_CONNECTING if still pending, and SF_DEAD on error.
 	 */
-	SocketFlag FinishConnect(ConnectionSocket *s);
+	SocketFlag FinishConnect(ConnectionSocket *s) anope_override;
 
 	/** Called when the socket is destructing
 	 */
-	void Destroy();
+	void Destroy() anope_override;
 };
 
 class SSLModule;
@@ -167,7 +167,7 @@ class SSLModule : public Module
 		SSL_CTX_free(server_ctx);
 	}
 
-	void OnPreServerConnect()
+	void OnPreServerConnect() anope_override
 	{
 		ConfigReader config;
 

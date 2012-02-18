@@ -34,7 +34,7 @@ class AkillDelCallback : public NumberList
 			source.Reply(_("Deleted %d entries from the AKILL list."), Deleted);
 	}
 
-	void HandleNumber(unsigned Number)
+	void HandleNumber(unsigned Number) anope_override
 	{
 		if (!Number)
 			return;
@@ -226,7 +226,7 @@ class CommandOSAKill : public Command
 				{
 				}
 
-				void HandleNumber(unsigned number)
+				void HandleNumber(unsigned number) anope_override
 				{
 					if (!number)
 						return;
@@ -337,7 +337,7 @@ class CommandOSAKill : public Command
 		this->SetSyntax(_("CLEAR"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &cmd = params[0];
 
@@ -360,7 +360,7 @@ class CommandOSAKill : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

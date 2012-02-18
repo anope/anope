@@ -24,7 +24,7 @@ class FlagsChanAccess : public ChanAccess
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const
+	bool HasPriv(const Anope::string &priv) const anope_override
 	{
 		std::map<Anope::string, char>::iterator it = defaultFlags.find(priv);
 		if (it != defaultFlags.end() && this->flags.count(it->second) > 0)
@@ -37,7 +37,7 @@ class FlagsChanAccess : public ChanAccess
 		return Anope::string(this->flags.begin(), this->flags.end());
 	}
 
-	void Unserialize(const Anope::string &data)
+	void Unserialize(const Anope::string &data) anope_override
 	{
 		for (unsigned i = data.length(); i > 0; --i)
 			this->flags.insert(data[i - 1]);
@@ -65,7 +65,7 @@ class FlagsAccessProvider : public AccessProvider
 	{
 	}
 
-	ChanAccess *Create()
+	ChanAccess *Create() anope_override
 	{
 		return new FlagsChanAccess(this);
 	}
@@ -300,7 +300,7 @@ class CommandCSFlags : public Command
 		this->SetSyntax(_("\037channel\037 CLEAR\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &cmd = params[1];
@@ -336,7 +336,7 @@ class CommandCSFlags : public Command
 			this->OnSyntaxError(source, cmd);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -394,7 +394,7 @@ class CSFlags : public Module
 		this->OnReload();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		defaultFlags.clear();

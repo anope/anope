@@ -27,7 +27,7 @@ struct ChanSuspend : ExtensibleItem, Serializable
 		return "ChanSuspend";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data sd;
 
@@ -61,7 +61,7 @@ class CommandCSSuspend : public Command
 		this->SetSyntax(_("\037channel\037 [+\037expiry\037] [\037reason\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		Anope::string expiry = params.size() > 1 ? params[1] : "";
@@ -130,7 +130,7 @@ class CommandCSSuspend : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -155,7 +155,7 @@ class CommandCSUnSuspend : public Command
 		this->SetSyntax(_("\037channel\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -192,7 +192,7 @@ class CommandCSUnSuspend : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -228,7 +228,7 @@ class CSSuspend : public Module
 		}
 	}
 
-	void OnPreChanExpire(ChannelInfo *ci, bool &expire)
+	void OnPreChanExpire(ChannelInfo *ci, bool &expire) anope_override
 	{
 		if (!ci->HasFlag(CI_SUSPENDED))
 			return;

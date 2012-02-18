@@ -11,6 +11,7 @@
 /*************************************************************************/
 
 #include "module.h"
+#include <unistd.h>
 
 Anope::string DatabaseFile;
 
@@ -73,13 +74,13 @@ class DBFlatFile : public Module
 		}
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		DatabaseFile = config.ReadValue("db_flatfile", "database", "anope.db", 0);
 	}
 
-	EventReturn OnLoadDatabase()
+	EventReturn OnLoadDatabase() anope_override
 	{
 		std::fstream db;
 		db.open(DatabaseFile.c_str(), std::ios_base::in);
@@ -134,7 +135,7 @@ class DBFlatFile : public Module
 	}
 
 
-	EventReturn OnSaveDatabase()
+	EventReturn OnSaveDatabase() anope_override
 	{
 		BackupDatabase();
 

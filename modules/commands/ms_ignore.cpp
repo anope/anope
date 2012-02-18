@@ -24,7 +24,7 @@ class CommandMSIgnore : public Command
 		this->SetSyntax(_("[\037channel\037] {\002ADD|DEL|LIST\002} [\037entry\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!memoserv)
 			return;
@@ -101,7 +101,7 @@ class CommandMSIgnore : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

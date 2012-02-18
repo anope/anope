@@ -24,7 +24,7 @@ public:
 		this->SetSyntax(_("\037channel\037 \037command\037 \037method\037 [\037status\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &channel = params[0];
 
@@ -151,7 +151,7 @@ public:
 			this->OnSyntaxError(source, "");
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -192,7 +192,7 @@ class CSLog : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnLog(Log *l)
+	void OnLog(Log *l) anope_override
 	{
 		if (l->Type != LOG_COMMAND || l->u == NULL || l->c == NULL || l->ci == NULL || !Me || !Me->IsSynced())
 			return;

@@ -99,7 +99,7 @@ class XOPChanAccess : public ChanAccess
 	{
 	}
 
-	bool HasPriv(const Anope::string &priv) const
+	bool HasPriv(const Anope::string &priv) const anope_override
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -129,7 +129,7 @@ class XOPChanAccess : public ChanAccess
 		return "";
 	}
 
-	void Unserialize(const Anope::string &data)
+	void Unserialize(const Anope::string &data) anope_override
 	{
 		for (int i = 0; xopAccess[i].type != XOP_UNKNOWN; ++i)
 		{
@@ -188,7 +188,7 @@ class XOPAccessProvider : public AccessProvider
 	{
 	}
 
-	ChanAccess *Create()
+	ChanAccess *Create() anope_override
 	{
 		return new XOPChanAccess(this);
 	}
@@ -340,7 +340,7 @@ class XOPBase : public Command
 					}
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -394,17 +394,11 @@ class XOPBase : public Command
 		const Anope::string &nick = params.size() > 2 ? params[2] : "";
 
 		AccessGroup access = ci->AccessFor(u);
-		bool override = false;
 
-		if (!access.HasPriv("ACCESS_LIST"))
+		if (!access.HasPriv("ACCESS_LIST") && !u->HasCommand("chanserv/access/list"))
 		{
-			if (u->HasCommand("chanserv/access/list"))
-				override = true;
-			else
-			{
-				source.Reply(ACCESS_DENIED);
-				return;
-			}
+			source.Reply(ACCESS_DENIED);
+			return;
 		}
 
 		if (!ci->GetAccessCount())
@@ -428,7 +422,7 @@ class XOPBase : public Command
 				{
 				}
 
-				void HandleNumber(unsigned Number)
+				void HandleNumber(unsigned Number) anope_override
 				{
 					if (!Number || Number > ci->GetAccessCount())
 						return;
@@ -567,12 +561,12 @@ class CommandCSQOP : public XOPBase
 		this->SetDesc(_("Modify the list of QOP users"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoXop(source, params, XOP_QOP);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -621,12 +615,12 @@ class CommandCSAOP : public XOPBase
 		this->SetDesc(_("Modify the list of AOP users"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoXop(source, params, XOP_AOP);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -677,12 +671,12 @@ class CommandCSHOP : public XOPBase
 		this->SetDesc(_("Maintains the HOP (HalfOP) list for a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoXop(source, params, XOP_HOP);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -731,12 +725,12 @@ class CommandCSSOP : public XOPBase
 		this->SetDesc(_("Modify the list of SOP users"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoXop(source, params, XOP_SOP);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -786,12 +780,12 @@ class CommandCSVOP : public XOPBase
 		this->SetDesc(_("Maintains the VOP (VOicePeople) list for a channel"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoXop(source, params, XOP_VOP);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

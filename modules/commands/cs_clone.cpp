@@ -22,7 +22,7 @@ public:
 		this->SetSyntax(_("\037channel\037 \037target\037 [\037what\037]"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &channel = params[0];
 		const Anope::string &target = params[1];
@@ -159,7 +159,7 @@ public:
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

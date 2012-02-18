@@ -20,19 +20,19 @@ class SGLineManager : public XLineManager
  public:
 	SGLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sgline", 'G') { }
 
-	void OnMatch(User *u, XLine *x)
+	void OnMatch(User *u, XLine *x) anope_override
 	{
 		if (u)
 			u->Kill(Config->OperServ, x->Reason);
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x)
+	void OnExpire(XLine *x) anope_override
 	{
 		Log(OperServ, "expire/akill") << "AKILL on \2" << x->Mask << "\2 has expired";
 	}
 	
-	void Send(User *u, XLine *x)
+	void Send(User *u, XLine *x) anope_override
 	{
 		try
 		{
@@ -49,7 +49,7 @@ class SGLineManager : public XLineManager
 		}
 	}
 
-	void SendDel(XLine *x)
+	void SendDel(XLine *x) anope_override
 	{
 		try
 		{
@@ -72,7 +72,7 @@ class SQLineManager : public XLineManager
  public:
 	SQLineManager(Module *creator) : XLineManager(creator, "xlinemanager/sqline", 'Q') { }
 
-	void OnMatch(User *u, XLine *x)
+	void OnMatch(User *u, XLine *x) anope_override
 	{
 		if (u)
 		{
@@ -83,17 +83,17 @@ class SQLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x)
+	void OnExpire(XLine *x) anope_override
 	{
 		Log(OperServ, "expire/sqline") << "SQLINE on \2" << x->Mask << "\2 has expired";
 	}
 
-	void Send(User *u, XLine *x)
+	void Send(User *u, XLine *x) anope_override
 	{
 		ircdproto->SendSQLine(u, x);
 	}
 
-	void SendDel(XLine *x)
+	void SendDel(XLine *x) anope_override
 	{
 		ircdproto->SendSQLineDel(x);
 	}
@@ -113,7 +113,7 @@ class SNLineManager : public XLineManager
  public:
 	SNLineManager(Module *creator) : XLineManager(creator, "xlinemanager/snline", 'N') { }
 
-	void OnMatch(User *u, XLine *x)
+	void OnMatch(User *u, XLine *x) anope_override
 	{
 		if (u)
 		{
@@ -123,22 +123,22 @@ class SNLineManager : public XLineManager
 		this->Send(u, x);
 	}
 
-	void OnExpire(XLine *x)
+	void OnExpire(XLine *x) anope_override
 	{
 		Log(OperServ, "expire/snline") << "SNLINE on \2" << x->Mask << "\2 has expired";
 	}
 
-	void Send(User *u, XLine *x)
+	void Send(User *u, XLine *x) anope_override
 	{
 		ircdproto->SendSGLine(u, x);
 	}
 
-	void SendDel(XLine *x)
+	void SendDel(XLine *x) anope_override
 	{
 		ircdproto->SendSGLineDel(x);
 	}
 
-	XLine *Check(User *u)
+	XLine *Check(User *u) anope_override
 	{
 		for (unsigned i = this->GetList().size(); i > 0; --i)
 		{
@@ -198,7 +198,7 @@ class OperServCore : public Module
 		XLineManager::UnregisterXLineManager(&snlines);
 	}
 
-	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message)
+	EventReturn OnBotPrivmsg(User *u, BotInfo *bi, Anope::string &message) anope_override
 	{
 		if (Config->OSOpersOnly && !u->HasMode(UMODE_OPER) && bi->nick == Config->OperServ)
 		{
@@ -210,44 +210,44 @@ class OperServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnServerQuit(Server *server)
+	void OnServerQuit(Server *server) anope_override
 	{
 		if (server->HasFlag(SERVER_JUPED))
 			Log(server, "squit", OperServ) << "Received SQUIT for juped server " << server->GetName();
 	}
 
-	void OnUserModeSet(User *u, UserModeName Name)
+	void OnUserModeSet(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_OPER)
 			Log(u, "oper", OperServ) << "is now an IRC operator.";
 	}
 
-	void OnUserModeUnset(User *u, UserModeName Name)
+	void OnUserModeUnset(User *u, UserModeName Name) anope_override
 	{
 		if (Name == UMODE_OPER)
 			Log(u, "oper", OperServ) << "is no longer an IRC operator";
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)
+	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
 	{
 		if (u && !exempt)
 			XLineManager::CheckAll(u);
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &oldnick)
+	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		if (ircd->sqline && !u->HasMode(UMODE_OPER))
 			this->sqlines.Check(u);
 	}
 
-	EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick)
+	EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick) anope_override
 	{
 		if (this->sqlines.CheckChannel(ci->c))
 			kick = true;
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->OperServ)
 			return EVENT_CONTINUE;

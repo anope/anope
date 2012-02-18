@@ -55,7 +55,7 @@ class CommandBSInfo : public Command
 		this->SetSyntax(_("\002INFO {\037chan\037 | \037nick\037}\002"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &query = params[0];
 
@@ -221,7 +221,7 @@ class CommandBSInfo : public Command
 			source.Reply(_("\002%s\002 is not a valid bot or registered channel."), query.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

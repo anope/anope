@@ -30,12 +30,12 @@ struct HostRequest : ExtensibleItem, Serializable
 	Anope::string host;
 	time_t time;
 
-	Anope::string serialize_name() const
+	Anope::string serialize_name() const anope_override
 	{
 		return "HostRequest";
 	}
 
-	serialized_data serialize()
+	serialized_data serialize() anope_override
 	{
 		serialized_data data;
 
@@ -79,7 +79,7 @@ class CommandHSRequest : public Command
 		this->SetSyntax(_("vhost"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -162,7 +162,7 @@ class CommandHSRequest : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -182,7 +182,7 @@ class CommandHSActivate : public Command
 		this->SetSyntax(_("\037nick\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -206,7 +206,7 @@ class CommandHSActivate : public Command
 			source.Reply(_("No request for nick %s found."), nick.c_str());
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -226,7 +226,7 @@ class CommandHSReject : public Command
 		this->SetDesc(_("Reject the requested vHost of a user"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -259,7 +259,7 @@ class CommandHSReject : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -321,12 +321,12 @@ class CommandHSWaiting : public Command
 		this->SetSyntax("");
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		return this->DoList(source);
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -362,7 +362,7 @@ class HSRequest : public Module
 			it->second->Shrink("hs_request");
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);

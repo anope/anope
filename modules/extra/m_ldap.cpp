@@ -97,7 +97,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return this->Bind(i, this->admin_binddn, this->admin_pass);
 	}
 
-	LDAPQuery Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass)
+	LDAPQuery Bind(LDAPInterface *i, const Anope::string &who, const Anope::string &pass) anope_override
 	{
 		berval cred;
 		cred.bv_val = strdup(pass.c_str());
@@ -120,7 +120,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
-	LDAPQuery Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter)
+	LDAPQuery Search(LDAPInterface *i, const Anope::string &base, const Anope::string &filter) anope_override
 	{
 		if (i == NULL)
 			throw LDAPException("No interface");
@@ -138,7 +138,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
-	LDAPQuery Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes)
+	LDAPQuery Add(LDAPInterface *i, const Anope::string &dn, LDAPMods &attributes) anope_override
 	{
 		LDAPMod **mods = this->BuildMods(attributes);
 		LDAPQuery msgid;
@@ -159,7 +159,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
-	LDAPQuery Del(LDAPInterface *i, const Anope::string &dn)
+	LDAPQuery Del(LDAPInterface *i, const Anope::string &dn) anope_override
 	{
 		LDAPQuery msgid;
 		int ret = ldap_delete_ext(this->con, dn.c_str(), NULL, NULL, &msgid);
@@ -178,7 +178,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
-	LDAPQuery Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes)
+	LDAPQuery Modify(LDAPInterface *i, const Anope::string &base, LDAPMods &attributes) anope_override
 	{
 		LDAPMod **mods = this->BuildMods(attributes);
 		LDAPQuery msgid;
@@ -199,7 +199,7 @@ class LDAPService : public LDAPProvider, public Thread, public Condition
 		return msgid;
 	}
 
-	void Run()
+	void Run() anope_override
 	{
 		while (!this->GetExitState())
 		{
@@ -356,7 +356,7 @@ class ModuleLDAP : public Module, public Pipe
 		LDAPServices.clear();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		int i, num;
@@ -412,7 +412,7 @@ class ModuleLDAP : public Module, public Pipe
 		}
 	}
 
-	void OnModuleUnload(User *, Module *m)
+	void OnModuleUnload(User *, Module *m) anope_override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{
@@ -436,7 +436,7 @@ class ModuleLDAP : public Module, public Pipe
 		} 
 	}
 
-	void OnNotify()
+	void OnNotify() anope_override
 	{
 		for (std::map<Anope::string, LDAPService *>::iterator it = this->LDAPServices.begin(); it != this->LDAPServices.end(); ++it)
 		{

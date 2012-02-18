@@ -54,6 +54,3 @@ void Pipe::Notify()
 	write(this->WritePipe, &dummy, 1);
 }
 
-void Pipe::OnNotify()
-{
-}

@@ -22,7 +22,7 @@ class CommandCSSetSecure : public Command
 		this->SetSyntax(_("\037channel\037 {ON | OFF}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 		ChannelInfo *ci = cs_findchan(params[0]);
@@ -54,7 +54,7 @@ class CommandCSSetSecure : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &)
+	bool OnHelp(CommandSource &source, const Anope::string &) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

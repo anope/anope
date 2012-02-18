@@ -21,12 +21,12 @@ class MyForbidService : public ForbidService
  public:
 	MyForbidService(Module *m) : ForbidService(m) { }
 
-	void AddForbid(ForbidData *d)
+	void AddForbid(ForbidData *d) anope_override
 	{
 		this->forbidData.push_back(d);
 	}
 
-	void RemoveForbid(ForbidData *d)
+	void RemoveForbid(ForbidData *d) anope_override
 	{
 		std::vector<ForbidData *>::iterator it = std::find(this->forbidData.begin(), this->forbidData.end(), d);
 		if (it != this->forbidData.end())
@@ -34,7 +34,7 @@ class MyForbidService : public ForbidService
 		delete d;
 	}
 
-	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype)
+	ForbidData *FindForbid(const Anope::string &mask, ForbidType ftype) anope_override
 	{
 		const std::vector<ForbidData *> &forbids = this->GetForbids();
 		for (unsigned i = forbids.size(); i > 0; --i)
@@ -47,7 +47,7 @@ class MyForbidService : public ForbidService
 		return NULL;
 	}
 
-	const std::vector<ForbidData *> &GetForbids()
+	const std::vector<ForbidData *> &GetForbids() anope_override
 	{
 		for (unsigned i = this->forbidData.size(); i > 0; --i)
 		{
@@ -85,7 +85,7 @@ class CommandOSForbid : public Command
 		this->SetSyntax(_("LIST (NICK|CHAN|EMAIL)"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!this->fs)
 			return;
@@ -211,7 +211,7 @@ class CommandOSForbid : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
@@ -237,7 +237,7 @@ class OSForbid : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnUserConnect(dynamic_reference<User> &u, bool &exempt)
+	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
 	{
 		if (!u || exempt)
 			return;
@@ -245,7 +245,7 @@ class OSForbid : public Module
 		this->OnUserNickChange(u, "");
 	}
 
-	void OnUserNickChange(User *u, const Anope::string &)
+	void OnUserNickChange(User *u, const Anope::string &) anope_override
 	{
 		if (u->HasMode(UMODE_OPER))
 			return;
@@ -265,7 +265,7 @@ class OSForbid : public Module
 		}
 	}
 
-	void OnJoinChannel(User *u, Channel *c)
+	void OnJoinChannel(User *u, Channel *c) anope_override
 	{
 		if (u->HasMode(UMODE_OPER))
 			return;
@@ -293,7 +293,7 @@ class OSForbid : public Module
 		}
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
 		if (source.u->HasMode(UMODE_OPER))
 			return EVENT_CONTINUE;

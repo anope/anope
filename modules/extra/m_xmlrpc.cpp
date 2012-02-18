@@ -14,7 +14,7 @@ class MyXMLRPCClientSocket : public XMLRPCClientSocket
 	{
 	}
 
-	bool Read(const Anope::string &message)
+	bool Read(const Anope::string &message) anope_override
 	{
 		if (message.find("xml version") != Anope::string::npos)
 			this->in_query = true;
@@ -100,7 +100,7 @@ class MyXMLRPCListenSocket : public XMLRPCListenSocket
 			listen_sockets.erase(it);
 	}
 	
-	ClientSocket *OnAccept(int fd, const sockaddrs &addr)
+	ClientSocket *OnAccept(int fd, const sockaddrs &addr) anope_override
 	{
 		MyXMLRPCClientSocket *socket = new MyXMLRPCClientSocket(this, fd, addr);
 
@@ -150,7 +150,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface
 			this->events.erase(it);
 	}
 
-	void Reply(XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void Reply(XMLRPCClientSocket *source, XMLRPCRequest *request) anope_override
 	{
 		if (!request->id.empty())
 			request->reply("id", request->id);
@@ -174,7 +174,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface
 		Log(LOG_DEBUG) << reply;
 	}
 
-	Anope::string Sanitize(const Anope::string &string)
+	Anope::string Sanitize(const Anope::string &string) anope_override
 	{
 		static struct special_chars
 		{
@@ -204,7 +204,7 @@ class MyXMLRPCServiceInterface : public XMLRPCServiceInterface
 		return ret;
 	}
 
-	void RunXMLRPC(XMLRPCClientSocket *source, XMLRPCRequest *request)
+	void RunXMLRPC(XMLRPCClientSocket *source, XMLRPCRequest *request) anope_override
 	{
 		for (unsigned i = 0; i < this->events.size(); ++i)
 		{
@@ -262,7 +262,7 @@ class ModuleXMLRPC : public Module
 		listen_sockets.clear();
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 

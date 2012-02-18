@@ -31,7 +31,7 @@ class BotServCore : public Module
 
 	}
 
-	void OnPrivmsg(User *u, Channel *c, Anope::string &msg)
+	void OnPrivmsg(User *u, Channel *c, Anope::string &msg) anope_override
 	{
 		if (!u || !c || !c->ci || !c->ci->bi || msg.empty())
 			return;
@@ -100,7 +100,7 @@ class BotServCore : public Module
 		}
 	}
 
-	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params)
+	EventReturn OnPreCommand(CommandSource &source, Command *command, std::vector<Anope::string> &params) anope_override
 	{
 		if (this->fantasy_channel != NULL)
 		{
@@ -120,7 +120,7 @@ class BotServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnJoinChannel(User *user, Channel *c)
+	void OnJoinChannel(User *user, Channel *c) anope_override
 	{
 		if (c->ci && c->ci->bi)
 		{
@@ -144,7 +144,7 @@ class BotServCore : public Module
 		}
 	}
 
-	void OnLeaveChannel(User *u, Channel *c)
+	void OnLeaveChannel(User *u, Channel *c) anope_override
 	{
 		/* Channel is persistent, it shouldn't be deleted and the service bot should stay */
 		if (c->HasFlag(CH_PERSIST) || (c->ci && c->ci->HasFlag(CI_PERSIST)))
@@ -170,7 +170,7 @@ class BotServCore : public Module
 		}
 	}
 
-	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	EventReturn OnPreHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->BotServ)
 			return EVENT_CONTINUE;
@@ -186,7 +186,7 @@ class BotServCore : public Module
 		return EVENT_CONTINUE;
 	}
 
-	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params)
+	void OnPostHelp(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		if (!params.empty() || source.owner->nick != Config->BotServ)
 			return;
@@ -199,7 +199,7 @@ class BotServCore : public Module
 				"name with one of the following characters: %s."), Config->ChanServ.c_str(), Config->BSFantasyCharacter.c_str());
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param)
+	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		if (Config->BSSmartJoin && Name == CMODE_BAN && c->ci && c->ci->bi && c->FindUser(c->ci->bi))
 		{

@@ -17,8 +17,8 @@ struct Exception : Serializable
 	time_t time;			/* When this exception was added */
 	time_t expires;			/* Time when it expires. 0 == no expiry */
 
-	Anope::string serialize_name() const { return "Exception"; }
-	serialized_data serialize();
+	Anope::string serialize_name() const anope_override { return "Exception"; }
+	serialized_data serialize() anope_override;
 	static void unserialize(serialized_data &data);
 };
 
@@ -36,7 +36,7 @@ class SessionService : public Service
 
 	virtual Exception *FindException(User *u) = 0;
 
-	virtual Exception *FindException(const Anope::string &host) = 0;
+	virtual Exception *FindException(const Anope::string &host) = 0; 
 
 	virtual ExceptionVector &GetExceptions() = 0;
 

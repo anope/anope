@@ -23,7 +23,7 @@ class MemoDelCallback : public NumberList
 	{
 	}
 
-	void HandleNumber(unsigned Number)
+	void HandleNumber(unsigned Number) anope_override
 	{
 		if (!Number || Number > mi->memos.size())
 			return;
@@ -47,7 +47,7 @@ class CommandMSDel : public Command
 		this->SetSyntax(_("[\037channel\037] {\037num\037 | \037list\037 | LAST | ALL}"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		User *u = source.u;
 
@@ -124,7 +124,7 @@ class CommandMSDel : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");

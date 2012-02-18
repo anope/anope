@@ -37,7 +37,3 @@ void Pipe::Notify()
 	eventfd_write(this->GetFD(), 1);
 }
 
-void Pipe::OnNotify()
-{
-}
-

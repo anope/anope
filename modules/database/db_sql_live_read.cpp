@@ -19,7 +19,7 @@ class SQLCache : public Timer
 		return false;
 	}
 
-	void Tick(time_t)
+	void Tick(time_t) anope_override
 	{
 		for (cache_map::iterator it = this->cache.begin(), next_it; it != this->cache.end(); it = next_it)
 		{
@@ -59,21 +59,21 @@ class MySQLLiveModule : public Module
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
-	void OnReload()
+	void OnReload() anope_override
 	{
 		ConfigReader config;
 		Anope::string engine = config.ReadValue("db_sql", "engine", "", 0);
 		this->SQL = service_reference<SQLProvider>("SQLProvider", engine);
 	}
 
-	void OnShutdown()
+	void OnShutdown() anope_override
 	{
 		Implementation i[] = { I_OnFindChan, I_OnFindNick, I_OnFindCore };
 		for (size_t j = 0; j < 3; ++j)
 			ModuleManager::Detach(i[j], this);
 	}
 
-	void OnFindChan(const Anope::string &chname)
+	void OnFindChan(const Anope::string &chname) anope_override
 	{
 		if (chan_cache.Check(chname))
 			return;
@@ -107,7 +107,7 @@ class MySQLLiveModule : public Module
 		}
 	}
 
-	void OnFindNick(const Anope::string &nick)
+	void OnFindNick(const Anope::string &nick) anope_override
 	{
 		if (nick_cache.Check(nick))
 			return;
@@ -141,7 +141,7 @@ class MySQLLiveModule : public Module
 		}
 	}
 
-	void OnFindCore(const Anope::string &nick)
+	void OnFindCore(const Anope::string &nick) anope_override
 	{
 		if (core_cache.Check(nick))
 			return;

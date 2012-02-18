@@ -52,7 +52,7 @@ void SocketEngine::AddSocket(Socket *s)
 	if (s->GetFD() > MaxFD)
 		MaxFD = s->GetFD();
 	FD_SET(s->GetFD(), &ReadFDs);
-	Sockets.insert(std::make_pair(s->GetFD(), s));
+	Sockets[s->GetFD()] = s;
 	++FDCount;
 }
 

@@ -22,7 +22,7 @@ class CommandBSSet : public Command
 		this->SetSyntax(_("\037(channel | bot)\037 \037option\037 \037settings\037"));
 	}
 
-	void Execute(CommandSource &source, const std::vector<Anope::string> &params)
+	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
 		const Anope::string &chan = params[0];
 		const Anope::string &option = params[1];
@@ -150,7 +150,7 @@ class CommandBSSet : public Command
 		return;
 	}
 
-	bool OnHelp(CommandSource &source, const Anope::string &subcommand)
+	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		if (subcommand.empty())
 		{
@@ -226,7 +226,7 @@ class CommandBSSet : public Command
 		return true;
 	}
 
-	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand)
+	void OnSyntaxError(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
 		if (subcommand.empty())
 			Command::OnSyntaxError(source, "");

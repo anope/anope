@@ -53,6 +53,12 @@
 # include "anope_windows.h"
 #endif
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+# define anope_override override
+#else
+# define anope_override
+#endif
+
 /**
  * RFC: defination of a valid nick
  * nickname =  ( letter / special ) *8( letter / digit / special / "-" )

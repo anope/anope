@@ -257,7 +257,7 @@ class ESHA256 : public Module
 		use_iv = false;
 	}
 
-	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest)
+	EventReturn OnEncrypt(const Anope::string &src, Anope::string &dest) anope_override
 	{
 		char digest[SHA256_DIGEST_SIZE + 1];
 		SHA256Context ctx;
@@ -278,7 +278,7 @@ class ESHA256 : public Module
 		return EVENT_ALLOW;
 	}
 
-	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password)
+	EventReturn OnCheckAuthentication(Command *c, CommandSource *source, const std::vector<Anope::string> &params, const Anope::string &account, const Anope::string &password) anope_override
 	{
 		NickAlias *na = findnick(account);
 		NickCore *nc = na ? na->nc : NULL;

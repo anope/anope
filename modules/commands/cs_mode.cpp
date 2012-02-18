@@ -136,7 +136,7 @@ class CommandCSMode : public Command
 							source.Reply(_("Missing parameter for mode %c."), cm->ModeChar);
 						else
 						{
-							if (ci->RemoveMLock(cm, mode_param))
+							if (ci->RemoveMLock(cm, adding, mode_param))
 							{
 								if (!mode_param.empty())
 									mode_param = " " + mode_param;
@@ -144,7 +144,7 @@ class CommandCSMode : public Command
 								Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to unlock " << (adding ? '+' : '-') << cm->ModeChar << mode_param;
 							}
 							else
-								source.Reply(_("%c is not locked on %s."), cm->ModeChar, ci->name.c_str());
+								source.Reply(_("%c%c is not locked on %s."), adding == 1 ? '+' : '-', cm->ModeChar, ci->name.c_str());
 						}
 				}
 			}

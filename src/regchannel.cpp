@@ -806,10 +806,11 @@ bool ChannelInfo::SetMLock(ChannelMode *mode, bool status, const Anope::string &
 
 /** Remove a mlock
  * @param mode The mode
+ * @param status True for mlock on, false for mlock off
  * @param param The param of the mode, required if it is a list or status mode
  * @return true on success, false on failure
  */
-bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
+bool ChannelInfo::RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param)
 {
 	if (mode->Type == MODE_REGULAR || mode->Type == MODE_PARAM)
 	{
@@ -817,13 +818,21 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 		if (it != this->mode_locks.end())
 			for (; it != it_end; it = it_next)
 			{
+				const ModeLock &ml = it->second;
 				++it_next;
+
+				if (status != ml.set)
+					continue;
+
 				EventReturn MOD_RESULT;
 				FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));
 				if (MOD_RESULT != EVENT_STOP)
+				{
 					this->mode_locks.erase(it);
+					return true;
+				}
 			}
-		return true;
+		return false;
 	}
 	else
 	{
@@ -835,7 +844,7 @@ bool ChannelInfo::RemoveMLock(ChannelMode *mode, const Anope::string &param)
 			for (; it != it_end; ++it)
 			{
 				const ModeLock &ml = it->second;
-				if (ml.param == param)
+				if (ml.set == status && ml.param == param)
 				{
 					EventReturn MOD_RESULT;
 					FOREACH_RESULT(I_OnUnMLock, OnUnMLock(this, &it->second));

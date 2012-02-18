@@ -99,7 +99,7 @@ class CommandCSSetPersist : public Command
 					if (ci->c && ci->c->HasMode(CMODE_PERM))
 						ci->c->RemoveMode(NULL, cm);
 					/* Remove from mlock */
-					ci->RemoveMLock(cm);
+					ci->RemoveMLock(cm, true);
 				}
 
 				/* No channel mode, no BotServ, but using ChanServ as the botserv bot

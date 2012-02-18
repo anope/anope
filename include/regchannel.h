@@ -363,10 +363,11 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 
 	/** Remove a mlock
 	 * @param mode The mode
+	 * @param status True for mlock on, false for mlock off
 	 * @param param The param of the mode, required if it is a list or status mode
 	 * @return true on success, false on failure
 	 */
-	bool RemoveMLock(ChannelMode *mode, const Anope::string &param = "");
+	bool RemoveMLock(ChannelMode *mode, bool status, const Anope::string &param = "");
 
 	/** Clear all mlocks on the channel
 	 */

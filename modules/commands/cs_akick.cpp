@@ -207,6 +207,8 @@ class CommandCSAKick : public Command
 					if (!Number || Number > ci->GetAkickCount())
 						return;
 
+					FOREACH_MOD(I_OnAkickDel, OnAkickDel(source.u, ci, ci->GetAkick(Number - 1)));
+
 					++Deleted;
 					ci->EraseAkick(Number - 1);
 				}
@@ -235,6 +237,8 @@ class CommandCSAKick : public Command
 
 			bool override = !ci->AccessFor(u).HasPriv("AKICK");
 			Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "to delete " << mask;
+
+			FOREACH_MOD(I_OnAkickDel, OnAkickDel(u, ci, ci->GetAkick(i)));
 
 			ci->EraseAkick(i);
 

@@ -316,11 +316,11 @@ class CommandOSAKill : public Command
 	void DoClear(CommandSource &source)
 	{
 		User *u = source.u;
-		FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, NULL, akills));
 
 		for (unsigned i = akills->GetCount(); i > 0; --i)
 		{
 			XLine *x = akills->GetEntry(i - 1);
+			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
 			akills->DelXLine(x);
 		}
 

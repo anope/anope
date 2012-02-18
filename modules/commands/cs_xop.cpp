@@ -226,7 +226,16 @@ class XOPBase : public Command
 		}
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
-			mask += "!*@*";
+		{
+			User *targ = finduser(mask);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+		}
 
 		for (unsigned i = 0; i < ci->GetAccessCount(); ++i)
 		{

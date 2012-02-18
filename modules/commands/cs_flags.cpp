@@ -89,7 +89,16 @@ class CommandCSFlags : public Command
 		AccessGroup u_access = ci->AccessFor(u);
 
 		if (mask.find_first_of("!*@") == Anope::string::npos && findnick(mask) == NULL)
-			mask += "!*@*";
+		{
+			User *targ = finduser(mask);
+			if (targ != NULL)
+				mask = "*!*@" + targ->GetDisplayedHost();
+			else
+			{
+				source.Reply(NICK_X_NOT_REGISTERED, mask.c_str());
+				return;
+			}
+		}
 
 		ChanAccess *current = NULL;
 		std::set<char> current_flags;

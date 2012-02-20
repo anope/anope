@@ -19,8 +19,8 @@ static bool has_chgidentmod = false;
 static bool has_globopsmod = true; // Not a typo
 #include "inspircd-ts6.h"
 
-IRCDVar myIrcd[] = {
-	{"InspIRCd 2.0",	/* ircd name */
+IRCDVar myIrcd = {
+	"InspIRCd 2.0",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
 	 1,					/* SVSNICK */
 	 1,					/* Vhost */
@@ -42,9 +42,6 @@ IRCDVar myIrcd[] = {
 	 "$",				/* TLD Prefix for Global */
 	 20,				/* Max number of modes we can send per line */
 	 1,					/* IRCd sends a SSL users certificate fingerprint */
-	 }
-	,
-	{NULL}
 };
 
 static bool has_servicesmod = false;
@@ -58,9 +55,9 @@ class InspIRCdProto : public InspIRCdTS6Proto
 		UplinkSocket::Message() << "CAPAB CAPABILITIES :PROTOCOL=1202";
 		UplinkSocket::Message() << "CAPAB END";
 		SendServer(Me);
-		UplinkSocket::Message(Config->Numeric) << "BURST";
+		UplinkSocket::Message(Me) << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Config->Numeric) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << ircd->name <<" - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Me->GetName() << " :" << ircd->name <<" - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
 	}
 };
 
@@ -718,7 +715,7 @@ class ProtoInspIRCd : public Module
 	{
 		this->SetAuthor("Anope");
 
-		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_var(&myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 		

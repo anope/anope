@@ -48,11 +48,11 @@ struct IRCDVar
 
 class CoreExport IRCDProto
 {
- private:
-	virtual void SendSVSKillInternal(const BotInfo *, const User *, const Anope::string &) = 0;
-	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &) = 0;
+ protected:
+	virtual void SendSVSKillInternal(const BotInfo *, const User *, const Anope::string &);
+	virtual void SendModeInternal(const BotInfo *, const Channel *, const Anope::string &);
 	virtual void SendModeInternal(const BotInfo *, const User *, const Anope::string &) = 0;
-	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &) = 0;
+	virtual void SendKickInternal(const BotInfo *, const Channel *, const User *, const Anope::string &);
 	virtual void SendMessageInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
 	virtual void SendNoticeInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &msg);
 	virtual void SendPrivmsgInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
@@ -60,12 +60,12 @@ class CoreExport IRCDProto
 	virtual void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf);
 	virtual void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf);
 	virtual void SendCTCPInternal(const BotInfo *bi, const Anope::string &dest, const Anope::string &buf);
-	virtual void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf);
+	virtual void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf);
  public:
 	virtual ~IRCDProto() { }
 
 	virtual void SendSVSNOOP(const Server *, bool) { }
-	virtual void SendTopic(BotInfo *, Channel *) = 0;
+	virtual void SendTopic(BotInfo *, Channel *);
 	virtual void SendVhostDel(User *) { }
 	virtual void SendAkill(User *, const XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;
@@ -86,12 +86,12 @@ class CoreExport IRCDProto
 	virtual void SendPong(const Anope::string &servname, const Anope::string &who);
 	virtual void SendJoin(User *, Channel *, const ChannelStatus *) = 0;
 	virtual void SendSQLineDel(const XLine *x) { }
-	virtual void SendInvite(const BotInfo *bi, const Anope::string &chan, const Anope::string &nick);
+	virtual void SendInvite(const BotInfo *bi, const Channel *c, const User *u);
 	virtual void SendPart(const BotInfo *bi, const Channel *chan, const char *fmt, ...);
 	virtual void SendGlobops(const BotInfo *source, const char *fmt, ...);
 	virtual void SendSQLine(User *, const XLine *x) { }
 	virtual void SendSquit(Server *, const Anope::string &message);
-	virtual void SendSVSO(const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSVSO(const BotInfo *, const Anope::string &, const Anope::string &) { }
 	virtual void SendChangeBotNick(const BotInfo *bi, const Anope::string &newnick);
 	virtual void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when);
 	virtual void SendVhost(User *, const Anope::string &, const Anope::string &) { }
@@ -103,14 +103,14 @@ class CoreExport IRCDProto
 	virtual void SendSZLine(User *u, const XLine *) { }
 	virtual void SendSGLine(User *, const XLine *) { }
 	virtual void SendCTCP(const BotInfo *bi, const Anope::string &dest, const char *fmt, ...);
-	virtual void SendSVSJoin(const Anope::string &, const Anope::string &, const Anope::string &, const Anope::string &) { }
-	virtual void SendSWhois(const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSVSJoin(const BotInfo *bi, const Anope::string &, const Anope::string &, const Anope::string &) { }
+	virtual void SendSWhois(const BotInfo *bi, const Anope::string &, const Anope::string &) { }
 	virtual void SendBOB() { }
 	virtual void SendEOB() { }
 	virtual void SendServer(const Server *) = 0;
 	virtual bool IsNickValid(const Anope::string &) { return true; }
 	virtual bool IsChannelValid(const Anope::string &);
-	virtual void SendNumeric(const Anope::string &source, int numeric, const Anope::string &dest, const char *fmt, ...);
+	virtual void SendNumeric(int numeric, const Anope::string &dest, const char *fmt, ...);
 	virtual void SendLogin(User *u) = 0;
 	virtual void SendLogout(User *u) = 0;
 

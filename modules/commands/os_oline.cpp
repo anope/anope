@@ -34,7 +34,7 @@ class CommandOSOLine : public Command
 			source.Reply(NICK_X_NOT_IN_USE, nick.c_str());
 		else if (u2 && flag[0] == '+')
 		{
-			ircdproto->SendSVSO(Config->OperServ, nick, flag);
+			ircdproto->SendSVSO(source.owner, nick, flag);
 			u2->SetMode(source.owner, UMODE_OPER);
 			u2->SendMessage(source.owner, _("You are now an IRC Operator."));
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
@@ -42,7 +42,7 @@ class CommandOSOLine : public Command
 		}
 		else if (u2 && flag[0] == '-')
 		{
-			ircdproto->SendSVSO(Config->OperServ, nick, flag);
+			ircdproto->SendSVSO(source.owner, nick, flag);
 			source.Reply(_("Operflags \002%s\002 have been added for \002%s\002."), flag.c_str(), nick.c_str());
 			Log(LOG_ADMIN, u, this) << "for " << nick;
 		}

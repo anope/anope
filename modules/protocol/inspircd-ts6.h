@@ -36,7 +36,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		if (!has_chgidentmod)
 			Log() << "CHGIDENT not loaded!";
 		else
-			UplinkSocket::Message(Config->HostServ) << "CHGIDENT " << nick << " " << vIdent;
+			UplinkSocket::Message(findbot(Config->HostServ)) << "CHGIDENT " << nick << " " << vIdent;
 	}
 
 	void SendChgHostInternal(const Anope::string &nick, const Anope::string &vhost)
@@ -44,20 +44,19 @@ class InspIRCdTS6Proto : public IRCDProto
 		if (!has_chghostmod)
 			Log() << "CHGHOST not loaded!";
 		else
-			UplinkSocket::Message(Config->Numeric) << "CHGHOST " << nick << " " << vhost;
+			UplinkSocket::Message(Me) << "CHGHOST " << nick << " " << vhost;
 	}
 
  public:
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
-		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->Numeric) << "GLINE " << x->Mask;
+		UplinkSocket::Message(findbot(Config->OperServ)) << "GLINE " << x->Mask;
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
 	{
-		UplinkSocket::Message(whosets->GetUID()) << "FTOPIC " << c->name << " " << Anope::CurTime << " " << c->topic_setter << " :" << c->topic;
+		UplinkSocket::Message(whosets) << "FTOPIC " << c->name << " " << Anope::CurTime << " " << c->topic_setter << " :" << c->topic;
 	}
 
 	void SendVhostDel(User *u) anope_override
@@ -77,54 +76,41 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		User *u = finduser(Config->OperServ);
-		UplinkSocket::Message(u ? u->GetUID() : Config->Numeric) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		BotInfo *bi = findbot(Config->OperServ);
+		UplinkSocket::Message(bi) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
+	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source ? source->GetUID() : Config->Numeric) << "KILL " << user->GetUID() << " :" << buf;
-	}
-
-	void SendNumericInternal(const Anope::string &source, int numeric, const Anope::string &dest, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(Config->Numeric) << "PUSH " << dest << " ::" << source << " " << numeric << " " << dest << " " << buf;
+		UplinkSocket::Message() << "PUSH " << dest << " ::" << Me->GetName() << " " << numeric << " " << dest << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *source, const Channel *dest, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source ? source->GetUID() : Config->Numeric) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
+		UplinkSocket::Message(source) << "FMODE " << dest->name << " " << dest->creation_time << " " << buf;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->Numeric) << "MODE " << u->GetUID() << " " << buf;
+		UplinkSocket::Message(bi) << "MODE " << u->GetUID() << " " << buf;
 	}
 
 	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Config->Numeric) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->my_signon << " " << modes << " :" << u->realname;
-	}
-
-	void SendKickInternal(const BotInfo *source, const Channel *chan, const User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(source->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
-		else
-			UplinkSocket::Message(source->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << user->nick;
+		UplinkSocket::Message(Me) << "UID " << u->GetUID() << " " << u->timestamp << " " << u->nick << " " << u->host << " " << u->host << " " << u->GetIdent() << " 0.0.0.0 " << u->my_signon << " " << modes << " :" << u->realname;
 	}
 
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const Server *server) anope_override
 	{
-		UplinkSocket::Message("") << "SERVER " << server->GetName() << " " << Config->Uplinks[CurrentUplink]->password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+		UplinkSocket::Message() << "SERVER " << server->GetName() << " " << Config->Uplinks[CurrentUplink]->password << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	/* JOIN */
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :," << user->GetUID();
+		UplinkSocket::Message(Me) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :," << user->GetUID();
 		/* Note that we can send this with the FJOIN but choose not to
 		 * because the mode stacker will handle this and probably will
 		 * merge these modes with +nrt and other mlocked modes
@@ -150,7 +136,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	/* UNSQLINE */
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "DELLINE Q " << x->Mask;
+		UplinkSocket::Message(Me) << "DELLINE Q " << x->Mask;
 	}
 
 	/* SQLINE */
@@ -160,7 +146,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Config->Numeric) << "ADDLINE Q " << x->Mask << " " << Config->OperServ << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << Config->OperServ << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 
 	/* Functions that use serval cmd functions */
@@ -176,9 +162,9 @@ class InspIRCdTS6Proto : public IRCDProto
 	void SendConnect() anope_override
 	{
 		SendServer(Me);
-		UplinkSocket::Message(Config->Numeric) << "BURST";
+		UplinkSocket::Message(Me) << "BURST";
 		Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-		UplinkSocket::Message(Config->Numeric) << "VERSION :Anope-" << Anope::Version() << " " << Config->ServerName << " :" << ircd->name << " - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
+		UplinkSocket::Message(Me) << "VERSION :Anope-" << Anope::Version() << " " << Config->ServerName << " :" << ircd->name << " - (" << (enc ? enc->name : "unknown") << ") -- " << Anope::VersionBuildString();
 	}
 
 	/* SVSHOLD - set */
@@ -186,7 +172,7 @@ class InspIRCdTS6Proto : public IRCDProto
 	{
 		BotInfo *bi = findbot(Config->NickServ);
 		if (bi)
-			UplinkSocket::Message(bi->GetUID()) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
+			UplinkSocket::Message(bi) << "SVSHOLD " << nick << " " << Config->NSReleaseTimeout << " :Being held for registered user";
 	}
 
 	/* SVSHOLD - release */
@@ -194,13 +180,13 @@ class InspIRCdTS6Proto : public IRCDProto
 	{
 		BotInfo *bi = findbot(Config->NickServ);
 		if (bi)
-			UplinkSocket::Message(bi->GetUID()) << "SVSHOLD " << nick;
+			UplinkSocket::Message(bi) << "SVSHOLD " << nick;
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "DELLINE Z " << x->GetHost();
+		UplinkSocket::Message(Me) << "DELLINE Z " << x->GetHost();
 	}
 
 	/* SZLINE */
@@ -210,39 +196,38 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Config->Numeric) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft <<" :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft <<" :" << x->Reason;
 	}
 
-	void SendSVSJoin(const Anope::string &source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override
+	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override
 	{
 		User *u = finduser(nick);
-		BotInfo *bi = findbot(source);
-		UplinkSocket::Message(bi->GetUID()) << "SVSJOIN " << u->GetUID() << " " << chan;
+		UplinkSocket::Message(source) << "SVSJOIN " << u->GetUID() << " " << chan;
 	}
 
-	void SendSWhois(const Anope::string &, const Anope::string &who, const Anope::string &mask) anope_override
+	void SendSWhois(const BotInfo *, const Anope::string &who, const Anope::string &mask) anope_override
 	{
 		User *u = finduser(who);
 
-		UplinkSocket::Message(Config->Numeric) << "METADATA " << u->GetUID() << " swhois :" << mask;
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " swhois :" << mask;
 	}
 
 	void SendBOB() anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "BURST " << Anope::CurTime;
+		UplinkSocket::Message(Me) << "BURST " << Anope::CurTime;
 	}
 
 	void SendEOB() anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "ENDBURST";
+		UplinkSocket::Message(Me) << "ENDBURST";
 	}
 
 	void SendGlobopsInternal(BotInfo *source, const Anope::string &buf)
 	{
 		if (has_globopsmod)
-			UplinkSocket::Message(source ? source->GetUID() : Config->Numeric) << "SNONOTICE g :" << buf;
+			UplinkSocket::Message(source) << "SNONOTICE g :" << buf;
 		else
-			UplinkSocket::Message(source ? source->GetUID() : Config->Numeric) << "SNONOTICE A :" << buf;
+			UplinkSocket::Message(source) << "SNONOTICE A :" << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -250,17 +235,17 @@ class InspIRCdTS6Proto : public IRCDProto
 		if (!u->Account() || u->Account()->HasFlag(NI_UNCONFIRMED))
 			return;
 
-		UplinkSocket::Message(Config->Numeric) << "METADATA " << u->GetUID() << " accountname :" << u->Account()->display;
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :" << u->Account()->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "METADATA " << u->GetUID() << " accountname :";
+		UplinkSocket::Message(Me) << "METADATA " << u->GetUID() << " accountname :";
 	}
 
 	void SendChannel(Channel *c) anope_override
 	{
-		UplinkSocket::Message(Config->Numeric) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :";
+		UplinkSocket::Message(Me) << "FJOIN " << c->name << " " << c->creation_time << " +" << c->GetModes(true, true) << " :";
 	}
 
 	bool IsNickValid(const Anope::string &nick) anope_override
@@ -455,7 +440,8 @@ class InspircdIRCdMessage : public IRCdMessage
 bool event_idle(const Anope::string &source, const std::vector<Anope::string> &params)
 {
 	BotInfo *bi = findbot(params[0]);
-	UplinkSocket::Message(bi ? bi->GetUID() : params[0]) << "IDLE " << source << " " << start_time << (bi ? Anope::CurTime - bi->lastmsg : 0);
+	if (bi)
+		UplinkSocket::Message(bi) << "IDLE " << source << " " << start_time << " " << (Anope::CurTime - bi->lastmsg);
 	return true;
 }
 
@@ -464,7 +450,7 @@ bool event_time(const Anope::string &source, const std::vector<Anope::string> &p
 	if (params.size() < 2)
 		return true;
 
-	UplinkSocket::Message(Config->Numeric) << "TIME " << source << " " << params[1] << " " << Anope::CurTime;
+	UplinkSocket::Message(Me) << "TIME " << source << " " << params[1] << " " << Anope::CurTime;
 	return true;
 }
 
@@ -473,7 +459,7 @@ bool event_rsquit(const Anope::string &source, const std::vector<Anope::string> 
 	/* On InspIRCd we must send a SQUIT when we recieve RSQUIT for a server we have juped */
 	Server *s = Server::Find(params[0]);
 	if (s && s->HasFlag(SERVER_JUPED))
-		UplinkSocket::Message(Config->Numeric) << "SQUIT " << s->GetSID() << " :" << (params.size() > 1 ? params[1].c_str() : "");
+		UplinkSocket::Message(Me) << "SQUIT " << s->GetSID() << " :" << (params.size() > 1 ? params[1].c_str() : "");
 
 	ircdmessage->OnSQuit(source, params);
 

@@ -346,10 +346,17 @@ class ModuleProxyScan : public Module
 		if (exempt || !user || !Me->IsSynced() || !user->server->IsSynced())
 			return;
 
-		sockaddrs user_ip(user->ip);
 		/* At this time we only support IPv4 */
-		if (user_ip.sa.sa_family != AF_INET)
+		sockaddrs user_ip;
+		try
+		{
+			user_ip.pton(AF_INET, user->ip);
+		}
+		catch (const SocketException &)
+		{
+			/* User doesn't have a valid IPv4 IP (ipv6/spoof/etc) */
 			return;
+		}
 
 		if (!this->con_notice.empty() && !this->con_source.empty())
 		{

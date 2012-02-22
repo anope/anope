@@ -51,7 +51,22 @@ class InspIRCdTS6Proto : public IRCDProto
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(findbot(Config->OperServ)) << "GLINE " << x->Mask;
+		BotInfo *bi = findbot(Config->OperServ);
+
+		/* InspIRCd may support regex bans */
+		if (x->IsRegex() && has_rlinemod)
+		{
+			Anope::string mask = x->Mask;
+			size_t h = x->Mask.find('#');
+			if (h != Anope::string::npos)
+				mask = mask.replace(h, 1, ' ');
+			UplinkSocket::Message(bi) << "RLINE " << mask;
+			return;
+		}
+		else if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
+		UplinkSocket::Message(bi) << "GLINE " << x->Mask;
 	}
 
 	void SendTopic(BotInfo *whosets, Channel *c) anope_override
@@ -70,13 +85,59 @@ class InspIRCdTS6Proto : public IRCDProto
 			this->SendChgIdentInternal(u->nick, u->GetIdent());
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
+
 		BotInfo *bi = findbot(Config->OperServ);
+		/* InspIRCd may support regex bans, if they do we can send this and forget about it */
+		if (x->IsRegex() && has_rlinemod)
+		{
+			Anope::string mask = x->Mask;
+			size_t h = x->Mask.find('#');
+			if (h != Anope::string::npos)
+				mask = mask.replace(h, 1, ' ');
+			UplinkSocket::Message(bi) << "RLINE " << mask << " " << timeleft << " :" << x->Reason;
+			return;
+		}
+		else if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
+		/* ZLine if we can instead */
+		try
+		{
+			if (x->GetUser() == "*")
+			{
+				sockaddrs(x->GetHost());
+				ircdproto->SendSZLine(u, x);
+				return;
+			}
+		}
+		catch (const SocketException &) { }
+
 		UplinkSocket::Message(bi) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
 	}
 

@@ -17,6 +17,7 @@
 static bool has_globopsmod = false;
 static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
+static bool has_rlinemod = false;
 #include "inspircd-ts6.h"
 
 IRCDVar myIrcd = {
@@ -369,6 +370,8 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 				has_hidechansmod = true;
 			if (params[1].find("m_servprotect.so") != Anope::string::npos)
 				ircd->pseudoclient_mode = "+Ik";
+			if (params[1].find("m_rline.so") != Anope::string::npos)
+				has_rlinemod = true;
 		}
 		else if (params[0].equals_cs("CAPABILITIES"))
 		{

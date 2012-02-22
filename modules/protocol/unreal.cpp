@@ -48,6 +48,21 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
+		/* ZLine if we can instead */
+		try
+		{
+			if (x->GetUser() == "*")
+			{
+				sockaddrs(x->GetHost());
+				ircdproto->SendSZLineDel(x);
+				return;
+			}
+		}
+		catch (const SocketException &) { }
+
 		UplinkSocket::Message() << "BD - G " << x->GetUser() << " " << x->GetHost() << " " << Config->OperServ;
 	}
 
@@ -65,13 +80,48 @@ class UnrealIRCdProto : public IRCDProto
 		u->SetMode(bi, UMODE_CLOAK);
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(findbot(Config->OperServ), "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
+		/* ZLine if we can instead */
+		try
+		{
+			if (x->GetUser() == "*")
+			{
+				sockaddrs(x->GetHost());
+				ircdproto->SendSZLine(u, x);
+				return;
+			}
+		}
+		catch (const SocketException &) { }
+
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message() << "BD + G " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->Reason;
+		UplinkSocket::Message() << "BD + G " << x->GetUser() << " " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->GetReason();
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
@@ -149,7 +199,7 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message() << "c " << x->Mask << " :" << x->Reason;
+		UplinkSocket::Message() << "c " << x->Mask << " :" << x->GetReason();
 	}
 
 	/*
@@ -237,7 +287,7 @@ class UnrealIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message() << "BD + Z * " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->Reason;
+		UplinkSocket::Message() << "BD + Z * " << x->GetHost() << " " << x->By << " " << Anope::CurTime + timeleft << " " << x->Created << " :" << x->GetReason();
 	}
 
 	/* SGLINE */
@@ -246,7 +296,7 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
-		Anope::string edited_reason = x->Reason;
+		Anope::string edited_reason = x->GetReason();
 		edited_reason = edited_reason.replace_all_cs(" ", "_");
 		UplinkSocket::Message() << "BR + " << edited_reason << " :" << x->Mask;
 	}

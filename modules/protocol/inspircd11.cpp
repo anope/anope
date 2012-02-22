@@ -81,6 +81,21 @@ class InspIRCdProto : public IRCDProto
 {
 	void SendAkillDel(const XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
+		/* ZLine if we can instead */
+		try
+		{
+			if (x->GetUser() == "*")
+			{
+				sockaddrs(x->GetHost());
+				ircdproto->SendSZLineDel(x);
+				return;
+			}
+		}
+		catch (const SocketException &) { }
+
 		UplinkSocket::Message(findbot(Config->OperServ)) << "GLINE " << x->Mask;
 	}
 
@@ -100,13 +115,48 @@ class InspIRCdProto : public IRCDProto
 			inspircd_cmd_chgident(u->nick, u->GetIdent());
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(findbot(Config->OperServ), "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
+		/* ZLine if we can instead */
+		try
+		{
+			if (x->GetUser() == "*")
+			{
+				sockaddrs(x->GetHost());
+				ircdproto->SendSZLine(u, x);
+				return;
+			}
+		}
+		catch (const SocketException &) { }
+
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE G " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE G " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
 	}
 
 	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
@@ -194,7 +244,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
 	}
 
 	/* Functions that use serval cmd functions */
@@ -254,7 +304,7 @@ class InspIRCdProto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
 	}
 
 	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override

@@ -47,7 +47,7 @@ class RatboxProto : public IRCDProto
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me) << "RESV * " << x->Mask << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "RESV * " << x->Mask << " :" << x->GetReason();
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
@@ -59,11 +59,14 @@ class RatboxProto : public IRCDProto
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
+		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->GetReason();
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
 		BotInfo *bi = findbot(Config->OperServ);
 		UplinkSocket::Message(bi) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
@@ -89,14 +92,38 @@ class RatboxProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
+		BotInfo *bi = findbot(Config->OperServ);
+
+		if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
+		UplinkSocket::Message(bi) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	/* SERVER name hop descript */

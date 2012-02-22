@@ -82,7 +82,7 @@ class CommandOSChanKill : public Command
 
 					XLine *x = new XLine("*@" + uc->user->host, u->nick, expires, realreason, XLineManager::GenerateUID());
 					akills->AddXLine(x);
-					akills->Check(uc->user);
+					akills->OnMatch(uc->user, x);
 				}
 
 				Log(LOG_ADMIN, u, this) << "on " << c->name << " (" << realreason << ")";

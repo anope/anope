@@ -60,19 +60,24 @@ class CommandOSAKill : public Command
 	void DoAdd(CommandSource &source, const std::vector<Anope::string> &params)
 	{
 		User *u = source.u;
-		unsigned last_param = 2;
 		Anope::string expiry, mask;
-		time_t expires;
 
-		mask = params.size() > 1 ? params[1] : "";
-		if (!mask.empty() && mask[0] == '+')
+		if (params.size() < 2)
 		{
-			expiry = mask;
-			mask = params.size() > 2 ? params[2] : "";
-			last_param = 3;
+			this->OnSyntaxError(source, "ADD");
+			return;
 		}
 
-		expires = !expiry.empty() ? dotime(expiry) : Config->AutokillExpiry;
+		spacesepstream sep(params[1]);
+		sep.GetToken(mask);
+
+		if (mask[0] == '+')
+		{
+			expiry = mask;
+			sep.GetToken(mask);
+		}
+
+		time_t expires = !expiry.empty() ? dotime(expiry) : Config->AutokillExpiry;
 		/* If the expiry given does not contain a final letter, it's in days,
 		 * said the doc. Ah well.
 		 */
@@ -87,84 +92,108 @@ class CommandOSAKill : public Command
 		else if (expires > 0)
 			expires += Anope::CurTime;
 
-		if (params.size() <= last_param)
+		if (sep.StreamEnd())
 		{
 			this->OnSyntaxError(source, "ADD");
 			return;
 		}
 
-		Anope::string reason = params[last_param];
-		if (last_param == 2 && params.size() > 3)
-			reason += " " + params[3];
-		if (!mask.empty() && !reason.empty())
+		Anope::string reason;
+		if (mask.find('#') != Anope::string::npos)
 		{
-			User *targ = NULL;
-			std::pair<int, XLine *> canAdd = akills->CanAdd(mask, expires);
-			if (mask.find('!') != Anope::string::npos)
-				source.Reply(_("\002Reminder\002: AKILL masks cannot contain nicknames; make sure you have \002not\002 included a nick portion in your mask."));
-			else if (mask.find('@') == Anope::string::npos && !(targ = finduser(mask)))
-				source.Reply(BAD_USERHOST_MASK);
-			else if (mask.find_first_not_of("~@.*?") == Anope::string::npos)
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			else if (canAdd.first == 1)
-				source.Reply(_("\002%s\002 already exists on the AKILL list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-			else
+			Anope::string remaining = sep.GetRemaining();
+
+			size_t co = remaining[0] == ':' ? 0 : remaining.rfind(" :");
+			if (co == Anope::string::npos)
 			{
-				if (targ)
-					mask = "*@" + targ->host;
-				unsigned int affected = 0;
-				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (Anope::Match(it->second->GetIdent() + "@" + it->second->host, mask))
-						++affected;
-				float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
-
-				if (percent > 95)
-				{
-					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-					Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
-					return;
-				}
-
-				if (Config->AddAkiller)
-					reason = "[" + u->nick + "] " + reason;
-
-				Anope::string id;
-				if (Config->AkillIds)
-				{
-					id = XLineManager::GenerateUID();
-					reason = reason + " (ID: " + id + ")";
-				}
-
-				XLine *x = new XLine(mask, u->nick, expires, reason, id);
-
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
-				if (MOD_RESULT == EVENT_STOP)
-				{
-					delete x;
-					return;
-				}
-
-				akills->AddXLine(x);
-				if (Config->AkillOnAdd)
-					akills->Send(NULL, x);
-
-				source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
-
-				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
-				if (readonly)
-					source.Reply(READ_ONLY_MODE);
+				this->OnSyntaxError(source, "ADD");
+				return;
 			}
+
+			if (co != 0)
+				++co;
+
+			reason = remaining.substr(co + 1);
+			mask += " " + remaining.substr(0, co);
+			mask.trim();
 		}
 		else
-			this->OnSyntaxError(source, "ADD");
+			reason = sep.GetRemaining();
 
-		return;
+		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
+		{
+			if (Config->RegexEngine.empty())
+			{
+				source.Reply(_("Regex is enabled."));
+				return;
+			}
+
+			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			if (!provider)
+			{
+				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				return;
+			}
+
+			try
+			{
+				Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
+				delete provider->Compile(stripped_mask);
+			}
+			catch (const RegexException &ex)
+			{
+				source.Reply("%s", ex.GetReason().c_str());
+				return;
+			}
+		}
+
+		User *targ = finduser(mask);
+		if (targ)
+			mask = "*@" + targ->host;
+
+		if (!akills->CanAdd(source, mask, expires, reason))
+			return;
+		else if (mask.find_first_not_of("/~@.*?") == Anope::string::npos)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			return;
+		}
+
+		XLine *x = new XLine(mask, u->nick, expires, reason);
+		if (Config->AkillIds)
+			x->UID = XLineManager::GenerateUID();
+
+		unsigned int affected = 0;
+		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			if (akills->Check(it->second, x))
+				++affected;
+		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
+
+		if (percent > 95)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			Log(LOG_ADMIN, u, this) << "tried to akill " << percent << "% of the network (" << affected << " users)";
+			delete x;
+			return;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, akills));
+		if (MOD_RESULT == EVENT_STOP)
+		{
+			delete x;
+			return;
+		}
+
+		akills->AddXLine(x);
+		if (Config->AkillOnAdd)
+			akills->Send(NULL, x);
+
+		source.Reply(_("\002%s\002 added to the AKILL list."), mask.c_str());
+
+		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << x->Reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		if (readonly)
+			source.Reply(READ_ONLY_MODE);
 	}
 
 	void DoDel(CommandSource &source, const std::vector<Anope::string> &params)
@@ -199,10 +228,14 @@ class CommandOSAKill : public Command
 				return;
 			}
 
-			FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
+			do
+			{
+				FOREACH_MOD(I_OnDelXLine, OnDelXLine(u, x, akills));
 
-			source.Reply(_("\002%s\002 deleted from the AKILL list."), x->Mask.c_str());
-			AkillDelCallback::DoDel(source, x);
+				source.Reply(_("\002%s\002 deleted from the AKILL list."), x->Mask.c_str());
+				AkillDelCallback::DoDel(source, x);
+			}
+			while ((x = akills->HasEntry(mask)));
 
 		}
 
@@ -240,7 +273,7 @@ class CommandOSAKill : public Command
 					entry["Number"] = stringify(number);
 					entry["Mask"] = x->Mask;
 					entry["Creator"] = x->By;
-					entry["Created"] = do_strftime(x->Created);
+					entry["Created"] = do_strftime(x->Created, NULL, true);
 					entry["Expires"] = expire_left(NULL, x->Expires);
 					entry["Reason"] = x->Reason;
 					this->list.addEntry(entry);
@@ -255,13 +288,13 @@ class CommandOSAKill : public Command
 			{
 				XLine *x = akills->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
 					entry["Mask"] = x->Mask;
 					entry["Creator"] = x->By;
-					entry["Created"] = do_strftime(x->Created);
+					entry["Created"] = do_strftime(x->Created, NULL, true);
 					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
 					entry["Reason"] = x->Reason;
 					list.addEntry(entry);
@@ -327,7 +360,7 @@ class CommandOSAKill : public Command
 		source.Reply(_("The AKILL list has been cleared."));
 	}
  public:
-	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 4)
+	CommandOSAKill(Module *creator) : Command(creator, "operserv/akill", 1, 2)
 	{
 		this->SetDesc(_("Manipulate the AKILL list"));
 		this->SetSyntax(_("ADD [+\037expiry\037] \037mask\037 \037reason\037"));
@@ -367,11 +400,14 @@ class CommandOSAKill : public Command
 		source.Reply(_("Allows Services operators to manipulate the AKILL list. If\n"
 				"a user matching an AKILL mask attempts to connect, Services\n"
 				"will issue a KILL for that user and, on supported server\n"
-				"types, will instruct all servers to add a ban (K-line) for\n"
-				"the mask which the user matched.\n"
+				"types, will instruct all servers to add a ban for the mask\n"
+				"which the user matched.\n"
 				" \n"
-				"\002AKILL ADD\002 adds the given nick or user@host/ip mask to the AKILL\n"
-				"list for the given reason (which \002must\002 be given).\n"
+				"\002AKILL ADD\002 adds the given mask to the AKILL\n"
+				"list for the given reason, which \002must\002 be given.\n"
+				"Mask should be in the format of nick!user@host#real name,\n"
+				"though all that is required is user@host. If a real name is specified,\n"
+				"the reason must be prepended with a :.\n"
 				"\037expiry\037 is specified as an integer followed by one of \037d\037 \n"
 				"(days), \037h\037 (hours), or \037m\037 (minutes). Combinations (such as \n"
 				"\0371h30m\037) are not permitted. If a unit specifier is not \n"
@@ -380,7 +416,12 @@ class CommandOSAKill : public Command
 				"usermask to be added starts with a \037+\037, an expiry time must\n"
 				"be given, even if it is the same as the default. The\n"
 				"current AKILL default expiry time can be found with the\n"
-				"\002STATS AKILL\002 command.\n"
+				"\002STATS AKILL\002 command.\n"));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
+		source.Reply(_(
 				" \n"
 				"The \002AKILL DEL\002 command removes the given mask from the\n"
 				"AKILL list if it is present.  If a list of entry numbers is \n"

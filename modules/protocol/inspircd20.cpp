@@ -17,6 +17,7 @@
 static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
 static bool has_globopsmod = true; // Not a typo
+static bool has_rlinemod = false;
 #include "inspircd-ts6.h"
 
 IRCDVar myIrcd = {
@@ -556,8 +557,16 @@ class Inspircd20IRCdMessage : public InspircdIRCdMessage
 			Anope::string module;
 
 			while (ssep.GetToken(module))
+			{
 				if (module.equals_cs("m_svshold.so"))
 					has_svsholdmod = true;
+				else if (module.find("m_rline.so") == 0)
+				{
+					has_rlinemod = true;
+					if (!Config->RegexEngine.empty() && Config->RegexEngine != module.substr(11))
+						Log() << "Warning: InspIRCd is using regex engine " << module.substr(11) << ", but we have " << Config->RegexEngine << ". This may cause inconsistencies.";
+				}
+			}
 		}
 		else if (params[0].equals_cs("MODSUPPORT"))
 		{

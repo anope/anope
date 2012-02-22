@@ -141,7 +141,7 @@ class CommandOSSXLineBase : public Command
 					entry["Number"] = stringify(Number);
 					entry["Mask"] = x->Mask;
 					entry["By"] = x->By;
-					entry["Created"] = do_strftime(x->Created);
+					entry["Created"] = do_strftime(x->Created, NULL, true);
 					entry["Expires"] = expire_left(NULL, x->Expires);
 					entry["Reason"] = x->Reason;
 					list.addEntry(entry);
@@ -156,13 +156,13 @@ class CommandOSSXLineBase : public Command
 			{
 				XLine *x = this->xlm()->GetEntry(i);
 
-				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask))
+				if (mask.empty() || mask.equals_ci(x->Mask) || mask == x->UID || Anope::Match(x->Mask, mask, false, true))
 				{
 					ListFormatter::ListEntry entry;
 					entry["Number"] = stringify(i + 1);
 					entry["Mask"] = x->Mask;
 					entry["By"] = x->By;
-					entry["Created"] = do_strftime(x->Created);
+					entry["Created"] = do_strftime(x->Created, NULL, true);
 					entry["Expires"] = expire_left(source.u->Account(), x->Expires);
 					entry["Reason"] = x->Reason;
 					list.addEntry(entry);
@@ -307,85 +307,105 @@ class CommandOSSNLine : public CommandOSSXLineBase
 		sep.GetToken(mask);
 		Anope::string reason = sep.GetRemaining();
 
-		if (!mask.empty() && !reason.empty())
+		if (mask.empty() || reason.empty())
 		{
-			std::pair<int, XLine *> canAdd = this->xlm()->CanAdd(mask, expires);
-			if (mask.find_first_not_of("*?") == Anope::string::npos)
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			else if (canAdd.first == 1)
-				source.Reply(_("\002%s\002 already exists on the %s list."), canAdd.second->Mask.c_str(), source.command.c_str());
-			else if (canAdd.first == 2)
-				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-			else
+			this->OnSyntaxError(source, "ADD");
+			return;
+		}
+
+		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
+		{
+			if (Config->RegexEngine.empty())
 			{
-				/* Clean up the last character of the mask if it is a space
-				 * See bug #761
-				 */
-				unsigned masklen = mask.length();
-				if (mask[masklen - 1] == ' ')
-					mask.erase(masklen - 1);
-				unsigned int affected = 0;
-				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (Anope::Match(it->second->realname, mask))
-						++affected;
-				float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
-
-				if (percent > 95)
-				{
-					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-					Log(LOG_ADMIN, u, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
-					return;
-				}
-
-				if (Config->AddAkiller)
-					reason = "[" + u->nick + "] " + reason;
-
-				Anope::string id;
-				if (Config->AkillIds)
-				{
-					id = XLineManager::GenerateUID();
-					reason = reason + " (ID: " + id + ")";
-				}
-
-				XLine *x = new XLine(mask, u->nick, expires, reason, id);
-
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
-				if (MOD_RESULT == EVENT_STOP)
-				{
-					delete x;
-					return;
-				}
-
-				this->xlm()->AddXLine(x);
-				if (Config->KillonSNline && !ircd->sglineenforce)
-				{
-					Anope::string rreason = "G-Lined: " + reason;
-
-					for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-					{
-						User *user = it->second;
-						++it;
-
-						if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask))
-							user->Kill(Config->ServerName, rreason);
-					}
-				}
-
-				source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
-				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
-				if (readonly)
-					source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Regex is enabled."));
+				return;
 			}
 
-		}
-		else
-			this->OnSyntaxError(source, "ADD");
+			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			if (!provider)
+			{
+				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				return;
+			}
 
-		return;
+			try
+			{
+				Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
+				delete provider->Compile(stripped_mask);
+			}
+			catch (const RegexException &ex)
+			{
+				source.Reply("%s", ex.GetReason().c_str());
+				return;
+			}
+		}
+
+		if (!this->xlm()->CanAdd(source, mask, expires, reason))
+			return;
+		else if (mask.find_first_not_of("/.*?") == Anope::string::npos)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			return;
+		}
+
+		/* Clean up the last character of the mask if it is a space
+		 * See bug #761
+		 */
+		unsigned masklen = mask.length();
+		if (mask[masklen - 1] == ' ')
+			mask.erase(masklen - 1);
+
+		XLine *x = new XLine(mask, u->nick, expires, reason);
+		if (Config->AkillIds)
+			x->UID = XLineManager::GenerateUID();
+
+		unsigned int affected = 0;
+		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			if (this->xlm()->Check(it->second, x))
+				++affected;
+		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
+
+		if (percent > 95)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			Log(LOG_ADMIN, u, this) << "tried to " << source.command << " " << percent << "% of the network (" << affected << " users)";
+			delete x;
+			return;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
+		if (MOD_RESULT == EVENT_STOP)
+		{
+			delete x;
+			return;
+		}
+
+		this->xlm()->AddXLine(x);
+
+		if (Config->KillonSNline)
+		{
+			this->xlm()->Send(u, x);
+
+			if (!ircd->sglineenforce)
+			{
+				Anope::string rreason = "G-Lined: " + reason;
+
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+				{
+					User *user = it->second;
+					++it;
+
+					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->realname, x->Mask, false, true))
+						user->Kill(Config->ServerName, rreason);
+				}
+			}
+		}
+
+		source.Reply(_("\002%s\002 added to the %s list."), mask.c_str(), source.command.c_str());
+		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+		if (readonly)
+			source.Reply(READ_ONLY_MODE);
 	}
 
 	service_reference<XLineManager> snlines;
@@ -421,6 +441,10 @@ class CommandOSSNLine : public CommandOSSXLineBase
 				"\002STATS AKILL\002 command.\n"
 				"Note: because the realname mask may contain spaces, the\n"
 				"separator between it and the reason is a colon.\n"));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
 		source.Reply(_(" \n"
 				"The \002SNLINE DEL\002 command removes the given mask from the\n"
 				"SNLINE list if it is present.  If a list of entry numbers is \n"
@@ -496,95 +520,118 @@ class CommandOSSQLine : public CommandOSSXLineBase
 		Anope::string reason = params[last_param];
 		if (last_param == 2 && params.size() > 3)
 			reason += " " + params[3];
-		if (!mask.empty() && !reason.empty())
+
+		if (mask.empty() || reason.empty())
 		{
-			std::pair<int, XLine *> canAdd = this->sqlines->CanAdd(mask, expires);
-			if (mask.find_first_not_of("*") == Anope::string::npos)
-				source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-			else if (canAdd.first == 1)
-				source.Reply(_("\002%s\002 already exists on the SQLINE list."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 2)
-				source.Reply(_("Expiry time of \002%s\002 changed."), canAdd.second->Mask.c_str());
-			else if (canAdd.first == 3)
-				source.Reply(_("\002%s\002 is already covered by %s."), mask.c_str(), canAdd.second->Mask.c_str());
-			else
+			this->OnSyntaxError(source, "ADD");
+			return;
+		}
+
+		if (mask[0] == '/' && mask[mask.length() - 1] == '/')
+		{
+			if (Config->RegexEngine.empty())
 			{
-				unsigned int affected = 0;
-				for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
-					if (Anope::Match(it->second->nick, mask))
-						++affected;
-				float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
-
-				if (percent > 95)
-				{
-					source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
-					Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
-					return;
-				}
-
-				Anope::string id = XLineManager::GenerateUID();
-				reason = reason + " (ID: " + id + ")";
-
-				XLine *x = new XLine(mask, u->nick, expires, reason, id);
-
-				EventReturn MOD_RESULT;
-				FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
-				if (MOD_RESULT == EVENT_STOP)
-				{
-					delete x;
-					return;
-				}
-
-				this->xlm()->AddXLine(x);
-				if (Config->KillonSQline)
-				{
-					Anope::string rreason = "Q-Lined: " + reason;
-
-					if (mask[0] == '#')
-					{
-						for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
-						{
-							Channel *c = cit->second;
-
-							if (!Anope::Match(c->name, mask))
-								continue;
-							for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
-							{
-								UserContainer *uc = *it;
-								++it;
-
-								if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
-									continue;
-								c->Kick(NULL, uc->user, "%s", reason.c_str());
-							}
-						}
-					}
-					else
-					{
-						for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
-						{
-							User *user = it->second;
-							++it;
-
-							if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask))
-								user->Kill(Config->ServerName, rreason);
-						}
-					}
-				}
-				this->xlm()->Send(NULL, x);
-
-				source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
-				Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
-
-				if (readonly)
-					source.Reply(READ_ONLY_MODE);
+				source.Reply(_("Regex is enabled."));
+				return;
 			}
 
-		}
-		else
-			this->OnSyntaxError(source, "ADD");
+			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			if (!provider)
+			{
+				source.Reply(_("Unable to find regex engine %s"), Config->RegexEngine.c_str());
+				return;
+			}
 
-		return;
+			try
+			{
+				Anope::string stripped_mask = mask.substr(1, mask.length() - 2);
+				delete provider->Compile(stripped_mask);
+			}
+			catch (const RegexException &ex)
+			{
+				source.Reply("%s", ex.GetReason().c_str());
+				return;
+			}
+		}
+
+		if (!this->sqlines->CanAdd(source, mask, expires, reason))
+			return;
+		else if (mask.find_first_not_of("./?*") == Anope::string::npos)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			return;
+		}
+
+		XLine *x = new XLine(mask, u->nick, expires, reason);
+		if (Config->AkillIds)
+			x->UID = XLineManager::GenerateUID();
+
+		unsigned int affected = 0;
+		for (Anope::insensitive_map<User *>::iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+			if (this->xlm()->Check(it->second, x))
+				++affected;
+		float percent = static_cast<float>(affected) / static_cast<float>(UserListByNick.size()) * 100.0;
+
+		if (percent > 95)
+		{
+			source.Reply(USERHOST_MASK_TOO_WIDE, mask.c_str());
+			Log(LOG_ADMIN, u, this) << "tried to SQLine " << percent << "% of the network (" << affected << " users)";
+			delete x;
+			return;
+		}
+
+		EventReturn MOD_RESULT;
+		FOREACH_RESULT(I_OnAddXLine, OnAddXLine(u, x, this->xlm()));
+		if (MOD_RESULT == EVENT_STOP)
+		{
+			delete x;
+			return;
+		}
+
+		this->xlm()->AddXLine(x);
+		if (Config->KillonSQline)
+		{
+			Anope::string rreason = "Q-Lined: " + reason;
+
+			if (mask[0] == '#')
+			{
+				for (channel_map::const_iterator cit = ChannelList.begin(), cit_end = ChannelList.end(); cit != cit_end; ++cit)
+				{
+					Channel *c = cit->second;
+
+					if (!Anope::Match(c->name, mask, false, true))
+						continue;
+					for (CUserList::iterator it = c->users.begin(), it_end = c->users.end(); it != it_end; )
+					{
+						UserContainer *uc = *it;
+						++it;
+
+						if (uc->user->HasMode(UMODE_OPER) || uc->user->server == Me)
+							continue;
+						c->Kick(NULL, uc->user, "%s", reason.c_str());
+					}
+				}
+			}
+			else
+			{
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end();)
+				{
+					User *user = it->second;
+					++it;
+
+					if (!user->HasMode(UMODE_OPER) && user->server != Me && Anope::Match(user->nick, x->Mask, false, true))
+						user->Kill(Config->ServerName, rreason);
+				}
+			}
+
+			this->xlm()->Send(u, x);
+		}
+
+		source.Reply(_("\002%s\002 added to the SQLINE list."), mask.c_str());
+		Log(LOG_ADMIN, u, this) << "on " << mask << " (" << reason << ") expires in " << (expires ? duration(expires - Anope::CurTime) : "never") << " [affects " << affected << " user(s) (" << percent << "%)]";
+
+		if (readonly)
+			source.Reply(READ_ONLY_MODE);
 	}
 
  	service_reference<XLineManager> sqlines;
@@ -607,8 +654,7 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"connect, Services will not allow it to pursue his IRC\n"
 				"session.\n"
 				"If the first character of the mask is #, services will \n"
-				"prevent the use of matching channels (on IRCds that \n"
-				"support it).\n"));
+				"prevent the use of matching channels."));
 		source.Reply(_(" \n"
 				"\002SQLINE ADD\002 adds the given (nick's) mask to the SQLINE\n"
 				"list for the given reason (which \002must\002 be given).\n"
@@ -621,6 +667,10 @@ class CommandOSSQLine : public CommandOSSXLineBase
 				"must be given, even if it is the same as the default. The\n"
 				"current SQLINE default expiry time can be found with the\n"
 				"\002STATS AKILL\002 command.\n"));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your mask in // if this desired.", Config->RegexEngine.c_str());
 		source.Reply(_(" \n"
 				"The \002SQLINE DEL\002 command removes the given mask from the\n"
 				"SQLINE list if it is present. If a list of entry numbers is \n"

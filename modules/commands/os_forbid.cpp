@@ -41,7 +41,7 @@ class MyForbidService : public ForbidService
 		{
 			ForbidData *d = this->forbidData[i - 1];
 
-			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask))
+			if ((ftype == FT_NONE || ftype == d->type) && Anope::Match(mask, d->mask, false, true))
 				return d;
 		}
 		return NULL;
@@ -217,6 +217,10 @@ class CommandOSForbid : public Command
 		source.Reply(" ");
 		source.Reply(_("Forbid allows you to forbid usage of certain nicknames, channels,\n"
 				"and email addresses. Wildcards are accepted for all entries."));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
 		return true;
 	}
 };
@@ -273,8 +277,13 @@ class OSForbid : public Module
 		BotInfo *bi = findbot(Config->OperServ);
 		ForbidData *d = this->forbidService.FindForbid(c->name, FT_CHAN);
 		if (bi != NULL && d != NULL)
-		{			
-			if (!c->HasFlag(CH_INHABIT))
+		{
+			if (ircd->chansqline)
+			{
+				XLine x(c->name, bi->nick, Anope::CurTime + Config->CSInhabit, d->reason);
+				ircdproto->SendSQLine(NULL, &x);
+			}
+			else if (!c->HasFlag(CH_INHABIT))
 			{
 				/* Join ChanServ and set a timer for this channel to part ChanServ later */
 				c->Hold();

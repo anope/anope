@@ -119,7 +119,7 @@ class OSIgnoreService : public IgnoreService
 				tmp = mask + "!*@*";
 
 			for (; ign != ign_end; ++ign)
-				if (Anope::Match(tmp, ign->mask))
+				if (Anope::Match(tmp, ign->mask, false, true))
 					break;
 		}
 
@@ -297,6 +297,10 @@ class CommandOSIgnore : public Command
 				"Wildcards are permitted.\n"
 				" \n"
 				"Ignores will not be enforced on IRC Operators."));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
 		return true;
 	}
 };

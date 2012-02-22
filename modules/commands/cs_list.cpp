@@ -87,7 +87,7 @@ class CommandCSList : public Command
 			else if (channoexpire && !ci->HasFlag(CI_NO_EXPIRE))
 				continue;
 
-			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern) || Anope::Match(ci->name, spattern))
+			if (pattern.equals_ci(ci->name) || ci->name.equals_ci(spattern) || Anope::Match(ci->name, pattern, false, true) || Anope::Match(ci->name, spattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nchans <= Config->CSListMax)
 				{
@@ -125,6 +125,10 @@ class CommandCSList : public Command
 				"(Channels with the \002PRIVATE\002 option set are not listed.)\n"
 				"Note that a preceding '#' specifies a range, channel names\n"
 				"are to be written without '#'."));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
 		return true;
 	}
 };

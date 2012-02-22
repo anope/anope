@@ -67,7 +67,7 @@ class CoreExport IRCDProto
 	virtual void SendSVSNOOP(const Server *, bool) { }
 	virtual void SendTopic(BotInfo *, Channel *);
 	virtual void SendVhostDel(User *) { }
-	virtual void SendAkill(User *, const XLine *) = 0;
+	virtual void SendAkill(User *, XLine *) = 0;
 	virtual void SendAkillDel(const XLine *) = 0;
 	virtual void SendSVSKill(const BotInfo *source, const User *user, const char *fmt, ...);
 	virtual void SendMode(const BotInfo *bi, const Channel *dest, const char *fmt, ...);

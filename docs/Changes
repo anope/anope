@@ -1,5 +1,7 @@
 Anope Version 1.9.7
 --------------------
+A Added ability for using regex as patterns for various commands
+A Extended ability of operserv/akill to also match against nick and realname
 
 Anope Version 1.9.6
 --------------------

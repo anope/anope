@@ -72,7 +72,7 @@ How To Add IRCd Support
     of each.
 
     1) Name: This member tells Anope about the IRCD's name. It may contain
-             text about it's name and version. This is used to identify the
+             text about its name and version. This is used to identify the
              build on startup.
 
     2) NickServ Mode: This is the user mode set by Anope on NickServ.

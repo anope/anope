@@ -279,7 +279,7 @@ Anope Internal Events
         av[0]  The name of the channel that has been unsuspended.
 
     EVENT_CHANGE_NICK
-        A user has just changed it's nick.
+        A user has just changed its nick.
         av[0]  The new nickname of the user. Event is called after the user has been changed
                to this nickname.
         av[1]  The old nickname of the user.
@@ -314,7 +314,7 @@ Anope Internal Events
         av[0]  The new level of DefCon being invoked.
 
     EVENT_GROUP
-        A user has grouped it's nickname to another user group.
+        A user has grouped its nickname to another user group.
         av[0]  The nickname of the user that joined the group.
 
     EVENT_JOIN_CHANNEL
@@ -365,7 +365,7 @@ Anope Internal Events
         av[2]  The nickname being ghosted.
 
     EVENT_NICK_IDENTIFY
-        A user has just identified for it's nickname with NickServ.
+        A user has just identified for its nickname with NickServ.
         av[0]  The nickname of the user that just identified.
 
     EVENT_NICK_LOGOUT
@@ -380,7 +380,7 @@ Anope Internal Events
         av[2]  The nickname being recovered.
 
     EVENT_NICK_REGISTERED
-        A new user has just registered it's nickname. This event is being
+        A new user has just registered its nickname. This event is being
         emitted when the registration is completed, but the user modes have not
         yet been set.
         av[0]  The nickname of the newly registered user.

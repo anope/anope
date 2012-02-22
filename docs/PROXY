@@ -6,9 +6,9 @@ Anope Proxy Detector
 
 1) Introduction
 
-    Anope has had a built-in proxy detector since it's first version. Recently,
+    Anope has had a built-in proxy detector since its first version. Recently,
     however, this built-in proxy detector has been removed. This was because
-    the Anope team found that the proxy detector was showing it's age, and the
+    the Anope team found that the proxy detector was showing its age, and the
     time needed to restore it to a good state wasn't worth it, also considering
     that there are currently good alternatives out there which do the job as
     good as it can be done already.

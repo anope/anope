@@ -1,5 +1,6 @@
 Anope Version 1.8 - GIT
 -----------------------
+02/22  F Fixed several grammar errors in docs/ (patch provided by Simba) [  #00]
 12/31  F Fixed os_svsnick to allow changing the case of a users' nick    [#1369]
 
 

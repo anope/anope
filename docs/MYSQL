@@ -8,7 +8,7 @@ Anope MySQL Support
     core, we decided to save it for 2.0. However, having your db's easily 
     accessible on your website is still a great feature.
 
-    PHASE 1:Anope will be able to save all it's databases to MySQL. It will 
+    PHASE 1:Anope will be able to save all its databases to MySQL. It will 
     happen in conjunction with the current FFF databases. This first step is 
     nothing more than a MySQL dump of the databases (i.e. read-only), since 
     Anope will not (for now) read from Mysql. (COMPLETED)

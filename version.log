@@ -8,9 +8,10 @@ VERSION_MAJOR="1"
 VERSION_MINOR="8"
 VERSION_PATCH="8"
 VERSION_EXTRA="-git"
-VERSION_BUILD="3092"
+VERSION_BUILD="3093"
 
 # Changes since 1.8.7 Release
+#Revision 3093 - Fixed several grammar errors in docs/ (patch provided by Simba)
 #Revision 3092 - Updated Copyright to 2012
 #Revision 3091 - Bug #1369 - Fixed os_svsnick to allow changing the case of a users' nick
 

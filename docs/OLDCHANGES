@@ -167,7 +167,7 @@ Provided by Anope Dev. <team@anope.org>
 2003/07/20  Fixed chanserv badword MySQL issue
 2003/08/30  Allow for E/F lines when handling akilled host's joining the network
 2003/07/25  Added External socket support (*VERY* EXPERIMENTAL)
-2003/07/20  Made MySQL ns_id, na_id and ci_id useful by preserving it's value across updates
+2003/07/20  Made MySQL ns_id, na_id and ci_id useful by preserving its value across updates
 2003/07/20  Some MySQL Optimizations (MySQL 3.23.32+ required)
 
 Provided by DrStein

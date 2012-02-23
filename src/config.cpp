@@ -318,17 +318,17 @@ bool ValidateNotZero(ServerConfig *, const Anope::string &tag, const Anope::stri
 
 bool ValidateEmailReg(ServerConfig *config, const Anope::string &tag, const Anope::string &value, ValueItem &data)
 {
-	if (config->NSEmailReg)
+	if (!config->NSRegistration.equals_ci("none") && !config->NSRegistration.equals_ci("disable"))
 	{
 		if (value.equals_ci("unconfirmedexpire"))
 		{
 			if (!data.GetInteger() && dotime(data.GetValue()) <= 0)
-				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
+				throw ConfigException("The value for <" + tag + ":" + value + "> must be non-zero when e-mail or admin registration is enabled!");
 		}
 		else
 		{
 			if (!data.GetBool())
-				throw ConfigException("The value for <" + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
+				throw ConfigException("The value for <" + tag + ":" + value + "> must be set to yes when e-mail or admin registrations is enabled!");
 		}
 	}
 	return true;
@@ -366,6 +366,9 @@ bool ValidateNickServ(ServerConfig *config, const Anope::string &tag, const Anop
 			if (data.GetValue().length() > 21)
 				throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
 		}
+		else if (value.equals_ci("registration"))
+			if (!data.GetValue().equals_ci("none") && !data.GetValue().equals_ci("mail") && !data.GetValue().equals_ci("admin") && !data.GetValue().equals_ci("registration"))
+				throw ConfigException("The value for <nickserv:registration> must be one of \"none\", \"mail\", \"admin\", or \"disable\"");
 	}
 	return true;
 }
@@ -1158,7 +1161,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "nonicknameownership", "no", new ValueContainerBool(&conf->NoNicknameOwnership), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "regexengine", "", new ValueContainerString(&conf->RegexEngine), DT_STRING, NoValidation},
 		{"nickserv", "name", "", new ValueContainerString(&conf->NickServ), DT_STRING, NoValidation},
-		{"nickserv", "emailregistration", "no", new ValueContainerBool(&conf->NSEmailReg), DT_BOOLEAN, NoValidation},
+		{"nickserv", "registration", "none", new ValueContainerString(&conf->NSRegistration), DT_STRING, ValidateNickServ},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&conf->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},

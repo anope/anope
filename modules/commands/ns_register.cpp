@@ -121,6 +121,12 @@ class CommandNSRegister : public Command
 			return;
 		}
 
+		if (Config->NSRegistration.equals_ci("disable"))
+		{
+			source.Reply(_("Registration is currently disabled."));
+			return;
+		}
+
 		if (!u->HasMode(UMODE_OPER) && Config->NickRegDelay && Anope::CurTime - u->my_signon < Config->NickRegDelay)
 		{
 			source.Reply(_("You must have been using this nick for at least %d seconds to register."), Config->NickRegDelay);
@@ -190,7 +196,12 @@ class CommandNSRegister : public Command
 			if (enc_decrypt(na->nc->pass, tmp_pass) == 1)
 				source.Reply(_("Your password is \002%s\002 - remember this for later use."), tmp_pass.c_str());
 
-			if (Config->NSEmailReg)
+			if (Config->NSRegistration.equals_ci("admin"))
+			{
+				na->nc->SetFlag(NI_UNCONFIRMED);
+				source.Reply(_("All new accounts must be validated by an administrator. Please wait for your registration to be confirmed."));
+			}
+			else if (Config->NSRegistration.equals_ci("mail"))
 			{
 				na->nc->SetFlag(NI_UNCONFIRMED);
 				if (SendRegmail(u, na, source.owner))
@@ -199,7 +210,7 @@ class CommandNSRegister : public Command
 					source.Reply(_("If you do not confirm your email address within %s your account will expire."), duration(Config->NSUnconfirmedExpire).c_str());
 				}
 			}
-			else
+			else if (Config->NSRegistration.equals_ci("none"))
 			{
 				ircdproto->SendLogin(u);
 				if (!Config->NoNicknameOwnership && na->nc == u->Account() && na->nc->HasFlag(NI_UNCONFIRMED) == false)
@@ -261,7 +272,7 @@ class CommandNSResend : public Command
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override
 	{
-		if (!Config->NSEmailReg)
+		if (Config->NSRegistration.equals_ci("mail"))
 			return;
 
 		User *u = source.u;
@@ -290,7 +301,7 @@ class CommandNSResend : public Command
 
 	bool OnHelp(CommandSource &source, const Anope::string &subcommand) anope_override
 	{
-		if (!Config->NSEmailReg)
+		if (Config->NSRegistration.equals_ci("mail"))
 			return false;
 
 		this->SendSyntax(source);
@@ -302,7 +313,7 @@ class CommandNSResend : public Command
 
 	void OnServHelp(CommandSource &source) anope_override
 	{
-		if (Config->NSEmailReg)
+		if (Config->NSRegistration.equals_ci("mail"))
 			Command::OnServHelp(source);
 	}
 };
@@ -319,6 +330,8 @@ class NSRegister : public Module
 	{
 		this->SetAuthor("Anope");
 
+		if (Config->NSRegistration.equals_ci("disable"))
+			throw ModuleException("Module will not load with nickserv:registration disabled.");
 	}
 };
 

@@ -529,8 +529,8 @@ class CoreExport ServerConfig
 	bool NSSecureAdmins;
 	/* Services opers must be /operd on the ircd aswell */
 	bool NSStrictPrivileges;
-	/* Use email to verify new users registering */
-	bool NSEmailReg;
+	/* Type of confirmation to use, or to disable registration completely */
+	Anope::string NSRegistration;
 	/* Core NickServ modules */
 	Anope::string NickCoreModules;
 	/* Set the proper channel modes on users when they identify */

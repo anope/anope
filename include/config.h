@@ -456,6 +456,8 @@ class CoreExport ServerConfig
 	bool HidePrivilegedCommands;
 	/* If set, nicks cant be owned/everything is entirely account based */
 	bool NoNicknameOwnership;
+	/* Regex engine to use */
+	Anope::string RegexEngine;
 
 	/* A vector of our logfile options */
 	std::vector<LogInfo *> LogInfos;

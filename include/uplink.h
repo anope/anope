@@ -25,11 +25,15 @@ class UplinkSocket : public ConnectionSocket, public BufferedSocket
 	
 	class CoreExport Message
 	{
-		Anope::string source;
+	 private:
+		const Server *server;
+		const User *user;
 		std::stringstream buffer;
+
 	 public:
 	 	Message();
-	 	Message(const Anope::string &);
+	 	explicit Message(const Server *);
+		explicit Message(const User *);
 	 	~Message();
 		template<typename T> Message &operator<<(const T &val)
 		{

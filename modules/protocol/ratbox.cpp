@@ -13,8 +13,8 @@
 
 static Anope::string TS6UPLINK;
 
-IRCDVar myIrcd[] = {
-	{"Ratbox 2.0+",	/* ircd name */
+IRCDVar myIrcd = {
+	"Ratbox 2.0+",	/* ircd name */
 	 "+oiS",			/* Modes used by pseudoclients */
 	 0,				/* SVSNICK */
 	 0,				/* Vhost */
@@ -36,44 +36,44 @@ IRCDVar myIrcd[] = {
 	 "$$",			/* TLD Prefix for Global */
 	 4,				/* Max number of modes we can send per line */
 	 0,				/* IRCd sends a SSL users certificate fingerprint */
-	 }
-	,
-	{NULL}
 };
 
 class RatboxProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "OPERWALL :" << buf;
+		UplinkSocket::Message(source) << "OPERWALL :" << buf;
 	}
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "RESV * " << x->Mask << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "RESV * " << x->Mask << " :" << x->GetReason();
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNXLINE * " << x->Mask;
+		UplinkSocket::Message(bi) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
+		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->GetReason();
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		UplinkSocket::Message(bi) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "UNRESV * " << x->Mask;
+		UplinkSocket::Message(Me) << "UNRESV * " << x->Mask;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
@@ -92,19 +92,38 @@ class RatboxProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
+		BotInfo *bi = findbot(Config->OperServ);
+
+		if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
-	}
-
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "KILL " << user->GetUID() << " :" << buf;
+		UplinkSocket::Message(bi) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	/* SERVER name hop descript */
@@ -151,40 +170,12 @@ class RatboxProto : public IRCDProto
 	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me->GetSID()) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
-	}
-
-	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name << " :" << buf;
-		else
-			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name;
-	}
-
-	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "MODE " << dest->name << " " << buf;
+		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 0 " << u->GetUID() << " :" << u->realname;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "SVSMODE " << u->nick << " " << buf;
-	}
-
-	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
-		else
-			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID();
-	}
-
-	/* INVITE */
-	void SendInvite(const BotInfo *source, const Anope::string &chan, const Anope::string &nick) anope_override
-	{
-		User *u = finduser(nick);
-		UplinkSocket::Message(source->GetUID()) << "INVITE " << (u ? u->GetUID() : nick) << " " << chan;
+		UplinkSocket::Message(bi) << "SVSMODE " << u->nick << " " << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -192,12 +183,12 @@ class RatboxProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID();
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -226,7 +217,7 @@ class RatboxProto : public IRCDProto
 			status.SetFlag(CMODE_OP);
 			bi->Join(c, &status);
 		}
-		UplinkSocket::Message(bi->GetUID()) << "TOPIC " << c->name << " :" << c->topic;
+		IRCDProto::SendTopic(bi, c);
 		if (needjoin)
 			bi->Part(c);
 	}
@@ -570,7 +561,7 @@ class ProtoRatbox : public Module
 	{
 		this->SetAuthor("Anope");
 
-		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_var(&myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 

@@ -14,8 +14,10 @@
 
 class CoreExport XLine : public Serializable
 {
+	void InitRegex();
  public:
 	Anope::string Mask;
+	Regex *regex;
 	Anope::string By;
 	time_t Created;
 	time_t Expires;
@@ -25,11 +27,18 @@ class CoreExport XLine : public Serializable
 
 	XLine(const Anope::string &mask, const Anope::string &reason = "", const Anope::string &uid = "");
 
-	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid);
+	XLine(const Anope::string &mask, const Anope::string &by, const time_t expires, const Anope::string &reason, const Anope::string &uid = "");
+	~XLine();
 
 	Anope::string GetNick() const;
 	Anope::string GetUser() const;
 	Anope::string GetHost() const;
+	Anope::string GetReal() const;
+
+	Anope::string GetReason() const;
+
+	bool HasNickOrReal() const;
+	bool IsRegex() const;
 
 	Anope::string serialize_name() const;
 	serialized_data serialize();
@@ -41,7 +50,8 @@ class CoreExport XLineManager : public Service
 	char type;
 	/* List of XLines in this XLineManager */
 	std::vector<XLine *> XLines;
-	static std::map<Anope::string, XLine *, ci::less> XLinesByUID;
+	/* Akills can have the same IDs, sometimes */
+	static std::multimap<Anope::string, XLine *, ci::less> XLinesByUID;
  public:
 	/* List of XLine managers we check users against in XLineManager::CheckAll */
 	static std::list<XLineManager *> XLineManagers;
@@ -63,7 +73,7 @@ class CoreExport XLineManager : public Service
 	 * Wparam u The user
 	 * @return A pair of the XLineManager the user was found in and the XLine they matched, both may be NULL for no match
 	 */
-	static std::pair<XLineManager *, XLine *> CheckAll(User *u);
+	static void CheckAll(User *u);
 
 	/** Generate a unique ID for this XLine
 	 * @return A unique ID
@@ -116,15 +126,13 @@ class CoreExport XLineManager : public Service
 	void Clear();
 
 	/** Checks if a mask can/should be added to the XLineManager
+	 * @param source The source adding the mask.
 	 * @param mask The mask
 	 * @param expires When the mask would expire
-	 * @return A pair of int and XLine*.
-	 * 1 - Mask already exists
-	 * 2 - Mask already exists, but the expiry time was changed
-	 * 3 - Mask is already covered by another mask
-	 * In each case the XLine it matches/is covered by is returned in XLine*
+	 * @param reason the reason
+	 * @return true if the mask can be added
 	 */
-	std::pair<int, XLine *> CanAdd(const Anope::string &mask, time_t expires);
+	bool CanAdd(CommandSource &source, const Anope::string &mask, time_t expires, const Anope::string &reason);
 
 	/** Checks if this list has an entry
 	 * @param mask The mask
@@ -134,15 +142,21 @@ class CoreExport XLineManager : public Service
 
 	/** Check a user against all of the xlines in this XLineManager
 	 * @param u The user
-	 * @return The xline the user marches, if any. Also calls OnMatch()
+	 * @return The xline the user marches, if any.
 	 */
-	virtual XLine *Check(User *u);
+	XLine *CheckAllXLines(User *u);
+
+	/** Check a user against an xline
+	 * @param u The user
+	 * @param x The xline
+	 */
+	virtual bool Check(User *u, XLine *x) = 0;
 
 	/** Called when a user matches a xline in this XLineManager
 	 * @param u The user
 	 * @param x The XLine they match
 	 */
-	virtual void OnMatch(User *u, XLine *x);
+	virtual void OnMatch(User *u, XLine *x) = 0;
 
 	/** Called when an XLine expires
 	 * @param x The xline

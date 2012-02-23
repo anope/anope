@@ -194,8 +194,9 @@ class NSAJoin : public Module
 	void OnNickIdentify(User *u) anope_override
 	{
 		AJoinList *channels = u->Account()->GetExt<AJoinList *>("ns_ajoin_channels");
+		BotInfo *bi = findbot(Config->NickServ);
 
-		if (channels == NULL)
+		if (channels == NULL || bi == NULL)
 			return;
 
 		for (unsigned i = 0; i < channels->size(); ++i)
@@ -255,15 +256,14 @@ class NSAJoin : public Module
 				}
 			}
 
-			if (need_invite)
+			if (need_invite && c != NULL)
 			{
-				BotInfo *bi = findbot(Config->NickServ);
-				if (!bi || !ci->AccessFor(u).HasPriv("INVITE"))
+				if (!ci->AccessFor(u).HasPriv("INVITE"))
 					continue;
-				ircdproto->SendInvite(bi, channels->at(i).first, u->nick);
+				ircdproto->SendInvite(bi, c, u);
 			}
 
-			ircdproto->SendSVSJoin(Config->NickServ, u->nick, channels->at(i).first, key);
+			ircdproto->SendSVSJoin(bi, u->nick, channels->at(i).first, key);
 		}
 	}
 };

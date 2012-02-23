@@ -11,7 +11,6 @@
 
 #include "services.h"
 #include "config.h"
-#include "module.h"
 #include "extern.h"
 #include "bots.h"
 #include "access.h"
@@ -1157,6 +1156,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "retrywait", "60", new ValueContainerInt(&conf->RetryWait), DT_INTEGER, ValidateNotZero},
 		{"options", "hideprivilegedcommands", "no", new ValueContainerBool(&conf->HidePrivilegedCommands), DT_BOOLEAN, NoValidation},
 		{"options", "nonicknameownership", "no", new ValueContainerBool(&conf->NoNicknameOwnership), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"options", "regexengine", "", new ValueContainerString(&conf->RegexEngine), DT_STRING, NoValidation},
 		{"nickserv", "name", "", new ValueContainerString(&conf->NickServ), DT_STRING, NoValidation},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&conf->NSEmailReg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},

@@ -22,9 +22,9 @@ class SGLineManager : public XLineManager
 
 	void OnMatch(User *u, XLine *x) anope_override
 	{
+		this->Send(u, x);
 		if (u)
 			u->Kill(Config->OperServ, x->Reason);
-		this->Send(u, x);
 	}
 
 	void OnExpire(XLine *x) anope_override
@@ -34,19 +34,7 @@ class SGLineManager : public XLineManager
 	
 	void Send(User *u, XLine *x) anope_override
 	{
-		try
-		{
-			if (!ircd->szline)
-				throw SocketException("SZLine is not supported");
-			else if (x->GetUser() != "*")
-				throw SocketException("Can not ZLine a username");
-			sockaddrs(x->GetHost());
-			ircdproto->SendSZLine(u, x);
-		}
-		catch (const SocketException &)
-		{
-			ircdproto->SendAkill(u, x);
-		}
+		ircdproto->SendAkill(u, x);
 	}
 
 	void SendDel(XLine *x) anope_override
@@ -65,6 +53,44 @@ class SGLineManager : public XLineManager
 			ircdproto->SendAkillDel(x);
 		}
 	}
+
+	bool Check(User *u, XLine *x) anope_override
+	{
+		if (x->regex)
+		{
+			Anope::string uh = u->GetIdent() + "@" + u->host, nuhr = u->nick + "!" + uh + "#" + u->realname;
+			if (x->regex->Matches(uh) || x->regex->Matches(nuhr))
+				return true;
+
+			return false;
+		}
+
+		if (!x->GetNick().empty() && !Anope::Match(u->nick, x->GetNick()))
+			return false;
+
+		if (!x->GetUser().empty() && !Anope::Match(u->GetIdent(), x->GetUser()))
+			return false;
+
+		if (!x->GetReal().empty() && !Anope::Match(u->realname, x->GetReal()))
+			return false;
+
+		if (!x->GetHost().empty())
+		{
+			try
+			{
+				cidr cidr_ip(x->GetHost());
+				sockaddrs ip(u->ip);
+				if (cidr_ip.match(ip))
+					return true;
+			}
+			catch (const SocketException &) { }
+		}
+
+		if (x->GetHost().empty() || Anope::Match(u->host, x->GetHost()))
+			return true;
+
+		return false;
+	}
 };
 
 class SQLineManager : public XLineManager
@@ -74,13 +100,13 @@ class SQLineManager : public XLineManager
 
 	void OnMatch(User *u, XLine *x) anope_override
 	{
+		this->Send(u, x);
+
 		if (u)
 		{
 			Anope::string reason = "Q-Lined: " + x->Reason;
 			u->Kill(Config->OperServ, reason);
 		}
-
-		this->Send(u, x);
 	}
 
 	void OnExpire(XLine *x) anope_override
@@ -98,12 +124,18 @@ class SQLineManager : public XLineManager
 		ircdproto->SendSQLineDel(x);
 	}
 
+	bool Check(User *u, XLine *x) anope_override
+	{
+		if (x->regex)
+			return x->regex->Matches(u->nick);
+		return Anope::Match(u->nick, x->Mask);
+	}
+
 	bool CheckChannel(Channel *c)
 	{
-		if (ircd->chansqline)
-			for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
-				if (Anope::Match(c->name, (*it)->Mask))
-					return true;
+		for (std::vector<XLine *>::const_iterator it = this->GetList().begin(), it_end = this->GetList().end(); it != it_end; ++it)
+			if (Anope::Match(c->name, (*it)->Mask, false, true))
+				return true;
 		return false;
 	}
 };
@@ -115,12 +147,13 @@ class SNLineManager : public XLineManager
 
 	void OnMatch(User *u, XLine *x) anope_override
 	{
+		this->Send(u, x);
+
 		if (u)
 		{
 			Anope::string reason = "G-Lined: " + x->Reason;
 			u->Kill(Config->OperServ, reason);
 		}
-		this->Send(u, x);
 	}
 
 	void OnExpire(XLine *x) anope_override
@@ -138,27 +171,11 @@ class SNLineManager : public XLineManager
 		ircdproto->SendSGLineDel(x);
 	}
 
-	XLine *Check(User *u) anope_override
+	bool Check(User *u, XLine *x) anope_override
 	{
-		for (unsigned i = this->GetList().size(); i > 0; --i)
-		{
-			XLine *x = this->GetList()[i - 1];
-
-			if (x->Expires && x->Expires < Anope::CurTime)
-			{
-				this->OnExpire(x);
-				this->DelXLine(x);
-				continue;
-			}
-
-			if (Anope::Match(u->realname, x->Mask))
-			{
-				this->OnMatch(u, x);
-				return x;
-			}
-		}
-
-		return NULL;
+		if (x->regex)
+			return x->regex->Matches(u->realname);
+		return Anope::Match(u->realname, x->Mask, false, true);
 	}
 };
 
@@ -237,7 +254,7 @@ class OperServCore : public Module
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override
 	{
 		if (ircd->sqline && !u->HasMode(UMODE_OPER))
-			this->sqlines.Check(u);
+			this->sqlines.CheckAllXLines(u);
 	}
 
 	EventReturn OnCheckKick(User *u, ChannelInfo *ci, bool &kick) anope_override

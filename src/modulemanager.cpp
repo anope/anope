@@ -462,7 +462,7 @@ void ModuleManager::UnloadAll()
 {
 	std::vector<Anope::string> modules[MT_END];
 	for (std::list<Module *>::iterator it = Modules.begin(), it_end = Modules.end(); it != it_end; ++it)
-		if ((*it)->type != PROTOCOL)
+		if ((*it)->type != PROTOCOL && !(*it)->GetPermanent())
 			modules[(*it)->type].push_back((*it)->name);
 
 	for (size_t i = MT_BEGIN + 1; i != MT_END; ++i)

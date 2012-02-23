@@ -17,10 +17,11 @@
 static bool has_globopsmod = false;
 static bool has_chghostmod = false;
 static bool has_chgidentmod = false;
+static bool has_rlinemod = false;
 #include "inspircd-ts6.h"
 
-IRCDVar myIrcd[] = {
-	{"InspIRCd 1.2",	/* ircd name */
+IRCDVar myIrcd = {
+	"InspIRCd 1.2",	/* ircd name */
 	 "+I",				/* Modes used by pseudoclients */
 	 1,					/* SVSNICK */
 	 1,					/* Vhost */
@@ -42,9 +43,6 @@ IRCDVar myIrcd[] = {
 	 "$",				/* TLD Prefix for Global */
 	 20,				/* Max number of modes we can send per line */
 	 1,					/* IRCd sends a SSL users certificate fingerprint */
-	 }
-	,
-	{NULL}
 };
 
 static bool has_servicesmod = false;
@@ -372,6 +370,8 @@ class Inspircd12IRCdMessage : public InspircdIRCdMessage
 				has_hidechansmod = true;
 			if (params[1].find("m_servprotect.so") != Anope::string::npos)
 				ircd->pseudoclient_mode = "+Ik";
+			if (params[1].find("m_rline.so") != Anope::string::npos)
+				has_rlinemod = true;
 		}
 		else if (params[0].equals_cs("CAPABILITIES"))
 		{
@@ -705,7 +705,7 @@ class ProtoInspIRCd : public Module
 	{
 		this->SetAuthor("Anope");
 
-		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_var(&myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 

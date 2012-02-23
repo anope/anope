@@ -516,7 +516,7 @@ class CoreExport Module : public Extensible
 
 	/** Called before a XLine is deleted
 	 * @param u The user deleting the XLine
-	 * @param x The XLine, can be NULL for all XLines
+	 * @param x The XLine
 	 * @param xlm The xline manager it was deleted from
 	 */
 	virtual void OnDelXLine(User *u, XLine *x, XLineManager *xlm) { }
@@ -835,7 +835,6 @@ class CoreExport Module : public Extensible
 	 * @param nc The nickcore of the memo being deleted
 	 * @param mi The memo info
 	 * @param m The memo
-	 * @param number What memo number is being deleted, can be 0 for all memos
 	 */
 	virtual void OnMemoDel(const NickCore *nc, MemoInfo *mi, Memo *m) { }
 
@@ -843,7 +842,6 @@ class CoreExport Module : public Extensible
 	 * @param ci The channel of the memo being deleted
 	 * @param mi The memo info
 	 * @param m The memo
-	 * @param number What memo number is being deleted, can be 0 for all memos
 	 */
 	virtual void OnMemoDel(ChannelInfo *ci, MemoInfo *mi, Memo *m) { }
 

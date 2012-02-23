@@ -107,13 +107,15 @@ class CommandMSDel : public Command
 			}
 			else
 			{
-				if (ci)
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, NULL));
-				else
-					FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, NULL));
 				/* Delete all memos. */
 				for (unsigned i = 0, end = mi->memos.size(); i < end; ++i)
+				{
+					if (ci)
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(ci, mi, mi->memos[i]));
+					else
+						FOREACH_MOD(I_OnMemoDel, OnMemoDel(u->Account(), mi, mi->memos[i]));
 					delete mi->memos[i];
+				}
 				mi->memos.clear();
 				if (!chan.empty())
 					source.Reply(_("All memos for channel %s have been deleted."), chan.c_str());

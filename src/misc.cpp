@@ -18,6 +18,7 @@
 #include "config.h"
 #include "bots.h"
 #include "language.h"
+#include "regexpr.h"
 
 #include <errno.h>
 #include <sys/types.h>
@@ -570,9 +571,45 @@ std::vector<Anope::string> BuildStringVector(const Anope::string &src, char deli
 
 /*************************************************************************/
 
-bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive)
+bool Anope::Match(const Anope::string &str, const Anope::string &mask, bool case_sensitive, bool use_regex)
 {
 	size_t s = 0, m = 0, str_len = str.length(), mask_len = mask.length();
+
+	if (use_regex && mask_len >= 2 && mask[0] == '/' && mask[mask.length() - 1] == '/')
+	{
+		Anope::string stripped_mask = mask.substr(1, mask_len - 2);
+		// This is often called with the same mask multiple times in a row, so cache it
+		static Regex *r = NULL;
+
+		if (r == NULL || r->GetExpression() != stripped_mask)
+		{
+			service_reference<RegexProvider> provider("Regex", Config->RegexEngine);
+			if (provider)
+			{
+				try
+				{
+					delete r;
+					r = NULL;
+					// This may throw
+					r = provider->Compile(stripped_mask);
+				}
+				catch (const RegexException &ex)
+				{
+					Log(LOG_DEBUG) << ex.GetReason();
+				}
+			}
+			else
+			{
+				delete r;
+				r = NULL;
+			}
+		}
+
+		if (r != NULL && r->Matches(str))
+			return true;
+
+		// Fall through to non regex match
+	}
 
 	while (s < str_len && m < mask_len && mask[m] != '*')
 	{

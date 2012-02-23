@@ -30,17 +30,17 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 		case 'l':
 			if (u && u->HasMode(UMODE_OPER))
 			{
-				ircdproto->SendNumeric(Config->ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(Config->ServerName, 211, source, "%s %d %d %d %d %d %d %ld", Config->Uplinks[CurrentUplink]->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - start_time));
+				ircdproto->SendNumeric(211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+				ircdproto->SendNumeric(211, source, "%s %d %d %d %d %d %d %ld", Config->Uplinks[CurrentUplink]->host.c_str(), UplinkSock->WriteBufferLen(), TotalWritten, -1, UplinkSock->ReadBufferLen(), TotalRead, -1, static_cast<long>(Anope::CurTime - start_time));
 			}
 
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
+			ircdproto->SendNumeric(219, source, "%c :End of /STATS report.", params[0][0]);
 			break;
 		case 'o':
 		case 'O':
 			/* Check whether the user is an operator */
 			if (u && !u->HasMode(UMODE_OPER) && Config->HideStatsO)
-				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
+				ircdproto->SendNumeric(219, source, "%c :End of /STATS report.", params[0][0]);
 			else
 			{
 				for (unsigned i = 0; i < Config->Opers.size(); ++i)
@@ -49,10 +49,10 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 
 					NickAlias *na = findnick(o->name);
 					if (na)
-						ircdproto->SendNumeric(Config->ServerName, 243, source, "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
+						ircdproto->SendNumeric(243, source, "O * * %s %s 0", o->name.c_str(), o->ot->GetName().c_str());
 				}
 
-				ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
+				ircdproto->SendNumeric(219, source, "%c :End of /STATS report.", params[0][0]);
 			}
 
 			break;
@@ -60,14 +60,14 @@ bool OnStats(const Anope::string &source, const std::vector<Anope::string> &para
 		case 'u':
 		{
 			time_t uptime = Anope::CurTime - start_time;
-			ircdproto->SendNumeric(Config->ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
-			ircdproto->SendNumeric(Config->ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
+			ircdproto->SendNumeric(242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s", (uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
+			ircdproto->SendNumeric(250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
+			ircdproto->SendNumeric(219, source, "%c :End of /STATS report.", params[0][0]);
 			break;
 		} /* case 'u' */
 
 		default:
-			ircdproto->SendNumeric(Config->ServerName, 219, source, "%c :End of /STATS report.", params[0][0]);
+			ircdproto->SendNumeric(219, source, "%c :End of /STATS report.", params[0][0]);
 	}
 
 	return true;
@@ -83,14 +83,14 @@ bool OnTime(const Anope::string &source, const std::vector<Anope::string> &)
 	struct tm *tm = localtime(&t);
 	char buf[64];
 	strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	ircdproto->SendNumeric(Config->ServerName, 391, source, "%s :%s", Config->ServerName.c_str(), buf);
+	ircdproto->SendNumeric(391, source, "%s :%s", Config->ServerName.c_str(), buf);
 	return true;
 }
 
 bool OnVersion(const Anope::string &source, const std::vector<Anope::string> &)
 {
 	Module *enc = ModuleManager::FindFirstOf(ENCRYPTION);
-	ircdproto->SendNumeric(Config->ServerName, 351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
+	ircdproto->SendNumeric(351, source, "Anope-%s %s :%s -(%s) -- %s", Anope::Version().c_str(), Config->ServerName.c_str(), ircd->name, enc ? enc->name.c_str() : "unknown", Anope::VersionBuildString().c_str());
 	return true;
 }
 
@@ -103,18 +103,18 @@ bool OnMotd(const Anope::string &source, const std::vector<Anope::string> &)
 	FILE *f = fopen(Config->MOTDFilename.c_str(), "r");
 	if (f)
 	{
-		ircdproto->SendNumeric(Config->ServerName, 375, source, ":- %s Message of the Day", Config->ServerName.c_str());
+		ircdproto->SendNumeric(375, source, ":- %s Message of the Day", Config->ServerName.c_str());
 		char buf[BUFSIZE];
 		while (fgets(buf, sizeof(buf), f))
 		{
 			buf[strlen(buf) - 1] = 0;
-			ircdproto->SendNumeric(Config->ServerName, 372, source, ":- %s", buf);
+			ircdproto->SendNumeric(372, source, ":- %s", buf);
 		}
 		fclose(f);
-		ircdproto->SendNumeric(Config->ServerName, 376, source, ":End of /MOTD command.");
+		ircdproto->SendNumeric(376, source, ":End of /MOTD command.");
 	}
 	else
-		ircdproto->SendNumeric(Config->ServerName, 422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
+		ircdproto->SendNumeric(422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
 
 	return true;
 }

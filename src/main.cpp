@@ -178,50 +178,71 @@ void UplinkSocket::OnError(const Anope::string &error)
 	Log(LOG_TERMINAL) << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
 }
 
-UplinkSocket::Message::Message()
+UplinkSocket::Message::Message() : server(NULL), user(NULL)
 {
 }
 
-UplinkSocket::Message::Message(const Anope::string &s) : source(s)
+UplinkSocket::Message::Message(const Server *s) : server(s), user(NULL)
 {
+}
+
+UplinkSocket::Message::Message(const User *u) : server(NULL), user(u)
+{
+	if (!u)
+		server = Me;
 }
 
 UplinkSocket::Message::~Message()
 {
+	Anope::string message_source = "";
+
+	if (this->server != NULL)
+	{
+		if (this->server != Me && !this->server->HasFlag(SERVER_JUPED))
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->server->GetName() << " who is not from me?";
+			return;
+		}
+
+		if (ircd->ts6)
+			message_source = this->server->GetSID();
+		else
+			message_source = this->server->GetName();
+	}
+	else if (this->user != NULL)
+	{
+		if (this->user->server != Me && !this->user->server->HasFlag(SERVER_JUPED))
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << this->user->nick << " who is not from me?";
+			return;
+		}
+
+		BotInfo *bi = findbot(this->user->nick);
+		if (bi != NULL && bi->introduced == false)
+		{
+			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" from " << bi->nick << " when not introduced";
+			return;
+		}
+
+		if (ircd->ts6)
+			message_source = this->user->GetUID();
+		else
+			message_source = this->user->nick;
+	}
+
 	if (!UplinkSock)
 	{
-		if (!this->source.empty())
-			Log(LOG_DEBUG) << "Attempted to send \"" << this->source << " " << this->buffer.str() << "\" with UplinkSock NULL";
+		if (!message_source.empty())
+			Log(LOG_DEBUG) << "Attempted to send \"" << message_source << " " << this->buffer.str() << "\" with UplinkSock NULL";
 		else
 			Log(LOG_DEBUG) << "Attempted to send \"" << this->buffer.str() << "\" with UplinkSock NULL";
 		return;
 	}
 
-	if (this->source == Me->GetName())
+	if (!message_source.empty())
 	{
-		if (ircd->ts6)
-			this->source = Me->GetSID();
-	}
-	else if (!this->source.empty() && this->source != Me->GetSID())
-	{
-		BotInfo *bi = findbot(this->source);
-		if (bi != NULL)
-		{
-			if (bi->introduced == false)
-			{
-				Log(LOG_DEBUG) << "Attempted to send \"" << this->source << " " << this->buffer.str() << "\" with source not introduced";
-				return;
-			}
-
-			if (ircd->ts6)
-				this->source = bi->GetUID();
-		}
-	}
-
-	if (!this->source.empty())
-	{
-		UplinkSock->Write(":" + this->source + " " + this->buffer.str());
-		Log(LOG_RAWIO) << "Sent: :" << this->source << " " << this->buffer.str();
+		UplinkSock->Write(":" + message_source + " " + this->buffer.str());
+		Log(LOG_RAWIO) << "Sent: :" << message_source << " " << this->buffer.str();
 	}
 	else
 	{

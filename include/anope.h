@@ -346,8 +346,9 @@ namespace Anope
 	 * @param str The string to check against the pattern (e.g. foobar)
 	 * @param mask The pattern to check (e.g. foo*bar)
 	 * @param case_sensitive Whether or not the match is case sensitive, default false.
+	 * @param use_regex Whether or not to try regex. case_sensitive is not used in regex.
 	 */
-	extern CoreExport bool Match(const string &str, const string &mask, bool case_sensitive = false);
+	extern CoreExport bool Match(const string &str, const string &mask, bool case_sensitive = false, bool use_regex = false);
 
 	/** Find a message in the message table
 	 * @param name The name of the message were looking for

@@ -35,6 +35,7 @@ class Module;
 class NickAlias;
 class NickCore;
 class OperType;
+class Regex;
 class Server;
 class ServerConfig;
 class Socket;

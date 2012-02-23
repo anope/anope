@@ -93,7 +93,7 @@ class CommandNSList : public Command
 			 * Instead we build a nice nick!user@host buffer to compare.
 			 * The output is then generated separately. -TheShadow */
 			Anope::string buf = Anope::printf("%s!%s", na->nick.c_str(), !na->last_usermask.empty() ? na->last_usermask.c_str() : "*@*");
-			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern))
+			if (na->nick.equals_ci(pattern) || Anope::Match(buf, pattern, false, true))
 			{
 				if (((count + 1 >= from && count + 1 <= to) || (!from && !to)) && ++nnicks <= Config->NSListMax)
 				{
@@ -156,6 +156,10 @@ class CommandNSList : public Command
 				" \n"
 				"    \002LIST * NOEXPIRE\002\n"
 				"        Lists all registered nicks which have been set to not expire.\n"));
+		if (!Config->RegexEngine.empty())
+			source.Reply(" \n"
+					"Regex matches are also supported using the %s engine.\n"
+					"Enclose your pattern in // if this desired.", Config->RegexEngine.c_str());
 
 		return true;
 	}

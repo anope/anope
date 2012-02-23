@@ -660,7 +660,7 @@ void ChannelInfo::EraseAkick(unsigned index)
 {
 	if (this->akick.empty() || index >= this->akick.size())
 		return;
-
+	
 	delete this->akick[index];
 	this->akick.erase(this->akick.begin() + index);
 }
@@ -719,6 +719,8 @@ void ChannelInfo::EraseBadWord(unsigned index)
 {
 	if (this->badwords.empty() || index >= this->badwords.size())
 		return;
+	
+	FOREACH_MOD(I_OnBadWordDel, OnBadWordDel(this, this->badwords[index]));
 
 	delete this->badwords[index];
 	this->badwords.erase(this->badwords.begin() + index);

@@ -13,8 +13,8 @@
 
 static Anope::string TS6UPLINK;
 
-IRCDVar myIrcd[] = {
-	{"hybrid-7.2.3+plexus-3.0.1",	/* ircd name */
+IRCDVar myIrcd = {
+	"hybrid-7.2.3+plexus-3.0.1",	/* ircd name */
 	 "+oi",				/* Modes used by pseudoclients */
 	 1,				/* SVSNICK */
 	 1,				/* Vhost */
@@ -36,49 +36,49 @@ IRCDVar myIrcd[] = {
 	 "$$",			/* TLD Prefix for Global */
 	 4,				/* Max number of modes we can send per line */
 	 1,					/* IRCd sends a SSL users certificate fingerprint */
-	 }
-	,
-	{NULL}
 };
 
 class PlexusProto : public IRCDProto
 {
 	void SendGlobopsInternal(const BotInfo *source, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "OPERWALL :" << buf;
+		UplinkSocket::Message(source) << "OPERWALL :" << buf;
 	}
 
 	void SendSQLine(User *, const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "RESV * " << x->Mask << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "RESV * " << x->Mask << " :" << x->GetReason();
 	}
 
 	void SendSGLineDel(const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNXLINE * " << x->Mask;
+		UplinkSocket::Message(bi) << "UNXLINE * " << x->Mask;
 	}
 
 	void SendSGLine(User *, const XLine *x) anope_override
 	{
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "XLINE * " << x->Mask << " 0 :" << x->Reason;
+		UplinkSocket::Message(bi) << "XLINE * " << x->Mask << " 0 :" << x->GetReason();
 	}
 
 	void SendAkillDel(const XLine *x) anope_override
 	{
+		if (x->IsRegex() || x->HasNickOrReal())
+			return;
+
 		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
+		UplinkSocket::Message(bi) << "UNKLINE * " << x->GetUser() << " " << x->GetHost();
 	}
 
 	void SendSQLineDel(const XLine *x) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) <<  "UNRESV * " << x->Mask;
+		UplinkSocket::Message(Me) <<  "UNRESV * " << x->Mask;
 	}
 
 	void SendJoin(User *user, Channel *c, const ChannelStatus *status) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " +" << c->GetModes(true, true) << " :" << user->GetUID();
 		if (status)
 		{
 			/* First save the channel status incase uc->Status == status */
@@ -97,19 +97,38 @@ class PlexusProto : public IRCDProto
 		}
 	}
 
-	void SendAkill(User *, const XLine *x) anope_override
+	void SendAkill(User *u, XLine *x) anope_override
 	{
+		BotInfo *bi = findbot(Config->OperServ);
+
+		if (x->IsRegex() || x->HasNickOrReal())
+		{
+			if (!u)
+			{
+				/* No user (this akill was just added), and contains nick and/or realname. Find users that match and ban them */
+				for (Anope::insensitive_map<User *>::const_iterator it = UserListByNick.begin(); it != UserListByNick.end(); ++it)
+					if (x->manager->Check(it->second, x))
+						this->SendAkill(it->second, x);
+				return;
+			}
+
+			XLine *old = x;
+
+			if (old->manager->HasEntry("*@" + u->host))
+				return;
+
+			/* We can't akill x as it has a nick and/or realname included, so create a new akill for *@host */
+			x = new XLine("*@" + u->host, old->By, old->Expires, old->Reason, old->UID);
+			old->manager->AddXLine(x);
+
+			Log(bi, "akill") << "AKILL: Added an akill for " << x->Mask << " because " << u->GetMask() << "#" << u->realname << " matches " << old->Mask;
+		}
+
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		BotInfo *bi = findbot(Config->OperServ);
-		UplinkSocket::Message(bi ? bi->GetUID() : Config->OperServ) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->Reason;
-	}
-
-	void SendSVSKillInternal(const BotInfo *source, const User *user, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(source ? source->GetUID() : Me->GetSID()) << "KILL " << user->GetUID() << " :" << buf;
+		UplinkSocket::Message(bi) << "KLINE * " << timeleft << " " << x->GetUser() << " " << x->GetHost() << " :" << x->GetReason();
 	}
 
 	void SendServer(const Server *server) anope_override
@@ -117,12 +136,12 @@ class PlexusProto : public IRCDProto
 		if (server == Me)
 			UplinkSocket::Message() << "SERVER " << server->GetName() << " " << server->GetHops() << " :" << server->GetDescription();
 		else
-			UplinkSocket::Message(Me->GetSID()) << "SID " << server->GetName() << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
+			UplinkSocket::Message(Me) << "SID " << server->GetName() << " " << server->GetHops() << " " << server->GetSID() << " :" << server->GetDescription();
 	}
 
 	void SendForceNickChange(const User *u, const Anope::string &newnick, time_t when) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
+		UplinkSocket::Message(Me) << "ENCAP " << u->server->GetName() << " SVSNICK " << u->GetUID() << " " << u->timestamp << " " << newnick << " " << when;
 	}
 
 	void SendVhostDel(User *u) anope_override
@@ -137,8 +156,8 @@ class PlexusProto : public IRCDProto
 	void SendVhost(User *u, const Anope::string &ident, const Anope::string &host) anope_override
 	{
 		if (!ident.empty())
-			UplinkSocket::Message(Me->GetSID()) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
+			UplinkSocket::Message(Me) << "ENCAP * CHGIDENT " << u->GetUID() << " " << ident;
+		UplinkSocket::Message(Me) << "ENCAP * CHGHOST " << u->GetUID() << " " << host;
 	}
 
 	void SendConnect() anope_override
@@ -181,40 +200,12 @@ class PlexusProto : public IRCDProto
 	void SendClientIntroduction(const User *u) anope_override
 	{
 		Anope::string modes = "+" + u->GetModes();
-		UplinkSocket::Message(Me->GetSID()) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
-	}
-
-	void SendPartInternal(const BotInfo *bi, const Channel *chan, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name << " :" << buf;
-		else
-			UplinkSocket::Message(bi->GetUID()) << "PART " << chan->name;
-	}
-
-	void SendModeInternal(const BotInfo *bi, const Channel *dest, const Anope::string &buf) anope_override
-	{
-		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "MODE " << dest->name << " " << buf;
+		UplinkSocket::Message(Me) << "UID " << u->nick << " 1 " << u->timestamp << " " << modes << " " << u->GetIdent() << " " << u->host << " 255.255.255.255 " << u->GetUID() << " 0 " << u->host << " :" << u->realname;
 	}
 
 	void SendModeInternal(const BotInfo *bi, const User *u, const Anope::string &buf) anope_override
 	{
-		UplinkSocket::Message(bi ? bi->GetUID() : Me->GetSID()) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
-	}
-
-	void SendKickInternal(const BotInfo *bi, const Channel *chan, const User *user, const Anope::string &buf) anope_override
-	{
-		if (!buf.empty())
-			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID() << " :" << buf;
-		else
-			UplinkSocket::Message(bi->GetUID()) << "KICK " << chan->name << " " << user->GetUID();
-	}
-
-	/* INVITE */
-	void SendInvite(const BotInfo *source, const Anope::string &chan, const Anope::string &nick) anope_override
-	{
-		User *u = finduser(nick);
-		UplinkSocket::Message(source->GetUID()) << "INVITE " << (u ? u->GetUID() : nick) << " " <<  chan;
+		UplinkSocket::Message(bi) << "ENCAP * SVSMODE " << u->GetUID() << " " << u->timestamp << " " << buf;
 	}
 
 	void SendLogin(User *u) anope_override
@@ -222,17 +213,17 @@ class PlexusProto : public IRCDProto
 		if (!u->Account())
 			return;
 
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID() << " " << u->Account()->display;
 	}
 
 	void SendLogout(User *u) anope_override
 	{
-		UplinkSocket::Message(Me->GetSID()) << "ENCAP * SU " << u->GetUID();
+		UplinkSocket::Message(Me) << "ENCAP * SU " << u->GetUID();
 	}
 
 	void SendTopic(BotInfo *bi, Channel *c) anope_override
 	{
-		UplinkSocket::Message(bi->GetUID()) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
+		UplinkSocket::Message(bi) << "ENCAP * TOPIC " << c->name << " " << c->topic_setter << " " << c->topic_time + 1 << " :" << c->topic;
 	}
 
 	void SendChannel(Channel *c) anope_override
@@ -240,7 +231,7 @@ class PlexusProto : public IRCDProto
 		Anope::string modes = c->GetModes(true, true);
 		if (modes.empty())
 			modes = "+";
-		UplinkSocket::Message(Me->GetSID()) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << "%s :";
+		UplinkSocket::Message(Me) << "SJOIN " << c->creation_time << " " << c->name << " " << modes << " :";
 	}
 };
 
@@ -656,7 +647,7 @@ class ProtoPlexus : public Module
 	{
 		this->SetAuthor("Anope");
 
-		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_var(&myIrcd);
 		pmodule_ircd_proto(&this->ircd_proto);
 		pmodule_ircd_message(&this->ircd_message);
 

@@ -74,14 +74,16 @@ Serializable::Serializable()
 {
 	if (serizliable_items == NULL)
 		serizliable_items = new std::list<Serializable *>();
-	serizliable_items->push_front(this);
-	this->s_iter = serizliable_items->begin();
+	serizliable_items->push_back(this);
+	this->s_iter = serizliable_items->end();
+	--this->s_iter;
 }
 
 Serializable::Serializable(const Serializable &)
 {
-	serizliable_items->push_front(this);
-	this->s_iter = serizliable_items->begin();
+	serizliable_items->push_back(this);
+	this->s_iter = serizliable_items->end();
+	--this->s_iter;
 }
 
 Serializable::~Serializable()

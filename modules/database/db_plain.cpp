@@ -507,7 +507,7 @@ static void LoadBotInfo(const std::vector<Anope::string> &params)
 		bi = new BotInfo(params[0], params[1], params[2]);
 
 	bi->created = params[3].is_pos_number_only() ? convertTo<time_t>(params[3]) : 0;
-	bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32_t>(params[4]) : 0;
+	//bi->chancount = params[4].is_pos_number_only() ? convertTo<uint32_t>(params[4]) : 0;
 	bi->realname = params[5];
 
 	Log(LOG_DEBUG_2) << "[db_plain]: Loaded botinfo for " << bi->nick;
@@ -736,7 +736,7 @@ class DBPlain : public Module
 			if (bi->HasFlag(BI_CONF))
 				continue;
 
-			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->chancount << " :" << bi->realname << endl;
+			db_buffer << "BI " << bi->nick << " " << bi->GetIdent() << " " << bi->host << " " << bi->created << " " << bi->GetChannelCount() << " :" << bi->realname << endl;
 			if (bi->FlagCount())
 				db_buffer << "MD FLAGS " << bi->ToString() << endl;
 		}

@@ -71,7 +71,7 @@ class CommandBSInfo : public Command
 			info[_("Real name")] = bi->realname;
 			info[_("Created")] = do_strftime(bi->created);
 			info[_("Options")] = bi->HasFlag(BI_PRIVATE) ? _("Private") : _("None");
-			info[_("Used on")] = stringify(bi->chancount) + " channel(s)";
+			info[_("Used on")] = stringify(bi->GetChannelCount()) + " channel(s)";
 
 			std::vector<Anope::string> replies;
 			info.Process(replies);

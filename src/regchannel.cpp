@@ -246,9 +246,6 @@ ChannelInfo::ChannelInfo(ChannelInfo &ci) : Flags<ChannelInfoFlag, CI_END>(Chann
 	this->akick.clear();
 	this->badwords.clear();
 
-	if (this->bi)
-		++this->bi->chancount;
-
 	for (int i = 0; i < TTB_SIZE; ++i)
 		this->ttb[i] = ci.ttb[i];
 
@@ -397,13 +394,7 @@ void ChannelInfo::unserialize(serialized_data &data)
 			ci->levels[v[i]] = convertTo<int16_t>(v[i + 1]);
 	}
 	if (data.count("bi") > 0)
-	{
-		if (ci->bi)
-			ci->bi->chancount--;
 		ci->bi = findbot(data["bi"].astr());
-		if (ci->bi)
-			ci->bi->chancount++;
-	}
 	data["capsmin"] >> ci->capsmin;
 	data["capspercent"] >> ci->capspercent;
 	data["floodlines"] >> ci->floodlines;

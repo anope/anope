@@ -25,7 +25,6 @@ BotInfo::BotInfo(const Anope::string &nnick, const Anope::string &nuser, const A
 	this->realname = nreal;
 	this->server = Me;
 
-	this->chancount = 0;
 	this->lastmsg = this->created = Anope::CurTime;
 	this->introduced = false;
 
@@ -85,7 +84,6 @@ Serializable::serialized_data BotInfo::serialize()
 	data["host"] << this->host;
 	data["realname"] << this->realname;
 	data["created"] << this->created;
-	data["chancount"] << this->chancount;
 	data["flags"] << this->ToString();
 
 	return data;
@@ -97,7 +95,6 @@ void BotInfo::unserialize(serialized_data &data)
 	if (bi == NULL)
 		bi = new BotInfo(data["nick"].astr(), data["user"].astr(), data["host"].astr(), data["realname"].astr());
 	data["created"] >> bi->created;
-	data["chancount"] >> bi->chancount;
 	bi->FromString(data["flags"].astr());
 }
 
@@ -142,8 +139,6 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	if (ci->bi)
 		ci->bi->UnAssign(u, ci);
 	
-	++this->chancount;
-
 	ci->bi = this;
 	if (ci->c && ci->c->users.size() >= Config->BSMinUsers)
 		this->Join(ci->c, &Config->BotModeList);
@@ -164,9 +159,20 @@ void BotInfo::UnAssign(User *u, ChannelInfo *ci)
 			ci->bi->Part(ci->c);
 	}
 
-	--this->chancount;
-
 	ci->bi = NULL;
+}
+
+unsigned BotInfo::GetChannelCount()
+{
+	unsigned count = 0;
+	for (registered_channel_map::const_iterator it = RegisteredChannelList.begin(), it_end = RegisteredChannelList.end(); it != it_end; ++it)
+	{
+		ChannelInfo *ci = it->second;
+
+		if (ci->bi == this)
+			++count;
+	}
+	return count;
 }
 
 void BotInfo::Join(Channel *c, ChannelStatus *status)

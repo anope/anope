@@ -622,7 +622,6 @@ static void LoadBots()
 
 		BotInfo *bi = new BotInfo(nick, user, host, real);
 		bi->created = created;
-		bi->chancount = chancount;
 
 		if (flags & OLD_BI_PRIVATE)
 			bi->SetFlag(BI_PRIVATE);

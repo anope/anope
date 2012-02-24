@@ -39,7 +39,6 @@ static const Anope::string BotFlagString[] = { "BEGIN", "CORE", "PRIVATE", "CONF
 class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Serializable
 {
  public:
-	uint32_t chancount;
 	time_t created;			/* Birth date ;) */
 	time_t lastmsg;			/* Last time we said something */
 	typedef Anope::insensitive_map<CommandInfo> command_map;
@@ -88,6 +87,10 @@ class CoreExport BotInfo : public User, public Flags<BotFlag, BI_END>, public Se
 	 * @param ci The channel registration to remove the bot from.
 	 */
 	void UnAssign(User *u, ChannelInfo *ci);
+
+	/** Get the number of channels this bot is assigned to
+	 */
+	unsigned GetChannelCount();
 
 	/** Join this bot to a channel
 	 * @param c The channel

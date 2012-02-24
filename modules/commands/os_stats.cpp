@@ -123,7 +123,7 @@ class CommandOSStats : public Command
 	{
 		Anope::string buf;
 		for (std::set<Anope::string>::iterator it = Capab.begin(); it != Capab.end(); ++it)
-			buf += *it;
+			buf += " " + *it;
 		if (!buf.empty())
 			buf.erase(buf.begin());
 

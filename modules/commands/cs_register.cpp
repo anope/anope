@@ -123,7 +123,7 @@ class CommandCSRegister : public Command
 			"NOTICE: In order to register a channel, you must have\n"
 			"first registered your nickname.  If you haven't,\n"
 			"\002%s%s HELP\002 for information on how to do so."),
-			source.owner->nick.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str());
+			source.owner->nick.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), source.owner->nick.c_str(), Config->UseStrictPrivMsgString.c_str(), Config->NickServ.c_str());
 		return true;
 	}
 };

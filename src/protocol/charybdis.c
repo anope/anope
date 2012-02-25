@@ -873,6 +873,9 @@ void charybdis_cmd_remove_akill(char *user, char *host)
 {
     Uid *ud;
 
+    if (!user || !*user || !host || !*host)
+        return;
+
     ud = find_uid(s_OperServ);
     send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
              "UNKLINE * %s %s", user, host);

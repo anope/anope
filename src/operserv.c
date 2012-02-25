@@ -809,6 +809,14 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     *host = 0;
     host++;
 
+    if (!*host)
+    {
+    	if (u)
+		notice_lang(s_OperServ, u, BAD_USERHOST_MASK);
+	free(mask2);
+	return -1;
+    }
+
     entry = scalloc(sizeof(Akill), 1);
 
     if (!entry) {

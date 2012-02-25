@@ -243,7 +243,7 @@ static void delete_server(Server * serv, const char *quitreason)
         serv->prev->next = serv->next;
     if (serv->next)
         serv->next->prev = serv->prev;
-    if (serv->uplink->links == serv)
+    if (serv->uplink && serv->uplink->links == serv)
         serv->uplink->links = serv->next;
 
     if (debug)

@@ -100,7 +100,7 @@ class InspIRCdTS6Proto : public IRCDProto
 			size_t h = x->Mask.find('#');
 			if (h != Anope::string::npos)
 				mask = mask.replace(h, 1, ' ');
-			UplinkSocket::Message(bi) << "RLINE " << mask << " " << timeleft << " :" << x->Reason;
+			UplinkSocket::Message(bi) << "RLINE " << mask << " " << timeleft << " :" << x->GetReason();
 			return;
 		}
 		else if (x->IsRegex() || x->HasNickOrReal())
@@ -138,7 +138,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		}
 		catch (const SocketException &) { }
 
-		UplinkSocket::Message(bi) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(bi) << "ADDLINE G " << x->GetUser() << "@" << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
 	}
 
 	void SendNumericInternal(int numeric, const Anope::string &dest, const Anope::string &buf) anope_override
@@ -207,7 +207,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << Config->OperServ << " " << Anope::CurTime << " " << timeleft << " :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Q " << x->Mask << " " << Config->OperServ << " " << Anope::CurTime << " " << timeleft << " :" << x->GetReason();
 	}
 
 	/* Functions that use serval cmd functions */
@@ -257,7 +257,7 @@ class InspIRCdTS6Proto : public IRCDProto
 		time_t timeleft = x->Expires - Anope::CurTime;
 		if (timeleft > 172800 || !x->Expires)
 			timeleft = 172800;
-		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft <<" :" << x->Reason;
+		UplinkSocket::Message(Me) << "ADDLINE Z " << x->GetHost() << " " << x->By << " " << Anope::CurTime << " " << timeleft <<" :" << x->GetReason();
 	}
 
 	void SendSVSJoin(const BotInfo *source, const Anope::string &nick, const Anope::string &chan, const Anope::string &) anope_override

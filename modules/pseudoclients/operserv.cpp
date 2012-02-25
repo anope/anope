@@ -23,8 +23,6 @@ class SGLineManager : public XLineManager
 	void OnMatch(User *u, XLine *x) anope_override
 	{
 		this->Send(u, x);
-		if (u)
-			u->Kill(Config->OperServ, x->Reason);
 	}
 
 	void OnExpire(XLine *x) anope_override
@@ -101,12 +99,6 @@ class SQLineManager : public XLineManager
 	void OnMatch(User *u, XLine *x) anope_override
 	{
 		this->Send(u, x);
-
-		if (u)
-		{
-			Anope::string reason = "Q-Lined: " + x->Reason;
-			u->Kill(Config->OperServ, reason);
-		}
 	}
 
 	void OnExpire(XLine *x) anope_override
@@ -148,12 +140,6 @@ class SNLineManager : public XLineManager
 	void OnMatch(User *u, XLine *x) anope_override
 	{
 		this->Send(u, x);
-
-		if (u)
-		{
-			Anope::string reason = "G-Lined: " + x->Reason;
-			u->Kill(Config->OperServ, reason);
-		}
 	}
 
 	void OnExpire(XLine *x) anope_override

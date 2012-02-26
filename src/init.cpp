@@ -24,6 +24,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <grp.h>
 
 ServerConfig::Uplink *uplink_server;
 

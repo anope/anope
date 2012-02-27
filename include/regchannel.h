@@ -437,8 +437,6 @@ class CoreExport ChannelInfo : public Extensible, public Flags<ChannelInfoFlag, 
 	void ClearLevels();
 };
 
-extern void check_modes(Channel *c);
-
 extern ChannelInfo *cs_findchan(const Anope::string &chan);
 extern bool IsFounder(User *user, ChannelInfo *ci);
 extern void update_cs_lastseen(User *user, ChannelInfo *ci);

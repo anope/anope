@@ -76,7 +76,7 @@ class CommandCSRegister : public Command
 			/* Implement new mode lock */
 			if (c)
 			{
-				check_modes(c);
+				c->CheckModes();
 
 				ChannelMode *cm;
 				if (u->FindChannel(c) != NULL)
@@ -138,16 +138,6 @@ class CSRegister : public Module
 		commandcsregister(this)
 	{
 		this->SetAuthor("Anope");
-
-		ModuleManager::Attach(I_OnDelChan, this);
-	}
-
-	void OnDelChan(ChannelInfo *ci) anope_override
-	{
-		if (ci->c && ci->c->HasMode(CMODE_REGISTERED))
-			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
-		if (ci->c && ci->HasFlag(CI_PERSIST))
-			ci->c->RemoveMode(NULL, CMODE_PERM, "", false);
 	}
 };
 

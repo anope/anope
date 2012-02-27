@@ -67,7 +67,7 @@ public:
 			{
 				target_ci->c->ci = target_ci;
 
-				check_modes(target_ci->c);
+				target_ci->c->CheckModes();
 
 				ChannelMode *cm;
 				if (u->FindChannel(target_ci->c) != NULL)

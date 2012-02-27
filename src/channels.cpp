@@ -91,7 +91,8 @@ void Channel::Reset()
 		}
 	}
 
-	check_modes(this);
+	this->CheckModes();
+
 	for (CUserList::const_iterator it = this->users.begin(), it_end = this->users.end(); it != it_end; ++it)
 		chan_set_correct_modes((*it)->user, this, 1);
 	
@@ -107,11 +108,79 @@ void Channel::Sync()
 	}
 	if (this->ci)
 	{
-		check_modes(this);
+		this->CheckModes();
 
 		if (Me && Me->IsSynced())
 			this->ci->RestoreTopic();
 	}
+}
+
+void Channel::CheckModes()
+{
+	if (this->bouncy_modes)
+		return;
+
+	/* Check for mode bouncing */
+	if (this->server_modecount >= 3 && this->chanserv_modecount >= 3)
+	{
+		Log() << "Warning: unable to set modes on channel " << this->name << ". Are your servers' U:lines configured correctly?";
+		this->bouncy_modes = 1;
+		return;
+	}
+
+	if (this->chanserv_modetime != Anope::CurTime)
+	{
+		this->chanserv_modecount = 0;
+		this->chanserv_modetime = Anope::CurTime;
+	}
+	this->chanserv_modecount++;
+
+	EventReturn MOD_RESULT;
+	FOREACH_RESULT(I_OnCheckModes, OnCheckModes(this));
+	if (MOD_RESULT == EVENT_STOP)
+		return;
+
+	if (this->ci)
+		for (std::multimap<ChannelModeName, ModeLock>::const_iterator it = this->ci->GetMLock().begin(), it_end = this->ci->GetMLock().end(); it != it_end; ++it)
+		{
+			const ModeLock &ml = it->second;
+			ChannelMode *cm = ModeManager::FindChannelModeByName(ml.name);
+			if (!cm)
+				continue;
+
+			if (cm->Type == MODE_REGULAR)
+			{
+				if (!this->HasMode(cm->Name) && ml.set)
+					this->SetMode(NULL, cm);
+				else if (this->HasMode(cm->Name) && !ml.set)
+					this->RemoveMode(NULL, cm);
+			}
+			else if (cm->Type == MODE_PARAM)
+			{
+				/* If the channel doesnt have the mode, or it does and it isn't set correctly */
+				if (ml.set)
+				{
+					Anope::string param;
+					this->GetParam(cm->Name, param);
+
+					if (!this->HasMode(cm->Name) || (!param.empty() && !ml.param.empty() && !param.equals_cs(ml.param)))
+						this->SetMode(NULL, cm, ml.param);
+				}
+				else
+				{
+					if (this->HasMode(cm->Name))
+						this->RemoveMode(NULL, cm);
+				}
+	
+			}
+			else if (cm->Type == MODE_LIST)
+			{
+				if (ml.set)
+					this->SetMode(NULL, cm, ml.param);
+				else
+					this->RemoveMode(NULL, cm, ml.param);
+			}
+		}
 }
 
 void Channel::JoinUser(User *user)
@@ -333,43 +402,7 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 	if (!EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
 
-	/* Non registered channels can not be +r */
-	if (!ci && HasMode(CMODE_REGISTERED))
-		RemoveMode(NULL, CMODE_REGISTERED);
-
-	/* Non registered channel has no mlock */
-	if (!ci)
-		return;
-
-	ModeLock *ml = ci->GetMLock(cm->Name, cm->Type == MODE_PARAM ? "" : param);
-	if (ml)
-	{
-		if (ml->set && cm->Type == MODE_PARAM)
-		{
-			Anope::string cparam;
-			this->GetParam(cm->Name, cparam);
-
-			/* We have the wrong param set */
-			if (cparam.empty() || ml->param.empty() || !cparam.equals_cs(ml->param))
-				/* Reset the mode with the correct param */
-				this->SetMode(NULL, cm, ml->param);
-		}
-		else if (!ml->set)
-		{
-			if (cm->Type == MODE_REGULAR)
-				this->RemoveMode(NULL, cm);
-			else if (cm->Type == MODE_PARAM)
-			{
-				Anope::string cparam;
-				this->GetParam(cm->Name, cparam);
-				this->RemoveMode(NULL, cm, cparam);
-			}
-			else if (cm->Type == MODE_LIST)
-			{
-				this->RemoveMode(NULL, cm, param);
-			}
-		}
-	}
+	this->CheckModes();
 }
 
 /** Remove a mode internally on a channel, this is not sent out to the IRCd
@@ -459,19 +492,10 @@ void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bo
 
 	/* Check for mlock */
 
-	/* Non registered channel, no mlock */
-	if (!ci || !EnforceMLock || MOD_RESULT == EVENT_STOP)
+	if (!EnforceMLock || MOD_RESULT == EVENT_STOP)
 		return;
 
-	ModeLock *ml = ci->GetMLock(cm->Name, param);
-	/* This channel has this the mode locked on */
-	if (ml && ml->set)
-	{
-		if (cm->Type == MODE_REGULAR)
-			this->SetMode(NULL, cm);
-		else if (cm->Type == MODE_PARAM || cm->Type == MODE_LIST)
-			this->SetMode(NULL, cm, ml->param);
-	}
+	this->CheckModes();
 }
 
 /** Set a mode on a channel

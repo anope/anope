@@ -938,6 +938,13 @@ class CoreExport Module : public Extensible
 	 * @param l The log message
 	 */
 	virtual void OnLog(Log *l) { }
+
+	/** Called when a channels modes are being checked to see if they are allowed,
+	 * mostly to ensure mlock/+r are set.
+	 * @param c The channel
+	 * @return EVENT_STOP to stop checking modes
+	 */
+	virtual EventReturn OnCheckModes(Channel *c) { return EVENT_CONTINUE; }
 };
 
 /** Implementation-specific flags which may be set in ModuleManager::Attach()
@@ -957,7 +964,7 @@ enum Implementation
 		/* ChanServ */
 		I_OnChanSuspend, I_OnChanDrop, I_OnPreChanExpire, I_OnChanExpire, I_OnAccessAdd,
 		I_OnAccessDel, I_OnAccessClear, I_OnLevelChange, I_OnChanRegistered, I_OnChanUnsuspend, I_OnCreateChan, I_OnDelChan, I_OnChannelCreate,
-		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick,
+		I_OnChannelDelete, I_OnAkickAdd, I_OnAkickDel, I_OnCheckKick, I_OnCheckModes,
 		I_OnChanInfo, I_OnFindChan, I_OnCheckPriv, I_OnGroupCheckPriv,
 
 		/* BotServ */

@@ -172,6 +172,13 @@ class CSSetPersist : public Module
 	{
 		this->SetAuthor("Anope");
 
+		ModuleManager::Attach(I_OnDelChan, this);
+	}
+
+	void OnDelChan(ChannelInfo *ci) anope_override
+	{
+		if (ci->c && ci->HasFlag(CI_PERSIST))
+			ci->c->RemoveMode(NULL, CMODE_PERM, "", false);
 	}
 };
 

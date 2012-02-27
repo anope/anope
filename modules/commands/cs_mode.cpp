@@ -96,7 +96,7 @@ class CommandCSMode : public Command
 			}
 
 			if (ci->c)
-				check_modes(ci->c);
+				ci->c->CheckModes();
 		}
 		else if (subcommand.equals_ci("DEL") && !param.empty())
 		{

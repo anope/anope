@@ -86,6 +86,10 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	 */
 	void Sync();
 
+	/** Check if a channels modes are correct.
+	 */
+	void CheckModes();
+
 	/** Join a user internally to the channel
 	 * @param u The user
 	 */

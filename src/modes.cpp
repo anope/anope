@@ -178,7 +178,7 @@ ChannelMode::~ChannelMode()
  */
 bool ChannelMode::CanSet(User *u) const
 {
-	if (Config->NoMLock.find(this->ModeChar) != Anope::string::npos)
+	if (Config->NoMLock.find(this->ModeChar) != Anope::string::npos || Config->CSRequire.find(this->ModeChar) != Anope::string::npos)
 		return false;
 	return true;
 }

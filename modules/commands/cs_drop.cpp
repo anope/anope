@@ -53,15 +53,16 @@ class CommandCSDrop : public Command
 			return;
 		}
 
-		if (ci->c && ModeManager::FindChannelModeByName(CMODE_REGISTERED))
-			ci->c->RemoveMode(NULL, CMODE_REGISTERED, "", false);
-
 		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER"));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
 
+		Channel *c = ci->c;
 		delete ci;
 
 		source.Reply(_("Channel \002%s\002 has been dropped."), chan.c_str());
+
+		if (c)
+			c->CheckModes();
 
 		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 

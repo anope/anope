@@ -313,7 +313,7 @@ void Server::Sync(bool SyncLinks)
 		for (channel_map::const_iterator it = ChannelList.begin(), it_end = ChannelList.end(); it != it_end; ++it)
 		{
 			Channel *c = it->second;
-			check_modes(c);
+			c->CheckModes();
 			if (c->ci)
 				c->ci->RestoreTopic();
 		}

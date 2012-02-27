@@ -411,9 +411,6 @@ class InspircdIRCdMessage : public IRCdMessage
 		{
 			c->creation_time = ts;
 			c->Reset();
-
-			/* Reset mlock */
-			check_modes(c);
 		}
 		/* Their TS is newer than ours, our modes > theirs, unset their modes if need be */
 		else if (ts > c->creation_time)

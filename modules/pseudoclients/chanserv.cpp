@@ -65,7 +65,7 @@ class ChanServCore : public Module
 		if (ChanServ == NULL)
 			throw ModuleException("No bot named " + Config->ChanServ);
 
-		Implementation i[] = { I_OnBotPrivmsg, I_OnDelCore, I_OnPreHelp, I_OnPostHelp };
+		Implementation i[] = { I_OnBotPrivmsg, I_OnDelCore, I_OnPreHelp, I_OnPostHelp, I_OnCheckModes };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -178,6 +178,17 @@ class ChanServCore : public Module
 				"Services Operators can also, depending on their access drop\n"
 				"any channel, view (and modify) the access, levels and akick\n"
 				"lists and settings for any channel."));
+	}
+
+	EventReturn OnCheckModes(Channel *c) anope_override
+	{
+		if (!Config->CSRequire.empty())
+			if (c->ci)
+				c->SetModes(NULL, false, "+%s", Config->CSRequire.c_str());
+			else
+				c->SetModes(NULL, false, "-%s", Config->CSRequire.c_str());
+
+		return EVENT_CONTINUE;
 	}
 };
 

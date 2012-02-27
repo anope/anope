@@ -593,6 +593,7 @@ class ProtoPlexus : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_OPER, 'o'));
 		ModeManager::AddUserMode(new UserMode(UMODE_SNOMASK, 's'));
 		ModeManager::AddUserMode(new UserMode(UMODE_WALLOPS, 'w'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NOCTCP, 'C'));
 		ModeManager::AddUserMode(new UserMode(UMODE_DEAF, 'D'));
 		ModeManager::AddUserMode(new UserMode(UMODE_SOFTCALLERID, 'G'));
 		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
@@ -622,6 +623,7 @@ class ProtoPlexus : public Module
 
 		/* Add channel modes */
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_BANDWIDTH, 'B'));
+		ModeManager::AddChannelMode(new ChannelMode(CMODE_NOCTCP, 'C'));
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_REGMODERATED, 'M'));
 		ModeManager::AddChannelMode(new ChannelMode(CMODE_NONOTICE, 'N'));
 		ModeManager::AddChannelMode(new ChannelModeOper('O'));

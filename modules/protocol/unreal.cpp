@@ -1156,7 +1156,7 @@ class ProtoUnreal : public Module
 		ModeManager::AddUserMode(new UserMode(UMODE_NETADMIN, 'N'));
 		ModeManager::AddUserMode(new UserMode(UMODE_REGPRIV, 'R'));
 		ModeManager::AddUserMode(new UserMode(UMODE_PROTECTED, 'S'));
-		ModeManager::AddUserMode(new UserMode(UMODE_NO_CTCP, 'T'));
+		ModeManager::AddUserMode(new UserMode(UMODE_NOCTCP, 'T'));
 		ModeManager::AddUserMode(new UserMode(UMODE_WEBTV, 'V'));
 		ModeManager::AddUserMode(new UserMode(UMODE_WHOIS, 'W'));
 		ModeManager::AddUserMode(new UserMode(UMODE_ADMIN, 'a'));

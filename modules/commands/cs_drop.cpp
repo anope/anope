@@ -56,6 +56,8 @@ class CommandCSDrop : public Command
 		bool override = (ci->HasFlag(CI_SECUREFOUNDER) ? !IsFounder(u, ci) : !ci->AccessFor(u).HasPriv("FOUNDER"));
 		Log(override ? LOG_OVERRIDE : LOG_COMMAND, u, this, ci) << "(founder was: " << (ci->GetFounder() ? ci->GetFounder()->display : "none") << ")";
 
+		FOREACH_MOD(I_OnChanDrop, OnChanDrop(ci));
+
 		Channel *c = ci->c;
 		delete ci;
 
@@ -63,8 +65,6 @@ class CommandCSDrop : public Command
 
 		if (c)
 			c->CheckModes();
-
-		FOREACH_MOD(I_OnChanDrop, OnChanDrop(chan));
 
 		return;
 	}

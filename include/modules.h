@@ -586,10 +586,10 @@ class CoreExport Module : public Extensible
 	 */
 	virtual void OnLevelChange(User *u, ChannelInfo *ci, const Anope::string &priv, int16_t what) { }
 
-	/** Called when a channel is dropped
-	 * @param chname The channel name
+	/** Called right before a channel is dropped
+	 * @param ci The channel
 	 */
-	virtual void OnChanDrop(const Anope::string &chname) { }
+	virtual void OnChanDrop(ChannelInfo *ci) { }
 
 	/** Called when a channel is registered
 	 * @param ci The channel

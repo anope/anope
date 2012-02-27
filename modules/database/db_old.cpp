@@ -43,7 +43,8 @@ else \
 #define OLD_NI_HIDE_STATUS	0x00020000 /* Don't show services access status */
 #define OLD_NI_SUSPENDED	0x00040000 /* Nickname is suspended */
 #define OLD_NI_AUTOOP		0x00080000 /* Autoop nickname in channels */
-#define OLD_NI_NOEXPIRE		0x00100000 /* nicks in this group won't expire */
+
+#define OLD_NS_NO_EXPIRE		0x0004     /* nick won't expire */
 
 #define OLD_CI_KEEPTOPIC		0x00000001
 #define OLD_CI_SECUREOPS		0x00000002
@@ -442,8 +443,6 @@ static void LoadNicks()
 				nc->SetFlag(NI_SUSPENDED);
 			if (!(uint & OLD_NI_AUTOOP))
 				nc->SetFlag(NI_AUTOOP);
-			if (uint & OLD_NI_NOEXPIRE)
-				nc->Extend("noexpire", NULL);
 
 			uint16_t u16;
 			READ(read_uint16(&u16, f));
@@ -544,6 +543,7 @@ static void LoadNicks()
 
 			uint16_t tmpu16;
 			READ(read_uint16(&tmpu16, f));
+
 			Anope::string core;
 			READ(read_string(core, f));
 			NickCore *nc = findcore(core);
@@ -559,7 +559,7 @@ static void LoadNicks()
 			na->time_registered = time_registered;
 			na->last_seen = last_seen;
 
-			if (na->nc->HasExt("noexpire"))
+			if (tmpu16 & OLD_NS_NO_EXPIRE)
 				na->SetFlag(NS_NO_EXPIRE);
 
 			Log(LOG_DEBUG) << "Loaded NickAlias " << na->nick;

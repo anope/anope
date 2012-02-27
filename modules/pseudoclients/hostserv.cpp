@@ -36,7 +36,7 @@ class HostServCore : public Module
 		NickAlias *na = findnick(u->nick);
 		if (!na || !na->HasVhost())
 			na = findnick(u->Account()->display);
-		if (!na)
+		if (!na || !na->HasVhost())
 			return;
 
 		if (u->vhost.empty() || !u->vhost.equals_cs(na->GetVhostHost()) || (!na->GetVhostIdent().empty() && !u->GetVIdent().equals_cs(na->GetVhostIdent())))

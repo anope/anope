@@ -73,7 +73,7 @@ class DBMySQL : public Module
 		query_text.erase(query_text.end() - 1);
 		query_text += ") ON DUPLICATE KEY UPDATE ";
 		for (Serializable::serialized_data::const_iterator it = data.begin(), it_end = data.end(); it != it_end; ++it)
-			query_text += it->first + "=VALUES(" + it->first + "),";
+			query_text += "`" + it->first + "`=VALUES(`" + it->first + "`),";
 		query_text.erase(query_text.end() - 1);
 
 		SQLQuery query(query_text);

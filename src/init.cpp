@@ -146,7 +146,7 @@ bool GetCommandLineArgument(const Anope::string &name, char shortname, Anope::st
 
 	for (std::vector<std::pair<Anope::string, Anope::string> >::iterator it = CommandLineArguments.begin(), it_end = CommandLineArguments.end(); it != it_end; ++it)
 	{
-		if (it->first.equals_ci(name) || it->first[0] == shortname)
+		if (it->first.equals_ci(name) || (it->first.length() == 1 && it->first[0] == shortname))
 		{
 			param = it->second;
 			return true;

@@ -20,7 +20,7 @@ class CommandBSKick : public Command
 	CommandBSKick(Module *creator) : Command(creator, "botserv/kick", 3, 6)
 	{
 		this->SetDesc(_("Configures kickers"));
-		this->SetSyntax(_("\037channel\037 \037option\037 {\037ON|\037} [\037settings\037]"));
+		this->SetSyntax(_("\037channel\037 \037option\037 {\037ON|OFF\037} [\037settings\037]"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

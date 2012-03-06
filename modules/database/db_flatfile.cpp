@@ -13,10 +13,9 @@
 #include "module.h"
 #include <unistd.h>
 
-Anope::string DatabaseFile;
-
 class DBFlatFile : public Module
 {
+	Anope::string DatabaseFile;
 	/* Day the last backup was on */
 	int LastDay;
 	/* Backup file names */
@@ -47,7 +46,7 @@ class DBFlatFile : public Module
 		if (tm->tm_mday != LastDay)
 		{
 			LastDay = tm->tm_mday;
-			Anope::string newname = "backups/" + DatabaseFile + "." + stringify(tm->tm_year) + stringify(tm->tm_mon) + stringify(tm->tm_mday);
+			Anope::string newname = "backups/" + DatabaseFile + "." + stringify(tm->tm_year) + "." + stringify(tm->tm_mon) + "." + stringify(tm->tm_mday);
 
 			/* Backup already exists */
 			if (IsFile(newname))

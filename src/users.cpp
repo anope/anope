@@ -835,7 +835,7 @@ User *do_nick(const Anope::string &source, const Anope::string &nick, const Anop
 		user->SetVIdent(username);
 		user->SetModesInternal(modes.c_str());
 
-		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ")" : "") << " (" << user->realname << ") " << user->ip << " connected to the network (" << serv->GetName() << ")";
+		Log(user, "connect") << (!vhost.empty() ? Anope::string("(") + vhost + ") " : "") << "(" << user->realname << ") " << user->ip << " connected to the network (" << serv->GetName() << ")";
 
 		bool exempt = false;
 		if (user->server && user->server->IsULined())

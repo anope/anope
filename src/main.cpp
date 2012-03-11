@@ -83,7 +83,7 @@ class UpdateTimer : public Timer
 };
 
 UplinkSocket *UplinkSock = NULL;
-int CurrentUplink = 0;
+int CurrentUplink = -1;
 
 static void Connect();
 
@@ -100,8 +100,7 @@ class ReconnectTimer : public Timer
 		}
 		catch (const SocketException &ex)
 		{
-			quitmsg = ex.GetReason();
-			quitting = true;
+			Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (CurrentUplink + 1) << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << "): " << ex.GetReason();
 		}
 	}
 };
@@ -146,8 +145,16 @@ UplinkSocket::~UplinkSocket()
 
 	if (AtTerm())
 	{
-		quitting = true;
-		return_code = -1;
+		if (static_cast<unsigned>(CurrentUplink + 1) == Config->Uplinks.size())
+		{
+			quitting = true;
+			quitmsg = "Unable to connect to any uplink";
+			return_code = -1;
+		}
+		else
+		{
+			new ReconnectTimer(1);
+		}
 	}
 	else if (!quitting)
 	{
@@ -168,14 +175,14 @@ bool UplinkSocket::Read(const Anope::string &buf)
 
 void UplinkSocket::OnConnect()
 {
-	Log(LOG_TERMINAL) << "Successfully connected to " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
+	Log(LOG_TERMINAL) << "Successfully connected to uplink #" << (CurrentUplink + 1) << " " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port;
 	ircdproto->SendConnect();
 	FOREACH_MOD(I_OnServerConnect, OnServerConnect());
 }
 
 void UplinkSocket::OnError(const Anope::string &error)
 {
-	Log(LOG_TERMINAL) << "Unable to connect to server " << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << (!error.empty() ? (": " + error) : "");
+	Log(LOG_TERMINAL) << "Unable to connect to uplink #" << (CurrentUplink + 1) << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << ")" << (!error.empty() ? (": " + error) : "");
 }
 
 UplinkSocket::Message::Message() : server(NULL), user(NULL)
@@ -264,7 +271,7 @@ static void Connect()
 	FOREACH_MOD(I_OnPreServerConnect, OnPreServerConnect());
 	DNSQuery rep = DNSManager::BlockingQuery(u->host, u->ipv6 ? DNS_QUERY_AAAA : DNS_QUERY_A);
 	Anope::string reply_ip = !rep.answers.empty() ? rep.answers.front().rdata : u->host;
-	Log(LOG_TERMINAL) << "Attempting to connect to " << u->host << " (" << reply_ip << "), port " << u->port;
+	Log(LOG_TERMINAL) << "Attempting to connect to uplink #" << (CurrentUplink + 1) << " " << u->host << " (" << reply_ip << "), port " << u->port;
 	UplinkSock->Connect(reply_ip, u->port);
 }
 
@@ -410,9 +417,7 @@ int main(int ac, char **av, char **envp)
 	}
 	catch (const SocketException &ex)
 	{
-		quitmsg = ex.GetReason();
-		quitting = true;
-		return_code = -1;
+		Log(LOG_TERMINAL) << "Unable to connect to uplink #" << CurrentUplink << " (" << Config->Uplinks[CurrentUplink]->host << ":" << Config->Uplinks[CurrentUplink]->port << "): " << ex.GetReason();
 	}
 
 	/* Set up timers */

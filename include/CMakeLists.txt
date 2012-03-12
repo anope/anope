@@ -27,6 +27,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   foreach(PCH_SOURCE ${PCH_SOURCES})
     find_includes(${PCH_SOURCE} INCLUDES)
     set(INCLUDES_LIST)
+    append_to_list(INCLUDES_LIST ${PCH_SOURCE})
     foreach(INCLUDE ${INCLUDES})
       # Extract the filename from the #include line
       extract_include_filename(${INCLUDE} FILENAME QUOTE_TYPE)

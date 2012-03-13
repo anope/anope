@@ -13,6 +13,30 @@
 
 #include "module.h"
 
+struct Stats : Serializable
+{
+	Anope::string serialize_name() const
+	{
+		return "Stats";
+	}
+
+	serialized_data serialize() anope_override
+	{
+		serialized_data data;
+
+		data["maxusercnt"] << maxusercnt;
+		data["maxusertime"] << maxusertime;
+
+		return data;
+	}
+
+	static void unserialize(serialized_data &data)
+	{
+		data["maxusercnt"] >> maxusercnt;
+		data["maxusertime"] >> maxusertime;
+	}
+};
+
 /**
  * Count servers connected to server s
  * @param s The server to start counting from
@@ -187,10 +211,12 @@ class CommandOSStats : public Command
 class OSStats : public Module
 {
 	CommandOSStats commandosstats;
+	SerializeType stats_type;
+	Stats stats_saver;
 
  public:
 	OSStats(const Anope::string &modname, const Anope::string &creator) : Module(modname, creator, CORE),
-		commandosstats(this)
+		commandosstats(this), stats_type("Stats", Stats::unserialize)
 	{
 		this->SetAuthor("Anope");
 

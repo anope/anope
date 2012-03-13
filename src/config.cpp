@@ -1160,6 +1160,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"options", "regexengine", "", new ValueContainerString(&conf->RegexEngine), DT_STRING, NoValidation},
 		{"nickserv", "name", "", new ValueContainerString(&conf->NickServ), DT_STRING, NoValidation},
 		{"nickserv", "registration", "none", new ValueContainerString(&conf->NSRegistration), DT_STRING, ValidateNickServ},
+		{"nickserv", "unregistered_notice", "", new ValueContainerString(&conf->NSUnregisteredNotice), DT_STRING, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&conf->NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "confirmemailchanges", "no", new ValueContainerBool(&conf->NSConfirmEmailChanges), DT_BOOLEAN, NoValidation},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},

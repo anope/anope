@@ -197,7 +197,7 @@ class NickServCore : public Module
 			throw ModuleException("No bot named " + Config->NickServ);
 
 		Implementation i[] = { I_OnDelNick, I_OnDelCore, I_OnChangeCoreDisplay, I_OnNickIdentify, I_OnNickGroup,
-		I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp };
+		I_OnNickUpdate, I_OnUserNickChange, I_OnPreHelp, I_OnPostHelp, I_OnUserConnect };
 		ModuleManager::Attach(i, this, sizeof(i) / sizeof(Implementation));
 	}
 
@@ -349,6 +349,12 @@ class NickServCore : public Module
 			"nicknames or other malicious actions. Abuse of %s\n"
 			"will result in, at minimum, loss of the abused\n"
 			"nickname(s)."), Config->NickServ.c_str());
+	}
+
+	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
+	{
+		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u)
+			u->SendMessage(NickServ, Config->NSUnregisteredNotice);
 	}
 };
 

@@ -533,6 +533,8 @@ class CoreExport ServerConfig
 	bool NSStrictPrivileges;
 	/* Type of confirmation to use, or to disable registration completely */
 	Anope::string NSRegistration;
+	/* A message sent to unregistered users on connect */
+	Anope::string NSUnregisteredNotice;
 	/* Core NickServ modules */
 	Anope::string NickCoreModules;
 	/* Set the proper channel modes on users when they identify */

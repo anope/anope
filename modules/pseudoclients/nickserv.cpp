@@ -353,7 +353,7 @@ class NickServCore : public Module
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
 	{
-		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u)
+		if (!Config->NoNicknameOwnership && !Config->NSUnregisteredNotice.empty() && u && findnick(u->nick) == NULL)
 			u->SendMessage(NickServ, Config->NSUnregisteredNotice);
 	}
 };

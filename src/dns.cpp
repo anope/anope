@@ -72,7 +72,7 @@ DNSRequest::DNSRequest(const Anope::string &addr, QueryType qt, bool cache, Modu
 
 	do
 	{
-		static unsigned short cur_id = 0;
+		static unsigned short cur_id = rand();
 		this->id = cur_id++;
 	}
 	while (DNSEngine->requests.count(this->id));

@@ -158,6 +158,10 @@ ServerConfig::ServerConfig() : config_data(), NSDefFlags(NickCoreFlagStrings), C
 			this->SessionAutoKillExpiry = 1800; /* 30 minutes */
 	}
 
+	/* Check the user keys */
+	if (this->Seed == 0)
+		Log() << "Configuration option options:seed should be set. It's for YOUR safety! Remember that!";
+
 	SetDefaultMLock(this);
 
 	if (IsFile(this->NameServer))
@@ -1135,6 +1139,7 @@ ConfigItems::ConfigItems(ServerConfig *conf)
 		{"networkinfo", "userlen", "10", new ValueContainerUInt(&conf->UserLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"networkinfo", "hostlen", "64", new ValueContainerUInt(&conf->HostLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
 		{"options", "passlen", "32", new ValueContainerUInt(&conf->PassLen), DT_UINTEGER | DT_NORELOAD, NoValidation},
+		{"options", "seed", "0", new ValueContainerLUInt(&conf->Seed), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&conf->NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"options", "strictpasswords", "no", new ValueContainerBool(&conf->StrictPasswords), DT_BOOLEAN, NoValidation},
 		{"options", "badpasslimit", "0", new ValueContainerUInt(&conf->BadPassLimit), DT_UINTEGER, NoValidation},

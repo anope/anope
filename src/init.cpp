@@ -472,7 +472,7 @@ void Init(int ac, char **av)
 	InitLanguages();
 
 	/* Initialize random number generator */
-	srand(time(NULL));
+	srand(Config->Seed);
 
 	/* load modules */
 	Log() << "Loading modules...";

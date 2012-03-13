@@ -661,6 +661,9 @@ class CoreExport ServerConfig
 	/* List of modules to autoload */
 	std::list<Anope::string> ModulesAutoLoad;
 
+	/* Seed to use for RNG */
+	unsigned long Seed;
+
 	/* Numeric */
 	Anope::string Numeric;
 	/* Array of ulined servers */

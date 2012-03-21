@@ -31,7 +31,13 @@ struct AJoinList : std::vector<std::pair<Anope::string, Anope::string> >, Extens
 		sd["nc"] << this->nc->display;
 		Anope::string channels;
 		for (unsigned i = 0; i < this->size(); ++i)
-			channels += this->at(i).first + "," + this->at(i).second;
+		{
+			channels += this->at(i).first;
+			if (!this->at(i).second.empty())
+				channels += "," + this->at(i).second;
+			if (i+1 < this->size())
+				channels += " ";
+		}
 		sd["channels"] << channels;
 
 		return sd;

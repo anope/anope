@@ -80,7 +80,7 @@ static ModuleReturn moduleCopyFile(const Anope::string &name, Anope::string &out
 	output = tmp_output;
 	free(tmp_output);
 
-	Log(LOG_DEBUG) << "Runtime module location: " << output;
+	Log(LOG_DEBUG_2) << "Runtime module location: " << output;
 	
 	std::ofstream target(output.c_str(), std::ios_base::in | std::ios_base::binary);
 	if (!target.is_open())
@@ -139,7 +139,13 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 	/* Don't skip return value checking! -GD */
 	ModuleReturn ret = moduleCopyFile(modname, pbuf);
 	if (ret != MOD_ERR_OK)
+	{
+		if (ret == MOD_ERR_NOEXIST)
+			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file not exists)";
+		else if (ret == MOD_ERR_FILE_IO)
+			Log(LOG_TERMINAL) << "Error while loading " << modname << " (file IO error, check file permissions and diskspace)";
 		return ret;
+	}
 
 	dlerror();
 	void *handle = dlopen(pbuf.c_str(), RTLD_LAZY);
@@ -209,7 +215,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		return MOD_ERR_VERSION;
 	}
 	else
-		Log(LOG_DEBUG) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
+		Log(LOG_DEBUG_2) << "Module " << modname << " is compiled against current version of Anope " << Anope::VersionShort();
 
 	if (m->type == PROTOCOL && ModuleManager::FindFirstOf(PROTOCOL) != m)
 	{
@@ -217,7 +223,7 @@ ModuleReturn ModuleManager::LoadModule(const Anope::string &modname, User *u)
 		Log() << "You cannot load two protocol modules";
 		return MOD_ERR_UNKNOWN;
 	}
-
+	Log(LOG_DEBUG) << "Module loaded.";
 	FOREACH_MOD(I_OnModuleLoad, OnModuleLoad(u, m));
 
 	return MOD_ERR_OK;

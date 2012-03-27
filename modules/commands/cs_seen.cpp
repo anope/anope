@@ -346,7 +346,8 @@ class CSSeen : public Module
 
 	void OnUserConnect(dynamic_reference<User> &u, bool &exempt) anope_override
 	{
-		UpdateUser(u, NEW, u->nick, "", "", "");
+		if (u)
+			UpdateUser(u, NEW, u->nick, "", "", "");
 	}
 
 	void OnUserNickChange(User *u, const Anope::string &oldnick) anope_override

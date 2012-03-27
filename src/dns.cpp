@@ -144,44 +144,54 @@ void DNSPacket::PackName(unsigned char *output, unsigned short output_size, unsi
 Anope::string DNSPacket::UnpackName(const unsigned char *input, unsigned short input_size, unsigned short &pos)
 {
 	Anope::string name;
-	unsigned short pos_ptr = pos;
+	unsigned short pos_ptr = pos, lowest_ptr = input_size;
+	bool compressed = false;
 
 	if (pos_ptr >= input_size)
-		throw SocketException("Unable to unpack name");
+		throw SocketException("Unable to unpack name - no input");
 
-	unsigned short offset;
-	do
+	while (input[pos_ptr] > 0)
 	{
-		offset = input[pos_ptr];
+		unsigned short offset = input[pos_ptr];
 
 		if (offset & DNS_POINTER)
 		{
+			if ((offset & DNS_POINTER) != DNS_POINTER)
+				throw SocketException("Unable to unpack name - bogus compression header");
 			if (pos_ptr + 1 >= input_size)
-				throw SocketException("Unable to unpack name");
-			offset = (offset & DNS_LABEL) << 8 | input[++pos_ptr];
-			pos_ptr = offset;
-			if (pos_ptr >= input_size)
-				throw SocketException("Unable to unpack name");
-			offset = input[pos_ptr];
-			++pos;
+				throw SocketException("Unable to unpack name - bogus compression header");
+
+			/* Place pos at the second byte of the first (farthest) compression pointer */
+			if (compressed == false)
+			{
+				++pos;
+				compressed = true;
+			}
+
+			pos_ptr = (offset & DNS_LABEL) << 8 | input[pos_ptr + 1];
+
+			/* Pointers can only go back */
+			if (pos_ptr >= lowest_ptr)
+				throw SocketException("Unable to unpack name - bogus compression pointer");
+			lowest_ptr = pos_ptr;
 		}
+		else
+		{
+			if (pos_ptr + offset + 1 >= input_size)
+				throw SocketException("Unable to unpack name - offset too large");
+			if (!name.empty())
+				name += ".";
+			for (unsigned i = 1; i <= offset; ++i)
+				name += input[pos_ptr + i];
 
-		if (pos_ptr + offset >= input_size)
-			throw SocketException("Unable to unpack name");
-		if (!name.empty())
-			name += ".";
-		for (unsigned i = 1; i <= offset; ++i)
-			name += input[pos_ptr + i];
-
-		pos_ptr += offset + 1;
-		if (pos_ptr >= input_size)
-			throw SocketException("Unable to unpack name");
-		offset = input[pos_ptr];
-		if (pos_ptr > pos)
-			pos = pos_ptr;
+			pos_ptr += offset + 1;
+			if (compressed == false)
+				/* Move up pos */
+				pos = pos_ptr;
+		}
 	}
-	while (offset);
 
+	/* +1 pos either to one byte after the compression pointer or one byte after the ending \0 */
 	++pos;
 
 	Log(LOG_DEBUG_2) << "Resolver: UnpackName successfully unpacked " << name;

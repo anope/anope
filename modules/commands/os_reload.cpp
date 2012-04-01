@@ -37,7 +37,7 @@ class CommandOSReload : public Command
 		{
 			Config = old_config;
 			Log() << "Error reloading configuration file: " << ex.GetReason();
-			source.Reply(_("Error reloading confguration file: ") + ex.GetReason());
+			source.Reply(_("Error reloading configuration file: ") + ex.GetReason());
 		}
 
 		return;

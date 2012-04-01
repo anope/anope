@@ -91,7 +91,7 @@ class CommandNSGhost : public Command
 	{
 		this->SendSyntax(source);
 		source.Reply(" ");
-		source.Reply(_("itermminates a \"ghost\" IRC session using your nick.  A\n"
+		source.Reply(_("Terminates a \"ghost\" IRC session using your nick. A\n"
 				"ghost\" session is one which is not actually connected,\n"
 				"but which the IRC server believes is still online for one\n"
 				"reason or another. Typically, this happens if your\n"

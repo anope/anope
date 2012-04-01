@@ -120,7 +120,7 @@ class CommandHSSetAll : public Command
 	CommandHSSetAll(Module *creator) : Command(creator, "hostserv/setall", 2, 2)
 	{
 		this->SetDesc(_("Set the vhost for all nicks in a group"));
-		this->SetSyntax(_("\037nick\037 \037hostmask>\037"));
+		this->SetSyntax(_("\037nick\037 \037hostmask\037"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

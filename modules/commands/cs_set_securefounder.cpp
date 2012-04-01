@@ -61,8 +61,8 @@ class CommandCSSetSecureFounder : public Command
 		source.Reply(" ");
 		source.Reply(_("Enables or disables the \002secure founder\002 option for a channel.\n"
 			"When \002secure founder\002 is set, only the real founder will be\n"
-			"able to drop the channel, change its password, its founder and its\n"
-			"successor, and not those who have founder level access through\n"
+			"able to drop the channel, change its founder and its successor,\n"
+			"and not those who have founder level access through\n"
 			"the access/qop command."));
 		return true;
 	}

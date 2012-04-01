@@ -156,7 +156,7 @@ class CommandMSInfo : public Command
 			if (!mi->memomax)
 			{
 				if (!u->IsServicesOper() && hardmax)
-					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos.  You cannot change this limit."));
+					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos. You cannot change this limit."));
 				else
 					source.Reply(_("Your memo limit is \0020\002; you will not receive any new memos."));
 			}

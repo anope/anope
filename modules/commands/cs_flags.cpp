@@ -306,7 +306,7 @@ class CommandCSFlags : public Command
 		this->SetDesc(_("Modify the list of privileged users"));
 		this->SetSyntax(_("\037channel\037 MODIFY \037mask\037 \037changes\037"));
 		this->SetSyntax(_("\037channel\037 LIST [\037mask\037 | +\037flags\037]"));
-		this->SetSyntax(_("\037channel\037 CLEAR\002"));
+		this->SetSyntax(_("\037channel\037 CLEAR"));
 	}
 
 	void Execute(CommandSource &source, const std::vector<Anope::string> &params) anope_override

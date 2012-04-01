@@ -83,7 +83,7 @@ class GlobalCore : public Module
 	{
 		if (!params.empty() || source.owner->nick != Config->Global)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:\n"), Config->Global.c_str());
+		source.Reply(_("%s commands:"), Config->Global.c_str());
 		return EVENT_CONTINUE;
 	}
 };

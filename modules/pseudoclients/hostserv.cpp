@@ -70,7 +70,7 @@ class HostServCore : public Module
 	{
 		if (!params.empty() || source.owner->nick != Config->HostServ)
 			return EVENT_CONTINUE;
-		source.Reply(_("%s commands:\n"), Config->HostServ.c_str());
+		source.Reply(_("%s commands:"), Config->HostServ.c_str());
 		return EVENT_CONTINUE;
 	}
 };

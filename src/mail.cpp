@@ -41,7 +41,7 @@ void MailThread::Run()
 		fprintf(pipe, "To: %s <%s>\n", MailTo.c_str(), Addr.c_str());
 	else
 		fprintf(pipe, "To: \"%s\" <%s>\n", MailTo.c_str(), Addr.c_str());
-	fprintf(pipe, "Subject: %s\n", Subject.c_str());
+	fprintf(pipe, "Subject: %s\n\n", Subject.c_str());
 	fprintf(pipe, "%s", Message.c_str());
 	fprintf(pipe, "\n.\n");
 

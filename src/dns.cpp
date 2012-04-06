@@ -205,7 +205,7 @@ Question DNSPacket::UnpackQuestion(const unsigned char *input, unsigned short in
 
 	question.name = this->UnpackName(input, input_size, pos);
 
-	if (pos + 4 >= input_size)
+	if (pos + 4 > input_size)
 		throw SocketException("Unable to unpack question");
 
 	question.type = static_cast<QueryType>(input[pos] << 8 | input[pos + 1]);
@@ -221,7 +221,7 @@ ResourceRecord DNSPacket::UnpackResourceRecord(const unsigned char *input, unsig
 {
 	ResourceRecord record = static_cast<ResourceRecord>(this->UnpackQuestion(input, input_size, pos));
 
-	if (pos + 6 >= input_size)
+	if (pos + 6 > input_size)
 		throw SocketException("Unable to unpack resource record");
 
 	record.ttl = (input[pos] << 24) | (input[pos + 1] << 16) | (input[pos + 2] << 8) | input[pos + 3];

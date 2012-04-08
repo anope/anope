@@ -229,8 +229,8 @@ Anope::string SQLiteService::BuildQuery(const SQLQuery &q)
 {
 	Anope::string real_query = q.query;
 
-	for (std::map<Anope::string, Anope::string>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
-		real_query = real_query.replace_all_cs("@" + it->first + "@", "'" + this->Escape(it->second) + "'");
+	for (std::map<Anope::string, QueryData>::const_iterator it = q.parameters.begin(), it_end = q.parameters.end(); it != it_end; ++it)
+		real_query = real_query.replace_all_cs("@" + it->first + "@", (it->second.escape ? ("'" + this->Escape(it->second.data) + "'") : it->second.data));
 
 	return real_query;
 }

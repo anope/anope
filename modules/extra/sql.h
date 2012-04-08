@@ -11,10 +11,17 @@ class SQLException : public ModuleException
 
 /** A SQL query
  */
+
+struct QueryData
+{
+	Anope::string data;
+	bool escape;
+};
+
 struct SQLQuery
 {
 	Anope::string query;
-	std::map<Anope::string, Anope::string> parameters;
+	std::map<Anope::string, QueryData> parameters;
 
 	SQLQuery() { }
 	SQLQuery(const Anope::string &q) : query(q) { }
@@ -36,12 +43,13 @@ struct SQLQuery
 		return !(*this == other);
 	}
 
-	template<typename T> void setValue(const Anope::string &key, const T& value)
+	template<typename T> void setValue(const Anope::string &key, const T& value, bool escape = true)
 	{
 		try
 		{
 			Anope::string string_value = stringify(value);
-			this->parameters[key] = string_value;
+			this->parameters[key].data = string_value;
+			this->parameters[key].escape = escape;
 		}
 		catch (const ConvertException &ex) { }
 	}

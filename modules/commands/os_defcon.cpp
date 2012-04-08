@@ -438,7 +438,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 
@@ -452,7 +452,7 @@ class OSDefcon : public Module
 		return EVENT_CONTINUE;
 	}
 
-	EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name, const Anope::string &) anope_override
+	EventReturn OnChannelModeUnset(Channel *c, User *setter, ChannelModeName Name, const Anope::string &) anope_override
 	{
 		ChannelMode *cm = ModeManager::FindChannelModeByName(Name);
 

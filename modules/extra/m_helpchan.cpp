@@ -22,7 +22,7 @@ class HelpChannel : public Module
 		OnReload();
 	}
 
-	EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param) anope_override
+	EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) anope_override
 	{
 		if (Name == CMODE_OP && c && c->ci && c->name.equals_ci(this->HelpChan))
 		{

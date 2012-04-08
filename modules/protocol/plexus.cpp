@@ -408,7 +408,7 @@ class PlexusIRCdMessage : public IRCdMessage
 			 * This will enforce secureops etc on the user
 			 */
 			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-				c->SetModeInternal(*it, buf);
+				c->SetModeInternal(NULL, *it, buf);
 
 			/* Now set whatever modes this user is allowed to have on the channel */
 			chan_set_correct_modes(u, c, 1);
@@ -514,11 +514,11 @@ bool event_bmask(const Anope::string &source, const std::vector<Anope::string> &
 		{
 			Anope::string b = myStrGetToken(bans, ' ', i);
 			if (ban && params[2].equals_cs("b"))
-				c->SetModeInternal(ban, b);
+				c->SetModeInternal(NULL, ban, b);
 			else if (except && params[2].equals_cs("e"))
-				c->SetModeInternal(except, b);
+				c->SetModeInternal(NULL, except, b);
 			if (invex && params[2].equals_cs("I"))
-				c->SetModeInternal(invex, b);
+				c->SetModeInternal(NULL, invex, b);
 		}
 	}
 	return true;

@@ -94,6 +94,7 @@ class CommandCSInfo : public Command
 			CheckOptStr(optbuf, CI_TOPICLOCK, _("Topic Lock"), ci, u->Account());
 			CheckOptStr(optbuf, CI_PERSIST, _("Persistant"), ci, u->Account());
 			CheckOptStr(optbuf, CI_NO_EXPIRE, _("No expire"), ci, u->Account());
+			CheckOptStr(optbuf, CI_STATS, _("Chanstats"), ci, u->Account());
 
 			info["Options"] = optbuf.empty() ? _("None") : optbuf;
 			info["Mode lock"] = ci->GetMLockAsString(true);

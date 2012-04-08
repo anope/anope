@@ -718,7 +718,7 @@ class InspircdIRCdMessage : public IRCdMessage
 			 * This will enforce secureops etc on the user
 			 */
 			for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-				c->SetModeInternal(*it, buf);
+				c->SetModeInternal(NULL, *it, buf);
 
 			/* Now set whatever modes this user is allowed to have on the channel */
 			chan_set_correct_modes(u, c, 1);

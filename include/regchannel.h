@@ -57,6 +57,8 @@ enum ChannelInfoFlag
 	 * is set or not
 	 */
 	CI_PERSIST,
+	/* Chanstats are enabled */
+	CI_STATS,
 
 	CI_END
 };
@@ -64,7 +66,7 @@ enum ChannelInfoFlag
 const Anope::string ChannelInfoFlagStrings[] = {
 	"BEGIN", "KEEPTOPIC", "SECUREOPS", "PRIVATE", "TOPICLOCK", "RESTRICTED",
 	"PEACE", "SECURE", "NO_EXPIRE", "MEMO_HARDMAX", "SECUREFOUNDER",
-	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", ""
+	"SIGNKICK", "SIGNKICK_LEVEL", "SUSPENDED", "PERSIST", "STATS", ""
 };
 
 /** Flags for badwords

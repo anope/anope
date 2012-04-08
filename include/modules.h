@@ -439,9 +439,10 @@ class CoreExport Module : public Extensible
 
 	/** Called when a new topic is set
 	 * @param c The channel
+	 * @param setter The user who set the new topic
 	 * @param topic The new topic
 	 */
-	virtual void OnTopicUpdated(Channel *c, const Anope::string &topic) { }
+	virtual void OnTopicUpdated(Channel *c, User *setter, const Anope::string &topic) { }
 
 	/** Called before a channel expires
 	 * @param ci The channel
@@ -847,19 +848,21 @@ class CoreExport Module : public Extensible
 
 	/** Called when a mode is set on a channel
 	 * @param c The channel
+	 * @param setter The user who is setting the mode
 	 * @param Name The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeSet(Channel *c, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeSet(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is unset on a channel
 	 * @param c The channel
+	 * @param setter the user who is unsetting the mode
 	 * @param Name The mode name
 	 * @param param The mode param, if there is one
 	 * @return EVENT_STOP to make mlock/secureops etc checks not happen
 	 */
-	virtual EventReturn OnChannelModeUnset(Channel *c, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
+	virtual EventReturn OnChannelModeUnset(Channel *c, User *setter, ChannelModeName Name, const Anope::string &param) { return EVENT_CONTINUE; }
 
 	/** Called when a mode is set on a user
 	 * @param u The user

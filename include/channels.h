@@ -135,18 +135,20 @@ class CoreExport Channel : public Base, public Extensible, public Flags<ChannelF
 	std::pair<ModeList::iterator, ModeList::iterator> GetModeList(ChannelModeName Name);
 
 	/** Set a mode internally on a channel, this is not sent out to the IRCd
+	 * @param setter The setter
 	 * @param cm The mode
 	 * @param param The param
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void SetModeInternal(ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void SetModeInternal(User *setter, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Remove a mode internally on a channel, this is not sent out to the IRCd
+	 * @param setter The Setter
 	 * @param cm The mode
 	 * @param param The param
 	 * @param EnforceMLock true if mlocks should be enforced, false to override mlock
 	 */
-	void RemoveModeInternal(ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
+	void RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::string &param = "", bool EnforceMLock = true);
 
 	/** Set a mode on a channel
 	 * @param bi The client setting the modes

@@ -879,19 +879,19 @@ class Unreal32IRCdMessage : public IRCdMessage
 			if (keep_their_modes && ban && buf[0] == '&')
 			{
 				buf.erase(buf.begin());
-				c->SetModeInternal(ban, buf);
+				c->SetModeInternal(NULL, ban, buf);
 			}
 			/* Except */
 			else if (keep_their_modes && except && buf[0] == '"')
 			{
 				buf.erase(buf.begin());
-				c->SetModeInternal(except, buf);
+				c->SetModeInternal(NULL, except, buf);
 			}
 			/* Invex */
 			else if (keep_their_modes && invex && buf[0] == '\'')
 			{
 				buf.erase(buf.begin());
-				c->SetModeInternal(invex, buf);
+				c->SetModeInternal(NULL, invex, buf);
 			}
 			else
 			{
@@ -930,7 +930,7 @@ class Unreal32IRCdMessage : public IRCdMessage
 				 * This will enforce secureops etc on the user
 				 */
 				for (std::list<ChannelMode *>::iterator it = Status.begin(), it_end = Status.end(); it != it_end; ++it)
-					c->SetModeInternal(*it, buf);
+					c->SetModeInternal(NULL, *it, buf);
 
 				/* Now set whatever modes this user is allowed to have on the channel */
 				chan_set_correct_modes(u, c, 1);

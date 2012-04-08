@@ -97,6 +97,8 @@ enum NickCoreFlag
 	/* If set means the nick core does not have their email addrses confirmed.
 	 */
 	NI_UNCONFIRMED,
+	/* Chanstats are enabled for this user */
+	NI_STATS,
 
 	NI_END
 };
@@ -104,7 +106,7 @@ enum NickCoreFlag
 const Anope::string NickCoreFlagStrings[] = {
 	"BEGIN", "KILLPROTECT", "SECURE", "MSG", "MEMO_HARDMAX", "MEMO_SIGNON", "MEMO_RECEIVE",
 	"PRIVATE", "HIDE_EMAIL", "HIDE_MASK", "HIDE_QUIT", "KILL_QUICK", "KILL_IMMED",
-	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", ""
+	"MEMO_MAIL", "HIDE_STATUS", "SUSPENDED", "AUTOOP", "FORBIDDEN", "UNCONFIRMED", "STATS", ""
 };
 
 class CoreExport NickAlias : public Base, public Extensible, public Flags<NickNameFlag, NS_END>, public Serializable

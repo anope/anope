@@ -120,6 +120,7 @@ class CommandNSInfo : public Command
 				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_MSG, _("Message mode"), na->nc);
 				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_AUTOOP, _("Auto-op"), na->nc);
 				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_SUSPENDED, _("Suspended"), na->nc);
+				CheckOptStr<NickCoreFlag, NI_END>(u, optbuf, NI_STATS, _("Chanstats"), na->nc);
 				CheckOptStr<NickNameFlag, NS_END>(u, optbuf, NS_NO_EXPIRE, _("No expire"), na);
 
 				info[_("Options")] = optbuf.empty() ? _("None") : optbuf;

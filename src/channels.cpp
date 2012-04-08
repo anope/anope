@@ -332,17 +332,18 @@ std::pair<Channel::ModeList::iterator, Channel::ModeList::iterator> Channel::Get
 }
 
 /** Set a mode internally on a channel, this is not sent out to the IRCd
+ * @param setter The user who is setting the mode
  * @param cm The mode
  * @param param The param
  * @param EnforeMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::SetModeInternal(User *setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, cm->Name, param));
+	FOREACH_RESULT(I_OnChannelModeSet, OnChannelModeSet(this, setter, cm->Name, param));
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->Type == MODE_STATUS)
@@ -406,17 +407,18 @@ void Channel::SetModeInternal(ChannelMode *cm, const Anope::string &param, bool 
 }
 
 /** Remove a mode internally on a channel, this is not sent out to the IRCd
+ * @param setter The user who is unsetting the mode
  * @param cm The mode
  * @param param The param
  * @param EnforceMLock true if mlocks should be enforced, false to override mlock
  */
-void Channel::RemoveModeInternal(ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
+void Channel::RemoveModeInternal(User *setter, ChannelMode *cm, const Anope::string &param, bool EnforceMLock)
 {
 	if (!cm)
 		return;
 
 	EventReturn MOD_RESULT;
-	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, cm->Name, param));
+	FOREACH_RESULT(I_OnChannelModeUnset, OnChannelModeUnset(this, setter, cm->Name, param));
 
 	/* Setting v/h/o/a/q etc */
 	if (cm->Type == MODE_STATUS)
@@ -535,7 +537,7 @@ void Channel::SetMode(BotInfo *bi, ChannelMode *cm, const Anope::string &param, 
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, true, param);
-	SetModeInternal(cm, param, EnforceMLock);
+	SetModeInternal(bi ? finduser(bi->nick) : NULL, cm, param, EnforceMLock);
 }
 
 /**
@@ -587,7 +589,7 @@ void Channel::RemoveMode(BotInfo *bi, ChannelMode *cm, const Anope::string &para
 	}
 
 	ModeManager::StackerAdd(bi, this, cm, false, realparam);
-	RemoveModeInternal(cm, realparam, EnforceMLock);
+	RemoveModeInternal(bi ? finduser(bi->nick) : NULL, cm, realparam, EnforceMLock);
 }
 
 /**
@@ -725,9 +727,9 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 		if (cm->Type == MODE_REGULAR)
 		{
 			if (add)
-				this->SetModeInternal(cm, "", EnforceMLock);
+				this->SetModeInternal(setter, cm, "", EnforceMLock);
 			else
-				this->RemoveModeInternal(cm, "", EnforceMLock);
+				this->RemoveModeInternal(setter, cm, "", EnforceMLock);
 			continue;
 		}
 		else if (cm->Type == MODE_PARAM)
@@ -736,7 +738,7 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 
 			if (!add && cmp->MinusNoArg)
 			{
-				this->RemoveModeInternal(cm, "", EnforceMLock);
+				this->RemoveModeInternal(setter, cm, "", EnforceMLock);
 				continue;
 			}
 		}
@@ -750,9 +752,9 @@ void Channel::SetModesInternal(User *setter, const Anope::string &mode, bool Enf
 				paramstring += " " + token;
 
 			if (add)
-				this->SetModeInternal(cm, token, EnforceMLock);
+				this->SetModeInternal(setter, cm, token, EnforceMLock);
 			else
-				this->RemoveModeInternal(cm, token, EnforceMLock);
+				this->RemoveModeInternal(setter, cm, token, EnforceMLock);
 		}
 		else
 			Log() << "warning: Channel::SetModesInternal() recieved more modes requiring params than params, modes: " << mode;
@@ -874,7 +876,7 @@ void Channel::ChangeTopicInternal(const Anope::string &user, const Anope::string
 
 	Log(LOG_DEBUG) << "Topic of " << this->name << " changed by " << user << " to " << newtopic;
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, this->topic));
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, u, this->topic));
 
 	if (this->ci)
 	{
@@ -891,7 +893,7 @@ void Channel::ChangeTopic(const Anope::string &user, const Anope::string &newtop
 
 	ircdproto->SendTopic(this->ci->WhoSends(), this);
 
-	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, this->topic));
+	FOREACH_MOD(I_OnTopicUpdated, OnTopicUpdated(this, u, this->topic));
 
 	if (this->ci)
 	{

@@ -70,7 +70,7 @@ Server::Server(Server *uplink, const Anope::string &name, unsigned hops, const A
 							if (cm == NULL)
 								cm = ModeManager::FindChannelModeByChar(ModeManager::GetStatusChar(want_modes[j]));
 							if (cm && cm->Type == MODE_STATUS)
-								c->SetModeInternal(bi ? finduser(bi->nick) : NULL, cm, bi->nick);
+								c->SetModeInternal(bi, cm, bi->nick);
 						}
 					}
 				}

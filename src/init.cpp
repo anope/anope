@@ -252,12 +252,9 @@ void Fork()
 #ifndef _WIN32
 	kill(getppid(), SIGUSR2);
 	
-	if (isatty(fileno(stdout)))
-		fclose(stdout);
-	if (isatty(fileno(stdin))) 
-		fclose(stdin);
-	if (isatty(fileno(stderr)))
-		fclose(stderr);
+	freopen("/dev/null", "r", stdin);
+	freopen("/dev/null", "w", stdout);
+	freopen("/dev/null", "w", stderr);
 
 	setpgid(0, 0);
 #else

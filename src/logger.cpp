@@ -161,10 +161,7 @@ Log::~Log()
 	else if (nofork && this->Type <= LOG_TERMINAL)
 		std::cout << GetTimeStamp() << " " << this->BuildPrefix() << this->buf.str() << std::endl;
 	else if (this->Type == LOG_TERMINAL)
-	{
-		if (AtTerm())
-			std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
-	}
+		std::cout << this->BuildPrefix() << this->buf.str() << std::endl;
 	for (unsigned i = 0; Config && i < Config->LogInfos.size(); ++i)
 	{
 		LogInfo *l = Config->LogInfos[i];
